@@ -1,0 +1,624 @@
+
+ALCATEL-IND1-TRAP-MGR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	IpAddress,
+	Unsigned32,
+	NOTIFICATION-TYPE 	FROM SNMPv2-SMI
+	RowStatus,
+	DisplayString 		FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP 	FROM SNMPv2-CONF
+	softentIND1TrapMgr,
+	trapMgrTraps 		FROM ALCATEL-IND1-BASE
+        InetAddressType, InetAddress    FROM INET-ADDRESS-MIB;
+
+
+alcatelIND1TrapMgrMIB  MODULE-IDENTITY
+	LAST-UPDATED  "200708070000Z"
+	ORGANIZATION "Alcatel-Lucent"
+	CONTACT-INFO
+	    "Please consult with Customer Service to ensure the most appropriate
+	     version of this document is used with the products in question:
+ 
+			Alcatel-Lucent, Enterprise Solutions Division
+		       (Formerly Alcatel Internetworking, Incorporated)
+			       26801 West Agoura Road
+			    Agoura Hills, CA  91301-5122
+			      United States Of America
+	
+	    Telephone:               North America  +1 800 995 2696
+				     Latin America  +1 877 919 9526
+				     Europe         +31 23 556 0100
+				     Asia           +65 394 7933
+				     All Other      +1 818 878 4507
+	
+	    Electronic Mail:         support@ind.alcatel.com
+	    World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+	    File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+	DESCRIPTION
+	    "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+                 For the Birds Of Prey Product Line
+                 Trap Manager Subsystem.
+         
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+         
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+         
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+         
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+	REVISION      "200708070000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+	::= { softentIND1TrapMgr 1 }
+
+
+    alcatelIND1TrapMgrMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Trap Manager Subsystem Managed Objects."
+        ::= { alcatelIND1TrapMgrMIB 1 }
+
+
+    alcatelIND1TrapMgrMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Trap Manager Subsystem Conformance Information."
+        ::= { alcatelIND1TrapMgrMIB 2 }
+
+
+    alcatelIND1TrapMgrMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Trap Manager Subsystem Units Of Conformance."
+        ::= { alcatelIND1TrapMgrMIBConformance 1 }
+
+
+    alcatelIND1TrapMgrMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For SNMP Agent Subsystem Compliance Statements."
+        ::= { alcatelIND1TrapMgrMIBConformance 2 }
+
+-- 
+-- Trap Manager configuration
+-- 
+
+trapMgt  OBJECT IDENTIFIER ::= { alcatelIND1TrapMgrMIBObjects 1 }
+
+
+trapConfigTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TrapConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The trap configuration table."
+	::= { trapMgt 1 }
+
+trapConfigEntry  OBJECT-TYPE
+	SYNTAX  TrapConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A trap configuration entry."
+	INDEX { trapIndex }
+	::= { trapConfigTable 1 }
+
+TrapConfigEntry ::= SEQUENCE {
+	trapIndex		INTEGER,
+	trapName		DisplayString,
+	trapFamily		DisplayString, 
+	trapAbsorbPeriod	INTEGER}
+
+trapIndex  OBJECT-TYPE
+	SYNTAX  INTEGER (0..1024)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Trap identifier."
+	::= { trapConfigEntry 1 }
+
+trapName  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Trap name."
+	::= { trapConfigEntry 2 }
+
+trapFamily  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Trap family name."
+	::= { trapConfigEntry 3 }
+
+trapAbsorbPeriod  OBJECT-TYPE
+	SYNTAX  INTEGER (0..3600)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"at maximum, one instance of this trap
+		 is sent out within the period.
+		 value 0 : the trap is not absorbed."
+	::= { trapConfigEntry 4 }
+
+
+trapStationTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TrapStationEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list of management stations."
+	::= { trapMgt 2 }
+
+trapStationEntry  OBJECT-TYPE
+	SYNTAX  TrapStationEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A management station entry."
+	INDEX { trapStationIP }
+	::= { trapStationTable 1 }
+
+TrapStationEntry ::= SEQUENCE {
+	trapStationIP		IpAddress,
+	trapStationPort		Unsigned32,
+	trapStationRowStatus	RowStatus,
+	trapStationProtocol	INTEGER,
+	trapStationUser		DisplayString,
+	trapStationReplay	Unsigned32,
+	trapStationNextSeq	Unsigned32 }
+
+trapStationIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The IP address of this management entity."
+	::= { trapStationEntry 1 }
+
+trapStationPort  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"The UDP port used by this management entity.
+		 This defaults to the SNMP-TRAP port 162."
+	DEFVAL { 162 }
+	::= { trapStationEntry 2 }
+
+trapStationRowStatus  OBJECT-TYPE
+	SYNTAX  RowStatus
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"Reading or writting values :
+		 - active (1) : traps enabled to the station
+		 - notInService (2) : traps disabled to the station
+		 Only reading values :
+		 - notReady (3) : missing parameters for the station
+		 Only writting values :
+		 - createAndGo (4) : to create an active station
+		 - createAndWait (5) : to create a notInService station
+		 - destroy (6) : to remove a station."
+	::= { trapStationEntry 3 }
+ 
+trapStationProtocol  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		v1 (1),
+		v2 (2),
+		v3 (3) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"The type of protocol used to send the traps
+		 to the station.
+		 The different values are :
+		 v1 : the traps are sent using SNMPv1.
+		 v2 : the traps are sent using SNMPv2.
+		 v3 : the traps are sent using SNMPv3."
+	DEFVAL { v3 }
+	::= { trapStationEntry 4 }
+
+trapStationUser  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..32))
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"User name used to send the trap to the station.
+		 This name must correspond to an existing user
+		 account name."
+	::= { trapStationEntry 5 }
+
+trapStationReplay  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"The replay value. The switch is required
+		 to send the last known traps for this station 
+		 from the replay value."
+	DEFVAL { 0 }
+	::= { trapStationEntry 6 }
+
+
+trapStationNextSeq  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The sequence number of the next trap generated
+		 for this station."
+	DEFVAL { 0 }
+	::= { trapStationEntry 7 }
+
+
+trapFilterTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TrapFilterEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The trap filtering table for each individual trap."
+	::= { trapMgt 3 }
+
+trapFilterEntry  OBJECT-TYPE
+	SYNTAX  TrapFilterEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A trap filter entry."
+	INDEX { trapStationIP, trapIndex }
+	::= { trapFilterTable 1 }
+
+TrapFilterEntry ::= SEQUENCE {
+	trapFilterStatus	INTEGER }
+
+trapFilterStatus  OBJECT-TYPE
+	SYNTAX  INTEGER { on(1), off(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"For the individual filtering :
+		 on :  the filter is activated, the traps identified
+		       by trapFilterId can not be sent to the SNMP
+		       manager identified by trapStationIP.
+		 off : no filter is activated."
+	DEFVAL { off }
+	::= { trapFilterEntry 1 }
+
+
+trapAbsorption OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enable(1),
+		disable(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"enable : the trap absorption service is enabled
+		 disable : the trap absorption service is disabled."
+	DEFVAL { enable }
+	::= { trapMgt 4 }
+
+trapToWebView OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enable(1),
+		disable(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"enable : the traps are forwarded to WebView
+		 disable : the traps are not forwarded to WebView."
+	DEFVAL { enable }
+	::= { trapMgt 5 }
+
+
+alaTrapInetStationTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlaTrapInetStationEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list of management stations."
+	::= { trapMgt 6 }
+
+alaTrapInetStationEntry  OBJECT-TYPE
+	SYNTAX  AlaTrapInetStationEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A management station entry."
+	INDEX { alaTrapInetStationIPType, alaTrapInetStationIP }
+	::= { alaTrapInetStationTable 1 }
+
+AlaTrapInetStationEntry ::= SEQUENCE {
+	alaTrapInetStationIPType	InetAddressType,
+	alaTrapInetStationIP		InetAddress,
+	alaTrapInetStationPort		Unsigned32,
+	alaTrapInetStationRowStatus	RowStatus,
+	alaTrapInetStationProtocol	INTEGER,
+	alaTrapInetStationUser		DisplayString,
+	alaTrapInetStationReplay	Unsigned32,
+	alaTrapInetStationNextSeq	Unsigned32 }
+
+alaTrapInetStationIPType  OBJECT-TYPE
+	SYNTAX  InetAddressType
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The value of alaTrapInetStationIPType indicates the IP 
+ 	address type for alaTrapInetStationIP."
+	::= { alaTrapInetStationEntry 1 }
+
+alaTrapInetStationIP  OBJECT-TYPE
+	SYNTAX  InetAddress (SIZE (4 | 16))
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The IP address of this management entity. The address type of 
+ 	alaTrapInetStationIP is indicated by alaTrapInetStationIPType."
+	::= { alaTrapInetStationEntry 2 }
+
+alaTrapInetStationPort  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"The UDP port used by this management entity.
+		 This defaults to the SNMP-TRAP port 162."
+	DEFVAL { 162 }
+	::= { alaTrapInetStationEntry 3 }
+
+alaTrapInetStationRowStatus  OBJECT-TYPE
+	SYNTAX  RowStatus
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"Reading or writting values :
+		 - active (1) : traps enabled to the station
+		 - notInService (2) : traps disabled to the station
+		 Only reading values :
+		 - notReady (3) : missing parameters for the station
+		 Only writting values :
+		 - createAndGo (4) : to create an active station
+		 - createAndWait (5) : to create a notInService station
+		 - destroy (6) : to remove a station."
+	::= { alaTrapInetStationEntry 4 }
+ 
+alaTrapInetStationProtocol  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		v1 (1),
+		v2 (2),
+		v3 (3) }
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"The type of protocol used to send the traps
+		 to the station.
+		 The different values are :
+		 v1 : the traps are sent using SNMPv1.
+		 v2 : the traps are sent using SNMPv2.
+		 v3 : the traps are sent using SNMPv3."
+	DEFVAL { v3 }
+	::= { alaTrapInetStationEntry 5 }
+
+alaTrapInetStationUser  OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..32))
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"User name used to send the trap to the station.
+		 This name must correspond to an existing user
+		 account name."
+	::= { alaTrapInetStationEntry 6 }
+
+alaTrapInetStationReplay  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"The replay value. The switch is required
+		 to send the last known traps for this station 
+		 from the replay value."
+	DEFVAL { 0 }
+	::= { alaTrapInetStationEntry 7 }
+
+
+alaTrapInetStationNextSeq  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The sequence number of the next trap generated
+		 for this station."
+	DEFVAL { 0 }
+	::= { alaTrapInetStationEntry 8 }
+
+
+alaTrapInetFilterTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlaTrapInetFilterEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The trap filtering table for each individual trap."
+	::= { trapMgt 7 }
+
+alaTrapInetFilterEntry  OBJECT-TYPE
+	SYNTAX  AlaTrapInetFilterEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A trap filter entry."
+	INDEX { alaTrapInetStationIPType, alaTrapInetStationIP, trapIndex }
+	::= { alaTrapInetFilterTable 1 }
+
+AlaTrapInetFilterEntry ::= SEQUENCE {
+	alaTrapInetFilterStatus	INTEGER }
+
+alaTrapInetFilterStatus  OBJECT-TYPE
+	SYNTAX  INTEGER { on(1), off(2) }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"For the individual filtering :
+		 on :  the filter is activated, the traps identified
+		       by trapFilterId can not be sent to the SNMP
+		       manager identified by alaTrapInetStationIP.
+		 off : no filter is activated."
+	DEFVAL { off }
+	::= { alaTrapInetFilterEntry 1 }
+
+
+--
+-- Trap description
+--
+
+trapAbsorptionTrap  NOTIFICATION-TYPE
+	OBJECTS
+	{
+		trapAbsorStamp,
+		trapAbsorTrapId,
+		trapAbsorCounter,
+		trapAbsorTime
+	}
+	STATUS  current
+	DESCRIPTION
+		"The absorption Trap is sent when a trap has been
+		 absorbed at least once."
+	::= { trapMgrTraps 0 1 }
+
+--
+-- Objects used in the absorption trap
+--
+
+trapNotif  OBJECT IDENTIFIER ::= { alcatelIND1TrapMgrMIBObjects 3 }
+
+trapAbsorStamp  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The time stamp of the absorbed trap."
+	::= { trapNotif 1 }
+
+trapAbsorTrapId  OBJECT-TYPE
+	SYNTAX  INTEGER (0..1024)
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The trap identifier of the absorbed trap."
+	::= { trapNotif 2 }
+
+trapAbsorCounter  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION   
+		"The number of the iterations of the absorbed trap."
+	::= { trapNotif 3 }
+
+trapAbsorTime  OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The time stamp of the last iteration."
+	::= { trapNotif 4 }
+
+
+--
+-- Compliance Statements
+--
+
+    alcatelIND1TrapMgrMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Trap Manager Subsystem."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS
+            {
+                trapMgtGroup,
+                trapTrapsGroup,
+                trapNotifGroup
+            }
+
+        ::= { alcatelIND1TrapMgrMIBCompliances 1 }
+
+
+--
+-- Units Of Conformance
+--
+
+     trapMgtGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    trapIndex,
+	    trapName,
+	    trapFamily,
+	    trapAbsorbPeriod,
+	    trapStationIP,
+	    trapStationPort,
+	    trapStationRowStatus,
+	    trapStationProtocol,
+	    trapStationUser,
+	    trapStationReplay,
+	    trapStationNextSeq,
+	    trapFilterStatus,
+	    trapAbsorption,
+	    trapToWebView,
+	    alaTrapInetStationPort,
+	    alaTrapInetStationRowStatus,
+	    alaTrapInetStationProtocol,
+	    alaTrapInetStationUser,
+	    alaTrapInetStationReplay,
+	    alaTrapInetStationNextSeq,
+	    alaTrapInetFilterStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for Trap Management."
+        ::= { alcatelIND1TrapMgrMIBGroups 1 }
+
+
+    trapTrapsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS
+	{
+	    trapAbsorptionTrap
+	}
+        STATUS  current
+        DESCRIPTION
+            "Collection of notifications for Trap Management."
+        ::= { alcatelIND1TrapMgrMIBGroups 2 }
+
+
+     trapNotifGroup OBJECT-GROUP
+        OBJECTS
+        {
+	    trapAbsorStamp,
+	    trapAbsorTrapId,
+	    trapAbsorCounter,
+	    trapAbsorTime
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects
+	     for Trap Management notifications."
+        ::= { alcatelIND1TrapMgrMIBGroups 3 }
+
+
+END

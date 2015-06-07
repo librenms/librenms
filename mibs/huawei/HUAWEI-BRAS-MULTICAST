@@ -1,0 +1,254 @@
+--  ==================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI BRAS Management MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              V1.0 YangChangMao, 2007-06-14, publish
+-- ==================================================================
+
+HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
+    
+    IMPORTS
+        hwBRASMib            
+            FROM HUAWEI-MIB
+        
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF            
+
+        IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
+        NOTIFICATION-TYPE            
+            FROM SNMPv2-SMI            
+        RowStatus, DisplayString
+            FROM SNMPv2-TC;
+
+        hwMulticastVirtualAdjust MODULE-IDENTITY 
+            LAST-UPDATED "200705121200Z"        -- May 12, 2007 at 12:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd."
+            CONTACT-INFO 
+                "R&D NanJing, Huawei Technologies co.,Ltd.
+                Huihong Bld.,NO.91 Baixia Rd., 
+                Bai-Xia District Nanjing P.R. China
+                Zip:210001 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com"
+            DESCRIPTION 
+                "The HUAWEI-BRAS-MULTICAST-MIB contains objects to
+                manage BRAS."
+            ::= { hwBRASMib 17 }
+
+--
+-- Node definitions
+--
+    
+    hwMulticastVirtualAdjustMibObjects OBJECT IDENTIFIER ::= { hwMulticastVirtualAdjust 1 }    
+
+--
+-- Multicast Virtual Adjust Set Band Table
+--
+    hwMulticastVirtualAdjustSetBandTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMulticastVirtualAdjustSetBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of setting multicast program bandwidth."
+        ::= { hwMulticastVirtualAdjustMibObjects 1 }
+
+    
+    hwMulticastVirtualAdjustSetBandEntry OBJECT-TYPE
+        SYNTAX HwMulticastVirtualAdjustSetBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Setting multicast program bandwidth entry."
+        INDEX { 
+            hwMulticastVirtualAdjustSetBandListIndex
+        }
+        ::= { hwMulticastVirtualAdjustSetBandTable 1 }
+
+    
+        HwMulticastVirtualAdjustSetBandEntry ::=
+        SEQUENCE { 
+            hwMulticastVirtualAdjustSetBandListIndex
+                Integer32,
+            hwMulticastVirtualAdjustSetBandType
+                INTEGER,
+            hwMulticastVirtualAdjustSetBandValue
+                Integer32,
+            hwMulticastVirtualAdjustSetBandDetectInterval
+                Integer32,
+            hwMulticastVirtualAdjustSetBandThreshold
+                Integer32,
+            hwMulticastVirtualAdjustSetBandRowStatus
+                RowStatus
+         }
+
+    hwMulticastVirtualAdjustSetBandListIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..8191)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Start of multicast list index."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 1 }
+
+    
+    hwMulticastVirtualAdjustSetBandType OBJECT-TYPE
+        SYNTAX INTEGER {dynamic(1),static(2)}
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Type of multicast program bandwidth configured."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 2 }
+
+    
+    hwMulticastVirtualAdjustSetBandValue OBJECT-TYPE
+        SYNTAX Integer32 (10..400000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Bandwidth of multicast program.
+             units:Kbps(kbit/s)."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 3 }
+
+    
+    hwMulticastVirtualAdjustSetBandDetectInterval OBJECT-TYPE
+        SYNTAX Integer32 (15..1800)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Detect interval of dynamic bandwidth statistics.
+             units:second."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 4 }
+
+    
+    hwMulticastVirtualAdjustSetBandThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ratio of bandwidth variation."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 5 }
+
+    hwMulticastVirtualAdjustSetBandRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "used to manage the creation and deletion of multicast virtual adjust band setting rows."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 6 }
+
+
+--
+-- Multicast Virtual Adjust Show Band Table
+--
+        hwMulticastVirtualAdjustShowBandTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMulticastVirtualAdjustShowBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of displaying multicast program bandwidth."
+        ::= { hwMulticastVirtualAdjustMibObjects 2 }
+
+    
+    hwMulticastVirtualAdjustShowBandEntry OBJECT-TYPE
+        SYNTAX HwMulticastVirtualAdjustShowBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Bandwidth display entry."
+        INDEX { 
+            hwMulticastVirtualAdjustShowBandListIndex,
+            hwMulticastVirtualAdjustShowBandSourceIp,
+            hwMulticastVirtualAdjustShowBandGroupIp
+        }
+        ::= { hwMulticastVirtualAdjustShowBandTable 1 }
+
+    
+    HwMulticastVirtualAdjustShowBandEntry ::=
+        SEQUENCE { 
+            hwMulticastVirtualAdjustShowBandListIndex
+                Integer32,
+            hwMulticastVirtualAdjustShowBandSourceIp
+                IpAddress,
+            hwMulticastVirtualAdjustShowBandGroupIp
+                IpAddress,
+            hwMulticastVirtualAdjustShowBandwidth
+                Integer32
+         }
+
+    hwMulticastVirtualAdjustShowBandListIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..8191)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index of multicast list."
+        ::= { hwMulticastVirtualAdjustShowBandEntry 1 }
+
+    
+    hwMulticastVirtualAdjustShowBandSourceIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Source address of multicast program."
+        ::= { hwMulticastVirtualAdjustShowBandEntry 2 }
+
+    
+    hwMulticastVirtualAdjustShowBandGroupIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Group address of multicast program."
+        ::= { hwMulticastVirtualAdjustShowBandEntry 3 }
+
+    
+    hwMulticastVirtualAdjustShowBandwidth OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bandwidth of multicast program.
+             units:Kbps(kbit/s)"
+        ::= { hwMulticastVirtualAdjustShowBandEntry 4 }     
+        
+--
+--  Conformance information
+--
+
+        hwMulticastMIBConformance OBJECT IDENTIFIER ::= { hwMulticastVirtualAdjust 2 }
+        
+        hwMulticastMIBCompliances OBJECT IDENTIFIER ::= { hwMulticastMIBConformance 1 }
+        
+--
+--  this module
+--
+        hwMulticastMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-DATACOMM-OID-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwMulticastGroup }
+            ::= { hwMulticastMIBCompliances 1 }
+        
+        hwMulticastMIBGroups OBJECT IDENTIFIER ::= { hwMulticastMIBConformance 2 }
+        
+        hwMulticastGroup OBJECT-GROUP
+            OBJECTS { 
+            hwMulticastVirtualAdjustSetBandType,
+            hwMulticastVirtualAdjustSetBandValue,
+            hwMulticastVirtualAdjustSetBandDetectInterval,
+            hwMulticastVirtualAdjustSetBandThreshold,
+            hwMulticastVirtualAdjustSetBandRowStatus,
+            hwMulticastVirtualAdjustShowBandwidth           
+            }
+            STATUS current
+            DESCRIPTION 
+                "The hwMulticast group."
+            ::= { hwMulticastMIBGroups 1 }       
+END
+        
+        

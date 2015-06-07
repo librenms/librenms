@@ -1,0 +1,447 @@
+
+BAY-STACK-ADAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress, RowStatus
+        FROM SNMPv2-TC
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackAdacMib MODULE-IDENTITY
+    LAST-UPDATED    "200610160000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "Nortel Networks Auto-Discovery/Auto-Configuration of Nortel IP
+         Phones MIB
+
+         Copyright 2004 Nortel Networks, Inc.
+         All rights reserved.
+         This Nortel Networks SNMP Management Information Base
+         Specification embodies Nortel Networks' confidential and
+         proprietary intellectual property. Nortel Networks retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Nortel Networks
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200610160000Z" -- 16 October 2006
+    DESCRIPTION "v5:  Added bsAdacPortOperEnable, bsAdacPortMacDetectionEnable,
+	              bsAdacPortLldpDetectionEnable, bsAdacPortOperDisabledNotification"
+
+    REVISION "200605240000Z" -- 24 May 2006
+    DESCRIPTION "v4:  Removed untagAll enumeration."
+
+    REVISION "200603130000Z" -- 13 March 2006
+    DESCRIPTION "v3:  Added bsAdacOperEnable, bsAdacPortTaggedFramesPvid,
+                      bsAdacPortTaggedFramesTagging and bsAdacPortType"
+
+    REVISION "200504120000Z" -- 12 April 2005
+    DESCRIPTION "v2:  Added support for MAC Address Ranges"
+
+    REVISION "200412130000Z" -- 13 December 2004
+    DESCRIPTION "v1:  Initial version."
+
+    ::= { bayStackMibs 9 }
+
+bsAdacNotifications OBJECT IDENTIFIER ::= { bayStackAdacMib 0 }
+bsAdacObjects       OBJECT IDENTIFIER ::= { bayStackAdacMib 1 }
+
+
+--
+-- ADAC Scalar Objects
+--
+
+bsAdacScalars OBJECT IDENTIFIER ::= { bsAdacObjects 1 }
+
+bsAdacAdminEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to administratively enable or disable ADAC.
+         A value of true(1) means ADAC should be enabled, while a value
+         of false(2) means ADAC should be disabled.  Note that ADAC might
+         remain operationally disabled due to other conditions (such as
+         missing Uplink and Call Server ports).  To determine whether
+         ADAC is operationally enabled, see bsAdacOperEnable."
+    ::= { bsAdacScalars 2 }
+
+bsAdacOperatingMode OBJECT-TYPE
+    SYNTAX      INTEGER   {
+                  untaggedFramesBasic(1),
+                  untaggedFramesAdvanced(2),
+                  taggedFrames(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This operating mode must be set depending on how the
+         IP Phones are configured to send frames (tagged/untagged)
+         and on the desired level of complexity for auto-configuration.
+
+         A value of untaggedFramesBasic(1) means that the IP Phones are
+         configured to send untagged frames and no Voice-VLAN will be
+         created (only apply QoS).
+
+         A value of untaggedFramesAdvanced(2) means that the IP Phones are
+         configured to send untagged frames and the Voice-VLAN will be
+         created too, beside applying QoS.
+
+         A value of taggedFrames(3) means that the IP Phones are
+         configured to send tagged frames; the Voice-VLAN will be
+         created and QoS will be applied accordingly.
+
+         This object cannot take the value untaggedFramesAdvanced(2) or
+         taggedFrames(3) if bsAdacVoiceVlan has the value 0, or if both
+         bsAdacCallServerPort and bsAdacUplinkPort have the value 0."
+    ::= { bsAdacScalars 3 }
+
+bsAdacCallServerPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The port on which the Call Server is connected.  This value
+         is used only when the current operating mode is either
+         untaggedFramesAdvanced(2) or taggedFrames(3).  It may not
+         be changed to 0 if the current operating mode is one of
+         these values."
+    ::= { bsAdacScalars 4 }
+
+bsAdacUplinkPort OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The uplink port is used usually when the Call Server is not
+         connected directly to the current module/stack.  This value
+         is used only when the current operating mode is either
+         untaggedFramesAdvanced(2) or taggedFrames(3).  It may not
+         be changed to 0 if the current operating mode is one of
+         these values."
+    ::= { bsAdacScalars 5 }
+
+bsAdacVoiceVlan OBJECT-TYPE
+    SYNTAX      INTEGER (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A value that uniquely identifies the Voice Virtual LAN associated
+         with ADAC.  This value it is used only when the current operating
+         mode is untaggedFramesAdvanced(2) or taggedFrames(3).  It may not
+         be changed to 0 if the current operating mode is one of these
+         values."
+    ::= { bsAdacScalars 6 }
+
+bsAdacNotificationControlEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object controls whether port status changes will result in
+         generation of a bsAdacPortConfigNotification.  The value true(1)
+         means that the notifications will be generated.  The value false(2)
+         means that they will not be generated."
+    ::= { bsAdacScalars 7 }
+
+bsAdacMacAddrRangeControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    clearTable(2),
+                    defaultTable(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object always returns none(1) when retrieved.  When set to
+         clearTable(2), it will delete all entries from the bsAdacMacAddrRangeTable.
+         When set to defaultTable(3), it will delete all entries from the
+         bsAdacMacAddrRangeTable and replace them with factory default entries."
+    ::= { bsAdacScalars 8 }
+
+bsAdacOperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether ADAC is operationally enabled.  A value of
+         true(1) indicates that it is enabled, while a value of false(2) indicates
+         that it is disabled.  Note a value of false(2) for this object and a value
+         of true(1) for bsAdacAdminEnable indicates that ADAC is not operational
+         due to some condition such as missing Uplink and Call Server ports."
+    ::= { bsAdacScalars 9 }
+
+--
+-- ADAC Port Table
+--
+
+bsAdacPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsAdacPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of objects that display and control the port
+         attributes of ADAC."
+    ::= { bsAdacObjects 2 }
+
+bsAdacPortEntry OBJECT-TYPE
+    SYNTAX BsAdacPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A set of objects that display and control the port
+         attributes of ADAC."
+    INDEX { bsAdacPortIndex }
+    ::= { bsAdacPortTable 1 }
+
+BsAdacPortEntry ::=
+    SEQUENCE {
+        bsAdacPortIndex                          InterfaceIndex,
+        bsAdacPortAdminEnable                    TruthValue,
+        bsAdacPortConfigStatus                   INTEGER,
+        bsAdacPortTaggedFramesPvid               Integer32,
+        bsAdacPortTaggedFramesTagging            INTEGER,
+        bsAdacPortType                           INTEGER,
+        bsAdacPortOperEnable                     TruthValue,
+	bsAdacPortMacDetectionEnable		 TruthValue,
+	bsAdacPortLldpDetectionEnable		 TruthValue
+    }
+
+bsAdacPortIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies a port.
+         This value is similar to ifIndex in MIB2."
+    ::= { bsAdacPortEntry 1 }
+
+bsAdacPortAdminEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "true (1) Auto-Detection (and implicitly Auto-Configuration)
+         of Nortel IP Phones is enabled on this interface.
+         false (2) Auto-Detection (and implicitly Auto-Configuration)
+         of Nortel IP Phones is disabled on this interface."
+    ::= { bsAdacPortEntry 2 }
+
+bsAdacPortConfigStatus OBJECT-TYPE
+    SYNTAX      INTEGER   {
+                  configApplied(1),
+                  configNotApplied(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Auto-Configuration status for the port.
+         A value of configApplied(1) means that the ADAC configuration
+         is applied for this port.
+         A value of configNotApplied(2) means that the ADAC configuration
+         is not applied for this port."
+    ::= { bsAdacPortEntry 3 }
+
+bsAdacPortTaggedFramesPvid OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the PVID value that Auto-Configuration will try to apply for
+         ports which have Auto-Detection enabled (bsAdacPortAdminEnable is set
+         to true(1)), and which are running in Tagged-Frames operational mode
+         (bsAdacOperatingMode is set to taggedFrames(3)).
+
+         A value of 0 means that the Auto-Configuration will not change the
+         PVID of the respective port.
+
+         If the VLAN with the ID equal with this PVID does not exist when
+         Auto-Configuration is applied to a port, then Auto-Configuration won't
+         change the port's PVID (it will ignore the current value of this object,
+         and treat it as if its value is currently 0)."
+    ::= { bsAdacPortEntry 4 }
+
+bsAdacPortTaggedFramesTagging OBJECT-TYPE
+    SYNTAX      INTEGER   {
+                  tagAll(1),
+                  tagPvidOnly(2),
+                  untagPvidOnly(3),
+                  noChange(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the tagging value that Auto-Configuration will apply for
+         ports which have Auto-Detection enabled (bsAdacPortAdminEnable is
+         set to true(1)), and which are running in Tagged-Frames operational
+         mode (bsAdacOperatingMode is set to taggedFrames(3)).
+	 
+         A value of tagAll(1) means that the Telephony ports will have
+         the tagging enabled on all frames.
+
+         A value of tagPvidOnly(2) means that the Telephony ports will have
+         the tagging enabled on frames matching the PVID of the port.
+
+         A value of untagPvidOnly(3) means that the Telephony ports will have
+         the tagging disabled on frames matching the PVID of the port.
+
+         A value of noChange(4) means that the Auto-Configuration will not
+         change the tagging of the respective port."
+    ::= { bsAdacPortEntry 5 }
+
+bsAdacPortType OBJECT-TYPE
+    SYNTAX      INTEGER   {
+                  telephony(1),
+                  callServer(2),
+                  uplink(3),
+                  other(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes how ADAC classifies this port.
+
+         A value of telephony(1) means that the Auto-Detection is enabled
+         for this port (bsAdacPortAdminEnable is set to true(1)).
+
+         A value of callServer(2) means that the port is configured as Call Server.
+
+         A value of uplink(3) means that the port is either configured as Uplink
+         or it's part of the same trunk as the current set Uplink port.
+
+         A value of other(4) means that the port has none of the types above."
+     ::= { bsAdacPortEntry 6 }
+
+bsAdacPortOperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether Auto-Detection is operationally enabled on port.
+	 A value of true(1) indicates that it is enabled, while a value of false(2)
+         indicates that it is disabled.
+	 
+	 Note a value of false(2) for this object and a value of true(1) for
+	 bsAdacPortAdminEnable indicates that Auto-Detection (and implicitly
+	 Auto-Configuration) is not operational due to some condition such as
+	 reaching the maximum number of devices supported per port."
+    ::= { bsAdacPortEntry 7 }
+
+bsAdacPortMacDetectionEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "true (1) Auto-Detection of Nortel IP Phones based on MAC Address
+	 is enabled on this interface.
+
+         false (2) Auto-Detection of Nortel IP Phones based on MAC Address
+	 is disabled on this interface.
+
+	 It cannot be set to false(2) if no other supported detection
+	 mechanism is enabled on port."
+    ::= { bsAdacPortEntry 8 }
+
+bsAdacPortLldpDetectionEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "true (1) Auto-Detection of Nortel IP Phones based on 802.1ab 
+	 is enabled on this interface.
+
+         false (2) Auto-Detection of Nortel IP Phones based on 802.1ab
+	 is disabled on this interface.
+
+	 It cannot be set to false(2) if no other supported detection
+	 mechanism is enabled on port."
+     ::= { bsAdacPortEntry 9 }
+
+--
+-- ADAC MAC Address Range Table
+--
+
+bsAdacMacAddrRangeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsAdacMacAddrRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of objects that display and control the attributes of
+         the MAC Address ranges supported by ADAC.
+         Overlapping ranges are not allowed and the attempts to create an 
+         entry that overlaps an existing entry will fail."
+    ::= { bsAdacObjects 3 }
+
+bsAdacMacAddrRangeEntry OBJECT-TYPE
+    SYNTAX      BsAdacMacAddrRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that display and control the attributes of
+         the MAC Address ranges supported by ADAC."
+    INDEX    { bsAdacMacAddrRangeLowEndIndex, bsAdacMacAddrRangeHighEndIndex }
+    ::= { bsAdacMacAddrRangeTable 1 }
+
+BsAdacMacAddrRangeEntry ::=
+   SEQUENCE {
+        bsAdacMacAddrRangeLowEndIndex          MacAddress,
+        bsAdacMacAddrRangeHighEndIndex         MacAddress,
+        bsAdacMacAddrRangeRowStatus            RowStatus
+    }
+
+bsAdacMacAddrRangeLowEndIndex OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The low end of the MAC Address range."
+    ::= { bsAdacMacAddrRangeEntry 1 }
+
+bsAdacMacAddrRangeHighEndIndex OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The high end of the MAC Address range."
+    ::= { bsAdacMacAddrRangeEntry 2 }
+
+bsAdacMacAddrRangeRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This is used to control creation/deletion of entries
+         in this table."
+  ::= { bsAdacMacAddrRangeEntry 3 }
+
+--
+-- ADAC Notifications Section
+--
+
+bsAdacPortConfigNotification NOTIFICATION-TYPE
+    OBJECTS     { bsAdacPortConfigStatus }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates if the Auto-Configuration
+         is applied or not on the port. It will be sent on
+         every status change."
+    ::= { bsAdacNotifications 1 }
+
+bsAdacPortOperDisabledNotification NOTIFICATION-TYPE
+    OBJECTS     { bsAdacPortOperEnable }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates if a port having bsAdacPortAdminEnable set
+	 to true(1) changes its bsAdacPortOperEnable from true(1) to false(2) due
+	 to some condition such as reaching the maximum number of devices supported
+	 per port."
+    ::= { bsAdacNotifications 2 }
+
+END

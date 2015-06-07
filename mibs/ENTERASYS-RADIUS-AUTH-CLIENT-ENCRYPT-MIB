@@ -1,0 +1,535 @@
+ENTERASYS-RADIUS-AUTH-CLIENT-ENCRYPT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE                     FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP                  FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, RowStatus                    FROM SNMPv2-TC
+    etsysModules                                     FROM ENTERASYS-MIB-NAMES;
+
+etsysRadiusAuthClientEncryptMIB MODULE-IDENTITY
+       LAST-UPDATED "200211111556Z"  -- Mon Nov 11 15:56 GMT 2002
+       ORGANIZATION 
+                 "Enterasys Networks"
+       CONTACT-INFO
+             "Enterasys Networks, Inc.
+              35 Industrial Way, P.O. Box 5005
+              Rochester, NH 03867-0505
+              Phone: +1-603-332-9400
+              E-Mail: support@enterasys.com"
+       DESCRIPTION
+             "The Enterasys Networks Proprietary MIB module for entities 
+              implementing the client side of the Remote Access Dialin 
+              User Service (RADIUS) authentication protocol (RFC2865).
+
+                                   N O T I C E
+
+              Use of this MIB in any product requires the approval
+              of the Office of the CTO, Enterasys Networks, Inc.  
+              Permission to use this MIB will not be granted for 
+              products in which SNMPv3 is now, or will soon be,
+              implemented.  Permission to use this MIB in products
+              that are never scheduled to implement SNMPv3 will be 
+              granted on a case-by-case basis, depending on what 
+              other suitable, secure means of RADIUS client 
+              configuration are available in the product.
+
+                                  ------------------
+
+              The standard RADIUS Authentication Client MIB (RFC2618)
+              does not have any writable objects, and is missing key 
+              objects needed for configuration.
+          
+              Use of this MIB requires encryption/decryption for security
+              during transmission, using SNMPv1.  Therefore, there are two 
+              separate processes needed to use this MIB.  
+          
+              1)  The standard processes for SNMP gets and sets.
+              2)  The encoding/encryption or decryption/decoding of objects.
+          
+              The encryption/decryption algorithm, as presented herein, is
+              taken from the RADIUS protocol, and is the method specified
+              for encryption of Tunnel-Password Attributes in RFC 2868.
+
+              For a detailed discussion of the encoding/decoding and 
+              encryption/decryption of applicable objects, refer to the 
+              definition of RadiusEncryptionString defined in the Textual 
+              Conventions section of this MIB.
+          
+              Note that the encryption/decryption method makes use of an 
+              agreed-upon Secret and an Authenticator which are shared between
+              the RADIUS Client SNMP interface and the management entity
+              implementing the MIB.
+          
+              The reason that the shared secret and authenticator are 
+              algorithmically derived in the RADIUS Client / SNMP Agent
+              and in the SNMP Management Station is to permit plug-'n-play
+              remote installation, configuration and management of the device.
+              
+              An object is included to allow remote management of the 
+              Authenticator portion of the encryption key.  It is suggested 
+              that this value be changed by the network administrator after
+              initial configuration of the system.
+          
+              On receipt, the process is reversed to yield the plain-text 
+              String."
+
+       REVISION    "200211111556Z"  -- Mon Nov 11 15:56 GMT 2002
+       DESCRIPTION "Removed the display hint for the RadiusEncryptedString
+                    textual convention."
+
+       REVISION    "200201241606Z"  -- Thu Jan 24 16:06 GMT 2002
+       DESCRIPTION "Changed { etsysRadiusAuthClientEncryptOID } to
+                    { etsysModules 5 } so that the released MIB would
+                    work with the NetSNMP stack that is currently
+                    being used by Netsight."
+
+       REVISION    "200011080000Z" -- 08 November 2000
+       DESCRIPTION "Initial version"
+
+  ::= { etsysModules 5 } -- { etsysRadiusAuthClientEncryptOID }
+
+
+-- ------------------------------------
+-- Textual Conventions
+-- ------------------------------------
+
+RadiusEncryptedString ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+             "Before encryption, the 'native' objects must be encoded into a
+              formatted Octet String.  After decryption, the Octet String must
+              be decoded to obtain the 'native' objects.
+
+              Fields which contain integers must be in network byte order prior
+              to encryption of the formatted octet string.  The network byte
+              order for the Internet protocol suite is big endian.  The Berkeley
+              Software Distribution (BSD) functions htons and htonl will convert 
+              two and four byte integers, respectively, from host to network 
+              byte order.  Likewise, the BSD functions ntohs and ntohl will 
+              convert integers from network byte order to host byte order.
+          
+              0                   1                   2                   3
+              0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+              |     Type      |    Length     |   Salt                        |
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+              |   String ...
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+          
+              Type
+
+              The data type of the non-encrypted 'native' data:
+          
+              1 = Integer32
+              2 = OCTET STRING
+          
+              Length
+
+              The length in octets of the native object sub-field of the
+              Octet String, exclusive of any optional padding.  Note that the
+              Integrity Check sub-fields (CRC, OID-tail, Time Stamp, Source
+              IPv4 address) are not included in this length value, but since 
+              the IC sub-fields are always present and are of fixed length, 
+              there is no impediment to proper packet parsing.
+                
+              Salt
+
+              The Salt field is two octets in length and is used to ensure the
+              uniqueness of the encryption key used to encrypt each object.
+              The most significant bit (leftmost) of the Salt field
+              MUST be set (1).  The contents of each Salt field in a given
+              SNMP packet must be unique.  This two-byte field must be in 
+              network byte order (big endian).   
+          
+              String
+          
+               0                   1                   2                   3
+               0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+              |  CRC (4 bytes)                                                |
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+              |  OID-tail (4 bytes)                                           |
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+              |  Time Stamp (4 bytes)                                         |
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+              |  Source IPv4 address (4 bytes)                                |
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+              |  Object/Padding ...
+              +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+          
+              The plain-text String field consists of six logical sub-fields:
+              the CRC, OID-tail, Time Stamp, Source IPv4 address and native Object
+              sub-fields (all of which are required), and the optional Padding
+              sub-field.  The String field MUST be treated as a counted-string 
+              of undistinguished octets, and not as a standard C/UNIX-style 
+              null-terminated, printable ASCII string.
+          
+              CRC Sub-field
+          
+                The CRC sub-field contains a 32-bit CRC (CRC-32) calculated
+                over the following concatenated sub-fields of the String:
+                the OID-tail, Time Stamp, Source IPv4 address and unpadded native
+                Object fields.  The CRC sub-field acts as an integrity check on 
+                the decrypted data.  This four-byte field must be in 
+                network byte order (big endian).
+          
+              OID-tail Sub-field
+          
+                The OID-tail sub-field contains the least significant four octets
+                of the Object ID of the varbind.  This field is included as an
+                integrity check on the OID of the varbind.  This four-byte field 
+                must be in network byte order (big endian).
+          
+              Time Stamp Sub-field
+          
+                The Time Stamp sub-field contains a 32-bit unsigned integer 
+                value representing the time the encrypted message was assembled.
+                This field acts as an integrity check by facilitating the 
+                disposal of stale or replayed messages. The time window of 
+                acceptance is implementation dependent, and may be the subject 
+                of local (i.e. managed entity) policy configuration.  The Time 
+                Stamp is relative time, in units of seconds, referenced to the 
+                sysUpTime object of the managed entity.  This four-byte field 
+                must be in network byte order (big endian).
+          
+              Source IPv4 address Sub-field
+          
+                The Source IPv4 address sub-field contains an unsigned 32-bit
+                representation of the IPv4 address of the source of the encrypted
+                message.  This is an added check to allow verification of the
+                source of the varbind.  This four-byte field must be in 
+                network byte order (big endian).
+
+              The CRC, OID-tail, Time Stamp, and Source IPv4 address sub-fields are
+              collectively hereinafter referred to as the Integrity Check (IC) 
+              sub-fields.
+          
+              Object/Padding Sub-field
+          
+                Object 
+                  The Object sub-field contains the actual or native
+                  object data followed by padding, if necessary.
+                  If the 'native' data type is Integer32, this field 
+                  must be in network byte order (big endian).
+          
+                Padding
+                  If the combined length (in octets) of the non-encrypted 
+                  CRC, OID-tail, Time Stamp, Source IPv4 address, and native
+                  Object sub-fields is not an even multiple of 16, then the 
+                  Padding sub-field MUST be present.  If it is present, the 
+                  length of the Padding sub-field is variable, between 1 and
+                  15 octets.  The value of the pad octets MUST be zero.
+          
+           Encrypting/Decrypting the String Field
+          
+              The entire String field MUST be encrypted as follows, prior to 
+              transmission:
+          
+              Construct a plain-text version of the String field by
+              concatenating the CRC, OID-tail, Time Stamp, Source IPv4 address
+              and native Object sub-fields.  If necessary, pad the resulting 
+              string until its length (in octets) is an even multiple 
+              of 16.  It is required that zero octets (0x00) be used 
+              for padding.  Call this plain-text P.
+          
+                 Shared Secret
+          
+                    The shared secret is formed from the MAC (hardware)
+                    address of the primary management interface of the
+                    managed device (containing the RADIUS Client).  The
+                    MAC address is represented as upper-cased, dashed-ASCII
+                    string, e.g. 08-00-2B-11-22-33.  This string is not
+                    null-terminated.
+          
+                Authenticator
+          
+                    The 128-bit authenticator is a manageable object.  This
+                    field is a 16 byte (not null-terminated) ascii string. The
+                    pre-defined factory default value is an Enterasys
+                    Networks trade secret.  The user is advised to change 
+                    it from the default value after initial configuration 
+                    of the system.
+          
+              Call the shared secret S, the [pseudo-random] 128-bit 
+              Authenticator R, and the contents of the Salt field A.  
+              Break P into 16 octet chunks p(1), p(2)...p(i), 
+              where i = len(P)/16.  Call the cipher-text blocks 
+              c(1), c(2)...c(i) and the final cipher-text C. Intermediate 
+              values b(1), b(2)...c(i) are required.  Encryption
+              performed in the following manner ('+' indicates concatenation):
+          
+                  b(1) = MD5(S + R + A)    c(1) = p(1) xor b(1)   C = c(1)
+                  b(2) = MD5(S + c(1))     c(2) = p(2) xor b(2)   C = C + c(2)
+                              .                      .
+                              .                      .
+                              .                      .
+                  b(i) = MD5(S + c(i-1))   c(i) = p(i) xor b(i)   C = C + c(i)
+          
+                 The resulting encrypted String field will contain
+                  c(1)+c(2)+...+c(i)."
+
+       SYNTAX OCTET STRING (SIZE(0..255))
+
+-- ------------------------------------
+-- MIB Objects
+-- ------------------------------------
+
+etsysRadiusAuthClientEncryptMIBObjects     OBJECT IDENTIFIER
+       ::= { etsysRadiusAuthClientEncryptMIB 1 }
+
+etsysRadiusAuthClientRetryTimeoutEncrypt OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-write
+      STATUS         obsolete
+      DESCRIPTION
+             "The number of seconds to wait for a RADIUS Server to
+              respond to a request.  This parameter value is maintained
+              across system reboots.  This object's true data type is 1, 
+              Integer32."
+      ::= { etsysRadiusAuthClientEncryptMIBObjects 1 }
+
+etsysRadiusAuthClientRetriesEncrypt OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-write
+      STATUS         obsolete
+      DESCRIPTION
+             "The number of times to resend an authentication packet
+              if a RADIUS Server does not respond to a request.
+              This parameter value is maintained across system reboots.
+              This object's true data type is 1, Integer32."
+      ::= { etsysRadiusAuthClientEncryptMIBObjects 2 }
+
+etsysRadiusAuthClientEnableEncrypt OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-write
+      STATUS         obsolete
+      DESCRIPTION
+             "This indicates whether or not the RADIUS Client is
+              or is to be, enabled or disabled. This parameter value 
+              is maintained across system reboots.  This object's true 
+              data type is Integer32(1), and it follows an enumeration 
+              textual convention (enable(1), disable(2))."
+      ::= { etsysRadiusAuthClientEncryptMIBObjects 3 }
+
+etsysRadiusAuthClientAuthTypeEncrypt OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-write
+      STATUS         obsolete
+      DESCRIPTION
+             "This indicates which method is being used for 
+              authentication.  The authentication type is an 
+              Integer32 object that maps to the following enumeration 
+              constants:
+
+                  mac(1)   - indicates MAC address authentication
+                  eapol(2) - indicates EAPOL authentication
+
+              This list of enumeration constants is subject to
+              change.  This parameter value is maintained across system 
+              reboots."
+      ::= { etsysRadiusAuthClientEncryptMIBObjects 4 }
+
+etsysRadiusAuthClientManageAuthKeyEncrypt  OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-write
+      STATUS         obsolete
+      DESCRIPTION
+            "The Authenticator used, in part, to form the key 
+             to encrypt/decrypt the objects of type RadiusEncryptedString. 
+             This object's true data type is OCTET STRING.  This 
+             parameter value is maintained across system reboots."
+      ::= { etsysRadiusAuthClientEncryptMIBObjects 5 }
+
+etsysRadiusAuthServerEncryptTable OBJECT-TYPE
+      SYNTAX         SEQUENCE OF EtsysRadiusAuthServerEncryptEntry
+      MAX-ACCESS     not-accessible
+      STATUS         obsolete
+      DESCRIPTION
+            "The (conceptual) table listing the RADIUS authentication
+             servers with which the client shares a secret."
+      ::= { etsysRadiusAuthClientEncryptMIBObjects 6 }
+
+etsysRadiusAuthServerEncryptEntry OBJECT-TYPE
+      SYNTAX         EtsysRadiusAuthServerEncryptEntry
+      MAX-ACCESS     not-accessible
+      STATUS         obsolete
+      DESCRIPTION
+            "An entry (conceptual row) representing a RADIUS
+             authentication server with which the client shares
+             a secret.
+             
+             All created conceptual rows are non-volatile and as such
+             must be maintained upon restart of the agent."
+      INDEX      { etsysRadiusAuthServerIndexEncrypt }
+      ::= { etsysRadiusAuthServerEncryptTable 1 }
+
+EtsysRadiusAuthServerEncryptEntry ::= SEQUENCE {
+      etsysRadiusAuthServerIndexEncrypt                        INTEGER,
+      etsysRadiusAuthClientServerAddressEncrypt                RadiusEncryptedString,
+      etsysRadiusAuthClientServerPortNumberEncrypt             RadiusEncryptedString,
+      etsysRadiusAuthClientServerSecretEncrypt                 RadiusEncryptedString,
+      etsysRadiusAuthClientServerSecretEnteredEncrypt          RadiusEncryptedString,
+      etsysRadiusAuthClientServerClearTimeEncrypt              RadiusEncryptedString,
+      etsysRadiusAuthClientServerStatusEncrypt                 RowStatus
+}
+
+etsysRadiusAuthServerIndexEncrypt OBJECT-TYPE
+      SYNTAX         INTEGER (1..2147483647)
+      MAX-ACCESS     not-accessible
+      STATUS         obsolete
+      DESCRIPTION
+             "A number uniquely identifying each conceptual row
+              in the etsysRadiusAuthServerEncryptTable.
+   
+              In the event of an agent restart, the same value
+              of etsysRadiusAuthServerIndexEncrypt must be used 
+              to identify each conceptual row in 
+              etsysRadiusAuthServerTableEncrypt as prior to the 
+              restart."
+      ::= { etsysRadiusAuthServerEncryptEntry 1 }
+
+etsysRadiusAuthClientServerAddressEncrypt OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-create
+      STATUS         obsolete
+      DESCRIPTION
+            "The dotted-decimal IPv4 address of RADIUS 
+             authentication server.  This parameter value 
+             is maintained across system reboots.  This 
+             object's true data type is 2, OCTET STRING."
+      ::= { etsysRadiusAuthServerEncryptEntry 2 }
+
+etsysRadiusAuthClientServerPortNumberEncrypt  OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-create
+      STATUS         obsolete
+      DESCRIPTION
+            "The UDP port number (0-65535) the client is using
+             to send requests to this server.  This parameter 
+             value is maintained across system reboots.  This
+             object's true data type  is 1, Integer32."
+      ::= { etsysRadiusAuthServerEncryptEntry 3 }
+
+etsysRadiusAuthClientServerSecretEncrypt  OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-create
+      STATUS         obsolete
+      DESCRIPTION
+            "This object is the secret shared between the RADIUS 
+             authentication server and RADIUS client.  This 
+             parameter value is maintained across system reboots.
+             This object's true data type is 2, OCTET STRING."
+      ::= { etsysRadiusAuthServerEncryptEntry 4 }
+
+etsysRadiusAuthClientServerSecretEnteredEncrypt  OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-only
+      STATUS         obsolete
+      DESCRIPTION
+            "This object indicates the existence of a shared secret.
+             This object's true data type is 1, Integer32."
+      ::= { etsysRadiusAuthServerEncryptEntry 5 }
+
+etsysRadiusAuthClientServerClearTimeEncrypt OBJECT-TYPE
+      SYNTAX         RadiusEncryptedString
+      MAX-ACCESS     read-create
+      STATUS         obsolete
+      DESCRIPTION   
+            "This value indicates the date and time since server
+             counters were last cleared.  
+
+             On a write, the server counters will be cleared and
+             the clear time will be set to the current time if the
+             decoded object is zero.
+             
+             This object's true data type is 1, Integer32."
+      ::= { etsysRadiusAuthServerEncryptEntry 6 }
+
+etsysRadiusAuthClientServerStatusEncrypt OBJECT-TYPE
+      SYNTAX         RowStatus
+      MAX-ACCESS     read-create
+      STATUS         obsolete
+      DESCRIPTION   
+             "Lets users create and delete RADIUS authentication
+              server entries on systems that support this capability.
+              
+              Rules
+             
+              1. When creating a RADIUS Authentication Client, it 
+                 is up to the management station to determine a 
+                 suitable etsysRadiusAuthServerIndexEncrypt.
+                 To facilitate interoperability, agents should not 
+                 put any restrictions on the 
+                 etsysRadiusAuthServerIndexEncrypt beyond the 
+                 obvious ones that it be valid and unused.
+
+              2. Before a new row can become 'active', values
+                 must be supplied for the columnar objects
+                 etsysRadiusAuthClientServerAddressEncrypt,
+                 etsysRadiusAuthClientServerPortNumberEncrypt and
+                 etsysRadiusAuthClientServerSecretEncrypt.
+
+              3. The value of etsysRadiusAuthClientServerStatusEncrypt
+                 must be set to 'notInService' in order to modify a 
+                 writable object in the same conceptual row.
+
+              4. etsysRadiusAuthClientServer entries whose 
+                 status is 'notReady' or 'notInService' will 
+                 not be used for authentication."
+
+        ::= { etsysRadiusAuthServerEncryptEntry 7 }
+
+
+-- ------------------------------------
+-- Conformance information
+-- ------------------------------------
+
+etsysRadiusAuthClientEncryptMIBConformance
+       OBJECT IDENTIFIER ::= { etsysRadiusAuthClientEncryptMIB 2 }
+etsysRadiusAuthClientEncryptMIBCompliances
+       OBJECT IDENTIFIER ::= { etsysRadiusAuthClientEncryptMIBConformance 1 }
+etsysRadiusAuthClientEncryptMIBGroups
+       OBJECT IDENTIFIER ::= { etsysRadiusAuthClientEncryptMIBConformance 2 }
+
+
+-- ------------------------------------
+-- Units of conformance
+-- ------------------------------------
+
+etsysRadiusAuthClientEncryptMIBGroup OBJECT-GROUP
+     OBJECTS { etsysRadiusAuthClientRetryTimeoutEncrypt,
+               etsysRadiusAuthClientRetriesEncrypt,
+               etsysRadiusAuthClientEnableEncrypt,
+               etsysRadiusAuthClientAuthTypeEncrypt,
+               etsysRadiusAuthClientManageAuthKeyEncrypt,
+               etsysRadiusAuthClientServerAddressEncrypt,
+               etsysRadiusAuthClientServerPortNumberEncrypt,
+               etsysRadiusAuthClientServerSecretEncrypt,
+               etsysRadiusAuthClientServerSecretEnteredEncrypt,
+               etsysRadiusAuthClientServerClearTimeEncrypt,
+               etsysRadiusAuthClientServerStatusEncrypt
+             }
+     STATUS  obsolete
+     DESCRIPTION
+     "The basic collection of objects providing a proprietary
+      extension to the standard RADIUS Client MIB. This 
+      proprietary MIB allows secure SETs to key RADIUS Clients
+      objects, via SNMPv1."
+     ::= { etsysRadiusAuthClientEncryptMIBGroups 1 }
+
+
+-- ------------------------------------
+-- Compliance statements
+-- ------------------------------------
+
+etsysRadiusClientEncryptMIBCompliance MODULE-COMPLIANCE
+     STATUS  current
+     DESCRIPTION
+           "The compliance statement for authentication clients
+            implementing the RADIUS Authentication Client MIB."
+     MODULE  -- this module
+            MANDATORY-GROUPS { etsysRadiusAuthClientEncryptMIBGroup }
+
+     ::= { etsysRadiusAuthClientEncryptMIBCompliances 1 }
+
+END

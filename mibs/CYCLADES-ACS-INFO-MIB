@@ -1,0 +1,194 @@
+CYCLADES-ACS-INFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cyACSMgmt
+		FROM CYCLADES-ACS-MIB
+	InterfaceIndex
+		FROM IF-MIB
+	MODULE-IDENTITY, OBJECT-TYPE, 
+	Counter32, Integer32
+			FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+cyACSInfo	MODULE-IDENTITY
+	LAST-UPDATED	"200508290000Z"
+	ORGANIZATION	"Cyclades Corporation"
+	CONTACT-INFO	"postal : Cyclades Corporation
+				  3541 Gateway Boulevard
+				  Fremont, CA 94538, USA
+			 e-mail : Technical Support
+				  support@cyclades.com"
+	DESCRIPTION	"This module defines objects of the ACS/TS information"
+	REVISION	"200508290000Z"
+	DESCRIPTION	"Changed the Contact-Info"
+	REVISION	"200209200000Z"
+	DESCRIPTION	"First Draft"
+::= { cyACSMgmt 3 }
+
+cyInfoSerialTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF CyISPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"This is the information of the specific serial port"
+::= { cyACSInfo 1 }
+
+cyisPortEntry	OBJECT-TYPE
+	SYNTAX		CyISPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"One particular serial port "
+	INDEX		{ cyISPortNumber }
+::= { cyInfoSerialTable 1 }
+
+CyISPortEntry ::= SEQUENCE  {
+	cyISPortNumber	InterfaceIndex,      --  X == ttyX sX.
+	cyISPortTty	DisplayString,         -- associate device
+	cyISPortName	DisplayString,          -- alias name
+	cyISPortSpeed	Integer32,
+	cyISPortTxBytes	Counter32,          
+	cyISPortRXBytes	Counter32,
+	cyISPortErrFrame	Counter32,
+	cyISPortErrParity	Counter32,
+	cyISPortErrBreaks	Counter32,
+	cyISPortErrOverrun	Counter32,
+	cyISPortSigDTR		INTEGER,
+	cyISPortSigCD		INTEGER,
+	cyISPortSigDSR		INTEGER,
+	cyISPortSigRTS		INTEGER,
+	cyISPortSigCTS		INTEGER,
+	cyISPortSigRI		INTEGER
+ }
+
+cyISPortNumber	OBJECT-TYPE
+	SYNTAX		InterfaceIndex	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"number to identifier the serial port."
+::= { cyisPortEntry 1 }
+
+cyISPortTty		OBJECT-TYPE
+	SYNTAX		DisplayString	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The device name for the serial port."
+::= { cyisPortEntry 2 }
+
+cyISPortName		OBJECT-TYPE
+	SYNTAX		DisplayString	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Alias name given to the server connected to the serial port."
+::= { cyisPortEntry 3 }
+
+cyISPortSpeed	OBJECT-TYPE
+	SYNTAX		Integer32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The speed for serial port."
+::= { cyisPortEntry 4 }
+
+cyISPortTxBytes	OBJECT-TYPE        
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of transmited bytes by the serial port."
+::= { cyisPortEntry 5 }
+
+cyISPortRXBytes	OBJECT-TYPE
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of received bytes by the serial port."
+::= { cyisPortEntry 6 }
+
+cyISPortErrFrame	OBJECT-TYPE
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of frame error."
+::= { cyisPortEntry 7 }
+
+cyISPortErrParity	OBJECT-TYPE
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of parity error."
+::= { cyisPortEntry 8 }
+
+cyISPortErrBreaks	OBJECT-TYPE	
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of breaks error."
+::= { cyisPortEntry 9 }
+
+cyISPortErrOverrun	OBJECT-TYPE
+	SYNTAX		Counter32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of overrun error."
+::= { cyisPortEntry 10 }
+
+cyISPortSigDTR	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				down(0),
+				up(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The state of DTR signal."
+::= { cyisPortEntry 11 }
+
+cyISPortSigCD	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				down(0),
+				up(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The state of DCD signal."
+::= { cyisPortEntry 12 }
+
+cyISPortSigDSR	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				down(0),
+				up(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The state of DSR signal."
+::= { cyisPortEntry 13 }
+
+cyISPortSigRTS	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				down(0),
+				up(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The state of RTS signal."
+::= { cyisPortEntry 14 }
+
+cyISPortSigCTS	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				down(0),
+				up(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The state of CTS signal."
+::= { cyisPortEntry 15 }
+
+cyISPortSigRI	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				down(0),
+				up(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The state of RI signal."
+::= { cyisPortEntry 16 }
+
+END
+

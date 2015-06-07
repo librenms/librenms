@@ -1,0 +1,552 @@
+--  =================================================================
+-- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI DLDP MIB, this mib will maintain information of DLDP 
+--              protocol for datacomm product.  
+-- Reference:
+-- Version:     V1.00
+-- History:
+--  
+--  V1.00 2008-07-15 initial version
+-- =================================================================
+
+HUAWEI-DLDP-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    TruthValue,MacAddress,TEXTUAL-CONVENTION,RowStatus
+        FROM SNMPv2-TC
+
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32,
+    OBJECT-IDENTITY, Unsigned32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+                
+    hwDatacomm
+        FROM HUAWEI-MIB
+               
+    EnabledStatus
+        FROM P-BRIDGE-MIB;
+ 
+    hwDldpMIB MODULE-IDENTITY
+        LAST-UPDATED "200807151430Z"        -- July 15, 2008 at 14:30 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "R&D NanJing, Huawei Technologies co.,Ltd.
+            High hope mansion, 
+            Baixia road,
+            Nanjing city
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com        
+            Zip:100000
+            "
+        DESCRIPTION
+            "This file is a DLDP-MIB. It provides the functions such as
+           globally enabling or disabling the DLDP protocol, enabling the global
+           alarm, clearing statistics on ports and configuring work mode."
+            ::= { hwDatacomm 173 }  
+         
+      -- Textual Convention
+                 
+        PortIndex ::= TEXTUAL-CONVENTION
+               STATUS    current
+            DESCRIPTION
+                "Each port is uniquely identified by a port number. The port number ranges from 0
+                to 575."
+              SYNTAX Integer32(0..575) 
+              
+    -- ============================================================================
+    -- Node definitions
+    -- ============================================================================ 
+
+    hwDldpObjects  OBJECT IDENTIFIER ::= { hwDldpMIB 1}
+    
+    hwDldpPortTrapObjects OBJECT IDENTIFIER ::= { hwDldpMIB 2}
+
+    hwDldpTraps OBJECT IDENTIFIER ::= { hwDldpMIB 3 }  
+    
+    hwDldpConformance  OBJECT IDENTIFIER ::= { hwDldpMIB 4 }
+ 
+
+  -- ============================================================================
+  --
+  -- ======================= Objects definitions=================================
+  --
+  -- ============================================================================  
+
+  hwDldpConfiguration  OBJECT IDENTIFIER ::= { hwDldpObjects 1}
+  hwDldpStatistics     OBJECT IDENTIFIER ::= { hwDldpObjects 2} 
+
+    hwDldpEnable OBJECT-TYPE 
+        SYNTAX   EnabledStatus 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Globally enable or disable the DLDP configuration. If the hwDldpEnable 
+                is 1, DLDP is enabled. If the hwDldpEnable is 2, DLDP is disabled. 
+            By default, DLDP is disabled."   
+        DEFVAL { 2 }
+        ::= { hwDldpConfiguration 1 }   
+
+    hwDldpUnidirectionalShutdown OBJECT-TYPE 
+        SYNTAX   INTEGER 
+           { 
+            auto(1),
+            manual(2)
+        }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "When the device discovers a one-way link, the shutdown mode of port. The modes include
+            auto and manual. By default, DLDP is auto."
+        DEFVAL { 1 }        
+        ::= { hwDldpConfiguration 2 }     
+    
+    hwDldpWorkMode OBJECT-TYPE 
+        SYNTAX   INTEGER 
+           { 
+            normal(1),
+            enhance(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It configures the work mode of the DLDP protocol, including normal and enhanced mode.
+            By default, the mode is enhanced." 
+        DEFVAL { 2 }  
+        ::= { hwDldpConfiguration 3 } 
+        
+   hwDldpAdvertInterval OBJECT-TYPE 
+        SYNTAX Integer32(1..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Global interval for sending advertisement packets for the DLDP configuration.
+            By default, the interval is 5s."     
+        DEFVAL { 5 }
+        ::= { hwDldpConfiguration 4 }
+        
+   hwDelayDownTimer OBJECT-TYPE 
+        SYNTAX Integer32(1..5)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Global timeout of DelayDown timer. The value rangs from 1s to 5s,
+            By default, the time is 1s."     
+        DEFVAL { 1 }
+        ::= { hwDldpConfiguration 5 }
+        
+   hwDldpAuthenMode OBJECT-TYPE 
+        SYNTAX   INTEGER 
+           { 
+            none(1),
+            md5(2),
+            simple(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Global authentication mode of the DLDP configuration. It has three authentication
+             modes, including none, md5,and simple. By default the authentication mode
+             is none."     
+        DEFVAL { 1 }
+        ::= { hwDldpConfiguration 6 }
+        
+   hwDldpMd5Password OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..24)) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Global md5 password for authentication when authentication is md5."
+        ::= { hwDldpConfiguration 7 }
+    
+   hwDldpSimplePassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..16)) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Global simple password for authentication when authentication is simple."
+        ::= { hwDldpConfiguration 8 }
+  
+   hwDldpPortTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF HwDldpPortEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+            "DLDP port configuration table."
+      ::= { hwDldpConfiguration  9 }
+      
+   hwDldpPortEntry OBJECT-TYPE
+        SYNTAX HwDldpPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+               "Entries of the DLDP port configuration table."
+        INDEX{ hwDldpPortIndex }
+        ::= { hwDldpPortTable 1}  
+  
+   HwDldpPortEntry ::=
+        SEQUENCE{    
+                    hwDldpPortIndex            PortIndex,
+                    hwDldpPortStateReset       TruthValue,
+                    hwDldpPortState            INTEGER,
+                    hwDldpPortLinkState        INTEGER,
+                    hwDldpResetStatistics      TruthValue,
+                    hwDldpRowStatus            RowStatus                                     
+                    }
+                    
+   hwDldpPortIndex  OBJECT-TYPE
+        SYNTAX PortIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+           DESCRIPTION 
+                   "It describes enabled DLDP port index. Each port is uniquely identified by a port number. It ranges from 0
+                    to 575."     
+           ::= {hwDldpPortEntry 1}
+                      
+   hwDldpPortStateReset OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+           DESCRIPTION 
+               "It describes the DLDP status of the reset port."
+           DEFVAL { false }    
+           ::= {hwDldpPortEntry 2}
+           
+       hwDldpPortState OBJECT-TYPE
+        SYNTAX INTEGER
+        { 
+            initial(1),
+            inactive(2),
+            active(3),
+            advertisement(4), 
+            probe(5),
+            disable(6),
+            delayDown(7)            
+        }
+        MAX-ACCESS read-only
+        STATUS current
+           DESCRIPTION 
+               "Port state has seven states, including initial, inactive, active,
+               advertisement, probe, disable, and delayDown."     
+           ::= {hwDldpPortEntry 3}
+       
+       
+    hwDldpPortLinkState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+           up(1),
+            down(2)     
+        }
+        MAX-ACCESS read-only
+        STATUS current
+           DESCRIPTION 
+               "Port state has two modes, including up and down."     
+           ::= {hwDldpPortEntry 4}
+             
+       hwDldpResetStatistics OBJECT-TYPE
+           SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "It clears the statistics of packets received and sent on the current 
+             port."
+        ::= { hwDldpPortEntry 5 }
+        
+       hwDldpRowStatus OBJECT-TYPE
+           SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " Operation of CreateAndGo can be
+             used to create a new instance, and operation of Destroy be 
+             used to destroy an existent index. But these operations 
+             will not take effect if they are not activated by running the
+             command of activating or setting mib node of hwDldpEnable."
+        ::= { hwDldpPortEntry 6 }
+        
+    hwDldpNeighbourTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF HwDldpNeighbourEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+            "DLDP Neighbour configuration table."
+      ::= { hwDldpConfiguration  10 }
+      
+   hwDldpNeighbourEntry OBJECT-TYPE
+        SYNTAX HwDldpNeighbourEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+               "Entries of the DLDP Neighbour configuration table."
+        INDEX{ hwDldpPortIndex, hwDldpNeighbourMacAddr, hwDldpNeighbourPortIndex}
+        ::= { hwDldpNeighbourTable 1}
+                    
+       HwDldpNeighbourEntry ::=
+        SEQUENCE  {    
+                    hwDldpNeighbourMacAddr
+                            MacAddress,
+                    hwDldpNeighbourPortIndex
+                            Integer32,
+                    hwDldpNeighbourPortName
+                            OCTET STRING,
+                    hwDldpNeighbourState
+                               INTEGER,                           
+                    hwDldpNeighbourAgeTime
+                            Integer32        
+                    }
+                     
+   hwDldpNeighbourMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+           DESCRIPTION 
+               "When the activated port detects a neighbor, it can record the neighbor information, including
+               MAC address of neighbor. The port may detect multiple neighbors."   
+           ::= {hwDldpNeighbourEntry 1}
+                                
+       hwDldpNeighbourPortIndex OBJECT-TYPE
+        SYNTAX  Integer32(0..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+           DESCRIPTION 
+               "When the activated port detects a neighbor, it can record the port index of the neighbour."     
+           ::= {hwDldpNeighbourEntry 2}
+           
+       hwDldpNeighbourPortName OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+           DESCRIPTION 
+               "When the activated port detects a neighbor, it can record the port name of the neighbour."     
+           ::= {hwDldpNeighbourEntry 3}
+           
+    hwDldpNeighbourState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+           unknown(1),
+           oneWay(2),
+           twoWay(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+           DESCRIPTION 
+               "When the activated port detects a neighbor, it can record the state of the neighbour, and its value includes unknown, one way, and two way."
+           ::= {hwDldpNeighbourEntry 4}
+            
+    hwDldpNeighbourAgeTime OBJECT-TYPE
+        SYNTAX  Integer32(3..300)
+        MAX-ACCESS read-only
+        STATUS current
+           DESCRIPTION 
+               "When the activated port detects a neighbor, it can record the aging time of the neighbor. The aging time
+               is three times the interval for sending advertisement packets." 
+           DEFVAL { 15 }    
+           ::= {hwDldpNeighbourEntry 5}
+           
+   hwDldpPortStatisticsTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF HwDldpPortStatisticsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+            "DLDP port statics configuration table."
+      ::= { hwDldpStatistics  1 }
+      
+   hwDldpPortStatisticsEntry OBJECT-TYPE
+        SYNTAX HwDldpPortStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+               "Entries of the table of the packets sent or received on the DLDP port."
+        INDEX{ hwDldpPortIndex }
+        ::= { hwDldpPortStatisticsTable 1}  
+  
+   HwDldpPortStatisticsEntry ::=
+        SEQUENCE  {    
+                    hwDldpPortStatisticsTx
+                              Counter32,
+                    hwDldpPortStatisticsRxTotal
+                              Counter32,
+                    hwDldpPortStatisticsRxError
+                               Counter32,
+                    hwDldpPortStatisticsRxLoop
+                              Counter32,
+                    hwDldpPortStatisticsRxValid
+                              Counter32,        
+                    hwDldpPortStatisticsRxAuthenFail
+                              Counter32                                               
+                    }
+                   
+    hwDldpPortStatisticsTx OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                   "It describes the number of packets sent on the activated port."     
+           ::= {hwDldpPortStatisticsEntry 1}
+           
+        hwDldpPortStatisticsRxTotal OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                   "It describes the number of packets received on the activated port."     
+           ::= {hwDldpPortStatisticsEntry 2}
+
+     hwDldpPortStatisticsRxError OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                   "It describes the number of error packets received on the activated port."     
+           ::= {hwDldpPortStatisticsEntry 3}
+           
+        hwDldpPortStatisticsRxLoop OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                   "It describes the number of loop packets received on the activated port."     
+           ::= {hwDldpPortStatisticsEntry 4}
+           
+        hwDldpPortStatisticsRxValid OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                   "It describes the number of valid packets received on the activated port."     
+           ::= {hwDldpPortStatisticsEntry 5}
+           
+        hwDldpPortStatisticsRxAuthenFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                   "It describes the number of authentication failure packets received on the activated port."     
+           ::= {hwDldpPortStatisticsEntry 6}
+     
+     hwDldpTrapPortIndex OBJECT-TYPE 
+        SYNTAX PortIndex
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "It describes the index of the activated port that detected one way or found that two way is resumed."     
+        ::= { hwDldpPortTrapObjects 1 }
+                         
+---Notifycation        
+      hwDldpUnidirectionalLink  NOTIFICATION-TYPE
+      OBJECTS {hwDldpTrapPortIndex}
+      STATUS current    
+    DESCRIPTION 
+          "Notify the NMS that the DLDP detected one way. The hwDldpNeighbourPortIndex node is the port index."
+    ::= { hwDldpTraps 1}
+
+      hwDldpLinkResume  NOTIFICATION-TYPE
+      OBJECTS {hwDldpTrapPortIndex}
+     STATUS current    
+    DESCRIPTION 
+          "Notify the NMS that the DLDP detected that unidirectional link was resumed. The hwDldpNeighbourPortIndex node is port index."
+    ::= { hwDldpTraps 2}  
+        
+    --
+    -- ***********************************************************
+    --
+    -- HAUWEIDLDPMIBCONFORMANCE
+    --
+    -- ***********************************************************
+    --
+     
+    hwDldpCompliances OBJECT IDENTIFIER ::= { hwDldpConformance 1 }
+    hwDldpGroups OBJECT IDENTIFIER ::= { hwDldpConformance 2 }
+    -- compliance statements
+    hwDldpCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        the HUAWEI-DLDP-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { 
+    hwDldpConfigGroup,
+    hwDldpStatisticsGroup,
+    hwDldpPortGroup,
+    hwDldpPortTrapGroup,
+    hwDldpTrapGroup
+    }
+    ::= { hwDldpCompliances 1 }    
+       
+    -- MIB groupings
+    hwDldpConfigGroup OBJECT-GROUP
+    OBJECTS {  
+    hwDldpEnable,
+    hwDldpUnidirectionalShutdown,
+    hwDldpWorkMode,
+    hwDldpAdvertInterval,
+    hwDelayDownTimer, 
+    hwDldpAuthenMode,
+    hwDldpMd5Password,
+    hwDldpSimplePassword
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to configure the
+        DLDP implementation behavior.
+        This group is mandatory for agents which implement the DLDP."
+    ::= { hwDldpGroups 1 }     
+    
+    hwDldpStatisticsGroup OBJECT-GROUP
+    OBJECTS {  
+    hwDldpPortStatisticsTx,    
+    hwDldpPortStatisticsRxTotal,
+    hwDldpPortStatisticsRxError,
+    hwDldpPortStatisticsRxLoop,
+    hwDldpPortStatisticsRxValid,
+    hwDldpPortStatisticsRxAuthenFail        
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to represent DLDP
+         statistics.
+        This group is mandatory for agents which implement the DLDP
+        and have the capability of receiving and transmitting DLDP frames."
+    ::= { hwDldpGroups 2 } 
+   
+    hwDldpPortGroup OBJECT-GROUP
+    OBJECTS {  
+    hwDldpPortStateReset,
+    hwDldpPortState,
+    hwDldpPortLinkState,
+    hwDldpResetStatistics,
+    hwDldpRowStatus,
+    hwDldpNeighbourPortName,
+    hwDldpNeighbourState,
+    hwDldpNeighbourAgeTime     
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects indicates the information of port."
+    ::= { hwDldpGroups 3 } 
+    
+    hwDldpPortTrapGroup OBJECT-GROUP
+    OBJECTS { hwDldpTrapPortIndex }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects indicates that the activated port index detected one way or found that two way is resumed." 
+    ::= { hwDldpGroups 4 }
+    
+       hwDldpTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {  
+    hwDldpUnidirectionalLink,
+    hwDldpLinkResume            
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of notifications used to indicate that the HUAWEI-DLDP-MIB
+        data is consistent and indicate the general status information.
+        This group is mandatory for agents which implement the DLDP
+        and have the capability of receiving DLDP frames."
+    ::= { hwDldpGroups 5 }  
+    
+END     
+    
+--
+-- HUAWEI-DLDP-MIB.mib
+--     

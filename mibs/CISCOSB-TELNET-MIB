@@ -1,0 +1,154 @@
+CISCOSB-TELNET-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private TELNET MIB
+-- Version:              7.47
+-- Date:                 24-Nov-2008
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, IpAddress     FROM SNMPv2-SMI
+    TruthValue,DisplayString                    FROM SNMPv2-TC
+    InetAddressType, InetAddress                FROM INET-ADDRESS-MIB; -- RFC2851
+
+rlTelnet MODULE-IDENTITY
+                LAST-UPDATED "200811240000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines telnet private MIBs."
+                REVISION "200811240000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 58 }
+
+rlTelnetMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlTelnet 1 }
+
+rlTelnetPassword OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..20))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Telnet Password"
+    ::= { rlTelnet 2 }
+
+rlTelnetTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of minutes after which the TCP connection is closed
+         if no activity is detected from the Client"
+    DEFVAL  {0}
+    ::= { rlTelnet 3 }
+
+rlTelnetUsersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlTelnetUsersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table hold information about current telnet sessions"
+    ::= { rlTelnet 4 }
+
+rlTelnetUsersEntry OBJECT-TYPE
+    SYNTAX      RlTelnetUsersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlTelnetSessionId }
+    ::= { rlTelnetUsersTable 1 }
+
+RlTelnetUsersEntry ::= SEQUENCE {
+    rlTelnetSessionId                INTEGER,
+    rlTelnetSessionClientAddressType InetAddressType,
+    rlTelnetSessionClientAddress     InetAddress,
+    rlTelnetSessionLoginTime         DisplayString,
+    rlTelnetSessionStatus            INTEGER
+}
+
+rlTelnetSessionId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Telnet Session ID"
+    ::= { rlTelnetUsersEntry 1 }
+
+rlTelnetSessionClientAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Telnet Session Client Inet address type"
+    ::= { rlTelnetUsersEntry 2 }
+
+rlTelnetSessionClientAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Telnet Session Client Inet address"
+    ::= { rlTelnetUsersEntry 3 }
+
+rlTelnetSessionLoginTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Telnet Session Login Time string"
+    ::= { rlTelnetUsersEntry 4 }
+
+rlTelnetSessionStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        connected(1),
+        disconnect(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Telnet Session status. After status has been set to diconnect the
+         sessions is closed and the matching entry is deleted from the table."
+    ::= { rlTelnetUsersEntry 5 }
+
+rlTelnetLoginBanner OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Telnet Login Banner. When telnet connection is established,
+         the banner is the concatanation of this MIB and rlTelnetSecondLoginBanner."
+    ::= { rlTelnet 5 }
+
+rlTelnetSecondLoginBanner OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Telnet Login Banner Extension. When telnet connection is established,
+         the banner is the concatanation of rlTelnetLoginBanner and this MIB"
+    ::= { rlTelnet 6 }
+
+rlTelnetEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "<ip telnet server> command added. Communication via this MIB."
+    ::= { rlTelnet 7 }
+
+END

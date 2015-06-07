@@ -1,0 +1,1045 @@
+CTRON-SFPS-PORT-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-port-mib.txt
+--  Revision: 0.0.11
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--  tcl    enterprises
+        Counter, TimeTicks, Gauge
+                FROM RFC1155-SMI
+ 
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.1
+        sfpsPortConfig, sfpsPortStats, sfpsPortAttributeTable,
+        sfpsPortAttributeAPI
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+--SfpsSwitchInstance ::= OCTET STRING (SIZE(4))
+--  this will map to chassis.module index value
+ 
+SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+--SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+  
+
+--  SFPS Switching Port Group
+--  This group contains the managed objects used to setup and
+--  configure the SFPS ports for packet switching and statisics
+--  monitoring.  This group contains two sub-groups:  configuration
+--  and statistics. 
+
+
+--  SFPS Port Configuration Tables
+--  This table contains the managed objects used to set-up and configure
+--  each SFPS switching port.  A seperate table exists for inbound ports
+--  and outbound ports.
+
+--  Inbound ports.
+
+sfpsInPortConfigTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsInPortConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the configuration information of each
+                 configured inbound SFPS switch port.  If SFPS is not
+                 configured on a port, than an entry will not exist."
+        ::= { sfpsPortConfig 1 }
+
+sfpsInPortConfigEntry    OBJECT-TYPE
+        SYNTAX  SfpsInPortConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry specifies the SFPS configuration for the SFPS
+                inbound switch port for which the entry exists."
+        INDEX   { sfpsInPortConfigPort }
+        ::= { sfpsInPortConfigTable 1 }
+
+SfpsInPortConfigEntry ::=
+        SEQUENCE {
+                sfpsInPortConfigPort            SfpsSwitchPort,
+                sfpsInPortConfigAdminStatus     INTEGER,
+                sfpsInPortConfigOperStatus      INTEGER,
+                sfpsInPortConfigOperTime        TimeTicks,
+                sfpsInPortConfigType            INTEGER,
+                sfpsInPortConfigReservedBW      INTEGER,
+                sfpsInPortConfigAllocBW         INTEGER,
+                sfpsInPortConfigQoS             INTEGER,
+                sfpsInPortConfigQSize           INTEGER,
+                sfpsInPortConfigQLen            Gauge,
+                sfpsInPortConfigSwitchId        OCTET STRING,
+                sfpsInPortConfigMediaType       INTEGER,
+                sfpsInPortConfigFrontPanelPort  SfpsSwitchPort,
+                sfpsInPortConfigLinkStatus      INTEGER,
+                sfpsInPortConfigLinkStateAge    TimeTicks,
+                sfpsInPortConfigRouterPort      INTEGER,
+                sfpsInPortConfigSlotNumber      INTEGER,
+                sfpsInPortConfigMib2PortId      INTEGER,
+                sfpsInPortConfigTopoAgent       DisplayString,
+                sfpsInPortConfigLayer3Learning  INTEGER
+        }
+
+sfpsInPortConfigPort    OBJECT-TYPE
+        SYNTAX  SfpsSwitchPort
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The primary index to the SFPS in port table.  This identifies
+                the inbound SFPS switch port for which the entry exists."
+        ::= { sfpsInPortConfigEntry 1 }
+
+sfpsInPortConfigAdminStatus      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3),
+                            loopback(4)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the SFPS inbound switch port
+                 for which the entry exists."
+        ::= { sfpsInPortConfigEntry 2 }
+
+sfpsInPortConfigOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6),    --  not running,invalid config
+                        testing(7)            --  in loopback mode
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current operating condition of the SFPS
+                 on the inbound switch port for which this entry exists."
+        ::= { sfpsInPortConfigEntry 3 }
+
+sfpsInPortConfigOperTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the elapsed time, in hundredths of a second,
+                 that sfpsInPortOperStatus has been in its current
+                 operational state on the SFPS inbound switch port for which
+                 this entry exists."
+        ::= { sfpsInPortConfigEntry 4 }
+
+sfpsInPortConfigType      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            access-port(2),
+                            network-port(3),
+                            host-mgmt-port(4),
+                            host-ctl-port(5),
+                            unknown(6),
+                            going-to-access(7),
+                            hybrid-port(8),
+                            stand-by(9),
+                            network-only(10),
+                            accessOnly(11),
+                            raPrimary(12),
+                            uplink(13),
+                            fclStandby(14),
+                            loopStandby(15),
+                            raStandby(16),
+                            flood(17),
+                            uplinkFlood(18),
+                            downlinkFlood(19),
+                            unknown-ra-standby(20)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the type of port access attribute for the inbound SFPS
+                 port for which the entry exists.  Access ports allow single
+                 user or shared access and perform statisics and control;
+                 network ports are equivalent to trunk ports with no access
+                 control; host management port indicates the (virtual) port
+                 to which the (internal) management agent is attached; host
+                 control port indicates the port to redirect non-management
+                 packets."
+        ::= { sfpsInPortConfigEntry 5 }
+
+sfpsInPortConfigReservedBW      OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the amount of Bandwidth that is reserved for the inbound
+                 SFPS port for which this entry exists.  This bandwidth is
+                 set aside for this port and may be given to another port if
+                 unused."
+
+--  ? should this be in Mbits/sec or as a percentage of total b/w.
+--  Currently defined as percentage of total b/w in switch.
+                 
+        ::= { sfpsInPortConfigEntry 6 }
+
+sfpsInPortConfigAllocBW      OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the amount of Bandwidth that is allocated for
+                 the inbound SFPS port for which this entry exists.
+                 This bandwidth may be less than the reserved
+                 bandwidth." 
+
+--  ? should this be in Mbits/sec or as a percentage of total b/w.
+--  Currently defined as percentage of total b/w in switch.
+                 
+        ::= { sfpsInPortConfigEntry 7 }
+
+sfpsInPortConfigQoS     OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the desired QoS service class for the inbound
+                 SFPS port for which this entry exists."
+
+--  ? should this map to the ATM service classes
+
+        ::= { sfpsInPortConfigEntry 8 }
+
+sfpsInPortConfigQSize    OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the maximum inbound queue size for this port.
+                 Size is indicated in packets (packet descriptors)."
+        ::= { sfpsInPortConfigEntry 9 }
+
+sfpsInPortConfigQLen    OBJECT-TYPE
+        SYNTAX          Gauge
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the actual inbound queue size for this port.
+                 Size is indicated in packets (packet descriptors).  This
+                 is a transient value that reflects the current depth of
+                 queue."
+        ::= { sfpsInPortConfigEntry 10 }
+
+sfpsInPortConfigSwitchId  OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This entry is the id of the port." 
+        ::= { sfpsInPortConfigEntry 11 }
+
+sfpsInPortConfigMediaType      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            ethernet(1),
+                            fddi(2),
+                            atm-lec(3),
+                            token-ring(4),
+                            wan(5),
+                            inb(6),
+                            hcp(7),
+                            hdp(8),
+                            atm-svc(9),
+                            atm-pvc(10),
+                            unknown(11),
+                            atm-forum-lec(12),
+                            atm-forum-pvc(13),
+                            atm-forum-svc(14)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsInPortConfigEntry 12 }
+
+sfpsInPortConfigFrontPanelPort     OBJECT-TYPE
+        SYNTAX          SfpsSwitchPort
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This represents the front panel physical port number"
+        ::= { sfpsInPortConfigEntry 13 }
+
+sfpsInPortConfigLinkStatus      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            linkUp(2),
+                            linkDown(3),
+                                        link-N-A(4)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The link status of this port."
+        ::= { sfpsInPortConfigEntry 14 }
+
+sfpsInPortConfigLinkStateAge      OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Number of time ticks that link has been in this state."
+        ::= { sfpsInPortConfigEntry 15 }
+
+
+sfpsInPortConfigRouterPort      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            router-port(2),
+                            no-router(3)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies whether this port is a router port."
+        ::= { sfpsInPortConfigEntry 16 }
+
+sfpsInPortConfigSlotNumber      OBJECT-TYPE
+    SYNTAX      INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Slot number in the chassis."
+        ::= { sfpsInPortConfigEntry 17 }
+
+sfpsInPortConfigMib2PortId      OBJECT-TYPE
+    SYNTAX      INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Mib2 Port id"
+        ::= { sfpsInPortConfigEntry 18 }
+
+sfpsInPortConfigTopoAgent      OBJECT-TYPE
+    SYNTAX      DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Topology Agent"
+        ::= { sfpsInPortConfigEntry 19 }
+
+sfpsInPortConfigLayer3Learning      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                other(1),
+                enabled(2),
+                disabled(3)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Topology Agent"
+        ::= { sfpsInPortConfigEntry 22 }
+
+
+
+
+--  Outbound Ports
+
+sfpsOutPortConfigTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsOutPortConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the configuration information of each
+                 configured outbound SFPS switch port.  If SFPS is not
+                 configured on a port, than an entry will not exist."
+        ::= { sfpsPortConfig 2 }
+
+sfpsOutPortConfigEntry    OBJECT-TYPE
+        SYNTAX  SfpsOutPortConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry specifies the SFPS configuration for the SFPS
+                outbound switch port for which the entry exists."
+        INDEX   { sfpsOutPortConfigPort }
+        ::= { sfpsOutPortConfigTable 1 }
+
+SfpsOutPortConfigEntry ::=
+        SEQUENCE {
+                sfpsOutPortConfigPort            SfpsSwitchPort,
+                sfpsOutPortConfigAdminStatus     INTEGER,
+                sfpsOutPortConfigOperStatus      INTEGER,
+                sfpsOutPortConfigOperTime        TimeTicks,
+                sfpsOutPortConfigType            INTEGER,
+                sfpsOutPortConfigReservedBW      INTEGER,
+                sfpsOutPortConfigAllocBW         INTEGER,
+                sfpsOutPortConfigQoS             INTEGER,
+                sfpsOutPortConfigQSize           INTEGER,
+                sfpsOutPortConfigQLen            Gauge,
+                sfpsOutPortConfigSwitchId        OCTET STRING,
+                sfpsOutPortConfigMediaType       INTEGER,
+                sfpsOutPortConfigFrontPanelPort  SfpsSwitchPort,
+                sfpsOutPortConfigLinkStatus      INTEGER,
+                sfpsOutPortConfigLinkStateAge    TimeTicks,
+                sfpsOutPortConfigRouterPort      INTEGER,
+                sfpsOutPortConfigSlotNumber      INTEGER,
+                sfpsOutPortConfigMib2PortId      INTEGER
+
+
+        }
+
+sfpsOutPortConfigPort    OBJECT-TYPE
+        SYNTAX  SfpsSwitchPort
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The primary index to the SFPS in port table.  This identifies
+                the outbound SFPS switch port for which the entry exists."
+        ::= { sfpsOutPortConfigEntry 1 }
+
+sfpsOutPortConfigAdminStatus      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3),
+                            loopback(4)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the SFPS outbound switch port
+                 for which the entry exists."
+        ::= { sfpsOutPortConfigEntry 2 }
+
+sfpsOutPortConfigOperStatus     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6),    --  not running,invalid config
+                        testing(7)            --  in loopback mode
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current operating condition of the SFPS
+                 on the outbound switch port for which this entry exists."
+        ::= { sfpsOutPortConfigEntry 3 }
+
+sfpsOutPortConfigOperTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the elapsed time, in hundredths of a second,
+                 that sfpsOutPortOperStatus has been in its current
+                 operational state on the SFPS outbound switch port for which
+                 this entry exists."
+        ::= { sfpsOutPortConfigEntry 4 }
+
+sfpsOutPortConfigType      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            access-port(2),
+                            network-port(3),
+                            host-mgmt-port(4),
+                            host-ctl-port(5),
+                            unknown(6),
+                            going-to-access(7),
+                            hybrid-port(8),
+                                        stand-by(9),
+                            network-only(10),
+                            accessOnly(11),
+                            raPrimary(12),
+                            standbyFCLConflict(13),
+                            standbyLoopedPort(14),
+                            standbyVersionConflict(15),
+                            standbyRANonPrimary(16),
+                            flood(17),
+                            uplinkFlood(18),
+                            downlinkFlood(19),
+                            unknown-ra-standby(20)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the type of port access attribute for the outbound SFPS
+                 port for which the entry exists.  Access ports allow single
+                 user or shared access and perform statisics and control;
+                 network ports are equivalent to trunk ports with no access
+                 control; host management port indicates the (virtual) port
+                 to which the (internal) management agent is attached; host
+                 control port indicates the port to redirect non-management
+                 packets."
+        ::= { sfpsOutPortConfigEntry 5 }
+
+sfpsOutPortConfigReservedBW      OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the amount of Bandwidth that is reserved for the outbound
+                 SFPS port for which this entry exists.  This bandwidth is
+                 set aside for this port and may be given to another port if
+                 unused."
+
+--  ? should this be in Mbits/sec or as a percentage of total b/w.
+--  Currently defined as percentage of total b/w in switch.
+                 
+        ::= { sfpsOutPortConfigEntry 6 }
+
+sfpsOutPortConfigAllocBW      OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the amount of Bandwidth that is allocated for
+                 the outbound  SFPS port for which this entry exists.
+                 This bandwidth may be less than the reserved
+                 bandwidth." 
+
+--  ? should this be in Mbits/sec or as a percentage of total b/w.
+--  Currently defined as percentage of total b/w in switch.
+                 
+        ::= { sfpsOutPortConfigEntry 7 }
+
+sfpsOutPortConfigQoS     OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the desired QoS service class for the outbound
+                 SFPS port for which this entry exists."
+
+--  ? should this map to the ATM service classes
+
+        ::= { sfpsOutPortConfigEntry 8 }
+
+sfpsOutPortConfigQSize    OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the maximum outbound queue size for this port.
+                 Size is indicated in packets (packet descriptors)."
+        ::= { sfpsOutPortConfigEntry 9 }
+
+sfpsOutPortConfigQLen    OBJECT-TYPE
+        SYNTAX          Gauge
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the actual outbound queue size for this port.
+                 Size is indicated in packets (packet descriptors).  This
+                 is a transient value that reflects the current depth of
+                 queue."
+        ::= { sfpsOutPortConfigEntry 10 }
+
+sfpsOutPortConfigSwitchId       OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This entry is id of the port."
+        ::= { sfpsOutPortConfigEntry 11 }
+
+sfpsOutPortConfigMediaType      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            ethernet(1),
+                            fddi(2),
+                            atm-lec(3),
+                            token-ring(4),
+                            wan(5),
+                            inb(6),
+                            hcp(7),
+                            hdp(8),
+                            atm-encap(9),
+                            atm-pvc(10),
+                            unknown(11),
+                            atm-forum-lec(12),
+                            atm-forum-pvc(13),
+                            atm-forum-svc(14)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsOutPortConfigEntry 12 }
+
+sfpsOutPortConfigFrontPanelPort      OBJECT-TYPE
+        SYNTAX          SfpsSwitchPort
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsOutPortConfigEntry 13 }
+
+sfpsOutPortConfigLinkStatus      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            linkUp(2),
+                            linkDown(3),
+                            linkNA(4)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The link status of this port."
+        ::= { sfpsOutPortConfigEntry 14 }
+
+sfpsOutPortConfigLinkStateAge      OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Number of time ticks that link has been in this state."
+        ::= { sfpsOutPortConfigEntry 15 }
+
+sfpsOutPortConfigRouterPort      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            router-port(2),
+                            no-router(3)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies whether this port is a router port."
+        ::= { sfpsOutPortConfigEntry 16 }
+
+sfpsOutPortConfigSlotNumber      OBJECT-TYPE
+    SYNTAX      INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Slot number in the chassis."
+        ::= { sfpsOutPortConfigEntry 17 }
+
+sfpsOutPortConfigMib2PortId      OBJECT-TYPE
+    SYNTAX      INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Mib2 Port id"
+        ::= { sfpsOutPortConfigEntry 18 }
+
+
+
+--
+
+-- SFPS Switching Port Statistics Tables
+-- This table contains the objects that specify the packet and byte counters
+-- for each configured SFPS switching port.  A separate table exists for
+-- inbound and outbound ports.
+
+--  Inbound ports.
+
+sfpsInPortStatsTable         OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SfpsInPortStatsEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "This table contains the packet and byte counters for each
+                 inbound SFPS switch port."
+        ::= { sfpsPortStats 1 }
+
+sfpsInPortStatsEntry         OBJECT-TYPE
+        SYNTAX      SfpsInPortStatsEntry
+        ACCESS      not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the SFPS packet and byte counters for the
+                 inbound SFPS switch port for which this entry exists."
+        INDEX           { sfpsInPortStatsPort }
+        ::= { sfpsInPortStatsTable 1 }
+
+SfpsInPortStatsEntry ::=
+        SEQUENCE {
+                sfpsInPortStatsPort                  SfpsSwitchPort,
+                sfpsInPortStatsAdminStatus           INTEGER,
+                sfpsInPortStatsReset                 INTEGER,
+                sfpsInPortStatsOperTime              TimeTicks,
+                sfpsInPortStatsPkts                  Counter,
+                sfpsInPortStatsDiscardPkts           Counter,
+                sfpsInPortStatsBytes                 Counter,
+                sfpsInPortStatsDiscardBytes          Counter,
+                sfpsInPortStatsQOverflows            Counter,
+                sfpsInPortStatsLinkUps               Counter,
+                sfpsInPortStatsLinkDowns             Counter
+        }
+
+sfpsInPortStatsPort     OBJECT-TYPE
+        SYNTAX          SfpsSwitchPort
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The primary index to the SFPS port table.  This identifies
+                the SFPS inbound switch port for which the entry exists."
+        ::= { sfpsInPortStatsEntry 1 }
+
+sfpsInPortStatsAdminStatus   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the SFPS packet and byte
+                 counters on the inbound SFPS switch port for which this entry
+                 exists."
+        ::= { sfpsInPortStatsEntry 2 }
+
+sfpsInPortStatsReset         OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Resets the SFPS packet and byte counters on the inbound SFPS
+                switch port for which this entry exists."
+        ::= { sfpsInPortStatsEntry 3 }
+
+sfpsInPortStatsOperTime        OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the amount of time (# of time ticks) that the
+                port-specific SFPS packet and byte counters have been
+                active on the inbound SFPS switch port for which this entry
+                exists."
+        ::= { sfpsInPortStatsEntry 4 }
+
+sfpsInPortStatsPkts        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have been
+                 received, during sfpsInPortStatsOpertime, on the inbound
+                 SFPS switch port for which this entry exists."
+        ::= { sfpsInPortStatsEntry 5 }
+
+sfpsInPortStatsDiscardPkts       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have been
+                 discarded (dropped), during sfpsInPortStatsOpertime, on the
+                 inbound SFPS switch port for which this entry exists"
+        ::= { sfpsInPortStatsEntry 6 }
+
+sfpsInPortStatsBytes  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS bytes that have been
+                received, during sfpsInPortStatsOperTime, on the inbound
+                SFPS switch port for which the entry exists."
+        ::= { sfpsInPortStatsEntry 7 }
+
+sfpsInPortStatsDiscardBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in the SFPS packets
+                that have been discarded (dropped), during
+                sfpsInPortStatsOperTime, on the inbound SFPS switch port for
+                which the entry exists."
+        ::= { sfpsInPortStatsEntry 8 }
+
+sfpsInPortStatsQOverflows OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of queue overflow conditions
+                 have been experienced for the inbound SFPS switch port
+                 for which the entry exists."
+        ::= { sfpsInPortStatsEntry 9 }
+
+sfpsInPortStatsLinkUps OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link ups that this port has seen."
+        ::= { sfpsInPortStatsEntry 10 }
+
+sfpsInPortStatsLinkDowns OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link downs that this port has seen."
+        ::= { sfpsInPortStatsEntry 11 }
+
+--
+
+--  Outbound ports.
+
+sfpsOutPortStatsTable         OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SfpsOutPortStatsEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "This table contains the packet and byte counters for each
+                 outbound SFPS switch port."
+        ::= { sfpsPortStats 2 }
+
+sfpsOutPortStatsEntry         OBJECT-TYPE
+        SYNTAX      SfpsOutPortStatsEntry
+        ACCESS      not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the SFPS packet and byte counters for the
+                 outbound SFPS switch port for which this entry exists."
+        INDEX           { sfpsOutPortStatsPort }
+        ::= { sfpsOutPortStatsTable 1 }
+
+SfpsOutPortStatsEntry ::=
+        SEQUENCE {
+                sfpsOutPortStatsPort                  SfpsSwitchPort,
+                sfpsOutPortStatsAdminStatus           INTEGER,
+                sfpsOutPortStatsReset                 INTEGER,
+                sfpsOutPortStatsOperTime              TimeTicks,
+                sfpsOutPortStatsPkts                  Counter,
+                sfpsOutPortStatsDiscardPkts           Counter,
+                sfpsOutPortStatsBytes                 Counter,
+                sfpsOutPortStatsDiscardBytes          Counter,
+                sfpsOutPortStatsQOverflows            Counter,
+                sfpsOutPortStatsLinkUps               Counter,
+                sfpsOutPortStatsLinkDowns             Counter
+        }
+
+sfpsOutPortStatsPort     OBJECT-TYPE
+        SYNTAX          SfpsSwitchPort
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The primary index to the SFPS port table.  This identifies
+                the SFPS outbound switch port for which the entry exists."
+        ::= { sfpsOutPortStatsEntry 1 }
+
+sfpsOutPortStatsAdminStatus   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the SFPS packet and byte
+                 counters on the outbound SFPS switch port for which this entry
+                 exists."
+        ::= { sfpsOutPortStatsEntry 2 }
+
+sfpsOutPortStatsReset         OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Resets the SFPS packet and byte counters on the outbound SFPS
+                switch port for which this entry exists."
+        ::= { sfpsOutPortStatsEntry 3 }
+
+sfpsOutPortStatsOperTime        OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the amount of time (# of time ticks) that the
+                port-specific SFPS packet and byte counters have been
+                active on the outbound SFPS switch port for which this entry
+                exists."
+        ::= { sfpsOutPortStatsEntry 4 }
+
+sfpsOutPortStatsPkts        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have been
+                 received, during sfpsOutPortStatsOpertime, on the outbound
+                 SFPS switch port for which this entry exists."
+        ::= { sfpsOutPortStatsEntry 5 }
+
+sfpsOutPortStatsDiscardPkts       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have been
+                 discarded (dropped), during sfpsOutPortStatsOpertime, on the
+                 outbound SFPS switch port for which this entry exists"
+        ::= { sfpsOutPortStatsEntry 6 }
+
+sfpsOutPortStatsBytes  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS bytes that have been
+                received, during sfpsOutPortStatsOperTime, on the outbound
+                SFPS switch port for which the entry exists."
+        ::= { sfpsOutPortStatsEntry 7 }
+
+sfpsOutPortStatsDiscardBytes OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of bytes in the SFPS packets
+                that have been discarded (dropped), during
+                sfpsOutPortStatsOperTime, on the outbound SFPS switch port for
+                which the entry exists."
+        ::= { sfpsOutPortStatsEntry 8 }
+
+sfpsOutPortStatsQOverflows OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of queue overflow conditions
+                 have been experienced for the outbound SFPS switch port
+                 for which the entry exists."
+        ::= { sfpsOutPortStatsEntry 9 }
+
+sfpsOutPortStatsLinkUps OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link ups that this port has seen."
+        ::= { sfpsOutPortStatsEntry 10 }
+
+sfpsOutPortStatsLinkDowns OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of link downs that this port has seen."
+        ::= { sfpsOutPortStatsEntry 11 }
+
+
+-- Port Attributes
+
+sfpsPortAttributePort     OBJECT-TYPE
+    SYNTAX      INTEGER 
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsPortAttributeTable 1 }
+
+sfpsPortAttributeAttributes     OBJECT-TYPE
+    SYNTAX      HexInteger      
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsPortAttributeTable 2 }
+
+sfpsPortAttributeLearnSelfArp     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off(2),
+                on(1)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsPortAttributeTable 3 }
+
+
+-- Port Attributes API
+
+sfpsPortAttributeAPIVerb     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                other(1),
+                resetAll(2),
+                resetPort(3),
+                enablePortAttr(4),
+                disablePortAttr(5)
+        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsPortAttributeAPI 1 }
+
+sfpsPortAttributeAPIPort     OBJECT-TYPE
+    SYNTAX      INTEGER 
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsPortAttributeAPI 2 }
+
+sfpsPortAttributeAPIAttribute     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none(2),
+                learnSelfArp(1)
+        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsPortAttributeAPI 3 }
+
+END 

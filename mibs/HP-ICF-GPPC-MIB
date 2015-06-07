@@ -1,0 +1,563 @@
+HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, RowStatus
+            FROM SNMPv2-TC
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        PortList
+            FROM Q-BRIDGE-MIB
+        hpSwitch
+            FROM HP-ICF-OID;
+
+    hpicfGppcMIB MODULE-IDENTITY
+        LAST-UPDATED "200709271125Z"
+        ORGANIZATION "Hewlett Packard Company,
+                      Procurve Networking Business"
+        CONTACT-INFO "Hewlett Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module is for HP proprietary
+                     General Purpose Packet Control (GPPC)"
+
+        REVISION     "200709271125Z"
+        DESCRIPTION  "Initial revision."
+
+        ::= { hpSwitch 41 }
+
+-- ***********************************************
+-- TEXTUAL Conventions
+-- ***********************************************
+    HpicfGppcPolicyName ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Type definition for the name of a policy.
+
+                    A policy name is a printable string consisting
+                    of up to 64 characters from the ASCII character
+                    set."
+        SYNTAX      OCTET STRING (SIZE(1..32))
+
+-- ***********************************************
+-- Start of MIB Objects
+-- ***********************************************
+    hpicfGppcConformance OBJECT IDENTIFIER ::= { hpicfGppcMIB 1 }
+
+-- ***********************************************
+-- GPPC application control table
+-- ***********************************************
+    hpicfGppcAppControlTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfGppcAppControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The application control table.  This keeps track
+                    of the applications that use GPPC, the policies
+                    set by these applications, and information on
+                    where/when/how to apply these policies.
+
+                    This information includes the interfaces and VLANs
+                    where the policy should be applied, whether it
+                    should be applied at ingress or egress, and when it
+                    should expire."
+
+        ::= { hpicfGppcMIB 2 }
+
+    hpicfGppcAppControlEntry OBJECT-TYPE
+        SYNTAX      HpicfGppcAppControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the application control table."
+        INDEX       { hpicfGppcAcAppName,
+                    hpicfGppcAcAppInstance,
+                    hpicfGppcAcPolicyName }
+        ::= { hpicfGppcAppControlTable 1 }
+
+    HpicfGppcAppControlEntry ::=
+        SEQUENCE {
+            hpicfGppcAcAppName          SnmpAdminString,
+            hpicfGppcAcAppInstance      SnmpAdminString,
+            hpicfGppcAcPolicyName       HpicfGppcPolicyName,
+            hpicfGppcAcIngressIfList    PortList,
+            hpicfGppcAcIngressVlanMap1k OCTET STRING,
+            hpicfGppcAcIngressVlanMap2k OCTET STRING,
+            hpicfGppcAcIngressVlanMap3k OCTET STRING,
+            hpicfGppcAcIngressVlanMap4k OCTET STRING,
+            hpicfGppcAcEgressIfList     PortList,
+            hpicfGppcAcEgressVlanMap1k  OCTET STRING,
+            hpicfGppcAcEgressVlanMap2k  OCTET STRING,
+            hpicfGppcAcEgressVlanMap3k  OCTET STRING,
+            hpicfGppcAcEgressVlanMap4k  OCTET STRING,
+            hpicfGppcAcExpPolicy        INTEGER,
+            hpicfGppcAcExpString        OCTET STRING,
+            hpicfGppcAcLastErrorCode    INTEGER,
+            hpicfGppcAcLastErrorString  OCTET STRING,
+            hpicfGppcAcRowAdminStatus   INTEGER,
+            hpicfGppcAcRowStatus        RowStatus 
+        }
+
+    hpicfGppcAcAppName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Name of the application that last modified this
+                    row.  All applications of the same type should use
+                    the same name and should use different instance
+                    identifiers to identify themselves uniquely.
+
+                    This is a printable string up to 16 bytes in size."
+        ::= { hpicfGppcAppControlEntry 1 }
+
+    hpicfGppcAcAppInstance OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(1..16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Instance identifier of the application.  This is
+                    used to distinguish between different instances of
+                    the same application.
+
+                    This is a printable string up to 16 bytes in size."
+        ::= { hpicfGppcAppControlEntry 2 }
+
+    hpicfGppcAcPolicyName OBJECT-TYPE
+        SYNTAX      HpicfGppcPolicyName
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Name of the policy.  Each policy is uniquely
+                    identified by its name.  It is possible to apply the
+                    same policy in different manners to different
+                    interfaces and VLANs.
+
+                    This is a printable string up to 64 characters in
+                    size."
+        ::= { hpicfGppcAppControlEntry 3 }
+
+    hpicfGppcAcIngressIfList OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "List of interfaces to which this policy applies at
+                    ingress."
+        ::= { hpicfGppcAppControlEntry 4 }
+
+    hpicfGppcAcIngressVlanMap1k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 0 through 1023.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 0 through 7, the second
+                    octet to VLANs 8 through 15, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at ingress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 5 }
+
+    hpicfGppcAcIngressVlanMap2k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 1024 through 2047.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 1024 through 1031, the second
+                    octet to VLANs 1032 through 1039, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at ingress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 6 }
+
+    hpicfGppcAcIngressVlanMap3k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 2048 through 3071.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 2048 through 2055, the second
+                    octet to VLANs 2056 through 2063, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at ingress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 7 }
+
+    hpicfGppcAcIngressVlanMap4k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 3072 through 4095.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 3072 through 3079, the second
+                    octet to VLANs 3080 through 3087, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at ingress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 8 }
+
+    hpicfGppcAcEgressIfList OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "List of interfaces to which this policy applies at
+                    egress."
+        ::= { hpicfGppcAppControlEntry 9 }
+
+    hpicfGppcAcEgressVlanMap1k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 0 through 1023.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 0 through 7, the second
+                    octet to VLANs 8 through 15, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at egress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 10 }
+
+    hpicfGppcAcEgressVlanMap2k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 1024 through 2047.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 1024 through 1031, the second
+                    octet to VLANs 1032 through 1039, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at egress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 11 }
+
+    hpicfGppcAcEgressVlanMap3k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 2048 through 3071.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 2048 through 2055, the second
+                    octet to VLANs 2056 through 2063, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at egress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 12 }
+
+    hpicfGppcAcEgressVlanMap4k OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "A string of octets containing one bit per VLAN for
+                    VLANS with vlan index values of 3072 through 4095.
+                    The first octet corresponds to VLANs with
+                    vlan index values of 3072 through 3079, the second
+                    octet to VLANs 3080 through 3087, etc.  The most
+                    significant bit of each octet corresponds to the
+                    lowest vlan index value in that octet.
+
+                    For each VLAN that this policy should apply to
+                    at egress, the corresponding bit is set to '1'."
+        ::= { hpicfGppcAppControlEntry 13 }
+
+    hpicfGppcAcExpPolicy OBJECT-TYPE
+        SYNTAX      INTEGER { permanent(1) }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Expiration policy.  This indicates whether a policy
+                    should expire automatically.
+
+                    'permanent' means a policy should never expire
+                    automatically."
+        ::= { hpicfGppcAppControlEntry 14 }
+
+    hpicfGppcAcExpString OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..24))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Expiration string.  This is used in conjuntion with
+                    hpicfGppcAcExpPolicy to indicate when a policy
+                    should expire automatically.
+
+                    The value stored in this object is interpreted
+                    differently for different expiration policies.  When
+                    the expiration policy is 'permanent', this value is
+                    ignored."
+        ::= { hpicfGppcAppControlEntry 15 }
+
+    hpicfGppcAcLastErrorCode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        no-error(0),
+                        gppc-generic-error(1),
+                        gppc-length-error(2),
+                        gppc-name-error(3),
+                        gppc-parameter-error(4),
+                        gppc-not-implemented(5),
+                        gppc-malloc-error(6),
+                        gppc-too-many-apps(7),
+                        gppc-too-many-policies(8),
+                        gppc-already-reserved(9),
+                        gppc-entry-not-found(10),
+                        gppc-entry-exists(11),
+                        gppc-platform-error(12),
+                        gppc-app-using-policy(13),
+                        gppc-invalid-policy-type(14),
+                        gppc-not-reserved(15),
+                        gppc-no-policy(16),
+                        gppc-policy-not-active(17),
+                        gppc-policy-has-rules(18),
+                        gppc-rule-exists(19),
+                        gppc-mac-mirror-mac-exists(30),
+                        gppc-mac-mirror-dir-both-conflict(31),
+                        gppc-mac-mirror-dir-src-conflict(32),
+                        gppc-mac-mirror-dir-dst-conflict(33),
+                        gppc-mac-mirror-invalid-session(34),
+                        gppc-mac-mirror-invalid-direction(35),
+                        gppc-mac-mirror-no-entry(36),
+                        gppc-mac-mirror-convert-error(37),
+                        gppc-mac-mirror-table-full(38),
+                        gppc-cfg-generic-error(50),
+                        gppc-cfg-entry-not-found(51),
+                        gppc-cfg-set-error(52),
+                        gppc-cfg-get-error(53),
+                        gppc-cfg-no-record(54),
+                        gppc-cfg-add-record-error(55),
+                        gppc-cfg-invalid(56),
+                        gppc-cfg-malloc-error(57)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Error code of the last error that occurred.  A
+                    non-zero value indicates that the last operation
+                    performed by this instance of the application on the
+                    named policy did not succeed.  A detailed
+                    description of the error is available in
+                    hpicfGppcAcLastErrorString."
+        ::= { hpicfGppcAppControlEntry 16 }
+
+    hpicfGppcAcLastErrorString OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Description of the last error that occurred.  This
+                    is a printable ASCII string that describes the error
+                    in some detail."
+        ::= { hpicfGppcAppControlEntry 17 }
+
+    hpicfGppcAcRowAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(1),
+                        enabled(2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Administrative status of this row.  The named policy
+                    in this row is applied to the interfaces and/or
+                    VLANs by this instance of the application only when
+                    the administrative status is enabled.  This is the
+                    main on/off switch for the row.  The row status must
+                    be active for this switch to have an effect."
+        ::= { hpicfGppcAppControlEntry 18 }
+
+    hpicfGppcAcRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Status of this row.  Row status must be active, and
+                    the admin status (see hpicfGppcAcRowAdminStatus)
+                    must be enabled for this row to be activated."
+        ::= { hpicfGppcAppControlEntry 19 }
+
+-- ***********************************************
+-- GPPC named policy table
+-- ***********************************************
+    hpicfGppcNamedPolicyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfGppcNamedPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The named policy table.  This table lists the name
+                    and type of all policies that are applied via GPPC."
+        ::= { hpicfGppcMIB 3 }
+
+    hpicfGppcNamedPolicyEntry OBJECT-TYPE
+        SYNTAX      HpicfGppcNamedPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the named policy table."
+        INDEX       { hpicfGppcNpPolicyName }
+        ::= { hpicfGppcNamedPolicyTable 1 }
+
+    HpicfGppcNamedPolicyEntry ::=
+        SEQUENCE {
+            hpicfGppcNpPolicyName       HpicfGppcPolicyName,
+            hpicfGppcNpPolicyType       INTEGER,
+            hpicfGppcNpRowStatus        RowStatus 
+        }
+
+    hpicfGppcNpPolicyName OBJECT-TYPE
+        SYNTAX      HpicfGppcPolicyName
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Name of the policy.  The name of a policy is its
+                    unique identification.  It is a printable string
+                    in ASCII characters.  It can be up to 64 characters
+                    in length"
+        ::= { hpicfGppcNamedPolicyEntry 1 }
+
+    hpicfGppcNpPolicyType OBJECT-TYPE
+        SYNTAX      INTEGER { mac-based-mirroring(1) }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Type of the policy.  A policy type of
+                    'mac-based-mirroring' indicates that the policy is
+                    used to mirror traffic based on the MAC address of
+                    the source or destination."
+        ::= { hpicfGppcNamedPolicyEntry 2 }
+
+    hpicfGppcNpRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Status of this row.  The named policy must be
+                    active before rules can be added to it or removed
+                    from it.  A newly created policy will remain in
+                    notReady state until it is given a valid policy type
+                    (see hpicfGppcNpPolicyType).
+
+                    A row in the named policy table can not be deleted
+                    if the named policy is referenced by a row in the
+                    application control table.  The application
+                    control entries that refer to this row must be
+                    deleted before this row can be deleted."
+        ::= { hpicfGppcNamedPolicyEntry 3 }
+
+-- ***********************************************
+-- GPPC policy rules table
+-- ***********************************************
+    hpicfGppcPolicyRulesTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfGppcPolicyRulesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The policy rules table.  A policy can consist of
+                    multiple rules.  All of the rules of a policy are
+                    listed in this table.  Each rule consists of a
+                    string and a numeric identifier - the rule id."
+        ::= { hpicfGppcMIB 4 }
+
+    hpicfGppcPolicyRulesEntry OBJECT-TYPE
+        SYNTAX      HpicfGppcPolicyRulesEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the policy rules table."
+        INDEX       { hpicfGppcNpPolicyName,
+                    hpicfGppcPrRuleId }
+        ::= { hpicfGppcPolicyRulesTable 1 }
+
+    HpicfGppcPolicyRulesEntry ::=
+        SEQUENCE {
+            hpicfGppcPrRuleId     Integer32,
+            hpicfGppcPrPolicyRule OCTET STRING,
+            hpicfGppcPrRowStatus  RowStatus 
+        }
+
+    hpicfGppcPrRuleId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Numeric identifier of the rule.  The rules in a
+                    policy are processed sequentially in increasing
+                    order of their rule ids.  These numeric ids are
+                    generated by the application that creates the
+                    policy.  Rules within a policy have unique rule
+                    ids."
+        ::= { hpicfGppcPolicyRulesEntry 1 }
+
+    hpicfGppcPrPolicyRule OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Rule string.  This is a string that represents one
+                    rule in the policy.  A policy can consist of one or
+                    many rules."
+        ::= { hpicfGppcPolicyRulesEntry 2 }
+
+    hpicfGppcPrRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Status of this row.  A rule must have an active row
+                    status in order to take effect.  Only active rules
+                    within the named policy are applied when an
+                    application applies the policy.  It is possible to
+                    use this row status as an on/off switch for enabling
+                    or disabling selected rules within a policy.
+
+                    A newly created rule will remain in notReady state
+                    until it is given a valid rule string (see
+                    hpicfGppcPrPolicyRule)."
+        ::= { hpicfGppcPolicyRulesEntry 3 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfGppcMIBCompliances  OBJECT IDENTIFIER ::= { hpicfGppcConformance 1 }
+    hpicfGppcMIBGroups       OBJECT IDENTIFIER ::= { hpicfGppcConformance 2 }
+
+    hpicfGppcMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers
+                    implementing the HP-ICF-GPPC-MIB."
+        MODULE
+            MANDATORY-GROUPS { hpicfGppcGroup }
+            GROUP       hpicfGppcGroup
+            DESCRIPTION "Support for this group is required for HP routers
+                        that implement GPPC."
+        ::= { hpicfGppcMIBCompliances 1 }
+
+    hpicfGppcGroup OBJECT-GROUP
+        OBJECTS     {
+            hpicfGppcAcIngressIfList,
+            hpicfGppcAcIngressVlanMap1k,
+            hpicfGppcAcIngressVlanMap2k,
+            hpicfGppcAcIngressVlanMap3k,
+            hpicfGppcAcIngressVlanMap4k,
+            hpicfGppcAcEgressIfList,
+            hpicfGppcAcEgressVlanMap1k,
+            hpicfGppcAcEgressVlanMap2k,
+            hpicfGppcAcEgressVlanMap3k,
+            hpicfGppcAcEgressVlanMap4k,
+            hpicfGppcAcExpPolicy,
+            hpicfGppcAcExpString,
+            hpicfGppcAcLastErrorCode,
+            hpicfGppcAcLastErrorString,
+            hpicfGppcAcRowAdminStatus,
+            hpicfGppcAcRowStatus,
+            hpicfGppcNpPolicyType,
+            hpicfGppcNpRowStatus,
+            hpicfGppcPrPolicyRule,
+            hpicfGppcPrRowStatus
+        }
+        STATUS      current
+        DESCRIPTION "A collection of HP proprietary objects to support
+                    GPPC."
+        ::= { hpicfGppcMIBGroups 1 }
+END

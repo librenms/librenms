@@ -1,0 +1,2830 @@
+-- ============================================================================
+-- Copyright (C) by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: In this Module, mainly defined the TEXTUAL-CONVENTION which used
+--              by huawei devices, including HWFrameType, HWPCBType, HWSubPCBType,
+--              HWPortType. The following table is the code area which used by
+--              each product:
+-- Reference:
+-- Version:     V3.14
+-- History:
+
+
+-- ============================================================================
+    HUAWEI-TC-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+            Integer32,IpAddress, OBJECT-TYPE, MODULE-IDENTITY,
+            NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION,DateAndTime,MacAddress
+                FROM SNMPv2-TC
+            ifEntry
+                FROM IF-MIB
+            huawei
+                FROM HUAWEI-MIB;
+
+
+        huaweiTCMIB MODULE-IDENTITY
+            LAST-UPDATED "2005090800Z"
+            ORGANIZATION "Fix-Net Dep, Huawei Technologies Co.,Ltd."
+            CONTACT-INFO
+                "Floot 5 ,Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,  P.R.C.
+                http://www.huawei.com
+                Zip:518129
+                "
+            DESCRIPTION
+                "huawei  text conventions and common  defination.    "
+            ::= { huawei 20021210 }
+
+        HWErrorCode ::= TEXTUAL-CONVENTION
+            STATUS deprecated
+            DESCRIPTION
+                "SNMP expand Error code defintion."
+            SYNTAX INTEGER
+
+        HWFrameType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "This data type is used as the syntax of the
+                hwframeType object in the definition of
+                HUAWEI-DEVICE-MIBs hwframeTable.
+                  "
+            SYNTAX INTEGER
+                {
+                fnameUnknow(1),
+-- MD5500:
+                fnameMd16(2),                   -- MD 16 Slot Frame
+                fnameMd8(3),                    -- MD 8  Slot Frame
+                fnameMd4(4),                    -- MD 4  Slot Frame
+                fnameMa16(5),                   -- MA 16 Slot Frame
+                fnameMa8(6),                    -- MA 8  Slot Frame
+                fnameMa4(7),                    -- MA 4  Slot Frame
+                fnameSmx16(8),                  -- MA 16 Slot Slave Frame
+                fnameRsa(9),                    -- RSA Frame
+                fnameRsp19(10),                 -- RSP 19 Slot Frame
+                fnameRsp15(11),                 -- RSP 15 Slot Frame
+                fnameRsp14(12),                 -- RSP 14 Slot Frame
+                fnameRsp12(13),                 -- RSP 12 Slot Frame
+                fnameRsp10(14),                 -- RSP 10 Slot Frame
+                fnameRsp6A(15),                 -- RSP 6  Slot A Type Frame
+                fnameRsp6B(16),                 -- RSP 6  Slot B Type Frame
+                fnamePv819(17),                 -- PV8 19 Slot Frame
+                fnamePv815(18),                 -- PV8 15 Slot Frame
+                fnamePv814(19),                 -- PV8 14 Slot Frame
+                fnamePv812(20),                 -- PV8 12 Slot Frame
+                fnamePv810(21),                 -- PV8 10 Slot Frame
+                fnamePv86A(22),                 -- PV8 6 Slot A Type Frame
+                fnamePv86B(23),                 --PV8 6 Slot B Type Frame
+-- UA3000 added frame
+                fnameHubm(24),                  -- Honet
+                fnameHube(25),                  -- Honet
+                fnameHubf(26),                  -- Honet
+-- MD5500 added frame
+                fnameUamr(27),
+                fnameUasr(28),
+                fnameUafmr(29),
+                fnameUafsr(30),
+                fnameUamv(31),
+                fnameUasv(32),
+                fnameUafmv(33),
+                fnameUafsv(34),
+                fnameUabmr(35),
+                fnameOnu60ar(36),
+                fnameOnuf01D100r(37),
+                fnameUabmv(38),
+                fnameOnu60av(39),
+                fnameOnuf01D100v(40),
+                fnameHubs(41),
+                fnameHubb(42),
+                fnameHubl(43),
+                fnameMa7(44),
+                fnameSmxMa4(45),
+                fnameSmxMa7(46),
+                fnameMdb16(47),
+-- Musa
+                fnameMusa(50),
+-- MA5200
+                fnameMusa5200E(51),
+                fnameMusa5200F(52),
+-- AG
+                fnamePvm10(60),
+                fnamePvm6B(61) ,
+                fnamePvm6A(62),
+                fnamePvmUam(63),
+                fnamePvmUafm(64),
+                fnamePvmUafs(65),
+                fnamePvmUas(66),
+                fnamePvmUamb(67),
+                fnamePvmOnuf01D100(68),
+                fnameOnu04(262176),
+                fnameOnu08(262177),
+-- A8010:
+                fnameA8010U18(70),
+                fnameA8010U5(71),
+-- MA5105
+                fnameMA5105(80),                -- MA5105
+                fnameBSL(81) ,                  -- BSL
+                fnameB08(82),                   -- B08
+-- MA5300
+                fnameMA5306(83),
+                fnameMA5300(84),
+                fnameS3026V(85),
+
+                fnameOnuf01D100H602Hublr(86),
+                fnameOnuf01D100H602Hublv(87),
+                fnameAmgH602Hubl(88),
+                fnameUaH602Hubl(89),
+                fnameHaba(90),
+                fnameHabb(91),
+                fnameHabd(92),
+                fnameHabe(93),
+                fnameHabl(94),
+                fnameHabt(95),
+                fnameApsbHabe(96),
+                fnameApsrHabe(97),
+-- 8040:
+                fname1760(100),                 -- Quidway R1760 FRAME, 1 MIM slot and 2 SIC slot
+                fname2610(101),                 -- Quidway R2610 FRAME, 1 MIM slot and 2 SIC slot
+                fname2611(102),                 -- Quidway R2611 FRAME, 1 MIM slot and 2 SIC slot
+                fname2620(103),                 -- Quidway R2620 FRAME, 2 MIM slot
+                fname2621(104),                 -- Quidway R2621 FRAME, 2 MIM slot
+                fname2630(105),                 -- Quidway R2630 FRAME, 3 MIM slot
+                fname2631(106),                 -- Quidway R2631 FRAME, 3 MIM slot
+                fname3640(107),                 -- Quidway R3640 FRAME, 4 MIM slot
+                fname3680(108),                 -- Quidway R3680 FRAME, 8 MIM slot
+-- 8060:
+                fname4620(120),                 -- Quidway R4620 FRAME, 1RPU+2IfCard+2PWR+1FAN
+                fname4640(121),                 -- Quidway R4640 FRAME, 1RPU+4IfCard+2PWR+1FAN
+                fname4680(122),                 -- Quidway R4680 FRAME, 1RPU+8IfCard+1NPU+2PWR+1FAN
+                fnameNE20-2(123),               -- Quidway NE20-2 FRAME, 1RPU+2IfCard+1NPU+2PWR+1FAN
+                fnameNE20-4(124),               -- Quidway NE20-4 FRAME, 1RPU+4IfCard+1NPU+2PWR+1FAN
+                fnameNE20-8(125),               -- Quidway NE20-8 FRAME, 1RPU+8IfCard+1NPU+2PWR+1FAN
+                fnameNE20E-4(126),              -- Quidway NE20E-4 FRAME, 2RPU+4IfCard+2NPU+2PWR+1FAN+2COP
+                fnameNE20E-8(127),              -- Quidway NE20E-8 FRAME, 2RPU+8IfCard+2NPU+2PWR+1FAN+2COP
+-- 8070:
+                fnameNE05(130),                 -- Quidway NE05 FRAME, 4 VIU Slot, 1 RSU slot
+                fnameNE08(131),                 -- Quidway NE08 FRAME, 7 VIU slot, 1 RSU slot
+                fnameNE16(132),                 -- Quidway NE16 FRAME, 12 VIU slot, 2 RSU slot
+                fnameNE08E(133),                -- Quidway NE08E FRAME, 6 VIU slot, 2 RSU slot
+                fnameNE16E(134),                -- Quidway NE16E FRAME, 12 VIU slot, 2 RSU slot
+-- 8011:
+                fnameNE80(140),                 -- Quidway NE80 FRAME,
+                fnameNE40-8(141),               -- Quidway NE40-8 FRAME,
+                fnameNE40-4(142),               -- Quidway NE40-4 FRAME,
+                fnameNE40-2(143),               -- Quidway NE40-2 FRAME,
+-- MA
+                fnameMA5600H511upba(800),
+                fnameMa5600MA5100(801),
+                fnameMa5600MA5103(802),
+                fnameMa5600MA5106(803),
+-- PVU
+                fnamePvuMainHaba(900),
+                fnamePvuMainHabb(901),
+                fnamePvuMainHabd(902),
+                fnamePvuMainHabe(903),
+                fnamePvuMainHabl(904),
+                fnamePvuMainHabt(905),
+-- PVM
+                fnamePvmMainHaba(1000),
+                fnamePvmMainHabb(1001),
+                fnamePvmMainHabd(1002),
+                fnamePvmMainHabe(1003),
+                fnamePvmMainHabl(1004),
+                fnamePvuMainHabt(1005),
+
+                fnamePvuSlaveHabb(1500),
+                fnamePvuSlaveHabe(1501),
+-- MD
+                fnameRspHubt(200710),
+                fnamePv8Hubt(200711),
+-- MA5105
+                fnameMa5605(134912)  ,
+
+--  MA5200 add definitiong of frame 0x21000(135168) ~ 0x21FFF(139263)
+                fnameMA5200G2(135168),             -- Quidway MA5200G-2 FRAME, 
+                fnameMA5200G4(135169),             -- Quidway MA5200G-4 FRAME, 
+                fnameMA5200G8(135170),              -- Quidway MA5200G-8 FRAME, 
+                
+--WA5700:
+                fnameWA5700(155648),
+
+-- 8031:
+                fname8031CXUNKN(536576),             -- Unknown frame
+                fname8031CX200A(536577),             -- Quidway CX200A Carrier Switch
+                fname8031CX200B(536578),             -- Quidway CX200B Carrier Switch
+                fname8031CX300A(536579),             -- Quidway CX300A Carrier Switch
+                fname8031CX300B(536580),             -- Quidway CX300B Carrier Switch
+                fname8031CX380(536581),              -- Quidway CX380 Carrier Switch
+                fname8031CX6008(536582),             -- Quidway CX600-8 Carrier Switch
+                fname8031CX60016(536583),            -- Quidway CX600-16 Carrier Switch
+                
+                fname8031CX200C(536584),             -- Quidway CX200C Metro Service Platform
+                
+                fname8031CX200DAC(536585),      -- Quidway CX200D-AC Metro Service Platform
+                fname8031CX200DDC(536586),      -- Quidway CX200D-DC Metro Service Platform
+                
+                fname8031S2326PEIAC(536587),      -- Quidway S2326P-EI-AC Metro Service Platform
+                fname8031S2326PEIDC(536588),      -- Quidway S2326P-EI-DC Metro Service Platform
+                
+                fname8031S2318PEIAC(536589),     -- Quidway S2318P-EI-AC Metro Service Platform
+                fname8031S2318PEIDC(536590),     -- Quidway S2318P-EI-DC Metro Service Platform
+                
+                fname8031S2309PEIAC(536591),      -- Quidway S2309P-EI-AC Metro Service Platform
+                fname8031S2309PEIDC(536592),      -- Quidway S2309P-EI-DC Metro Service Platform
+                
+                fname8031S2326PSIAC(536593),      -- Quidway S2326P-SI-AC Metro Service Platform
+                fname8031S2318PSIAC(536594),      -- Quidway S2318P-SI-AC Metro Service Platform
+                fname8031S2309PSIAC(536595),      -- Quidway S2309P-SI-AC Metro Service Platform
+                
+                fname8031S3352PEIAC(536596),      -- Quidway S3352P-EI-AC Metro Service Platform
+                fname8031S3352PEIDC(536597),      -- Quidway S3352P-EI-DC Metro Service Platform
+                
+                fname8031S3328TPEIAC(536598),     -- Quidway S3328TP-EI-AC Metro Service Platform
+                fname8031S3328TPEIDC(536599),      -- Quidway S3328TP-EI-DC Metro Service Platform
+                
+                fname8031S3352PSIAC(536600),     -- Quidway S3352P-SI-AC Metro Service Platform
+                fname8031S3352PSIDC(536601),      -- Quidway S3352P-SI-DC Metro Service Platform
+                
+                fname8031S3328TPSIAC(536602),      -- Quidway S3328TP-SI-AC Metro Service Platform
+                fname8031S3328TPSIDC(536603),      -- Quidway S3328TP-SI-DC Metro Service Platform
+                
+                fname8031CX200DMCAC(536604),      -- Quidway CX200DMC-AC Metro Service Platform
+                fname8031CX200DMCDC(536605),     -- Quidway CX200DMC-DC Metro Service Platform
+                
+                fname8031CX200DEAAC(536606),      -- Quidway CX200DEA-AC Metro Service Platform
+                fname8031CX200DEADC(536607),      -- Quidway CX200DEA-DC Metro Service Platform
+                
+                fname8031CX6004(536608),            -- Quidway CX600-4 Carrier Switch
+                
+                fname8031CX200DEAMCAC(536609),     -- Quidway CX200DEA-MC-AC Metro Service Platform
+                fname8031CX200DEAMCDC(536610),      -- Quidway CX200DEA-MC-DC Metro Service Platform                
+                
+                fname8031S3328TPEI24SAC(536611)       -- Quidway S3328TP-EI-24S-AC Metro Service Platform  
+                fname8031S3328TPEI24SDC(536612)       -- Quidway S3328TP-EI-24S-DC Metro Service Platform
+                fname8031S3328TPSI24SAC(536613)       -- Quidway S3328TP-SI-24S-AC Metro Service Platform 
+                fname8031S3328TPSI24SDC(536614)       -- Quidway S3328TP-SI-24S-DC Metro Service Platform  
+                 
+                fname8031S3352PEI24SAC(536615)        -- Quidway S3352P-EI-24S-AC  Metro Service Platform                           
+                fname8031S3352PEI24SDC(536616)        -- Quidway S3352P-EI-24S-DC  Metro Service Platform  
+                  
+                fname8031S3352PEI48SAC(536617)        -- Quidway S3352P-EI-48S-AC  Metro Service Platform                                             
+                fname8031S3352PEI48SDC(536618)        -- Quidway S3352P-EI-48S-DC  Metro Service Platform  
+                fname8031S3352PSI48SAC(536619)        -- Quidway S3352P-SI-48S-AC  Metro Service Platform
+                fname8031S3352PSI48SDC(536620)        -- Quidway S3352P-SI-48S-DC  Metro Service Platform  
+                               
+                fname8031S2309TPEIAC(536621)        -- Quidway S2309TP-EI-AC  Metro Service Platform                                             
+                fname8031S2309TPEIDC(536622)        -- Quidway S2309TP-EI-DC  Metro Service Platform     
+                fname8031S2309TPSIAC(536623)        -- Quidway S2309TP-SI-AC  Metro Service Platform 
+                
+                fname8031S2318TPEIAC(536624)        -- Quidway S2318TP-EI-AC  Metro Service Platform                                            
+                fname8031S2318TPEIDC(536625)        -- Quidway S2318TP-EI-DC  Metro Service Platform   
+                fname8031S2318TPSIAC(536626)        -- Quidway S2318TP-SI-AC  Metro Service Platform 
+                
+                fname8031S2326TPEIAC(536627)        -- Quidway S2326TP-EI-AC  Metro Service Platform                                             
+                fname8031S2326TPEIDC(536628)        -- Quidway S2326TP-EI-DC  Metro Service Platform                    
+                fname8031S2326TPSIAC(536629)        -- Quidway S2326TP-SI-AC  Metro Service Platform
+                 
+                fname8031S2352PEIAC(536630)         -- Quidway S2352P-EI-AC  Metro Service Platform            
+                fname8031S2352PEIDC(536631)         -- Quidway S2352P-EI-DC  Metro Service Platform
+                fname8031CX6003DC(536632),           -- Quidway CX600-3 DC Carrier Switch
+                fname8031CX6003AC(536633),           -- Quidway CX600-3 AC Carrier Switch                                         
+
+                fname8031S5328CEI(536634),         -- Quidway S5328C-EI  Metro Service Platform            
+                fname8031S5328CEI24S(536635),      -- Quidway S5328C-EI-24S  Metro Service Platform    
+                fname8031S5352CEI(536636),         -- Quidway S5352C-EI  Metro Service Platform         
+                fname8031S5324TPSIAC(536637),         -- Quidway S5324TP-SI-AC Metro Service Platform                                                                                                                                             
+                fname8031S5324TPSIDC(536638),         -- Quidway S5324TP-SI-DC Metro Service Platform                                                                                                                                             
+                fname8031S5348TPSIAC(536639),         -- Quidway S5348TP-SI-AC Metro Service Platform                                                                                                                                             
+                fname8031S5348TPSIDC(536640),         -- Quidway S5348TP-SI-DC Metro Service Platform                                                                                                                                             
+                fname8031S5324TPPWRSI(536641),         --Quidway S5324TP-PWR-SI Metro Service Platform                                                                                                                                              
+                fname8031S5348TPPWRSI(536642),         --Quidway S5348TP-PWR-SI Metro Service Platform                                                                                                                                              
+                fname8031S5328CSI(536643),            -- Quidway S5328C-SI Metro Service Platform                                                                                                                                           
+                fname8031S5352CSI(536644),            -- Quidway S5352C-SI Metro Service Platform                                                                                                                                           
+                fname8031S5328CPWRSI(536645),         -- Quidway S5328C-PWR-SI  Metro Service Platform                                                                                                                                           
+                fname8031S5352CPWRSI(536646),         -- Quidway S5352C-PWR-SI  Metro Service Platform                                                                                                                                             
+                fname8031S5328CPWREI(536647),         -- Quidway S5328C-PWR-EI  Metro Service Platform                                                                                                                                             
+                fname8031S5352CPWREI(536648),         -- Quidway S5352C-PWR-EI  Metro Service Platform                                                                                                                                             
+                fname8031S2309TPPWREI(536649),         --Quidway S2309TP-PWR-EI Metro Service Platform                                                                                                                                              
+                fname8031S2326TPPWREI(536650),         --Quidway S2326TP-PWR-EI Metro Service Platform                                                                                                                                              
+                fname8031S3328TPPWREI(536651),         --Quidway S3328TP-PWR-EI Metro Service Platform                                                                                                                                              
+                fname8031S3352PPWREI(536652),         -- Quidway S3352P-PWR-EI  Metro Service Platform   
+                
+-- 8090:
+                fname8090Unknown(561152),            -- Quidway unknown FRAME,
+                fname8090Whole(561153),              -- Quidway NE80E FRAME, NE5000E FRAME,
+                fname8090Half(561154),              -- Quidway NE40E FRAME,
+                fname8090HalfLow(561155),            -- Quidway Ne40E FRAME low ,40E
+                fname8090BTBMaster(561156),          -- Quidwy NE5000E BTB MASTER FRAME
+                fname8090BTBSlave(561157),           -- Quidwy NE5000E BTB Slave FRAME
+                fname8090ClusterCentral(561158),     -- Quidwy NE5000E Cluster Central FRAME
+                fname8090ClusterLine(561159),        -- Quidwy NE5000E Cluster Line  FRAME
+                fname8090Quarter(561160),            -- Quidwy Ne40E-4 FRAME
+                fname8090NE40E3DC(561161),          -- Quidwy Ne40E-3 FRAME
+                fname8090NE40E3AC(561162),          -- Quidwy Ne40E-3 FRAME
+                fname8090HalfX(561163),              -- Quidway NE40E-X8 FRAME,   
+                fname8090WholeX(561164),             -- Quidway NE80E-X16 FRAME,
+
+-- ME60:
+                fnameME60Unknown(159744),           -- Quidway unknown FRAME,
+                fnameME60Whole(159745),            -- Quidway ME60-16 FRAME,
+                fnameME60Half(159746),             -- Quidway ME60-8 FRAME,
+                fnameME60HalfLow(159747),               -- Quidway ME60-8 FRAME, 
+                fnameME60WholeBKPC(159748),             -- Quidway ME60-16 FRAME
+                fnameME60Quarter(159749),                -- Quidway ME60-4 FRAME
+                
+-- S9300:       0x000A1000~0x000A1fff(659456~663551)
+                fnameLE0103(659456),                -- Quidway S9303 FRAME
+                fnameLE0106(659457),                -- Quidway S9306 FRAME
+                fnameLE0112(659458),                -- Quidway S9312 FRAME
+                fnameLE0110(659459),                -- Quidway S9310 FRAME
+                fnameLE0203Poe(659460),             -- Quidway S9303 POE FRAME 
+                fnameLE0206Poe(659461),             -- Quidway S9306 POE FRAME
+                fnameLE02WMMPA(659462),
+                }
+
+
+        HWPCBType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "This data type is used as the syntax of the
+                hwSlotType object in the definition of
+                HUAWEI-DEVICE-MIBs hwSlotTable.
+
+                The definition of this textual convention with the
+                addition of newly assigned values is published
+                periodically by the Huawei MIB Criterion Group, every
+                value indicate a PCB produced by Huawei.
+
+                "
+            SYNTAX INTEGER
+                {
+-- MD 5500
+                bnameUnknown(1),
+                bnameH511Mmxa(2),               -- MMXA board, mainboard of MA5100V1
+                bnameH511Mmxb(3),               -- MMXB board, mainboard of MA5100V1 with APON sub-board
+                bnameH511Mmxc(4),               -- MMXC board, mainboard of MA5100V2 with V5 characteritics etc.
+                bnameH511Asxa(5),               -- ASXA board, mainboard of MD5500, with ASX chip on board for 8x622M switch
+                bnameH511Aica(6),               -- ATM Interface Card, service board of MD5500, support STM-1 and STM-4
+                bnameH511Lanc(7),               -- 8 Port FE service board of MD/MA,
+                                                -- for ethernet service access, support 64 VLAN
+                bnameH512Lanc(8),               -- Update version of H511LANC, support 32/2K VLAN, and region VLAN (IPDSLAM)
+                bnameH512Land(9),               -- Update version of H512LANC, support 32/256/2K VLAN (IPDSLAM),
+                                                -- and 8FE/4FE/8Optic/4Optic/1GE subboard
+                bnameH511Adlb(10),              --
+                bnameH511Adlc(11),              -- 16 Port ADSL board
+                bnameH511Adld(12),              -- 32 Port ADSL board
+                bnameH512Adld(13),              -- 32 Port ADSL board, use another chipset contrast to H511ADLD
+                bnameH511Cesc(14),              -- 16 E1 Port CES board, not support TDM, with 2 E1 subboard
+                bnameH511Cesd(15),              -- 8 V35 Port CES board, with 3 V35 subboard
+                bnameH511Cese(16),              -- 8 E1 Port CES board, not support TDM, with 1 E1 subboard
+                bnameH511Cesf(17),              -- No subboard, for TDM use
+                bnameH511Cesh(18),              -- 16 E1 port CES board, with 2 E1 subboard, support TDM
+                bnameH512Cesh(19),              -- Same as H511CESH, diffrent from chipset
+                bnameH511Ea16(20),              -- Same as H511CESC, diffrent from chipset
+                bnameH511Ce8(21),               -- Same as H511CESE, diffrent from chipset
+                bnameH511Ce8V(22),              -- Same as H511CESD, diffrent from chipset
+                bnameH511Dt16(23),              -- 16 E1 Port CES board, only support TDM mode
+                bnameH511Dn16(24),              -- 16 E1 Port CES board, only support TDM mode, support DDN clock
+                bnameH511Frca(25),              -- 8 E1 Port FR board
+                bnameH511Frcb(26),              -- 8 V35 Port FR board
+                bnameH511Slfa(27),              -- 8 G.SHDSL port FR board, work in E1 mode
+                bnameH511Slfb(28),              -- 8 G.SHDSL port FR board, work in V35 mode
+                bnameH511Slca(29),              -- 8 G.SHDSL port CES board, work in E1 mode, not support TDM
+                bnameH511Slcb(30),              -- 8 G.SHDSL port CES board, work in V35 mode
+                bnameH511Splb(31),              -- 16 port split board word with H511ADLC
+                bnameH511Splc(32),              -- 32 port split board word with H511ADLD/H512ADLD
+                bnameH511Pots(33),              -- 32 Port Pots board
+                bnameH511Aiua(34),              -- ATM Interface Unit, can work with STM-1/IMA/E3 subboard, use the same PCB as MMXA
+                bnameH511Aiub(35),              -- ATM Interface Unit, can work with STM-1/IMA/E3/APON/STM-4 subboard, use the same PCB as MMXA
+                bnameH511Aiuc(36),              -- ATM Interface Unit, can work with STM-1/IMA/E3/APON/STM-4 subboard, use the same PCB as MMXC
+                bnameH511Ipuo(37),              -- Optic interface IP process board
+                bnameH511Epue(38),              -- Electric Interface IP process board
+                bnameH511Ipue(39),              -- Electric interface ehternet process board
+                bnameH511Epuo(40),              -- Optic interface ehternet process board
+                bnameH511Vspd(41),              -- VoDSL process board
+                bnameH511Msua(42),              -- 2 Port STM-1(with 2M structure) access board
+                bnameH511Imua(43),              -- 32 port IMA interface access board
+                bnameH511Smxa(44),              -- main board in slave frame for DSLAM use, use the same PCB as MMXA
+                bnameH511Smxb(45),              -- main board in slave frame for DSLAM use, use the same PCB as MMXB
+                bnameH511Sepa(46),              -- Board used to connect slave frame for DSLAM use
+                bnameEsc(47),                   -- For HONET
+                bnameRsp(48),                   -- For HONET
+                bnamePv8(49),                   -- For HONET
+                bnameApru(50),                  -- For HONET
+                bnameAprx(51),                  -- For HONET
+                bnameAsl(52),                   -- For HONET
+                bnameA32(53),                   -- For HONET
+                bnameDsl(54),                   -- For HONET
+                bnameMlc(55),                   -- For HONET
+                bnameIdla(56),                  -- For HONET
+                bnameCdi(57),                   -- For HONET
+                bnameAti(58),                   -- For HONET
+                bnameTss(59),                   -- For HONET
+                bnamePwx03(60),                 -- For HONET
+                bnamePwx04(61),                 -- For HONET
+                bnameEmu(62),                   -- For HONET
+                bnameHwc(63),                   -- For HONET
+                bnameVfb(64),                   -- For HONET
+                bnamePvu(65),                   -- For HONET
+
+                bnameH511Shla(66),
+                bnameH511Adle(67),
+                bnameMD5500H511BTSA(68),
+                bnameh511Land(69),
+
+                bnameH601Apma(70),
+                bnameH601Apsa(71),
+                bnameH601Apfa(72),
+                bnameH601Csla(73),
+                bnameH601Cslf(74),
+                bnameH601Adla(75),
+                bnameH512Adle(76),
+                bnameH512Adli(77),
+                bnameH531BASA(78),
+                bnameH531BASE(79),
+
+-- MUSA
+                bnameSmb(80),
+                bnameHrb(81),
+                bnameHab(82),
+
+-- MA5200
+                bnameNat(83),
+                bnameCts(84),
+
+                bnameH511BTSB(85),              -- For MA5100&MD5300, Broad test card B , providing test for broad subscribers
+
+-- AG
+                bnamePvm(90),
+
+                bnameSdl(100),
+                bnameH511Msuc(101),
+                bnameH511AsxB(102),
+
+-- A8010
+                bnamVspNas(110),
+                bnamVspIpp(111),
+                bnamVspHsp(112),
+                bnamVspAnyport(113),
+                bnamVsu(114),
+                bnamHsp(115),
+                bnamFrb(116),
+                bnamMstu(117),
+-- ESR
+                bnameMpua(130) ,                -- BS21MPUA
+                bnameMpub(131) ,                -- BS22MPUB
+                bnameNeta(132) ,                -- BS21NETA
+                bnameNetb(133) ,                -- BS22NETB
+                bnameSFCA(134) ,                -- BS21NETA
+                bnameLpua(135) ,                -- BS21LPUA
+                bnameLpub(136) ,                -- BS22LPUB
+                bnameLpuc(137) ,                -- BS22LPUC
+                bnameLpud(138) ,                -- BS22LPUD
+-- ESR
+                bnameSpubBas(139) ,             -- SN01SPUB
+                bnameSpubSerm(140) ,            -- SN01SPUB
+                bnameLpui(141) ,                -- SN01LPUI
+                bnameLpuh(142) ,                -- SN01LPUH
+                bnameO2CC(143) ,                -- BS2202CC
+-- MA5105
+                bnameMa5105e1(200),             -- E1
+                bnameMa5105fe(201),             -- FE
+                bnameMa5105adsl(202),           -- ADSL
+                bnameMa5105ima(203),            -- IMA
+-- MD5500
+                bnameMD5500Hsl(204),
+                bnameMD5500PV4(205),
+-- MA5300
+                bnameMa5300ESM(206),
+                bnameMa5300VDSL16(207),
+                bnameMa5300VDSL24(208),
+                bnameMa5300ADSL(209),
+-- UA5000
+                 bnameH601Aiua(210),
+-- MD5500
+                bnameH511IMUB(211),
+                bnameH511IMUD(212),
+                bnameH531EADL(213),
+                bnameH531EVDB(214),
+                bnameH533ESHA(215),
+                bnameH531ETHA(216),
+                bnameH533EADB(217),
+-- S3026V
+                bnameH523VDLA(218),
+                bnameH523VDLAVDSA(219),
+-- UA5000
+                bnameH601SDLA(220),
+                bnameH601DEHA(221),
+                bnameH601VDLA(222),
+                bnameH601IPMA(264),
+                bnameH601ADMA(265),
+-- MA5100
+                bnameH512ADLC(230),
+                bnameH513ADLD(231),
+                bnameH513ADLE(232),
+                bnameH513ADLF(233),
+                bnameH513ADLI(234),
+                bnameH514ADLD(235),
+                bnameH515ADLD(236),
+                bnameH516ADLD(237),
+                bnameH517ADLD(238),
+                bnameH518ADLD(239),
+                bnameH519ADLD(240),
+                bnameH514ADLE(241),
+                bnameH515ADLE(242),
+                bnameH516ADLE(243),
+                bnameH517ADLE(244),
+                bnameH518ADLE(245),
+                bnameH519ADLE(246),
+                bnameH511Spli(247),
+                bnameSepl(248),
+                bnameSmxl(249),
+-- MA5105
+                bnameMa5105shdsl(250),
+                bnameMa5105fc(251),
+-- MA5105 N2B
+                bnameN2Be1(252),
+                bnameN2Bfe(253),
+                bnameN2Bima(254),
+                bnameN2Badslb08(255),
+                bnameN2Badslbsl(256),
+                bnameN2Bshdslb08(257),
+                bnameN2Bshdslbsl(258),
+-- MA5100
+                bnameADLC(259),
+                bnameADLD(260),
+                bnameADLE(261),
+                bnameADLI(262),
+                bnameADL(263),
+                bnameH601IPMA(264),
+                bnameH602ADMB(265),
+                bnameH511TSBA(266),
+                bnameH511VDLA(267),
+                bnameVPU(268),
+-- MA5105
+                bnameMa5105adli(270),
+                bnameMa5105adlh(271),
+                bnameMa5105adce(272),
+                bnameMa5105adch(273),
+                bnameMa5105adid(274),
+                bnameH601ADLB(275),
+                bnameH601CSLB(276),
+                bnameH601SDLB(277),
+                bnameH602ADMC(278),
+-- UA5000
+                bnameH601AIUB(280),
+                bnameH601CSLI(281),
+                bnameH601VDLB(282),
+                bnameH602ADMI(283),
+                bnameH601CSLC(284),
+                bnameH523mfce(299),
+-- HONET board type, for iManager N2000 BMS HV20 integrate management
+                bnameHV20ASL(300),              -- For HONET, analog subscriber card of HONET SIPP II/III system, having 16 paths of subscriber lines on each card.
+                bnameHV20DRV(301),              -- For HONET, dual-tone number receiving card of HONET SIPP II/III. Each card configures  16 dual-tone number receivers. Meanwhile, DRV card also provides the function of level switch between difference level and TTL level.
+                bnameHV20RSA(302),              -- For HONET, a main board, usually used in remote subscriber shelf.
+                bnameHV20DTM(303),              -- For HONET, digital trunk card of HONET SIPP II/III system.  Each card provides 2 E1 interfaces.
+                bnameHV20DSL(304),              -- For HONET, digital subscriber card of HONET SIPP II/III system. Each card configures 8 paths of digital subscriber lines.
+                bnameHV20DDU(305),              -- For HONET, digital interface card of HONET SIPP II/III system.Each card performs the switch between 2 paths 64K bit/s signal and V35, V24 signals.
+                bnameHV20TSS(306),              -- For HONET, test card of HONET SIPP II/III system, providing test for analog subscribers and digital subscribers.
+                bnameHV20TSI(307),              -- For HONET, test card used in digital subscriber testing. This is no longer in use.
+                bnameHV20AV5(308),              -- For HONET, maste r control card of HONET SIPP II/III system, responsible f or the protocol processing, equiment management, and network exchanging.
+                bnameHV20PWC(309),              -- For HONET, power supply card of HONET SIPP II/III system. PWC card does not provide 48V generator, and is only used in the master control shelf of the SIPP II system.
+                bnameHV20PWX(310),              -- For HONET, power supply card of HONET SIPP II/III system. PWX card provides 48V generator, which is used in various shelfs.
+                bnameHV20DM4(311),              -- For HONET, tributary interface card. Each baord provides the 4 paths of switch between sub-synchronous PCM lines and 2112Kbit/s synchronous code, and 4 paths of inversion. It also determines the dirction of receiving and sending of the 4 paths of signals, which realizes the function of self-healing switch.
+                bnameHV20TIU(312),              -- For HONET, optical interface card of OLT terminal station. The function of a TIU card is to multiplex the 28 paths of 2112 Kbit/s tributary signals sent by 7 DM4, and then send them back to the 7 DM4.
+                bnameHV20NMI(313),              -- For HONET, used in OLT, ONU-512, ONU-128, ONU-1000A of the HONET system, functioning as maintenance of the optical transmission equipment, environment monitoring and equipment management.
+                bnameHV20FIU(314),              -- For HONET, optical interface in the trunk ONU, providing simultaneously two pairs of optical interfaces.
+                bnameHV20EIU(315),              -- For HONET, used in the E1 interface of ONU-128. EIU card completes the justification and restoration of two 2M signals.
+                bnameHV20BIU(316),              -- For HONET, optical interface card used in triburary ONU, accepting 2 to 6 2M point to point transmission.
+                bnameHV20ILM(317),              -- For HONET, InfoLink management card of CATV subscriber shelf.
+                bnameHV20ESC(318),              -- For HONET, environment monitor interface card of HONET SIPP II/III system, providing the environment quantity of the remote ONU and monitoring the operation of the power supply.
+                bnameHV20PWH(319),              -- For HONET, power supply card of PHD optical transmission system, used in various transmission shelfs.
+                bnameHV20ILR(320),              -- For HONET, InfoLink optical receiving card of CATV subscriber shelf.
+                bnameHV20ILT(321),              -- For HONET, InfoLink optical sending card of CATV subscriber shelf.
+                bnameHV20PV8(322),              -- For HONET, the master control card of HONET SIPP II/III system, responsible for protocol handling, equipment management, and network switch. The only difference between PV8 card and PV4 card is that the former has 8 paths of standard E1 interfaces while the latter has only 4.
+                bnameHV20PV4(323),              -- For HONET, the master control card of HONET SIPP II/III system, responsible for protocol handling, equipment management, and network switch. The only difference between PV8 card and PV4 card is that the former has 8 paths of standard E1 interfaces while the latter has only 4.
+                bnameHV20RSP(324),              -- For HONET, a new-type remote RSA card of HONET SIPP II/III system whose convergence rate can be adjusted, connecting to remote ONU subscribers collaboratively with digital trunk cards. Each RSP card may configure at most 4 2M PCM links, and can realize 1:1, 1:2, and 1:4 convergence rates.
+                bnameHV20HSL(325),              -- For HONET, N*64 super rate card (N=1~31), of HONET SIPP II/III system. Each card provides externally 2 synchronous V.35 interface in the mode of DCE or DTE, and two FE1 interfaces.
+                bnameHV20ATI(326),              -- For HONET, analog trunk interface card of HONET SIPP II/III system, used to connect subscriber machines which have only EM interfaces, realizing EM communication transfer in the access network. Each AIT cards provides 6 physical EM ports. The slots are compatible with such card slots as ASL, DSL, and VFB.
+                bnameHV20SRX(327),              -- For HONET, sub-rate card of HONET SIPP II/III system. Each card provides externally 5 synchronous/asynchronous compatible V.24 interfaces in DCE mode, completing the multiplexing of multiple sub-rate data specified in X.50 and X.58 protocols.
+                bnameHV20VFB(328),              -- For HONET, 2 line/4 line voice frequency interface card of HONET SIPP II/III system, providing the private network of the railway dispatching system with private interface card.
+                bnameHV20VDM(329),              -- For HONET, a card to stack sound frequencies in HONET SIPP II/III system. It is inserted in the subscriber shelf, and is compatible with other card slots in such cards as ASL, DSL, and VFB. Each VDM card has 16 channels, supporting at most 16 paths of voice frequency tiling.
+                bnameHV20CDI(330),              -- For HONET, analog trunk card in HONET SIPP II/III system, supporting DDI service. CDI baord may dynamically distribute time slots, and its slots are compatible with the slots of such cards as ASL, DSL, and VFB.
+                bnameHV20ASP(331),              -- For HONET, AV5 baord of the remote main node of HONET SIPP II/III system (HV20A003 version or above not supportable),.
+                bnameHV20DTE(332),              -- For HONET, a new- type 2M bit/s digital trunk interface card of HONET SIPP II/III system. Each card configures 8 2M PCM 30/32 systems.
+                bnameHV20WSA(333),              -- For HONET, remote main node card which is wireless connected to ETS450 WLL base station in HONET SIPP II/III system. Each card outputs 2M E1 trunk, mainly used in WSA subscriber shelf. WSA card communicates with the host via RSA protocol, which equals to RSA main node card.
+                bnameHV20DTH(334),              -- For HONET, 1.544M bit/s digital leased line interface card of HONET SIPP II/III system. Each card configures 8 1.544M PCM 22/24 systems, providing T1 leased line service.
+                bnameHV20ASL32(335),            -- For HONET, a new-type analog subscriber card of HONET SIPP II/III system, which can provide 32 paths of subscriber lines on each card.
+                bnameHV20NPU(336),              -- For HONET, net process unit in HONET SIPP II/III system, which can provide 10M ethernet interface .
+                bnameHV20DLI(337),              -- For HONET, DECT interface board, which provide 32 channle for wireless subscriber.
+                bnameHV20CKS(338),              -- For HONET, a clock card of HONET SIPP II/III system.
+                bnameHV20CKD(339),              -- For HONET, a clock card of HONET SIPP II/III system.
+                bnameHV20SBL(340),              -- For HONET, 2B1Q card of HONET SIPP II/III system. Each card provides 8 paths of 2B1Q interfaces, which are used in DDN access.
+                bnameHV20MLC(341),              -- For HONET, a new-type SBL card, can be used as both subscriber card and main node board.
+                bnameHV20SCS(342),              -- For HONET, SCS Card is subrate concentrate switch card that is used with SRX Card, MTA port, DE1 Channel, and this card only support connection between subrate of 2.4K, 4.8K, 9.6K, 19.2K.
+                bnameHV20HWC(343),              -- For HONET, a signal level convert board, only used for PV8 board in PV8-10 control shelf.
+-- MIM & SIC card for router:
+                bnameReserverd(400),            -- For router, Reserved board name
+                bnameUnknown(401),              -- For router, Unknown board
+                bnameMIM8AS(402),              -- For router, MIM card with 8 asynchronous serial port
+                bnameMIM4SA(403),              -- For router, MIM card with 4 high-speed synchronous/asynchronous serial port
+                bnameMIM4BS(404),              -- For router, MIM card with 4 ISDN BRI S/T port
+                bnameMIM2E1(405),              -- For router, MIM card with 2 channelized cE1/PRI port
+                bnameMIM4E1(406),              -- For router, MIM card with 4 channelized cE1/PRI port
+                bnameMIM1FE(407),              -- For router, MIM card with 1 10Base-T/100Base-TX port
+                bnameMIM1E1(408),              -- For router, MIM card with 1 channelized cE1/PRI port
+                bnameMIM2FE(409),              -- For router, MIM card with 2 10Base-T/100Base-TX port
+                bnameMIM2VI(411),              -- For router, MIM card with 2 line voice processing unit
+                bnameMIM4VI(412),              -- For router, MIM card with 4 line voice processing unit
+                bnameMIM30VI(413),             -- For router, MIM card with 30 line voice processing unit
+                bnameMIM2S1B(414),             -- For router, MIM card with 2 synchronous/asynchronous serial port and 1 ISDN BRI S/T port
+                bnameMIM2SA(415),              -- For router, MIM card with 2 high-speed synchronous/asynchronous serial port
+                bnameMIM16AS(416),             -- For router, MIM card with 16 asynchronous serial port
+                bnameMIMnew8AS(417),           -- For router, MIM card with 8 asynchronous serial port (new)
+                bnameMIM8LSA(418),             -- For router, MIM card with 8 low-speed synchronous/asynchronous serial port
+                bnameMIM2FXS(419),             -- For router, MIM card with 2 FXS port
+                bnameMIM2FX0(420),             -- For router, MIM card with 2 FXO port
+                bnameMIM2EM(421),              -- For router, MIM card with 2 E&M port
+                bnameMIM4FXS(422),             -- For router, MIM card with 4 FXS port
+                bnameMIM4FXO(423),             -- For router, MIM card with 4 FXO port
+                bnameMIM4EM(424),              -- For router, MIM card with 4 E&M port
+                bnameFixedSA(425),             -- For router 2620/2621, 1/2 fixed high-speed synchronous serial port
+                bnameMIME1VI(426),             -- For router, MIM card with 1 E1 port for voice processing
+                bnameMIM12AM(427),             -- For router, MIM card with 12 analog modem port
+                bnameMIM6AM(428),              -- For router, MIM card with 6 analog modem port
+                bnameMIMNDEC(429),             -- For router, MIM card for network encryption
+                bnameMIMnew2SA(430),           -- For router, MIM card with 2 high-speed synchronous/asynchronous serial port (new)
+                bnameFixedAux(431),            -- For router, Fixed Aux port
+                bnameFixedConsole(432),        -- For router, Fixed Console Port
+                bnameFixedSA1760(433),        -- For router 1760/2610/2611, fixed synchronous/asynchronous serial port
+                bnameSIC1FE(434),              -- For router, SIC card with 1 10Base-T/100Base-TX port
+                bnameSIC1SA(435),              -- For router, SIC card with 1 high-speed sychronous/asynchronous serial port
+                bnameSIC3AS(436),              -- For router, SIC card with 3 asynchronous serial port
+                bnameSIC1E1(437),              -- For router, SIC card with 1 channelized cE1/PRI port
+                bnameSIC1T1(438),              -- For router, SIC card with 1 channelized cT1/PRI port
+                bnameSIC1BU(439),              -- For router, SIC card with 1 ISDN BRI U port
+                bnameSIC2BU(440),              -- For router, SIC card with 2 ISDN BRI U port
+                bnameSIC1BS(441),              -- For router, SIC card with 1 ISDN BRI S/T port
+                bnameSIC2BS(442),              -- For router, SIC card with 2 ISDN BRI S/T port
+                bnameSIC1AM(443),              -- For router, SIC card with 1 analog modem port
+                bnameSIC2AM(444),              -- For router, SIC card with 2 analog modem port
+                bnameSIC1EM(445),              -- For router, SIC card with 1 E&M port
+                bnameSIC2EM(446),              -- For router, SIC card with 2 E&M port
+                bnameSIC1FXS(447),             -- For router, SIC card with 1 FXS port
+                bnameSIC2FXS(448),             -- For router, SIC card with 2 FXS port
+                bnameSIC1FXO(449),             -- For router, SIC card with 1 FXO port
+                bnameSIC2FXO(450),             -- For router, SIC card with 2 FXO port
+                bnameMIM6FCM(451),             -- For router, MIM card with 6 fast connect modem port
+                bnameMIM8SA(452),              -- For router, MIM card with 8 high-speed sychronous/asychronous serial port
+                bnameMIM1T1(453),              -- For router, MIM card with 1 channelized cT1/PRI port
+                bnameMIM2T1(454),              -- For router, MIM card with 2 channelized cT1/PRI port
+                bnameMIM4T1(455),              -- For router, MIM card with 4 channelized cT1/PRI port
+                bnameMIMT1VI(456),             -- For router, MIM card with 1 T1 port for voice processing
+                bnameMIM4FCM(457),             -- For router, MIM card with 4 fast connect modem port
+                bnameMIM2FCM(458),             -- For router, MIM card with 2 fast connect modem port
+                bnameMIMcE3(459),              -- For router, MIM card with 1 channelized E3 port
+                bnameMIM6AME(460),             -- For router, MIM card with 6 analog modem port (new)
+                bnameMIM12AME(461),            -- For router, MIM card with 12 analog modem port (new)
+                bnameMIM1E1-F(465),            -- For router, MIM card with 1 fractional E1 port
+                bnameMIM2E1-F(466),            -- For router, MIM card with 2 fractional E1 port
+                bnameMIM4E1-F(467),            -- For router, MIM card with 4 fractional E1 port
+                bnameMIM1T1-F(468),            -- For router, MIM card with 1 fractional T1 port
+                bnameMIM2T1-F(469),            -- For router, MIM card with 2 fractional T1 port
+                bnameMIM4T1-F(470),            -- For router, MIM card with 4 fractional T1 port
+                bnameSIC1E1-F(471),            -- For router, SIC card with 1 fractional E1 port
+                bnameSIC1T1-F(472),            -- For router, SIC card with 1 fractional T1 port
+                bnameMIMcT3(473),              -- For router, MIM card with 1 channelized T3 port
+                bnameMIMATMADSL1(474),        -- For router, MIM card with 1 adsl port
+                bnameMIMATMADSL2(475),        -- For router, MIM card with 2 adsl ports
+                bnameMIMATM155(476),          -- For router, MIM card with 1 155M port
+                bnameMIM8AS-701(477),          -- For router, MIM card with 8 asynchronous serial port(using SD701)
+                bnameMIM16AS-701(478),         -- For router, MIM card with 16 asynchronous serial port(using SD701)
+                bnameMIM4SA-701(479),          -- For router, MIM card with 4 high-speed synchronous/asynchronous serial port(using SD701)
+                bnameMIM2SA-701(480),          -- For router, MIM card with 2 high-speed synchronous/asynchronous serial port(using SD701)
+-- 8070:
+                bnameRTC1RSU(550),              -- RSU process board
+                bnameRTC1RSK(551),              -- RSU back board
+                bnameRTC2RSUA(552),             -- RSU process board 128M
+                bnameRTC2RSUB(553),             -- RSU process board 256M
+                bnameRTC2RSUC(554),             -- RSU process board 512M
+                bnameRTC2RSEU(555),             -- RSU back board
+                bnameRTC1VIU(556),              -- VIU process board
+                bnameRTC1BAK(557),              -- VIU back board
+                bnameRTC2VIUA(558),             -- VIU process board 128M
+                bnameRTC2VIUB(559),             -- VIU process board 256M
+                bnameRTC2VIUC(560),             -- VIU process board 512M
+                bnameRTC2VIEU(561),             -- VIU back board version 2
+                bnameRTC4VIU(562),              -- Enhanced VIU process board
+                bnameRTC1HAU(563),              -- HAU
+                bnameRTC2HAU(564),              -- HAU version 2
+                bnameRTC1SMMU(565),             -- ALU used by NE08
+                bnameRTC2ALU(566),              -- ALU used by NE16E, NE08E and NE05
+                bnameRTC4VIUA(567),             -- NE05/08/16E front board
+                bnameRTC4VIUB(568),             -- NE05/08/16E front board
+                bnameRTC4VIUC(569),             -- NE05/08/16E front board
+                bnameRTC1RSHC(570),             -- NE05/08/16E board:for ne05 rshc
+                bname5FEMP(571),                -- NE05/08/16E board:for imu
+                bname2GOMP(572),                -- NE05/08/16E board:for imu
+                bname1GOMP(573),                -- NE05/08/16E board:for imu
+                bname2GEMP(574),                -- NE05/08/16E board:for imu
+                bname1GEMP(575),                -- NE05/08/16E board:for imu
+                bname5FEMK(576),                -- NE05/08/16E board:for imu
+                bname3FEMK(577),                -- NE05/08/16E board:for imu
+                bname2GOMK(578),                -- NE05/08/16E board:for imu
+                bname2GEMK(579),                -- NE05/08/16E board:for imu
+                bname1GOMK(580),                -- NE05/08/16E board:for imu
+                bname1GEMK(581),                -- NE05/08/16E board:for imu
+                bnameRTC3RSUB(582),             -- RSU process board 256M version 3
+                bnameRTC3RSUC(583),             -- RSU process board 512M version 3
+                bnameRTC2VIUS(584),             -- VIU process board 256M,used only by NE05
+                bnameRTC3VIUB(585),             -- VIU process board 256M version 3
+                bnameRTC8VIUB(586),             -- VIU process board 256M version 8
+                bnamePWR(587),                  -- Power supply
+                bnameFAN(588),                  -- Fan
+                bname3FEMP(589),                -- NE05/08/16E board:for imu front
+                bnameRTC2RSUD(590),             -- RSU process board 1G
+
+-- 8011:
+                bnameCR01BAKB(600),             -- For NE80, backplane of NE80
+                bnameCR01BAKC(601),             -- For NE40-8, backplane of NE40-8
+                bnameCR01BAKD(602),             -- For NE40-4, backplane of NE40-4
+                bnameCR01BAKE(603),             -- For NE40-2, backplane of NE40-2
+                bnameCR01PWRB(604),             -- For NE80, power supply card of NE80
+                bnameCR01DPRB(605),             -- For NE80, power destribution card of NE80
+                bnameCR01PWRD(606),             -- For NE40, power supply card of NE40
+                bnameCR01FANB(607),             -- For NE80, fan card of NE80
+                bnameCR01FAND(608),             -- For NE40, fan card of NE40
+                bnameCR01MPUB(609),             -- For NE80, main control card of NE80
+                bnameCR01SRUB(610),             -- For NE40, main control card of NE40
+                bnameCR01NETB(611),             -- For NE80, switch card of NE80
+                bnameCR01CLKB(612),             -- For NE80, clock card of NE80
+                bnameCR01HUBB(613),             -- For NE80, HUB card of NE80
+                bnameCR01LPUB(614),             -- For NE80 & NE40, mother card of NE80 and NE40
+                bnameCR01NATB(615),             -- For NE80 & NE40, NAT card of NE80 and NE40
+
+-- MA5300:
+                bnameH531ESME(616),
+                bnameH531EIUA(617),
+-- MA5100 ADSL:
+                bnameH511Mmxs(620),
+                bnameADLF(622),                 -- 32 port ADSL board over pots
+                bnameADLG(623),                 -- 32 port ADSL board over pots
+                bnameADLH(624),                 -- 32 port ADSL board over pots
+                bnameADLJ(625),                 -- 32 port ADSL board over pots
+                bnameADLK(626),                 -- 32 port ADSL board over pots
+                bnameADLL(627),                 -- 32 port ADSL board over pots
+                bnameADLM(628),                 -- 32 port ADSL board over pots
+                bnameADLN(629),                 -- 32 port ADSL board over pots
+                bnameADLO(630),                 -- 32 port ADSL board over pots
+                bnameADLP(631),                 -- 32 port ADSL board over pots
+                bnameADLQ(632),                 -- 32 port ADSL board over pots
+                bnameADLR(633),                 -- 32 port ADSL board over pots
+                bnameADLS(634),                 -- 32 port ADSL board over pots
+                bnameADLT(635),                 -- 32 port ADSL board over pots
+                bnameADLU(636),                 -- 32 port ADSL board over pots
+                bnameADLV(637),                 -- 32 port ADSL board over pots
+                bnameADLW(638),                 -- 32 port ADSL board over pots
+                bnameADLX(639),                 -- 32 port ADSL board over pots
+                bnameADLY(640),                 -- 32 port ADSL board over pots
+                bnameADLZ(641),                 -- 32 port ADSL board over pots
+                bnameADC(642),                  -- 32 port ADSL2+ board over pots
+                bnameADCA(643),                 -- 32 port ADSL2+ board over pots
+                bnameADCB(644),                 -- 32 port ADSL2+ board over pots
+                bnameADCC(645),                 -- 32 port ADSL2+ board over pots
+                bnameADCD(646),                 -- 32 port ADSL2+ board over pots
+                bnameADCE(647),                 -- 32 port ADSL2+ board over pots
+                bnameADCF(648),                 -- 32 port ADSL2+ board over pots
+                bnameADCG(649),                 -- 32 port ADSL2+ board over pots
+                bnameADCH(650),                 -- 32 port ADSL2+ board over pots
+                bnameADCI(651),                 -- 32 port ADSL2+ board over pots
+                bnameADCJ(652),                 -- 32 port ADSL2+ board over pots
+                bnameADCK(653),                 -- 32 port ADSL2+ board over pots
+                bnameADCL(654),                 -- 32 port ADSL2+ board over pots
+                bnameADCM(655),                 -- 32 port ADSL2+ board over pots
+                bnameADCN(656),                 -- 32 port ADSL2+ board over pots
+                bnameADCO(657),                 -- 32 port ADSL2+ board over pots
+                bnameADCP(658),                 -- 32 port ADSL2+ board over pots
+                bnameADCQ(659),                 -- 32 port ADSL2+ board over pots
+                bnameADCR(660),                 -- 32 port ADSL2+ board over pots
+                bnameADCS(661),                 -- 32 port ADSL2+ board over pots
+                bnameADCT(662),                 -- 32 port ADSL2+ board over pots
+                bnameADCU(663),                 -- 32 port ADSL2+ board over pots
+                bnameADCV(664),                 -- 32 port ADSL2+ board over pots
+                bnameADCW(665),                 -- 32 port ADSL2+ board over pots
+                bnameADCX(666),                 -- 32 port ADSL2+ board over pots
+                bnameADCY(667),                 -- 32 port ADSL2+ board over pots
+                bnameADCZ(668),                 -- 32 port ADSL2+ board over pots
+                bnameADI(669),                  -- 32 port ADSL2+ board over ISDN
+                bnameADID(670),                 -- 32 port ADSL2+ board over ISDN
+                bnameADIE(671),                 -- 32 port ADSL2+ board over ISDN
+                bnameADIF(672),                 -- 32 port ADSL2+ board over ISDN
+                bnameADIH(673),                 -- 32 port ADSL2+ board over ISDN
+                bnameADIJ(674),                 -- 32 port ADSL2+ board over ISDN
+                bnameADIK(675),                 -- 32 port ADSL2+ board over ISDN
+                bnameADIM(676),                 -- 32 port ADSL2+ board over ISDN
+                bnameADIA(677),                 -- 32 port ADSL2+ board over pots
+                bnameADIB(678),                 -- 32 port ADSL2+ board over pots
+                bnameADIC(679),                 -- 32 port ADSL2+ board over pots
+                bnameADIG(680),                 -- 32 port ADSL2+ board over pots
+                bnameADII(681),                 -- 32 port ADSL2+ board over pots
+                bnameADIL(682),                 -- 32 port ADSL2+ board over pots
+                bnameADIN(683),                 -- 32 port ADSL2+ board over pots
+                bnameADIO(684),                 -- 32 port ADSL2+ board over pots
+                bnameADIP(685),                 -- 32 port ADSL2+ board over pots
+                bnameADIQ(686),                 -- 32 port ADSL2+ board over pots
+                bnameADIR(687),                 -- 32 port ADSL2+ board over pots
+                bnameADIS(688),                 -- 32 port ADSL2+ board over pots
+                bnameADIT(689),                 -- 32 port ADSL2+ board over pots
+                bnameADIU(690),                 -- 32 port ADSL2+ board over pots
+                bnameADIV(691),                 -- 32 port ADSL2+ board over pots
+                bnameADIW(692),                 -- 32 port ADSL2+ board over pots
+                bnameADIX(693),                 -- 32 port ADSL2+ board over pots
+                bnameADIY(694),                 -- 32 port ADSL2+ board over pots
+                bnameADIZ(695),                 -- 32 port ADSL2+ board over pots
+                bnameADM(696),                  -- 64 port ADSL2+ board over pots
+                bnameADMA(697),                 -- 64 port ADSL2+ board over pots
+                bnameADMB(698),                 -- 64 port ADSL2+ board over pots
+                bnameADMC(699),                 -- 64 port ADSL2+ board over pots
+                bnameADMD(700),                 -- 64 port ADSL2+ board over pots
+                bnameADME(701),                 -- 64 port ADSL2+ board over pots
+                bnameADMF(702),                 -- 64 port ADSL2+ board over pots
+                bnameADMG(703),                 -- 64 port ADSL2+ board over pots
+                bnameADMH(704),                 -- 64 port ADSL2+ board over pots
+                bnameADMI(705),                 -- 64 port ADSL2+ board over pots
+                bnameADMJ(706),                 -- 64 port ADSL2+ board over pots
+                bnameADMK(707),                 -- 64 port ADSL2+ board over pots
+                bnameADML(708),                 -- 64 port ADSL2+ board over pots
+                bnameADMM(709),                 -- 64 port ADSL2+ board over pots
+                bnameADMN(710),                 -- 64 port ADSL2+ board over pots
+                bnameADMO(711),                 -- 64 port ADSL2+ board over pots
+                bnameADMP(712),                 -- 64 port ADSL2+ board over pots
+                bnameADMQ(713),                 -- 64 port ADSL2+ board over pots
+                bnameADMR(714),                 -- 64 port ADSL2+ board over pots
+                bnameADMS(715),                 -- 64 port ADSL2+ board over pots
+                bnameADMT(716),                 -- 64 port ADSL2+ board over pots
+                bnameADMU(717),                 -- 64 port ADSL2+ board over pots
+                bnameADMV(718),                 -- 64 port ADSL2+ board over pots
+                bnameADMW(719),                 -- 64 port ADSL2+ board over pots
+                bnameADMX(720),                 -- 64 port ADSL2+ board over pots
+                bnameADMY(721),                 -- 64 port ADSL2+ board over pots
+                bnameADMZ(722),                 -- 64 port ADSL2+ board over pots
+                bnameADD(723),
+                bnameADDA(724),
+                bnameADDB(725),
+                bnameADDC(726),
+                bnameADDD(727),
+                bnameADDE(728),
+                bnameADDF(729),
+                bnameADDG(730),
+                bnameADDH(731),
+                bnameADDI(732),
+                bnameADDJ(733),
+                bnameADDK(734),
+                bnameADDL(735),
+                bnameADDM(736),
+                bnameADDN(737),
+                bnameADDO(738),
+                bnameADDP(739),
+                bnameADDQ(740),
+                bnameADDR(741),
+                bnameADDS(742),
+                bnameADDT(743),
+                bnameADDU(744),
+                bnameADDV(745),
+                bnameADDW(746),
+                bnameADDX(747),
+                bnameADDY(748),
+                bnameADDZ(749),
+                bnameH601APMB(750),
+                bnameH601APSB(751),
+                bnameH601APSR(752),
+                bnameH511SCUA(753),
+                bnameH601IPMB(754),
+                bnameH533ECBD(755),
+                bnameH512ADME(756),
+-- UA
+                bnameH601CSMB(757),
+                bnameH601EAUA(758),
+                bnameH601TSSB(759),
+                bnameH601BP2B(760),
+
+                bnameADE(761),
+                bnameADEA(762),
+                bnameADEB(763),
+                bnameADEC(764),
+                bnameADED(765),
+                bnameADEE(766),
+                bnameADEF(767),
+                bnameADEG(768),
+                bnameADEH(769),
+                bnameADEI(770),
+                bnameADEJ(771),
+                bnameADEK(772),
+                bnameADEL(773),
+                bnameADEM(774),
+                bnameADEN(775),
+                bnameADEO(776),
+                bnameADEP(777),
+                bnameADEQ(778),
+                bnameADER(779),
+                bnameADES(780),
+                bnameADET(781),
+                bnameADEU(782),
+                bnameADEV(783),
+                bnameADEW(784),
+                bnameADEX(785),
+                bnameADEY(786),
+                bnameADEZ(787),
+
+                bnameH602CSMB(788),             -- UA5000 ADSL2+ board
+                bnameH603CSMC(789),             -- UA5000 ADSL2+ board
+                bnameH601ADRB(790),             -- UA5000 32
+
+
+-- MA5300:
+                bnameH531EBDC(800),
+                bnameH531EBDI(801),
+                bnameH531EADI(802),
+                bnameH531EADK(803),
+                bnameH531EBDL(804),
+-- PVU
+                bnamePVU8(1000),                -- H601PVU
+                bnamePVU4(1001),                -- H601PVU
+                bnameH602PWX2(1100),            -- H602PWX2
+
+-- 8060
+                bnameDEVUNKNOWN(3700),
+                bnameDEVRPU(3701),            -- RPU without NP
+                bnameDEVNPRPU(3702),          -- RPU with NP (256M RAM)
+                bnameDEVNP(3703),             -- NPU
+                bnameDEV6FAN(3704),           -- Board with 6 fans
+                bnameDEV8FAN(3705),           -- Board with 8 fans
+                bnameDEVPOWER(3706),          -- Power module
+                bnameDEVRPUE(3707),           -- RPUE without NP
+                bnameDEVNPRPUE(3708),         -- RPUE with NP (512M RAM)
+                bnameDEVCOPE(3709),           -- COP card
+                bnameDEVCF(3710),             -- CF card
+                bnameE200EFAN(3711),
+                bnameE200EPWRAC(3712),
+                bnameE200EPWRDC(3713),
+                fnameE200E(3714),
+                bnameE200ERPU(3715),
+                bnameE100ERPU(3716),
+                bnameUSG3040MBD(3717),
+                bnameEXIFE2GE(3718),
+
+                bnameDEVH2FE(3719),           -- HIC 2FE
+                bnameDEVHG1GE(3720),          -- 1GE
+                bnameDEVHG2GE(3721),          -- 2GE
+                bnameDEVH4FE(3722),           -- HIC 4FE
+                bnameDEVH8FE(3723),           -- HIC 8FE
+                bnameDEVH1POS(3724),          -- 1POS
+                bnameDEVH2POS(3725),          -- 2POS
+                bnameDEVH4POS(3726),          -- 4POS
+                bnameDEVH2FEP(3727),          -- 2FEP
+                bnameDEVH4FEP(3728),          -- 4FEP
+                bnameDEVH8FEP(3729),          -- 8FEP
+                bnameDEVLCPOS(3730),          -- CPOS
+                bnameDEVHIPSEC(3731),         -- HIC IPSEC
+                bnameDEVHBYPASS(3732),        -- BYPass
+                bnameEXIFE2FE(3733),          -- Dual port Fast Ethernet Card 
+                bnameUSG50RPU(3734),          -- Main Processing Unit
+                bnameFW11USBC(3735),          -- Universal Serial Bus Interface Card
+                bnameFW41HPSEC(3736),         -- High Speed IP Security Card C
+                bnameFW41HPSEA(3737),         -- High Speed IP Security Card A
+                bnameFW41GEBY(3738),          -- Gigabit Ethernet Card with Bypass Function  
+                bnameFW11EPSEA(3739),         -- Enhanced IP Security Card A
+                bnameRTM1GEUB(3740),          -- 1-Port 1000M Ethernet Electrical Interface Board(RJ45)
+                bnameRTM1GEUA(3741),          -- 1-Port 1000BASE-SX Gigabit Ethernet Interface Board(SFP) 
+                bnameFW11EPSEC(3742),         -- Enhanced IP Security Card
+                bnameFW1IPSEC0(3743),         -- IP Security Card
+                bnameFW111AMM0(3744),         -- 1-Port ATM/155M Multimode Interface Module(SC)
+                bnameFW111ASM0(3745),         -- 1-Port ATM/155M Single Mode Interface Module(1310nm,15km,SC)
+                bnameFW111ADP0(3746),         -- 1-Port ADSL over POTS Interface Board 
+                
+                bnameDEVLATME1(3749),         -- ATM E1
+                bnameDEVLATME3(3750),         -- ATM E3
+                bnameDEVLATM(3751),           -- ATM Multimode
+                bnameDEVL4SA(3752),           -- 4SA
+                bnameDEVLGSFE(3753),          -- 10/100 SingleMode FE
+                bnameDEVLGMFE(3754),          -- 10/100 MultiMode FE
+                bnameDEVLGGE(3755),           -- FIC GE(Fiber)
+                bnameDEVLDGE(3756),           -- FIC GE(Copper)
+                bnameDEVL1FE(3757),           -- 1FE
+                bnameDEVL2FE(3758),           -- 2FE
+                bnameDEVL8E1A(3759),          -- 8E1A
+                bnameDEVL8E1B(3760),          -- 8E1B
+                bnameDEVL8CE1A(3761),         -- 8CE1A
+                bnameDEVL8CE1B(3762),         -- 8CE1B
+                bnameDEVL8CT1A(3763),         -- 8CT1A
+                bnameDEVL8CT1B(3764),         -- 8CT1B
+                bnameDEVL4CE1A(3765),         -- 4CE1A
+                bnameDEVL4CE1B(3766),         -- 4CE1B
+                bnameDEVL4E1A(3767),          -- 4E1A
+                bnameDEVL4E1B(3768),          -- 4E1B
+                bnameDEVL4CT1A(3769),         -- 4CT1A
+                bnameDEVL4CT1B(3770),         -- 4CT1B
+                bnameDEVL4E1(3771),           -- 4E1
+                bnameDEVL4CE1(3772),          -- 4CE1
+                bnameDEVL4CT1(3773),          -- 4CT1
+                bnameDEVL8T1(3774),           -- 8T1
+                bnameDEVL1CT3(3775),          -- 1CT3
+                bnameDEVL1CE3(3776),          -- 1CE3
+                bnameDEVLIPSEC(3777),
+                bnameDEVL1HSSI(3778),         -- 1HSSI
+                bnameDEVL2HSSI(3779),         -- 2HSSI
+                bnameDEVH16CE1A(3780),        -- 16CE1(120 Ohm)
+                bnameDEVH16CE1B(3781),        -- 16CE1(75 Ohm)
+                bnameDEVH16CT1(3782),         -- 16CT1(120 Ohm)
+                bnameDEVHCPE1(3783),          -- 1CPOSE1(ESFP)
+                bnameDEVHCPT1(3784),          -- 1CPOST1(ESFP)
+                bnameDEVH1ATM(3785),          -- HIC 1ATM(ESFP)
+                bnameDEVH2ATM(3786),          -- HIC 2ATM(ESFP)
+                bnameDEVH4ATM(3787),          -- HIC 4ATM(ESFP)
+                bnameDEVLIPSECSD707(3792),    -- FIC IPSEC(SD707)
+                bnameNE20RPU(3793),           -- NE20 RPU (512M RAM)
+                bnameNE20ERPU(3794),          -- NE20E RPU (1G RAM)
+                bnameNE20ENPU(3795),          -- NE20E NPU
+                bnameNE20EFAN(3796),          -- NE20E FAN
+                bnameNE20EPOWERAC(3797),      -- NE20E AC POWER
+                bnameNE20EPOWERDC(3798),      -- NE20E DC POWER
+                bnameDEVLATMSM(3799),         -- ATM Singlemode
+                bnameDEVLATMSL(3800),         -- ATM Singlemode Long Reach
+                bnameDEVHG2GESFPCOPR(3810),   -- 2GE SFP&COPR
+                bnameDEVH3E3(3811),           -- HIC 3E3
+                bnameDEVH3T3(3812),           -- HIC 3T3
+                
+-- MA5100
+                bnameH563ECBD(131082),
+-- MA5105 from 0X20F00 ~0X20Fff
+                bnameH521mfea(134912),
+                bnameH521mfoa(134913),
+                bnameH521mimb(134914),
+                bnameH521mcoa(134915),
+                bnameH521mgoa(134916),
+                bnameH523adla(134928),
+                   
+--  MA5200 add definitiong of board type 0x21000(135168) ~ 0x21FFF(139263)
+                bnameH521SMU(135168),
+                bnameH521CLK(135169),
+                bnameH521PWR(135170),
+                bnameH521DPR(135171),
+                bnameH521FAN(135172),
+                bnameH521DRYPWR(135173),
+                bnameH521DRYFAN(135174),
+                bnameH521SFU(135175),
+                bnameH521SFUF(135176),
+                bnameH521SSU(135177),
+                bnameH521SPU(135178),
+                bnameH522SFUT(135179),
+                bnameH522SPUT(135180),
+                bnameH522SSUT(135181),
+                bnameH522SPUF(135182),
+                bnameH522SSUF(135183),
+                bnameH521SMUE(135184),
+                bnameH523SMUG(135185),
+                bnameH521NSBD(135186),
+                bnameH523SFUG(135187),
+                
+-- WA5700:
+                bnameBWAMPU(155648),
+                bnameBWAODU(155649),
+
+-- AMG
+                bnameAG03PVM(262154),
+                bnameH603RSUG(262656),        -- H603RSUG
+                bnameA04(262657),             -- A04
+                bnameA08(262658),             -- A08
+
+-- 8011
+                bnameCR01LPUF(528384),             --For NE40, new main control card of NE40
+                bnameCR01CLKD(528385),             --For NE80, new main control card of NE80
+                bnameCR01NETD(528386),             --For NE80, new switch card of NE80
+                bnameCR03NETH(528387),             --For NE80, new switch card of NE80
+                bnameCR03SRUD(528388),             --For NE40-2,NE40-8,new main control card of NE40
+                bnameCR03SRUE(528389),             --For NE40-4 or NE40-8,new main control card of NE40
+                bnameCR03MPUF(528390),         --For NE80, new main control card of NE80
+                bnameCR01M2GSR(528391),            --For NE80, new power supply card of NE80
+                bnameCR01SPUA(528392),             --Flexible Card Service Processing Unit A
+                bnameCR01SPUB(528393),             --Flexible Card Service Processing Unit B, NetStream Traffic Statistics Service Board
+                bnameCR01SPUC(528394),             --Flexible Card Service Processing Unit C
+                bnameCR01CLPU(528395),             --
+                bnameCR01LPUE(528396),       --For NE40 & NE80 , mother card of NE80 and NE40
+                bnameCR01MPUE(528397),       --For NE80 , main control card of NE80
+                bnameCR01SRUC(528398),       --For NE40-2 , main control card of NE40-2
+                bnameRS01SFCB(528399),         --For S8016 SPECIAL, SWITCH CARD
+                bnameCR01NETSTREAMB(528400),         --For ne40&ne80, netstream board
+
+-- 8031:
+
+                bnameCX00UNBD(536832),                   -- Unknown board
+                bnameCX21SCUB(536833),                   -- Switching and Control Processing Unit - 24 Port Fast Ethernet Electrical Interface
+                bnameCX21SCUC(536834),                   -- General Switch Control Unit-24 Ports 100BASE-FX Interface Card(SFP)
+                bnameCX31E2GE0(536835),                  -- 2 Ports 1000Base-T Gigabit Ethernet Electrical Interface Card
+                bnameCX31E2GF0(536836),                  -- 2 Ports Gigabit Ethernet SFP Optical Interface Card  With LC Connector
+                bnameCX31E2GFE0(536837),                 -- 2 Ports Gigabit Ethernet SFP Optical Interface Card With LC Connector (Enhance Board)
+                bnameCX31E4GE0(536838),                  -- 4 Ports 1000Base-T Gigabit Ethernet Electrical Interface Card
+                bnameCX31E4GF0(536839),                  -- 4 Ports Gigabit Ethernet SFP Optical Interface Card  With LC Connector
+                bnameCX31EGFE0(536840),                  -- 16 Ports Fast Ethernet Electrical Interface Card
+                bnameCX31EGFF0(536841),                  -- 16 Ports Fast Ethernet SFP Optical Interface Card With LC Connector
+                bnameCX31R2GF0(536842),                  -- 2 Ports Gigabit Ethernet RPR-SFP Optical Interface Card With LC Connector
+                bnameCX31SCUA0(536843),                  -- 48G Switching and Control Processing Unit
+                bnameCX31SCUB0(536844),                  -- 24G Switching and Control Processing Unit
+                bnameCX21FMCB(536845),                   -- CX200B Fan Monitor Control Board
+                bnameCX31FMCBA(536846),                  -- CX300A Fan Monitor Control Board
+                bnameCX31FMCBB(536847),                  -- CX300B Fan Monitor Control Board
+                bnameCX21POWDC(536848),                  -- CX200B DC Power Monitor Control Board
+                bnameCX31POWDC(536849),                  -- CX300A/B DC Power Monitor Control Board
+                bnameCX21POWAC(536850),                  -- CX200B AC Power Monitor Control Board
+                bnameCX31POWAC(536851),                  -- CX300A/B AC Power Monitor Control Board
+                bnameCX31R2UF0(536852),                  -- 2-Port STM-16c/OC-48c RPR Interface Card(SFP)
+                bnameCX31E4GFF(536853),                  -- 4-Port 1000BASE-X Interface Card(Enhanced II,SFP)
+                bnameCX31E2GFF(536854),                  -- 2-Port 1000BASE-X Interface Card(Enhanced II,SFP)
+                bnameCX31MPUA(536855),                   -- CX380 Main Processing Unit
+                bnameCX31LPUA(536856),                   -- CX380 Switch Forward Unit
+                bnameCX31E1XE(536857),                   -- CX380 1-Port 10GE Electrical Interface Card(RJ45)
+                bnameCX31E8GE(536858),                   -- CX380 8-Port 1000BASE-T Interface Card(RJ45)
+                bnameCX31EAGE(536859),                   -- CX380 10-Port 1000BASE-T Interface Card(RJ45)
+                bnameCX31ECGE(536860),                   -- CX380 12-Port 1000BASE-T Interface Card(RJ45)
+                bnameCX31EGGE(536861),                   -- CX380 16-Port 1000BASE-T Interface Card(RJ45)
+                bnameCX31E1XF(536862),                   -- CX380 1-Port 10GE Optical Interface Card(XFP)
+                bnameCX31E8GF(536863),                   -- CX380 8-Port 1000BASE-X Interface Card(SFP)
+                bnameCX31EAGF(536864),                   -- CX380 10-Port 1000BASE-X Interface Card(SFP)
+                bnameCX31ECGF(536865),                   -- CX380 12-Port 1000BASE-X Interface Card(SFP)
+                bnameCX31EGGF(536866),                   -- CX380 16-Port 1000BASE-X Interface Card(SFP)
+                bnameCX3B1AUAC(536867),                  -- CX380 Chassis(8U,2 MCU Slots,2 SRU Slots,8 SIC Slots,2 Power Supply Slots,Without MCU and Power Module)
+                bnameCX31AGE1B(536868),                  -- CX380 16-Port ATM Service E1 75ohm Interface Card
+                bnameCX31AGE1A(536869),                  -- CX380 16-Port ATM Service E1 120ohm Interface Card
+                bnameCX31AGT1(536870),                   -- CX380 16-Port ATM Service T1 100ohm Interface Card
+                bnameCX31A1CC(536871),                   -- CX380 1-Port Channelized STM-1 ATM Service Interface Card
+                bnameCX31A4CC(536872),                   -- CX380 4-Port Channelized STM-1 ATM Service Interface Card
+                bnameCX31CMPB(536873),                   -- CX380 CPU ATM Service Pinch Board
+                bnameCX31CLKA(536874),                   -- CX380 CX31MPUA Clock Pinch Board
+                bnameCX31TCMA(536875),                   -- CX380 CX31SFUA TCAM Pinch Board
+                bnameCX31BAKE(536876),                   -- CX380 Backplane
+
+                bnameCX61SRUA0(536877),                  -- CX600-8 - Main Process Switch Fabric Unit
+                bnameCX61MPUB0(536878),                  -- CX600-16 Main Processing Unit
+                bnameCX61SFUD0(536879),                  -- CX600-8 Switch Fabric Unit
+                bnameCX61SFUF0(536880),                  -- CX600-16 Switch Fabric Unit
+                bnameCX61FCBA(536881),                   -- CX600 Fan module
+                bnameCX61TSUA(536882),                   -- CX600 TSU Module 
+                bnameCX61SPUB(536883),                   -- CX600 NETSTREAM Module   
+                bnameCX61LPUA(536884),                   -- CX600 LPUA Module   
+                bnameCX61LPUG(536885),                   -- CX600 LPUG Module  
+                
+                bnameCX31R2GFT(536886),                  -- 2-Port 1000BASE-X RPR Interface Card (Timing)                      
+                bnameCX31E2GFET(536887),                 -- 2-Port 1000BASE-X Interface Card (Timing, Enhanced I)   
+                bnameCX31T8CE1A(536888),                 -- 8-Port,Channelized E1,TDM,DB68,75ohm,Interface Card  
+                bnameCX31T8CE1B(536889),                 -- 8-Port,Channelized E1,TDM,DB68,120ohm,Interface Card
+                bnameCX31T8CT1(536890),                  -- 8-Port,Channelized T1,TDM,DB68,100ohm,Interface Card
+                
+                bnameCX21SCUD(536891),                   -- General Switch Control,2GE(SFP)+16FE(SFP)+8FE(RJ45) Mixed Interface Card
+                
+                bnameCX31T4CE1A(536892),                 -- 4-Port,Channelized E1,TDM,DB68,75ohm,Interface Card  
+                bnameCX31T4CE1B(536893),                 -- 4-Port,Channelized E1,TDM,DB68,120ohm,Interface Card
+                bnameCX31T4CT1(536894),                  -- 4-Port,Channelized T1,TDM,DB68,100ohm,Interface Card
+                bnameCX31T1CCE1(536895),                 -- CX,CX31T1CC,Channelized STM-1 TDMPWE Interface Card
+
+                bnameCX3E1FBXA(536896),                  -- CX380 CX3E1FBXA CX380 Upper FAN Box
+                bnameCX3E1FBXB(536897),                  -- CX380 CX3E1FBXB CX380 Under FAN Box
+                
+                bnameCX22EOFE(536898),                   -- CX200D, 24FE(RJ45)+2GE(SFP) Mixed Interface Card
+                bnameCX61LPUF(536899),                   -- CX600 LPUF Module
+                bnameCX61LPUK(536900),                   -- CX600 LPUK Module
+                
+                bnameCX21SCUBVD(536901),                 -- Switching and Control Processing Unit - 24 Ports Fast Ethernet Electrical Interface and 1 Port MEth Interface
+                bnameCX21SCUCVC(536902),                 -- General Switch Control Unit-24 Ports 100BASE-FX Interface Card(SFP) and 1 Port MEth Interface
+
+                
+                bnameCX31TMCE1A(536903),                 -- CX,CX31TMCE1A,32-Port,Channelized E1,FB,75ohm,Interface Card,1*1
+                bnameCX31TMCE1B(536904),                 -- CX,CX31TMCE1B,32-Port,Channelized E1,FB,120ohm,Interface Card,1*1
+                bnameCX31TGCE1A(536905),                 -- CX,CX31TGCE1A,16-Port,Channelized E1,FB,75ohm,Interface Card
+                bnameCX31TGCE1B(536906),                 -- CX,CX31TGCE1B,16-Port,Channelized E1,FB,120ohm,Interface Card,1*1
+                bnameCX31A4CF(536907),                   -- CX,CX31A4CF,4-Port,STM-1,SFP,Interface Card,1*1
+                bnameCX31A1KF(536908),                   -- CX,CX31A4CF,1-Port,STM-4,SFP,Interface Card,1*1
+                
+                bnameCX31PWRAC(536909),                      -- CX380 CX31PWRAC AC Power
+                bnameCX31PWRDC(536910),                      -- CX380 CX31PWRDC DC Power
+                bnameCX31CLOCKA(536911),                     -- CX380,CX31CLKA,Stratum 3 Clock Unit 
+                bnameCX31E4GFS(536912),                      -- CX380,CX31E4GFS,4-Port 1000BASE-X Optical Interface Card(SyncE,SFP)
+                bnameCX31E4GFP(536913),                      -- CX380,CX31E4GFP,4-Port 1000BASE-X Optical Interface Card(SyncE,PTP,SFP)
+                bnameCX31E4GES(536914),                      -- CX380,CX31E4GES,4-Port 1000BASE-T Interface Card(SyncE,RJ45)
+                bnameCX31E4GEP(536915),                      -- CX380,CX31E4GEP,4-Port 1000BASE-T Interface Card(SyncE,PTP,RJ45)
+                bnameCX31EGGFTA(536916),                     -- CX380,CX31EGGFTA,16-Port 1000BASE-X Interface Card(Timing transmit,SFP)
+                bnameCX31E8PA(536917),                       -- CX380,CX31E8PA,CX31EGGFTA Ethernet Pinch Board
+                bnameCX31EGGFS(536918),                      -- CX380,CX31EGGFS,16-Port 1000BASE-X Interface Card(SyncE,SFP
+                bnameCX31EGGES(536919),                      -- CX380,CX31EGGES,16-Port 1000BASE-T Interface Card(SyncE,RJ45)
+                bnameCX31LPUB(536920),                       -- CX380,CX31LPUB,Line Processing Unit
+                bnameCX31E1XFS(536921),                      -- CX380,CX31E1XFS,1-Port 10GE Optical Interface Card(SyncE,XFP)
+                
+                bnameCX22EOFEC(536922),          -- CX200DMC, 24FE(RJ45)+2GE(SFP)+2Monitor Mixed Interface Card
+                bnameCX22EOFEA(536923),          -- CX200DEA, 24FE(RJ45)+2GE(SFP)+2Combo Mixed Interface Card
+                bnameCX22EOFEAMC(536924),        -- CX200DEAMC, 24FE(RJ45)+2GE(SFP)+2Combo+2Monitor Mixed Interface Card
+                
+                bnameCX22EFFF(536925)           -- CX22EFFF,24FE(RJ45)+2GE(SFP)+2Combo Mixed Interface Card
+                bnameCX22EMFEA(536926)                  -- CX22EMFEA,48FE(RJ45)+4GE(SFP) Interface Card
+                bnameCX22EMFEB(536927)                  -- CX22EMFEB,24FE(RJ45)+24FE(SFP)+4GE(SFP) Interface Card    
+                bnameCX22EMFF(536928)                   -- CX22EMFF,48FE(SFP)+4GE(SFP) Interface Card   
+                bnameCX61LPUK1(536929),               -- CX600 CR52LPUK1,Flexible Card Line Processing Unit(LPUF-20,2 sub-slots,Not hot pluggable for sub cards) B 
+                bnameCX61LPUK2(536930),               -- CX600 CR52LPUK2,Flexible Card Line Processing Unit(LPUF-21) A
+                bnameCX61LPUK3(536931),               -- CX600 CR52LPUK3,Flexible Card Line Processing Unit(LPUF-21) B
+                bnameCX61SFUG(536932),                -- CX600,CX61SFUG0,Switch Fabric Unit G
+                
+                bnameCX22E8FF(536933)                 -- CX22E8FF,8FE(RJ45)+1Combo Mixed Interface Card
+                bnameCX22EDFE(536934)                  -- CX22EDFF,16FE(RJ45)+2Combo Mixed Interface Card
+                bnameCX22EFFE(536935)                  -- CX22EFFF,24FE(RJ45)+2Combo Mixed Interface Card
+                bnameCX61MPUD(536936),                -- CX600-3 Main Processing Unit    
+
+                bnameCX22EFGE(536937),                  -- CX22EFGE,24GE(RJ45)+ E2XX(XGE) + E4GF(SFP) Interface Card    
+                bnameCX22EFGF(536938),                  -- CX22EFGF,24GE(SFP)+ E2XX(XGE)+ E4GF(SFP)  Interface Card   
+                bnameCX22EMGE(536939),                  -- CX22EMGE,48GE(RJ45)+ E2XX(XGE)+ E4GF(SFP)  Interface Card   
+
+                bnameCX22EFGEA(536940),                  -- CX22EMGE,48GE(RJ45)+ E2XX(XGE)+ E4GF(SFP)  Interface Card  
+                bnameCX22EMGEA(536941),                  -- CX22EFGEA,20GE+4COMBO General Switch Control Card
+                bnameCX22EFGEF(536942),                  -- CX22EFGEF,20GE+4COMBO,24 PORT PSE General Switch Control Card
+                bnameCX22EMGEB(536943),                  -- CX22EMGEB,44GE+4COMBO,48 PORT PSE General Switch Control Card
+                bnameCX22EFGEC(536944),                  -- CX22EFGEC,20GE+4COMBO+2XGE General Switch Control Card   
+                bnameCX22EMGEC(536945),                  -- CX22EMGEC,48GE+2XGE General Switch Control Card
+                bnameCX22EFGED(536946),                  -- CX22EFGED,20GE+4COMBO+2XGE,24 PORT PSE General Switch Control Card
+                bnameCX22EMGED(536947),                  -- CX22EMGED,48GE+2XGE,48 PORT PSE General Switch Control Card
+                bnameCX22EFGEE(536948),                  -- CX22EFGEE,24GE+2*10GE General Switch Control Card(PSE)
+                bnameCX22EMGEE(536949),                  -- CX22EMGEE,48GE+2*10GE General Switch Control Card(PSE)
+                bnameCX22E8FEC(536950),                  -- CX22E8FEC,8FE+1GE General Switch Control Card(PSE)
+                bnameCX22EFFEA(536951),                  -- CX22EFFEA,24FE+2GE General Switch Control Card(PSE)
+                bnameCX22EFFEC(536952),                  -- CX22EFFEC,24FE+4GE General Switch Control Card(PSE)
+                bnameCX22EMFEC(536953),                  -- CX22EMFEC,48FE+4GE General Switch Control Card(PSE)                   
+-- 8090:
+                bname8090DEVUNKNOWN(561152),         -- Unknown board type
+                bname8090DEVMPU(561153),             -- Main Processing Unit
+                bname8090DEVSFU(561154),             -- Switch Fabric Unit for Full Capacity System
+                bname8090DEVLPU(561155),             -- Flexible Card Line Processing Unit,obsolete
+                bname8090DEVCLK(561156),             -- system clk board on MPU board,obsolete
+                bname8090DEVPOWER(561157),           -- DC/DC Power Module
+                bname8090DEVFAN(561158),             -- Fan Module
+                bname8090DEVLCD(561159),             -- LCD Module
+                bname8090DEVSRUMPU(561160),          -- MPU Module on SRU board,obsolete
+                bname8090DEVSRUSFU(561161),          -- Switch Fabric Unit for Half & Halflow Frame System for SFUD
+                bname8090DEVNETSTREAM(561162),       -- NETSTREAM Module
+                bname8090DEVRAINIER(561163),      -- RAINIER Module
+                bname8090DEVGRE(561164),              -- GRE Module
+                bname8090DEVTSU(561165),              -- TSU Module
+                bname8090DEVSFEA(561166),              -- Switch Fabric Unit for Full Capacity System
+                bname8090DEVSRU(561167),             -- SRU  board
+                bname8090DEVLPUA(561168),            -- LPUA Module
+                bname8090DEVLPUB(561169),            -- LPUB Module
+                bname8090DEVLPUC(561170),            -- LPUC Module
+                bname8090DEVCR52LPUE(561171),        -- CR52LPUE Module
+                bname8090DEVCR53LPUF(561172),        -- CR53LPUF Module
+                bname8090DEVLPUG(561173),            -- LPUG Module
+                bname8090DEVLPUH(561174),            -- LPUH Module
+                bname8090DEVLPUK(561175),            -- LPUK Module
+                bname8090DEVSPU(561176),             -- NETSTREAM Module
+                bname8090DEVSFUG(561177),            -- SFUG Module
+                bname8090DEVMPUA(561178),            -- Cluster Central Main Processing Unit A
+                bname8090DEVSFUA(561179),            -- Cluster Central Switch Fabric Unit A
+                bname8090DEVECUA(561180),            -- Cluster Electric Cross Unit A
+                bname8090DEVICUA(561181),            -- Cluster Internal Communication Unit A
+                bname8090DEVCR52LPUM(561182),        -- CR52LPUM Module
+                bname8090DEVCR52LPUI(561183),        -- CR52LPUI Module  
+                bname8090DEVLPUK1(561184),           -- LPUF-20-B Module  
+                bname8090DEVLPUK2(561185),           -- LPUF-21-A Module  
+                bname8090DEVLPUK3(561186),           -- LPUF-21-B Module
+                bname8090DEVMPUD(561187),            -- NE40E-3 Main Processing Unit  
+                bname8090DEVMPUC(561188),            -- MPUC Module 
+                bname8090DEVSRU40A(561189),          -- SRU40A Module
+                bname8090DEVLPUN(561190),            -- LPUN Module  
+                bname8090DEVLPUR(561191),            -- LPUR Module 
+                bname8090DEVSFU40A(561192),          -- SFU40A Module  
+                bname8090DEVSFU40B(561193),          -- SFU40B Module
+                bname8090DEVSFUI(561194),            -- SFUI Module
+                
+                
+-- ME60:
+                bnameME60UNKNOWN(159744),
+                bnameME60MPUA(159745),                -- ME60-16 MPU Module
+                bnameME60MPUB(159746),                -- ME60-8 MPU Module
+                bnameME60SFUA(159747),                -- ME60-16 SFU Module
+                bnameME60SFUB(159748),                -- ME60-8 SFU Module
+                bnameME60CLK(159749),                 -- CLK Module
+                bnameME60POWER(159750),               -- POWER Module
+                bnameME60FAN(159751),                 -- FAN Module
+                bnameME60LCD(159752),                 -- LCD Module
+                bnameME60CR52LPUA(159753),            -- CR52LPUA Module
+                bnameME60ME01LPUA(159754),            -- ME01LPUA Module
+                bnameME60ME01TSUA0(159755),            --CR52TSU Module
+                bnameME60ME01SSUA0(159756),            --CR52SSU Module
+                bnameME60ME01SBCA0(159757),            --CR52SBC Module
+                bnameME60ME01VSUA0TSU(159758),         --ME01TSU Module
+                bnameME60ME01VSUA0SSU(159759),         --ME01SSU Module
+                bnameME60ME01VSUA0SBC(159760),         --ME01SBC Module
+                bnameME60ME01LPUE(159761),             --LPUE Module
+                bnameME60RAINIER(159762),              --RAINIER Module
+
+                bnameME60ME01VSUA0DPI(159763),         --ME01DPI Module
+                bnameME60ME01LPUB0(159764),        --Ezchip LPUB Module
+                bnameME60ME01LPUC0(159765),         --Ezchip LPUC Module
+                
+                bnameME60MPUC(159766),                 --ME60-16 MPU Module
+                bnameME60SFUC(159767),                 --ME60-16 SFU Module
+                bnameME60SFUD(159768),                  --ME60-16 SFU Module
+
+-- S9300:       0x000A1000~0x000A1fff(659456~663551)
+                bnameLE01SRUA(659456),                   --Switching and Routing Unit Board
+                bnameLE01G48SA(659457),                  --48-Port 100/1000BASE-X Interface Card(EA,SFP)
+                bnameLE01G24SA(659458),                  --E-product,LE01G24S,24Gig-Ethernet SFP Interface Board,1*1
+                bnameLE01G48SE(659459),
+                bnameLE01G48SC(659460),                  --48-Port 100/1000BASE-X Interface Card(EC,SFP)
+                bnameLE01G48SD(659461),                  --48-Port 100/1000BASE-X Interface Card(ED,SFP£©
+                bnameLE01POWER(659462),                  --Quidway S9300,LE02CMUA,Centralized Monitoring Board,1*2
+                bnameLE01FAN(659463),                    --Metro Ethernet E Product,LE02FCMA,Fan Monitor and Control Board,1*3
+                bnameLE02SRUA(659464),                   --Quidway S9300,LE02SRUA,Switch and Routing Unit(256G Switch Capacity),1*1
+                bnameLE02SRUB(659465),                    --Main Control Unit
+                bnameLE02MCUA(659466),                   --Main Control Unit
+                bnameLE02CMUA(659467),
+                bnameLE02G48TC(659468),                  --Quidway S9300,LE02G48TC,48-Port 1000BASE-T Interface Card(EC,RJ45),128K MAC,1*1
+                bnameLE02G48VC(659469),
+                bnameLE02X4UXC(659470),                  --E-product,LE02X4UXC,40G Ethernet XFP Interface Board,1*1
+                bnameLE02X2UXC(659471),                  --E-product,LE02X2UXC,20G Ethernet XFP Interface Board,1*1
+                bnameLE02S24XC(659472),
+                bnameLE02T24XC(659473),
+                bnameLE02V24XC(659474),
+                bnameLE02G48SC(659475),                  --Quidway S9300,LE02G48SC,48-Port 1000BASE-X Interface Card(EC,SFP),128K MAC,1*1
+                bnameLE02G24SC(659476),                  --24-Port 100/1000BASE-X Interface Card(EC,SFP)
+                bnameLE02G24TC(659477),
+                bnameLE02G48TD(659478),                  --Quidway S9300-LE02G48TD-48-Port 1000BASE-T Interface Card-512K MAC-1*1
+                bnameLE02G48VD(659479),
+                bnameLE02X4UXD(659480),
+                bnameLE02X2UXD(659481),
+                bnameLE02S24XD(659482),
+                bnameLE02T24XD(659483),
+                bnameLE02V24XD(659484),
+                bnameLE02G48SD(659485),                  --48-Port 1000BASE-X Interface
+                bnameLE02G24SD(659486),                  --24-Port 100/1000BASE-X Interface Card(ED,SFP)
+                bnameLE02G48SA(659487),                  --Quidway S9300,LE02G48SA,48-Port 1000BASE-X Interface Card(EA,SFP),32K MAC,1*1
+                bnameLE02G48TA(659488),                  --Quidway S9300,LE02G48TA,48-Port 1000BASE-T Interface Card(EA,RJ45),32K MAC,1*1
+                bnameLE02G48VA(659489),
+                bnameLE02X4UXA(659490),                  --4-Port 10GBASE-X Interface Card(EA,XFP)
+                bnameLE02X2UXA(659491),                  --2-Port 10GBASE-X Interface Card(EA,XFP)
+                bnameLE02S24XA(659492),                  --24-Port 100/1000BASE-X and 2-Port 10GBASE-X Interface Card(EA,SFP/XFP)
+                bnameLE02T24XA(659493),                  --24-Port 100/1000BASE-T and 2-Port 10GBASE-X Interface Card(EA,RJ45/XFP)
+                bnameLE02V24XA(659494),
+                bnameLE02G24SA(659495),                  --Quidway S9300,LE02G24SA,24-Port 1000BASE-X Interface Card(SI,SFP),32K MAC,1*1
+                bnameLE02G24TA(659496),
+                bnameLE02G24CA(659497),                  --Quidway S9300,LE02G24CA,24-Port 1000BASE-X and 8-Port 1000BASE-T Combo Interface Card(SI,SFP/RJ45),1*1
+                bnameLE02X12SA(659498),                  --12-Port 10GBASE-X Interface Card(SA£¬SFP+)
+                bnameLE02E4UAA(659499),
+                bnameLE02E12GA(659500),                  --12-Port EPON Interface and 12-Port 1000BASE-X Interface Card (SFP)
+                bnameLE02X2NXA(659501),                  --2-Port 10GBASE-X NP Interface Card(NP,XFP)
+                bnameLE02G24NA(659502),                  --24-Port 1000BASE-X NP Interface Card(NP,SFP)
+                bnameLE01G48SB(659503),
+                bnameLE01MCUA(659504),                  --Main Control Unit
+                bnameLE02SRUBA(659505),
+                bnameLE02SRUAVB(659506),
+                bnameLE02F48SA(659507),                 --48-Port 100BASE-FX Interface Card(EA,SFP)
+                bnameLE02F48SC(659508),                 --48-Port 100BASE-FX Interface Card(EC,SFP)
+                bnameLE02F48SD(659509),                 --48-Port 100BASE-FX Interface Card(ED,SFP)
+                bnameLE02F48TA(659510),                 --48-Port 100/1000BASE-T Interface Card(EA,RJ45)
+                bnameLE02F48TC(659511),                 --48-Port 100/1000BASE-T Interface Card(EC,RJ45)
+                bnameLE02F48TD(659512),                 --48-Port 100/1000BASE-T Interface Card(ED,RJ45)
+                bnameLE02T24SA(659513),                 --24-Port 100/1000BASE-T and 8-Port 100/1000BASE-X Interface Card£¨EA£¬RJ45/SFP£©
+        bnameLE03SRUA(659514),                  --Main Control Unit(BITS/1588)
+        bnameLE03MCUA(659515),                  --Main Control Unit(BITS/1588)
+        bnameLE02VAMPA(659516),
+        bnameLE02G48TH(659517),
+        bnameLE02G48PA(659518),
+   -- SSP:        
+                bnameSSP302X10GL(571003),              -- SSP30-2x10GE-LAN-XFP   
+                bnameSSP302X10GW(571004),              -- SSP30-2x10GE-WAN-XFP  
+                bnameSSP301X10GL(571005),              -- SSP30-1x10GE-LAN-XFP 
+                bnameSSP301X10GW(571006),              -- SSP30-1x10GE-WAN-XFP                 
+                bnameSSP3020GSF(571007),               -- SSP30-20xGE-SFP  
+                bnameSSP3010GSF(571008),               -- SSP30-10xGE-SFP  
+                bnameSSP3024GTX(571009),               -- SSP30-24xGE-TX   
+                bnameSSP3048GTX(571010),               -- SSP30-48xGE-TX  
+                bnameSSP302XP64X(571011),              -- SSP30-2xPOS/STM64-XFP
+                bnameSSP301XP64X(571012),              -- SSP30-1xPOS/STM64-XFP  
+                bnameSSP308XP16S(571013),              -- SSP30-8xPOS/STM16-SFP   
+                bnameSSP304XP16S(571014),              -- SSP30-4xPOS/STM16-SFP 
+                bnameSSP302XP16S(571015),              -- SSP30-2xPOS/STM16-SFP  
+                bnameSSP301XP16S(571016),              -- SSP30-1xPOS/STM16-SFP  
+                bnameSSP308XP4S(571017),               -- SSP30-8xPOS/STM4-SFP   
+                bnameSSP304XP4S(571018),               -- SSP30-4xPOS/STM4-SFP  
+                bnameSSP308XP1S(571019),               -- SSP30-8xPOS/STM1-SFP   
+                bnameSSP201X10GLLPUA(571020),          -- SSP20-1x10GE-LAN-XFP LPUA  
+                bnameSSP201X10GLLPUG(571021),          -- SSP20-1x10GE-LAN-XFP LPUG 
+                bnameSSP201X10GWLPUA(571022),          -- SSP20-1x10GE-WAN-XFP LPUA 
+                bnameSSP201X10GWLPUG(571023),          -- SSP20-1x10GE-WAN-XFP LPUG 
+                bnameSSP2010GSLPUA(571024),            -- SSP20-10xGE-SFP LPUA  
+                bnameSSP2010GSLPUG(571025),            -- SSP20-10xGE-SFP LPUG  
+                bnameSSP205GSLPUA(571026),             -- SSP20-5xGE-SFP  LPUA
+                bnameSSP205GSLPUG(571027),             -- SSP20-5xGE-SFP  LPUG  
+                bnameSSP2024GTLPUA(571028),            -- SSP20-24xGE-TX  LPUA   
+                bnameSSP2024GTLPUG(571029),            -- SSP20-24xGE-TX  LPUG  
+                bnameSSP2024GFSLPUG(571030),           -- SSP20-24xGE/FE-SFP  LPUG  
+                bnameSSP20PS64LPUA(571031),            -- SSP20-POS/STM64-XFP LPUA
+                bnameSSP20PS64LPUG(571032),            -- SSP20-POS/STM64-XFP LPUG
+                bnameSSP20PS64LPUA(571033),            -- SSP20-4xPOS/STM16-SFP LPUA
+                bnameSSP20PS64LPUG(571034),            -- SSP20-4xPOS/STM16-SFP LPUG 
+                bnameSSP202XPS16LPUA(571035),          -- SSP20-2xPOS/STM16-SFP LPUA 
+                bnameSSP202XPS16LPUG(571036),          -- SSP20-2xPOS/STM16-SFP LPUG 
+                bnameSSP201XPS16LPUA(571037),          -- SSP20-POS/STM16-SFP LPUA  
+                bnameSSP201XPS16LPUG(571038),          -- SSP20-POS/STM16-SFP LPUG 
+                bnameSSP204XPS4LPUA(571039),           -- SSP20-4xPOS/STM4-SFP LPUA
+                bnameSSP204XPS4LPUG(571040),           -- SSP20-4xPOS/STM4-SFP LPUG
+                bnameSSP208XPS1LPUA(571041),           -- SSP20-8xPOS/STM1-SFP LPUA
+                bnameSSP208XPS1LPUG(571042),           -- SSP20-8xPOS/STM1-SFP LPUG
+                bnameSSP204XPS1LPUA(571043),           -- SSP20-4xPOS/STM1-SFP LPUA
+                bnameSSP204XPS1LPUG(571044),           -- SSP20-4xPOS/STM1-SFP LPUG                
+                bnameSSPDEVOPM(571045)                 -- SSP10-OPM Module
+
+                }
+
+        HWSubPCBType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "This data type is used as the syntax of the
+                hwSubslotType object in the definition of
+                HUAWEI-DEVICE-MIB's hwSubslotTable.
+                "
+            SYNTAX INTEGER
+                {
+                subbnameunknown(1),
+                subbnameh511o2ctg(2),
+                subbnameh511o2ctb(3),
+                subbnameh511o1ctg(4),
+                subbnameh511o1ctb(5),
+                subbnameh511v2ht(6),
+                subbnameh511v1ht(7),
+                subbnameh512o8ffb(8),
+                subbnameh512o8fff(9),
+                subbnameh511o1gfa(10),
+                subbnameh511o1gfe(11),
+                subbnameh511o1gfg(12),
+                subbnameh511o2cpb(13),
+                subbnameh511o2cpg(14),
+                subbnameh511o1cpb(15),
+                subbnameh511o1cpg(16),
+                subbnameh511o1hxc(17),
+                subbnameh511o1hxb(18),
+                subbnameh511o1hxa(19),
+                subbnameh511e23t(20),
+                subbnameh511e13t(21),
+                subbnameh511t23t(22),
+                subbnameh511t13t(23),
+                subbnameh511o2cvb(24),
+                subbnameh511o2cvg(25),
+                subbnameh511e8it(26),
+                subbnameh511e81d(27),
+                subbnameh511e8vd(28),
+                subbnameh511s81d(29),
+                subbnamevc01sdsp(30),
+
+-- 20020619
+                subbnameh511o1gfx(31),
+                subbnameh511e8fi(32),
+                subbnameh511o1cvb(33),
+                subbnameh511o1cvg(34),
+
+-- UA3000
+                subbnameh601e8ia(35),
+                subbnameh601o1cng(36),
+                subbnameh601o1cnb(37),
+                subbnameh601o2cng(38),
+                subbnameh601o2cnb(39),
+
+                subbnameh511e1ct(40),
+                subbnameh511e2ct(41),
+                subbnameh531o1gaa(42),
+                subbnameh531o2gaa(43),
+                subbnameh531o1gae(44),
+                subbnameh531o2gae(45),
+                subbnameh531e4fb(46),
+                subbnameh53104fbf(47),
+                subbnameh53104fbb(48),
+-- MA5200
+                subbnameaim1(50),
+                subbnameaim2(51),
+                subbnameaim3(52),
+                subbnameaim4(53),
+                subbnamepim1(54),
+                subbnamepim2(55),
+                subbnamepim3(56),
+                subbnamepim4(57),
+                subbnameh521E6FC(58),
+                subbnameh521O6FCSMTRJ(59),
+                subbnameh521O6FCMMTRJ(60),
+                subbnameh521O6FCSLC(61),
+                subbnameh521O1GCSMTRJ(62),
+                subbnameh521O1GCMMTRJ(63),
+                subbnameh521O1GCSLC(64),
+                subbnameh521O1GCMLC(65),
+                subbnameh521O2GCSMTRJ(66),
+                subbnameh521O2GCMMTRJ(67),
+                subbnameh521O2GCSLC(68),
+                subbnameh521O2GCMLC(69),
+                subbnameh521EGCSTKC(70),
+                subbnameh521OGCSTKC(71),
+                subbnameh521P1CCOC3(72),
+                subbnameh521P1HCOC12(73),
+-- ESR
+                subbnameAtm155(130) ,
+                subbnameAtm622(131) ,
+                subbnamePos155 (132) ,
+                subbnamePos622(133) ,
+                subbnameO2cc   (134) ,
+                subbnameE43a(135) ,
+                subbnameE8fi (136) ,
+                subbnameO8fi (137) ,
+                subbnameO1gi (138) ,
+                subbnameE8f(139),
+                subbnameO8f (140) ,
+                subbnameO1g (141) ,
+                subbnameO2g (142) ,
+                subbnameO8g (143) ,
+                subbnameAtm2g5(144) ,
+                subbnameBfm(145),
+                subbnameh601e23a(146),
+                subbnameh601e13a(147),
+-- -LAND
+                subbnameH511o1GTG(148),
+-- VPRING
+                subbnameh511v2htg(151),
+                subbnameh511v1htg(152),
+                subbnameh511v2htb(153),
+                subbnameh511v1htb(154),
+                subbnameh601v2haf(155),
+                subbnameh601v1haf(156),
+                subbnameh601v2hag(157),
+                subbnameh601v1hag(158),
+                subbnameh601v2hab(159),
+                subbnameh601v1hab(160),
+                subbnameh601cesa(165),
+                subbnameh601v2ha(166),
+-- LanD
+                subbnameLande8fs(167),
+                subbnameLando8fsb(168),
+                subbnameLando8fsf(169),
+                subbnameLando8fsg(170),
+                subbnameLando4fsb(171),
+                subbnameLando4fsf(172),
+                subbnameLando4fsg(173),
+                subbnameLando1gta(174),
+                subbnameLando1gtf(175),
+                subbnameLando1gth(176),
+                subbnameh512e81d(177),
+                subbnameLando2fsb(178),
+                subbnameLando2fsf(179),
+                subbnameLando2fsg(180),
+                subbnameLando1fsb(181),
+                subbnameLando1fsf(182),
+                subbnameLando1fsg(183),
+-- 622M ATM
+                subbnamebs22o1hda(184),
+                subbnamebs22o1hdb(185),
+                subbnamebs22o1hdc(186),
+                subbnameH601e2fn(187),
+                subbnameH601o2fnf(188),
+                subbnameH601o2fnb(189),
+                subbnameH601o1fnf(190),
+                subbnameH601o1fnb(191),
+                subbnameH601o1gne(192),
+                subbnameH601o1gna(193),
+                subbnameH601o1gng(194),
+-- VPU
+                subbnamevpuh511etca(195),
+                subbnamevpuh511etcb(196),
+                subbnamevpuh511e2fn(197),
+                subbnamevpuh511o2fnb(198),
+                subbnamevpuh511o1gna(199),
+-- MSUC
+                subbnameH511O1CSB(200),
+                subbnameH511O1CSF(201),
+                subbnameH511O1CSG(202),
+                subbnameH511E1CS(203),
+-- 155M ATM
+                subbnameH601O2CNH(210),
+                subbnameH601O1CNH(211),
+                subbnameH511O2CPH(212),
+                subbnameH511O1CPH(213),
+                subbnameH511O2CPI(214),
+-- UA VPRING
+                subbnameH602V2HAF(215),
+                subbnameH602V1HAF(220),
+                subbnameH602V2HAG(221),
+                subbnameH602V1HAG(222),
+                subbnameH602V1HTF(223),
+                subbnameH602V1HTG(224),
+
+                subbnameH602V2HCF(225),
+                subbnameH602V1HCF(226),
+                subbnameH602V2HCG(227),
+                subbnameH602V1HCG(228),
+                subbnameH602V1HEF(229),
+                subbnameH602V1HEG(230),
+
+
+-- 8070
+                subbnameRTC1ETPA(300),          -- Ethernet process card
+                subbnameRTC1ETKA(301),          -- Ethernet back card
+                subbnameRTC1ETKX(302),          -- Ethernet back card(fiber)
+                subbnameRTC1GEM(303),           -- GE process card(fiber)
+                subbnameRTC1GEPA(304),          -- GE process card
+                subbnameRTC1GEKA(305),          -- GE back card(A)
+                subbnameRTC1GEKB(306),          -- GE back card(B)
+                subbnameRTC1GEKC(307),          -- GE back card(C)
+                subbnameRTC1GEKD(308),          -- GE back card(D)
+                subbnameRTC1GEPT(309),          -- GE process card(copper)
+                subbnameRTC1SAPA(310),          -- 4SA process card
+                subbnameRTC1SAKA(311),          -- 4SA back card
+                subbnameRTC1POPA(312),          -- POS process card
+                subbnameRTC1POK(313),           -- POS back card
+                subbnameRTC2POPB(314),          -- POS++ process card
+                subbnameRTC1CPOP(315),          -- CPOS process card
+                subbnameRTC1CPOB(316),          -- CPOS process card that supports t1
+                subbnameRTC1PAK(317),           -- CPOS/POS++ /8236 ATM back card
+                subbnameRTC1ATPA(318),          -- 8230 ATM process card
+                subbnameRTC1ATK(319),           -- 8230 ATM back card
+                subbnameRTC1ATPB(320),          -- 8236 ATM process card
+                subbnameRTC1T8IP(321),          -- 8-port T1 ATM process card
+                subbnameRTC18TKA(322),          -- 8-port T1 ATM back card
+                subbnameRTC18TKB(323),          -- 8-port T1 ATM back card
+                subbnameRTC1E8IP(324),          -- 8-port E1 ATM process card
+                subbnameRTC18EKA(325),          -- 8-port E1 ATM back card
+                subbnameRTC18EKB(326),          -- 8-port E1 ATM back card
+                subbnameRTC1ATSP(327),          -- 1-port ATM T3 process card
+                subbnameRTC1CT3K(328),          -- 1-port ATM T3 back card
+                subbnameRTC1AESP(329),          -- 1-port ATM E3 process card
+                subbnameRTC1CE3K(330),          -- 1-port ATM E3 back card
+                subbnameRTC1ATDP(331),          -- 2-port ATM T3 process card
+                subbnameRTC1T3DK(332),          -- 2-port ATM T3 back card
+                subbnameRTC1AEDP(333),          -- 2-port ATM E3 process card
+                subbnameRTC1E3DK(334),          -- 2-port ATM E3 back card
+                subbnameRTC1ATHP(335),          -- 622M ATM  process card
+                subbnameRTC1PAHA(336),          -- 622M ATM back card
+                subbnameRTC1PAHB(337),          -- 622M ATM back card
+                subbnameRTC1PAHC(338),          -- 622M ATM back card
+                subbnameRTC1CEPA(339),          -- 4-port CE1/e1 process card
+                subbnameRTC14EPB(340),          -- 4-port CE1/e1 process card
+                subbnameRTC14CEP(341),          -- 4-port CE1/e1 process card
+                subbnameRTC1QEKA(342),          -- 4-port CE1/e1 back card
+                subbnameRTC14EKA(343),          -- 4-port CE1/e1 back card
+                subbnameRTC14EKB(344),          -- 4-port CE1/e1 back card
+                subbnameRTC18EPA(345),          -- 8-port CE1/e1 process card
+                subbnameRTC18EPB(346),          -- 8-port CE1/e1 process card
+                subbnameRTC18CEP(347),          -- 8-port CE1/e1 process card
+                subbnameRTC1E3PA(348),          -- E3 process card
+                subbnameRTC1E3DP(349),          -- 2E3 process card
+                subbnameRTC1CE3P(350),          -- CE3 process card
+                subbnameRTC18TPA(351),          -- 8T1 process card
+                subbnameRTC18TPB(352),          -- 8T1 process card
+                subbnameRTC18CTP(353),          -- 8T1 process card
+                subbnameRTC1T3PA(354),          -- T3 process card
+                subbnameRTC1T3DP(355),          -- 2T3 process card
+                subbnameRTC1CT3P(356),          -- CT3 process card
+                subbnameRTC1CFPA(357),          -- flash card front
+                subbnameRTC1FEPA(358),          -- FETH card front
+                subbnameIMUETHP(359),           -- imu-eth card front
+                subbnameIMUETHK(360),           -- imu-eth card back
+                subbnameIMUGEOP(361),           -- imu-geo card front
+                subbnameIMUGEOK(362),           -- imu-geo card back
+                subbnameIMUGEEP(363),           -- imu-gee card front
+                subbnameIMUGEEK(364),           -- imu-gee card back
+                subbnameRTC14CTP(365),          -- NE05/08/16E:4t1 front
+                subbnameRTC14TKA(366),          -- NE05/08/16E:4t1 back
+                subbnameRTC1CPOC(367),          -- NE05/08/16E:CPOC front
+-- 8011
+                subbnameCR01P4CM(400),          -- For NE80 & NE40, daughter card with 4 155M POS multimode optical port at 1300nm wavelength
+                subbnameCR01P4CS(401),          -- For NE80 & NE40, daughter card with 4 155M POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01P1HM(402),          -- For NE80 & NE40, daughter card with 1 622M POS multimode optical port at 1300nm wavelength
+                subbnameCR01P1HS(403),          -- For NE80 & NE40, daughter card with 1 622M POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01P1UZ(404),          -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelenght (2km)
+                subbnameCR01P1US(405),          -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01P1UL(406),          -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelength (40km)
+                subbnameCR01P1UV(407),          -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelength (70km)
+                subbnameCR01P1RZ(408),          -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (2km)
+                subbnameCR01P1RS(409),          -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01P1RL(410),          -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (40km)
+                subbnameCR01P1RV(411),          -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (70km)
+                subbnameCR01P4HM(412),          -- For NE80 & NE40, daughter card with 4 622M POS multimode optical port at 1300nm wavelength
+                subbnameCR01P4HS(413),          -- For NE80 & NE40, daughter card with 4 622M POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01A8CM(414),          -- For NE80 & NE40, daughter card with 8 155M ATM multimode optical port at 1300nm wavelength
+                subbnameCR01A8CS(415),          -- For NE80 & NE40, daughter card with 8 155M ATM singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01R1UZ(416),          -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (2km)
+                subbnameCR01R1US(417),          -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01R1UL(418),          -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (40km)
+                subbnameCR01R1UV(419),          -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (70km)
+                subbnameCR01C2CF(420),          -- For NE80 & NE40, daughter card with 2 155M CPOS optical port (include SFP module)
+                subbnameCR01C4CF(421),          -- For NE80 & NE40, daughter card with 4 155M CPOS optical port (include SFP module)
+                subbnameCR01EGFE(422),          -- For NE80 & NE40, daughter card with 16 FE port
+                subbnameCR01EGFM(423),          -- For NE80 & NE40, daughter card with 16 FE multimode optical port at 1300nm wavelength
+                subbnameCR01EGFS(424),          -- For NE80 & NE40, daughter card with 16 FE singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameCR01E2GP(425),          -- For NE80 & NE40, daughter card with 2 GE multimode optical port at 850nm wavelength
+                subbnameCR01E2GS(426),          -- For NE80 & NE40, daughter card with 2 GE singlemode optiacl port at 1300nm (10-15km)
+                subbnameCR01E2GQ(427),          -- For NE80 & NE40, daughter card with 2 GE singlemode optical port at 1550nm (40km)
+                subbnameCR01E2GV(428),          -- For NE80 & NE40, daughter card with 2 GE singlemode optical port at 1300nm (70km)
+                subbnameCR01E4GC(429),          -- For NE80 & NE40, daughter card with 4 GE optical port (include GIBC module)
+                subbnameCR01E8FB(430),          -- For NE80 & NE40, daughter card with 8 FE electronic/optical port
+                subbnameUR01A1CFF(431),
+                subbnameUR01A2CFF(432),
+                subbnameUR01A4CFF(433),
+                subbnameUR01A8CFF(434),
+                subbnameCR01A8CFF(435),
+                subbnameCR01A4CFF(436),
+                subbnameCR01SPUA(437),
+                subbnameCR01SPUB(438),
+                subbnameCR01SPUC(439),
+                subbnameCR018CT1(440),
+                subbnameCR01C1CF(441),
+
+         --scua
+               subbnameH511L24GA(450),
+               subbnameH511L12GA(451),
+               subbnameH511L02GA(452),
+               subbnameH511L02FA(453),
+               subbnameH511L02FE(454),
+               subbnameH511O4GS(455),
+               subbnameH511O2GS(456),
+               subbnameH511E2FA(457),
+               subbnameH511O2FS(458),
+
+        --IPMB
+               subbnameH601O2GNE(459),
+               subbnameH601O2GNA(460),
+               subbnameH601O2GNG(461),
+
+
+-- A8010
+                subbnameCkmb(65536),
+                subbnameP2ci(65537),
+                subbnameCsma(65538),
+                subbnameCsmb(65539),
+                subbnameCsmc(65540),
+                subbnameCsmd(65541),
+                subbnameCkma(65542),
+                subbnameCkmc(65543),
+                subbnameO8fib(65544),
+                subbnameO8fif(65545),
+                subbnameO1gie(65546),
+                subbnameO1gig(65547),
+                subbnameO1gii(65548),
+                subbnameO1gia(65549),
+                subbnameOgfib(65550),
+                subbnameOgfif(65551),
+                subbnameO2gie(65552),
+                subbnameO2gia(65553),
+                subbnameP2cig(65554),
+                subbnameP2cib(65555),
+                subbname8efi(65556),
+                subbnameO2cib(65557),
+                subbnameO2cig(65558),
+                subbnameE2ai(65559),
+                subbnameE8vd(65560),
+                subbnameE81d(65561),
+                subbnameLdcu(65562),
+                subbnameLiua(65563),
+                subbnameLiub(65564),
+                subbnameLiuc(65565),
+                subbnameSelf(65566),
+
+
+                subbnameCsme(65568),
+                subbnameCsmg(65569),
+                subbnameCsmh(65570),
+-- MA5100
+                subbnameApc(65836),
+-- MA5300
+                subbnameMa530016VPSL(65900),
+                subbnameMa530024VPSL(65901),
+                subbnameMa5300APSL(65902),
+                subbnameMa5300FE(65903),
+                subbnameH531CQTA(65904),
+                subbnameH531O2FAB(65905),
+                subbnameH53104FAF(65906),
+                subbnameH531O2FAB(65907),
+                subbnameH53104FAF(65908),
+                subbnameH531O2GAX(65909),
+                subbnameH531R2HAF(65910),
+                subbnameH531R2HAX(65911),
+                subbnameH531O1FAB(65912),
+                subbnameH531O1FAF(65913),
+                subbnameH531O1FAG(65914),
+                subbnameH531E2GA(65915),
+                subbnameTD91FEGA(65916),
+-- S3026V
+                subbnameLS66GS1UA(65920),
+                subbnameLS66GM1UA(65921),
+                subbnameLS66FS1UA(65922),
+                subbnameLS66FL1U(65923) ,
+                subbnameLS66FM1UA(65924),
+                subbnameLS66GT1UA(65925),
+                subbnameLS66ST1U(65926),
+                subbnameLS66GZ1UA(65927),
+                subbnameLS61GL1UA(65928),
+
+-- MA5200 add definition of sub card type  0x21000(135168) ~ 0x21FFF(139263)
+                subbnameH521P4CDM(135168),
+                subbnameH521P4CDS(135169),
+                subbnameH521P1HDM(135170),
+                subbnameH521P1HDS(135171),
+                subbnameH521P1UDZ(135172),
+                subbnameH521P1UDS(135173),
+                subbnameH521P1UDL(135174),
+                subbnameH521P1UDV(135175),
+                subbnameH521P1RDZ(135176),
+                subbnameH521P1RDS(135177),
+                subbnameH521P1RDL(135178),
+                subbnameH521P1RDV(135179),
+                subbnameH521P4HDM(135180),
+                subbnameH521P4HDS(135181),
+                subbnameCR01C4CF(135182), 
+                subbnameCR01C2CF(135183), 
+                subbnameH521E16FD(135184),
+                subbnameH521O16FDM(135185),
+                subbnameH521O16FDS(135186),
+                subbnameH521O2GDP(135187),
+                subbnameH521O2GDS(135188),
+                subbnameH521O2GDQ(135189),
+                subbnameH521O2GDV(135190),
+                subbnameH521O4GDG(135191),
+                subbnameH521O2GD(135192), 
+                subbnameH521O8FDB(135193),
+                subbnameH521E4FD(135194), 
+                subbnameH5218E1(135195),  
+                subbnameH521E8FD(135196), 
+                subbnameH521O8FDM(135197),
+                subbnameH521O8FDS(135198),
+                subbnameH521O1GDG(135199),
+                subbnameH521O2GDG(135200),
+                subbnameH521A4CDM(135201),
+                subbnameH521A4CDS(135202),
+                subbnameH521A8CDM(135203),
+                subbnameH521A8CDS(135204),
+                subbnameH521A2HDF(135205),
+                subbnameH521E8F(135206),
+                subbnameH521EGFE(135207),
+                subbnameH521E2GF(135208),
+                subbnameH521A8CFF(135209),
+                subbnameH521A2HFF(135210),
+                subbnameH521E3(135211),
+                subbnameH521T3(135212),
+                subbnameH521E1(135213),
+                subbnameH521T1(135214),
+                subbnameH522GXCE1T(135215),
+                subbnameH522GXCT1T(135216),
+                subbnameH5218CE1(135217),
+                subbnameH5218CT1(135218),
+                subbnameH522P2CFT(135219),
+                subbnameH522P4CFT(135220),
+                subbnameH522GERPR(135221),
+                subbnameH523POS10G(135222),
+                subbnameH523GE10GLAN(135223),
+                subbnameH523GE10GWAN(135224),
+                
+-- WA5700:
+                subnameBWAE1(155648),
+                subnameBWAT1(155649),
+                subnameBWAGE(155650),
+
+-- NE40&80
+                subbname8CE1(528640),         --8 Ports,RJ45,Channelized E1,Flexible Card
+                subbnameGCE1(528641),         -- 16-port Channelized E1,RJ45 Interface Line Card
+                subbnameE4GS(528642),         -- 4-Port Gigabit Ethernet Optical Interface Line Process Card (MTRJ,Single-mode,10km)
+                subbnameE4GP(528643),         -- 4-Port Gigabit Ethernet Optical Interface Line Process Card(MTRJ,Multi-mode,500m)
+                subbnameE4GQ(528644),         -- 4-Port Gigabit Ethernet Optical Interface Line Process Card(LC,Single-mode,1550nm,40km)
+                subbnameE4GV(528645),         -- 4-Port Gigabit Ethernet Optical Interface Line Process Card (LC,Single-mode,1550nm,70km)
+                subbnameP2HM(528646),         -- 2-Port OC-12c/STM-4c POS Optical Interface Line Process Card(SC,Multi-mode,1300nm,500m)
+                subbnameP2HS(528647),         -- 2-Port OC-12c/STM-4c POS Optical Interface Line Process Card(SC,Single-mode,1300nm,15km)
+                subbnameP8CM(528648),         -- 8-Port OC-3c/STM-1 POS Optical Interface Line Process Card(MTRJ,Multi-mode,2km)
+                subbnameP8CS(528649),         -- 8-Port OC-3c/STM-1 POS Optical Interface Line Process Card(MTRJ,Single-mode,15km)
+                subbnameE4FE(528650),         --
+                subbnameEGFE(528651),         -- 16-Port Fast Ethernet Electrical Interface Line Process Card(RJ45)
+                subbnameEGFS(528652),         -- 16-Port Fast Ethernet Optical Interface Line Process Card(MTRJ,Single-mode,15km)
+                subbnameEGFM(528653),         -- 16-Port Fast Ethernet Optical Interface Line Process Card(MTRJ,Multi-mode,1300nm,2km)
+                subbnameE4GC(528654),         -- 4 Ports Gigabits Ethernet GBIC Interface Line Card_LAN
+                subbnameEGFEM(528655),        --
+                subbnameLGFSM(528656),        --
+                subbnameEGFMM(528657),        --
+                subbnameE4GSM(528658),        --
+                subbnameE4GPM(528659),        --
+                subbnameE4GQM(528660),        --
+                subbnameE4GVM(528661),        --
+                subbnameE4GCM(528662),        --
+                subbnameE4GEM(528663),        --
+                subbnameEWFEM(528664),        --
+                subbnameEGFEF(528665),        -- 16FE_RJ45 Flexible Card
+                subbnameP1CFF(528666),        -- 1POS155_SFP Flexible Plug Card
+                subbnameP2CFF(528667),        -- 2POS155_SFP Flexible Plug Card
+                subbnameP4CFF(528668),        -- 4 Port POS155 SFP Optical Interface Line Process Card
+                subbnameE8FF(528669),         -- 8*FE Optical Interface Line Card-SFP
+                subbnameE1GFF(528670),        -- 1GE_SFP Flexible Plug Card
+                subbnameE2GFF(528671),        -- 2GE_SFP Flexible Plug Card
+                subbnameA2HFF(528672),        -- 2-Port OC-12C/STM-4C ATM Optical LC-SFP
+                subbname3E3(528673),          -- 3 Ports,SMB,E3,Flexible Card
+                subbname3T3(528674),          -- 3 Ports,SMB,T3,Flexible Card
+                subbnameE0GFF(528675),        -- NAT Flexible Plug Card
+                subbnameETGFF(528676),        -- NATPT Flexible Plug Card
+                subbnameSNGFF(528677),        -- NetStream Flexible Plug Card
+                subbnameSTGFF(528678),        -- L2TP Flexible Plug Card
+                subbnameSGGFF(528679),        -- GRE Flexible Plug Card
+                subbname8E1(528680),          -- 8 Ports E1 Interface Line Card_RJ45
+                subbnameA2HF(528681),         --
+                subbnameEGFEE(528682),        -- 16 Ports FE RJ45 Electrical Interface Line Card_LAN
+                subbnameEWFE(528683),         --
+                subbnameE4GE(528684),         --
+                subbnameEGFSM(528685),        -- 16*FE 1300nm15km-MTRJ
+                subbnameR1UF(528686),         -- 1*OC-48c/STM-16c RPR-SFP Optical Interface Line Card
+                subbnameN2GB(528687),         -- Netstream
+                subbnameP4CM(528688),         -- For NE80 & NE40, daughter card with 4 155M POS multimode optical port at 1300nm wavelength
+                subbnameP4CS(528689),         -- For NE80 & NE40, daughter card with 4 155M POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameP1HM(528690),         -- For NE80 & NE40, daughter card with 1 622M POS multimode optical port at 1300nm wavelength
+                subbnameP1HS(528691),         -- For NE80 & NE40, daughter card with 1 622M POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameP1UZ(528692),         -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelenght (2km)
+                subbnameP1US(528693),         -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameP1UL(528694),         -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelength (40km)
+                subbnameP1UV(528695),         -- For NE80 & NE40, daughter card with 1 2.5G POS singlemode optical port at 1300nm wavelength (70km)
+                subbnameP1RZ(528696),         -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (2km)
+                subbnameP1RS(528697),         -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameP1RL(528698),         -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (40km)
+                subbnameP1RV(528699),         -- For NE80 & NE40, daughter card with 1 2.5G channelized POS singlemode optical port at 1300nm wavelength (70km)
+                subbnameP4HM(528700),         -- For NE80 & NE40, daughter card with 4 622M POS multimode optical port at 1300nm wavelength
+                subbnameP4HS(528701),         -- For NE80 & NE40, daughter card with 4 622M POS singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameA8CM(528702),         -- For NE80 & NE40, daughter card with 8 155M ATM multimode optical port at 1300nm wavelength
+                subbnameA8CS(528703),         -- For NE80 & NE40, daughter card with 8 155M ATM singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameR1UZ(528704),         -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (2km)
+                subbnameR1US(528705),         -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (10-15km)
+                subbnameR1UL(528706),         -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (40km)
+                subbnameR1UV(528707),         -- For NE80 & NE40, daughter card with 1 2.5G RPR singlemode optical port at 1300nm wavelength (70km)
+                subbnameC2CF(528708),         -- For NE80 & NE40, daughter card with 2 155M CPOS optical port (include SFP module)
+                subbnameC4CF(528709),         -- For NE80 & NE40, daughter card with 4 155M CPOS optical port (include SFP module)
+                subbnameE2GP(528710),         -- For NE80 & NE40, daughter card with 2 GE multimode optical port at 850nm wavelength
+                subbnameE2GS(528711),         -- For NE80 & NE40, daughter card with 2 GE singlemode optiacl port at 1300nm (10-15km)
+                subbnameE2GQ(528712),         -- For NE80 & NE40, daughter card with 2 GE singlemode optical port at 1550nm (40km)
+                subbnameE2GV(528713),         -- For NE80 & NE40, daughter card with 2 GE singlemode optical port at 1300nm (70km)
+                subbnameE8FB(528714),         -- For NE80 & NE40, daughter card with 8 FE electronic/optical port
+                subbnameA1CFF(528715),        -- 1-port STS-3C/STM-1 ATM SFP Optical Interface Flexible Plug Card
+                subbnameA2CFF(528716),        -- 2-port STS-3C/STM-1 ATM SFP Optical Interface Flexible Plug Card
+                subbnameA4CFF(528717),        -- 4 Ports STS-3C/STM-1 ATM SFP Optical Interface Line Card
+                subbnameA8CFF(528718),        -- 8-port STS-3C/STM-1 ATM SFP Optical Interface Flexible Plug Card
+                subbname8CT1(528719),         --
+                subbnameC1CF(528720),         -- 1-Port Channelized OC-3/STM-1 to DS0 SFP Optical Interface Line Card
+                subbnameE8FEF(528721),        -- 8FE_RJ45 Flexible Card
+                subbnameP1HF(528722),         --
+                subbnameEWFEE(528723),        -- 32 Ports FE RJ45 Electrical Interface Line Card
+                subbnameEGFT(528724),         -- 16-Port Fast Ethernet Optical Interface Line Process Card(Single-mode,1550nm,15km,LC)
+                subbnameCR01OPMQ(528725),     -- Single-mode,1550nm,LC Interface Optical Protection Module
+                subbnameCR01OPMZ(528726),     -- Single-mode,1300nm,LC Interface Optical Protection Module
+                subbnameCR01OPMM(528727),     -- Multi-mode,1300nm,LC Interface Optical Protection Module
+                subbnameCR01OPMP(528728),     -- Multi-mode,850nm,LC Interface Optical Protection Module
+                subbnameSPCB(528729),         -- 4*FE-RJ45 And 4*FE-SFP And 4*OC-3c/STM-1 POS Multi-mode 1300nm 2km-MTRJ Interface Line Card
+                subbnameEGFSE(528730),        -- CR01EGFSE0
+                subbnameEGFME(528731),        -- CR01EGFME0
+                subbnameP8CFF(528732),        -- 8 Port POS155 SFP Optical Interface Line Process Card
+                subbnameE4GFF(528733),        -- 4-port GE SFP Interface Line Card
+                subbnameEGFF(528734),         -- 16*FE Optical Interface Line Card-SFP
+                subbnameP2HF(528735),         -- CR03P2HF-2*OC-12c/STM-4c-POS-SFP Optical Interface Card
+
+-- 8031
+                subbnameCX61E1XX0(536577),      -- CX600-1-port 10G Ethernet LAN Optical Interface LPU (Enhanced)
+                subbnameCX61W1XX0(536578),      -- CX600 1-port 10G Ethernet WAN Optical Interface LPU (Enhanced)
+                subbnameCX61EAGF0(536579),      -- CX600-10-port Gigabit Ethernet Optical Interface LPU (Enhanced)
+                subbnameCX61EFGE0(536580),      -- CX600-24-port 10M/100M/1000M Ethernet Electrical Interface LPU(Enhanced)
+                subbnameCX61E2XXE0(536581),     -- CX600-2-port 10G Ethernet LAN Optical Interface LPU
+                subbnameCX61EFGEE0(536582),     -- CX600-24-port 10M/100M/1000M Ethernet Electrical Interface LPU
+                subbnameCX61EFGFE0(536583),     -- CX600-24-port Gigabit Ethernet Optical Interface LPU
+                subbnameCX61EMGEE0(536584),     -- CX600-48-port 10M/100M/1000M Ethernet Electrical Interface LPU
+                subbnameCX61EMGFE0(536585),     -- CX600-48-port Gigabit Ethernet Optical Interface LPU
+                subbnameCX61E1XS0(536586),      -- CX600-NetEngine-CR61E1XS0-1*10GE LAN 1310nm 10km-LC
+                subbnameCX61E1XQ0(536587),      -- CX600-NetEngine-CR61E1XQ0-1*10GE LAN 1550nm 40km-LC
+                subbnameCX61W1XS0(536588),      -- CX600-NetEngine-CR61W1XS0-1*10GE WAN 1310nm 10km-LC
+                subbnameCX61W1XQ0(536589),      -- CX600-NetEngine-CR61W1XQ0-1*10GE WAN 1550nm 40km-LC
+                subbnameCX61W1XV0(536590),      -- CX600-NetEngine-CR61W1XV0-1*10GE WAN 1550nm 80km-LC
+                subbnameCX61R1XX(536591),       ---CX600-CX61R1XX0-1*OC-192c/STM-64c RPR-XFP
+                subbnameCX61R4UF(536592),       ---CX600-CX61R4UF0-4*OC-48c/STM-16c RPR-SFP
+                subbnameCX61R2GF(536593),       -- CX600-CX61R2GF0-2*GE/STM-16c RPR-SFP
+                subbnameCX61R4GF(536594),       -- CX600-CX61R4GF0-4*GE/STM-16c RPR-SFP
+                subbnameCX61EFFF(536595),       -- CX600-CX61EFFF0-24
+                subbnameCX61R2UF(536596),       ---CX600-CX61R2UF0-2*OC-48c/STM-16c RPR-SFP
+                subbnameCX61E1XXA(536597),      ---CX600-CX61E1XXA-1 10GE-Lan/Wan
+                subbnameCX61EBGF(536598),       ---CX600-CR52EBGF0,12-port 100/1000Base-X SFP Flexible Interface Daughter Card
+                subbnameCX61EBGE(536599),       ---CX600-CR52EBGE0,12-port 10/100/1000Base-TX RJ45 Flexible Interface Daughter Card 
+                subbnameCX61L1XX(536600),       ---CX600-CR52L1XX0,1-port 10GBase WAN/LAN XFP Flexible Interface Daughter Card
+                subbnameCx61L4XX(536601),       ---CX600-CR52L4XX0,4-port 10GBase WAN/LAN-XFP Flexible Card(Occupy two sub-slots) 
+                subbnameCX61EKGE(536602),       ---CX600-CR52EKGE0,40-port 10/100/1000Base-RJ45 Flexible Card (Occupy two sub-slots) 
+                subbnameCX61EKGF(536603),       ---CX600-CR52EKGF0,40-Port 100/1000Base-SFP Flexible Card(Occupy two sub-slots) 
+                subbnameCX61P1XXB(536604),      ---CX600-CR52P1XXBZ0,1 port OC-192c/STM-64c POS-XFP Flexible Card
+-- 8090
+                subbname8090CFCARD(561151),         --CFCARD in MPUA or CFCARD2 in SRUA/MPUB
+                subbname8090Unkown(561152),          --
+                subbname8090E1XZ(561153),          --1*10GE LAN Single-mode Optical Interface LPU
+                subbname8090W1XZ(561154),          --1*10GE WAN Single-mode Optical Interface LPU
+                subbname8090EAGF(561155),          --10-port GbE SFP Optical Interface LPU
+                subbname8090P4UF(561156),          --4-port 2.5G POS SFP Optical Interface LPU
+                subbname8090GE(561157),            --GE card
+                subbname8090FE(561158),            --Fe card
+                subbname8090P1XZ(561159),          --1*OC-192c/STM-64c POS Optical Interface LPU
+                subbname8090Pos622(561160),        -- Pos_622
+                subbname8090Pos25G(561161),        -- Pos_2.5G
+                subbname8090ATM(561162),           --ATM
+                subbname8090DPT25G(561163),        -- DPT 2.5G
+                subbname8090P16X155Channel(561164),-- POS_16x155_CHANNEL
+                subbname8090P4HF(561165),          -- POS_4X622
+                subbname8090Pos155(561166),        -- POS_155
+                subbname8090E2XX(561167),          --2*10GBase LAN-XFP Optical Interface LPU C
+                subbname8090W2XX(561168),          --2*10GBase WAN-XFP Optical Interface LPU C
+                subbname8090P2XX(561169),          --2*OC-192c/STM-64c POS-XFP Optical Interface LPU C
+                subbname8090EMGE(561170),          --48*10/100/1000Base-TX-RJ45 Electrical Interface LPU
+                subbname8090A8CF(561171),          --ATM8X155M
+                subbname8090RPR10G(561172),        --RPR_1X_10G_CARD
+                subbname8090P8CF(561173),          --8*OC-3c/STM-1 POS-SFP Optical Interface LPU
+                subbname8090EFGE(561174),          --24*10/100/1000Base-TX-RJ45 Electrical Interface LPU
+
+                subbnameRNRPOS4X155(561175),          --4*OC-3c/STM-1 POS-SFP Optical Interface LPU
+                subbnameRNRPOS1X622(561176),          --1 Port 622M POS Interface LPU
+                subbnameRNRPOS1X25G(561177),          --1 Port 2.5G POS Interface LPU
+                subbnameRNRPOS16X155(561178),         --16*OC-3c/STM-1 POS-SFP Optical Interface LPU
+                subbnameRNRPOS4X622(561179),          --4 Port 622M POS Interface LPU
+                subbnameRNRPOS8X155(561180),          --8*OC-3c/STM-1 POS-SFP Optical Interface LPU
+                subbnameRNRATM8X155(561181),          -- 8 Port 155M ATM Interface LPU
+                subbnameRNRATM2X622(561182),          -- 2 Port 622M ATM Interface LPU
+
+                subbnameRNRETH4X100D(561183),        -- 4 Port 100M RJ45 Interface LPU
+                subbnameRNRETH4X100G(561184),        -- 4 Port 100M Fiber Interface LPU
+
+                subbnameRNRETH8X100D(561185),        -- 8 Port 100M RJ45 Interface LPU
+                subbnameRNRETH8X100G(561186),        -- 8 Port 100M Fiber Interface LPU
+
+                subbnameRNRETH16X100D(561187),       -- 16 Port 100M RJ45 Interface LPU
+                subbnameRNRETH16X100G(561188),       -- 16 Port 100M Fiber Interface LPU
+
+                subbnameRNRETH16X100OTHER(561189),   -- 16 Port 100M Interface LPU
+
+                subbnameRNRETH4XGE(561190),           -- 4 Port GE RJ45/Fiber Interface LPU
+                subbnameRNRETH4XGC(561191),           -- 4 Port GE GE_BIC RJ45/Fiber Interface LPU
+
+                subbnameRNRETH2XGE(561192),           -- 2 Port GE Interface LPU
+                subbnameRNRETH2XGC(561193),           -- 2 Port GE GE_BIC Interface LPU
+
+                subbnameRNRDPTCARD(561194),           --FRR Card
+
+                subbnameRNRCE1PDH2M(561195),        -- 8
+                subbnameRNRCT1PDH1P5M(561196),      -- 8
+
+                subbnameRNRE1PDH2M(561197) ,        -- 8
+                subbnameRNRE3PDH34M(561198),        -- 3
+                subbnameRNRT3PDH44M(561199),        -- 3
+
+                subbnameRNRCPOSOC3(561200),          --1
+                subbnameRNRPOSOC12C(561201),         --4
+                subbnameRNRPOSOC48C(561202),         --1
+
+                subbname8090P1UF(561203),              --1-port 2.5G POS SFP Optical Interface LPU
+                subbname8090P2UF(561204),              --2-port 2.5G POS SFP Optical Interface LPU
+
+                subbnameRNRATMA8CFFF(561205),        --8 Port 155M ATM Interface LPU
+                subbnameRNRATMA2HFFF(561206),        --2 Port 622M ATM Interface LPU
+                subbnameRNRRPR1X25(561207),           --1 Port 2.5G SDH RPR
+
+                subbnameRNRPOSP4CFFF(561208),        --4 Port 155M POS
+                subbnameRNRETHE8FFF(561209),         --8 Port 100M Fiber Interface LPU
+                subbname8090EFGF(561210),               --24GE
+                subbname8090EMGF(561211),               --48GE
+                subbnameRNRCPOS2OC3(561212),          --2*CPOS OC-3/STM-1-SFP Optical
+                subbmaneRNRCPOS4OC3(561213),      --4*CPOS OC-3/STM-1-SFP Optical
+                subbmaneRNR8XCE1(561214),          --UR-PIM-8xCHE1-RJ45
+                subbmaneRNRCPOSOC3FR(561215),    --1*CPOS OC-3/STM-1-SFP Optical
+                subbmaneRNR8XCT1(561216),          --UR-PIM-8xCHT1-RJ45
+                subbname8090R2UF(561217),               --2 Port 2.5G SDH RPR
+                subbname8090R4UF(561218),               --4 Port 2.5G SDH RPR
+
+                subbname8090R2GF(561219),               --2 Port GE RPR
+                subbname8090R4GF(561220),               --4 Port GE RPR
+                subbname8090EFFF(561221),               --24-port GE/FE SFP Phyiscal Interface Card
+
+                subbname8090CR53P1XX(561222),               --1-port 10G POS XFP  Flexible Pluggable Interface Daughter Card
+                subbname8090CR53E8GF(561223),               --8-port GE SFP Flexible Pluggable  Interface Daughter Card
+                subbname8090CR53E8FF(561224),               --8-port FE SFP  Flexible Pluggable  Interface Daughter Card
+                subbname8090CR53P1UF(561225),               --1-port 2.5G POS SFP Flexible Pluggable Interface Daughter Card
+                subbname8090CR53A2HF(561226),               --2-port 622M ATM  SFP  Flexible Pluggable Interface Daughter Card
+                subbname8090CR53A4CF(561227),               --4-port 155M ATM  SFP  Flexible Pluggable Interface Daughter Card
+
+                subbname8090L1XX0(561228),              --1-port 10GBase WAN/LAN XFP Flexible Interface Daughter Card
+                subbname8090EBGF(561229),               --12ports 100Base-FX/1000Base-X
+                subbname8090EBGE(561230),                --12ports 10Base-T/100Base-TX/1000Base-T
+                
+                subbname8090EAGF(561231),               -- 5 port GbE SFP Optical Interface LPU
+      subbname8090P4CF(561232),               -- 4*OC-3c/STM-1 POS-SFP Optical Interface LPU
+
+       subbname8090L4XX(561233),    -- 4-port 10G LAN/WAN XFP Optical Interface Daughter Card,1*1
+       subbname8090EKGE(561234),    -- 40-port 10/100/1000M RJ-45 Interface Daughter Card,1*1
+        subbname8090EKGF(561235),    -- 40-Port FE/GE SFP Optical Interface Daughter Card,1*1
+         subbname8090P2UFZ(561236),   -- 2-port 2.5G POS SFP Flexible Pluggable Interface Daughter Card, 1*1 
+        subbname8090P4UFZ(561237),   -- 4-port 2.5G POS SFP Flexible Pluggable Interface Daughter Card, 1*1 
+       subbname8090P4HFZ(561238),   -- 4-port 622M POS SFP Flexible Pluggable Interface Daughter Card, 1*1 
+        subbname8090P8HFZ(561239),   -- 8-port 622M POS SFP Flexible Pluggable Interface Daughter Card, 1*1 
+        subbname8090P4CFZ(561240),   -- 4-port 155M POS SFP Flexible Pluggable Interface Daughter Card, 1*1 
+        subbname8090P8CFZ(561241),   -- 8-port 155M POS SFP Flexible Pluggable Interface Daughter Card, 1*1   
+         subbname8090C2CF(561242) ,    -- 2-Port Channelized OC-3c/STM-1c POS-SFP Flexible Card
+         subbname80904E3CT3(561243),  -- 4-Port Clear Channel E3/Channelized T3-SMB Flexible Card
+         subbname80908CE1CT1(561244), -- 8-Port Channelized E1/T1-RJ45 Flexible Card
+         subbname8090P1XXB(561245),    -- 1 port OC-192c/STM-64c POS-XFP Flexible Card
+         subbname8090OFCA(561246),               -- Cluster Optical Flexible Card A
+        subbname8090CR53P1MZ(561247),               --1-port 40G POS XFP  Flexible Pluggable Interface Daughter Card
+        subbname809055EMFE(561248),  -- 48-Port 10/100Base-TX-Delander Flexible Card                
+        subbname8090CR53E4XX(561249),               --4-port Eth Interface Daughter Card
+        subbname8090CR52CKGFY(561250),   --40-port GF card
+        subbname8090CR52EBGFB(561251),   --12-port GF card
+        subbname8090CR52L1XXB(561252),   --1-port 10G LAN/WAN card
+        subbname8090CR53D1MV(561253),               --1-port 40G WDM POS XFP  Flexible Pluggable Interface Daughter Card 
+        subbname8090CR53E8GFB(561254),   --8-port 100/1000Base-X SFP Flexible Interface Daughter Card
+        subbname8090CR52EEGFN(561255),   --20-Port 100/1000Base-X-SFP Flexible Card
+        subbname8090CR52EEGFNB(561256),  --20-Port 100/1000Base-X-SFP Flexible Card B
+        subbname8090CR52L2XXN(561257),   --2-Port 10GBase WAN/LAN-XFP Flexible Card
+        subbname8090CR52L2XXNB(561258),  --2-Port 10GBase WAN/LAN-XFP Flexible Card B
+        subbname8090CR52L2XEEG(561259),  --2-Port 10GBase WAN/LAN-XFP and 20-Port 100/1000Base-X-SFP Flexible Card
+        subbname8090CR52L2XEEGB(561260), ---2-Port 10GBase WAN/LAN-XFP and 20-Port 100/1000Base-X-SFP Flexible Card B
+        subbname8090CR53A4CFB(561261),   ---4-Port OC-3c/STM-1c ATM-SFP Flexible Card
+                
+-- ME60:
+                subbnameME60Unkown(159744),
+                subbnameME60P1XZE0(159745),        --ME60P1XZE0 Module
+                subbnameME60W1XQE0(159746),        --ME60W1XQE0 Module
+                subbnameME60W1XSE0(159747),        --ME60W1XSE0 Module
+                subbnameME60E1XQE0(159748),        --ME60E1XQE0 Module
+                subbnameME60E1XSE0(159749),        --ME60E1XSE0 Module
+                subbnameME60EAGFE0(159750),        --ME60EAGFE0 Module
+                subbnameME60P4UFE0(159751),        --ME60P4UFE0 Module
+                subbnameME60EAGFB0(159752),        --ME60EAGFB0 Module
+                subbnameME60P1XQE0(159753),        --ME60P1XQE0 Module
+                subbnameME60P1XVE0(159754),        --ME60P1XVE0 Module
+                subbnameME60E1XSB0(159755),        --ME60E1XSB0 Module
+                subbnameME60E1XQB0(159756),        --ME60E1XQB0 Module
+                subbnameME60W1XSB0(159757),        --ME60W1XSB0 Module
+                subbnameME60W1XQB0(159758),        --ME60W1XQB0 Module
+                subbnameME60EFGEB0(159759),        --ME60EFGEB0 Module
+
+                subbnameME60EFGFB0(159760),         --ME01EFGFB0 Module
+                subbnameME60E2XXB0(159761),         --ME01E2XXB0 Module
+                subbnameME60EAGFB1(159762),         --ME01EAGFB1 Module
+                subbnameME60E5GFB0(159763),         --ME01E5GFB0 Module
+                subbnameME60E1XXB0(159764),         --ME01E1XXB0 Module
+                subbnameME60P2XXM0(159765),         --ME01P2XXM0 Module
+                subbnameME60EFGFM0(159766),         --ME01EFGFM0 Module
+                subbnameME60EAGFM0(159767),         --ME01EAGFM0 Module
+                subbnameME60P8CFM0(159768),         --ME01P8CFM0 Module
+                subbnameME60P4HFM0(159769),         --ME01P4HFM0 Module
+                subbnameME60P4UFM0(159770),         --ME01P4UFM0 Module
+                subbnameME60E1XXM0(159771),         --ME01E1XXM0 Module
+                subbnameME60E2XXM0(159772),         --ME01E2XXM0 Module
+                subbnameME60P1XXM0(159773),         --ME01P1XXM0 Module
+
+                subbnameME60A4HFB0(159774),         --ME01A4HFB0 Module
+                subbnameME60AGCFB0(159775),         --ME01AGCFB0 Module
+                subbnameME60E4GFB0(159776),         --ME01E4GFB0 Module
+                subbnameME60EWFEB0(159777),         --ME01EWFEB0 Module
+                subbnameME60EGFFB0(159778),         --ME01EGFFB0 Module
+
+                subbnameME60EMGFB0(159779),         --ME01EMGFB0 Module
+                subbnameME60EMGFM0(159780),         --ME01EMGFM0 Module
+                
+                subbnameME60EFFFB1(159781),         --24*1000Base SFP Light/Electrical Interface BSU line control board 
+                subbnameME60EFFFM0(159782),          --24*1000Base SFP Light/Electrical Interface MSU line control board 
+                
+                subbnameME60EAGFYB0(159783),         --10*1GE SFP Light/Electrical Interface with TM  -1*1 
+
+                subbnameME60A8CFB0(159784),         --ME60A8CFB0 Module
+                subbnameME60P8CFM1(159785),         --ME60P8CFM1 Module
+                
+                subbnameME60E4XXB0(159786),         --ME60E4XXB0 Module
+                subbnameME60E4XXM0(159787),          --ME60E4XXM0 Module
+
+-- S9300:       0x000A1000~0x000A1fff(659456~663551)
+          subbnameLE01FSUA(659456),
+                subbnameLE02CKMA(659457),          --Clock Pinch Board-1588
+                subbnameLE02FSUA(659458),          --Flexible Service Unit
+                subbnameLE02CKMB(659459),           --Clock Pinch Board-BITS/1588
+                subbnameLE02VSTSA(659460),
+                subbnameLE02S4USE(659461)
+           }
+        HWPortType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "This data type is used as the syntax of the ifType
+                object in the (updated) definition of MIB-II's
+                ifTable.
+
+                The definition of this textual convention with the
+                addition of newly assigned values is published
+                periodically by the IANA, in either the Assigned
+                Numbers RFC, or some derivative of it specific to
+                Internet Network Management number assignments.  (The
+                latest arrangements can be obtained by contacting the
+                IANA.)
+
+                Requests for new values should be made to IANA via
+                email (iana@iana.org).
+
+                The relationship between the assignment of ifType
+                values and of OIDs to particular media-specific MIBs
+                is solely the purview of IANA and is subject to change
+                without notice.  Quite often, a media-specific MIB's
+                OID-subtree assignment within MIB-II's 'transmission'
+                subtree will be the same as its ifType value.
+                However, in some circumstances this will not be the
+                case, and implementors must not pre-assume any
+                specific relationship between ifType values and
+                transmission subtree OIDs.
+
+                "
+            SYNTAX INTEGER
+                {
+                other(1),                       -- none of the following
+                regular1822(2),
+                hdh1822(3),
+                ddnX25(4),
+                rfc877x25(5),
+                ethernetCsmacd(6),
+                iso88023Csmacd(7),
+                iso88024TokenBus(8),
+                iso88025TokenRing(9),
+                iso88026Man(10),
+                starLan(11),
+                proteon10Mbit(12),
+                proteon80Mbit(13),
+                hyperchannel(14),
+                fddi(15),
+                lapb(16),
+                sdlc(17),
+                ds1(18),                        -- DS1-MIB
+                e1(19),                         -- Obsolete see DS1-MIB
+                basicISDN(20),
+                primaryISDN(21),
+                propPointToPointSerial(22),     -- proprietary serial
+                ppp(23),
+                softwareLoopback(24),
+                eon(25),                        -- CLNP over IP
+                ethernet3Mbit(26),
+                nsip(27),                       -- XNS over IP
+                slip(28),                       -- generic SLIP
+                ultra(29),                      -- ULTRA technologies
+                ds3(30),                        -- DS3-MIB
+                sip(31),                        -- SMDS, coffee
+                frameRelay(32),                 -- DTE only.
+                rs232(33),
+                para(34),                       -- parallel-port
+                arcnet(35),                     -- arcnet
+                arcnetPlus(36),                 -- arcnet plus
+                atm(37),                        -- ATM cells
+                miox25(38),
+                sonet(39),                      -- SONET or SDH
+                x25ple(40),
+                iso88022llc(41),
+                localTalk(42),
+                smdsDxi(43),
+                frameRelayService(44),          -- FRNETSERV-MIB
+                v35(45),
+                hssi(46),
+                hippi(47),
+                modem(48),                      -- Generic modem
+                aal5(49),                       -- AAL5 over ATM
+                sonetPath(50),
+                sonetVT(51),
+                smdsIcip(52),                   -- SMDS InterCarrier Interface
+                propVirtual(53),                -- proprietary virtual/internal
+                propMultiplexor(54),            -- proprietary multiplexing
+                ieee80212(55),                  -- 100BaseVG
+                fibreChannel(56),               -- Fibre Channel
+                hippiInterface(57),             -- HIPPI interfaces
+                frameRelayInterconnect(58),     -- Obsolete use either [frameRelay(32)] or [frameRelayService(44)].
+                aflane8023(59),                 -- ATM Emulated LAN for 802.3
+                aflane8025(60),                 -- ATM Emulated LAN for 802.5
+                cctEmul(61),                    -- ATM Emulated circuit
+                fastEther(62),                  -- Fast Ethernet (100BaseT)
+                isdn(63),                       -- ISDN and X.25
+                v11(64),                        -- CCITT V.11/X.21
+                v36(65),                        -- CCITT V.36
+                g703at64k(66),                  -- CCITT G703 at 64Kbps
+                g703at2mb(67),                  -- Obsolete see DS1-MIB
+                qllc(68),                       -- SNA QLLC
+                fastEtherFX(69),                -- Fast Ethernet (100BaseFX)
+                channel(70),                    -- channel
+                ieee80211(71),                  -- radio spread spectrum
+                ibm370parChan(72),              -- IBM System 360/370 OEMI Channel
+                escon(73),                      -- IBM Enterprise Systems Connection
+                dlsw(74),                       -- Data Link Switching
+                isdns(75),                      -- ISDN S/T interface
+                isdnu(76),                      -- ISDN U interface
+                lapd(77),                       -- Link Access Protocol D
+                ipSwitch(78),                   -- IP Switching Objects
+                rsrb(79),                       -- Remote Source Route Bridging
+                atmLogical(80),                 -- ATM Logical Port
+                ds0(81),                        -- Digital Signal Level 0
+                ds0Bundle(82),                  -- group of ds0s on the same ds1
+                bsc(83),                        -- Bisynchronous Protocol
+                async(84),                      -- Asynchronous Protocol
+                cnr(85),                        -- Combat Net Radio
+                iso88025Dtr(86),                -- ISO 802.5r DTR
+                eplrs(87),                      -- Ext Pos Loc Report Sys
+                arap(88),                       -- Appletalk Remote Access Protocol
+                propCnls(89),                   -- Proprietary Connectionless Protocol
+                hostPad(90),                    -- CCITT-ITU X.29 PAD Protocol
+                termPad(91),                    -- CCITT-ITU X.3 PAD Facility
+                frameRelayMPI(92),              -- Multiproto Interconnect over FR
+                x213(93),                       -- CCITT-ITU X213
+                adsl(94),                       -- Asymmetric Digital Subscriber Loop
+                radsl(95),                      -- Rate-Adapt. Digital Subscriber Loop
+                sdsl(96),                       -- Symmetric Digital Subscriber Loop
+                vdsl(97),                       -- Very H-Speed Digital Subscrib. Loop
+                iso88025CRFPInt(98),            -- ISO 802.5 CRFP
+                myrinet(99),                    -- Myricom Myrinet
+                voiceEM(100),                   -- voice recEive and transMit
+                voiceFXO(101),                  -- voice Foreign Exchange Office
+                voiceFXS(102),                  -- voice Foreign Exchange Station
+                voiceEncap(103),                -- voice encapsulation
+                voiceOverIp(104),               -- voice over IP encapsulation
+                atmDxi(105),                    -- ATM DXI
+                atmFuni(106),                   -- ATM FUNI
+                atmIma (107),                   -- ATM IMA
+                pppMultilinkBundle(108),        -- PPP Multilink Bundle
+                ipOverCdlc (109),               -- IBM ipOverCdlc
+                ipOverClaw (110),               -- IBM Common Link Access to Workstn
+                stackToStack (111),             -- IBM stackToStack
+                virtualIpAddress (112),         -- IBM VIPA
+                mpc (113),                      -- IBM multi-protocol channel support
+                ipOverAtm (114),                -- IBM ipOverAtm
+                iso88025Fiber (115),            -- ISO 802.5j Fiber Token Ring
+                tdlc (116),                     -- IBM twinaxial data link control
+                gigabitEthernet (117),          -- Gigabit Ethernet
+                hdlc (118),                     -- HDLC
+                lapf (119),                     -- LAP F
+                v37 (120),                      -- V.37
+                x25mlp (121),                   -- Multi-Link Protocol
+                x25huntGroup (122),             -- X25 Hunt Group
+                trasnpHdlc (123),               -- Transp HDLC
+                interleave (124),               -- Interleave channel
+                fast (125),                     -- Fast channel
+                ip (126),                       -- IP (for APPN HPR in IP networks)
+                docsCableMaclayer (127),        -- CATV Mac Layer
+                docsCableDownstream (128),      -- CATV Downstream interface
+                docsCableUpstream (129),        -- CATV Upstream interface
+                a12MppSwitch (130),             -- Avalon Parallel Processor
+                tunnel (131),                   -- Encapsulation interface
+                coffee (132),                   -- coffee pot
+                ces (133),                      -- Circuit Emulation Service
+                atmSubInterface (134),          -- ATM Sub Interface
+                l2vlan (135),                   -- Layer 2 Virtual LAN using 802.1Q
+                l3ipvlan (136),                 -- Layer 3 Virtual LAN using IP
+                l3ipxvlan (137),                -- Layer 3 Virtual LAN using IPX
+                digitalPowerline (138),         -- IP over Power Lines
+                mediaMailOverIp (139),          -- Multimedia Mail over IP
+                dtm (140),                      -- Dynamic syncronous Transfer Mode
+                dcn (141),                      -- Data Communications Network
+                ipForward (142),                -- IP Forwarding Interface
+                msdsl (143),                    -- Multi-rate Symmetric DSL
+                ieee1394 (144),                 -- IEEE1394 High Performance Serial Bus
+                if-gsn (145),                   -- HIPPI-6400
+                dvbRccMacLayer (146),           -- DVB-RCC MAC Layer
+                dvbRccDownstream (147),         -- DVB-RCC Downstream Channel
+                dvbRccUpstream (148),           -- DVB-RCC Upstream Channel
+                atmVirtual (149),               -- ATM Virtual Interface
+                mplsTunnel (150),               -- MPLS Tunnel Virtual Interface
+                srp (151),                      -- Spatial Reuse Protocol
+                voiceOverAtm (152),             -- Voice Over ATM
+                voiceOverFrameRelay (153),      -- Voice Over Frame Relay
+                idsl (154),                     -- Digital Subscriber Loop over ISDN
+                compositeLink (155),            -- Avici Composite Link Interface
+                ss7SigLink (156),               -- SS7 Signaling Link
+                propWirelessP2P (157),          -- Prop. P2P wireless interface
+                frForward (158),                -- Frame Forward Interface
+                rfc1483 (159),                  -- Multiprotocol over ATM AAL5
+                usb (160),                      -- USB Interface
+                ieee8023adLag (161),            -- IEEE 802.3ad Link Aggregate
+                bgppolicyaccounting (162),      -- BGP Policy Accounting
+                frf16MfrBundle (163),           -- FRF .16 Multilink Frame Relay
+                h323Gatekeeper (164),           -- H323 Gatekeeper
+                h323Proxy (165),                -- H323 Voice and Video Proxy
+                mpls (166),                     -- MPLS
+                mfSigLink (167),                -- Multi-frequency signaling link
+                hdsl2 (168),                    -- High Bit-Rate DSL - 2nd generation
+                shdsl (169),                    -- Multirate HDSL2
+                ds1FDL (170),                   -- Facility Data Link 4Kbps on a DS1
+                pos (171),                      -- Packet over SONET/SDH Interface
+                dvbAsiIn (172),                 -- DVB-ASI Input
+                dvbAsiOut (173),                -- DVB-ASI Output
+                plc (174),                      -- Power Line Communtications
+                nfas (175),                     -- Non Facility Associated Signaling
+                tr008 (176),                    -- TR008
+                gr303RDT (177),                 -- Remote Digital Terminal
+                gr303IDT (178),                 -- Integrated Digital Terminal
+                isup (179),                     -- ISUP
+                propDocsWirelessMaclayer (180), -- prop/Maclayer
+                propDocsWirelessDownstream (181),   -- prop/Downstream
+                propDocsWirelessUpstream (182), -- prop/Upstream
+                hiperlan2 (183),                -- HIPERLAN Type 2 Radio Interface
+                propBWAp2Mp (184),              -- PropBroadbandWirelessAccesspt2multipt
+                sonetOverheadChannel (185),     -- SONET Overhead Channel
+                digitalWrapperOverheadChannel (186),    -- Digital Wrapper
+                aal2 (187),                     -- ATM adaptation layer 2
+                radioMAC (188),                 -- MAC layer over radio links
+                atmRadio (189),                 -- ATM over radio links
+                imt (190),                      -- Inter Machine Trunks
+                mvl (191),                      -- Multiple Virtual Lines DSL
+                reachDSL (192),                 -- Long Reach DSL
+                frDlciEndPt (193),              -- Frame Relay DLCI End Point
+                atmVciEndPt (194),              -- ATM VCI End Point
+                opticalChannel (195),           -- Optical Channel
+                opticalTransport (196),         -- Optical Transport
+                propAtm (197),                  -- Proprietary ATM
+                voiceOverCable (198),           -- Voice Over Cable Interface
+                infiniband (199),               -- Infiniband
+                teLink (200),                   -- TE Link
+                q2931 (201),                    -- Q.2931
+                virtualTg (202),                -- Virtual Trunk Group
+                sipTg (203),                    -- SIP Trunk Group
+                sipSig (204),                   -- SIP Signaling
+                docsCableUpstreamChannel (205), -- CATV Upstream Channel
+                econet (206),                   -- Acorn Econet
+                pon155 (207),                   -- FSAN 155Mb Symetrical PON interface
+                pon622 (208),                   -- FSAN622Mb Symetrical PON interface
+                bridge (209),                   -- Transparent bridge interface
+                linegroup (210),                -- Interface common to multiple lines
+                voiceEMFGD (211),               -- voice E&M Feature Group D
+                voiceFGDEANA (212),             -- voice FGD Exchange Access North American
+                voiceDID (213),                 -- voice Direct Inward Dialing
+                mpegTransport (214),            -- MPEG transport interface
+                sixToFour (215),                -- 6to4 interface
+                gtp (216),                      -- GTP (GPRS Tunneling Protocol)
+                pdnEtherLoop1 (217),            -- Paradyne EtherLoop 1
+                pdnEtherLoop2 (218),            -- Paradyne EtherLoop 2
+                opticalChannelGroup (219),      -- Optical Channel Group
+                homepna (220),                  -- HomePNA ITU-T G.989
+                gfp (221),                      -- Generic Framing Procedure (GFP)
+                ciscoISLvlan (222),             -- Layer 2 Virtual LAN using Cisco ISL
+                fcipLink (224),                 -- FCIP Link
+                rpr (225),                      -- Resilient Packet Ring Interface Type
+                qam (226),                      -- RF Qam Interface
+                lmp (227),                      -- Link Management Protocol
+                cblVectaStar (228),             -- Cambridge Broadband Limited VectaStar
+                docsCableMCmtsDownstream (229), -- CATV Modular CMTS Downstream Interface
+                adsl2 (230),                    -- Asymmetric Digital Subscriber Loop Version 2
+                macSecControlledIF (231),       -- MACSecControlled
+                macSecUncontrolledIF (232),     -- MACSecUncontrolled
+
+-- huawei expanding
+                aponOltPort(501),               -- Apon olt port
+                aponOltSubport(502),            -- Apon olt sub port
+                aponOntPort(503),               -- Apon ont port
+                atmPort(504),                   -- atm port
+                atmSubport(505),                -- atm sub port
+                adslPort(506),
+                lanPort(507),                   -- lan port
+                cescPort(508),                  -- E1 port of CESC board
+                cesdPort(509),                  -- V35 port of CESD board
+                frcPort(510),                   -- E1 port FR board
+                fpcSubport(511),                --
+                sepPort(512),                   --
+                vpringPort(513),                -- STM-4 VPRING port
+                eimPort(514),                   -- FE port of BAS board
+                geimPort(515),                  -- GE port of BAS board
+                basMainport(516),               -- ATM port of BAS board used to create connection
+                apruCes(517),                   -- Apon CES port
+                apruLan(518),                   -- Apon LAN port
+                asxSoftSar(519),                -- soft sar port of ASX board
+                asxHardSar(520),                -- hard sar port of ASX board
+                cesE1Port(521),                 -- E1 port of CES board, for TDM use
+                e1Port(522),                    -- E1 port of CES
+                t1Port(523),                    -- T1 port of CES
+                pstnPort(524),
+                braPort(525),
+                praPort(536),
+                cdiPort(539),
+                vfbPort(540),
+                atiPort(541),
+                mlcE1Port(542),
+                v5TkPort(543),
+                comPort(544),
+                v35Port(545),                   --
+                mmxIwe8Port(546),               -- CES port on MMXC board
+                frPortE1(547),                  -- E1 port of FR board
+                frPortT1(548),                  -- T1 port of FR board
+                frPortV35(549),                 -- V35 port of FR board
+                aiuAtmPort(550),                -- ATM port on AIU board
+                imaPort(551),                   -- IMA port
+                e3Port(552),                    -- E3 port
+                mmxImaPort(554),                -- IMA port on MMX board
+                nullPort(555),
+                shdslPort(556),                 -- G.SHDSL  port
+                iadMainport(557),
+                iadPort(558),                   --
+                cesSDTVPort(559),               -- CES SDT virtual port
+                vlanVPort(560),                 -- VLAN virtual port of LAN board
+                frVCCIndexVPort(561),           -- FR VCC virtual port
+                frStreamVPort(562),             -- FR stream virtual port
+                imaGroupVPort(563),             -- IMA group virtual port
+                adslInterleaveVPort(564),       -- Interleavet virtual port of ADSL board
+                adslFastVPort(565),             -- Fast virtual port of ADSL board
+                lanTrunkVPort(566),             -- Trunk virtual port of LAN board
+                sepsmxAtmPort(568),
+                dehaUdtPort(569),               -- UDT Port of DEHA board
+                t1TdmPort(570),                -- T1 port of TDM 
+                cposT1ccPort(571),             -- CPOS port of T1CC
+                lanswitchPort(572),             -- port of the board for lanswitch between chassises
+                vsrPort(573),                   -- VSR port of OFCA board or SFEA
+-- MA5200
+                debugserial(580),
+                debugnet(581),
+                sdlFE1Port(600),                -- SDL FE1 port
+                sdlShdslPort(601),              -- SDL G.SHDSL port
+-- 8010
+                dsp(65536),
+                bits(65537),
+                clk(65538),
+                mon(65539),
+                aux(65540),
+                sdho(65541),
+                sdhe(65542),
+
+-- MA5200 add definition of port type 0x21000(135168) ~ 0x21FFF(139263)
+                portnameH521ATMOC3S(135168),
+                portnameH521ATMOC3M(135169),
+                portnameH521ATMOC12S(135170),
+                portnameH521ATMOC12M(135171),
+                portnameH521CPOSOC3S(135172),
+                portnameH521CPOSOC3M(135173),
+                portnameH521CPOSOC48S(135174),
+                portnameH521CPOSOC48M(135175),
+                portnameH521FEE(135176),
+                portnameH521FEOSSFP(135177),
+                portnameH521FEOMSFP(135178),
+                portnameH521GEESFP(135179),
+                portnameH521GEOSSFP(135180),
+                portnameH521GEOMSFP(135181),
+                portnameH521POSOC3S(135182),
+                portnameH521POSOC3M(135183),
+                portnameH521POSOC12S(135184),
+                portnameH521POSOC12M(135185),
+                portnameH521POSOC48S(135186),
+                portnameH521POSOC48M(135187),
+                portnameH521E1(135188),
+                portnameH521T1(135189),
+                portnameH521E3(135190),
+                portnameH521T3(135191),
+                portnameH521CE1(135192),
+                portnameH521CT1(135193),
+                portnameH521CPOSOC3(135194),
+                portnameH521GEEGBIC(135195),
+                portnameH521GEOMGBIC(135196),
+                portnameH521GEOSGBIC(135197),
+                portnameH521GEOMMTRJ(135198),
+                portnameH521GEOSMTRJ(135199),
+                portnameH521GEOSLC(135200),
+                portnameH521GEOMLC(135201),
+                portnameH521GEOSSC(135202),
+                portnameH521GEOMSC(135203),
+                portnameH521FEOSMTRJ(135204),
+                portnameH521FEOMMTRJ(135205),
+                portnameH521FEOSSC(135206),
+                portnameH521FEOMSC(135207),
+                portnameH521FEOSLC(135208),
+                portnameH521FEOMLC(135209),
+                portnameH522GERPR(135210),
+                portnameH523POS10G(135211),
+                portnameH523GE10GLAN(135212),
+                portnameH523GE10GWAN(135213),
+                portnameH521ATMOC3(135214),
+                portnameH521ATMOC12(135215),
+                portnameH521CPOSOC48S(135216),
+                portnameH521FEOSFP(135217),
+                portnameH521POSOC3(135218),
+                portnameH521POSOC12(135219),
+                portnameH521POSOC48(135220),
+                portnameH521GEOGBIC(135221),
+                portnameH521GEOLC(135222),
+                portnameH521GEOSC(135223),
+                portnameH521GEOSFP(135224),
+                portnameH521FEOLC(135225),
+                portnameH521FEOSC(135226),
+                portnameH523POS10GS(135227),
+                portnameH523POS10GM(135228),
+                portnameH523GE10GLANS(135229),
+                portnameH523GE10GLANM(135230),
+                portnameH523GE10GWANS(135231),
+                portnameH523GE10GWANM(135232),
+                portnameH521SMUFE(135233),
+                portnameH523SMUGGE(135234),
+                              
+-- WA5700:
+                bwaTdmPort(155648),
+
+-- S9300:       0x000A1000~0x000A1fff(659456~663551)
+              portnameLE01SFP(659456),
+              portnameLE01ESFP(659457),
+              portnameLE01RJ45(659458),
+               portnameLE01ERJ45(659459),
+               portnameLE01RJ45POE(659460),
+               portnameLE01XFP(659461),
+               portnameLE01EXFP(659462),
+               portnameLE01COMBO(659463),
+               portnameLE02EPON(659464)
+ 
+                }
+
+        HWUnSupportNodeInteger ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "
+                To the nodes that don't supported in the MIB table ,the default value
+                should be return for keeping the integrity of the OID in the MIB table ,
+                and the type of the default value is INTEGER, and default value is 65535.
+
+                "
+            SYNTAX INTEGER { defaultValue(65535) }
+
+        HWUnSupportNodeString ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                " To the nodes that don't supported in the MIB table ,the default value
+                should be return for keeping the integrity of the OID in the MIB table,
+                and the default string is the null string. "
+            SYNTAX OCTET STRING (SIZE (0))
+
+        HWUnSupportNodeIPAddress ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "To the nodes that don't supported in the MIB table ,the default value
+                should be return for keeping the integrity of the OID in the MIB table,
+                and the default IP address is 0.0.0.0."
+            SYNTAX IpAddress
+
+        HWUnSupportNodeMacAddress ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "To the nodes that don't supported in the MIB table ,the default value
+                should be return for keeping the integrity of the OID in the MIB table,
+                and the default string is '000000'. "
+
+            SYNTAX MacAddress
+        HWVirtualEntityType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "To show the relevant virtual entity type in vender type object.
+                "
+            SYNTAX INTEGER
+                {
+                other(1),                       -- none of the following
+
+ -- 8090:
+                virent8090DEVLPU(561152),             -- The whole IO board, include all entities on the slot
+                
+                virent8090DEVMPU(561153),        -- Whole MPU Board, include all entities on the slot, virtual entity
+                virent8090DEVSRU(561154),        -- Whole SRU Board, include all entities on the slot, virtual entity
+                virent8090DEVSFU(561155),        -- Switch Fabric Unit for Full Capacity System, include all entities on the slot,virtual entity
+                virent8090DEVSRUSFU(561156),     -- Switch Fabric Unit for Half & Halflow Frame System, include all entities on the slot,virtual entity
+                virent8090DEVICU(561157),        -- Whole ICU Board, include all entities on the slot, virtual entity 
+                virent8090DEVECU(561158),        -- Whole ECU Board, include all entities on the slot, virtual entity
+ --ME60:                
+                virentME60DEVLPU(159744),                 -- The whole IO board, incude all entitys on the slot
+                virentME60EDVMPU(159745),            -- Whole MPU Board, incude all entitys on the slot, virtual entity
+                virentME60EDVSRU(159746),            -- Whole SRU Board, incude all entitys on the slot, virtual entity
+                virentME60EDVSFUA(159747),        -- Switch Fabric Unit for Full Capacity System, incude all entitys on the slot,virtual entity
+                virentME60EDVSFUB(159748),           -- Switch Fabric Unit for Half & Halflow Frame System, incude all entitys on the slot,virtual entity
+
+
+                }
+
+        HWAdditionalEntityType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "To show the relevant additional entity type in vender type object.
+                "
+            SYNTAX INTEGER
+                {
+                other(1),                      -- none of the following
+-- MA5200:                      
+                addentnameMA5200TCAM(135168),       -- TCAM  Module
+                addentnameMA5200CPCD(135169),       -- CPCD  Module
+-- 8090:                
+                addentname8090DEVFAD(561152),       -- FAD  Module
+                addentname8090DEVTCAM(561153),      -- TCAM Module
+                addentname8090DEVCLK(561154),       -- Clock Board
+                addentname8090DEVMIF(561155),        -- MIF Module
+                addentname8090DEVCR52CLKB(561156),  -- 1588 v2 Clock Board
+                
+-- ME60:                
+                addentnameME60DEVFAD(159744),       -- FAD  Module
+                addentnameME60DEVTCAM(159745),      -- TCAM Module
+                addentnameME60DEVCLK(159746),       -- Clock Board
+                addentnameME60DEVMIF(159747),        -- MIF Module
+
+
+                }
+
+
+        hwAlarmId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The trap id only valids in the alarm trap Varible binding parameters .
+                 "
+            ::= { huaweiTCMIB 1 }
+
+        hwAlarmTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The trap  time  only valids in the alarm trap Varible binding parameters .
+                 "
+            ::= { huaweiTCMIB 2 }
+
+        hwAlarmSn OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The serial number  only valids in the alarm trap Varible binding parameters .
+                 "
+            ::= { huaweiTCMIB 3 }
+
+        hwCauseId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The cause for   sending  a trap .
+                 "
+            ::= { huaweiTCMIB 4 }
+
+        hwTrapType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                eventAlarm(0),
+                faultAlarm(1),
+                clearAlarm(2),
+                synAlarm(3),
+
+                maitainTrap(10),
+                topDiscovery(11),
+                debugTrap(12)
+            }
+
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The trap type .
+                   "
+            ::= { huaweiTCMIB 5 }
+
+        hwFrameTypeOid OBJECT-TYPE
+            SYNTAX HWFrameType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the Frames definition only for Entity-Mib use"
+            ::= { huaweiTCMIB 11 }
+
+        hwSlotTypeOid OBJECT-TYPE
+            SYNTAX HWPCBType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the slots definition only for Entity-Mib use"
+            ::= { huaweiTCMIB 12}
+
+        hwSubslotTypeOid OBJECT-TYPE
+            SYNTAX HWSubPCBType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the sub slots  definition only for Entity-Mib use"
+            ::= { huaweiTCMIB 13}
+
+        hwPortTypeOid    OBJECT-TYPE
+            SYNTAX HWPortType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the ports definition only for Entity-Mib use"
+            ::= { huaweiTCMIB 14}
+        hwVirtualEntityOid    OBJECT-TYPE
+            SYNTAX HWVirtualEntityType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The virtual entity definition only for Entity-mib."
+            ::= { huaweiTCMIB 15}
+
+        hwAdditionalEntityOid    OBJECT-TYPE
+            SYNTAX HWAdditionalEntityType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The additional entity definition only for Entity-mib."
+            ::= { huaweiTCMIB 16}
+
+    END
+
+

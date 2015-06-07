@@ -1,0 +1,173 @@
+CISCOSB-SpecialBpdu-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      Cisco Switch Interfaces Private
+-- Version:    7.50
+-- Date:       07 July 2009
+
+IMPORTS
+    ifIndex                                                 FROM IF-MIB
+    MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
+    RowStatus, TruthValue, MacAddress, TEXTUAL-CONVENTION   FROM SNMPv2-TC
+    switch001                                               FROM CISCOSB-MIB;
+
+
+rlSpecialBpdu   MODULE-IDENTITY
+                LAST-UPDATED "200805031234Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                    "<description>"
+                REVISION "200805031234Z"
+                DESCRIPTION
+                    "The private MIB module definition Traffic Segmentation MIB."
+                ::= { switch001 144 }
+
+
+EncapType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "The L2 encapsulation type. In case the entry contains MAC only,
+         the encapsulation will be none(1), otherwisw:
+         EthernetV2 (2), LLC (2) or LLC-Snap (3)"
+    SYNTAX    INTEGER {
+                    none(1),
+                    ethernet-v2(2),
+                    llc(3),
+                    llc-snap(4)
+                }
+
+Action ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Action to be taken. Bridge(1) or Discard (2)"
+    SYNTAX    INTEGER {
+                    bridge(1),
+                    discard(2)
+                }
+
+HwAction ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Configured action in the HW. Forward(1), Drop (2) or Trap(3)"
+    SYNTAX    INTEGER {
+                    forward(1),
+                    drop(2),
+                    trap(3)
+                }
+--------------------------------------------------------------------------------
+-- Special BPDU
+--------------------------------------------------------------------------------
+
+--rlSpecialBpduTable
+
+rlSpecialBpduTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlSpecialBpduEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains entries of Special BPDU configuration"
+    ::= { rlSpecialBpdu 1 }
+
+rlSpecialBpduEntry OBJECT-TYPE
+    SYNTAX      RlSpecialBpduEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of Special BPDU configuration table"
+    INDEX   { rlSpecialBpduMacAddr,
+              rlSpecialBpduEncap,
+              rlSpecialBpduProtId }
+    ::= { rlSpecialBpduTable 1 }
+
+RlSpecialBpduEntry ::= SEQUENCE {
+        rlSpecialBpduMacAddr            MacAddress,
+        rlSpecialBpduEncap              EncapType,
+        rlSpecialBpduProtId             OCTET STRING (SIZE (5)),
+        rlSpecialBpduAction             Action,
+        rlSpecialBpduRowStatus          RowStatus
+}
+
+rlSpecialBpduMacAddr    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Reserved MAC Mc 01:80:C2:00:00:00 - 01:80:C2:00:00:2F."
+    ::= { rlSpecialBpduEntry 1 }
+
+rlSpecialBpduEncap      OBJECT-TYPE
+    SYNTAX      EncapType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "L2 Encapsulation Type: Ethernet-V2, LLC or LLC-Snap."
+    ::= { rlSpecialBpduEntry 2 }
+
+rlSpecialBpduProtId     OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Protocol ID. For Ethernet-V2: 0x600 - 0xFFFF; For LLC: 0 - 0xFFFF;
+         For LLC-Snap: 0 - 0xFFFFFFFFFF."
+    ::= { rlSpecialBpduEntry 3 }
+
+rlSpecialBpduAction     OBJECT-TYPE
+    SYNTAX      Action
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action to be taken on the incoming frame: Discard or Bridge."
+    ::= { rlSpecialBpduEntry 4 }
+
+rlSpecialBpduRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { rlSpecialBpduEntry 5 }
+
+
+--rlSpecialBpduHwTable
+
+rlSpecialBpduHwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlSpecialBpduHwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains entries of Special BPDU Hw status"
+    ::= { rlSpecialBpdu 2 }
+
+rlSpecialBpduHwEntry OBJECT-TYPE
+    SYNTAX      RlSpecialBpduHwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of Special BPDU Hw status table"
+    INDEX   { rlSpecialBpduMacAddr }
+    ::= { rlSpecialBpduHwTable 1 }
+
+RlSpecialBpduHwEntry ::= SEQUENCE {
+        rlSpecialBpduHwAction           HwAction
+}
+
+rlSpecialBpduHwAction    OBJECT-TYPE
+    SYNTAX      HwAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "HW action per MAC address: Forward, Drop or Trap."
+    ::= { rlSpecialBpduHwEntry 2 }
+
+END
+
+

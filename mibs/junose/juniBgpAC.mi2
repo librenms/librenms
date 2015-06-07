@@ -1,0 +1,553 @@
+
+-- *****************************************************************************
+-- Juniper-BGP-CONF
+--
+-- SNMP Agent Capabilities definitions for the BGP MIB.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+-- Copyright (c) 2007 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-BGP-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniBgpAgent  MODULE-IDENTITY
+    LAST-UPDATED "200705110517Z"  -- 11-May-07 01:17 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the BGP component of the SNMP
+        agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200705110517Z"  -- 11-May-07 01:17 AM EDT  - JUNOSe 9.0
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Added support for BGP conditional advertisement"
+    REVISION    "200312181528Z"  -- 18-Dec-03 10:28 AM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Added support for route-map option in default-information originate
+         and neighbor ... default-originate.
+         Added support for IP profiles and IP service-profiles to be used
+         by BGP when creating IP dynamic interfaces over MPLS tunnels.
+         BGP4-V2-MIB-JUNIPER:
+         Implemented an experimental version of the Internet draft BGP4 MIB
+         extentions (version 2) based on draft-ietf-idr-bgp4-mibv2-03.txt."
+    REVISION    "200312181427Z"  -- 18-Dec-03 09:27 AM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Added support for send-label.
+         Added support for carrier's carrier feature for BGP/MPLS VPN.
+         Added support for reconvergence after loss of MPLS next-hop."
+    REVISION    "200307092135Z"  -- 09-Jul-03 05:35 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Added support for maximum-paths eiBGP.
+         Added support for bgpIpV6.
+         Replaced VRF distance objects with address family distance objects.
+         Changed default values for VRF maximum paths.
+         Obsoleted storage heap size objects.
+         Added support for leaked flag attribute of the BGP route."
+    REVISION    "200211061633Z"  -- 06-Nov-02 11:33 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Replaced Unisphere names with Juniper names.
+         Added support for neighbor site-of-origin and peer leniency."
+    REVISION    "200209051256Z"  -- 05-Sep-02 08:56 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Added support for four-octet AS-numbers, dynamic capability
+         negotiation, iBGP multipath, confederation peers filter-list, and peer
+         and peer-group address family maximum prefix strict flags.
+         Replaced Route MPLS label object with separate in and out objects.
+         Deprecated support for two-octet AS-numbers.
+         Obsoleted rsBgpEqualCostLimit."
+    REVISION    "200209041756Z"  -- 04-Sep-02 01:56 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "BGP4-MIB:
+         Added full support for RFC1657 and draft-ietf-idr-bgp4-mib-07.
+         Juniper-BGP-MIB:
+         Added support for BGP internal redistribute.
+         Obsoleted juniBgpStorageInitialHistoryRoutePoolSize and
+         juniBgpStorageMaxHistoryRoutePoolSize.
+         Added the ability to unconfigure BGP attributes from the MIB."
+    REVISION    "200203011751Z"  -- 01-Mar-02 12:51 PM EST  - JUNOSe 3.5
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Added support for adding unicast BGP routes into a multicast view."
+    REVISION    "200201231316Z"  -- 23-Jan-02 01:16 PM EST  - JUNOSe 3.4
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Added support for peer and peer-group local-as."
+    REVISION    "200112041609Z"  -- 04-Dec-01 11:09 AM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Juniper-BGP-MIB:
+         Replaced the BGP route congiguration group with new tables containing
+         the original route destination as an additional index."
+    REVISION    "200112031848Z"  -- 03-Dec-01 01:48 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module.
+         Juniper-BGP-MIB:
+         Added support for BGP default IPv4 unicast."
+    ::= { juniAgents 4 }
+
+
+-- *****************************************************************************
+-- BGP SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniBgpAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 3.0 and 3.1 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when a new object was added to the
+        general configuration group."
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup,
+            juniBgpStatisticsConfGroup,
+            juniBgpConfederationPeerConfGroup,
+            juniBgpPeerConfGroup,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup,
+            juniBgpPeerGroupConfGroup,
+            juniBgpPeerGroupAddressFamilyConfGroup,
+            juniBgpRouteConfGroup,
+            juniBgpNetworkConfGroup,
+            juniBgpAggregateConfGroup,
+            juniBgpVrfConfGroup,
+            juniBgpAddressFamilyConfGroup,
+            juniBgpStorageConfGroup }
+    ::= { juniBgpAgent 1 }
+
+juniBgpAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 3.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when the BGP route congiguration
+        group was replaced with new tables containing the original route
+        destination as an additional index."
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup2,
+            juniBgpStatisticsConfGroup,
+            juniBgpConfederationPeerConfGroup,
+            juniBgpPeerConfGroup,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup,
+            juniBgpPeerGroupConfGroup,
+            juniBgpPeerGroupAddressFamilyConfGroup,
+            juniBgpRouteConfGroup,
+            juniBgpNetworkConfGroup,
+            juniBgpAggregateConfGroup,
+            juniBgpVrfConfGroup,
+            juniBgpAddressFamilyConfGroup,
+            juniBgpStorageConfGroup }
+    ::= { juniBgpAgent 2 }
+
+juniBgpAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 3.3 system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when the peer and peer-group local-as
+        support was added."
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup2,
+            juniBgpStatisticsConfGroup,
+            juniBgpConfederationPeerConfGroup,
+            juniBgpPeerConfGroup,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup,
+            juniBgpPeerGroupConfGroup,
+            juniBgpPeerGroupAddressFamilyConfGroup,
+            juniBgpNewRouteConfGroup,
+            juniBgpNetworkConfGroup,
+            juniBgpAggregateConfGroup,
+            juniBgpVrfConfGroup,
+            juniBgpAddressFamilyConfGroup,
+            juniBgpStorageConfGroup }
+    ::= { juniBgpAgent 3 }
+
+juniBgpAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 3.4 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added for adding
+        unicast BGP routes into a multicast view."
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup2,
+            juniBgpStatisticsConfGroup,
+            juniBgpConfederationPeerConfGroup,
+            juniBgpPeerConfGroup2,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup,
+            juniBgpPeerGroupConfGroup2,
+            juniBgpPeerGroupAddressFamilyConfGroup,
+            juniBgpNewRouteConfGroup,
+            juniBgpNetworkConfGroup,
+            juniBgpAggregateConfGroup,
+            juniBgpVrfConfGroup,
+            juniBgpAddressFamilyConfGroup,
+            juniBgpStorageConfGroup }
+    ::= { juniBgpAgent 4 }
+
+juniBgpAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 3.5 and subseguent 3.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added for the
+        standard BGP4-MIB and for BGP internal redistribute."
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup2,
+            juniBgpStatisticsConfGroup,
+            juniBgpConfederationPeerConfGroup,
+            juniBgpPeerConfGroup2,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup,
+            juniBgpPeerGroupConfGroup2,
+            juniBgpPeerGroupAddressFamilyConfGroup,
+            juniBgpNewRouteConfGroup,
+            juniBgpNetworkConfGroup,
+            juniBgpAggregateConfGroup,
+            juniBgpVrfConfGroup2,
+            juniBgpAddressFamilyConfGroup,
+            juniBgpStorageConfGroup }
+    ::= { juniBgpAgent 5 }
+
+juniBgpAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-BGP-MIB for four-octet AS-numbers, dynamic capability
+        negotiation, iBGP multipath and confederation peers filter-list."
+    SUPPORTS    BGP4-MIB
+        INCLUDES {
+            bgp4MIBGlobalsGroup,
+            bgp4MIBPeerGroup,
+            bgp4MIBRcvdPathAttrGroup,
+            bgp4MIBPathAttrGroup,
+            bgp4MIBNotificationGroup,
+            bgp4MIBNewNotificationGroup }
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup3,
+            juniBgpStatisticsConfGroup,
+            juniBgpConfederationPeerConfGroup,
+            juniBgpPeerConfGroup3,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup2,
+            juniBgpPeerGroupConfGroup3,
+            juniBgpPeerGroupAddressFamilyConfGroup2,
+            juniBgpNewRouteConfGroup,
+            juniBgpNetworkConfGroup2,
+            juniBgpAggregateConfGroup2,
+            juniBgpVrfConfGroup3,
+            juniBgpAddressFamilyConfGroup2,
+            juniBgpStorageConfGroup2 }
+    ::= { juniBgpAgent 6 }
+
+juniBgpAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 4.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-BGP-MIB for neighbor site-of-origin and peer leniency."
+    SUPPORTS    BGP4-MIB
+        INCLUDES {
+            bgp4MIBGlobalsGroup,
+            bgp4MIBPeerGroup,
+            bgp4MIBRcvdPathAttrGroup,
+            bgp4MIBPathAttrGroup,
+            bgp4MIBNotificationGroup,
+            bgp4MIBNewNotificationGroup }
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup4,
+            juniBgpStatisticsConfGroup,
+            juniBgpFourOctetConfederationPeerConfGroup,
+            juniBgpPeerConfGroup4,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup3,
+            juniBgpPeerGroupConfGroup4,
+            juniBgpPeerGroupAddressFamilyConfGroup3,
+            juniBgpNewRouteConfGroup2,
+            juniBgpNetworkConfGroup2,
+            juniBgpAggregateConfGroup2,
+            juniBgpVrfConfGroup4,
+            juniBgpAddressFamilyConfGroup2,
+            juniBgpStorageConfGroup2,
+            juniBgpDeprecatedGroup }
+    ::= { juniBgpAgent 7 }
+
+juniBgpAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-BGP-MIB for several new features."
+    SUPPORTS    BGP4-MIB
+        INCLUDES {
+            bgp4MIBGlobalsGroup,
+            bgp4MIBPeerGroup,
+            bgp4MIBRcvdPathAttrGroup,
+            bgp4MIBPathAttrGroup,
+            bgp4MIBNotificationGroup,
+            bgp4MIBNewNotificationGroup }
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup5,
+            juniBgpStatisticsConfGroup,
+            juniBgpFourOctetConfederationPeerConfGroup,
+            juniBgpPeerConfGroup5,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup3,
+            juniBgpPeerGroupConfGroup5,
+            juniBgpPeerGroupAddressFamilyConfGroup3,
+            juniBgpNewRouteConfGroup2,
+            juniBgpNetworkConfGroup2,
+            juniBgpAggregateConfGroup2,
+            juniBgpVrfConfGroup4,
+            juniBgpAddressFamilyConfGroup2,
+            juniBgpStorageConfGroup2,
+            juniBgpDeprecatedGroup }
+    ::= { juniBgpAgent 8 }
+
+juniBgpAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 5.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-BGP-MIB for send-label, carrier's carrier feature for BGP/MPLS
+        VPN and reconvergence after loss of MPLS next-hop."
+    SUPPORTS    BGP4-MIB
+        INCLUDES {
+            bgp4MIBGlobalsGroup,
+            bgp4MIBPeerGroup,
+            bgp4MIBRcvdPathAttrGroup,
+            bgp4MIBPathAttrGroup,
+            bgp4MIBNotificationGroup,
+            bgp4MIBNewNotificationGroup }
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup5,
+            juniBgpStatisticsConfGroup,
+            juniBgpFourOctetConfederationPeerConfGroup,
+            juniBgpPeerConfGroup5,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup3,
+            juniBgpPeerGroupConfGroup5,
+            juniBgpPeerGroupAddressFamilyConfGroup3,
+            juniBgpNewRouteConfGroup3,
+            juniBgpNetworkConfGroup2,
+            juniBgpAggregateConfGroup2,
+            juniBgpVrfConfGroup5,
+            juniBgpAddressFamilyConfGroup3,
+            juniBgpStorageConfGroup3,
+            juniBgpDeprecatedGroup }
+    ::= { juniBgpAgent 9 }
+
+juniBgpAgentV10  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 10 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component was supported in JUNOSe 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-BGP-MIB for route-map option in default-information originate
+        and neighbor ... default-originate, and when support was added for the
+        new dynamic capability negotiation draft."
+    SUPPORTS    BGP4-MIB
+        INCLUDES {
+            bgp4MIBGlobalsGroup,
+            bgp4MIBPeerGroup,
+            bgp4MIBRcvdPathAttrGroup,
+            bgp4MIBPathAttrGroup,
+            bgp4MIBNotificationGroup,
+            bgp4MIBNewNotificationGroup }
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup5,
+            juniBgpStatisticsConfGroup,
+            juniBgpFourOctetConfederationPeerConfGroup,
+            juniBgpPeerConfGroup5,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup4,
+            juniBgpPeerGroupConfGroup5,
+            juniBgpPeerGroupAddressFamilyConfGroup4,
+            juniBgpNewRouteConfGroup3,
+            juniBgpNetworkConfGroup2,
+            juniBgpAggregateConfGroup2,
+            juniBgpVrfConfGroup6,
+            juniBgpAddressFamilyConfGroup4,
+            juniBgpStorageConfGroup3,
+            juniBgpDeprecatedGroup }
+    ::= { juniBgpAgent 10 }
+
+juniBgpAgentV11  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 11 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component is supported in JUNOSe 5.3 and subsequent system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the BGP application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-BGP-MIB for BGP conditional advertisement."
+    SUPPORTS    BGP4-MIB
+        INCLUDES {
+            bgp4MIBGlobalsGroup,
+            bgp4MIBPeerGroup,
+            bgp4MIBRcvdPathAttrGroup,
+            bgp4MIBPathAttrGroup,
+            bgp4MIBNotificationGroup,
+            bgp4MIBNewNotificationGroup }
+    SUPPORTS    BGP4-V2-MIB-JUNIPER
+        INCLUDES {
+            jnxBgpM2TimersGroup,
+            jnxBgpM2CountersGroup,
+            jnxBgpM2AsPathGroup,
+            jnxBgpM2As4byteGroup,
+            jnxBgpM2BaseGroup,
+            jnxBgpM2ErrorsGroup,
+            jnxBgpM2PeerGroup,
+            jnxBgpM2PathAttributesGroup,
+            jnxBgpM2MIBNotificationsGroup,
+            jnxBgpM2AuthenticationGroup,
+            jnxBgpM2CommunitiesGroup,
+            jnxBgpM2ExtCommunitiesGroup,
+            jnxBgpM2RouteReflectionGroup,
+            jnxBgpM2AsConfederationGroup,
+            jnxBgpM2CapabilitiesGroup,
+            jnxBgpM2PeerConfigurationGroup,
+            jnxBgpM2PeerAuthConfigurationGroup,
+            jnxBgpM2PeerRouteReflectorCfgGroup,
+            jnxBgpM2PeerAsConfederationCfgGroup,
+            jnxBgpM2Rfc2545Group }
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup5,
+            juniBgpStatisticsConfGroup,
+            juniBgpFourOctetConfederationPeerConfGroup,
+            juniBgpPeerConfGroup6,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup5,
+            juniBgpPeerGroupConfGroup6,
+            juniBgpPeerGroupAddressFamilyConfGroup5,
+            juniBgpNewRouteConfGroup3,
+            juniBgpNetworkConfGroup2,
+            juniBgpAggregateConfGroup2,
+            juniBgpVrfConfGroup6,
+            juniBgpAddressFamilyConfGroup5,
+            juniBgpStorageConfGroup3,
+            juniBgpPeerDynamicCapabilityConfGroup,
+            juniBgpDeprecatedGroup }
+    ::= { juniBgpAgent 11 }
+
+juniBgpAgentV12  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 12 of the BGP component of the JUNOSe SNMP agent.  This version
+        of the BGP component is supported in JUNOSe 9.0 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the BGP application in JUNOSe."
+    SUPPORTS    BGP4-MIB
+        INCLUDES {
+            bgp4MIBGlobalsGroup,
+            bgp4MIBPeerGroup,
+            bgp4MIBRcvdPathAttrGroup,
+            bgp4MIBPathAttrGroup,
+            bgp4MIBNotificationGroup,
+            bgp4MIBNewNotificationGroup }
+    SUPPORTS    BGP4-V2-MIB-JUNIPER
+        INCLUDES {
+            jnxBgpM2TimersGroup,
+            jnxBgpM2CountersGroup,
+            jnxBgpM2AsPathGroup,
+            jnxBgpM2As4byteGroup,
+            jnxBgpM2BaseGroup,
+            jnxBgpM2ErrorsGroup,
+            jnxBgpM2PeerGroup,
+            jnxBgpM2PathAttributesGroup,
+            jnxBgpM2MIBNotificationsGroup,
+            jnxBgpM2AuthenticationGroup,
+            jnxBgpM2CommunitiesGroup,
+            jnxBgpM2ExtCommunitiesGroup,
+            jnxBgpM2RouteReflectionGroup,
+            jnxBgpM2AsConfederationGroup,
+            jnxBgpM2CapabilitiesGroup,
+            jnxBgpM2PeerConfigurationGroup,
+            jnxBgpM2PeerAuthConfigurationGroup,
+            jnxBgpM2PeerRouteReflectorCfgGroup,
+            jnxBgpM2PeerAsConfederationCfgGroup,
+            jnxBgpM2Rfc2545Group }
+    SUPPORTS    Juniper-BGP-MIB
+        INCLUDES {
+            juniBgpGeneralConfGroup5,
+            juniBgpStatisticsConfGroup,
+            juniBgpFourOctetConfederationPeerConfGroup,
+            juniBgpPeerConfGroup6,
+            juniBgpAfiSafiPeerConfGroup,
+            juniBgpPeerAddressFamilyConfGroup5,
+            juniBgpPeerGroupConfGroup6,
+            juniBgpPeerGroupAddressFamilyConfGroup5,
+            juniBgpNewRouteConfGroup3,
+            juniBgpNetworkConfGroup2,
+            juniBgpAggregateConfGroup2,
+            juniBgpVrfConfGroup6,
+            juniBgpAddressFamilyConfGroup5,
+            juniBgpStorageConfGroup3,
+            juniBgpPeerDynamicCapabilityConfGroup,
+            juniBgpPeerAddressFamilyConditionalAdvConfGroup,
+            juniBgpPeerGroupAddressFamilyConditionalAdvConfGroup,
+            juniBgpDeprecatedGroup }
+    ::= { juniBgpAgent 12 }
+END

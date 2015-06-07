@@ -1,0 +1,553 @@
+ENTERASYS-SECURE-SHELL-SERVER-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-secure-shell-server-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Secure Shell Server MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright January, 2003 Enterasys Networks, Inc.
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DateAndTime, RowStatus, StorageType
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF   
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysSecureShellServerMIB MODULE-IDENTITY
+    LAST-UPDATED "200302121714Z"  -- Wed Feb 12 17:14 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  35 Industrial Way, P.O. Box 5005
+                  Rochester, NH 03867-0505
+                  USA
+         Phone:   +1 603 332 9400
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         Secure Shell server management functionality, specifically
+         for embedded systems.
+
+         It provides configuration controls for Enterasys Networks'
+         Secure Shell system management."
+
+    REVISION "200302121714Z"  -- Wed Feb 12 17:14 GMT 2003
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 36 }
+
+
+etsysSecureShellServer
+        OBJECT IDENTIFIER ::= { etsysSecureShellServerMIB 1 }
+
+etsysSecureShellServerConfig
+        OBJECT IDENTIFIER ::= { etsysSecureShellServer 1 }
+
+etsysSecureShellServerMac
+        OBJECT IDENTIFIER ::= { etsysSecureShellServer 2 }
+
+etsysSecureShellServerCipher
+        OBJECT IDENTIFIER ::= { etsysSecureShellServer 3 }
+
+etsysSecureShellServerHostKey
+        OBJECT IDENTIFIER ::= { etsysSecureShellServer 4 }
+
+
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+SshCipherList ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The list of encryption ciphers that could be supported and
+         enabled on the managed entities Secure Shell server."
+    SYNTAX      BITS {
+                    triple-des-cbc (0),
+                    twofish128-cbc (1),
+                    blowfish-cbc   (2),
+                    cast128-cbc    (3),
+                    aes128-cbc     (4)
+                }
+
+
+SshMacList ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The list of MACs (Message Authentication Codes) that could
+         be supported and enabled on the managed entities Secure Shell
+         server."
+    SYNTAX      BITS {
+                    hmac-md5       (0),
+                    hmac-md5-96    (1),
+                    hmac-sha1      (2),
+                    hmac-sha1-96   (3),
+                    hmac-ripemd160 (4) 
+                }
+
+HexString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS       current
+    DESCRIPTION
+        "An OCTET-STRING with a suitable display hint."
+    SYNTAX       OCTET STRING (SIZE (0..1024))
+
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Server Config Group
+-- ---------------------------------------------------------- --
+  
+etsysSecureShellServerAdminStatus    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                     enabled      (1),
+                     disabled     (2),
+                     reinitialize (3)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Controls the operation of the Secure Shell server.
+         When enabled and the etsysSecureShellServerOperStatus
+         object is 'operational' the Secure Shell server will
+         accept connection requests and provide a secure CLI
+         session for properly authenticated users.
+         Setting this object to 'reinitialize' when it is in the
+         'enabled' state will cause the Secure Shell Server task
+         to reinitialize itself and the value of this object will
+         remain 'enabled'.  Setting this object to 'reinitialize'
+         from any other state will have no effect."
+    DEFVAL { disabled }
+    ::= { etsysSecureShellServerConfig 1 }
+
+etsysSecureShellServerOperStatus     OBJECT-TYPE
+    SYNTAX        INTEGER {
+                     operational    (1),
+                     initializing   (2),
+                     nonOperational (3)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current operational state of the Secure Shell Server."
+    DEFVAL { nonOperational }
+    ::= { etsysSecureShellServerConfig 2 }
+
+etsysSecureShellServerErrorStatus    OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A descriptive message indicating the reason for any failure
+         of the Secure Shell Server to successfully transition into
+         the operational state."
+    DEFVAL { ''H }
+    ::= { etsysSecureShellServerConfig 3 }
+
+etsysSecureShellServerAdminPort      OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The TCP port number that the Secure Shell Server is should
+         listen for connection requests on."
+    DEFVAL { 22 }
+    ::= { etsysSecureShellServerConfig 4 }
+
+etsysSecureShellServerOperPort       OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The TCP port number that the Secure Shell Server is currently
+         listening for connection requests on."
+    ::= { etsysSecureShellServerConfig 5 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Server MAC Group
+-- ---------------------------------------------------------- --
+
+etsysSecureShellServerSupportedMacs    OBJECT-TYPE
+    SYNTAX        SshMacList
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Specifies the MAC (Message Authentication Code) algorithms
+         that are supported on this management entity."
+    ::= { etsysSecureShellServerMac 1 }
+
+etsysSecureShellServerAdminMacs        OBJECT-TYPE
+    SYNTAX        SshMacList
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Specifies the MAC (Message Authentication Code) algorithms
+         that the server should accept for use in data integrity
+         verification.  A re-initialization of the server may be
+         required for this selection to take effect.  By default
+         managed entities SHOULD enable all of their supported MACs."
+    ::= { etsysSecureShellServerMac 2 }
+
+etsysSecureShellServerOperMacs         OBJECT-TYPE
+    SYNTAX        SshMacList
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Specifies the MAC (Message Authentication Code) algorithms
+         that the server is currently configured to accept for use
+         in data integrity verification."
+    ::= { etsysSecureShellServerMac 3 }
+
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Server Cipher Group
+-- ---------------------------------------------------------- --
+
+etsysSecureShellServerSupportedCiphers    OBJECT-TYPE
+    SYNTAX        SshCipherList
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Specifies the ciphers that are supported on this management
+         entity."
+    ::= { etsysSecureShellServerCipher 1 }
+
+etsysSecureShellServerAdminCiphers        OBJECT-TYPE
+    SYNTAX        SshCipherList
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The cipher(s) that the server should accept for use in
+         encrypting secure sessions.  A re-initialization of the
+         server may be required for this selection to take effect.
+         By default managed entities SHOULD enable all of their
+         supported ciphers."
+    ::= { etsysSecureShellServerCipher 2 }
+
+etsysSecureShellServerOperCiphers         OBJECT-TYPE
+    SYNTAX        SshCipherList
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Specifies the cipher(s) that the server is currently configured
+         to accept for use in encrypting all sessions."
+    ::= { etsysSecureShellServerCipher 3 }
+
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Server Host Key Group
+-- ---------------------------------------------------------- --
+
+etsysSecureShellServerHostKeyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysSecureShellServerHostKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains per public/private host key pair
+         information."
+    ::= { etsysSecureShellServerHostKey 1 }
+
+etsysSecureShellServerHostKeyEntry OBJECT-TYPE
+    SYNTAX      EtsysSecureShellServerHostKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list information about a particular public/private
+         host key pair."
+    INDEX { etsysSecureShellServerHostKeyType,
+            etsysSecureShellServerHostKeySize }
+    ::= { etsysSecureShellServerHostKeyTable 1 }
+
+EtsysSecureShellServerHostKeyEntry ::=
+    SEQUENCE {
+        etsysSecureShellServerHostKeyType               INTEGER,
+        etsysSecureShellServerHostKeySize               INTEGER,
+        etsysSecureShellServerHostKeyDate               DateAndTime,
+        etsysSecureShellServerHostKeyOperStatus         BITS,
+        etsysSecureShellServerHostKeyAdminStatus        INTEGER,
+        etsysSecureShellServerHostKeyFingerprint        HexString,
+        etsysSecureShellServerHostKeyErrorStatus        SnmpAdminString,
+        etsysSecureShellServerHostKeyStorageType        StorageType,
+        etsysSecureShellServerHostKeyRowStatus          RowStatus
+    }
+
+etsysSecureShellServerHostKeyType          OBJECT-TYPE
+    SYNTAX        INTEGER { sshDss   (1), 
+                            sshRsa   (2)
+                  }
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The type of the public/private host key pair represented by
+         this conceptual row."
+    ::= { etsysSecureShellServerHostKeyEntry 1 }
+
+etsysSecureShellServerHostKeySize          OBJECT-TYPE
+    SYNTAX        INTEGER { bits512   (1), 
+                            bits768   (2),
+                            bits1024  (3),
+                            bits2048  (4)
+                  }
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The size of the public/private host key pair represented by
+         this conceptual row."
+    ::= { etsysSecureShellServerHostKeyEntry 2 }
+
+etsysSecureShellServerHostKeyDate          OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The date and time the public/private host key pair that is
+         represented by this row, and is currently operational, was
+         generated."
+    ::= { etsysSecureShellServerHostKeyEntry 3 }
+
+etsysSecureShellServerHostKeyOperStatus    OBJECT-TYPE
+    SYNTAX        BITS    { initializing  (0), 
+                            operational   (1),
+                            completed     (2), 
+                            pending       (3), 
+                            failed        (4)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The status of this public/private host key pair.
+
+         The meaning of the values are as follows:
+
+         initializing (0)  Indicates that a new host key pair, of the
+                           size and type specified by this row, is
+                           being generated.
+
+         operational (1)   Indicates that the host key pair described
+                           by this row is currently operational.
+
+         completed (2)     Indicates that the host key pair has been
+                           successfully initialized or reinitialized.
+
+         pending (3)       Indicates that the new host key pair will
+                           not become operational until the server is
+                           reinitialized.
+
+         failed (4)        Indicates that the host key pair generation
+                           operation has failed."
+    ::= { etsysSecureShellServerHostKeyEntry 4 }
+
+etsysSecureShellServerHostKeyAdminStatus   OBJECT-TYPE
+    SYNTAX        INTEGER { noOp          (1),
+                            reinitialize  (2)
+                  }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Reinitializing the private/public host key pair can be compute
+         intensive.  Writing reinitialize(2) to this object while the
+         etsysSecureShellServerHostOperStatus object indicates that a
+         host key initialization is currently in progress has no affect.
+
+         The meaning of the values are as follows:
+
+         noOp (1)         This object always returns noOp(1) on a read.
+                          A write of noOp(1) has no affect.
+
+         reinitialize (2) Writing reinitialize(2) causes the managed
+                          entity to generate a new host key pair of
+                          the size and type specified by this row."
+    DEFVAL { noOp }
+    ::= { etsysSecureShellServerHostKeyEntry 5 }
+
+etsysSecureShellServerHostKeyFingerprint   OBJECT-TYPE
+    SYNTAX        HexString (SIZE(16))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The RSA fingerprint of the public part of the host key
+         pair.  This value can be used with the SSH client to
+         verify, on the initial connection, that the Secure Shell
+         server responding to the request is the server running
+         on the managed entity.  This is the fingerprint of the
+         operational host key pair.  If the key pair represented
+         by this row is not operational then sixteen null octets
+         MUST be returned."
+    ::= { etsysSecureShellServerHostKeyEntry 6 }
+
+etsysSecureShellServerHostKeyErrorStatus   OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is a descriptive error message about any failure
+         to generate an initial public/private host key pair,
+         or to reinitialize the key pair for this row.  This
+         would include messages to the effect of exceeding the
+         number of key pairs supported by this managed entity.
+         This message reverts back to its default value when
+         the etsysSecureShellServerHostAdminStatus object is
+         set to reinitialize(2)."
+    DEFVAL { ''H }
+    ::= { etsysSecureShellServerHostKeyEntry 7 }
+
+etsysSecureShellServerHostKeyStorageType   OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this conceptual row.  Managed entities
+         that do not support configurable host keys MUST define this
+         row as 'permanent' and need not allow write-access to the
+         RowStatus object in the row.  All user created rows MUST
+         have the default value, nonVolatile."
+    DEFVAL { nonVolatile }
+    ::= { etsysSecureShellServerHostKeyEntry 8 }
+
+etsysSecureShellServerHostKeyRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object manages the creation and deletion this entry.
+
+         active        - Indicates that the host key pair represented
+                         by this row is available for use by the Secure
+                         Shell Server to the extent indicated by the
+                         status objects in this row.  Transitions to
+                         this state will cause a a new host key pair
+                         to be generated by the managed entity.
+
+         notInService  - Indicates that this entry exists in the
+                         agent but is unavailable for use.
+                         State transitions from the active(1) state
+                         to the notInService(2) state will cause the
+                         host key pair represented by this row to be
+                         deleted.
+
+         notReady      - Should not be possible.
+
+         createAndWait - A new entry will be created in this table
+                         for the specified host key pair and the new
+                         entry will transition to the notInService(2)
+                         state.  No key pair will be generated.
+
+         createAndGo   - A new entry will be created in this table
+                         for the specified host key pair and the new
+                         entry will transition to the active(1) state.
+
+         destroy       - Deletes this row and any host key pair that
+                         may be associated with it."
+    REFERENCE
+        "RFC2579 (Textual Conventions for SMIv2)"
+    ::= { etsysSecureShellServerHostKeyEntry 9 }
+
+
+-- ---------------------------------------------------------- --
+-- Enterasys Secure Shell (SSH) MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysSecureShellServerConformance
+    OBJECT IDENTIFIER ::= { etsysSecureShellServerMIB 2 }
+
+etsysSecureShellServerGroups      
+    OBJECT IDENTIFIER ::= { etsysSecureShellServerConformance 1 }
+
+etsysSecureShellServerCompliances
+    OBJECT IDENTIFIER ::= { etsysSecureShellServerConformance 2 }
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysSecureShellServerConfigGroup OBJECT-GROUP
+    OBJECTS {
+           etsysSecureShellServerAdminStatus,
+           etsysSecureShellServerOperStatus,
+           etsysSecureShellServerAdminPort,
+           etsysSecureShellServerOperPort,
+           etsysSecureShellServerSupportedMacs,
+           etsysSecureShellServerAdminMacs,
+           etsysSecureShellServerOperMacs,
+           etsysSecureShellServerSupportedCiphers,
+           etsysSecureShellServerAdminCiphers,
+           etsysSecureShellServerOperCiphers
+        }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing basic SSH server 
+         configuration on a managed entity."
+    ::= { etsysSecureShellServerGroups 1 }
+
+etsysSecureShellServerHostKeyGroup OBJECT-GROUP
+    OBJECTS {
+           etsysSecureShellServerHostKeyDate,
+           etsysSecureShellServerHostKeyOperStatus,
+           etsysSecureShellServerHostKeyAdminStatus,
+           etsysSecureShellServerHostKeyFingerprint,
+           etsysSecureShellServerHostKeyErrorStatus,
+           etsysSecureShellServerHostKeyStorageType,
+           etsysSecureShellServerHostKeyRowStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing basic SSH server 
+         host key management on a managed entity."
+    ::= { etsysSecureShellServerGroups 2 }
+
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysSecureShellServerCompliance MODULE-COMPLIANCE
+    STATUS    current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         Enterasys Secure Shell (SSH) MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+            etsysSecureShellServerConfigGroup
+    }
+
+    GROUP   etsysSecureShellServerHostKeyGroup
+    DESCRIPTION
+        "Mandatory for all implementations that provide support
+         for user manageable public/private host key pairs."
+
+::= { etsysSecureShellServerCompliances 1 }
+
+END

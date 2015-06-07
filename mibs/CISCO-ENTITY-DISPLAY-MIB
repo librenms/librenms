@@ -1,0 +1,365 @@
+-- *****************************************************************
+-- CISCO-ENTITY-DISPLAY-MIB: Cisco Entity DISPLAY MIB file
+--   
+-- Jan 2003, Arvind Prabhudev, Mickey Spiegel, Sonal Maheshwari
+--   
+-- Copyright (c) 2003, 2009 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-ENTITY-DISPLAY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32,
+    MODULE-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    entPhysicalIndex
+        FROM ENTITY-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoEntityDisplayMIB MODULE-IDENTITY
+    LAST-UPDATED    "200910050000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-displaymib@cisco.com"
+    DESCRIPTION
+        "This MIB module provides information about the
+        status of display devices such as Light Emitting
+        Diodes (LEDs) and alphanumeric displays present
+        on the physical entities contained by the managed
+        system."
+    REVISION        "200910050000Z"
+    DESCRIPTION
+        "Added the enumeration 'greenAndAmber' to
+        CDisplayColor TEXTUAL-CONVENTION.
+        Added support for ceDisplayBeaconGroup."
+    REVISION        "200303200000Z"
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { ciscoMgmt 344 }
+
+
+
+-- Textual Conventions
+
+CDisplayType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An integer value that indicates the type of
+        display device."
+    SYNTAX          INTEGER  {
+                        led(1),
+                        alphanumeric(2)
+                    }
+
+CDisplayColor ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An integer value that describes the color of the
+        display.
+
+        'greenAndAmber'    - Indicates that the display color
+                             toggles between green and amber."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        white(2),
+                        red(3),
+                        green(4),
+                        yellow(5),
+                        amber(6),
+                        blue(7),
+                        greenAndAmber(8)
+                    }
+
+CDisplayState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An integer value that describes the state of the
+        display."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        off(2),
+                        on(3),
+                        blinking(4)
+                    }
+-- MIB Object Definitions
+
+ciscoEntityDisplayMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoEntityDisplayMIB 1 }
+
+-- This table contains current display status information.
+
+ceDisplayTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDisplayEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides information about the display
+        devices on the physical entities in the managed
+        system and their current display status."
+    ::= { ciscoEntityDisplayMIBObjects 1 }
+
+ceDisplayEntry OBJECT-TYPE
+    SYNTAX          CeDisplayEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the ceDisplayTable that provides
+        information about an LED or an alphanumeric display
+        in the system including its current display status."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDisplayIndex
+                    } 
+    ::= { ceDisplayTable 1 }
+
+CeDisplayEntry ::= SEQUENCE {
+        ceDisplayIndex Unsigned32,
+        ceDisplayType  CDisplayType,
+        ceDisplayName  SnmpAdminString,
+        ceDisplayState CDisplayState,
+        ceDisplayColor CDisplayColor,
+        ceDisplayText  SnmpAdminString
+}
+
+ceDisplayIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..1024)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An arbitrary index that uniquely identifies an LED or
+        an alphanumeric display on the physical entity
+        identified by entPhysicalIndex." 
+    ::= { ceDisplayEntry 1 }
+
+ceDisplayType OBJECT-TYPE
+    SYNTAX          CDisplayType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the type of display described
+        in this entry. i.e. whether it is an LED display or
+        an alphanumeric display." 
+    ::= { ceDisplayEntry 2 }
+
+ceDisplayName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object provides a human-readable string which is
+        the name for the display device specified in this entry." 
+    ::= { ceDisplayEntry 3 }
+
+ceDisplayState OBJECT-TYPE
+    SYNTAX          CDisplayState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the current display state for
+        the display specified in this entry." 
+    ::= { ceDisplayEntry 4 }
+
+ceDisplayColor OBJECT-TYPE
+    SYNTAX          CDisplayColor
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the color currently seen on
+        the display specified in this entry. If the display
+        specified by this entry is an alphanumeric display,
+        i.e. ceDisplayType is of type 'alphanumeric' then,
+        color may not apply and the agent may choose to
+        indicate this by setting this object to 'unknown'." 
+    ::= { ceDisplayEntry 5 }
+
+ceDisplayText OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object provides a human-readable string which is
+        the text currently displayed in the alphanumeric display
+        specified in this entry. If the display specified by
+        this entry is an LED, i.e. ceDisplayType is of type 'led'
+        then, this object would be an empty string." 
+    ::= { ceDisplayEntry 6 }
+ 
+
+
+ceDisplayBeaconTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDisplayBeaconEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides functionality to manage
+        beacon display devices in the managed system."
+    ::= { ciscoEntityDisplayMIBObjects 2 }
+
+ceDisplayBeaconEntry OBJECT-TYPE
+    SYNTAX          CeDisplayBeaconEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing management information of
+        beacon functionality of a particular beacon 
+        display device.
+
+        Only those display devices, as specified by 
+        entPhysicalIndex in ENTITY-MIB, that support 
+        beacon functionality will be populated in this 
+        table."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDisplayIndex
+                    } 
+    ::= { ceDisplayBeaconTable 1 }
+
+CeDisplayBeaconEntry ::= SEQUENCE {
+        ceDisplayBeaconEnabled TruthValue
+}
+
+ceDisplayBeaconEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies if the beacon functionality is
+        administratively enabled for this display device.
+
+        'true'    - beacon functionality is administratively 
+                    enabled
+        'false'   - beacon functionality is administratively 
+                    disabled." 
+    ::= { ceDisplayBeaconEntry 1 }
+ 
+
+-- MIB Conformance Information
+
+ceDisplayMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoEntityDisplayMIB 2 }
+
+ceDisplayMIBCompliances  OBJECT IDENTIFIER
+    ::= { ceDisplayMIBConformance 1 }
+
+ceDisplayMIBGroups  OBJECT IDENTIFIER
+    ::= { ceDisplayMIBConformance 2 }
+
+
+-- Compliance Statements
+
+ceDisplayMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities that implement the
+        CISCO-ENTITY-DISPLAY-MIB.
+
+        This compliance statement is deprecated and superceded by
+        ceDisplayMIBCompliance2."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ceDisplayGroup }
+
+    GROUP           ceDisplayLEDGroup
+    DESCRIPTION
+        "This group is required when the display entity is an
+        LED."
+
+    GROUP           ceDisplayAlphaNumericGroup
+    DESCRIPTION
+        "This group is required when the display entity is an
+        alphanumeric display."
+    ::= { ceDisplayMIBCompliances 1 }
+
+ceDisplayMIBCompliance2 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities that implement the
+        CISCO-ENTITY-DISPLAY-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ceDisplayGroup }
+
+    GROUP           ceDisplayLEDGroup
+    DESCRIPTION
+        "This group is required when the display entity is an
+        LED."
+
+    GROUP           ceDisplayAlphaNumericGroup
+    DESCRIPTION
+        "This group is required when the display entity is an
+        alphanumeric display."
+
+    GROUP           ceDisplayBeaconGroup
+    DESCRIPTION
+        "This group is required when system supports beacon
+        functionality."
+
+    OBJECT          ceDisplayBeaconEnabled
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { ceDisplayMIBCompliances 2 }
+
+-- MIB groupings
+
+ceDisplayGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDisplayType,
+                        ceDisplayName,
+                        ceDisplayState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that provide information
+        about a display in the system including its current state."
+    ::= { ceDisplayMIBGroups 1 }
+
+ceDisplayLEDGroup OBJECT-GROUP
+    OBJECTS         { ceDisplayColor }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects relevant to LED display."
+    ::= { ceDisplayMIBGroups 2 }
+
+ceDisplayAlphaNumericGroup OBJECT-GROUP
+    OBJECTS         { ceDisplayText }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects relevant to alphanumeric display."
+    ::= { ceDisplayMIBGroups 3 }
+
+ceDisplayBeaconGroup OBJECT-GROUP
+    OBJECTS         { ceDisplayBeaconEnabled }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects relevant to beacon
+        functionality."
+    ::= { ceDisplayMIBGroups 4 }
+
+END
+
+
+
+
+
+
+

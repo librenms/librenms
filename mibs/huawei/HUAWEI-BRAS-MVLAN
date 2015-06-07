@@ -1,0 +1,164 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-MVLAN-MIB DEFINITIONS
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+HUAWEI-BRAS-MVLAN-MIB    DEFINITIONS ::= BEGIN
+    
+    IMPORTS
+    hwBRASMib            
+        FROM HUAWEI-MIB
+    VlanIndex,VlanId 
+        FROM Q-BRIDGE-MIB;   
+
+        hwMVLAN MODULE-IDENTITY 
+            LAST-UPDATED "200708271200Z"
+            ORGANIZATION 
+                "Huawei Technologies Co., Ltd."
+            CONTACT-INFO 
+                "R&D NanJing, Huawei Technologies co.,Ltd.
+                Huihong Bld.,NO.91 Baixia Rd., 
+                Bai-Xia District Nanjing P.R. China
+                Zip:210001 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com."
+            DESCRIPTION 
+                "The HUAWEI-BRAS-MVLAN-MIB contains objects to
+                manage BRAS."
+            ::= { hwBRASMib 14 }
+
+    
+    hwhwMVLANMibObjects OBJECT IDENTIFIER ::= { hwMVLAN 1 }            
+    
+
+    hwMulticastVlanTable   OBJECT-TYPE
+        SYNTAX        SEQUENCE OF HWMulticastVlanEntry
+        ACCESS        not-accessible
+        STATUS        current
+        DESCRIPTION
+                "A table of setting multicast program VlanTable."
+        ::=  { hwhwMVLANMibObjects 1 }
+              
+
+   hwMulticastVlanEntry OBJECT-TYPE
+        SYNTAX        HWMulticastVlanEntry
+        ACCESS        not-accessible
+        STATUS        current
+        DESCRIPTION    "An entry of hwMulticastVlanEntry."
+        INDEX       { hwMulticastVlanIfIndex }
+        ::= { hwMulticastVlanTable 1 }
+   
+    HWMulticastVlanEntry ::=
+        SEQUENCE {
+                hwMulticastVlanIfIndex
+                        VlanIndex,
+                hwMulticastInnerVlan
+                        VlanId,
+                hwMulticastOuterVlan
+                        VlanId,
+                hwMulticastOpType
+                        INTEGER         
+             }          
+                
+      
+      hwMulticastVlanIfIndex   OBJECT-TYPE
+        SYNTAX        VlanIndex
+        ACCESS        read-only
+        STATUS        current
+        DESCRIPTION    "A value used to index per-VLAN tables: values of 0 and
+                    4095 are not permitted.  If the value is between 1 and
+                    4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+                    global scope within a given bridged domain (see VlanId
+                    textual convention).  If the value is greater than 4095,
+                    then it represents a VLAN with scope local to the
+                    particular agent, i.e., one without a global VLAN-ID
+                    assigned to it.  Such VLANs are outside the scope of
+                    IEEE 802.1Q, but it is convenient to be able to manage them
+                    in the same way using this MIB."
+        ::= { hwMulticastVlanEntry 1 }
+   
+      
+      hwMulticastInnerVlan   OBJECT-TYPE
+        SYNTAX        VlanId
+        ACCESS        read-write
+        STATUS        current
+        DESCRIPTION    "The hwMulticastInnerVlan that uniquely identifies a VLAN.  This
+                     is the 12-bit VLAN-ID used in the VLAN Tag header.
+                     The range is defined by the REFERENCEd specification."
+        REFERENCE
+        "IEEE Std 802.1Q 2003 Edition, Virtual Bridged
+        Local Area Networks."
+        ::= { hwMulticastVlanEntry 2 }
+        
+       
+      
+      hwMulticastOuterVlan   OBJECT-TYPE
+        SYNTAX        VlanId
+        ACCESS        read-write
+        STATUS        current
+        DESCRIPTION    "The hwMulticastOuterVlan that uniquely identifies a VLAN.  This
+                     is the 12-bit VLAN-ID used in the VLAN Tag header.
+                     The range is defined by the REFERENCEd specification."
+        REFERENCE
+        "IEEE Std 802.1Q 2003 Edition, Virtual Bridged
+        Local Area Networks."
+        ::= { hwMulticastVlanEntry 3 }
+
+
+      
+      hwMulticastOpType   OBJECT-TYPE
+        SYNTAX        INTEGER {
+                                set(0),
+                                undo(1)
+                                }
+        ACCESS        read-write
+        STATUS        current
+        DESCRIPTION    
+        "0 : set multicast-vlan.
+        1 : undo multicast-vlan."
+        ::= { hwMulticastVlanEntry 4 }
+
+--
+--  Conformance information
+--
+
+        hwMVlanMIBConformance OBJECT IDENTIFIER ::= { hwMVLAN 2 }
+        
+        hwMVlanMIBCompliances OBJECT IDENTIFIER ::= { hwMVlanMIBConformance 1 }
+        
+--
+--  this module
+--
+        hwMVlanMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-DATACOMM-OID-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwMVlanGroup }
+            ::= { hwMVlanMIBCompliances 1 }
+
+--
+--  groups
+--
+        hwMVlanMIBGroups OBJECT IDENTIFIER ::= { hwMVlanMIBConformance 2 }
+        
+        hwMVlanGroup OBJECT-GROUP
+            OBJECTS { hwMulticastVlanIfIndex,
+                        hwMulticastInnerVlan,
+                        hwMulticastOuterVlan,
+                        hwMulticastOpType
+            }
+            STATUS current
+            DESCRIPTION 
+                "The hwMVLAN group."
+            ::= { hwMVlanMIBGroups 1 }           
+
+--  ============== conformance information define end ==============
+
+END

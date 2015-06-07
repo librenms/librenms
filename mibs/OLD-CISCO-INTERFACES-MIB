@@ -1,0 +1,1405 @@
+-- *****************************************************************
+-- OLD-CISCO-INTERFACES-MIB.my:  Cisco Interfaces MIB file
+--
+-- May 1994, Jeffrey T. Johnson
+--
+-- Copyright (c) 1994,1997 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+               OLD-CISCO-INTERFACES-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, ifIndex
+			FROM RFC1213-MIB
+		    local
+			FROM CISCO-SMI;
+          
+               linterfaces         OBJECT IDENTIFIER ::= { local 2 }
+
+
+               -- Local Interface Group
+
+          -- This group is present in all products.
+
+
+          -- Local Interface Table
+
+          -- This group provides additional objects to the table
+          -- defined by RFC1156.
+
+               lifTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF LifEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of interface entries."
+                   ::= { linterfaces 1 }
+
+               lifEntry OBJECT-TYPE
+                   SYNTAX LifEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            cisco interface."
+                   INDEX { ifIndex }
+               ::= { lifTable 1 }
+
+               LifEntry ::=
+                   SEQUENCE {
+                       locIfHardType
+                           DisplayString,
+                       locIfLineProt
+                           INTEGER,
+                       locIfLastIn
+                           INTEGER,
+                       locIfLastOut
+                           INTEGER,
+                       locIfLastOutHang
+                           INTEGER,
+                       locIfInBitsSec
+                           INTEGER,
+                       locIfInPktsSec
+                           INTEGER,
+                       locIfOutBitsSec
+                           INTEGER,
+                       locIfOutPktsSec
+                           INTEGER,
+                       locIfInRunts
+                           INTEGER,
+                       locIfInGiants
+                           INTEGER,
+                       locIfInCRC
+                           INTEGER,
+                       locIfInFrame
+                           INTEGER,
+                       locIfInOverrun
+                           INTEGER,
+                       locIfInIgnored
+                           INTEGER,
+                       locIfInAbort
+                           INTEGER,
+                       locIfResets
+                           INTEGER,
+                       locIfRestarts
+                           INTEGER,
+                       locIfKeep
+                           INTEGER,
+                       locIfReason
+                           DisplayString,
+                       locIfCarTrans
+                           INTEGER,
+                       locIfReliab
+                           INTEGER,
+                       locIfDelay
+                           INTEGER,
+                       locIfLoad
+                           INTEGER,
+                       locIfCollisions
+                           INTEGER,
+                       locIfInputQueueDrops
+                           INTEGER,
+                       locIfOutputQueueDrops
+                           INTEGER,
+                       locIfDescr
+                           DisplayString,
+                       locIfSlowInPkts
+                           Counter,
+                       locIfSlowOutPkts
+                           Counter,
+                       locIfSlowInOctets
+                           Counter,
+                       locIfSlowOutOctets
+                           Counter,
+                       locIfFastInPkts
+                           Counter,
+                       locIfFastOutPkts
+                           Counter,
+                       locIfFastInOctets
+                           Counter,
+                       locIfFastOutOctets
+                           Counter,
+                       locIfotherInPkts
+                           Counter,
+                       locIfotherOutPkts
+                           Counter,
+                       locIfotherInOctets
+                           Counter,
+                       locIfotherOutOctets
+                           Counter,
+                       locIfipInPkts
+                           Counter,
+                       locIfipOutPkts
+                           Counter,
+                       locIfipInOctets
+                           Counter,
+                       locIfipOutOctets
+                           Counter,
+                       locIfdecnetInPkts
+                           Counter,
+                       locIfdecnetOutPkts
+                           Counter,
+                       locIfdecnetInOctets
+                           Counter,
+                       locIfdecnetOutOctets
+                           Counter,
+                       locIfxnsInPkts
+                           Counter,
+                       locIfxnsOutPkts
+                           Counter,
+                       locIfxnsInOctets
+                           Counter,
+                       locIfxnsOutOctets
+                           Counter,
+                       locIfclnsInPkts
+                           Counter,
+                       locIfclnsOutPkts
+                           Counter,
+                       locIfclnsInOctets
+                           Counter,
+                       locIfclnsOutOctets
+                           Counter,
+                       locIfappletalkInPkts
+                           Counter,
+                       locIfappletalkOutPkts
+                           Counter,
+                       locIfappletalkInOctets
+                           Counter,
+                       locIfappletalkOutOctets
+                           Counter,
+                       locIfnovellInPkts
+                           Counter,
+                       locIfnovellOutPkts
+                           Counter,
+                       locIfnovellInOctets
+                           Counter,
+                       locIfnovellOutOctets
+                           Counter,
+                       locIfapolloInPkts
+                           Counter,
+                       locIfapolloOutPkts
+                           Counter,
+                       locIfapolloInOctets
+                           Counter,
+                       locIfapolloOutOctets
+                           Counter,
+                       locIfvinesInPkts
+                           Counter,
+                       locIfvinesOutPkts
+                           Counter,
+                       locIfvinesInOctets
+                           Counter,
+                       locIfvinesOutOctets
+                           Counter,
+                       locIfbridgedInPkts
+                           Counter,
+                       locIfbridgedOutPkts
+                           Counter,
+                       locIfbridgedInOctets
+                           Counter,
+                       locIfbridgedOutOctets
+                           Counter,
+                       locIfsrbInPkts
+                           Counter,
+                       locIfsrbOutPkts
+                           Counter,
+                       locIfsrbInOctets
+                           Counter,
+                       locIfsrbOutOctets
+                           Counter,
+                       locIfchaosInPkts
+                           Counter,
+                       locIfchaosOutPkts
+                           Counter,
+                       locIfchaosInOctets
+                           Counter,
+                       locIfchaosOutOctets
+                           Counter,
+                       locIfpupInPkts
+                           Counter,
+                       locIfpupOutPkts
+                           Counter,
+                       locIfpupInOctets
+                           Counter,
+                       locIfpupOutOctets
+                           Counter,
+                       locIfmopInPkts
+                           Counter,
+                       locIfmopOutPkts
+                           Counter,
+                       locIfmopInOctets
+                           Counter,
+                       locIfmopOutOctets
+                           Counter,
+                       locIflanmanInPkts
+                           Counter,
+                       locIflanmanOutPkts
+                           Counter,
+                       locIflanmanInOctets
+                           Counter,
+                       locIflanmanOutOctets
+                           Counter,
+                       locIfstunInPkts
+                           Counter,
+                       locIfstunOutPkts
+                           Counter,
+                       locIfstunInOctets
+                           Counter,
+                       locIfstunOutOctets
+                           Counter,
+                       locIfspanInPkts
+                           Counter,
+                       locIfspanOutPkts
+                           Counter,
+                       locIfspanInOctets
+                           Counter,
+                       locIfspanOutOctets
+                           Counter,
+                       locIfarpInPkts
+                           Counter,
+                       locIfarpOutPkts
+                           Counter,
+                       locIfarpInOctets
+                           Counter,
+                       locIfarpOutOctets
+                           Counter,
+                       locIfprobeInPkts
+                           Counter,
+                       locIfprobeOutPkts
+                           Counter,
+                       locIfprobeInOctets
+                           Counter,
+                       locIfprobeOutOctets
+                           Counter,
+                       locIfDribbleInputs
+                           Counter
+                   }
+
+
+          -- The following section describes the components of the
+          -- table.
+
+               locIfHardType OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Returns the type of interface."
+                   ::= { lifEntry 1 }
+
+               locIfLineProt OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Boolean whether interface line protocol is
+                           up or not."
+                   ::= { lifEntry 2 }
+
+               locIfLastIn OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Elapsed time in milliseconds since last line
+                           protocol input packet was received."
+                   ::= { lifEntry 3 }
+
+               locIfLastOut OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Elapsed time in milliseconds since last line
+                           protocol output packet was transmitted."
+                   ::= { lifEntry 4 }
+
+               locIfLastOutHang OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Elapsed time in milliseconds since last line
+                           protocol output packet could not be
+                           successfully transmitted."
+                   ::= { lifEntry 5 }
+
+               locIfInBitsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of input bits per second."
+                   ::= { lifEntry 6 }
+
+               locIfInPktsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of input packets per second."
+                   ::= { lifEntry 7 }
+
+               locIfOutBitsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of output bits per second."
+                   ::= { lifEntry 8 }
+
+               locIfOutPktsSec OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Five minute exponentially-decayed moving
+                           average of output packets per second."
+                   ::= { lifEntry 9 }
+
+               locIfInRunts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of packets input which were smaller
+                           then the allowable physical media permitted."
+                   ::= { lifEntry 10 }
+
+               locIfInGiants OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which were larger
+                           then the physical media permitted."
+                   ::= { lifEntry 11 }
+
+               locIfInCRC OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which had cyclic
+                           redundancy checksum errors."
+                   ::= { lifEntry 12 }
+
+               locIfInFrame OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packet which were
+                           misaligned."
+                   ::= { lifEntry 13 }
+
+               locIfInOverrun OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of input which arrived too quickly for
+                           the to hardware receive."
+                   ::= { lifEntry 14 }
+
+               locIfInIgnored OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which were simply
+                           ignored by this interface."
+                   ::= { lifEntry 15 }
+
+               locIfInAbort OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of input packets which were aborted."
+                   ::= { lifEntry 16 }
+
+               locIfResets OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of times the interface internally
+                           reset."
+                   ::= { lifEntry 17 }
+
+               locIfRestarts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of times interface needed to be
+                           completely restarted."
+                   ::= { lifEntry 18 }
+
+               locIfKeep OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Boolean whether keepalives are enabled on
+                           this interface."
+                   ::= { lifEntry 19 }
+
+               locIfReason OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Reason for interface last status change."
+                   ::= { lifEntry 20 }
+
+               locIfCarTrans OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Number of times interface saw the carrier
+                           signal transition."
+                   ::= { lifEntry 21 }
+
+               locIfReliab OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The reliability of the interface. Used by
+                           IGRP."
+                   ::= { lifEntry 22 }
+
+               locIfDelay OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The amount of delay in microseconds of the
+                           interface. Used by IGRP."
+                   ::= { lifEntry 23 }
+
+               locIfLoad OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The loading factor of the interface. Used by
+                           IGRP."
+                   ::= { lifEntry 24 }
+
+               locIfCollisions OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of output collisions detected on
+                           this interface."
+                   ::= { lifEntry 25 }
+
+               locIfInputQueueDrops OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of packets dropped because the
+                           input queue was full."
+                   ::= { lifEntry 26 }
+
+               locIfOutputQueueDrops OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of packets dropped because the
+                           output queue was full."
+                   ::= { lifEntry 27 }
+
+               locIfDescr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "User configurable interface description."
+                   ::= { lifEntry 28 }
+
+               locIfSlowInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Inbound traffic routed with
+                           slow switching"
+                   ::= { lifEntry 30 }
+
+               locIfSlowOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Outbound traffic routed
+                           with slow switching"
+                   ::= { lifEntry 31 }
+
+               locIfSlowInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Inbound traffic routed with
+                           slow switching"
+                   ::= { lifEntry 32 }
+
+               locIfSlowOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Outbound traffic routed with
+                           slow switching"
+                   ::= { lifEntry 33 }
+
+               locIfFastInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Inbound traffic routed with
+                           fast switching"
+                   ::= { lifEntry 34 }
+
+               locIfFastOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Packet count for Outbound traffic routed
+                           with fast switching"
+                   ::= { lifEntry 35 }
+
+               locIfFastInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Inbound traffic routed with
+                           fast switching"
+                   ::= { lifEntry 36 }
+
+               locIfFastOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Octet count for Outbound traffic routed with
+                           fast switching"
+                   ::= { lifEntry 37 }
+
+               locIfotherInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol input packet count"
+                   ::= { lifEntry 38 }
+
+               locIfotherOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol output packet count"
+                   ::= { lifEntry 39 }
+
+               locIfotherInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol input octet count"
+                   ::= { lifEntry 40 }
+
+               locIfotherOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Other protocol output octet count"
+                   ::= { lifEntry 41 }
+
+               locIfipInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol input packet count"
+                   ::= { lifEntry 42 }
+
+               locIfipOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol output packet count"
+                   ::= { lifEntry 43 }
+
+               locIfipInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol input octet count"
+                   ::= { lifEntry 44 }
+
+               locIfipOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ip protocol output octet count"
+                   ::= { lifEntry 45 }
+
+               locIfdecnetInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol input packet count"
+                   ::= { lifEntry 46 }
+
+               locIfdecnetOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol output packet count"
+                   ::= { lifEntry 47 }
+
+               locIfdecnetInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol input byte count"
+                   ::= { lifEntry 48 }
+
+               locIfdecnetOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Decnet protocol output byte count"
+                   ::= { lifEntry 49 }
+
+               locIfxnsInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol input packet count"
+                   ::= { lifEntry 50 }
+
+               locIfxnsOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol output packet count"
+                   ::= { lifEntry 51 }
+
+               locIfxnsInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol input byte count"
+                   ::= { lifEntry 52 }
+
+               locIfxnsOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "XNS protocol output byte count"
+                   ::= { lifEntry 53 }
+
+               locIfclnsInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol input packet count"
+                   ::= { lifEntry 54 }
+
+               locIfclnsOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol output packet count"
+                   ::= { lifEntry 55 }
+
+               locIfclnsInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol input byte count"
+                   ::= { lifEntry 56 }
+
+               locIfclnsOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CLNS protocol output byte count"
+                   ::= { lifEntry 57 }
+
+               locIfappletalkInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol input packet count"
+                   ::= { lifEntry 58 }
+
+               locIfappletalkOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol output packet count"
+                   ::= { lifEntry 59 }
+
+               locIfappletalkInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol input octet count"
+                   ::= { lifEntry 60 }
+
+               locIfappletalkOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Appletalk protocol output octet count"
+                   ::= { lifEntry 61 }
+
+               locIfnovellInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol input packet count"
+                   ::= { lifEntry 62 }
+
+               locIfnovellOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol output packet count"
+                   ::= { lifEntry 63 }
+
+               locIfnovellInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol input octet count"
+                   ::= { lifEntry 64 }
+
+               locIfnovellOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Novell protocol output octet count"
+                   ::= { lifEntry 65 }
+
+               locIfapolloInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol input packet count"
+                   ::= { lifEntry 66 }
+
+               locIfapolloOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol output packet count"
+                   ::= { lifEntry 67 }
+
+               locIfapolloInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol input octet count"
+                   ::= { lifEntry 68 }
+
+               locIfapolloOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Apollo protocol output octet count"
+                   ::= { lifEntry 69 }
+
+               locIfvinesInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol input packet count"
+                   ::= { lifEntry 70 }
+
+               locIfvinesOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol output packet count"
+                   ::= { lifEntry 71 }
+
+               locIfvinesInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol input octet count"
+                   ::= { lifEntry 72 }
+
+               locIfvinesOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Vines protocol output octet count"
+                   ::= { lifEntry 73 }
+
+               locIfbridgedInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol input packet count"
+                   ::= { lifEntry 74 }
+
+               locIfbridgedOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol output packet count"
+                   ::= { lifEntry 75 }
+
+               locIfbridgedInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol input octet count"
+                   ::= { lifEntry 76 }
+
+               locIfbridgedOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Bridged protocol output octet count"
+                   ::= { lifEntry 77 }
+
+               locIfsrbInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol input packet count"
+                   ::= { lifEntry 78 }
+
+               locIfsrbOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol output packet count"
+                   ::= { lifEntry 79 }
+
+               locIfsrbInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol input octet count"
+                   ::= { lifEntry 80 }
+
+               locIfsrbOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "SRB protocol output octet count"
+                   ::= { lifEntry 81 }
+
+               locIfchaosInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol input packet count"
+                   ::= { lifEntry 82 }
+
+               locIfchaosOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol output packet count"
+                   ::= { lifEntry 83 }
+
+               locIfchaosInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol input octet count"
+                   ::= { lifEntry 84 }
+
+               locIfchaosOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Choas protocol output octet count"
+                   ::= { lifEntry 85 }
+
+               locIfpupInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol input packet count"
+                   ::= { lifEntry 86 }
+
+               locIfpupOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol output packet count"
+                   ::= { lifEntry 87 }
+
+               locIfpupInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol input octet count"
+                   ::= { lifEntry 88 }
+
+               locIfpupOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PUP protocol output octet count"
+                   ::= { lifEntry 89 }
+
+               locIfmopInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol input packet count"
+                   ::= { lifEntry 90 }
+
+               locIfmopOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol output packet count"
+                   ::= { lifEntry 91 }
+
+               locIfmopInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol input octet count"
+                   ::= { lifEntry 92 }
+
+               locIfmopOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MOP protocol output octet count"
+                   ::= { lifEntry 93 }
+
+               locIflanmanInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol input packet count"
+                   ::= { lifEntry 94 }
+
+               locIflanmanOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol output packet count"
+                   ::= { lifEntry 95 }
+
+               locIflanmanInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol input octet count"
+                   ::= { lifEntry 96 }
+
+               locIflanmanOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LanMan protocol output octet count"
+                   ::= { lifEntry 97 }
+
+               locIfstunInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol input packet count"
+                   ::= { lifEntry 98 }
+
+               locIfstunOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol output packet count"
+                   ::= { lifEntry 99 }
+
+               locIfstunInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol input octet count"
+                   ::= { lifEntry 100 }
+
+               locIfstunOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "STUN protocol output octet count"
+                   ::= { lifEntry 101 }
+
+               locIfspanInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree input protocol packet count"
+                   ::= { lifEntry 102 }
+
+               locIfspanOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree output protocol packet count"
+                   ::= { lifEntry 103 }
+
+               locIfspanInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree input octet packet count"
+                   ::= { lifEntry 104 }
+
+               locIfspanOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Spanning tree output octet packet count"
+                   ::= { lifEntry 105 }
+
+               locIfarpInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol input packet count"
+                   ::= { lifEntry 106 }
+
+               locIfarpOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol output packet count"
+                   ::= { lifEntry 107 }
+
+               locIfarpInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol input octet count"
+                   ::= { lifEntry 108 }
+
+               locIfarpOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Arp protocol output octet count"
+                   ::= { lifEntry 109 }
+
+               locIfprobeInPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol input packet count"
+                   ::= { lifEntry 110 }
+
+               locIfprobeOutPkts OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol output packet count"
+                   ::= { lifEntry 111 }
+
+               locIfprobeInOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol input octet count"
+                   ::= { lifEntry 112 }
+
+               locIfprobeOutOctets OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Probe protocol output octet count"
+                   ::= { lifEntry 113 }
+
+               locIfDribbleInputs OBJECT-TYPE
+                   SYNTAX  Counter
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The number of good packets received with the
+                           dribble condition present"
+                   ::= { lifEntry 114 }
+
+               -- End of table
+
+
+
+          -- Local FSIP card Table, also used for 4T, HSSI, Mx serial
+
+          -- This group provides additional objects to the table
+          -- defined by RFC1156.
+
+               lFSIPTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF LFSIPEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of card entries for 4T, HSSI,
+		             Mx serial or FSIP."
+                   ::= { linterfaces 2 }
+
+               lFSIPEntry OBJECT-TYPE
+                   SYNTAX LFSIPEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of objects specific to 4T,
+			     HSSI, Mx serial or FSIP."
+                   INDEX { locIfFSIPIndex }
+               ::= { lFSIPTable 1 }
+
+               LFSIPEntry ::=
+                   SEQUENCE {
+                       locIfFSIPIndex
+                           INTEGER,
+                       locIfFSIPtype
+                           INTEGER,
+                       locIfFSIPrts
+                           INTEGER,
+                       locIfFSIPcts
+                           INTEGER,
+                       locIfFSIPdtr
+                           INTEGER,
+                       locIfFSIPdcd
+                           INTEGER,
+                       locIfFSIPdsr
+                           INTEGER,
+                       locIfFSIPrxClockrate
+                           INTEGER,
+                       locIfFSIPrxClockrateHi
+                           INTEGER,
+                       locIfFSIPportType
+                           INTEGER
+                   }
+
+
+          -- The following section describes the components of the
+          -- table.
+
+               locIfFSIPIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interface index of this card corresponding
+                           to its ifIndex"
+                   ::= { lFSIPEntry 1 }
+
+               locIfFSIPtype OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        dte(2),
+                        dce(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this FSIP line DCE or DTE"
+                   ::= { lFSIPEntry 2 }
+
+               locIfFSIPrts OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the RTS signal up or down"
+                   ::= { lFSIPEntry 3 }
+
+               locIfFSIPcts OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the CTS signal up or down"
+                   ::= { lFSIPEntry 4 }
+
+               locIfFSIPdtr OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the DTR signal up or down"
+                   ::= { lFSIPEntry 5 }
+
+               locIfFSIPdcd OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the DCD signal up or down"
+                   ::= { lFSIPEntry 6 }
+
+               locIfFSIPdsr OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        notAvailable(1),
+                        up(2),
+                        down(3)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is the DSR signal up or down"
+                   ::= { lFSIPEntry 7 }
+
+               locIfFSIPrxClockrate OBJECT-TYPE
+                   SYNTAX INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                       "Received clock rate"
+                   ::= { lFSIPEntry 8 }
+
+               locIfFSIPrxClockrateHi OBJECT-TYPE
+                   SYNTAX INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                       "Use when received clock rate 
+			is greater than 2^32 (gigabits)."
+                   ::= { lFSIPEntry 9 }
+
+	       -- PortType is modeled after rs232PortType 
+	       -- in RS-232-MIB.my
+
+               locIfFSIPportType OBJECT-TYPE
+                   SYNTAX  INTEGER {
+			 noCable(1),
+                         rs232(2),
+			 rs422(3),
+			 rs423(4),
+			 v35(5),
+			 x21(6),
+			 rs449(7),
+			 rs530(8),
+		         hssi(9)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Cable Type of 4T, HSSI, Mx serial or FSIP"
+                   ::= { lFSIPEntry 10 }
+
+               -- End of table
+
+
+END

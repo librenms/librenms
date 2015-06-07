@@ -1,0 +1,462 @@
+
+-- *****************************************************************************
+-- Juniper-COPS-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Common Open Policy Service (COPS) Protocol Layer MIB
+--
+-- Copyright (c) 2000, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-COPS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Counter32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    JuniName
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniCopsProtocolMIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Common Open Policy Service (COPS) Protocol MIB for the Juniper
+        Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200201141901Z"  -- 14-Jan-02 02:01 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Expanded MIB to include following objects:
+            juniCopsProtocolSessionLocalAddress,
+            juniCopsProtocolSessionTransportRouterName "
+    REVISION    "200002220000Z"  -- 22-Feb-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 37 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+--  This MIB contains definitions needed for the COPS Protocol component.
+--
+juniCopsProtocolObjects    OBJECT IDENTIFIER ::= { juniCopsProtocolMIB 1 }
+
+juniCopsProtocolCfg        OBJECT IDENTIFIER ::= { juniCopsProtocolObjects 1 }
+juniCopsProtocolStatus     OBJECT IDENTIFIER ::= { juniCopsProtocolObjects 2 }
+juniCopsProtocolStatistics OBJECT IDENTIFIER ::= { juniCopsProtocolObjects 3 }
+juniCopsProtocolSession    OBJECT IDENTIFIER ::= { juniCopsProtocolObjects 4 }
+
+--
+-- Statistics Objects
+--
+juniCopsProtocolStatisticsScalars  OBJECT IDENTIFIER
+    ::= { juniCopsProtocolStatistics 1 }
+
+juniCopsProtocolSessionsCreated  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of COPS protocol sessions created."
+    ::= { juniCopsProtocolStatisticsScalars 1 }
+
+juniCopsProtocolSessionsDeleted  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of COPS protocol sessions deleted."
+    ::= { juniCopsProtocolStatisticsScalars 2 }
+
+juniCopsProtocolCurrentSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of current COPS protocol sessions."
+    ::= { juniCopsProtocolStatisticsScalars 3 }
+
+juniCopsProtocolBytesReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes received by the COPS protocol layer."
+    ::= { juniCopsProtocolStatisticsScalars 4 }
+
+juniCopsProtocolPacketsReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received by the COPS protocol layer."
+    ::= { juniCopsProtocolStatisticsScalars 5 }
+
+juniCopsProtocolBytesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes sent by the COPS protocol layer."
+    ::= { juniCopsProtocolStatisticsScalars 6 }
+
+juniCopsProtocolPacketsSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets sent by the COPS protocol layer."
+    ::= { juniCopsProtocolStatisticsScalars 7 }
+
+juniCopsProtocolKeepAlivesReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number keep alive packets received by the COPS protocol layer."
+    ::= { juniCopsProtocolStatisticsScalars 8 }
+
+juniCopsProtocolKeepAlivesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of keep alive packets sent by the COPS protocol layer."
+    ::= { juniCopsProtocolStatisticsScalars 9 }
+
+
+--
+--  Session Information
+--
+juniCopsProtocolSessionTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniCopsProtocolSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The COPS protocol session information table."
+    ::= { juniCopsProtocolSession 1 }
+
+juniCopsProtocolSessionEntry  OBJECT-TYPE
+    SYNTAX      JuniCopsProtocolSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the COPS protocol session information table."
+    INDEX     { juniCopsProtocolSessionClientType }
+    ::= { juniCopsProtocolSessionTable 1 }
+
+JuniCopsProtocolSessionEntry ::= SEQUENCE {
+    juniCopsProtocolSessionClientType            Integer32,
+    juniCopsProtocolSessionRemoteAddress         IpAddress,
+    juniCopsProtocolSessionRemotePort            Integer32,
+    juniCopsProtocolSessionBytesReceived         Counter32,
+    juniCopsProtocolSessionPacketsReceived       Counter32,
+    juniCopsProtocolSessionBytesSent             Counter32,
+    juniCopsProtocolSessionPacketsSent           Counter32,
+    juniCopsProtocolSessionREQSent               Counter32,
+    juniCopsProtocolSessionDECReceived           Counter32,
+    juniCopsProtocolSessionRPTSent               Counter32,
+    juniCopsProtocolSessionDRQSent               Counter32,
+    juniCopsProtocolSessionSSQSent               Counter32,
+    juniCopsProtocolSessionOPNSent               Counter32,
+    juniCopsProtocolSessionCATReceived           Counter32,
+    juniCopsProtocolSessionCCSent                Counter32,
+    juniCopsProtocolSessionCCReceived            Counter32,
+    juniCopsProtocolSessionSSCSent               Counter32,
+    juniCopsProtocolSessionLocalAddress          IpAddress,
+    juniCopsProtocolSessionTransportRouterName   JuniName }
+
+juniCopsProtocolSessionClientType  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The COPS client-type for which this entry information is valid."
+    ::= { juniCopsProtocolSessionEntry 1 }
+
+juniCopsProtocolSessionRemoteAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the remote end of this session."
+    ::= { juniCopsProtocolSessionEntry 2 }
+
+juniCopsProtocolSessionRemotePort  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote port for this session."
+    ::= { juniCopsProtocolSessionEntry 3 }
+
+juniCopsProtocolSessionBytesReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes received by this session."
+    ::= { juniCopsProtocolSessionEntry 4 }
+
+juniCopsProtocolSessionPacketsReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received by this session."
+    ::= { juniCopsProtocolSessionEntry 5 }
+
+juniCopsProtocolSessionBytesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes sent on this session."
+    ::= { juniCopsProtocolSessionEntry 6 }
+
+juniCopsProtocolSessionPacketsSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 7 }
+
+juniCopsProtocolSessionREQSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of REQ packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 8 }
+
+juniCopsProtocolSessionDECReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DEC packets received on this session."
+    ::= { juniCopsProtocolSessionEntry 9 }
+
+juniCopsProtocolSessionRPTSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RPT packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 10 }
+
+juniCopsProtocolSessionDRQSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DRQ packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 11 }
+
+juniCopsProtocolSessionSSQSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of SSQ packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 12 }
+
+juniCopsProtocolSessionOPNSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of OPN packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 13 }
+
+juniCopsProtocolSessionCATReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of CAT packets received on this session."
+    ::= { juniCopsProtocolSessionEntry 14 }
+
+juniCopsProtocolSessionCCSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of CC packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 15 }
+
+juniCopsProtocolSessionCCReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of CC packets received on this session."
+    ::= { juniCopsProtocolSessionEntry 16 }
+
+juniCopsProtocolSessionSSCSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of SSC packets sent on this session."
+    ::= { juniCopsProtocolSessionEntry 17 }
+
+
+juniCopsProtocolSessionLocalAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the local end of this session."
+    ::= { juniCopsProtocolSessionEntry 18 }
+
+juniCopsProtocolSessionTransportRouterName  OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name of the transport router for this
+        session."
+    ::= { juniCopsProtocolSessionEntry 19 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniCopsProtocolTrapControl  OBJECT IDENTIFIER
+--     ::= { juniCopsProtocolMIB 2 }
+-- juniCopsProtocolTraps        OBJECT IDENTIFIER
+--     ::= { juniCopsProtocolMIB 3 }
+-- juniCopsProtocolTrapPrefix   OBJECT IDENTIFIER
+--     ::= { juniCopsProtocolTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniCopsProtocolMIBConformance   OBJECT IDENTIFIER
+    ::= { juniCopsProtocolMIB 4 }
+juniCopsProtocolMIBCompliances   OBJECT IDENTIFIER
+    ::= { juniCopsProtocolMIBConformance 1 }
+juniCopsProtocolMIBGroups        OBJECT IDENTIFIER
+    ::= { juniCopsProtocolMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniCopsProtocolAuthCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Current compliance statement for authentication clients implementing
+        the Juniper COPS Protocol MIB authentication functionality.  This
+        statement became obsolete when the local address and transport router
+        name objects were add."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniCopsProtocolGroup }
+    ::= { juniCopsProtocolMIBCompliances 1 }                       -- JUNOSe 2.0
+
+juniCopsProtocolAuthCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for authentication clients implementing the
+        Juniper COPS Protocol MIB authentication functionality."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniCopsProtocolGroup2 }
+    ::= { juniCopsProtocolMIBCompliances 2 }                       -- JUNOSe 4.0
+
+--
+-- units of conformance
+--
+juniCopsProtocolGroup  OBJECT-GROUP
+    OBJECTS {
+        juniCopsProtocolSessionsCreated,
+        juniCopsProtocolSessionsDeleted,
+        juniCopsProtocolCurrentSessions,
+        juniCopsProtocolBytesReceived,
+        juniCopsProtocolPacketsReceived,
+        juniCopsProtocolBytesSent,
+        juniCopsProtocolPacketsSent,
+        juniCopsProtocolKeepAlivesReceived,
+        juniCopsProtocolKeepAlivesSent,
+
+        juniCopsProtocolSessionRemoteAddress,
+        juniCopsProtocolSessionRemotePort,
+        juniCopsProtocolSessionBytesReceived,
+        juniCopsProtocolSessionPacketsReceived,
+        juniCopsProtocolSessionBytesSent,
+        juniCopsProtocolSessionPacketsSent,
+        juniCopsProtocolSessionREQSent,
+        juniCopsProtocolSessionDECReceived,
+        juniCopsProtocolSessionRPTSent,
+        juniCopsProtocolSessionDRQSent,
+        juniCopsProtocolSessionSSQSent,
+        juniCopsProtocolSessionOPNSent,
+        juniCopsProtocolSessionCATReceived,
+        juniCopsProtocolSessionCCSent,
+        juniCopsProtocolSessionCCReceived,
+        juniCopsProtocolSessionSSCSent }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of the COPS
+        Protocol.  This group became obsolete when the local address and
+        transport router name objects were add."
+    ::= { juniCopsProtocolMIBGroups 1 }
+
+juniCopsProtocolGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniCopsProtocolSessionsCreated,
+        juniCopsProtocolSessionsDeleted,
+        juniCopsProtocolCurrentSessions,
+        juniCopsProtocolBytesReceived,
+        juniCopsProtocolPacketsReceived,
+        juniCopsProtocolBytesSent,
+        juniCopsProtocolPacketsSent,
+        juniCopsProtocolKeepAlivesReceived,
+        juniCopsProtocolKeepAlivesSent,
+
+        juniCopsProtocolSessionRemoteAddress,
+        juniCopsProtocolSessionRemotePort,
+        juniCopsProtocolSessionBytesReceived,
+        juniCopsProtocolSessionPacketsReceived,
+        juniCopsProtocolSessionBytesSent,
+        juniCopsProtocolSessionPacketsSent,
+        juniCopsProtocolSessionREQSent,
+        juniCopsProtocolSessionDECReceived,
+        juniCopsProtocolSessionRPTSent,
+        juniCopsProtocolSessionDRQSent,
+        juniCopsProtocolSessionSSQSent,
+        juniCopsProtocolSessionOPNSent,
+        juniCopsProtocolSessionCATReceived,
+        juniCopsProtocolSessionCCSent,
+        juniCopsProtocolSessionCCReceived,
+        juniCopsProtocolSessionSSCSent,
+        juniCopsProtocolSessionLocalAddress,
+        juniCopsProtocolSessionTransportRouterName }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of the COPS
+        Protocol."
+    ::= { juniCopsProtocolMIBGroups 2 }
+
+END

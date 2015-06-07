@@ -1,0 +1,130 @@
+--
+-- Juniper Mobile Gateway Shared Memory IP pool objects MIB.
+--
+-- Copyright (c) 2010-2013, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-MOBILE-GATEWAY-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+Counter64, Integer32, Unsigned32,
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString, TruthValue
+        FROM SNMPv2-TC
+
+    InetAddressType, InetAddress, InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+
+    jnxMobileGatewayMibRoot	
+        FROM JUNIPER-SMI;
+
+jnxMbgDhcpMib MODULE-IDENTITY
+    LAST-UPDATED "201103301200Z" -- Mar 30, 2011, 12:00:00 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This module defines objects pertaining to Mobile-Edge
+         DHCP Services"
+    REVISION "201103301200Z" -- Mar 30, 2011, 12:00:00
+    DESCRIPTION "Initial version"
+
+    ::= { jnxMobileGatewayMibRoot 8 }
+
+jnxMbgDhcpNotifications          OBJECT IDENTIFIER ::= 
+                                         { jnxMbgDhcpMib 0 }
+jnxMbgDhcpObjects                OBJECT IDENTIFIER ::=
+                                         { jnxMbgDhcpMib 1 }
+jnxMbgDhcpNotificationVars       OBJECT IDENTIFIER ::=
+                                         { jnxMbgDhcpObjects 1 }
+--
+-- Objects used in Notifications
+--
+
+jnxMbgDhcpServerIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP address of the dhcp server."
+    ::= { jnxMbgDhcpNotificationVars 1 }
+
+jnxMbgDhcpLogicalSystemName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the logical-system
+         on the mobile-gateway"
+    ::= { jnxMbgDhcpNotificationVars 2 }
+
+jnxMbgDhcpRoutingInstanceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name which identifies the routing instance
+         on the mobile-gateway."
+    ::= { jnxMbgDhcpNotificationVars 3 }
+
+jnxMbgDhcpProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The configured dhcp profile name"
+    ::= { jnxMbgDhcpNotificationVars 4 }
+
+jnxMbgDhcpPoolName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The configured dhcp pool name with in a dhcp profile" 
+    ::= { jnxMbgDhcpNotificationVars 5 }
+
+jnxMbgDhcpReachability OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "True  - The server is reachable
+         False - The server is unreachable."
+    ::= { jnxMbgDhcpNotificationVars 6 }
+--
+-- Notifications
+--
+jnxMbgDhcpServerReachability NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgDhcpServerIP,
+                  jnxMbgDhcpLogicalSystemName,
+                  jnxMbgDhcpRoutingInstanceName,
+                  jnxMbgDhcpProfileName,
+                  jnxMbgDhcpReachability }
+    STATUS      current
+    DESCRIPTION
+        "This notification is used to notify if the given
+         dhcp server is reachable/unreachable."
+    ::= { jnxMbgDhcpNotifications 1 }
+
+jnxMbgDhcpAddrPoolExhaust NOTIFICATION-TYPE
+    OBJECTS     { jnxMbgDhcpServerIP,
+                  jnxMbgDhcpLogicalSystemName,
+                  jnxMbgDhcpRoutingInstanceName,
+                  jnxMbgDhcpProfileName,
+                  jnxMbgDhcpPoolName }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that the addresses
+         from a given address pool have exhusted."
+    ::= { jnxMbgDhcpNotifications 2 }
+
+END

@@ -1,0 +1,47 @@
+-- ARISTA-SMI_MIB: arista structure of management information
+-- Copyright (c) 2008 Arista Networks, Inc.  All rights reserved.
+
+ARISTA-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+
+arista MODULE-IDENTITY
+    LAST-UPDATED "200810271830Z"
+    ORGANIZATION "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+         Postal: 275 Middlefield Road
+                 Suite 150
+                 Menlo Park, CA 94025
+
+         Tel: +1 650 462-5000
+
+         E-mail: snmp@aristanetworks.com"
+        DESCRIPTION
+                "The Structure of Management Information for the
+                Arista Networks enterprise."
+        REVISION      "200810271830Z"
+        DESCRIPTION
+                "Initial version."
+        ::= { enterprises 30065 }        -- assigned by IANA
+
+aristaProducts OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "aristaProducts is the root object identifier from
+         which sysObjectID values are assigned.  Values are
+         defined in ARISTA-PRODUCTS-MIB."
+    ::= { arista 1 }
+
+aristaModules OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "aristaModules provides a root object identifier
+         from which MODULE-IDENTITY values may be assigned."
+    ::= { arista 2 }
+END

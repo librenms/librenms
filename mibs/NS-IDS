@@ -1,0 +1,880 @@
+-- This module defines enterprise MIBs DI Setting.
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-IDS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenIDS
+        FROM NETSCREEN-SMI
+    Counter32, Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    ;
+
+nsIdsProtect MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs DI Setting."
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200204260000Z" -- April 26, 2002
+    DESCRIPTION
+        "Screen option on zone setting, add new screen option (Zhong
+         Wang)"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200101080000Z" -- January 08, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenIDS 1 }
+
+NsIdsAttkMonEntry ::= SEQUENCE
+{
+    nsIdsAttkMonIfIdx       Integer32,
+    nsIdsAttkMonVsys        Integer32,
+    nsIdsAttkMonSynAttk     Counter32,
+    nsIdsAttkMonTearDrop    Counter32,
+    nsIdsAttkMonSrcRoute    Counter32,
+    nsIdsAttkMonPingDeath   Counter32,
+    nsIdsAttkMonAddrSpoof   Counter32,
+    nsIdsAttkMonLand        Counter32,
+    nsIdsAttkMonIcmpFlood   Counter32,
+    nsIdsAttkMonUdpFlood    Counter32,
+    nsIdsAttkMonWinnuke     Counter32,
+    nsIdsAttkMonPortScan    Counter32,
+    nsIdsAttkMonIpSweep     Counter32,
+    nsAttkMonSynFrag        Counter32,
+    nsAttkMonTcpNoFlag      Counter32,
+    nsAttkMonIpUnknownProt  Counter32,
+    nsAttkMonIpOptBad       Counter32,
+    nsAttkMonIpOptRecord    Counter32,
+    nsAttkMonIpOptTimestamp Counter32,
+    nsAttkMonIpOptSCHT      Counter32,
+    nsAttkMonIpOptLSR       Counter32,
+    nsAttkMonIpOptSSR       Counter32,
+    nsAttkMonIpOptStream    Counter32,
+    nsAttkMonIcmpFrag       Counter32,
+    nsAttkMonIcmpLarge      Counter32,
+    nsAttkMonTcpSynFin      Counter32,
+    nsAttkMonTcpFinNoAck    Counter32,
+    nsAttkMonHttpMalUrl     Counter32,
+    nsAttkMonSessMalNum     Counter32,
+    nsAttkMonSynAckAck      Counter32,
+    nsAttkMonIpFrag         Counter32,
+    nsIdsAttkMonIfInfo      Integer32
+}
+
+NsIdsProtectSetEntry ::= SEQUENCE
+{
+    nsIdsProtectZoneIdx       Integer32,
+    nsIdsDetectPingOfDeath    INTEGER,
+    nsIdsDetectTearDrop       INTEGER,
+    nsIdsDetectWinNuke        INTEGER,
+    nsIdsFilterIpSrcRoute     INTEGER,
+    nsIdsDetectPortScan       INTEGER,
+    nsIdsDetectAddrSweep      INTEGER,
+    nsIdsDetectLand           INTEGER,
+    nsIdsBlockComponent       INTEGER,
+    nsIdsDetectIpSpoof        INTEGER,
+    nsIdsDetectSyn            INTEGER,
+    nsIdsDetectIcmpFlood      INTEGER,
+    nsIdsDetectUdpFlood       INTEGER,
+    nsIdsDetectSynFrag        INTEGER,
+    nsIdsDetectTcpNoFlag      INTEGER,
+    nsIdsDetectIpUnknownProt  INTEGER,
+    nsIdsDetectIpOptBad       INTEGER,
+    nsIdsDetectIpOptRecord    INTEGER,
+    nsIdsDetectIpOptTimestamp INTEGER,
+    nsIdsDetectIpOptSCHT      INTEGER,
+    nsIdsDetectIpOptLSR       INTEGER,
+    nsIdsDetectIpOptSSR       INTEGER,
+    nsIdsDetectIpOptStream    INTEGER,
+    nsIdsDetectIcmpFrag       INTEGER,
+    nsIdsDetectIcmpLarge      INTEGER,
+    nsIdsDetectTcpSynFin      INTEGER,
+    nsIdsDetectTcpFinNoAck    INTEGER,
+    nsIdsHttpMalUrl           INTEGER,
+    nsIdsSessMalNum           INTEGER,
+    nsIdsDetectSynAckAck      INTEGER,
+    nsIdsDetectIpFrag         INTEGER
+}
+
+NsIdsProtectThreshEntry ::= SEQUENCE
+{
+    nsIdsProtectThreshZoneIdx Integer32,
+    nsIdsSynAttackThresh      Integer32,
+    nsIdsSynAttackTimeout     Integer32,
+    nsIdsSynAttackAlmTh       Integer32,
+    nsIdsSynAttackQueSize     Integer32,
+    nsIdsSynAttackAgeTime     Integer32,
+    nsIdsIcmpFloodThresh      Integer32,
+    nsIdsUdpFloodThresh       Integer32,
+    nsIdsPortScanThresh       Integer32,
+    nsIdsIpSweepThresh        Integer32,
+    nsIdsSynAckAckThres       Integer32
+}
+
+nsIdsProtectSetTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsIdsProtectSetEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen ScreenOS can allow DI protection on each of
+         NetScreen device's physical interface. This table collects the
+         DI protection configuration on each physical interface."
+    ::= { nsIdsProtect 1 }
+
+nsIdsProtectSetEntry OBJECT-TYPE
+    SYNTAX        NsIdsProtectSetEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Hold the DI setting attribute."
+    INDEX
+        { nsIdsProtectZoneIdx }
+    ::= { nsIdsProtectSetTable 1 }
+
+nsIdsProtectZoneIdx OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "unique zone id."
+    ::= { nsIdsProtectSetEntry 1 }
+
+nsIdsDetectPingOfDeath OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Ping of Death."
+    ::= { nsIdsProtectSetEntry 2 }
+
+nsIdsDetectTearDrop OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Tear Drop Attack."
+    ::= { nsIdsProtectSetEntry 3 }
+
+nsIdsDetectWinNuke OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Win Nuke Attack."
+    ::= { nsIdsProtectSetEntry 4 }
+
+nsIdsFilterIpSrcRoute OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Filter IP Source Route Option attack."
+    ::= { nsIdsProtectSetEntry 5 }
+
+nsIdsDetectPortScan OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Port Scan Death attack."
+    ::= { nsIdsProtectSetEntry 6 }
+
+nsIdsDetectAddrSweep OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Address Sweep Attack."
+    ::= { nsIdsProtectSetEntry 7 }
+
+nsIdsDetectLand OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Land Attack."
+    ::= { nsIdsProtectSetEntry 8 }
+
+nsIdsBlockComponent OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Block Java/ActiveX/ZIP/EXE Component."
+    ::= { nsIdsProtectSetEntry 9 }
+
+nsIdsDetectIpSpoof OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP Spoofing attack."
+    ::= { nsIdsProtectSetEntry 10 }
+
+nsIdsDetectSyn OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect SYN attack."
+    ::= { nsIdsProtectSetEntry 11 }
+
+nsIdsDetectIcmpFlood OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect ICMP Flood attack."
+    ::= { nsIdsProtectSetEntry 12 }
+
+nsIdsDetectUdpFlood OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect UDP Flood attack."
+    ::= { nsIdsProtectSetEntry 13 }
+
+nsIdsDetectSynFrag OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect SYN fragment"
+    ::= { nsIdsProtectSetEntry 14 }
+
+nsIdsDetectTcpNoFlag OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect TCP without flag set."
+    ::= { nsIdsProtectSetEntry 15 }
+
+nsIdsDetectIpUnknownProt OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Unknown protocol IP packet."
+    ::= { nsIdsProtectSetEntry 16 }
+
+nsIdsDetectIpOptBad OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP bad option."
+    ::= { nsIdsProtectSetEntry 17 }
+
+nsIdsDetectIpOptRecord OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP record option."
+    ::= { nsIdsProtectSetEntry 18 }
+
+nsIdsDetectIpOptTimestamp OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP timestamp option."
+    ::= { nsIdsProtectSetEntry 19 }
+
+nsIdsDetectIpOptSCHT OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP security option."
+    ::= { nsIdsProtectSetEntry 20 }
+
+nsIdsDetectIpOptLSR OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Loose source route."
+    ::= { nsIdsProtectSetEntry 21 }
+
+nsIdsDetectIpOptSSR OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect strict source route."
+    ::= { nsIdsProtectSetEntry 22 }
+
+nsIdsDetectIpOptStream OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP stream option."
+    ::= { nsIdsProtectSetEntry 23 }
+
+nsIdsDetectIcmpFrag OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect ICMP fragment."
+    ::= { nsIdsProtectSetEntry 24 }
+
+nsIdsDetectIcmpLarge OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect large ICMP packet."
+    ::= { nsIdsProtectSetEntry 25 }
+
+nsIdsDetectTcpSynFin OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect TCP syn fin both set."
+    ::= { nsIdsProtectSetEntry 26 }
+
+nsIdsDetectTcpFinNoAck OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect TCP fin set without ack bit set."
+    ::= { nsIdsProtectSetEntry 27 }
+
+nsIdsHttpMalUrl OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect malicious URL."
+    ::= { nsIdsProtectSetEntry 28 }
+
+nsIdsSessMalNum OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect malicious session connection."
+    ::= { nsIdsProtectSetEntry 29 }
+
+nsIdsDetectSynAckAck OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect SYN ACK ACK DoS."
+    ::= { nsIdsProtectSetEntry 30 }
+
+nsIdsDetectIpFrag OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Block IP fragment packet."
+    ::= { nsIdsProtectSetEntry 31 }
+
+nsIdsProtectThreshTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsIdsProtectThreshEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen ScreenOS can allow DI protection on each of
+         NetScreen device's physical interface. This table collects the
+         DI protection configuration on each physical interface."
+    ::= { nsIdsProtect 2 }
+
+nsIdsProtectThreshEntry OBJECT-TYPE
+    SYNTAX        NsIdsProtectThreshEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Hold the DI setting attribute."
+    INDEX
+        { nsIdsProtectThreshZoneIdx }
+    ::= { nsIdsProtectThreshTable 1 }
+
+nsIdsProtectThreshZoneIdx OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "unique zone id."
+    ::= { nsIdsProtectThreshEntry 1 }
+
+nsIdsSynAttackThresh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SYN attack threshold."
+    ::= { nsIdsProtectThreshEntry 2 }
+
+nsIdsSynAttackTimeout OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SYN attack timeout."
+    ::= { nsIdsProtectThreshEntry 3 }
+
+nsIdsSynAttackAlmTh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SYN attack alarm threshold."
+    ::= { nsIdsProtectThreshEntry 4 }
+
+nsIdsSynAttackQueSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SYN attack queue size."
+    ::= { nsIdsProtectThreshEntry 5 }
+
+nsIdsSynAttackAgeTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SYN flood age time."
+    ::= { nsIdsProtectThreshEntry 6 }
+
+nsIdsIcmpFloodThresh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ICMP attack alarm threshold."
+    ::= { nsIdsProtectThreshEntry 7 }
+
+nsIdsUdpFloodThresh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "UDP attack alarm threshold."
+    ::= { nsIdsProtectThreshEntry 8 }
+
+nsIdsPortScanThresh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ICMP attack alarm threshold."
+    ::= { nsIdsProtectThreshEntry 9 }
+
+nsIdsIpSweepThresh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "UDP attack alarm threshold."
+    ::= { nsIdsProtectThreshEntry 10 }
+
+nsIdsSynAckAckThres OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SYN ack ack alarm threshold."
+    ::= { nsIdsProtectThreshEntry 11 }
+
+nsIdsAttkMonTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsIdsAttkMonEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The table monitors the intrusion attack attemps amount to
+         NetScreen Device."
+    ::= { netscreenIDS 2 }
+
+nsIdsAttkMonEntry OBJECT-TYPE
+    SYNTAX        NsIdsAttkMonEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing intrusion attack couters."
+    INDEX
+        { nsIdsAttkMonIfIdx }
+    ::= { nsIdsAttkMonTable 1 }
+
+nsIdsAttkMonIfIdx OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "unique interface id."
+    ::= { nsIdsAttkMonEntry 1 }
+
+nsIdsAttkMonVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "according NetScreen's concepts. each interface belongs to one
+         virtual system. This attribute displays the virtual system name
+         an interface belongs to."
+    ::= { nsIdsAttkMonEntry 2 }
+
+nsIdsAttkMonSynAttk OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "sync attack packet counter."
+    ::= { nsIdsAttkMonEntry 3 }
+
+nsIdsAttkMonTearDrop OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "tear drop attack packet counter."
+    ::= { nsIdsAttkMonEntry 4 }
+
+nsIdsAttkMonSrcRoute OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "source route option attack packet counter."
+    ::= { nsIdsAttkMonEntry 5 }
+
+nsIdsAttkMonPingDeath OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ping of death attack packet counter."
+    ::= { nsIdsAttkMonEntry 6 }
+
+nsIdsAttkMonAddrSpoof OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "address spoofing attack packet counter."
+    ::= { nsIdsAttkMonEntry 7 }
+
+nsIdsAttkMonLand OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "land attack packet counter."
+    ::= { nsIdsAttkMonEntry 8 }
+
+nsIdsAttkMonIcmpFlood OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ICMP flood attack packet counter."
+    ::= { nsIdsAttkMonEntry 9 }
+
+nsIdsAttkMonUdpFlood OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "udp flood attack packet counter."
+    ::= { nsIdsAttkMonEntry 10 }
+
+nsIdsAttkMonWinnuke OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "weired netbios attack packet counter."
+    ::= { nsIdsAttkMonEntry 11 }
+
+nsIdsAttkMonPortScan OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "port scan attempt attack packet counter."
+    ::= { nsIdsAttkMonEntry 12 }
+
+nsIdsAttkMonIpSweep OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "address sweep attemp attack packet counter."
+    ::= { nsIdsAttkMonEntry 13 }
+
+nsAttkMonSynFrag OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect SYN fragment"
+    ::= { nsIdsAttkMonEntry 14 }
+
+nsAttkMonTcpNoFlag OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect TCP without flag set."
+    ::= { nsIdsAttkMonEntry 15 }
+
+nsAttkMonIpUnknownProt OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Unknown protocol IP packet."
+    ::= { nsIdsAttkMonEntry 16 }
+
+nsAttkMonIpOptBad OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP bad option."
+    ::= { nsIdsAttkMonEntry 17 }
+
+nsAttkMonIpOptRecord OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP record option."
+    ::= { nsIdsAttkMonEntry 18 }
+
+nsAttkMonIpOptTimestamp OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP timestamp option."
+    ::= { nsIdsAttkMonEntry 19 }
+
+nsAttkMonIpOptSCHT OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP security option."
+    ::= { nsIdsAttkMonEntry 20 }
+
+nsAttkMonIpOptLSR OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect Loose source route."
+    ::= { nsIdsAttkMonEntry 21 }
+
+nsAttkMonIpOptSSR OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect strict source route."
+    ::= { nsIdsAttkMonEntry 22 }
+
+nsAttkMonIpOptStream OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect IP stream option."
+    ::= { nsIdsAttkMonEntry 23 }
+
+nsAttkMonIcmpFrag OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect ICMP fragment."
+    ::= { nsIdsAttkMonEntry 24 }
+
+nsAttkMonIcmpLarge OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect large ICMP packet."
+    ::= { nsIdsAttkMonEntry 25 }
+
+nsAttkMonTcpSynFin OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect TCP syn fin both set."
+    ::= { nsIdsAttkMonEntry 26 }
+
+nsAttkMonTcpFinNoAck OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect TCP fin set without ack bit set."
+    ::= { nsIdsAttkMonEntry 27 }
+
+nsAttkMonHttpMalUrl OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect malicious URL."
+    ::= { nsIdsAttkMonEntry 28 }
+
+nsAttkMonSessMalNum OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect malicious session connection."
+    ::= { nsIdsAttkMonEntry 29 }
+
+nsAttkMonSynAckAck OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Detect SYN ACK ACK attack."
+    ::= { nsIdsAttkMonEntry 30 }
+
+nsAttkMonIpFrag OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Block IP fragment packet."
+    ::= { nsIdsAttkMonEntry 31 }
+
+nsIdsAttkMonIfInfo OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Internal id assigned to this interface. Stays persistent across resets."
+    ::= { nsIdsAttkMonEntry 32 }
+
+END
+
+

@@ -1,0 +1,607 @@
+CTSMTMIB-MIB  DEFINITIONS ::= BEGIN
+
+        --  Ctron SMT MIB
+        --  Revision: 1.03.02
+        --  Date: April 18, 1997
+        --  Part Number:  2170563-01
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+
+     IMPORTS
+             Counter
+                 FROM RFC1155-SMI
+             ctsmtmib
+                FROM CTRON-MIB-NAMES
+             OBJECT-TYPE
+                 FROM RFC-1212;
+
+
+
+     ctsmtmibRingTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtsmtmibRingEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+                 "A list of fddi nodes found on the ring."
+         ::= { ctsmtmib 1 }
+
+     ctsmtmibRingEntry  OBJECT-TYPE
+         SYNTAX  CtsmtmibRingEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+                 "A fddi ring entry containing information common to all
+                  stations in a token path."
+         INDEX   { ctsmtmibRingSmtIndex, ctsmtmibRingMacIndex,
+                   ctsmtmibRingNodeIndex, ctsmtmibRingMacAddr }
+         ::= { ctsmtmibRingTable 1 }
+
+     CtsmtmibRingEntry ::= SEQUENCE {
+         ctsmtmibRingSmtIndex        INTEGER,
+         ctsmtmibRingMacIndex        INTEGER,
+         ctsmtmibRingNodeIndex       INTEGER,
+         ctsmtmibRingMacAddr         OCTET STRING,
+         ctsmtmibRingUpStreamAddr    OCTET STRING,
+         ctsmtmibRingNodeClass       INTEGER,
+         ctsmtmibRingMacCount        INTEGER,
+         ctsmtmibRingNonMasterCount  INTEGER,
+         ctsmtmibRingMasterCount     INTEGER,
+         ctsmtmibRingTopology        INTEGER,
+         ctsmtmibRingDuplicate       INTEGER
+         }
+
+     ctsmtmibRingSmtIndex  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The value of the SMT index associated with this ring."
+         ::= { ctsmtmibRingEntry 1 }
+
+     ctsmtmibRingMacIndex  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "A unique value for each MAC within a given SMT."
+         ::= { ctsmtmibRingEntry 2 }
+
+     ctsmtmibRingNodeIndex  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The index of the node on the ring in reverse token
+                  flow order. It is sequential from 1 to n where n is
+                  the number of nodes on the ring at a given time."
+         ::= { ctsmtmibRingEntry 3 }
+
+     ctsmtmibRingMacAddr  OBJECT-TYPE
+         SYNTAX  OCTET STRING
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "A canonical representation of the MAC address of the
+                  node."
+         ::= { ctsmtmibRingEntry 4 }
+
+     ctsmtmibRingUpStreamAddr  OBJECT-TYPE
+         SYNTAX  OCTET STRING (SIZE (6))
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "This is a canonical representation of the upstream
+                  neighbor's address. The upstream neighbor is the last
+                  MAC to receive the token before this MAC. Unknown
+                  addresses should be specified as 00-00-F8-00-00-00."
+         ::= { ctsmtmibRingEntry 5 }
+
+     ctsmtmibRingNodeClass  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     station (1),
+                     concentrator (2)
+                 }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "Reports if the node is a station or a concentrator."
+         ::= { ctsmtmibRingEntry 6 }
+
+     ctsmtmibRingMacCount  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The number of MACs on this FDDI node."
+         ::= { ctsmtmibRingEntry 7 }
+
+     ctsmtmibRingNonMasterCount  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The sum of all A ports, B ports, and S ports on this
+                  node."
+         ::= { ctsmtmibRingEntry 8 }
+
+     ctsmtmibRingMasterCount  OBJECT-TYPE
+         SYNTAX  INTEGER (0..255)
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The number of master ports on this node."
+         ::= { ctsmtmibRingEntry 9 }
+
+     ctsmtmibRingTopology  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "A bit mapped representation of the current state of
+                  the node.
+                  if state:                Add 2**n where n =
+                  Wrapped Node                    0
+                  Unattached Concentrator         1
+                  A-A Twisted Ring                2
+                  B-B Twisted Ring                3
+                  Rooted Station                  4
+                  SRF Supported                   5
+
+                  where
+                    Wrapped Node: is set when the node's cf-state is
+                                  Wrap-A,  Wrap-B, Wrap-C, or Wrap-AB.
+                    Unattached Concentrator: is set when a concentrator
+                                  has no active A, B, or S ports.
+                    A-A Twisted Ring: is set when this node's A port is
+                                  connected to another A port.
+                    B-B Twisted Ring: is set when this node's B port is
+                                  connected to another B port.
+                    Rooted Station: is a station with ports A, B and S,
+                                  not active in tree mode.
+                    SRF Supported: This node adheres to the status
+                                  reporting frame protocol."
+         ::= { ctsmtmibRingEntry 10 }
+
+     ctsmtmibRingDuplicate  OBJECT-TYPE
+         SYNTAX  INTEGER (0..2)
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "A bit mapped representation of duplicate address
+                  information.
+
+                  if State:                 Add 2**n where n=
+                  My Duplicate:                     0
+                  UNA Duplicate:                    1
+
+                  where
+                     My Duplicate: This node determines that it's MAC
+                        address is same as the MAC address for another
+                        node on the ring.
+                     UNA Duplicate: The upstream neighbor of this node
+                        has determined that its's MAC address is same as
+                        the MAC address for another node on the ring."
+         ::= { ctsmtmibRingEntry 11 }
+
+     ctsmtmibMacTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtsmtmibMacEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+                 "A list of MAC entries. The total number of entries is
+                  given by the value of ctsmtmibRingMacCount with appropriate
+                  ctsmtmibRingMacAddr."
+         ::= { ctsmtmib 2 }
+
+     ctsmtmibMacEntry  OBJECT-TYPE
+         SYNTAX  CtsmtmibMacEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+                 "A MAC entry containing information pertaining to a
+                  given MAC."
+         INDEX   { ctsmtmibMacSmtIndex, ctsmtmibMacIndex }
+         ::= { ctsmtmibMacTable 1 }
+
+     CtsmtmibMacEntry ::= SEQUENCE {
+         ctsmtmibMacSmtIndex         INTEGER,
+         ctsmtmibMacIndex            INTEGER,
+         ctsmtmibMacNifTxCts         Counter,
+         ctsmtmibMacNifRxCts         Counter,
+         ctsmtmibMacSifTxCts         Counter,
+         ctsmtmibMacSifRxCts         Counter,
+         ctsmtmibMacEcfTxCts         Counter,
+         ctsmtmibMacEcfRxCts         Counter,
+         ctsmtmibMacPmfTxCts         Counter,
+         ctsmtmibMacPmfRxCts         Counter,
+         ctsmtmibMacRdfTxCts         Counter,
+         ctsmtmibMacRdfRxCts         Counter,
+         ctsmtmibMacRingOpCts        Counter,
+         ctsmtmibMacTxCts            Counter,
+         ctsmtmibMacRingMapUpdateCts Counter,
+         ctsmtmibMacAutoNegotiation  INTEGER
+         }
+
+     ctsmtmibMacSmtIndex  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The value of the SMT Index associated with this MAC."
+         ::= { ctsmtmibMacEntry 1 }
+
+     ctsmtmibMacIndex  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "A unique value for each MAC within a given SMT."
+         ::= { ctsmtmibMacEntry 2 }
+
+     ctsmtmibMacNifTxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Neighborhood Information frames
+                  transmitted by the MAC."
+         ::= { ctsmtmibMacEntry 3 }
+
+     ctsmtmibMacNifRxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Neighborhood Information frames received
+                  by the MAC."
+         ::= { ctsmtmibMacEntry 4 }
+
+     ctsmtmibMacSifTxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Status Information frames transmitted by
+                  the MAC."
+         ::= { ctsmtmibMacEntry 5 }
+
+     ctsmtmibMacSifRxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Status Information Frames received by
+                  the MAC."
+         ::= { ctsmtmibMacEntry 6 }
+
+     ctsmtmibMacEcfTxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Echo Frames transmitted by the MAC."
+         ::= { ctsmtmibMacEntry 7 }
+
+     ctsmtmibMacEcfRxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Echo Frames received by the MAC."
+         ::= { ctsmtmibMacEntry 8 }
+
+     ctsmtmibMacPmfTxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Parameter Management Frames transmitted
+                  by the MAC."
+         ::= { ctsmtmibMacEntry 9 }
+
+     ctsmtmibMacPmfRxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Parameter Management Frames received by
+                  the MAC."
+         ::= { ctsmtmibMacEntry 10 }
+
+     ctsmtmibMacRdfTxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Request Denied Frames transmitted by the
+                  MAC."
+         ::= { ctsmtmibMacEntry 11 }
+
+     ctsmtmibMacRdfRxCts  OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of Request Denied Frames received by the MAC."
+         ::= { ctsmtmibMacEntry 12 }
+
+     ctsmtmibMacRingOpCts OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of the number of times the ring has entered
+                  'Ring Operational' state from the 'Ring Not Operational'
+                  state."
+         ::= { ctsmtmibMacEntry 13 }
+
+     ctsmtmibMacTxCts OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "A count that should as closely as possible match the
+                  number of frames transmitted by this MAC."
+         ::= { ctsmtmibMacEntry 14 }
+
+     ctsmtmibMacRingMapUpdateCts OBJECT-TYPE
+         SYNTAX  Counter
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The count of the number of times the ring map table has
+                  been updated."
+         ::= { ctsmtmibMacEntry 15 }
+
+     ctsmtmibMacAutoNegotiation  OBJECT-TYPE
+         SYNTAX  INTEGER {
+               true(1),
+               false(2)
+         } 
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+                 "Indicates whether the station has auto-negotiation
+                  enabled or disabled."
+         ::= { ctsmtmibMacEntry 16 }
+
+     ctsmtmibAttachmentNumber  OBJECT-TYPE
+         SYNTAX  INTEGER (0..65535)
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The total number of attachments (across all SMTs) on
+                  this network management application entity. The value
+                  for this variable must remain constant at least from
+                  one re-initialization of the entity's network
+                  management system to the next re-initialization."
+         ::= { ctsmtmib 3 }
+
+     ctsmtmibAttachmentTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtsmtmibAttachmentEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+                 "A list of Attachment entries. The number of entries is
+                  given by the value of fdmimAttachmentNumber."
+         ::= { ctsmtmib 4 }
+
+     ctsmtmibAttachmentEntry  OBJECT-TYPE
+         SYNTAX  CtsmtmibAttachmentEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+                 "An Attachment entry containing information common to a
+                  given set of Attachments.
+
+                  There is a natural association of Attachment resource
+                  indices to the PORT Indices. The resource index for
+                  the Attachment is equal to the associated port index
+                  for 'single-attachment' and 'concentrator' type
+                  fdmimAttachmentClasses. For 'dual-attachment' classes,
+                  the Attachment Index is the PORT Index of the A PORT
+                  of the A/B PORT pair that represents the Attachment."
+         INDEX   { ctsmtmibAttachmentSMTIndex, ctsmtmibAttachmentIndex }
+         ::= { ctsmtmibAttachmentTable 1 }
+
+     CtsmtmibAttachmentEntry ::= SEQUENCE {
+         ctsmtmibAttachmentSMTIndex              INTEGER,
+         ctsmtmibAttachmentIndex                 INTEGER,
+         ctsmtmibAttachmentClass                 INTEGER,
+         ctsmtmibAttachmentOpticalBypassPresent  INTEGER,
+         ctsmtmibAttachmentIMaxExpiration        INTEGER,
+         ctsmtmibAttachmentInsertedStatus        INTEGER,
+         ctsmtmibAttachmentInsertPolicy          INTEGER
+         }
+
+     ctsmtmibAttachmentSMTIndex  OBJECT-TYPE
+         SYNTAX  INTEGER (1..65535)
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The value of the SMT index associated with this
+                  Attachment."
+         ::= { ctsmtmibAttachmentEntry 1 }
+
+     ctsmtmibAttachmentIndex  OBJECT-TYPE
+         SYNTAX  INTEGER (1..65535)
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "A unique value for each Attachment on a given SMT. "
+         ::= { ctsmtmibAttachmentEntry 2 }
+
+     ctsmtmibAttachmentClass  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     single-attachment(1),
+                     dual-attachment(2),
+                     concentrator(3)
+                 }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The Attachment class. This represents a PORT or a pair
+                  of PORTs plus the associated optional optical bypass
+                  that are managed as a functional unit. The PORT
+                  associations are the following unit.
+                         single-attachment - S Ports
+                         dual-attachment   - A/B Port pairs
+                         concentrator      - M Ports
+                 "
+         ::= { ctsmtmibAttachmentEntry 3 }
+
+     ctsmtmibAttachmentOpticalBypassPresent  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     true(1),
+                     false(2)
+                 }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "The value of this is false for 'single-attachment' .
+                  Correct operation of CMT for single-attachments
+                  requires that a bypass function must not loopback the
+                  network side of the MIC, but only the node side."
+         ::= { ctsmtmibAttachmentEntry 4 }
+
+     ctsmtmibAttachmentIMaxExpiration  OBJECT-TYPE
+         SYNTAX  INTEGER (0..2147483647)
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "I_Max (refer to ANSI SMT 9.4.4.2.1). Systems not
+                  implementing optical bypass should return a value of
+                  0. Else the value should be returned in the granularity
+                  of 80ns."
+         ::= { ctsmtmibAttachmentEntry 5 }
+
+     ctsmtmibAttachmentInsertedStatus  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     true(1),
+                     false(2),
+                     unimplemented(3)
+                 }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "Indicates whether the attachment is currently inserted
+                  in the node."
+         ::= { ctsmtmibAttachmentEntry 6 }
+
+     ctsmtmibAttachmentInsertPolicy  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     true(1),
+                     false(2),
+                     unimplemented(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+                 "Indicates the Insert Policy for this Attachment."
+         ::= { ctsmtmibAttachmentEntry 7 }
+
+ctsmtmibSMTTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CtsmtmibSMTEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "Describes the dual homed status for SMT entries."
+        ::= { ctsmtmib 5 }
+
+ctsmtmibSMTEntry OBJECT-TYPE
+        SYNTAX CtsmtmibSMTEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A specific dual homed SMT entry."
+        INDEX { ctsmtmibSmtIndex }
+        ::= { ctsmtmibSMTTable 1 }
+
+CtsmtmibSMTEntry ::= SEQUENCE {
+        ctsmtmibSMTDualHomeStatus
+                INTEGER,
+        ctsmtmibSMTDualHomeWrpLEDStatus
+                INTEGER,
+        ctsmtmibSmtIndex
+                INTEGER
+}
+
+
+ctsmtmibSMTDualHomeStatus       OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notDualHomed(1),
+                linkAorB(2),
+                linkAandB(3)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Indicates the current dual homed link status for a given
+                SMT instance.
+                        notDualHomed(1) - This SMT is not dual homed.
+                        linkAorB(2) - Dual homed with link on A and no link
+                                      link on B, or link on B and no link
+                                      on A.
+                        linkAandB(3) - Dual homed with link on A and B."
+        ::= { ctsmtmibSMTEntry 1}
+
+
+ctsmtmibSMTDualHomeWrpLEDStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                on(1),
+                off(2)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "When on, the WRAP LED will be illuminated when
+                the node is in a dual homed configuration with link on the
+                A, B or both A and B ports. When off, the WRAP LED will not
+                be illuminated when the node is in a dual homed
+                configuration with link on A and B, but will be illuminated
+                when in a dual homed configuration with no link on A or B."
+        DEFVAL { on }
+        ::= { ctsmtmibSMTEntry 2}
+
+ctsmtmibSmtIndex        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the particular SMT entry."
+        ::= { ctsmtmibSMTEntry 3 }
+
+END

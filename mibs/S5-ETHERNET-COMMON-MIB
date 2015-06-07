@@ -1,0 +1,856 @@
+
+S5-ETHERNET-COMMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32
+            FROM SNMPv2-SMI
+	s5EnCfg, s5EnStat
+		FROM S5-ETHERNET-MIB
+	TimeIntervalSec, SrcIndx, AttId
+		FROM S5-TCS-MIB;
+ 
+s5EthernetCommonMib MODULE-IDENTITY
+       LAST-UPDATED    "200407200000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "5000 Ethernet Common MIB
+
+            Copyright 1993-2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Nortel Networks SNMP Management Information Base Specification
+            (Specification) embodies Nortel Networks' confidential and
+            proprietary intellectual property. Nortel Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Nortel Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+
+       REVISION "200407200000Z" -- 20 July 2004
+       DESCRIPTION "Version 118:  Conversion to SMIv2"
+
+       ::= { s5EnCfg 0 }
+
+
+-- SECTION 2: Configuration information
+
+-- Port Table
+
+s5EnPortTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5EnPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table containing information about each
+		managed ethernet connectivity port on a board.
+		The number of entries is determined by the
+		number of managed ports. Those boards
+		that do not have any ports do not have
+		any entries in this table."
+	::= { s5EnCfg 1 }
+
+s5EnPortEntry OBJECT-TYPE
+	SYNTAX	S5EnPortEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in Ethernet port table. Entries
+		can not be created or deleted via SNMP."
+	INDEX	{ s5EnPortBrdIndx,
+		  s5EnPortIndx }
+	::= { s5EnPortTable 1 }
+
+S5EnPortEntry ::= SEQUENCE {
+	s5EnPortBrdIndx INTEGER,
+	s5EnPortIndx INTEGER,
+	s5EnPortPartStatus INTEGER,
+	s5EnPortPartTime TimeIntervalSec,
+	s5EnPortLinkStatus INTEGER,
+	s5EnPortJabberStatus INTEGER
+	}
+
+s5EnPortBrdIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the board. This corresponds to
+		the index of the slot containing the board."
+	::= { s5EnPortEntry 1 }
+
+s5EnPortIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the port on the board. Its
+		value ranges between 1 and index of the last
+		manageable port on the board."
+	::= { s5EnPortEntry 2 }
+
+s5EnPortPartStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		enabled(2),
+		partition(3),
+		autoPartition(4),
+		timedPartition(5)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The partition status of the port.
+		The following values can be written:
+		  enabled(2)..........enabled port
+		  partition(3)........partition port
+		  timedPartition(5)...time partition port (uses value
+		                        from s5EnPortPartTime)
+
+		The following values reflect the partition
+		status of the port:
+		  other(1).............partition status unknown
+		  enabled(2)...........port enabled
+		  partition(3).........port partitioned
+		  autoPartition(4).....port auto-partitioned by
+		                         hardware
+		  timedPartition(5)....port is timed partitioned
+		                         (see value of
+		                         s5EnPortPartTime).
+		On GETs with port status of timedPartition(5), if
+		the time remaining before the partition is undone
+		is available, it will be reported in object
+		s5EnPortPartTime as a positive value. If not
+		available, the value of s5EnPortPartTime will
+		be zero. When changing a port to timedPartition(5),
+		the SET request must also contain the value
+		for object s5EnPortPartTime. Only value
+		partition(3) will survive resets of the host card."
+	::= { s5EnPortEntry 3 }
+
+s5EnPortPartTime OBJECT-TYPE
+	SYNTAX	TimeIntervalSec
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The length of time to keep the port
+		partitioned when a timed partition is
+		done to the port. This object can only
+		be written in the same request that sets
+		s5EnPortPartStatus to timedPartition(5).
+		Afterwards, it indicates the amount of
+		time left before the timed partition
+		is completed, at which time
+		s5EnPortPartStatus is changed to
+		enabled(2). This object has the value of
+		zero if the port is not time partitioned,
+		or if the amount of time is not available."
+	::= { s5EnPortEntry 4 }
+
+s5EnPortLinkStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		off(2),
+		on(3)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Tells whether the port is receiving
+		link status. The values are:
+		  other(1)...returned for AUI
+		  off(2).....link is not connected
+		  on(3)......link is connected
+		on/off applies to 10BASE-T and Fiber ports only."
+	::= { s5EnPortEntry 5 }
+
+s5EnPortJabberStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		jabbering(2),
+		ok(3)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The jabber status of the DTE(s) connected
+		to the port. The values are:
+		  other(1).......unknown or other condition
+		  jabbering(2)...port receiving jabber
+		  ok(3)..........no jabber detected."
+	::= { s5EnPortEntry 6 }
+
+
+-- The System 5000 Port Extension Table
+ 
+-- Implementation of the Port Extension Table is optional
+ 
+s5EnPortExtTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF S5EnPortExtEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "An extension table to s5EnPortTable containing 
+                additional information about per port
+                switchable, autonegotiating 10/100 Mbit
+                ethernet connectivity ports on a board.
+                The number of entries is determined by the
+                number of managed ports. Those boards
+                that do not have any ports do not have
+                any entries in this table."
+        ::= { s5EnCfg 3 }
+ 
+s5EnPortExtEntry OBJECT-TYPE
+        SYNTAX  S5EnPortExtEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A row in Ethernet port extension table. 
+                Entries can not be created or deleted 
+                via SNMP."
+        INDEX   { s5EnPortExtBrdIndx,
+                  s5EnPortExtIndx }
+        ::= { s5EnPortExtTable 1 }
+ 
+S5EnPortExtEntry ::= SEQUENCE {
+        s5EnPortExtBrdIndx INTEGER,
+        s5EnPortExtIndx INTEGER,
+        s5EnPortExtHwCapability OCTET STRING,
+        s5EnPortExtAutoNegAdv OCTET STRING,
+        s5EnPortExtAutoNegRcvd OCTET STRING,
+        s5EnPortExt10MbSegAttCfg AttId,
+        s5EnPortExt100MbSegAttCfg AttId,
+        s5EnPortExt10MbSegConnCapability OCTET STRING,
+        s5EnPortExt100MbSegConnCapability OCTET STRING,
+        s5EnPortExtActiveSpeed INTEGER,
+        s5EnPortExtCurDuplexMode INTEGER
+        }
+ 
+s5EnPortExtBrdIndx OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the board. This corresponds to
+                the index of the slot containing the board."
+        ::= { s5EnPortExtEntry 1 }
+ 
+s5EnPortExtIndx OBJECT-TYPE
+        SYNTAX  INTEGER (1..255)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the port on the board. Its
+                value ranges between 1 and index of the last
+                manageable port on the board."
+        ::= { s5EnPortExtEntry 2 }
+ 
+s5EnPortExtHwCapability OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(1))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A bit array that contains the bit map
+                representing the hardware capabilites
+                of the port.   The bit 7 tells if the port
+                supports auto-negotiation.  If the auto negotiation
+                is on,  the port will have multiple speed capabilities
+                while if the auto negotiation is not supported, the
+                hardware will only be capable for one speed:
+ 
+                 bit 0 - 10 BASE-T half duplex capable
+                 bit 1 - 10 BASE-T full duplex capable
+                 bit 2 - 100 BASE-TX half duplex capable
+                 bit 3 - 100 BASE-TX full duplex capable
+
+                 bit 5 - 100 BASE-FX full duplex capable
+                 bit 6 - 100 BASE-FX half duplex capable
+                 bit 7 - auto negotiation support capability
+
+                When auto negotiation is supported only bits 0-3
+                are used to indicate the capabilities available
+                for negotiation, and any or all of these bits may
+                be set as long as at least one bit is set.
+
+                When auto negotiation is NOT supported (bit 7 = 0)
+                all other bits are used to indicate the capabilities
+                supported by the port, but which must be manually
+                configured."
+        ::= { s5EnPortExtEntry 3 }
+ 
+s5EnPortExtAutoNegAdv OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(1))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "A bit array that contains the bit map
+                representing the abilities advertised
+                during link negociation.  The bit 7 tells
+                if auto negotiation is enabled or disabled:
+                 bit 0 - 10 BASE-T half duplex capable
+                 bit 1 - 10 BASE-T full duplex capable
+                 bit 2 - 100 BASE-TX half duplex capable
+                 bit 3 - 100 BASE-TX full duplex capable
+
+                 bit 5 - 100 BASE-FX full duplex capable
+                 bit 6 - 100 BASE-FX half duplex capable
+                 bit 7 - auto negotiation is enabled or disabled
+                Only capabilites present in the hardware as
+                indicated by s5EnPortExtHwCapability can be
+                advertised.
+
+                If auto negotiation is enabled only bits 0-3
+                are used to indicate the capabilities available
+                for negotiation. Any or all of these bits may be
+                set as long as at least one bit is set, AND the
+                settings are in accordance with s5EnPortExtHwCapability.
+
+                If auto negotiation is disabled one and only
+                one of the speed setting bits MUST be set in
+                accordance with s5EnPortExtHwCapability."
+        ::= { s5EnPortExtEntry 4 }
+ 
+s5EnPortExtAutoNegRcvd OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(1))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A bit array that contains the bit map
+                representing the auto-negotiation
+                abilities of the remote end of the link:
+                 bit 0 - 10 BASE-T half duplex capable
+                 bit 1 - 10 BASE-T full duplex capable
+                 bit 2 - 100 BASE-TX half duplex capable
+                 bit 3 - 100 BASE-TX full duplex capable
+                "
+        ::= { s5EnPortExtEntry 5 }
+ 
+s5EnPortExt10MbSegAttCfg OBJECT-TYPE
+        SYNTAX  AttId
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "The index for the segment used in case 
+                a 10 Mbit link is established."
+        ::= { s5EnPortExtEntry 6 }
+ 
+s5EnPortExt100MbSegAttCfg OBJECT-TYPE
+        SYNTAX  AttId
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "The index for the segment used in case 
+                a 100 Mbit link is established."
+        ::= { s5EnPortExtEntry 7 }
+ 
+s5EnPortExt10MbSegConnCapability OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(8))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A bit array that contains the bit map
+                representing all available 10Mbit backplane
+                segment and local segment connections for
+                the port.  One bit is also reserved to
+                indicate if the cluster has an isolate
+                capability.
+ 
+                The first 31 bits of the array represent
+                the backplane numbers, starting from the
+                lower order bit. Bit 32 indicates whether
+                the port has a null connection capability.
+                The bits in the fifth and sixth octets,
+                starting with bits in the lower order octet,
+                represent local segments that the port
+                can connect to.
+ 
+                A bit with a value of 1 means that the
+                port is capable of  connecting to the
+                corresponding backplane segment, local segment
+                or null segment."
+        ::= { s5EnPortExtEntry 8 }
+ 
+ s5EnPortExt100MbSegConnCapability OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(8))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A bit array that contains the bit map
+                representing all available 100Mbit backplane
+                segment and local segment connections for
+                the port.  One bit is also reserved to
+                indicate if the cluster has an isolate
+                capability.
+ 
+                The first 31 bits of the array represent
+                the backplane numbers, starting from the
+                lower order bit. Bit 32 indicates whether
+                the port has a null connection capability.
+                The bits in the fifth and sixth octets,
+                starting with bits in the lower order octet,
+                represent local segments that the port
+                can connect to.
+ 
+                A bit with a value of 1 means that the
+                port is capable of  connecting to the
+                corresponding backplane segment, local segment
+                or null segment."
+        ::= { s5EnPortExtEntry 9 }
+ 
+s5EnPortExtActiveSpeed OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(1),
+                bps10M(2),
+                bps100M(3)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The speed of the link. The possible
+                values are:
+                  unknown(1)........unknown, no link
+                  bps10M(2).........10 Mbit link
+                  bps100M(3)........100 Mbit link"
+        ::= { s5EnPortExtEntry 10 }
+ 
+s5EnPortExtCurDuplexMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(1),
+                halfDuplex(2),
+                fullDuplex(3)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The status of duplex mode. The possible
+                values are:
+                  unknown(1)........unknown, no link
+                  halfDuplex(2).........half duplex mode
+                  fullDuplex(3)........full duplex mode"
+        ::= { s5EnPortExtEntry 11 }
+ 
+
+
+-- SECTION 3: Statistics
+
+-- Basic Statistics Table
+
+s5EnBStatTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5EnBStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table containing Ethernet basic
+		statistics. The entries in the table
+		may come from several different data
+		sources. The number of entries is
+		determined by the number of sources
+		that can provide the information."
+	::= { s5EnStat 1 }
+
+s5EnBStatEntry OBJECT-TYPE
+	SYNTAX	S5EnBStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in Ethernet basic statistics table.
+		Entries can not be created or deleted via
+		SNMP."
+	INDEX	{ s5EnBStatSrcIndx }
+	::= { s5EnBStatTable 1 }
+
+S5EnBStatEntry ::= SEQUENCE {
+	s5EnBStatSrcIndx SrcIndx,
+
+	s5EnBStatGoodOctets Counter32,
+	s5EnBStatGoodFrms Counter32,
+	s5EnBStatBcastFrms Counter32,
+	s5EnBStatMcastFrms Counter32,
+
+	s5EnBStatAlignErrors Counter32,
+	s5EnBStatFcsErrors Counter32,
+	s5EnBStatRunts Counter32,
+	s5EnBStatTooLongFrms Counter32,
+	s5EnBStatFragments Counter32,
+	s5EnBStatVeryLongEvents Counter32,
+	s5EnBStatColls Counter32,
+
+	s5EnBStatLateColls Counter32,
+	s5EnBStatShortEvents Counter32,
+	s5EnBStatRateMismatches Counter32,
+	s5EnBStatBackOffFailures Counter32,
+	s5EnBStatAutoPartitions Counter32,
+	s5EnBStatShortIPGs Counter32,
+	s5EnBStatNullFrames Counter32
+	}
+
+s5EnBStatSrcIndx OBJECT-TYPE
+	SYNTAX	SrcIndx
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the entry in the table.
+		This index identifies the source of the
+		information. Only those sources that provide
+		these statistics are in this table."
+	::= { s5EnBStatEntry 1 }
+
+s5EnBStatGoodOctets OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of octets contained in frames received
+		which had no errors.
+
+		This counter includes octets in unicast, broadcast,
+		and multicast frames. This counter includes octets
+		after the start frame delimiter up to FCS but not
+		including FCS octets."
+	::= { s5EnBStatEntry 2 }
+
+s5EnBStatGoodFrms OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of frames that are detected without
+		errors. This does not include frames received
+		with a frame-too-long, runt, FCS, or alignment errors.
+		This counter includes unicast, broadcast, and multicast
+		frames."
+	::= { s5EnBStatEntry 3 }
+
+s5EnBStatBcastFrms OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of frames that are detected without
+		errors and are directed to the broadcast group
+		address. This does not include frames received
+		with a frame-too-long, runt, FCS, or alignment
+		errors. Multicast frames are not included."
+	::= { s5EnBStatEntry 4 }
+
+s5EnBStatMcastFrms OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of frames that are detected
+		without errors and are directed to a
+		non-broadcast group address. This does not
+		include frames received with a frame-too-long,
+		runt, FCS, or alignment errors."
+	::= { s5EnBStatEntry 5 }
+
+s5EnBStatAlignErrors OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of frames detected
+		that are not an integral number of octets
+		in length and do not pass the FCS check.
+		This counter is incremented when the
+		frame is received with FramingError and
+		FcsError and whose OctetCount is greater
+		than of equal to minFramSize and less than
+		or equal to maxFramSize."
+	::= { s5EnBStatEntry 6 }
+
+s5EnBStatFcsErrors OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of frames detected that are an
+		integral number of octets in length that
+		do not pass the FCS check. This counter is
+		incremented when the frame is received with
+		FcsError and NoFramingError and NoCollisions
+		and whose OctetCount is greater than or equal
+		to minFramsize and less than or equal to
+		maxFrameSize."
+	::= { s5EnBStatEntry 7 }
+
+s5EnBStatRunts OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of frames detected that are less than
+		the minimum permitted frame size and have a
+		good FCS."
+	::= { s5EnBStatEntry 8 }
+
+s5EnBStatTooLongFrms OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of frames detected that exceed the
+		maximum permitted frame size. This counter is
+		incremented when a frame received on this port whose
+		OctetCount is greater than maxFramSize."
+	::= { s5EnBStatEntry 9 }
+
+s5EnBStatFragments OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of fragments detected between 80-512 bits
+		(64 bytes), inclusively, with invalid FCS. (These
+		commonly represent collision fragments, and are
+		not errors)."
+	::= { s5EnBStatEntry 10 }
+
+s5EnBStatVeryLongEvents OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of the times that MAU
+		jabber lockup protection (MJLP) was detected
+		due to transmission of data that exceeded
+		5 msec in duration(OctetCount greater than
+		maxFramSize). This information can be useful
+		in identifying faulty stations."
+	::= { s5EnBStatEntry 11 }
+
+s5EnBStatColls OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of receive collisions detected."
+	::= { s5EnBStatEntry 12 }
+
+s5EnBStatLateColls OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of late receive collisions detected.
+		This counter is incremented for each event
+		in which there is a receive Collision and
+		ActivityDuration is greater than the
+		LateEventThreshold."
+	::= { s5EnBStatEntry 13 }
+
+s5EnBStatShortEvents OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of fragments detected with
+		ActivityDuration less than ShortEventMaxTime.
+		ShortEventMaxTime is greater than 74 bit times and
+		less than 82 bit times."
+	::= { s5EnBStatEntry 14 }
+
+s5EnBStatRateMismatches OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of the occurrences of
+		out of spec bit rates. This indicates the
+		number of times the FIFO buffer over-runs or
+		under-runs due to transmission rate errors."
+	::= { s5EnBStatEntry 15 }
+
+s5EnBStatBackOffFailures OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"This counter is incremented by one for each
+		frame received on this port with collision and
+		port activity time greater than 552 to 560 bit time."
+	::= { s5EnBStatEntry 16 }
+
+s5EnBStatAutoPartitions OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of the number of times that this port
+		was automatically partitioned. The condition
+		occurs when 32 consecutive collisions are
+		detected on the port."
+	::= { s5EnBStatEntry 17 }
+
+s5EnBStatShortIPGs OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of occurrences of a too short IPG
+		(inter packet gap before a good packet) that were
+		detected."
+	::= { s5EnBStatEntry 18 }
+
+s5EnBStatNullFrames OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of the occurrences of
+		frames received with no collision and whose
+		octetCount is equal to 0 and activity time is
+		greater than ValidPacketMinTime."
+	::= { s5EnBStatEntry 19 }
+
+
+
+-- Port Extension Statistics Table
+
+s5EnPStatTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5EnPStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table containing Ethernet port
+		extension statistics. This table extends
+		table s5EnBStatTable for ports. The entries
+		in the table may come only from port
+		sources. The number of entries is determined
+		by the number of sources that can provide the
+		information."
+	::= { s5EnStat 2 }
+
+s5EnPStatEntry OBJECT-TYPE
+	SYNTAX	S5EnPStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in Ethernet port extension statistic table.
+		Entries can not be created or deleted via
+		SNMP."
+	INDEX	{ s5EnPStatSrcIndx }
+	::= { s5EnPStatTable 1 }
+
+S5EnPStatEntry ::= SEQUENCE {
+	s5EnPStatSrcIndx SrcIndx,
+
+	s5EnPStatSourceAddrChngs Counter32,
+	s5EnPStatLinkStatusChngs Counter32,
+	s5EnPStatLastSourceAddr OCTET STRING
+	}
+
+s5EnPStatSrcIndx OBJECT-TYPE
+	SYNTAX	SrcIndx
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the entry in the table.
+		This index identifies the source of the
+		information. Only those sources that provide
+		these statistics are in this table."
+	::= { s5EnPStatEntry 1 }
+
+s5EnPStatSourceAddrChngs OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of changes in Last Source Address."
+	::= { s5EnPStatEntry 2 }
+
+s5EnPStatLinkStatusChngs OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Contains a count of number of changes in
+		link status from on(3) to off(2)."
+	::= { s5EnPStatEntry 3 }
+
+s5EnPStatLastSourceAddr	OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE (0..6))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The Source Address of the last readable frame
+		received by this port.  If no frames have been
+		received by this port since the agent began
+		monitoring this port, the agent shall return
+		a string of length zero."
+	::= { s5EnPStatEntry 4 }
+
+-- Segment Extension Statistics Table
+
+s5EnSStatTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5EnSStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table containing Ethernet Segment
+		extension statistics. This table extends
+		table s5EnBStatTable for segments. The
+		entries in the table may come from several
+		different data sources. The number
+		of entries is determined by the number
+		of sources that can provide the information."
+	::= { s5EnStat 3 }
+
+s5EnSStatEntry OBJECT-TYPE
+	SYNTAX	S5EnSStatEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in Ethernet segment statistics table.
+		Entries can not be created or deleted via
+		SNMP."
+	INDEX	{ s5EnSStatSrcIndx }
+	::= { s5EnSStatTable 1 }
+
+S5EnSStatEntry ::= SEQUENCE {
+	s5EnSStatSrcIndx SrcIndx,
+	s5EnSStatSegColls Counter32,
+	s5EnSStatSegRate INTEGER
+	}
+
+s5EnSStatSrcIndx OBJECT-TYPE
+	SYNTAX	SrcIndx
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the entry in the table.
+		This index identifies the source of the
+		information. Only those sources that provide
+		these statistics are in this table."
+	::= { s5EnSStatEntry 1 }
+
+s5EnSStatSegColls OBJECT-TYPE
+	SYNTAX	Counter32
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"A count of number of transmit collision 
+		events(one per packet activity) for a
+		segment (i.e., local channel or backplane
+		network)."
+	::= { s5EnSStatEntry 2 }
+
+s5EnSStatSegRate OBJECT-TYPE
+   SYNTAX   INTEGER {
+      unknown (1),
+      bps10m (2),
+      bps100m (3)
+      }
+   MAX-ACCESS   read-only
+   STATUS   current
+   DESCRIPTION
+      "The segment speed type of this ethernet segment.
+      The following values are currently defined:
+      unknown (1) ------- unknown type
+      bps10m (2) ------- 10Mbps ethernet
+      bps100m (3) ------ 100Mbps ethernet"
+   ::= { s5EnSStatEntry 3 }
+
+END

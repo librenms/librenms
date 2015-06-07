@@ -1,0 +1,228 @@
+CISCOSB-rlLcli-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB LCLI MIB
+-- Version:    7.36
+-- Date:       26 Mar 2004
+--
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    TruthValue, DisplayString, RowStatus        FROM SNMPv2-TC
+    Unsigned32, TimeTicks,
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI;
+
+    rlLCli  MODULE-IDENTITY
+        LAST-UPDATED "200503280000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for CISCOSB CLI MIB."
+        REVISION "200707260000Z"
+        DESCRIPTION
+                 "Removed ranges of rlLCliTimeout, rlLCliSshTimeout, rlLCliTelnetTimeout since the range is dynamic
+                  according to device capabilities. "
+        REVISION "200504110000Z"
+        DESCRIPTION
+                 "Changed lower range of rlLCliTimeout, rlLCliSshTimeout, rlLCliTelnetTimeout to 0
+                  to support 0 as 'no timeout' "
+        REVISION "200503280000Z"
+        DESCRIPTION
+                 "1) Added Module-identity range.
+                  2) Changed description of rlLCliMibVersion
+                  3) Added ranges to rlLCliTimeout, rlLCliSshTimeout, rlLCliTelnetTimeout "
+        REVISION "200403260000Z"
+        DESCRIPTION
+             "Initial version of this MIB."
+        ::= { switch001 74 }
+
+
+rlLCliMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 3."
+    ::= { rlLCli 1 }
+
+rlLCliTimeout OBJECT-TYPE
+   SYNTAX Unsigned32 (0..3932159)
+-- (0..65535*60+59)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "LCLI Timeout indicates the interval in seconds, that
+        the system waits until user input is detected."
+   DEFVAL {600}
+   ::= { rlLCli 2 }
+
+rlLCliHistoryEnable OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "Indicates if command history function is supported."
+   DEFVAL {true}
+   ::= { rlLCli 3 }
+
+rlLCliHistorySize OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "Indicates number of commands that the system will record
+        in its history buffer."
+   DEFVAL {10}
+   ::= { rlLCli 4 }
+
+rlLcliCommandLevelTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlLcliCommandLevelEntry
+   MAX-ACCESS  not-accessible
+   STATUS  current
+   DESCRIPTION
+       "This Table maps a CLI command to its level. "
+    ::= { rlLCli 5 }
+
+rlLcliCommandLevelEntry OBJECT-TYPE
+    SYNTAX  RlLcliCommandLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX {rlLcliCommandLevelCommandName,
+          rlLcliCommandLevelContextName }
+    ::= { rlLcliCommandLevelTable 1 }
+
+RlLcliCommandLevelEntry ::= SEQUENCE {
+    rlLcliCommandLevelCommandName     DisplayString,
+    rlLcliCommandLevelContextName     DisplayString,
+    rlLcliCommandLevelInsertTime      TimeTicks,
+    rlLcliCommandLevelCommandLevel    INTEGER,
+    rlLcliCommandLevelActionMode      INTEGER,
+    rlLcliCommandLevelStatus          RowStatus
+}
+
+rlLcliCommandLevelCommandName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " The CLI command name "
+    ::=  { rlLcliCommandLevelEntry 1 }
+
+rlLcliCommandLevelContextName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " The CLI context ID which the command name is associated with "
+    ::=  { rlLcliCommandLevelEntry 2 }
+
+rlLcliCommandLevelInsertTime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The time elapsed until this entry was created."
+    ::= { rlLcliCommandLevelEntry 3 }
+
+rlLcliCommandLevelCommandLevel OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " The level which is associated with the command name "
+    ::=  { rlLcliCommandLevelEntry 4 }
+
+rlLcliCommandLevelActionMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        set (1),
+        reset (2),
+        setAll (3),
+        resetAll (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " The level action which is associated with the command name "
+    DEFVAL    { set }
+    ::=  { rlLcliCommandLevelEntry 5 }
+
+rlLcliCommandLevelStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " The status of the commandLevel table entry. "
+    ::= { rlLcliCommandLevelEntry 6 }
+
+rlLCliSshTimeout OBJECT-TYPE
+   SYNTAX Unsigned32 (0..3932159)
+-- (0..65535*60+59)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "LCLI Timeout indicates the interval in seconds, that
+        the system waits until user input is detected on SSH LCLI."
+   DEFVAL {600}
+   ::= { rlLCli 6 }
+
+rlLCliTelnetTimeout OBJECT-TYPE
+   SYNTAX Unsigned32 (0..3932159)
+-- (0..65535*60+59)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+       "LCLI Timeout indicates the interval in seconds, that
+        the system waits until user input is detected on telnet LCLI."
+   DEFVAL {600}
+   ::= { rlLCli 7 }
+
+rlLCliTelnetHistoryEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if command history function is supported for Telnet."
+    DEFVAL {true}
+    ::= { rlLCli 8 }
+
+rlLCliTelnetHistorySize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates number of commands that the system will record
+         in its history buffer for Telnet."
+    DEFVAL {10}
+    ::= { rlLCli 9 }
+
+rlLCliSshHistoryEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if command history function is supported for Ssh."
+    DEFVAL {true}
+    ::= { rlLCli 10 }
+
+rlLCliSshHistorySize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates number of commands that the system will record
+         in its history buffer for Ssh."
+    DEFVAL {10}
+    ::= { rlLCli 11 }
+
+END
+
+

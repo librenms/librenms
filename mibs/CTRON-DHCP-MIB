@@ -1,0 +1,569 @@
+CTRON-DHCP-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-dhcp-mib.txt  Cabletron Dynamic Host Configuration Protocol 
+        --  Server MIB.
+        --  Revision: 01.00.00
+        --  Part Number: 
+        --  Date:  July 28, 1997
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03866-5005
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+        --
+        --  Copyright August 1997 Cabletron Systems
+
+    --  Abstract
+    --
+    --  This memo defines management objects which are required to support
+    --  Cabletron's implementation of the Dynamic Host Configuration Protocol.
+    --  This MIB supports in part RFC1541 and RFC1533.  Specifically, it enables
+    --  a device to be configured as a DHCP server, and allows a limited number
+    --  of DHCP Options.
+ 
+    --  Structure of MIB
+    --
+    --  Objects, in this MIB, are arranged into groups.  Each group is organized
+    --  as a set of related objects and is described below.
+ 
+    --  The ctDhcpServerStats Group
+    --
+    --  This group enables DHCP globally, and displays statistics relating
+    --  to the overall DHCP entity.  It also allows abandoned addresses to
+    --  be recovered.
+
+    --  The ctDhcpInterfaceConfig Group
+    --
+    --  This group contains information describing the assignment
+    --  of interfaces on this device to perform DHCP server functions. 
+    --  It allows customization of the server on an interface basis.
+
+    --  The ctDhcpClientStatusTable Group
+    --
+    --  This group contains information describing some identifying
+    --  characteristics which are collected for ACTIVE leases.  The data 
+    --  are deleted when the lease expires.
+
+
+IMPORTS
+      OBJECT-TYPE
+        FROM RFC-1212
+      DisplayString, PhysAddress
+        FROM RFC1213-MIB
+      nwRtrProtoSuites 
+        FROM ROUTER-OIDS
+      nwIpRouter, nwIpMibs, nwIpComponents, nwIpClientServices
+        FROM CTRON-IP-ROUTER-MIB
+      IpAddress, Counter
+        FROM RFC1155-SMI;
+
+
+
+    ctDhcp                 OBJECT IDENTIFIER ::= { nwIpClientServices 2 }
+
+    --========       group definitions           =============
+ 
+    ctDhcpServerStats          OBJECT IDENTIFIER ::= { ctDhcp 1 }
+
+    ctDhcpInterfaceConfig      OBJECT IDENTIFIER ::= { ctDhcp 2 }
+
+    ctDhcpClientStatusTable    OBJECT IDENTIFIER ::= { ctDhcp 3 }
+
+--====================================================================
+
+    --
+ --========        ctDhcpServerStats group       =============--
+    --
+
+--      This table enables DHCP globally, and displays statistics relating
+--      to the overall DHCP entity.
+
+        ctDhcpAdminStatus       OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to enable or disable the DHCP
+                        server function for the entire device.  This object 
+                        must be set to enabled for the server to function on 
+                        this device."
+                ::= { ctDhcpServerStats 1}
+
+        ctDhcpOperStatus        OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Indicates the current operating status of the DHCP
+                        server function on this device.  The value of 
+                        ctDhcpIfOperStatus for at least one interface must be 
+                        set to enabled for this object to be enabled."
+                ::= { ctDhcpServerStats 2}
+
+        ctDhcpDiscovers OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of discover messages 
+                        received by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 3}
+
+        ctDhcpOffers    OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of offer messages 
+                        sent by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 4}
+
+        ctDhcpRequests  OBJECT-TYPE
+                SYNTAX  Counter 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of request messages 
+                        received by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 5}
+
+        ctDhcpDeclines  OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of decline messages 
+                        received by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 6}
+
+        ctDhcpReleases  OBJECT-TYPE
+                SYNTAX  Counter 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of release messages 
+                        received by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 7}
+
+        ctDhcpAcks      OBJECT-TYPE
+                SYNTAX  Counter 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of ack messages 
+                        sent by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 8}
+
+        ctDhcpNaks      OBJECT-TYPE
+                SYNTAX  Counter 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of nak messages 
+                        sent by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 9}
+
+        ctDhcpOtherServers       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of messages 
+                        received by the DHCP server since the last reset
+                        which were directed to other servers."
+                ::= { ctDhcpServerStats 10}
+
+        ctDhcpProtocolErrors       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of protocol errors detected 
+                        by the DHCP server since the last reset."
+                ::= { ctDhcpServerStats 11}
+
+        ctDhcpServerTime       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of seconds that this DHCP 
+                        server has been in operation since its non-volatile 
+                        memory was last cleared."
+                ::= { ctDhcpServerStats 12}
+
+        ctDhcpNoOfActiveClients       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the number of clients who currently
+                        have network addresses assigned by this DHCP server."
+                ::= { ctDhcpServerStats 13}
+
+        ctDhcpReclaimIP OBJECT-TYPE
+                SYNTAX  IpAddress
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is a method of reclaiming abandoned IP
+                        addresses.  The value reads as 0.0.0.0.  Writing to
+                        it with an IP address of a client on the active list
+                        will remove the entry from the list.  It is used to 
+                        recover addresses with long leases from clients who
+                        have left the network without sending a release notice."
+                ::= { ctDhcpServerStats 14 }
+
+    --
+ --========        ctDhcpInterfaceConfig group       =============--
+    --
+
+--      This table structure contains information describing the assignment
+--      of interfaces on this device to perform DHCP server functions.
+
+        ctDhcpServerIfTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtDhcpServerIfEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "This table contains an entry for each port of a
+                        DHCP server which is eligible to perform DHCP functions. 
+                        The table is indexed by ctDhcpIfIndex, which indicates
+                        the value of the MIB 2 ifindex which identifies the
+                        device's interface for which the entry exists."
+                ::= { ctDhcpInterfaceConfig 1 }
+        
+        ctDhcpServerIfEntry OBJECT-TYPE
+                SYNTAX      CtDhcpServerIfEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of the configuration parameters for a
+                         single interface on the DHCP server."
+                INDEX       { ctDhcpIfIndex }
+                ::= { ctDhcpServerIfTable 1 }
+        
+        CtDhcpServerIfEntry ::=
+                SEQUENCE {
+                        ctDhcpIfIndex
+                        INTEGER,
+                        ctDhcpIfAdminStatus
+                        INTEGER,
+                        ctDhcpIfOperStatus
+                        INTEGER,
+                        ctDhcpIfServerAddress
+                        IpAddress,
+                        ctDhcpIfNetworkAddress
+                        IpAddress,
+                        ctDhcpIfSubnetMask
+                        IpAddress,
+                        ctDhcpIfLowestaddress
+                        IpAddress,
+                        ctDhcpIfHighestAddress
+                        IpAddress,
+                        ctDhcpIfAddressesUsed
+                        INTEGER,
+                        ctDhcpIfAddressesFree
+                        INTEGER,
+                        ctDhcpIfLeasePeriod
+                        INTEGER,
+                        ctDhcpIfDefaultGateway
+                        IpAddress,
+                        ctDhcpIfDomainNameServer
+                        IpAddress,
+                        ctDhcpIfDomainName
+                        OCTET STRING,
+                        ctDhcpIfWINServer
+                        IpAddress
+                        }
+        
+        ctDhcpIfIndex    OBJECT-TYPE
+                SYNTAX      INTEGER 
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        entries which belong to the DHCP server interface list.  
+                        This value ranges from 1 to 2."
+                ::= { ctDhcpServerIfEntry 1 }
+        
+        ctDhcpIfAdminStatus   OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "Used to enable and disable the DHCP functions on this
+                        interface only.  This object must be set to enabled for 
+                        the DHCP functions to occur on this interface."
+                ::= { ctDhcpServerIfEntry 2 }
+
+        ctDhcpIfOperStatus   OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2),
+                        invalid-config(3)
+                        }
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Indicates the current operating status of the DHCP
+                        server function on this interface."
+                ::= { ctDhcpServerIfEntry 3 }
+
+        ctDhcpIfServerAddress   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "This is the IP address of the interface which
+                        is providing access to the DHCP server for clients
+                        which are connected to this network."
+                ::= { ctDhcpServerIfEntry 4 }
+
+        ctDhcpIfNetworkAddress   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This is the IP subnet which is being served by
+                        this interface of the DHCP server."
+                ::= { ctDhcpServerIfEntry 5 }
+
+        ctDhcpIfSubnetMask   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This is the subnet mask of the IP subnet which is 
+                        being served by this interface of the DHCP server."
+                ::= { ctDhcpServerIfEntry 6 }
+
+        ctDhcpIfLowestaddress   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This is the lowest numerical value of the IP address
+                        range that will be assigned to clients by this interface
+                        of the DHCP server.  Its value must be greater or equal 
+                        to ctDhcpIfNetworkAddress and less than or equal to 
+                        ctDhcpIfHighestAddress."
+                ::= { ctDhcpServerIfEntry 7 }
+
+        ctDhcpIfHighestAddress   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This is the highest numerical value of the IP address
+                        range that will be assigned to clients by this interface
+                        of the DHCP server.  Its value must be greater or equal
+                        to ctDhcpIfLowestaddress but remain within 
+                        ctDhcpIfNetworkAddress."
+                ::= { ctDhcpServerIfEntry 8 }
+
+        ctDhcpIfAddressesUsed   OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "This value is the number of clients which are currently 
+                        using IP addresses assigned by this interface of the
+                        DHCP server."
+                ::= { ctDhcpServerIfEntry 9 }
+
+        ctDhcpIfAddressesFree   OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "This value is the number of IP addresses that are 
+                        currently available for distribution by this interface 
+                        of the DHCP server."
+                ::= { ctDhcpServerIfEntry 10 }
+
+        ctDhcpIfLeasePeriod   OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This value is the time period for which an IP address
+                        assigned by this interface is valid.  The units are 
+                        seconds.  A value of 0 signifys that the lease will 
+                        never expire."
+                ::= { ctDhcpServerIfEntry 11 }
+
+        ctDhcpIfDefaultGateway   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This value is an DHCP option that can be passed to a 
+                        client by this interface if it is requested as part 
+                        of the DHCP process.  This value is the IP address of 
+                        the default gateway to be used by the client."
+                ::= { ctDhcpServerIfEntry 12 }
+
+        ctDhcpIfDomainNameServer   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This value is an DHCP option that can be passed to a 
+                        client by this interface if it is requested as part 
+                        of the DHCP process.  This value is the IP address of 
+                        the domain name server to be used by the client."
+                ::= { ctDhcpServerIfEntry 13 }
+
+        ctDhcpIfDomainName   OBJECT-TYPE
+                SYNTAX      OCTET STRING
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This value is an DHCP option that can be passed to a 
+                        client by this interface if it is requested as part 
+                        of the DHCP process.  This value is the domain name 
+                        to be used by the client."
+                ::= { ctDhcpServerIfEntry 14 }
+
+        ctDhcpIfWINServer   OBJECT-TYPE
+                SYNTAX      IpAddress
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "This value is an DHCP option that can be passed to a 
+                        client by this interface if it is requested as part 
+                        of the DHCP process.  This value is the IP address of 
+                        the NetBIOS overTCP/IP name server to be used by the 
+                        client."
+                ::= { ctDhcpServerIfEntry 15 }
+          
+
+    --
+ --========        ctDhcpClientStatusTable group       =============--
+    --
+
+--      The table structure contains information describing some statistics
+--      which are collected for ACTIVE leases.  The data are deleted
+--      when the lease expires.
+
+        ctDhcpClientStatsTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtDhcpClientStatsEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "This table contains an entry for each DHCP client. The
+                        table is indexed by ctDhcpClientStatsID, which indicates
+                        an arbitrary order of entries."
+                ::= { ctDhcpClientStatusTable 1 }
+        
+        ctDhcpClientStatsEntry OBJECT-TYPE
+                SYNTAX      CtDhcpClientStatsEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single client, which could be on any
+                        of the subnets being served by participating interfaces."
+                INDEX       { ctDhcpClientStatsID }
+                ::= { ctDhcpClientStatsTable 1 }
+        
+        CtDhcpClientStatsEntry ::=
+                SEQUENCE {
+                        ctDhcpClientStatsID
+                        INTEGER,
+                        ctDhcpClientName
+                        OCTET STRING,
+                        ctDhcpClientIP
+                        IpAddress,
+                        ctDhcpClientID
+                        OCTET STRING,
+                        ctDhcpEndOfLease
+                        INTEGER
+                        }
+        
+        ctDhcpClientStatsID    OBJECT-TYPE
+                SYNTAX      INTEGER 
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        active clients which have been given network addresses 
+                        by this DHCP server."
+                ::= { ctDhcpClientStatsEntry 1 }
+        
+        ctDhcpClientName OBJECT-TYPE
+                SYNTAX  OCTET STRING 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the name of the client as listed by the client
+                        in a DHCP request packet."
+                ::= { ctDhcpClientStatsEntry 2}
+
+        ctDhcpClientIP  OBJECT-TYPE
+                SYNTAX  IpAddress 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the assigned IP address of the client during
+                        this active connection."
+                ::= { ctDhcpClientStatsEntry 3}
+
+        ctDhcpClientID OBJECT-TYPE
+                SYNTAX  OCTET STRING
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the ID of the client as listed by the client
+                        in a DHCP request packet.  It is normally the client's
+                        Ethernet MAC address."
+                ::= { ctDhcpClientStatsEntry 4}
+
+
+        ctDhcpEndOfLease       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value is the time at which the lease of the IP
+                        address will expire.  The units are seconds and the
+                        value is relative to the same starting point as 
+                        ctDhcpIfServerTime."
+                ::= { ctDhcpClientStatsEntry 5}
+
+END

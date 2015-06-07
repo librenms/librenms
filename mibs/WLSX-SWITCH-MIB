@@ -1,0 +1,2270 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+   WLSX-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxSwitchMIB MODULE-IDENTITY 
+       LAST-UPDATED "0602222204Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            System level information about the Aruba switches."
+       REVISION        "0602222204Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 1 }
+
+   wlsxSystemXGroup         	OBJECT IDENTIFIER ::= { wlsxSwitchMIB 1 }
+   wlsxUserInfoGroup         	OBJECT IDENTIFIER ::= { wlsxSwitchMIB 2 }
+   wlsxAccessPointInfoGroup     OBJECT IDENTIFIER ::= { wlsxSwitchMIB 3 }
+   wlsxSwitchTraps         	OBJECT IDENTIFIER ::= { wlsxSwitchMIB 100 }
+
+   -- wlsxSystemXGroup contains objects to describe a switch.
+
+   wlsxHostname OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..32))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Name of the switch."
+        ::= { wlsxSystemXGroup 1 }
+
+   wlsxModelName OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..32))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Model Name of the switch."
+        ::= { wlsxSystemXGroup 2 }
+
+   wlsxSwitchIp OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Switch IP as configured by the user. This IP address uniquely 
+			identifies the switch."
+        ::= { wlsxSystemXGroup 3 }
+
+   wlsxSwitchRole OBJECT-TYPE
+        SYNTAX      INTEGER {
+						master(1),
+						local(2),
+						standbymaster(3)
+						}
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"Role of this switch in the Switch Domain."
+        ::= { wlsxSystemXGroup 4 }
+
+   wlsxSwitchMasterIp OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 Master IP of the switch
+			"
+        ::= { wlsxSystemXGroup 5 }
+
+
+-- Switch List Table contains all the switches in the domain. This table is 
+-- valid only when queried from the master switch.
+
+   wlsxSwitchListTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchListEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"This Table will list all the switches in the Switch Domain.
+		 It will be populated only on the master switch. Local switches
+		 return empty table.
+		"
+	
+      ::= { wlsxSystemXGroup 6 } 
+
+     wlsxSwitchListEntry OBJECT-TYPE 
+	  SYNTAX       MxSwitchListEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Switch List Entry"
+	  INDEX { switchListSwitchIPAddress}
+      ::= { wlsxSwitchListTable 1 } 
+
+     MxSwitchListEntry ::=
+     SEQUENCE {
+         switchListSwitchIPAddress	IpAddress,
+         switchListSwitchRole 		INTEGER
+     }
+
+     switchListSwitchIPAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			IP Address of the switch.
+            "
+        ::= { wlsxSwitchListEntry 1 }
+
+     switchListSwitchRole OBJECT-TYPE
+        SYNTAX      INTEGER {
+						master(1),
+						local(2),
+						standbymaster(3)
+					}
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Role of the Switch.
+            "
+        ::= { wlsxSwitchListEntry 2 }
+
+
+   wlsxSwitchLicenseCount OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 The number of licenses installed on the switch
+			"
+        ::= { wlsxSystemXGroup 7 }
+
+
+-- The license table lists all valid licenses installed on the switch
+
+   wlsxSwitchLicenseTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF LicenseEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"This table lists all licenses installed on the switch.
+		"
+	
+      ::= { wlsxSystemXGroup 8 } 
+
+     wlsxLicenseEntry OBJECT-TYPE 
+	  SYNTAX       LicenseEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "License Entry"
+	  INDEX { licenseIndex }
+      ::= { wlsxSwitchLicenseTable 1 } 
+
+     LicenseEntry ::=
+     SEQUENCE {
+     	 licenseIndex           Integer32,
+         licenseKey				DisplayString,
+         licenseInstalled		DisplayString,
+         licenseExpires			DisplayString,
+         licenseFlags			DisplayString,
+         licenseService 		DisplayString
+     }
+
+     licenseIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			License ID number
+            "
+        ::= { wlsxLicenseEntry 1 }
+
+     licenseKey OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License Key
+            "
+        ::= { wlsxLicenseEntry 2 }
+
+     licenseInstalled OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License installation time
+            "
+        ::= { wlsxLicenseEntry 3 }
+
+     licenseExpires OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License expiry time
+            "
+        ::= { wlsxLicenseEntry 4 }
+
+     licenseFlags OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			License flags; E - enabled; A - auto-generated;
+			               R - reboot required to activate
+            "
+        ::= { wlsxLicenseEntry 5 }
+
+     licenseService OBJECT-TYPE
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The service enabled by this license.
+            "
+        ::= { wlsxLicenseEntry 6 }
+
+-- Table lists all the processors and there corresponding Load.
+
+   wlsxSysXProcessorTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysXProcessorEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			The table of processors contained by the switch.
+		"
+      ::= { wlsxSystemXGroup 9 } 
+
+   wlsxSysXProcessorEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysXProcessorEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  "
+	  	An entry for one processor contained by the switch.
+	  "
+	  INDEX { sysXProcessorID}
+      ::= { wlsxSysXProcessorTable 1 } 
+
+   WlsxSysXProcessorEntry ::=
+     SEQUENCE {
+         sysXProcessorID		Integer32,
+         sysXProcessorDescr 	DisplayString,
+		 sysXProcessorLoad		Integer32
+     }
+
+   sysXProcessorID OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Processor Index.
+            "
+        ::= { wlsxSysXProcessorEntry 1 }
+
+   sysXProcessorDescr OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+			desription of the processor.
+            "
+        ::= { wlsxSysXProcessorEntry 2 }
+
+   sysXProcessorLoad OBJECT-TYPE
+        SYNTAX       Integer32 (0..100)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			The average, over the last minute, of the percentage of
+			time that this processor was not idle.
+			"
+        ::= { wlsxSysXProcessorEntry 3 }
+
+-- Table contains all the storage devices in the switch and there 
+-- utilization numbers.
+
+   wlsxSysXStorageTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysXStorageEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+		"
+		The table of Storage-devices contained by the switch.
+		"
+	
+      ::= { wlsxSystemXGroup 10 } 
+
+   wlsxSysXStorageEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysXStorageEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+			 	An entry for one long-term storage device contained by the 
+				switch.
+			 "
+	  INDEX { sysXStorageIndex }
+      ::= { wlsxSysXStorageTable 1 } 
+
+   WlsxSysXStorageEntry ::=
+     SEQUENCE {
+        sysXStorageIndex	Integer32,
+        sysXStorageType 	INTEGER,
+	 	sysXStorageSize		Integer32,
+	 	sysXStorageUsed		Integer32,
+	 	sysXStorageName		DisplayString
+   }
+
+   sysXStorageIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+            "
+        ::= { wlsxSysXStorageEntry 1 }
+
+   sysXStorageType OBJECT-TYPE
+        SYNTAX      INTEGER {
+					ram(1),
+					flashMemory(2)
+		  	    }
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            "
+        ::= { wlsxSysXStorageEntry 2 }
+
+   sysXStorageSize OBJECT-TYPE
+        SYNTAX      Integer32
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		size of the storage filesystem in MB.
+            "
+        ::= { wlsxSysXStorageEntry 3 }
+
+   sysXStorageUsed OBJECT-TYPE
+        SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		size of the storage filesystem in MB.
+            "
+        ::= { wlsxSysXStorageEntry 4 }
+
+   sysXStorageName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+			name of the storage filesystem.
+            "
+        ::= { wlsxSysXStorageEntry 5 }
+
+-- This table describes the memory utilization of the switch
+
+   wlsxSysXMemoryTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxSysXMemoryEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+		"
+		The memory status of the switch
+		"
+	
+      ::= { wlsxSystemXGroup 11 } 
+
+   wlsxSysXMemoryEntry OBJECT-TYPE 
+	  SYNTAX       WlsxSysXMemoryEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+		An entry for one memory region on the switch.  Currently,
+		only the CP region is monitored.
+	     "
+	  INDEX { sysXMemoryIndex }
+      ::= { wlsxSysXMemoryTable 1 } 
+
+   WlsxSysXMemoryEntry ::=
+     SEQUENCE {
+         sysXMemoryIndex	Integer32,
+	 	sysXMemorySize	Integer32,
+	 	sysXMemoryUsed	Integer32,
+	 	sysXMemoryFree	Integer32
+   }
+
+   sysXMemoryIndex OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+            "
+        ::= { wlsxSysXMemoryEntry 1 }
+
+   sysXMemorySize OBJECT-TYPE
+        SYNTAX      Integer32
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		Total memory in KB.
+            "
+        ::= { wlsxSysXMemoryEntry 2 }
+
+   sysXMemoryUsed OBJECT-TYPE
+        SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		Used memory in KB.
+            "
+        ::= { wlsxSysXMemoryEntry 3 }
+
+   sysXMemoryFree OBJECT-TYPE
+        SYNTAX      Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+	    		Free memory in KB.
+            "
+        ::= { wlsxSysXMemoryEntry 4 }
+
+   wlsxSwitchLicenseSerialNumber OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			 The license serial number of the switch
+			"
+        ::= { wlsxSystemXGroup 12 }
+
+-- wlsxUserInfoGroup contains information about the users connected to the switch.
+
+   wlsxSwitchUserTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchUserEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists all the users (both wired and wireless) currently
+			connected to the switch. Users are identified by their IP address.
+		"
+	
+      ::= { wlsxUserInfoGroup 1 } 
+
+     wlsxSwitchUserEntry OBJECT-TYPE 
+	  SYNTAX       MxSwitchUserEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "User Entry"
+	  INDEX { userIpAddress}
+      ::= { wlsxSwitchUserTable 1 } 
+
+     MxSwitchUserEntry ::=
+     SEQUENCE {
+         userIpAddress				IpAddress,
+         userPhyAddress 			MacAddress,
+		 userName					DisplayString,
+		 userRole					DisplayString,
+		 userUpTime					TimeTicks,
+		 userAuthenticationMethod	INTEGER,
+		 userLocation				DisplayString,
+		 userServerName				DisplayString,
+		 userConnectedVlan			Integer32,
+		 userConnectedSlot			Integer32,
+		 userConnectedPort			Integer32,
+		 userBWContractName			DisplayString,
+		 userBWContractUsage		INTEGER
+
+     }
+
+     userIpAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			IP Address from which the user connected to the switch.
+            "
+        ::= { wlsxSwitchUserEntry 1 }
+
+     userPhyAddress OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Physical Address of the station from which the user connected to 
+			the switch.
+            "
+        ::= { wlsxSwitchUserEntry 2 }
+
+     userName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Name of the User.
+            "
+        ::= { wlsxSwitchUserEntry 3 }
+
+     userRole OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Role configured for this user.
+            "
+        ::= { wlsxSwitchUserEntry 4 }
+
+		 
+     userUpTime OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Time since the user is connected to the switch.	
+            "
+        ::= { wlsxSwitchUserEntry 5 }
+
+     userAuthenticationMethod OBJECT-TYPE
+         SYNTAX       INTEGER {
+						none(1),
+						other(2),
+						web(3),
+						dot1x(4),
+						vpn(5),
+						mac(6)
+						}
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Authentication mechanism used by the user to connect to the switch.
+            "
+        ::= { wlsxSwitchUserEntry 6 }
+
+     userLocation OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Location of the access point (in Building.Floor.... format), which
+			the user used to connect to the switch.
+            "
+        ::= { wlsxSwitchUserEntry 7 }
+
+     userServerName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the Back-end authentication server, used to authenticate
+			the user.
+            "
+        ::= { wlsxSwitchUserEntry 8 }
+
+     userConnectedVlan OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Vlan on which the user is connected to the switch.
+            "
+        ::= { wlsxSwitchUserEntry 9 }
+
+     userConnectedSlot OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Slot on switch, where the user connection terminates.
+            "
+        ::= { wlsxSwitchUserEntry 10 }
+
+     userConnectedPort OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Port on switch, where the user connection terminates.
+            "
+        ::= { wlsxSwitchUserEntry 11 }
+
+     userBWContractName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the Bandwidth Contract applied to this user.
+            "
+        ::= { wlsxSwitchUserEntry 12 }
+
+     userBWContractUsage OBJECT-TYPE
+         SYNTAX       INTEGER {
+							user(1),
+							shared(2)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates how the Bandwidth Contract is used.
+            "
+        ::= { wlsxSwitchUserEntry 13 }
+
+  -- StationMgmt Table
+  --Station Management Table contains all the station associated with this AP.
+
+   wlsxSwitchStationMgmtTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchStationMgmtEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists all the wireless stations associated with the 
+			Access points connected to this switch. 
+		"
+	
+      ::= { wlsxUserInfoGroup 2 } 
+
+   wlsxSwitchStationMgmtEntry OBJECT-TYPE 
+	  SYNTAX       MxSwitchStationMgmtEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Management Entry"
+	  INDEX {staPhyAddress, staAccessPointBSSID}
+      ::= { wlsxSwitchStationMgmtTable 1 } 
+
+   MxSwitchStationMgmtEntry ::=
+     SEQUENCE {
+         staPhyAddress				MacAddress,
+		 staAccessPointBSSID		MacAddress,
+		 staUserName				DisplayString,
+		 staUserRole				DisplayString,
+		 staAssociationID			Unsigned32,
+		 staAccessPointESSID		DisplayString,
+		 staSignalToNoiseRatio		Integer32,
+		 staTransmitRate			INTEGER,
+		 staReceiveRate				INTEGER
+   }
+
+   	staPhyAddress OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The Physical Address of the Station.
+            "
+        ::= { wlsxSwitchStationMgmtEntry 1 }
+
+	staAccessPointBSSID OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			BSSID of the Access point through which the station is connected
+			to the switch
+            "
+        ::= { wlsxSwitchStationMgmtEntry 2 }
+
+	staUserName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the User connecting from this station.
+            "
+        ::= { wlsxSwitchStationMgmtEntry 3 }
+
+	staUserRole OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			User Role.
+            "
+        ::= { wlsxSwitchStationMgmtEntry 4 }
+
+	staAssociationID OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			AID with which the Station is associated with this system.
+            "
+        ::= { wlsxSwitchStationMgmtEntry 5 }
+
+	staAccessPointESSID OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			ESSID of the Access point
+            "
+        ::= { wlsxSwitchStationMgmtEntry 6 }
+
+   	staSignalToNoiseRatio OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			SNR for the BSSID.
+            "
+        ::= { wlsxSwitchStationMgmtEntry 7 }
+
+   	staTransmitRate OBJECT-TYPE
+         SYNTAX       INTEGER{
+		 				rate1Mbps(1),
+						rate2Mbps(2),
+						rate5point5Mbps(3),
+						rate6Mbps(4),
+						rate9Mbps(5),
+						rate11Mbps(6),
+						rate12Mbps(7),
+						rate18Mbps(8),
+						rate24Mbps(9),
+						rate36Mbps(10),
+						rate48Mbps(11),
+						rate54Mbps(12)
+		 			  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates Transmit rate of the channel
+            "
+        ::= { wlsxSwitchStationMgmtEntry 8 }
+
+   	staReceiveRate OBJECT-TYPE
+         SYNTAX       INTEGER{
+		 				rate1Mbps(1),
+						rate2Mbps(2),
+						rate5point5Mbps(3),
+						rate6Mbps(4),
+						rate9Mbps(5),
+						rate11Mbps(6),
+						rate12Mbps(7),
+						rate18Mbps(8),
+						rate24Mbps(9),
+						rate36Mbps(10),
+						rate48Mbps(11),
+						rate54Mbps(12)
+		 			  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates Receive rate of the channel
+            "
+        ::= { wlsxSwitchStationMgmtEntry 9 }
+
+
+  -- StationStats Table
+  --Station Statistics Table contains a summary of statistics collected by the
+  --switch. The stats are indexed by Station Mac and AP BSSID it is associated
+  --to.
+
+   wlsxSwitchStationStatsTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchStationStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists the statistics of all the wireless stations 
+			associated with the Access points connected to this switch. 
+		"
+	
+      ::= { wlsxUserInfoGroup 3 } 
+
+   wlsxSwitchStationStatsEntry OBJECT-TYPE 
+	  SYNTAX       MxSwitchStationStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Statistics Entry"
+	  INDEX {staPhyAddress, staAccessPointBSSID}
+      ::= { wlsxSwitchStationStatsTable 1 } 
+
+   MxSwitchStationStatsEntry ::=
+     SEQUENCE {
+		 staTxPackets				Counter32,
+		 staTxBytes				Counter32,
+		 staRxPackets				Counter32,
+		 staRxBytes				Counter32,
+		 staBwRate				Integer32,
+		 staFrameRetryRate		Integer32,
+		 staFrameLowSpeedRate		Integer32,
+		 staFrameNonUnicastRate		Integer32,
+		 staFrameFragmentationRate		Integer32,
+		 staFrameReceiveErrorRate		Integer32
+     }
+
+   	staTxPackets OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Packets Transmitted by the station.
+            "
+        ::= { wlsxSwitchStationStatsEntry 1 }
+
+   	staTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Bytes Transmitted by the station.
+			"
+        ::= { wlsxSwitchStationStatsEntry 2 }
+
+   	staRxPackets OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Packets Received by the Station
+            "
+        ::= { wlsxSwitchStationStatsEntry 3 }
+
+   	staRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Bytes Received by the station.
+            "
+        ::= { wlsxSwitchStationStatsEntry 4 }
+
+   	staBwRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Bandwidth Rate in Kbps of the station.
+            "
+        ::= { wlsxSwitchStationStatsEntry 5 }
+
+   	staFrameRetryRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Station Frame Retry Rate.
+            "
+        ::= { wlsxSwitchStationStatsEntry 6 }
+
+   	staFrameLowSpeedRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Station Frame Low Speed Rate.
+            "
+        ::= { wlsxSwitchStationStatsEntry 7 }
+
+   	staFrameNonUnicastRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Station Frame Non Unicast Packet Rate.
+            "
+        ::= { wlsxSwitchStationStatsEntry 8 }
+
+   	staFrameFragmentationRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Station Frame Fragmentation Rate.
+            "
+        ::= { wlsxSwitchStationStatsEntry 9 }
+
+   	staFrameReceiveErrorRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Station Frame Receive Error Rate.
+            "
+        ::= { wlsxSwitchStationStatsEntry 10 }
+
+-- wlsxAccessPointInfoGroup contains a Local Access Point Information Table.
+-- which lists all the AP's connected to this switch, a Global AP Info Table
+-- which lists all the AP's in the Domain. The Global table is valid only
+-- on the Master switch. The Group also contains two scalar objects which 
+-- indicate the total number of AP's and the total number of Clients connected.
+
+
+   wlsxSwitchTotalNumAccessPoints  OBJECT-TYPE 
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Number of Access Points Connected to this switch.
+            "
+        ::= { wlsxAccessPointInfoGroup 1 }
+
+   wlsxSwitchTotalNumStationsAssociated  OBJECT-TYPE 
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Number of Stations Associated to this switch.
+            "
+        ::= { wlsxAccessPointInfoGroup 2 }
+
+-- Local Access Point Table.
+
+   wlsxSwitchAccessPointTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchAccessPointEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists all the Access Points Connected to this switch. 
+		"
+      ::= { wlsxAccessPointInfoGroup 3 } 
+
+   wlsxSwitchAccessPointEntry OBJECT-TYPE 
+	  SYNTAX       MxSwitchAccessPointEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Management Entry"
+	  INDEX {apBSSID}
+      ::= { wlsxSwitchAccessPointTable 1 } 
+
+   MxSwitchAccessPointEntry ::=
+     SEQUENCE {
+         apBSSID				MacAddress,
+		 apESSID				DisplayString,
+		 apSlot					Unsigned32,
+		 apPort					Unsigned32,
+		 apIpAddress			IpAddress,
+		 apPhyType				INTEGER,
+		 apType					INTEGER,
+		 apCurrentChannel		INTEGER,
+		 apLocation				DisplayString,
+		 apTotalTime			TimeTicks,
+		 apInactiveTime			TimeTicks,
+		 apLoadBalancing		TruthValue,
+		 apChannelNoise			Integer32,
+		 apSignalToNoiseRatio	Integer32,
+		 apTransmitRate			INTEGER,
+		 apReceiveRate			INTEGER
+   }
+
+   	apBSSID OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The Physical Address of the Access Point.
+            "
+        ::= { wlsxSwitchAccessPointEntry 1 }
+
+   	apESSID OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			ESSID of the Access Point
+            "
+        ::= { wlsxSwitchAccessPointEntry 2 }
+
+   	apSlot OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Slot to which the Access Point is connected.
+            "
+        ::= { wlsxSwitchAccessPointEntry 3 }
+
+   	apPort OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Port to which the Access Point is connected.
+            "
+        ::= { wlsxSwitchAccessPointEntry 4 }
+
+   	apIpAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Address of the Access Point.
+            "
+        ::= { wlsxSwitchAccessPointEntry 5 }
+
+   	apPhyType OBJECT-TYPE
+         SYNTAX       INTEGER{
+						dot11a(1),
+						dot11b(2),
+						dot11g(3)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Physical Layer Protocol support of the AP.
+            "
+        ::= { wlsxSwitchAccessPointEntry 6 }
+
+   	apType OBJECT-TYPE
+         SYNTAX       INTEGER{
+						ap(1),
+						am(2)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates whether the Access point is an Air Monitor or regular AP.
+            "
+        ::= { wlsxSwitchAccessPointEntry 7 }
+
+   	apCurrentChannel OBJECT-TYPE
+         SYNTAX       INTEGER(1..165)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Current Operating frequency channel.
+            "
+        ::= { wlsxSwitchAccessPointEntry 8 }
+
+   	apLocation OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Location of the AP defined in Building.Floor.... mode.
+            "
+        ::= { wlsxSwitchAccessPointEntry 9 }
+
+   	apTotalTime OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time since the Ap is connected to the switch 
+            "
+        ::= { wlsxSwitchAccessPointEntry 10 }
+
+   	apInactiveTime OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            Time since the Ap has been inactive 
+            "
+        ::= { wlsxSwitchAccessPointEntry 11 }
+
+   	apLoadBalancing OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates whether Load balancing is enabled or not.
+            "
+        ::= { wlsxSwitchAccessPointEntry 12 }
+
+   	apChannelNoise OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates the noise on the channel
+            "
+        ::= { wlsxSwitchAccessPointEntry 13 }
+
+   	apSignalToNoiseRatio OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			SNR for the BSSID.
+            "
+        ::= { wlsxSwitchAccessPointEntry 14 }
+
+   	apTransmitRate OBJECT-TYPE
+         SYNTAX       INTEGER{
+		 				rate1Mbps(1),
+						rate2Mbps(2),
+						rate5point5Mbps(3),
+						rate6Mbps(4),
+						rate9Mbps(5),
+						rate11Mbps(6),
+						rate12Mbps(7),
+						rate18Mbps(8),
+						rate24Mbps(9),
+						rate36Mbps(10),
+						rate48Mbps(11),
+						rate54Mbps(12)
+		 			  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates Transmit rate of the channel
+            "
+        ::= { wlsxSwitchAccessPointEntry 15 }
+
+   	apReceiveRate OBJECT-TYPE
+         SYNTAX       INTEGER{
+		 				rate1Mbps(1),
+						rate2Mbps(2),
+						rate5point5Mbps(3),
+						rate6Mbps(4),
+						rate9Mbps(5),
+						rate11Mbps(6),
+						rate12Mbps(7),
+						rate18Mbps(8),
+						rate24Mbps(9),
+						rate36Mbps(10),
+						rate48Mbps(11),
+						rate54Mbps(12)
+		 			  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates Receive rate of the channel
+            "
+        ::= { wlsxSwitchAccessPointEntry 16 }
+
+
+ --Global AP Table
+   wlsxSwitchGlobalAPTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchGlobalAPEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists all the Access Points Connected in the 
+			Switch Domain. This table is valid only on a
+			Master switch. On a Local switch, the table is empty.
+		"
+      ::= { wlsxAccessPointInfoGroup 4 } 
+
+   wlsxSwitchGlobalAPEntry OBJECT-TYPE 
+	  SYNTAX       MxSwitchGlobalAPEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "Station Management Entry"
+	  INDEX {globalAPLocation, globalAPAddress}
+      ::= { wlsxSwitchGlobalAPTable 1 } 
+
+   MxSwitchGlobalAPEntry ::=
+     SEQUENCE {
+         globalAPLocation		DisplayString,
+		 globalAPAddress		IpAddress,
+		 globalAPLocalSwitch	IpAddress,
+		 globalAPdot11aPhyAddr	MacAddress,
+		 globalAPdot11bPhyAddr	MacAddress,
+		 globalAPState			INTEGER,
+		 globalAPdot11gPhyAddr	MacAddress
+   }
+
+   	globalAPLocation OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Physical Location of the AP, defined in Building.Floor.Location
+			format.
+            "
+        ::= { wlsxSwitchGlobalAPEntry 1 }
+
+   	globalAPAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			Address of the Access Point.
+            "
+        ::= { wlsxSwitchGlobalAPEntry 2 }
+
+   	globalAPLocalSwitch OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			IP Address of the Local Switch this Access Point is connected to.
+            "
+        ::= { wlsxSwitchGlobalAPEntry 3 }
+
+   	globalAPdot11aPhyAddr OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Physical Mac address of the module supporting dot11a in the
+			Access Point. AP can have support for both dot11a and dot11b 
+			physical layer.
+            "
+        ::= { wlsxSwitchGlobalAPEntry 4 }
+
+   	globalAPdot11bPhyAddr OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Physical Mac address of the module supporting dot11b in the
+			Access Point. AP can have support for both dot11a and dot11b 
+			physical layer.
+            "
+        ::= { wlsxSwitchGlobalAPEntry 5 }
+
+   	globalAPState OBJECT-TYPE
+         SYNTAX       INTEGER(1..7)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			State of the AP.
+			1 -- AP is UP.
+			2 -- AP is DOWN.
+			3-7 -- Values are deprecated.
+            "
+        ::= { wlsxSwitchGlobalAPEntry 6 }
+
+   	globalAPdot11gPhyAddr OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Physical Mac address of the module supporting dot11g in the
+			Access Point. AP can have support for both a,b,g 
+			physical layer.
+            "
+        ::= { wlsxSwitchGlobalAPEntry 7 }
+
+ -- Local AP Stats.
+
+   wlsxSwitchAccessPointStatsTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchAccessPointStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists the statistics of all the Access Points Connected 
+			to this switch. 
+		"
+      ::= { wlsxAccessPointInfoGroup 5 } 
+
+   wlsxSwitchAccessPointStatsEntry OBJECT-TYPE 
+	  SYNTAX       MxSwitchAccessPointStatsEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "
+			 Ap Stats Entry.
+			 "
+	  INDEX {apBSSID}
+      ::= { wlsxSwitchAccessPointStatsTable 1 } 
+
+   MxSwitchAccessPointStatsEntry ::=
+     SEQUENCE {
+		 apStatsChannel						INTEGER,
+		 apChannelBwRate					Integer32,
+		 apChannelFrameRetryRate			Integer32,
+		 apChannelFrameLowSpeedRate			Integer32,
+		 apChannelFrameNonUnicastRate		Integer32,
+		 apChannelFrameFragmentationRate	Integer32,
+		 apChannelFrameReceiveErrorRate		Integer32,
+		 apBSSTxPackets						Counter32,
+		 apBSSTxBytes						Counter32,
+		 apBSSRxPackets						Counter32,
+		 apBSSRxBytes						Counter32,
+		 apBSSBwRate						Integer32,
+		 apBSSFrameRetryRate				Integer32,
+		 apBSSFrameLowSpeedRate				Integer32,
+		 apBSSFrameNonUnicastRate			Integer32,
+		 apBSSFrameFragmentationRate		Integer32,
+		 apBSSFrameReceiveErrorRate			Integer32
+   }
+
+   	apStatsChannel OBJECT-TYPE
+         SYNTAX       INTEGER(1..165)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Channel on which the ap is operating.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 1 }
+
+
+   	apChannelBwRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Bandwidth Rate in Kbps of the apChannel.
+            "
+        ::= {  wlsxSwitchAccessPointStatsEntry 2 }
+
+   	apChannelFrameRetryRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Ap Channel Frame Retry Rate.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 3 }
+
+   	apChannelFrameLowSpeedRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Ap Channel Frame Low Speed Rate.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 4 }
+
+   	apChannelFrameNonUnicastRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Ap Channel Frame Non Unicast Packet Rate.
+            "
+        ::= {wlsxSwitchAccessPointStatsEntry 5 }
+
+   	apChannelFrameFragmentationRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Ap Channel Frame Fragmentation Rate.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry  6 }
+
+   	apChannelFrameReceiveErrorRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Ap Channel Frame Receive Error Rate.
+            "
+        ::= {  wlsxSwitchAccessPointStatsEntry 7 }
+
+   	apBSSTxPackets OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Packets Transmitted by the ap on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 8 }
+
+   	apBSSTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Bytes Transmitted by the ap on this BSSID.
+			"
+        ::= { wlsxSwitchAccessPointStatsEntry 9 }
+
+   	apBSSRxPackets OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Packets Received by the ap on this BSSID
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry  10 }
+
+   	apBSSRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Bytes Received by the ap on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 11 }
+
+   	apBSSBwRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Bandwidth Rate in Kbps of the ap on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 12 }
+
+   	apBSSFrameRetryRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Frame Retry Rate on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 13 }
+
+   	apBSSFrameLowSpeedRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Frame Low Speed Rate on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 14 }
+
+   	apBSSFrameNonUnicastRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Frame Non Unicast Packet Rate on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 15 }
+
+   	apBSSFrameFragmentationRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Frame Fragmentation Rate on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 16 }
+
+   	apBSSFrameReceiveErrorRate OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Frame Receive Error Rate on this BSSID.
+            "
+        ::= { wlsxSwitchAccessPointStatsEntry 17 }
+
+
+
+-- wlsxSwitchTraps
+-- This group defines all the traps related to the switch platform. 
+wlsxSwitchTrapObjectsGroup      OBJECT IDENTIFIER ::= { wlsxSwitchTraps 100 }
+
+wlsxAuthServerName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate the 
+				Authentication Server, used for Authentication.
+            "
+::= { wlsxSwitchTrapObjectsGroup 1 }
+
+
+wlsxAuthServerTimeout OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate the 
+				Authentication Server Timeout.
+            "
+::= { wlsxSwitchTrapObjectsGroup 2 }
+
+wlsxFanNumber OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate 
+				a failing fan number.
+            "
+::= { wlsxSwitchTrapObjectsGroup 4 }
+
+
+wlsxLineCardNumber OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate a 
+				Line Card in the switch.
+            "
+::= { wlsxSwitchTrapObjectsGroup 5 }
+
+
+wlsxVoltageType OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate the 
+				type of the voltage.
+            "
+::= { wlsxSwitchTrapObjectsGroup 6 }
+
+
+wlsxVoltageValue OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..10))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate the 
+				voltage value in Float.
+            "
+::= { wlsxSwitchTrapObjectsGroup 7 }
+
+
+wlsxTemperatureValue OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate 
+				Temperature Value.
+            "
+::= { wlsxSwitchTrapObjectsGroup 8 }
+
+
+wlsxProcessName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate a 
+				process name.
+            "
+::= { wlsxSwitchTrapObjectsGroup 9 }
+
+wlsxStationMacAddress OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Physical Address of the Station.
+            "
+::= { wlsxSwitchTrapObjectsGroup 10 }
+
+wlsxStationBlackListReason OBJECT-TYPE
+         SYNTAX       INTEGER {
+		 				userDefined(1),
+						mitmAttack(2),
+						authFailure(3),
+						pingFlood(4),
+						sessionFlood(5),
+						synFlood(6),
+						sessionBlacklist(7),
+						ipSpoofing(8),
+						other(100)
+		 			  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Reason for which a station is black listed. 
+            "
+::= { wlsxSwitchTrapObjectsGroup 11 }
+
+wlsxSpoofedIpAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object is used in a trap to identify a Spoofed IP Address.
+            "
+::= { wlsxSwitchTrapObjectsGroup 12 }
+
+wlsxSpoofedOldPhyAddress OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object is used in a trap to identify a Old Mac Address.
+            "
+::= { wlsxSwitchTrapObjectsGroup 13 }
+
+wlsxSpoofedNewPhyAddress OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object is used in a trap to identify a New Mac Address.
+            "
+::= { wlsxSwitchTrapObjectsGroup 14 }
+
+wlsxDBName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object is used in a trap to identify name of the Database.
+            "
+::= { wlsxSwitchTrapObjectsGroup 15 }
+
+wlsxDBUserName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object is used in a trap to identify name of the Database user.
+            "
+::= { wlsxSwitchTrapObjectsGroup 16 }
+
+wlsxDBIpAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object is used in a trap to identify the IpAddress of the DB.
+            "
+::= { wlsxSwitchTrapObjectsGroup 17 }
+
+wlsxDBType OBJECT-TYPE
+         SYNTAX       INTEGER{
+		 				mssql(1),
+						mysql(2)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object is used in a trap to identify the Port of the user.
+            "
+::= { wlsxSwitchTrapObjectsGroup 18 }
+
+wlsxVrID OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object contains the Virtual Router Identifier.
+            "
+::= { wlsxSwitchTrapObjectsGroup 19 }
+
+wlsxVrMasterIp OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object contains the Master IP address.
+            "
+::= { wlsxSwitchTrapObjectsGroup 20 }
+
+wlsxVrrpOperState OBJECT-TYPE
+         SYNTAX       INTEGER {
+						initialize(1),
+						backup(2),
+		 				master(3)
+					  }
+
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object represents the VRRP operational state.
+            "
+::= { wlsxSwitchTrapObjectsGroup 21 }
+
+wlsxApTxPower OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object contains the value of the AP Transmit Power.
+            "
+::= { wlsxSwitchTrapObjectsGroup 22 }
+
+wlsxESIServerGrpName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object represents the External Services Interface 
+			(ESI) Server Group name
+            "
+::= { wlsxSwitchTrapObjectsGroup 23 }
+
+
+wlsxESIServerName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object represents the External Services Interface
+			(ESI) Server name
+            "
+::= { wlsxSwitchTrapObjectsGroup 24 }
+
+wlsxESIServerIpaddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object represents the External Services Interface 
+			(ESI) Server 
+			IP Address
+            "
+::= { wlsxSwitchTrapObjectsGroup 25 }
+
+wlsxLicenseDaysRemaining OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Object represents number of the days remaining prior
+			to a license expiry
+            "
+::= { wlsxSwitchTrapObjectsGroup 26 }
+
+wlsxSlotNumber OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This Object is used in the traps to indicate a 
+				Line Card in the switch.  This value matches the value
+				of sysExtCardSlot.
+            "
+::= { wlsxSwitchTrapObjectsGroup 27 }
+
+-- Trap Definitions.
+
+wlsxSwitchIPChanged NOTIFICATION-TYPE        
+	OBJECTS {wlsxSwitchIp}
+    STATUS  current
+    DESCRIPTION
+			"A trap which indicates that the switch IP address has changed." 
+    ::= { wlsxSwitchTraps 1001 }
+
+wlsxSwitchRoleChange NOTIFICATION-TYPE        
+	OBJECTS {wlsxSwitchRole}
+    STATUS  current
+    DESCRIPTION
+			"A trap which indicates that the role of the switch has changed in 
+			the Domain."
+    ::= { wlsxSwitchTraps 1002 }
+
+-- Authentication Traps.
+wlsxUserEntryCreated NOTIFICATION-TYPE        
+	OBJECTS {userPhyAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a New user is created.
+			"
+    ::= { wlsxSwitchTraps 1003 }
+
+wlsxUserEntryDeleted NOTIFICATION-TYPE        
+	OBJECTS {userPhyAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a user is deleted.
+			"
+    ::= { wlsxSwitchTraps 1004 }
+
+
+wlsxUserEntryAuthenticated NOTIFICATION-TYPE        
+	OBJECTS {userPhyAddress, userName, userAuthenticationMethod, userRole}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a user is Authenticated.
+			"
+    ::= { wlsxSwitchTraps 1005 }
+
+
+wlsxUserEntryDeAuthenticated NOTIFICATION-TYPE        
+	OBJECTS {userPhyAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a user is Deauthenticated.
+			"
+    ::= { wlsxSwitchTraps 1006 }
+
+
+wlsxUserAuthenticationFailed NOTIFICATION-TYPE        
+	OBJECTS {userPhyAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a user authentication has failed.
+			"
+    ::= { wlsxSwitchTraps 1007 }
+
+
+wlsxAuthServerReqTimedOut NOTIFICATION-TYPE        
+	OBJECTS {wlsxAuthServerName}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the authentication server request 
+			timed out.
+			"
+    ::= { wlsxSwitchTraps 1008 }
+
+wlsxAuthServerTimedOut NOTIFICATION-TYPE        
+	OBJECTS {wlsxAuthServerName, wlsxAuthServerTimeout}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the authentication server 
+			timed out.
+			"
+    ::= { wlsxSwitchTraps 1009 }
+
+wlsxAuthServerIsUp NOTIFICATION-TYPE        
+	OBJECTS {wlsxAuthServerName}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the authentication server is up.
+			"
+    ::= { wlsxSwitchTraps 1010 }
+
+wlsxAuthMaxUserEntries NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the User Entries table is full and
+			cannot add any more entries.
+			"
+    ::= { wlsxSwitchTraps 1011 }
+
+wlsxAuthMaxAclEntries NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the Acl Entries table is full and
+			cannot add any more entries.
+			"
+    ::= { wlsxSwitchTraps 1012 }
+
+wlsxAuthMaxBWContracts NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the switch reached the maximum number of
+			configurable Bandwidth contracts.
+			"
+    ::= { wlsxSwitchTraps 1013 }
+
+-- Platform Traps.
+
+wlsxPowerSupplyFailure NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the power supply has failed.
+			"
+    ::= { wlsxSwitchTraps 1014 }
+
+wlsxFanFailure NOTIFICATION-TYPE        
+	OBJECTS {wlsxFanNumber}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the fan has failed.
+			"
+    ::= { wlsxSwitchTraps 1015 }
+
+wlsxOutOfRangeVoltage NOTIFICATION-TYPE        
+	OBJECTS {wlsxVoltageType, wlsxVoltageValue}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the switch received out of range 
+			voltage.
+			"
+    ::= { wlsxSwitchTraps 1016 }
+
+wlsxOutOfRangeTemperature NOTIFICATION-TYPE        
+	OBJECTS {wlsxTemperatureValue}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the Temperature is out of bounds.
+			"
+    ::= { wlsxSwitchTraps 1017 }
+
+
+wlsxLCInserted NOTIFICATION-TYPE        
+	OBJECTS {wlsxLineCardNumber, wlsxSlotNumber}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a Line card is inserted.
+			"
+    ::= { wlsxSwitchTraps 1018 }
+
+wlsxSCInserted NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a supervisory card is inserted.
+			"
+    ::= { wlsxSwitchTraps 1019 }
+
+wlsxGBICInserted NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a GBIC is inserted in a line card. 
+			"
+    ::= { wlsxSwitchTraps 1020 }
+
+wlsxProcessDied NOTIFICATION-TYPE        
+	OBJECTS {wlsxProcessName}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a process has died.
+			"
+    ::= { wlsxSwitchTraps 1021 }
+
+wlsxProcessExceedsMemoryLimits NOTIFICATION-TYPE        
+	OBJECTS {wlsxProcessName}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a process is consuming large
+			amounts of memory.
+			"
+    ::= { wlsxSwitchTraps 1022 }
+
+wlsxLowOnFlashSpace NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the switch is running low on flash space.
+			"
+    ::= { wlsxSwitchTraps 1023 }
+
+wlsxLowMemory NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the system free memory is low.
+			"
+    ::= { wlsxSwitchTraps 1024 }
+
+wlsxFanTrayRemoved NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the fan tray is removed.
+			"
+    ::= { wlsxSwitchTraps 1025 }
+
+wlsxFanTrayInserted NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the fan tray is removed.
+			"
+    ::= { wlsxSwitchTraps 1026 }
+
+wlsxLCRemoved NOTIFICATION-TYPE        
+	OBJECTS {wlsxLineCardNumber, wlsxSlotNumber}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a Line card is removed.
+			"
+    ::= { wlsxSwitchTraps 1027 }
+
+wlsxSCRemoved NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a supervisory card is removed.
+			"
+    ::= { wlsxSwitchTraps 1028 }
+
+wlsxPowerSupplyMissing NOTIFICATION-TYPE        
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that the power supply is missing.
+			"
+    ::= { wlsxSwitchTraps 1029 }
+
+-- Access point up/down traps.
+
+wlsxAccessPointIsUp NOTIFICATION-TYPE        
+	OBJECTS {apLocation, apIpAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that an Access point at Location 
+			apLocation and Address apIpAddress is up.
+			"
+    ::= { wlsxSwitchTraps 1030 }
+
+wlsxAccessPointIsDown NOTIFICATION-TYPE        
+	OBJECTS {apLocation, apIpAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that an Access point at Location 
+			apLocation and Address apIpAddress is down.
+			"
+    ::= { wlsxSwitchTraps 1031}
+
+
+wlsxCoverageHoleDetected NOTIFICATION-TYPE        
+	OBJECTS {apLocation, apIpAddress, wlsxStationMacAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that an Access point at Location
+			apLocation and Address apIpAddress has detected a Coverage Hole.
+			"
+    ::= { wlsxSwitchTraps 1032}
+
+
+wlsxChannelChanged NOTIFICATION-TYPE        
+	OBJECTS {apLocation, apIpAddress, apCurrentChannel}
+    STATUS  deprecated
+    DESCRIPTION
+			"
+			A trap which indicates that an Access point at Location 
+			apLocation and Address apIpAddress has changed the channel to 
+			apCurrentChannel.
+			"
+    ::= { wlsxSwitchTraps 1033}
+
+wlsxStationAddedToBlackList NOTIFICATION-TYPE        
+	OBJECTS {wlsxStationMacAddress, wlsxStationBlackListReason}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a station with address
+			wlsxStationMacAddress is black listed for 
+			wlsxStationBlackListReason reason.
+			"
+    ::= { wlsxSwitchTraps 1034}
+
+wlsxStationRemovedFromBlackList NOTIFICATION-TYPE        
+	OBJECTS {wlsxStationMacAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a station with address
+			wlsxStationMacAddress is removed from black list.
+			"
+    ::= { wlsxSwitchTraps 1035}
+
+wlsxIpSpoofingDetected NOTIFICATION-TYPE        
+	OBJECTS {wlsxSpoofedIpAddress, wlsxSpoofedOldPhyAddress, wlsxSpoofedNewPhyAddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap indicating that the switch detected IP Spoofing.
+			"
+    ::= { wlsxSwitchTraps 1036}
+
+wlsxDBCommunicationFailure NOTIFICATION-TYPE        
+	OBJECTS {wlsxDBName, wlsxDBUserName, wlsxDBIpAddress, wlsxDBType}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap to indicate that communication with Database failed.
+			"
+    ::= { wlsxSwitchTraps 1037}
+
+wlsxVrrpStateChange NOTIFICATION-TYPE        
+	OBJECTS {wlsxVrID, wlsxVrMasterIp, wlsxVrrpOperState}
+    STATUS  current
+    DESCRIPTION
+			"
+				A trap which indicates that VRRP State has changed on the switch.
+			"
+    ::= { wlsxSwitchTraps 1038}
+
+wlsxAPRadioAttributesChanged NOTIFICATION-TYPE        
+	OBJECTS {apLocation, apIpAddress, apCurrentChannel, wlsxApTxPower}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates changes in the Radio attributes of an 
+			Access Point at location apLocation and address apIpAddress.
+			Ap channel is apCurrentChannel, and Transmit power is 
+			apTxPower.
+			"
+    ::= { wlsxSwitchTraps 1039}
+
+wlsxESIServerUp NOTIFICATION-TYPE        
+	OBJECTS {wlsxESIServerGrpName, wlsxESIServerName, wlsxESIServerIpaddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a ESI server <wlsxESIServerName> in 
+			group <wlsxESIServerGrpName> with <wlsxESIServerIpaddress> is up
+			"
+    ::= { wlsxSwitchTraps 1040}
+
+wlsxESIServerDown NOTIFICATION-TYPE        
+	OBJECTS {wlsxESIServerGrpName, wlsxESIServerName, wlsxESIServerIpaddress}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that a ESI server <wlsxESIServerName> in 
+			group <wlsxESIServerGrpName> with <wlsxESIServerIpaddress> is down
+			"
+    ::= { wlsxSwitchTraps 1041}
+
+wlsxLicenseExpiry NOTIFICATION-TYPE        
+	OBJECTS {wlsxLicenseDaysRemaining}
+    STATUS  current
+    DESCRIPTION
+			"
+			A trap which indicates that one or more licenses on the
+			switch will expire in <wlsxLicenseDaysRemaining> days
+			"
+    ::= { wlsxSwitchTraps 1042}
+
+END
+

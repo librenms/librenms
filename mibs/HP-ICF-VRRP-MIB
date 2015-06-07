@@ -1,0 +1,204 @@
+HP-ICF-VRRP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        vrrpOperEntry, vrrpAssoIpAddrEntry
+            FROM VRRP-MIB
+        TruthValue
+            FROM SNMPv2-TC
+        hpSwitch
+            FROM HP-ICF-OID;
+
+    hpicfVrrpMIB MODULE-IDENTITY 
+        LAST-UPDATED "200708220000Z"  -- AUGUST 22, 2007
+	ORGANIZATION "Hewlett Packard Company,
+                      Procurve Networking Business"
+        CONTACT-INFO "Hewlett Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     extensions to the standard VRRP MIB (RFC 2787)."
+
+        REVISION     "200708220000Z"  -- AUGUST 22, 2007
+        DESCRIPTION  "Added hpicfVrrpVrPreemptDelayTime to the 
+                      hpicfVrrpOperEntry object."
+
+        REVISION      "200507140000Z"  -- July 14, 2005
+        DESCRIPTION   "Initial revision."
+        
+        ::= { hpSwitch 31 }
+
+-- **********************************************************************
+-- VRRP MIB Groups
+-- **********************************************************************
+
+    hpicfVrrpOperations  OBJECT IDENTIFIER ::= { hpicfVrrpMIB 1 }
+    hpicfVrrpConformance OBJECT IDENTIFIER ::= { hpicfVrrpMIB 2 }
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+    hpicfVrrpAdminStatus OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When set to TRUE, this enables VRRP globally on the
+                    router. If set to FALSE, this would disable VRRP.
+                    Default is FALSE."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperations 1 }
+
+-- **********************************************************************
+-- Extensions to the VRRP Operations Table (RFC 2787)
+-- **********************************************************************
+
+    hpicfVrrpOperTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfVrrpOperEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the vrrpOperTable (RFC 2787)."
+        ::= { hpicfVrrpOperations 2 }
+
+    hpicfVrrpOperEntry OBJECT-TYPE
+        SYNTAX      HpicfVrrpOperEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the vrrpOperTable."
+        AUGMENTS    { vrrpOperEntry }
+        ::= { hpicfVrrpOperTable 1 }
+
+    HpicfVrrpOperEntry ::=
+        SEQUENCE {
+            hpicfVrrpVrMode             INTEGER,
+            hpicfVrrpVrMasterPreempt    TruthValue,
+            hpicfVrrpVrTransferControl  TruthValue,
+            hpicfVrrpVrPreemptDelayTime Integer32
+        }
+
+    hpicfVrrpVrMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        owner(1),
+                        backup(2),
+                        uninitialized(3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object denotes whether this VR has been
+                    designated as an owner or as a backup. On VR 
+                    creation, this field is set to uninitialized. 
+                    The user cannot set the value of this object to 
+                    uninitialized."
+        DEFVAL      { uninitialized }
+        ::= { hpicfVrrpOperEntry 1 }
+
+    hpicfVrrpVrMasterPreempt OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object, when set to TRUE, would enable the 
+                    Master Preemption mode wherein a virtual router 
+                    even though an owner will not preempt a lower 
+                    priority Backup."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperEntry 2 }
+
+    hpicfVrrpVrTransferControl OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object, when set to TRUE, would serve as 
+                    trigger to enable a virtual router owner to take
+                    control of its IP address. When this value is read 
+                    it always returns FALSE."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperEntry 3 }
+
+    hpicfVrrpVrPreemptDelayTime OBJECT-TYPE
+        SYNTAX      Integer32(0..600)  
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object specifies the time that the owner 
+                     virtual router will wait before taking control of 
+                     its virtual IP address. A value of 0 indicates 
+                     that that the pre-empt delay timer is not active"
+        DEFVAL      { 0 }
+        ::= { hpicfVrrpOperEntry 4 }
+
+-- **********************************************************************
+-- Extensions to the VRRP Associated IP Address Table (RFC 2787)
+-- **********************************************************************
+
+    hpicfVrrpAssoIpAddrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfVrrpAssoIpAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the vrrpAssoIpAddrTable (RFC 2787)."
+        ::= { hpicfVrrpOperations 3 }
+
+    hpicfVrrpAssoIpAddrEntry OBJECT-TYPE
+        SYNTAX      HpicfVrrpAssoIpAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the vrrpAssoIpAddrTable."
+        AUGMENTS    { vrrpAssoIpAddrEntry }
+        ::= { hpicfVrrpAssoIpAddrTable 1 }
+
+    HpicfVrrpAssoIpAddrEntry ::=
+        SEQUENCE {
+            hpicfVrrpAssoIpMask  IpAddress
+        }
+
+    hpicfVrrpAssoIpMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The subnet mask to be used in conjunction with
+                    the 'vrrpAssoIpAddr' object to uniquely identify 
+                    a subnet."
+	DEFVAL      { '00000000'H } -- 0.0.0.0
+        ::= { hpicfVrrpAssoIpAddrEntry 1 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfVrrpMIBCompliances  OBJECT IDENTIFIER ::= { hpicfVrrpConformance 1 }
+    hpicfVrrpMIBGroups       OBJECT IDENTIFIER ::= { hpicfVrrpConformance 2 }
+
+-- ......................................................................
+-- Compliance statements
+-- ......................................................................
+
+    hpicfVrrpMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    VRRP (RFC 3768) and implementing the HP-ICF-VRRP-MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfVrrpOperGroup }
+
+            GROUP       hpicfVrrpOperGroup
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support VRRP (RFC 3768)."
+        ::= { hpicfVrrpMIBCompliances 1 }
+
+-- ......................................................................
+-- Conformance Groups
+-- ......................................................................
+
+    hpicfVrrpOperGroup OBJECT-GROUP
+        OBJECTS     { hpicfVrrpAdminStatus,
+                      hpicfVrrpVrMode,
+                      hpicfVrrpVrMasterPreempt,
+                      hpicfVrrpVrTransferControl,
+                      hpicfVrrpVrPreemptDelayTime,
+                      hpicfVrrpAssoIpMask }
+        STATUS      current
+        DESCRIPTION "A collection of HP proprietary objects to support 
+                    VRRP configuration on HP routers."
+        ::= { hpicfVrrpMIBGroups 1 }
+
+END

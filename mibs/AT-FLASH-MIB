@@ -1,0 +1,167 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: FLASH module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-FLASH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+flash MODULE-IDENTITY
+    LAST-UPDATED "200606281222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    FLASH module. "
+
+    REVISION "200606281222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 31}
+
+flashGetFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash get operations that have failed."
+    ::= { flash 1 }
+
+flashOpenFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash open operations that have failed."
+    ::= { flash 2 }
+
+flashReadFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash read operations that have failed."
+    ::= { flash 3 }
+
+flashCloseFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash close operations that have failed."
+    ::= { flash 4 }
+
+flashCompleteFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash complete operations that have failed."
+    ::= { flash 5 }
+
+flashWriteFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash write operations that have failed."
+    ::= { flash 6 }
+
+flashCreateFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash create operations that have failed."
+    ::= { flash 7 }
+
+flashPutFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash put operations that have failed."
+    ::= { flash 8 }
+
+flashDeleteFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash delete operations that have failed."
+    ::= { flash 9 }
+
+flashCheckFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash check operations that have failed."
+    ::= { flash 10 }
+
+flashEraseFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash erase operations that have failed."
+    ::= { flash 11 }
+
+flashCompactFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash compaction operations that have failed."
+    ::= { flash 12 }
+
+flashVerifyFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of flash verify operations that have failed."
+    ::= { flash 13 }
+
+flashTrap 	OBJECT IDENTIFIER ::= { flash 0}
+flashFailureTrap NOTIFICATION-TYPE
+    OBJECTS  { flashGetFailure, flashOpenFailure, flashReadFailure,
+    		 flashCloseFailure, flashCompleteFailure, flashWriteFailure,
+    		 flashCreateFailure, flashPutFailure, flashDeleteFailure, 
+    		 flashCheckFailure, flashEraseFailure, flashCompactFailure,
+    		 flashVerifyFailure }
+    STATUS      current
+    DESCRIPTION
+                "A flash failure trap is generated when any of the above 
+                flash counter is incremented and the failure type is
+                sent in the trap."
+    ::= { flashTrap 1 }
+
+
+END

@@ -1,0 +1,662 @@
+-- ============================================================================
+-- AT-FILEv2.MIB, Allied Telesis enterprise MIB:
+-- File MIB for the AlliedWare Plus(tm) operating system
+-- 
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+	AT-FILEv2-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			modules			
+				FROM AT-SMI-MIB			
+			IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString			
+				FROM SNMPv2-TC;
+	
+	
+		-- 1.3.6.1.4.1.207.8.4.4.4.600
+		atFilev2 MODULE-IDENTITY 
+			LAST-UPDATED "200809240000Z"		-- September 24, 2008 at 00:00 GMT
+			ORGANIZATION 
+				"Allied Telesis Labs New Zealand"
+			CONTACT-INFO 
+				"http://www.alliedtelesis.com"
+			DESCRIPTION 
+				"The AT File v2 MIB, for listing file contents of flash, nvs
+				and sd-cards on local and stacked devices, and copying, moving
+				and deleting files from local, stacked and remote sources."
+			REVISION "200809240000Z"		-- September 24, 2008 at 00:00 GMT
+			DESCRIPTION 
+				"Initial revision."
+			::= { modules 600 }
+
+		
+	
+	
+--
+-- Node definitions
+--
+	
+-- ---------------------------------------------------------- --
+-- The options objects
+-- ---------------------------------------------------------- --
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.1
+		atFilev2TableOptions OBJECT IDENTIFIER::= { atFilev2 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.1.1
+		atFilev2Recursive OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set a value of '1' to enable recursive listing of directories
+				in the atFilev2Table listing."
+			DEFVAL { 0 }
+			::= { atFilev2TableOptions 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.1.2
+		atFilev2AllFiles OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set a value of '1' to enable listing of all files (including
+				hidden etc) in the atFilev2Table listing."
+			DEFVAL { 0 }
+			::= { atFilev2TableOptions 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.1.3
+		atFilev2Device OBJECT-TYPE
+			SYNTAX Integer32 (1..3)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set a value that corresponds with the various devices listed
+				below:
+						
+				1. Flash (default)
+				2. Card
+				3. NVS
+				
+				Subsequent SNMP queries to the atFilev2Table will use this as
+				the device to generate a file listing from."
+			DEFVAL { 1 }
+			::= { atFilev2TableOptions 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.1.4
+		atFilev2StackID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set an integer to correspond to the stack ID of a stack
+				member. 
+				
+				Subsequent SNMP queries to the atFilev2Table will use this as
+				the stack member to generate a file listing from.
+				
+				If running a stand-alone unit, use the default value of 1."
+			DEFVAL { 1 }
+			::= { atFilev2TableOptions 4 }
+
+		
+-- ---------------------------------------------------------- --
+-- The file table
+-- ---------------------------------------------------------- --
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.2
+		atFilev2Table OBJECT-TYPE
+			SYNTAX SEQUENCE OF AtFilev2Entry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A list of files present on the device and stack-member
+				specified by the atFilev2Device and atFilev2StackID objects."
+			::= { atFilev2 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.2.1
+		atFilev2Entry OBJECT-TYPE
+			SYNTAX AtFilev2Entry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the list of files containing information about a
+				single file."
+			INDEX { atFilev2Filename }
+			::= { atFilev2Table 1 }
+
+		
+		AtFilev2Entry ::=
+			SEQUENCE { 
+				atFilev2Filename
+					OCTET STRING,
+				atFilev2FileSize
+					Integer32,
+				atFilev2FileCreationTime
+					OCTET STRING,
+				atFilev2FileAttribs
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.2.1.1
+		atFilev2Filename OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the file. Files are sorted in alphabetical order.
+				Directory names end with / and have a 'd' present in the
+				atFilev2FileAttribs object.
+				
+				The filename is truncated at 112 characters due to SNMP OID
+				length limitations. If two files are not uniquely
+				distinguishable within the first 112 characters, the listing
+				will halt after the first file."
+			::= { atFilev2Entry 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.2.1.2
+		atFilev2FileSize OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The size of the file in bytes."
+			::= { atFilev2Entry 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.2.1.3
+		atFilev2FileCreationTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"File creation time in the form <MMM DD YYYY HH:MM:SS>.
+				Eg: Sep 7 2008 06:07:54."
+			::= { atFilev2Entry 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.2.1.4
+		atFilev2FileAttribs OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The standard file accessibility attributes in the form <drwx>.
+				
+				d - directory
+				r - readable
+				w - writeable
+				x - executable
+				
+				If a file does not have a particular attribute set, the
+				respective position will contain a -. For example, <-r-x>
+				indicates a readable and executable file that is not a
+				directory or writeable."
+			::= { atFilev2Entry 4 }
+
+		
+-- ---------------------------------------------------------- --
+-- The file operation objects
+-- ---------------------------------------------------------- --
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3
+		atFilev2FileOperation OBJECT IDENTIFIER::= { atFilev2 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.1
+		atFilev2SourceStackID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set an integer corresponding to the stack ID of the stack
+				member to use as the source. This value is ignored if the
+				source device is set to TFTP. 
+				
+				If running a stand-alone unit, use the default value of 1."
+			::= { atFilev2FileOperation 1 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.2
+		atFilev2SourceDevice OBJECT-TYPE
+			SYNTAX Integer32 (0..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set an integer that corresponds with a device found below:
+				
+				0. Unconfigured (not settable)
+				1. Flash
+				2. Card
+				3. NVS
+				4. TFTP
+				
+				For copying, you may use any combination of devices for the
+				source and destination except for copying from TFTP to TFTP.
+				For moving files you cannot use TFTP as source or destination.
+				For deleting, the source cannot be TFTP. 
+				
+				To copy a file from TFTP to flash, use 4 for source and 1 for
+				destination.
+				
+				You must fully configure all required parameters for each
+				device. Only TFTP has an IP address required."
+			DEFVAL { '1'b }
+			::= { atFilev2FileOperation 2 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.3
+		atFilev2SourceFilename OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The filename of the source file to copy, move or delete.
+				Include any path as required, but the storage type is not
+				necessary. Setting a null string will return an error.
+				
+				For example, to copy the file latest.cfg from the
+				backupconfigs/routers directory on the TFTP server, you would
+				set:
+				
+				backupconfigs/routers/latest.cfg"
+			::= { atFilev2FileOperation 3 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.4
+		atFilev2DestinationStackID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set an integer corresponding to the stack ID of the stack
+				member to use as the destination. This value is ignored if the
+				destination device is set to TFTP, or if a deletion operation
+				is carried out. 
+				
+				If running a stand-alone unit, use the default value of 1."
+			::= { atFilev2FileOperation 4 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.5
+		atFilev2DestinationDevice OBJECT-TYPE
+			SYNTAX Integer32 (0..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set an integer that corresponds with a device found below:
+				
+				0. Unconfigured (not settable)
+				1. Flash
+				2. Card
+				3. NVS
+				4. TFTP
+				
+				For copying, you may use any combination of devices for the
+				source and destination except for copying from TFTP to TFTP.
+				For moving files you cannot use TFTP as source or destination.
+				For deleting, the destination source is ignored.
+				
+				To copy a file from TFTP to flash, use 4 for source and 1 for
+				destination.
+				
+				You must fully configure all required parameters for each
+				device. Only TFTP has an IP address required."
+			DEFVAL { '1'b }
+			::= { atFilev2FileOperation 5 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.6
+		atFilev2DestinationFilename OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The destination filename of the file to copy or move. Include
+				any path as required, but the storage type is not necessary.
+				For any operation other than a file deletion, setting a null
+				string will return an error. For deletions, any value set to
+				this object is ignored.
+				
+				Note: If the destination is set to flash, card or nvs, any file
+				at the destination that shares the destination filename will be
+				overwritten by a move or copy operation.
+				
+				The destination filename does not need to be the same as the
+				source filename.
+				
+				For example, to copy a release file from the TFTP server to the
+				local flash into the backuprelease directory, you would set:
+				
+				backuprelease/latest.rel"
+			::= { atFilev2FileOperation 6 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.7
+		atFilev2CopyBegin OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"A read on this object can return several possible values,
+				depending on the current status of the system and the
+				various file operation objects:
+				
+				idle                               There is no file operation
+				                                   in progress and all required
+				                                   objects have been set
+				                                   correctly. Setting a '1' to
+				                                   this object will begin the
+				                                   file copy.
+				
+				Error codes: [1-7]                 A copy operation cannot be
+				                                   started until these errors
+				                                   are resolved. See below for
+				                                   key.
+				
+				[action]ing x [--> y]              A file operation is
+				                                   currently in progress. You
+				                                   cannot start another
+				                                   operation while the object
+				                                   is returning this value.
+				
+				[action] x [--> y] success         The last copy, move or
+				                                   delete operation was 
+				                                   successfully completed.
+				
+				[action] x [--> y] failure: [err]  The last copy, move or
+				                                   delete operation failed, 
+				                                   with the error message
+				                                   attached. Common failures 
+				                                   include lack of space on the
+				                                   destination file system,
+				                                   incorrect source file names
+				                                   or communication errors with
+				                                   remote services.
+				
+				Upon reading a success or failure message, the message will be
+				cleared and the next read will result in either an 'idle'
+				message or an 'Error codes' message if not all required objects
+				have been correctly set. If the read returned 'idle', a new
+				file operation can now be started.
+				
+				
+				Error codes for file copy:
+				
+				1 - atFilev2SourceDevice has not been set
+				2 - atFilev2SourceFilename has not been set
+				3 - atFilev2DestinationDevice has not been set
+				4 - atFilev2DestinationFilename has not been set
+				5 - atFilev2SourceDevice and atFilev2DestinationDevice are both
+				    set to TFTP
+				6 - the combination of source device, stackID and filename is
+				    the same as the destination device, stackID and filename
+				    (i.e. it is not valid to copy a file onto itself.
+				7 - TFTP IP address has not been set and TFTP has been set for
+				    one of the devices
+				
+				Provided all above requirements are met, immediately upon
+				executing the SNMP set, the device will indicate that it was a
+				success. The actual file copy itself will be started and
+				continue on the device until it has completed. For large files,
+				operations can take several minutes to complete.
+				
+				Subsequent reads of the object will return one of messages
+				shown in the first table, to allow for tracking of the progress
+				of the copy operation."
+			::= { atFilev2FileOperation 7 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.8
+		atFilev2MoveBegin OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"A read on this object can return several possible values,
+				depending on the current status of the system and the various
+				file operation objects:
+				
+				idle                               There is no file operation
+				                                   in progress and all required
+				                                   objects have been set
+				                                   correctly. Setting a '1' to
+				                                   this object will begin the
+				                                   file move.
+				
+				Error codes: [1-6]                 A move operation cannot be
+				                                   started until these errors
+				                                   are resolved. See below for
+				                                   key.
+				
+				[action]ing x [--> y]              A file operation is
+				                                   currently in progress. You
+				                                   cannot start another
+				                                   operation while the object
+				                                   is returning this value.
+				
+				[action] x [--> y] success         The last copy, move or
+				                                   delete operation was 
+				                                   successfully completed.
+				
+				[action] x [--> y] failure: [err]  The last copy, move or
+				                                   delete operation failed,
+				                                   with the error message
+				                                   attached. Common failures 
+				                                   include lack of space on the
+				                                   destination file system,
+				                                   incorrect source file names
+				                                   or communication errors with
+				                                   remote services.
+				
+				Upon reading a success or failure message, the message will be
+				cleared and the next read will result in either an 'idle'
+				message or an 'Error codes' message if not all required objects
+				have been correctly set. If the read returned 'idle', a new
+				file operation can now be started.
+				
+				
+				Error codes for file move:
+				
+				1 - atFilev2SourceDevice has not been set
+				2 - atFilev2SourceFilename has not been set
+				3 - atFilev2DestinationDevice has not been set
+				4 - atFilev2DestinationFilename has not been set
+				5 - either atFilev2SourceDevice or atFilev2DestinationDevice
+				    are set to TFTP
+				6 - the combination of source device, stackID and filename is
+				    the same as the destination device, stackID and filename
+				    (i.e. it is not valid to move a file onto itself.
+				
+				Provided all above requirements are met, immediately upon
+				executing the SNMP set, the device will indicate that it was a
+				success. The actual file move itself will be started and
+				continue on the device until it has completed. For large files,
+				operations can take several minutes to complete.
+				
+				Subsequent reads of the object will return one of messages
+				shown in the first table, to allow for tracking of the progress
+				of the move operation."
+			::= { atFilev2FileOperation 8 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.9
+		atFilev2DeleteBegin OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"A read on this object can return several possible values,
+				depending on the current status of the system and the various
+				file operation objects:
+				
+				idle                               There is no file operation
+				                                   in progress and all required
+				                                   objects have been set
+				                                   correctly. Setting a '1' to
+				                                   this object will begin the
+				                                   file deletion.
+				
+				Error codes: [1-3]                 A delete operation cannot be
+				                                   started until these errors
+				                                   are resolved. See below for
+				                                   key.
+				
+				[action]ing x [--> y]              A file operation is
+				                                   currently in progress. You
+				                                   cannot start another
+				                                   operation while the object
+				                                   is returning this value.
+				
+				[action] x [--> y] success         The last copy, move or
+				                                   delete operation was 
+				                                   successfully completed.
+				
+				[action] x [--> y] failure: [err]  The last copy, move or
+				                                   delete operation failed,
+				                                   with the error message
+				                                   attached. Common failures 
+				                                   include lack of space on the
+				                                   destination file system,
+				                                   incorrect source file names
+				                                   or communication errors with
+				                                   remote services.
+				
+				Upon reading a success or failure message, the message will be
+				cleared and the next read will result in either an 'idle'
+				message or an 'Error codes' message if not all required objects
+				have been correctly set. If the read returned 'idle', a new
+				file operation can now be started.
+				
+				File deletion operations ignore the values set in the
+				atFilev2DestinationStackID, atFilev2DestinationDevice and
+				atFilev2DestinationFilename objects.
+				
+				The file deletion operation is equivalent to the CLI 'delete
+				force [file]' command, so it is possible to delete any
+				normally-protected system files, such as the currently
+				configured boot release.
+				
+				
+				Error codes for file deletion:
+				
+				1 - atFilev2SourceDevice has not been set
+				2 - atFilev2SourceFilename has not been set
+				3 - atFilev2SourceDevice has been set to TFTP
+				
+				Provided all above requirements are met, immediately upon
+				executing the SNMP set, the device will indicate that it was a
+				success. The actual file deletion itself will be started and
+				continue on the device until it has completed. For large files,
+				operations can take several minutes to complete.
+				
+				Subsequent reads of the object will return one of messages
+				shown in the first table, to allow for tracking of the progress
+				of the delete operation."
+			::= { atFilev2FileOperation 9 }
+
+		
+-- Begin file operation devices.
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.10
+		atFilev2Flash1 OBJECT IDENTIFIER::= { atFilev2FileOperation 10 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.11
+		atFilev2Card2 OBJECT IDENTIFIER::= { atFilev2FileOperation 11 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.12
+		atFilev2Nvs3 OBJECT IDENTIFIER::= { atFilev2FileOperation 12 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.13
+		atFilev2Tftp4 OBJECT IDENTIFIER::= { atFilev2FileOperation 13 }
+
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.3.13.1
+		atFilev2TftpIPAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The IP address of the TFTP server that is to be used for the
+				file copy process. This IP address needs to be reachable from
+				the device or the file copy will fail."
+			::= { atFilev2Tftp4 1 }
+-- End file operation devices.
+
+-- ---------------------------------------------------------- -- 
+-- The SD Card Table
+-- ---------------------------------------------------------- -- 
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.4 
+		atFilev2SDcardTable  OBJECT-TYPE 
+			SYNTAX      SEQUENCE OF AtFilev2SDcardEntry 
+			MAX-ACCESS  not-accessible 
+			STATUS      current 
+			DESCRIPTION 
+				"A table of information about SD cards." 
+			::= { atFilev2 4 }
+
+
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.4.1 
+		atFilev2SDcardEntry OBJECT-TYPE 
+			SYNTAX      AtFilev2SDcardEntry 
+			MAX-ACCESS  not-accessible 
+			STATUS      current 
+			DESCRIPTION 
+				"Data pertaining to an SD card instance." 
+			INDEX { atFilev2SDcardStackMemberId } 
+			::= { atFilev2SDcardTable 1 }
+
+	 
+	 	AtFilev2SDcardEntry ::=
+			SEQUENCE
+			{
+	  			atFilev2SDcardStackMemberId 
+	  				Unsigned32,
+	   			atFilev2SDcardPresence
+	    			INTEGER
+	     	}
+
+	      
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.4.1.1
+		atFilev2SDcardStackMemberId OBJECT-TYPE
+			SYNTAX      Unsigned32
+			MAX-ACCESS  read-only
+			STATUS      current
+			DESCRIPTION
+				"The index of the stack member hosting this SD card."
+			::= { atFilev2SDcardEntry  1 }
+		
+		
+		-- 1.3.6.1.4.1.207.8.4.4.4.600.4.1.2
+		atFilev2SDcardPresence OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				notPresent(1),
+				present(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether or not an SD card is inserted
+				into a slot."
+			::= { atFilev2SDcardEntry 2 }
+
+
+-- Add any new devices to the bottom as required.
+	
+	END
+
+--
+-- at-filev2.mib
+--

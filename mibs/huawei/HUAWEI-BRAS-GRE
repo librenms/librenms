@@ -1,0 +1,200 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-GRE-MIB DEFINITIONS
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+HUAWEI-BRAS-GRE-MIB    DEFINITIONS ::= BEGIN
+    
+    IMPORTS
+    hwBRASMib            
+        FROM HUAWEI-MIB
+    RowStatus 
+        FROM SNMPv2-TC;   
+
+        hwGRE MODULE-IDENTITY 
+            LAST-UPDATED "200508101200Z"
+            ORGANIZATION 
+                "HAUWEI MIB Standard community.
+                "
+            CONTACT-INFO 
+        "Floor 5, Block 4, R&D Building,
+        Huawei Longgang Production Base,
+        Shenzhen,   P.R.C.
+        http://www.huawei.com
+        Zip:518057
+        "
+            DESCRIPTION 
+                "V1.00.
+                The GRE mib is for all datacomm product.
+                "
+            ::= { hwBRASMib 13 }
+
+    
+    hwhwGREMibObjects OBJECT IDENTIFIER ::= { hwGRE 1 }        
+
+
+    hwQueryGreGroupTable   OBJECT-TYPE
+    SYNTAX        SEQUENCE OF HWQueryGreGroupEntry
+    ACCESS        not-accessible
+    STATUS        current    
+    ::=  { hwhwGREMibObjects 1 }
+    
+   hwQueryGreGroupEntry OBJECT-TYPE
+    SYNTAX        HWQueryGreGroupEntry
+    ACCESS        not-accessible
+    STATUS        current
+    DESCRIPTION    "An entry of hwQueryGreGroupTable."
+        INDEX           { hwQueryGreGroupName }
+    ::= { hwQueryGreGroupTable 1 }
+   
+    HWQueryGreGroupEntry ::=
+        SEQUENCE {
+                hwQueryGreGroupName
+                        OCTET STRING,
+                hwQueryGreGroupCounter
+                        Integer32,
+                hwQueryGreGroupActiveTunnel
+                        OCTET STRING,
+                hwQueryGreGroupTunnel1Name
+                        OCTET STRING,
+                hwQueryGreGroupTunnel2Name
+                        OCTET STRING,
+                hwQueryGreGroupTunnel3Name
+                        OCTET STRING,
+                hwQueryGreGroupTunnel4Name
+                        OCTET STRING,
+                hwQueryGreGroupTunnel1Preference        
+                    Integer32,
+                hwQueryGreGroupTunnel2Preference        
+                    Integer32,
+                hwQueryGreGroupTunnel3Preference        
+                    Integer32,
+                hwQueryGreGroupTunnel4Preference        
+                    Integer32
+                    
+                 }          
+
+        hwQueryGreGroupName   OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (1..32))
+         ACCESS        read-only
+         STATUS        current
+         DESCRIPTION    "The name of the gre-group."
+         ::= { hwQueryGreGroupEntry 1 }
+   
+
+        hwQueryGreGroupCounter   OBJECT-TYPE
+         SYNTAX        Integer32(0..4)
+         ACCESS        read-only
+         STATUS        current
+         DESCRIPTION    "The number of interfaces that the gre-group bound."
+         ::= { hwQueryGreGroupEntry 2 }
+   
+
+        hwQueryGreGroupActiveTunnel   OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..64))
+         ACCESS        read-only
+         STATUS        current
+         DESCRIPTION    "The name of the active tunnel of the gre-group."
+         ::= { hwQueryGreGroupEntry 3 }
+
+
+        hwQueryGreGroupTunnel1Name   OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..64))
+         ACCESS        read-only
+         STATUS        current
+         DESCRIPTION    "The name of the first tunnel of the gre-group."
+         ::= { hwQueryGreGroupEntry 4 }
+      
+
+        hwQueryGreGroupTunnel2Name   OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..64))
+         ACCESS        read-only
+         STATUS        current
+         DESCRIPTION    "The name of the second tunnel of the gre-group."
+         ::= { hwQueryGreGroupEntry 5 }
+      
+
+        hwQueryGreGroupTunnel3Name   OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..64))
+         ACCESS        read-only
+         STATUS        current
+         DESCRIPTION    "The name of the third tunnel of the gre-group."
+         ::= { hwQueryGreGroupEntry 6}
+      
+
+        hwQueryGreGroupTunnel4Name   OBJECT-TYPE
+         SYNTAX        OCTET STRING (SIZE (0..64))
+         ACCESS        read-only
+         STATUS        current
+         DESCRIPTION    "The name of the fourth tunnel of the gre-group."
+         ::= { hwQueryGreGroupEntry 7 }
+
+
+        hwQueryGreGroupTunnel1Preference      OBJECT-TYPE
+         SYNTAX             Integer32(0..4294967295)
+         MAX-ACCESS             read-only
+         STATUS             current
+         DESCRIPTION            "The preference of the first tunnel."
+         ::= { hwQueryGreGroupEntry 8 }
+
+
+        hwQueryGreGroupTunnel2Preference      OBJECT-TYPE
+         SYNTAX             Integer32(0..4294967295)
+         MAX-ACCESS             read-only
+         STATUS             current
+         DESCRIPTION            "The preference of the second tunnel."
+         ::= { hwQueryGreGroupEntry 9 }
+       
+
+        hwQueryGreGroupTunnel3Preference      OBJECT-TYPE
+         SYNTAX             Integer32(0..4294967295)
+         MAX-ACCESS             read-only
+         STATUS             current
+         DESCRIPTION            "The preference of the third tunnel."
+         ::= { hwQueryGreGroupEntry 10 }
+       
+
+        hwQueryGreGroupTunnel4Preference      OBJECT-TYPE
+         SYNTAX             Integer32(0..4294967295)
+         MAX-ACCESS             read-only
+         STATUS             current
+         DESCRIPTION            "The preference of the fourth tunnel."
+         ::= { hwQueryGreGroupEntry 11 }    
+         
+         
+    --  ============== conformance information ==============
+        hwQueryGreConformance OBJECT IDENTIFIER ::= { hwGRE 2 }
+        
+        
+        hwQueryGreCompliances OBJECT IDENTIFIER ::= { hwQueryGreConformance 1 }
+        hwQueryGreCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwQueryGrePolicyGroup}  
+                                               
+              ::= { hwQueryGreCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwQueryGreGroups OBJECT IDENTIFIER ::= { hwQueryGreConformance 2 } 
+        
+        hwQueryGrePolicyGroup OBJECT-GROUP
+            OBJECTS { hwQueryGreGroupName, hwQueryGreGroupCounter, hwQueryGreGroupActiveTunnel, 
+                hwQueryGreGroupTunnel1Name, hwQueryGreGroupTunnel2Name, hwQueryGreGroupTunnel3Name,
+                hwQueryGreGroupTunnel4Name, hwQueryGreGroupTunnel1Preference, hwQueryGreGroupTunnel2Preference,
+                hwQueryGreGroupTunnel3Preference, hwQueryGreGroupTunnel4Preference}                      
+            STATUS current
+            DESCRIPTION 
+                "The query gre policy group."
+            ::= { hwQueryGreGroups 1 }
+        --  ============== conformance information define end ==============
+END       

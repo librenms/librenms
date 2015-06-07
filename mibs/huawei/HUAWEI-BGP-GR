@@ -1,0 +1,341 @@
+--  =================================================================
+-- Copyright (C) 2006 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description the HUAWEI-BGP-GR-MIB provides information about BPG GR,
+-- management of huawei can make simple configuration of BGP GR also. 
+-- Reference:
+-- Version: V1.0
+-- History:
+-- yefei60142 2006-11-22 publish
+-- =================================================================
+
+    HUAWEI-BGP-GR-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InetAddress            
+                FROM INET-ADDRESS-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+        hwBgpGRMIB MODULE-IDENTITY 
+            LAST-UPDATED "200611220000Z"        -- November 22, 2006 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                " R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            DESCRIPTION 
+                "The HUAWEI-BGP-GR-MIB contains objects to 
+                Manage configuration and Monitor running state 
+                for BGP Graceful Restart feature."
+            ::= { hwDatacomm 138 }
+
+        
+    
+-- Status to judge whether capability of GR have enabled or not            
+        Status ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This type is used to show status of GR,for example 'enable' 
+                means capability of GR have enabled, 'disable' means
+                capability of GR have disabled"
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+
+--  AFI type of enumeration 
+        AFIType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This type is used to show Address Family"
+            SYNTAX INTEGER
+                {
+                notspecified(1),
+                ipv4(2),
+                ipv6(3),
+                vpls(25),
+                l2vpn(196)
+                }
+
+--  SAFI type of enumeration       
+        SAFIType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This type is used to show Sub Address Family"
+            SYNTAX INTEGER
+                {
+                notspecified(1),
+                unicast(2),
+                multicast(3),
+                unicastandmulticast(4),
+                mpls(5),
+                vpls(65),
+                vpnv4(128)
+                }
+
+--  GRRole  show role of router in the process of GR,restarter/helper/grnormal/grnegotiatefail
+        GRRole ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "This type is used to show Role of router in the process of GR,
+                'restarter' means the router pay Restarter role in the process 
+                of GR,'helper'means the router pay Helper role in the process of 
+                GR,if each peer have conferred with each others on GR,we call the
+                kind of state is 'grnormal',if negotiation is unsuccessful,the
+                kind of state is 'grnegotiatefail'."
+            SYNTAX INTEGER
+                {
+                grnormal(1),
+                restarter(2),
+                helper(3),
+                grnegotiatefail(4)
+                }
+
+    
+--
+-- Node definitions
+--
+    
+--  Node definitions
+-- 
+        hwBgpGRMIBObjects OBJECT IDENTIFIER ::= { hwBgpGRMIB 1 }
+
+        
+--  BGPGRCapability  Capability of GR for BGP 
+        hwBgpGRCapability OBJECT-TYPE
+            SYNTAX Status
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "We can see status of GR by this node,the value 'enable'
+                denotes that capability of GR have be actived, 'disable'
+                denotes that capability of GR have be disabled."
+            ::= { hwBgpGRMIBObjects 1 }
+
+        
+--  GRRestartTimer    BGP GR restart timer            
+        hwBgpGRRestartTime OBJECT-TYPE
+            SYNTAX Integer32 (3..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Value of BGP GR restart timer(second)"
+            ::= { hwBgpGRMIBObjects 2 }
+
+        
+--  GRWaitForRibTimer   BGP GR wait-for-EndofRib timer          
+        hwBgpGRWaitForRibTime OBJECT-TYPE
+            SYNTAX Integer32 (3..3000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of BGP GR wait-for-EndofRib timer(second)"
+            ::= { hwBgpGRMIBObjects 3 }
+
+        
+--  config table 
+-- hwGRStatusInfoTable to show state of local router for a special peer Begin   
+        hwBgpGRStatusInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBgpGRStatusInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table show state of local router for a special peer."
+            ::= { hwBgpGRMIBObjects 4 }
+
+        
+        hwBgpGRStatusInfoEntry OBJECT-TYPE
+            SYNTAX HwBgpGRStatusInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "State of local router for a special peer in this entry"
+            INDEX { hwBgpGRStatAddressFamily, hwBgpGRStatSubAddressFamily, hwBgpGRStatInstanceID, hwBgpGRStatPeerAddress }
+            ::= { hwBgpGRStatusInfoTable 1 }
+
+        
+        HwBgpGRStatusInfoEntry ::=
+            SEQUENCE { 
+                hwBgpGRStatAddressFamily
+                    AFIType,
+                hwBgpGRStatSubAddressFamily
+                    SAFIType,
+                hwBgpGRStatInstanceID
+                    Unsigned32,
+                hwBgpGRStatPeerAddress
+                    InetAddress,
+                hwBgpGRStatLocalGRRole
+                    GRRole
+             }
+
+        hwBgpGRStatAddressFamily OBJECT-TYPE
+            SYNTAX AFIType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Address family of BGP(
+                notspecified(1),
+                ipv4(2),
+                ipv6(3),
+                vpls(25),
+                l2vpn(196))"
+            ::= { hwBgpGRStatusInfoEntry 1 }
+
+        
+        hwBgpGRStatSubAddressFamily OBJECT-TYPE
+            SYNTAX SAFIType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Sub address family of BGP(
+                notspecified(1),
+                unicast(2),
+                multicast(3),
+                unicastandmulticast(4),
+                mpls(5),
+                vpls(65),
+                vpnv4(128))"
+            ::= { hwBgpGRStatusInfoEntry 2 }
+
+        
+        hwBgpGRStatInstanceID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The instance index of linking peer"
+            ::= { hwBgpGRStatusInfoEntry 3 }
+        hwBgpGRStatPeerAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Ipv4 address family of peer,note:there is only one kind of IP Address at 
+                a special address family,for example,there is ipv4 address at public 
+                unicast,and there will not be ipv6 address."
+            ::= { hwBgpGRStatusInfoEntry 4 } 
+
+        
+        hwBgpGRStatLocalGRRole OBJECT-TYPE
+            SYNTAX GRRole
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Role of router in the process of GR,'restarter' means the router
+                pay Restarter role in the process of GR,'helper' means the
+                router pay Helper role in the process of GR,if each peer have
+                confered with each others on GR,we call the kind of state is
+                'grnormal',if negotiation is unsuccessful,the kind of state is
+                'grnegotiatefail'"
+            ::= { hwBgpGRStatusInfoEntry 5 }
+
+        
+        hwBgpGRTrap OBJECT IDENTIFIER ::= { hwBgpGRMIB 2 }
+
+        
+--  hwGRStatusInfoTable to show state of local router for a special peer   End
+-- hwGRWarningInfoTable Alarm table for GR   Begin
+        hwBgpGRRestarterEnterGR NOTIFICATION-TYPE
+            OBJECTS { hwBgpGRStatLocalGRRole }
+            STATUS current
+            DESCRIPTION 
+                "We will report alarm when the local
+                Router enters the GR state."
+            ::= { hwBgpGRTrap 1 }
+
+        
+        hwBgpGRRestarterExitGR NOTIFICATION-TYPE
+            OBJECTS { hwBgpGRStatLocalGRRole }
+            STATUS current
+            DESCRIPTION 
+                "We will recover the hwRestarterEnterGR alarm when the local
+                Router exit the GR state."
+            ::= { hwBgpGRTrap 2 }
+
+        
+        hwBgpGRHelperGRRestartTimeOut NOTIFICATION-TYPE
+            OBJECTS { hwBgpGRStatLocalGRRole }
+            STATUS current
+            DESCRIPTION 
+                "The Restart Timer of Helper is overtime for special reason
+                in process of GR."
+            ::= { hwBgpGRTrap 3 }
+
+        
+        hwBgpGRHelperGRWaitForEndofRibTimeOut NOTIFICATION-TYPE
+            OBJECTS { hwBgpGRStatLocalGRRole }
+            STATUS current
+            DESCRIPTION 
+                "The WaitForEndofRib Timer of Helper is overtime for special reason
+                in process of GR."
+            ::= { hwBgpGRTrap 4 }
+
+        
+--  hwGRWarningInfoTable Alarm table for GR   End
+-- conformance information
+        hwBgpGRMIBConformance OBJECT IDENTIFIER ::= { hwBgpGRMIB 3 }
+
+        
+        hwBgpGRMIBCompliances OBJECT IDENTIFIER ::= { hwBgpGRMIBConformance 1 }
+
+        
+--   compliance statements
+-- this module
+        hwBgpGRMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for Border GateWay Protocol Graceful Restart MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwBgpGRCfgGroup, hwBgpGRStatGroup, hwBgpGRTrapGroup }
+            ::= { hwBgpGRMIBCompliances 1 }
+
+        
+        hwBgpGRMIBGroups OBJECT IDENTIFIER ::= { hwBgpGRMIBConformance 2 }
+
+        
+--   units of conformance
+        hwBgpGRCfgGroup OBJECT-GROUP
+            OBJECTS { hwBgpGRRestartTime, hwBgpGRWaitForRibTime, hwBgpGRCapability }
+            STATUS current
+            DESCRIPTION 
+                "Required objects to provide hwBgpGRMIB objects configuration 
+                information. hwBgpGRCfgGroup is optional."
+            ::= { hwBgpGRMIBGroups 1 }
+
+        
+        hwBgpGRStatGroup OBJECT-GROUP
+            OBJECTS { hwBgpGRStatLocalGRRole }
+            STATUS current
+            DESCRIPTION 
+                "Required objects to provide hwBgpGRMIB objects configuration 
+                information. hwBgpGRStatGroup is optional."
+            ::= { hwBgpGRMIBGroups 2 }
+
+        
+        hwBgpGRTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwBgpGRRestarterEnterGR, hwBgpGRRestarterExitGR, hwBgpGRHelperGRRestartTimeOut, hwBgpGRHelperGRWaitForEndofRibTimeOut }
+            STATUS current
+            DESCRIPTION 
+                "Objects required for BGP GR Trap."
+            ::= { hwBgpGRMIBGroups 3 }
+
+        
+    
+    END
+
+--
+-- HUAWEI-BGP-GR-MIB.my
+--

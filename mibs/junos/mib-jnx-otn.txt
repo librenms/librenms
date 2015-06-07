@@ -1,0 +1,1019 @@
+--
+-- Juniper Enterprise Specific MIB: OTN Interface Management MIB Extension
+-- 
+-- Copyright (c) 2008, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-OTN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, TimeTicks, NOTIFICATION-TYPE,
+    Unsigned32, Counter32
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    jnxOtnMibRoot, jnxOtnNotifications
+        FROM JUNIPER-SMI
+    ifIndex, ifDescr
+        FROM IF-MIB;
+
+jnxOtnMib MODULE-IDENTITY
+    LAST-UPDATED "200807100931Z" -- Thur Jul 10 09:30:00 2008 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This MIB module defines objects used for managing the
+             OTN interfaces of Juniper products."
+    REVISION      "200807100000Z" 
+    DESCRIPTION
+               "Added OTN Alarms and PM data."
+    REVISION      "200807100000Z" 
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxOtnMibRoot 1 }
+
+JnxOtnAlarmId ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Identifies specific sonet/sdh alarms that may exist on an
+             interface."
+    SYNTAX     BITS {
+                   otnLosAlarm(0),      -- OTN Loss of signal alarm
+                   otnLofAlarm(1),      -- OTN Loss of frame alarm 
+                   otnLomAlarm(2),      -- OTN Loss of multi frame alarm 
+                   otnWavelengthlockAlarm(3), 
+                                        -- OTN wavelength lock alarm 
+                   otnOtuAisAlarm(4),   -- OTN AIS alarm 
+                   otnOtuBdiAlarm(5),   -- OTN OTU BDI alarm 
+                   otnOtuTtimAlarm(6),  -- OTN OTU TTIM alarm 
+                   otnOtuIaeAlarm(7),   -- OTN OTU IAE alarm 
+                   otnOtuSdAlarm(8),    -- OTN OTU bit err. rate defect alarm,
+                   otnOtuSfAlarm(9),    -- OTN OTU  bit err. rate fault alarm,
+                   otnOtuFecExcessiveErrsAlarm(10),  
+                                        -- OTN OTU Fec Excessive Errors alarm 
+                   otnOtuFecDegradedErrsAlarm(11), 
+                                        -- OTN OTU Fec Degraded Errs alarm 
+                   otnOtuBbeThreholdAlarm(12),
+                                        -- OTN OTU BBE Threshold alarm 
+                   otnOtuEsThreholdAlarm(13), 
+                                        -- OTN OTU ES Threshold alarm 
+                   otnOtuSesThreholdAlarm(14),
+                                        -- OTN OTU SES Threshold alarm 
+                   otnOtuUasThreholdAlarm(15),    
+                                        -- OTN OTU UAS Threshold alarm alarm 
+                   otnOduAisAlarm(16),  -- OTN ODU AIS alarm 
+                   otnOduOciAlarm(17),  -- OTN ODU OCI alarm 
+                   otnOduLckAlarm(18),  -- OTN ODU LCK alarm 
+                   otnOduBdiAlarm(19),  -- OTN ODU BDI alarm 
+                   otnOduTtimAlarm(20), -- OTN ODU TTIM alarm 
+                   otnOduSdAlarm(21),   -- OTN ODU bit err. rate defect alarm,
+                   otnOduSfAlarm(22),   -- OTN ODU  bit err. rate fault alarm,
+                   otnOduRxApsChange(23),
+                                        -- OTN Rx APS Change
+                   otnOduBbeThreholdAlarm(24),
+                                        -- OTN ODU BBE Threshold alarm 
+                   otnOduEsThreholdAlarm(25),
+                                        -- OTN OTU ES Threshold alarm 
+                   otnOduSesThreholdAlarm(26),
+                                        -- OTN OTU SES Threshold alarm 
+                   otnOduUasThreholdAlarm(27),
+                                        -- OTN ODU UAS Threshold alarm alarm
+                   otnOpuPMTAlarm(28)   -- OTN OPU Payload Mismatch alarm 
+               }
+
+--
+-- Otn alarm information
+--
+
+jnxOtnAlarms OBJECT IDENTIFIER ::= { jnxOtnMib 1 }
+
+jnxOtnAlarmTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION 
+                "Information about alarms on all the sonet/sdh physical
+                 interfaces on this router."
+        ::= { jnxOtnAlarms 1 } 
+
+jnxOtnAlarmEntry OBJECT-TYPE
+        SYNTAX     JnxOtnAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about alarms on a sonet/sdh physical interface on 
+                 this router."
+        INDEX   { ifIndex }
+        ::= { jnxOtnAlarmTable 1 }
+
+JnxOtnAlarmEntry ::=
+    SEQUENCE {
+        jnxOtnCurrentAlarms
+                JnxOtnAlarmId,
+        jnxOtnLastAlarmId
+                JnxOtnAlarmId,
+        jnxOtnLastAlarmTime
+                TimeTicks,
+        jnxOtnLastAlarmDate
+                DateAndTime,
+        jnxOtnLastAlarmEvent
+                INTEGER
+    }
+
+jnxOtnCurrentAlarms OBJECT-TYPE
+        SYNTAX      JnxOtnAlarmId
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"This object identifies all the active OTN alarms on this
+                 interface."
+	::= { jnxOtnAlarmEntry 1 }
+
+jnxOtnLastAlarmId OBJECT-TYPE
+	SYNTAX      JnxOtnAlarmId
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The object identifies the OTN alarm that most recently
+                 was set or cleared."
+	::= { jnxOtnAlarmEntry 2 }
+
+jnxOtnLastAlarmTime OBJECT-TYPE
+	SYNTAX      TimeTicks
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The value of sysUpTime when the management subsystem learned
+                 of the last alarm event."
+	::= { jnxOtnAlarmEntry 3 }
+
+jnxOtnLastAlarmDate OBJECT-TYPE
+	SYNTAX      DateAndTime
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The system date and time when the management subsystem learned
+                 of the last alarm event."
+	::= { jnxOtnAlarmEntry 4 }
+
+jnxOtnLastAlarmEvent OBJECT-TYPE
+       	SYNTAX      INTEGER {
+                        none    (1),
+                        set     (2),
+                        cleared (3)
+                    }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"This indicates whether the last alarm event set a new alarm
+                 or cleared an existing alarm."
+	::= { jnxOtnAlarmEntry 5 }
+
+
+-- Performance Monitoring Data
+
+jnxOtnPerformanceMonitoring OBJECT IDENTIFIER ::= { jnxOtnMib 2 }
+
+-- Current ODU Stats
+
+jnxOtnCurrentOdu15minTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF JnxOtnCurrentOdu15minEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Information about ODU Performance monitoring for this
+                 interfaces on this router."
+	::= { jnxOtnPerformanceMonitoring 1 }
+
+jnxOtnCurrentOdu15minEntry OBJECT-TYPE
+	SYNTAX     JnxOtnCurrentOdu15minEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+                "Performance data about ia 15 minute interface on
+                 this router"
+	INDEX	{ ifIndex }
+	::= { jnxOtnCurrentOdu15minTable 1 }
+
+JnxOtnCurrentOdu15minEntry ::=
+    SEQUENCE {
+	jnxOtnCurrentOdu15minBIP
+		Unsigned32,
+	jnxOtnCurrentOdu15minBBE
+		Unsigned32,
+	jnxOtnCurrentOdu15minES
+		Unsigned32,
+	jnxOtnCurrentOdu15minSES
+		Unsigned32,
+	jnxOtnCurrentOdu15minUAS
+		Unsigned32,
+        jnxOtnCurrentOdu15minElapsedTime
+                Unsigned32
+    }
+
+jnxOtnCurrentOdu15minBIP OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute BIP counter"
+        ::= { jnxOtnCurrentOdu15minEntry 1 }
+
+jnxOtnCurrentOdu15minBBE OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute BBE counter"
+        ::= { jnxOtnCurrentOdu15minEntry 2 }
+
+jnxOtnCurrentOdu15minES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute ES counter"
+        ::= { jnxOtnCurrentOdu15minEntry 3 }
+
+jnxOtnCurrentOdu15minSES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute SES counter"
+        ::= { jnxOtnCurrentOdu15minEntry 4 }
+
+jnxOtnCurrentOdu15minUAS OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute UAS counter"
+        ::= { jnxOtnCurrentOdu15minEntry 5 }
+
+
+jnxOtnCurrentOdu15minElapsedTime OBJECT-TYPE
+       SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnCurrentOdu15minEntry 6 }
+
+
+-- The OTN ODU Interval 
+
+jnxOtnIntervalOdu15minTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnIntervalOdu15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 2 }
+
+jnxOtnIntervalOdu15minEntry OBJECT-TYPE
+        SYNTAX     JnxOtnIntervalOdu15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data in a 15 minute interface on 
+                 this router."
+        INDEX   { ifIndex, jnxOtnIntervalOdu15minIntervalNumber }
+        ::= { jnxOtnIntervalOdu15minTable 1 }
+
+JnxOtnIntervalOdu15minEntry ::=
+    SEQUENCE {
+        jnxOtnIntervalOdu15minIntervalNumber
+                INTEGER,
+        jnxOtnIntervalOdu15minBIP
+                Unsigned32,
+        jnxOtnIntervalOdu15minBBE
+                Unsigned32,
+        jnxOtnIntervalOdu15minES
+                Unsigned32,
+        jnxOtnIntervalOdu15minSES
+                Unsigned32,
+        jnxOtnIntervalOdu15minUAS
+                Unsigned32,
+        jnxOtnIntervalOdu15minInvalidData
+                Unsigned32,
+        jnxOtnIntervalODdu15minTimeStamp
+                DateAndTime
+    }
+
+jnxOtnIntervalOdu15minIntervalNumber OBJECT-TYPE
+        SYNTAX      INTEGER (1..96)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A number between 1 and 96, where 1 is the most
+            recently completed 15 minute interval and 96 is
+            the 15 minutes interval completed 23 hours and 45
+            minutes prior to interval 1."
+        ::= { jnxOtnIntervalOdu15minEntry 1 }
+
+jnxOtnIntervalOdu15minBIP OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute BIP counter"
+        ::= { jnxOtnIntervalOdu15minEntry 2 }
+
+jnxOtnIntervalOdu15minBBE OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute BBE counter"
+        ::= { jnxOtnIntervalOdu15minEntry 3 }
+
+jnxOtnIntervalOdu15minES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute ES counter"
+        ::= { jnxOtnIntervalOdu15minEntry 4 }
+
+jnxOtnIntervalOdu15minSES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute SES counter"
+        ::= { jnxOtnIntervalOdu15minEntry 5 }
+
+jnxOtnIntervalOdu15minUAS OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute UAS counter"
+        ::= { jnxOtnIntervalOdu15minEntry 6 }
+
+jnxOtnIntervalOdu15minInvalidData OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnIntervalOdu15minEntry 7 }
+
+jnxOtnIntervalODdu15minTimeStamp OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnIntervalOdu15minEntry 8 }
+
+-- The OTN ODU Total (24 hour table)
+
+jnxOtnTotalOduTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnTotalOduEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION 
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 3 }
+
+jnxOtnTotalOduEntry OBJECT-TYPE
+        SYNTAX     JnxOtnTotalOduEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data about ia 15 minute interface on 
+                 this router."
+        INDEX   { ifIndex }
+        ::= { jnxOtnTotalOduTable 1 }
+
+JnxOtnTotalOduEntry ::=
+    SEQUENCE {
+        jnxOtnTotalOduDayNumber
+                INTEGER,
+        jnxOtnTotalOduBIP
+                Unsigned32,
+        jnxOtnTotalOduBBE
+                Unsigned32,
+        jnxOtnTotalOduES
+                Unsigned32,
+        jnxOtnTotalOduSES
+                Unsigned32,
+        jnxOtnTotalOduUAS
+                Unsigned32
+    }
+
+jnxOtnTotalOduDayNumber OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Day 'n'number -- currently only one day is supported "
+        ::= { jnxOtnTotalOduEntry 1 }
+
+
+jnxOtnTotalOduBIP OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) BIP counter"
+        ::= { jnxOtnTotalOduEntry 2 }
+
+jnxOtnTotalOduBBE OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) BBE counter in an OTN ODU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOduEntry 3 }
+
+jnxOtnTotalOduES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) ES counter in an OTN ODU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOduEntry 4 }
+
+jnxOtnTotalOduSES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) SES counter in an OTN ODU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOduEntry 5 }
+
+jnxOtnTotalOduUAS OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) UAS counter in an OTN ODU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOduEntry 6 }
+
+
+-- OTN OTU Current PM Data
+jnxOtnCurrentOtu15minTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnCurrentOtu15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 4 }
+
+jnxOtnCurrentOtu15minEntry OBJECT-TYPE
+        SYNTAX     JnxOtnCurrentOtu15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data about ia 15 minute interface on
+                 this router"
+        INDEX   { ifIndex }
+        ::= { jnxOtnCurrentOtu15minTable 1 }
+
+JnxOtnCurrentOtu15minEntry ::=
+    SEQUENCE {
+        jnxOtnCurrentOtu15minBIP
+                Unsigned32,
+        jnxOtnCurrentOtu15minBBE
+                Unsigned32,
+        jnxOtnCurrentOtu15minES
+                Unsigned32,
+        jnxOtnCurrentOtu15minSES
+                Unsigned32,
+        jnxOtnCurrentOtu15minUAS
+                Unsigned32,
+        jnxOtnCurrentOtu15minElapsedTime
+                Unsigned32
+    }
+jnxOtnCurrentOtu15minBIP OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute BIP counter"
+        ::= { jnxOtnCurrentOtu15minEntry 1 }
+
+jnxOtnCurrentOtu15minBBE OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute BBE counter"
+        ::= { jnxOtnCurrentOtu15minEntry 2 }
+
+jnxOtnCurrentOtu15minES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute ES counter"
+        ::= { jnxOtnCurrentOtu15minEntry 3 }
+
+jnxOtnCurrentOtu15minSES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute SES counter"
+        ::= { jnxOtnCurrentOtu15minEntry 4 }
+
+jnxOtnCurrentOtu15minUAS OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute UAS counter"
+        ::= { jnxOtnCurrentOtu15minEntry 5 }
+
+
+jnxOtnCurrentOtu15minElapsedTime OBJECT-TYPE
+       SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnCurrentOtu15minEntry 6 }
+
+
+-- The OTN OTU Interval
+
+jnxOtnIntervalOtu15minTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnIntervalOtu15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 5 }
+
+jnxOtnIntervalOtu15minEntry OBJECT-TYPE
+        SYNTAX     JnxOtnIntervalOtu15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data about ia 15 minute interface on
+                 this router."
+        INDEX   { ifIndex, jnxOtnIntervalOtu15minIntervalNumber }
+        ::= { jnxOtnIntervalOtu15minTable 1 }
+
+JnxOtnIntervalOtu15minEntry ::=
+    SEQUENCE {
+        jnxOtnIntervalOtu15minIntervalNumber
+                INTEGER,
+        jnxOtnIntervalOtu15minBIP
+                Unsigned32,
+        jnxOtnIntervalOtu15minBBE
+                Unsigned32,
+        jnxOtnIntervalOtu15minES
+                Unsigned32,
+        jnxOtnIntervalOtu15minSES
+                Unsigned32,
+        jnxOtnIntervalOtu15minUAS
+                Unsigned32,
+        jnxOtnIntervalOtu15minInvalidData
+                Unsigned32,
+        jnxOtnIntervalOtu15minTimeStamp
+                DateAndTime
+    }
+
+jnxOtnIntervalOtu15minIntervalNumber OBJECT-TYPE
+        SYNTAX      INTEGER (1..96)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A number between 1 and 96, where 1 is the most
+            recently completed 15 minute interval and 96 is
+            the 15 minutes interval completed 23 hours and 45
+            minutes prior to interval 1."
+        ::= { jnxOtnIntervalOtu15minEntry 1 }
+
+jnxOtnIntervalOtu15minBIP OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute BIP counter"
+        ::= { jnxOtnIntervalOtu15minEntry 2 }
+
+jnxOtnIntervalOtu15minBBE OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute BBE counter"
+        ::= { jnxOtnIntervalOtu15minEntry 3 }
+
+jnxOtnIntervalOtu15minES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute ES counter"
+        ::= { jnxOtnIntervalOtu15minEntry 4 }
+
+jnxOtnIntervalOtu15minSES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 'n' 15 minute SES counter"
+        ::= { jnxOtnIntervalOtu15minEntry 5 }
+
+jnxOtnIntervalOtu15minUAS OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute UAS counter"
+        ::= { jnxOtnIntervalOtu15minEntry 6 }
+
+jnxOtnIntervalOtu15minInvalidData OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnIntervalOtu15minEntry 7 }
+
+jnxOtnIntervalOtu15minTimeStamp OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnIntervalOtu15minEntry 8 }
+
+-- The OTN OTU Total (24 hour table)
+
+jnxOtnTotalOtuTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnTotalOtuEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 6 }
+
+jnxOtnTotalOtuEntry OBJECT-TYPE
+        SYNTAX     JnxOtnTotalOtuEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data about ia 15 minute interface on
+                 this router."
+        INDEX   { ifIndex }
+        ::= { jnxOtnTotalOtuTable 1 }
+
+JnxOtnTotalOtuEntry ::=
+    SEQUENCE {
+        jnxOtnTotalOtuDayNumber
+                INTEGER,
+        jnxOtnTotalOtuBIP
+                Unsigned32,
+        jnxOtnTotalOtuBBE
+                Unsigned32,
+        jnxOtnTotalOtuES
+                Unsigned32,
+        jnxOtnTotalOtuSES
+                Unsigned32,
+        jnxOtnTotalOtuUAS
+                Unsigned32
+    }
+
+jnxOtnTotalOtuDayNumber OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Day 'n'number -- currently only one day is supported "
+        ::= { jnxOtnTotalOtuEntry 1 }
+
+
+jnxOtnTotalOtuBIP OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) BIP counter in an OTN OTU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOtuEntry 2 }
+
+jnxOtnTotalOtuBBE OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) BBE counter in an OTN OTU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOtuEntry 3 }
+
+jnxOtnTotalOtuES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) ES counter in an OTN OTU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOtuEntry 4 }
+
+jnxOtnTotalOtuSES OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) SES counter in an OTN OTU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOtuEntry 5 }
+
+jnxOtnTotalOtuUAS OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Total (1 day) counter in an OTN OTU frame in the 
+                in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOtuEntry 6 }
+
+
+-- FEC PM Data
+-- OTN OTU FEC Current PM Data
+jnxOtnCurrentOtuFec15minTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnCurrentOtuFec15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 7 }
+
+jnxOtnCurrentOtuFec15minEntry OBJECT-TYPE
+        SYNTAX     JnxOtnCurrentOtuFec15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data about ia 15 minute interface on
+                 this router"
+        INDEX   { ifIndex }
+        ::= { jnxOtnCurrentOtuFec15minTable 1 }
+
+JnxOtnCurrentOtuFec15minEntry ::=
+    SEQUENCE {
+        jnxOtnCurrentOtuFec15minCorrectedErrors
+                Unsigned32,
+        jnxOtnCurrentOtuFec15minCorrectedErrorRatioX
+                Unsigned32,
+        jnxOtnCurrentOtuFec15minCorrectedErrorRatioY
+                Unsigned32,
+        jnxOtnCurrentOtuFec15minUncorrectedWords
+                Unsigned32,
+        jnxOtnCurrentOtuFec15minElapsedTime
+                Unsigned32
+    }
+jnxOtnCurrentOtuFec15minCorrectedErrors OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute FEC Corrected Errors counter"
+        ::= { jnxOtnCurrentOtuFec15minEntry 1 }
+
+jnxOtnCurrentOtuFec15minCorrectedErrorRatioX OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute CorrectedErrorRatioX counter"
+        ::= { jnxOtnCurrentOtuFec15minEntry 2 }
+
+jnxOtnCurrentOtuFec15minCorrectedErrorRatioY OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute CorrectedErrorRatioY  exponent"
+        ::= { jnxOtnCurrentOtuFec15minEntry 3 }
+
+jnxOtnCurrentOtuFec15minUncorrectedWords OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Current 15 minute FEC UnCorrected Words counter"
+        ::= { jnxOtnCurrentOtuFec15minEntry 4 }
+
+jnxOtnCurrentOtuFec15minElapsedTime OBJECT-TYPE
+       SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnCurrentOtuFec15minEntry 5 }
+
+-- OTN OTU FEC Interval PM Data
+
+jnxOtnIntervalOtuFec15minTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnIntervalOtuFec15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION 
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 8 } 
+
+jnxOtnIntervalOtuFec15minEntry OBJECT-TYPE
+        SYNTAX     JnxOtnIntervalOtuFec15minEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data about ia 15 minute interface on
+                 this router"
+        INDEX   { ifIndex, jnxOtnIntervalOtuFec15minIntervalNumber }
+        ::= { jnxOtnIntervalOtuFec15minTable 1 }
+
+JnxOtnIntervalOtuFec15minEntry ::=
+    SEQUENCE {
+        jnxOtnIntervalOtuFec15minIntervalNumber
+                INTEGER,
+        jnxOtnIntervalOtuFec15minCorrectedErrors
+                Unsigned32,
+        jnxOtnIntervalOtuFec15minCorrectedErrorRatioX
+                Unsigned32,
+        jnxOtnIntervalOtuFec15minCorrectedErrorRatioY
+                Unsigned32,
+        jnxOtnIntervalOtuFec15minUncorrectedWords
+                Unsigned32,
+        jnxOtnIntervalOtuFec15minTimeStamp
+                DateAndTime
+    }
+
+jnxOtnIntervalOtuFec15minIntervalNumber OBJECT-TYPE
+        SYNTAX      INTEGER (1..96)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A number between 1 and 96, where 1 is the most
+            recently completed 15 minute interval and 96 is
+            the 15 minutes interval completed 23 hours and 45
+            minutes prior to interval 1."
+        ::= { jnxOtnIntervalOtuFec15minEntry 1 }
+
+jnxOtnIntervalOtuFec15minCorrectedErrors OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute FEC Corrected Errors counter"
+        ::= { jnxOtnIntervalOtuFec15minEntry 2 }
+
+jnxOtnIntervalOtuFec15minCorrectedErrorRatioX OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute CorrectedErrorRatioX counter"
+        ::= { jnxOtnIntervalOtuFec15minEntry 3 }
+
+jnxOtnIntervalOtuFec15minCorrectedErrorRatioY OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute CorrectedErrorRatioY  exponent"
+        ::= { jnxOtnIntervalOtuFec15minEntry 4 }
+
+jnxOtnIntervalOtuFec15minUncorrectedWords OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute FEC UnCorrected Words counter"
+        ::= { jnxOtnIntervalOtuFec15minEntry 5 }
+
+jnxOtnIntervalOtuFec15minTimeStamp OBJECT-TYPE
+       SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Time elapsed for this 15 minute interval"
+        ::= { jnxOtnIntervalOtuFec15minEntry 6 }
+
+
+-- OTN OTU FEC total (24hr) PM Data
+
+jnxOtnTotalOtuFecTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxOtnTotalOtuFecEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Information about ODU Performance monitoring for this
+                 interfaces on this router."
+        ::= { jnxOtnPerformanceMonitoring 9 }
+
+jnxOtnTotalOtuFecEntry OBJECT-TYPE
+        SYNTAX     JnxOtnTotalOtuFecEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Performance data about ia 15 minute interface on
+                 this router" 
+        INDEX   { ifIndex }
+        ::= { jnxOtnTotalOtuFecTable 1 }
+
+JnxOtnTotalOtuFecEntry ::=
+    SEQUENCE { 
+        jnxOtnTotalOtuFecDayNumber
+                INTEGER,
+        jnxOtnTotalOtuFecCorrectedErrors
+                Unsigned32,
+        jnxOtnTotalOtuFecUncorrectedWords
+                Unsigned32
+    }
+
+jnxOtnTotalOtuFecDayNumber OBJECT-TYPE
+        SYNTAX      INTEGER (1..96)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A number between 1 and 96, where 1 is the most
+            recently completed 15 minute interval and 96 is
+            the 15 minutes interval completed 23 hours and 45
+            minutes prior to interval 1."
+        ::= { jnxOtnTotalOtuFecEntry 1 }
+
+jnxOtnTotalOtuFecCorrectedErrors OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute FEC Corrected Errors counter
+                in an OTN frame in the in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0"
+        ::= { jnxOtnTotalOtuFecEntry 2 }
+
+
+jnxOtnTotalOtuFecUncorrectedWords OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              " Interval 15 minute FEC UnCorrected Words counter
+                in an OTN frame in the in the previous 24 hour interval. 
+                Invalid 15 minute intervals count as 0."
+        ::= { jnxOtnTotalOtuFecEntry 3 }
+
+
+--
+-- Configuration Management Notifications
+--
+
+jnxOtnNotificationPrefix   OBJECT IDENTIFIER ::= { jnxOtnNotifications 0 }
+
+jnxOtnAlarmSet NOTIFICATION-TYPE
+       OBJECTS { ifDescr,
+                 jnxOtnLastAlarmId, 
+                 jnxOtnCurrentAlarms,
+		 jnxOtnLastAlarmDate }
+       STATUS  current
+       DESCRIPTION
+		"Notification of a recently set Otn alarm."
+	::= { jnxOtnNotificationPrefix 1 }
+
+jnxOtnAlarmCleared NOTIFICATION-TYPE
+       OBJECTS { ifDescr,
+                 jnxOtnLastAlarmId, 
+                 jnxOtnCurrentAlarms,
+		 jnxOtnLastAlarmDate }
+       STATUS  current
+       DESCRIPTION
+		"Notification of a recently cleared Otn alarm."
+	::= { jnxOtnNotificationPrefix 2 }
+
+END

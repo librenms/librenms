@@ -1,0 +1,65 @@
+
+BAY-STACK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackMib    MODULE-IDENTITY
+   LAST-UPDATED "200508220000Z"
+   ORGANIZATION "Nortel Networks"
+   CONTACT-INFO ""
+   DESCRIPTION
+       "General BayStack MIB."
+
+   REVISION "200508220000Z" -- 22 August 2005
+   DESCRIPTION
+       "Version 1:  Initial version."
+
+   ::= { bayStackMibs 13 }
+
+bayStackObjects OBJECT IDENTIFIER ::= { bayStackMib 1 }
+
+--
+-- General Stack configuration group
+--
+
+bayStackConfig OBJECT IDENTIFIER ::= { bayStackObjects 1 }
+
+bayStackConfigExpectedStackSize OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected stack size.  A unit that expects to be
+         standalone would use a value of 1."
+    ::= { bayStackConfig 1 }
+
+bayStackConfigStackErrorNotificationInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "Seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects controls the frequency with which
+         bsnStackConfigurationError notifications are generated."
+    DEFVAL { 60 }
+    ::= { bayStackConfig 2 }
+
+bayStackConfigStackErrorNotificationEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This objects controls whether bsnStackConfigurationError
+         notifications are generated."
+    ::= { bayStackConfig 3 }
+
+END
+

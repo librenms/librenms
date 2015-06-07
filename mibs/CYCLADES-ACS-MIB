@@ -1,0 +1,37 @@
+CYCLADES-ACS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cyclades
+		FROM CYCLADES-MIB
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI;
+
+cyACSMgmt	MODULE-IDENTITY
+	LAST-UPDATED	"200508290000Z"
+	ORGANIZATION	"Cyclades Corporation"
+	CONTACT-INFO	"postal : Cyclades Corporation
+				  3541 Gateway Boulevard
+				  Fremont, CA 94538, USA
+			 e-mail : Technical Support
+				  support@cyclades.com"
+	DESCRIPTION	"This file defines the Cyclades MIB extensions to 
+			 ACSxx products"
+	REVISION	"200508290000Z"
+	DESCRIPTION	"Changed the Contact-Info"
+	REVISION	"200310170000Z"
+	DESCRIPTION	"Defined new MIB - CYCLADES-ACS-PM-MIB"
+	REVISION	"200210100000Z"
+	DESCRIPTION	"Defined new MIB - CYCLADES-ACS-SYS-MIB"
+	REVISION	"200209200000Z"
+	DESCRIPTION	"First Draft"
+::= { cyclades 4 }
+
+-- Current Cyclades ACS core mib table entries :
+--	cyACSSys	OBJECT-IDENTITY  ::= { cyACSMgmt 1 }
+--	cyACSConf	OBJECT-IDENTITY  ::= { cyACSMgmt 2 }
+--	cyACSInfo	OBJECT-IDENTITY  ::= { cyACSMgmt 3 }
+--	cyACSAdm	OBJECT-IDENTITY  ::= { cyACSMgmt 4 }
+--	cyPM		OBJECT-IDENTITY  ::= { cyACSMgmt 5 }
+
+END
+

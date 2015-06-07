@@ -1,0 +1,299 @@
+CTRON-SFPS-BINDERY-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-bindery-mib.txt
+--  Revision: 0.0.04
+--
+--  Part Number: 
+--  Date: April 19, 1996
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+--      Counter, Gauge, 
+      TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt
+                sfpsAgentConfig
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+--SfpsSwitchInstance ::= INTEGER
+--  this will map to chassis.module index value
+
+--SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+
+--SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+--
+
+--  SFPS Switch Agent Bindery Group
+--  This group contains the objects that pertain to the SFPS Bindery.
+
+sfpsAgentBinderyConfigTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsAgentBinderyConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+                "Soft Binding is implemented through a few new base classes, 
+                a small army of instances of the base classes plus a bindery
+                table to tie the whole mess together."
+       ::= { sfpsAgentConfig 1 }
+
+sfpsAgentBinderyConfigEntry    OBJECT-TYPE
+        SYNTAX  SfpsAgentBinderyConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+               "Each entry specifies the  configuration for the bindery component."
+        INDEX   {sfpsAgentBinderyConfigHashLeaf,sfpsAgentBinderyConfigHashIndex  }
+       ::= { sfpsAgentBinderyConfigTable 1 }
+
+SfpsAgentBinderyConfigEntry
+    ::=         SEQUENCE {
+                sfpsAgentBinderyConfigHashLeaf          HexInteger,
+                sfpsAgentBinderyConfigHashIndex         INTEGER,
+                sfpsAgentBinderyConfigName              DisplayString,
+                sfpsAgentBinderyConfigType              DisplayString,
+                sfpsAgentBinderyConfigOperStatus        INTEGER,
+                sfpsAgentBinderyConfigAdminStatus       INTEGER,
+                sfpsAgentBinderyConfigStatusTime        TimeTicks,
+                sfpsAgentBinderyConfigNVStatus          INTEGER
+        }  
+
+sfpsAgentBinderyConfigHashLeaf    OBJECT-TYPE
+        SYNTAX  HexInteger  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "NO hash, part of instance key."
+        ::= { sfpsAgentBinderyConfigEntry 1 }
+
+sfpsAgentBinderyConfigHashIndex     OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION  
+               "NO Bucket index, part of instance key."
+        ::= { sfpsAgentBinderyConfigEntry 2 }
+
+
+sfpsAgentBinderyConfigName     OBJECT-TYPE
+        SYNTAX   DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Elements Name."
+        ::= { sfpsAgentBinderyConfigEntry 3 }
+
+
+sfpsAgentBinderyConfigType  OBJECT-TYPE
+        SYNTAX  DisplayString 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Type of element."
+        ::= { sfpsAgentBinderyConfigEntry 4 }
+
+sfpsAgentBinderyConfigOperStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        kStatusRunning(1),      --  all is well
+                        kStatusHalted(2),       -- admin disabled
+                        kStatusPending(3),      -- Trying to run, not there yet
+                        kStatusFaulted(4),      -- Internal error, never will recover
+                        kStatusNotStarted(5)    -- Not fully started yet
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational state of the entry."
+        ::= { sfpsAgentBinderyConfigEntry 5 }
+
+sfpsAgentBinderyConfigAdminStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),               -- Not running or stopped
+                        disable(2),             -- Please stop
+                        enable(3)               -- Go
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative state of the entry."
+        ::= { sfpsAgentBinderyConfigEntry 6 }
+
+
+sfpsAgentBinderyConfigStatusTime  OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time tick of last OperStatus change."
+        ::= { sfpsAgentBinderyConfigEntry 7 }
+
+
+sfpsAgentBinderyConfigNVStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),               -- Not running or stopped
+                        disable(2),             -- Please stop
+                        enable(3),              -- Go
+                        unset(4)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative state of the entry."
+        ::= { sfpsAgentBinderyConfigEntry 8 }
+
+
+--- Bindery API
+
+sfpsAgentBinderyAPI  OBJECT IDENTIFIER ::= { sfpsAgentConfig 2 }
+
+sfpsAgentBinderyAPIVerb  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                getStatus(1),
+                nextElem(2),
+                disable(3),
+                disableInNvram(4),
+                enable(5),
+                enableInNvram(6),
+                clear(7),
+                clearAll(8)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The BinderyAPI is a flat MIB that can be used to enable/disable
+                 Bindery components, and to save the enable/disable info into
+                 Nvram. The next reboot/reset, each SFPSElement will check the
+                 NvramStatus and not start if disabled."
+        ::= { sfpsAgentBinderyAPI 1 }
+
+sfpsAgentBinderyAPIElementName  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enter in the dotted notation Bindery ID (xxx.yyy.zzz) of the
+                 SFPSElement you wish to perform the action."
+        ::= { sfpsAgentBinderyAPI 2 }
+
+sfpsAgentBinderyAPINVStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3),
+                unset(4),
+                invalid(5)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current Admin Status of this Element in Nvram."
+        ::= { sfpsAgentBinderyAPI 3 }
+
+sfpsAgentBinderyAPIAdminStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3),
+                invalid(4)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current AdminStatus of the SFPSElement."
+        ::= { sfpsAgentBinderyAPI 4 }
+
+sfpsAgentBinderyAPIOperStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                running(1),
+                halted(2),
+                pending(3),
+                faulted(4),
+                notStarted(5),
+                invalid(6)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays the Current OperStatus of the SFPSElement."
+        ::= { sfpsAgentBinderyAPI 5 }
+
+sfpsAgentBinderyAPINvSet  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Total number of SFPSElements stored in NVRAM for persistence."
+        ::= { sfpsAgentBinderyAPI 6 }
+
+sfpsAgentBinderyAPINvTotal  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Total number of SFPSElements allocated in NVRAM. The 
+                switch will always allocate enough space in NVRAM for
+                the number of elements. That is, NvTotal will always be
+                greater than or equal to NvSet."
+        ::= { sfpsAgentBinderyAPI 7 }
+
+
+sfpsAgentBinderyAPIDefaultStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3),
+        unset(4),
+                invalid(5)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsAgentBinderyAPI 8 }
+
+END

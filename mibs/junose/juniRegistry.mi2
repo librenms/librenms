@@ -1,0 +1,157 @@
+
+-- *****************************************************************************
+-- Juniper-Registry
+--
+-- Juniper Networks enterprise SNMP MIB.
+--   Registry for the E-series edge router family of products.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2004 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-Registry  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    juniperUniAdmin
+        FROM Juniper-UNI-SMI;
+
+juniAdmin  MODULE-IDENTITY
+    LAST-UPDATED "200412231158Z"  -- 23-Dec-04 06:58 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "Administratively assigned object identifiers for Juniper Networks
+        E-series edge router products."
+    -- Revision History
+    REVISION    "200412231158Z"  -- 23-Dec-04 06:58 AM EST  - JUNOSe main
+    DESCRIPTION
+        "Updated for  the second generation E-series products."
+    REVISION    "200312171925Z"  -- 17-Dec-03 02:25 PM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Added support for the second generation E-series products."
+    REVISION    "200312171722Z"  -- 17-Dec-03 12:22 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added 1G flash card."
+    REVISION    "200211132038Z"  -- 13-Nov-02 03:38 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added 512M flash card."
+    REVISION    "200106012118Z"  -- 01-Jun-01 05:18 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this SNMP management information module."
+    ::= { juniperUniAdmin 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Object identities for product family registries.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRegistry  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "The root for administratively assigned object identifiers for Juniper
+--      Networks cross-product objects."
+    ::= { juniAdmin 1 }
+
+juniErxRegistry  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "The root for administratively assigned object identifiers for Juniper
+--      Networks first generation E-series (ERX) edge router family products."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-ERX-Registry module (in the
+--      juniErxRegistry.mi2 file)."
+    ::= { juniAdmin 2 }
+
+juniES2Registry  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "The root for administratively assigned object identifiers for Juniper
+--      Networks second generation E-series edge router family products."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-ES2-Registry module (in the
+--      juniES2Registry.mi2 file)."
+    ::= { juniAdmin 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--  Cross-product physical entity identifiers.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniEntPhysicalType  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "The OID values under juniEntPhysicalType are used by the SNMP agent in
+--      the Juniper Networks edge router products as the AutonomousType values
+--      for the entPhysicalVendorType varbinds for objects in the
+--      entPhysicalTable."
+    ::= { juniRegistry 1 }
+
+--
+-- PCMCIA Flash Cards
+--
+juniPcmciaFlashCard  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a standard PCMCIA flash card."
+    ::= { juniEntPhysicalType 1 }
+
+juni85MegT2FlashCard  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for an 85 Megabyte Type II ATA PCMCIA flash card
+        (Product Code: PCM-85)."
+    ::= { juniPcmciaFlashCard 1 }
+
+juni220MegT2FlashCard  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a 220 Megabyte Type II ATA PCMCIA flash card
+        (Product Code: FLASH-220M)."
+    ::= { juniPcmciaFlashCard 2 }
+
+juni512MegT2FlashCard  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a 512 Megabyte Type II ATA PCMCIA flash card
+        (Product Code: RX-FLASH512-FRU)."
+    ::= { juniPcmciaFlashCard 3 }
+
+juni1GigT2FlashCard  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a 1 Gigabyte Type II ATA PCMCIA flash card
+        (Product Code: ERX-FLASH1GB-FRU)."
+    ::= { juniPcmciaFlashCard 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--  Registration OIDs for Juniper Traceroute implementation types.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTraceRouteImplementationTypes  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration node (point) for Juniper Traceroute implementation
+        types."
+    REFERENCE
+        "See DISMAN-TRACEROUTE-MIB.traceRouteCtlType (RFC2925) for how these
+        objects are used."
+    ::= { juniRegistry 2 }
+
+juniTraceRouteUsingIcmpProbe  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using ICMP probes to perform the
+        trace-route operation."
+    REFERENCE
+        "DISMAN-TRACEROUTE-MIB.traceRouteCtlType (RFC2925)"
+    ::= { juniTraceRouteImplementationTypes 1 }
+
+END

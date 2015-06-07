@@ -1,0 +1,8393 @@
+
+    
+      GAMATRONIC-MIB DEFINITIONS ::= BEGIN
+--Change for power max 1/1/2004
+--Change new  15/8 TRAPS
+--Changes New 20/11  Alarm Sevirity psStatus Changed  from alarm1 to alarm96   and read write
+--Changes New 20/11  Alarm set changed to alarm 1 to alarm 96
+--Changes New 20/11  Add new mib SverityMap Maping alarm to severity  
+--Changes New 15/1 Spare commands for read and write
+--Changes New 15/1 Dry Contactors new 2 tables for dry1 and dry 2 and add drystatus for enable disable as well
+--Changes New 15/1 Alarm  add  more 64 alarms to the psStatus and to alarm set
+--Changes New 15/1 Add spares in AC input , Batery General , DCoutput, psConf Nomonal
+--Changes New 15/1  IDE spares in psUNIT
+--changes 25/11 add No out  share bit and bad sharing to INU
+--changes 24/11 - DryIn Status
+--changes 23/11   -  NOMINALS
+--Changes 21/11  - add eq run hours and Minutes to batgeneral
+--                 add  No out    spare bit   badsharing to PSU
+--                 add invertor voltage in DC output
+--			Add eq major and Minor read write to NOM and Invertor voltage
+--			Add Commands  Leds (bit structure ) and store and load user defaults
+--                Changes from write to read only
+--Changes 7/11  add leds and mbx version  psCommandMBXSWRev   psCommandLed
+--changes 28/9   change in mibs new commands and change write to read
+--changes 26/8  change userdefine command to be read write
+--changes 24/8  add 5 userdefined commands
+--changes 23/8  add psdrycontactstatus
+-- Change 21/8  adding commans
+--Changes 18/8 changes in commaand mib
+--changes 21/7  - Add in statistics mib (end of the mib) first and last sequence number for each statistic table current available
+--			Add in log mib (end of the mib) first and last of sequence available in log table
+--changes 11/7 - add in psPSU -  psPSUNotRespond
+--add in psINU  psINUNotRespond
+--add in psCommands -  option to get filename
+-- change acInputOk to be read only
+--changes 9/7  add date time in one integer for psLogDateTime
+--  Changes:    22/6/2000
+---  Change Alarm severity
+--- Add  IP Address for TRAP 
+--  Creation Date20/5/2000
+--  Added new dry contactors
+--  commands for tests and softwre down load
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   -- Integer32,
+    enterprises,IpAddress                              FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString 
+ --  TruthValue, RowStatus, RowPointer, TimeInterval
+                                             FROM SNMPv2-TC;
+ -- MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+ --                                             FROM SNMPv2-CONF;
+
+    
+gamatronicLTD  MODULE-IDENTITY
+  LAST-UPDATED  "0005150000Z"
+  ORGANIZATION  " GAMATRONIC Ltd."
+  CONTACT-INFO
+    " 			Asher Avisar
+              Postal: 
+              Tel: 	+972-2-588-8222
+              Fax:     	+972-2-582-8875
+              E-mail: 	aavissar@gamatronic.co.il"
+
+  DESCRIPTION
+"This is the GAMATRONIC POWER SUPPLY PRIVATE  MIB module"
+ -- REVISION      "Version 1.0"
+  
+ ::= { enterprises 6050 }
+
+psMIB   OBJECT IDENTIFIER ::= { gamatronicLTD  1 }
+
+--
+--  The MIB module consist of the following groups:
+-- (1) UNIT
+-- (2)  Battery 
+-- (3)  Power Supply
+-- (4) INE
+-- (5)  AC Input
+-- (6)  DC Output
+-- (7)  Contactors
+-- (8)  Set UP
+-- (9)  Status
+-- (10)  Log
+-- (11)  Trap
+-- (12) Alarm Set
+--
+-- Textual Conventions
+--
+
+-- PS Textual Convention
+-- PS   DateTime Textual Convention
+ 
+-- Alarm Severity Identifier Textual Convention
+
+PsAlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+"The value of this object identifies the severity of an alarm, including 'cleared'."
+    SYNTAX    INTEGER {
+                 critical(1),
+                 major(2),
+                 minor(3),
+                 warning(4)
+               }
+
+
+
+--
+-- PS's MIB 
+--
+
+psUnit   OBJECT IDENTIFIER ::= { psMIB 1 }
+
+psBattery   OBJECT IDENTIFIER ::= { psMIB 2 }
+psPSU  OBJECT IDENTIFIER ::= { psMIB 3 }
+psINU OBJECT IDENTIFIER ::= { psMIB 4 }
+
+
+psACInput  OBJECT IDENTIFIER ::= { psMIB 5}
+
+psDCOutput  OBJECT IDENTIFIER ::= { psMIB 6}
+
+psContuctor  OBJECT IDENTIFIER ::= { psMIB 7}
+
+psConfNominal  OBJECT IDENTIFIER ::= { psMIB 8}
+
+psStatus  OBJECT IDENTIFIER ::= { psMIB 9}
+psStatistics  OBJECT IDENTIFIER ::= { psMIB 10}
+psLog  OBJECT IDENTIFIER ::= { psMIB 11}
+psTrap  OBJECT IDENTIFIER ::= { psMIB 12}
+psAlarmSet  OBJECT IDENTIFIER ::= { psMIB 13}
+psSecurity  OBJECT IDENTIFIER ::= { psMIB 14}
+psCommand OBJECT IDENTIFIER ::= {psMIB  15}
+psSeverityMap OBJECT IDENTIFIER ::= {psMIB 16 }
+psSpare   OBJECT IDENTIFIER ::= {psMIB 17}
+psDial   OBJECT IDENTIFIER ::= {psMIB 18}
+psPowerPlus OBJECT IDENTIFIER ::= {psMIB 19}
+
+-- The Battery group consists of the following objects:
+
+--
+-- Battery MIB definitions
+--
+
+psBatteryNumber OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Number of Battery supported "
+    ::= { psBattery  1 }
+psBatteryVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Battery Voltage  present in 0.1V "
+    ::= { psBattery 2 }
+
+psBatteryTestStatus OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			on      (0),
+			off   (1)
+			
+				}
+	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Test status of the battery. Automatically set to 0 when test is completed."
+    ::= { psBattery 3 }
+
+psBatteryNominalCapacity OBJECT-TYPE
+    SYNTAX 		INTEGER 
+	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery Nominal Capacity."
+    ::= { psBattery 4 }
+
+psBatteryActualCapacity OBJECT-TYPE
+    SYNTAX 		INTEGER 
+	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Battery Actual Capacity."
+    ::= { psBattery 5 }
+
+psBatteryTestTime  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Battery Test time in seconds ."
+    ::= { psBattery 6 }
+
+psBatteryLoadTime  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Battery Load time in seconds ."
+    ::= { psBattery 7 }
+
+psBatteryNearestTestMonth  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery nearest Test time - Month ."
+    ::= { psBattery 8 }
+psBatteryNearestTestDay  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery nearest Test time - Day ."
+    ::= { psBattery 9 }
+
+psBatteryNearestTestHour  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery nearest Test time - Hour."
+    ::= { psBattery 10 }
+psBatteryNearestTestMinute  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery nearest Test time - Minute ."
+    ::= { psBattery 11 }
+psBatteryChargeMode  OBJECT-TYPE
+    SYNTAX 		INTEGER {
+				floating(0),
+				equalizes(1)
+					}
+   MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Battery Charge mode  0 = Floating 1 = Equalized "
+    ::= { psBattery 12 }
+
+psBatteryEqRunTimeHours  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Equalizer Run Time Hours "
+    ::= { psBattery 13 }
+
+psBatteryEqRunTimeMinutes  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Equalizer Run Time Minutes "
+    ::= { psBattery 14 }
+
+psBatterySpareRead1  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 15 }
+psBatterySpareRead2  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 16 }
+psBatterySpareRead3  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 17 }
+psBatterySpareWrite1  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 18 }
+psBatterySpareWrite2  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 19 }
+psBatterySpareWrite3  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 20 }
+psBatterySpareWrite4  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 21 }
+psBatterySpareWrite5  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 22 }
+psBatterySpareWrite6  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 23 }
+psBatterySpareWrite7  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 24 }
+
+psBatterySpareWrite8  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+   MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" Spare "
+    ::= { psBattery 25 }
+
+
+psBatteryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsBatteryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Battery  Information table."
+     ::= { psBattery 26 }
+
+psBatteryEntry OBJECT-TYPE
+    SYNTAX      PsBatteryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines for each Information for each PS. The entry is indexed by the psBatteryIndex. "
+    INDEX { psBatteryIndex }
+    ::= { psBatteryTable 1 }
+
+PsBatteryEntry ::= SEQUENCE {
+psBatteryIndex			INTEGER,
+psBatteryCurrentDirection	INTEGER,
+psBatteryCurrent		INTEGER,
+psBatteryTemperatureSign	INTEGER,
+psBatteryTemperature		INTEGER,
+psBatteryStatus			INTEGER,
+psBatteryFuseStatus		INTEGER,
+psBatteryInstalationYear	INTEGER,
+psBatteryInstalationMonth	INTEGER,
+psBatteryInstalationDay		INTEGER
+
+}
+
+psBatteryIndex OBJECT-TYPE 
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The PS table index."
+    ::= { psBatteryEntry 1 }
+
+
+
+
+
+psBatteryCurrentDirection  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"The PS Battery current Direction.  0= Charge. "
+    ::= { psBatteryEntry 2 }
+
+
+psBatteryCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Battery Current presents in units of 0.1A . "
+    ::= { psBatteryEntry 3 }
+
+
+psBatteryTemperatureSign OBJECT-TYPE
+    SYNTAX 		INTEGER {
+positive(0),
+negative(1)
+            }
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Battery Sign of the Temerature- Positive = 0 Negative = 1."
+    ::= { psBatteryEntry 4 }
+
+
+psBatteryTemperature OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Battery Temperature giving in Celsius. "
+    ::= { psBatteryEntry 5 }
+
+
+psBatteryStatus OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			passed(0),
+			failed (1),
+			low(2)
+				}
+	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Status of the Battery 0 = Passed, 1 = Failed 2 = Low."
+    ::= { psBatteryEntry 6 }
+
+
+psBatteryFuseStatus OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok(0),
+			bad(1)
+			
+				}
+	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The status of the battery fuse. 0 = OK, 1 = BAD."
+    ::= { psBatteryEntry 7 }
+
+
+
+psBatteryInstalationYear  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery Installation date -Year ."
+    ::= { psBatteryEntry 8 }
+
+psBatteryInstalationMonth  OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery Installation date -Month ."
+    ::= { psBatteryEntry 9 }
+
+psBatteryInstalationDay OBJECT-TYPE
+    SYNTAX 		INTEGER	
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+" The Battery Installation date -Day ."
+    ::= { psBatteryEntry 10 }
+
+
+-- The Power Supply  group consists of the following objects:
+
+--
+-- Power Supply MIB definitions
+--
+
+psPSUNumber OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Number of Power Supplies supported "
+    ::= { psPSU  1 }
+
+psPSUTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsPSUEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Power Supply  Information table."
+     ::= { psPSU 2 }
+
+psPSUEntry OBJECT-TYPE
+    SYNTAX      PsPSUEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines for each Information for each PS. The entry is indexed by the psPSUIndex. "
+    INDEX { psPSUIndex }
+    ::= { psPSUTable 1 }
+
+PsPSUEntry ::= SEQUENCE {
+psPSUIndex				INTEGER,
+psPSUVoltage			INTEGER,
+psPSUCurrent			INTEGER,
+psPSUTemperature			INTEGER,
+psPSUActivity			INTEGER,
+psPSUPsType				INTEGER,
+psPSUStatus                   INTEGER,
+psPSUPsOK				INTEGER,
+psPSUNotRespond               INTEGER,
+psPSUNOOut				INTEGER,
+psPSUPSpareBit			INTEGER,
+psPSUBadSharing			INTEGER,
+psPSUReserve1			INTEGER,
+psPSUReserve2			INTEGER,
+psPSUReserve3			INTEGER,
+psPSUShutInstruction		INTEGER,
+psPSUTestStatus			INTEGER,
+psPSUCurrentLimitDecreased	INTEGER,
+psPSUACInputOK			INTEGER,
+psPSUSelfTestPass			INTEGER,
+psPSUCurrentLimitExceed		INTEGER,
+psPSUShutHighTemp			INTEGER,
+psPSUShutHighVolt			INTEGER,
+psPSURemoteMode			INTEGER,
+psPSUFloatingMode			INTEGER,
+psPSUEqualizeMode             INTEGER,
+psPSUFanStataus			INTEGER,
+psPSUIndication			INTEGER
+
+		}
+
+psPSUIndex OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The PSU table index."
+    ::= { psPSUEntry 1 }
+
+
+psPSUVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"PSU Voltage  present in 0.1V "
+    ::= { psPSUEntry 2 }
+
+
+
+
+
+psPSUCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"PSU Current presents in units of 0.1A . "
+    ::= { psPSUEntry 3 }
+
+
+
+psPSUTemperature OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"PSU Temperature giving in Celsius. "
+    ::= { psPSUEntry 4 }
+
+psPSUActivity OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			off (0),
+			on  (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+"PSU Activity  0 = off  1= on "
+    ::= { psPSUEntry 5 }
+
+psPSUPsType OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+ "PSU TYPE
+
+01 - HPSu24-100   24V 100A
+02 - HPSu50-50    50V 50A Vertical Construction
+03 - HPSu50-50    50V 50A Horizontal  Construction
+04 - HPSu50-75    50V 75A Vertical Construction
+05 - HPSu50-16    50V 16A Regular
+06 HPSu50-16U   50V 16A Universal "
+    ::= { psPSUEntry 6 }
+
+psPSUStatus OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS STATUS  The  next are bits taken from this status "
+
+    ::= { psPSUEntry 7 }
+ 
+
+psPSUPsOK      OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok (0),
+			notok(1)
+			} 	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Ps Ok status "
+    ::= { psPSUEntry 8 }
+
+
+psPSUNotRespond   OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok (0),
+			bad(1)
+			} 	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"PSU Not Responding
+ "
+    ::= { psPSUEntry 9 }
+
+
+psPSUNOOut			OBJECT-TYPE
+    SYNTAX              INTEGER {
+					no (0),
+                              yes (1)
+					}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS No Out "
+
+    ::= { psPSUEntry 10}
+
+psPSUPSpareBit		OBJECT-TYPE
+    SYNTAX              INTEGER {
+					ok (0),
+                              notok (1)
+					}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS Spare Bits "
+
+    ::= { psPSUEntry 11}
+
+
+psPSUBadSharing	OBJECT-TYPE
+    SYNTAX              INTEGER {
+					ok (0),
+                              notok (1)
+					}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS Bad Sharing "
+::= { psPSUEntry 12}
+
+
+psPSUReserve1			OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" RESERVE "
+::= { psPSUEntry 13}
+
+psPSUReserve2  OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" RESERVE "
+::= { psPSUEntry 14}
+
+psPSUReserve3	OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" RESERVE "
+::= { psPSUEntry 15}
+
+		
+
+
+
+
+psPSUShutInstruction OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Shut by instruction status "
+
+    ::= { psPSUEntry 16 }
+
+psPSUTestStatus OBJECT-TYPE
+    SYNTAX              INTEGER {
+				notintest (0),
+				inprogress (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Test In progress status 0= not in progress 1 = test in progress "
+
+    ::= { psPSUEntry 17 }
+psPSUCurrentLimitDecreased  OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Is Current limit decreased due to temperature "
+
+    ::= { psPSUEntry 18 }
+
+psPSUACInputOK  OBJECT-TYPE
+    SYNTAX              INTEGER {
+				ok (0),
+				notok (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" AC  Input status"
+
+    ::= { psPSUEntry 19 }
+
+psPSUSelfTestPass		 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				ok (0),
+				notok (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Self Test status "
+
+    ::= { psPSUEntry 20 }
+
+psPSUCurrentLimitExceed	 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Current limit excedded"
+
+    ::= { psPSUEntry 21 }
+
+
+psPSUShutHighTemp 	 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Shut down high temperature"
+
+    ::= { psPSUEntry 22 }
+
+
+psPSUShutHighVolt		 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Shut down high Voltage"
+
+    ::= { psPSUEntry 23 }
+psPSURemoteMode      OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS in Remote Mode"
+
+    ::= { psPSUEntry 24 }
+psPSUFloatingMode      OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS in Floating Mode"
+
+    ::= { psPSUEntry 25 }
+
+
+psPSUEqualizeMode      OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS in EqualizeMode"
+
+    ::= { psPSUEntry 26 }
+psPSUFanStataus	     OBJECT-TYPE
+    SYNTAX              INTEGER {
+				ok (0),
+				bad (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS FAN STATUS"
+
+    ::= { psPSUEntry 27 }
+
+   psPSUIndication        OBJECT-TYPE
+                             SYNTAX   INTEGER  {
+                                pscurrent (0),
+				voltage (1),
+				temperature (3)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS in EqualizeMode"
+
+    ::= { psPSUEntry 28 }
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+-- The Inverted  group consists of the following objects:
+
+--
+-- Inverted  Unit  MIB definitions
+--
+
+psINUNumber OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Number of Power Supplies supported "
+    ::= { psINU  1 }
+
+psINUTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsINUEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Power Supply  Information table."
+     ::= { psINU 2 }
+
+psINUEntry OBJECT-TYPE
+    SYNTAX      PsINUEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines for each Information for each PS. The entry is indexed by the psINUIndex. "
+    INDEX { psINUIndex }
+    ::= { psINUTable 1 }
+
+PsINUEntry ::= SEQUENCE {
+psINUIndex				INTEGER,
+psINUVoltage			INTEGER,
+psINUCurrent			INTEGER,
+psINUTemperature			INTEGER,
+psINUActivity			INTEGER,
+psINUPsType				INTEGER,
+psINUStatus                   INTEGER,
+psINUPsOK				INTEGER,
+psINUNotRespond               INTEGER,
+psINUNOOut				INTEGER,
+psINUPSpareBit			INTEGER,
+psINUBadSharing			INTEGER,
+psINUReserve1			INTEGER,
+psINUReserve2			INTEGER,
+psINUReserve3			INTEGER,
+psINUShutInstruction		INTEGER,
+psINUReserve7			INTEGER,
+psINUCurrentLimitDecreased	INTEGER,
+psINUReserve8			INTEGER,
+psINUSelfTestPass			INTEGER,
+psINUCurrentLimitExceed		INTEGER,
+psINUShutHighTemp			INTEGER,
+psINUShutHighVolt			INTEGER,
+psINURemoteMode			INTEGER,
+psINUReserve9                  INTEGER,
+psINUReserve10            INTEGER,
+psINUFanStataus			INTEGER,
+psINUIndication			INTEGER
+
+		}
+
+psINUIndex OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The INU table index."
+    ::= { psINUEntry 1 }
+
+
+psINUVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"INU Voltage  present in 0.1V "
+    ::= { psINUEntry 2 }
+
+
+
+
+
+psINUCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"INU Current presents in units of 0.1A . "
+    ::= { psINUEntry 3 }
+
+
+
+psINUTemperature OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"INU Temperature giving in Celsius. "
+    ::= { psINUEntry 4 }
+
+psINUActivity OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			off (0),
+			on  (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+"INU Activity  0 = off  1= on "
+    ::= { psINUEntry 5 }
+
+
+
+psINUPsType OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"INU TYPE
+
+0xA0	HPSu50-50 - H	
+0x91	HPSu50-16U	
+0x90	HPSu50-16	
+0x85	INV50-24	
+0x84	HPSu50-42	
+0x83	HPSu50-100	
+0x82	HPSu50-75	
+0x81	HPSu50-50	
+0x80	HPSu24-100	
+
+
+ "
+    ::= { psINUEntry 6 }
+psINUStatus OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS STATUS  The  next are bits taken from this status "
+
+    ::= { psINUEntry 7 }
+ 
+
+psINUPsOK      OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok (0),
+			notok(1)
+			} 	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Ps Ok status "
+    ::= { psINUEntry 8 }
+
+
+psINUNotRespond   OBJECT-TYPE
+    SYNTAX 	 	INTEGER {
+			ok (0),
+			bad(1)
+			} 	
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"INU Not Responding
+ "
+    ::= { psINUEntry 9 }
+
+
+psINUNOOut			OBJECT-TYPE
+    SYNTAX              INTEGER {
+					no (0),
+                              yes (1)
+					}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" INU No Out "
+
+    ::= { psINUEntry 10}
+
+psINUPSpareBit		OBJECT-TYPE
+    SYNTAX              INTEGER {
+					ok (0),
+                              notok (1)
+					}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" INUSpare Bits "
+
+    ::= { psINUEntry 11}
+
+
+psINUBadSharing	OBJECT-TYPE
+    SYNTAX              INTEGER {
+					ok (0),
+                              notok (1)
+					}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" INU  Bad Sharing "
+::= { psINUEntry 12}
+psINUReserve1			OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" RESERVE "
+::= { psINUEntry 13}
+
+psINUReserve2  OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" RESERVE "
+::= { psINUEntry 14}
+
+psINUReserve3	OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" RESERVE "
+::= { psINUEntry 15}
+
+		
+
+
+
+
+psINUShutInstruction OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Shut by instruction status "
+
+    ::= { psINUEntry 16 }
+
+psINUReserve7			OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Reserve "
+    ::= { psINUEntry 17 }
+psINUCurrentLimitDecreased  OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Is Current limit decreased due to temperature "
+
+    ::= { psINUEntry 18 }
+
+psINUReserve8			OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Reserve "
+
+    ::= { psINUEntry 19 }
+
+psINUSelfTestPass		 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				ok (0),
+				notok (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Self Test status "
+
+    ::= { psINUEntry 20 }
+
+psINUCurrentLimitExceed	 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Current limit excedded"
+
+    ::= { psINUEntry 21 }
+
+
+psINUShutHighTemp 	 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Shut down high temperature"
+
+    ::= { psINUEntry 22 }
+
+
+psINUShutHighVolt		 OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Shut down high Voltage"
+
+    ::= { psINUEntry 23 }
+psINURemoteMode      OBJECT-TYPE
+    SYNTAX              INTEGER {
+				no (0),
+				yes (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS in Remote Mode"
+
+    ::= { psINUEntry 24 }
+psINUReserve9			OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Reserve "
+    ::= { psINUEntry 25 }
+
+
+psINUReserve10			OBJECT-TYPE
+    SYNTAX              INTEGER 
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Reserve "
+    ::= { psINUEntry 26 }
+psINUFanStataus	     OBJECT-TYPE
+    SYNTAX              INTEGER {
+				ok (0),
+				bad (1)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS FAN STATUS"
+
+    ::= { psINUEntry 27 }
+
+   psINUIndication        OBJECT-TYPE
+                             SYNTAX   INTEGER  {
+                                pscurrent (0),
+				voltage (1),
+				temperature (3)
+				}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" PS in EqualizeMode"
+
+    ::= { psINUEntry 28 }
+
+
+
+
+
+
+-- The AC INPUT  group consists of the following objects:
+
+--
+-- AC INPUT MIB definitions
+--
+
+psACInputVoltage1 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput Voltage  present in 0.1V "
+    ::= { psACInput 1 }
+
+psACInputVoltage2 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput Voltage  present in 0.1V "
+    ::= { psACInput 2 }
+
+psACInputVoltage3 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput Voltage  present in 0.1V "
+    ::= { psACInput 3 }
+
+
+psACInputCurrent1 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput Current presents in units of 0.1A . "
+    ::= { psACInput 4 }
+
+psACInputCurrent2 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput Current presents in units of 0.1A . "
+    ::= { psACInput 5 }
+
+psACInputCurrent3 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput Current presents in units of 0.1A . "
+    ::= { psACInput 6 }
+
+
+
+
+
+psACInputFrequency  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput Frequency giving in 0.01HZ. "
+    ::= { psACInput 7 }
+
+psACInputACStatus OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok (0),
+			notok  (1)
+			}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"ACInput AC Status  0 = OK  1= Not OK "
+    ::= { psACInput 8 }
+
+psACInputSurgeStatus OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok    (0),
+			notok (1)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Status of the ACInput Surge 0 = OK, 1 = Not OK."
+    ::= { psACInput 9 }
+
+
+psACInputSpareInp0 OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare"
+    ::= { psACInput 10 }
+psACInputSpareInp1 OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare"
+    ::= { psACInput 11 }
+
+
+psACInputSpareInp2 OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare"
+    ::= { psACInput 12 }
+
+psACInputSpareInp3 OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare"
+    ::= { psACInput 14 }
+
+psACInputSpareInp4 OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare"
+    ::= { psACInput 15 }
+
+psACInputSpareInp5 OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare"
+    ::= { psACInput 16 }
+
+psACInputSpareInp6 OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" Spare"
+    ::= { psACInput 17 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- The DC OUTPUT  group consists of the following objects:
+
+--
+-- DC OUTPUT MIB definitions
+--
+
+
+
+psDCoutputVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Voltage  present in 0.1V "
+    ::= { psDCOutput 1 }
+
+
+
+psDCoutputCurrent1 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Current presents in units of 0.1A . "
+    ::= { psDCOutput 2 }
+
+psDCoutputCurrent2 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Current presents in units of 0.1A . "
+    ::= { psDCOutput 3 }
+
+psDCoutputCurrent3 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Current presents in units of 0.1A . "
+    ::= { psDCOutput 4 }
+
+psDCoutputCurrent4 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Current presents in units of 0.1A . "
+    ::= { psDCOutput 5 }
+
+psDCoutputCurrent5 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Current presents in units of 0.1A . "
+    ::= { psDCOutput 6 }
+
+
+
+psDCoutputDCStatus OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok (0),
+			overvoltage  (1),
+			undervoltage  (2),
+			disconnected   (3)
+			}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput DC Status  0 = OK  1= OverVoltage 2 = UnderVoltage 3 = Disconnected "
+    ::= { psDCOutput 11 }
+
+psDCoutputSurgeStatus OBJECT-TYPE
+    SYNTAX 		INTEGER {
+			ok(0),
+			notok (1)
+				}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+" The Status of the DCoutput Surge 0 = OK, 1 = Not OK."
+    ::= { psDCOutput  12}
+
+psDCoutputInvertorVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Invertor Voltage  present in 0.1V "
+    ::= { psDCOutput 13 }
+
+psDCOutputDCOutput OBJECT-TYPE
+    SYNTAX 		INTEGER
+		{ 
+		ok(0),
+		overvoltage(1),
+		undervoltage(2),
+		disconnect (3)
+		}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+    
+"  0=OK  
+1= OverVoltage
+2 = Undervoltage.
+3 = Disconnected."
+    ::= { psDCOutput 14} 
+   
+   psDCoutputSpare1 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Spare "
+    ::= { psDCOutput 15 }
+
+ psDCoutputSpare2   OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Spare "
+    ::= { psDCOutput 16 }
+ 
+ psDCoutputSpare3 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Spare "
+    ::= { psDCOutput 17 }
+ psDCoutputSpare4 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Spare "
+    ::= { psDCOutput 18 }
+ psDCoutputSpare5 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Spare "
+    ::= { psDCOutput 19}
+
+ 
+psDCoutputSpare6 OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"DCoutput Spare "
+    ::= { psDCOutput 20 }
+
+
+-- The PS Contuctors  and Dry Contacts group consists of the following objects:
+
+--
+-- Contuctors MIB definitions
+--
+
+psContuctor1 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 1 in Battery Circuit "
+    ::= { psContuctor  1 }
+
+psContuctor2 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 2 in Battery Circuit "
+    ::= { psContuctor  2 }
+
+psContuctor3 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 3 in Battery Circuit "
+    ::= { psContuctor  3 }
+
+psContuctor4 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 4 in Battery Circuit "
+    ::= { psContuctor  4 }
+ 
+psContuctor5 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 5 in Load Circuit "
+    ::= { psContuctor  5 }
+
+psContuctor6 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 6 in Load Circuit "
+    ::= { psContuctor  6 }
+
+psContuctor7 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 7 in Load Circuit "
+    ::= { psContuctor  7 }
+
+psContuctor8 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 8 in Load Circuit "
+    ::= { psContuctor  8 }
+
+psContuctor9 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 9 in Load Circuit "
+    ::= { psContuctor  9 }
+psContuctor10 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		open (0),
+		close (1)
+			}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Contuctor 10 in Load Circuit "
+    ::= { psContuctor 10 }
+
+psDryContactTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsDryContactorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Dry Contactor alarm table."
+
+    ::= { psContuctor  11 }
+
+
+psDryContactorEntry OBJECT-TYPE
+    SYNTAX      PsDryContactorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+"An entry in this table defines for each Dry Contactor the Alarm vector"
+    INDEX  {psDryContactorIndex}
+    ::= { psDryContactTable 1 }
+
+PsDryContactorEntry ::= SEQUENCE {
+psDryContactorIndex				INTEGER,
+psDryContactorAlarm1			INTEGER,
+psDryContactorAlarm2			INTEGER,
+psDryContactorAlarm3			INTEGER,
+psDryContactorAlarm4			INTEGER,
+psDryContactorAlarm5			INTEGER,
+psDryContactorAlarm6			INTEGER,
+psDryContactorAlarm7			INTEGER,
+psDryContactorAlarm8			INTEGER,
+psDryContactorAlarm9			INTEGER,
+psDryContactorAlarm10			INTEGER,
+psDryContactorAlarm11			INTEGER,
+psDryContactorAlarm12			INTEGER,
+psDryContactorAlarm13			INTEGER,
+psDryContactorAlarm14			INTEGER,
+psDryContactorAlarm15			INTEGER,
+psDryContactorAlarm16			INTEGER,
+psDryContactorAlarm17			INTEGER,
+psDryContactorAlarm18			INTEGER,
+psDryContactorAlarm19			INTEGER,
+psDryContactorAlarm20			INTEGER,
+psDryContactorAlarm21			INTEGER,
+psDryContactorAlarm22			INTEGER,
+psDryContactorAlarm23			INTEGER,
+psDryContactorAlarm24			INTEGER,
+psDryContactorAlarm25			INTEGER,
+psDryContactorAlarm26			INTEGER,
+psDryContactorAlarm27			INTEGER,
+psDryContactorAlarm28			INTEGER,
+psDryContactorAlarm29			INTEGER,
+psDryContactorAlarm30			INTEGER,
+psDryContactorAlarm31			INTEGER,
+psDryContactorAlarm32			INTEGER
+
+
+
+
+		}
+
+psDryContactorIndex OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The DRY  Contact table index."
+    ::= { psDryContactorEntry 1 }
+
+psDryContactorAlarm1 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 1."
+    ::= { psDryContactorEntry 2 }
+
+
+psDryContactorAlarm2 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 2."
+    ::= { psDryContactorEntry 3 }
+
+psDryContactorAlarm3 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 3."
+    ::= { psDryContactorEntry 4 }
+psDryContactorAlarm4 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 4."
+    ::= { psDryContactorEntry 5 }
+
+psDryContactorAlarm5 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 5."
+    ::= { psDryContactorEntry 6 }
+psDryContactorAlarm6 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 6."
+    ::= { psDryContactorEntry 7}
+
+
+
+
+psDryContactorAlarm7 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 7."
+    ::= { psDryContactorEntry 8 }
+psDryContactorAlarm8 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 8."
+    ::= { psDryContactorEntry 9 }
+
+psDryContactorAlarm9 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 9."
+    ::= { psDryContactorEntry 10}
+
+
+
+psDryContactorAlarm10 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 10."
+    ::= { psDryContactorEntry 11}
+psDryContactorAlarm11 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 11."
+    ::= { psDryContactorEntry 12}
+
+
+
+psDryContactorAlarm12 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 12."
+    ::= { psDryContactorEntry 13 }
+
+psDryContactorAlarm13 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 13."
+    ::= { psDryContactorEntry 14}
+
+
+psDryContactorAlarm14 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 14."
+    ::= { psDryContactorEntry 15 }
+
+psDryContactorAlarm15 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 15."
+    ::= { psDryContactorEntry 16 }
+psDryContactorAlarm16 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 16."
+    ::= { psDryContactorEntry 17}
+
+
+
+
+psDryContactorAlarm17 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 17."
+    ::= { psDryContactorEntry 18 }
+
+
+psDryContactorAlarm18 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 18."
+    ::= { psDryContactorEntry 19 }
+
+psDryContactorAlarm19 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 19."
+    ::= { psDryContactorEntry 20 }
+psDryContactorAlarm20 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 20."
+    ::= { psDryContactorEntry 21 }
+
+psDryContactorAlarm21 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 21."
+    ::= { psDryContactorEntry 22 }
+psDryContactorAlarm22 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 22."
+    ::= { psDryContactorEntry 23}
+
+
+
+
+
+psDryContactorAlarm23 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 23."
+    ::= { psDryContactorEntry 24 }
+
+
+psDryContactorAlarm24 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 24."
+    ::= { psDryContactorEntry 25 }
+
+psDryContactorAlarm25 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 25."
+    ::= { psDryContactorEntry 26 }
+psDryContactorAlarm26 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 26."
+    ::= { psDryContactorEntry 27 }
+
+psDryContactorAlarm27 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 27."
+    ::= { psDryContactorEntry 28 }
+psDryContactorAlarm28 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 28."
+    ::= { psDryContactorEntry 29}
+
+psDryContactorAlarm29 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 29."
+    ::= { psDryContactorEntry 30}
+psDryContactorAlarm30 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 30."
+    ::= { psDryContactorEntry 31 }
+
+psDryContactorAlarm31 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 31."
+    ::= { psDryContactorEntry 32 }
+psDryContactorAlarm32 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 32."
+    ::= { psDryContactorEntry 33}
+
+psDryContactStatus OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Dry contactor alarm status "
+    ::= { psContuctor 12 }
+
+
+
+
+psDryContact1Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsDryContactor1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Dry Contactor alarm table."
+
+    ::= { psContuctor  13 }
+
+
+psDryContactor1Entry OBJECT-TYPE
+    SYNTAX      PsDryContactor1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+"An entry in this table defines for each Dry Contactor the Alarm vector"
+    INDEX  {psDryContactor1Index}
+    ::= { psDryContact1Table 1 }
+
+PsDryContactor1Entry ::= SEQUENCE {
+psDryContactor1Index				INTEGER,
+psDryContactor1Alarm1			INTEGER,
+psDryContactor1Alarm2			INTEGER,
+psDryContactor1Alarm3			INTEGER,
+psDryContactor1Alarm4			INTEGER,
+psDryContactor1Alarm5			INTEGER,
+psDryContactor1Alarm6			INTEGER,
+psDryContactor1Alarm7			INTEGER,
+psDryContactor1Alarm8			INTEGER,
+psDryContactor1Alarm9			INTEGER,
+psDryContactor1Alarm10			INTEGER,
+psDryContactor1Alarm11			INTEGER,
+psDryContactor1Alarm12			INTEGER,
+psDryContactor1Alarm13			INTEGER,
+psDryContactor1Alarm14			INTEGER,
+psDryContactor1Alarm15			INTEGER,
+psDryContactor1Alarm16			INTEGER,
+psDryContactor1Alarm17			INTEGER,
+psDryContactor1Alarm18			INTEGER,
+psDryContactor1Alarm19			INTEGER,
+psDryContactor1Alarm20			INTEGER,
+psDryContactor1Alarm21			INTEGER,
+psDryContactor1Alarm22			INTEGER,
+psDryContactor1Alarm23			INTEGER,
+psDryContactor1Alarm24			INTEGER,
+psDryContactor1Alarm25			INTEGER,
+psDryContactor1Alarm26			INTEGER,
+psDryContactor1Alarm27			INTEGER,
+psDryContactor1Alarm28			INTEGER,
+psDryContactor1Alarm29			INTEGER,
+psDryContactor1Alarm30			INTEGER,
+psDryContactor1Alarm31			INTEGER,
+psDryContactor1Alarm32			INTEGER
+
+
+
+
+		}
+
+psDryContactor1Index OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The DRY  Contact table index."
+    ::= { psDryContactor1Entry 1 }
+
+psDryContactor1Alarm1 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 1."
+    ::= { psDryContactor1Entry 2 }
+
+
+psDryContactor1Alarm2 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 2."
+    ::= { psDryContactor1Entry 3 }
+
+psDryContactor1Alarm3 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 3."
+    ::= { psDryContactor1Entry 4 }
+psDryContactor1Alarm4 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 4."
+    ::= { psDryContactor1Entry 5 }
+
+psDryContactor1Alarm5 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 5."
+    ::= { psDryContactor1Entry 6 }
+psDryContactor1Alarm6 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 6."
+    ::= { psDryContactor1Entry 7}
+
+
+
+
+psDryContactor1Alarm7 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 7."
+    ::= { psDryContactor1Entry 8 }
+psDryContactor1Alarm8 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 8."
+    ::= { psDryContactor1Entry 9 }
+
+psDryContactor1Alarm9 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 9."
+    ::= { psDryContactor1Entry 10}
+
+
+
+psDryContactor1Alarm10 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 10."
+    ::= { psDryContactor1Entry 11}
+psDryContactor1Alarm11 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 11."
+    ::= { psDryContactor1Entry 12}
+
+
+
+psDryContactor1Alarm12 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 12."
+    ::= { psDryContactor1Entry 13 }
+
+psDryContactor1Alarm13 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 13."
+    ::= { psDryContactor1Entry 14}
+
+
+psDryContactor1Alarm14 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 14."
+    ::= { psDryContactor1Entry 15 }
+
+psDryContactor1Alarm15 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 15."
+    ::= { psDryContactor1Entry 16 }
+psDryContactor1Alarm16 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 16."
+    ::= { psDryContactor1Entry 17}
+
+
+
+
+psDryContactor1Alarm17 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 17."
+    ::= { psDryContactor1Entry 18 }
+
+
+psDryContactor1Alarm18 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 18."
+    ::= { psDryContactor1Entry 19 }
+
+psDryContactor1Alarm19 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 19."
+    ::= { psDryContactor1Entry 20 }
+psDryContactor1Alarm20 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 20."
+    ::= { psDryContactor1Entry 21 }
+
+psDryContactor1Alarm21 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 21."
+    ::= { psDryContactor1Entry 22 }
+psDryContactor1Alarm22 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 22."
+    ::= { psDryContactor1Entry 23}
+
+
+
+
+
+psDryContactor1Alarm23 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 23."
+    ::= { psDryContactor1Entry 24 }
+
+
+psDryContactor1Alarm24 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 24."
+    ::= { psDryContactor1Entry 25 }
+
+psDryContactor1Alarm25 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 25."
+    ::= { psDryContactor1Entry 26 }
+psDryContactor1Alarm26 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 26."
+    ::= { psDryContactor1Entry 27 }
+
+psDryContactor1Alarm27 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 27."
+    ::= { psDryContactor1Entry 28 }
+psDryContactor1Alarm28 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 28."
+    ::= { psDryContactor1Entry 29}
+
+psDryContactor1Alarm29 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 29."
+    ::= { psDryContactor1Entry 30}
+psDryContactor1Alarm30 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 30."
+    ::= { psDryContactor1Entry 31 }
+
+psDryContactor1Alarm31 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 31."
+    ::= { psDryContactor1Entry 32 }
+psDryContactor1Alarm32 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 32."
+    ::= { psDryContactor1Entry 33}
+
+psDryContact1Status OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Dry contactor alarm status "
+    ::= { psContuctor 14 }
+
+
+
+
+psDryContact2Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsDryContactor2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Dry Contactor alarm table."
+
+    ::= { psContuctor  15 }
+
+
+psDryContactor2Entry OBJECT-TYPE
+    SYNTAX      PsDryContactor2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+
+"An entry in this table defines for each Dry Contactor the Alarm vector"
+    INDEX  {psDryContactor2Index}
+    ::= { psDryContact2Table 1 }
+
+PsDryContactor2Entry ::= SEQUENCE {
+psDryContactor2Index				INTEGER,
+psDryContactor2Alarm1			INTEGER,
+psDryContactor2Alarm2			INTEGER,
+psDryContactor2Alarm3			INTEGER,
+psDryContactor2Alarm4			INTEGER,
+psDryContactor2Alarm5			INTEGER,
+psDryContactor2Alarm6			INTEGER,
+psDryContactor2Alarm7			INTEGER,
+psDryContactor2Alarm8			INTEGER,
+psDryContactor2Alarm9			INTEGER,
+psDryContactor2Alarm10			INTEGER,
+psDryContactor2Alarm11			INTEGER,
+psDryContactor2Alarm12			INTEGER,
+psDryContactor2Alarm13			INTEGER,
+psDryContactor2Alarm14			INTEGER,
+psDryContactor2Alarm15			INTEGER,
+psDryContactor2Alarm16			INTEGER,
+psDryContactor2Alarm17			INTEGER,
+psDryContactor2Alarm18			INTEGER,
+psDryContactor2Alarm19			INTEGER,
+psDryContactor2Alarm20			INTEGER,
+psDryContactor2Alarm21			INTEGER,
+psDryContactor2Alarm22			INTEGER,
+psDryContactor2Alarm23			INTEGER,
+psDryContactor2Alarm24			INTEGER,
+psDryContactor2Alarm25			INTEGER,
+psDryContactor2Alarm26			INTEGER,
+psDryContactor2Alarm27			INTEGER,
+psDryContactor2Alarm28			INTEGER,
+psDryContactor2Alarm29			INTEGER,
+psDryContactor2Alarm30			INTEGER,
+psDryContactor2Alarm31			INTEGER,
+psDryContactor2Alarm32			INTEGER
+
+
+
+
+		}
+
+psDryContactor2Index OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The DRY  Contact table index."
+    ::= { psDryContactor2Entry 1 }
+
+psDryContactor2Alarm1 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 1."
+    ::= { psDryContactor2Entry 2 }
+
+
+psDryContactor2Alarm2 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 2."
+    ::= { psDryContactor2Entry 3 }
+
+psDryContactor2Alarm3 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 3."
+    ::= { psDryContactor2Entry 4 }
+psDryContactor2Alarm4 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 4."
+    ::= { psDryContactor2Entry 5 }
+
+psDryContactor2Alarm5 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 5."
+    ::= { psDryContactor2Entry 6 }
+psDryContactor2Alarm6 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 6."
+    ::= { psDryContactor2Entry 7}
+
+
+
+
+psDryContactor2Alarm7 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 7."
+    ::= { psDryContactor2Entry 8 }
+psDryContactor2Alarm8 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 8."
+    ::= { psDryContactor2Entry 9 }
+
+psDryContactor2Alarm9 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 9."
+    ::= { psDryContactor2Entry 10}
+
+
+
+psDryContactor2Alarm10 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 10."
+    ::= { psDryContactor2Entry 11}
+psDryContactor2Alarm11 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 11."
+    ::= { psDryContactor2Entry 12}
+
+
+
+psDryContactor2Alarm12 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 12."
+    ::= { psDryContactor2Entry 13 }
+
+psDryContactor2Alarm13 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 13."
+    ::= { psDryContactor2Entry 14}
+
+
+psDryContactor2Alarm14 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 14."
+    ::= { psDryContactor2Entry 15 }
+
+psDryContactor2Alarm15 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 15."
+    ::= { psDryContactor2Entry 16 }
+psDryContactor2Alarm16 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 16."
+    ::= { psDryContactor2Entry 17}
+
+
+
+
+psDryContactor2Alarm17 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 17."
+    ::= { psDryContactor2Entry 18 }
+
+
+psDryContactor2Alarm18 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 18."
+    ::= { psDryContactor2Entry 19 }
+
+psDryContactor2Alarm19 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 19."
+    ::= { psDryContactor2Entry 20 }
+psDryContactor2Alarm20 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 20."
+    ::= { psDryContactor2Entry 21 }
+
+psDryContactor2Alarm21 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 21."
+    ::= { psDryContactor2Entry 22 }
+psDryContactor2Alarm22 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 22."
+    ::= { psDryContactor2Entry 23}
+
+
+
+
+
+psDryContactor2Alarm23 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 23."
+    ::= { psDryContactor2Entry 24 }
+
+
+psDryContactor2Alarm24 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 24."
+    ::= { psDryContactor2Entry 25 }
+
+psDryContactor2Alarm25 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 25."
+    ::= { psDryContactor2Entry 26 }
+psDryContactor2Alarm26 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 26."
+    ::= { psDryContactor2Entry 27 }
+
+psDryContactor2Alarm27 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 27."
+    ::= { psDryContactor2Entry 28 }
+psDryContactor2Alarm28 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 28."
+    ::= { psDryContactor2Entry 29}
+
+psDryContactor2Alarm29 OBJECT-TYPE
+   SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 29."
+    ::= { psDryContactor2Entry 30}
+psDryContactor2Alarm30 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 30."
+    ::= { psDryContactor2Entry 31 }
+
+psDryContactor2Alarm31 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 31."
+    ::= { psDryContactor2Entry 32 }
+psDryContactor2Alarm32 OBJECT-TYPE
+    SYNTAX 		INTEGER  {
+				set (1),
+				notset (0)
+				}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " The Dry Contactor Alarm 32."
+    ::= { psDryContactor2Entry 33}
+
+psDryContact2Status OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Dry contactor alarm status "
+    ::= { psContuctor 16 }
+
+
+
+
+
+
+--   SEVERITY MAPING  index :1 =  Critical , 2 = major 3 = minor 4 = worning
+
+psSeverityMapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsSeverityMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Severity  table."
+     ::= { psSeverityMap 1 }
+
+psSeverityMapEntry  OBJECT-TYPE
+    SYNTAX      PsSeverityMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines Severity per Alarm  psSeverityIndex 1 = Critical and 4 = worning . "
+    INDEX { psSeverityMapIndex }
+    ::= { psSeverityMapTable 1 }
+
+PsSeverityMapEntry ::= SEQUENCE {
+psSeverityMapIndex			INTEGER,
+psSeverityMapAlarm1to32	INTEGER,
+psSeverityMapAlarm33to64		INTEGER,
+psSeverityMapAlarm65to96 INTEGER
+
+
+}
+
+psSeverityMapIndex OBJECT-TYPE 
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The PS table index 1=  critical , 4 = worning ."
+    ::= { psSeverityMapEntry 1 }
+
+
+
+
+psSeverityMapAlarm1to32 OBJECT-TYPE 
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Alarm 1 to 32."
+    ::= { psSeverityMapEntry 2 }
+
+
+psSeverityMapAlarm33to64 OBJECT-TYPE 
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Alarm 33 to 64."
+    ::= { psSeverityMapEntry 3 }
+
+psSeverityMapAlarm65to96 OBJECT-TYPE 
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Alarm 65 to 96."
+    ::= { psSeverityMapEntry 4 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- The PS Nominal Values Configuration  group consists of the following objects:
+
+--
+-- Nominal Configuration MIB definitions
+--
+
+psConfEnableCurrentLimit  OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                   disable (0),
+			enable (1)
+				} 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Enable Current Limit "
+    ::= { psConfNominal  1 }
+
+
+psConfEnablePeriodicEqualize OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                   disable (0),
+			enable (1)
+				} 
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Enable   Periodic   Equalize"
+    ::= { psConfNominal  2 }
+
+
+
+psConfGHighTempAlarm  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " High Temprature Alarm Giving in Celsious "
+    ::= { psConfNominal  3 }
+
+
+psConfLowTempAlarmSign  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			positive (0),
+			negative (1)
+			} 
+ 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Low Temperature Alarm Sign "
+    ::= { psConfNominal  4 }
+
+
+psConfLowTempAlarm OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Low Temprature Alarm Giving in Celsious "
+    ::= { psConfNominal  5 }
+
+
+psConfTemperatureCoefficient  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Temperature     Coefficient    0.01V/C"
+    ::= { psConfNominal  6 }
+
+
+psConfNumOfInvertors  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Number Of Invertors "
+    ::= { psConfNominal  7 }
+
+
+psConfNumOfRectifiers  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Number Of Psu's "
+    ::= { psConfNominal  8 }
+
+psConfACHigh  OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " AC High Voltage Alarm"
+    ::= { psConfNominal  9 }
+
+
+psConfACLow  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " AC Low Voltage Alarm"
+    ::= { psConfNominal  10 }
+
+psConfCurrentLimit  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Current Limit "
+    ::= { psConfNominal  11 }
+
+psConfHIA  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " HI_A "
+    ::= { psConfNominal  12 }
+
+
+psConfBDOC  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " BDOC "
+    ::= { psConfNominal  13 }
+
+psConfBatteryNominalCapacity OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Battery   Nominal   Capacity"
+    ::= { psConfNominal  14 }
+
+psConfEqualStopTime  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Equal  Stop Time "
+    ::= { psConfNominal  15 }
+
+psConfEqualStopCurrent  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Equal  Stop Current "
+    ::= { psConfNominal  16 }
+
+psConfEqualPeriod  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Equal Period "
+    ::= { psConfNominal  17 }
+psConfEqualStartCurrent  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Equal  Start  Current "
+    ::= { psConfNominal  18 }
+
+psConfMajorLowVoltage1  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Major Low Voltage for  MAJ_LV1 Alarm giving in units of 0.01V "
+    ::= { psConfNominal  19 }
+
+psConfMajorLowVoltage  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Major Low Voltage for  MAJ_LV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  20 }
+
+psConfMinorLowVoltage  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Minor Low Voltage for  MIN_LV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  21 }
+
+psConfMinorHighVoltage  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Minor High Voltage for  MIN_HV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  22 }
+
+psConfMajorHighVoltage  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Major High Voltage for  MAJ_HV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  23} 
+
+
+psConfFloatingVoltage OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Floating Voltage set giving in units of 0.01V "
+    ::= { psConfNominal  24 } 
+psConfEqualizingVoltage OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Equalizing Voltage set giving in units of 0.01V "
+    ::= { psConfNominal  25 } 
+
+psConfNumberOfBattery OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Number Of Batteries "
+    ::= { psConfNominal  26 } 
+
+
+psConfEnableTempComp OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                   disable (0),
+			 enable (1)
+				} 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Enable Temperature Comp. "
+    ::= { psConfNominal  27 }
+psConfNumberOfLVD OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Number Of Contacts "
+    ::= { psConfNominal  28 }
+
+
+psConfEqMajorLowVoltageLV1  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Major Low Voltage for  MAJ_LV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  29 }
+
+psConfEqMajorLowVoltageLv  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Minor Low Voltage for  MIN_LV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  30 }
+
+psConfEqMinorLowVoltageLV  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Minor Lowh Voltage for  MIN_LV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  31 }
+
+psConfEqMinorHighVoltageHV  OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Mainor High Voltage for  MAJ_HV Alarm giving in units of 0.01V "
+    ::= { psConfNominal  32} 
+
+
+psConfEqMajorHighVoltageHV OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Major High  Voltage  HV set giving in units of 0.01V "
+    ::= { psConfNominal  33 } 
+psConfInvertorVoltage OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " DC Volt Set "
+    ::= { psConfNominal  34 } 
+psConfInvertorHighVoltage OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " High Voltage Alarm  0.01 V"
+    ::= { psConfNominal  35 } 
+
+psConfInvertorLowVoltage OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Low Voltage Alarm  0.01V"
+    ::= { psConfNominal  36 } 
+
+psConfLVDDisconnectTime OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Top time LVD to disconnect upon failure - in hours "
+    ::= { psConfNominal  37 } 
+
+psConfNomSpare0 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  38 } 
+
+psConfNomSpare1 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  39 } 
+
+psConfNomSpare2 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  40 } 
+
+psConfNomSpare3 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  41 } 
+
+psConfNomSpare4 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  42 } 
+
+psConfNomSpare5 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  43 } 
+
+psConfNomSpare6 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  44 } 
+
+psConfNomSpare7 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  45 } 
+
+psConfNomSpare8 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  46 } 
+
+psConfNomSpare9 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  47 } 
+
+psConfNomSpare10 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare "
+    ::= { psConfNominal  48 } 
+
+
+
+-- The PS Alarm STatus  group consists of the following objects:
+
+--
+-- Status MIB definitions
+--
+
+psStatusAlarm1  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+      				}  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " More Then one rectifier is bad "
+    ::= { psStatus  1 }
+
+
+psStatusAlarm2    OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)	
+			}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+        " One Rectifier is bad "
+    ::= { psStatus  2 }
+
+
+
+psStatusAlarm3  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " AC Line Failure"
+    ::= { psStatus  3 }
+
+psStatusAlarm4 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Controler Internal Supply is bad"
+    ::= { psStatus  4 }
+
+psStatusAlarm5 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " AC Line Too High"
+    ::= { psStatus  5 }
+
+psStatusAlarm6  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " AC Line Too Low"
+    ::= { psStatus  6 }
+
+psStatusAlarm7 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " System Over Temperature "
+    ::= { psStatus  7 }
+
+psStatusAlarm8  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " BDOCA "
+    ::= { psStatus  8 }
+
+
+psStatusAlarm9  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC Too High Rectifier is off "
+    ::= { psStatus  9 }
+
+
+
+psStatusAlarm10 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC High Worning "
+    ::= { psStatus  10 }
+
+
+psStatusAlarm11 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC Too LOw Lvd Disconnect "
+    ::= { psStatus  11 }
+
+psStatusAlarm12  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC Low Worning "
+    ::= { psStatus  12 }
+
+
+
+psStatusAlarm13  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " LVD Contact Open "
+    ::= { psStatus  13 }
+
+psStatusAlarm14 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Load Breaker Open "
+    ::= { psStatus  14 }
+
+psStatusAlarm15  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " System Running in Equalizing "
+    ::= { psStatus  15 }
+
+psStatusAlarm16  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Last Battery Test Fail "
+    ::= { psStatus  16 }
+
+psStatusAlarm17 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserve  "
+    ::= { psStatus  17 }
+
+
+
+psStatusAlarm18  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserve "
+    ::= { psStatus  18 }
+
+psStatusAlarm19  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserve "
+    ::= { psStatus  19 }
+
+psStatusAlarm20 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserver "
+    ::= { psStatus  20 }
+
+psStatusAlarm21  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " PD Not Responding "
+    ::= { psStatus  21 }
+
+psStatusAlarm22  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Invertor Not Responding "
+    ::= { psStatus  22 }
+psStatusAlarm23  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Rectifier Not Responding "
+    ::= { psStatus  23 }
+
+psStatusAlarm24  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Last Self Test Failed "
+    ::= { psStatus  24 }
+
+psStatusAlarm25 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Fuse "
+    ::= { psStatus  25 }
+
+psStatusAlarm26 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+					}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Current Sharing in Rectifier "
+    ::= { psStatus  26 }
+
+
+psStatusAlarm27 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Output in Rectifier "
+    ::= { psStatus  27 }
+
+psStatusAlarm28 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Relay Board "
+    ::= { psStatus  28 }
+
+psStatusAlarm29   OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Load Current too High "
+    ::= { psStatus  29 }
+
+psStatusAlarm30 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Serge Blown "
+    ::= { psStatus  30 }
+
+psStatusAlarm31 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Gets Set at Start Up "
+    ::= { psStatus  31 }
+psStatusAlarm32 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Misc Alarm "
+    ::= { psStatus  32 }
+psStatusAlarm33 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  33 }
+psStatusAlarm34 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  34 }
+psStatusAlarm35 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  35 }
+psStatusAlarm36 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  36 }
+psStatusAlarm37 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  37 }
+psStatusAlarm38 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  38}
+psStatusAlarm39 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  39 }
+psStatusAlarm40 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  40}
+psStatusAlarm41 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  41 }
+psStatusAlarm42 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  42 }
+psStatusAlarm43 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  43 }
+psStatusAlarm44 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  44 }
+psStatusAlarm45 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  45 }
+psStatusAlarm46 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  46 }
+psStatusAlarm47 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  47 }
+psStatusAlarm48 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  48 }
+psStatusAlarm49 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  49 }
+psStatusAlarm50 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  50}
+psStatusAlarm51 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  51 }
+psStatusAlarm52 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  52 }
+psStatusAlarm53 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  53 }
+psStatusAlarm54 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  54 }
+psStatusAlarm55  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  55 }
+psStatusAlarm56 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  56 }
+psStatusAlarm57 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  57 }
+psStatusAlarm58 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  58 }
+psStatusAlarm59 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  59 }
+psStatusAlarm60 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  60 }
+psStatusAlarm61 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  61 }
+psStatusAlarm62 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  62 }
+psStatusAlarm63 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  63 }
+
+psStatusAlarm64 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  64 }
+
+psStatusAlarm65 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus 65 }
+psStatusAlarm66 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  66 }
+psStatusAlarm67 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  67 }
+psStatusAlarm68 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  68 }
+psStatusAlarm69 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  69 }
+psStatusAlarm70 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  70}
+psStatusAlarm71 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  71 }
+psStatusAlarm72 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  72}
+psStatusAlarm73 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  73 }
+psStatusAlarm74 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  74 }
+psStatusAlarm75 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  75 }
+psStatusAlarm76 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  76 }
+psStatusAlarm77 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  77 }
+psStatusAlarm78 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  78 }
+psStatusAlarm79 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  79 }
+psStatusAlarm80 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  80 }
+psStatusAlarm81 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  81 }
+psStatusAlarm82 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  82}
+psStatusAlarm83 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  83 }
+psStatusAlarm84 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  84 }
+psStatusAlarm85 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  85 }
+psStatusAlarm86 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  86 }
+psStatusAlarm87  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  87 }
+psStatusAlarm88 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  88 }
+psStatusAlarm89 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  89 }
+psStatusAlarm90 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  90 }
+psStatusAlarm91 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  91 }
+psStatusAlarm92 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  92 }
+psStatusAlarm93 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  93 }
+psStatusAlarm94 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  94 }
+psStatusAlarm95 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  95 }
+
+psStatusAlarm96 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			notactive (0),
+			warning    (4),
+			minor       (3),
+                  major       (2),
+			critical    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psStatus  96 }
+
+
+
+psStatusAlarmStruct OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " The Alarm 32 bit integer  struct "
+    ::= { psStatus  97}
+
+psStatusAlarmStruct1 OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " The Alarm 32 bit integer  struct "
+    ::= { psStatus  98}
+
+
+psStatusAlarmStruct2 OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " The Alarm 32 bit integer  struct "
+    ::= { psStatus  99}
+
+
+
+
+
+
+
+
+-- The PS UNIT INFORMATION  group consists of the following objects:
+
+--
+-- Status MIB definitions
+--
+
+psUnitSysName  OBJECT-TYPE
+    SYNTAX 	DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Name of the system "
+    ::= { psUnit  1 }
+psUnitManufacture  OBJECT-TYPE
+    SYNTAX 	DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Name of Manufacture "
+    ::= { psUnit  2 }
+
+psUnitBatteryType  OBJECT-TYPE
+    SYNTAX 	DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Type of battery "
+    ::= { psUnit  3 }
+
+psUnitPSType  OBJECT-TYPE
+    SYNTAX 	DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Type of power supply "
+    ::= { psUnit  4 }
+
+
+psUnitControllerType  OBJECT-TYPE
+    SYNTAX 	DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Type of Controller "
+    ::= { psUnit  5 }
+
+psUnitSoftwareVersion  OBJECT-TYPE
+    SYNTAX 	DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Software Version "
+    ::= { psUnit  6 }
+
+psUnitComProtocolVersion  OBJECT-TYPE
+    SYNTAX 	DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Communication protocol version "
+    ::= { psUnit  7 }
+
+psUnitSerialNumber  OBJECT-TYPE
+    SYNTAX      DisplayString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " System Serial Number "
+    ::= { psUnit  8 }
+
+psUnitRTCDay OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " System Real Time Clock Day "
+    ::= { psUnit  9 }
+psUnitRTCMonth OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " System Real Time Clock Month "
+    ::= { psUnit  10 }
+psUnitRTCYear OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " System Real Time Clock Year "
+    ::= { psUnit  11 }
+
+psUnitRTCHour OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " System Real Time Clock Hour "
+    ::= { psUnit  12 }
+
+psUnitRTCMinute OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " System Real Time Clock Minutes "
+    ::= { psUnit  13 }
+
+psUnitRTCSecond OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " System Real Time Clock Seconds "
+    ::= { psUnit  14 }
+
+
+
+
+psWorkingTime   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+           STATUS      current
+      DESCRIPTION 
+	" Hours of Working Time"
+	::= {psUnit 15}
+
+psScreenShot   OBJECT-TYPE
+        SYNTAX  OCTET STRING  (SIZE (160))
+	MAX-ACCESS  read-write
+            STATUS      current
+      DESCRIPTION 
+	" Display Led Image"
+        ::= {psUnit 16}
+
+psSpareIde0   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 17}
+psSpareIde1   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 18}
+psSpareIde2   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 19}
+psSpareIde3   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 20}
+psSpareIde4   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 21}
+psSpareIde5   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 22}
+psSpareIde6   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 23}
+psSpareIde7   OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+           STATUS      current
+      DESCRIPTION 
+	" Spare IDE"
+	::= {psUnit 24}
+
+-- The Statistics group consists of the following objects:
+
+-- Hourly Statistics
+-- Daily Statistics
+-- Monthly Statistics
+--           LOG MIB definitions
+--
+
+
+
+
+psHourlyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsHourlyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Hourly  Information table."
+     ::= { psStatistics 1 }
+
+psHourlyEntry OBJECT-TYPE
+    SYNTAX      PsHourlyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines statistics  per hour. The entry is indexed by the psHorlyIndex. "
+    INDEX { psHourlyIndex }
+    ::= { psHourlyTable 1 }
+
+PsHourlyEntry ::= SEQUENCE {
+psHourlyIndex			INTEGER,
+psHourlyMaxVoltage		INTEGER,
+psHourlyMinVoltage		INTEGER,
+psHourlyAvrVoltage		INTEGER,
+psHourlyMaxCurrent		INTEGER,
+psHourlyMinCurrent		INTEGER,
+psHourlyAvrCurrent		INTEGER,
+psHourlyEndTime			INTEGER
+}
+
+psHourlyIndex OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The Hourlytable index."
+    ::= { psHourlyEntry 1 }
+
+
+psHourlyMaxVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Maximum Voltage  present in 0.01V "
+    ::= { psHourlyEntry 2 }
+
+
+psHourlyMinVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Miniimum Voltage  present in 0.01V "
+    ::= { psHourlyEntry 3 }
+
+
+psHourlyAvrVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Average Voltage  present in 0.01V "
+    ::= { psHourlyEntry 4 }
+
+
+
+
+psHourlyMinCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Minimum current  present in 0.1A "
+    ::= { psHourlyEntry 5 }
+
+
+psHourlyMaxCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Maximum current  present in 0.1A "
+    ::= { psHourlyEntry 6 }
+
+
+psHourlyAvrCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Average current  present in 0.1A "
+    ::= { psHourlyEntry 7 }
+
+psHourlyEndTime OBJECT-TYPE
+    SYNTAX 		INTEGER (0..23)
+    MAX-ACCESS  read-only
+    STATUS      current
+     DESCRIPTION
+" End Time of hour interval . Between 00 to 23 "
+    ::= { psHourlyEntry 8 }
+
+
+--    Daily Table
+
+psDailyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsDailyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Daily  Information table."
+     ::= { psStatistics 2 }
+
+psDailyEntry OBJECT-TYPE
+    SYNTAX      PsDailyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines statistics  per hour. The entry is indexed by the psHorlyIndex. "
+    INDEX { psDailyIndex }
+    ::= { psDailyTable 1 }
+
+PsDailyEntry ::= SEQUENCE {
+psDailyIndex			INTEGER,
+psDailyMaxVoltage		INTEGER,
+psDailyMinVoltage		INTEGER,
+psDailyAvrVoltage		INTEGER,
+psDailyMaxCurrent		INTEGER,
+psDailyMinCurrent		INTEGER,
+psDailyAvrCurrent		INTEGER,
+psDailyDayOfMonth		INTEGER
+}
+
+psDailyIndex OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The Dailytable index."
+    ::= { psDailyEntry 1 }
+
+
+psDailyMaxVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Maximum Voltage  present in 0.01V "
+    ::= { psDailyEntry 2 }
+
+
+psDailyMinVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Miniimum Voltage  present in 0.01V "
+    ::= { psDailyEntry 3 }
+
+
+psDailyAvrVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Average Voltage  present in 0.01V "
+    ::= { psDailyEntry 4 }
+
+
+
+
+psDailyMinCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Minimum current  present in 0.1A "
+    ::= { psDailyEntry 5 }
+
+psDailyMaxCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Maximum current  present in 0.1A "
+    ::= { psDailyEntry 6 }
+
+
+
+
+psDailyAvrCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Average current  present in 0.1A "
+    ::= { psDailyEntry 7 }
+
+psDailyDayOfMonth OBJECT-TYPE
+    SYNTAX 		INTEGER (1..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+DESCRIPTION
+"Day of Month Between 1 to 31 "
+    ::= { psDailyEntry 8 }
+
+
+
+--
+--    Monthly Table
+
+psMonthlyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsMonthlyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Monthly  Information table."
+     ::= { psStatistics 3 }
+
+psMonthlyEntry OBJECT-TYPE
+    SYNTAX      PsMonthlyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines statistics  per hour. The entry is indexed by the psHorlyIndex. "
+    INDEX { psMonthlyIndex }
+    ::= { psMonthlyTable 1 }
+
+PsMonthlyEntry ::= SEQUENCE {
+psMonthlyIndex			INTEGER,
+psMonthlyMaxVoltage		INTEGER,
+psMonthlyMinVoltage		INTEGER,
+psMonthlyAvrVoltage		INTEGER,
+psMonthlyMaxCurrent		INTEGER,
+psMonthlyMinCurrent		INTEGER,
+psMonthlyAvrCurrent		INTEGER,
+psMonthlyMonth			INTEGER
+
+}
+
+psMonthlyIndex OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The Monthlytable index."
+    ::= { psMonthlyEntry 1 }
+
+
+psMonthlyMaxVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Maximum Voltage  present in 0.01V "
+    ::= { psMonthlyEntry 2 }
+
+
+psMonthlyMinVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Miniimum Voltage  present in 0.01V "
+    ::= { psMonthlyEntry 3 }
+
+
+psMonthlyAvrVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Average Voltage  present in 0.01V "
+    ::= { psMonthlyEntry 4 }
+
+
+
+
+psMonthlyMinCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Minimum current  present in 0.1A "
+    ::= { psMonthlyEntry 5 }
+
+psMonthlyMaxCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Maximum current  present in 0.1A "
+    ::= { psMonthlyEntry 6 }
+
+
+psMonthlyAvrCurrent OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Average current  present in 0.1A "
+    ::= { psMonthlyEntry 7 }
+
+psMonthlyMonth OBJECT-TYPE
+    SYNTAX 		INTEGER (1..12)
+    MAX-ACCESS  read-only
+    STATUS      current
+DESCRIPTION
+" Month Between 1 to 12 "
+    ::= { psMonthlyEntry 8 }
+
+psHourlyFirst OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The first in Hourlytable index."
+    ::= { psStatistics 4 }
+
+psHourlyLast OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The Last in Hourlytable index."
+    ::= { psStatistics 5 }
+
+psDailyFirst OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The first in Daily table index."
+    ::= { psStatistics 6 }
+
+psDailyLast OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The Last in Daily table index."
+    ::= { psStatistics 7 }
+psMonthlyFirst OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The first in Monthly table index."
+    ::= { psStatistics 8 }
+
+psMonthlyLast OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " The Last in Monthlytable index."
+    ::= { psStatistics 9}
+
+
+
+-- The Loggroup consists of the following objects:
+
+-- 
+--           LOG MIB definitions
+--
+
+
+
+psLogTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PsLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PS Hourly  Information table."
+     ::= { psLog 1 }
+
+psLogEntry OBJECT-TYPE
+    SYNTAX      PsLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+"An entry in this table defines statistics  per hour. The entry is indexed by the psHorlyIndex. "
+    INDEX { psLogIndex }
+    ::= { psLogTable 1 }
+
+PsLogEntry ::= SEQUENCE {
+psLogIndex			INTEGER,
+psLogDateYear                INTEGER,
+psLogDateMonth                INTEGER,
+
+psLogDateDay                INTEGER,
+
+psLogDateHour                INTEGER,
+
+psLogDateMinute                INTEGER,
+
+psLogDateSecond                INTEGER,
+
+
+psLogDCVoltage			INTEGER,
+psLogStatus				INTEGER,
+psLogAlarmCode			INTEGER,
+psLogDateTime			INTEGER,
+psLogGeneral                  INTEGER
+}
+
+psLogIndex OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " TheLog  index."
+    ::= { psLogEntry 1 }
+
+
+psLogDateYear  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Log Date and Time  Year"
+    ::= { psLogEntry 2 }
+
+psLogDateMonth  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Log Date and Time  Month"
+    ::= { psLogEntry 3 }
+psLogDateDay  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Log Date and Time  Day"
+    ::= { psLogEntry 4 }
+
+psLogDateHour  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Log Date and Time  Hour"
+    ::= { psLogEntry 5 }
+
+psLogDateMinute  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Log Date and Time  Minute"
+    ::= { psLogEntry 6 }
+
+
+psLogDateSecond  OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Log Date and Time  Second"
+    ::= { psLogEntry 7 }
+
+
+
+
+
+
+psLogDCVoltage OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Log DC Voltage "
+    ::= { psLogEntry 8 }
+
+
+psLogStatus OBJECT-TYPE
+    SYNTAX 		INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+"Contactor Status "
+    ::= { psLogEntry 9 }
+
+
+
+
+
+psLogAlarmCode OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+     DESCRIPTION
+" The Alarm Code "
+    ::= { psLogEntry 10 }
+
+psLogDateTime  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+     DESCRIPTION
+" date time year 7 bits ,  month 4 bits , day 5 bits, hours 5 bits,minutes 6 bits, seconds/2  5 bits   "
+    ::= { psLogEntry 11 }
+
+
+psLogGeneral  OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+     DESCRIPTION
+" General bit strin Information. It is deferent between various PS types   "
+    ::= { psLogEntry 12 }
+
+psLogFirst OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+     DESCRIPTION
+" The First sequence in log entry "
+    ::= { psLog 2 }
+
+psLogLast OBJECT-TYPE
+    SYNTAX 		INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+     DESCRIPTION
+" The Last sequence in log entry "
+    ::= { psLog 3 }
+
+--
+-- Trap MIB definitions
+
+
+psTrapSeverity OBJECT-TYPE
+    SYNTAX  PsAlarmSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The PS alarm Sevirity."
+     ::= { psTrap 1}
+
+
+psTrapStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+			off (0),
+			on(1)
+			}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The PS alarm status."
+     ::= { psTrap 2}
+ psTrapActivation OBJECT-TYPE
+    SYNTAX  INTEGER  {
+			off (0),
+			on(1)
+			}
+    MAX-ACCESS  read-write
+   STATUS      current
+    DESCRIPTION
+       "The PS Trap Activation."
+    ::= { psTrap 3 }
+
+
+--  1006  TRAPS  -----
+
+
+psAlarm1006     OBJECT IDENTIFIER  ::= { psTrap 10}
+psTrapPrefix1006 OBJECT IDENTIFIER ::= {psAlarm1006 0}
+psTrap1006ACLow  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"AC LOW"
+                        ::= {psTrapPrefix1006 1}
+psTrap1006Battery2TestFault  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"BATTERY No 2 TEST FAULT	
+"
+                        ::= {psTrapPrefix1006 2}
+
+psTrap1006Battery1TestFault  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"BATTERY No 1 TEST FAULT	
+"
+                        ::= {psTrapPrefix1006 3}
+psTrap1006LVD2Open  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"LVD2 DRIVEN OPEN (not physically sensed)	
+"
+                        ::= {psTrapPrefix1006 4}
+
+psTrap1006LVD1Open  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"LVD1 DRIVEN OPEN (not physically sensed)	
+"
+                        ::= {psTrapPrefix1006 5}
+
+psTrap1006AUXContactOpen  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"AUXILLIARY CONTACT OPEN"
+                        ::= {psTrapPrefix1006 6}
+psTrap1006AUXBreakerOpen  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"AUXILLIARY BREAKER OPEN"
+                        ::= {psTrapPrefix1006 7}
+psTrap1006BatteryBreakerOpen  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"BATTERY BREAKER OPEN"
+                        ::= {psTrapPrefix1006 8}
+
+ psTrap1006LoadBreakerOpen  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"LOAD BREAKER OPEN"
+                        ::= {psTrapPrefix1006 9}
+
+ psTrap1006DCLOWLow  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"DC LOWLOW"
+                        ::= {psTrapPrefix1006 10}
+ psTrap1006Rectifier  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"RECTIFIER (one or more)"
+                        ::= {psTrapPrefix1006 11}
+
+psTrap1006OverTemptature  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"OVER TEMPERATURE"
+                        ::= {psTrapPrefix1006 12}
+psTrap1006LVDBypassOpen  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"LVD bypass OPEN (one or both) "
+                        ::= {psTrapPrefix1006 13}
+psTrap1006DCHigh NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"DC HIGH "
+                        ::= {psTrapPrefix1006 14}
+psTrap1006DCLow NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"DC Low "
+                        ::= {psTrapPrefix1006 15}
+psTrap1006ACHigh NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"AC HIGH"
+                        ::= {psTrapPrefix1006 16}
+
+psAlarm     OBJECT IDENTIFIER  ::= { psTrap 11}
+psTrapPrefix OBJECT IDENTIFIER ::= {psAlarm 0}
+psTrapRFAMAJ  NOTIFICATION-TYPE
+			OBJECTS {
+			
+                                psTrapSeverity,
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"More than 1 rectifier faulty "
+                        ::= {psTrapPrefix 1}
+
+psTrapRFAMIN  NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                               
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"1 rectifier faulty "
+                        ::= {psTrapPrefix 2}
+psTrapACFAIL  NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"AC input is abnormal (low high & fail) "
+                        ::= {psTrapPrefix 3}
+psTrapLVDX2  NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"Both LVDs are open "
+                        ::= {psTrapPrefix 4}
+
+psTrapSYSOT  NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"system over temperature"
+                        ::= {psTrapPrefix 5}
+
+psTrapLVDX1  NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"One LVD is open"
+                        ::= {psTrapPrefix 6}
+
+psTrapCBOPEN  NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"load breaker open( min 1 of all load c.b)"
+                        ::= {psTrapPrefix 7}
+psTrapEQHST	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"Equalizing mode"
+                        ::= {psTrapPrefix 8}
+
+psTrapBATTST	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"Last battery test fail"
+                        ::= {psTrapPrefix 9}
+psTrapINUBAD	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"1 or more inverter/s faulty"
+                        ::= {psTrapPrefix 10}
+psTrapUNIVPD	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"universal PD not responding"
+                        ::= {psTrapPrefix 11}
+
+psTrapIBADIN	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"an inverter/s not responding on PD bus"
+                        ::= {psTrapPrefix 12}
+psTrapRBADIN	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"a rectifier/s not responding on PD bus"
+                        ::= {psTrapPrefix 13}
+psTrapSLFTST	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"last self test failed"
+                        ::= {psTrapPrefix 14}
+
+psTrapFUSEBD	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				" battery fuse fault"
+                        ::= {psTrapPrefix 15}
+psTrapLOADHI	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				" Load current high"
+                        ::= {psTrapPrefix 16}
+
+psTrapSURGBD	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				" Surge fault"
+                        ::= {psTrapPrefix 17}
+psTrapEQLONG	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				" equalizing running more than 60 hours"
+                        ::= {psTrapPrefix 18}
+
+
+psTrapFUSE24	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				" 24V Fuse fault"
+                        ::= {psTrapPrefix 19}
+psTrapFUSE48	 NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				" 48V Fuse fault"
+                        ::= {psTrapPrefix 20}
+
+
+psTrapBYPS2	     NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"ByPass LVD2 is ON"
+                        ::= {psTrapPrefix 21}
+
+psTrapBYPS1	     NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"ByPass LVD1 is ON"
+                        ::= {psTrapPrefix 22}
+
+
+psTrapCB24CR	     NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"24V breaker critical"
+                        ::= {psTrapPrefix 23}
+psTrapCB48CR	     NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"48V breaker critical"
+                        ::= {psTrapPrefix 24}
+psTrapBATOT	     NOTIFICATION-TYPE
+			OBJECTS {
+                                psTrapSeverity,
+                                psTrapStatus
+                                 }
+	            STATUS  current
+			DESCRIPTION  
+				"battery over temperature"
+                        ::= {psTrapPrefix 25}
+
+
+
+---
+
+
+--
+-- 
+--
+
+
+
+--
+-- Alarm Set  MIB definitions
+--
+
+psAlarmSet1  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " More Then one rectifier is bad "
+    ::= { psAlarmSet  1 }
+
+psAlarmSet2  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+        " One Rectifier is bad "
+    ::= { psAlarmSet  2 }
+
+
+
+psAlarmSet3 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " AC Line Failure"
+    ::= { psAlarmSet  3 }
+
+psAlarmSet4 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Controler Internal Supply is bad"
+    ::= { psAlarmSet  4 }
+
+psAlarmSet5 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " AC Line Too High"
+    ::= { psAlarmSet  5 }
+
+psAlarmSet6  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " AC Line Too Low"
+    ::= { psAlarmSet  6 }
+
+psAlarmSet7  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " System Over Temperature "
+    ::= { psAlarmSet  7 }
+
+psAlarmSet8  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " BDOCA "
+    ::= { psAlarmSet  8 }
+
+
+psAlarmSet9  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC Too High Rectifier is off "
+    ::= { psAlarmSet  9 }
+
+
+
+psAlarmSet10 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC High Worning "
+    ::= { psAlarmSet  10 }
+
+
+psAlarmSet11 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC Too LOw Lvd Disconnect "
+    ::= { psAlarmSet  11 }
+
+psAlarmSet12  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " DC Low Worning "
+    ::= { psAlarmSet  12 }
+
+
+
+psAlarmSet13  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " LVD Contact Open "
+    ::= { psAlarmSet  13 }
+
+psAlarmSet14  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Load Breaker Open "
+    ::= { psAlarmSet  14 }
+
+psAlarmSet15  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " System Running in Equalizing "
+    ::= { psAlarmSet  15 }
+
+psAlarmSet16  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Last Battery Test Fail "
+    ::= { psAlarmSet  16 }
+
+psAlarmSet17 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserve  "
+    ::= { psAlarmSet  17 }
+
+
+
+psAlarmSet18 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserve "
+    ::= { psAlarmSet  18 }
+
+psAlarmSet19  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserve "
+    ::= { psAlarmSet  19 }
+
+psAlarmSet20 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Reserver "
+    ::= { psAlarmSet  20 }
+
+psAlarmSet21  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " PD Not Responding "
+    ::= { psAlarmSet  21 }
+
+psAlarmSet22  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Invertor Not Responding "
+    ::= { psAlarmSet  22 }
+psAlarmSet23  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Rectifier Not Responding "
+    ::= { psAlarmSet  23 }
+
+psAlarmSet24  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Last Self Test Failed "
+    ::= { psAlarmSet  24 }
+
+psAlarmSet25 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Fuse "
+    ::= { psAlarmSet  25 }
+
+psAlarmSet26 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Current Sharing in Rectifier "
+    ::= { psAlarmSet  26 }
+
+
+psAlarmSet27 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Output in Rectifier "
+    ::= { psAlarmSet  27 }
+
+psAlarmSet28 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Bad Relay Board "
+    ::= { psAlarmSet  28 }
+
+psAlarmSet29   OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Load Current too High "
+    ::= { psAlarmSet  29 }
+
+psAlarmSet30 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Serge Blown "
+    ::= { psAlarmSet  30 }
+
+psAlarmSet31 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Gets Set at Start Up "
+    ::= { psAlarmSet  31 }
+psAlarmSet32 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Misc Alarm "
+    ::= { psAlarmSet  32 }
+
+
+
+psAlarmSet33 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  33 }
+psAlarmSet34 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  34 }
+psAlarmSet35 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  35 }
+psAlarmSet36 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  36 }
+psAlarmSet37 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  37 }
+psAlarmSet38 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  38}
+psAlarmSet39 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  39 }
+psAlarmSet40 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  40}
+psAlarmSet41 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  41 }
+psAlarmSet42 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  42 }
+psAlarmSet43 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  43 }
+psAlarmSet44 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  44 }
+psAlarmSet45 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  45 }
+psAlarmSet46 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  46 }
+psAlarmSet47 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  47 }
+psAlarmSet48 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  48 }
+psAlarmSet49 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  49 }
+psAlarmSet50 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  50}
+psAlarmSet51 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  51 }
+psAlarmSet52 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write    
+STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  52 }
+psAlarmSet53 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write   
+ STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  53 }
+psAlarmSet54 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  54 }
+psAlarmSet55 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  55 }
+psAlarmSet56 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  56 }
+psAlarmSet57 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  57 }
+psAlarmSet58  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  58 }
+psAlarmSet59 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  59 }
+psAlarmSet60 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  60 }
+psAlarmSet61 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write  
+  STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  61 }
+psAlarmSet62 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  62 }
+psAlarmSet63 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  63 }
+
+psAlarmSet64 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  64 }
+
+psAlarmSet65 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet 65 }
+psAlarmSet66 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  66 }
+psAlarmSet67 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  67 }
+psAlarmSet68 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  68 }
+psAlarmSet69 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write  
+  STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  69 }
+psAlarmSet70 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  70}
+psAlarmSet71 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write  
+  STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  71 }
+psAlarmSet72 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  72}
+psAlarmSet73 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  73 }
+psAlarmSet74 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  74 }
+psAlarmSet75 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  75 }
+psAlarmSet76 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  76 }
+psAlarmSet77 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write  
+  STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  77 }
+psAlarmSet78 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  78 }
+psAlarmSet79 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  79 }
+psAlarmSet80 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  80 }
+psAlarmSet81 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  81 }
+psAlarmSet82 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  82}
+psAlarmSet83 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  83 }
+psAlarmSet84 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  84 }
+psAlarmSet85 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  85 }
+psAlarmSet86 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  86 }
+psAlarmSet87 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  87 }
+psAlarmSet88 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  88 }
+psAlarmSet89  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  89 }
+psAlarmSet90 OBJECT-TYPE
+    SYNTAX 	INTEGER{
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  90 }
+psAlarmSet91 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  91 }
+psAlarmSet92 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  92 }
+psAlarmSet93 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  93 }
+psAlarmSet94 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write 
+   STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  94 }
+psAlarmSet95 OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  95 }
+
+psAlarmSet96  OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			enable (0),
+			disable    (1)
+				}  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare "
+    ::= { psAlarmSet  96 }
+
+
+
+
+
+--
+-- Security mib  MIB definitions
+--
+
+psSecurityComunity1 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (16))  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Configure comunity "
+    ::= { psSecurity  1  }
+
+psSecurityComunity2 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (16))  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Configure comunity "
+    ::= { psSecurity  2  }
+
+psSecurityComunity3 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (16))  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Configure comunity "
+    ::= { psSecurity  3  }
+
+psSecurityPasswordComunity OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (16))  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Configure password  for get only comunity  comunity "
+    ::= { psSecurity  4  }
+
+psSecurityPasswordSet OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (16))  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Password for SNMP  set  Command"
+    ::= { psSecurity  5 }
+psSecuritySetGetPassword OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (16))  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Set  or Get Password     -----   Must match the password set or get  in order to use SNMP Set or get Commands"
+    ::= { psSecurity 6 }
+
+psSecurityErasePassword OBJECT-TYPE
+    SYNTAX 	INTEGER {
+			reset (1),
+                  dont (0)
+			}
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Erase Password "
+    ::= { psSecurity  7 }
+psSecurityTrapIp1 OBJECT-TYPE
+    SYNTAX 	IpAddress
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " IP Address For Trap "
+    ::= { psSecurity  8 }
+
+ psSecurityTrapIp2 OBJECT-TYPE
+    SYNTAX 	IpAddress
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " IP Address For Trap "
+    ::= { psSecurity  9 }
+psSecurityTrapIp3 OBJECT-TYPE
+    SYNTAX 	IpAddress
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " IP Address For Trap "
+    ::= { psSecurity  10 }
+psSecurityTrapIp4 OBJECT-TYPE
+    SYNTAX 	IpAddress
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " IP Address For Trap "
+    ::= { psSecurity  11 }
+psSecurityInterfaceIP OBJECT-TYPE
+    SYNTAX 	IpAddress
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " New IP for Interface "
+    ::= { psSecurity  12 }
+psSecurityInterfaceNetMask OBJECT-TYPE
+    SYNTAX 	IpAddress
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " The Net Mask "
+    ::= { psSecurity  13 }
+psSecurityInterfaceGateWay OBJECT-TYPE
+    SYNTAX 	IpAddress
+  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " IP Address For The Gateway "
+    ::= { psSecurity  14}
+psSecurityInterfaceActivate OBJECT-TYPE
+    SYNTAX 	INTEGER   {
+              donot (0),
+		  activate (1)
+				}
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Activate the New IP"
+    ::= { psSecurity  15}
+
+
+
+
+--
+-- Command mib  MIB definitions
+-- Set the following Instants in order to: Test Battery , PSU and INU and To activate new software
+psCommandGoFloat OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+                         {
+			no (0),
+                  yes (1)
+			}
+     MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Go Float "
+    ::= { psCommand  1  }
+psCommandGoEqualizing OBJECT-TYPE
+    SYNTAX 	INTEGER  (4..72)
+				  
+                        
+     MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Go Equalizing in hours"
+    ::= { psCommand  2  }
+psCommandDoSelfTest OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+                         {
+			no (0),
+                  yes (1)
+			}
+     MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Fo Self Test"
+    ::= { psCommand  3  }
+
+
+psCommandRunFlash1 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+                         {
+			activate(1),
+                  dontactivate (0)
+			}
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Activate Flash 1 software"
+    ::= { psCommand  4  }
+psCommandRunFlash2 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+                 {
+			activate(1),
+                  dontactivate (0)
+			}
+     MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Activate Flash 2"
+    ::= { psCommand  5  }
+psCommandTestBatteryAll OBJECT-TYPE
+    SYNTAX 	INTEGER  (1..9)
+				  
+                        
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Test All Battery in hours"
+    ::= { psCommand  6  }
+
+psCommandDoBoot OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+                         {
+			do(1),
+                  dont (0)
+			}
+   MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Re Boot the system"
+    ::= { psCommand  7 }
+
+psCommandLoadDefault OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+                         {
+			load(1),
+                  dontload (0)
+			}
+     MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Load default "
+    ::= { psCommand  8 }
+
+psCommandProgramNonActiveFlash OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+			load(1),
+                  dontload (0)
+			}
+
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Copy the down loaded file to non active flash"
+    ::= { psCommand  9}
+psCommandNonActiveFlash OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " Get The non active Flash 1 or 2 "
+    ::= { psCommand  10 }
+
+psCommandNonActiveStatus OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " Get The Non Active Flash Status"
+    ::= { psCommand  11 }
+
+
+psCommandDownLoadSoftware OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+            no       (0),
+		activate (1)
+}
+				  
+    MAX-ACCESS read-write 
+    STATUS      current
+    DESCRIPTION
+       " Down Load File"
+    ::= { psCommand  12 }
+
+psCommandDownLoadCheck OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+		completeok (0),
+            inprogress (1),
+                notok1 (2),
+                notok2  (3),
+		   notok3   (4)
+}
+				  
+    MAX-ACCESS read-write 
+    STATUS      current
+    DESCRIPTION
+       "  Check if down load completed OK"
+    ::= { psCommand  13 }
+
+
+psCommandFileName OBJECT-TYPE
+    SYNTAX 	DisplayString				  
+    MAX-ACCESS read-write 
+    STATUS      current
+    DESCRIPTION
+       "  File Name to load"
+    ::= { psCommand  14 }
+
+psCommandIpAddress OBJECT-TYPE
+    SYNTAX 	IpAddress				  
+    MAX-ACCESS read-write 
+    STATUS      current
+    DESCRIPTION
+       "  Ip Address of the server from which to load the file"
+    ::= { psCommand  15 }
+
+psCommandAbortBatTest OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                no(0),
+		    abort (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Abort battery test"
+    ::= { psCommand  16 }
+psCommandEraseTotalTime OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                no(0),
+		    erase (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Erase Total Time "
+    ::= { psCommand  17}
+
+psCommandAbortProgramFlash OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " User Define Command "
+    ::= { psCommand  18}
+
+psCommandUserDefine2 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " User Define Command "
+    ::= { psCommand  19}
+psCommandUserDefine3 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " User Define Command "
+    ::= { psCommand  20}
+psCommandUserDefine4 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " User Define Command "
+    ::= { psCommand  21}
+psCommandUserDefine5 OBJECT-TYPE
+    SYNTAX 	INTEGER  {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " User Define Command "
+    ::= { psCommand  22}
+
+psCommandFlash1Protect OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " 1 means that  flash   1 is read only "
+    ::= { psCommand  23 }
+
+psCommandFlash2Protect OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " 1 means that  flash  2 is read only "
+    ::= { psCommand  24 }
+
+psCommandFlashFix OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " 1 means that flash is fix "
+    ::= { psCommand  25 }
+
+psCommandFlashFixNumber OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " 1Telling wich flah is FIX one or Two "
+    ::= { psCommand  26 }
+
+psCommandRemoteTest OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " 1 means that Conatctors remote test is active"
+    ::= { psCommand  27 }
+psCommandControlerStatus OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " 1 means that The controler is active "
+    ::= { psCommand  28 }
+
+psCommandFirmwareRev OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (4))  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " firmware revision "
+    ::= { psCommand  29 }
+
+psCommandFlash2SWRev OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (12))  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " Flash 2 softwre revision  "
+    ::= { psCommand  30 }
+
+psCommandFlash1SWRev OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (12))  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " Flash 1 softwre revision  "
+    ::= { psCommand  31 }
+
+psCommandMBXSWRev OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (12))  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " MBX  softwre revision  "
+    ::= { psCommand  32 }
+
+psCommandLeds OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only 
+    STATUS      current
+    DESCRIPTION
+       " Leds -MSB-0 0 0 0 0 0 0 0 23 22 21 20 19 18 17 10 9 1 2 3 4 5 6 7 8 16 15 14 13 12 11 24-LSB  "
+    ::= { psCommand  33 }
+
+psCommandProgramingInProcess OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Programing progress status "
+    ::= { psCommand  34}
+
+psCommandLoadUserDefaults OBJECT-TYPE
+    SYNTAX 	INTEGER   {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " 1 means Load Default"
+    ::= { psCommand  35 }
+
+
+psCommandStoreUserDefaults OBJECT-TYPE
+    SYNTAX 	INTEGER   {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " 1 means Store Default"
+    ::= { psCommand  36 }
+psCommandLoadUserParameters OBJECT-TYPE
+    SYNTAX 	INTEGER   {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " 1 means Load Parameters"
+    ::= { psCommand  37 }
+
+psCommandStoreUserParameters OBJECT-TYPE
+    SYNTAX 	INTEGER   {
+                no(0),
+		    activate (1)
+			}
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " 1 means Store Parameters"
+    ::= { psCommand  38 }
+psCommandDryInStatus OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Dry In Status     
+bit	Property	
+32..11	Reserved	
+10	Load Critical	
+09	Load 24V	
+08	LVD #2	
+07	User 4	
+06	User 3	
+05	User 2	
+04	User 1	
+03	Load 48V	
+02	Surge	
+01	Batt Fuse	
+00	LVD #1	
+
+ "
+    ::= { psCommand  39}
+
+psCommandSpareR0 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  40 }
+
+psCommandSpareR1 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  41 }
+psCommandSpareR2 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  42 }
+psCommandSpareR3 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  43 }
+psCommandSpareR4 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  44 }
+psCommandSpareR5 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  45 }
+psCommandSpareR6 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  46 }
+psCommandSpareR7 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  47 }
+psCommandSpareR8 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  48 }
+psCommandSpareR9 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  49 }
+psCommandSpareR10 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-only
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  50 }
+
+psCommandSpareW0 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  51 }
+
+psCommandSpareW1 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  52 }
+
+psCommandSpareW2 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  53 }
+
+psCommandSpareW3 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  54 }
+
+psCommandSpareW4 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  55 }
+
+psCommandSpareW5 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  56 }
+
+psCommandSpareW6 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  57 }
+psCommandSpareW7 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  58 }
+
+
+
+psCommandSpareW8 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  59 }
+
+psCommandSpareW9 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  60 }
+
+psCommandSpareW10 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  61 }
+
+psCommandSpareW11 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  62 }
+
+psCommandSpareW12 OBJECT-TYPE
+    SYNTAX 	INTEGER  
+				  
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION
+       " Spare Command"
+    ::= { psCommand  63 }
+--           SPARE    MIB  GROUP
+psSpare1 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  1 }
+psSpare2 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  2 }
+psSpare3 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  3 }
+psSpare4 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  4 }
+psSpare5 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  5 }
+psSpare6 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  6 }
+psSpare7 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  7 }
+psSpare8 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  8 }
+psSpare9 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  9 }
+psSpare10 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  10 }
+psSpare11 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  11 }
+psSpare12 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  12 }
+psSpare13 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  13 }
+psSpare14 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  14 }
+psSpare15 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  15 }
+
+psSpare16 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  16 }
+psSpare17 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  17 }
+psSpare18 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  18 }
+psSpare19 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  19 }
+psSpare20 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  20 }
+psSpare21 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  21 }
+psSpare22 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  22 }
+psSpare23 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  23}
+psSpare24 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  24}
+psSpare25 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  25 }
+psSpare26 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  26 }
+psSpare27 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  27 }
+psSpare28 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  28 }
+psSpare29 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  29 }
+psSpare30 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  30 }
+psSpare31 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  31 }
+psSpare32 OBJECT-TYPE
+    SYNTAX 	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Spare MIB "
+    ::= { psSpare  32 }
+
+
+
+--   DIAL GROUP
+psDialATDModemSetUp OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (0..40))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " ATD COMMAND For MODEM SET UP
+        Example :
+   This is default for Cellolar Modem
+       ATZ\x0d ATS0=1\x0d AT&D0\x0d AT+IPR=9600\x0d\x00
+      
+"
+    ::= { psDial  1 }
+
+psDialATDDialOut OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (0..40))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " ATD COMMAND For Dial Out
+        
+      
+"
+    ::= { psDial  2 }
+
+psDialOutFlag OBJECT-TYPE
+    SYNTAX 	INTEGER {
+                 nodialout (0),
+                 dialout   (1)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Dial Out flag
+   1 =dial out        
+      
+"
+    ::= { psDial  3 }
+
+psDialOutNumRetries OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Number of retries if dial failed        
+      
+"
+    ::= { psDial  4 }
+
+psDialOutNumRetriesActual OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Number of actual  retries done if dial failed        
+      
+"
+    ::= { psDial  5 }
+
+psDialTimeOutBetweenRetries OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    UNITS    "10 Seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time out between retries in 10 Seconds units        
+      
+"
+    ::= { psDial  6 }
+
+psDialTimeOutAfterLastSuccess OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    UNITS    "10 Seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time out After last success  when we have new alarm in Minutes units        
+      
+"
+    ::= { psDial  7 }
+
+psDialTimeOutAfterLastRetryFailed OBJECT-TYPE
+    SYNTAX 	INTEGER 
+    UNITS    "Minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time out After last retry failed  when we have new alarm in Minutes  units        
+      
+"
+    ::= { psDial  8 }
+
+--   POWER MAX GROUP
+psPowerPlus1 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 1
+      
+"
+    ::= { psPowerPlus  1 }
+
+psPowerPlus2 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 2
+      
+"
+    ::= { psPowerPlus  2 }
+
+
+psPowerPlus3 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 3
+      
+"
+    ::= { psPowerPlus  3 }
+
+psPowerPlus4 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 4
+      
+"
+    ::= { psPowerPlus  4 }
+
+psPowerPlus5 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 5
+      
+"
+    ::= { psPowerPlus  5 }
+
+psPowerPlus6 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 6
+      
+"
+    ::= { psPowerPlus  6 }
+
+psPowerPlus7 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 7
+      
+"
+    ::= { psPowerPlus  7 }
+
+psPowerPlus8 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 8
+      
+"
+    ::= { psPowerPlus  8 }
+
+psPowerPlus9 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 9
+      
+"
+    ::= { psPowerPlus  9 }
+
+psPowerPlus10 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 10
+      
+"
+    ::= { psPowerPlus  10 }
+
+psPowerPlus11 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 11
+      
+"
+    ::= { psPowerPlus  11 }
+
+
+
+psPowerPlus12    OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 12
+      
+"
+    ::= { psPowerPlus  12 }
+
+psPowerPlus13    OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 13
+      
+"
+    ::= { psPowerPlus  13 }   
+
+psPowerPlus14 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 14
+      
+"
+    ::= { psPowerPlus  14 }    
+
+psPowerPlus15 OBJECT-TYPE
+    SYNTAX 	OCTET STRING (SIZE (128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Power Plus  String 15
+      
+"
+    ::= { psPowerPlus  15 }
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+
+END
+

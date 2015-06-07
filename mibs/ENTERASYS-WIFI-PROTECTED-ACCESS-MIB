@@ -1,0 +1,790 @@
+ENTERASYS-WIFI-PROTECTED-ACCESS-MIB DEFINITIONS ::= BEGIN
+
+--
+--  enterasys-wifi-protected-access-mib.txt
+--
+--  This MIB module provides configuration and information objects
+--  for Enterasys Networks' implementation of the Wi-Fi Protected
+--  Access (WPA).  This MIB was derived from version 3 of the 
+--  IEEE 802.11i draft.
+--
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+--
+--  Copyright July 2003 Enterasys Networks, Inc.
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32
+         FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, MacAddress, TruthValue
+         FROM SNMPv2-TC
+    etsysModules
+         FROM ENTERASYS-MIB-NAMES;
+
+etsysWiFiProtectedAccessMIB MODULE-IDENTITY
+    LAST-UPDATED "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         Wi-Fi Protected Access (WPA) management functionality.
+       
+         This implementation includes Enterasys variants of objects
+         that appear in draft 3.0 of IEEE Std 802.11i, and are relevant
+         to the Wi-Fi Alliance's WPA specification.  Since the initial
+         WPA implementation is TKIP-based, the initial version of this
+         MIB does not include AES-specific objects."
+
+    REVISION    "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    DESCRIPTION "Corrected the postal code in the CONTACT-INFO clause."
+
+    REVISION    "200308071708Z"  -- Thu Aug  7 17:08 GMT 2003
+    DESCRIPTION "Initial version of this MIB module."
+
+    ::= { etsysModules 32 }
+
+
+-- ---------------------------------------------------------- --
+-- The Wi-Fi Protected Access Object Identifier
+-- ---------------------------------------------------------- --
+
+etsysWiFiProtectedAccessObjects
+         OBJECT IDENTIFIER ::= { etsysWiFiProtectedAccessMIB 1 }
+
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+--  WPA Configuration Table
+-- ---------------------------------------------------------- --
+
+etsysWPAConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysWPAConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table containing WPA configuration objects."
+    ::= { etsysWiFiProtectedAccessObjects 1 }
+
+etsysWPAConfigEntry OBJECT-TYPE
+    SYNTAX      EtsysWPAConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the etsysWPAConfigTable."
+    INDEX { etsysWPAConfigIndex }
+    ::= { etsysWPAConfigTable 1 }
+
+EtsysWPAConfigEntry ::= 
+    SEQUENCE {
+        etsysWPAConfigIndex                         INTEGER,
+        etsysWPAConfigOptionImplemented             TruthValue,
+        etsysWPAConfigEnabled                       TruthValue,
+        etsysWPAConfigTKIPNumberOfReplayCounters    INTEGER,
+        etsysWPAConfigVersion                       Integer32,
+        etsysWPAConfigPairwiseKeysSupported         Unsigned32,
+        etsysWPAConfigMulticastCipher               OCTET STRING,
+        etsysWPAConfigGroupRekeyMethod              INTEGER,
+        etsysWPAConfigGroupRekeyTime                Unsigned32,
+        etsysWPAConfigGroupRekeyPackets             Unsigned32,
+        etsysWPAConfigGroupRekeyStrict              TruthValue,
+        etsysWPAConfigPSKValue                      OCTET STRING,
+        etsysWPAConfigPSKPassPhrase                 DisplayString,
+        etsysWPAConfigPSKValueEntered               TruthValue,
+        etsysWPAConfigMultipleAuthSuitesSupported   TruthValue,
+        etsysWPAConfigGroupMasterRekeyTime          Unsigned32,
+        etsysWPAConfigGroupUpdateTimeOut            Unsigned32,
+        etsysWPAConfigGroupUpdateCount              Unsigned32,
+        etsysWPAConfigPairwiseUpdateTimeOut         Unsigned32,
+        etsysWPAConfigPairwiseUpdateCount           Unsigned32,
+        etsysWPAConfigLegacyOptionSupported         TruthValue,
+        etsysWPAConfigAllowLegacyClients            TruthValue,
+        etsysWPAConfigRekeyPairwiseWEP              TruthValue
+    }
+
+etsysWPAConfigIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each 802.11 interface is represented by an entry in the 
+         ifTable. If this index is zero, the information in this 
+         table shall apply to all 802.11 interfaces."
+    ::= { etsysWPAConfigEntry 1 }
+
+etsysWPAConfigOptionImplemented OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether the entity is WPA-capable."
+    ::= { etsysWPAConfigEntry 2 }
+
+etsysWPAConfigEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When this object is set to TRUE, this shall indicate that 
+         WPA is enabled on this entity. The entity will advertise the
+         WPA Information Element in its Beacons and Probe Responses.
+    
+         This object requires that dot11PrivacyInvoked also be set
+         to TRUE.
+        
+         If dot11PrivacyInvoked is TRUE and etsysWPAConfigEnabled is
+         FALSE, the security mechanism used is WEP."
+    ::= { etsysWPAConfigEntry 3 }
+
+etsysWPAConfigTKIPNumberOfReplayCounters OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the number of replay counters: 
+             (0) - 1 replay counter,
+             (1) - 2 replay counters,
+             (2) - 4 replay counters,
+             (3) - 16 replay counters."
+    ::= { etsysWPAConfigEntry 4 }
+
+etsysWPAConfigVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The highest WPA version this entity supports."
+    ::= { etsysWPAConfigEntry 5 }
+
+etsysWPAConfigPairwiseKeysSupported OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates how many pairwise keys the entity 
+         supports for WPA. When zero, it only supports (four) 
+         group keys."
+    ::= { etsysWPAConfigEntry 6 }
+
+etsysWPAConfigMulticastCipher OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the multicast cipher suite selector 
+         the entity must use. The multicast cipher suite in the WPA 
+         Information Element shall take its value from this variable. 
+         It consists of an OUI (the three most significant octets) 
+         and a cipher suite identifier (the least significant octet).
+        
+         The network administrator can always override the 
+         automatically selected multicast cipher suite by writing 
+         this object."
+    ::= { etsysWPAConfigEntry 7 }
+
+etsysWPAConfigGroupRekeyMethod OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(1), timeBased(2), packetBased(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object selects a mechanism for rekeying the WPA Group Key.
+         The default is time-based, once per day. Rekeying the Group
+         key is only applicable to an entity acting in the Authenticator
+          role (an AP in an ESS)."
+    DEFVAL              { timeBased }
+    ::= { etsysWPAConfigEntry 8 }
+
+etsysWPAConfigGroupRekeyTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds after which the WPA group key 
+         must be refreshed. The timer shall start at the moment 
+         the group key was set using the MLME-SetKeys primitive.
+         The fine granularity (seconds) also enables the network 
+         Administrator to 'immediately' refresh the group key."
+    DEFVAL { 86400 } -- once per day
+    ::= { etsysWPAConfigEntry 9 }
+                                  
+etsysWPAConfigGroupRekeyPackets OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    UNITS       "1000 packets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A packet count (in 1000s of packets) after which the WPA 
+         group key shall be refreshed. The packet counter shall 
+         start at the moment the group key was set using the 
+         MLME-SetKeys primitive and it shall count all packets 
+         encrypted using the current group key."
+    ::= { etsysWPAConfigEntry 10 }
+
+etsysWPAConfigGroupRekeyStrict OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object signals that the WPA group key shall be
+             refreshed whenever a Station leaves the BSS."
+    ::= { etsysWPAConfigEntry 11 }
+
+etsysWPAConfigPSKValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-write  
+    STATUS      current
+    DESCRIPTION
+        "The Pre-Shared Key (PSK) for when WPA in PSK mode is 
+         the selected authentication suite. In that case, the PMK 
+         will obtain its value from this object. 
+        
+         A string of all 0x00 octets has the meaning 'clear the
+         key'.
+
+         This object is logically write-only. Reading this 
+         variable shall return unsuccessful status or null or zero."
+    ::= { etsysWPAConfigEntry 12 }
+
+etsysWPAConfigPSKPassPhrase OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PSK, for when WPA in PSK mode is the selected 
+         authentication suite, is configured by etsysWPAConfigPSKValue.
+        
+         An alternative manner of setting the PSK uses the 
+         password-to-key algorithm defined in section XXX. This 
+         variable provides a means to enter a pass phrase. When 
+         this object is written, the WPA entity shall use the 
+         password-to-key algorithm specified in section XXX to 
+         derive a pre-shared key and populate etsysWPAConfigPSKValue 
+         with this key.
+        
+         This object is logically write-only. Reading this 
+         variable shall return unsuccessful status or null 
+         or zero."
+    ::= { etsysWPAConfigEntry 13 }
+
+
+etsysWPAConfigPSKValueEntered OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the Pre-Shared Key (etsysWPAConfigPSKValue)
+         is set.  This allows a network management system to prompt
+         the network manager, when appropriate, to enter the initial
+         value of the key."
+    ::= { etsysWPAConfigEntry 14 }
+
+etsysWPAConfigMultipleAuthSuitesSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the entity can take advantage of multiple
+         selections in the etsysWPAConfigAuthenticationSuitesTable.
+
+         On radios that allow use of only one key management suite at
+         a time, the access point may choose among the selected suites
+         in an arbitrary fashion."
+    ::= { etsysWPAConfigEntry 15 }
+
+etsysWPAConfigGroupMasterRekeyTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds after which the WPA group master 
+         key must be changed. The timer shall start at the 
+         moment the group master key was set.
+
+         A group key refresh will occur on a group master key 
+         change.
+         The fine granularity (seconds) also enables the network 
+         Administrator to 'immediately' refresh the group master key."
+    DEFVAL { 604800 } -- 604800 = 7*86400, once per week
+    ::= { etsysWPAConfigEntry 16 }
+
+etsysWPAConfigGroupUpdateTimeOut OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds after which the WPA group 
+         update handshake will be retried. The timer shall 
+         start at the moment the group update message is sent."
+    DEFVAL { 100 }
+    ::= { etsysWPAConfigEntry 17 }
+
+etsysWPAConfigGroupUpdateCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of times the WPA Group update will be retried."
+    DEFVAL { 3 }
+    ::= { etsysWPAConfigEntry 18 }
+
+etsysWPAConfigPairwiseUpdateTimeOut OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds after which the WPA 4-way handshake
+         will be retried. The timer shall start at the moment a
+         4-way message is sent."
+    DEFVAL { 100 }
+    ::= { etsysWPAConfigEntry 19 }
+
+etsysWPAConfigPairwiseUpdateCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of times the WPA 4-way handshake will be retried."
+    DEFVAL { 3 }
+    ::= { etsysWPAConfigEntry 20 }
+
+etsysWPAConfigLegacyOptionSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the entity supports the 'Allow
+         Legacy Clients' option.  The answer may vary depending upon
+         the currently-installed radio card model."
+    ::= { etsysWPAConfigEntry 21 }
+
+etsysWPAConfigAllowLegacyClients OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides a way to indicate that an access point in
+         WPA mode should accept associations from both WPA clients and
+         legacy (pre-WPA, pre-RSN) clients.
+
+         When this object is true(1), the etsysWPAConfigMulticastCipher
+         must be WEP-40 or WEP-104 (a.k.a. 128-bit WEP).
+
+         Using WEP Group keys and letting legacy clients associate may
+         weaken security.  To minimize this,
+
+            1.  Enable legacy associations only on radios that support
+                Pairwise keys.
+
+            2.  Enable frequent Group key rekeying.  With TKIP and AES,
+                there's much less threat of key cracking than with WEP,
+                so the default is 'once in a blue moon'.  With WEP, you
+                need to think more in terms of Rapid Rekeying.
+
+         Access points implementing this feature are under no obligation
+         to support non-802.1X clients.  For instance, an access point
+         might use one-time dynamic WEP keys when WPA Group key rotation
+         is disabled.  Static WEP clients would not know these keys."
+    ::= { etsysWPAConfigEntry 22 }
+
+etsysWPAConfigRekeyPairwiseWEP OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object applies when WPA is enabled (dot11PrivacyInvoked,
+         etsysWPAConfigEnabled) and management has chosen to allow a mix
+         of WPA and non-WPA clients (etsysWPAConfigAllowLegacyClients).
+
+         It specifies whether the access point should tumble Pairwise
+         WEP keys belonging to non-WPA clients.  The access point uses
+         Group key rotation as a trigger for Pairwise WEP key tumbling;
+         if you want the latter, be sure to configure the former.
+
+         See also:  etsysDot1xRekeyPairwise."
+    ::= { etsysWPAConfigEntry 23 }
+
+
+-- ---------------------------------------------------------- --
+--  Unicast Cipher Suite configuration table
+-- ---------------------------------------------------------- --
+
+etsysWPAConfigUnicastCiphersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysWPAConfigUnicastCiphersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists the unicast ciphers supported 
+         by this entity. It allows enabling and disabling 
+         of each unicast cipher by network management. 
+         The Unicast Cipher Suite list in the WPA Information 
+         Element is formed using the information in this table."
+    ::= { etsysWiFiProtectedAccessObjects 2 }
+
+etsysWPAConfigUnicastCiphersEntry OBJECT-TYPE
+    SYNTAX      EtsysWPAConfigUnicastCiphersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table entry, indexed by the interface index (or all
+         interfaces) and the unicast cipher."
+    INDEX { etsysWPAConfigIndex, etsysWPAConfigUnicastCipherIndex }
+    ::= { etsysWPAConfigUnicastCiphersTable 1 }
+
+EtsysWPAConfigUnicastCiphersEntry ::= 
+    SEQUENCE {
+         etsysWPAConfigUnicastCipherIndex    Unsigned32,
+         etsysWPAConfigUnicastCipher         OCTET STRING,
+         etsysWPAConfigUnicastCipherEnabled  TruthValue
+    }
+
+etsysWPAConfigUnicastCipherIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The auxiliary index into the 
+         etsysWPAConfigUnicastCiphersTable."
+    ::= { etsysWPAConfigUnicastCiphersEntry 1 }
+
+etsysWPAConfigUnicastCipher OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The selector of a supported unicast cipher. It consists of
+         an OUI (the three most significant octets) and a cipher
+         suite identifier (the least significant octet)."
+    ::= { etsysWPAConfigUnicastCiphersEntry 2 }
+
+etsysWPAConfigUnicastCipherEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object enables or disables the unicast cipher."
+    ::= { etsysWPAConfigUnicastCiphersEntry 3 }
+
+
+-- ---------------------------------------------------------- --
+--  The Authentication Suites Table
+-- ---------------------------------------------------------- --
+
+etsysWPAConfigAuthenticationSuitesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysWPAConfigAuthenticationSuitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists the authentication suites supported 
+         by this entity. Each authentication suite can be 
+         individually enabled and disabled. The Authentication 
+         Suite List in the WPA IE is formed using the information 
+         in this table."
+    ::= { etsysWiFiProtectedAccessObjects 3 }
+
+etsysWPAConfigAuthenticationSuitesEntry OBJECT-TYPE
+    SYNTAX      EtsysWPAConfigAuthenticationSuitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (row) in the
+         etsysWPAConfigAuthenticationSuitesTable."
+    INDEX { etsysWPAConfigIndex, etsysWPAConfigAuthenticationSuiteIndex }
+    ::= { etsysWPAConfigAuthenticationSuitesTable 1 }
+
+EtsysWPAConfigAuthenticationSuitesEntry ::= 
+    SEQUENCE {
+         etsysWPAConfigAuthenticationSuiteIndex      Unsigned32,
+         etsysWPAConfigAuthenticationSuite           OCTET STRING,
+         etsysWPAConfigAuthenticationSuiteEnabled    TruthValue 
+    }
+
+etsysWPAConfigAuthenticationSuiteIndex      OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The auxiliary variable used as an index into 
+         the etsysWPAConfigAuthenticationSuitesTable."
+    ::= { etsysWPAConfigAuthenticationSuitesEntry 1 }
+
+etsysWPAConfigAuthenticationSuite OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The selector of an authentication suite. It consists of an
+         OUI (the three most significant octets) and a cipher suite
+         identifier (the least significant octet). "
+    ::= { etsysWPAConfigAuthenticationSuitesEntry 2 }
+
+etsysWPAConfigAuthenticationSuiteEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether the corresponding 
+         authentication suite is enabled/disabled."
+    ::= { etsysWPAConfigAuthenticationSuitesEntry 3 }
+
+
+-- ---------------------------------------------------------- --
+--  WPA statistics 
+-- ---------------------------------------------------------- --
+
+etsysWPAStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysWPAStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table maintains per-STA statistics for SN. 
+         The entry with etsysWPAStatsSTAAddress set to 
+         FF-FF-FF-FF-FF-FF shall contain statistics for 
+         broadcast/multicast traffic."
+    ::= { etsysWiFiProtectedAccessObjects 4 }
+
+etsysWPAStatsEntry OBJECT-TYPE
+    SYNTAX      EtsysWPAStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the etsysWPAStatsTable."
+    INDEX { etsysWPAConfigIndex, etsysWPAStatsIndex }
+    ::= { etsysWPAStatsTable 1 }
+
+EtsysWPAStatsEntry ::= 
+    SEQUENCE {
+         etsysWPAStatsIndex                          Unsigned32,
+         etsysWPAStatsSTAAddress                     MacAddress,
+         etsysWPAStatsVersion                        Unsigned32,
+         etsysWPAStatsSelectedUnicastCipher          OCTET STRING,
+         etsysWPAStatsTKIPICVErrors                  Counter32,
+         etsysWPAStatsTKIPLocalMICFailures           Counter32,
+         etsysWPAStatsTKIPRemoteMICFailures          Counter32,
+         etsysWPAStatsTKIPCounterMeasuresInvoked     Counter32
+    }
+
+etsysWPAStatsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An auxiliary index into the etsysWPAStatsTable."
+    ::= { etsysWPAStatsEntry 1 }
+
+etsysWPAStatsSTAAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the station the statistics in this
+         conceptual row belong to."
+    ::= { etsysWPAStatsEntry 2 }
+
+etsysWPAStatsVersion OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The WPA version which the station associated with."
+    ::= { etsysWPAStatsEntry 3 }
+
+etsysWPAStatsSelectedUnicastCipher OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Authentication Suite the station selected 
+         during association. The value consists of a three 
+         octet OUI followed by a one octet Type as follows:
+
+         OUI      Value Authentication Type          Key Management Type
+         -------- ----- -------------------          -------------------
+         00:00:00 0     Reserved                     Reserved
+         00:00:00 1     Unspecified authentication   802.1X Key Management
+                                                     over 802.1X
+         00:00:00 2     None                         802.1X Key Management
+                                                     using pre-shared Key
+         00:00:00 3-255 Reserved                     Reserved
+         Vendor   any   Vendor Specific              Vendor Specific
+         other    any   Reserved                     Reserved"
+    ::= { etsysWPAStatsEntry 4 }
+
+etsysWPAStatsTKIPICVErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of TKIP ICV errors encountered 
+         when decrypting packets for the station."
+    ::= { etsysWPAStatsEntry 5 }
+
+etsysWPAStatsTKIPLocalMICFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of Michael MIC failure encountered 
+         when checking the integrity of packets received from 
+         the station at this entity."
+    ::= { etsysWPAStatsEntry 6 }
+
+etsysWPAStatsTKIPRemoteMICFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of Michael MIC failures encountered 
+         by the station identified by dot11StatsSTAAddress and 
+         reported back to this entity. "
+    ::= { etsysWPAStatsEntry 7 }
+
+etsysWPAStatsTKIPCounterMeasuresInvoked OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Counts the number of times a MIC failure occurred two 
+         times within 60 seconds and counter-measures were 
+         invoked. This variables counts this for both local and 
+         remote. It counts every time countermeasures are 
+         invoked."
+    ::= { etsysWPAStatsEntry 8 }
+
+
+-- ---------------------------------------------------------- --
+-- Wi-Fi Protected Access MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysWpaConformance
+    OBJECT IDENTIFIER ::= { etsysWiFiProtectedAccessMIB 2 }
+
+etsysWpaGroups      
+    OBJECT IDENTIFIER ::= { etsysWpaConformance 1 }
+
+etsysWpaCompliances
+    OBJECT IDENTIFIER ::= { etsysWpaConformance 2 }
+
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysWpaBaseGroup OBJECT-GROUP
+    OBJECTS {
+        etsysWPAConfigOptionImplemented,
+        etsysWPAConfigEnabled,
+        etsysWPAConfigTKIPNumberOfReplayCounters,
+        etsysWPAConfigVersion,
+        etsysWPAConfigPairwiseKeysSupported,
+        etsysWPAConfigMulticastCipher,
+        etsysWPAConfigGroupRekeyMethod,
+        etsysWPAConfigGroupRekeyTime,
+        etsysWPAConfigGroupRekeyPackets,
+        etsysWPAConfigGroupRekeyStrict,
+        etsysWPAConfigPSKValue,
+        etsysWPAConfigPSKValueEntered,
+        etsysWPAConfigMultipleAuthSuitesSupported,
+        etsysWPAConfigPSKPassPhrase,
+        etsysWPAConfigGroupMasterRekeyTime,
+        etsysWPAConfigGroupUpdateTimeOut,
+        etsysWPAConfigGroupUpdateCount,
+        etsysWPAConfigPairwiseUpdateTimeOut,
+        etsysWPAConfigPairwiseUpdateCount,
+        etsysWPAConfigLegacyOptionSupported,
+        etsysWPAConfigAllowLegacyClients,
+        etsysWPAConfigRekeyPairwiseWEP
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration
+         information for the WPA service."
+    ::= { etsysWpaGroups 1 }
+
+etsysWpaUnicastCipherGroup OBJECT-GROUP
+    OBJECTS {
+         etsysWPAConfigUnicastCipher,
+         etsysWPAConfigUnicastCipherEnabled
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration
+         information for the WPA service."
+    ::= { etsysWpaGroups 2 }
+
+etsysWpaAuthSuiteGroup OBJECT-GROUP
+    OBJECTS {
+         etsysWPAConfigAuthenticationSuite,
+         etsysWPAConfigAuthenticationSuiteEnabled
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration
+         information for the WPA service."
+    ::= { etsysWpaGroups 3 }
+
+etsysWpaStatsGroup OBJECT-GROUP
+    OBJECTS {
+         etsysWPAStatsSTAAddress,
+         etsysWPAStatsVersion,
+         etsysWPAStatsSelectedUnicastCipher,
+         etsysWPAStatsTKIPICVErrors,
+         etsysWPAStatsTKIPLocalMICFailures,
+         etsysWPAStatsTKIPRemoteMICFailures,
+         etsysWPAStatsTKIPCounterMeasuresInvoked
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing statistics
+         information for the WPA service."
+    ::= { etsysWpaGroups 4 }
+
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysWpaCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         Enterasys Wi-Fi Protected Access (WPA) MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            etsysWpaBaseGroup
+        }
+          
+    ::= { etsysWpaCompliances 1 }
+
+END

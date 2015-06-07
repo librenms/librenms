@@ -1,0 +1,1195 @@
+
+SWCOMMGMT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        IpAddress, TimeTicks        FROM RFC1155-SMI
+        MODULE-IDENTITY,OBJECT-TYPE FROM SNMPv2-SMI
+        MacAddress                  FROM SNMPv2-TC
+        DisplayString, PhysAddress  FROM RFC1213-MIB
+        privateMgmt     	        FROM SWPRIMGMT-MIB
+        TRAP-TYPE                   FROM RFC-1215;
+        
+
+    swComMgmtMIB MODULE-IDENTITY
+        LAST-UPDATED "0007150000Z"
+	    ORGANIZATION "enterprise, Inc."
+	    CONTACT-INFO
+	        "   Customer Service
+
+		    Postal: 
+
+		       Tel: 
+
+		    E-mail: "
+	    DESCRIPTION
+		    "The Structure of Common Management Information for the
+		    proprietary enterprise."
+        ::= { privateMgmt 1 }
+        
+ErrorReturnCode ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "This variable is used primarily as an enumeration
+		      to list the proprietary return codes that this
+		      device can send to a management station in
+		      response to a failed SNMP operation."
+		      
+	   SYNTAX  INTEGER {
+                   cannotModifyMltMemberPort(201),
+                   onlyOnePortInMlt(202),
+                   moreThan4PortsInMlt(203),
+                   mltWithDifferentVlan(204),
+                   cannotModifyVlanPortWithMltMemberPort(205),
+                   arpClassIdSpecified(206),
+                   arpClassIdOnlyForIpSubnetVlan(207),
+                   ipSubnetVlanArpClassIdCannotBeZero(208),
+                   arpClassIdWithExistVid(209)
+                   
+       }
+       
+       
+                           
+    agentConfigInfo         OBJECT IDENTIFIER ::= { swComMgmtMIB 1 }
+
+    -- ****************
+    -- agentBasicInfo *
+    -- ****************
+    agentBasicInfo          OBJECT IDENTIFIER ::= { agentConfigInfo 1 }
+    
+    agentRuntimeSwVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..12))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This is a textual description of the runtime software version 
+            and revision. If the version number is one and revision number 
+            is zero agentRuntimeSwVersion would be 'Ver. 1.0'"
+        ::= { agentBasicInfo 1 }
+
+    agentPromFwVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..12))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This is a textual description of the agent PROM firmware 
+            version and revision. If the version number is one and revision
+            number is zero agentPromFwVersion would be 'Ver. 1.0'"
+        ::= { agentBasicInfo 2 }
+
+    agentHwRevision OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..12))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This is a textual description of the hardware version and 
+            revision. If the version number is one and revision number is 
+            zero agentHwRevision would be 'Ver. 1.0'"
+        ::= { agentBasicInfo 3 }
+        
+--    agentModuleType OBJECT-TYPE
+--       SYNTAX  DisplayString (SIZE (0..80))
+--        MAX-ACCESS  read-only
+--        STATUS  current
+--        DESCRIPTION
+--            "The extension module type."
+--        ::= { agentBasicInfo 4 }
+        
+    agentDeviceSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..42))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The serial number of the device."
+        ::= { agentBasicInfo 5 }        
+    
+    agentMgmtProtocolCapability OBJECT-TYPE
+        SYNTAX  INTEGER {   
+                    other(1),
+                    snmp-ip(2),
+                    snmp-ipx(3),
+                    snmp-ip-ipx(4)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The network management protocol(s) supported by this agent."
+        ::= { agentBasicInfo 6 }
+    
+    
+    -- *************************
+    -- agentMibcapabilityTable *
+    -- *************************
+
+    agentMibCapabilityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentMibCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of MIB capability entries supported by this agent."    
+        ::= { agentBasicInfo 7 }
+
+    agentMibCapabilityEntry OBJECT-TYPE
+        SYNTAX  AgentMibCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A MIB capability entry contains objects describing a particular
+            MIB supported by this agent."
+        INDEX   { agentMibCapabilityIndex }
+        ::= { agentMibCapabilityTable 1 }
+
+    AgentMibCapabilityEntry ::= 
+        SEQUENCE {
+            agentMibCapabilityIndex
+                INTEGER,
+            agentMibCapabilityDescr
+                DisplayString,
+            agentMibCapabilityVersion
+                INTEGER,
+            agentMibCapabilityType
+                INTEGER
+        }
+
+    agentMibCapabilityIndex OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535) 
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "A list of agentMibCapabilityDescr entries."
+        ::= { agentMibCapabilityEntry 1 }
+
+    agentMibCapabilityDescr OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..16))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The name of the MIB supported by the agent."
+        ::= { agentMibCapabilityEntry 2 }
+
+    agentMibCapabilityVersion OBJECT-TYPE
+        SYNTAX  INTEGER  (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The version of the MIB specified in this entry."
+        ::= { agentMibCapabilityEntry 3 }
+
+    agentMibCapabilityType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    standard(2),
+                    proprietary(3),
+                    experiment(4)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The type of the MIB specified in this entry."
+        ::= { agentMibCapabilityEntry 4 }
+
+    agentStatusConsoleInUse   OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               in-use(2),
+               not-in-use(3)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This indicates whether console is currently in-use."
+        ::= { agentBasicInfo 8 }
+
+--    agentStatusSaveCfg OBJECT-TYPE
+--        SYNTAX INTEGER {
+--               other(1),
+--               proceeding(2),
+--               completed(3),
+--               failed(4)
+--               }
+--        MAX-ACCESS read-only
+--        STATUS current
+--        DESCRIPTION
+--            "This indicates the status of the device configuration.
+--            
+--            other(1) - this entry is currently in use but the conditions 
+--                     under which it will remain so are different from each 
+--                     of the following values.
+--            proceeding(2) - the device configuration is being currently 
+--                     saved into the NV-RAM.
+--            completed(3) - all of the device configuration parameters have 
+--                     been saved into NV-RAM.
+--            failed(4) - The process to save device configuration is failed."
+--        ::= { agentBasicInfo 8 }
+
+    agentSerialPortDataBits OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of data bits, per byte of data, this port should 
+            send/receive."
+        ::= { agentBasicInfo 9 }
+        
+    agentSerialPortParityBits OBJECT-TYPE
+        SYNTAX  INTEGER {   
+                    none(1)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The Parity for console mode, If the agentRs232PortConfig change
+            to console mode then the device will use this group to make a 
+            setup for console value."
+        ::= { agentBasicInfo 10 }
+    
+    agentSerialPortStopBits OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The Stop Bits for console mode."
+        ::= { agentBasicInfo 11 }
+        
+    agentPrimaryPowerState OBJECT-TYPE
+        SYNTAX  INTEGER {   
+                    ready(1),
+                    not-ready(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The primary power status."
+        ::= { agentBasicInfo 12 }
+        
+    agentRedundantPowerState OBJECT-TYPE
+        SYNTAX  INTEGER {   
+                    ready(1),
+                    not-ready(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The redundant power status."
+        ::= { agentBasicInfo 13 }
+        
+        
+    -- ******************
+    -- agentBasicConfig *
+    -- ******************
+
+    agentBasicConfig        OBJECT IDENTIFIER ::= { agentConfigInfo 2 }
+
+    agentFirmwareFile OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the firmware file to be downloaded."
+        ::= { agentBasicConfig 1 }
+
+    agentFirmwareSourceAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The ip address where new firmware file is located on."
+        ::= { agentBasicConfig 2 }
+
+    agentFirmwareUpdateCtrl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    activate(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "while this object is set to 'activate', FTP download is working
+            immediately, and agentFirmwareUpdateState is changed to 'in-process'.
+            The agent always returns 'other' while it is read." 
+        ::= { agentBasicConfig 3 }
+
+    agentFirmwareUpdateState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1) ,
+                    in-process(2),
+                    invalid-file(3),
+                    violation(4),
+                    file-not-found(5),
+                    disk-full(6),
+                    complete(7),
+                    time-out(8),
+                    tftp-establish-fail(9)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "status of firmware download control. If the value is 'other',
+            means never firmware updated since device started up." 
+        ::= { agentBasicConfig 4 }
+
+    agentSystemRestart OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    cold-start(2),
+                    no-restart(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the agent system restart state. Setting 
+            this object to no-restart(3) has no effect. Setting this object to
+            cold-start(2) will restart the agent. The agent always returns 
+            no-restart(3) when this object is read."
+        ::= { agentBasicConfig 5 }
+
+    agentRs232PortConfig OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                    other(1),
+                    console(2),
+                    out-of-band(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the RS-232 mode while device restart."
+        ::= { agentBasicConfig 6 }
+
+    agentBaudRateConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    baudRate-2400 (2),
+                    baudRate-9600 (3),
+                    baudRate-19200(4),
+                    baudRate-38400(5),
+                    baudRate-57200(6),
+                    baudRate-115200(7)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the baud rate while device restart."
+        ::= { agentBasicConfig 7 }
+        
+    agentAutoLogoutConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    never(2),
+                    autoLogout-2mins(3),
+                    autoLogout-5mins(4),
+                    autoLogout-10mins(5),
+                    autoLogout-15mins(6)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the time which the console will log out
+            the current user if there is no user input."
+        ::= { agentBasicConfig 8 }
+    
+    agentTelnetState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object decide the TELNET enabled or disabled."
+        ::= { agentBasicConfig 9 }
+        
+    agentWebState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object decide the WEB enabled or disabled."
+        ::= { agentBasicConfig 10 }  
+        
+    agentFactoryReset OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    reset(2),
+                    config(3),
+                    system(4),
+                    no-reset(5)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the agent system reset state. Setting 
+            this object to no-reset(5) has no effect. Setting this object to
+            reset(2) will reset the agent to default settings except IP 
+            address, user account and history log. Setting this object to
+            config(3) will reset the agent to default settings. Setting this
+            object to system(4) will reset the agent to default settings.
+            Then the switch will do factory reset, save and reboot. The 
+            agent always returns no-reset(5) when this object is read."            
+        ::= { agentBasicConfig 11 }
+        
+
+    -- ***********************
+    -- agentIpProtocolConfig *
+    -- ***********************
+
+    agentIpProtoConfig      OBJECT IDENTIFIER ::= { agentConfigInfo 3 }
+
+    agentIpNumOfIf OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The total number of IP interfaces supported by this agent."
+        ::= {  agentIpProtoConfig 1 }
+
+    agentIpIfTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentIpIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of IP interface entries supported by the agent."
+        ::= {  agentIpProtoConfig 2 }
+
+    agentIpIfEntry OBJECT-TYPE
+        SYNTAX  AgentIpIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An agentIPIfEntry contains information about a particular IP
+            interface."
+        INDEX   { agentIpIfIndex }
+        ::= { agentIpIfTable 1 }
+
+    AgentIpIfEntry ::= 
+        SEQUENCE {
+            agentIpIfIndex
+                INTEGER,
+            agentIpIfAddress 
+                IpAddress,
+            agentIpIfNetMask
+                IpAddress,
+            agentIpIfDefaultRouter
+                IpAddress,
+            agentIpIfMacAddr
+                PhysAddress,
+            agentIpIfType
+                INTEGER                                                   
+        }
+
+    agentIpIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object uniquely identifies the IP interface number in the
+            agentIpIfTable. This value should never greater than 
+            agentIpNumOfIf."
+        ::= {  agentIpIfEntry 1 }
+
+    agentIpIfAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The IP address of the interface."
+        ::= {  agentIpIfEntry 2 }
+
+    agentIpIfNetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The IP net mask for this interface."
+        ::= {  agentIpIfEntry 3 }
+
+    agentIpIfDefaultRouter OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The default gateway for this IP interface."
+        ::= {  agentIpIfEntry 4 }
+
+    agentIpIfMacAddr OBJECT-TYPE
+        SYNTAX  PhysAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The MAC address of this IP interface. For interfaces which do 
+            not have such an address. (e.g., a serial line), this object 
+            should contain an octet string of zero length."
+        ::= {  agentIpIfEntry 5 }
+
+    agentIpIfType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),          -- none of the following
+                    ethernet-csmacd(6),
+                    slip(28)           -- generic SLIP
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The physical layer interface of the IP interface."
+        ::= {  agentIpIfEntry 6 }
+
+    agentIpBootServerAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The IP Address of Boot Server."
+        ::= {  agentIpProtoConfig 3 }
+
+    agentIpGetIpFromBootpServer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    manual(2),
+                    frombootp(3),
+                    fromdhcp(4)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates whether the agent get its system IP 
+            address from Bootp/DHCP server at start up."
+        ::= { agentIpProtoConfig 4 }
+        
+    agentIpSystemIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The system IP address."
+        ::= { agentIpProtoConfig 5 }
+        
+    agentIpSystemSubnetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The system subnet mask."
+        ::= { agentIpProtoConfig 6 }
+        
+    agentIpDefaultGateway OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The system default gateway."
+        ::= { agentIpProtoConfig 7 }
+        
+--
+--    agentIpUnauthAddr OBJECT-TYPE
+--        SYNTAX  IpAddress
+--        MAX-ACCESS  read-only
+--        STATUS  current
+--        DESCRIPTION
+--            "The IP address of an unauthorized SNMP packet."
+--        ::= { agentIpProtoConfig 5 }
+--
+--    agentIpUnauthComm OBJECT-TYPE
+--        SYNTAX  DisplayString (SIZE (0..40))
+--        MAX-ACCESS  read-only
+--        STATUS  current
+--        DESCRIPTION
+--            "The community string of an unauthorized SNMP packet."
+--        ::= { agentIpProtoConfig 6 }
+
+    -- ************************
+    -- agentIptrapMangerTable *
+    -- ************************
+
+--    agentIpTrapManagerTable OBJECT-TYPE
+--        SYNTAX  SEQUENCE OF AgentIpTrapManagerEntry
+--        MAX-ACCESS  not-accessible
+--        STATUS  current
+--        DESCRIPTION
+--            "A list of trap manager entries to which to send SNMP traps."
+--        ::= {  agentIpProtoConfig 5 }
+--
+--    agentIpTrapManagerEntry OBJECT-TYPE
+--        SYNTAX  AgentIpTrapManagerEntry
+--        MAX-ACCESS  not-accessible
+--        STATUS  current
+--        DESCRIPTION
+--            "This entry contains the particular trap manager settings."
+--        INDEX   { agentIpTrapManagerIpAddr }
+--        ::= { agentIpTrapManagerTable 1 }
+--
+--    AgentIpTrapManagerEntry ::= 
+--        SEQUENCE {
+--                    agentIpTrapManagerIpAddr
+--                        IpAddress,
+--                    agentIpTrapManagerComm
+--                        DisplayString,
+--                    agentIpTrapManagerStatus
+--                        INTEGER
+--        }
+--
+--    agentIpTrapManagerIpAddr OBJECT-TYPE
+--        SYNTAX  IpAddress
+--        MAX-ACCESS  read-only
+--        STATUS  current
+--        DESCRIPTION
+--            "The IP address to receive SNMP traps from this device."
+--        ::= { agentIpTrapManagerEntry 1 }
+--
+--    agentIpTrapManagerComm OBJECT-TYPE
+--        SYNTAX  DisplayString (SIZE (0..40))
+--        MAX-ACCESS  read-create
+--        STATUS  current
+--        DESCRIPTION
+--            "The community string of the SNMP trap packet sent to the trap
+--            manager."
+--        ::= { agentIpTrapManagerEntry 2 }
+--
+--    agentIpTrapManagerStatus OBJECT-TYPE
+--        SYNTAX  INTEGER {
+--                   other(1),
+--                    disabled(2),
+--                    enabled(3)
+--                }
+--        MAX-ACCESS  read-create
+--        STATUS  current
+--        DESCRIPTION
+--            "This object indicates whether or not the trap should be send
+--            to this trap manager."
+--        ::= { agentIpTrapManagerEntry 3 }
+--
+--    agenMaxManagerIp OBJECT-TYPE
+--        SYNTAX  INTEGER
+--        MAX-ACCESS  read-only
+--        STATUS  current
+--        DESCRIPTION
+--            "Maximum number of entries in the management ip security
+--            table (agentManagerIpSecurityTable)."
+--        ::= {  agentIpProtoConfig 10 }
+--
+--    agenCurrtManagerIp OBJECT-TYPE
+--        SYNTAX  INTEGER
+--        MAX-ACCESS  read-only
+--        STATUS  current
+--        DESCRIPTION
+--            "Current applied number of entries in the management ip
+--            security table."
+--        ::= {  agentIpProtoConfig 11 }
+    
+    
+    -- ***********************
+    -- agentCommunityTable *
+    -- ***********************
+
+    agentCommunityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentCommunityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of SNMP community string."
+        ::= {  agentConfigInfo 4 }
+
+    agentCommunityEntry OBJECT-TYPE
+        SYNTAX  AgentCommunityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An agentCommunityEntry contains information about SNMP community
+            string and access level."
+        INDEX   { agentCommunityString }
+        ::= { agentCommunityTable 1 }
+
+    AgentCommunityEntry ::= 
+        SEQUENCE {
+            agentCommunityString
+                DisplayString,
+            agentCommunityLevel
+                INTEGER,
+            agentCommunitystate
+                INTEGER                                                   
+        }
+
+    agentCommunityString OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "When an SNMP message is received by this entity, the community
+            string in the message is compared with this string first. If it
+            doesn't match, the user can't access this entity by manage tool."
+        ::= {  agentCommunityEntry 1 }
+
+    agentCommunityLevel OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    read-only(2),
+                    read-write(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The access level of SNMP. The value read-only(2) indicates the
+            user only can view the information about this device, but can't
+            modify it. The value read-write(3) is granted to all items in 
+            the MIB."
+        ::= {  agentCommunityEntry 2 }
+
+    agentCommunitystate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    invalid(2),
+                    valid(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry. 
+            
+            other(1) - this entry is currently in use but the conditions
+                under which it will remain so are different from each of
+                the following values.
+            invalid(2) - writing this value to the object, and then the
+                corresponding entry will be removed from the table.
+            valid(3) - this entry is reside in the table."
+        ::= { agentCommunityEntry 3 }
+        
+        
+    -- ***********************
+    -- agentTrustHostTable *
+    -- ***********************
+
+    agentTrustHostTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentTrustHostEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of managemnet station IP addresses."
+        ::= {  agentConfigInfo 5 }
+
+    agentTrustHostEntry OBJECT-TYPE
+        SYNTAX  AgentTrustHostEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An agentTrustHostEntry contains information about managemnet 
+            station IP addresses and port."
+        INDEX   { agentTrustHostId }
+        ::= { agentTrustHostTable 1 }
+
+    AgentTrustHostEntry ::= 
+        SEQUENCE {
+            agentTrustHostId
+                INTEGER,
+            agentTrustHostIPAddr
+                IpAddress,
+            agentTrustHostState
+                INTEGER,
+            agentTrustHostIPMask
+                IpAddress
+        }
+
+    agentTrustHostId OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object uniquely identifies the management station in the
+            agentTrustHostTable."
+        ::= {  agentTrustHostEntry 1 }
+        
+    agentTrustHostIPAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP address of the managemet station."
+        ::= {  agentTrustHostEntry 2 }
+
+    agentTrustHostState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    invalid(2),
+                    valid(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry. 
+            
+            other(1) - this entry is currently in use but the conditions
+                under which it will remain so are different from each of
+                the following values.
+            invalid(2) - writing this value to the object, and then the
+                corresponding entry will be removed from the table.
+            valid(3) - this entry is reside in the table."
+        ::= { agentTrustHostEntry 3 }
+        
+    agentTrustHostIPMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP subnet mask of the managemet station."
+        ::= {  agentTrustHostEntry 4 }
+
+
+    -- ***********************
+    -- agentLogConfig *
+    -- ***********************
+    agentLogConfig          OBJECT IDENTIFIER ::= { agentConfigInfo 6 }
+    
+    agentLogUploadLogFileName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The name of the log file to be uploaded from the device to TFTP
+            server when enabling log upload function (by writing 
+            agentLogUploadLog)."
+        ::= {  agentLogConfig 1 }
+        
+    agentLogUploadLogSourceAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The ip address where been uploaded log file."
+        ::= {  agentLogConfig 2 }
+        
+    agentLogUploadLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                active(2)
+            }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "As the object is set to active, it will immediately invoke log
+            upload function. If set to normal, do nothing."
+        ::= {  agentLogConfig 3 }
+    
+    agentLogUploadLogState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    in-process(2),
+                    invalid-file(3),
+                    violation(4),
+                    file-not-found(5),
+                    disk-full(6),
+                    complete(7),
+                    time-out(8),
+                    tftp-establish-fail(9)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "status of upload log control. If the value is 'other',
+            means never log updated since device started up." 
+        ::= { agentLogConfig 4 }
+        
+    agentLogClearLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                active(2)
+            }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "As the object is set to active, the log table will be clear. 
+            If set to normal, do nothing."
+        ::= {  agentLogConfig 5 }
+                
+    
+    -- ***********************
+    -- agentTblSize *
+    -- ***********************
+    agentTblSize          OBJECT IDENTIFIER ::= { agentConfigInfo 7 }
+    
+    agentArpNumber OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of current ipNetToMediaTable entries that are not 
+            invalid."
+        ::= {  agentTblSize 1 }
+        
+    agentIpNumber OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of current IP interface on this device."
+        ::= {  agentTblSize 2 }
+        
+    agentStaticVlanNumber OBJECT-TYPE
+        SYNTAX  INTEGER(0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of static VLAN on this device."
+        ::= {  agentTblSize 3 }
+        
+    
+    -- ***********************
+    -- agentRTC *
+    -- *********************** 
+    agentRTC          OBJECT IDENTIFIER ::= { agentConfigInfo 8 }
+      
+    agentRTCYear OBJECT-TYPE
+        SYNTAX  INTEGER (1980..3999)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The number of the year."
+        ::= {  agentRTC 1 }
+
+    agentRTCMonth OBJECT-TYPE
+        SYNTAX  INTEGER (1..12)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The number of the month."
+        ::= { agentRTC 2 }
+      
+    agentRTCDate OBJECT-TYPE
+        SYNTAX  INTEGER (1..31)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The number of the date."
+        ::= { agentRTC 3 }
+        
+    agentRTCHour OBJECT-TYPE
+        SYNTAX  INTEGER (0..23)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The number of the hour."
+        ::= { agentRTC 4 }
+        
+    agentRTCMinute OBJECT-TYPE
+        SYNTAX  INTEGER (0..59)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The number of the hour."
+        ::= { agentRTC 5 }
+      
+    agentRTCSecond OBJECT-TYPE
+        SYNTAX  INTEGER (0..59)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The number of the second."
+        ::= { agentRTC 6 }
+        
+    agentRTCWeekDay OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    date-Sunday(1),
+                    date-Monday(2),
+                    date-Tuesday(3),
+                    date-Wednesday(4),
+                    date-Thursday(5),
+                    date-Friday(6),
+                    date-Saturday(7)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current week day."
+        ::= { agentRTC 7 }
+        
+
+    -- *********************
+    --  agentMIBTraps       
+    -- *********************
+    agentMIBTraps          OBJECT IDENTIFIER ::= { agentConfigInfo 9 }
+    
+    primaryPowerOn TRAP-TYPE
+          ENTERPRISE swComMgmtMIB
+          DESCRIPTION
+              "The trap is sent whenever the primary power is turn on."
+          ::= 1
+          
+    primaryPowerOff TRAP-TYPE
+          ENTERPRISE swComMgmtMIB
+          DESCRIPTION
+              "The trap is sent whenever the primary power is turn off."
+          ::= 2
+          
+    redundantPowerOn TRAP-TYPE
+          ENTERPRISE swComMgmtMIB
+          DESCRIPTION
+              "The trap is sent whenever the redundant power is turn on."
+          ::= 3
+          
+    redundantPowerOff TRAP-TYPE
+          ENTERPRISE swComMgmtMIB
+          DESCRIPTION
+              "The trap is sent whenever the redundant power is turn off."
+          ::= 4
+    
+    
+    -- ***********************
+    -- agentSyslog *
+    -- *********************** 
+    agentSyslog          OBJECT IDENTIFIER ::= { agentConfigInfo 10 }
+      
+    agentSyslogState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object decide the Syslog sending message enabled or 
+            disabled."
+        DEFVAL   { disabled }
+        ::= { agentSyslog 1 }
+
+    agentSyslogMaxHostSupport OBJECT-TYPE
+        SYNTAX  INTEGER (0..10)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The maximum number of syslog servers supported."
+        DEFVAL   { 5 }
+        ::= { agentSyslog 2 }
+      
+    agentSyslogHostTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentSyslogHostEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table specifys syslog server configurations."
+        ::= { agentSyslog 3 }
+
+    agentSyslogHostEntry OBJECT-TYPE
+        SYNTAX  AgentSyslogHostEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information specifies syslog server configurations."
+        INDEX  { agentSyslogHostId }
+        ::= { agentSyslogHostTable 1 }
+
+    AgentSyslogHostEntry ::= 
+        SEQUENCE {
+            agentSyslogHostId
+                INTEGER,
+            agentSyslogHostIp
+                IpAddress,
+            agentSyslogHostSeverity
+                BITS,
+            agentSyslogHostFacility
+                INTEGER,
+            agentSyslogHostUDPPort
+                INTEGER,
+            agentSyslogHostState
+                INTEGER
+        }
+
+    agentSyslogHostId OBJECT-TYPE
+        SYNTAX  INTEGER (1..10)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The index of syslog host."
+        ::= { agentSyslogHostEntry 1 }
+
+    agentSyslogHostIp OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The IP address of the host."
+        ::= { agentSyslogHostEntry 2 }
+
+    agentSyslogHostSeverity OBJECT-TYPE
+        SYNTAX  BITS {
+               informational(0),
+               warning(1),
+               error(2),
+               fatal(3)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The object indicates the severity level indicator.The device 
+            support four severity levels in SYSLOG protocol. The fatal(3) 
+            mapping to emergency and critical level." 
+        ::= { agentSyslogHostEntry 3 }
+
+    agentSyslogHostFacility OBJECT-TYPE
+        SYNTAX  INTEGER {
+               local0(1),
+               local1(2),
+               local2(3),
+               local3(4),
+               local4(5),
+               local5(6),
+               local6(7),
+               local7(8)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Some of the operating system daemons and processes have been
+            assigned Facility values.  Processes and daemons that have not
+            been explicitly assigned a Facility may use any of the 
+            local use facilities or they may use the user-level Facility."
+        DEFVAL   { local7 }
+        ::= { agentSyslogHostEntry 4 }
+
+    agentSyslogHostUDPPort OBJECT-TYPE
+        SYNTAX  INTEGER (514..530)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The object indicates UDP port number." 
+        DEFVAL   { 514 }
+        ::= { agentSyslogHostEntry 5 }
+    
+    agentSyslogHostState OBJECT-TYPE
+        SYNTAX  INTEGER {
+               other(1),
+               disabled(2),
+               enabled(3),
+               invalid(4)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry. 
+
+            other(1) - this entry is currently in use but the conditions 
+            	under which it will remain so are different from each of 
+            	the following values.
+            disabled(2) - the syslog host disabled.
+            enabled(3) - the syslog host enabled.
+            invalid(4) - writing this value to the object, and then the
+                corresponding entry will be removed from the table."
+        DEFVAL   { disabled }
+        ::= { agentSyslogHostEntry 6 }
+        
+        
+    agentRemoteUserLogState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object decide the remote user log message will be shown
+            on screen or not."
+        DEFVAL   { disabled }
+        ::= { agentSyslog 4 }
+                   
+END

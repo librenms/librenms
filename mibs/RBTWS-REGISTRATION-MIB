@@ -1,0 +1,72 @@
+RBTWS-REGISTRATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+	FROM SNMPv2-SMI
+    rbtwsRegistration
+	FROM RBTWS-ROOT-MIB;
+
+rbtwsRegistrationMib MODULE-IDENTITY
+    LAST-UPDATED "200605301630Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+	"The MIB module for Enterasys Networks wireless switch registrations.
+
+        Copyright 2006 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200605220008Z"
+    DESCRIPTION "v2.0.7: Revised for 4.1 release"
+
+    REVISION "200501010000Z"
+    DESCRIPTION "v1: initial version, as for 4.0 and older releases"
+
+    ::= { rbtwsRegistration 3 }
+
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Generic OID values to identify Chassis Components of a box:
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+rbtwsChassisComponents      OBJECT IDENTIFIER ::= { rbtwsRegistration 4 }
+
+rbtwsChasCompPowerSupplies  OBJECT IDENTIFIER ::= { rbtwsChassisComponents 1 }
+
+rbtwsChasCompFans           OBJECT IDENTIFIER ::= { rbtwsChassisComponents 2 }
+
+rbtwsChasCompPowerSupply1   OBJECT IDENTIFIER ::= { rbtwsChasCompPowerSupplies 1 }
+rbtwsChasCompPowerSupply2   OBJECT IDENTIFIER ::= { rbtwsChasCompPowerSupplies 2 }
+
+rbtwsChasCompFan1           OBJECT IDENTIFIER ::= { rbtwsChasCompFans 1 }
+rbtwsChasCompFan2           OBJECT IDENTIFIER ::= { rbtwsChasCompFans 2 }
+rbtwsChasCompFan3           OBJECT IDENTIFIER ::= { rbtwsChasCompFans 3 }
+
+-- End of generic OID values for Chassis Components
+
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- OID values for boxes (wireless switches and access points):
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+-- Wireless Switches:
+
+rbtwsWirelessSwitch          OBJECT IDENTIFIER ::= { rbtwsRegistration 1 }
+
+rbtwsSwitch8100      OBJECT IDENTIFIER ::= { rbtwsWirelessSwitch 1 }
+
+rbtwsSwitch8200      OBJECT IDENTIFIER ::= { rbtwsWirelessSwitch 2 }
+
+rbtwsSwitch8400      OBJECT IDENTIFIER ::= { rbtwsWirelessSwitch 3 }
+
+-- End of OID values for boxes
+
+END

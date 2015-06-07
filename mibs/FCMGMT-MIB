@@ -1,0 +1,2844 @@
+
+--
+--				"@(#)fa.mib 00/07/07"
+--
+-- Title: Fibre Alliance Fibre Channel Management Framework Integration MIB
+--	  Rev 1.5, June 1, 1999.
+--
+-- Note: This is released for Brocade
+--
+-- Corrected revisionNumber description. last editor on Sept. 09, 2004
+--
+-- added FA MIB  last edited on Dec. 18, 2000.
+-- Last edit date: Sept. 09, 2004
+
+FCMGMT-MIB DEFINITIONS ::= BEGIN 
+  IMPORTS 
+    IpAddress,  TimeTicks, experimental 
+        FROM RFC1155-SMI 
+    OBJECT-TYPE 
+        FROM RFC-1212 
+    DisplayString 
+        FROM RFC1213-MIB 
+    TRAP-TYPE 
+        FROM RFC-1215; 
+
+    --Textual conventions for this MIB    
+
+    FcNameId ::= OCTET STRING (SIZE(8))
+    
+    FcGlobalId ::= OCTET STRING (SIZE(16))
+    
+    FcAddressId ::= OCTET STRING (SIZE(3))
+
+    FcEventSeverity  ::= INTEGER { 
+                unknown     (1),
+				emergency	(2),
+				alert		(3),
+				critical	(4),
+				error		(5),
+				warning     (6),
+				notify      (7),
+				info		(8),
+				debug		(9),
+				mark		(10)	-- All messages logged
+            } 
+
+    FcUnitType ::= INTEGER { 
+                unknown(1),
+                other(2), -- none of the following 
+                hub(3), -- passive connectivity unit
+                        -- supporting loop protocol.
+                switch(4), -- active connectivity unit
+                        -- supporting multiple protocols.
+                gateway(5), -- unit that converts not only
+                        -- the interface but also encapsulates
+                        -- the frame into another protocol. The
+                        -- assumption is that there is always
+                        -- two gateways connected together. For
+                        -- example, FC <-> ATM.
+                converter(6), -- unit that converts from one
+                        -- interface to another. For
+                        -- example, FC <-> SCSI.
+                hba(7), -- host bus adapter
+                proxy-agent(8), -- software proxy-agent
+                storage-device(9), -- disk,cd,tape,etc
+                host(10), -- host computer
+                storage-subsystem(11), -- raid, library, etc
+                module(12), -- subcomponent of a system
+                swdriver(13), -- software driver
+                storage-access-device(14), -- Provides storage management
+                                          -- and access for hetergeneous
+                                          -- hosts and heterogeneous devices.
+                wdm(15), -- waveform division mutiplexer
+                ups(16) -- uninterruptable power supply
+            } 
+
+
+
+
+
+----------------------------------------------------------------------
+    fcmgmt    OBJECT IDENTIFIER ::= { experimental 94 } 
+
+    -- groups in fcmgmt 
+
+    connSet         OBJECT IDENTIFIER ::= { fcmgmt 1 } 
+    trapReg         OBJECT IDENTIFIER ::= { fcmgmt 2 } 
+    statSet         OBJECT IDENTIFIER ::= { fcmgmt 4 }
+    connUnitServiceSet    OBJECT IDENTIFIER ::= { fcmgmt 5 }
+    connUnitServiceScalars     OBJECT IDENTIFIER ::= { connUnitServiceSet 1 }
+    connUnitServiceTables      OBJECT IDENTIFIER ::= { connUnitServiceSet 2 }
+
+    revisionNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (4))
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION
+            "This is the revision number for this MIB. The
+            format of the revision value is as follows
+                (0) = high order major revision number
+                (1) = low order major revision number
+                (2) = high order minor revision number
+                (3) = low order minor revision number
+            The value will be stored as an ASCII value. The
+            following is the current value of this object.
+                (0) = '0'
+                (1) = '3'
+                (2) = '0'
+                (3) = '0'
+            This defines a revision of 03.00
+            "
+        ::= { fcmgmt 3 }
+
+    -- the connectivity unit group 
+
+    -- Implementation of the group is mandatory for all systems. 
+
+    uNumber OBJECT-TYPE 
+        SYNTAX INTEGER
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "The number of connectivity units present on this
+            system (represented by this agent). May be a count 
+            of the boards in a chassis or the number of full boxes
+            in a rack." 
+        DEFVAL { 1 } 
+        ::= { connSet 1 }
+
+    systemURL OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The top-level URL of the system. If it does not exist
+            the value is empty string. The URL format is 
+            implementation dependant and can have keywords embedded
+            that are preceeded by a percent sign (eg, %USER).
+            The following are the defined keywords that will
+            be recognized and replaced with data during a launch.
+                USER        - replace with username
+                PASSWORD    - replace with password
+                GLOBALID    - replace with globalid
+                SERIALNO    - replace with serial number
+            "
+        DEFVAL { "" }
+        ::= { connSet 2 }
+
+    statusChangeTime OBJECT-TYPE 
+        SYNTAX TimeTicks 
+        ACCESS read-only 
+        STATUS obsolete 
+        DESCRIPTION 
+            "The sysuptime timestamp in centiseconds at which
+            the last status change occurred for any members of
+            the set."
+        ::= { connSet 3 }
+
+    configurationChangeTime OBJECT-TYPE 
+        SYNTAX TimeTicks 
+        ACCESS read-only 
+        STATUS obsolete
+        DESCRIPTION 
+            "The sysuptime timestamp in centiseconds at which
+            the last configuration change occurred for any
+            members of the set. This represents a union of change
+            information for connUnitConfigurationChangeTime."
+        ::= { connSet 4 }
+
+    connUnitTableChangeTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        ACCESS read-only 
+        STATUS obsolete
+        DESCRIPTION
+            "The sysuptime timestamp in centiseconds at which
+            the connUnitTable was updated (an entry was either
+            added or deleted."
+        ::= { connSet 5 }
+
+    -- The Connectivity table contains general information on the 
+    -- system's units.
+    connUnitTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF ConnUnitEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "A list of units under a single SNMP agent. The number 
+            of entries is given by the value of uNumber. It is 1 
+            for stand-alone system." 
+        ::= { connSet 6 }
+
+    connUnitEntry OBJECT-TYPE 
+        SYNTAX ConnUnitEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "A connectivity unit entry containing objects for a 
+             particular unit." 
+        INDEX { connUnitId } 
+        ::= { connUnitTable 1 } 
+
+        ConnUnitEntry ::= 
+            SEQUENCE { 
+                connUnitId
+                    OCTET STRING,
+                connUnitGlobalId
+                    FcGlobalId,
+                connUnitType 
+                    FcUnitType, 
+                connUnitNumports 
+                    INTEGER, 
+                connUnitState 
+                    INTEGER, 
+                connUnitStatus 
+                    INTEGER, 
+                connUnitProduct 
+                    DisplayString, 
+                connUnitSn 
+                    DisplayString, 
+                connUnitUpTime 
+                    TimeTicks, 
+                connUnitUrl 
+                    DisplayString, 
+                connUnitDomainId 
+                    OCTET STRING, 
+                connUnitProxyMaster 
+                    INTEGER, 
+                connUnitPrincipal 
+                    INTEGER,
+                connUnitNumSensors 
+                    INTEGER,
+                connUnitStatusChangeTime
+                    TimeTicks,
+                connUnitConfigurationChangeTime
+                    TimeTicks,
+                connUnitNumRevs
+                    INTEGER,
+                connUnitNumZones
+                    INTEGER,
+                connUnitModuleId
+                    OCTET STRING,
+                connUnitName
+                    DisplayString,
+                connUnitInfo
+                    DisplayString,
+                connUnitControl
+                    INTEGER,
+                connUnitContact
+                    DisplayString,
+                connUnitLocation
+                    DisplayString,
+                connUnitEventFilter
+                    FcEventSeverity,
+                connUnitNumEvents
+                    INTEGER,
+                connUnitMaxEvents
+                    INTEGER,
+                connUnitEventCurrID
+                    INTEGER
+            } 
+
+        connUnitId OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (16))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+ 			"The unique identification for this connectivity unit
+			among those within this proxy domain.  
+			The value MUST be unique within the proxy domain
+			because it is the index variable for connUnitTable.
+			The value assigned to a given conectivity unit
+			SHOULD be persistent across agent and unit resets.
+			It SHOULD be the same as connUnitGlobalId
+			if connUnitGlobalId is known and stable."
+            ::= { connUnitEntry 1 } 
+
+        connUnitGlobalId OBJECT-TYPE 
+            SYNTAX FcGlobalId
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+			"An optional global-scope identifier for this connectivity unit.
+			It MUST be a WWN for this connectivity unit
+			or 16 octets of value zero. 
+			WWN formats requiring fewer than 16 octets 
+			MUST be extended to 16 octets with trailing zero octets,
+			If a WWN is used for connUnitId,
+			the same WWN MUST be used for connUnitGlobalId.
+			When a non-zero value is provided, 
+			it SHOULD be persistent across agent and unit resets.
+			It SHOULD be globally unique.
+			It SHOULD be one of these FC-PH/PH3 formats:
+				IEEE (NAA=1)
+				IEEE Extended (NAA=2)
+				IEEE Registered (NAA=5).
+				IEEE Registered extended (NAA=6).
+ 
+			Use of the IEEE formats allows any IEEE-registered vendor
+			to assure global uniqueness independently.
+			The following are some references on IEEE WWN formats:
+	   http://standards.ieee.org/regauth/oui/tutorials/fibreformat.html 
+	   http://standards.ieee.org/regauth/oui/tutorials/fibrecomp_id.html
+
+			If one or more WWNs are associated with the connUnit
+			via other management methods,
+			one of them SHOULD be used for connUnitGlobalId.
+			If there is not a WWN assigned specifically to the connUnit,
+			there is some merit, though not a requirement,
+			to using a WWN assigned to (one of) 
+			its permanently attached FC/LAN interface(s). 
+			This can not risk uniqueness, though.
+			As a counterexample, if your
+			agent runs in a host and the host has an HBA,
+			it is quite possible that agent, host, and HBA
+			will all be distinct connUnits, so the host
+			and agent can not use the WWN of the HBA.
+			Another example:
+			If your hub has a built-in Ethernet port, it
+			might be reasonable for the hub to use its LAN
+			address (prefixed with the appropriate
+			NAA) as its connUnitId. But if the
+			Ethernet were a replaceable PCCard, the hub
+			should have an independent ID."
+            ::= { connUnitEntry 2 } 
+
+        connUnitType OBJECT-TYPE 
+            SYNTAX FcUnitType 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The type of this connectivity unit." 
+            ::= { connUnitEntry 3 } 
+
+
+        connUnitNumports OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Number of physical ports in the connectivity unit 
+                (internal/embedded, external)." 
+            ::= { connUnitEntry 4 } 
+
+        connUnitState OBJECT-TYPE 
+            SYNTAX INTEGER {
+                unknown(1),
+                online(2),
+                offline(3)
+            }
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Overall state of the connectivity unit."
+            ::= { connUnitEntry 5 } 
+
+        connUnitStatus OBJECT-TYPE 
+            SYNTAX INTEGER { 
+                unknown(1),
+                unused(2), 
+                ok(3), 
+                warning(4), -- needs attention 
+                failed(5) 
+            } 
+            ACCESS read-only 
+            STATUS mandatory 
+
+            DESCRIPTION 
+                "Overall status of the connectivity unit." 
+            ::= { connUnitEntry 6 } 
+
+        connUnitProduct OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The connectivity unit vendor's product
+                model name." 
+            ::= { connUnitEntry 7 } 
+
+        connUnitSn OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The serial number for this connectivity unit." 
+            ::= { connUnitEntry 8 } 
+
+        connUnitUpTime OBJECT-TYPE 
+            SYNTAX TimeTicks 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The number of centiseconds since the 
+                last unit initialization." 
+            ::= { connUnitEntry 9 } 
+
+        connUnitUrl OBJECT-TYPE 
+            SYNTAX DisplayString 
+            ACCESS read-write 
+            STATUS mandatory 
+            DESCRIPTION 
+                "URL to launch a management application, 
+                if applicable. Otherwise empty string. 
+                In a standalone unit, this would be the 
+                same as the top-level URL. This has the same
+		    definition as systemURL for keywords." 
+            ::= { connUnitEntry 10 } 
+
+        connUnitDomainId OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE(3)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "24 bit Fibre Channel address ID of this 
+                connectivity unit, right justified with leading 
+                zero's if required. This should be set to the
+                Fibre Channel address ID or if it is a switch
+                it would be set to the Domain Controller address.
+                If this value is not applicable,
+                return all bits set to one."
+            ::= { connUnitEntry 11 } 
+
+        connUnitProxyMaster OBJECT-TYPE 
+            SYNTAX INTEGER { 
+                unknown(1),
+                no(2), 
+                yes(3) 
+            } 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "A value of 'yes' means this is the proxy master 
+                unit for a set of managed units. For example, 
+                this could be the only unit with a management 
+                card in it for a set of units. A standalone unit
+                should return 'yes' for this object."
+            ::= { connUnitEntry 12 } 
+
+        connUnitPrincipal OBJECT-TYPE 
+            SYNTAX INTEGER { 
+                unknown(1),
+                no(2), 
+                yes(3) 
+            } 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Whether this connectivity unit is the principal unit 
+                within the group of fabric elements. If this value 
+                is not applicable, return unknown."
+            ::= { connUnitEntry 13 } 
+
+        connUnitNumSensors OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Number of sensors in the connUnitSensorTable." 
+            ::= { connUnitEntry 14 } 
+        
+        connUnitStatusChangeTime OBJECT-TYPE 
+            SYNTAX TimeTicks 
+            ACCESS read-only 
+            STATUS obsolete
+            DESCRIPTION 
+                "The sysuptime timestamp in centiseconds 
+                at which the last status change occurred."
+            ::= { connUnitEntry 15 } 
+
+        connUnitConfigurationChangeTime OBJECT-TYPE 
+            SYNTAX TimeTicks 
+            ACCESS read-only 
+            STATUS obsolete
+            DESCRIPTION 
+                "The sysuptime timestamp in centiseconds 
+                at which the last configuration change
+                occurred."
+            ::= { connUnitEntry 16 } 
+
+        connUnitNumRevs OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The number of revisions in the connUnitRevsTable." 
+            DEFVAL { 1 } 
+            ::= { connUnitEntry 17 }
+
+        connUnitNumZones OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS obsolete
+            DESCRIPTION 
+                "Number of zones defined in connUnitZoneTable."
+            ::= { connUnitEntry 18 } 
+
+        connUnitModuleId OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE(16))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This is a unique id, persistent between boots,
+                that can be used to group a set of connUnits
+                together into a module. The intended use would
+                be to create a connUnit with a connUnitType of
+                'module' to represent a physical or logical
+		    group of connectivity units. Then the value
+		    of the group would be set to the value of
+                connUnitId for this 'container' connUnit.
+                connUnitModuleId should be zeros if this
+                connUnit is not part of a module."
+            ::= { connUnitEntry 19 } 
+
+        connUnitName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..79))
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION     
+                "A display string containing a name for this
+                connectivity unit.  This object value should be 
+                persistent between boots."
+            ::= { connUnitEntry 20 }
+
+        connUnitInfo OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION     
+                "A display string containing information
+                about this connectivity unit. This object value 
+                should be persistent between boots."
+            ::= { connUnitEntry 21 }
+
+        connUnitControl OBJECT-TYPE
+            SYNTAX INTEGER {
+                unknown(1),
+                invalid(2),
+                resetConnUnitColdStart(3),
+                resetConnUnitWarmStart(4),
+                offlineConnUnit(5),
+                onlineConnUnit(6)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "This object is used to control the addressed
+                connUnit. 
+                
+                NOTE: 'Cold Start' and 'Warm Start'
+                are as defined in MIB II and are not meant
+                to be a factory reset.
+
+                resetConnUnitColdStart: 
+                    the addressed unit performs
+                    a 'Cold Start' reset.
+
+                resetConnUnitWarmStart: 
+                    the addressed unit performs
+                    a 'Warm Start' reset.
+
+                offlineConnUnit: 
+                    the addressed unit puts itself into
+                    an implementation dependant 'offline' state. 
+                    In general,if a unit is in an offline state,
+                    it cannot be used to perform meaningful 
+                    Fibre Channel work.
+
+                onlineConnUnit: 
+                    the addressed unit puts itself into an 
+                    implementation dependant 'online' state. 
+                    In general, if a unit is in an online state, 
+                    it is capable of performing meaningful 
+                    Fibre Channel work.
+                
+                NOTE: Each implementation may chose not to allow
+                any or all of these values on a SET. "
+
+            ::= { connUnitEntry 22 } 
+
+        connUnitContact OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-write 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Contact information for this connectivity
+                unit."
+            ::= { connUnitEntry 23 } 
+
+        connUnitLocation OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-write 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Location information for this connectivity
+                unit."
+            ::= { connUnitEntry 24 } 
+
+        connUnitEventFilter OBJECT-TYPE 
+            SYNTAX FcEventSeverity
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This value defines the event severity
+                that will be logged by this connectivity unit.
+                All events of severity less than or equal to
+                connUnitEventFilter are logged in connUnitEventTable." 
+            ::= { connUnitEntry 25 } 
+
+        connUnitNumEvents OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Number of events currently in the 
+                connUnitEventTable."
+            ::= { connUnitEntry 26 } 
+
+        connUnitMaxEvents OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Max number of events that can be defined
+                in connUnitEventTable."
+            ::= { connUnitEntry 27 } 
+
+        connUnitEventCurrID OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The last used event id (connUnitEventId)."
+            ::= { connUnitEntry 28 } 
+
+
+------------------------------------------------------------------
+-- The Table of revisions for hardware and software elements.
+
+    connUnitRevsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ConnUnitRevsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Table of the revisions supported by 
+            connectivity units managed by this agent."
+        ::= { connSet 7 }
+
+    connUnitRevsEntry OBJECT-TYPE
+        SYNTAX ConnUnitRevsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            ""
+        INDEX { connUnitRevsUnitId,
+            connUnitRevsIndex }
+            ::= { connUnitRevsTable 1 }
+        
+        ConnUnitRevsEntry ::=
+            SEQUENCE {
+                connUnitRevsUnitId
+                    OCTET STRING, 
+                connUnitRevsIndex
+                    INTEGER,
+                connUnitRevsRevId
+                    DisplayString,
+                connUnitRevsDescription
+                    DisplayString            }
+
+        connUnitRevsUnitId OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (16))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The connUnitId of the connectivity unit
+                that contains this revision table."
+            ::= { connUnitRevsEntry 1 }
+
+        connUnitRevsIndex OBJECT-TYPE 
+            SYNTAX INTEGER (1..2147483647)
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "A unique value among all connUnitRevsEntrys
+                with the same value of connUnitRevsUnitId,
+                in the range between 1 and
+                connUnitNumRevs[connUnitRevsUnitId]."
+            ::= { connUnitRevsEntry 2 }
+
+        connUnitRevsRevId OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "A vendor-specific string identifying a
+                revision of a component of the connUnit
+                indexed by connUnitRevsUnitId."
+            ::= { connUnitRevsEntry 3 }
+
+        connUnitRevsDescription OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "Description of a component to which the revision 
+                corresponds."
+            ::= { connUnitRevsEntry 4 }
+
+-----------------------------------------------------------------------
+--    The Sensor table
+
+    connUnitSensorTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ConnUnitSensorEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Table of the sensors supported by each
+            connectivity unit managed by this agent."
+        ::= { connSet 8 }
+
+    connUnitSensorEntry OBJECT-TYPE
+        SYNTAX ConnUnitSensorEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Each entry contains the information for a
+            specific sensor."
+        INDEX { connUnitSensorUnitId,
+            connUnitSensorIndex }
+            ::= { connUnitSensorTable 1 }
+
+        ConnUnitSensorEntry ::=
+            SEQUENCE {
+                connUnitSensorUnitId
+                   OCTET STRING,
+                connUnitSensorIndex
+                    INTEGER,
+                connUnitSensorName
+                    DisplayString,
+                connUnitSensorStatus
+                    INTEGER,
+                connUnitSensorInfo
+                    DisplayString,
+                connUnitSensorMessage
+                    DisplayString,
+                connUnitSensorType
+                    INTEGER,
+                connUnitSensorCharacteristic
+                    INTEGER
+            }
+
+        connUnitSensorUnitId OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (16))
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The connUnitId of the connectivity unit
+                that contains this sensor table."
+            ::= { connUnitSensorEntry 1 }
+
+        connUnitSensorIndex OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647)
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "A unique value among all connUnitSensorEntrys
+                with the same value of connUnitSensorUnitId,
+                in the range between 1 and
+                connUnitNumSensor[connUnitSensorUnitId]."
+            ::= { connUnitSensorEntry 2}
+
+        connUnitSensorName OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "A textual identification of the sensor
+		    intended primarily for operator use."
+            ::= { connUnitSensorEntry 3 }
+
+        connUnitSensorStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+                unknown(1),
+		    other(2),
+                ok(3),      -- the sensor indicates ok
+                warning(4), -- the sensor indicates a warning
+                failed(5)   -- the sensor indicates failure
+            }
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The status indicated by the sensor."
+            ::= { connUnitSensorEntry 4 }
+
+        connUnitSensorInfo OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "Miscellaneous static info about the sensor
+                such as its serial number."
+            ::= { connUnitSensorEntry 5 }
+
+        connUnitSensorMessage OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "This describes the status of the sensor
+                as a message. It may also provide more
+                resolution on the sensor indication, for
+                example 'Cover temperature 1503K, above
+                nominal operating range'"
+            ::= { connUnitSensorEntry 6 }
+
+        connUnitSensorType OBJECT-TYPE
+            SYNTAX INTEGER {
+                unknown(1),
+                other(2),
+                battery(3),
+                fan(4),
+                power-supply(5),
+                transmitter(6),
+                enclosure(7),
+                board(8),
+                receiver(9)
+            }
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The type of component being monitored by this
+                sensor."
+            ::= { connUnitSensorEntry 7 }
+
+        connUnitSensorCharacteristic OBJECT-TYPE
+            SYNTAX INTEGER {
+                unknown(1),
+                other(2),
+                temperature(3),
+                pressure(4),
+                emf(5),
+                currentValue(6), -- current is a keyword
+                airflow(7),
+                frequency(8),
+                power(9),
+                door(10)
+            }
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The characteristics being monitored by this
+                sensor."
+            ::= { connUnitSensorEntry 8 }
+
+-----------------------------------------------------------------------
+--    The port table 
+
+    connUnitPortTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF ConnUnitPortEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Generic information on ports for a specific 
+            connUnit." 
+        ::= { connSet 10 }
+
+    connUnitPortEntry OBJECT-TYPE 
+        SYNTAX ConnUnitPortEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Each entry contains the information for 
+            a specific port." 
+        INDEX { connUnitPortUnitId, 
+            connUnitPortIndex } 
+            ::= { connUnitPortTable 1 } 
+
+        ConnUnitPortEntry ::= 
+            SEQUENCE { 
+                connUnitPortUnitId 
+                    OCTET STRING, 
+                connUnitPortIndex 
+                    INTEGER,
+                connUnitPortType 
+                    INTEGER, 
+                connUnitPortFCClassCap
+                    OCTET STRING,
+                connUnitPortFCClassOp 
+                    OCTET STRING, 
+                connUnitPortState
+                    INTEGER,
+                connUnitPortStatus 
+                    INTEGER, 
+                connUnitPortTransmitterType
+                    INTEGER, 
+                connUnitPortModuleType 
+                    INTEGER, 
+                connUnitPortWwn 
+                    FcNameId, 
+                connUnitPortFCId 
+                    OCTET STRING, 
+                connUnitPortSn 
+                    DisplayString, 
+                connUnitPortRevision 
+                    DisplayString,
+                connUnitPortVendor
+                    DisplayString,
+                connUnitPortSpeed
+                    INTEGER,
+                connUnitPortControl
+                    INTEGER,
+                connUnitPortName
+                    DisplayString,
+                connUnitPortPhysicalNumber
+                    INTEGER,
+                connUnitPortStatObject
+                    OBJECT IDENTIFIER,
+                connUnitPortProtocolCap
+                    OCTET STRING,
+                connUnitPortProtocolOp
+                    OCTET STRING,
+                connUnitPortNodeWwn 
+                    FcNameId,
+                connUnitPortHWState
+                    INTEGER
+            } 
+
+        connUnitPortUnitId OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (16))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The connUnitId of the connectivity unit
+                that contains this port."
+            ::= { connUnitPortEntry 1 } 
+
+        connUnitPortIndex OBJECT-TYPE 
+            SYNTAX INTEGER (1..2147483647)
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "A unique value among all connUnitPortEntrys
+                on this connectivity unit, between 0 and
+                connUnitNumPort[connUnitPortUnitId]."
+            ::= { connUnitPortEntry 2 } 
+
+        connUnitPortType OBJECT-TYPE 
+            SYNTAX INTEGER { 
+                unknown       (1),
+                other         (2), 
+                not-present   (3),
+                hub-port      (4), 
+                n-port        (5),  -- end port for fabric
+                l-port        (6),  -- end port for loop
+                fl-port       (7),  -- public loop 
+                f-port        (8),  -- fabric port 
+                e-port        (9),  -- fabric expansion port 
+                g-port        (10), -- generic fabric port
+                domain-ctl    (11), -- domain controller 
+                hub-controller(12), 
+                scsi          (13), -- parallel SCSI port 
+                escon         (14),
+                lan           (15),
+                wan           (16),
+                ac            (17), -- AC power line
+                dc            (18), -- DC power line
+                ssa           (19) -- serial storage architecture
+            } 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The port type." 
+            ::= { connUnitPortEntry 3 } 
+
+        connUnitPortFCClassCap OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (2))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Bit mask that specifies the classes
+                of service capability of this port. If this is not
+                applicable, return all bits set to zero.
+                
+                The bits have
+                the following definition:
+                    unknown      - 0
+                    class-f      - 1
+                    class-one    - 2
+                    class-two    - 4
+                    class-three  - 8
+                    class-four   - 16
+                    class-five   - 32
+                    class-six    - 64" 
+            ::= { connUnitPortEntry 4 } 
+
+        connUnitPortFCClassOp OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (2))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Bit mask that specifies the classes
+                of service that are currently operational.
+                If this is not applicable, return all bits 
+                set to zero.  This object has the same 
+                definition as connUnitPortFCClassCap"
+            ::= { connUnitPortEntry 5 } 
+
+        connUnitPortState OBJECT-TYPE
+            SYNTAX INTEGER {
+                unknown(1),
+                online(2), -- available for meaningful work
+                offline(3), -- not available for meaningful work
+                bypassed(4), -- no longer used (4/12/00)
+                diagnostics(5)
+            }
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The user selected state of the port hardware."
+            ::= { connUnitPortEntry 6 }
+
+        connUnitPortStatus OBJECT-TYPE 
+            SYNTAX INTEGER { 
+                unknown           (1),
+                unused            (2), -- device cannot report this status
+                ready             (3), -- FCAL Loop or FCPH Link reset protocol
+                                       -- initialization has completed
+                warning           (4), -- do not use (4/12/00)
+                failure           (5), -- do not use (4/12/00)
+                notparticipating  (6), -- loop notparticipating and does not
+                                       -- have a loop address
+                initializing      (7), -- protocol is proceeding
+                bypass            (8), -- do not use (4/12/00)
+                ols               (9)  -- FCP offline status
+            } 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "An overall protocol status for the 
+                port. This value of connUnitPortState is not
+                online, then this is reported Unknown." 
+            ::= { connUnitPortEntry 7 } 
+
+        connUnitPortTransmitterType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                unknown(1),
+                other(2), 
+                unused(3), 
+                shortwave(4), 
+                longwave(5), 
+                copper(6), 
+                scsi(7),
+                longwaveNoOFC(8),
+                shortwaveNoOFC(9),
+                longwaveLED(10),
+                ssa(11)
+             } 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The technology of the port transceiver." 
+            ::= { connUnitPortEntry 8 } 
+
+        connUnitPortModuleType OBJECT-TYPE 
+            SYNTAX INTEGER { 
+                unknown(1),
+                other(2), 
+                gbic(3), 
+                embedded(4), -- fixed, ie, oneXnine
+                glm(5),
+                gbicSerialId(6),
+                gbicNoSerialId(7),
+                gbicNotInstalled(8),
+                smallFormFactor(9)
+            } 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The module type of the port connector." 
+            ::= { connUnitPortEntry 9 } 
+
+        connUnitPortWwn OBJECT-TYPE 
+            SYNTAX FcNameId 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The World Wide Name of the port 
+                if applicable, otherwise empty string." 
+             ::= { connUnitPortEntry 10 } 
+
+        connUnitPortFCId OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE(3))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This is the assigned Fibre Channel ID of
+                this port.  This value is expected to be
+                a Big Endian value of 24 bits. If this is
+                loop, then it is the ALPA that is connected.
+                If this is an eport, then it will only
+                contain the domain ID left justified, zero
+                filled. If this port does not have a Fibre
+                Channel address, return all bits set to 1."
+            ::= { connUnitPortEntry 11 } 
+
+        connUnitPortSn OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE(0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The serial number of the unit (e.g., for 
+                a GBIC). If this is not applicable, return 
+                empty string." 
+            ::= { connUnitPortEntry 12 } 
+
+        connUnitPortRevision OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE(0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The port revision (e.g., for a GBIC)."
+            ::= { connUnitPortEntry 13 } 
+
+        connUnitPortVendor OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE(0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The port vendor (e.g., for a GBIC)."
+            ::= { connUnitPortEntry 14 } 
+
+        connUnitPortSpeed OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory
+            DESCRIPTION
+                "The speed of the port in kilobytes per 
+                second."
+            ::= { connUnitPortEntry 15 }
+
+        connUnitPortControl OBJECT-TYPE
+            SYNTAX INTEGER {
+                unknown(1),
+                invalid(2),
+                resetConnUnitPort(3),
+                bypassConnUnitPort(4),
+                unbypassConnUnitPort(5),
+                offlineConnUnitPort(6),
+                onlineConnUnitPort(7),
+                resetConnUnitPortCounters(8)
+            }
+            ACCESS read-write -- (or maybe write-only)
+            STATUS mandatory
+            DESCRIPTION
+                "This object is used to control the addressed
+                connUnit's port. Valid commands are:
+
+                resetConnUnitPort: If the addressed connUnit
+                    allows this operation to be performed to this
+                    port, the addressed port performs a
+                    vendor-specific 'reset' operation. Examples of
+                    these operations are: the Link Reset protocol,
+                    the Loop Initialization protocol, or a
+                    resynchronization occurring between the
+                    transceiver in the addressed port to the
+                    transceiver that the port is connected to.
+
+                bypassConnUnitPort: If the addressed connUnit
+                    allows this operation to be performed to this
+                    port, the addressed port performs a
+                    vendor-specific 'bypass' operation. Examples of
+                    these operations are:
+                    transitioning from online to offline, a
+                    request(NON-PARTICIPATING) command to the
+                    Loop Port state machine, or removal of the
+                    port from an arbitrated loop by a hub.
+
+                unbypassConnUnitPort: If the addressed connUnit
+                    allows this operation to be performed to this
+                    port, the addressed port performs a
+                    vendor-specific 'unbypass' operation. Examples
+                    of these operations are:
+                    the Link Failure protocol, a
+                    request(PARTICIPATING) command to the
+                    Loop Port state machine, or addition of the
+                    port to an arbitrated loop by a hub.
+
+                offlineConnUnitPort: If the addressed connUnit
+                    allows this operation to be performed to this
+                    port, the addressed port performs a
+                    vendor-specific 'offline' operation. Examples
+                    of these operations are:
+                    disabling a port's transceiver, the Link
+                    Failure protocol, request(NON-PARTICIPATING)
+                    command to the Loop Port state machine, or
+                    removal of the port from an arbitrated loop
+                    by a hub.
+
+                onlineConnUnitPort: If the addressed connUnit
+                    allows this operation to be performed to this
+                    port, the addressed port performs a
+                    vendor-specific 'online' operation. Examples
+                    of these operations are:
+                    enabling a port's transceiver, the Link
+                    Failure protocol, request(PARTICIPATING)
+                    command to the Loop Port state machine, or
+                    addition of the port from an arbitrated loop
+                    by a hub.
+
+                NOTE: Each implementation may chose not to allow
+                any or all of these values on a SET. "
+
+            ::= { connUnitPortEntry 16 }
+
+        connUnitPortName OBJECT-TYPE 
+            SYNTAX DisplayString
+            ACCESS read-write 
+            STATUS mandatory 
+            DESCRIPTION 
+                "A string describing the addressed port."
+            ::= { connUnitPortEntry 17 }
+
+        connUnitPortPhysicalNumber OBJECT-TYPE 
+            SYNTAX INTEGER
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This is the internal port number this 
+                port is known by. In many implementations, 
+                this should be the same as connUnitPortIndex.
+                Some implementations may have an internal port
+                representation not compatible with the rules
+                for table indeces.  In that case, provide the
+                internal representation of this port in this 
+                object.  This value may also be used in the 
+                connUnitLinkPortNumberX or connUnitLinkPortNumberY
+                objects of the connUnitLinkTable."
+            ::= { connUnitPortEntry 18 } 
+
+        connUnitPortStatObject OBJECT-TYPE 
+            SYNTAX OBJECT IDENTIFIER 
+            ACCESS read-only 
+            STATUS deprecated 
+            DESCRIPTION
+                "This contains the OID of the first object of the
+                table that contains the statistics for this particular
+                port. If this has a value of zero, then there are no
+                statistics available for this port. The port type
+                information will help identify the statistics objects
+                that will be found in the table. From this point, one
+                would do a getnext to get the next statistics object.
+                When the first part of the OID changes, the end of
+                table is reached."
+            ::= { connUnitPortEntry 19 } 
+
+	connUnitPortProtocolCap OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (2))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Bit mask that specifies the driver level
+                protocol capability of this port. If this is not
+                applicable, return all bits set to zero.
+                
+                The bits have
+                the following definition:
+                    unknown      - 0
+                    Loop         - 1
+                    Fabric       - 2
+                    SCSI         - 4
+                    TCP/IP       - 8
+                    VI           - 16
+                    FICON        - 32" 
+            ::= { connUnitPortEntry 20 }
+
+	connUnitPortProtocolOp OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (2))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Bit mask that specifies the driver level
+                protocol(s) that are currently operational.
+                If this is not applicable, return all bits 
+                set to zero.  This object has the same 
+                definition as connUnitPortProtocolCap"
+            ::= { connUnitPortEntry 21 }
+
+        connUnitPortNodeWwn OBJECT-TYPE 
+            SYNTAX FcNameId 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The Node World Wide Name of the port 
+                if applicable, otherwise all zeros.
+                This should have the same value for a
+                group of related ports. The container is
+                defined as the largest physical entity.
+                For example, all ports on HBAs on a host
+                will have the same Node WWN. All ports on
+                the same storage subsystem will have the
+                same Node WWN." 
+             ::= { connUnitPortEntry 22 } 
+
+        connUnitPortHWState OBJECT-TYPE
+            SYNTAX INTEGER {
+                unknown     (1),
+                failed      (2), -- port failed diagnostics
+                bypassed    (3),  -- FCAL bypass, loop only
+                active      (4), -- connected to a device
+                loopback    (5), -- Port in ext loopback
+                txfault     (6), -- Transmitter fault
+                noMedia     (7), -- media not installed
+                linkDown    (8)  -- waiting for activity (rx sync)
+            }
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The hardware detected state of the port."
+           ::= { connUnitPortEntry 23 }
+
+
+-----------------------------------------------------------------------
+-- event group
+
+    connUnitEventTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF ConnUnitEventEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "The table of connectivity unit events. Errors, 
+            warnings, and information should be reported
+            in this table." 
+        ::= { connSet 11 }
+
+    connUnitEventEntry OBJECT-TYPE 
+        SYNTAX ConnUnitEventEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Each entry contains information on 
+            a specific event for the given 
+            connectivity unit." 
+        INDEX { connUnitEventUnitId, connUnitEventIndex } 
+        ::= { connUnitEventTable 1 } 
+
+        ConnUnitEventEntry ::= 
+            SEQUENCE { 
+                connUnitEventUnitId 
+                    OCTET STRING, 
+                connUnitEventIndex 
+                    INTEGER,
+                connUnitEventId 
+                    INTEGER, 
+                connUnitREventTime 
+                    DisplayString, 
+                connUnitSEventTime 
+                    TimeTicks, 
+                connUnitEventSeverity
+                    FcEventSeverity, 
+                connUnitEventType
+                    INTEGER,
+                connUnitEventObject
+                    OBJECT IDENTIFIER, 
+                connUnitEventDescr 
+                    DisplayString
+            } 
+
+        connUnitEventUnitId OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (16))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The connUnitId of the connectivity unit
+                that contains this event table."
+            ::= { connUnitEventEntry 1 } 
+
+        connUnitEventIndex OBJECT-TYPE 
+            SYNTAX INTEGER (1..2147483647)
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Each connectivity unit has its own event buffer.
+                As it wraps, it may write over previous events.
+                This object is an index into the buffer.
+                It is recommended that this table be read using
+                'getNext's to retrieve the initial table.
+                The management application should read the
+                event table at periodic intervals and then 
+                determine if any new entries were added by 
+                comparing the last known index value with the 
+                current highest index value. The management 
+                application should then update its copy of
+                the event table. If the read interval
+                is too long, it is possible that there may 
+                be events that may not be contained in the
+                agent's internal event buffer.
+                For example, an agent may read events 50-75.
+                At the next read interval, connUnitEventCurrID
+                is 189.  If the management app tries to read
+                event index 76, and the agent's internal buffer
+                is 100 entries max, event index 76 will no longer
+                be available.
+                The index value is an incrementing integer starting
+                from one every time there is a table reset.
+                On table reset, all contents are emptied and
+                all indeces are set to zero. When an
+                event is added to the table, the event is
+                assigned the next higher integer value than
+                the last item entered into the table. If the
+                index value reaches its maximum value, the next
+                item entered will cause the index value to
+                roll over and start at one again."
+            ::= { connUnitEventEntry 2 } 
+
+        connUnitEventId OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS obsolete
+            DESCRIPTION 
+                "The internal event Id. Incremented for each 
+                event, ranging between 0 and connUnitMaxEvents.
+                Not used as table index to simplify 
+                the agent implementation. When this
+                reaches the end of the range specified by
+                connUnitMaxEvents, the Id will roll over to start
+                at zero. This value will be set back to zero at
+                reset. The relationship of this value to the index
+                is that internal event id may represent a smaller
+                number than a 32 bit integer (eg max 100 entries) 
+                and would only have a value range up to 
+                connUnitMaxEvents."
+            ::= { connUnitEventEntry 3 } 
+
+        connUnitREventTime OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (15))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This is the real time when the event occurred.
+                It has the following format.
+                    DDMMYYYY HHMMSS
+                    DD=day number
+                    MM=month number
+                    YYYY=year number
+                    HH=hour number
+                    MM=minute number
+                    SS=seconds number
+                If not applicable, return a NULL string."
+            ::= { connUnitEventEntry 4 } 
+
+        connUnitSEventTime OBJECT-TYPE 
+            SYNTAX TimeTicks
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This is the sysuptime timestamp when the
+                event occurred."
+            ::= { connUnitEventEntry 5 } 
+
+        connUnitEventSeverity OBJECT-TYPE 
+            SYNTAX FcEventSeverity
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The event severity level." 
+            ::= { connUnitEventEntry 6 } 
+
+        connUnitEventType OBJECT-TYPE 
+            SYNTAX INTEGER {
+                unknown(1),
+                other(2),
+                status(3),
+                configuration(4),
+                topology(5)
+            }
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The type of this event."
+            ::= { connUnitEventEntry 7 } 
+
+        connUnitEventObject OBJECT-TYPE 
+            SYNTAX OBJECT IDENTIFIER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This is used with the connUnitEventType
+                to identify which object the event refers to.
+                It can be the OID of a connectivity unit or of
+                another object like connUnitPortStatus[...]"
+            ::= { connUnitEventEntry 8 } 
+
+        connUnitEventDescr OBJECT-TYPE 
+            SYNTAX DisplayString 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The description of the event." 
+            ::= { connUnitEventEntry 9 } 
+
+-- The link table
+-- is intended to organize and communicate 
+-- any information the agent possesses
+-- which would assist a management application
+-- to discover the CONNECTIVITY UNITS in the 
+-- framework and the TOPOLOGY of their interconnect.
+-- That is, the goal is to assist the management
+-- application not only to LIST the elements of the framework,
+-- but to MAP them.
+
+-- With this goal, the agent SHOULD include
+-- as much as it possesses about any links
+-- from its own connectivity units to others,
+-- including links among its own units.
+
+-- An agent SHOULD include partial information
+-- about links if it is not able to fully
+-- define them in accord with the following structure;
+-- however, the information MUST include either 
+-- a nonzero connUnitNodeId- or a nonzero connUnitPortWwn-
+-- for each end of the link.
+
+-- If the agent is able to discover links
+-- which do not directly attach to members of its agency
+-- and its discovery algorithm gives some assurance
+-- the links are recently valid, it MAY include these links. 
+
+-- Link information entered by administrative action
+-- MAY be included even if not validated directly
+-- if the link has at least one endpoint in this agency,
+-- but SHOULD NOT be included otherwise.
+
+-- A connectivity unit should fill the table in as best it can.
+-- One of the methods to fill this in would be to use the RNID
+-- ELS (ANSI document 99-422v0). This allows one to query a
+-- port for the information needed for the link table.
+
+-- This table is accessed either directly if the management
+-- software has an index value or via GetNexts. The value of
+-- the indexes are not required to be contiguous. Each entry
+-- created in this table will be assigned an index. This
+-- relationship is kept persistent until the entry is removed
+-- from the table or the system is reset. The total number of
+-- entries are defined by the size of the table
+
+-- For an entry to be considered to be valid, both the X (local)
+-- and the Y (remote) need to have one valid value.
+
+    connUnitLinkTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ConnUnitLinkEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "A list of links know to this agent from this
+            connectivity unit to other connectivity units."
+        ::= { connSet 12 }
+
+    connUnitLinkEntry OBJECT-TYPE
+        SYNTAX ConnUnitLinkEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "An entry describing a particular link to another."
+        INDEX { connUnitLinkUnitId,
+            connUnitLinkIndex }
+            ::= { connUnitLinkTable 1 }
+
+        ConnUnitLinkEntry ::=
+            SEQUENCE {
+                connUnitLinkUnitId
+                    OCTET STRING,
+                connUnitLinkIndex
+                    INTEGER,
+                connUnitLinkNodeIdX
+                    OCTET STRING,
+                connUnitLinkPortNumberX
+                    INTEGER,
+                connUnitLinkPortWwnX
+                    OCTET STRING,
+                connUnitLinkNodeIdY
+                    OCTET STRING,
+                connUnitLinkPortNumberY
+                    INTEGER,
+                connUnitLinkPortWwnY
+                    OCTET STRING,
+                connUnitLinkAgentAddressY
+                    OCTET STRING,
+                connUnitLinkAgentAddressTypeY
+                    INTEGER,
+                connUnitLinkAgentPortY
+                    INTEGER,
+                connUnitLinkUnitTypeY
+                    FcUnitType,
+                connUnitLinkConnIdY
+                    OCTET STRING,
+                connUnitLinkCurrIndex
+                    INTEGER
+          }
+
+        connUnitLinkUnitId OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (16))
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The connUnitId of the connectivity unit
+                that contains this link table."
+            ::= { connUnitLinkEntry 1 }
+
+        connUnitLinkIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..2147483647)
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "This value is used to create a unique value
+                for each entry in the link table with the same
+		    connUnitLinkUnitId. The value
+                can only be reused if it is not currently in
+                in use and the value is the next candidate to
+                be used. This value is allowed to wrap at the
+                highest value represented by the number of bits.
+                This value is reset to zero when the system is
+                Reset and the first value to be used is one."
+            ::= { connUnitLinkEntry 2 }
+
+        connUnitLinkNodeIdX OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(64))
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The node WWN of the unit at one end
+                of the link.  If the node WWN is unknown 
+                and the node is a connUnit in the responding 
+                agent then the value of this object MUST BE 
+                equal to its connUnitID."
+            ::= { connUnitLinkEntry 3 }
+
+        connUnitLinkPortNumberX OBJECT-TYPE
+            SYNTAX INTEGER
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The port number on the unit specified by
+                connUnitLinkNodeIdX if known, otherwise -1. 
+                If the value is nonnegative then it will be
+                equal to connUnitPortPhysicalNumber."
+            ::= { connUnitLinkEntry 4 }
+
+        connUnitLinkPortWwnX OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(16))
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The port WWN of the unit specified by
+                connUnitLinkNodeIdX if known, 
+                otherwise 16 octets of binary 0"
+            ::= { connUnitLinkEntry 5 }
+
+        connUnitLinkNodeIdY OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(64))
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The node WWN of the unit at the other end
+                of the link.  If the node WWN is unknown 
+                and the node is a connUnit in the responding 
+                SNMP agency then the value of this object 
+                MUST BE equal to its connUnitID."
+            ::= { connUnitLinkEntry 6 }
+
+        connUnitLinkPortNumberY OBJECT-TYPE
+            SYNTAX INTEGER
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The port number on the unit specified by
+                connUnitLinkNodeIdY if known, otherwise -1. 
+                If the value is nonnegative then it will be
+                equal to connUnitPortPhysicalNumber."
+            ::= { connUnitLinkEntry 7 }
+
+        connUnitLinkPortWwnY OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(16))
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The port WWN on the unit specified by
+                connUnitLinkNodeIdY if known, 
+                otherwise 16 octets of binary 0"
+            ::= { connUnitLinkEntry 8 } 
+
+        connUnitLinkAgentAddressY OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE(16))
+            ACCESS read-only
+            STATUS mandatory 
+            DESCRIPTION 
+                "The address of an FCMGMT MIB agent for the
+                node identified by connUnitLinkNodeIdY,
+                if known; otherwise 16 octets of binary 0"
+            ::= { connUnitLinkEntry 9 } 
+
+        connUnitLinkAgentAddressTypeY OBJECT-TYPE
+            SYNTAX INTEGER
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "If connUnitLinkAgentAddressY is nonzero,
+                it is a protocol address.
+                ConnUnitLinkAgentAddressTypeY is the
+                the 'address family number' assigned by IANA
+                to identify the address format.
+                (eg, 1 is Ipv4, 2 is Ipv6)."
+            ::= { connUnitLinkEntry 10 }
+
+        connUnitLinkAgentPortY OBJECT-TYPE 
+            SYNTAX INTEGER
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The IP port number for the agent. This is
+                provided in case the agent is at a non-standard
+                SNMP port."
+            ::= { connUnitLinkEntry 11 } 
+
+        connUnitLinkUnitTypeY OBJECT-TYPE 
+            SYNTAX FcUnitType
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Type of the FC connectivity unit as defined in
+                connUnitType."
+            ::= { connUnitLinkEntry 12 } 
+
+        connUnitLinkConnIdY OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE(3)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "This is the Fibre Channel ID of this port.
+                If the connectivity unit is a switch, this
+                is expected to be a Big Endian value of 24
+                bits. If this is loop, then it is the ALPA
+                that is connected. If this is an eport, then
+                it will only contain the domain ID. If not
+                any of those, unknown or cascaded loop,
+                return all bits set to 1."
+            ::= { connUnitLinkEntry 13 } 
+
+	connUnitLinkCurrIndex OBJECT-TYPE 
+            SYNTAX INTEGER 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The last used link index."
+            ::= { connUnitLinkEntry 14 }
+
+
+------------------------------------------------------------------
+-- The following four tables have been obsoleted. These were used to
+-- keep statistic information based on the type of port type. It was
+-- changed for all ports to use a common statistics table.
+
+-- Hub Port Statistics
+
+--    connUnitPortStatHubTable OBJECT-TYPE
+--        SYNTAX SEQUENCE OF ConnUnitPortStatHubEntry
+--        ACCESS not-accessible
+--        STATUS obsolete
+--        DESCRIPTION
+--            "A list of statistics for the hub port type.
+
+--	     This object has been obsoleted."
+--       ::= { statSet 1 }
+	
+ 
+-- Fabric Port Statistics
+
+--    connUnitPortStatFabricTable OBJECT-TYPE
+--        SYNTAX SEQUENCE OF ConnUnitPortStatFabricEntry
+--        ACCESS not-accessible
+--        STATUS obsolete
+--        DESCRIPTION
+--            "A list of statistics for the fabric port types.
+
+--	     This object has been obsoleted."
+--        ::= { statSet 2 }
+
+-- SCSI Port Statistics
+
+--    connUnitPortStatSCSITable OBJECT-TYPE
+--        SYNTAX SEQUENCE OF ConnUnitPortStatSCSIEntry
+--        ACCESS not-accessible
+--        STATUS obsolete
+--        DESCRIPTION
+--            "A list of statistics for the SCSI port type.
+
+--	     This object has been obsoleted."
+--        ::= { statSet 3 }
+
+-- LAN/WAN Port Statistics
+
+--    connUnitPortStatLANTable OBJECT-TYPE
+--        SYNTAX SEQUENCE OF ConnUnitPortStatLANEntry
+--        ACCESS not-accessible
+--        STATUS obsolete
+--        DESCRIPTION
+--            "A list of statistics for the LAN/WAN port type.
+
+--	     This object has been obsoleted."
+--        ::= { statSet 4 }
+
+  
+
+-- There is one and only one statistics table for each
+-- individual port. For all objects in statistics table, if the object is not
+-- supported by the conn unit then the high order bit is set to 1 with all other
+-- bits set to zero. The high order bit is reserved to indicate if the object
+-- if supported or not. All objects start at a value of zero at hardware
+-- initialization and continue incrementing till end of 63 bits and then
+-- wrap to zero. 
+
+-- Port Statistics
+
+    connUnitPortStatTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ConnUnitPortStatEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "A list of statistics for the fabric port types."
+        ::= { statSet 5 }
+
+    connUnitPortStatEntry OBJECT-TYPE
+        SYNTAX ConnUnitPortStatEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "An entry describing port statistics."
+        INDEX { connUnitPortStatUnitId,
+                connUnitPortStatIndex }
+            ::= { connUnitPortStatTable 1 }
+
+        ConnUnitPortStatEntry ::=
+            SEQUENCE {
+                connUnitPortStatUnitId
+                    FcGlobalId,
+                connUnitPortStatIndex
+                    INTEGER,
+                connUnitPortStatCountError
+                    OCTET STRING, 
+                connUnitPortStatCountTxObjects
+                    OCTET STRING, 
+                connUnitPortStatCountRxObjects
+                    OCTET STRING, 
+                connUnitPortStatCountTxElements
+                    OCTET STRING,
+                connUnitPortStatCountRxElements
+                    OCTET STRING,
+                connUnitPortStatCountBBCreditZero
+                    OCTET STRING,
+                connUnitPortStatCountInputBuffersFull
+                    OCTET STRING,
+                connUnitPortStatCountFBSYFrames
+                    OCTET STRING,
+                connUnitPortStatCountPBSYFrames
+                    OCTET STRING,
+                connUnitPortStatCountFRJTFrames
+                    OCTET STRING,
+                connUnitPortStatCountPRJTFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass1RxFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass1TxFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass1FBSYFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass1PBSYFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass1FRJTFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass1PRJTFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass2RxFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass2TxFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass2FBSYFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass2PBSYFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass2FRJTFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass2PRJTFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass3RxFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass3TxFrames
+                    OCTET STRING,
+                connUnitPortStatCountClass3Discards
+                    OCTET STRING,
+                connUnitPortStatCountRxMulticastObjects
+                    OCTET STRING,
+                connUnitPortStatCountTxMulticastObjects
+                    OCTET STRING,
+                connUnitPortStatCountRxBroadcastObjects
+                    OCTET STRING,
+                connUnitPortStatCountTxBroadcastObjects
+                    OCTET STRING,
+                connUnitPortStatCountRxLinkResets
+                    OCTET STRING,
+                connUnitPortStatCountTxLinkResets
+                    OCTET STRING,
+                connUnitPortStatCountNumberLinkResets
+                    OCTET STRING,
+                connUnitPortStatCountRxOfflineSequences
+                    OCTET STRING,
+                connUnitPortStatCountTxOfflineSequences
+                    OCTET STRING,
+                connUnitPortStatCountNumberOfflineSequences
+                    OCTET STRING,
+                connUnitPortStatCountLinkFailures
+                    OCTET STRING,
+                connUnitPortStatCountInvalidCRC
+                    OCTET STRING,
+                connUnitPortStatCountInvalidTxWords
+                    OCTET STRING,
+                connUnitPortStatCountPrimitiveSequenceProtocolErrors
+                    OCTET STRING,
+                connUnitPortStatCountLossofSignal
+                    OCTET STRING,
+                connUnitPortStatCountLossofSynchronization
+                    OCTET STRING,
+                connUnitPortStatCountInvalidOrderedSets
+                    OCTET STRING,
+                connUnitPortStatCountFramesTooLong
+                    OCTET STRING,
+                connUnitPortStatCountFramesTruncated
+                    OCTET STRING,
+                connUnitPortStatCountAddressErrors
+                    OCTET STRING,
+                connUnitPortStatCountDelimiterErrors
+                    OCTET STRING,
+                connUnitPortStatCountEncodingDisparityErrors
+                    OCTET STRING
+            }
+
+        connUnitPortStatUnitId OBJECT-TYPE
+            SYNTAX FcGlobalId
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The connUnitId of the connectivity unit
+                that contains this port stat table."
+            ::= { connUnitPortStatEntry 1 }
+
+        connUnitPortStatIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..2147483647)
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "A unique value among all entrys
+                in this table, between 0 and
+                connUnitNumPort[connUnitPortUnitId]."
+            ::= { connUnitPortStatEntry 2 }
+
+        connUnitPortStatCountError OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "A count of the errors that have occured 
+                on this port."
+            ::= { connUnitPortStatEntry 3 } 
+
+        connUnitPortStatCountTxObjects OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The number of frames/packets/IOs/etc that have been transmitted
+                by this port. Note: A Fibre Channel frame starts with SOF and
+                ends with EOF. FC loop devices should not count frames passed
+                through. This value represents the sum total for all other Tx
+                objects."
+            ::= { connUnitPortStatEntry 4 } 
+
+        connUnitPortStatCountRxObjects OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The number of frames/packets/IOs/etc that have been received
+                by this port. Note: A Fibre Channel frame starts with SOF and
+                ends with EOF. FC loop devices should not count frames passed
+                through. This value represents the sum total for all other Rx
+                objects."
+            ::= { connUnitPortStatEntry 5 } 
+
+        connUnitPortStatCountTxElements OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION
+                    "The number of octets or bytes that have been transmitted
+                     by this port. One second periodic polling of the port. This
+                     value is saved and compared with the next polled value to
+                     compute net throughput. Note, for Fibre Channel, ordered
+                     sets are not included in the count."
+            ::= { connUnitPortStatEntry 6 } 
+
+        connUnitPortStatCountRxElements OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                    "The number of octets or bytes that have been received.
+                     by this port. One second periodic polling of the port. This
+                     value is saved and compared with the next polled value to
+                     compute net throughput. Note, for Fibre Channel, ordered
+                     sets are not included in the count."
+            ::= { connUnitPortStatEntry 7 }
+
+        connUnitPortStatCountBBCreditZero OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of transitions in/out of BBcredit zero state.
+                    The other side is not providing any credit. Note,
+                    this is a Fibre Channel stat only."
+            ::= { connUnitPortStatEntry 8 }
+
+        connUnitPortStatCountInputBuffersFull OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of occurrences when all input buffers of a
+                    port were full and outbound buffer-to-buffer credit
+                    transitioned to zero. There is no credit to
+                    provide to other side. Note, this is a Fibre Channel
+                    stat only."
+            ::= { connUnitPortStatEntry 9 }
+
+        connUnitPortStatCountFBSYFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FBSY was returned to this port as a
+                    result of a frame that could not be delivered to the other
+                    end of the link. This occurs if either the Fabric or the
+                    destination port is temporarily busy.  Port can only occur
+                    on SOFc1 frames (the frames that establish a connection).
+                    Note, this is a Fibre Channel only stat. This is the sum
+                    of all classes. If you cannot keep the by class counters,
+                    then keep the sum counters."
+            ::= { connUnitPortStatEntry 10 }
+
+        connUnitPortStatCountPBSYFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that PBSY was returned to this port as a
+                    result of a frame that could not be delivered to the other
+                    end of the link. This occurs if the destination port is
+                    temporarily busy.  PBSY can only occur on SOFc1 frames
+                    (the frames that establish a connection). Note, this is
+                    a Fibre Channel only stat.This is the sum
+                    of all classes. If you cannot keep the by class counters,
+                    then keep the sum counters."
+            ::= { connUnitPortStatEntry 11 }
+
+        connUnitPortStatCountFRJTFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FRJT was returned to this port as a
+                    result of a Frame that was rejected by the fabric. Note,
+                    This is the total for all classes and is a Fibre Channel
+                    only stat."
+            ::= { connUnitPortStatEntry 12 }
+
+        connUnitPortStatCountPRJTFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FRJT was returned to this port as a
+                    result of a Frame that was rejected at the destination
+                    N_Port. Note, This is the total for all classes and is
+                    a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 13 }
+
+        connUnitPortStatCountClass1RxFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Class 1 Frames received at this port. Note, this
+                    is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 14 }
+
+        connUnitPortStatCountClass1TxFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Class 1 Frames transmitted out this port. Note,
+                    this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 15 }
+
+        connUnitPortStatCountClass1FBSYFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FBSY was returned to this port as a
+                    result of a Class 1 Frame that could not be delivered to the
+                    other end of the link. This occurs if either the Fabric or the
+                    destination port is temporarily busy.  FBSY can only occur on
+                    SOFc1 frames (the frames that establish a connection). Note,
+                    this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 16 }
+
+        connUnitPortStatCountClass1PBSYFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that PBSY was returned to this port as a result
+                    of a Class 1 Frame that could not be delivered to the other end
+                    of the link. This occurs if the destination N_Port is temporarily
+                    busy.  PBSY can only occur on SOFc1 frames (the frames that
+                    establish a connection). Note, this is a Fibre Channel only
+                    stat."
+            ::= { connUnitPortStatEntry 17 }
+
+        connUnitPortStatCountClass1FRJTFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FRJT was returned to this port as a result
+                    of a Class 1 Frame that was rejected by the fabric. Note, this
+                    is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 18 }
+
+        connUnitPortStatCountClass1PRJTFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FRJT was returned to this port as a result
+                    of a Class 1 Frame that was rejected at the destination N_Port.
+                    Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 19 }
+
+        connUnitPortStatCountClass2RxFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Class 2 Frames received at this port. Note, this
+                    is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 20 }
+
+        connUnitPortStatCountClass2TxFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Class 2 Frames transmitted out this port. Note,
+                    this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 21 }
+
+        connUnitPortStatCountClass2FBSYFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FBSY was returned to this port as a
+                    result of a Class 2 Frame that could not be delivered to the
+                    other end of the link. This occurs if either the Fabric or the
+                    destination port is temporarily busy.  FBSY can only occur on
+                    SOFc1 frames (the frames that establish a connection). Note,
+                    this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 22 }
+
+        connUnitPortStatCountClass2PBSYFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that PBSY was returned to this port as a result
+                    of a Class 2 Frame that could not be delivered to the other end
+                    of the link. This occurs if the destination N_Port is temporarily
+                    busy.  PBSY can only occur on SOFc1 frames (the frames that
+                    establish a connection). Note, this is a Fibre Channel only
+                    stat."
+            ::= { connUnitPortStatEntry 23 }
+
+        connUnitPortStatCountClass2FRJTFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FRJT was returned to this port as a result
+                    of a Class 2 Frame that was rejected by the fabric. Note, this
+                    is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 24 }
+
+        connUnitPortStatCountClass2PRJTFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of times that FRJT was returned to this port as a result
+                    of a Class 2 Frame that was rejected at the destination N_Port.
+                    Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 25 }
+
+        connUnitPortStatCountClass3RxFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Class 3 Frames received at this port. Note, this
+                    is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 26 }
+
+        connUnitPortStatCountClass3TxFrames OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Class 3 Frames transmitted out this port. Note,
+                    this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 27 }
+
+        connUnitPortStatCountClass3Discards OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Class 3 Frames that were discarded upon reception
+                    at this port.  There is no FBSY or FRJT generated for Class 3
+                    Frames.  They are simply discarded if they cannot be delivered.
+                    Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 28 }
+
+        connUnitPortStatCountRxMulticastObjects OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Multicast Frames or Packets received at this port."
+            ::= { connUnitPortStatEntry 29 }
+
+        connUnitPortStatCountTxMulticastObjects OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Multicast Frames or Packets transmitted out this port."
+            ::= { connUnitPortStatEntry 30 }
+
+        connUnitPortStatCountRxBroadcastObjects OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Broadcast Frames or Packets received at this port."
+            ::= { connUnitPortStatEntry 31 }
+
+        connUnitPortStatCountTxBroadcastObjects OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Broadcast Frames or Packets transmitted out this port.
+                    On a Fibre Channel loop, count only OPNr frames generated."
+            ::= { connUnitPortStatEntry 32 }
+
+        connUnitPortStatCountRxLinkResets OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Link resets. This is the number of LRs received. Note, this
+                    is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 33 }
+
+        connUnitPortStatCountTxLinkResets OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Link resets. This is the number LRs  transmitted. Note, this
+                    is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 34 }
+
+        connUnitPortStatCountNumberLinkResets OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Link resets and LIPs detected at this port.
+                    The number times the reset link protocol is initiated.
+                    These are the count of the logical resets, a count of the
+                    number of primatives. Note, this is a Fibre Channel only
+                    stat."
+            ::= { connUnitPortStatEntry 35 }
+
+        connUnitPortStatCountRxOfflineSequences OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Offline Primitive OLS received at this port.
+                    Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 36 }
+
+        connUnitPortStatCountTxOfflineSequences OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Offline Primitive OLS transmitted by this port.
+                    Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 37 }
+
+        connUnitPortStatCountNumberOfflineSequences OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of Offline Primitive sequence received at this port.
+                    Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 38 }
+
+        connUnitPortStatCountLinkFailures OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of link failures. This count is part of the Link Error
+                    Status Block (LESB). (FC-PH 29.8). Note, this is a Fibre
+                    Channel only stat."
+            ::= { connUnitPortStatEntry 39 }
+
+        connUnitPortStatCountInvalidCRC OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of frames received with invalid CRC. This count is
+                    part of the Link Error Status Block (LESB). (FC-PH 29.8). Loop
+                    ports should not count CRC errors passing through when
+                    monitoring. Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 40 }
+
+        connUnitPortStatCountInvalidTxWords OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of invalid transmission words received at this
+                    port. This count is part of the Link Error Status Block (LESB).
+                   (FC-PH 29.8). Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 41 }
+
+        connUnitPortStatCountPrimitiveSequenceProtocolErrors OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of primitive sequence protocol errors detected at
+                    this port. This count is part of the Link Error Status
+                    Block (LESB). (FC-PH 29.8). Note, this is a Fibre Channel
+                    only stat."
+            ::= { connUnitPortStatEntry 42 }
+
+        connUnitPortStatCountLossofSignal OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of instances of signal loss detected at port.
+                    This count is part of the Link Error Status Block (LESB). 
+                    (FC-PH 29.8). Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 43 }
+
+        connUnitPortStatCountLossofSynchronization OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of instances of synchronization loss detected at port.
+                    This count is part of the Link Error Status Block (LESB).
+                    (FC-PH 29.8). Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 44 }
+
+        connUnitPortStatCountInvalidOrderedSets OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of invalid ordered sets received at port. This count
+                    is part of the Link Error Status Block (LESB). (FC-PH 29.8).
+                    Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 45 }
+
+        connUnitPortStatCountFramesTooLong OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of frames received at this port where the
+                    frame length was greater than what was agreed to in
+                    FLOGI/PLOGI. This could be caused by losing the end of
+                    frame delimiter. Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 46 }
+
+        connUnitPortStatCountFramesTruncated OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of frames received at this port where the
+                    frame length was less than the minimum indicated by the
+                    frame header - normally 24 bytes, but it could be more if the
+                    DFCTL field indicates an optional header should have been
+                    present. Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 47 }
+
+        connUnitPortStatCountAddressErrors OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of frames received with unknown addressing.
+                    e.x. unknown SID or DID. the SID or DID is not known to the
+                    routing algorithm. Note. this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 48 }
+
+        connUnitPortStatCountDelimiterErrors OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of invalid frame delimiters received at this
+                    port. An example is a frame with a class 2 start and and a
+                    class 3 at the end. Note, this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 49 }
+
+        connUnitPortStatCountEncodingDisparityErrors OBJECT-TYPE 
+            SYNTAX OCTET STRING (SIZE (8))
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                   "Count of disparity errors received at this port. Note,
+                    this is a Fibre Channel only stat."
+            ::= { connUnitPortStatEntry 50 }
+
+
+--------------------------------------------------------------------
+-- the Fibre Channel Simple Name Server table
+--
+-- The Fibre Channel Simple Name Server table contains an entry for each device
+-- presently known to this connUnit. There will not be any version on this since
+-- FC-GS3 does not define a version today.
+--
+-- This table is accessed either directly if the management
+-- software has an index value or via GetNexts. The value of
+-- the indexes are not required to be contiguous. Each entry
+-- created in this table will be assigned an index. This
+-- relationship is kept persistent until the entry is removed
+-- from the table or the system is reset. The total number of
+-- entries are defined by the size of the table
+
+connUnitSnsMaxEntry OBJECT-TYPE        
+	SYNTAX  INTEGER        
+	ACCESS  read-only
+        STATUS  mandatory        
+	DESCRIPTION
+            "The maximum number of entries in the table."
+        ::= { connUnitServiceScalars 1 }
+
+connUnitSnsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ConnUnitSnsEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+            "This table contains an entry for each object registered with
+             this port in the switch."
+    ::= { connUnitServiceTables 1 }
+
+connUnitSnsEntry OBJECT-TYPE
+    SYNTAX      ConnUnitSnsEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+            "The Simple Name Server table for the port represented by
+             connUnitSnsPortIndex ."
+    INDEX { connUnitSnsId, connUnitSnsPortIndex, connUnitSnsPortIdentifier }
+    ::= { connUnitSnsTable 1 }
+
+ConnUnitSnsEntry ::=
+    SEQUENCE {
+           connUnitSnsId
+               OCTET STRING,
+           connUnitSnsPortIndex
+                INTEGER,
+            connUnitSnsPortIdentifier
+                FcAddressId,
+            connUnitSnsPortName
+                FcNameId,
+            connUnitSnsNodeName
+                FcNameId,
+            connUnitSnsClassOfSvc
+                OCTET STRING,
+            connUnitSnsNodeIPAddress
+                OCTET STRING,
+            connUnitSnsProcAssoc
+                OCTET STRING,
+            connUnitSnsFC4Type
+                OCTET STRING,
+            connUnitSnsPortType
+                OCTET STRING,
+            connUnitSnsPortIPAddress
+                OCTET STRING,
+            connUnitSnsFabricPortName
+                FcNameId,
+            connUnitSnsHardAddress
+                FcAddressId,
+            connUnitSnsSymbolicPortName
+                DisplayString,
+            connUnitSnsSymbolicNodeName
+                DisplayString
+    }
+
+connUnitSnsId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The connUnitId of the connectivity unit
+        that contains this Name Server table."
+    ::= { connUnitSnsEntry 1 }
+
+connUnitSnsPortIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The physical port number of this SNS table entry.  Each physical port
+		has an SNS table with 1-n entries indexed by connUnitSnsPortIdentifier (port
+		address)"
+    ::= { connUnitSnsEntry 2 }
+
+connUnitSnsPortIdentifier OBJECT-TYPE
+    SYNTAX      FcAddressId
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Port Identifier for this entry in the SNS table."
+    ::= { connUnitSnsEntry 3 }
+
+connUnitSnsPortName OBJECT-TYPE
+    SYNTAX      FcNameId
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Port Name for this entry in the SNS table."
+    ::= { connUnitSnsEntry 4 }
+
+connUnitSnsNodeName OBJECT-TYPE
+    SYNTAX      FcNameId
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Node Name for this entry in the SNS table."
+    ::= { connUnitSnsEntry 5 }
+
+connUnitSnsClassOfSvc OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Classes of Service offered by this entry in the SNS table."
+    ::= { connUnitSnsEntry 6 }
+
+connUnitSnsNodeIPAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The IPv6 formatted address of the Node for this entry in the SNS table."
+
+    ::= { connUnitSnsEntry 7 }
+
+connUnitSnsProcAssoc OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Process Associator for this entry in the SNS table."
+    ::= { connUnitSnsEntry 8 }
+
+connUnitSnsFC4Type OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The FC-4 Types supported by this entry in the SNS table."
+    ::= { connUnitSnsEntry 9 }
+
+connUnitSnsPortType OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Port Type of this entry in the SNS table."
+    ::= { connUnitSnsEntry 10 }
+
+connUnitSnsPortIPAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The IPv6 formatted address of this entry in the SNS table."
+    ::= { connUnitSnsEntry 11 }
+
+connUnitSnsFabricPortName OBJECT-TYPE
+    SYNTAX      FcNameId
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Fabric Port name of this entry in the SNS table."
+    ::= { connUnitSnsEntry 12 }
+
+connUnitSnsHardAddress OBJECT-TYPE
+    SYNTAX      FcAddressId
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Hard Address of this entry in the SNS table."
+    ::= { connUnitSnsEntry 13 }
+
+connUnitSnsSymbolicPortName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..79))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Symbolic Port Name of this entry in the SNS table."
+    ::= { connUnitSnsEntry 14 }
+
+connUnitSnsSymbolicNodeName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..79))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The Symbolic Node Name of this entry in the SNS table."
+    ::= { connUnitSnsEntry 15 }
+
+
+-----------------------------------------------------------------------
+-- SNMP trap registration group 
+
+    trapMaxClients OBJECT-TYPE 
+        SYNTAX INTEGER 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "The maximum number of SNMP trap recipients
+            supported by the connectivity unit." 
+        ::= { trapReg 1 } 
+
+    trapClientCount OBJECT-TYPE 
+        SYNTAX INTEGER 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "The current number of rows in the trap table."
+        ::= { trapReg 2 } 
+
+    trapRegTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF TrapRegEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "A table containing a row for each IP address/port
+            number that traps will be sent to."
+        ::= { trapReg 3 } 
+
+    trapRegEntry OBJECT-TYPE 
+        SYNTAX TrapRegEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Ip/Port pair for a specific client." 
+        INDEX { trapRegIpAddress,
+                trapRegPort } 
+        ::= { trapRegTable 1 } 
+
+    TrapRegEntry ::= 
+        SEQUENCE { 
+            trapRegIpAddress 
+                IpAddress, 
+            trapRegPort 
+                INTEGER,
+            trapRegFilter
+                FcEventSeverity,
+            trapRegRowState
+                INTEGER
+        } 
+
+    trapRegIpAddress OBJECT-TYPE 
+        SYNTAX IpAddress 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "The Ip address of a client registered for 
+            traps."
+        ::= { trapRegEntry 1 } 
+
+    trapRegPort OBJECT-TYPE 
+        SYNTAX INTEGER (1..2147483647) 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "The UDP port to send traps to for this host.
+            Normally this would be the standard trap port
+            (162).  This object is an index and must be
+            specified to create a row in this table."
+        ::= { trapRegEntry 2 } 
+
+    trapRegFilter OBJECT-TYPE 
+        SYNTAX FcEventSeverity
+        ACCESS read-write 
+        STATUS mandatory 
+        DESCRIPTION 
+            "This value defines the trap severity
+            filter for this trap host. The connUnit will send
+            traps to this host that have a severity level 
+            less than or equal to this value.
+            The default value of this object is 'warning'."
+        ::= { trapRegEntry 3} 
+
+    trapRegRowState OBJECT-TYPE
+        SYNTAX INTEGER {
+            rowDestroy(1), -- Remove row from table.
+            rowInactive(2), -- Row exists, but TRAPs disabled
+            rowActive(3)   -- Row exists and is enabled for
+                           -- sending traps
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Specifies the state of the row.
+            rowDestroy
+                READ: Can never happen.
+                WRITE: Remove this row from the table.
+            rowInactive
+                READ: Indicates that this row does exist, but
+                      that traps are not enabled to be sent to the
+                      target.
+                WRITE: If the row does not exist, and the agent
+                       allows writes to the trap table, then a new
+                       row is created. The values of the optional
+                       columns will be set to default values. Traps are
+                       not enabled to be sent to the target. If the row
+                       already existed, then traps are disabled from being
+                       sent to the target.
+            rowActive
+                READ: Indicates that this row exists, and that traps
+                      are enabled to be sent to the target.
+                WRITE: If the row does not exist, and the agent
+                      allows writes to the trap table, then a new row is
+                      created. The values of the optional columns will be
+                      set to default values. Traps are enabled to be sent
+                      to the target. If the row already exists, then traps
+                      are enabled to be sent to the target.
+                      
+            A value of rowActive or rowInactive must be specified to
+            create a row in the table."
+        ::= { trapRegEntry 4} 
+
+
+-- Related traps 
+
+    connUnitStatusChange TRAP-TYPE 
+        ENTERPRISE fcmgmt 
+        VARIABLES { connUnitStatus, connUnitState } 
+        DESCRIPTION 
+            "The overall status of the connectivity unit has 
+            changed.
+            Recommended severity level (for filtering): alert" 
+        ::= 1
+
+    -- connUnitAddedTrap , 2, no longer used
+
+    connUnitDeletedTrap TRAP-TYPE
+        ENTERPRISE fcmgmt
+        VARIABLES { connUnitId }
+        DESCRIPTION
+            "A connUnit has been deleted from this agent.
+            Recommended severity level (for filtering): warning" 
+        ::= 3
+
+    connUnitEventTrap TRAP-TYPE 
+        ENTERPRISE fcmgmt 
+        VARIABLES { connUnitEventId, 
+                    connUnitEventType,
+                    connUnitEventObject,
+                    connUnitEventDescr } 
+        DESCRIPTION 
+            "An event has been generated by the 
+            connectivity unit.
+            Recommended severity level (for filtering): info" 
+        ::= 4                                            
+
+    connUnitSensorStatusChange TRAP-TYPE 
+        ENTERPRISE fcmgmt 
+        VARIABLES { connUnitSensorStatus } 
+        DESCRIPTION 
+            "The overall status of the connectivity unit has 
+            changed.
+            Recommended severity level (for filtering): alert" 
+        ::= 5  
+
+    connUnitPortStatusChange TRAP-TYPE 
+        ENTERPRISE fcmgmt 
+        VARIABLES { connUnitPortStatus, connUnitPortState } 
+        DESCRIPTION 
+            "The overall status of the connectivity unit has 
+            changed.
+            Recommended severity level (for filtering): alert" 
+        ::= 6
+
+END
+
+
+

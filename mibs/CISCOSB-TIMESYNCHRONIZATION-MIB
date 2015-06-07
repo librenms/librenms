@@ -1,0 +1,1890 @@
+CISCOSB-TIMESYNCHRONIZATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    Unsigned32, Integer32, IpAddress,
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    InetAddressType, InetAddress                FROM INET-ADDRESS-MIB
+    DisplayString, TEXTUAL-CONVENTION   ,
+    RowStatus, TruthValue                       FROM SNMPv2-TC
+    InterfaceIndex                              FROM IF-MIB;
+
+rlTimeSynchronization MODULE-IDENTITY
+      LAST-UPDATED "200408030024Z"
+      ORGANIZATION "Cisco Systems, Inc."
+
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
+
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+      DESCRIPTION
+              "The MIB module describes the private MIB for SNTP & TIME definitions."
+      REVISION     "200906180024Z"
+      DESCRIPTION
+              "Added support in DHCP timezone option."
+      REVISION     "200709060024Z"
+      DESCRIPTION
+              "Added rlClockStatus"
+      REVISION     "200311230024Z"
+      DESCRIPTION
+              "Initial revision"
+      ::= { switch001 92 }
+
+rlTimeSyncMethodMode OBJECT IDENTIFIER ::= { rlTimeSynchronization 1 }
+rlSntpNtpClient  OBJECT IDENTIFIER ::= { rlTimeSynchronization 2 }
+
+rlSntpNtpConfig  OBJECT IDENTIFIER ::= { rlSntpNtpClient 1 }
+rlSntpConfig  OBJECT IDENTIFIER ::= { rlSntpNtpClient 2 }
+rlNtpConfig  OBJECT IDENTIFIER ::= { rlSntpNtpClient 3 }
+
+--
+-- Textual Conventions
+--
+
+NTPTimeStamp ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "4d.4d"
+        STATUS       current
+        DESCRIPTION  "NTP timestamps are represented as a 64-bit
+                      unsigned fixed-point number, in seconds relative to
+                      00:00 on 1 January 1900.  The integer part is in the
+                      first 32 bits and the fraction part is in the last
+                      32 bits."
+        REFERENCE    "D.L. Mills, 'Network Time Protocol (Version 3)',
+                      RFC-1305, March 1992, Section 3.1"
+        SYNTAX       OCTET STRING (SIZE (8))
+
+NTPSignedTimeValue ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "2d.2d"
+        STATUS       current
+        DESCRIPTION  "The time in seconds that could represent signed
+                      quantities like time delay with respect to some
+                      source.  This textual-convention is specific to CISCOSB
+                      implementation of NTP where 32-bit integers are used
+                      for such quantities.  The signed integer part is in
+                      the first 16 bits and the fraction part is in the
+                      last 16 bits."
+        SYNTAX       OCTET STRING (SIZE (4))
+
+NTPStratum ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION  "Indicates the stratum of the clock.  The stratum
+                      defines the accuracy of a time server.  Higher the
+                      stratum, lower the accuracy.
+                      0, unspecified
+                      1, primary reference (e.g., calibrated atomic clock,
+                         radio clock)
+                      2-255, secondary reference (via NTP)"
+        REFERENCE    "D.L. Mills, 'Network Time Protocol (Version 3)',
+                      RFC-1305, March 1992, Section 2.2"
+        SYNTAX       Integer32 (0..255)
+
+-- ----------------------------------------------------------------------
+-- Global TimeSyncMethod
+-- ----------------------------------------------------------------------
+
+RlTimeSyncMethod  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Method to be used for time synchronization in the device."
+   SYNTAX INTEGER { none(1),
+                    sntp(2),
+                    ntp(3)
+                  }
+
+RlDaylightSavingTimeMode  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Daylight Saving Time - Recurring/Date/None."
+   SYNTAX INTEGER {
+                    recurring(1),
+                    date(2),
+                    none(3)
+                  }
+
+rlTimeSyncMibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "TimeSync Mib Version."
+        ::= { rlTimeSyncMethodMode 1 }
+
+rndTimeSyncManagedTime  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The time will be sent in the format hhmmss"
+        ::= { rlTimeSyncMethodMode 2 }
+
+rndTimeSyncManagedDate  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The date will be sent in the format ddmmyy"
+         ::= { rlTimeSyncMethodMode 3 }
+
+rndTimeSyncManagedDateTime  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(12))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The date and time will be sent in the format ddmmyyhhmmss"
+        ::= { rlTimeSyncMethodMode 4 }
+
+rlTimeSyncMethod OBJECT-TYPE
+        SYNTAX      RlTimeSyncMethod
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Method to be used for time synchronization in the device."
+        DEFVAL      { none }
+        ::= { rlTimeSyncMethodMode 5 }
+
+rlTimeZone OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Offset from Greenwich time (format [+/-]hh:mm)."
+        ::=  {rlTimeSyncMethodMode 6 }
+
+rlTimeZoneCode OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Code definition for current TimeZone."
+        ::=  {rlTimeSyncMethodMode 7 }
+
+rlDaylightSavingTimeMode OBJECT-TYPE
+        SYNTAX      RlDaylightSavingTimeMode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Daylight Saving Time - Recurring/Date/None."
+        DEFVAL      { none }
+        ::= { rlTimeSyncMethodMode 8 }
+
+rlDaylightSavingTimeStart OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(14))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Daylight Saving Time start date.
+                 In recurring mode (format 1): week wday month hh:mm
+                 In recurring mode (format 2): RJul n hh:mm
+                 In date mode:      month day year hh:mm
+                 week:  0-6  (0=First, 6=Last)
+                 wday:  1-7  (Sunday-Saturday)
+                 month: 1-12 (January-December)
+                 day:   1-31
+                 year:  0-99 (2000-2099)
+                 hh:    0-23 (hours)
+                 mm:    0-59 (minutes)
+                 n:     0-365 (zero-based Julian day of the year. Leap days shall be
+                               counted, and it is possible to refer to February 29).
+                 Format 2 for recurring mode is used only in the dynamic entry and
+                 should not be used in the static entry (with index 1)."
+        ::= { rlTimeSyncMethodMode 9 }
+
+rlDaylightSavingTimeEnd OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(14))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Daylight Saving Time start date.
+                 In recurring mode (format 1): week wday month hh:mm
+                 In recurring mode (format 2): RJul n hh:mm
+                 In date mode:      month day year hh:mm
+                 week:  0-6  (0=First, 6=Last)
+                 wday:  1-7  (Sunday-Saturday)
+                 month: 1-12 (January-December)
+                 day:   1-31
+                 year:  0-99 (2000-2099)
+                 hh:    0-23 (hours)
+                 mm:    0-59 (minutes)
+                 n:     0-365 (zero-based Julian day of the year. Leap days shall be
+                               counted, and it is possible to refer to February 29).
+                 Format 2 for recurring mode is used only in the dynamic entry and
+                 should not be used in the static entry (with index 1)."
+        ::= { rlTimeSyncMethodMode 10 }
+
+rlDaylightSavingTimeOffset OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Daylight Saving Time - The number of minutes to add to
+                     the clock during summer time."
+        DEFVAL      { 60 }
+        ::= { rlTimeSyncMethodMode 11 }
+
+rlDaylightSavingTimeCode OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Code definition for current Daylight Saving Time."
+        ::=  {rlTimeSyncMethodMode 12 }
+
+rlTZDSTOffset OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Local Time Zone and Daylight Saving Time offset
+                     in seconds."
+        ::= { rlTimeSyncMethodMode 13 }
+
+rlTimeZoneName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Human readable string describing Local Time Zone and Daylight Saving Time."
+        ::=  {rlTimeSyncMethodMode 14 }
+
+
+
+--
+-- TimeZone table
+--
+
+-- TimeZone table aimed to replace next mibs:
+--    rlTimeSyncMethod
+--    rlTimeZone
+--    rlTimeZoneCode
+--    rlDaylightSavingTimeMode
+--    rlDaylightSavingTimeStart
+--    rlDaylightSavingTimeEnd
+--    rlDaylightSavingTimeOffset
+--    rlDaylightSavingTimeCode
+--    rlTZDSTOffset
+--    rlTimeZoneName
+-- Table consist of one entry (with index = 1) and each field corresponding
+-- to one of this MIB scalars, holding Timezone and Summertime static information.
+-- In case DHCP timezone option is supported, the table will contain another row,
+-- with index = 2, that will contain dynamic values for Timezone and Summertime
+-- received through DHCP.
+
+rlTimeZoneTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlTimeZoneEntry
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION   "TimeZone information."
+  ::= { rlTimeSyncMethodMode 15 }
+
+rlTimeZoneEntry OBJECT-TYPE
+   SYNTAX      RlTimeZoneEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX { rlTimeZoneIndex }
+::= { rlTimeZoneTable 1 }
+
+RlTimeZoneEntry ::= SEQUENCE {
+    rlTimeZoneIndex                     INTEGER,
+    rlTimeZoneTimeSyncMethod            RlTimeSyncMethod,
+    rlTimeZoneTimeZoneOffset            DisplayString (SIZE(1..6)),
+    rlTimeZoneTimeZoneCode              DisplayString (SIZE(0..16)),
+    rlTimeZoneDaylightSavingTimeMode    RlDaylightSavingTimeMode,
+    rlTimeZoneDaylightSavingTimeStart   OCTET STRING (SIZE(14)),
+    rlTimeZoneDaylightSavingTimeEnd     OCTET STRING (SIZE(14)),
+    rlTimeZoneDaylightSavingTimeOffset  Integer32,
+    rlTimeZoneDaylightSavingTimeCode    DisplayString (SIZE(0..16)),
+    rlTimeZoneTZDSTOffset               INTEGER,
+    rlTimeZoneTimeZoneName              DisplayString (SIZE(0..16)),
+    rlTimeZoneDataType                  INTEGER,
+    rlTimeZoneDataSourceIfIndex         INTEGER,
+    rlTimeZoneDataDynamicConfSource     INTEGER
+}
+
+rlTimeZoneIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry index. A row with index 2 will be existing in case the DHCP
+                 timezone is supported, and will contain Timezone and Summertime dynamic
+                 values.
+                 Using index 2 in SET operations is allowed only for SNMP
+                 inner clients (SNMPServ users), on condition that DHCP timezone option
+                 is supported."
+    ::= { rlTimeZoneEntry 1 }
+
+rlTimeZoneTimeSyncMethod OBJECT-TYPE
+    SYNTAX      RlTimeSyncMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Method to be used for time synchronization in the device."
+    DEFVAL      { none }
+    ::= { rlTimeZoneEntry 2 }
+
+rlTimeZoneTimeZoneOffset OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Offset from Greenwich time (format [+/-]hh:mm)."
+    ::= { rlTimeZoneEntry 3 }
+
+rlTimeZoneTimeZoneCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Code definition for current TimeZone."
+   ::= { rlTimeZoneEntry 4 }
+
+rlTimeZoneDaylightSavingTimeMode OBJECT-TYPE
+    SYNTAX      RlDaylightSavingTimeMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Daylight Saving Time - Recurring/Date/None."
+    DEFVAL      { none }
+   ::= { rlTimeZoneEntry 5 }
+
+rlTimeZoneDaylightSavingTimeStart OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(14))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Daylight Saving Time start date.
+                 In recurring mode (format 1): week wday month hh:mm
+                 In recurring mode (format 2): RJul n hh:mm
+                 In date mode:      month day year hh:mm
+                 week:  0-6  (0=First, 6=Last)
+                 wday:  1-7  (Sunday-Saturday)
+                 month: 1-12 (January-December)
+                 day:   1-31
+                 year:  0-99 (2000-2099)
+                 hh:    0-23 (hours)
+                 mm:    0-59 (minutes)
+                 n:     0-365 (zero-based Julian day of the year. Leap days shall be
+                               counted, and it is possible to refer to February 29).
+                 Format 2 for recurring mode is used only in the dynamic entry and
+                 should not be used in the static entry (with index 1)."
+   ::= { rlTimeZoneEntry 6 }
+
+rlTimeZoneDaylightSavingTimeEnd OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(14))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Daylight Saving Time start date.
+                 In recurring mode (format 1): week wday month hh:mm
+                 In recurring mode (format 2): RJul n hh:mm
+                 In date mode:      month day year hh:mm
+                 week:  0-6  (0=First, 6=Last)
+                 wday:  1-7  (Sunday-Saturday)
+                 month: 1-12 (January-December)
+                 day:   1-31
+                 year:  0-99 (2000-2099)
+                 hh:    0-23 (hours)
+                 mm:    0-59 (minutes)
+                 n:     0-365 (zero-based Julian day of the year. Leap days shall be
+                               counted, and it is possible to refer to February 29).
+                 Format 2 for recurring mode is used only in the dynamic entry and
+                 should not be used in the static entry (with index 1)."
+   ::= { rlTimeZoneEntry 7 }
+
+rlTimeZoneDaylightSavingTimeOffset OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Daylight Saving Time - The number of minutes to add to
+                 the clock during summer time."
+    DEFVAL      { 60 }
+    ::= { rlTimeZoneEntry 8 }
+
+rlTimeZoneDaylightSavingTimeCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Code definition for current Daylight Saving Time."
+   ::= { rlTimeZoneEntry 9 }
+
+rlTimeZoneTZDSTOffset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local Time Zone and Daylight Saving Time offset in seconds."
+   ::= { rlTimeZoneEntry 10 }
+
+rlTimeZoneTimeZoneName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Human readable string describing Local Time Zone and Daylight Saving Time."
+    ::= { rlTimeZoneEntry 11 }
+
+rlTimeZoneDataType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    static(1),
+                    dynamic(2)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type of data in this entry: static or dynamic."
+    DEFVAL      { static }
+        ::= { rlTimeZoneEntry 12 }
+
+rlTimeZoneDataSourceIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "IfIndex of the interface through which the dynamic data of this row has been learned.
+                     The value of this field will be 0 if rlTimeZoneTimeDataType is static (since it is
+                     relevant only for dynamic entry), and this is the only value allowed for SET in this case."
+        DEFVAL      { 0 }
+        ::= { rlTimeZoneEntry 13 }
+
+rlTimeZoneDataDynamicConfSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    dhcpv4(2),
+                    dhcpv6(3)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The source of dynamic data in this entry, for example: dhcpv4.
+                 Values other than 'none' are relevant only for dynamic entry."
+    DEFVAL      { none }
+        ::= { rlTimeZoneEntry 14 }
+
+
+rlClockStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       invalid(1),
+                       manuallySet(2),
+                       synchronizedBySntp(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current status of the clock. The value 'invalid' means time is meaninglesss,
+                     since it has neither been manually configured nor achieved as a result
+                     of SNTP synchronization."
+        ::=  {rlTimeSyncMethodMode 16 }
+
+rlDhcpTimezoneOptionEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Specifies whether the DHCP Timezone option (DHCPv4 option 100) is supported in the system.
+                     Setting this value to FALSE, will clear Timezone and Summertime dynamic configuration,
+                     so that:
+                     1) rlTimeZoneTimeZoneCode and rlTimeZoneDaylightSavingTimeCode length will
+                        be 0 for rlTimeZoneEntry whose index = 2 (dynamic entry).
+                     2) the operative values of Timezone and Summertime will be those
+                        statically configured. Thus, GET operations on the following
+                        MIB scalars will result is static values:
+                        rlTimeZone, rlTimeZoneCode, rlDaylightSavingTimeMode,
+                        rlDaylightSavingTimeStart, rlDaylightSavingTimeEnd, rlDaylightSavingTimeOffset,
+                        rlDaylightSavingTimeCode, rlTZDSTOffset."
+        ::=  {rlTimeSyncMethodMode 17 }
+
+rlAutomaticClockSetFromPCEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Specifies whether automatic set of time and date is permitted from
+                     connected host PC.
+                     The feature is meant to be used in order to initialize the clock
+                     after reboot (if SNTP is not in use), since the device does not have
+                     a realtime clock."
+        DEFVAL      { false }
+        ::=  {rlTimeSyncMethodMode 18 }
+
+rlTimeAndDateHaveBeenSet OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates whether the time and date have been set in the
+                     device, manually or through SNTP synchronization.
+                     If only time has been set, the value of this MIB will
+                     be FALSE. If only date has been set, the value of this MIB
+                     will be FALSE."
+        ::=  {rlTimeSyncMethodMode 19 }
+
+
+
+-- ----------------------------------------------------------------------
+-- SNTP/NTP client configuration parameters
+-- ----------------------------------------------------------------------
+
+RlSntpNtpSyncType   ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Method to be used for time synchronization in the device."
+    SYNTAX          INTEGER {
+                        none(1),
+                        unicast(2),
+                        anycast(3),
+                        broadcast(4)
+                    }
+
+RlSntpNtpSyncEntryType  ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Entry in rlSntpNtpConfigSrvTable."
+    SYNTAX          INTEGER {
+                        primaryPollSrv(1),
+                        syncSrv(2)
+                    }
+
+rlSntpNtpMibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SntpNtp Mib Version."
+        ::= { rlSntpNtpConfig 1 }
+
+rlSntpNtpConfigMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       none(1),
+                       unicast(2),
+                       anycast(3),
+                       multicast(4),
+                       unicastAnycast(5),
+                       unicastMulticast(6),
+                       anycastMulticast(7),
+                       unicastAnycastMulticast(8)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current configuration operational mode of SNTP/NTP client."
+        DEFVAL      { none }
+        ::= { rlSntpNtpConfig 2 }
+
+rlSntpNtpConfigSysStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of the local clock. If the value is set
+                     to 1, i.e., this is a primary reference, then the
+                     Primary-Clock procedure described in Section 3.4.6,
+                     in RFC-1305 is invoked."
+        ::= { rlSntpNtpConfig 3 }
+
+rlSntpNtpConfigPollInterval OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Period of time (in seconds) between succesive attempts to
+                     perform an update via SNTP."
+        DEFVAL      { 1024 }
+        ::= { rlSntpNtpConfig 4 }
+
+rlSntpNtpConfigPrimaryPollSrvAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Ip Address of a trusted SNTP server for polling."
+        ::= { rlSntpNtpConfig 5 }
+
+rlSntpNtpConfigPrimaryPollSrvMrid OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The mrid of the primary server."
+        ::= { rlSntpNtpConfig 6 }
+
+rlSntpNtpConfigPrimaryPollSrvIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interface addressed of the primary server."
+        ::= { rlSntpNtpConfig 7 }
+
+rlSntpNtpConfigPrimaryPollSrvStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of the primary polling server."
+        ::= { rlSntpNtpConfig 8 }
+
+rlSntpNtpConfigSyncSrvAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Ip Address of the synced server."
+        ::= { rlSntpNtpConfig 9 }
+
+rlSntpNtpConfigSyncSrvMrid OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The mrid of the synced server."
+        ::= { rlSntpNtpConfig 10 }
+
+rlSntpNtpConfigSyncSrvIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interface addressed of the synced server."
+        ::= { rlSntpNtpConfig 11 }
+
+rlSntpNtpConfigSyncSrvType OBJECT-TYPE
+        SYNTAX      RlSntpNtpSyncType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Synced server type."
+        DEFVAL      { none }
+        ::= { rlSntpNtpConfig 12 }
+
+
+rlSntpNtpConfigSyncSrvStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of the synced server."
+        ::= { rlSntpNtpConfig 13 }
+
+rlSntpNtpConfigRetryTimeout OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP/NTP requests Retry Interval."
+        ::= { rlSntpNtpConfig 14 }
+
+rlSntpNtpConfigRetryCnt OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP/NTP requests Retry Count."
+        ::= { rlSntpNtpConfig 15 }
+
+-- ----------------------------------------------------------------------
+-- SNTP Config Servers
+-- ----------------------------------------------------------------------
+
+-- Will replace next MIBs:
+
+--  rlSntpNtpConfigPrimaryPollSrvAddr
+--  rlSntpNtpConfigPrimaryPollSrvMrid
+--  rlSntpNtpConfigPrimaryPollSrvIfIndex
+--  rlSntpNtpConfigPrimaryPollSrvStratum
+
+--  rlSntpNtpConfigSyncSrvAddr
+--  rlSntpNtpConfigSyncSrvMrid
+--  rlSntpNtpConfigSyncSrvIfIndex
+--  rlSntpNtpConfigSyncSrvType
+--  rlSntpNtpConfigSyncSrvStratum
+
+rlSntpNtpConfigSrvTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpNtpConfigSrvEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing information about config servers."
+        ::= { rlSntpNtpConfig 16 }
+
+rlSntpNtpConfigSrvEntry OBJECT-TYPE
+        SYNTAX      RlSntpNtpConfigSrvEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry in rlSntpNtpConfigSrvTable."
+        INDEX       { rlSntpNtpConfigSrvEntryType }
+        ::= { rlSntpNtpConfigSrvTable 1 }
+
+RlSntpNtpConfigSrvEntry ::=
+        SEQUENCE {
+            rlSntpNtpConfigSrvEntryType         RlSntpNtpSyncEntryType,
+            rlSntpNtpConfigSrvInetAddressType   InetAddressType,
+            rlSntpNtpConfigSrvInetAddress       InetAddress,
+            rlSntpNtpConfigSrvMrid              INTEGER,
+            rlSntpNtpConfigSrvIfIndex           INTEGER,
+            rlSntpNtpConfigSrvSyncType          RlSntpNtpSyncType,
+            rlSntpNtpConfigSrvStratum           NTPStratum
+        }
+
+rlSntpNtpConfigSrvEntryType OBJECT-TYPE
+        SYNTAX      RlSntpNtpSyncEntryType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Server type: Synchronize Server or Primary Poll Server."
+        ::= { rlSntpNtpConfigSrvEntry 1 }
+
+rlSntpNtpConfigSrvInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Server inet address type."
+        ::= { rlSntpNtpConfigSrvEntry 2 }
+
+rlSntpNtpConfigSrvInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Server inet address."
+        ::= { rlSntpNtpConfigSrvEntry 3 }
+
+rlSntpNtpConfigSrvMrid OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The mrid of the server."
+        ::= { rlSntpNtpConfigSrvEntry 4 }
+
+rlSntpNtpConfigSrvIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interface addressed of the server."
+        ::= { rlSntpNtpConfigSrvEntry 5 }
+
+rlSntpNtpConfigSrvSyncType OBJECT-TYPE
+        SYNTAX      RlSntpNtpSyncType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The type of synchronization."
+        ::= { rlSntpNtpConfigSrvEntry 6 }
+
+rlSntpNtpConfigSrvStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of the synced server."
+        ::= { rlSntpNtpConfigSrvEntry 7 }
+
+-- ----------------------------------------------------------------------
+-- SNTP client configuration parameters
+-- ----------------------------------------------------------------------
+
+rlSntpClientMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       none(1),
+                       active(2),
+                       passive(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current operational mode of SNTP client."
+        DEFVAL      { none }
+        ::= { rlSntpConfig 1 }
+
+rlSntpUnicastAdminState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP Unicast Administrative state - Enable/Disable SNTP.
+                     In case of reinitializing polling or time
+                     synchronization this MIB is modified. The MIB can
+                     be enabled even thought it is already enabled."
+        DEFVAL      { disabled }
+        ::= { rlSntpConfig 2 }
+
+rlSntpBroadcastAdminState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2),
+                       ipv4OnlyEnabled(3),
+                       ipv6OnlyEnabled(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP Broadcast Administrative state - Enable/Disable SNTP.
+                     In case of reinitializing polling or time
+                     synchronization this MIB is modified. The MIB can
+                     be enabled even thought it is already enabled."
+        DEFVAL      { disabled }
+        ::= { rlSntpConfig 3 }
+
+rlSntpAnycastAdminState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2),
+                       ipv4OnlyEnabled(3),
+                       ipv6OnlyEnabled(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP Anycast Administrative state - Enable/Disable SNTP.
+                     In case of reinitializing polling or time
+                     synchronization this MIB is modified. The MIB can
+                     be enabled even thought it is already enabled."
+        DEFVAL      { disabled }
+        ::= { rlSntpConfig 4 }
+
+rlSntpUnicastPollState OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP Unicast poll state - TRUE for polled."
+        DEFVAL      { false }
+        ::= { rlSntpConfig 5 }
+
+rlSntpBroadcastPollState OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP Broadcast poll state - TRUE for polled."
+        DEFVAL      { false }
+        ::= { rlSntpConfig 6 }
+
+rlSntpAnycastPollState OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP Anycast poll state - TRUE for polled."
+        DEFVAL      { false }
+        ::= { rlSntpConfig 7 }
+
+rlSntpAuthenticationState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP authentication state- Enable/Disable SNTP."
+        DEFVAL      { disabled }
+        ::= { rlSntpConfig 8 }
+
+rlTimeValidFlag OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Is time valid."
+        DEFVAL      { false }
+        ::= { rlSntpConfig 9 }
+
+-- ----------------------------------------------------------------------
+-- Table for configuring Interfaces (Broadcast)
+-- ----------------------------------------------------------------------
+
+rlSntpConfigBroadcastTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpBroadcastEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing broadcast mode information per
+                     interface."
+        ::= { rlSntpConfig 10 }
+
+rlSntpBroadcastEntry OBJECT-TYPE
+        SYNTAX      RlSntpBroadcastEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Private paramters for interface:
+                     sntp status, broadcast mode."
+        INDEX       { rlSntpBroadcastIfIndex }
+        ::= { rlSntpConfigBroadcastTable 1 }
+
+RlSntpBroadcastEntry ::=
+        SEQUENCE {
+           rlSntpBroadcastIfIndex        INTEGER,
+           rlSntpBroadcastIfAdminState   INTEGER,
+           rlSntpBroadcastMode           INTEGER,
+           rlSntpBroadcastPolled         TruthValue,
+           rlSntpBroadcastAddress        IpAddress,
+           rlSntpBroadcastStratum        NTPStratum,
+           rlSntpBroadcastLastResp       NTPTimeStamp,
+           rlSntpBroadcastStatus         INTEGER,
+           rlSntpBroadcastOffset         NTPTimeStamp,
+           rlSntpBroadcastDelay          NTPSignedTimeValue,
+           rlSntpBroadcastRowStatus      RowStatus
+        }
+
+rlSntpBroadcastIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The interface addressed by this entry."
+        ::=  {rlSntpBroadcastEntry 1}
+
+rlSntpBroadcastIfAdminState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP interface Adminstrative state- Enable/Disable SNTP.
+                     In case of reinitializing polling or time
+                     synchronization this MIB is modified. The MIB can
+                     be enabled even thought it is already enabled."
+        DEFVAL      { disabled }
+        ::= { rlSntpBroadcastEntry 2 }
+
+rlSntpBroadcastMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       none(1),
+                       receive(2),
+                       send(3),
+                       receiveSend(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP/NTP Broadcast Mode.
+                     none        - no broadcast SNTP packets are received or sent.
+                     Receive     - host only receive SNTP packets that were sent
+                                   to broadcast address (were not directed to
+                                   the host). This is multicast mode in the RFC.
+                     Send        - host only send SNTP packets and wait for replies
+                                   directed to the host. This is anycast mode in
+                                   the RFC.
+                     ReceiveSend - host receive broadcast messages (destination
+                                   is broadcast address in the received messages)
+                                   and send SNTP packets to wait for replies
+                                   directed to the host (destination address
+                                   of the reply is the host address). This mode
+                                   combines anycast and multicast modes in the
+                                   RFC."
+        DEFVAL      { receiveSend }
+        ::= { rlSntpBroadcastEntry 3 }
+
+rlSntpBroadcastPolled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "TRUE if participating in polling cycle, else FALSE."
+        DEFVAL { false }
+        ::= {  rlSntpBroadcastEntry 4 }
+
+rlSntpBroadcastAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Ip Address of a trusted SNTP server."
+        ::= { rlSntpBroadcastEntry 5 }
+
+rlSntpBroadcastStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpBroadcastEntry 6 }
+
+rlSntpBroadcastLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Broadcast Last Response Time"
+        ::= { rlSntpBroadcastEntry 7 }
+
+rlSntpBroadcastStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Broadcast.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpBroadcastEntry 8 }
+
+rlSntpBroadcastOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpBroadcastEntry 9 }
+
+rlSntpBroadcastDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpBroadcastEntry 10 }
+
+rlSntpBroadcastRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The Status of this SNTP broadcast interface
+                     information."
+        ::= { rlSntpBroadcastEntry 11 }
+
+
+
+-- ----------------------------------------------------------------------
+-- Table for configuring Interfaces (Anycast)
+-- ----------------------------------------------------------------------
+
+rlSntpConfigAnycastTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpAnycastEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing anycast information per
+                     interface."
+        ::= { rlSntpConfig 11 }
+
+rlSntpAnycastEntry OBJECT-TYPE
+        SYNTAX      RlSntpAnycastEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Private paramters for interface:
+                     server info."
+        INDEX       { rlSntpAnycastIfIndex }
+        ::= { rlSntpConfigAnycastTable 1 }
+
+RlSntpAnycastEntry ::=
+        SEQUENCE {
+           rlSntpAnycastIfIndex          INTEGER,
+           rlSntpAnycastAddress          IpAddress,
+           rlSntpAnycastStratum          NTPStratum,
+           rlSntpAnycastLastResp         NTPTimeStamp,
+           rlSntpAnycastStatus           INTEGER,
+           rlSntpAnycastOffset           NTPTimeStamp,
+           rlSntpAnycastDelay            NTPSignedTimeValue,
+           rlSntpAnycastRowStatus        RowStatus
+        }
+
+rlSntpAnycastIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The interface addressed by this entry."
+        ::=  {rlSntpAnycastEntry 1}
+
+rlSntpAnycastAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Ip Address of a trusted SNTP server."
+        ::= { rlSntpAnycastEntry 2 }
+
+rlSntpAnycastStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpAnycastEntry 3 }
+
+rlSntpAnycastLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Anycast Last Response Time"
+        ::= { rlSntpAnycastEntry 4 }
+
+rlSntpAnycastStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Anycast.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpAnycastEntry 5 }
+
+rlSntpAnycastOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAnycastEntry 6 }
+
+rlSntpAnycastDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAnycastEntry 7 }
+
+rlSntpAnycastRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The Status of this SNTP anycast interface
+                     information."
+        ::= { rlSntpAnycastEntry 8 }
+
+-- ----------------------------------------------------------------------
+-- Table for configuring Servers (Unicast)
+-- ----------------------------------------------------------------------
+
+rlSntpConfigServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing trusted SNTP servers to be queried in
+                     unicast or broadcast mode."
+        ::= { rlSntpConfig 12 }
+
+rlSntpServerEntry OBJECT-TYPE
+        SYNTAX      RlSntpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A trusted server."
+        INDEX       { rlSntpServerAddress }
+        ::= { rlSntpConfigServerTable 1 }
+
+RlSntpServerEntry ::=
+        SEQUENCE {
+           rlSntpServerAddress           IpAddress,
+           rlSntpServerPolled            TruthValue,
+           rlSntpServerStratum           NTPStratum,
+           rlSntpServerLastResp          NTPTimeStamp,
+           rlSntpServerStatus            INTEGER,
+           rlSntpServersOffset           NTPTimeStamp,
+           rlSntpServersDelay            NTPSignedTimeValue,
+           rlSntpServersKeyIdentifier    Unsigned32,
+           rlSntpServerRowStatus         RowStatus
+        }
+
+rlSntpServerAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Ip Address of a trusted SNTP server."
+        ::= { rlSntpServerEntry 1 }
+
+rlSntpServerPolled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "TRUE if participating in polling cycle, else FALSE."
+        DEFVAL { false }
+        ::= {  rlSntpServerEntry 2 }
+
+rlSntpServerStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpServerEntry 3 }
+
+rlSntpServerLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Server Last Response Time"
+        ::= { rlSntpServerEntry 4 }
+
+rlSntpServerStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Server.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpServerEntry 5 }
+
+rlSntpServersOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpServerEntry 6 }
+
+rlSntpServersDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpServerEntry 7 }
+
+rlSntpServersKeyIdentifier OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Authentication key identifier. The valid range is
+                     1-4294967295.
+                     Value zero, means no authentication is being done."
+        ::= { rlSntpServerEntry 8 }
+
+rlSntpServerRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The Status of this SNTP server information."
+        ::= { rlSntpServerEntry 9 }
+
+-- ----------------------------------------------------------------------
+-- Table for configuring authentication keys
+-- ----------------------------------------------------------------------
+
+rlSntpConfigAuthenticationTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpAuthenticationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table authentication keys."
+        ::= { rlSntpConfig 13 }
+
+rlSntpAuthenticationEntry OBJECT-TYPE
+        SYNTAX      RlSntpAuthenticationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Keys information for authenticationof NTP packets."
+        INDEX       { rlSntpAuthenticationKeyID }
+        ::= { rlSntpConfigAuthenticationTable 1 }
+
+RlSntpAuthenticationEntry ::=
+        SEQUENCE {
+           rlSntpAuthenticationKeyID        Unsigned32 (1..4294967295),
+           rlSntpAuthenticationKeyValue     DisplayString,
+           rlSntpAuthenticationKeyState     INTEGER,
+           rlSntpAuthenticationRowStatus    RowStatus
+        }
+
+rlSntpAuthenticationKeyID OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The key identifier. Valid rabge for key identifier
+                     is 1-4294967295."
+        ::=  {rlSntpAuthenticationEntry 1}
+
+rlSntpAuthenticationKeyValue OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..8))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Key value."
+        ::= { rlSntpAuthenticationEntry 2 }
+
+rlSntpAuthenticationKeyState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Authentication key state - Enable/Disable key."
+        DEFVAL      { disabled }
+        ::= { rlSntpAuthenticationEntry 3 }
+
+rlSntpAuthenticationRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The Status of this Authentication key information."
+        ::= { rlSntpAuthenticationEntry 4 }
+
+rlSntpPort OBJECT-TYPE
+        SYNTAX      INTEGER (1.. 65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "User defined SNTP port."
+        DEFVAL      { 123 }
+        ::= { rlSntpConfig 14 }
+
+
+-- ----------------------------------------------------------------------
+-- IPv6 Support
+-- ----------------------------------------------------------------------
+
+-- ----------------------------------------------------------------------
+-- IPv6: Table for configuring Interfaces (Broadcast)
+-- ----------------------------------------------------------------------
+
+rlSntpConfigBroadcastInetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpBroadcastInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing broadcast mode information per
+                     interface."
+        ::= { rlSntpConfig 15 }
+
+rlSntpBroadcastInetEntry OBJECT-TYPE
+        SYNTAX      RlSntpBroadcastInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Private paramters for interface:
+                     sntp status, broadcast mode."
+        INDEX       { rlSntpBroadcastInetIfIndex }
+        ::= { rlSntpConfigBroadcastInetTable 1 }
+
+RlSntpBroadcastInetEntry ::=
+        SEQUENCE {
+           rlSntpBroadcastInetIfIndex       INTEGER,
+           rlSntpBroadcastInetIfAdminState  INTEGER,
+           rlSntpBroadcastInetMode          INTEGER,
+           rlSntpBroadcastInetPolled        TruthValue,
+           rlSntpBroadcastInetAddressType   InetAddressType,
+           rlSntpBroadcastInetAddress       InetAddress,
+           rlSntpBroadcastInetStratum       NTPStratum,
+           rlSntpBroadcastInetLastResp      NTPTimeStamp,
+           rlSntpBroadcastInetStatus        INTEGER,
+           rlSntpBroadcastInetOffset        NTPTimeStamp,
+           rlSntpBroadcastInetDelay         NTPSignedTimeValue,
+           rlSntpBroadcastInetRowStatus     RowStatus
+        }
+
+rlSntpBroadcastInetIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The interface addressed by this entry."
+        ::=  {rlSntpBroadcastInetEntry 1}
+
+rlSntpBroadcastInetIfAdminState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       enabled(1),
+                       disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP interface Adminstrative state- Enable/Disable SNTP.
+                     In case of reinitializing polling or time
+                     synchronization this MIB is modified. The MIB can
+                     be enabled even thought it is already enabled."
+        DEFVAL      { disabled }
+        ::= { rlSntpBroadcastInetEntry 2 }
+
+rlSntpBroadcastInetMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       none(1),
+                       receive(2),
+                       send(3),
+                       receiveSend(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "SNTP/NTP Broadcast Mode.
+                     none        - no broadcast SNTP packets are received or sent.
+                     Receive     - host only receive SNTP packets that were sent
+                                   to broadcast address (were not directed to
+                                   the host). This is multicast mode in the RFC.
+                     Send        - host only send SNTP packets and wait for replies
+                                   directed to the host. This is anycast mode in
+                                   the RFC.
+                     ReceiveSend - host receive broadcast messages (destination
+                                   is broadcast address in the received messages)
+                                   and send SNTP packets to wait for replies
+                                   directed to the host (destination address
+                                   of the reply is the host address). This mode
+                                   combines anycast and multicast modes in the
+                                   RFC."
+        DEFVAL      { receiveSend }
+        ::= { rlSntpBroadcastInetEntry 3 }
+
+rlSntpBroadcastInetPolled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "TRUE if participating in polling cycle, else FALSE."
+        DEFVAL { false }
+        ::= {  rlSntpBroadcastInetEntry 4 }
+
+rlSntpBroadcastInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Inet Address Type of a trusted SNTP server."
+        ::= { rlSntpBroadcastInetEntry 5 }
+
+rlSntpBroadcastInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Inet Address of a trusted SNTP server."
+        ::= { rlSntpBroadcastInetEntry 6 }
+
+rlSntpBroadcastInetStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpBroadcastInetEntry 7 }
+
+rlSntpBroadcastInetLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Broadcast Last Response Time"
+        ::= { rlSntpBroadcastInetEntry 8 }
+
+rlSntpBroadcastInetStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Broadcast.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpBroadcastInetEntry 9 }
+
+rlSntpBroadcastInetOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpBroadcastInetEntry 10 }
+
+rlSntpBroadcastInetDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpBroadcastInetEntry 11 }
+
+rlSntpBroadcastInetRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The Status of this SNTP broadcast interface
+                     information."
+        ::= { rlSntpBroadcastInetEntry 12 }
+
+-- ----------------------------------------------------------------------
+-- IPv6: Table for configuring Interfaces (Anycast)
+-- ----------------------------------------------------------------------
+
+rlSntpConfigAnycastInetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpAnycastInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing anycast information per
+                     interface."
+        ::= { rlSntpConfig 16 }
+
+rlSntpAnycastInetEntry OBJECT-TYPE
+        SYNTAX      RlSntpAnycastInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Private paramters for interface:
+                     server info."
+        INDEX       { rlSntpAnycastInetIfIndex }
+        ::= { rlSntpConfigAnycastInetTable 1 }
+
+RlSntpAnycastInetEntry ::=
+        SEQUENCE {
+           rlSntpAnycastInetIfIndex          INTEGER,
+           rlSntpAnycastInetAddressType      InetAddressType,
+           rlSntpAnycastInetAddress          InetAddress,
+           rlSntpAnycastInetStratum          NTPStratum,
+           rlSntpAnycastInetLastResp         NTPTimeStamp,
+           rlSntpAnycastInetStatus           INTEGER,
+           rlSntpAnycastInetOffset           NTPTimeStamp,
+           rlSntpAnycastInetDelay            NTPSignedTimeValue,
+           rlSntpAnycastInetRowStatus        RowStatus
+        }
+
+rlSntpAnycastInetIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The interface addressed by this entry."
+        ::=  {rlSntpAnycastInetEntry 1}
+
+rlSntpAnycastInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Inet Address Type of a trusted SNTP server."
+        ::= { rlSntpAnycastInetEntry 2 }
+
+rlSntpAnycastInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Inet Address of a trusted SNTP server."
+        ::= { rlSntpAnycastInetEntry 3 }
+
+rlSntpAnycastInetStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpAnycastInetEntry 4 }
+
+rlSntpAnycastInetLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Anycast Last Response Time"
+        ::= { rlSntpAnycastInetEntry 5 }
+
+rlSntpAnycastInetStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Anycast.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpAnycastInetEntry 6 }
+
+rlSntpAnycastInetOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAnycastInetEntry 7 }
+
+rlSntpAnycastInetDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAnycastInetEntry 8 }
+
+rlSntpAnycastInetRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The Status of this SNTP anycast interface
+                     information."
+        ::= { rlSntpAnycastInetEntry 9 }
+
+-- ----------------------------------------------------------------------
+-- IPv6: Table for configuring Servers (Unicast)
+-- ----------------------------------------------------------------------
+
+rlSntpConfigServerInetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpServerInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing trusted SNTP servers to be queried in
+                     unicast or broadcast mode."
+        ::= { rlSntpConfig 17 }
+
+rlSntpServerInetEntry OBJECT-TYPE
+        SYNTAX      RlSntpServerInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A trusted server."
+        INDEX       {   rlSntpServerInetAddressType,
+                        rlSntpServerInetAddress }
+        ::= { rlSntpConfigServerInetTable 1 }
+
+RlSntpServerInetEntry ::=
+        SEQUENCE {
+           rlSntpServerInetAddressType      InetAddressType,
+           rlSntpServerInetAddress          InetAddress,
+           rlSntpServerInetPolled           TruthValue,
+           rlSntpServerInetStratum          NTPStratum,
+           rlSntpServerInetLastResp         NTPTimeStamp,
+           rlSntpServerInetStatus           INTEGER,
+           rlSntpServerInetOffset           NTPTimeStamp,
+           rlSntpServerInetDelay            NTPSignedTimeValue,
+           rlSntpServerInetKeyIdentifier    Unsigned32,
+           rlSntpServerInetRowStatus        RowStatus
+        }
+
+rlSntpServerInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Inet Address Type of a trusted SNTP server."
+        ::= { rlSntpServerInetEntry 1 }
+
+rlSntpServerInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Inet Address of a trusted SNTP server."
+        ::= { rlSntpServerInetEntry 2 }
+
+rlSntpServerInetPolled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "TRUE if participating in polling cycle, else FALSE."
+        DEFVAL { false }
+        ::= {  rlSntpServerInetEntry 3 }
+
+rlSntpServerInetStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpServerInetEntry 4 }
+
+rlSntpServerInetLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Server Last Response Time"
+        ::= { rlSntpServerInetEntry 5 }
+
+rlSntpServerInetStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Server.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpServerInetEntry 6 }
+
+rlSntpServerInetOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpServerInetEntry 7 }
+
+rlSntpServerInetDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpServerInetEntry 8 }
+
+rlSntpServerInetKeyIdentifier OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Authentication key identifier. The valid range is
+                     1-4294967295.
+                     Value zero, means no authentication is being done."
+        ::= { rlSntpServerInetEntry 9 }
+
+rlSntpServerInetRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The Status of this SNTP server information."
+        ::= { rlSntpServerInetEntry 10 }
+
+
+rlSntpAllServerInetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RlSntpAllServerInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table containing all SNTP servers (for example: statically
+                     configured, dynamically configured) to be queried in unicast
+                     or broadcast mode."
+        ::= { rlSntpConfig 18 }
+
+rlSntpAllServerInetEntry OBJECT-TYPE
+        SYNTAX      RlSntpAllServerInetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A server entry."
+
+        INDEX       {   rlSntpAllServerSource,
+                        rlSntpAllServerIfIndex,
+                        rlSntpAllServerPreference,
+                        rlSntpAllServerInetAddressType,
+                        rlSntpAllServerInetAddress
+                    }
+        ::= { rlSntpAllServerInetTable 1 }
+
+RlSntpAllServerInetEntry ::=
+        SEQUENCE {
+           rlSntpAllServerSource              INTEGER,
+           rlSntpAllServerIfIndex             InterfaceIndex,
+           rlSntpAllServerPreference          INTEGER,
+           rlSntpAllServerInetAddressType     InetAddressType,
+           rlSntpAllServerInetAddress         InetAddress,
+           rlSntpAllServerInetPolled          TruthValue,
+           rlSntpAllServerInetStratum         NTPStratum,
+           rlSntpAllServerInetLastResp        NTPTimeStamp,
+           rlSntpAllServerInetStatus          INTEGER,
+           rlSntpAllServerInetOffset          NTPTimeStamp,
+           rlSntpAllServerInetDelay           NTPSignedTimeValue,
+           rlSntpAllServerInetKeyIdentifier   Unsigned32
+        }
+
+rlSntpAllServerSource OBJECT-TYPE
+        SYNTAX INTEGER {
+         static(1),
+         dhcpv6(2)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The SNTP server source: static means manually defined,
+                     dhcpv6 means learnt from DHCP. Only static entries are
+                     stored in CDB."
+        ::= { rlSntpAllServerInetEntry 1 }
+
+rlSntpAllServerIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex from which the SNTP server configuration was
+                     received (for dhcpv6 configurations). For static entries
+                     the value of this field will always be 1. "
+        ::= { rlSntpAllServerInetEntry 2 }
+
+rlSntpAllServerPreference OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The preference of SNTP server (for dhcpv6 configurations).
+                     For static entries the value of this field will always be 0. "
+        ::= { rlSntpAllServerInetEntry 3 }
+
+rlSntpAllServerInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "SNTP server inet address type."
+        ::= { rlSntpAllServerInetEntry 4 }
+
+rlSntpAllServerInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "SNTP server inet address."
+        ::= { rlSntpAllServerInetEntry 5 }
+
+rlSntpAllServerInetPolled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "TRUE if participating in polling cycle, else FALSE."
+        DEFVAL { false }
+        ::= {  rlSntpAllServerInetEntry 6 }
+
+rlSntpAllServerInetStratum OBJECT-TYPE
+        SYNTAX      NTPStratum
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The stratum of this server."
+        ::= { rlSntpAllServerInetEntry 7 }
+
+rlSntpAllServerInetLastResp OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "SNTP Server Last Response Time"
+        ::= { rlSntpAllServerInetEntry 8 }
+
+rlSntpAllServerInetStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       unknown(1),
+                       inProcess(2),
+                       up(3),
+                       down(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Operational State of the remote IP Address of
+                     the SNTP Server.
+                     unknown     - requests were not sent yet.
+                     inProcess   - replies were not received yet.
+                     up          - server sent SNTP packets.
+                     down        - server stopped sending SNTP packets."
+        DEFVAL      { unknown }
+        ::= { rlSntpAllServerInetEntry 9 }
+
+rlSntpAllServerInetOffset OBJECT-TYPE
+        SYNTAX      NTPTimeStamp
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated offset of the server's clock relative to
+                 the local clock, in seconds.  The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAllServerInetEntry 10 }
+
+rlSntpAllServerInetDelay OBJECT-TYPE
+        SYNTAX      NTPSignedTimeValue
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The estimated round-trip delay of the server's clock
+                 relative to the local clock over the network path
+                 between them, in seconds. The host determines the
+                 value of this object using the algorithm described in
+                 RFC 2030."
+        ::= { rlSntpAllServerInetEntry 11 }
+
+rlSntpAllServerInetKeyIdentifier OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Authentication key identifier. The valid range is
+                     1-4294967295.
+                     Value zero, means no authentication is being done."
+        ::= { rlSntpAllServerInetEntry 12 }
+
+
+
+END

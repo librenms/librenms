@@ -1,0 +1,82 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2002-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+juniperMIB MODULE-IDENTITY
+    LAST-UPDATED "200304170100Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+    DESCRIPTION
+            "The Structure of Management Information for Juniper Networks."
+    REVISION    "200304170100Z" -- 17-Apr-03
+    DESCRIPTION
+            "Added jnxExperiment branch."
+    ::= { enterprises 2636 }
+
+--
+-- Juniper MIB tree structure
+--
+
+jnxProducts OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Product OIDs."
+    ::= { juniperMIB 1 }
+
+jnxServices OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Services OIDs."
+    ::= { juniperMIB 2 }
+
+jnxMibs OBJECT-IDENTITY 
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's MIB objects."
+    ::= { juniperMIB 3 }
+
+jnxTraps OBJECT-IDENTITY 
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Trap OIDs."
+    ::= { juniperMIB 4 }
+
+    jnxChassisTraps       OBJECT IDENTIFIER ::= { jnxTraps 1 }
+    jnxChassisOKTraps     OBJECT IDENTIFIER ::= { jnxTraps 2 }
+    jnxRmonTraps          OBJECT IDENTIFIER ::= { jnxTraps 3 }
+    jnxLdpTraps           OBJECT IDENTIFIER ::= { jnxTraps 4 }
+    jnxCmNotifications    OBJECT IDENTIFIER ::= { jnxTraps 5 }
+    jnxSonetNotifications OBJECT IDENTIFIER ::= { jnxTraps 6 }
+    jnxPMonNotifications  OBJECT IDENTIFIER ::= { jnxTraps 7 }
+
+
+--  This is the top-level object identifier registry used by Juniper
+--  products for SNMP modules containing experimental MIB definitions.
+--  In this context, experimental MIBs are defined as:
+--    1) IETF work-in-process MIBs which have not been assigned a permanent
+--       object identifier by the IANA.
+--    2) Juniper work-in-process MIBs that have not achieved final
+--       production quality or field experience.
+--   NOTE: Support for MIBs under the this OID subtree is temporary and
+--         changes to objects may occur without notice."
+
+jnxExperiment  OBJECT IDENTIFIER ::= { juniperMIB 5 }
+
+END

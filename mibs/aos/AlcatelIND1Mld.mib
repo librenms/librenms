@@ -1,0 +1,1493 @@
+ALCATEL-IND1-MLD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    InetAddressIPv6,InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    softentIND1Mld
+        FROM ALCATEL-IND1-BASE;
+
+alcatelIND1MldMIB MODULE-IDENTITY
+    LAST-UPDATED "200809100000Z" 
+    ORGANIZATION "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+         
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+        
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+        
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+         
+             Proprietary IPv6 Multicast MIB definitions
+         
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+         
+         No liability shall be assumed for any incidental, indirect, special,
+         or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+         
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+         
+                     Copyright (C) 1995-2007 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200809100000Z"
+    DESCRIPTION
+        "Add flood unknown object"
+    REVISION      "200808080000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module. Added maximum group limit objects."
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The revised version of this MIB Module."
+
+    ::= { softentIND1Mld 1 }
+
+alcatelIND1MldMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1MldMIB 1 }
+
+
+--
+--  System Configuration
+--
+
+alaMld OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 1 }
+
+alaMldStatus OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IPv6 multicast switching and routing 
+         on the system."
+    DEFVAL        { disable }
+    ::= { alaMld 1 }
+
+alaMldQuerying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Querying on the system."
+    DEFVAL        { disable }
+    ::= { alaMld 2 }
+
+alaMldSpoofing OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Spoofing on the system."
+    DEFVAL        { disable }
+    ::= { alaMld 3 }
+
+alaMldZapping OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Zapping on the system."
+    DEFVAL        { disable }
+    ::= { alaMld 4 }
+
+alaMldVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the default MLD protocol Version running on the system."
+    DEFVAL        { 1 }
+    ::= { alaMld 5 }
+
+alaMldRobustness OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Robustness variable used on the system."
+    DEFVAL        { 2 }
+    ::= { alaMld 6 }
+
+alaMldQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Query Interval used on the system."
+    DEFVAL        { 125 }
+    ::= { alaMld 7 }
+
+alaMldQueryResponseInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Query Response Interval on the system."
+    DEFVAL        { 10000 }
+    ::= { alaMld 8 }
+
+alaMldLastMemberQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Last Member Query Interval on the system."
+    DEFVAL        { 1000 }
+    ::= { alaMld 9 }
+
+alaMldRouterTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The MLD Router Timeout on the system."
+    DEFVAL        { 90 }
+    ::= { alaMld 10 }
+
+alaMldSourceTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The MLD Source Timeout on the system."
+    DEFVAL        { 30 }
+    ::= { alaMld 11 }
+
+alaMldProxying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Proxying on the system."
+    DEFVAL        { disable }
+    ::= { alaMld 12 }
+
+alaMldUnsolicitedReportInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The MLD Unsolicited Report Interval on the system."
+    DEFVAL        { 1 }
+    ::= { alaMld 13 }
+
+alaMldQuerierForwarding OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Querier Forwarding on the system."
+    DEFVAL        { disable }
+    ::= { alaMld 14 }
+
+alaMldMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32  
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The global limit on maximum number of MLD Group memberships that can be learnt on each 
+	port/vlan instance."
+    DEFVAL 		{0}
+    ::= { alaMld 15 }
+
+alaMldMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The global configuration of action to be taken when MLD group membership limit is exceeded on a 
+	port/vlan instance."
+    DEFVAL        { none }
+    ::= { alaMld 16 }
+alaMldFloodUnknown OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable flooding of multicast data packets during flow
+    learning and setup."
+    DEFVAL        { disable }
+    ::= { alaMld 17 }
+
+
+--
+--  VLAN Configuration Table
+--
+
+alaMldVlan OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 2 }
+
+alaMldVlanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldVlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The VLAN table contains the information on which IPv6 multicast
+         switching and routing is configured."
+    ::= { alaMldVlan 1 }
+
+alaMldVlanEntry OBJECT-TYPE
+    SYNTAX          MldVlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponds to a VLAN on which IPv6 multicast switching
+         and routing is configured."
+    INDEX         { 
+                    alaMldVlanIndex 
+                  }
+    ::= { alaMldVlanTable 1 }
+
+MldVlanEntry ::= SEQUENCE {
+    alaMldVlanIndex                       Unsigned32,
+    alaMldVlanStatus                      INTEGER,
+    alaMldVlanQuerying                    INTEGER,
+    alaMldVlanSpoofing                    INTEGER,
+    alaMldVlanZapping                     INTEGER,
+    alaMldVlanVersion                     Unsigned32,
+    alaMldVlanRobustness                  Unsigned32,
+    alaMldVlanQueryInterval               Unsigned32,
+    alaMldVlanQueryResponseInterval       Unsigned32,
+    alaMldVlanLastMemberQueryInterval     Unsigned32,
+    alaMldVlanRouterTimeout               Unsigned32,
+    alaMldVlanSourceTimeout               Unsigned32,
+    alaMldVlanProxying                    INTEGER,
+    alaMldVlanUnsolicitedReportInterval   Unsigned32,
+    alaMldVlanQuerierForwarding           INTEGER,
+    alaMldVlanMaxGroupLimit  		  Unsigned32,
+    alaMldVlanMaxGroupExceedAction        INTEGER,
+    alaMldVlanSpoofAddressType		  InetAddressType,
+    alaMldVlanSpoofAddress                InetAddress
+}
+
+alaMldVlanIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The VLAN on which IPv6 multicast switching and routing 
+         is configured."
+    ::= { alaMldVlanEntry 1 }
+
+alaMldVlanStatus OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IPv6 multicast switching and routing 
+         on the VLAN."
+    ::= { alaMldVlanEntry 2 }
+
+alaMldVlanQuerying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Querying on the VLAN."
+    ::= { alaMldVlanEntry 3 }
+
+alaMldVlanSpoofing OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Spoofing on the VLAN."
+    ::= { alaMldVlanEntry 4 }
+
+alaMldVlanZapping OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Zapping on the VLAN."
+    ::= { alaMldVlanEntry 5 }
+
+alaMldVlanVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the default MLD protocol Version running on the VLAN."
+    ::= { alaMldVlanEntry 6 }
+
+alaMldVlanRobustness OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Robustness variable used on the VLAN."
+    ::= { alaMldVlanEntry 7 }
+
+alaMldVlanQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Query Interval used on the VLAN."
+    ::= { alaMldVlanEntry 8 }
+
+alaMldVlanQueryResponseInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Query Response Interval on the VLAN."
+    ::= { alaMldVlanEntry 9 }
+
+alaMldVlanLastMemberQueryInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Last Member Query Interval on the VLAN."
+    ::= { alaMldVlanEntry 10 }
+
+alaMldVlanRouterTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Router Timeout on the VLAN."
+    ::= { alaMldVlanEntry 11 }
+
+alaMldVlanSourceTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Source Timeout on the VLAN."
+    ::= { alaMldVlanEntry 12 }
+
+alaMldVlanProxying OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Proxying on the VLAN."
+    ::= { alaMldVlanEntry 13 }
+
+alaMldVlanUnsolicitedReportInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the MLD Unsolicited Report Interval on the VLAN."
+    ::= { alaMldVlanEntry 14 }
+
+alaMldVlanQuerierForwarding OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Querier Forwarding on the VLAN."
+    ::= { alaMldVlanEntry 15 }
+
+alaMldVlanMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of MLD Group memberships that can be learnt on the VLAN."
+    DEFVAL 		{0}
+    ::= { alaMldVlanEntry 16 }
+
+alaMldVlanMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when the MLD group membership limit is exceeded on the VLAN."
+    DEFVAL        { none }
+    ::= { alaMldVlanEntry 17 }
+
+alaMldVlanSpoofAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType(1..2)
+    MAX-ACCESS      read-write
+    STATUS          obsolete 
+    DESCRIPTION
+        "Set the type of SpoofAddress for the VLAN."
+    ::= { alaMldVlanEntry 18 }
+
+alaMldVlanSpoofAddress OBJECT-TYPE   
+    SYNTAX          InetAddress        
+    MAX-ACCESS      read-write   
+    STATUS          obsolete   
+    DESCRIPTION   
+        "Set the SpoofAddress for the VLAN."   
+    ::= { alaMldVlanEntry 19 } 
+
+--
+--  Group Membership Table
+--
+
+alaMldMember OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 3 }
+
+alaMldMemberTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the MLD group membership information."
+    ::= { alaMldMember 1 }
+
+alaMldMemberEntry OBJECT-TYPE
+    SYNTAX          MldMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an MLD group membership request."
+    INDEX         { 
+                    alaMldMemberVlan,
+                    alaMldMemberIfIndex,
+                    alaMldMemberGroupAddress,
+                    alaMldMemberSourceAddress
+                  }
+    ::= { alaMldMemberTable 1 }
+
+MldMemberEntry ::= SEQUENCE {
+    alaMldMemberVlan                      Unsigned32,
+    alaMldMemberIfIndex                   InterfaceIndex,
+    alaMldMemberGroupAddress              InetAddressIPv6,
+    alaMldMemberSourceAddress             InetAddressIPv6,
+    alaMldMemberMode                      INTEGER,
+    alaMldMemberCount                     Counter32,
+    alaMldMemberTimeout                   TimeTicks
+}
+
+alaMldMemberVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's VLAN."
+    ::= { alaMldMemberEntry 1 }
+
+alaMldMemberIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's ifIndex."
+    ::= { alaMldMemberEntry 2 }
+
+alaMldMemberGroupAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv6 group address."
+    ::= { alaMldMemberEntry 3 }
+
+alaMldMemberSourceAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's IPv6 source address."
+    ::= { alaMldMemberEntry 4 }
+
+alaMldMemberMode OBJECT-TYPE
+    SYNTAX          INTEGER { include(1), exclude(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's MLD source filter mode."
+    ::= { alaMldMemberEntry 5 }
+
+alaMldMemberCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's counter."
+    ::= { alaMldMemberEntry 6 }
+
+alaMldMemberTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The group membership request's timeout."
+    ::= { alaMldMemberEntry 7 }
+
+
+--
+--  Static Group Membership Table
+--
+
+alaMldStaticMember OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 4 }
+
+alaMldStaticMemberTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the static MLD group membership information."
+    ::= { alaMldStaticMember 1 }
+
+alaMldStaticMemberEntry OBJECT-TYPE
+    SYNTAX          MldStaticMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a static MLD group membership request."
+    INDEX         { 
+                    alaMldStaticMemberVlan,
+                    alaMldStaticMemberIfIndex,
+                    alaMldStaticMemberGroupAddress
+                  }
+    ::= { alaMldStaticMemberTable 1 }
+
+MldStaticMemberEntry ::= SEQUENCE {
+    alaMldStaticMemberVlan                Unsigned32,
+    alaMldStaticMemberIfIndex             InterfaceIndex,
+    alaMldStaticMemberGroupAddress        InetAddressIPv6,
+    alaMldStaticMemberRowStatus           RowStatus
+}
+
+alaMldStaticMemberVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The static group membership request's VLAN."
+    ::= { alaMldStaticMemberEntry 1 }
+
+alaMldStaticMemberIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The static group membership request's ifIndex."
+    ::= { alaMldStaticMemberEntry 2 }
+
+alaMldStaticMemberGroupAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The static group membership request's IPv6 group address."
+    ::= { alaMldStaticMemberEntry 3 }
+
+alaMldStaticMemberRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticMemberEntry 4 }
+
+
+--
+--  Neighbor Table
+--
+
+alaMldNeighbor OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 5 }
+
+alaMldNeighborTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldNeighborEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the neighboring IP multicast routers."
+    ::= { alaMldNeighbor 1 }
+
+alaMldNeighborEntry OBJECT-TYPE
+    SYNTAX          MldNeighborEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast router."
+    INDEX         { 
+                    alaMldNeighborVlan,
+                    alaMldNeighborIfIndex,
+                    alaMldNeighborHostAddress
+                  }
+    ::= { alaMldNeighborTable 1 }
+
+MldNeighborEntry ::= SEQUENCE {
+    alaMldNeighborVlan                    Unsigned32,
+    alaMldNeighborIfIndex                 InterfaceIndex,
+    alaMldNeighborHostAddress             InetAddressIPv6,
+    alaMldNeighborCount                   Counter32,
+    alaMldNeighborTimeout                 TimeTicks
+}
+
+alaMldNeighborVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's VLAN."
+    ::= { alaMldNeighborEntry 1 }
+
+alaMldNeighborIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's ifIndex."
+    ::= { alaMldNeighborEntry 2 }
+
+alaMldNeighborHostAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's IPv6 host address."
+    ::= { alaMldNeighborEntry 3 }
+
+alaMldNeighborCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's counter."
+    ::= { alaMldNeighborEntry 4 }
+
+alaMldNeighborTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast router's timeout."
+    ::= { alaMldNeighborEntry 5 }
+
+
+--
+--  Static Neighbor Table
+--
+
+alaMldStaticNeighbor OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 6 }
+
+alaMldStaticNeighborTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticNeighborEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the static IP multicast routers."
+    ::= { alaMldStaticNeighbor 1 }
+
+alaMldStaticNeighborEntry OBJECT-TYPE
+    SYNTAX          MldStaticNeighborEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a static IP multicast router."
+    INDEX         { 
+                    alaMldStaticNeighborVlan,
+                    alaMldStaticNeighborIfIndex
+                  }
+    ::= { alaMldStaticNeighborTable 1 }
+
+MldStaticNeighborEntry ::= SEQUENCE {
+    alaMldStaticNeighborVlan              Unsigned32,
+    alaMldStaticNeighborIfIndex           InterfaceIndex,
+    alaMldStaticNeighborRowStatus         RowStatus
+}
+
+alaMldStaticNeighborVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The static IP multicast router's VLAN."
+    ::= { alaMldStaticNeighborEntry 1 }
+
+alaMldStaticNeighborIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The static IP multicast router's ifIndex."
+    ::= { alaMldStaticNeighborEntry 2 }
+
+alaMldStaticNeighborRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticNeighborEntry 3 }
+
+
+--
+--  Querier Table
+--
+
+alaMldQuerier OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 7 }
+
+alaMldQuerierTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldQuerierEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the neighboring MLD queriers."
+    ::= { alaMldQuerier 1 }
+
+alaMldQuerierEntry OBJECT-TYPE
+    SYNTAX          MldQuerierEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an MLD querier."
+    INDEX         { 
+                    alaMldQuerierVlan,
+                    alaMldQuerierIfIndex,
+                    alaMldQuerierHostAddress
+                  }
+    ::= { alaMldQuerierTable 1 }
+
+MldQuerierEntry ::= SEQUENCE {
+    alaMldQuerierVlan                     Unsigned32,
+    alaMldQuerierIfIndex                  InterfaceIndex,
+    alaMldQuerierHostAddress              InetAddressIPv6,
+    alaMldQuerierCount                    Counter32,
+    alaMldQuerierTimeout                  TimeTicks
+}
+
+alaMldQuerierVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's VLAN."
+    ::= { alaMldQuerierEntry 1 }
+
+alaMldQuerierIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's ifIndex."
+    ::= { alaMldQuerierEntry 2 }
+
+alaMldQuerierHostAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's IPv6 host address."
+    ::= { alaMldQuerierEntry 3 }
+
+alaMldQuerierCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's counter."
+    ::= { alaMldQuerierEntry 4 }
+
+alaMldQuerierTimeout OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MLD querier's timeout."
+    ::= { alaMldQuerierEntry 5 }
+
+
+--
+--  Static Querier Table
+--
+
+alaMldStaticQuerier OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 8 }
+
+alaMldStaticQuerierTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldStaticQuerierEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the static MLD queriers."
+    ::= { alaMldStaticQuerier 1 }
+
+alaMldStaticQuerierEntry OBJECT-TYPE
+    SYNTAX          MldStaticQuerierEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to a static MLD querier."
+    INDEX         { 
+                    alaMldStaticQuerierVlan,
+                    alaMldStaticQuerierIfIndex
+                  }
+    ::= { alaMldStaticQuerierTable 1 }
+
+MldStaticQuerierEntry ::= SEQUENCE {
+    alaMldStaticQuerierVlan               Unsigned32,
+    alaMldStaticQuerierIfIndex            InterfaceIndex,
+    alaMldStaticQuerierRowStatus          RowStatus
+}
+
+alaMldStaticQuerierVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The static MLD querier's VLAN."
+    ::= { alaMldStaticQuerierEntry 1 }
+
+alaMldStaticQuerierIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The static MLD querier's ifIndex."
+    ::= { alaMldStaticQuerierEntry 2 }
+
+alaMldStaticQuerierRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Used in accordance with installation and removal conventions
+         for conceptual rows."
+    ::= { alaMldStaticQuerierEntry 3 }
+
+
+--
+--  Source Table
+--
+
+alaMldSource OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 9 }
+
+alaMldSourceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldSourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IP multicast source information."
+    ::= { alaMldSource 1 }
+
+alaMldSourceEntry OBJECT-TYPE
+    SYNTAX          MldSourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast source flow."
+    INDEX         { 
+                    alaMldSourceVlan,
+                    alaMldSourceGroupAddress,
+                    alaMldSourceHostAddress,
+                    alaMldSourceDestAddress,
+                    alaMldSourceOrigAddress
+                  }
+    ::= { alaMldSourceTable 1 }
+
+MldSourceEntry ::= SEQUENCE {
+    alaMldSourceVlan                      Unsigned32,
+    alaMldSourceIfIndex                   InterfaceIndex,
+    alaMldSourceGroupAddress              InetAddressIPv6,
+    alaMldSourceHostAddress               InetAddressIPv6,
+    alaMldSourceDestAddress               InetAddressIPv6,
+    alaMldSourceOrigAddress               InetAddressIPv6,
+    alaMldSourceType                      INTEGER
+}
+
+alaMldSourceVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's VLAN."
+    ::= { alaMldSourceEntry 1 }
+
+alaMldSourceIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's ifIndex."
+    ::= { alaMldSourceEntry 2 }
+
+alaMldSourceGroupAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 group address."
+    ::= { alaMldSourceEntry 3 }
+
+alaMldSourceHostAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 host address."
+    ::= { alaMldSourceEntry 4 }
+
+alaMldSourceDestAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 tunnel destination address."
+    ::= { alaMldSourceEntry 5 }
+
+alaMldSourceOrigAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's IPv6 tunnel source address."
+    ::= { alaMldSourceEntry 6 }
+
+alaMldSourceType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast source flow's encapsulation type."
+    ::= { alaMldSourceEntry 7 }
+
+
+--
+--  Forward Table
+--
+
+alaMldForward OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 10 }
+
+alaMldForwardTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IP multicast forward information."
+    ::= { alaMldForward 1 }
+
+alaMldForwardEntry OBJECT-TYPE
+    SYNTAX          MldForwardEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast forwarded flow."
+    INDEX         { 
+                    alaMldForwardVlan,
+                    alaMldForwardGroupAddress,
+                    alaMldForwardHostAddress,
+                    alaMldForwardDestAddress,
+                    alaMldForwardOrigAddress,
+                    alaMldForwardNextVlan,
+                    alaMldForwardNextIfIndex
+                  }
+    ::= { alaMldForwardTable 1 }
+
+MldForwardEntry ::= SEQUENCE {
+    alaMldForwardVlan                     Unsigned32,
+    alaMldForwardIfIndex                  InterfaceIndex,
+    alaMldForwardGroupAddress             InetAddressIPv6,
+    alaMldForwardHostAddress              InetAddressIPv6,
+    alaMldForwardDestAddress              InetAddressIPv6,
+    alaMldForwardOrigAddress              InetAddressIPv6,
+    alaMldForwardType                     INTEGER,
+    alaMldForwardNextVlan                 Unsigned32,
+    alaMldForwardNextIfIndex              InterfaceIndex,
+    alaMldForwardNextType                 INTEGER
+}
+
+alaMldForwardVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's VLAN."
+    ::= { alaMldForwardEntry 1 }
+
+alaMldForwardIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's ifIndex."
+    ::= { alaMldForwardEntry 2 }
+
+alaMldForwardGroupAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 group address."
+    ::= { alaMldForwardEntry 3 }
+
+alaMldForwardHostAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 host address."
+    ::= { alaMldForwardEntry 4 }
+
+alaMldForwardDestAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 tunnel destination address."
+    ::= { alaMldForwardEntry 5 }
+
+alaMldForwardOrigAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's IPv6 tunnel source address."
+    ::= { alaMldForwardEntry 6 }
+
+alaMldForwardType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's encapsulation type."
+    ::= { alaMldForwardEntry 7 }
+
+alaMldForwardNextVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's next VLAN."
+    ::= { alaMldForwardEntry 8 }
+
+alaMldForwardNextIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's next ifIndex."
+    ::= { alaMldForwardEntry 9 }
+
+alaMldForwardNextType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast forwarded flow's next encapsulation type."
+    ::= { alaMldForwardEntry 10 }
+
+
+--
+--  Tunnel Table
+--
+
+alaMldTunnel OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 11 }
+
+alaMldTunnelTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MldTunnelEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the IP multicast tunnel information."
+    ::= { alaMldTunnel 1 }
+
+alaMldTunnelEntry OBJECT-TYPE
+    SYNTAX          MldTunnelEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to an IP multicast tunneled flow."
+    INDEX         { 
+                    alaMldTunnelVlan,
+                    alaMldTunnelGroupAddress,
+                    alaMldTunnelHostAddress,
+                    alaMldTunnelDestAddress,
+                    alaMldTunnelOrigAddress,
+                    alaMldTunnelNextDestAddress
+                  }
+    ::= { alaMldTunnelTable 1 }
+
+MldTunnelEntry ::= SEQUENCE {
+    alaMldTunnelVlan                      Unsigned32,
+    alaMldTunnelIfIndex                   InterfaceIndex,
+    alaMldTunnelGroupAddress              InetAddressIPv6,
+    alaMldTunnelHostAddress               InetAddressIPv6,
+    alaMldTunnelDestAddress               InetAddressIPv6,
+    alaMldTunnelOrigAddress               InetAddressIPv6,
+    alaMldTunnelType                      INTEGER,
+    alaMldTunnelNextDestAddress           InetAddressIPv6,
+    alaMldTunnelNextType                  INTEGER
+}
+
+alaMldTunnelVlan OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's VLAN."
+    ::= { alaMldTunnelEntry 1 }
+
+alaMldTunnelIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's ifIndex."
+    ::= { alaMldTunnelEntry 2 }
+
+alaMldTunnelGroupAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's IPv6 group address."
+    ::= { alaMldTunnelEntry 3 }
+
+alaMldTunnelHostAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's IPv6 host address."
+    ::= { alaMldTunnelEntry 4 }
+
+alaMldTunnelDestAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's IPv6 tunnel destination address."
+    ::= { alaMldTunnelEntry 5 }
+
+alaMldTunnelOrigAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's IPv6 tunnel source address."
+    ::= { alaMldTunnelEntry 6 }
+
+alaMldTunnelType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's encapsulation type."
+    ::= { alaMldTunnelEntry 7 }
+
+alaMldTunnelNextDestAddress OBJECT-TYPE
+    SYNTAX          InetAddressIPv6
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's next IPv6 tunnel destination address."
+    ::= { alaMldTunnelEntry 8 }
+
+alaMldTunnelNextType OBJECT-TYPE
+    SYNTAX          INTEGER { mcast(1), pim(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast tunneled flow's next encapsulation type."
+    ::= { alaMldTunnelEntry 9 }
+
+   
+--
+--  Port Table for IPv6 Multicast objects managed per port
+--
+		
+alaMldPort  OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 12 }
+
+alaMldPortTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AlaMldPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION 
+       "The table listing the IPv6 Multicast port information."   
+     ::= { alaMldPort 1 }
+   
+alaMldPortEntry OBJECT-TYPE
+     SYNTAX     AlaMldPortEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION 
+       "An entry corresponding to IPv6 Multicast port information."
+     INDEX        { 
+                    alaMldPortIfIndex
+                  }
+    ::= { alaMldPortTable 1 }
+   
+AlaMldPortEntry ::=
+     SEQUENCE {
+       alaMldPortIfIndex   	  	InterfaceIndex,
+       alaMldPortMaxGroupLimit   	Unsigned32,
+       alaMldPortMaxGroupExceedAction   INTEGER
+     }
+ 
+alaMldPortIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IP multicast port's ifIndex."
+    ::= { alaMldPortEntry 1 }
+
+alaMldPortMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The maximum number of MLD Group memberships that can be learnt 
+	on the interface."
+    DEFVAL 		{0}
+    ::= { alaMldPortEntry 2 }
+
+alaMldPortMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when MLD group membership limit is 
+	exceeded for the interface."
+    DEFVAL        { none }
+    ::= { alaMldPortEntry 3 }
+
+
+--
+--  Port Vlan Table
+--
+
+alaMldPortVlan OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 13 }
+
+alaMldPortVlanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaMldPortVlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The table listing the MLD group membership limit information
+	for a port/vlan instance."
+    ::= { alaMldPortVlan 1 }
+
+alaMldPortVlanEntry OBJECT-TYPE
+    SYNTAX          AlaMldPortVlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry corresponding to MLD group membership limit on a port/vlan."
+    INDEX         { 
+                    alaMldPortIfIndex,
+		    alaMldVlanId
+                  }
+    ::= { alaMldPortVlanTable 1 }
+
+AlaMldPortVlanEntry ::= SEQUENCE {
+    alaMldVlanId                        Unsigned32,
+    alaMldPortVlanCurrentGroupCount     Unsigned32,
+    alaMldPortVlanMaxGroupLimit 	Unsigned32,
+    alaMldPortVlanMaxGroupExceedAction  INTEGER
+}
+
+alaMldVlanId 	    OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The IPv6 multicast group membership VLAN."
+    ::= { alaMldPortVlanEntry 1 }
+
+alaMldPortVlanCurrentGroupCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current IPv6 multicast group memberships on a port/vlan 
+	instance."
+    ::= { alaMldPortVlanEntry 2 }
+
+alaMldPortVlanMaxGroupLimit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Maximum MLD Group memberships on the port/vlan instance."
+    ::= { alaMldPortVlanEntry 3 }
+
+alaMldPortVlanMaxGroupExceedAction OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), drop(1), replace(2) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The action to be taken when MLD group membership limit is
+	exceeded for the port/vlan instance."
+    ::= { alaMldPortVlanEntry 4 }
+
+
+--
+--  Conformance Table
+--
+
+alcatelIND1MldMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1MldMIB 2 }
+
+alcatelIND1MldMIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1MldMIBConformance 1 }
+
+alaMldCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for systems running IPv6 multicast switch 
+         and routing and implementing ALCATEL-IND1-MLD-MIB."
+    MODULE
+    MANDATORY-GROUPS { alaMldGroup, alaMldVlanGroup, alaMldMemberGroup,
+                       alaMldStaticMemberGroup, alaMldNeighborGroup,
+                       alaMldStaticNeighborGroup, alaMldQuerierGroup,
+                       alaMldStaticQuerierGroup, alaMldSourceGroup,
+                       alaMldForwardGroup, alaMldTunnelGroup,
+                       alaMldPortGroup, alaMldPortVlanGroup }
+    ::= { alcatelIND1MldMIBCompliances 1 }
+
+alcatelIND1MldMIBGroups OBJECT IDENTIFIER ::= { alcatelIND1MldMIBConformance 2 }
+
+alaMldGroup OBJECT-GROUP
+    OBJECTS { alaMldStatus, alaMldQuerying, alaMldSpoofing, alaMldZapping, 
+              alaMldVersion, alaMldRobustness, alaMldQueryInterval,
+              alaMldQueryResponseInterval, alaMldLastMemberQueryInterval,
+              alaMldRouterTimeout, alaMldSourceTimeout, alaMldProxying,
+              alaMldUnsolicitedReportInterval, alaMldQuerierForwarding,
+              alaMldMaxGroupLimit, alaMldMaxGroupExceedAction,
+              alaMldFloodUnknown }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support management of IPv6 multicast switching
+         and routing system configuration."
+    ::= { alcatelIND1MldMIBGroups 1 }
+
+alaMldVlanGroup OBJECT-GROUP
+    OBJECTS { alaMldVlanStatus, alaMldVlanQuerying, alaMldVlanSpoofing, 
+              alaMldVlanZapping, alaMldVlanVersion, alaMldVlanRobustness, 
+              alaMldVlanQueryInterval, alaMldVlanQueryResponseInterval, 
+              alaMldVlanLastMemberQueryInterval, alaMldVlanRouterTimeout, 
+              alaMldVlanSourceTimeout, alaMldVlanProxying,
+              alaMldVlanUnsolicitedReportInterval, alaMldVlanQuerierForwarding, 
+	      alaMldVlanMaxGroupLimit, alaMldVlanMaxGroupExceedAction,
+              alaMldVlanSpoofAddressType, alaMldVlanSpoofAddress }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support management of IPv6 multicast switching
+         and routing vlan configuration."
+    ::= { alcatelIND1MldMIBGroups 2 }
+
+alaMldMemberGroup OBJECT-GROUP
+    OBJECTS { alaMldMemberMode, alaMldMemberCount, alaMldMemberTimeout }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         group membership information."
+    ::= { alcatelIND1MldMIBGroups 3 }
+
+alaMldStaticMemberGroup OBJECT-GROUP
+    OBJECTS { alaMldStaticMemberRowStatus }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         static group membership information tables."
+    ::= { alcatelIND1MldMIBGroups 4 }
+
+alaMldNeighborGroup OBJECT-GROUP
+    OBJECTS { alaMldNeighborCount, alaMldNeighborTimeout }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         IP multicast router information."
+    ::= { alcatelIND1MldMIBGroups 5 }
+
+alaMldStaticNeighborGroup OBJECT-GROUP
+    OBJECTS { alaMldStaticNeighborRowStatus }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         static IP multicast router information."
+    ::= { alcatelIND1MldMIBGroups 6 }
+
+alaMldQuerierGroup OBJECT-GROUP
+    OBJECTS { alaMldQuerierCount, alaMldQuerierTimeout }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         MLD querier information."
+    ::= { alcatelIND1MldMIBGroups 7 }
+
+alaMldStaticQuerierGroup OBJECT-GROUP
+    OBJECTS { alaMldStaticQuerierRowStatus }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         static MLD querier information."
+    ::= { alcatelIND1MldMIBGroups 8 }
+
+alaMldSourceGroup OBJECT-GROUP
+    OBJECTS { alaMldSourceIfIndex, alaMldSourceType }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         IP multicast source information."
+    ::= { alcatelIND1MldMIBGroups 9 }
+
+alaMldForwardGroup OBJECT-GROUP
+    OBJECTS { alaMldForwardIfIndex, alaMldForwardType, alaMldForwardNextType }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         IP multicast forward information."
+    ::= { alcatelIND1MldMIBGroups 10 }
+
+alaMldTunnelGroup OBJECT-GROUP
+    OBJECTS { alaMldTunnelIfIndex, alaMldTunnelType, alaMldTunnelNextType }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching and routing 
+         IP multicast tunnel information."
+    ::= { alcatelIND1MldMIBGroups 11 }
+
+alaMldPortGroup OBJECT-GROUP
+    OBJECTS { alaMldPortMaxGroupLimit, alaMldPortMaxGroupExceedAction }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to support IPv6 multicast switching configuration."
+    ::= { alcatelIND1MldMIBGroups 12 }
+
+alaMldPortVlanGroup OBJECT-GROUP
+    OBJECTS { alaMldPortVlanCurrentGroupCount, alaMldPortVlanMaxGroupLimit, alaMldPortVlanMaxGroupExceedAction }
+    STATUS          current
+    DESCRIPTION
+        "An object to support IPv6 multicast switching group limit information 
+	for a port/vlan instance."
+    ::= { alcatelIND1MldMIBGroups 13 }
+
+
+END

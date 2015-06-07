@@ -1,0 +1,709 @@
+CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-chassis-mib.txt
+        --  Revision: 1.07.00
+        --  Part Number:  2170548
+        --  Date: January 31, 1997
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific chassis MIB.
+        --
+        --  This module will be extended, as needed.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+        IMPORTS
+                NetworkAddress, Counter, TimeTicks
+                        FROM RFC1155-SMI
+                chassis
+                        FROM CTRON-MIB-NAMES
+                DisplayString
+                        FROM RFC1213-MIB
+                OBJECT-TYPE
+                        FROM RFC-1212;
+
+
+        --  This MIB module uses the extended OBJECT-TYPE macro as defined
+        --  RFC 1212
+
+        --  Textual convention
+
+
+        -- DisplayString ::= OCTET STRING
+        --  This data type is used to model textual information taken from
+        --  the NVT ASCII character set.  By convention, objects with this
+        --  syntax, unless explicitly stated, are declared as having:
+        --
+        --  SIZE (0..255)
+
+        --  chType is, in generic terms, similar to sysObjectID in
+        --  MIB-II.  It is defined for the sake of completeness, and
+        --  in order to negate dependencies on other MIBs.
+
+        chType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Identifies the type of hub-based or standalone device.
+                 A vendor's authoritative identification of this
+                 chassis or device.  By convention, this value is
+                 allocated within the SMI enterprises subtree(1.3.6.1.4.1),
+                 and provides an easy and unambiguous means for
+                 determining `what kind of box' is being managed.  If this
+                 information is not present or unknown, its value should
+                 be set to the OBJECT IDENTIFIER { 0 0 }, which is a
+                 syntactically valid object identifier."
+            ::= { chassis 1 }
+
+        chBackplaneTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ChBackplaneEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of backplanes resident in this chassis."
+            ::= { chassis 2 }
+
+        chBackplaneEntry  OBJECT-TYPE
+            SYNTAX  ChBackplaneEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A backplane entry containing objects for a particular
+                 backplane."
+            INDEX   { chBackplaneID }
+            ::= { chBackplaneTable 1 }
+
+        ChBackplaneEntry  ::=
+            SEQUENCE {
+                chBackplaneID
+                    INTEGER,
+                chBackplaneType
+                    OBJECT IDENTIFIER
+            }
+
+        chBackplaneID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "An unique value identifying a backplane within the
+                 chassis."
+            ::= { chBackplaneEntry 1 }
+
+        chBackplaneType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "An authoritative identification that is specific to
+                 the particular media being used to realize the
+                 backplane.  For example, if the backplane is realized
+                 by an Ethernet, then the value of this object refers
+                 to a well known OID defined for Ethernet.  If this
+                 information is not present or unknown, its value
+                 should be set to OBJECT IDENTIFIER { 0 0 }, which
+                 is a syntactically valid object identifier."
+            ::= { chBackplaneEntry 2 }
+
+        chNumSlots  OBJECT-TYPE
+            SYNTAX  INTEGER (0..64)
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Number of slots in a chassis.  For bounded, slot-less
+                 systems, the value of this object shall be zero(0)."
+            ::= { chassis 3 }
+
+        --  Component Table and Definitions
+        --  Components are instances of functional devices.  For
+        --  example, if two routers and three bridges were installed
+        --  in a chassis, said chassis accommodates five components.
+
+        chCompTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ChCompEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of components installed in this chassis."
+            ::= { chassis 4 }
+
+        chCompEntry  OBJECT-TYPE
+            SYNTAX  ChCompEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A component entry containing objects for a particular
+                 component."
+            INDEX   { chCompID }
+            ::= { chCompTable 1 }
+
+        ChCompEntry  ::= 
+            SEQUENCE {
+                chCompID
+                    INTEGER,
+                chCompAdminStatus
+                    INTEGER,
+                chCompArg
+                    OCTET STRING,
+                chCompType
+                    OBJECT IDENTIFIER,
+                chCompName
+                    DisplayString,
+                chCompVersion
+                    DisplayString,
+                chCompTimeStamp
+                    TimeTicks,
+                chCompAccessPolicy
+                    INTEGER,
+                chCompBasicCommStr
+                    OCTET STRING,
+                chCompROCommStr
+                    OCTET STRING,
+                chCompRWCommStr
+                    OCTET STRING,
+                chCompSUCommStr
+                    OCTET STRING,
+                chCompNetAdr
+                    NetworkAddress
+            }
+
+        chCompID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "An unique value identifying a component, which includes,
+                 but is not limited to, routers, bridges, and terminal
+                 servers.  Multiple instances of a functional device may
+                 exist within the same chassis."
+            ::= { chCompEntry 1 }
+
+        chCompAdminStatus OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        invalid(2),
+                        enabled(3),
+                        testing(4),
+                        operational(5),
+                        error(6),
+                        disabled(7),
+                        delete(8)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "Provides the state of the given component.  A component
+                 is activated by writing a value of enabled(3).  Once
+                 enabled, a component enters testing mode, which is
+                 denoted by testing(4), when this object is read.  After
+                 tests are complete, the component either enters the
+                 operational(5), or the error(6) state.
+
+                 The component may be de-activated by writing a value of
+                 disabled(7).  In a disabled state, a component does
+                 exist within the given chassis, but is benign.  A disabled
+                 component is available for subsequent activation."
+            ::= { chCompEntry 2 }
+
+        chCompArg OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE(32))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "A variable that may be passed to a component, when it
+                 is being either enabled or disabled."
+            ::= { chCompEntry 3 }
+
+        chCompType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Identifies a component within this chassis.  A vendor's
+                 authoritative identification of this component type.
+                 By convention, this value is allocated within the SMI
+                 enterprises subtree(1.3.6.1.4.1), and provides an easy
+                 and unambiguous means for determining the component
+                 type.  If this information is not present or unknown,
+                 its value should be set to the OBJECT IDENTIFIER { 0 0 },
+                 which is a syntactically valid object identifier."
+            ::= { chCompEntry 4 }
+
+        chCompName  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..32))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A textual description of the component."
+            ::= { chCompEntry 5 }
+
+        chCompVersion  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..32))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A textual description of the version/revision level for
+                 this component's software."
+            ::= { chCompEntry 6 }
+
+        chCompTimeStamp  OBJECT-TYPE
+            SYNTAX  TimeTicks
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The value of sysUpTime of this management entity, when
+                 this component was last (re-)initialized."
+            ::= { chCompEntry 7 }
+
+        chCompAccessPolicy  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        invalid(2),
+                        same(3),                --  current IP address and
+                                                --  community string pair
+                                                --  may be used to access
+                                                --  this component
+                        otherCommStr(4),        --  use community string
+                                                --  specified by
+                                                --  chCompROCommStr (or
+                                                --  chCompRWCommStr), with
+                                                --  current IP address to
+                                                --  access this component.
+                                                --  Community access profile
+                                                --  and view are determined
+                                                --  by the associated
+                                                --  community string that
+                                                --  will be used.
+                        other(5)                --  use community string
+                                                --  specified by
+                                                --  chCompROCommStr (or
+                                                --  chCompRWCommStr), and
+                                                --  address specified by
+                                                --  chCompNetAdr to access
+                                                --  this component.
+                                                --  Community access profile
+                                                --  and view are determined
+                                                --  by the associated
+                                                --  community string that
+                                                --  will be used.
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "Defines access information for the pertinent component."
+            ::= { chCompEntry 8 }
+
+        chCompBasicCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Read-only community string for the pertinent component.
+                 If the value of chCompAccessPolicy is otherCommStr(4) or
+                 other(5), then this object shall determine the read-only
+                 Community String to be used when accessing this component.
+                 This also defined the basic read only community string to
+                 access MIBs registered to this component."
+            ::= { chCompEntry 9 }
+
+        chCompROCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Read-only community string for the pertinent component.
+                 If the value of chCompAccessPolicy is otherCommStr(4) or
+                 other(5), then this object shall determine the read-only
+                 Community String to be used when accessing this component.
+                 This also defined the read only community string to
+                 access MIBs registered to this component."
+            ::= { chCompEntry 10 }
+
+        chCompRWCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Read-write community string for the pertinent component.
+                 If the value of chCompAccessPolicy is otherCommStr(4) or
+                 other(5), then this object shall determine the read-write
+                 Community String to be used when accessing this component.
+                 This also defined the read write community string to
+                 access MIBs registered to this component."
+            ::= { chCompEntry 11 }
+
+        chCompSUCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Super user community string for the pertinent component.
+                 If the value of chCompAccessPolicy is otherCommStr(4) or
+                 other(5), then this object shall determine the read-write
+                 Community String to be used when accessing this component.
+                 This also defined the read write community string to
+                 access MIBs registered to this component."
+            ::= { chCompEntry 12 }
+
+        chCompNetAdr  OBJECT-TYPE
+            SYNTAX  NetworkAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "If the value of chCompAccessPolicy is other(5), then this
+                 object shall determine the Network Address to be used to
+                 access this component. In all other cases, a value of
+                 0.0.0.0 shall be returned, when read."
+            ::= { chCompEntry 13 }
+
+        --  Slot Table and definitions
+        --  A module is the physical entity that resides in a chassis slot.
+        --  A module is also denoted as a board or card.  A component may
+        --  be realized by one or more modules, or one or more components
+        --  may be realized by the same module.
+        --  The slot table provides a physical representation of a chassis
+        --  and its components.
+
+        chSlotTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ChSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of modules installed in this chassis.  A component,
+                 such as a router, may be incorporated on one or more
+                 modules.  More than one component may be incorporated on
+                 each module."
+            ::= { chassis 5 }
+
+        chSlotEntry  OBJECT-TYPE
+            SYNTAX  ChSlotEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module."
+            INDEX  { chSlotID, chSlotCompID }
+            ::= { chSlotTable 1 }
+
+        ChSlotEntry  ::=
+            SEQUENCE {
+                chSlotID
+                    INTEGER,
+                chSlotCompID
+                    INTEGER,
+                chSlotClass
+                    OBJECT IDENTIFIER,
+                chSlotModuleType
+                    OBJECT IDENTIFIER,
+                chSlotModuleName
+                    DisplayString,
+                chSlotModuleVersion
+                    DisplayString,
+                chSlotModuleTimeStamp
+                    TimeTicks
+            }
+
+        chSlotID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number containing this module.  An unique
+                 value, in the range between 0 and and the value of
+                 chNumSlots."
+            ::= { chSlotEntry 1 }
+
+        chSlotCompID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The ID value for the component incorporated within this
+                 module.  This object is similar to chCompID."
+            ::= { chSlotEntry 2 }
+
+        chSlotClass  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The class (or type) of slot.  For example, slots that
+                only allow for power supply modules fall into a class
+                that is different from slots that allow only interface
+                cards."
+            ::= { chSlotEntry 3 }
+        chSlotModuleType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Uniquely defines the module type.  A vendor's
+                 authoritative identification for a module.  By
+                 convention, this value is allocated within the SMI
+                 enterprises subtree(1.3.6.1.4.1), and provides an easy
+                 and unambiguous means for determining the type of
+                 module."
+            ::= { chSlotEntry 4 }
+
+        chSlotModuleName  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..32))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "A textual description of the module."
+            ::= { chSlotEntry 5 }
+
+        chSlotModuleVersion  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..32))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A textual description of the version/revision level for
+                 this module's hardware and firmware."
+            ::= { chSlotEntry 6 }
+
+        chSlotModuleTimeStamp  OBJECT-TYPE
+            SYNTAX  TimeTicks
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The value of sysUpTime for this management entity, when
+                 this module was last (re-)initialized."
+            ::= { chSlotEntry 7 }
+
+
+
+        --  MIB Table
+        --  This table provides a list of MIBs that are incorporated in
+        --  the various components within chassis slots.
+
+        chCompMIBTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ChCompMIBEntry
+            ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                "A list of MIBs incorporated on components and their
+                 respective modules, within this chassis."
+            ::= { chassis 6 }
+
+        chCompMIBEntry  OBJECT-TYPE
+            SYNTAX  ChCompMIBEntry
+            ACCESS  not-accessible
+            STATUS  deprecated
+            DESCRIPTION
+                "A MIB entry containing objects for a MIB that is
+                 realized by a particular module."
+            INDEX { chCompMIBID, chCompMIBSlotID, chCompMIBCompID }
+            ::= { chCompMIBTable 1 }
+
+        ChCompMIBEntry ::=
+            SEQUENCE {
+                chCompMIBID
+                    INTEGER,
+                chCompMIBSlotID
+                    INTEGER,
+                chCompMIBCompID
+                    INTEGER,
+                chCompMIBGrpOID
+                    OBJECT IDENTIFIER,
+                chCompMIBVectorObjectBase
+                    OBJECT IDENTIFIER,
+                chCompMIBVectorNum
+                    INTEGER,
+                chCompMIBType
+                    INTEGER,
+                chCompMIBStatus
+                    INTEGER
+            }
+
+        chCompMIBID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  deprecated
+            DESCRIPTION
+                "An unique value identifying an instance of a MIB."
+        ::= { chCompMIBEntry 1 }
+
+        chCompMIBSlotID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  deprecated
+            DESCRIPTION
+                "The slot number for the module that incorporates this
+                 MIB.  The value shall be in the range between 0 and
+                 chNumSlots.  A non-zero values indicates that the
+                 information presented by this entry is realized only
+                 on the module in the specified slot.  A zero value
+                 indicates that this information pertains to the entire
+                 component, without partitioning across modules.
+
+                 This object is similar to chSlotID."
+        ::= { chCompMIBEntry 2 }
+
+        chCompMIBCompID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  deprecated
+            DESCRIPTION
+                "The component related to this MIB.  This object is
+                 similar to chCompID."
+            ::= { chCompMIBEntry 3 }
+
+        chCompMIBGrpOID  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "A reference to a specific MIB group definition.  For
+                 example, in the case of MIB-II, the value of this
+                 object may refer to an applicable group, which has
+                 been implemented.
+
+                 The access is read-write.  This will allow network
+                 administrators, to register MIBs for a module that is
+                 known to the chassis management entity, by type alone:
+                 that is, a module for which component information is
+                 unknown."
+            ::= { chCompMIBEntry 4 }
+
+        chCompMIBVectorObjectBase  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "A reference to a specific entry of a vector object
+                 within this MIB, associated with the module identified
+                 by chCompMIBSlotID.  For example, in the case of a
+                 repeater, the value of this object may refer to an
+                 entry in prtrBasicPortTable.  This object facilitates
+                 logical to physical mapping of entities such as
+                 channels, links, interfaces, and ports."
+            ::= { chCompMIBEntry 5 }
+
+        chCompMIBVectorNum  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "A value indicating the number of entries, starting with
+                 the one denoted by chCompMIBVectorObjectBase, that are
+                 realized on this module."
+            ::= { chCompMIBEntry 6 }
+
+        chCompMIBType  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                not-instanced(1),
+                instanced(2)
+            }
+            ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "Depicts whether the MIB in question is instanced
+                or not.
+
+                For reason similar to ones that apply to
+                chCompMIBGrpOID, the access mode is read-write."
+            ::= { chCompMIBEntry 7 }
+
+        chCompMIBStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                unknown(1),
+                invalid(2),
+                agent(3),
+                management(4)
+            }
+            ACCESS  read-only
+            STATUS  deprecated
+            DESCRIPTION
+                "Depicts the status of the MIB.  If marked as agent
+                 the MIB is generated based upon the components
+                 defined.  If marked as management the entry was entered
+                 via a management station.  If marked invalid the
+                 entry is to be deleted."
+            ::= { chCompMIBEntry 8 }
+
+        chPhysicalChanges  OBJECT-TYPE
+            SYNTAX   Counter
+            ACCESS   read-only
+            STATUS   deprecated
+            DESCRIPTION
+                "Depicts the number of physical changes that have occured
+                 to the chassis MIB.  This includes additions and
+                 removal of components in the component table."
+            ::= { chassis 7 }
+
+        chLogicalChanges  OBJECT-TYPE
+            SYNTAX   Counter
+            ACCESS   read-only
+            STATUS   deprecated
+            DESCRIPTION
+                "Depicts the number of logical changes that have occured
+                 to the chassis MIB.  This includes all sets to name
+                 strings etc."
+            ::= { chassis 8 }
+
+        chCompGlobalBasicCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE(1..27))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the base read only community string to
+                 access MIBs on this module. A write to this object will 
+                 change all instances of chCompBasicCommStr."
+            ::= { chassis 9 }
+
+        chCompGlobalROCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE(1..27))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the expanded read only community string to
+                 access MIBs on this module. A write to this object will 
+                 change all instances of chCompROCommStr."
+            ::= { chassis 10 }
+
+        chCompGlobalRWCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE(1..27))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the read write community string to
+                 access MIBs on this module.  A write to this object will 
+                 change all instances of chCompRWCommStr."
+            ::= { chassis 11 }
+
+        chCompGlobalSUCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE(1..27))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the super user community string to
+                 access MIBs on this module.  A write to this object will 
+                 change all instances of chCompSUCommStr."
+            ::= { chassis 12 }
+
+END

@@ -1,0 +1,217 @@
+
+S5-ETHERNET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+	s5Eth
+		FROM S5-ROOT-MIB
+	TimeIntervalSec
+		FROM S5-TCS-MIB;
+
+s5EthernetMib MODULE-IDENTITY
+       LAST-UPDATED    "200407200000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "5000 Ethernet MIB
+
+            Copyright 1993-2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Nortel Networks SNMP Management Information Base Specification
+            (Specification) embodies Nortel Networks' confidential and
+            proprietary intellectual property. Nortel Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Nortel Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+
+       REVISION "200407200000Z" -- 20 July 2004
+       DESCRIPTION "Version 118:  Conversion to SMIv2"
+
+       ::= { s5Eth 0 }
+
+-- Ethernet Groups
+
+-- Configuration
+s5EnCfg		OBJECT IDENTIFIER ::= { s5Eth 1 }
+
+-- Statistics
+s5EnStat	OBJECT IDENTIFIER ::= { s5Eth 2 }
+
+-- Miscellaneous
+s5EnMisc	OBJECT IDENTIFIER ::= { s5Eth 3 }
+
+
+
+-- SECTION 2: Miscellaneous
+
+
+-- Port Interconnect Control Table
+
+s5EnPIntconTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S5EnPIntconEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A table controlling the Interconnect status
+		of each managed Ethernet connectivity port that
+		is connected to the same backplane network as
+		each NMM agent interface. The number of entries
+		is determined by the number of managed ports
+		connected to backplane networks which the
+		NMM's interfaces are also connected to."
+	::= { s5EnMisc 1 }
+
+s5EnPIntconEntry OBJECT-TYPE
+	SYNTAX	S5EnPIntconEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A row in the Ethernet port Interconnect control table.
+		Entries can not be created or deleted via SNMP."
+	INDEX	{ s5EnPIntconIfIndx,
+		  s5EnPIntconBrdIndx,
+		  s5EnPIntconPortIndx }
+	::= { s5EnPIntconTable 1 }
+
+S5EnPIntconEntry ::= SEQUENCE {
+	s5EnPIntconIfIndx INTEGER,
+	s5EnPIntconBrdIndx INTEGER,
+	s5EnPIntconPortIndx INTEGER,
+	s5EnPIntconIntconStatus INTEGER,
+	s5EnPIntconAddrCollect INTEGER
+	}
+
+s5EnPIntconIfIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..65535)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of interface on the NMM.
+		This has the same value as ifIndex for
+		the interface."
+	::= { s5EnPIntconEntry 1 }
+
+s5EnPIntconBrdIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the board. This corresponds to
+		the index of the slot containing the board."
+	::= { s5EnPIntconEntry 2 }
+
+s5EnPIntconPortIndx OBJECT-TYPE
+	SYNTAX	INTEGER (1..255)
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The index of the port on the board. Its
+		value ranges between 1 and index of the last
+		manageable port on the board."
+	::= { s5EnPIntconEntry 3 }
+
+s5EnPIntconIntconStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		interconnect(2)
+		}
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The interconnection status of the port.
+		This object tells whether the port is
+		connected to a host or to an interconnect
+		(defined to be another NMM or a bridge that
+		is sending hello messages). The values are:
+		  other(1)..........unknown or host
+		  interconnect(2)...identified as
+		                      interconnect port
+
+		The NMM agent will assign this object the
+		value other(1) on initialization. If it
+		sees hello messages coming in on the port,
+		it will change the interconnection status
+		to be interconnect(2)."
+	::= { s5EnPIntconEntry 4 }
+
+s5EnPIntconAddrCollect OBJECT-TYPE
+	SYNTAX	INTEGER {
+		default(1),
+		neverCollect(2),
+		alwaysCollect(3)
+		}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"This object tells whether the NMM should
+		collect node address information from this
+		port for the Find Nodes and Show Nodes tables.
+
+		By default, the node addresses are collected
+		only from ports that are not identified as
+		interconnect ports. This object provides a
+		means of overriding the default for collection
+		and checking of node addresses. The values are:
+		  default(1).........follow default rules for
+		                       address collection
+		  neverCollect(2)....don't collect addrs,
+		                       whatever intercon status
+		  alwaysCollect(3)...do collect address,
+		                       regardless of config
+
+		Setting this variable to default(1) tells the
+		NMM to collect and check addresses if and only
+		the port has not been identified as an
+		interconnect port.
+
+		To disable node address collection
+		on a port, set this object to neverCollect(2).
+
+		To collect node addresses for an
+		interconnect port, set this object to
+		alwaysCollect(3).
+
+		To restore the 'natural' value for the port,
+		set this object to default(1)."
+	::= { s5EnPIntconEntry 5 }
+
+
+-- Show Nodes & Find Nodes Aging Timers
+
+s5EnNodeInactInterval OBJECT-TYPE
+	SYNTAX	TimeIntervalSec (0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The time interval in seconds used to change the
+		status of an entry in the Show Nodes Table
+		(found in the 5000 Common Stats MIB) from active
+		to inactive. When a station has not sent a frame
+		within the time interval represented by this
+		object, the status for the corresponding entry
+		is set to inactive."
+	DEFVAL	{ 5 } -- 5 seconds
+	::= { s5EnMisc 2 }
+
+
+s5EnNodeAgeInterval OBJECT-TYPE
+	SYNTAX	TimeIntervalSec (0..2147483647)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The time interval in seconds used for aging out
+		entries in the Show Nodes and Find Nodes Tables
+		(found in the 5000 Common Stats MIB). When a
+		station has not sent a frame within the time
+		interval represented by this object, the
+		corresponding entry is removed from the two
+		tables."
+	DEFVAL	{ 300 } -- 5 minutes
+	::= { s5EnMisc 3 }
+
+
+END

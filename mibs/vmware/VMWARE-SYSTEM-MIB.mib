@@ -1,0 +1,130 @@
+-- **********************************************************
+-- Copyright 2007-2010 VMware, Inc.  All rights reserved. 
+-- **********************************************************
+
+VMWARE-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+    FROM SNMPv2-SMI
+        DisplayString
+    FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+    FROM SNMPv2-CONF
+        vmwSystem
+   FROM VMWARE-ROOT-MIB;
+
+    vmwSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201008020000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+    "This MIB module provides for System Software identification"
+
+REVISION      "201008020000Z"
+DESCRIPTION
+    "Add vmwProdPatch managed object to report patch level"
+
+REVISION      "200801120000Z"
+DESCRIPTION
+    "Add to comments the Managed Object Browser (MOB) URLs which provide 
+     data this MIB module exposes."
+
+REVISION      "200712270000Z"
+DESCRIPTION
+    "This is the first revision in SMIv2 format. One object
+    (vmwProdOID) has been dropped from the original SMIv1 version
+    as it duplicates sysObjectId from SNMPv2-MIB."
+
+::= { vmwSystem 10 }
+
+vmwProdName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This product's name.
+         VIM Property: AboutInfo.name
+         https://esx.example.com/mob/?moid=ServiceInstance&doPath=content%2eabout"
+    ::= { vmwSystem 1 }
+
+vmwProdVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The product's version release identifier. Format is Major.Minor.Update
+         VIM Property: AboutInfo.version
+         https://esx.example.com/mob/?moid=ServiceInstance&doPath=content%2eabout"
+    ::= { vmwSystem 2 }
+
+-- { vmwSystem 3 } oid obsolete, do not reuse
+
+vmwProdBuild OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This identifier represents the most specific identifier.
+         VIM Property: AboutInfo.build
+         https://esx.example.com/mob/?moid=ServiceInstance&doPath=content%2eabout"
+    ::= { vmwSystem 4 }
+
+vmwProdUpdate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This identifier represents the update level applied to this system.
+         VIM Property: Advanced Options key: Misc.HostAgentUpdateLevel
+         https://esx.example.com/mob/?moid=ha%2dadv%2doptions"
+    ::= { vmwSystem 5 }
+
+vmwProdPatch OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This identifier represents the patch level applied to this system.
+         VIM Property: None. 
+         CLI: esxcli system version get"
+    ::= { vmwSystem 6 }
+
+-- conformance information
+vmwSystemMIBConformance
+OBJECT IDENTIFIER ::= { vmwSystemMIB 2 }
+vmwSystemMIBCompliances
+OBJECT IDENTIFIER ::= { vmwSystemMIBConformance 1 }
+vmwSysMIBGroups  OBJECT IDENTIFIER ::= { vmwSystemMIBConformance 2 }
+
+-- compliance statements
+vmwSysMIBBasicCompliance MODULE-COMPLIANCE
+STATUS  current
+DESCRIPTION
+    "The compliance statement for entities which implement the 
+    VMWARE-SYSTEM-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwSystemGroup }
+::= { vmwSystemMIBCompliances 2 }
+
+vmwSystemGroup OBJECT-GROUP
+    OBJECTS { 
+    vmwProdName,
+    vmwProdVersion,
+    vmwProdBuild,
+    vmwProdUpdate,
+    vmwProdPatch
+    }
+    STATUS  current
+    DESCRIPTION
+        "These objects uniquely identifies a given VMware system software image."
+    ::= { vmwSysMIBGroups 1 }
+
+END -- end of module VMWARE-SYSTEM-MIB.

@@ -1,0 +1,775 @@
+ALCATEL-IND1-ERP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                Counter32, Unsigned32, MODULE-IDENTITY, OBJECT-IDENTITY,
+                NOTIFICATION-TYPE, OBJECT-TYPE, TimeTicks, Integer32
+                                        FROM SNMPv2-SMI
+                InterfaceIndex          FROM IF-MIB
+                VlanId                  FROM Q-BRIDGE-MIB
+                MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+                                        FROM SNMPv2-CONF
+                TimeStamp, RowStatus, TEXTUAL-CONVENTION, TruthValue
+                                        FROM SNMPv2-TC
+                softentIND1Erp          FROM ALCATEL-IND1-BASE;
+
+
+        alcatelIND1ERPMIB MODULE-IDENTITY
+                LAST-UPDATED "200807100000Z"    --      07/10/2008 00:00 GMT
+                ORGANIZATION "Alcatel-Lucent"
+                CONTACT-INFO
+                "Please consult with Customer Service to insure the most appropriate
+                version of this document is used with the products in question:
+
+                Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                26801 West Agoura Road
+                Agoura Hills, CA  91301-5122
+                United States Of America
+
+                Telephone:              North America  +1 800 995 2696
+                                        Latin America  +1 877 919 9526
+                                        Europe         +31 23 556 0100
+                                        Asia           +65 394 7933
+                                        All Other      +1 818 878 4507
+
+                Electronic Mail:         support@ind.alcatel.com
+                World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+                DESCRIPTION
+                        "This module describes an authoritative enterprise-specific Simple
+                        Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                        For the Birds Of Prey Product Line
+                        ERP Switching is protection switching mechanism for ETH Layer Ethernet Ring
+                        topologies.
+
+                        The right to make changes in specification and other information
+                        contained in this document without prior notice is reserved.
+
+                        No liability shall be assumed for any incidental, indirect, special, or
+                        consequential damages whatsoever arising from or related to this
+                        document or the information contained herein.
+
+                        Vendors, end-users, and other interested parties are granted
+                        non-exclusive license to use this specification in connection with
+                        management of the products for which it is intended to be used.
+
+                        Copyright (C) 1995-2008 Alcatel-Lucent, Incorporated
+                        ALL RIGHTS RESERVED WORLDWIDE"
+
+                REVISION      "200807100000Z"
+
+                DESCRIPTION
+                        "The ERP MIB defines a set of ERP related management objects for ports
+                        that support Ethernet Ring Protection (ERP) Switching Protocol for ETH
+                        Layer Ring Topologies. With this, rapid protection switching of 50ms can
+                        be achieved.
+
+                        This MIB comprises proprietary managed objects as well the objects required
+                        for conforming to the protocol."
+       ::= { softentIND1Erp 1}
+
+-- This MIB contains the following groups
+alcatelIND1ERPMIBObjects OBJECT-IDENTITY
+           STATUS current
+           DESCRIPTION
+                "Branch For ERP
+                Subsystem Managed Objects."
+       ::= { alcatelIND1ERPMIB 1 }
+
+alaErpNotifications OBJECT IDENTIFIER   ::= { alcatelIND1ERPMIB 2 }
+alcatelIND1ERPMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1ERPMIB 3 }
+
+-- alcatelIND1ERPMIBObjects contains following groups
+       alaErpGlobal            OBJECT IDENTIFIER ::= {alcatelIND1ERPMIBObjects 1}
+       alaErpRingAttributes    OBJECT IDENTIFIER ::= {alcatelIND1ERPMIBObjects 2}
+
+
+-- ******************************************************************
+-- Textual conventions
+-- ******************************************************************
+
+AlaErpRingPortStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the status of the Ring Port.
+
+        forwarding(1)         Status is forwarding.
+        blocking(2)           Status is blocking."
+
+    SYNTAX      INTEGER
+                {
+                  forwarding (1),
+                  blocking   (2)
+                }
+
+AlaErpRingPortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the type of the Ring Port.
+
+        nonRpl(1)  Port is Non-RPL Port.
+        rpl(2)     Port is RPL Port. Node is RPL Owner for the Ring."
+
+    SYNTAX      INTEGER
+                {
+                  nonRpl (1),
+                  rpl     (2)
+                }
+
+AlaErpRingMepId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Maintenance association End Point Identifier (MEPID): A small
+        integer, unique over a given Maintenance Association,
+        identifying a specific MEP."
+
+    REFERENCE
+       "802.1ag clauses 3.18 and 19.2.1"
+
+    SYNTAX      Unsigned32 (1..8191)
+
+AlaErpRingMEGLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "MEG level of the R-APS PDU to be inserted."
+
+    SYNTAX      Unsigned32 (0..7)
+
+
+-- ******************************************************************
+--      ERP Global Variables
+-- ******************************************************************
+
+
+alaErpClearStats OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  default(0),
+                  reset(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the global clear statistics control for ERP.
+         The value reset (1) indicates that ERP should clear all
+         statistics related to all the rings in the system.
+         By default, this object contains a zero value."
+    DEFVAL  { default }
+    ::= { alaErpGlobal 1 }
+
+-- ******************************************************************
+--      ERP Ring Table
+-- ******************************************************************
+
+alaErpRingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaErpRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "There is one ERP Ring table per bridge. It permits
+        the configuration of Ring."
+    ::= { alaErpRingAttributes 1 }
+
+alaErpRingEntry OBJECT-TYPE
+    SYNTAX      AlaErpRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The ERP Ring table entry."
+    INDEX { alaErpRingId }
+    ::= { alaErpRingTable 1 }
+
+AlaErpRingEntry ::= SEQUENCE {
+      alaErpRingId                      INTEGER,
+      alaErpRingServiceVid              VlanId,
+      alaErpRingMEGLevel                AlaErpRingMEGLevel,
+      alaErpRingPort1                   InterfaceIndex,
+      alaErpRingPort2                   InterfaceIndex,
+      alaErpRingStatus                  INTEGER,
+      alaErpRingState                   INTEGER,
+      alaErpRingWaitToRestoreTimer      Unsigned32,
+      alaErpRingGuardTimer              Integer32,
+      alaErpRingClearStats              INTEGER,
+      alaErpRingLastStateChange         TimeStamp,
+      alaErpRingTimeToRevert            TimeTicks,
+      alaErpRingRowStatus               RowStatus
+    }
+
+alaErpRingId OBJECT-TYPE
+    SYNTAX      INTEGER (1 .. 2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+       "Ring identifier that is unique in the bridge."
+    ::= { alaErpRingEntry 1 }
+
+alaErpRingServiceVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "An integer indicating the VID of Service VLAN. All the ERP
+       control traffic will flow with Service VLAN tag across the
+       ring. This object must be specified while creating a row in
+       this table. Once the row has been created, the value of 
+       this object cannot be changed."
+    ::= { alaErpRingEntry 2 }
+
+alaErpRingMEGLevel OBJECT-TYPE
+    SYNTAX      AlaErpRingMEGLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "MEG level of the R-APS PDU to be inserted for this Ring.
+       This object must be specified while creating a row in
+       this table. Once the row has been created, the value of 
+       this object cannot be changed."
+    ::= { alaErpRingEntry 3 }
+
+alaErpRingPort1 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object is the interface index of the ring port,which is
+       either a bridge port, or an aggregated link within a bridge,
+       on which ring is configured.
+       There can be only two ring ports per ring in a bridge.
+       This object must be specified while creating a row in
+       this table. Once the row has been created, the value of 
+       this object cannot be changed."
+    ::= { alaErpRingEntry 4 }
+
+alaErpRingPort2 OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object is the interface index of the ring port,which is
+       either a bridge port, or an aggregated link within a bridge,
+       on which ring is configured.
+       There can be only two ring ports per ring in a bridge.
+       This object must be specified while creating a row in
+       this table. Once the row has been created, the value of 
+       this object cannot be changed."
+    ::= { alaErpRingEntry 5 }
+
+alaErpRingStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "An Integer value indicating the administrative state of the Ring.
+
+        enabled indicates that the Ring is to function normally, and
+        disabled that it is to cease functioning."
+    DEFVAL { disabled }
+    ::= { alaErpRingEntry 6 }
+
+alaErpRingState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  idle (0),
+                  protection (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS              current
+    DESCRIPTION
+       "The current state of the Ring."
+    ::= { alaErpRingEntry 7 }
+
+alaErpRingWaitToRestoreTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0 .. 12)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object is valid only for RPL Node.
+
+       This timer is started to prevent frequent operation switch due
+       to an intermittent defect.
+
+       It may be configured by the operator in 1 minute steps between
+       0 and 12 minutes."
+    DEFVAL { 5 }
+    ::= { alaErpRingEntry 8 }
+
+alaErpRingGuardTimer OBJECT-TYPE
+    SYNTAX      Integer32 ( 1 .. 200)
+    UNITS       "10 milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Defines the guard timer value in centiseconds.
+
+        This timer is started to prevent the ring nodes from receiving
+        outdated R-APS messages.
+
+        It may be configured by the operator in 10 ms steps between
+        10 ms to 2 seconds."
+    DEFVAL { 50 }
+    ::= { alaErpRingEntry 9 }
+
+alaErpRingClearStats OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  default(0),
+                  reset(1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Defines per ring clear statistics control for ERP.
+        The value reset (1) indicates that ERP should clear all
+        statistics related to a ring in the system.By default,
+        this object contains a zero value."
+    DEFVAL  { default }
+    ::= { alaErpRingEntry 10 }
+
+
+alaErpRingLastStateChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time (SysUpTime) at which the ethernet ring last 
+        entered either the IDLE or PROTECTION state."
+    ::= { alaErpRingEntry 11 }
+
+alaErpRingTimeToRevert OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Defines the time left to revert from Protection State to Idle State."
+    ::= {alaErpRingEntry 12}
+
+alaErpRingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated."
+    ::= { alaErpRingEntry 13 }
+
+-- ******************************************************************
+-- The ERP RING Port Table
+-- ******************************************************************
+
+alaErpRingPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaErpRingPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "There is one ERP Ring Port table per bridge. It permits
+        the configuration of Ring Ports."
+    ::= { alaErpRingAttributes 2 }
+
+alaErpRingPortEntry OBJECT-TYPE
+    SYNTAX      AlaErpRingPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The ERP Ring Port table entry."
+    INDEX { alaErpRingId, alaErpRingPortIfIndex }
+    ::= { alaErpRingPortTable 1 }
+
+AlaErpRingPortEntry ::= SEQUENCE {
+      alaErpRingPortIfIndex     InterfaceIndex,
+      alaErpRingPortStatus      AlaErpRingPortStatus,
+      alaErpRingPortType        AlaErpRingPortType,
+      alaErpRingPortEthOAMEvent TruthValue,
+      alaErpRingPortClearStats  INTEGER,
+      alaErpRingPortRmepId      AlaErpRingMepId
+    }
+
+alaErpRingPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+       "This object is the interface index of the interface either a
+        bridge port, or an aggregated link within a bridge port, to
+        which ring port is configured.
+        There can be only two ring ports per ring in a bridge."
+    ::= { alaErpRingPortEntry 1 }
+
+alaErpRingPortStatus OBJECT-TYPE
+    SYNTAX      AlaErpRingPortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Status of the Ring Port."
+    DEFVAL { blocking }
+    ::= { alaErpRingPortEntry 2 }
+
+alaErpRingPortType OBJECT-TYPE
+    SYNTAX      AlaErpRingPortType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Type of the Ring Port.
+
+       To configure a node as a RPL owner for the ring, this object
+       has value of RPL(2)."
+    DEFVAL { nonRpl }
+    ::= { alaErpRingPortEntry 3 }
+
+alaErpRingPortEthOAMEvent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "A Boolean indicating whether ERP Ring Port shall take loss of
+       connectivity event from Ethernet OAM.
+
+       True indicates that the Ring Port is to take events from
+       Ethernet OAM."
+    DEFVAL { false }
+    ::= { alaErpRingPortEntry 4 }
+
+alaErpRingPortClearStats OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  default(0),
+                  reset(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Defines per ring port clear statistics control for ERP.
+        The value reset (1) indicates that ERP should clear all
+        statistics related to a ring port in the system.By default,
+        this object contains a zero value."
+    DEFVAL  { default }
+    ::= { alaErpRingPortEntry 5 }
+
+alaErpRingPortRmepId OBJECT-TYPE
+    SYNTAX      AlaErpRingMepId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Identifier of Remote Endpoint."
+    ::= { alaErpRingPortEntry 6 }
+
+-- ******************************************************************
+-- The ERP VLAN Table
+-- ******************************************************************
+
+alaErpRingVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaErpRingVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table defines the association of VIDs and RingIds.
+
+        The writable objects in this table need to be persistent
+        upon reboot or restart of a device."
+    ::= { alaErpRingAttributes 3 }
+
+alaErpRingVlanEntry OBJECT-TYPE
+    SYNTAX      AlaErpRingVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The VLAN table entry."
+    INDEX { alaErpRingId, alaErpRingVlanProtectedVid }
+    ::= { alaErpRingVlanTable 1 }
+
+AlaErpRingVlanEntry ::= SEQUENCE {
+      alaErpRingVlanProtectedVid        VlanId,
+      alaErpRingVlanRowStatus           RowStatus
+    }
+
+alaErpRingVlanProtectedVid OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An integer indicating the VID of Protected VLAN."
+    ::= { alaErpRingVlanEntry 1 }
+
+alaErpRingVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row can not be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated."
+    ::= { alaErpRingVlanEntry 2 }
+
+-- ******************************************************************
+-- The ERP Statistics Table
+-- ******************************************************************
+
+alaErpStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaErpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "There is one ERP Stats table per bridge. This table
+       contains the statistics for the ERP on per Ring basis."
+    ::= { alaErpRingAttributes 4 }
+
+alaErpStatsEntry OBJECT-TYPE
+    SYNTAX      AlaErpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Statistics table entry."
+    AUGMENTS { alaErpRingPortEntry }
+    ::= { alaErpStatsTable 1 }
+
+AlaErpStatsEntry ::= SEQUENCE {
+      alaErpStatsSignalFailPduTx        Counter32,
+      alaErpStatsSignalFailPduRx        Counter32,
+      alaErpStatsSignalFailPduDrop      Counter32,
+      alaErpStatsNoRequestPduTx         Counter32,
+      alaErpStatsNoRequestPduRx         Counter32,
+      alaErpStatsNoRequestPduDrop       Counter32,
+      alaErpStatsRPLBlockPDUTx          Counter32,
+      alaErpStatsRPLBlockPDURx          Counter32,
+      alaErpStatsRPLBlockPDUDrop        Counter32,
+      alaErpStatsPDUErr                 Counter32
+    }
+
+alaErpStatsSignalFailPduTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of R-APS (SF) PDUs transmitted on this
+       interface for this Ring."
+    ::= { alaErpStatsEntry 1 }
+
+alaErpStatsSignalFailPduRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of valid R-APS (SF) PDUs received on this
+       interface for this Ring."
+    ::= { alaErpStatsEntry 2 }
+
+alaErpStatsSignalFailPduDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of valid R-APS (SF) PDUs dropped."
+    ::= { alaErpStatsEntry 3 }
+
+
+alaErpStatsNoRequestPduTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of R-APS (NR) PDUs transmitted on this
+       interface for this Ring."
+    ::= { alaErpStatsEntry 4 }
+
+alaErpStatsNoRequestPduRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of valid R-APS (NR) PDUs received on this
+       interface for this Ring."
+    ::= { alaErpStatsEntry 5 }
+
+alaErpStatsNoRequestPduDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of valid R-APS (NR) PDUs dropped."
+    ::= { alaErpStatsEntry 6 }
+
+alaErpStatsRPLBlockPDUTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of R-APS (NR, RB) PDUs transmitted on this
+       interface for this Ring."
+    ::= { alaErpStatsEntry 7 }
+
+alaErpStatsRPLBlockPDURx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of valid R-APS (NR, RB) PDUs received on this
+       interface for this Ring."
+    ::= { alaErpStatsEntry 8 }
+
+alaErpStatsRPLBlockPDUDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of valid R-APS (NR, RB) PDUs dropped."
+    ::= { alaErpStatsEntry 9 }
+
+alaErpStatsPDUErr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A count of the number of error R-APS PDUs received."
+    ::= { alaErpStatsEntry 10 }
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- ******************************************************************
+
+alaErpNotificationsRoot OBJECT IDENTIFIER   ::= { alaErpNotifications 0 }
+
+        alaErpRingStateChanged NOTIFICATION-TYPE
+        OBJECTS  {
+                        alaErpRingId,
+                        alaErpRingState
+                 }
+        STATUS   current
+        DESCRIPTION
+                "The ERP Ring State has changed to Protection from Idle. Notify the user by
+                 raising the Trap. "
+        ::= { alaErpNotificationsRoot 1 }
+
+        alaErpRingMultipleRpl NOTIFICATION-TYPE
+        OBJECTS {
+                        alaErpRingId
+                }
+        STATUS  current
+        DESCRIPTION
+                "The trap shall be raised on RPL if there are multiple RPLs detected in the
+                ring. When the RPL node receives the NR (RB) message, this trap is raised."
+        ::= { alaErpNotificationsRoot 2}
+
+        alaErpRingRemoved NOTIFICATION-TYPE
+        OBJECTS {
+                        alaErpRingId
+                }
+        STATUS  current
+        DESCRIPTION
+                "The trap shall be raised whenever the ring is removed dynamically in
+                Unlike NI Scenario only."
+        ::= { alaErpNotificationsRoot 3 }
+
+        alaErpRingPortStatusChanged NOTIFICATION-TYPE
+        OBJECTS {
+                          alaErpRingId,
+       			alaErpRingPortIfIndex,
+       			alaErpRingPortStatus
+                }
+        STATUS  current
+        DESCRIPTION
+                "The trap shall be raised whenever the ring port status is changed."
+        ::= { alaErpNotificationsRoot 4 }
+
+
+-- ******************************************************************
+-- CONFORMANCE
+-- ******************************************************************
+
+        alcatelIND1ERPMIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1ERPMIBConformance 1 }
+        alcatelIND1ERPMIBGroups OBJECT IDENTIFIER ::= { alcatelIND1ERPMIBConformance 2 }
+
+-- ******************************************************************
+
+-- ******************************************************************
+-- COMPLIANCE
+-- ******************************************************************
+        alcatelIND1ERPMIBCompliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+                "Compliance statement for ERP."
+        MODULE
+        MANDATORY-GROUPS
+        {
+                alaErpGlobalGroup,
+                alaErpRingAttributesGroup,
+                alaErpNotificationGroup
+        }
+        ::= { alcatelIND1ERPMIBCompliances 1 }
+
+-- ******************************************************************
+-- MIB Grouping
+-- ******************************************************************
+
+alaErpGlobalGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaErpClearStats
+   }
+   STATUS      current
+   DESCRIPTION
+       "Objects for the Global Group."
+    ::={alcatelIND1ERPMIBGroups 1 }
+
+alaErpRingAttributesGroup OBJECT-GROUP
+   OBJECTS
+   {
+        alaErpRingServiceVid,
+        alaErpRingMEGLevel,
+        alaErpRingPort1,
+        alaErpRingPort2,
+        alaErpRingStatus,
+        alaErpRingState,
+        alaErpRingWaitToRestoreTimer,
+        alaErpRingGuardTimer,
+        alaErpRingClearStats,
+        alaErpRingLastStateChange,
+        alaErpRingTimeToRevert,
+        alaErpRingRowStatus,
+        alaErpRingPortStatus,
+        alaErpRingPortType,
+        alaErpRingPortEthOAMEvent,
+        alaErpRingPortClearStats,
+        alaErpRingPortRmepId,
+        alaErpRingVlanRowStatus,
+        alaErpStatsSignalFailPduTx,
+        alaErpStatsSignalFailPduRx,
+        alaErpStatsSignalFailPduDrop,
+        alaErpStatsNoRequestPduTx,
+        alaErpStatsNoRequestPduRx,
+        alaErpStatsNoRequestPduDrop,
+        alaErpStatsRPLBlockPDUTx,
+        alaErpStatsRPLBlockPDURx,
+        alaErpStatsRPLBlockPDUDrop,
+        alaErpStatsPDUErr
+   }
+   STATUS      current
+   DESCRIPTION
+       "Objects for the Ring Group."
+    ::={alcatelIND1ERPMIBGroups 2 }
+
+alaErpNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS
+   {
+        alaErpRingStateChanged,
+        alaErpRingMultipleRpl,
+        alaErpRingRemoved,
+        alaErpRingPortStatusChanged
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of notifications for ERP."
+   ::= { alcatelIND1ERPMIBGroups 3 }
+END
+

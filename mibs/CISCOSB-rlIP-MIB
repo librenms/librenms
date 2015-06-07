@@ -1,0 +1,334 @@
+CISCOSB-rlIP-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB IP MIB
+--                       IP Extension/Private MIB
+--                       IPv6 auto configured address representation support
+--                       based on IP standard MIB IP-MIB
+-- Version:              0.00
+-- Date:                 16 June 2013
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter32, IpAddress,
+    mib-2, Unsigned32, Counter64,
+    zeroDotZero                        FROM SNMPv2-SMI
+    PhysAddress, TruthValue,
+    TimeStamp, RowPointer,
+    TEXTUAL-CONVENTION, TestAndIncr,
+    RowStatus, StorageType, DisplayString
+                                       FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    InetVersion, InetZoneIndex         FROM INET-ADDRESS-MIB
+    InterfaceIndex                     FROM IF-MIB
+    IpAddressOriginTC, IpAddressStatusTC
+                                       FROM IP-MIB
+    switch001                          FROM CISCOSB-MIB;
+
+rlIp MODULE-IDENTITY
+    LAST-UPDATED "201306161200Z" -- Sun June 16 12:00:00 PST 2011
+       ORGANIZATION "Cisco Systems, Inc."
+    CONTACT-INFO
+       "Postal: 170 West Tasman Drive
+       San Jose , CA 95134-1706
+       USA
+
+       
+       Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+    DESCRIPTION
+            "The private MIB module definition for Auto Configured IPv6 Address representation."
+    REVISION "201306161200Z"
+    DESCRIPTION
+            "Initial version of this MIB."
+    ::= { switch001 250 }
+
+--
+-- The textual conventions we define and use in this MIB.
+--
+
+RlIpAddressOriginTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "The origin of the address.
+
+            following are same as ipAddressOriginTC in standard MIB:
+
+            manual(2) indicates that the address was manually configured
+            to a specified address, e.g., by user configuration.
+
+            dhcp(4) indicates an address that was assigned to this
+            system by a DHCP server.
+
+            linklayer(5) indicates an address created by IPv6 stateless
+            auto-configuration.
+
+            random(6) indicates an address chosen by the system at
+            random, e.g., an IPv4 address within 169.254/16, or an RFC
+            3041 privacy address.
+
+            following are additional to standard MIB:
+
+            autoConfig(7) indicates that the address was auto configured configured
+            to a specified address, e.g., not by user configuration.
+
+            eui64(8) indicates that the address was partially configured configured
+            to a specified address, e.g., address suffix is based on MAC address with
+            EUI-64 representation.
+
+            tunnelIsatap(9) indicates that the address an ISATATP tunnel representation.
+
+            tunnelIsatap(10) indicates that the address an 6to4 tunnel representation.
+
+            tunnelIsatap(11) indicates that the address was partially configured configured
+            to a specified address, e.g., address prefix is preconfigured.
+            "
+    SYNTAX     INTEGER {
+        other(1),
+        manual(2),
+        dhcp(4),
+        linklayer(5),
+        random(6),
+-- additional to standard MIB
+        autoConfig(7),
+        eui64(8),
+        tunnelIsatap(9),
+        tunnel6to4(10),
+        generalPrefix(11)
+    }
+
+
+--
+-- Internet Address Table (Private/Extension)
+--
+
+rlIpAddressTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlIpAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table contains addressing information relevant to the
+            entity's interfaces.
+
+            in addition to ipAddressTable defined in standard MIB a represenattion of
+            IPv6 addresses based on additionl address origin such as EUI-64, general
+            prefix etc.
+            In this case the address information is partial address information.
+            Together with the address origin and the general prefix (when needed) user can
+            construct full address information.
+
+            The index (key) for this table includes this information additionally to the address."
+    ::= { rlIp 1 }
+
+rlIpAddressEntry OBJECT-TYPE
+    SYNTAX     RlIpAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An address mapping for a particular interface."
+    INDEX { rlIpAddressAddrType,
+            rlIpAddressAddr,
+            rlIpAddressOrigin,
+            rlIpAddressGeneralPrefixName }
+    ::= { rlIpAddressTable 1 }
+
+RlIpAddressEntry ::= SEQUENCE {
+        rlIpAddressAddrType     InetAddressType,
+        rlIpAddressAddr         InetAddress,
+-- additional to standard MIB
+        rlIpAddressOrigin       RlIpAddressOriginTC,
+        rlIpAddressGeneralPrefixName
+                                DisplayString,
+--
+        rlIpAddressIfIndex      InterfaceIndex,
+        rlIpAddressExtdType     INTEGER,
+        rlIpAddressPrefix       RowPointer,
+-- following filed has changed to a key
+--      rlIpAddressOrigin       IpAddressOriginTC,
+        rlIpAddressStatus       IpAddressStatusTC,
+        rlIpAddressCreated      TimeStamp,
+        rlIpAddressLastChanged  TimeStamp,
+        rlIpAddressRowStatus    RowStatus,
+        rlIpAddressStorageType  StorageType,
+-- additional fields - based on 'IpAddressEntry' augmentation
+        rlIpAddressExtdPrefixLength InetAddressPrefixLength,
+        rlIpAddressCompleteAddr InetAddress
+    }
+
+rlIpAddressAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of rlIpAddressAddr."
+    ::= { rlIpAddressEntry 1 }
+
+rlIpAddressAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP address to which this entry's addressing information
+            pertains.  The address type of this object is specified in
+            rlIpAddressAddrType.
+
+            In case of auto-configure address such as eui-64, general-prefix and others
+            it contains the partial address before appropriate manipulation.
+
+            Implementors need to be aware that if the size of
+            rlIpAddressAddr exceeds 116 octets, then OIDS of instances of
+            columns in this row will have more than 128 sub-identifiers
+            and cannot be accessed using SNMPv1, SNMPv2c, or SNMPv3."
+    ::= { rlIpAddressEntry 2 }
+
+-- additional to standard MIB
+
+rlIpAddressOrigin OBJECT-TYPE
+    SYNTAX     RlIpAddressOriginTC
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The origin of the address."
+    ::= { rlIpAddressEntry 3 }
+
+rlIpAddressGeneralPrefixName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name assigned to the prefix."
+    ::= { rlIpAddressEntry 4 }
+
+rlIpAddressIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface to
+            which this entry is applicable.  The interface identified by
+            a particular value of this index is the same interface as
+            identified by the same value of the IF-MIB's ifIndex."
+    ::= { rlIpAddressEntry 5 }
+
+rlIpAddressExtdType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 unicast(1),
+                 anycast(2),
+                 broadcast(3),
+                 multicast(4)
+    }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "Extend standard field ipAddressType to multicast"
+    DEFVAL { unicast }
+    ::= { rlIpAddressEntry 6 }
+
+rlIpAddressPrefix OBJECT-TYPE
+    SYNTAX     RowPointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "A pointer to the row in the prefix table to which this
+            address belongs.  May be { 0 0 } if there is no such row."
+    DEFVAL { zeroDotZero }
+    ::= { rlIpAddressEntry 7 }
+
+-- following filed has changed to a key
+-- rlIpAddressOrigin OBJECT-TYPE
+--     SYNTAX     IpAddressOriginTC
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--            "The origin of the address."
+--     ::= { rlIpAddressEntry 8 }
+
+rlIpAddressStatus OBJECT-TYPE
+    SYNTAX     IpAddressStatusTC
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The status of the address, describing if the address can be
+            used for communication.
+
+            In the absence of other information, an IPv4 address is
+            always preferred(1)."
+    DEFVAL { preferred }
+    ::= { rlIpAddressEntry 8 }
+
+rlIpAddressCreated OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime at the time this entry was created.
+            If this entry was created prior to the last re-
+            initialization of the local network management subsystem,
+            then this object contains a zero value."
+    ::= { rlIpAddressEntry 9 }
+
+rlIpAddressLastChanged OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime at the time this entry was last
+            updated.  If this entry was updated prior to the last re-
+            initialization of the local network management subsystem,
+            then this object contains a zero value."
+    ::= { rlIpAddressEntry 10 }
+
+rlIpAddressRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The status of this conceptual row.
+
+            The RowStatus TC requires that this DESCRIPTION clause
+            states under which circumstances other objects in this row
+            can be modified.  The value of this object has no effect on
+            whether other objects in this conceptual row can be
+            modified.
+
+            A conceptual row can not be made active until the
+            rlIpAddressIfIndex has been set to a valid index."
+    ::= { rlIpAddressEntry 11 }
+
+rlIpAddressStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The storage type for this conceptual row.  If this object
+            has a value of 'permanent', then no other objects are
+            required to be able to be modified."
+    DEFVAL { volatile }
+    ::= { rlIpAddressEntry 12 }
+
+
+-- additional fields - based on 'ipAddressEntry' augmentation
+
+rlIpAddressExtdPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The prefix length of this address."
+    DEFVAL { 64 }
+    ::= { rlIpAddressEntry 13 }
+
+rlIpAddressCompleteAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The Complete IP address to which this entry's addressing information
+            pertains.
+
+            In case of auto-configure address such as eui-64, general-prefix and others
+            it contains the complete address after appropriate manipulation"
+    ::= { rlIpAddressEntry 14 }
+
+END

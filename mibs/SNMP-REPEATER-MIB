@@ -1,0 +1,1319 @@
+-- *****************************************************************
+-- SNMP-REPEATER-MIB.my: rfc1516 802.3 Repeater MIB
+--
+-- Oct 1994, Steve Garcia
+--
+-- Copyright (c) 1994-1995 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+
+--
+-- This mib was extracted from RFC 1516
+--
+
+   SNMP-REPEATER-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       Counter, TimeTicks, Gauge
+                                           FROM RFC1155-SMI
+       mib-2,
+       DisplayString                       FROM RFC1213-MIB
+       TRAP-TYPE                           FROM RFC-1215
+       OBJECT-TYPE                         FROM RFC-1212;
+
+
+   snmpDot3RptrMgt OBJECT IDENTIFIER ::= { mib-2 22 }
+
+
+   -- All representations of MAC addresses in this MIB Module use,
+   -- as a textual convention (i.e., this convention does not affect
+   -- their encoding), the data type:
+
+   MacAddress ::= OCTET STRING (SIZE (6))    -- a 6 octet address in
+                                             -- the "canonical" order
+   -- defined by IEEE 802.1a, i.e., as if it were transmitted least
+   -- significant bit first.
+
+
+   --                      References
+   --
+   -- The following references are used throughout this MIB:
+   --
+   -- [IEEE 802.3 Std]
+   --    refers to IEEE 802.3/ISO 8802-3 Information processing
+   --    systems - Local area networks - Part 3: Carrier sense
+   --    multiple access with collision detection (CSMA/CD)
+   --    access method and physical layer specifications
+   --    (2nd edition, September 21, 1990).
+   --
+   -- [IEEE 802.3 Rptr Mgt]
+   --    refers to IEEE P802.3K, 'Layer Management for 10 Mb/s
+   --    Baseband Repeaters, Section 19,' Draft Supplement to
+   --    ANSI/IEEE 802.3, (Draft 8, April 9, 1992)
+
+
+   --                      MIB Groups
+   --
+   -- The rptrBasicPackage group is mandatory.
+   -- The rptrMonitorPackage and rptrAddrTrackPackage
+   -- groups are optional.
+
+
+   rptrBasicPackage
+       OBJECT IDENTIFIER ::= { snmpDot3RptrMgt 1 }
+
+   rptrMonitorPackage
+       OBJECT IDENTIFIER ::= { snmpDot3RptrMgt 2 }
+
+   rptrAddrTrackPackage
+       OBJECT IDENTIFIER ::= { snmpDot3RptrMgt 3 }
+
+
+   -- object identifiers for organizing the information
+   -- in the groups by repeater, port-group, and port
+
+   rptrRptrInfo
+       OBJECT IDENTIFIER ::= { rptrBasicPackage 1 }
+   rptrGroupInfo
+       OBJECT IDENTIFIER ::= { rptrBasicPackage 2 }
+   rptrPortInfo
+       OBJECT IDENTIFIER ::= { rptrBasicPackage 3 }
+
+   rptrMonitorRptrInfo
+       OBJECT IDENTIFIER ::= { rptrMonitorPackage 1 }
+   rptrMonitorGroupInfo
+       OBJECT IDENTIFIER ::= { rptrMonitorPackage 2 }
+   rptrMonitorPortInfo
+       OBJECT IDENTIFIER ::= { rptrMonitorPackage 3 }
+
+   rptrAddrTrackRptrInfo     -- this subtree is currently unused
+       OBJECT IDENTIFIER ::= { rptrAddrTrackPackage 1 }
+   rptrAddrTrackGroupInfo    -- this subtree is currently unused
+       OBJECT IDENTIFIER ::= { rptrAddrTrackPackage 2 }
+   rptrAddrTrackPortInfo
+       OBJECT IDENTIFIER ::= { rptrAddrTrackPackage 3 }
+
+
+   --
+   --                    The BASIC GROUP
+   --
+   -- Implementation of the Basic Group is mandatory for all
+   -- managed repeaters.
+
+   --
+   -- Basic Repeater Information
+   --
+   -- Configuration, status, and control objects for the overall
+   -- repeater
+   --
+
+   rptrGroupCapacity OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The rptrGroupCapacity is the number of groups
+               that can be contained within the repeater.  Within
+               each managed repeater, the groups are uniquely
+               numbered in the range from 1 to rptrGroupCapacity.
+
+               Some groups may not be present in the repeater, in
+               which case the actual number of groups present
+               will be less than rptrGroupCapacity.  The number
+               of groups present will never be greater than
+               rptrGroupCapacity.
+
+               Note:  In practice, this will generally be the
+               number of field-replaceable units (i.e., modules,
+               cards, or boards) that can fit in the physical
+               repeater enclosure, and the group numbers will
+               correspond to numbers marked on the physical
+               enclosure."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.2,
+               aRepeaterGroupCapacity."
+       ::= { rptrRptrInfo 1 }
+
+   rptrOperStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+                   other(1),            -- undefined or unknown status
+                   ok(2),               -- no known failures
+                   rptrFailure(3),      -- repeater-related failure
+                   groupFailure(4),     -- group-related failure
+                   portFailure(5),      -- port-related failure
+                   generalFailure(6)    -- failure, unspecified type
+               }
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The rptrOperStatus object indicates the
+               operational state of the repeater.  The
+               rptrHealthText object may be consulted for more
+               specific information about the state of the
+               repeater's health.
+
+               In the case of multiple kinds of failures (e.g.,
+               repeater failure and port failure), the value of
+               this attribute shall reflect the highest priority
+               failure in the following order, listed highest
+               priority first:
+
+                   rptrFailure(3)
+                   groupFailure(4)
+                   portFailure(5)
+                   generalFailure(6)."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.2,
+               aRepeaterHealthState."
+       ::= { rptrRptrInfo 2 }
+
+   rptrHealthText OBJECT-TYPE
+       SYNTAX    DisplayString (SIZE (0..255))
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The health text object is a text string that
+               provides information relevant to the operational
+               state of the repeater.  Agents may use this string
+               to provide detailed information on current
+               failures, including how they were detected, and/or
+               instructions for problem resolution.  The contents
+               are agent-specific."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.2,
+               aRepeaterHealthText."
+       ::= { rptrRptrInfo 3 }
+
+   rptrReset OBJECT-TYPE
+       SYNTAX    INTEGER {
+                     noReset(1),
+                     reset(2)
+                 }
+       ACCESS    read-write
+       STATUS    mandatory
+       DESCRIPTION
+               "Setting this object to reset(2) causes a
+               transition to the START state of Fig 9-2 in
+               section 9 [IEEE 802.3 Std].
+
+               Setting this object to noReset(1) has no effect.
+               The agent will always return the value noReset(1)
+               when this object is read.
+
+               After receiving a request to set this variable to
+               reset(2), the agent is allowed to delay the reset
+               for a short period.  For example, the implementor
+               may choose to delay the reset long enough to allow
+               the SNMP response to be transmitted.  In any
+               event, the SNMP response must be transmitted.
+
+               This action does not reset the management counters
+               defined in this document nor does it affect the
+               portAdminStatus parameters.  Included in this
+               action is the execution of a disruptive Self-Test
+               with the following characteristics:  a) The nature
+               of the tests is not specified.  b) The test resets
+               the repeater but without affecting management
+               information about the repeater.  c) The test does
+               not inject packets onto any segment.  d) Packets
+               received during the test may or may not be
+               transferred.  e) The test does not interfere with
+               management functions.
+
+               After performing this self-test, the agent will
+               update the repeater health information (including
+               rptrOperStatus and rptrHealthText), and send a
+               rptrHealth trap."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.3,
+               acResetRepeater."
+       ::= { rptrRptrInfo 4 }
+
+   rptrNonDisruptTest OBJECT-TYPE
+       SYNTAX    INTEGER {
+                     noSelfTest(1),
+                     selfTest(2)
+                 }
+       ACCESS    read-write
+       STATUS    mandatory
+       DESCRIPTION
+               "Setting this object to selfTest(2) causes the
+               repeater to perform a agent-specific, non-
+               disruptive self-test that has the following
+               characteristics:  a) The nature of the tests is
+               not specified.  b) The test does not change the
+               state of the repeater or management information
+               about the repeater.  c) The test does not inject
+               packets onto any segment.  d) The test does not
+               prevent the relay of any packets.  e) The test
+               does not interfere with management functions.
+
+               After performing this test, the agent will update
+               the repeater health information (including
+               rptrOperStatus and rptrHealthText) and send a
+               rptrHealth trap.
+
+               Note that this definition allows returning an
+               'okay' result after doing a trivial test.
+
+               Setting this object to noSelfTest(1) has no
+               effect.  The agent will always return the value
+               noSelfTest(1) when this object is read."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.3,
+               acExecuteNonDisruptiveSelfTest."
+       ::= { rptrRptrInfo 5 }
+
+   rptrTotalPartitionedPorts OBJECT-TYPE
+       SYNTAX    Gauge
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object returns the total number of ports in
+               the repeater whose current state meets all three
+               of the following criteria:  rptrPortOperStatus
+               does not have the value notPresent(3),
+               rptrPortAdminStatus is enabled(1), and
+               rptrPortAutoPartitionState is autoPartitioned(2)."
+       ::= { rptrRptrInfo 6 }
+
+   --
+   -- The Basic Port Group Table
+   --
+
+   rptrGroupTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF RptrGroupEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "Table of descriptive and status information about
+               the groups of ports."
+       ::= { rptrGroupInfo 1 }
+
+   rptrGroupEntry OBJECT-TYPE
+       SYNTAX    RptrGroupEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "An entry in the table, containing information
+               about a single group of ports."
+       INDEX    { rptrGroupIndex }
+       ::= { rptrGroupTable 1 }
+
+   RptrGroupEntry ::=
+       SEQUENCE {
+           rptrGroupIndex
+               INTEGER,
+           rptrGroupDescr
+               DisplayString,
+           rptrGroupObjectID
+               OBJECT IDENTIFIER,
+           rptrGroupOperStatus
+               INTEGER,
+           rptrGroupLastOperStatusChange
+               TimeTicks,
+           rptrGroupPortCapacity
+               INTEGER
+       }
+
+   rptrGroupIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the group within the
+               repeater for which this entry contains
+               information.  This value is never greater than
+               rptrGroupCapacity."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.5.2,
+               aGroupID."
+       ::= { rptrGroupEntry 1 }
+
+   rptrGroupDescr OBJECT-TYPE
+       SYNTAX    DisplayString (SIZE (0..255))
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "A textual description of the group.  This value
+               should include the full name and version
+               identification of the group's hardware type and
+               indicate how the group is differentiated from
+               other types of groups in the repeater.  Plug-in
+               Module, Rev A' or 'Barney Rubble 10BASE-T 4-port
+               SIMM socket Version 2.1' are examples of valid
+               group descriptions.
+
+               It is mandatory that this only contain printable
+               ASCII characters."
+       ::= { rptrGroupEntry 2 }
+
+   rptrGroupObjectID OBJECT-TYPE
+       SYNTAX    OBJECT IDENTIFIER
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The vendor's authoritative identification of the
+               group.  This value may be allocated within the SMI
+               enterprises subtree (1.3.6.1.4.1) and provides a
+               straight-forward and unambiguous means for
+               determining what kind of group is being managed.
+
+               For example, this object could take the value
+               1.3.6.1.4.1.4242.1.2.14 if vendor 'Flintstones,
+               Inc.' was assigned the subtree 1.3.6.1.4.1.4242,
+               and had assigned the identifier
+               1.3.6.1.4.1.4242.1.2.14 to its 'Wilma Flintstone
+               6-Port FOIRL Plug-in Module.'"
+       ::= { rptrGroupEntry 3 }
+
+   rptrGroupOperStatus OBJECT-TYPE
+       SYNTAX    INTEGER {
+                     other(1),
+                     operational(2),
+                     malfunctioning(3),
+                     notPresent(4),
+                     underTest(5),
+                     resetInProgress(6)
+                 }
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "An object that indicates the operational status
+               of the group.
+
+               A status of notPresent(4) indicates that the group
+               is temporarily or permanently physically and/or
+               logically not a part of the repeater.  It is an
+               implementation-specific matter as to whether the
+               agent effectively removes notPresent entries from
+               the table.
+
+               A status of operational(2) indicates that the
+               group is functioning, and a status of
+               malfunctioning(3) indicates that the group is
+               malfunctioning in some way."
+       ::= { rptrGroupEntry 4 }
+
+   rptrGroupLastOperStatusChange OBJECT-TYPE
+       SYNTAX    TimeTicks
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "An object that contains the value of sysUpTime at
+               the time that the value of the rptrGroupOperStatus
+               object for this group last changed.
+
+               A value of zero indicates that the group's
+               operational status has not changed since the agent
+               last restarted."
+       ::= { rptrGroupEntry 5 }
+
+   rptrGroupPortCapacity OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The rptrGroupPortCapacity is the number of ports
+               that can be contained within the group.  Valid
+               range is 1-1024.  Within each group, the ports are
+               uniquely numbered in the range from 1 to
+               rptrGroupPortCapacity.
+
+               Note:  In practice, this will generally be the
+               number of ports on a module, card, or board, and
+               the port numbers will correspond to numbers marked
+               on the physical embodiment."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.5.2,
+               aGroupPortCapacity."
+       ::= { rptrGroupEntry 6 }
+
+
+   --
+   -- The Basic Port Table
+   --
+
+   rptrPortTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF RptrPortEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "Table of descriptive and status information about
+               the ports."
+       ::= { rptrPortInfo 1 }
+
+   rptrPortEntry OBJECT-TYPE
+       SYNTAX    RptrPortEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "An entry in the table, containing information
+               about a single port."
+       INDEX    { rptrPortGroupIndex, rptrPortIndex }
+       ::= { rptrPortTable 1 }
+
+   RptrPortEntry ::=
+       SEQUENCE {
+           rptrPortGroupIndex
+               INTEGER,
+           rptrPortIndex
+               INTEGER,
+           rptrPortAdminStatus
+               INTEGER,
+           rptrPortAutoPartitionState
+               INTEGER,
+           rptrPortOperStatus
+               INTEGER
+       }
+
+   rptrPortGroupIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the group containing the
+               port for which this entry contains information."
+       ::= { rptrPortEntry 1 }
+
+   rptrPortIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the port within the group
+               for which this entry contains information.  This
+               value can never be greater than
+               rptrGroupPortCapacity for the associated group."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aPortID."
+       ::= { rptrPortEntry 2 }
+
+   rptrPortAdminStatus OBJECT-TYPE
+       SYNTAX    INTEGER {
+                     enabled(1),
+                     disabled(2)
+                 }
+       ACCESS    read-write
+       STATUS    mandatory
+       DESCRIPTION
+               "Setting this object to disabled(2) disables the
+               port.  A disabled port neither transmits nor
+               receives.  Once disabled, a port must be
+               explicitly enabled to restore operation.  A port
+               which is disabled when power is lost or when a
+               reset is exerted shall remain disabled when normal
+               operation resumes.
+
+               The admin status takes precedence over auto-
+               partition and functionally operates between the
+               auto-partition mechanism and the AUI/PMA.
+
+               Setting this object to enabled(1) enables the port
+               and exerts a BEGIN on the port's auto-partition
+               state machine.
+
+               (In effect, when a port is disabled, the value of
+               rptrPortAutoPartitionState for that port is frozen
+               until the port is next enabled.  When the port
+               becomes enabled, the rptrPortAutoPartitionState
+               becomes notAutoPartitioned(1), regardless of its
+               pre-disabling state.)"
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aPortAdminState and 19.2.6.3, acPortAdminControl."
+       ::= { rptrPortEntry 3 }
+
+   rptrPortAutoPartitionState OBJECT-TYPE
+       SYNTAX    INTEGER {
+                     notAutoPartitioned(1),
+                     autoPartitioned(2)
+                 }
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The autoPartitionState flag indicates whether the
+               port is currently partitioned by the repeater's
+               auto-partition protection.
+
+               The conditions that cause port partitioning are
+               specified in partition state machine in Section 9
+               [IEEE 802.3 Std].  They are not differentiated
+               here."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aAutoPartitionState."
+       ::= { rptrPortEntry 4 }
+
+   rptrPortOperStatus  OBJECT-TYPE
+       SYNTAX    INTEGER {
+                     operational(1),
+                     notOperational(2),
+                     notPresent(3)
+                 }
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object indicates the port's operational
+               status.  The notPresent(3) status indicates the
+               port is physically removed (note this may or may
+               not be possible depending on the type of port.)
+               The operational(1) status indicates that the port
+               is enabled (see rptrPortAdminStatus) and working,
+               even though it might be auto-partitioned (see
+               rptrPortAutoPartitionState).
+
+               If this object has the value operational(1) and
+               rptrPortAdminStatus is set to disabled(2), it is
+               expected that this object's value will soon change
+               to notOperational(2)."
+       ::= { rptrPortEntry 5 }
+
+
+   --
+   --                    The MONITOR GROUP
+   --
+   -- Implementation of this group is optional, but within the
+   -- group all elements are mandatory.  If a managed repeater
+   -- implements any part of this group, the entire group shall
+   -- be implemented.
+
+   --
+   -- Repeater Monitor Information
+   --
+   -- Performance monitoring statistics for the repeater
+   --
+
+   rptrMonitorTransmitCollisions OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented every time the
+               repeater state machine enters the TRANSMIT
+               COLLISION state from any state other than ONE PORT
+               LEFT (Ref: Fig 9-2, IEEE 802.3 Std).
+
+               The approximate minimum time for rollover of this
+               counter is 16 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.2,
+               aTransmitCollisions."
+       ::= { rptrMonitorRptrInfo 1 }
+
+
+   --
+   -- The Group Monitor Table
+   --
+
+   rptrMonitorGroupTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF RptrMonitorGroupEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "Table of performance and error statistics for the
+               groups."
+       ::= { rptrMonitorGroupInfo 1 }
+
+   rptrMonitorGroupEntry OBJECT-TYPE
+       SYNTAX    RptrMonitorGroupEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "An entry in the table, containing total
+               performance and error statistics for a single
+               group.  Regular retrieval of the information in
+               this table provides a means of tracking the
+               performance and health of the networked devices
+               attached to this group's ports.
+
+               The counters in this table are redundant in the
+               sense that they are the summations of information
+               already available through other objects.  However,
+               these sums provide a considerable optimization of
+               network management traffic over the otherwise
+               necessary retrieval of the individual counters
+               included in each sum."
+       INDEX    { rptrMonitorGroupIndex }
+       ::= { rptrMonitorGroupTable 1 }
+
+   RptrMonitorGroupEntry ::=
+       SEQUENCE {
+           rptrMonitorGroupIndex
+               INTEGER,
+           rptrMonitorGroupTotalFrames
+               Counter,
+           rptrMonitorGroupTotalOctets
+               Counter,
+           rptrMonitorGroupTotalErrors
+               Counter
+       }
+
+   rptrMonitorGroupIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the group within the
+               repeater for which this entry contains
+               information."
+       ::= { rptrMonitorGroupEntry 1 }
+
+   rptrMonitorGroupTotalFrames OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The total number of frames of valid frame length
+               that have been received on the ports in this group
+               and for which the FCSError and CollisionEvent
+               signals were not asserted.  This counter is the
+               summation of the values of the
+               rptrMonitorPortReadableFrames counters for all of
+               the ports in the group.
+
+               This statistic provides one of the parameters
+               necessary for obtaining the packet error rate.
+               The approximate minimum time for rollover of this
+               counter is 80 hours."
+       ::= { rptrMonitorGroupEntry 2 }
+
+   rptrMonitorGroupTotalOctets OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The total number of octets contained in the valid
+               frames that have been received on the ports in
+               this group.  This counter is the summation of the
+               values of the rptrMonitorPortReadableOctets
+               counters for all of the ports in the group.
+
+               This statistic provides an indicator of the total
+               data transferred.  The approximate minimum time
+               for rollover of this counter is 58 minutes."
+       ::= { rptrMonitorGroupEntry 3 }
+
+   rptrMonitorGroupTotalErrors OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The total number of errors which have occurred on
+               all of the ports in this group.  This counter is
+               the summation of the values of the
+               rptrMonitorPortTotalErrors counters for all of the
+               ports in the group."
+       ::= { rptrMonitorGroupEntry 4 }
+
+   --
+   -- The Port Monitor Table
+   --
+
+   rptrMonitorPortTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF RptrMonitorPortEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "Table of performance and error statistics for the
+               ports."
+       ::= { rptrMonitorPortInfo 1 }
+
+   rptrMonitorPortEntry OBJECT-TYPE
+       SYNTAX    RptrMonitorPortEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "An entry in the table, containing performance and
+               error statistics for a single port."
+       INDEX    { rptrMonitorPortGroupIndex, rptrMonitorPortIndex }
+       ::= { rptrMonitorPortTable 1 }
+
+   RptrMonitorPortEntry ::=
+       SEQUENCE {
+           rptrMonitorPortGroupIndex
+               INTEGER,
+           rptrMonitorPortIndex
+               INTEGER,
+           rptrMonitorPortReadableFrames
+               Counter,
+           rptrMonitorPortReadableOctets
+               Counter,
+           rptrMonitorPortFCSErrors
+               Counter,
+           rptrMonitorPortAlignmentErrors
+               Counter,
+           rptrMonitorPortFrameTooLongs
+               Counter,
+           rptrMonitorPortShortEvents
+               Counter,
+           rptrMonitorPortRunts
+               Counter,
+           rptrMonitorPortCollisions
+               Counter,
+           rptrMonitorPortLateEvents
+               Counter,
+           rptrMonitorPortVeryLongEvents
+               Counter,
+           rptrMonitorPortDataRateMismatches
+               Counter,
+           rptrMonitorPortAutoPartitions
+               Counter,
+           rptrMonitorPortTotalErrors
+               Counter
+       }
+
+   rptrMonitorPortGroupIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the group containing the
+               port for which this entry contains information."
+       ::= { rptrMonitorPortEntry 1 }
+
+   rptrMonitorPortIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the port within the group
+               for which this entry contains information."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aPortID."
+       ::= { rptrMonitorPortEntry 2 }
+
+   rptrMonitorPortReadableFrames OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object is the number of frames of valid
+               frame length that have been received on this port.
+               This counter is incremented by one for each frame
+               received on this port whose OctetCount is greater
+               than or equal to minFrameSize and less than or
+               equal to maxFrameSize (Ref: IEEE 802.3 Std,
+               4.4.2.1) and for which the FCSError and
+               CollisionEvent signals are not asserted.
+
+               This statistic provides one of the parameters
+               necessary for obtaining the packet error rate.
+               The approximate minimum time for rollover of this
+               counter is 80 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aReadableFrames."
+       ::= { rptrMonitorPortEntry 3 }
+
+   rptrMonitorPortReadableOctets OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object is the number of octets contained in
+               valid frames that have been received on this port.
+               This counter is incremented by OctetCount for each
+               frame received on this port which has been
+               determined to be a readable frame (i.e., including
+               FCS octets but excluding framing bits and dribble
+               bits).
+
+               This statistic provides an indicator of the total
+               data transferred.  The approximate minimum time
+               for rollover of this counter is 58 minutes."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aReadableOctets."
+       ::= { rptrMonitorPortEntry 4 }
+
+   rptrMonitorPortFCSErrors OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each frame
+               received on this port with the FCSError signal
+               asserted and the FramingError and CollisionEvent
+               signals deasserted and whose OctetCount is greater
+               than or equal to minFrameSize and less than or
+               equal to maxFrameSize (Ref: 4.4.2.1, IEEE 802.3
+               Std).
+
+               The approximate minimum time for rollover of this
+               counter is 80 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aFrameCheckSequenceErrors."
+       ::= { rptrMonitorPortEntry 5 }
+
+   rptrMonitorPortAlignmentErrors OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each frame
+               received on this port with the FCSError and
+               FramingError signals asserted and CollisionEvent
+               signal deasserted and whose OctetCount is greater
+               than or equal to minFrameSize and less than or
+               equal to maxFrameSize (Ref: IEEE 802.3 Std,
+               4.4.2.1).  If rptrMonitorPortAlignmentErrors is
+               incremented then the rptrMonitorPortFCSErrors
+               Counter shall not be incremented for the same
+               frame.
+
+               The approximate minimum time for rollover of this
+               counter is 80 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aAlignmentErrors."
+       ::= { rptrMonitorPortEntry 6 }
+
+   rptrMonitorPortFrameTooLongs OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each frame
+               received on this port whose OctetCount is greater
+               than maxFrameSize (Ref: 4.4.2.1, IEEE 802.3 Std).
+               If rptrMonitorPortFrameTooLongs is incremented
+               then neither the rptrMonitorPortAlignmentErrors
+               nor the rptrMonitorPortFCSErrors counter shall be
+               incremented for the frame.
+
+               The approximate minimum time for rollover of this
+               counter is 61 days."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aFramesTooLong."
+       ::= { rptrMonitorPortEntry 7 }
+
+   rptrMonitorPortShortEvents OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each
+               CarrierEvent on this port with ActivityDuration
+               less than ShortEventMaxTime.  ShortEventMaxTime is
+               greater than 74 bit times and less than 82 bit
+               times.  ShortEventMaxTime has tolerances included
+               to provide for circuit losses between a
+               conformance test point at the AUI and the
+               measurement point within the state machine.
+
+               Note:  shortEvents may indicate externally
+               generated noise hits which will cause the repeater
+               to transmit Runts to its other ports, or propagate
+               a collision (which may be late) back to the
+               transmitting DTE and damaged frames to the rest of
+               the network.
+
+               Implementors may wish to consider selecting the
+               ShortEventMaxTime towards the lower end of the
+               allowed tolerance range to accommodate bit losses
+               suffered through physical channel devices not
+               budgeted for within this standard.
+
+               The approximate minimum time for rollover of this
+               counter is 16 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aShortEvents."
+       ::= { rptrMonitorPortEntry 8 }
+
+   rptrMonitorPortRunts OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each
+               CarrierEvent on this port that meets one of the
+               following two conditions.  Only one test need be
+               made.  a) The ActivityDuration is greater than
+               ShortEventMaxTime and less than ValidPacketMinTime
+               and the CollisionEvent signal is deasserted.  b)
+               The OctetCount is less than 64, the
+               ActivityDuration is greater than ShortEventMaxTime
+               and the CollisionEvent signal is deasserted.
+               ValidPacketMinTime is greater than or equal to 552
+               bit times and less than 565 bit times.
+
+               An event whose length is greater than 74 bit times
+               but less than 82 bit times shall increment either
+               the shortEvents counter or the runts counter but
+               not both.  A CarrierEvent greater than or equal to
+               552 bit times but less than 565 bit times may or
+               may not be counted as a runt.
+
+               ValidPacketMinTime has tolerances included to
+               provide for circuit losses between a conformance
+               test point at the AUI and the measurement point
+               within the state machine.
+
+               Runts usually indicate collision fragments, a
+               normal network event.  In certain situations
+               associated with large diameter networks a
+               percentage of collision fragments may exceed
+               ValidPacketMinTime.
+
+               The approximate minimum time for rollover of this
+               counter is 16 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2, aRunts."
+       ::= { rptrMonitorPortEntry 9 }
+
+   rptrMonitorPortCollisions OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for any
+               CarrierEvent signal on any port for which the
+               CollisionEvent signal on this port is also
+               asserted.
+
+               The approximate minimum time for rollover of this
+               counter is 16 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aCollisions."
+       ::= { rptrMonitorPortEntry 10 }
+
+   rptrMonitorPortLateEvents OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each
+               CarrierEvent on this port in which the CollIn(X)
+               variable transitions to the value SQE (Ref:
+               9.6.6.2, IEEE 802.3 Std) while the
+               ActivityDuration is greater than the
+               LateEventThreshold.  Such a CarrierEvent is
+               counted twice, as both a collision and as a
+               lateEvent.
+
+               The LateEventThreshold is greater than 480 bit
+               times and less than 565 bit times.
+               LateEventThreshold has tolerances included to
+               permit an implementation to build a single
+               threshold to serve as both the LateEventThreshold
+               and ValidPacketMinTime threshold.
+
+               The approximate minimum time for rollover of this
+               counter is 81 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aLateEvents."
+       ::= { rptrMonitorPortEntry 11 }
+
+   rptrMonitorPortVeryLongEvents OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each
+               CarrierEvent on this port whose ActivityDuration
+               is greater than the MAU Jabber Lockup Protection
+               timer TW3 (Ref: 9.6.1 & 9.6.5, IEEE 802.3 Std).
+               Other counters may be incremented as appropriate."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aVeryLongEvents."
+       ::= { rptrMonitorPortEntry 12 }
+
+   rptrMonitorPortDataRateMismatches OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each frame
+               received on this port that meets all of the
+               following conditions:  a) The CollisionEvent
+               signal is not asserted.  b) The ActivityDuration
+               is greater than ValidPacketMinTime.  c) The
+               frequency (data rate) is detectably mismatched
+               from the local transmit frequency.  The exact
+               degree of mismatch is vendor specific and is to be
+               defined by the vendor for conformance testing.
+
+               When this event occurs, other counters whose
+               increment conditions were satisfied may or may not
+               also be incremented, at the implementor's
+               discretion.  Whether or not the repeater was able
+               to maintain data integrity is beyond the scope of
+               this standard."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aDataRateMismatches."
+       ::= { rptrMonitorPortEntry 13 }
+
+   rptrMonitorPortAutoPartitions OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each time
+               the repeater has automatically partitioned this
+               port.  The conditions that cause port partitioning
+               are specified in the partition state machine in
+               Section 9 [IEEE 802.3 Std].  They are not
+               differentiated here."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aAutoPartitions."
+       ::= { rptrMonitorPortEntry 14 }
+
+   rptrMonitorPortTotalErrors OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "The total number of errors which have occurred on
+               this port.  This counter is the summation of the
+               values of other error counters (for the same
+               port), namely:
+
+                   rptrMonitorPortFCSErrors,
+                   rptrMonitorPortAlignmentErrors,
+                   rptrMonitorPortFrameTooLongs,
+                   rptrMonitorPortShortEvents,
+                   rptrMonitorPortLateEvents,
+                   rptrMonitorPortVeryLongEvents, and
+                   rptrMonitorPortDataRateMismatches.
+
+               This counter is redundant in the sense that it is
+               the summation of information already available
+               through other objects.  However, it is included
+               specifically because the regular retrieval of this
+               object as a means of tracking the health of a port
+               provides a considerable optimization of network
+               management traffic over the otherwise necessary
+               retrieval of the summed counters."
+       ::= { rptrMonitorPortEntry 15 }
+
+
+   --
+   --                    The ADDRESS TRACKING GROUP
+   --
+   -- Implementation of this group is optional; it is appropriate
+   -- for all systems which have the necessary instrumentation.  If a
+   -- managed repeater implements any part of this group, the entire
+   -- group shall be implemented.
+
+   --
+   -- The Port Address Tracking Table
+   --
+
+   rptrAddrTrackTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF RptrAddrTrackEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "Table of address mapping information about the
+               ports."
+       ::= { rptrAddrTrackPortInfo 1 }
+
+   rptrAddrTrackEntry OBJECT-TYPE
+       SYNTAX    RptrAddrTrackEntry
+       ACCESS    not-accessible
+       STATUS    mandatory
+       DESCRIPTION
+               "An entry in the table, containing address mapping
+               information about a single port."
+       INDEX    { rptrAddrTrackGroupIndex, rptrAddrTrackPortIndex }
+       ::= { rptrAddrTrackTable 1 }
+
+   RptrAddrTrackEntry ::=
+       SEQUENCE {
+           rptrAddrTrackGroupIndex
+               INTEGER,
+           rptrAddrTrackPortIndex
+               INTEGER,
+           rptrAddrTrackLastSourceAddress     -- DEPRECATED OBJECT
+               MacAddress,
+           rptrAddrTrackSourceAddrChanges
+               Counter,
+           rptrAddrTrackNewLastSrcAddress
+               OCTET STRING
+       }
+
+   rptrAddrTrackGroupIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the group containing the
+               port for which this entry contains information."
+       ::= { rptrAddrTrackEntry 1 }
+
+   rptrAddrTrackPortIndex OBJECT-TYPE
+       SYNTAX    INTEGER (1..1024)
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object identifies the port within the group
+               for which this entry contains information."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aPortID."
+       ::= { rptrAddrTrackEntry 2 }
+
+   rptrAddrTrackLastSourceAddress OBJECT-TYPE
+       SYNTAX    MacAddress
+       ACCESS    read-only
+       STATUS    deprecated
+       DESCRIPTION
+               "This object is the SourceAddress of the last
+               readable frame (i.e., counted by
+               rptrMonitorPortReadableFrames) received by this
+               port.
+
+               This object has been deprecated because its value
+               is undefined when no frames have been observed on
+               this port.  The replacement object is
+               rptrAddrTrackNewLastSrcAddress."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aLastSourceAddress."
+       ::= { rptrAddrTrackEntry 3 }
+
+   rptrAddrTrackSourceAddrChanges OBJECT-TYPE
+       SYNTAX    Counter
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This counter is incremented by one for each time
+               that the rptrAddrTrackLastSourceAddress attribute
+               for this port has changed.
+
+               This may indicate whether a link is connected to a
+               single DTE or another multi-user segment.
+
+               The approximate minimum time for rollover of this
+               counter is 81 hours."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aSourceAddressChanges."
+       ::= { rptrAddrTrackEntry 4 }
+
+   rptrAddrTrackNewLastSrcAddress OBJECT-TYPE
+       SYNTAX    OCTET STRING (SIZE(0..6))
+       ACCESS    read-only
+       STATUS    mandatory
+       DESCRIPTION
+               "This object is the SourceAddress of the last
+               readable frame (i.e., counted by
+               rptrMonitorPortReadableFrames) received by this
+               port.  If no frames have been received by this
+               port since the agent began monitoring the port
+               activity, the agent shall return a string of
+               length zero."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.6.2,
+               aLastSourceAddress."
+       ::= { rptrAddrTrackEntry 5 }
+
+
+   -- Traps for use by Repeaters
+
+   -- Traps are defined using the conventions in RFC 1215 [6].
+
+   rptrHealth TRAP-TYPE
+       ENTERPRISE  snmpDot3RptrMgt
+       VARIABLES   { rptrOperStatus }
+       DESCRIPTION
+               "The rptrHealth trap conveys information related
+               to the operational status of the repeater.  This
+               trap is sent either when the value of
+               rptrOperStatus changes, or upon completion of a
+               non-disruptive test.
+
+               The rptrHealth trap must contain the
+               rptrOperStatus object.  The agent may optionally
+               include the rptrHealthText object in the varBind
+               list.  See the rptrOperStatus and rptrHealthText
+               objects for descriptions of the information that
+               is sent.
+
+               The agent must throttle the generation of
+               consecutive rptrHealth traps so that there is at
+               least a five-second gap between traps of this
+               type.  When traps are throttled, they are dropped,
+               not queued for sending at a future time.  (Note
+               that 'generating' a trap means sending to all
+               configured recipients.)"
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.4,
+               hubHealth notification."
+       ::= 1
+
+   rptrGroupChange TRAP-TYPE
+       ENTERPRISE  snmpDot3RptrMgt
+       VARIABLES   { rptrGroupIndex }
+       DESCRIPTION
+               "This trap is sent when a change occurs in the
+               group structure of a repeater.  This occurs only
+               when a group is logically or physically removed
+               from or added to a repeater.  The varBind list
+               contains the identifier of the group that was
+               removed or added.
+
+               The agent must throttle the generation of
+               consecutive rptrGroupChange traps for the same
+               group so that there is at least a five-second gap
+               between traps of this type.  When traps are
+               throttled, they are dropped, not queued for
+               sending at a future time.  (Note that 'generating'
+               a trap means sending to all configured
+               recipients.)"
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.4,
+               groupMapChange notification."
+       ::= 2
+
+   rptrResetEvent TRAP-TYPE
+       ENTERPRISE  snmpDot3RptrMgt
+       VARIABLES   { rptrOperStatus }
+       DESCRIPTION
+               "The rptrResetEvent trap conveys information
+               related to the operational status of the repeater.
+               This trap is sent on completion of a repeater
+               reset action.  A repeater reset action is defined
+               as an a transition to the START state of Fig 9-2
+               in section 9 [IEEE 802.3 Std], when triggered by a
+               management command (e.g., an SNMP Set on the
+               rptrReset object).
+
+               The agent must throttle the generation of
+               consecutive rptrResetEvent traps so that there is
+               at least a five-second gap between traps of this
+               type.  When traps are throttled, they are dropped,
+               not queued for sending at a future time.  (Note
+               that 'generating' a trap means sending to all
+               configured recipients.)
+
+               The rptrResetEvent trap is not sent when the agent
+               restarts and sends an SNMP coldStart or warmStart
+               trap.  However, it is recommended that a repeater
+               agent send the rptrOperStatus object as an
+               optional object with its coldStart and warmStart
+               trap PDUs.
+
+               The rptrOperStatus object must be included in the
+               varbind list sent with this trap.  The agent may
+               optionally include the rptrHealthText object as
+               well."
+       REFERENCE
+               "Reference IEEE 802.3 Rptr Mgt, 19.2.3.4, hubReset
+               notification."
+       ::= 3
+
+END

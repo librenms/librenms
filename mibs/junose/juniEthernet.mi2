@@ -1,0 +1,1087 @@
+
+-- *****************************************************************************
+-- Juniper-ETHERNET-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Ethernet MIB
+--
+-- Copyright (c) 2000, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2006 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ETHERNET-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs
+    JuniNextIfIndex
+        FROM Juniper-TC;
+
+juniEthernetMIB  MODULE-IDENTITY
+    LAST-UPDATED "200601112116Z"  -- 11-Jan-06 04:16 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Ethernet MIB for the Juniper Networks enterprise.  This MIB
+        contains managed objects for the Ethernet interfaces that extend the
+        IF-MIB.ifTable.  It also contains managed objects for creation of
+        Ethernet subInterfaces."
+    -- Revision History
+    REVISION    "200601112116Z"  -- 11-Jan-06 04:16 PM EST  - JUNOSe 7.3
+    DESCRIPTION
+        "Added juniLagIfLayer."
+    REVISION    "200509142008Z"  -- 14-Sep-05 03:08 PM EST  - JUNOSe 7.2
+    DESCRIPTION
+        "Added juniVlanSubIfVlanAdvisoryRx/TxSpeed."
+    REVISION    "200412141514Z"  -- 14-Dec-04 10:14 AM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Added XFP mau types.
+         Added speed10000Mbps enumeration value to juniEthernetIfSpeed."
+    REVISION    "200405261940Z"  -- 26-May-04 03:40 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Added mau type for 100 base FX."
+    REVISION    "200307282133Z"  -- 28-Jul-03 05:33 PM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Added support for Ethernet interface statistics."
+    REVISION    "200302202151Z"  -- 20-Feb-03 04:51 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added 0x8100 as value for juniVlanSubIfVlanStackEthertype.
+         Added 5000 and 5001 as valid values for juniVlanSubIfVlanId.
+         Added 5000 as a valid value for juniVlanSubIfVlanStackId.
+         Defined default values for juniVlanSubIfVlanId,
+            juniVlanSubIfVlanStackId and juniVlanSubIfVlanStackEthertype."
+    REVISION    "200210021534Z"  -- 02-Oct-02 11:34 AM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200210011744Z"  -- 01-Oct-02 01:44 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added MAU type and length support."
+    REVISION    "200204051947Z"  -- 05-Apr-02 02:47 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added VLAN stack support."
+    REVISION    "200101021655Z"  -- 02-Jan-01 11:55 AM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Added VLAN management support."
+    REVISION    "200004180000Z"  -- 18-Apr-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Added objects for Ethernet sub-interface creation.
+         Added juniEthernetIfOperDuplexMode to report current duplex mode.
+         Revised descriptions to note relationship to ifTable objects and to
+            explain autonegotiation dependencies.
+         Added speed1000Mbps enumeration value to juniEthernetIfSpeed.
+         Changed lower bound of juniEthernetIfMtu from 18 to 64."
+    REVISION    "200002030000Z"  --  3-Feb-00               - JUNOSe 1.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 34 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniEthernetIfMauType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of Medium Attachment Unit (physical cable connection) on an
+        Ethernet physical interface.  A MAU may be a fixed type, or it may be a
+        removable type (SFP or XFP).  SFP's and XFP's provide a readable Module
+        Definition interface containing fields for identifying module type and
+        supported cable length, although not all SFP's and XFP's include this
+        information.
+            mauNotPresent          Hardware not present
+            mauNotSupported        Secondary MAU not supported
+            mau10BaseT             10 Mbps twisted pair copper
+            mau100BaseTx           100 Mbps twisted pair copper
+            mau1000BaseT           1 Gbps twisted pair copper
+            mau1000BaseCx          1 Gbps shielded copper
+            mau1000BaseSx          1 Gbps short-wavelength multimode fiber
+            mau1000BaseLx          1 Gbps long-wavelength multi/single-mode fiber
+            mau1000BaseZx          1 Gbps long-wavelength single-mode fiber,
+                                   extended distance (non-standard)
+            mauSfpUnknown          SFP present but not identified
+            mauSfpNotPresent       SFP cage is empty
+            mau100BaseFxSm         100 Mbps optical Single mode
+            mau100BaseFxMm         100 Mbps optical Multi mode
+            mauSfpNotJnprCompliant SFP present but not Juniper compliant
+            mau10000BaseSr         10 Gbps short-wavelength multimode fiber
+            mau10000BaseLr         10 Gbps long-wavelength multi/single-mode fiber
+            mau10000BaseEr         10 Gbps long-wavelength single-mode fiber
+            mauXfpUnknown          XFP present but not identified
+            mauXfpNotPresent       XFP cage is empty
+            mauXfpNotJnprCompliant XFP present but not Juniper compliant"
+
+    SYNTAX      INTEGER {
+                    mauNotPresent(0),
+                    mauNotSupported(1),
+                    mau10BaseT(2),
+                    mau100BaseTx(3),
+                    mau1000BaseT(4),
+                    mau1000BaseCx(5),
+                    mau1000BaseSx(6),
+                    mau1000BaseLx(7),
+                    mau1000BaseZx(8),
+                    mauSfpUnknown(9),
+                    mauSfpNotPresent(10),
+                    mau100BaseFxSm(11),
+                    mau100BaseFxMm(12),
+                    mauSfpNotJnprCompliant(13),
+                    mau10000BaseSr(14),
+                    mau10000BaseLr(15),
+                    mau10000BaseEr(16),
+                    mauXfpUnknown(17),
+                    mauXfpNotPresent(18),
+                    mauXfpNotJnprCompliant(19) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniEthernetObjects     OBJECT IDENTIFIER ::= { juniEthernetMIB 1 }
+
+juniEthernetIfLayer    OBJECT IDENTIFIER ::= { juniEthernetObjects 1 }
+juniEthernetSubIfLayer OBJECT IDENTIFIER ::= { juniEthernetObjects 2 }
+juniVlanMajorIfLayer   OBJECT IDENTIFIER ::= { juniEthernetObjects 3 }
+juniVlanSubIfLayer     OBJECT IDENTIFIER ::= { juniEthernetObjects 4 }
+juniEthernetIfStats    OBJECT IDENTIFIER ::= { juniEthernetObjects 5 }
+juniLagIfLayer         OBJECT IDENTIFIER ::= { juniEthernetObjects 6 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Ethernet Interface Layer
+--
+-- This layer is managed with the following elements:
+--  o Interface Table (configuration of Ethernet interface parameters)
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The Ethernet Interface Table
+--
+juniEthernetIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniEthernetIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the Ethernet interface."
+    ::= { juniEthernetIfLayer 1 }
+
+juniEthernetIfEntry OBJECT-TYPE
+    SYNTAX      JuniEthernetIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular Ethernet interface.  Entries in this
+        table correspond with entries in the ifTable/ifXTable/juniIfTable."
+    INDEX     { juniEthernetIfIndex }
+    ::= { juniEthernetIfTable 1 }
+
+JuniEthernetIfEntry ::= SEQUENCE {
+    juniEthernetIfIndex            InterfaceIndex,
+    juniEthernetIfDuplexMode       INTEGER,
+    juniEthernetIfSpeed            INTEGER,
+    juniEthernetIfMtu              Integer32,
+    juniEthernetIfOperDuplexMode   INTEGER,
+    juniEthernetIfPrimaryMauType   JuniEthernetIfMauType,
+    juniEthernetIfSecondaryMauType JuniEthernetIfMauType,
+    juniEthernetIfPrimaryLength    Integer32,
+    juniEthernetIfSecondaryLength  Integer32 }
+
+juniEthernetIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the corresponding ethernet interface."
+    ::= { juniEthernetIfEntry 1 }
+
+juniEthernetIfDuplexMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    autoDuplex(1),
+                    halfDuplex(2),
+                    fullDuplex(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured duplex setting for this ethernet interface.  The
+        operational value is reported in this table entry's corresponding
+        juniEthernetIfOperDuplexMode object.
+
+        NOTE, configuration dependency:
+
+        Setting this object to values other than 'autoDuplex' takes effect only
+        when the corresponding juniEthernetIfSpeed object is simultaneously set
+        to other than 'autoNegotiate'.
+
+        Otherwise (i.e. this object is set to 'autoDuplex', AND/OR corresponding
+        juniEthernetIfSpeed object is set to 'autoNegotiate'), duplex mode is
+        negotiated."
+    DEFVAL    { autoDuplex }
+    ::= { juniEthernetIfEntry 2 }
+
+juniEthernetIfSpeed OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    autoNegotiate(1),
+                    speed10Mbps(2),
+                    speed100Mbps(3),
+                    speed1000Mbps(4),
+                    speed10000Mbps(5) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured speed setting for this ethernet interface.  The
+        operational value is reported in the corresponding Interfaces MIB
+        ifSpeed object.
+
+        NOTE, configuration dependency:
+
+        Setting this object to values other than 'autoNegotiate' takes effect
+        only when the corresponding juniEthernetIfDuplexMode object is
+        simultaneously set to other than 'autoDuplex'.
+
+        Otherwise (i.e. this object is set to 'autoNegotiate', AND/OR the
+        corresponding juniEthernetIfDuplexMode object is set to 'autoDuplex'),
+        speed is negotiated."
+    DEFVAL    { autoNegotiate }
+    ::= { juniEthernetIfEntry 3 }
+
+juniEthernetIfMtu OBJECT-TYPE
+    SYNTAX      Integer32 (64..9188)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured maximum transfer unit (MTU) for this ethernet interface.
+        The operational value is reported in the corresponding Interfaces MIB
+        ifMtu object."
+    DEFVAL    { 1518 }
+    ::= { juniEthernetIfEntry 4 }
+
+juniEthernetIfOperDuplexMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    autoDuplex(1),
+                    halfDuplex(2),
+                    fullDuplex(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational duplex mode for this ethernet interface."
+    ::= { juniEthernetIfEntry 5 }
+
+juniEthernetIfPrimaryMauType OBJECT-TYPE
+    SYNTAX      JuniEthernetIfMauType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The primary MAU type."
+    DEFVAL    { mauNotPresent }
+    ::= { juniEthernetIfEntry 6 }
+
+juniEthernetIfSecondaryMauType OBJECT-TYPE
+    SYNTAX      JuniEthernetIfMauType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The secondary MAU type for those ports that support a secondary."
+    DEFVAL    { mauNotSupported }
+   ::= { juniEthernetIfEntry 7 }
+
+juniEthernetIfPrimaryLength OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rated cable length in meters for the primary MAU.  If the value is
+        0, the length is unspecified."
+    DEFVAL    { 0 }
+    ::= { juniEthernetIfEntry 8 }
+
+juniEthernetIfSecondaryLength OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rated cable length in meters for the secondary MAU for those ports
+        that support a secondary.  If the value is 0, the length is
+        unspecified."
+    DEFVAL    { 0 }
+    ::= { juniEthernetIfEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Sub Interface Creation Mib
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- IfIndex selection for creating new Ethernet Subinterfaces
+--
+juniEthernetSubIfNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        juniEthernetSubIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniEthernetSubIfLayer 1 }
+
+--
+-- The Ethernet Subinterface Table
+--
+juniEthernetSubIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniEthernetSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for Ethernet Subinterfaces present in the
+        system."
+    ::= { juniEthernetSubIfLayer 2 }
+
+juniEthernetSubIfEntry OBJECT-TYPE
+    SYNTAX      JuniEthernetSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an Ethernet Subinterface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniEthernetSubIfIndex }
+    ::= { juniEthernetSubIfTable 1 }
+
+JuniEthernetSubIfEntry ::= SEQUENCE {
+    juniEthernetSubIfIndex           InterfaceIndex,
+    juniEthernetSubIfRowStatus       RowStatus,
+    juniEthernetSubIfLowerIfIndex    InterfaceIndexOrZero,
+    juniEthernetSubIfId              Integer32 }
+
+juniEthernetSubIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the Ethernet Subinterface.  When creating entries in
+        this table, suitable values for this object are determined by reading
+        juniEthernetSubNextIfIndex."
+    ::= { juniEthernetSubIfEntry 1 }
+
+juniEthernetSubIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniEthernetSubIfRowStatus
+            juniEthernetSubIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniEthernetSubIfIndex must have been determined
+            previously, by reading juniEthernetSubIfNextIfIndex.
+
+            The interface identified by juniEthernetSubIfLowerIfIndex must
+            exist, and must be a Ethernet interface.
+
+            A positive value configured for juniEthernetSubIfId must not already
+            be assigned to another subinterface layered onto the same underlying
+            Ethernet interface.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is
+        created/destroyed as a result of creating/destroying an entry in this
+        table."
+    ::= { juniEthernetSubIfEntry 2 }
+
+juniEthernetSubIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a Ethernet interface over which this Ethernet
+        Subinterface is to be layered.  A value of zero indicates no layering.
+        An implementation may choose to require that a nonzero value be
+        configured at entry creation."
+    ::= { juniEthernetSubIfEntry 3 }
+
+juniEthernetSubIfId OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An integer identifier for the Ethernet subinterface, used in
+        conjunction with the command-line interface.  It is provided here for
+        cross-reference purposes only.
+
+        The value must be unique among subinterfaces configured on the same
+        underlying Ethernet interface.
+
+        If this object is not configured, or is configured with a value of -1, a
+        nonzero value will be allocated internally and can be retrieved from
+        this object after table entry creation has succeeded.
+
+        A value of zero for this object is reserved for future use."
+    DEFVAL    { -1 }
+    ::= { juniEthernetSubIfEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- VLAN Major Interface Creation
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- IfIndex selection for creating new Major VLAN Interfaces
+--
+juniVlanMajorNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        juniVlanMajorIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.  "
+    ::= { juniVlanMajorIfLayer 1 }
+
+
+--
+-- The VLAN Major Interface Table
+--
+juniVlanMajorIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniVlanMajorIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for major VLAN interfaces present in the
+        system."
+    ::= { juniVlanMajorIfLayer 2 }
+
+juniVlanMajorIfEntry OBJECT-TYPE
+    SYNTAX      JuniVlanMajorIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a major VLAN interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniVlanMajorIfIndex }
+    ::= { juniVlanMajorIfTable 1 }
+
+JuniVlanMajorIfEntry ::= SEQUENCE {
+    juniVlanMajorIfIndex         InterfaceIndex,
+    juniVlanMajorIfLowerIfIndex  InterfaceIndexOrZero,
+    juniVlanMajorIfRowStatus     RowStatus }
+
+juniVlanMajorIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the major VLAN interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniVlanMajorNextIfIndex."
+    ::= { juniVlanMajorIfEntry 1 }
+
+juniVlanMajorIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface over which this major VLAN interface is to
+        be layered.  A value of zero indicates no layering.  An implementation
+        may choose to require that a nonzero value be configured at entry
+        creation."
+    ::= { juniVlanMajorIfEntry 2 }
+
+juniVlanMajorIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create or delete an entry in this table, the following entry objects
+        MUST be explicitly configured:
+            juniVlanMajorIfRowStatus
+            juniVlanMajorIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniVlanMajorIfIndex must have been determined
+            previously by reading juniVlanMajorIfNextIfIndex.
+
+            The interface identified by juniVlanMajorIfLowerIfIndex must exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is
+        created/destroyed as a result of creating/destroying an entry in this
+        table."
+    ::= { juniVlanMajorIfEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- VLAN SubInterface Creation
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniVlanSubNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniVlanSubIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniVlanSubIfLayer 1 }
+
+--
+-- The VLAN Subinterface Table
+--
+juniVlanSubIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniVlanSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for VLAN Subinterfaces present in the
+        system."
+    ::= { juniVlanSubIfLayer 2 }
+
+juniVlanSubIfEntry OBJECT-TYPE
+    SYNTAX      JuniVlanSubIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a VLAN Subinterface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniVlanSubIfIndex }
+    ::= { juniVlanSubIfTable 1 }
+
+JuniVlanSubIfEntry ::= SEQUENCE {
+    juniVlanSubIfIndex               InterfaceIndex,
+    juniVlanSubIfVlanId              Integer32,
+    juniVlanSubIfVlanUntagged        TruthValue,
+    juniVlanSubIfLowerIfIndex        InterfaceIndexOrZero,
+    juniVlanSubIfRowStatus           RowStatus,
+    juniVlanSubIfVlanStackId         Integer32,
+    juniVlanSubIfVlanStackEthertype  INTEGER,
+    juniVlanSubIfVlanAdvisoryRxSpeed Integer32,
+    juniVlanSubIfVlanAdvisoryTxSpeed Integer32 }
+
+juniVlanSubIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the VLAN Subinterface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniVlanSubNextIfIndex."
+    ::= { juniVlanSubIfEntry 1 }
+
+juniVlanSubIfVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (0..4095|5000|5001)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An integer identifier or tag ID for this VLAN A value of zero indicates
+        the default VLAN.
+
+        When VLANs are enabled, the value must be unique among subinterfaces
+        configured on the same underlying major VLAN interface.
+
+        If the VLAN ID is non-zero, then the juniVlanSubIfVlanUntagged field
+        must be disabled.
+
+        The VLAN ID default value of 5000 indicates that the VLAN Subinterface
+        has been created but the VLAN ID has yet to be assigned.
+
+        The VLAN ID value of 5001 indicates that this VLAN Subinterface is of
+        type S-VLAN any.  The juniVlanSubIfVlanStackId object should be set to a
+        non-default value (i.e. this VLAN Subinterface should be a S-VLAN)."
+    DEFVAL    { 5000 }
+    ::= { juniVlanSubIfEntry 2 }
+
+juniVlanSubIfVlanUntagged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When VLANs are enabled, this allows tagged frames to be received, while
+        transmitted frames remain untagged.  This can only be enabled when the
+        juniVlanSubIfVlanId field is zero."
+    ::= { juniVlanSubIfEntry 3 }
+
+juniVlanSubIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of VLAN major interface over which this VLAN Subinterface
+        is to be layered.  A value of zero indicates no layering.  An
+        implementation may choose to require that a nonzero value be configured
+        at entry creation."
+    ::= { juniVlanSubIfEntry 4 }
+
+juniVlanSubIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniVlanSubIfRowStatus
+            juniVlanSubIfLowerIfIndex
+            juniVlanSubIfVlanId
+            juniVlanSubIfVlanUntagged
+
+        To delete an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniVlanSubIfRowStatus
+            juniVlanSubIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniVlanSubIfIndex must have been determined previously
+            by reading juniVlanSubIfNextIfIndex.
+
+            The interface identified by juniVlanSubIfLowerIfIndex must exist,
+            and must be a Ethernet interface.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is
+        created/destroyed as a result of creating/destroying an entry in this
+        table."
+    ::= { juniVlanSubIfEntry 5 }
+
+juniVlanSubIfVlanStackId OBJECT-TYPE
+    SYNTAX      Integer32 (0..4095|5000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An integer identifier or tag ID for this S-VLAN.
+
+        When S-VLANs are enabled, the VLAN and S-VLAN ID valuse must be unique
+        among subinterfaces configured on the same underlying major VLAN
+        interface.
+
+        If the S-VLANs are enabled, then the juniVlanSubIfVlanUntagged field
+        must be disabled.
+
+        The S-VLAN ID default value of 5000 indicates that this VLAN
+        Subinterface is not configured as a S-VLAN."
+    DEFVAL    { 5000 }
+    ::= { juniVlanSubIfEntry 6 }
+
+juniVlanSubIfVlanStackEthertype OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    etherType8100h(33024),
+                    etherType88a8h(34984),
+                    etherType9100h(37120) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ethertype is used to recognize and demultiplex traffic for this
+        S-VLAN.  Must be either 0x8100, 0x88a8, or 0x9100."
+    DEFVAL    { etherType9100h }
+    ::= { juniVlanSubIfEntry 7 }
+
+juniVlanSubIfVlanAdvisoryRxSpeed OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Advisory receive speed, in kilobits per second (kbps),
+        of this subinterface. This object has no impact on
+        forwarding performance but may be used as a hint for
+        underlying circuit receive speed."
+    DEFVAL    { 0 }
+       ::= { juniVlanSubIfEntry 8 }
+
+juniVlanSubIfVlanAdvisoryTxSpeed OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Advisory transmit speed, in kilobits per second (kbps),
+        of this subinterface. This object has no impact on
+        forwarding performance but may be used as a hint for
+        underlying circuit transmit speed."
+    DEFVAL    { 0 }
+       ::= { juniVlanSubIfEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Ethernet Interface Statistics
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The Ethernet Interface Statistics Table
+--
+juniEthernetIfStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniEthernetIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The parameters for the Ethernet interface statistics."
+    ::= { juniEthernetIfStats 1 }
+
+juniEthernetIfStatsEntry OBJECT-TYPE
+    SYNTAX      JuniEthernetIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Parameters for a particular Ethernet interface statistics."
+    INDEX     { juniEthernetIfStatsIndex }
+    ::= { juniEthernetIfStatsTable 1 }
+
+JuniEthernetIfStatsEntry ::= SEQUENCE {
+    juniEthernetIfStatsIndex             InterfaceIndex,
+    juniEthernetIfIngressLineUtilization Unsigned32,
+    juniEthernetIfEgressLineUtilization  Unsigned32 }
+
+juniEthernetIfStatsIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex value of the corresponding ethernet interface."
+    ::= { juniEthernetIfStatsEntry 1 }
+
+juniEthernetIfIngressLineUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ingress line utilization statistic for this ethernet interface."
+    ::= { juniEthernetIfStatsEntry 2 }
+
+juniEthernetIfEgressLineUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The egress line utilization statistic for this ethernet interface."
+    ::= { juniEthernetIfStatsEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- LAG Interface Creation
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- IfIndex selection for creating new LAG Interfaces
+--
+juniLagNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        juniLagIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.  "
+    ::= { juniLagIfLayer 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniEthernetTrapControl  OBJECT IDENTIFIER ::= { juniEthernetMIB 2 }
+-- juniEthernetTraps        OBJECT IDENTIFIER ::= { juniEthernetMIB 3 }
+-- juniEthernetPrefix       OBJECT IDENTIFIER ::= { juniEthernetTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniEthernetConformance OBJECT IDENTIFIER ::= { juniEthernetMIB 4 }
+juniEthernetCompliances OBJECT IDENTIFIER ::= { juniEthernetConformance 1 }
+juniEthernetGroups      OBJECT IDENTIFIER ::= { juniEthernetConformance 2 }
+
+--
+-- compliance statements
+--
+juniEthernetCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Ethernet MIB.  This statement became obsolete when support for VLANs was
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniEthernetGroup,
+            juniEthernetSubIfGroup }
+    ::= { juniEthernetCompliances 1 }                              -- JUNOSe 2.0
+
+juniEthernetCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Ethernet MIB.  This statement became obsolete when VLAN stack support
+        was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniEthernetGroup,
+            juniEthernetSubIfGroup }
+        GROUP       juniVlanGroup
+            DESCRIPTION
+                "The juniVlanGroup is mandatory only for entities that support
+                VLAN interfaces."
+        GROUP       juniVlanSubIfGroup
+            DESCRIPTION
+                "The juniVlanSubIfGroup is mandatory only for entities that
+                support a subinterface to major interface layer model for VLAN
+                interfaces."
+    ::= { juniEthernetCompliances 2 }                              -- JUNOSe 3.0
+
+juniEthernetCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Ethernet MIB.  This statement became obsolete when MAU type and length
+        support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniEthernetGroup,
+            juniEthernetSubIfGroup }
+        GROUP       juniVlanGroup
+            DESCRIPTION
+                "The juniVlanGroup is mandatory only for entities that support
+                VLAN interfaces."
+        GROUP       juniVlanSubIfGroup2
+            DESCRIPTION
+                "This group is mandatory only for entities that support a
+                subinterface to major interface layer model for VLAN
+                interfaces."
+    ::= { juniEthernetCompliances 3 }                              -- JUNOSe 4.0
+
+juniEthernetCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Ethernet MIB.  This statement became obsolete when Ethernet interface
+        statistics support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniEthernetGroup2,
+            juniEthernetSubIfGroup }
+        GROUP       juniVlanGroup
+            DESCRIPTION
+                "The juniVlanGroup is mandatory only for entities that support
+                VLAN interfaces."
+        GROUP       juniVlanSubIfGroup2
+            DESCRIPTION
+                "This group is mandatory only for entities that support a
+                subinterface to major interface layer model for VLAN
+                interfaces."
+    ::= { juniEthernetCompliances 4 }                              -- JUNOSe 4.1
+
+juniEthernetCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Ethernet MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniEthernetGroup2,
+            juniEthernetSubIfGroup,
+            juniEthernetIfStatsGroup }
+        GROUP       juniVlanGroup
+            DESCRIPTION
+                "The juniVlanGroup is mandatory only for entities that support
+                VLAN interfaces."
+        GROUP       juniVlanSubIfGroup2
+            DESCRIPTION
+                "This group is mandatory only for entities that support a
+                subinterface to major interface layer model for VLAN
+                interfaces."
+    ::= { juniEthernetCompliances 5 }                              -- JUNOSe 5.2
+
+juniEthernetCompliance6  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Ethernet MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniEthernetGroup2,
+            juniEthernetSubIfGroup,
+            juniEthernetIfStatsGroup }
+        GROUP       juniVlanGroup
+            DESCRIPTION
+                "The juniVlanGroup is mandatory only for entities that support
+                VLAN interfaces."
+        GROUP       juniVlanSubIfGroup2
+            DESCRIPTION
+                "This group is mandatory only for entities that support a
+                subinterface to major interface layer model for VLAN
+                interfaces."
+        GROUP       juniLagIfGroup
+            DESCRIPTION
+                "The juniLagIfGroup is mandatory only for entities that support
+                LAG interfaces."
+    ::= { juniEthernetCompliances 6 }                              -- JUNOSe 7.0
+
+
+--
+-- units of conformance
+--
+juniEthernetGroup  OBJECT-GROUP
+    OBJECTS {
+        juniEthernetIfDuplexMode,
+        juniEthernetIfSpeed,
+        juniEthernetIfMtu,
+        juniEthernetIfOperDuplexMode }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of Ethernet
+        interfaces in a Juniper product.  This group became obsolete when MAU
+        type and length support was added."
+    ::= { juniEthernetGroups 1 }                                   -- JUNOSe 2.0
+
+juniEthernetSubIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniEthernetSubIfNextIfIndex,
+        juniEthernetSubIfRowStatus,
+        juniEthernetSubIfLowerIfIndex,
+        juniEthernetSubIfId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Ethernet SubInterfaces
+        in a Juniper product."
+    ::= { juniEthernetGroups 2 }                                   -- JUNOSe 2.0
+
+juniVlanGroup  OBJECT-GROUP
+    OBJECTS {
+        juniVlanMajorNextIfIndex,
+        juniVlanMajorIfLowerIfIndex,
+        juniVlanMajorIfRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Major VLAN interfaces
+        in a Juniper product."
+    ::= { juniEthernetGroups 3 }                                   -- JUNOSe 3.0
+
+juniVlanSubIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniVlanSubNextIfIndex,
+        juniVlanSubIfVlanId,
+        juniVlanSubIfVlanUntagged,
+        juniVlanSubIfLowerIfIndex,
+        juniVlanSubIfRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of VLAN
+        SubInterfaces in a Juniper product.  This group became obsolete when
+        VLAN stack support was added."
+    ::= { juniEthernetGroups 4 }                                   -- JUNOSe 3.0
+
+juniVlanSubIfGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniVlanSubNextIfIndex,
+        juniVlanSubIfVlanId,
+        juniVlanSubIfVlanUntagged,
+        juniVlanSubIfVlanStackId,
+        juniVlanSubIfLowerIfIndex,
+        juniVlanSubIfRowStatus,
+        juniVlanSubIfVlanStackEthertype,
+        juniVlanSubIfVlanAdvisoryRxSpeed,
+        juniVlanSubIfVlanAdvisoryTxSpeed }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of VLAN SubInterfaces in a
+        Juniper product."
+    ::= { juniEthernetGroups 5 }                                   -- JUNOSe 4.0
+
+juniEthernetGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniEthernetIfDuplexMode,
+        juniEthernetIfSpeed,
+        juniEthernetIfMtu,
+        juniEthernetIfOperDuplexMode,
+        juniEthernetIfPrimaryMauType,
+        juniEthernetIfSecondaryMauType,
+        juniEthernetIfPrimaryLength,
+        juniEthernetIfSecondaryLength }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of Ethernet interfaces in
+        a Juniper product."
+    ::= { juniEthernetGroups 6 }                                   -- JUNOSe 4.1
+
+juniEthernetIfStatsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniEthernetIfIngressLineUtilization,
+        juniEthernetIfEgressLineUtilization }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing Ethernet interface statistics in
+        a Juniper product."
+    ::= { juniEthernetGroups 7 }                                   -- JUNOSe 5.2
+
+juniLagIfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniLagNextIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of LAG interfaces in
+        a Juniper product."
+    ::= { juniEthernetGroups 8 }                                   -- JUNOSe 7.0
+
+END

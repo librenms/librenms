@@ -1,0 +1,953 @@
+ALCATEL-IND1-MAC-ADDRESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE,
+        OBJECT-IDENTITY,
+        NOTIFICATION-TYPE,
+        MODULE-IDENTITY,
+        Unsigned32                      FROM SNMPv2-SMI
+        ifIndex                         FROM IF-MIB
+        MacAddress,
+        RowStatus,
+        DisplayString,
+        TEXTUAL-CONVENTION              FROM SNMPv2-TC
+        dot1qVlanIndex                  FROM Q-BRIDGE-MIB
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP              FROM SNMPv2-CONF
+        softentIND1MacAddress,
+        sourceLearningTraps             FROM ALCATEL-IND1-BASE;
+
+
+alcatelIND1MacAddressMIB MODULE-IDENTITY
+    LAST-UPDATED "200704030000Z"
+    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
+
+     Telephone:               North America  +1 800 995 2696
+                              Latin America  +1 877 919 9526
+                              Europe         +31 23 556 0100
+                              Asia           +65 394 7933
+                              All Other      +1 818 878 4507
+
+     Electronic Mail:         support@ind.alcatel.com
+     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+    DESCRIPTION
+              "This module describes an authoritative enterprise-specific Simple
+        Network Management Protocol (SNMP) Management Information Base (MIB):
+
+        For the Birds Of Prey Product Line, this is the MIB module for
+              address learning mac addresses entity.
+
+        The right to make changes in specification and other information
+        contained in this document without prior notice is reserved.
+
+        No liability shall be assumed for any incidental, indirect, special, or
+        consequential damages whatsoever arising from or related to this
+        document or the information contained herein.
+
+        Vendors, end-users, and other interested parties are granted
+        non-exclusive license to use this specification in connection with
+        management of the products for which it is intended to be used.
+
+                   Copyright (C) 1995-2007 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "200704030000Z"
+
+    DESCRIPTION
+        "The MIB module for Source Learning Mac Address entity."
+    ::= { softentIND1MacAddress 1}
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Hook into the Alcatel Tree
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alcatelIND1MacAddressMIBObjects OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch For Source Learning Module MIB Subsystem Managed Objects."
+        ::= { alcatelIND1MacAddressMIB 1 }
+
+    alcatelIND1MacAddressMIBConformance OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for Source Learning Module MIB Subsystem Conformance Information."
+        ::= { alcatelIND1MacAddressMIB 2 }
+
+    alcatelIND1MacAddressMIBGroups OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for Source Learning Module MIB Subsystem Units of Conformance."
+        ::= { alcatelIND1MacAddressMIBConformance 1 }
+
+    alcatelIND1MacAddressMIBCompliances OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+            "Branch for Source Learning Module MIB Subsystem Compliance Statements."
+        ::= { alcatelIND1MacAddressMIBConformance 2 }
+
+
+
+--
+--textual conventions
+--
+
+MacAddressProtocolType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS        current
+    DESCRIPTION
+        "Protocol value should be displayed in hex format"
+    SYNTAX    INTEGER (0..2147483647)
+
+
+--
+-- Source Learning Common Definitions
+--
+
+
+-- --------------------------------------------------------------------------------------------
+-- Following (slMacAddressTable) table is deprecated.  The new table is "alaSlMacAddressGlobalTable".
+-- This new table will handle both VLAN and VPLS domain MAC addresses.
+-- The reason we keep this "slMacAddressTable" here is to be compatible with current
+-- existing application, say OmniVista".  At some point in the future this table will be removed.
+-- --------------------------------------------------------------------------------------------
+
+-- Source Learning MAC Address Table
+--  The Static Unicast Database for Transparent VLAN Bridges.
+--  Similar to the dot1qStaticUnicastTable of 802.1Q,
+--  It mainly allows the user to configure static Unicast
+--  MAC address.
+
+slMacAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SlMacAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains source addresses which can be configured as
+        permanent (not aged out), delete on reset, delete on timeout
+        in the MAC address table, and those dynamic learned addresses
+        which can be viewed and deleted."
+    ::= { alcatelIND1MacAddressMIBObjects 1 }
+
+slMacAddressEntry OBJECT-TYPE
+    SYNTAX      SlMacAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defninition of the Mac Addresses entries for which the switch
+        has information.
+
+        For creation of a Mac Address, the following 6 fields in
+        slMacAddressEntry are required:
+                ifIndex
+                dot1qVlanIndex
+                slMacAddress
+                slMacAddressManagement
+                slMacAddressDisposition
+                slMacAddressStatus: must be set last
+        Dynamic mac addresses can not be created manually.
+
+        For deletion of a Mac Address, the following 4 fields in
+        slMacAddressEntry are required:
+                ifIndex
+                dot1qVlanIndex
+                slMacAddress
+                slMacAddressStatus: must be set last"
+    INDEX   { ifIndex, dot1qVlanIndex, slMacAddress }
+    ::= { slMacAddressTable 1 }
+
+SlMacAddressEntry ::=
+    SEQUENCE {
+        slMacAddress
+            MacAddress,
+        slMacAddressManagement
+            INTEGER,
+        slMacAddressDisposition
+            INTEGER,
+        slMacAddressRowStatus
+            RowStatus,
+        slMacAddressProtocol
+            MacAddressProtocolType
+        }
+
+slMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC address for this entry."
+    ::= { slMacAddressEntry 1 }
+
+
+slMacAddressManagement OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    permanent(1),
+                    deleteOnReset(2),
+                    deleteOnTimeout(3),
+                    learned(4),
+                    staticMulticast(5)
+                    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object indicates the management of this entry.
+                permanent(1) - this entry is currently in use
+                    and will remain so after the user removing
+                    this entry.
+                deleteOnReset(2) - this entry is currently in
+                    use and will remain so until the next
+                    reset of the bridge.
+                deleteOnTimeout(3) - this entry is currently
+                    in use and will remain so until it is aged
+                    out.
+                learned(4) - this entry is currently in use
+                    and will remain so until it is aged out.
+        staticMulticast(5) - this entry is only applicable
+            to multicast destination addresses"
+
+    DEFVAL      { permanent }
+    ::= { slMacAddressEntry 2 }
+
+
+slMacAddressDisposition OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    bridging(1),
+                    filtering(2),
+                    quarantined(3),
+                    hostIntegrity(4),
+                    userNetworkProf(5)
+                    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object indicates the disposition of the entry.
+                bridging(1) - this entry is currently in use
+                    for bridging.
+                filtering(2) - this entry is currently in use
+                    for filtering.
+                quarantined(3) - this entry is currently in use
+                        for quarantined mac.
+                hostIntegrity check - the entry is currently under host integrity checking.
+                userNetworkProf - the entry is currently under user network profile Qos.
+        "
+    DEFVAL      { bridging }
+    ::= { slMacAddressEntry 3 }
+
+
+slMacAddressRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Row Status for creating/deleting the mac address."
+    ::= { slMacAddressEntry 4 }
+
+slMacAddressProtocol OBJECT-TYPE
+    SYNTAX  MacAddressProtocolType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object indicates the protocol associated with
+         a mac address."
+    ::= { slMacAddressEntry 5 }
+
+-- Layer 2 Mac Address Aging Mib Table
+
+
+slMacAddressAgingTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlMacAddressAgingEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Definition of the timeout for those learned mac addresses and
+        configured as deleted_on_timeout addresses."
+    ::= { alcatelIND1MacAddressMIBObjects 2 }
+
+slMacAddressAgingEntry OBJECT-TYPE
+    SYNTAX  SlMacAddressAgingEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about the aging time for some specific vlan.
+
+        For creation of the aging time, If the vlan Id is specified, then
+        the aging time value will be applied to those mac addresses in
+        that vlan. Otherwise, the aging time will be applied to all of
+        the mac addresses throughout the vlans."
+    INDEX    { dot1qVlanIndex }
+    ::= { slMacAddressAgingTable 1 }
+
+SlMacAddressAgingEntry ::=
+    SEQUENCE {
+        slMacAgingValue
+             INTEGER,
+        slMacAgingRowStatus
+             RowStatus
+
+        }
+
+slMacAgingValue OBJECT-TYPE
+    SYNTAX  INTEGER (10..1000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object indicates the value of mac address aging time."
+    DEFVAL      { 300 }
+    ::= { slMacAddressAgingEntry 1 }
+
+slMacAgingRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Row Status for creating/deleting the aging time."
+    ::= { slMacAddressAgingEntry 2 }
+
+
+
+
+
+-- layer 2 PesudoCAM Trap elements ***********************
+
+slPCamTrapObj OBJECT IDENTIFIER ::= { alcatelIND1MacAddressMIBObjects 3 }
+
+slPCAMSlotNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The slot number of this Coronado."
+    ::= { slPCamTrapObj 1 }
+
+slPCAMSliceNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The Slice Number of this Coronado."
+    ::= { slPCamTrapObj 2 }
+
+slPCAMStatus OBJECT-TYPE
+   SYNTAX       INTEGER {
+                        lowWaterMark(1),
+                        highWaterMark(2),
+                        floodWaterMark(3),
+                        full(4)
+                }
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+   "The layer 2 pesudoCAM status of this Coronado."
+   ::= { slPCamTrapObj 3 }
+
+
+        slMacToPortMacTable     OBJECT-TYPE
+                SYNTAX  SEQUENCE OF MacToPortMacEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "A list of Mac To Port Binding Mac address."
+                ::= { alcatelIND1MacAddressMIBObjects 4 }
+
+        slMacToPortMacEntry     OBJECT-TYPE
+                SYNTAX  MacToPortMacEntry
+                MAX-ACCESS  not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "Mac To Port Binding Mac address entry."
+                INDEX { slMacToPortMacVlanId, slMacToPortMacAddress}
+                ::= { slMacToPortMacTable 1 }
+
+
+        MacToPortMacEntry ::= SEQUENCE {
+                slMacToPortMacVlanId                                    INTEGER,
+                slMacToPortMacAddress             MacAddress,
+                slMacToPortMacRowStatus  RowStatus
+                }
+
+        slMacToPortMacVlanId            OBJECT-TYPE
+                SYNTAX  INTEGER (1..4094)
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "The vlan Id in which the packet with this mac address is flooded"
+                ::= { slMacToPortMacEntry 1 }
+
+
+        slMacToPortMacAddress   OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "A Mac address that is associated with the Mac To Port Binding."
+                ::= { slMacToPortMacEntry 2 }
+
+        slMacToPortMacRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "This indicate whether to add or delete the mac address"
+                ::= { slMacToPortMacEntry 3 }
+
+
+
+
+
+-- Layer 2 PesudoCAM Status Trap ***********************
+
+slPCAMStatusTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                slPCAMSlotNumber,
+                slPCAMSliceNumber,
+                slPCAMStatus
+                }
+   STATUS       current
+   DESCRIPTION
+        "Trap Status of Layer 2 pesudoCAM on this Coronado."
+   ::= { sourceLearningTraps 0 1 }
+
+-- BCM Table Hash Collision Traps *********************
+
+bcmHashCollisionTrap NOTIFICATION-TYPE
+    OBJECTS    {
+               bcmHashCollisionMac,
+               bcmHashCollisionSlot,
+               bcmHashCollisionPort,
+               bcmHashCollisionVlan,
+               bcmHashCollisionTable
+               }
+    STATUS     current
+    DESCRIPTION
+         "Trap to notify the hash collision in BCM Table."
+    ::= { sourceLearningTraps 0 3 }
+
+
+
+-- HAL Table Hash Collision Trap *********************
+
+halHashCollisionTrap NOTIFICATION-TYPE
+    OBJECTS    {
+           halHashCollisionMac,
+           halHashCollisionSlot,
+           halHashCollisionPort,
+           halHashCollisionVlan,
+           halHashCollisionTable
+           }
+    STATUS     current
+    DESCRIPTION
+         "Trap to notify the hash collision in BCM Table."
+    ::= { sourceLearningTraps 0 4 }
+
+-- Source Learning Global Configuration parameters
+
+       slDistributedMacMode OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "Enable/Disable Distributed MAC Mode.
+            When changed, the user must save the current
+            configuration and reboot the switch for change
+            to take effect."
+                DEFVAL { disable }
+         ::= { alcatelIND1MacAddressMIBObjects 5 }
+
+
+-- BCM Table Hash Collision Trap Parameters
+
+bcmHashCollisionTrapObj OBJECT IDENTIFIER ::= { alcatelIND1MacAddressMIBObjects 6 }
+
+-- MAC for which collision occured
+
+bcmHashCollisionMac OBJECT-TYPE
+   SYNTAX          MacAddress
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "MAC for which hash collision occured."
+   ::= { bcmHashCollisionTrapObj 1 }
+
+-- Hash Collision on slot
+
+bcmHashCollisionSlot OBJECT-TYPE
+   SYNTAX          Unsigned32
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "Physical slot number on which the collision MAC is tried to add."
+   ::= { bcmHashCollisionTrapObj 2 }
+
+-- Hash Collision on port
+
+bcmHashCollisionPort OBJECT-TYPE
+   SYNTAX          Unsigned32
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "Physical port number on which the collision MAC is tried to add."
+   ::= { bcmHashCollisionTrapObj 3 }
+
+-- Hash Collision on vlan
+
+bcmHashCollisionVlan OBJECT-TYPE
+   SYNTAX          Unsigned32
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "The Vlan Id on which the collision MAC is tried to add."
+   ::= { bcmHashCollisionTrapObj 4 }
+
+-- Hash Collision in Table
+
+bcmHashCollisionTable OBJECT-TYPE
+   SYNTAX          DisplayString (SIZE (0..31))
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "The BCM Table in which the collision occurred."
+   ::= { bcmHashCollisionTrapObj 5 }
+
+
+
+-- HAL Table Hash Collision Trap Parameters
+
+halHashCollisionTrapObj OBJECT IDENTIFIER ::= { alcatelIND1MacAddressMIBObjects 10 }
+
+-- MAC for which collision occured
+
+halHashCollisionMac OBJECT-TYPE
+   SYNTAX          MacAddress
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "MAC for which hash collision occured."
+   ::= { halHashCollisionTrapObj 1 }
+
+-- Hash Collision on slot
+
+halHashCollisionSlot OBJECT-TYPE
+   SYNTAX          Unsigned32
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "Physical slot number on which the collision MAC is tried to add."
+   ::= { halHashCollisionTrapObj 2 }
+
+-- Hash Collision on port
+
+halHashCollisionPort OBJECT-TYPE
+   SYNTAX          Unsigned32
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "Physical port number on which the collision MAC is tried to add."
+   ::= { halHashCollisionTrapObj 3 }
+
+-- Hash Collision on vlan
+
+halHashCollisionVlan OBJECT-TYPE
+   SYNTAX          Unsigned32
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION     "The Vlan Id on which the collision MAC is tried to add."
+   ::= { halHashCollisionTrapObj 4 }
+
+-- Hash Collision in Table
+
+halHashCollisionTable OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (0..31))
+   MAX-ACCESS      accessible-for-notify
+   STATUS      current
+   DESCRIPTION     "The BCM Table in which the collision occurred."
+   ::= { halHashCollisionTrapObj 5 }
+
+
+--layer 2 Mac Address Learning Table*********************
+
+slMacLearningControlTable   OBJECT-TYPE
+    SYNTAX         SEQUENCE OF SlMacLearningControlEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+                   "This table provides the control information about the mac learning on ports"
+                   ::= {  alcatelIND1MacAddressMIBObjects 7}
+
+slMacLearningControlEntry   OBJECT-TYPE
+    SYNTAX         SlMacLearningControlEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "This table provides the control information about the mac learning on ports"
+    INDEX          { ifIndex }
+                         ::= {  slMacLearningControlTable   1}
+
+SlMacLearningControlEntry ::=
+    SEQUENCE {
+        slMacLearningControlStatus          INTEGER
+             }
+
+slMacLearningControlStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                         enabled (1),
+                         disabled (2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Status of mac learning on port."
+                    DEFVAL { enabled }
+                    ::= { slMacLearningControlEntry 1}
+
+
+-- ------------------------------------------------------------------------
+-- Following table deprecates the original "slMacAddressTable", since it is
+-- supports both VLAN and VPLS based MAC addresses.
+-- ------------------------------------------------------------------------
+
+alaSlMacAddressGlobalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaSlMacAddressGlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MAC addresses from both Vlan and VPLS domain.
+         This table contains source addresses which can be configured as
+         permanent (not aged out), delete on reset, delete on timeout
+             in the MAC address table, and those dynamic learned addresses
+             which can be viewed and deleted."
+         ::= { alcatelIND1MacAddressMIBObjects 8 }
+
+alaSlMacAddressGlobalEntry OBJECT-TYPE
+    SYNTAX      AlaSlMacAddressGlobalEntry
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defninition of the Mac Addresses entries for which the switch
+             has information.
+
+        For creation of a Mac Address in VLAN domain, the following fields in
+        slMacAddressGlobalEntry are required:
+        slMacDomain
+                slOriginId   - IfIndex
+                slServiceId  - Vlan ID
+                slMacAddressGbl
+                slMacAddressGblManagement
+                slMacAddressGblDisposition
+        slMacAddressGblStatus: must be set last
+        Dynamic mac addresses can not be created manually.
+
+    For creation of Mac Address in VPLS domain, following fields in
+    alaSlMacAddressGlobalEntry are required:
+        slMacDomain
+        slLocaleType - SAP/sBind
+        slServiceId - VPLS Service ID
+        slOriginId  - SAP - PortId;   sBind - SDPID
+        slSubId     - SAP - VlanId;   sBind - VcID
+        slMacAddressGbl
+        slMacAddressGblStatus: must be set last
+    Dynamic mac addresses can not be created manually.
+
+        For deletion of a Mac Address in VLAN domain, the following fields in
+        alaSlMacAddressGlobalEntry are required:
+        slMacDomain
+            slOriginId   - IfIndex
+            slServiceId  - Vlan ID
+                slMacAddressGbl
+                slMacAddressGblManagement
+        slMacAddressGblStatus: must be set last
+
+    For deletion of a Mac Address in vpls based, following fileds in
+    alaSlMacAddressGlobalEntry are required:
+        slMacDomain
+        slLocaleType - SAP/sBind
+        slServiceId - VPLS Service ID
+        slOriginId  - SAP - PortId;   sBind - SDPID
+        slSubId     - SAP - VlanId;   sBind - VcID
+        slMacAddressGbl
+        slMacAddressGblStatus: must be set last
+    "
+    INDEX   {slMacDomain, slLocaleType, slOriginId, slServiceId, slSubId, slMacAddressGbl}
+    ::= {alaSlMacAddressGlobalTable  1 }
+
+AlaSlMacAddressGlobalEntry ::= SEQUENCE
+{
+    slMacDomain                  INTEGER,
+    slLocaleType                  INTEGER,
+    slOriginId                   INTEGER,
+    slServiceId                  INTEGER,
+    slSubId                      INTEGER,
+    slMacAddressGbl              MacAddress,
+    slMacAddressGblManagement    INTEGER,
+    slMacAddressGblDisposition   INTEGER,
+    slMacAddressGblRowStatus     RowStatus,
+    slMacAddressGblProtocol      MacAddressProtocolType
+}
+
+slMacDomain OBJECT-TYPE
+    SYNTAX  INTEGER {
+            all(0),
+            vlan(1),
+            vpls(2)
+                    }
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "This object indicates whether this MAC is learned on Vlan domain or vpls domain"
+    DEFVAL      { all }
+    ::= {alaSlMacAddressGlobalEntry  1 }
+
+slLocaleType OBJECT-TYPE
+   SYNTAX  INTEGER {
+            default(0),
+            sap(1),
+            sBind(2)
+            }
+   MAX-ACCESS      not-accessible
+   STATUS      current
+   DESCRIPTION "This field is used only for VPLS, It defaults to default for vlan domain MACs"
+   DEFVAL      { default }
+   ::= {alaSlMacAddressGlobalEntry 2}
+
+slOriginId OBJECT-TYPE
+   SYNTAX  INTEGER (0..2147483647)
+   MAX-ACCESS      not-accessible
+   STATUS      current
+   DESCRIPTION "This should be ifIndex for Vlan domain MAC;
+                               ifIndex for SAP of VPLS domain MAC;
+                               SDP_ID for sBind of VPLS domain MAC"
+   ::= {alaSlMacAddressGlobalEntry 3}
+
+slServiceId OBJECT-TYPE
+ SYNTAX  INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Depending on the domain type, Vlan based or VPLS based.
+     If Vlan based learning, then this field holds the Vlan ID.
+     If VPLS based learning, then this field holds the VPLS Service ID"
+    ::= {alaSlMacAddressGlobalEntry 4 }
+
+slSubId OBJECT-TYPE
+   SYNTAX  INTEGER (0..2147483647)
+   MAX-ACCESS      not-accessible
+   STATUS      current
+   DESCRIPTION "This object is only meaningful in VPLS domain.
+                If SAP, this is the encapsulation ID;
+                If sBind, this is the vcID,
+                This value will be default to -0- in VLAN domain"
+   ::= {alaSlMacAddressGlobalEntry 5}
+
+slMacAddressGbl OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address for this entry."
+    ::= {alaSlMacAddressGlobalEntry  6 }
+
+slMacAddressGblManagement OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    permanent(1),
+                    deleteOnReset(2),
+                    deleteOnTimeout(3),
+                    learned(4),
+                    staticMulticast(5)
+                    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object indicates the management of this entry.
+                permanent(1) - this entry is currently in use
+                    and will remain so after the user removing
+                    this entry.
+                deleteOnReset(2) - this entry is currently in
+                    use and will remain so until the next
+                    reset of the bridge.
+                deleteOnTimeout(3) - this entry is currently
+                    in use and will remain so until it is aged
+                    out.
+                learned(4) - this entry is currently in use
+                    and will remain so until it is aged out.
+        staticMulticast(5) - this entry is only applicable
+            to multicast destination addresses"
+
+    DEFVAL      { permanent }
+    ::= {alaSlMacAddressGlobalEntry  7 }
+
+slMacAddressGblDisposition OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    bridging(1),
+                    filtering(2),
+                    quarantined(3),
+                    hostIntegrity(4),
+                    userNetworkProf(5)
+                    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object indicates the disposition of the entry.
+                bridging(1) - this entry is currently in use for bridging.
+                filtering(2) - this entry is currently in use for filtering.
+        quarantined(3) - this entry is currently in use for quarantined mac.
+                hostIntegritycheck(4) - the entry is currently under host integrity checking.
+                userNetworkProf(5) - the entry is currently under user network profile Qos.
+        "
+    DEFVAL      { bridging }
+    ::= {alaSlMacAddressGlobalEntry  8 }
+
+slMacAddressGblRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Row Status for creating/deleting the mac address."
+    ::= {alaSlMacAddressGlobalEntry  9 }
+
+slMacAddressGblProtocol OBJECT-TYPE
+    SYNTAX  MacAddressProtocolType
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object indicates the protocol associated with
+         a mac address."
+    ::= {alaSlMacAddressGlobalEntry  10}
+
+
+-- ------------------------------------------------------------------------
+-- Following table provides number of MAC addresses count for
+-- VPLS based MAC addresses currently in CMM FDB.
+-- ------------------------------------------------------------------------
+--
+-- slMacAddrCountInfoTable OBJECT-TYPE
+--     SYNTAX   SEQUENCE OF SlMacAddrCountInfoEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS    current
+--    DESCRIPTION
+--        "Definition of the Mac Addresses count for VPLS MAC addresses"
+--    ::= {alcatelIND1MacAddressMIBObjects  9 }
+--
+--slMacAddrCountInfoEntry OBJECT-TYPE
+--    SYNTAX    SlMacAddrCountInfoEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS    current
+--    DESCRIPTION "Definition of the Mac Addresses count for VPLS MAC addresses"
+--    AUGMENTS   {slMacAddressGlobalEntry}
+--    ::= {slMacAddrCountInfoTable  1}
+--
+--SlMacAddrCountInfoEntry ::= SEQUENCE
+--{
+--      slStaticMacCount       INTEGER,
+--      slDynamicMacCount      INTEGER
+--}
+--
+--slStaticMacCount OBJECT-TYPE
+-- SYNTAX  INTEGER (1..2147483647)
+--    MAX-ACCESS read-only
+--    STATUS  current
+--    DESCRIPTION
+--      "This object contains the MAC address count for Static configured MACs"
+--    ::= {slMacAddrCountInfoEntry 1 }
+--
+--slDynamicMacCount OBJECT-TYPE
+-- SYNTAX  INTEGER (1..2147483647)
+--    MAX-ACCESS read-only
+--    STATUS  current
+--    DESCRIPTION
+--      "This object contains the MAC address count for dynamic learned MACs"
+--   ::= {slMacAddrCountInfoEntry 2 }
+--
+--
+--
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1MacAddressMIBCompliance MODULE-COMPLIANCE
+   STATUS    current
+   DESCRIPTION
+        "Compliance statement for source learning."
+   MODULE
+        MANDATORY-GROUPS
+        {
+                slMacAddressGroup,
+                slMacAgingGroup,
+                slPCamNotificationGroup,
+                slMacGeneralGroup,
+                slMacLearningGroup
+        }
+   ::= { alcatelIND1MacAddressMIBCompliances 1 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+slMacAddressGroup OBJECT-GROUP
+   OBJECTS
+   {
+        slMacAddress,
+        slMacAddressManagement,
+        slMacAddressDisposition,
+        slMacAddressRowStatus,
+        slMacAddressProtocol
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of source learning Mac addresses."
+   ::= { alcatelIND1MacAddressMIBGroups 1 }
+
+
+slMacAgingGroup OBJECT-GROUP
+   OBJECTS
+   {
+        slMacAgingValue,
+        slMacAgingRowStatus
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of source learning Mac addresses aging-time."
+   ::= { alcatelIND1MacAddressMIBGroups 2 }
+
+slPCamNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS
+   {
+        slPCAMStatusTrap
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of notification of signaling Pesudo CAM event."
+   ::= { alcatelIND1MacAddressMIBGroups 3 }
+
+slMacGeneralGroup OBJECT-GROUP
+    OBJECTS
+    {
+        slDistributedMacMode
+    }
+    STATUS  current
+   DESCRIPTION
+        "Collection of general sl objects."
+   ::= { alcatelIND1MacAddressMIBGroups 4 }
+
+slMacLearningGroup OBJECT-GROUP
+   OBJECTS
+   {
+        slMacLearningControlStatus
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of objects for management of enabling or disabling source learning on the ports."
+   ::= { alcatelIND1MacAddressMIBGroups 5 }
+
+
+--  END ***********************
+
+
+
+END
+
+

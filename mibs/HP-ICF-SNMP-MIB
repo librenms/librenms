@@ -1,0 +1,529 @@
+HP-ICF-SNMP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hpSwitch            
+            FROM HP-ICF-OID            
+        ifIndex, InterfaceIndexOrZero            
+            FROM IF-MIB            
+        InetAddressType, InetAddress            
+            FROM INET-ADDRESS-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF            
+        Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+            FROM SNMPv2-SMI;
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38
+    hpicfSnmpMIB MODULE-IDENTITY 
+        LAST-UPDATED "200708240000Z"      -- August 24, 2007 at 00:00 GMT
+        ORGANIZATION 
+            "Hewlett-Packard Company
+            Procurve Networking Business"
+        CONTACT-INFO 
+            "Hewlett-Packard Company
+            8000 Foothills Blvd.
+            Roseville, CA 95747"
+        DESCRIPTION 
+            "This MIB module contains HP proprietary
+            objects for managing SNMP entity."
+        REVISION "200611110000Z"      -- November 11, 2006 at 00:00 GMT
+        DESCRIPTION 
+            "Updated description and changed InterfaceIndex                      
+                    to InterfaceIndexOrZero for                       
+                    hpicfSnmpResponseSourceAddrIfIndex and                       
+                    hpicfSnmpTrapSourceAddrIfIndex objects."
+        REVISION "200609010000Z"      -- September 01, 2006 at 00:00 GMT
+        DESCRIPTION 
+            "Initial revision"
+        REVISION "200708240000Z"      -- August 24, 2007 at 00:00 GMT
+        DESCRIPTION 
+            "Added hpicfSnmpNotification information."
+        ::= { hpSwitch 38 }
+
+    
+
+
+--
+-- Node definitions
+--
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.0
+    hpicfSnmpNotification OBJECT IDENTIFIER ::= { hpicfSnmpMIB 0 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.0.1
+    hpicfSnmpAuthFail NOTIFICATION-TYPE
+        OBJECTS { hpicfSnmpAuthFailCount, hpicfSnmpAuthFailIPType, hpicfSnmpAuthFailIP }
+             
+        STATUS current
+        DESCRIPTION 
+            "The switch sends this notification when an SNMP 
+            SET command fails at the authorization check stage.
+            This notification applies to SETs within the hpicf tree that 
+            are network security related.  This object is controlled
+            by hpicfSnmpAuthNotifyEnable"
+
+        ::= { hpicfSnmpNotification 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1
+    hpicfSnmpObjects OBJECT IDENTIFIER ::= { hpicfSnmpMIB 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1
+    hpicfSnmpConfig OBJECT IDENTIFIER ::= { hpicfSnmpObjects 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1
+    hpicfSnmpGlobalCfg OBJECT IDENTIFIER ::= { hpicfSnmpConfig 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.1
+    hpicfSnmpResponseSourceAddrPolicyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfSnmpResponseSourceAddrPolicyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of entries used to configure the policy for
+            selecting source address while sending SNMP response. 
+            When this entry is configured, the source address field 
+            in the IP PKT header get modified based on the configured
+            option. There are 4 valid options that can be configured 
+            for ipv4 and ipv6 networks
+            a) rfc1517 
+               This is the default behavior if no other policy is
+               configured. In this case the source address will be 
+               the address of the interface from which packet goes 
+               out of the box. 
+            b) user configured ip address
+               In this case the configured address will be used as 
+               source address in the SNMP response.
+            c) user configured interface
+               In this case the IP address configured on the specified
+               interface will be used as source address in the SNMP 
+               response. In case of multinet interface then smallest
+               IP address present on the interface in lexicographical 
+               order will be used as source address while sending
+               SNMP responses for requests.
+            d) dst_ip_of_request
+               In this case, the destination ip address present in 
+               the IP header of received SNMP request will be used 
+               as source address in the SNMP response."
+        ::= { hpicfSnmpGlobalCfg 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.1.1
+    hpicfSnmpResponseSourceAddrPolicyEntry OBJECT-TYPE
+        SYNTAX HpicfSnmpResponseSourceAddrPolicyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the table, containing information about
+            a single source address. This table alows only 2 values 
+            that can be used as index to this table. These are:
+            1) hpicfSnmpResponseSourceAddressType = ipv4
+              Where user wants to configure the source address type 
+              used while sending the SNMP response on IPV4 network.
+            2) hpicfSnmpResponseSourceAddressType = ipv6
+             Where user wants to configure the source address type 
+             used while sending the SNMP response on IPV6 network."
+        INDEX { hpicfSnmpResponseSourceAddressType }
+        ::= { hpicfSnmpResponseSourceAddrPolicyTable 1 }
+
+    
+    HpicfSnmpResponseSourceAddrPolicyEntry ::=
+        SEQUENCE { 
+            hpicfSnmpResponseSourceAddressType
+                InetAddressType,
+            hpicfSnmpResponseSourceAddrPolicy
+                INTEGER,
+            hpicfSnmpResponseSourceAddress
+                InetAddress,
+            hpicfSnmpResponseSourceAddrIfIndex
+                InterfaceIndexOrZero
+         }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.1.1.1
+    hpicfSnmpResponseSourceAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "We allow only 2 values for this object as an index for 
+            hpicfSnmpResponseSourceAddrPolicyEntry -
+            1) hpicfSnmpResponseSourceAddressType = ipv4
+              Where user wants to configure the source address type 
+              used while sending the SNMP response on IPV4 network
+            2) hpicfSnmpResponseSourceAddressType = ipv6
+              Where user wants to configure the source address type 
+              used while sending the SNMP response on IPV6 network."
+        ::= { hpicfSnmpResponseSourceAddrPolicyEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.1.1.2
+    hpicfSnmpResponseSourceAddrPolicy OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            rfc1517(1),
+            configuredIP(2),
+            configuredInterface(3),
+            dstIpOfRequest(4)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " This specifies the policy for selecting the source 
+            address for outgoing SNMP responses.
+            a) rfc1517 
+             This is the default behavior if no other policy is
+             configured. In this case the source address will be 
+             the address of the interface from which packet goes 
+             out of the box. 
+            b) configuredIP
+             By setting this value will enable the SNMP agent to use
+             IP addresses specified in hpicfSnmpResponseSourceAddress
+             object as source address while sending the response.
+             hpicfSnmpResponseSourceAddress must be set to a valid
+             and active ip address before setting policy to
+             configuredIP.
+            c) configuredInterface
+             By setting this value will enable the SNMP agent to use
+             IP addresses configured on the interface specified by 
+             hpicfSnmpResponseSourceAddrIfIndex object as source
+             address while sending the response.
+             In case of multinet interface then smallest IP 
+             address present on the interface in lexicographical 
+             order will be used as source address while sending
+             SNMP responses for requests.
+             hpicfSnmpResponseSourceAddrIfIndex object must be set
+             to a valid loopback interface number before setting
+             policy to configuredInterface.
+            d) dst_ip_of_request
+             In this case, the destination ip address present in 
+             the IP header of received SNMP request will be used as 
+             source address in the SNMP response."
+        DEFVAL { 1 }
+        ::= { hpicfSnmpResponseSourceAddrPolicyEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.1.1.3
+    hpicfSnmpResponseSourceAddress OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the IP address which will be 
+            used as source ip while sending the SNMP response.
+            This object should be used in conjunction with the 
+            hpicfSnmpResponseSourceAddressType and 
+            hpicfSnmpResponseSourceAddrPolicy."
+        ::= { hpicfSnmpResponseSourceAddrPolicyEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.1.1.4
+    hpicfSnmpResponseSourceAddrIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndexOrZero
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the interface whose IP address
+            will be used as source IP while sending the SNMP response.
+            This object should be used in conjunction with the 
+            hpicfSnmpResponseSourceAddressType and 
+            hpicfSnmpResponseSourceAddrPolicy."
+        ::= { hpicfSnmpResponseSourceAddrPolicyEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.2
+    hpicfSnmpTrapSourceAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfSnmpTrapSourceAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of entries used to configure the source address 
+            used while generating SNMP Traps. When this entry is 
+            configured, the source address field in the IP PKT header 
+            get modified based on the configured option."
+        ::= { hpicfSnmpGlobalCfg 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.2.1
+    hpicfSnmpTrapSourceAddrEntry OBJECT-TYPE
+        SYNTAX HpicfSnmpTrapSourceAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the table, containing information about
+            a single source address. This table alows only 2 values 
+            that can be used as index to this table. These are:
+            1) hpicfSnmpResponseSourceAddressType = ipv4
+              Where user wants to configure the source address 
+              used while sending the SNMP TRAPs on IPV4 network.
+            2) hpicfSnmpResponseSourceAddressType = ipv6
+              Where user wants to configure the source address 
+              used while sending the SNMP TRAPs on IPV6 network."
+        INDEX { hpicfSnmpTrapSourceAddressType }
+        ::= { hpicfSnmpTrapSourceAddrTable 1 }
+
+    
+    HpicfSnmpTrapSourceAddrEntry ::=
+        SEQUENCE { 
+            hpicfSnmpTrapSourceAddressType
+                InetAddressType,
+            hpicfSnmpTrapSourceAddrPolicy
+                INTEGER,
+            hpicfSnmpTrapSourceAddress
+                InetAddress,
+            hpicfSnmpTrapSourceAddrIfIndex
+                InterfaceIndexOrZero
+         }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.2.1.1
+    hpicfSnmpTrapSourceAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            " This table alows only 2 values 
+            that can be used as index to this table. These are:
+            1) hpicfSnmpResponseSourceAddressType = ipv4
+             Where user wants to configure the source address 
+             used while sending the SNMP TRAPs on IPV4 network.
+            2) hpicfSnmpResponseSourceAddressType = ipv6
+             Where user wants to configure the source address 
+             used while sending the SNMP TRAPs on IPV6 network."
+        ::= { hpicfSnmpTrapSourceAddrEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.2.1.2
+    hpicfSnmpTrapSourceAddrPolicy OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            rfc1517(1),
+            configuredIP(2),
+            configuredInterface(3),
+            dstIpOfRequest(4)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " This specifies the policy for selecting the source 
+            address for outgoing SNMP responses.
+            a) rfc1517 
+             This is the default behavior if no other policy is
+             configured. In this case the source address will be 
+             the address of the interface from which packet goes 
+             out of the box. 
+            b) configuredIP
+             By setting this value will enable the SNMP agent to use
+             IP addresses specified in hpicfSnmpResponseSourceAddress
+             object as source address while sending the response.
+             hpicfSnmpTrapSourceAddress must be set to a valid
+             and active ip address before setting policy to
+             configuredIP.
+            c) configuredInterface
+             By setting this value will enable the SNMP agent to use
+             IP addresses configured on the interface specified by 
+             hpicfSnmpResponseSourceAddrIfIndex object as source
+             address while sending the response.
+             In case of multinet interface then smallest IP 
+             address present on the interface in lexicographical 
+             order will be used as source address while sending
+             SNMP responses for requests.
+             hpicfSnmpTrapSourceAddrIfIndex object must be set
+             to a valid loopback interface number before setting
+             policy to configuredInterface."
+        ::= { hpicfSnmpTrapSourceAddrEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.2.1.3
+    hpicfSnmpTrapSourceAddress OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the IP address which will be 
+            used as source ip while sending the SNMP TRAPs.
+            This object should be used in conjunction with the 
+            hpicfSnmpResponseSourceAddressType and 
+            hpicfSnmpTrapSourceAddrPolicy."
+        ::= { hpicfSnmpTrapSourceAddrEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.2.1.4
+    hpicfSnmpTrapSourceAddrIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndexOrZero
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the interface whose IP address
+            will be used as source ip while sending the SNMP TRAPs.
+            This object should be used in conjunction with the 
+            hpicfSnmpResponseSourceAddressType and
+            hpicfSnmpTrapSourceAddrPolicy."
+        ::= { hpicfSnmpTrapSourceAddrEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.1.1.3
+    hpicfSnmpAuthNotifyEnable OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Controls whether hpicfSnmpAuthFail notifications will be generated.
+            The default value is ‘1’ (Enabled).  A value of ‘2’ represents 
+            Disabled.  Writing this object requires authentication, such 
+            as provided by SNMPv3.
+            
+            NOTE that hpicfSnmpAuthFail and snmpEnableAuthenTraps (RFC-1157)
+            are mutually exclusive.  While they may both be disabled, only
+            one may be enabled at any given time.  Notifications enabled by
+            hpicfSnmpAuthFail are more comprehensive and are therefore
+            recommended."
+        ::= { hpicfSnmpGlobalCfg 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.2
+    hpicfSnmpNotificationObjects OBJECT IDENTIFIER ::= { hpicfSnmpObjects 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.2.1
+    hpicfSnmpAuthFailCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "A count of SNMP authorization failures detected by the SNMP entity."
+        ::= { hpicfSnmpNotificationObjects 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.2.2
+    hpicfSnmpAuthFailIPType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Type of IP address contained in hpicfSnmpAuthFailIP."
+        ::= { hpicfSnmpNotificationObjects 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.1.2.3
+    hpicfSnmpAuthFailIP OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "IP address of sender of message that failed authentication."
+        ::= { hpicfSnmpNotificationObjects 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2
+    hpicfSnmpConformance OBJECT IDENTIFIER ::= { hpicfSnmpMIB 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.1
+    hpicfSnmpCompliances OBJECT IDENTIFIER ::= { hpicfSnmpConformance 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.1.1
+    hpicfSnmpCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "A compliance statement for HP Routing switches with SNMP"
+        MODULE -- this module
+            MANDATORY-GROUPS { hpicfSnmpResponseSourceAddrTableCompliancesGroup, 
+                hpicfSnmpTrapSourceAddrTableCompliancesGroup }
+            GROUP hpicfSnmpResponseSourceAddrTableGroup
+                DESCRIPTION 
+                    "A Collection of Object(s) that allow  
+                    configuration of policies for selecting source address for 
+                    SNMP response."
+            GROUP hpicfSnmpTrapSourceAddrTableGroup
+                DESCRIPTION 
+                    "A Collection of Object(s) that allow  
+                    configuration of Trap source Addresses"
+        ::= { hpicfSnmpCompliances 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2
+    hpicfSnmpCompliancesGroups OBJECT IDENTIFIER ::= { hpicfSnmpConformance 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2.1
+    hpicfSnmpResponseSourceAddrTableCompliancesGroup OBJECT-GROUP
+        OBJECTS { hpicfSnmpResponseSourceAddressType, 
+            hpicfSnmpResponseSourceAddrPolicy, 
+            hpicfSnmpResponseSourceAddress, 
+            hpicfSnmpResponseSourceAddrIfIndex }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects allowing configuration of policies
+            in the switch for selecting the source address used while 
+            generating SNMP response"
+        ::= { hpicfSnmpCompliancesGroups 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2.2
+    hpicfSnmpTrapSourceAddrTableCompliancesGroup OBJECT-GROUP
+        OBJECTS { hpicfSnmpTrapSourceAddressType, 
+            hpicfSnmpTrapSourceAddrPolicy, 
+            hpicfSnmpTrapSourceAddress, 
+            hpicfSnmpTrapSourceAddrIfIndex }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects allowing configuration of source
+            addresses for SNMP traps geneated by the switch."
+        ::= { hpicfSnmpCompliancesGroups 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2.3
+    hpicfSnmpResponseSourceAddrTableGroup OBJECT-GROUP
+        OBJECTS { hpicfSnmpResponseSourceAddressType, 
+            hpicfSnmpResponseSourceAddrPolicy, 
+            hpicfSnmpResponseSourceAddress, 
+            hpicfSnmpResponseSourceAddrIfIndex }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hpicfSnmpCompliancesGroups 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2.4
+    hpicfSnmpTrapSourceAddrTableGroup OBJECT-GROUP
+        OBJECTS { hpicfSnmpResponseSourceAddressType, 
+            hpicfSnmpResponseSourceAddrPolicy, 
+            hpicfSnmpResponseSourceAddress, 
+            hpicfSnmpResponseSourceAddrIfIndex }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hpicfSnmpCompliancesGroups 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2.5
+    hpicfSnmpNotifyObjectGroup OBJECT-GROUP
+        OBJECTS { hpicfSnmpAuthFailCount, 
+        hpicfSnmpAuthFailIPType, hpicfSnmpAuthFailIP, 
+            hpicfSnmpAuthNotifyEnable }
+        STATUS current
+        DESCRIPTION 
+            "The operational status of hpicfSwitchAuthServerFail notifications.
+            The default value is ‘1’ (Enabled).  A value of ‘2’ represents 
+            Disabled.  Writing this object requires authentication, such 
+            as provided by SNMPv3."
+        ::= { hpicfSnmpCompliancesGroups 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.38.2.2.6
+    hpicfSnmpNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hpicfSnmpAuthFail }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hpicfSnmpCompliancesGroups 6 }
+
+
+END

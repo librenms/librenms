@@ -1,0 +1,1349 @@
+HP-USER-AUTH DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hpSwitch            
+            FROM HP-ICF-OID            
+        InterfaceIndex            
+            FROM IF-MIB            
+        VlanIndex            
+            FROM Q-BRIDGE-MIB            
+        SnmpAdminString            
+            FROM SNMP-FRAMEWORK-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, Unsigned32, OBJECT-TYPE, 
+        MODULE-IDENTITY, NOTIFICATION-TYPE            
+            FROM SNMPv2-SMI            
+        RowStatus
+            FROM SNMPv2-TC
+        TruthValue, MacAddress            
+            FROM SNMPv2-TC
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB;
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19
+    hpicfUsrAuthMIB MODULE-IDENTITY 
+        LAST-UPDATED "200708290000Z"      -- August 29, 2007 at 00:00 GMT
+        ORGANIZATION 
+            "Hewlett-Packard Company
+            ProCurve Networking Business"
+        CONTACT-INFO 
+            "Hewlett-Packard Company
+            8000 Foothills Blvd.
+            Roseville, CA 95747
+            www.ProCurve.com"
+        DESCRIPTION 
+            "This MIB module contains the definitions of Managed
+            Objects for various subsystems that perform 
+            user authentication. The subsystems under control
+            by this MIB are:
+            'WebAuth' - Web-based login authentication
+            'MacAuth' - MAC addresss-based authentication
+            'CLI Password' - CLI-based login authentication"
+        REVISION "200708290000Z"      -- August 29, 2007 at 00:00 GMT
+        DESCRIPTION 
+            "Added hpicfUsrAuthWMA failure notification and objects"
+        REVISION "200305231020Z"      -- May 23, 2003 at 10:20 GMT
+        DESCRIPTION 
+            "Initial revision."
+        REVISION "200508050000Z"      -- August 05, 2005 at 00:00 GMT
+        DESCRIPTION 
+            "Added import objects."
+        REVISION "200706221200Z"      -- June 22, 2007 at 12:00 GMT
+        DESCRIPTION 
+            "Added hpicfUsrAuthNotifyConformance group and objects."
+        ::= { hpSwitch 19 }
+
+    
+--
+-- Node definitions
+--
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.0
+    hpicfUsrAuthNotifications OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 0 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.0.1
+    hpicfUsrAuthCLIAuthFail NOTIFICATION-TYPE
+        OBJECTS { hpicfUsrAuthCLIFailCnt, hpicfUsrAuthCLIInterface }
+        STATUS current
+        DESCRIPTION 
+            "An hpicfUsrAuthCLIPasswd notification signifies that
+            CLI password authentication has failed.
+            Operational control of this notification is provided
+            using hpicfUsrAuthCliNotifyEnable.
+            "
+        ::= { hpicfUsrAuthNotifications 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.0.2
+    hpicfUsrAuthPasswdChng NOTIFICATION-TYPE
+        OBJECTS { hpicfUsrAuthCLIPasswdSet, hpicfUsrAuthCLIPwdNotifyCnt }
+        STATUS current
+        DESCRIPTION 
+            "An hpicfUsrAuthPasswdChng notification signifies that
+                         the manager password has been changed.  The value of 
+                         hpicfUsrAuthCLIPasswdSet can be used to determine
+                         whether the password has been set or cleared by this action.
+            "
+        ::= { hpicfUsrAuthNotifications 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.0.3
+    hpicfPortSecAuthFailure NOTIFICATION-TYPE
+        OBJECTS { hpicfUsrAuthWMAFailCnt, 
+            hpicfUsrAuthWMAFailVlan, 
+            hpicfUsrAuthWMAFailPort, 
+            hpicfUsrAuthWMAFailMAC }
+        STATUS current
+        DESCRIPTION 
+            "This notification indicates a failed Port Security
+            (network access) authentication event."
+        ::= { hpicfUsrAuthNotifications 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1
+    hpicfUsrAuthSystem OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.1
+    hpicfUsrAuthWebAuthDhcpBaseAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "For all ports running with web authentication 
+            enabled: Specifies the base address that should 
+            be used by the switch DHCP server for web-based 
+            authentication purposes."
+        ::= { hpicfUsrAuthSystem 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.2
+    hpicfUsrAuthWebAuthDhcpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "For all ports running with web authentication
+            enabled: Specifies the subnet mask to be used in 
+            conjunction with the DHCP base address when 
+            servicing DHCP requests.
+            
+            Allowable mask range is 255.255.240.0 (20) to 
+            255.255.255.0 (24)."
+        ::= { hpicfUsrAuthSystem 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.3
+    hpicfUsrAuthWebAuthDhcpLease OBJECT-TYPE
+        SYNTAX Integer32 (1..30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "For all ports running with web authentication
+            enabled: Specifies the DHCP lease length in 
+            seconds."
+        ::= { hpicfUsrAuthSystem 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.4
+    hpicfUsrAuthMacAuthAddrFormat OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            noDelimiter(1),
+            singleDash(2),
+            multiDash(3),
+            multiColon(4),
+            noDelimiterUppercase(5),
+            singleDashUppercase(6),
+            multiDashUppercase(7),
+            multiColonUppercase(8)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "For all ports running with MAC authentication
+            enabled: Specifies the MAC address format to use
+            in the RADIUS access-request, as follows:
+                    'noDelimiter'  - Sends MAC address in  aabbccddeeff format
+                    'singleDash'   - Sends MAC address in aabbcc-ddeeff format
+                    'multiDash'    - Sends MAC address in aa-bb-cc-dd-ee-ff format
+                    'multiColon'   - Sends MAC address in aa:bb:cc:dd:ee:ff format
+                    'noDelimiterUppercase'  - Sends MAC address in AABBCCDDEEFF format
+                    'singleDashUppercase'   - Sends MAC address in AABBCC-DDEEFF format
+                    'multiDashUppercase'    - Sends MAC address in AA-BB-CC-DD-EE-FF format
+                    'multiColonUppercase'   - Sends MAC address in AA:BB:CC:DD:EE:FF format
+            The default value is noDelimiter(1)."
+        ::= { hpicfUsrAuthSystem 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.5
+    hpicfUsrAuthCliNotifyEnable OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The operational status of hpicfUsrAuthCliAuthFail notifications.
+            The default value is ‘1’ (Enabled).  A value of ‘2’ represents 
+            Disabled.  Writing this object requires authentication, such 
+            as provided by SNMPv3.
+            "
+        ::= { hpicfUsrAuthSystem 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.6
+    hpicfUsrAuthCLIInterface OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            serial(1),
+            telnet(2),
+            ssh(3),
+            other(9)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Denotes the interface that is generating the notification.
+            "
+        ::= { hpicfUsrAuthSystem 6 }
+
+    
+--  
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.7
+    hpicfUsrAuthCLIPasswdSet OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates whether the CLI manager password
+            is set.  ‘1’ indicates True while ‘2’
+            indicates False.
+            "
+        ::= { hpicfUsrAuthSystem 7 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.8
+    hpicfUsrAuthCLIFailCnt OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The count of hpicfUsrAuthPasswdFail notifications sent by the hpicfUsrAuth
+            entity to the SNMP entity.  The actual count of notifications sent by SNMP
+            may be lower due to rate limiting or configuration."
+        ::= { hpicfUsrAuthSystem 8 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.9
+    hpicfUsrAuthCLIPwdNotifyCnt OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "A count of CLI password change notifications
+            sent from the Auth entity to the SNMP entity
+            within the switch.  This count may therefore differ from
+            the count of notifications actually sent by the SNMP
+            entity due to switch configuration (e.g., the value
+            of hpicfUsrAuthNotifyEnable.)"
+        ::= { hpicfUsrAuthSystem 9 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.10
+    hpicfUsrAuthWMAFailCnt OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The count of hpicfUsrAuthWMAFail notifications sent by the hpicfUsrAuth
+            entity to the SNMP entity.  The actual count of notifications sent by SNMP
+            may be lower due to rate limiting or configuration."
+        ::= { hpicfUsrAuthSystem 10 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.11
+    hpicfUsrAuthWMAFailMAC OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The MAC address supplied in the failed authentication request."
+        ::= { hpicfUsrAuthSystem 11 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.12
+    hpicfUsrAuthWMAFailPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The port index of the failed authentication request."
+        ::= { hpicfUsrAuthSystem 12 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.13
+    hpicfUsrAuthWMAFailVlan OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The VLAN ID associated with the failed authentication request."
+        ::= { hpicfUsrAuthSystem 13 }
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.14
+    hpicfUsrAuthPortSecNotifyEnable OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Provides operational control of hpicfPortSecAuthFailure 
+            notification.  When enabled (1), the notification will
+            be sent.  When disabled (2), the notification will not 
+            be sent.  Setting this object requires authentication,
+            such as provided by SNMPv3.
+            "
+        ::= { hpicfUsrAuthSystem 14 }
+
+   
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.15
+    hpicfUsrAuthPasswdNotifyEnable OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Provides operational control of hpicfUsrAuthPasswdChng notification.  
+            When enabled (1), the notification will be sent.  
+            When disabled (2), the notification will not be sent.
+            Setting this object requires authentication, such
+            as provided by SNMPv3."
+        ::= { hpicfUsrAuthSystem 15 }
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.16
+    --
+    -- EWA Server Table
+    -- 
+    hpicfUsrAuthWMAEWAServerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfUsrAuthWMAEWAServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of the Enhanced Web Auth servers." 
+        ::= { hpicfUsrAuthSystem 16 } 
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.1.16.1
+    hpicfUsrAuthWMAEWAServerEntry OBJECT-TYPE
+              SYNTAX      HpicfUsrAuthWMAEWAServerEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "Addresses for an Enhanced Web Auth server."
+              INDEX { hpicfUsrAuthWMAeWAServerIndex }
+              ::= { hpicfUsrAuthWMAEWAServerTable 1 }
+
+
+    HpicfUsrAuthWMAEWAServerEntry ::= SEQUENCE {
+              hpicfUsrAuthWMAeWAServerIndex                  Integer32,
+              hpicfUsrAuthWMAeWAServerIPAddressType          InetAddressType,
+              hpicfUsrAuthWMAeWAServerIPAddress              InetAddress,
+              hpicfUsrAuthWMAeWAServerPath                   OCTET STRING,           
+              hpicfUsrAUthWMAeWAServerRowStatus              RowStatus
+      }
+
+
+    hpicfUsrAuthWMAeWAServerIndex OBJECT-TYPE
+              SYNTAX      Integer32 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                "Index into hpicfUsrAuthWMAEWAServerTable."
+              ::= { hpicfUsrAuthWMAEWAServerEntry 1 }
+
+
+    hpicfUsrAuthWMAeWAServerIPAddressType OBJECT-TYPE
+              SYNTAX      InetAddressType
+              MAX-ACCESS  read-create
+              STATUS      current
+              DESCRIPTION
+                "The type of Enhanced Web Auth Server Address."
+              DEFVAL { unknown }
+              ::= { hpicfUsrAuthWMAEWAServerEntry 2 }
+
+
+    hpicfUsrAuthWMAeWAServerIPAddress OBJECT-TYPE
+              SYNTAX      InetAddress
+              MAX-ACCESS  read-create
+              STATUS      current
+              DESCRIPTION
+                "The IP address of the Enhanced Web Auth Server.
+                 If set to 0.0.0.0 or URL not configured
+                 no Enhanced Web Auth Server will run."
+              ::= { hpicfUsrAuthWMAEWAServerEntry 3 }
+
+
+    hpicfUsrAuthWMAeWAServerPath    OBJECT-TYPE
+              SYNTAX       OCTET STRING 
+              MAX-ACCESS   read-create
+              STATUS       current
+              DESCRIPTION 
+                "The Enhanced Web Auth Server Path for the location
+                 of the Enhanced Web Auth Pages.  If not configured 
+                 the default path will be used." 
+              ::= { hpicfUsrAuthWMAEWAServerEntry 4 }
+
+
+    hpicfUsrAUthWMAeWAServerRowStatus OBJECT-TYPE
+              SYNTAX       RowStatus
+              MAX-ACCESS   read-create
+              STATUS       current
+              DESCRIPTION 
+                "This marks the row as active/inactive." 
+              ::= { hpicfUsrAuthWMAEWAServerEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.2
+    hpicfUsrAuthPorts OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.2.1
+    hpicfUsrAuthPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfUsrAuthPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of system level information about Web-
+            MAC-based authentication for each port in the 
+            switch."
+        ::= { hpicfUsrAuthPorts 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.2.1.1
+    hpicfUsrAuthPortEntry OBJECT-TYPE
+        SYNTAX HpicfUsrAuthPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The port number, operational mode and 
+            re-authentication control for each switch port."
+        INDEX { hpicfUsrAuthPortNumber }
+        ::= { hpicfUsrAuthPortTable 1 }
+
+    
+    HpicfUsrAuthPortEntry ::=
+        SEQUENCE { 
+            hpicfUsrAuthPortNumber
+                InterfaceIndex,
+            hpicfUsrAuthWebAuthAdminStatus
+                TruthValue,
+            hpicfUsrAuthMacAuthAdminStatus
+                TruthValue,
+            hpicfUsrAuthPortReauthenticate
+                TruthValue
+         }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.2.1.1.1
+    hpicfUsrAuthPortNumber OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The port number associated with this switch port."
+        ::= { hpicfUsrAuthPortEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.2.1.1.2
+    hpicfUsrAuthWebAuthAdminStatus OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting this attribute TRUE enables web-based
+            authentication services.  A value of FALSE
+            disabled web-based authentication.  This attribute
+            cannot be set TRUE concurrently with 
+            hpicfUsrAuthMacAuthAdminStatus."
+        ::= { hpicfUsrAuthPortEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.2.1.1.3
+    hpicfUsrAuthMacAuthAdminStatus OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting this attribute TRUE enables MAC-based
+            authentication services.  A value of FALSE
+            disabled MAC-based authentication.  This attribute
+            cannot be set TRUE concurrently with 
+            hpicfUsrAuthWebAuthAdminStatus."
+        ::= { hpicfUsrAuthPortEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.2.1.1.4
+    hpicfUsrAuthPortReauthenticate OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The reauthentication control for this port. Setting this 
+            attribute TRUE forces all authenticated clients to 
+            re-authenticate themselves. Setting this attribute FALSE
+            has no effect. This attribute always returns FALSE
+            when read."
+        ::= { hpicfUsrAuthPortEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3
+    hpicfUsrAuthWebAuthConfig OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1
+    hpicfUsrAuthWebAuthConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfUsrAuthWebAuthConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains the configuration objects for 
+            Web-based Authentication associated with each port. An entry
+            appears in this table for each port that may authenticate
+            access to itself."
+        ::= { hpicfUsrAuthWebAuthConfig 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1
+    hpicfUsrAuthWebAuthConfigEntry OBJECT-TYPE
+        SYNTAX HpicfUsrAuthWebAuthConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The configuration information for Web-based authentication."
+        INDEX { hpicfUsrAuthPortNumber }
+        ::= { hpicfUsrAuthWebAuthConfigTable 1 }
+
+    
+    HpicfUsrAuthWebAuthConfigEntry ::=
+        SEQUENCE { 
+            hpicfUsrAuthWebAuthClientLimit
+                Integer32,
+            hpicfUsrAuthWebAuthClientMoves
+                INTEGER,
+            hpicfUsrAuthWebAuthSSLState
+                INTEGER,
+            hpicfUsrAuthWebAuthRedirectUrl
+                OCTET STRING,
+            hpicfUsrAuthWebAuthQuietPeriod
+                Integer32,
+            hpicfUsrAuthWebAuthServerTimeout
+                Integer32,
+            hpicfUsrAuthWebAuthServerMaxReq
+                Integer32,
+            hpicfUsrAuthWebAuthMaxRetries
+                Integer32,
+            hpicfUsrAuthWebAuthLogoffPeriod
+                Integer32,
+            hpicfUsrAuthWebAuthReAuthPeriod
+                Integer32,
+            hpicfUsrAuthWebAuthAuthVid
+                VlanIndex,
+            hpicfUsrAuthWebAuthUnauthVid
+                VlanIndex
+         }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.1
+    hpicfUsrAuthWebAuthClientLimit OBJECT-TYPE
+        SYNTAX Integer32 (1..32)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum number of authenticated clients to allow on 
+            the port."
+        DEFVAL { 1 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.2
+    hpicfUsrAuthWebAuthClientMoves OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disabled(1),
+            enabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies whether client may roam across ports under
+            web authentication control. Setting this attribute 
+            'enabled'allows authenticated clients to roam to other 
+            ports under web authentication control (that also have 
+            this attribute set to 'enabled') without requiring a 
+            re-authentication.  
+            
+            Setting this attribute 'disabled' disallows authenticated
+            clients from roaming to other ports (regardless of that 
+            port's attribute value).  The client has to re-
+            authenticate, if it attempts to roam."
+        DEFVAL { 1 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.3
+    hpicfUsrAuthWebAuthSSLState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disabled(1),
+            enabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies whether web-based authentication should use an 
+            SSL connection (i.e. https://) to switch to collect client  
+            credentials.
+            Note: A valid certificate must be configured on switch
+            before SSL connections are enabled."
+        DEFVAL { 1 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.4
+    hpicfUsrAuthWebAuthRedirectUrl OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..127))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the URL, to which an authenticated client should
+            be re-directed, after successful authentication."
+        ::= { hpicfUsrAuthWebAuthConfigEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.5
+    hpicfUsrAuthWebAuthQuietPeriod OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the time, in seconds, that the switch should 
+            refrain from re-attempting an authentication request for
+            a client whose credentials were rejected."
+        DEFVAL { 60 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.6
+    hpicfUsrAuthWebAuthServerTimeout OBJECT-TYPE
+        SYNTAX Integer32 (1..300)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the time, in seconds, that the switch should 
+            wait for an authentication reply to return before 
+            considering it as timed out."
+        DEFVAL { 30 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 6 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.7
+    hpicfUsrAuthWebAuthServerMaxReq OBJECT-TYPE
+        SYNTAX Integer32 (1..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the number of authentication requests that 
+            must time out before failing authentication."
+        DEFVAL { 3 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 7 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.8
+    hpicfUsrAuthWebAuthMaxRetries OBJECT-TYPE
+        SYNTAX Integer32 (1..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the number of authentication requests that
+            must fail (i.e. invalid credentials) before failing 
+            authentication."
+        DEFVAL { 3 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 8 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.9
+    hpicfUsrAuthWebAuthLogoffPeriod OBJECT-TYPE
+        SYNTAX Integer32 (1..999999999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the period, in seconds, at which an 
+            authenticated client will be considered unauthenticated
+            for a lack of activity (i.e. traffic originating 
+            from client)."
+        DEFVAL { 300 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 9 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.10
+    hpicfUsrAuthWebAuthReAuthPeriod OBJECT-TYPE
+        SYNTAX Integer32 (0..999999999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the period, in seconds, at which an 
+            authenticated client must re-authenticate. A value of 
+            0 signifies that an authenticated client will never have 
+            to re-authenticate."
+        DEFVAL { 0 }
+        ::= { hpicfUsrAuthWebAuthConfigEntry 10 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.11
+    hpicfUsrAuthWebAuthAuthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the port VID (PVID) that should be used for 
+            an authenticated client."
+        ::= { hpicfUsrAuthWebAuthConfigEntry 11 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.3.1.1.12
+    hpicfUsrAuthWebAuthUnauthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the port VID (PVID) that should be used for 
+            an unauthenticated client."
+        ::= { hpicfUsrAuthWebAuthConfigEntry 12 }
+
+    
+-- 
+-- 
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4
+    hpicfUsrAuthMacAuthConfig OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1
+    hpicfUsrAuthMacAuthConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfUsrAuthMacAuthConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains the configuration objects for 
+            Mac-based Authentication associated with each port. An entry
+            appears in this table for each port that may authenticate
+            access to itself."
+        ::= { hpicfUsrAuthMacAuthConfig 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1
+    hpicfUsrAuthMacAuthConfigEntry OBJECT-TYPE
+        SYNTAX HpicfUsrAuthMacAuthConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The configuration information for Mac-based authentication."
+        INDEX { hpicfUsrAuthPortNumber }
+        ::= { hpicfUsrAuthMacAuthConfigTable 1 }
+
+    
+    HpicfUsrAuthMacAuthConfigEntry ::=
+        SEQUENCE { 
+            hpicfUsrAuthMacAuthClientLimit
+                Integer32,
+            hpicfUsrAuthMacAuthClientMoves
+                INTEGER,
+            hpicfUsrAuthMacAuthQuietPeriod
+                Integer32,
+            hpicfUsrAuthMacAuthServerTimeout
+                Integer32,
+            hpicfUsrAuthMacAuthServerMaxReq
+                Integer32,
+            hpicfUsrAuthMacAuthLogoffPeriod
+                Integer32,
+            hpicfUsrAuthMacAuthReAuthPeriod
+                Integer32,
+            hpicfUsrAuthMacAuthAuthVid
+                VlanIndex,
+            hpicfUsrAuthMacAuthUnauthVid
+                VlanIndex
+         }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.1
+    hpicfUsrAuthMacAuthClientLimit OBJECT-TYPE
+        SYNTAX Integer32 (1..32)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum number of authenticated clients to allow on 
+            the port."
+        DEFVAL { 1 }
+        ::= { hpicfUsrAuthMacAuthConfigEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.2
+    hpicfUsrAuthMacAuthClientMoves OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disabled(1),
+            enabled(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies whether client may roam across ports under
+            web authentication control. Setting this attribute 
+            'enabled'allows authenticated clients to roam to other 
+            ports under web authentication control (that also have 
+            this attribute set to 'enabled') without requiring a 
+            re-authentication.  
+            
+            Setting this attribute 'disabled' disallows authenticated
+            clients from roaming to other ports (regardless of that 
+            port's attribute value).  The client has to re-
+            authenticate, if it attempts to roam."
+        DEFVAL { 1 }
+        ::= { hpicfUsrAuthMacAuthConfigEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.3
+    hpicfUsrAuthMacAuthQuietPeriod OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the time, in seconds, that the switch should 
+            refrain from re-attempting an authentication request for
+            a client whose credentials were rejected."
+        DEFVAL { 60 }
+        ::= { hpicfUsrAuthMacAuthConfigEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.4
+    hpicfUsrAuthMacAuthServerTimeout OBJECT-TYPE
+        SYNTAX Integer32 (1..300)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the time, in seconds, that the switch should 
+            wait for an authentication reply to return before 
+            considering it as timed out."
+        DEFVAL { 30 }
+        ::= { hpicfUsrAuthMacAuthConfigEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.5
+    hpicfUsrAuthMacAuthServerMaxReq OBJECT-TYPE
+        SYNTAX Integer32 (1..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the number of authentication requests that 
+            must time out before failing authentication."
+        DEFVAL { 3 }
+        ::= { hpicfUsrAuthMacAuthConfigEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.6
+    hpicfUsrAuthMacAuthLogoffPeriod OBJECT-TYPE
+        SYNTAX Integer32 (1..999999999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the period, in seconds, at which an 
+            authenticated client will be considered unauthenticated
+            for a lack of activity (i.e. traffic originating 
+            from client)."
+        DEFVAL { 300 }
+        ::= { hpicfUsrAuthMacAuthConfigEntry 6 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.7
+    hpicfUsrAuthMacAuthReAuthPeriod OBJECT-TYPE
+        SYNTAX Integer32 (0..999999999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the period, in seconds, at which an 
+            authenticated client must re-authenticate. A value of 
+            0 signifies that an authenticated client will never have 
+            to re-authenticate."
+        DEFVAL { 0 }
+        ::= { hpicfUsrAuthMacAuthConfigEntry 7 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.8
+    hpicfUsrAuthMacAuthAuthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the port VID (PVID) that should be used for 
+            an authenticated client."
+        ::= { hpicfUsrAuthMacAuthConfigEntry 8 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.4.1.1.9
+    hpicfUsrAuthMacAuthUnauthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the port VID (PVID) that should be used for 
+            an unauthenticated client."
+        ::= { hpicfUsrAuthMacAuthConfigEntry 9 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5
+    hpicfUsrAuthWebAuthStats OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1
+    hpicfUsrAuthWebAuthSessionStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfUsrAuthWebAuthSessionStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains session statistic objects
+            for each client (i.e. user) attempting to 
+            authenticate to a port with Web-authentication 
+            enabled. An entry appears in this table for each 
+            port in the switch."
+        ::= { hpicfUsrAuthWebAuthStats 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1.1
+    hpicfUsrAuthWebAuthSessionStatsEntry OBJECT-TYPE
+        SYNTAX HpicfUsrAuthWebAuthSessionStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The session statistics information for a port with
+            Web-based authentication enabled. This shows
+            the current values being collected for active sessions."
+        INDEX { hpicfUsrAuthPortNumber, hpicfUsrAuthWebAuthSessionMacAddr }
+        ::= { hpicfUsrAuthWebAuthSessionStatsTable 1 }
+
+    
+    HpicfUsrAuthWebAuthSessionStatsEntry ::=
+        SEQUENCE { 
+            hpicfUsrAuthWebAuthSessionMacAddr
+                MacAddress,
+            hpicfUsrAuthWebAuthSessionName
+                SnmpAdminString,
+            hpicfUsrAuthWebAuthSessionState
+                INTEGER,
+            hpicfUsrAuthWebAuthSessionStateTime
+                Unsigned32,
+            hpicfUsrAuthWebAuthSessionAuthVid
+                VlanIndex,
+            hpicfUsrAuthWebAuthSessionUnauthVid
+                VlanIndex
+         }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1.1.1
+    hpicfUsrAuthWebAuthSessionMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the MAC address of the client."
+        ::= { hpicfUsrAuthWebAuthSessionStatsEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1.1.2
+    hpicfUsrAuthWebAuthSessionName OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the username of the client."
+        ::= { hpicfUsrAuthWebAuthSessionStatsEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1.1.3
+    hpicfUsrAuthWebAuthSessionState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            authenticated(1),
+            unauthenticated(2),
+            authenticating(3),
+            authReqRejectNoVlan(4),
+            authReqRejectUnauthVlan(5),
+            authReqTimeoutNoVlan(6),
+            authReqTimeoutUnauthVlan(7)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the state of the client as follows:
+            'authenticated'            - authenticated client
+            'unauthenticated'          - unauthenticated client,  
+                                         waiting for credentials
+            'authenticating'           - credentials have been sent
+                                         for verification, waiting for
+                                         response
+            'authReqRejectNoVlan'      - credentials invalid; client
+                                         does not have access to 
+                                         unauthenticated VLAN
+            'authReqRejectUnauthVlan   - credentials invalid; client
+                                         does have access to 
+                                         unauthenticated VLAN
+            'authReqTimeoutNoVlan'     - credentials could not be 
+                                         verified; client is still 
+                                         unauthenticated and does 
+                                         not have access to 
+                                         unauthenticated VLAN
+            'authReqTimeoutUnauthVlan' - credentials could not be 
+                                         verified; client is still 
+                                         unauthenticated, but has 
+                                         access to unauthenticated
+                                         VLAN"
+        ::= { hpicfUsrAuthWebAuthSessionStatsEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1.1.4
+    hpicfUsrAuthWebAuthSessionStateTime OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The duration, in seconds, a client has spent in the
+            state specified by hpicfUsrAuthSessionState."
+        ::= { hpicfUsrAuthWebAuthSessionStatsEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1.1.5
+    hpicfUsrAuthWebAuthSessionAuthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the PVID that the authenticated client is
+            utilizing. If client is unauthenticated, this object 
+            has no meaning."
+        ::= { hpicfUsrAuthWebAuthSessionStatsEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.5.1.1.6
+    hpicfUsrAuthWebAuthSessionUnauthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the PVID that the unauthenticated client is
+            utilizing. If client is authenticated, this object 
+            has no meaning."
+        ::= { hpicfUsrAuthWebAuthSessionStatsEntry 6 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6
+    hpicfUsrAuthMacAuthStats OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 6 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6.1
+    hpicfUsrAuthMacAuthSessionStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpicfUsrAuthMacAuthSessionStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains session statistic objects
+            for each client (i.e. user) attempting to 
+            authenticate to a port with MAC-authentication 
+            enabled. An entry appears in this table for each 
+            port in the switch."
+        ::= { hpicfUsrAuthMacAuthStats 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6.1.1
+    hpicfUsrAuthMacAuthSessionStatsEntry OBJECT-TYPE
+        SYNTAX HpicfUsrAuthMacAuthSessionStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The session statistics information for a port with
+            Mac-based authentication enabled. This shows
+            the current values being collected for active sessions."
+        INDEX { hpicfUsrAuthPortNumber, hpicfUsrAuthMacAuthSessionMacAddr }
+        ::= { hpicfUsrAuthMacAuthSessionStatsTable 1 }
+
+    
+    HpicfUsrAuthMacAuthSessionStatsEntry ::=
+        SEQUENCE { 
+            hpicfUsrAuthMacAuthSessionMacAddr
+                MacAddress,
+            hpicfUsrAuthMacAuthSessionState
+                INTEGER,
+            hpicfUsrAuthMacAuthSessionStateTime
+                Unsigned32,
+            hpicfUsrAuthMacAuthSessionAuthVid
+                VlanIndex,
+            hpicfUsrAuthMacAuthSessionUnauthVid
+                VlanIndex
+         }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6.1.1.1
+    hpicfUsrAuthMacAuthSessionMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the MAC address of the client."
+        ::= { hpicfUsrAuthMacAuthSessionStatsEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6.1.1.2
+    hpicfUsrAuthMacAuthSessionState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            authenticated(1),
+            unauthenticated(2),
+            authenticating(3),
+            authReqRejectNoVlan(4),
+            authReqRejectUnauthVlan(5),
+            authReqTimeoutNoVlan(6),
+            authReqTimeoutUnauthVlan(7)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the state of the client as follows:
+            'authenticated'            - authenticated client
+            'unauthenticated'          - unauthenticated client,  
+                                         waiting for credentials
+            'authenticating'           - credentials have been sent
+                                         for verification, waiting for
+                                         response
+            'authReqRejectNoVlan'      - credentials invalid; client
+                                         does not have access to 
+                                         unauthenticated VLAN
+            'authReqRejectUnauthVlan   - credentials invalid; client
+                                         does have access to 
+                                         unauthenticated VLAN
+            'authReqTimeoutNoVlan'     - credentials could not be 
+                                         verified; client is still 
+                                         unauthenticated and does 
+                                         not have access to 
+                                         unauthenticated VLAN
+            'authReqTimeoutUnauthVlan' - credentials could not be 
+                                         verified; client is still 
+                                         unauthenticated, but has 
+                                         access to unauthenticated
+                                         VLAN"
+        ::= { hpicfUsrAuthMacAuthSessionStatsEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6.1.1.3
+    hpicfUsrAuthMacAuthSessionStateTime OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The duration, in seconds, a client has spent in the
+            state specified by hpicfUsrAuthSessionState."
+        ::= { hpicfUsrAuthMacAuthSessionStatsEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6.1.1.4
+    hpicfUsrAuthMacAuthSessionAuthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the PVID that the authenticated client is
+            utilizing. If client is unauthenticated, this object 
+            has no meaning."
+        ::= { hpicfUsrAuthMacAuthSessionStatsEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.6.1.1.5
+    hpicfUsrAuthMacAuthSessionUnauthVid OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the PVID that the unauthenticated client is
+            utilizing. If client is authenticated, this object 
+            has no meaning."
+        ::= { hpicfUsrAuthMacAuthSessionStatsEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7
+    hpicfUsrAuthConformance OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 7 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.2
+    hpicfUsrAuthGroups OBJECT IDENTIFIER ::= { hpicfUsrAuthConformance 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.2.1
+    hpicfUsrAuthSystemGroup OBJECT-GROUP
+        OBJECTS { hpicfUsrAuthWebAuthDhcpBaseAddress, 
+            hpicfUsrAuthWebAuthDhcpMask, 
+            hpicfUsrAuthWebAuthDhcpLease, 
+            hpicfUsrAuthMacAuthAddrFormat, 
+            hpicfUsrAuthCLIPasswdSet, 
+            hpicfUsrAuthCLIInterface }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing system 
+            information about, and control over, Web- and 
+            MAC-based authentication."
+        ::= { hpicfUsrAuthGroups 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.2.2
+    hpicfUsrAuthPortsGroup OBJECT-GROUP
+        OBJECTS { hpicfUsrAuthPortNumber, 
+            hpicfUsrAuthWebAuthAdminStatus, 
+            hpicfUsrAuthMacAuthAdminStatus, 
+            hpicfUsrAuthPortReauthenticate }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing system level
+            information about Web and MAC based authentication
+            for each port in the switch."
+        ::= { hpicfUsrAuthGroups 2 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.2.3
+    hpicfUsrAuthWebAuthConfigGroup OBJECT-GROUP
+        OBJECTS { hpicfUsrAuthWebAuthClientLimit, 
+            hpicfUsrAuthWebAuthClientMoves, 
+            hpicfUsrAuthWebAuthSSLState, 
+            hpicfUsrAuthWebAuthRedirectUrl, 
+            hpicfUsrAuthWebAuthQuietPeriod, 
+            hpicfUsrAuthWebAuthServerTimeout, 
+            hpicfUsrAuthWebAuthServerMaxReq, 
+            hpicfUsrAuthWebAuthMaxRetries, 
+            hpicfUsrAuthWebAuthLogoffPeriod, 
+            hpicfUsrAuthWebAuthReAuthPeriod, 
+            hpicfUsrAuthWebAuthAuthVid, 
+            hpicfUsrAuthWebAuthUnauthVid }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing configuration
+            objects for Web-based authentication associated with 
+            each port."
+        ::= { hpicfUsrAuthGroups 3 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.2.4
+    hpicfUsrAuthMacAuthConfigGroup OBJECT-GROUP
+        OBJECTS { hpicfUsrAuthMacAuthClientLimit, 
+            hpicfUsrAuthMacAuthClientMoves, 
+            hpicfUsrAuthMacAuthQuietPeriod, 
+            hpicfUsrAuthMacAuthServerTimeout, 
+            hpicfUsrAuthMacAuthServerMaxReq, 
+            hpicfUsrAuthMacAuthLogoffPeriod, 
+            hpicfUsrAuthMacAuthReAuthPeriod, 
+            hpicfUsrAuthMacAuthAuthVid, 
+            hpicfUsrAuthMacAuthUnauthVid }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing configuration
+            objects for MAC-based authentication associated with 
+            each port."
+        ::= { hpicfUsrAuthGroups 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.2.5
+    hpicfUsrAuthWebAuthSessionStatsGroup OBJECT-GROUP
+        OBJECTS { hpicfUsrAuthWebAuthSessionMacAddr, 
+            hpicfUsrAuthWebAuthSessionName, 
+            hpicfUsrAuthWebAuthSessionState, 
+            hpicfUsrAuthWebAuthSessionStateTime, 
+            hpicfUsrAuthWebAuthSessionAuthVid, 
+            hpicfUsrAuthWebAuthSessionUnauthVid }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing statistics about 
+            current sessions for Web-based authentication."
+        ::= { hpicfUsrAuthGroups 5 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.2.6
+    hpicfUsrAuthMacAuthSessionStatsGroup OBJECT-GROUP
+        OBJECTS { hpicfUsrAuthMacAuthSessionMacAddr, 
+            hpicfUsrAuthMacAuthSessionState, 
+            hpicfUsrAuthMacAuthSessionStateTime, 
+            hpicfUsrAuthMacAuthSessionAuthVid, 
+            hpicfUsrAuthMacAuthSessionUnauthVid
+             }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing statistics about 
+            current sessions for MAC-based authentication."
+        ::= { hpicfUsrAuthGroups 6 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.4
+    hpicfUsrAuthCompliances OBJECT IDENTIFIER ::= { hpicfUsrAuthConformance 4 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.7.4.1
+    hpicfUsrAuthCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for devices support of
+            HP-USER-AUTH MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS { hpicfUsrAuthSystemGroup, 
+                hpicfUsrAuthPortsGroup, 
+                hpicfUsrAuthWebAuthConfigGroup, 
+                hpicfUsrAuthMacAuthConfigGroup, 
+                hpicfUsrAuthWebAuthSessionStatsGroup, 
+                hpicfUsrAuthMacAuthSessionStatsGroup }
+        ::= { hpicfUsrAuthCompliances 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.8
+    hpicfUsrAuthNotifyConformance OBJECT IDENTIFIER ::= { hpicfUsrAuthMIB 8 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.8.1
+    hpicfUsrAuthNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hpicfUsrAuthCLIAuthFail, 
+            hpicfUsrAuthPasswdChng, 
+            hpicfPortSecAuthFailure }
+        STATUS current
+        DESCRIPTION 
+            "A group of authorization notifications."
+        ::= { hpicfUsrAuthNotifyConformance 1 }
+
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.19.8.2
+    hpicfNotifcationConfigDataGroup OBJECT-GROUP
+        OBJECTS { hpicfUsrAuthCLIFailCnt, 
+            hpicfUsrAuthCLIPwdNotifyCnt, 
+            hpicfUsrAuthWMAFailCnt, 
+            hpicfUsrAuthWMAFailMAC, 
+            hpicfUsrAuthWMAFailPort, 
+            hpicfUsrAuthWMAFailVlan, 
+            hpicfUsrAuthPasswdNotifyEnable, 
+            hpicfUsrAuthCliNotifyEnable, 
+            hpicfUsrAuthPortSecNotifyEnable }
+        STATUS current
+        DESCRIPTION 
+            "A group of notification data and configuration objects."
+        ::= { hpicfUsrAuthNotifyConformance 2 }
+
+    
+
+END

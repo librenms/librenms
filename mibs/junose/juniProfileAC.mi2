@@ -1,0 +1,98 @@
+
+-- *****************************************************************************
+-- Juniper-Profile-CONF
+--
+-- SNMP Agent Capabilities definitions for the Profile Manager MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Profile-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniProfileAgents
+        FROM Juniper-Agents;
+
+juniProfileManagerAgent  MODULE-IDENTITY
+    LAST-UPDATED "200212172000Z"  -- 17-Dec-02 03:00 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Profile Manager component of
+        the SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200212172000Z"  -- 17-Dec-02 03:00 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added juniProfAssignIfRangeTable and juniProfToIfRangeMapTable to
+        extend profile assignment to interface/encapsulation/range 3-tuples."
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200103291800Z"  -- 29-Mar-01 01:00 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniProfileAgents 1 }
+
+
+-- *****************************************************************************
+-- Profile Manager SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniProfileManagerAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the Profile Manager component of the JUNOSe SNMP agent.
+        This version of the Profile Manager component was supported in JUNOSe
+        1.1 thru 1.3 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Profile Manager
+        application in JUNOSe.  These capabilities became obsolete when support
+        was added for assignment of profiles to interface/ encapsulation pairs."
+    SUPPORTS    Juniper-PROFILE-MIB
+        INCLUDES {
+            juniProfileGroup }
+    ::= { juniProfileManagerAgent 1 }
+
+juniProfileManagerAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the Profile Manager component of the JUNOSe SNMP agent.
+        This version of the Profile Manager component was supported in JUNOSe
+        2.0 thru 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the Profile Manager application
+        in JUNOSe.  These capabilities became obsolete when support was added
+        for assignment of profiles to interface/encapsulation/range 3-tuples."
+    SUPPORTS    Juniper-PROFILE-MIB
+        INCLUDES {
+            juniProfileGroup,
+            juniProfileIfGroup }
+    ::= { juniProfileManagerAgent 2 }
+
+juniProfileManagerAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the Profile Manager component of the JUNOSe SNMP agent.
+        This version of the Profile Manager component is supported in JUNOSe 5.1
+        and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the Profile Manager application
+        in JUNOSe."
+    SUPPORTS    Juniper-PROFILE-MIB
+        INCLUDES {
+            juniProfileGroup,
+            juniProfileIfGroup2 }
+    ::= { juniProfileManagerAgent 3 }
+
+END

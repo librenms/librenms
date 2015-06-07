@@ -1,0 +1,316 @@
+--
+-- Juniper Enterprise Specific MIB: Utility MIB
+-- 
+-- Copyright (c) 2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-UTIL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime
+        FROM SNMPv2-TC
+    jnxUtilMibRoot
+        FROM JUNIPER-SMI;
+
+jnxUtil MODULE-IDENTITY
+    LAST-UPDATED "200701010000Z" -- Mon Jan 1 00:00:00 2007 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This MIB module provides a generic means for exposing junos
+            data via SNMP.  There are separate tables for each type of data,
+            and specific instances of each type are identified by its 
+            corresponding name."
+
+    REVISION      "200701010000Z" 
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxUtilMibRoot 1 }
+
+
+--
+-- Define a branch for data objects
+--
+    jnxUtilData    OBJECT IDENTIFIER ::= { jnxUtil 1 }
+
+
+--
+-- This table exposes 32 bit counter valued objects
+--
+    jnxUtilCounter32Table   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxUtilCounter32Entry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table exposes generic Counter valued objects.  Each 
+                counter instance, which can be populated via an internal junos 
+                interface, is identified by its corresponding name."
+        ::= { jnxUtilData 1 }
+
+    jnxUtilCounter32Entry   OBJECT-TYPE
+        SYNTAX          JnxUtilCounter32Entry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry exposes a separate Counter instance."
+        INDEX { IMPLIED jnxUtilCounter32Name }
+        ::= { jnxUtilCounter32Table 1 }
+
+    JnxUtilCounter32Entry ::=
+        SEQUENCE {
+            jnxUtilCounter32Name    DisplayString,
+            jnxUtilCounter32Value   Counter32,
+            jnxUtilCounter32Time    DateAndTime
+        }
+
+    jnxUtilCounter32Name OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..80))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The name assigned to this Counter instance."
+        ::= { jnxUtilCounter32Entry 1 }
+
+    jnxUtilCounter32Value OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of this generic, utility counter instance."
+        ::= { jnxUtilCounter32Entry 2 }
+
+    jnxUtilCounter32Time OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The time at which this instance was last populated."
+        ::= { jnxUtilCounter32Entry 3 }
+
+
+
+--
+-- This table exposes 64 bit counter valued objects
+--
+    jnxUtilCounter64Table   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxUtilCounter64Entry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table exposes generic Counter64 valued objects.  Each 
+                counter instance, which can be populated via an internal junos 
+                interface, is identified by its corresponding name."
+        ::= { jnxUtilData 2 }
+
+    jnxUtilCounter64Entry   OBJECT-TYPE
+        SYNTAX          JnxUtilCounter64Entry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry exposes a separate Counter64 instance."
+        INDEX { IMPLIED jnxUtilCounter64Name }
+        ::= { jnxUtilCounter64Table 1 }
+
+    JnxUtilCounter64Entry ::=
+        SEQUENCE {
+            jnxUtilCounter64Name    DisplayString,
+            jnxUtilCounter64Value   Counter64,
+            jnxUtilCounter64Time    DateAndTime
+        }
+
+    jnxUtilCounter64Name OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..80))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The name assigned to this object instance."
+        ::= { jnxUtilCounter64Entry 1 }
+
+    jnxUtilCounter64Value OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of this generic, utility object instance."
+        ::= { jnxUtilCounter64Entry 2 }
+
+    jnxUtilCounter64Time OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The time at which this instance was last populated."
+        ::= { jnxUtilCounter64Entry 3 }
+
+
+--
+-- This table exposes integer valued objects
+--
+    jnxUtilIntegerTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxUtilIntegerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table exposes generic Integer32 valued objects.  Each 
+                integer instance, which can be populated via an internal junos 
+                interface, is identified by its corresponding name."
+        ::= { jnxUtilData 3 }
+
+    jnxUtilIntegerEntry   OBJECT-TYPE
+        SYNTAX          JnxUtilIntegerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry exposes a separate Integer32 instance."
+        INDEX { IMPLIED jnxUtilIntegerName }
+        ::= { jnxUtilIntegerTable 1 }
+
+    JnxUtilIntegerEntry ::=
+        SEQUENCE {
+            jnxUtilIntegerName    DisplayString,
+            jnxUtilIntegerValue   Integer32,
+            jnxUtilIntegerTime    DateAndTime
+        }
+
+    jnxUtilIntegerName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..80))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The name assigned to this object instance."
+        ::= { jnxUtilIntegerEntry 1 }
+
+    jnxUtilIntegerValue OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of this generic, utility object instance."
+        ::= { jnxUtilIntegerEntry 2 }
+
+    jnxUtilIntegerTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The time at which this instance was last populated."
+        ::= { jnxUtilIntegerEntry 3 }
+
+--
+-- This table exposes unsigned integer valued objects
+--
+    jnxUtilUintTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxUtilUintEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table exposes generic Unsigned32 valued objects.  Each 
+                integer instance, which can be populated via an internal junos 
+                interface, is identified by its corresponding name."
+        ::= { jnxUtilData 4 }
+
+    jnxUtilUintEntry   OBJECT-TYPE
+        SYNTAX          JnxUtilUintEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry exposes a separate Unsigned32 instance."
+        INDEX { IMPLIED jnxUtilUintName }
+        ::= { jnxUtilUintTable 1 }
+
+    JnxUtilUintEntry ::=
+        SEQUENCE {
+            jnxUtilUintName    DisplayString,
+            jnxUtilUintValue   Unsigned32,
+            jnxUtilUintTime    DateAndTime
+        }
+
+    jnxUtilUintName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..80))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The name assigned to this object instance."
+        ::= { jnxUtilUintEntry 1 }
+
+    jnxUtilUintValue OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of this generic, utility object instance."
+        ::= { jnxUtilUintEntry 2 }
+
+    jnxUtilUintTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The time at which this instance was last populated."
+        ::= { jnxUtilUintEntry 3 }
+
+--
+-- This table exposes string valued objects
+--
+    jnxUtilStringTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF JnxUtilStringEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table exposes generic OCTET STRING valued objects.  Each 
+                string instance, which can be populated via an internal junos 
+                interface, is identified by its corresponding name."
+        ::= { jnxUtilData 5 }
+
+    jnxUtilStringEntry   OBJECT-TYPE
+        SYNTAX          JnxUtilStringEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry exposes a separate OCTET STRING instance."
+        INDEX { IMPLIED jnxUtilStringName }
+        ::= { jnxUtilStringTable 1 }
+
+    JnxUtilStringEntry ::=
+        SEQUENCE {
+            jnxUtilStringName    DisplayString,
+            jnxUtilStringValue   OCTET STRING,
+            jnxUtilStringTime    DateAndTime
+        }
+
+    jnxUtilStringName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..80))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The name assigned to this object instance."
+        ::= { jnxUtilStringEntry 1 }
+
+    jnxUtilStringValue OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..256))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of this generic, utility object instance."
+        ::= { jnxUtilStringEntry 2 }
+
+    jnxUtilStringTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The time at which this instance was last populated."
+        ::= { jnxUtilStringEntry 3 }
+
+END

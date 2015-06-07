@@ -1,0 +1,700 @@
+--  ======================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI-NAT-MIB
+-- Reference:
+-- Version:     V1.20
+-- History:
+-- 
+--  V1.20 2005-05-30 Wei Rixi(22510) added types to SessionType, fields to 
+--                  HwNatAddressGroupInfoEntry, HwNatInternalServerEntry & hwNatCfgGroup
+-- =======================================================================
+
+HUAWEI-NAT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, Counter32, Counter64, OBJECT-TYPE, 
+        MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        RowStatus, TruthValue, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwNATCommon MODULE-IDENTITY 
+        LAST-UPDATED "200303180900Z"        -- March 18, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd.
+            "
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The NAT mib is for all datacomm product..
+            "
+        ::= { hwNAT 1 }
+    
+
+    -- 
+    -- Textual conventions
+    -- 
+    SessionType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "The type of session."
+        SYNTAX INTEGER
+            {                
+            dnsSession(1),
+            finrstSession(2),
+            fragSession(3),
+            ftpSession(4),
+            ftpDataSession(5),
+            h225Session(6),
+            h245Session(7),
+            h323rtcpSession(8),
+            h323rtpSession(9),
+            h323t120Session(10),
+            httpSession(11),
+            hwccSession(12),
+            icmpSession(13),
+            ilsSession(14),
+            netbiosdataSession(15),
+            netbiosnameSession(16), 
+            netbiosSession(17), 
+            rasSession(18),
+            rtcpSession(19),
+            rtpSession(20),
+            rtspSession(21), 
+            smtpSession(22),
+            synSession(23),
+            tcpSession(24),
+            telnetSession(25),
+            pptpSession(26),
+            udpSession(27),
+            qqSession(28),
+            msnSession(29),
+            userdefineSession(30),                
+            sipSession(31),
+            siprtpSession(32),
+            siptrcpSession(33),
+            greSesion(34)
+            }
+        
+    AlgType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        SYNTAX INTEGER
+            {
+            h323Alg(1),                
+            dnsAlg(2), 
+            netbiosAlg(3),
+            ilsAlg(4),
+            ftpAlg(5),
+            icmpAlg(6),
+            pptpAlg(7),
+            hwccAlg(8),
+            qqAlg(9),
+            msnAlg(10),
+            userdefineAlg(11)                
+            }
+        
+    NatType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        SYNTAX INTEGER
+            {
+            nat(1),
+            pat(2),
+            easyIP(3)
+            }
+        
+
+--
+-- Node definitions
+--
+
+    -- 1.3.6.1.4.1.2011.5.25.7
+    hwNAT OBJECT IDENTIFIER ::= { hwDatacomm 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1
+    hwNatMibObjects OBJECT IDENTIFIER ::= { hwNATCommon 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1
+    hwNatAddressGroupInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNatAddressGroupInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            NAT address pool inforation table
+            "
+        ::= { hwNatMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1
+    hwNatAddressGroupInfoEntry OBJECT-TYPE
+        SYNTAX HwNatAddressGroupInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            NAT address pool inforation table entry.
+            "
+        INDEX { hwNatAddrGrpIndex }
+        ::= { hwNatAddressGroupInfoTable 1 }
+    
+    HwNatAddressGroupInfoEntry ::=
+        SEQUENCE { 
+            hwNatAddrGrpIndex
+                Integer32,
+            hwNatAddrGrpBeginningIpAddr
+                IpAddress,
+            hwNatAddrGrpEndingIpAddr
+                IpAddress,
+            hwNatAddrGrpRefCount
+                Integer32,
+            hwNatAddrGrpRowstatus
+                RowStatus,
+            hwNatAddrGrpVrrpID
+                Integer32,
+            hwNatAddrGrpVrfName
+                OCTET STRING                
+        }
+
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1.1
+    hwNatAddrGrpIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The index of address pool
+            
+            This item is index.
+            "
+        ::= { hwNatAddressGroupInfoEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1.2
+    hwNatAddrGrpBeginningIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The beginning IP address of address pool
+            "
+        ::= { hwNatAddressGroupInfoEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1.3
+    hwNatAddrGrpEndingIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The ending IP address of address pool
+            "
+        ::= { hwNatAddressGroupInfoEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1.4
+    hwNatAddrGrpRefCount OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This address pool reference count.
+            "
+        ::= { hwNatAddressGroupInfoEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1.5
+    hwNatAddrGrpRowstatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Row status
+            Only support CreateAndGo and Destroy.
+            "
+        ::= { hwNatAddressGroupInfoEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1.6
+    hwNatAddrGrpVrrpID OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            VRRP ID of address pool
+            "
+        DEFVAL { 0 }
+        ::= { hwNatAddressGroupInfoEntry 6 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.1.1.7
+    hwNatAddrGrpVrfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The VPN Name of address pool
+            "
+        DEFVAL { "--" }
+        ::= { hwNatAddressGroupInfoEntry 7 }
+            
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2
+    hwNatInternalServerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNatInternalServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The NAT internal server information table.
+            "
+        ::= { hwNatMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1
+    hwNatInternalServerEntry OBJECT-TYPE
+        SYNTAX HwNatInternalServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The NAT internal server information table entry.
+            "
+        INDEX { hwNatServerIndex }
+        ::= { hwNatInternalServerTable 1 }
+    
+    HwNatInternalServerEntry ::=
+        SEQUENCE { 
+            hwNatServerIndex
+                Integer32,
+            hwNatServerProtocol
+                Integer32,
+            hwNatServerInsideBeginIpAddr
+                IpAddress,
+            hwNatServerInsideEndIpAddr
+                IpAddress,
+            hwNatServerInsidePort
+                Integer32,
+            hwNatServerOutsideIpAddr
+                IpAddress,
+            hwNatServerOutsideBeginPort
+                Integer32,
+            hwNatServerOutsideEndPort
+                Integer32,
+            hwNatServerRowStatus
+                RowStatus,
+            hwNatServerVrrpID
+                Integer32,
+            hwNatServerVrfName
+                OCTET STRING
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.1
+    hwNatServerIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..256)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The index of NAT server array.
+            
+            This item is index.
+            "
+        ::= { hwNatInternalServerEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.2
+    hwNatServerProtocol OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The protocal number.
+            "
+        ::= { hwNatInternalServerEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.3
+    hwNatServerInsideBeginIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The beginning local IP address of NAT servers.
+            "
+        ::= { hwNatInternalServerEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.4
+    hwNatServerInsideEndIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The ending local IP address of NAT servers.
+            "
+        ::= { hwNatInternalServerEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.5
+    hwNatServerInsidePort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The local port number of NAT servers.
+            "
+        ::= { hwNatInternalServerEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.6
+    hwNatServerOutsideIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The global IP address of NAT server.
+            "
+        ::= { hwNatInternalServerEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.7
+    hwNatServerOutsideBeginPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The global beginning port of NAT server.
+            "
+        ::= { hwNatInternalServerEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.8
+    hwNatServerOutsideEndPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The global ending port of NAT server.
+            "
+        ::= { hwNatInternalServerEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.9
+    hwNatServerRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Row status
+            Only support CreateAndGo and Destroy.
+            "
+        ::= { hwNatInternalServerEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.10
+    hwNatServerVrrpID OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            VRRP ID of Inner Server
+            "
+        DEFVAL { 0 }
+        ::= { hwNatInternalServerEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.2.1.11
+    hwNatServerVrfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The VPN Name of Inner Server
+            "
+        DEFVAL { "--" }
+        ::= { hwNatInternalServerEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.3
+    hwNatTimeoutTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNatTimeoutEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The NAT session aging time table.
+            "
+        ::= { hwNatMibObjects 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.3.1
+    hwNatTimeoutEntry OBJECT-TYPE
+        SYNTAX HwNatTimeoutEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The NAT session aging time table entry.
+            "
+        INDEX { hwNatTimeoutSessionType }
+        ::= { hwNatTimeoutTable 1 }
+    
+    HwNatTimeoutEntry ::=
+        SEQUENCE { 
+            hwNatTimeoutSessionType
+                SessionType,
+            hwNatTimeoutValue
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.3.1.1
+    hwNatTimeoutSessionType OBJECT-TYPE
+        SYNTAX SessionType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The protocal type.
+            "
+        ::= { hwNatTimeoutEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.3.1.2
+    hwNatTimeoutValue OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            aging time, tcp:240, udp:40, icmp:20
+            "
+        ::= { hwNatTimeoutEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.4
+    hwNatAlgEnableTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNatAlgEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            NAT ALG enable table
+            "
+        ::= { hwNatMibObjects 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.4.1
+    hwNatAlgEnableEntry OBJECT-TYPE
+        SYNTAX HwNatAlgEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            nat alg table entry.
+            "
+        INDEX { hwNatAlgEnableProtocol }
+        ::= { hwNatAlgEnableTable 1 }
+    
+    HwNatAlgEnableEntry ::=
+        SEQUENCE { 
+            hwNatAlgEnableProtocol
+                AlgType,
+            hwNatAlgEnableFlag
+                TruthValue
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.4.1.1
+    hwNatAlgEnableProtocol OBJECT-TYPE
+        SYNTAX AlgType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The alg protocal type.
+            "
+        ::= { hwNatAlgEnableEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.1.4.1.2
+    hwNatAlgEnableFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            enable or disable.
+            true is enable,false is disable.
+            "
+        ::= { hwNatAlgEnableEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2
+    hwNatMonitorObjects OBJECT IDENTIFIER ::= { hwNATCommon 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.1
+    hwNatMonitorGlobalHash OBJECT IDENTIFIER ::= { hwNatMonitorObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.1.1
+    hwNatHashStatPatCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The hash count NAT with pat.
+            "
+        ::= { hwNatMonitorGlobalHash 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.1.2
+    hwNatHashStatNoPatCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The hash count NAT with no-pat.
+            "
+        ::= { hwNatMonitorGlobalHash 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.1.3
+    hwNatHashStatServerHashCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The hash count of NAT internal server.
+            "
+        ::= { hwNatMonitorGlobalHash 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.1.4
+    hwNatHashStatFragHashCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The hash count of fragment packets.
+            "
+        ::= { hwNatMonitorGlobalHash 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.2
+    hwNatMonitorGlobalPkts OBJECT IDENTIFIER ::= { hwNatMonitorObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.2.1
+    hwNatStatPktsCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The packet count of success address translation.
+            "
+        ::= { hwNatMonitorGlobalPkts 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.2.2
+    hwNatStatFailedPktsCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The packet count of failed address translation.
+            "
+        ::= { hwNatMonitorGlobalPkts 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.2.3
+    hwNatStatTCPPktsCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The TCP packet count of success address translation.
+            "
+        ::= { hwNatMonitorGlobalPkts 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.2.4
+    hwNatStatUDPPktsCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The UDP packet count of success address translation.
+            "
+        ::= { hwNatMonitorGlobalPkts 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.2.2.5
+    hwNatStatICMPPktsCount OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The ICMP packet count of success address translation.
+            "
+        ::= { hwNatMonitorGlobalPkts 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.3
+    hwNatConformance OBJECT IDENTIFIER ::= { hwNATCommon 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.3.1
+    hwNatMibGroups OBJECT IDENTIFIER ::= { hwNatConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.3.1.1
+    hwNatCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            hwNatAddrGrpBeginningIpAddr, 
+            hwNatAddrGrpEndingIpAddr, 
+            hwNatAddrGrpRowstatus, 
+            hwNatAddrGrpVrrpID,
+            hwNatAddrGrpVrfName,
+            hwNatServerProtocol, 
+            hwNatServerInsideBeginIpAddr, 
+            hwNatServerInsideEndIpAddr, 
+            hwNatServerInsidePort, 
+            hwNatServerRowStatus, 
+            hwNatTimeoutValue, 
+            hwNatAlgEnableFlag, 
+            hwNatAddrGrpRefCount, 
+            hwNatServerOutsideIpAddr, 
+            hwNatServerOutsideBeginPort, 
+            hwNatServerOutsideEndPort,
+            hwNatServerVrrpID,
+            hwNatServerVrfName
+            }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwNatMibGroups 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.7.1.3.1.2
+    hwNatMonitorGroup OBJECT-GROUP
+        OBJECTS { 
+            hwNatHashStatPatCount, 
+            hwNatHashStatNoPatCount, 
+            hwNatHashStatServerHashCount, 
+            hwNatHashStatFragHashCount, 
+            hwNatStatPktsCount, 
+            hwNatStatFailedPktsCount, 
+            hwNatStatTCPPktsCount, 
+            hwNatStatUDPPktsCount, 
+            hwNatStatICMPPktsCount 
+            }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwNatMibGroups 2 }
+    
+
+END

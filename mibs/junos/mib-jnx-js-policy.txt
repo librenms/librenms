@@ -1,0 +1,404 @@
+-- *******************************************************************
+-- Juniper enterprise specific policy objects MIB.
+--
+-- Copyright (c) 2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-JS-POLICY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        jnxJsPolicies                    FROM JUNIPER-JS-SMI    
+
+        Integer32, Counter64,
+        Gauge32, Counter32,
+        NOTIFICATION-TYPE,
+        MODULE-IDENTITY, OBJECT-TYPE     FROM SNMPv2-SMI
+        DisplayString, TimeStamp         FROM SNMPv2-TC; 
+
+
+    jnxJsSecPolicyMIB MODULE-IDENTITY
+        LAST-UPDATED  "200705071840Z" -- May 07, 2007
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+
+        DESCRIPTION
+            "This module defines the mib for policy monitoring.
+
+             A security policy, which can be configured from the user 
+             interface controls the traffic flow from one zone to another 
+             zone by defining the kind(s) of traffic permitted from 
+             specified IP sources to specified IP destinations at 
+             scheduled times. 
+
+             Juniper security device enforce the security policies rules 
+             for the transit traffic in terms of which traffic can pass 
+             through the firewall, and the actions taken on the traffic as 
+             it passes through the firewall. "
+        REVISION        "200612140000Z" -- Dec 14, 2006
+        DESCRIPTION     "Creation Date"
+    ::= { jnxJsPolicies 1 }   
+
+
+    jnxJsPolicyNotifications OBJECT IDENTIFIER ::= { jnxJsSecPolicyMIB 0 }
+    jnxJsPolicyObjects       OBJECT IDENTIFIER ::= { jnxJsSecPolicyMIB 1 }
+    jnxJsPolicyTrapVars      OBJECT IDENTIFIER ::= { jnxJsSecPolicyMIB 2 }
+
+                
+    -- ***************************************************************
+    --  Security Policy Table
+    -- ***************************************************************
+
+    jnxJsPolicyNumber  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of policies (regardless of their current 
+             state) present on this system."
+        ::= { jnxJsPolicyObjects 1 }
+
+
+    jnxJsPolicyTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsPolicyEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The table exposes the security policy entries. Security
+             devices/routers provide a network boundary with a single
+             point of entry and exit point, which allows the screening
+             and directing of traffic through the implementation of
+             access policies. The access policies can permit, deny, 
+             encrypt, authenticate, prioirtize, schedule and monitor
+             the traffic flow through the firewall. 
+             
+             This table lists entries of policy. The number of policies
+             are given by jnxJsPolicyNumber."
+    ::= { jnxJsPolicyObjects 2 }
+
+    jnxJsPolicyEntry OBJECT-TYPE
+        SYNTAX        JnxJsPolicyEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry contains a security policy.   
+
+            The security policies are configured under from-zone,
+            to-zone direction.  Under a specific zone direction, 
+            each security policy contains name, match-criteria,
+            action, and other options."
+
+        INDEX     { jnxJsPolicyFromZone, 
+                    jnxJsPolicyToZone,
+                    jnxJsPolicyName }
+        ::= { jnxJsPolicyTable 1 }
+
+    JnxJsPolicyEntry ::= SEQUENCE
+    {
+        jnxJsPolicyFromZone                    DisplayString,
+        jnxJsPolicyToZone                      DisplayString,
+        jnxJsPolicyName                        DisplayString,
+        jnxJsPolicySequenceNumber              Integer32,    
+        jnxJsPolicyAction                      INTEGER,
+        jnxJsPolicyScheduler                   DisplayString,
+        jnxJsPolicyState                       INTEGER,
+        jnxJsPolicyStatsAvailability           INTEGER,
+        jnxJsPolicyPerSecBytesThreshold        Integer32,
+        jnxJsPolicyPerMinKbytesThreshold       Integer32
+    }
+
+    jnxJsPolicyFromZone OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE(0..63))
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION
+            "The attribute displays the from zone name."  
+        ::= { jnxJsPolicyEntry 1 }
+
+    jnxJsPolicyToZone OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE(0..63))
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION
+            "The attribute exposes the to-zone name."
+        ::= { jnxJsPolicyEntry 2 }
+
+    jnxJsPolicyName OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE(0..63))
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION
+            "The name of the policy defined. It consists of up to 256 ascii 
+             characters and uniquely identifies the policy entry."
+        ::= { jnxJsPolicyEntry 3 }
+        
+    jnxJsPolicySequenceNumber OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The attribute indicates the policy sequence order of the policy
+             within a specific from-zone and to-zone pair. Policies are matched
+             in a sequence where the ordering is specified by this number."
+        ::= { jnxJsPolicyEntry 4 }
+
+    jnxJsPolicyAction OBJECT-TYPE
+        SYNTAX            INTEGER {
+                              permit    (1),
+                              deny      (2),
+                              reject    (3)
+                          } 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "The attribute indicates the actions performed when the 
+             criteria is matched.
+             
+             The action permit, deny and reject are used configured policies."
+        ::= { jnxJsPolicyEntry 5 }
+
+    jnxJsPolicyScheduler OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..63)) 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The name of the schedule attached to this policy. Certain schedule  
+             has a specified duration and this may effect the status of the 
+             policy."
+        ::= { jnxJsPolicyEntry 6 }
+        
+    jnxJsPolicyState OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                            active        (1),
+                            inactive      (2),
+                            unavailable   (3)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The state of this policy: active, inactive, or unavailable.
+             
+             The state can be effected by the scheduler if the scheduler
+             has a specified duration."
+        ::= { jnxJsPolicyEntry 7 }
+        
+    jnxJsPolicyStatsAvailability OBJECT-TYPE
+        SYNTAX          INTEGER  {
+                            available     (1),
+                            unavailable   (2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION
+            "The statistics availability of this policy.  
+             
+             The attribute indicates whether the statistics counters are
+             available and are actively updated. If available, there would
+             exists a matching jnxJsPolicyStatsEntry for the policy."
+        ::= { jnxJsPolicyEntry 8 }
+        
+    jnxJsPolicyPerSecBytesThreshold OBJECT-TYPE
+        SYNTAX          Integer32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The attribute indicates the threshold value of bytes per second."
+        ::= { jnxJsPolicyEntry 9 }
+
+    jnxJsPolicyPerMinKbytesThreshold OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The attribute indicates the threshold value of kbyte per min."
+        ::= { jnxJsPolicyEntry 10 }
+ 
+ 
+    -- ***************************************************************
+    --  Security Policy Statistics Table
+    -- ***************************************************************
+
+    jnxJsPolicyStatsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsPolicyStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The table exposes the security policy statistics entries. These
+             statistics can be enabled and disabled by configuration on a
+             per policy basis."
+    ::= { jnxJsPolicyObjects 3 }
+
+    jnxJsPolicyStatsEntry OBJECT-TYPE
+        SYNTAX        JnxJsPolicyStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry contains a security policy.
+
+            The security policies are configured under from-zone,
+            to-zone direction.  Under a specific zone direction,
+            each security policy contains name, match-criteria,
+            action, and other options."
+
+        INDEX     { jnxJsPolicyFromZone,
+                    jnxJsPolicyToZone,
+                    jnxJsPolicyName }
+        ::= { jnxJsPolicyStatsTable 1 }
+
+    JnxJsPolicyStatsEntry ::= SEQUENCE
+    {
+        jnxJsPolicyStatsCreationTime           TimeStamp,
+        jnxJsPolicyStatsInputBytes             Counter64,
+        jnxJsPolicyStatsInputByteRate          Gauge32,
+        jnxJsPolicyStatsOutputBytes            Counter64,
+        jnxJsPolicyStatsOutputByteRate         Gauge32,
+        jnxJsPolicyStatsInputPackets           Counter32,
+        jnxJsPolicyStatsInputPacketRate        Gauge32,
+        jnxJsPolicyStatsOutputPackets          Counter32,
+        jnxJsPolicyStatsOutputPacketRate       Gauge32,
+        jnxJsPolicyStatsNumSessions            Counter32,
+        jnxJsPolicyStatsSessionRate            Gauge32,
+        jnxJsPolicyStatsSessionDeleted         Counter32,
+        jnxJsPolicyStatsLookups                Counter32,
+        jnxJsPolicyStatsCountAlarm             Counter32
+    }
+
+    jnxJsPolicyStatsCreationTime OBJECT-TYPE
+        SYNTAX          TimeStamp 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The creation timestamp of the policy statistics entry. The
+             timestamp is modified during the creation and deletion of the
+             policy statistics entry. When the timestamp changes, the policy
+             entry statistics is assumed to be a new statistics entry and not
+             associated with previous statistic entry of the same indices."
+        ::= { jnxJsPolicyStatsEntry 1 }
+
+    jnxJsPolicyStatsInputBytes OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input bytes enters the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 2 }
+
+    jnxJsPolicyStatsInputByteRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input bytes per second or the rate that enters the FW 
+             through this policy."
+        ::= { jnxJsPolicyStatsEntry 3 }
+
+    jnxJsPolicyStatsOutputBytes OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output bytes associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 4 }
+
+    jnxJsPolicyStatsOutputByteRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output bytes per second or the rate associated 
+             with this policy."
+        ::= { jnxJsPolicyStatsEntry 5 }
+
+    jnxJsPolicyStatsInputPackets OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input packets enters the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 6 }
+
+    jnxJsPolicyStatsInputPacketRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of input packets per second or the input packet rate 
+             of the FW through this policy."
+        ::= { jnxJsPolicyStatsEntry 7 }
+
+    jnxJsPolicyStatsOutputPackets OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output packets associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 8 }
+
+    jnxJsPolicyStatsOutputPacketRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of output packets per second or the rate 
+             associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 9 }
+
+    jnxJsPolicyStatsNumSessions OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of sessions associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 10 }
+
+    jnxJsPolicyStatsSessionRate OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The rate of the sessions associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 11 }
+
+    jnxJsPolicyStatsSessionDeleted OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of sessions associated with this policy."
+        ::= { jnxJsPolicyStatsEntry 12 }
+
+    jnxJsPolicyStatsLookups OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of policy lookups performed."
+        ::= { jnxJsPolicyStatsEntry 13 }
+
+    jnxJsPolicyStatsCountAlarm OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of alarm counted when the traffic exceeds 
+             certain threshold configuration."
+        ::= { jnxJsPolicyStatsEntry 14 }
+
+
+
+    -- ***************************************************************
+    -- definition of access authentication related traps.
+    -- FIX : To be implemented.
+    -- ***************************************************************
+
+
+END

@@ -1,0 +1,164 @@
+-- ==================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI GTL MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- <author>,  <date>,  <contents>
+-- WangHaiwei   2007-1-16
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types are imported
+-- 
+-- ==================================================================
+
+    HUAWEI-GTL-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+    
+    
+        hwGtl MODULE-IDENTITY 
+            LAST-UPDATED "200611221414Z"        -- November 22, 2006 at 14:14 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies Co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "The private mib file includes the general extent 
+                information of the device.hwDatacomm(25).htGtl(142)"
+            ::= { hwDatacomm 142 }
+
+        
+    
+    
+--
+-- Node definitions
+--
+    
+-- ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ==================================================================  
+        hwGtlMibObjects OBJECT IDENTIFIER ::= { hwGtl 1 }
+
+        
+        hwGtlDefaultValueReason OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object specifies the reason why the system uses the default value."
+            ::= { hwGtlMibObjects 1 }
+
+        
+        hwGtlResourceItem OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object specifies the resource item which is nearly exhausted."
+            ::= { hwGtlMibObjects 2 }
+
+        
+        hwGtlFeatureName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object specifies the feature name which is near deadline."
+            ::= { hwGtlMibObjects 3 }
+
+        
+        hwGtlRemainTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Remain time of the feature which is near deadline.The unit is day."
+            ::= { hwGtlMibObjects 4 }
+
+        
+        hwGtlNotifications OBJECT IDENTIFIER ::= { hwGtl 2 }
+
+        
+        hwGtlDefaultValue NOTIFICATION-TYPE
+            OBJECTS { hwGtlDefaultValueReason }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents that the system will use default value if the license file fails to pass the verification."
+            ::= { hwGtlNotifications 1 }
+
+        
+        hwGtlResourceUsedUp NOTIFICATION-TYPE
+            OBJECTS { hwGtlResourceItem }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the resource is nearly exhausted."
+            ::= { hwGtlNotifications 2 }
+
+        
+        hwGtlNearDeadline NOTIFICATION-TYPE
+            OBJECTS { hwGtlFeatureName, hwGtlRemainTime }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the feature is near deadline."
+            ::= { hwGtlNotifications 3 }
+
+        
+--    Conformance information            
+        hwGtlConformance OBJECT IDENTIFIER ::= { hwGtl 3 }
+
+        
+        hwGtlCompliances OBJECT IDENTIFIER ::= { hwGtlConformance 1 }
+
+        
+        hwGtlCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-GTL-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwGtlObjectGroup, hwGtlNotificationGroup }
+            ::= { hwGtlCompliances 1 }
+
+        
+        hwGtlGroups OBJECT IDENTIFIER ::= { hwGtlConformance 2 }
+
+        
+        hwGtlObjectGroup OBJECT-GROUP
+            OBJECTS { hwGtlDefaultValueReason, hwGtlResourceItem, hwGtlFeatureName, hwGtlRemainTime }
+            STATUS current
+            DESCRIPTION 
+                "The GTL attribute group."
+            ::= { hwGtlGroups 1 }
+
+        
+        hwGtlNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwGtlDefaultValue, hwGtlResourceUsedUp, hwGtlNearDeadline }
+            STATUS current
+            DESCRIPTION 
+                "The notification group."
+            ::= { hwGtlGroups 2 }
+
+        
+    
+    END
+
+--
+-- HUAWEI-GTL-MIB.mib
+--

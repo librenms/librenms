@@ -1,0 +1,236 @@
+-- ==================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI L3 Vlan Management MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              Created by MaYe, 2003.08.11
+-- ==================================================================
+
+HUAWEI-L3VLAN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm
+            FROM HUAWEI-MIB
+        ifIndex
+            FROM IF-MIB
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF
+        OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC;
+        
+    hwL3Vlan MODULE-IDENTITY 
+        LAST-UPDATED "200308110900Z"
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO 
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com"
+        DESCRIPTION 
+            "The HUAWEI-L3VLAN-MIB contains objects to
+             manage level 3 vlan.
+             Through the MIB,you can get the detail information
+             of each vlan,such as VLANID,encapsulated type,the 
+             statistics of the received and sent packets and so on."
+        ::= { hwDatacomm 100 }
+        
+    hwL3VlanMIBObjects OBJECT IDENTIFIER ::= { hwL3Vlan 1 }
+
+    -- =================================================================
+    -- 1st The Sub-interface Vlan Table
+    -- =================================================================
+    
+    hwSubIfVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSubIfVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the information of vlans 
+             encapsulated by the sub-interfaces."
+        ::= { hwL3VlanMIBObjects 1 }
+
+    hwSubIfVlanEntry OBJECT-TYPE
+        SYNTAX HwSubIfVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Provides the information of a sub-interface vlan entry."
+        INDEX { hwSubIfIndex, hwSubIfVlanId }
+        ::= { hwSubIfVlanTable 1 }
+    
+    HwSubIfVlanEntry ::=
+        SEQUENCE { 
+             hwSubIfIndex
+                    INTEGER,
+             hwSubIfVlanId
+                 INTEGER,
+             hwSubIfVlanType
+                 INTEGER,    
+             hwSubIfVlanStatus
+                 RowStatus
+             }
+
+    hwSubIfIndex OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION    
+            "Interface index(es) of port(s) present on the device."
+        ::= { hwSubIfVlanEntry 1 }
+    
+    hwSubIfVlanId OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object specifies the vlan id encapsulated by 
+             the sub-interface."
+        ::= { hwSubIfVlanEntry 2 }    
+
+    hwSubIfVlanType OBJECT-TYPE
+        SYNTAX INTEGER { dot1q(2) }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object specifies the vlan type encapsulated 
+             by the sub-interface."
+        ::= { hwSubIfVlanEntry 3 }
+            
+    hwSubIfVlanStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object specifies the status of the sub-interface 
+             vlan table."
+        ::= { hwSubIfVlanEntry 4 }
+    
+    -- =================================================================
+    -- 2nd VLAN Flow Statistics Information Table
+    -- =================================================================
+
+    hwVLANMibRoutertVlanCountTable          OBJECT-TYPE
+        SYNTAX        SEQUENCE OF VLANMibRoutertVlanCountEntry
+        MAX-ACCESS      not-accessible
+        STATUS        mandatory
+        DESCRIPTION    
+            "Per vid router statistics table includes the
+                 number of packets that each vlan is received and sent."
+        ::= { hwL3VlanMIBObjects 2 }
+
+    hwVLANMibRoutertVlanCountEntry          OBJECT-TYPE
+        SYNTAX        VLANMibRoutertVlanCountEntry
+        MAX-ACCESS      not-accessible
+        STATUS        mandatory
+        DESCRIPTION    "Entry of vLANMibRoutertVlanCountTable"
+        INDEX           { hwVLANMibRouterPort,hwVLANMibRouterVID }
+        ::= { hwVLANMibRoutertVlanCountTable 1 }
+
+    VLANMibRoutertVlanCountEntry ::=
+        SEQUENCE {
+            hwVLANMibRouterPort
+                INTEGER,
+            hwVLANMibRouterVID
+                INTEGER,
+            hwVLANMibRouterVlanPacketTran
+                Counter,
+            hwVLANMibRouterVlanPacketSent
+                Counter,
+            hwVLANMibClearVidStatistics
+                INTEGER
+            }
+
+    hwVLANMibRouterPort OBJECT-TYPE
+        SYNTAX    INTEGER
+        MAX-ACCESS read-only
+        STATUS    mandatory
+        DESCRIPTION 
+            "Interface index(es) of trunk port(s) present on the device."
+        ::= { hwVLANMibRoutertVlanCountEntry 1 }           
+                    
+    hwVLANMibRouterVID       OBJECT-TYPE
+        SYNTAX        INTEGER(0..4094)
+        MAX-ACCESS    read-only
+        STATUS        mandatory
+        DESCRIPTION    
+            "The vlan id."
+        ::= { hwVLANMibRoutertVlanCountEntry 2 }
+
+    hwVLANMibRouterVlanPacketTran       OBJECT-TYPE
+        SYNTAX        Counter 
+        MAX-ACCESS    read-only
+        STATUS        mandatory
+        DESCRIPTION    
+            "The number of packets transmitted to vlan"
+        ::= { hwVLANMibRoutertVlanCountEntry 3 }
+
+
+    hwVLANMibRouterVlanPacketSent     OBJECT-TYPE
+        SYNTAX        Counter 
+        MAX-ACCESS    read-only
+        STATUS        mandatory
+        DESCRIPTION    "Number of packets sent by vlan"
+        ::= { hwVLANMibRoutertVlanCountEntry 4 }
+    
+    hwVLANMibClearVidStatistics     OBJECT-TYPE
+        SYNTAX        INTEGER{
+            unavailable(0),
+            clear(1)
+            } 
+        MAX-ACCESS    read-write
+        STATUS        mandatory
+        DESCRIPTION    
+            "Setting the object to clear(1) will clear the counters of a row 
+            of the hwVLANMibRoutertVlanCountTable. When a clear action had been
+            finished, or there is no clear action , the value of the object
+            would be unavailable(0)."
+        ::= { hwVLANMibRoutertVlanCountEntry 5 }
+
+    
+    --        
+    --  Trap Definitions
+    --
+        
+    hwL3VlanTraps OBJECT IDENTIFIER ::= { hwL3Vlan 2 }
+
+    --
+    -- Conformance information
+    --
+    
+    hwL3VlanConformance OBJECT IDENTIFIER ::= { hwL3Vlan 3 }
+
+    hwL3VlanCompliances OBJECT IDENTIFIER ::= { hwL3VlanConformance 1 }
+        
+    hwL3VlanCompliance  MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for systems supporting 
+             the HUAWEI-L3VLAN-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS {
+            hwSubIfVlanGroup
+            }
+        ::= { hwL3VlanCompliances 1 }
+        
+    hwL3VlanGroups OBJECT IDENTIFIER ::= { hwL3VlanConformance 2 }
+    
+    hwSubIfVlanGroup OBJECT-GROUP
+        OBJECTS {
+            hwSubIfVlanType,
+            hwSubIfVlanId,
+            hwSubIfVlanStatus
+            }
+        STATUS   current
+        DESCRIPTION
+            "Standard sub-interface vlan group."
+        ::= { hwL3VlanGroups 1}
+
+END

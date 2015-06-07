@@ -1,0 +1,5441 @@
+-- COPYRIGHT NOTICE
+-- Copyright (c) Hewlett Packard Company, 2003 
+-- All rights reserved
+--
+-- 
+--
+
+BLADETYPE2-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32, TimeTicks
+        FROM SNMPv2-SMI
+    IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, PhysAddress, MacAddress
+        FROM SNMPv2-TC
+    BridgeId
+        FROM BRIDGE-MIB
+    hpSwitchBladeType2-Mgmt 
+        FROM HP-SWITCH-PL-MIB;
+
+agent MODULE-IDENTITY
+    LAST-UPDATED "200312050000Z" --  5 December 2003
+    ORGANIZATION "Hewlett Packard Company "
+    CONTACT-INFO "customerservice@hp.com"
+    DESCRIPTION
+        "The MIB module for the general switch configuration and information ."
+    ::= { hpSwitchBladeType2-Mgmt 1 }
+
+-- MIB_INSERT_START
+-- ----------------------------------------------------------------------------
+-- { INSERT:  bt2Switch
+-- ----------------------------------------------------------------------------
+
+agentConfig       OBJECT IDENTIFIER ::= { agent 1 }
+agentStats        OBJECT IDENTIFIER ::= { agent 2 }
+agentInfo         OBJECT IDENTIFIER ::= { agent 3 }
+agentOper         OBJECT IDENTIFIER ::= { agent 4 }
+
+agSystem          OBJECT IDENTIFIER ::= { agentConfig 1 }
+agPortConfig      OBJECT IDENTIFIER ::= { agentConfig 2 }
+agRadiusConfig    OBJECT IDENTIFIER ::= { agentConfig 3 }
+agNTP	          OBJECT IDENTIFIER ::= { agentConfig 4 }
+agSyslog          OBJECT IDENTIFIER ::= { agentConfig 5 }
+agTrapHost        OBJECT IDENTIFIER ::= { agentConfig 6 }
+agTftp            OBJECT IDENTIFIER ::= { agentConfig 7 }
+agApply           OBJECT IDENTIFIER ::= { agentConfig 8 }
+agTacacsConfig    OBJECT IDENTIFIER ::= { agentConfig 10 }
+agMgmtNetConfig   OBJECT IDENTIFIER ::= { agentConfig 11 }
+agAccess	  OBJECT IDENTIFIER ::= { agentConfig 12 }
+
+pktStats	  OBJECT IDENTIFIER ::= { agentStats 1 }
+mpCpuStats	  OBJECT IDENTIFIER ::= { agentStats 2 }
+portStats	  OBJECT IDENTIFIER ::= { agentStats 3 }
+spStats	          OBJECT IDENTIFIER ::= { agentStats 4 }
+mgmtStats	  OBJECT IDENTIFIER ::= { agentStats 5 }
+ntpStats          OBJECT IDENTIFIER ::= { agentStats 9 }
+aclPortStats      OBJECT IDENTIFIER ::= { agentStats 10 }
+aclMeterPortStats OBJECT IDENTIFIER ::= { agentStats 11 }
+
+hardware          OBJECT IDENTIFIER ::= { agentInfo 1 }
+portInfo          OBJECT IDENTIFIER ::= { agentInfo 2 }
+swKeyInfo         OBJECT IDENTIFIER ::= { agentInfo 3 }
+agDiff            OBJECT IDENTIFIER ::= { agentInfo 4 }
+agCfgDump         OBJECT IDENTIFIER ::= { agentInfo 5 }
+mgmtInfo          OBJECT IDENTIFIER ::= { agentInfo 6 }
+geaportInfo       OBJECT IDENTIFIER ::= { agentInfo 7 }
+ufdInfo           OBJECT IDENTIFIER ::= { agentInfo 8 }
+
+agNTPOper         OBJECT IDENTIFIER ::= { agentOper 2 }
+
+-- There are two configuration blocks for Bladetype2 switches.
+-- The "current_config" reflects the configuration parameters that the
+-- switch is operating on and it is read-only.  The objects with "CurCfg"
+-- in the name are reflect to this configuration block.
+--
+-- The "new_config" accepts user configurations on set.  The objects with
+-- "NewCfg" in the name are reflect to this configuration block.
+--
+-- The newly set configurations will not take effect until a "apply"
+-- command has been issued (See agApplyConfiguration object defined in
+-- BLADETYPE2-SWITCH-MIB).
+--
+-- The newly set configurations will not be saved through next restarting
+-- of the switch unless a "save" command has been issued (See
+-- agSaveConfiguration object defined in BLADETYPE2-SWITCH-MIB).
+
+-- Hardware Information
+
+hwPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The hardware part number of the Bladetype2 Switch." 
+    ::= { hardware 1 }
+
+hwRevision OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The hardware revision.  If the revision is not
+	 available, a zero length string should be returned."
+    ::= { hardware 2 }
+
+hwPowerSupplyStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        bad(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"The status of the internal power supply."
+    ::= { hardware 3 }
+hwSensor1Temp OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The temperature of the rear left sensor in degrees Celsius."
+    ::= { hardware 4 }
+
+hwInsertedCubeType OBJECT-TYPE
+    SYNTAX   INTEGER {
+	fiberCube(1),
+	copperCube(2),
+	none(3)
+	}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The inserted cube type."
+    ::= { hardware 5 }
+
+-- Port operation table
+agPortOperTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgPortOperTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of port operations."
+    ::= { agentOper 1 }
+
+agPortOperTableEntry OBJECT-TYPE
+    SYNTAX  AgPortOperTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the port operations table."
+    INDEX   { portOperIdx }
+    ::= { agPortOperTable 1 }
+
+AgPortOperTableEntry ::=
+    SEQUENCE {
+	portOperIdx	 Integer32,
+	portOperState	 INTEGER,
+	portOperRmon	 INTEGER
+	}
+
+portOperIdx OBJECT-TYPE
+    SYNTAX  Integer32  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port index."
+    ::= { agPortOperTableEntry 1 }
+
+portOperState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable port."
+    ::= { agPortOperTableEntry 2 }
+
+portOperRmon OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable RMON for port."
+    ::= { agPortOperTableEntry 3 }
+
+
+
+
+--portOperDot1x	    OBJECT IDENTIFIER ::= { agPortOperTableEntry 4 }
+
+portOperDot1xTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PortOperDot1xTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of port operations."
+    ::= { agPortOperTable 2 }
+
+portOperDot1xTableEntry OBJECT-TYPE
+    SYNTAX  PortOperDot1xTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the port 802.1x operation table."
+    INDEX   { portOperDot1xIndx }
+    ::= { portOperDot1xTable 1 }
+
+PortOperDot1xTableEntry ::= SEQUENCE {
+    portOperDot1xIndx        	Integer32,
+    portOperDot1xReset		INTEGER,
+    portOperDot1xReauth		INTEGER
+    }
+
+portOperDot1xIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port index."
+    ::= { portOperDot1xTableEntry 1 }
+
+portOperDot1xReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Reinitialize 802.1x access control on port."
+    ::= { portOperDot1xTableEntry 2 }
+
+portOperDot1xReauth OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Initiate reauthentication on port."
+    ::= { portOperDot1xTableEntry 3 }
+
+-- NTP operation
+
+ntpOperSendReq OBJECT-TYPE
+    SYNTAX  INTEGER {
+        no(1),
+        yes(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Allows the user to send requests to the NTP server."
+    ::= { agNTPOper 1 }
+
+-- Port information table
+
+portInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PortInfoTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of port information."
+    ::= { portInfo 1 }
+
+portInfoTableEntry OBJECT-TYPE
+    SYNTAX  PortInfoTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the port information table."
+    INDEX   { portInfoIndx }
+    ::= { portInfoTable 1 }
+
+PortInfoTableEntry ::= SEQUENCE {
+    portInfoIndx        	Integer32,
+    portInfoSpeed       	INTEGER,
+    portInfoMode        	INTEGER,
+    portInfoFlowCtrl    	INTEGER,
+    portInfoLink        	INTEGER,
+    portInfoPhyIfDescr  	DisplayString,
+    portInfoPhyIfType   	INTEGER,
+    portInfoPhyIfMtu    	Integer32,
+    portInfoPhyIfPhysAddress  	PhysAddress,
+    portInfoPhyIfOperStatus	INTEGER, 
+    portInfoPhyIfLastChange	TimeTicks	
+    }
+
+portInfoIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port index."
+    ::= { portInfoTableEntry 1 }
+
+portInfoSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mbs10(2),
+        mbs100(3),
+        mbs1000(4),
+        any(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current operational speed of the port."
+    ::= { portInfoTableEntry 2 }
+
+portInfoMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        full-duplex(2),
+        half-duplex(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current operational mode of the port."
+    ::= { portInfoTableEntry 3 }
+
+portInfoFlowCtrl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current operational flow control of the port."
+    ::= { portInfoTableEntry 4 }
+
+portInfoLink OBJECT-TYPE
+    SYNTAX  INTEGER {
+        up(1),
+        down(2),
+        disabled(3),
+        inoperative(4) -- unrecognized PCI device
+        }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+         "The current operational link status of the port."
+     ::= { portInfoTableEntry 5 }
+
+portInfoPhyIfDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "A textual string containing information about the
+	    interface.  This string should include the name of
+	    the manufacturer, the product name and the version
+	    of the hardware interface."
+    ::= { portInfoTableEntry 6 }
+
+portInfoPhyIfType OBJECT-TYPE
+    SYNTAX  INTEGER {
+		other(1),          -- none of the following
+		regular1822(2),
+		hdh1822(3),
+		ddn-x25(4),
+		rfc877-x25(5),
+		ethernet-csmacd(6),
+		iso88023-csmacd(7),
+		iso88024-tokenBus(8),
+		iso88025-tokenRing(9),
+		iso88026-man(10),
+		starLan(11),
+		proteon-10Mbit(12),
+		proteon-80Mbit(13),
+		hyperchannel(14),
+		fddi(15),
+		lapb(16),
+		sdlc(17),
+		ds1(18),           -- T-1
+		e1(19),            -- european equiv. of T-1
+		basicISDN(20),
+		primaryISDN(21),   -- proprietary serial
+		propPointToPointSerial(22),
+		ppp(23),
+		softwareLoopback(24),
+		eon(25),            -- CLNP over IP [11]
+		ethernet-3Mbit(26),
+		nsip(27),           -- XNS over IP
+		slip(28),           -- generic SLIP
+		ultra(29),          -- ULTRA technologies
+		ds3(30),            -- T-3
+		sip(31),            -- SMDS
+		frame-relay(32)
+	    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The type of interface, distinguished according to
+	    the physical/link protocol(s) immediately `below'
+	    the network layer in the protocol stack."
+    ::= { portInfoTableEntry 7 }
+
+portInfoPhyIfMtu OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The size of the largest datagram which can be
+	    sent/received on the interface, specified in
+	    octets.  For interfaces that are used for
+	    transmitting network datagrams, this is the size
+	    of the largest network datagram that can be sent
+	    on the interface."
+    ::= { portInfoTableEntry 8 }
+
+portInfoPhyIfPhysAddress OBJECT-TYPE
+    SYNTAX  PhysAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The interface's address at the protocol layer
+	    immediately `below' the network layer in the
+	    protocol stack.  For interfaces which do not have
+	    such an address (e.g., a serial line), this object
+	    should contain an octet string of zero length."
+    ::= { portInfoTableEntry 9 }
+
+portInfoPhyIfOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+		up(1),       -- ready to pass packets
+		down(2),
+		testing(3)   -- in some test mode
+	    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The current operational state of the interface.
+	    The testing(3) state indicates that no operational
+	    packets can be passed."
+    ::= { portInfoTableEntry 10 }
+
+portInfoPhyIfLastChange OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The value of sysUpTime at the time the interface
+	    entered its current operational state.  If the
+	    current state was entered prior to the last re-
+	    initialization of the local network management
+	    subsystem, then this object contains a zero
+	    value."
+    ::= { portInfoTableEntry 11 }
+
+-- Agent System Group
+-- This group of objects take effect on the 'SET' request.
+-- There is no need to 'apply' or 'save'.
+ 
+agApplyConfiguration OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        apply(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to apply the changes made to configuration 
+         of the switch. By setting the value to apply(2), all the changes 
+         made since the last apply are written to the new_config block.
+
+         other(1) is returned when this object ie read. "
+    ::= { agSystem 2 }
+
+agSavePending OBJECT-TYPE
+    SYNTAX  INTEGER {
+        saveNeeded(1),
+        noSaveNeeded(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object, when read, gives the user information
+         whether an save action is needed and that the configuration
+         has been applied but not saved to the flash."
+    ::= { agSystem 3 }
+
+agSaveConfiguration OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        saveActive(2),
+        notSaveActive(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to write current configuration to 
+         nonvolatile storage.
+
+         When issued with the saveActive, the active configuration
+         in flash is saved to backup in flash and then the new
+         configuration is saved to the active configuration in flash.
+
+         When issued with notSaveActive, the active configuration
+         is NOT saved to the flash and the active configuration is
+         overwritten with the new configuration.
+
+         ok(1) is returned always when read."
+    ::= { agSystem 4 }
+
+agRevert OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        revert(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to revert the unapplied changes 
+         made to the switch. By setting the value to revert(2), 
+         all the unapplied changes will be reverted. This action 
+         will copy the current_config to the new_config block.
+
+         other(1) is returned when this object is read. "
+    ::= { agSystem 5 }
+
+agRevertApply OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        revertApply(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to revert the unsaved changes 
+         made to the switch. By setting the value to revertApply(2), 
+         all the unsaved as well as unapplied changes will be 
+         reverted.
+
+         other(1) is returned when this object is read. "
+    ::= { agSystem 6 }
+
+agReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        coldReset(2),
+        warmReset(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to reboot the switch.
+         other(1) is returned always when read.
+
+         The following values are writable:
+             coldReset(2)...
+             warmReset(3)..."
+    ::= { agSystem 7 }
+
+agConfigForNxtReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        active(2),
+        backup(3),
+        default(4)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The configuration information to be loaded from at next reset.
+
+          The following values are writable:
+              active(2)...active configuration block
+              backup(3)...backup configuration block
+              default(4)..default configuration block"
+    ::= { agSystem 8 }
+
+agImageForNxtReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        image1(2),
+        image2(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The software image to be booted from at next reset.
+
+         The following values are writable:
+             image1(2)...image 1
+             image2(3)...image 2"
+    ::= { agSystem 9 }
+
+agSoftwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The version of the software image that is currently running on the 
+         system in the form of 'major.minor.maintenance.bugfix'.  A zero 
+         length string is returned if version is not available."
+    ::= { agSystem 10 }
+
+agBootVer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The version of the boot code in the form of 'major.minor.bugfix'.
+         A zero length string is returned if version is not available."
+    ::= { agSystem 11 }
+
+agImage1Ver OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The version of the software image stored in image 1 storage in the 
+         form of 'major.minor.bugfix'.  A zero length string is returned if 
+         version is not available or there is no valid software image."
+    ::= { agSystem 12 }
+
+agImage2Ver OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The version of the software image stored in image 2 storage in the 
+         form of 'major.minor.bugfix'.  A zero length string is returned if 
+         version is not available or there is no valid software image."
+    ::= { agSystem 13 }
+
+agRtcDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The date on the real time clock in the form of 'mm/dd/yy'.  
+         A zero length string is returned if date is not available."
+    ::= { agSystem 14 }
+
+agRtcTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The time on the real time clock in the form of 'hh:mm:ss'.  
+         A zero length string is returned if time is not available."
+    ::= { agSystem 15 }
+
+agLastSetErrorReason   OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The error reason of the last SET failure."
+    ::= { agSystem 16 }
+
+agCurCfgHttpServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the HTTP server is listening to 
+         in the current_configuration block."
+    ::= { agSystem 17 }
+
+agNewCfgHttpServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the HTTP server is listening to 
+         in the new_configuration block."
+    ::= { agSystem 18 }
+
+agCurCfgLoginBanner OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..79))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The user defined login banner."
+    ::= { agSystem 19 }
+
+agNewCfgLoginBanner OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..79))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The user defined login banner."
+    ::= { agSystem 20 }
+
+
+
+agCurCfgConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable console output of syslog messages."
+    ::= { agSystem 23 }
+
+agNewCfgConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable console output of syslog messages."
+    ::= { agSystem 24 }
+
+
+agCurCfgBootp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable the use of BootP, as currently configured in the 
+         current_configuration block."
+    ::= { agSystem 29 }
+
+agNewCfgBootp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable the use of BootP, in the new_configuration block."
+    ::= { agSystem 30 }
+
+agSlotNumber OBJECT-TYPE
+    SYNTAX INTEGER (1..10)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Identifies the slot in which this switch is installed. If the 
+         agent implementing this MIB is not a blade in a chassis this 
+         value has no meaning."
+    ::= { agSystem 31 }
+
+agCurCfgSnmpTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (1..30)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Once SNMP operations like agApplyConfig, agDiffState and  
+         agDumpState, which use the state machine are done the resources
+         used by these operations need to be freed by setting the state
+         back to 'idle' so others can issue the commands via SNMP. 
+         agSnmpTimeout indicates the number of minutes before the resources
+         are freed and the state set back to 'idle' if this operation is not 
+         performed by the user."
+    ::= { agSystem 32 }
+
+agNewCfgSnmpTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (1..30)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Once SNMP operations like agApplyConfig, agDiffState and  
+         agDumpState, which use the state machine are done the resources
+         used by these operations need to be freed by setting the state
+         back to 'idle' so others can issue the commands via SNMP. 
+         agSnmpTimeout indicates the number of minutes before the resources
+         are freed and the state set back to 'idle' if this operation is not 
+         performed by the user."
+    ::= { agSystem 33 }
+
+agCurCfgTelnetServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the telnet server listens for telnet 
+         sessions."
+    ::= { agSystem 34 }
+
+agNewCfgTelnetServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the telnet server listens for telnet 
+         sessions."
+    ::= { agSystem 35 }
+
+agClearFlashDump OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        clear(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to clear the FLASH dump. 
+         ok(1) is returned when this object is read. "
+    ::= { agSystem 36 }
+
+agRackId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The rack unique identifier."
+    ::= { agSystem 37 }
+
+agChassis OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Chassis serial number."
+    ::= { agSystem 38 }
+
+agCurCfgTftpServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the TFTP server is listening to 
+         in the current_configuration block."
+    ::= { agSystem 39 }
+
+agNewCfgTftpServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the TFTP server is listening to 
+         in the new_configuration block."
+    ::= { agSystem 40 }
+
+agCurCfgHttpsServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the HTTPS server is listening to 
+         in the current_configuration block."
+    ::= { agSystem 49 }
+
+agNewCfgHttpsServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The TCP port number that the HTTPS server is listening to 
+         in the new_configuration block."
+    ::= { agSystem 50 }
+
+agCurDaylightSavings   OBJECT-TYPE
+    SYNTAX  INTEGER {
+    none(0),
+    africa-Algeria(1),
+    africa-Angola(2),
+    africa-Benin(3),
+    africa-Botswana(4),
+    africa-Burkina-Faso(5),
+    africa-Burundi(6),
+    africa-Cameroon(7),
+    africa-Central-African-Rep(8),
+    africa-Chad(9),
+    africa-Congo-WestDemRepCongo(10),
+    africa-Congo-EastDemRepCongo(11),
+    africa-Congo-Rep(12),
+    africa-Cote-dIvoire(13),
+    africa-Djibouti(14),
+    africa-Egypt(15),
+    africa-Equatorial-Guinea(16),
+    africa-Eritrea(17),
+    africa-Ethiopia(18),
+    africa-Gabon(19),
+    africa-Gambia(20),
+    africa-Ghana(21),
+    africa-Guinea(22),
+    africa-Guinea-Bissau(23),
+    africa-Kenya(24),
+    africa-Lesotho(25),
+    africa-Liberia(26),
+    africa-Libya(27),
+    africa-Malawi(28),
+    africa-Mali-SouthWestMali(29),
+    africa-Mali-NorthEastMali(30),
+    africa-Mauritania(31),
+    africa-Morocco(32),
+    africa-Mozambique(33),
+    africa-Namibia(34),
+    africa-Niger(35),
+    africa-Nigeria(36),
+    africa-Rwanda(37),
+    africa-SaoTome-And-Principe(38),
+    africa-Senegal(39),
+    africa-SierraLeone(40),
+    africa-Somalia(41),
+    africa-SouthAfrica(42),
+    africa-Spain-Mainland(43),
+    africa-Spain-CeutaMelilla(44),
+    africa-Spain-CanaryIslands(45),
+    africa-Sudan(46), 
+    africa-Swaziland(47),
+    africa-Tanzania(48),
+    africa-Togo(49),
+    africa-Tunisia(50),
+    africa-Uganda(51),
+    africa-Western-Sahara(52),
+    africa-Zambia(53),
+    africa-Zimbabwe(54),
+    americas-Anguilla(55),
+    americas-Antigua-Barbuda(56),
+    americas-Argentina-EArgentina(57),
+    americas-Argentina-MostLocations(58),
+    americas-Argentina-Jujuy(59),
+    americas-Argentina-Catamarca(60),
+    americas-Argentina-Mendoza(61),
+    americas-Aruba(62),
+    americas-Bahamas(63),
+    americas-Barbados(64),
+    americas-Belize(65),
+    americas-Bolivia(66), 
+    americas-Brazil-AtlanticIslands(67),
+    americas-Brazil-AmapaEPara(68),
+    americas-Brazil-NEBrazil(69),
+    americas-Brazil-Pernambuco(70), 
+    americas-Brazil-Tocantins(71),
+    americas-Brazil-AlagoasSergipe(72),
+    americas-Brazil-SSEBrazil(73),
+    americas-Brazil-MatoGrossoDoSul(74),
+    americas-Brazil-WParaRondonia(75),
+    americas-Brazil-Roraima(76),
+    americas-Brazil-EAmazonas(77),
+    americas-Brazil-WAmazonas(78),
+    americas-Brazil-Acre(79),
+    americas-Canada-NewfoundlandIsland(80),
+    americas-Canada-AtlanTime-NovaScotia(81),
+    americas-Canada-AtlanTime-ELabrador(82),
+    americas-Canada-EastTime-OntarioMostlocation(83),
+    americas-Canada-EastTime-ThunderBay(84),
+    americas-Canada-EastStdTime-PangnirtungNunavut(85),
+    americas-Canada-EastStdTime-EastNunavut(86),
+    americas-Canada-EastStdTime-CenNunavut(87),
+    americas-Canada-CenTime-ManitobaWestOntario(88),
+    americas-Canada-CenTime-RainyRiver(89),
+    americas-Canada-CenTime-WestNunavut(90),
+    americas-Canada-CenStdTime-SaskatchewanMostlocation(91),
+    americas-Canada-CenStdTime-SaskatchewanMidwest(92),
+    americas-Canada-MountTime-AlbertaEastBritishColumbia(93),
+    americas-Canada-MountTime-CentralNorthwestTerritories(94),
+    americas-Canada-MountTime-WestNorthwestTerritories(95),
+    americas-Canada-MountStdTime-DawsonCreekFortSaintJohnBritishColumbia(96),
+    americas-Canada-PacificTime-WestBritishColumbia(97),
+    americas-Canada-PacificTime-SouthYukon(98),
+    americas-Canada-PacificTime-NorthYukon(99),
+    americas-CaymanIslands(100),
+    americas-Chile-MostLocation(101),
+    americas-Chile-EasterIsland(102),
+    americas-Colombia(103),
+    americas-CostaRica(104),
+    americas-Cuba(105),
+    americas-Dominica(106), 
+    americas-DominicanRepublic (107),
+    americas-Ecuador(108),
+    americas-ElSalvado(109),
+    americas-FrenchGuiana(110),
+    americas-Greenland-MostLocation(111),
+    americas-Greenland-EastCoastNorthScoresbysund(112),
+    americas-Greenland-ScoresbysundIttoqqortoormiit(113),
+    americas-Greenland-ThulePituffik(114),
+    americas-Grenada(115),
+    americas-Guadeloupe(116),
+    americas-Guatemala(117),
+    americas-Guyana(118),
+    americas-Haiti(119),
+    americas-Honduras(120),
+    americas-Jamaica(121),
+    americas-Martinique(122),
+    americas-Mexico-CentTime-Mostlocations(123),
+    americas-Mexico-CentTime-QuintanaRoo(124),
+    americas-Mexico-CentTime-CampecheYucatan(125),
+    americas-Mexico-CentTime-CoahuilaDurangoNuevoLeonTamaulipas(126),
+    americas-Mexico-MountTime-SBajaNayaritSinaloa(127),
+    americas-Mexico-MountTime-Chihuahua(128),
+    americas-Mexico-MountStdTime-Sonora(129),
+    americas-Mexico-PacificTime(130),
+    americas-Montserrat(131),
+    americas-NetherlandsAntilles(132),
+    americas-Nicaragua(133),
+    americas-Panama(134),
+    americas-Paraguay(135),
+    americas-Peru(136),
+    americas-PuertoRico(137),
+    americas-StKittsAndNevis(138), 
+    americas-StLucia(139),
+    americas-StPierreAndMiquelon(140),
+    americas-StVincent(141),
+    americas-Suriname(142),
+    americas-TrinidadAndTobago(143),
+    americas-TurksAndCaicosIs(144),
+    americas-USA-EastTime(145),
+    americas-USA-EastTime-MichiganMostLocation(146),
+    americas-USA-EastTime-KentuckyLouisvilleArea(147),
+    americas-USA-EastTime-KentuckyWayneCounty(148),
+    americas-USA-EastStdTime-IndianaMostLocations(149),
+    americas-USA-EastStdTime-IndianaCrawfordCounty(150),
+    americas-USA-EastStdTime-IndianaStarkeCounty(151),
+    americas-USA-EastStdTime-IndianaSwitzerlandCounty(152),
+    americas-USA-CentTime(153),
+    americas-USA-CentTime-MichiganWisconsinborder(154),
+    americas-USA-CentTime-NorthDakotaOliverCounty(155),
+    americas-USA-MountTime(156),
+    americas-USA-MountTime-SouthIdahoAndEastOregon(157),
+    americas-USA-MountTime-Navajo(158),
+    americas-USA-MountStdTime-Arizona(159),
+    americas-USA-PacificTime(160),
+    americas-USA-AlaskaTime(161),
+    americas-USA-AlaskaTime-AlaskaPanhandle(162),
+    americas-USA-AlaskaTime-AlaskaPanhandleNeck(163),
+    americas-USA-AlaskaTime-WestAlaska(164),
+    americas-USA-AleutianIslands(165),
+    americas-USA-Hawaii(166),
+    americas-Uruguay(167),
+    americas-Venezuela(168),
+    americas-VirginIslands-UK(169),
+    americas-VirginIslands-US(170),
+    antarctica-McMurdoStationRossIsland(171),
+    antarctica-Amundsen-ScottStationSouthPole(172),
+    antarctica-PalmerStationAnversIsland(173),
+    antarctica-MawsonStationHolmeBay(174),
+    antarctica-DavisStationVestfoldHills(175),
+    antarctica-CaseyStationBaileyPeninsula(176),
+    antarctica-VostokStationSMagneticPole(177),
+    antarctica-Dumont-dUrvilleBaseTerreAdelie(178), 
+    antarctica-SyowaStationEOngulI(179),
+    arcticOcean-Svalbard(180),
+    arcticOcean-JanMayen(181),
+    asia-Afghanistan(182),
+    asia-Armenia(183),
+    asia-Azerbaijan(184),
+    asia-Bahrain(185),
+    asia-Bangladesh(186),
+    asia-Bhutan(187),
+    asia-Brunei(188),
+    asia-Cambodia(189),
+    asia-China-EastChinaBeijingGuangdongShanghai(190),
+    asia-China-Heilongjiang(191),
+    asia-China-CentralChinaGansuGuizhouSichuanYunnan(192),
+    asia-China-TibetmostofXinjiangUyghur(193),
+    asia-China-SouthwestXinjiangUyghur(194),
+    asia-Cyprus(195),
+    asia-EastTimor(196), 
+    asia-Georgia(197),
+    asia-HongKong(198),
+    asia-India(199),
+    asia-Indonesia-JavaAndSumatra(200),
+    asia-Indonesia-WestCentralBorneo(201),
+    asia-Indonesia-EastSouthBorneoCelebesBaliNusaTengarraWestTimor(202),
+    asia-Indonesia-IrianJayaAndMoluccas(203),
+    asia-Iran(204),
+    asia-Iraq(205),
+    asia-Israel(206),
+    asia-Japan(207),
+    asia-Jordan(208),
+    asia-Kazakhstan-MostLocations(209),
+    asia-Kazakhstan-QyzylordaKyzylorda(210),
+    asia-Kazakhstan-Aqtobe(211),
+    asia-Kazakhstan-AtyrauMangghystau(212),
+    asia-Kazakhstan-WestKazakhstan(213),
+    asia-Korea-North(214),
+    asia-Korea-South(215),
+    asia-Kuwait(216),
+    asia-Kyrgyzstan(217), 
+    asia-Laos(218),
+    asia-Lebanon(219),
+    asia-Macau(220),
+    asia-Malaysia-PeninsularMalaysia(221),
+    asia-Malaysia-SabahSarawak(222),
+    asia-Mongolia-MostLocations(223),
+    asia-Mongolia-BayanOlgiyGoviAltaiHovdUvsZavkhan(224),
+    asia-Mongolia-DornodSukhbaatar(225),
+    asia-Myanmar(226),
+    asia-Nepal(227),
+    asia-Oman(228),
+    asia-Pakistan(229), 
+    asia-Palestine(230),
+    asia-Philippines(231),
+    asia-Qatar(232),
+    asia-Russia-Moscow-01Kaliningrad(233),
+    asia-Russia-Moscow00WestRussia(234),
+    asia-Russia-Moscow01CaspianSea(235),
+    asia-Russia-Moscow02Urals(236),
+    asia-Russia-Moscow03WestSiberia(237),
+    asia-Russia-Moscow03Novosibirsk(238),
+    asia-Russia-Moscow04YeniseiRiver(239),
+    asia-Russia-Moscow05LakeBaikal(240),
+    asia-Russia-Moscow06LenaRiver(241),
+    asia-Russia-Moscow07AmurRiver(242),
+    asia-Russia-Moscow07SakhalinIsland(243),
+    asia-Russia-Moscow08Magadan(244),
+    asia-Russia-Moscow09Kamchatka(245),
+    asia-Russia-Moscow10BeringSea(246),
+    asia-SaudiArabia(247),
+    asia-Singapore(248),
+    asia-SriLanka(249),
+    asia-Syria(250),
+    asia-Taiwan(251),
+    asia-Tajikistan(252), 
+    asia-Thailand(253),
+    asia-Turkmenistan(254), 
+    asia-UnitedArabEmirates(255),
+    asia-Uzbekistan-WestUzbekistan(256),
+    asia-Uzbekistan-EastUzbekistan(257),
+    asia-Vietnam(258),
+    asia-Yemen(259),
+    atlanticOcean-Bermuda(260),
+    atlanticOcean-CapeVerde(261),
+    atlanticOcean-FaeroeIslands(262),
+    atlanticOcean-FalklandIslands(263),
+    atlanticOcean-Iceland(264),
+    atlanticOcean-Portugal-Mainland(265),
+    atlanticOcean-Portugal-MadeiraIslands(266),
+    atlanticOcean-Portugal-Azores(267),
+    atlanticOcean-SouthGeorgia-SouthSandwichIslands(268),
+    atlanticOcean-Spain-Mainland(269),
+    atlanticOcean-Spain-CeutaMelilla(270),
+    atlanticOcean-Spain-CanaryIslands(271),
+    atlanticOcean-StHelena(272),
+    atlanticOcean-Svalbard-JanMayen(273),
+    australia-LordHoweIsland(274),
+    australia-Tasmania(275),
+    australia-Victoria(276),
+    australia-NewSouthWales-MostLocations(277),
+    australia-NewSouthWales-Yancowinna(278),
+    australia-Queensland-MostLocations(279),
+    australia-Queensland-HolidayIslands(280),
+    australia-SouthAustralia(281),
+    australia-NorthernTerritory(282),
+    australia-WesternAustralia(283),
+    europe-Albania(284),
+    europe-Andorra(285),
+    europe-Austria(286),
+    europe-Belarus(287),
+    europe-Belgium(288),
+    europe-BosniaHerzegovina(289),
+    europe-Britain-UKGreatBritain(290),
+    europe-Britain-UKNorthernIreland(291),
+    europe-Bulgaria(292),
+    europe-Croatia(293),
+    europe-CzechRepublic(294),
+    europe-Denmark(295),
+    europe-Estonia(296),
+    europe-Finland(297),
+    europe-France(298), 
+    europe-Germany(299),
+    europe-Gibraltar(300),
+    europe-Greece(301),
+    europe-Hungary(302),
+    europe-Ireland(303),
+    europe-Italy(304),
+    europe-Latvia(305),
+    europe-Liechtenstein(306),
+    europe-Lithuania(307),
+    europe-Luxembourg(308),
+    europe-Macedonia(309),
+    europe-Malta(310),
+    europe-Moldova(311),
+    europe-Monaco(312),
+    europe-Netherlands(313),
+    europe-Norway(314),
+    europe-Poland(315),
+    europe-Portugal-Mainland(316),
+    europe-Portugal-MadeiraIslands(317),
+    europe-Portugal-Azores(318),
+    europe-Romania(319),
+    europe-Russia-Moscow-01Kaliningrad(320),
+    europe-Russia-Moscow00WestRussia(321),
+    europe-Russia-Moscow01CaspianSea(322),
+    europe-Russia-Moscow02Urals(323),
+    europe-Russia-Moscow03WestSiberia(324),
+    europe-Russia-Moscow03Novosibirsk(325),
+    europe-Russia-Moscow04YeniseiRiver(326),
+    europe-Russia-Moscow05LakeBaikal(327),
+    europe-Russia-Moscow06LenaRiver(328),
+    europe-Russia-Moscow07AmurRiver(329),
+    europe-Russia-Moscow07SakhalinIsland(330),
+    europe-Russia-Moscow08Magadan(331),
+    europe-Russia-Moscow09Kamchatka(332),
+    europe-Russia-Moscow10BeringSea(333),
+    europe-SanMarino(334),
+    europe-Slovakia(335),
+    europe-Slovenia(336),
+    europe-Spain-Mainland(337),
+    europe-Spain-CeutaAndMelilla(338),
+    europe-Spain-CanaryIslands(339),
+    europe-Sweden(340),
+    europe-Switzerland(341),
+    europe-Turkey(342),
+    europe-Ukraine-MostLocations(343),
+    europe-Ukraine-Ruthenia(344),
+    europe-Ukraine-Zaporozhye-ELugansk(345),
+    europe-Ukraine-CentralCrimea(346),
+    europe-VaticanCity(347),
+    europe-Yugoslavia(348),
+    indianOcean-BritishIndianOceanTerritory(349),
+    indianOcean-ChristmasIsland(350),
+    indianOcean-CocosOrKeelingIslands(351),
+    indianOcean-Comoros(352),
+    indianOcean-FrenchSouthernAndAntarcticLands(353),
+    indianOcean-Madagascar(354),
+    indianOcean-Maldives(355),
+    indianOcean-Mauritius(356),
+    indianOcean-Mayotte(357),
+    indianOcean-Reunion(358),
+    indianOcean-Seychelles(359),
+    pacificOcean-Chile-MostLocations(360),
+    pacificOcean-Chile-EasterIslandSalayGomez(361),
+    pacificOcean-CookIslands(362),
+    pacificOcean-Ecuador(363),
+    pacificOcean-Fiji(364),
+    pacificOcean-FrenchPolynesia-SocietyIslands(365),
+    pacificOcean-FrenchPolynesia-MarquesasIslands(366),
+    pacificOcean-FrenchPolynesia-GambierIslands(367),
+    pacificOcean-Guam(368),
+    pacificOcean-Kiribati-GilbertIslands(369),
+    pacificOcean-Kiribati-PhoenixIslands(370),
+    pacificOcean-Kiribati-LineIslands(371),
+    pacificOcean-MarshallIslands-MostLocations(372),
+    pacificOcean-MarshallIslands-Kwajalein(373),
+    pacificOcean-Micronesia-Yap(374),
+    pacificOcean-Micronesia-TrukOrChuuk(375),
+    pacificOcean-Micronesia-PonapeOrPohnpei(376), 
+    pacificOcean-Micronesia-Kosrae(377),
+    pacificOcean-Nauru(378),
+    pacificOcean-NewCaledonia(379),
+    pacificOcean-NewZealand-MostLocations(380),
+    pacificOcean-NewZealand-ChathamIslands(381),
+    pacificOcean-Niue(382),
+    pacificOcean-NorfolkIsland(383),
+    pacificOcean-NorthernMarianaIslands(384),
+    pacificOcean-Palau(385),
+    pacificOcean-PapuaNewGuinea(386),
+    pacificOcean-Pitcairn(387),
+    pacificOcean-SamoaAmerican(388),
+    pacificOcean-SamoaWestern(389),
+    pacificOcean-SolomonIslands(390),
+    pacificOcean-Tokelau(391),
+    pacificOcean-Tonga(392),
+    pacificOcean-Tuvalu(393),
+    pacificOceanUSA-EastTime(394),
+    pacificOceanUSA-EastTime-MichiganMostLocations(395),
+    pacificOceanUSA-EastTime-KentuckyLouisvilleArea(396),
+    pacificOceanUSA-EastTime-KentuckyWayneCounty(397),
+    pacificOceanUSA-EastStdTime-IndianaMostLocations(398),
+    pacificOceanUSA-EastStdTime-IndianaCrawfordCounty(399),
+    pacificOceanUSA-EastStdTime-IndianaStarkeCounty(400),
+    pacificOceanUSA-EastStdTime-IndianaSwitzerlandCounty(401),
+    pacificOceanUSA-CentTime(402),
+    pacificOceanUSA-CentTime-MichiganWisconsinborder(403),
+    pacificOceanUSA-CentTime-NorthDakotaOliverCounty(404),
+    pacificOceanUSA-MountTime(405),
+    pacificOceanUSA-MountTime-SouthIdahoAndEastOregon(406),
+    pacificOceanUSA-MountTime-Navajo(407),
+    pacificOceanUSA-MountStdTime-Arizona(408),
+    pacificOceanUSA-PacificTime(409),
+    pacificOceanUSA-AlaskaTime(410),
+    pacificOceanUSA-AlaskaTime-AlaskaPanhandle(411),
+    pacificOceanUSA-AlaskaTime-AlaskaPanhandleNeck(412),
+    pacificOceanUSA-AlaskaTime-WestAlaska(413),
+    pacificOceanUSA-AleutianIslands(414),
+    pacificOceanUSA-Hawaii(415),
+    pacificOcean-USMinorOutlyingIslands-JohnstonAtoll(416),
+    pacificOcean-USMinorOutlyingIslands-MidwayIslands(417),
+    pacificOcean-USMinorOutlyingIslands-WakeIsland(418),
+    pacificOcean-Vanuatu(419),
+    pacificOcean-WallisAndFutuna(420)
+	}
+    MAX-ACCESS read-only 
+    STATUS  current 
+    DESCRIPTION
+        "The daylight savings location."
+    ::= { agSystem 51 }
+
+agNewDaylightSavings   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+    none(0),
+    africa-Algeria(1),
+    africa-Angola(2),
+    africa-Benin(3),
+    africa-Botswana(4),
+    africa-Burkina-Faso(5),
+    africa-Burundi(6),
+    africa-Cameroon(7),
+    africa-Central-African-Rep(8),
+    africa-Chad(9),
+    africa-Congo-WestDemRepCongo(10),
+    africa-Congo-EastDemRepCongo(11),
+    africa-Congo-Rep(12),
+    africa-Cote-dIvoire(13),
+    africa-Djibouti(14),
+    africa-Egypt(15),
+    africa-Equatorial-Guinea(16),
+    africa-Eritrea(17),
+    africa-Ethiopia(18),
+    africa-Gabon(19),
+    africa-Gambia(20),
+    africa-Ghana(21),
+    africa-Guinea(22),
+    africa-Guinea-Bissau(23),
+    africa-Kenya(24),
+    africa-Lesotho(25),
+    africa-Liberia(26),
+    africa-Libya(27),
+    africa-Malawi(28),
+    africa-Mali-SouthWestMali(29),
+    africa-Mali-NorthEastMali(30),
+    africa-Mauritania(31),
+    africa-Morocco(32),
+    africa-Mozambique(33),
+    africa-Namibia(34),
+    africa-Niger(35),
+    africa-Nigeria(36),
+    africa-Rwanda(37),
+    africa-SaoTome-And-Principe(38),
+    africa-Senegal(39),
+    africa-SierraLeone(40),
+    africa-Somalia(41),
+    africa-SouthAfrica(42),
+    africa-Spain-Mainland(43),
+    africa-Spain-CeutaMelilla(44),
+    africa-Spain-CanaryIslands(45),
+    africa-Sudan(46), 
+    africa-Swaziland(47),
+    africa-Tanzania(48),
+    africa-Togo(49),
+    africa-Tunisia(50),
+    africa-Uganda(51),
+    africa-Western-Sahara(52),
+    africa-Zambia(53),
+    africa-Zimbabwe(54),
+    americas-Anguilla(55),
+    americas-Antigua-Barbuda(56),
+    americas-Argentina-EArgentina(57),
+    americas-Argentina-MostLocations(58),
+    americas-Argentina-Jujuy(59),
+    americas-Argentina-Catamarca(60),
+    americas-Argentina-Mendoza(61),
+    americas-Aruba(62),
+    americas-Bahamas(63),
+    americas-Barbados(64),
+    americas-Belize(65),
+    americas-Bolivia(66), 
+    americas-Brazil-AtlanticIslands(67),
+    americas-Brazil-AmapaEPara(68),
+    americas-Brazil-NEBrazil(69),
+    americas-Brazil-Pernambuco(70), 
+    americas-Brazil-Tocantins(71),
+    americas-Brazil-AlagoasSergipe(72),
+    americas-Brazil-SSEBrazil(73),
+    americas-Brazil-MatoGrossoDoSul(74),
+    americas-Brazil-WParaRondonia(75),
+    americas-Brazil-Roraima(76),
+    americas-Brazil-EAmazonas(77),
+    americas-Brazil-WAmazonas(78),
+    americas-Brazil-Acre(79),
+    americas-Canada-NewfoundlandIsland(80),
+    americas-Canada-AtlanTime-NovaScotia(81),
+    americas-Canada-AtlanTime-ELabrador(82),
+    americas-Canada-EastTime-OntarioMostlocation(83),
+    americas-Canada-EastTime-ThunderBay(84),
+    americas-Canada-EastStdTime-PangnirtungNunavut(85),
+    americas-Canada-EastStdTime-EastNunavut(86),
+    americas-Canada-EastStdTime-CenNunavut(87),
+    americas-Canada-CenTime-ManitobaWestOntario(88),
+    americas-Canada-CenTime-RainyRiver(89),
+    americas-Canada-CenTime-WestNunavut(90),
+    americas-Canada-CenStdTime-SaskatchewanMostlocation(91),
+    americas-Canada-CenStdTime-SaskatchewanMidwest(92),
+    americas-Canada-MountTime-AlbertaEastBritishColumbia(93),
+    americas-Canada-MountTime-CentralNorthwestTerritories(94),
+    americas-Canada-MountTime-WestNorthwestTerritories(95),
+    americas-Canada-MountStdTime-DawsonCreekFortSaintJohnBritishColumbia(96),
+    americas-Canada-PacificTime-WestBritishColumbia(97),
+    americas-Canada-PacificTime-SouthYukon(98),
+    americas-Canada-PacificTime-NorthYukon(99),
+    americas-CaymanIslands(100),
+    americas-Chile-MostLocation(101),
+    americas-Chile-EasterIsland(102),
+    americas-Colombia(103),
+    americas-CostaRica(104),
+    americas-Cuba(105),
+    americas-Dominica(106), 
+    americas-DominicanRepublic (107),
+    americas-Ecuador(108),
+    americas-ElSalvado(109),
+    americas-FrenchGuiana(110),
+    americas-Greenland-MostLocation(111),
+    americas-Greenland-EastCoastNorthScoresbysund(112),
+    americas-Greenland-ScoresbysundIttoqqortoormiit(113),
+    americas-Greenland-ThulePituffik(114),
+    americas-Grenada(115),
+    americas-Guadeloupe(116),
+    americas-Guatemala(117),
+    americas-Guyana(118),
+    americas-Haiti(119),
+    americas-Honduras(120),
+    americas-Jamaica(121),
+    americas-Martinique(122),
+    americas-Mexico-CentTime-Mostlocations(123),
+    americas-Mexico-CentTime-QuintanaRoo(124),
+    americas-Mexico-CentTime-CampecheYucatan(125),
+    americas-Mexico-CentTime-CoahuilaDurangoNuevoLeonTamaulipas(126),
+    americas-Mexico-MountTime-SBajaNayaritSinaloa(127),
+    americas-Mexico-MountTime-Chihuahua(128),
+    americas-Mexico-MountStdTime-Sonora(129),
+    americas-Mexico-PacificTime(130),
+    americas-Montserrat(131),
+    americas-NetherlandsAntilles(132),
+    americas-Nicaragua(133),
+    americas-Panama(134),
+    americas-Paraguay(135),
+    americas-Peru(136),
+    americas-PuertoRico(137),
+    americas-StKittsAndNevis(138), 
+    americas-StLucia(139),
+    americas-StPierreAndMiquelon(140),
+    americas-StVincent(141),
+    americas-Suriname(142),
+    americas-TrinidadAndTobago(143),
+    americas-TurksAndCaicosIs(144),
+    americas-USA-EastTime(145),
+    americas-USA-EastTime-MichiganMostLocation(146),
+    americas-USA-EastTime-KentuckyLouisvilleArea(147),
+    americas-USA-EastTime-KentuckyWayneCounty(148),
+    americas-USA-EastStdTime-IndianaMostLocations(149),
+    americas-USA-EastStdTime-IndianaCrawfordCounty(150),
+    americas-USA-EastStdTime-IndianaStarkeCounty(151),
+    americas-USA-EastStdTime-IndianaSwitzerlandCounty(152),
+    americas-USA-CentTime(153),
+    americas-USA-CentTime-MichiganWisconsinborder(154),
+    americas-USA-CentTime-NorthDakotaOliverCounty(155),
+    americas-USA-MountTime(156),
+    americas-USA-MountTime-SouthIdahoAndEastOregon(157),
+    americas-USA-MountTime-Navajo(158),
+    americas-USA-MountStdTime-Arizona(159),
+    americas-USA-PacificTime(160),
+    americas-USA-AlaskaTime(161),
+    americas-USA-AlaskaTime-AlaskaPanhandle(162),
+    americas-USA-AlaskaTime-AlaskaPanhandleNeck(163),
+    americas-USA-AlaskaTime-WestAlaska(164),
+    americas-USA-AleutianIslands(165),
+    americas-USA-Hawaii(166),
+    americas-Uruguay(167),
+    americas-Venezuela(168),
+    americas-VirginIslands-UK(169),
+    americas-VirginIslands-US(170),
+    antarctica-McMurdoStationRossIsland(171),
+    antarctica-Amundsen-ScottStationSouthPole(172),
+    antarctica-PalmerStationAnversIsland(173),
+    antarctica-MawsonStationHolmeBay(174),
+    antarctica-DavisStationVestfoldHills(175),
+    antarctica-CaseyStationBaileyPeninsula(176),
+    antarctica-VostokStationSMagneticPole(177),
+    antarctica-Dumont-dUrvilleBaseTerreAdelie(178), 
+    antarctica-SyowaStationEOngulI(179),
+    arcticOcean-Svalbard(180),
+    arcticOcean-JanMayen(181),
+    asia-Afghanistan(182),
+    asia-Armenia(183),
+    asia-Azerbaijan(184),
+    asia-Bahrain(185),
+    asia-Bangladesh(186),
+    asia-Bhutan(187),
+    asia-Brunei(188),
+    asia-Cambodia(189),
+    asia-China-EastChinaBeijingGuangdongShanghai(190),
+    asia-China-Heilongjiang(191),
+    asia-China-CentralChinaGansuGuizhouSichuanYunnan(192),
+    asia-China-TibetmostofXinjiangUyghur(193),
+    asia-China-SouthwestXinjiangUyghur(194),
+    asia-Cyprus(195),
+    asia-EastTimor(196), 
+    asia-Georgia(197),
+    asia-HongKong(198),
+    asia-India(199),
+    asia-Indonesia-JavaAndSumatra(200),
+    asia-Indonesia-WestCentralBorneo(201),
+    asia-Indonesia-EastSouthBorneoCelebesBaliNusaTengarraWestTimor(202),
+    asia-Indonesia-IrianJayaAndMoluccas(203),
+    asia-Iran(204),
+    asia-Iraq(205),
+    asia-Israel(206),
+    asia-Japan(207),
+    asia-Jordan(208),
+    asia-Kazakhstan-MostLocations(209),
+    asia-Kazakhstan-QyzylordaKyzylorda(210),
+    asia-Kazakhstan-Aqtobe(211),
+    asia-Kazakhstan-AtyrauMangghystau(212),
+    asia-Kazakhstan-WestKazakhstan(213),
+    asia-Korea-North(214),
+    asia-Korea-South(215),
+    asia-Kuwait(216),
+    asia-Kyrgyzstan(217), 
+    asia-Laos(218),
+    asia-Lebanon(219),
+    asia-Macau(220),
+    asia-Malaysia-PeninsularMalaysia(221),
+    asia-Malaysia-SabahSarawak(222),
+    asia-Mongolia-MostLocations(223),
+    asia-Mongolia-BayanOlgiyGoviAltaiHovdUvsZavkhan(224),
+    asia-Mongolia-DornodSukhbaatar(225),
+    asia-Myanmar(226),
+    asia-Nepal(227),
+    asia-Oman(228),
+    asia-Pakistan(229), 
+    asia-Palestine(230),
+    asia-Philippines(231),
+    asia-Qatar(232),
+    asia-Russia-Moscow-01Kaliningrad(233),
+    asia-Russia-Moscow00WestRussia(234),
+    asia-Russia-Moscow01CaspianSea(235),
+    asia-Russia-Moscow02Urals(236),
+    asia-Russia-Moscow03WestSiberia(237),
+    asia-Russia-Moscow03Novosibirsk(238),
+    asia-Russia-Moscow04YeniseiRiver(239),
+    asia-Russia-Moscow05LakeBaikal(240),
+    asia-Russia-Moscow06LenaRiver(241),
+    asia-Russia-Moscow07AmurRiver(242),
+    asia-Russia-Moscow07SakhalinIsland(243),
+    asia-Russia-Moscow08Magadan(244),
+    asia-Russia-Moscow09Kamchatka(245),
+    asia-Russia-Moscow10BeringSea(246),
+    asia-SaudiArabia(247),
+    asia-Singapore(248),
+    asia-SriLanka(249),
+    asia-Syria(250),
+    asia-Taiwan(251),
+    asia-Tajikistan(252), 
+    asia-Thailand(253),
+    asia-Turkmenistan(254), 
+    asia-UnitedArabEmirates(255),
+    asia-Uzbekistan-WestUzbekistan(256),
+    asia-Uzbekistan-EastUzbekistan(257),
+    asia-Vietnam(258),
+    asia-Yemen(259),
+    atlanticOcean-Bermuda(260),
+    atlanticOcean-CapeVerde(261),
+    atlanticOcean-FaeroeIslands(262),
+    atlanticOcean-FalklandIslands(263),
+    atlanticOcean-Iceland(264),
+    atlanticOcean-Portugal-Mainland(265),
+    atlanticOcean-Portugal-MadeiraIslands(266),
+    atlanticOcean-Portugal-Azores(267),
+    atlanticOcean-SouthGeorgia-SouthSandwichIslands(268),
+    atlanticOcean-Spain-Mainland(269),
+    atlanticOcean-Spain-CeutaMelilla(270),
+    atlanticOcean-Spain-CanaryIslands(271),
+    atlanticOcean-StHelena(272),
+    atlanticOcean-Svalbard-JanMayen(273),
+    australia-LordHoweIsland(274),
+    australia-Tasmania(275),
+    australia-Victoria(276),
+    australia-NewSouthWales-MostLocations(277),
+    australia-NewSouthWales-Yancowinna(278),
+    australia-Queensland-MostLocations(279),
+    australia-Queensland-HolidayIslands(280),
+    australia-SouthAustralia(281),
+    australia-NorthernTerritory(282),
+    australia-WesternAustralia(283),
+    europe-Albania(284),
+    europe-Andorra(285),
+    europe-Austria(286),
+    europe-Belarus(287),
+    europe-Belgium(288),
+    europe-BosniaHerzegovina(289),
+    europe-Britain-UKGreatBritain(290),
+    europe-Britain-UKNorthernIreland(291),
+    europe-Bulgaria(292),
+    europe-Croatia(293),
+    europe-CzechRepublic(294),
+    europe-Denmark(295),
+    europe-Estonia(296),
+    europe-Finland(297),
+    europe-France(298), 
+    europe-Germany(299),
+    europe-Gibraltar(300),
+    europe-Greece(301),
+    europe-Hungary(302),
+    europe-Ireland(303),
+    europe-Italy(304),
+    europe-Latvia(305),
+    europe-Liechtenstein(306),
+    europe-Lithuania(307),
+    europe-Luxembourg(308),
+    europe-Macedonia(309),
+    europe-Malta(310),
+    europe-Moldova(311),
+    europe-Monaco(312),
+    europe-Netherlands(313),
+    europe-Norway(314),
+    europe-Poland(315),
+    europe-Portugal-Mainland(316),
+    europe-Portugal-MadeiraIslands(317),
+    europe-Portugal-Azores(318),
+    europe-Romania(319),
+    europe-Russia-Moscow-01Kaliningrad(320),
+    europe-Russia-Moscow00WestRussia(321),
+    europe-Russia-Moscow01CaspianSea(322),
+    europe-Russia-Moscow02Urals(323),
+    europe-Russia-Moscow03WestSiberia(324),
+    europe-Russia-Moscow03Novosibirsk(325),
+    europe-Russia-Moscow04YeniseiRiver(326),
+    europe-Russia-Moscow05LakeBaikal(327),
+    europe-Russia-Moscow06LenaRiver(328),
+    europe-Russia-Moscow07AmurRiver(329),
+    europe-Russia-Moscow07SakhalinIsland(330),
+    europe-Russia-Moscow08Magadan(331),
+    europe-Russia-Moscow09Kamchatka(332),
+    europe-Russia-Moscow10BeringSea(333),
+    europe-SanMarino(334),
+    europe-Slovakia(335),
+    europe-Slovenia(336),
+    europe-Spain-Mainland(337),
+    europe-Spain-CeutaAndMelilla(338),
+    europe-Spain-CanaryIslands(339),
+    europe-Sweden(340),
+    europe-Switzerland(341),
+    europe-Turkey(342),
+    europe-Ukraine-MostLocations(343),
+    europe-Ukraine-Ruthenia(344),
+    europe-Ukraine-Zaporozhye-ELugansk(345),
+    europe-Ukraine-CentralCrimea(346),
+    europe-VaticanCity(347),
+    europe-Yugoslavia(348),
+    indianOcean-BritishIndianOceanTerritory(349),
+    indianOcean-ChristmasIsland(350),
+    indianOcean-CocosOrKeelingIslands(351),
+    indianOcean-Comoros(352),
+    indianOcean-FrenchSouthernAndAntarcticLands(353),
+    indianOcean-Madagascar(354),
+    indianOcean-Maldives(355),
+    indianOcean-Mauritius(356),
+    indianOcean-Mayotte(357),
+    indianOcean-Reunion(358),
+    indianOcean-Seychelles(359),
+    pacificOcean-Chile-MostLocations(360),
+    pacificOcean-Chile-EasterIslandSalayGomez(361),
+    pacificOcean-CookIslands(362),
+    pacificOcean-Ecuador(363),
+    pacificOcean-Fiji(364),
+    pacificOcean-FrenchPolynesia-SocietyIslands(365),
+    pacificOcean-FrenchPolynesia-MarquesasIslands(366),
+    pacificOcean-FrenchPolynesia-GambierIslands(367),
+    pacificOcean-Guam(368),
+    pacificOcean-Kiribati-GilbertIslands(369),
+    pacificOcean-Kiribati-PhoenixIslands(370),
+    pacificOcean-Kiribati-LineIslands(371),
+    pacificOcean-MarshallIslands-MostLocations(372),
+    pacificOcean-MarshallIslands-Kwajalein(373),
+    pacificOcean-Micronesia-Yap(374),
+    pacificOcean-Micronesia-TrukOrChuuk(375),
+    pacificOcean-Micronesia-PonapeOrPohnpei(376), 
+    pacificOcean-Micronesia-Kosrae(377),
+    pacificOcean-Nauru(378),
+    pacificOcean-NewCaledonia(379),
+    pacificOcean-NewZealand-MostLocations(380),
+    pacificOcean-NewZealand-ChathamIslands(381),
+    pacificOcean-Niue(382),
+    pacificOcean-NorfolkIsland(383),
+    pacificOcean-NorthernMarianaIslands(384),
+    pacificOcean-Palau(385),
+    pacificOcean-PapuaNewGuinea(386),
+    pacificOcean-Pitcairn(387),
+    pacificOcean-SamoaAmerican(388),
+    pacificOcean-SamoaWestern(389),
+    pacificOcean-SolomonIslands(390),
+    pacificOcean-Tokelau(391),
+    pacificOcean-Tonga(392),
+    pacificOcean-Tuvalu(393),
+    pacificOceanUSA-EastTime(394),
+    pacificOceanUSA-EastTime-MichiganMostLocations(395),
+    pacificOceanUSA-EastTime-KentuckyLouisvilleArea(396),
+    pacificOceanUSA-EastTime-KentuckyWayneCounty(397),
+    pacificOceanUSA-EastStdTime-IndianaMostLocations(398),
+    pacificOceanUSA-EastStdTime-IndianaCrawfordCounty(399),
+    pacificOceanUSA-EastStdTime-IndianaStarkeCounty(400),
+    pacificOceanUSA-EastStdTime-IndianaSwitzerlandCounty(401),
+    pacificOceanUSA-CentTime(402),
+    pacificOceanUSA-CentTime-MichiganWisconsinborder(403),
+    pacificOceanUSA-CentTime-NorthDakotaOliverCounty(404),
+    pacificOceanUSA-MountTime(405),
+    pacificOceanUSA-MountTime-SouthIdahoAndEastOregon(406),
+    pacificOceanUSA-MountTime-Navajo(407),
+    pacificOceanUSA-MountStdTime-Arizona(408),
+    pacificOceanUSA-PacificTime(409),
+    pacificOceanUSA-AlaskaTime(410),
+    pacificOceanUSA-AlaskaTime-AlaskaPanhandle(411),
+    pacificOceanUSA-AlaskaTime-AlaskaPanhandleNeck(412),
+    pacificOceanUSA-AlaskaTime-WestAlaska(413),
+    pacificOceanUSA-AleutianIslands(414),
+    pacificOceanUSA-Hawaii(415),
+    pacificOcean-USMinorOutlyingIslands-JohnstonAtoll(416),
+    pacificOcean-USMinorOutlyingIslands-MidwayIslands(417),
+    pacificOcean-USMinorOutlyingIslands-WakeIsland(418),
+    pacificOcean-Vanuatu(419),
+    pacificOceanWallisAndFutuna(420)
+	}
+    MAX-ACCESS read-write 
+    STATUS  current 
+    DESCRIPTION
+        "The daylight savings location."
+    ::= { agSystem 52 }
+
+agCurCfgIdleCLITimeout OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Set idle CLI sessions timeout."
+    ::= { agSystem 53 }
+
+agNewCfgIdleCLITimeout OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set idle CLI sessions timeout."
+    ::= { agSystem 54 }
+
+agCurCfgUfdTrap OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current status of the UFDFO SNMP trap."
+    ::= { agSystem 55 }
+
+agNewCfgUfdTrap OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable sending UFDFO SNMP trap."
+    ::= { agSystem 56 }
+
+agCurBootNxtCliMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        aoscli(1),
+        iscli(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current boot mode."
+    ::= { agSystem 64 }
+
+agNewBootNxtCliMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        aoscli(1),
+        iscli(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Next cli boot mode."
+    ::= { agSystem 65 }
+
+
+agCurCfgReminders OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current status of reminders feature."
+    ::= { agSystem 70 }
+
+agNewCfgReminders OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable reminders feature."
+    ::= { agSystem 71 }
+	
+-- Syslog Configuration
+agCurCfgSyslogHost OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The syslog host IP address, as currently configured in
+         the current_configuration block."
+    ::= { agSyslog 1 }
+
+agNewCfgSyslogHost OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The syslog host IP address, in the new_configuration block."
+    ::= { agSyslog 2 }
+
+agCurCfgSyslog2Host OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The second syslog host IP address, as currently configured in
+         the current_configuration block."
+    ::= { agSyslog 3 }
+
+agNewCfgSyslog2Host OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The second syslog host IP address, in the new_configuration block."
+    ::= { agSyslog 4 }
+
+agCurCfgSyslogFac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1),
+	local1(2),
+	local2(3),
+	local3(4),
+	local4(5),
+	local5(6),
+	local6(7),
+	local7(8)
+	}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The facility of syslog host in the current_configuration block."
+    ::= { agSyslog 5 }
+
+agNewCfgSyslogFac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1), 
+	local1(2),
+	local2(3),
+	local3(4),
+	local4(5),
+	local5(6),
+        local6(7),
+	local7(8)
+	}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The facility of syslog host in the new_configuration block."
+    ::= { agSyslog 6 }
+
+agCurCfgSyslog2Fac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1),
+	local1(2),
+	local2(3),
+	local3(4),
+	local4(5),
+	local5(6),
+	local6(7),
+	local7(8)
+	}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The facility of syslog2 host in the current_configuration block."
+    ::= { agSyslog 7 }
+
+agNewCfgSyslog2Fac   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	local0(1), 
+	local1(2),
+	local2(3),
+	local3(4),
+        local4(5),
+	local5(6),
+        local6(7),
+	local7(8)
+	}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The facility of syslogs host in the new_configuration block."
+    ::= { agSyslog 8 }
+
+agCurCfgSyslogSev   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        emerg0(1),
+	alert1(2),
+	crit2(3),
+	err3(4),
+	warning4(5),
+	notice5(6),
+	info6(7),
+	debug7(8)
+	}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The severity of syslog host in the current configuration block."
+    ::= { agSyslog 13 }
+
+agNewCfgSyslogSev   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        emerg0(1),
+	alert1(2),
+	crit2(3),
+	err3(4),
+	warning4(5),
+	notice5(6),
+	info6(7),
+	debug7(8)
+	}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The severity of syslog host in the new configuration block."
+    ::= { agSyslog 14 }
+
+agCurCfgSyslog2Sev   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        emerg0(1),
+	alert1(2),
+	crit2(3),
+	err3(4),
+	warning4(5),
+	notice5(6),
+	info6(7),
+	debug7(8)
+	}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The severity of syslog2 host in the current configuration block."
+    ::= { agSyslog 15 }
+
+agNewCfgSyslog2Sev   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        emerg0(1),
+	alert1(2),
+	crit2(3),
+	err3(4),
+	warning4(5),
+	notice5(6),
+	info6(7),
+	debug7(8)
+	}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The severity of syslogs host in the new configuration block."
+    ::= { agSyslog 16 }
+
+agClrSyslogMsgs OBJECT-TYPE
+    SYNTAX  INTEGER {
+            other(1),
+            reset(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Clears all current Syslog messages."
+    ::= { agSyslog 9 }
+
+agSyslogMsgTableMaxSize OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of rows in the syslog message table."
+    ::= { agSyslog 10 }
+
+agSyslogMsgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgSyslogMsgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of syslog messages."
+    ::= { agSyslog 11 }
+
+agSyslogMsgTableEntry OBJECT-TYPE
+    SYNTAX  AgSyslogMsgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A syslog message stored on the switch."
+    INDEX   { agSyslogMsgIndex }
+    ::= { agSyslogMsgTable 1 }
+
+AgSyslogMsgTableEntry ::= SEQUENCE {
+    agSyslogMsgIndex          Integer32,
+    agSyslogMessage           DisplayString
+    }
+
+agSyslogMsgIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The syslog message table index."
+    ::= { agSyslogMsgTableEntry 1 }
+
+agSyslogMessage OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The syslog message."
+    ::= { agSyslogMsgTableEntry 2 }
+
+agLog OBJECT IDENTIFIER ::= { agSyslog 12 }
+
+agNewCfgSyslogTrapConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable console syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 1 }
+
+agCurCfgSyslogTrapConsole OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable console syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 2 }
+
+agNewCfgSyslogTrapSystem OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable system level syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 3 }
+
+agCurCfgSyslogTrapSystem OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable system level syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 4 }
+
+agNewCfgSyslogTrapMgmt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable management(flash, config, login) syslog and SNMP 
+         trap, in the new_configuration block."
+    ::= { agLog 5 }
+
+agCurCfgSyslogTrapMgmt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable management(flash, config, login) syslog and SNMP 
+         trap, as currently configured in the current_configuration block."
+    ::= { agLog 6 }
+
+agNewCfgSyslogTrapCli OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable CLI generated error syslog and SNMP trap, in the 
+	 new_configuration block."
+    ::= { agLog 7 }
+
+agCurCfgSyslogTrapCli OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable CLI generated error syslog and SNMP trap, as 
+         currently configured in the current_configuration block." 
+    ::= { agLog 8 }
+
+agNewCfgSyslogTrapStg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable spanning tree syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 9 }
+
+agCurCfgSyslogTrapStg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable spanning tree syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 10 }
+
+agNewCfgSyslogTrapVlan OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable VLAN syslog and SNMP trap, in the new_configuration
+         block."
+    ::= { agLog 11 }
+
+agCurCfgSyslogTrapVlan OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable VLAN syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 12 }
+
+
+agNewCfgSyslogTrapSsh OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable SSH, RADIUS syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 19 }
+
+agCurCfgSyslogTrapSsh OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable SSH, RADIUS syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 20 }
+
+agNewCfgSyslogTrapVrrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable VRRP syslog and SNMP trap, in the new_configuration
+         block."
+    ::= { agLog 21 }
+
+agCurCfgSyslogTrapVrrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable VRRP syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 22 }
+
+
+agNewCfgSyslogTrapNtp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable NTP syslog and SNMP trap, in the new_configuration 
+         block."
+    ::= { agLog 25 }
+
+agCurCfgSyslogTrapNtp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable NTP syslog and SNMP trap, as currently configured 
+         in the current_configuration block."
+    ::= { agLog 26 }
+
+
+agNewCfgSyslogTrapIp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable IP related syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 31 }
+
+agCurCfgSyslogTrapIp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable IP related syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 32 }
+
+agNewCfgSyslogTrapWeb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable WEBUI related syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 35 }
+
+agCurCfgSyslogTrapWeb OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable WEBUI related syslog and SNMP trap, as currently 
+         configured in the current_configuration block."
+    ::= { agLog 36 }
+
+
+
+agNewCfgSyslogTrapOspf OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable OSPF related syslog and SNMP trap, 
+         in the new_configuration block."
+    ::= { agLog 41 }
+
+agCurCfgSyslogTrapOspf OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable OSPF related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 42 }
+
+agNewCfgSyslogTrapRmon OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable rmon related syslog and SNMP trap,
+         in the new_configuration block."
+    ::= { agLog 45 }
+
+agCurCfgSyslogTrapRmon OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable rmon related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 46 }
+
+agNewCfgSyslogTrapUfd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable UFD related syslog and SNMP trap, in the 
+         new_configuration block."
+    ::= { agLog 47 }
+
+agCurCfgSyslogTrapUfd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable UFD related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 48 }
+
+agNewCfgSyslogTrapCfg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable CFG related syslog and SNMP trap, in the
+         new_configuration block."
+    ::= { agLog 49 }
+
+agCurCfgSyslogTrapCfg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable CFG related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 50 }
+
+agNewCfgSyslogTrap8021x OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable 802.1X protocol related syslog and SNMP trap, in the
+         new_configuration block."
+    ::= { agLog 51 }
+
+agCurCfgSyslogTrap8021x OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable 802.1X protocol related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 52 }
+
+agNewCfgSyslogTrapHotlinks             OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable Hot Links related syslog and SNMP trap, in the
+         new_configuration block."
+    ::= { agLog 53 }
+
+agCurCfgSyslogTrapHotlinks             OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable Hot Links related syslog and SNMP trap,
+         as currently configured in the current_configuration block."
+    ::= { agLog 54 }
+
+-- Trap host table
+agTrapHostTableMaxEnt OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of rows in the trap host table."
+    ::= { agTrapHost 1 }
+
+agCurCfgTrapHostTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgCurCfgTrapHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of trap hosts which to send SNMP traps in the 
+         current_configuration block."
+    ::= { agTrapHost 2 }
+
+agCurCfgTrapHostEntry OBJECT-TYPE
+    SYNTAX  AgCurCfgTrapHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the trap host table in the current_configuration block."
+    INDEX   { agCurCfgTrapHostIndx }
+    ::= { agCurCfgTrapHostTable 1 }
+
+AgCurCfgTrapHostEntry ::= SEQUENCE {
+    agCurCfgTrapHostIndx            Integer32,
+    agCurCfgTrapHostIpAddr          IpAddress,
+    agCurCfgTrapHostCommString      DisplayString
+    }
+
+agCurCfgTrapHostIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index of the row in trap host table."
+    ::= { agCurCfgTrapHostEntry 1 }
+
+agCurCfgTrapHostIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The IP address of a trap host."
+    ::= { agCurCfgTrapHostEntry 2 }
+
+agCurCfgTrapHostCommString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The SNMP community string to use with the trap host"
+    ::= { agCurCfgTrapHostEntry 3 }
+
+agNewCfgTrapHostTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgNewCfgTrapHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of trap hosts which to send SNMP traps in the
+          new_configuration block."
+    ::= { agTrapHost 3 }
+
+agNewCfgTrapHostEntry OBJECT-TYPE
+    SYNTAX  AgNewCfgTrapHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the trap host table in the new_configuration block."
+    INDEX   { agNewCfgTrapHostIndx }
+    ::= { agNewCfgTrapHostTable 1 }
+
+AgNewCfgTrapHostEntry ::= SEQUENCE {
+    agNewCfgTrapHostIndx            Integer32,
+    agNewCfgTrapHostIpAddr          IpAddress,
+    agNewCfgTrapHostCommString      DisplayString
+    }
+
+agNewCfgTrapHostIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index of the row in trap host table."
+    ::= { agNewCfgTrapHostEntry 1 }
+
+agNewCfgTrapHostIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The IP address of a trap host."
+    ::= { agNewCfgTrapHostEntry 2 }
+
+agNewCfgTrapHostCommString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The SNMP community string to use with the trap host"
+    ::= { agNewCfgTrapHostEntry 3 }
+
+-- TFTP Config
+agTftpServer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The TFTP server IP address or domain name."
+    ::= { agTftp 1 }
+
+agTftpImage OBJECT-TYPE
+    SYNTAX  INTEGER {
+        image1(2),
+        image2(3),
+	boot(4)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Whether the image file should be loaded in image1 or image2  or
+         boot in flash."
+    ::= { agTftp 2 }
+
+agTftpImageFileName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The image file name to be downloaded."
+    ::= { agTftp 3 }
+
+agTftpCfgFileName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The configuration file name."
+    ::= { agTftp 4 }
+
+agTftpDumpFileName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The file name for core dump."
+    ::= { agTftp 5 }
+
+agTftpAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        img-get(2),
+        cfg-get(3),
+        cfg-put(4),
+        dump-put(5),
+        img-put(7),
+        tsdump-put(8)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to perform various TFTP Get or Put functions.
+         The TFTP sever is specified in agTftpServer object.
+	 img-get(2) - Download switch image from a specified image
+                      file (agTftpImageFileName) on the TFTP server to
+	              the destinated storage (agTftpImage).
+	 cfg-get(3) - Download switch configuration from a specified
+                      file (agTftpCfgFileName) on the TFTP server.
+	 cfg-put(4) - Upload switch configuration to a specified
+                      file (agTftpCfgFileName) on the TFTP server.
+	 dump-put(5)- Download switch core dump to a specified
+                      file (agTftpDumpFileName) on the TFTP server.
+         img-put(7)    - Upload specified switch image to a specified image
+                         file (agTftpImageFileName) on the TFTP server.
+         tsdump-put(5)- Download switch core dump to a specified
+                        file (agTftpTSDumpFileName) on the TFTP server.
+         other(1) is returned always when read."
+    ::= { agTftp 6 }
+
+agTftpLastActionStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The recorded status of the previous TFTP activity."
+    ::= { agTftp 7 }
+
+agTftpUserName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The username for FTP server or blank for TFTP server."
+    ::= { agTftp 9 }
+
+agTftpPassword OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The password for FTP server."
+    ::= { agTftp 10 }
+
+agTftpTSDumpFileName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The file name for TS dump."
+    ::= { agTftp 11 }
+
+-- Agent Port Table
+
+agPortTableMaxEnt OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of rows in the port configuration host table."
+    ::= { agPortConfig 1 }
+
+agPortCurCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgPortCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of port configuration in the current_configuration block."
+    ::= { agPortConfig 2 }
+
+agPortCurCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgPortCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the port table in the current_configuration block."
+    INDEX   { agPortCurCfgIndx }
+    ::= { agPortCurCfgTable 1 }
+
+AgPortCurCfgTableEntry ::= SEQUENCE {
+    agPortCurCfgIndx           Integer32,
+    agPortCurCfgState          INTEGER,
+    agPortCurCfgVlanTag        INTEGER,
+    agPortCurCfgStp            INTEGER,
+    agPortCurCfgRmon           INTEGER,
+    agPortCurCfgPVID           INTEGER,
+    agPortCurCfgGigEthAutoNeg  INTEGER,
+    agPortCurCfgGigEthSpeed    INTEGER,
+    agPortCurCfgGigEthMode     INTEGER,
+    agPortCurCfgGigEthFctl     INTEGER,
+    agPortCurCfgPortName       DisplayString,
+    agPortCurCfgLinkTrap       INTEGER,
+    agPortCurCfgTagPVID        INTEGER
+    ,
+    agPortCurCfgMulticastThreshold         INTEGER,
+    agPortCurCfgMulticastThresholdRate     INTEGER,
+    agPortCurCfgBroadcastThreshold         INTEGER,
+    agPortCurCfgBroadcastThresholdRate     INTEGER,
+    agPortCurCfgDLFThreshold               INTEGER,
+    agPortCurCfgDLFThresholdRate           INTEGER
+    }
+
+agPortCurCfgIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index of the row in port configurations table."
+    ::= { agPortCurCfgTableEntry 1 }
+
+agPortCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is the state of the port."
+    ::= { agPortCurCfgTableEntry 2 }
+
+agPortCurCfgVlanTag OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tagged(2),
+        untagged(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is VLAN tag state of the port"
+    ::= { agPortCurCfgTableEntry 3 }
+
+agPortCurCfgStp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object is used to turn Spanning Tree on or off for the port."
+    ::= { agPortCurCfgTableEntry 4 }
+
+agPortCurCfgRmon OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object is used to turn RMON on or off on the port."
+   ::= { agPortCurCfgTableEntry 5 }
+
+agPortCurCfgPVID OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The default VLAN ID for the port."
+    ::= { agPortCurCfgTableEntry 6 }
+
+agPortCurCfgGigEthAutoNeg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object is used to turn the autonegotiation on or off
+         for gigabit Ethernet connection."
+    ::= { agPortCurCfgTableEntry 11 }
+
+agPortCurCfgGigEthSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mbs10(2),
+        mbs100(3),
+        any(4),
+        mbs1000(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Selects the port speed for gigabit Ethernet connection."
+    ::= { agPortCurCfgTableEntry 12 }
+
+agPortCurCfgGigEthMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        full-duplex(2),
+        half-duplex(3),
+        full-or-half-duplex(4)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object is used to select port mode for gigabit Ethernet connection."
+    ::= { agPortCurCfgTableEntry 13 }
+
+agPortCurCfgGigEthFctl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object is used to select port flow control for
+         gigabit Ethernet connection."
+    ::= { agPortCurCfgTableEntry 14 }
+
+agPortCurCfgPortName	OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The switch port name."
+    ::= { agPortCurCfgTableEntry 15 }
+
+
+agPortCurCfgLinkTrap OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Indicates whether linkUp/linkDown traps should be
+        generated for this interface.
+
+        By default, this object should have the value
+        enabled(1) for interfaces which do not operate on
+        'top' of any other interface (as defined in the
+        ifStackTable), and disabled(2) otherwise."
+    ::= { agPortCurCfgTableEntry 18 }
+
+agPortCurCfgTagPVID OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tagged(2),
+        untagged(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is PVID tag state of the port"
+    ::= { agPortCurCfgTableEntry 19 }
+
+agPortCurCfgMulticastThreshold OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current status of the port's Multicast Threshold."
+    ::= { agPortCurCfgTableEntry 20 }
+
+agPortCurCfgMulticastThresholdRate OBJECT-TYPE
+    SYNTAX  INTEGER(0..262143) 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current port's Multicast Threshold Rate."
+    ::= { agPortCurCfgTableEntry 21 }
+
+agPortCurCfgBroadcastThreshold OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current status of the port's Broadcast Threshold."
+    ::= { agPortCurCfgTableEntry 22 }
+
+agPortCurCfgBroadcastThresholdRate OBJECT-TYPE
+    SYNTAX  INTEGER(0..262143)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current port's Broadcast Threshold Rate."
+    ::= { agPortCurCfgTableEntry 23 }
+
+agPortCurCfgDLFThreshold OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current status of the port's Destination Lookup Fail Threshold."
+    ::= { agPortCurCfgTableEntry 24 }
+
+agPortCurCfgDLFThresholdRate OBJECT-TYPE
+    SYNTAX  INTEGER(0..262143)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current port's Destination Lookup Fail Threshold Rate."
+    ::= { agPortCurCfgTableEntry 25 }
+
+agPortFiberCurCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgPortFiberCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of fiber port configuration in the current_configuration block."
+    ::= { agPortCurCfgTable 2 }
+
+agPortFiberCurCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgPortFiberCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the fiber port table in the current_configuration block."
+    INDEX   { agPortFiberCurCfgIndx }
+    ::= { agPortFiberCurCfgTable 1 }
+
+AgPortFiberCurCfgTableEntry ::= SEQUENCE {
+    agPortFiberCurCfgIndx            Integer32,
+    agPortFiberCurCfgTxCtrl          INTEGER,
+    agPortFiberCurCfgTxPulse         INTEGER,
+    agPortFiberCurCfgTxUp            INTEGER,
+    agPortFiberCurCfgTxDn            INTEGER
+    }
+
+agPortFiberCurCfgIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index of the row in fiber port current configuration table."
+    ::= { agPortFiberCurCfgTableEntry 1 }
+
+agPortFiberCurCfgTxCtrl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(0),
+        enabled(1)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is the state of the TX control."
+    ::= { agPortFiberCurCfgTableEntry 2 }
+
+agPortFiberCurCfgTxPulse OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(0),
+        enabled(1)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is the state of the TX pulse."
+    ::= { agPortFiberCurCfgTableEntry 3 }
+
+agPortFiberCurCfgTxUp OBJECT-TYPE
+    SYNTAX  INTEGER (1..10)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current TX up time."
+    ::= { agPortFiberCurCfgTableEntry 4 }
+
+agPortFiberCurCfgTxDn OBJECT-TYPE
+    SYNTAX  INTEGER (1..10)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current TX dn time."
+    ::= { agPortFiberCurCfgTableEntry 5 }
+
+agPortNewCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgPortNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of port configuration in the new_configuration block."
+    ::= { agPortConfig 3 }
+
+agPortNewCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgPortNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the port configuration table in the new_configuration block."
+    INDEX   { agPortNewCfgIndx }
+    ::= { agPortNewCfgTable 1 }
+
+AgPortNewCfgTableEntry ::= SEQUENCE {
+    agPortNewCfgIndx           Integer32,
+    agPortNewCfgState          INTEGER,
+    agPortNewCfgVlanTag        INTEGER,
+    agPortNewCfgStp            INTEGER,
+    agPortNewCfgRmon           INTEGER,
+    agPortNewCfgPVID           INTEGER,
+    agPortNewCfgGigEthAutoNeg  INTEGER,
+    agPortNewCfgGigEthSpeed    INTEGER,
+    agPortNewCfgGigEthMode     INTEGER,
+    agPortNewCfgGigEthFctl     INTEGER,
+    agPortNewCfgPortName       DisplayString,
+    agPortNewCfgLinkTrap       INTEGER,
+    agPortNewCfgTagPVID        INTEGER
+    ,
+    agPortNewCfgMulticastThreshold         INTEGER,
+    agPortNewCfgMulticastThresholdRate     INTEGER,
+    agPortNewCfgBroadcastThreshold         INTEGER,
+    agPortNewCfgBroadcastThresholdRate     INTEGER,
+    agPortNewCfgDLFThreshold               INTEGER,
+    agPortNewCfgDLFThresholdRate           INTEGER
+    }
+
+agPortNewCfgIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index of the row in port configurations table."
+    ::= { agPortNewCfgTableEntry 1 }
+
+agPortNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is the state of the port."
+    ::= { agPortNewCfgTableEntry 2 }
+
+agPortNewCfgVlanTag OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tagged(2),
+        untagged(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is VLAN tag state of the port"
+    ::= { agPortNewCfgTableEntry 3 }
+
+agPortNewCfgStp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object is used to turn Spanning Tree on or off for the port."
+    ::= { agPortNewCfgTableEntry 4 }
+
+agPortNewCfgRmon OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object is used to turn RMON on or off on the port."
+    ::= { agPortNewCfgTableEntry 5 }
+
+agPortNewCfgPVID OBJECT-TYPE
+    SYNTAX  INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The default VLAN ID for the port."
+    ::= { agPortNewCfgTableEntry 6 }
+
+agPortNewCfgGigEthAutoNeg OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object is used to turn the autonegotiation on or off
+         for gigabit Ethernet connection."
+    ::= { agPortNewCfgTableEntry 11 }
+
+agPortNewCfgGigEthSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mbs10(2),
+        mbs100(3),
+        any(4),
+        mbs1000(5)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Selects the port speed for gigabit Ethernet connection."
+    ::= { agPortNewCfgTableEntry 12 }
+ 
+agPortNewCfgGigEthMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        full-duplex(2),
+        half-duplex(3),
+        full-or-half-duplex(4)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object is used to select port mode for gigabit Ethernet connection."
+    ::= { agPortNewCfgTableEntry 13 }
+
+agPortNewCfgGigEthFctl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        transmit(2),
+        receive(3),
+        both(4),
+        none(5)
+       }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This object is used to select port flow control for
+         gigabit Ethernet connection."
+    ::= { agPortNewCfgTableEntry 14 }
+
+agPortNewCfgPortName	OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The switch port name."
+    ::= { agPortNewCfgTableEntry 15 }
+
+
+agPortNewCfgLinkTrap OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(1),
+	disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current 
+    DESCRIPTION
+        "Indicates whether linkUp/linkDown traps should be
+        generated for this interface.
+
+        By default, this object should have the value
+        enabled(1) for interfaces which do not operate on
+        'top' of any other interface (as defined in the
+        ifStackTable), and disabled(2) otherwise."
+    ::= { agPortNewCfgTableEntry 18 }
+
+agPortNewCfgTagPVID OBJECT-TYPE
+    SYNTAX  INTEGER {
+        tagged(2),
+        untagged(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is PVID tag state of the port"
+    ::= { agPortNewCfgTableEntry 19 }
+
+agPortNewCfgMulticastThreshold OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New status of the port's Multicast Threshold."
+    ::= { agPortNewCfgTableEntry 20 }
+    
+agPortNewCfgMulticastThresholdRate OBJECT-TYPE
+    SYNTAX  INTEGER(0..262143)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New port's Multicast Threshold Rate."
+    ::= { agPortNewCfgTableEntry 21 }
+
+agPortNewCfgBroadcastThreshold OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New status of the port's Broadcast Threshold."
+    ::= { agPortNewCfgTableEntry 22 }
+
+agPortNewCfgBroadcastThresholdRate OBJECT-TYPE
+    SYNTAX  INTEGER(0..262143)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New port's Broadcast Threshold Rate."
+    ::= { agPortNewCfgTableEntry 23 }
+
+agPortNewCfgDLFThreshold OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New status of the port's Destination Lookup Fail Threshold."
+    ::= { agPortNewCfgTableEntry 24 }
+
+agPortNewCfgDLFThresholdRate OBJECT-TYPE
+    SYNTAX  INTEGER(0..262143)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New port's Destination Lookup Fail Threshold Rate."
+    ::= { agPortNewCfgTableEntry 25 }
+
+agPortFiberNewCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgPortFiberNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of fiber port configuration in the new_configuration block."
+    ::= { agPortNewCfgTable 2 }
+
+agPortFiberNewCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgPortFiberNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the fiber port table in the new_configuration block."
+    INDEX   { agPortFiberNewCfgIndx }
+    ::= { agPortFiberNewCfgTable 1 }
+
+AgPortFiberNewCfgTableEntry ::= SEQUENCE {
+    agPortFiberNewCfgIndx            Integer32,
+    agPortFiberNewCfgTxCtrl          INTEGER,
+    agPortFiberNewCfgTxPulse         INTEGER,
+    agPortFiberNewCfgTxUp            INTEGER,
+    agPortFiberNewCfgTxDn            INTEGER
+    }
+
+agPortFiberNewCfgIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The index of the row in fiber port new configuration table."
+    ::= { agPortFiberNewCfgTableEntry 1 }
+
+agPortFiberNewCfgTxCtrl OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(0),
+        enabled(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New TX control."
+    ::= { agPortFiberNewCfgTableEntry 2 }
+
+agPortFiberNewCfgTxPulse OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(0),
+        enabled(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New TX pulse."
+    ::= { agPortFiberNewCfgTableEntry 3 }
+
+agPortFiberNewCfgTxUp OBJECT-TYPE
+    SYNTAX  INTEGER (1..10)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New TX up time."
+    ::= { agPortFiberNewCfgTableEntry 4 }
+
+agPortFiberNewCfgTxDn OBJECT-TYPE
+    SYNTAX  INTEGER (1..10)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "New TX dn time."
+    ::= { agPortFiberNewCfgTableEntry 5 }
+
+-- RADIUS Configuration 
+ 
+radCurCfgPrimaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Primary RADIUS server."
+    ::= { agRadiusConfig 1 }
+
+radNewCfgPrimaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Primary RADIUS server."
+    ::= { agRadiusConfig 2 }
+
+radCurCfgSecondaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Secondary RADIUS server."
+    ::= { agRadiusConfig 3 }
+
+radNewCfgSecondaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Secondary RADIUS server."
+    ::= { agRadiusConfig 4 }
+
+radCurCfgPort OBJECT-TYPE
+    SYNTAX  INTEGER  (1500..3000)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specify the RADIUS port number."
+    ::= { agRadiusConfig 5 }
+
+radNewCfgPort OBJECT-TYPE
+    SYNTAX  INTEGER  (1500..3000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Speicfy the RADIUS port number."
+    ::= { agRadiusConfig 6 }
+
+radCurCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER  (1..10)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of seconds before resending authentication
+         to RADIUS server."
+    ::= { agRadiusConfig 7 }
+
+radNewCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER  (1..10)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of seconds before resending authentication
+         to RADIUS server."
+    ::= { agRadiusConfig 8 }
+
+radCurCfgRetries OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of retries to the RADIUS server."
+    ::= { agRadiusConfig 9 }
+
+radNewCfgRetries OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Number of retries to the RADIUS server."
+    ::= { agRadiusConfig 10 }
+
+radCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disbale RADIUS authentication."
+    ::= { agRadiusConfig 11 }
+
+radNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable RADIUS authentication."
+    ::= { agRadiusConfig 12 }
+
+radCurCfgAuthenString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The RADIUS authentication string."
+    ::= { agRadiusConfig 13 }
+
+radNewCfgAuthenString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The RADIUS authentication string."
+    ::= { agRadiusConfig 14 }
+
+radCurCfgTelnet OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disbale RADIUS backdoor for telnet."
+    ::= { agRadiusConfig 15 }
+
+radNewCfgTelnet OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable RADIUS backdoor for telnet."
+    ::= { agRadiusConfig 16 }
+
+radCurCfgAuthenSecondString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The second RADIUS authentication string."
+    ::= { agRadiusConfig 17 }
+
+radNewCfgAuthenSecondString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The second RADIUS authentication string."
+    ::= { agRadiusConfig 18 }
+
+radCurCfgSecBd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disbale RADIUS secure backdoor for telnet."
+    ::= { agRadiusConfig 19 }
+
+radNewCfgSecBd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable RADIUS secure backdoor for telnet."
+    ::= { agRadiusConfig 20 }
+
+-- NTP Configuration 
+agCurCfgNTPServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The NTP Server Address."
+    ::= { agNTP 1 }
+
+agNewCfgNTPServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The NTP Server Address."
+    ::= { agNTP 2 }
+
+agCurCfgNTPResyncInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..44640)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The NTP Server resync interval in minutes."
+    ::= { agNTP 3 }
+
+agNewCfgNTPResyncInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..44640)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The NTP Server resync interval in minutes."
+    ::= { agNTP 4 }
+
+agCurCfgNTPTzoneHHMM OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..6))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The NTP Server timezone offset from GMT formatted as (+/-)HH:MM."
+    ::= { agNTP 5 }
+
+agNewCfgNTPTzoneHHMM OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..6))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The NTP Server timezone offset from GMT formatted as (+/-)HH:MM.
+         The valid range is from -12:59 to +12:59."
+    ::= { agNTP 6 }
+
+agCurCfgNTPDlight OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable/disable daylight savings time."
+    ::= { agNTP 7 }
+
+agNewCfgNTPDlight OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/disable daylight savings time."
+    ::= { agNTP 8 }
+
+agCurCfgNTPService OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable/disable NTP Service."
+    ::= { agNTP 9 }
+
+agNewCfgNTPService OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/disable NTP Service."
+    ::= { agNTP 10 }
+
+agCurCfgNTPSecServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Secondary NTP Server Address."
+    ::= { agNTP 11 }
+
+agNewCfgNTPSecServer OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Secondary NTP Server Address."
+    ::= { agNTP 12 }
+
+-- APPLY Configuration
+agApplyPending OBJECT-TYPE
+    SYNTAX  INTEGER {
+        applyNeeded(2),
+        noApplyNeeded(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object, when read, gives the user information
+         whether an apply action is needed and that the configuration
+         has been chaged by the user actions. The user then can
+         apply the changes by setting proper value to the object
+         agApplyConfiguration described above."
+    ::= { agApply 1 }
+
+agApplyConfig OBJECT-TYPE
+    SYNTAX  INTEGER {
+        apply(1), 
+        idle(2),
+        inprogress(3),
+        complete(4),
+        failed(5)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+         "When this object is read the current state is returned.
+          idle(3) indicates that there is no apply in progess.
+          complete(5) indicates that the last apply operation is completed.
+          Setting the value to apply(1), will write all the changes made
+          since the last apply to the current configuration block.
+	  If the apply is successful this variable will return the state
+          'complete' else it will return 'failed'. In case of failure,
+          to read the reason for failure use the agApplyTable."
+    ::= { agApply 2 }
+
+agApplyTableSize OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of strings in the apply table."
+    ::= { agApply 4 }
+
+agApplyTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgApplyTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of URL path for URL load balancing in the current_config."
+    ::= { agApply 5 }
+
+agApplyTableEntry OBJECT-TYPE
+    SYNTAX  AgApplyTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about an URL path for URL load balancing."
+    INDEX   { agApplyIndex }
+    ::= { agApplyTable 1 }
+
+AgApplyTableEntry ::= SEQUENCE {
+    agApplyIndex      Integer32,
+    agApplyString     OCTET STRING
+    }
+
+agApplyIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The table index."
+    ::= { agApplyTableEntry 1 }
+
+agApplyString OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A string in the apply table."
+    ::= { agApplyTableEntry 2 }
+
+-- TACACS+ Configuration
+
+tacCurCfgPrimaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Primary TACACS+ server."
+    ::= { agTacacsConfig 1 }
+
+tacNewCfgPrimaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Primary TACACS+ server."
+    ::= { agTacacsConfig 2 }
+
+tacCurCfgSecondaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Secondary TACSACS server."
+    ::= { agTacacsConfig 3 }
+tacNewCfgSecondaryIpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The IP address of the Secondary TACACS+ server."
+    ::= { agTacacsConfig 4 }
+
+
+tacCurCfgPort OBJECT-TYPE
+    SYNTAX  INTEGER  (1..65000)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specify the TACACS+ port number."
+    ::= { agTacacsConfig 5 }
+
+tacNewCfgPort OBJECT-TYPE
+    SYNTAX  INTEGER  (1..65000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify the TACACS+ port number."
+    ::= { agTacacsConfig 6 }
+
+tacCurCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER  (4..15)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of seconds before resending authentication
+         to TACACS+ server."
+    ::= { agTacacsConfig 7 }
+
+tacNewCfgTimeout OBJECT-TYPE
+    SYNTAX  INTEGER  (4..15)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of seconds before resending authentication
+         to TACACS+ server."
+    ::= { agTacacsConfig 8 }
+
+tacCurCfgRetries OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of retries to the TACACS+ server."
+    ::= { agTacacsConfig 9 }
+
+tacNewCfgRetries OBJECT-TYPE
+    SYNTAX  INTEGER  (1..3)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Number of retries to the TACACS+ server."
+    ::= { agTacacsConfig 10 }
+
+tacCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disbale TACACS+ authentication."
+    ::= { agTacacsConfig 11 }
+
+tacNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable TACACS+ authentication."
+    ::= { agTacacsConfig 12 }
+
+tacCurCfgAuthenString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The TACACS+ authentication string."
+    ::= { agTacacsConfig 13 }
+
+tacNewCfgAuthenString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The TACACS+ authentication string."
+    ::= { agTacacsConfig 14 }
+
+tacCurCfgTelnet OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disbale TACACS+ backdoor for telnet."
+    ::= { agTacacsConfig 15 }
+
+tacNewCfgTelnet OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable TACACS+ backdoor for telnet."
+    ::= { agTacacsConfig 16 }
+
+tacCurCfgAuthenSecondString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The second TACACS+ authentication string."
+    ::= { agTacacsConfig 17 }
+
+tacNewCfgAuthenSecondString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The second TACACS+ authentication string."
+    ::= { agTacacsConfig 18 }
+
+
+tacCurCfgSecBd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disbale TACACS+ secure backdoor for telnet."
+    ::= { agTacacsConfig 23 }
+
+tacNewCfgSecBd OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable TACACS+ secure backdoor for telnet."
+    ::= { agTacacsConfig 24 }
+
+tacCurCfgCmap OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable Tacacs+ new prividlege level maping."
+    ::= { agTacacsConfig 25 }
+
+tacNewCfgCmap OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable Tacacs+ new prividlege level maping."
+    ::= { agTacacsConfig 26 }
+
+agTacacsUserMapCurCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgTacacsUserMapCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of tacacs+ user map current configuration."
+    ::= { agTacacsConfig 31 }
+
+agTacacsUserMapCurCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgTacacsUserMapCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the tacacs+ user mapping table."
+    INDEX  { agTacacsUserMapCurCfgUId }
+    ::= { agTacacsUserMapCurCfgTable 1 }
+
+AgTacacsUserMapCurCfgTableEntry ::= SEQUENCE {
+    agTacacsUserMapCurCfgUId       Integer32,
+    agTacacsUserMapCurCfgMapping   INTEGER
+    }
+
+agTacacsUserMapCurCfgUId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current config remote privilege identifier."
+    ::= { agTacacsUserMapCurCfgTableEntry 1 }
+
+agTacacsUserMapCurCfgMapping OBJECT-TYPE
+    SYNTAX  INTEGER {
+        invalid(0),
+        user(1),
+        oper(2),
+        admin(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current Tacacs+ user privilege mappings."
+    ::= { agTacacsUserMapCurCfgTableEntry 2 }
+
+agTacacsUserMapNewCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgTacacsUserMapNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of tacacs+ user map new configuration."
+    ::= { agTacacsConfig 32 }
+
+agTacacsUserMapNewCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgTacacsUserMapNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the tacacs+ user mapping table."
+    INDEX  { agTacacsUserMapNewCfgUId }
+    ::= { agTacacsUserMapNewCfgTable 1 }
+
+AgTacacsUserMapNewCfgTableEntry ::= SEQUENCE {
+    agTacacsUserMapNewCfgUId       Integer32,
+    agTacacsUserMapNewCfgMapping   INTEGER
+    }
+
+agTacacsUserMapNewCfgUId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The new config remote privilege identifier."
+    ::= { agTacacsUserMapNewCfgTableEntry 1 }
+
+agTacacsUserMapNewCfgMapping OBJECT-TYPE
+    SYNTAX  INTEGER {
+        invalid(0),
+        user(1),
+        oper(2),
+        admin(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Set new Tacacs+ user privilege mappings."
+    ::= { agTacacsUserMapNewCfgTableEntry 2 }
+
+-- Multiple Management network MIB objects
+agMgmtNetTableMaxSize OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of entries in the Management
+         Network Table."
+    ::= { agMgmtNetConfig 1 }
+
+agCurCfgMgmtNetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgCurCfgMgmtNetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table for Management Network definitions
+         in the current configuration block."
+    ::= { agMgmtNetConfig 2 }
+
+agCurCfgMgmtNetEntry OBJECT-TYPE
+    SYNTAX  AgCurCfgMgmtNetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the management network definition table."
+    INDEX   {  agCurCfgMgmtNetIndex }
+    ::= { agCurCfgMgmtNetTable 1 }
+
+AgCurCfgMgmtNetEntry ::= SEQUENCE {
+    agCurCfgMgmtNetIndex        Integer32,
+    agCurCfgMgmtNetSubnet       IpAddress,
+    agCurCfgMgmtNetMask         IpAddress
+    }
+
+agCurCfgMgmtNetIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The index of the Management Network Definition table."
+    ::= { agCurCfgMgmtNetEntry 1 }
+
+agCurCfgMgmtNetSubnet OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The Management Network Address in the current_configuration
+         block."
+    ::= { agCurCfgMgmtNetEntry 2 }
+
+agCurCfgMgmtNetMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The Management Network Mask in the current_configuration
+         block."
+    ::= { agCurCfgMgmtNetEntry 3 }
+
+agNewCfgMgmtNetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgNewCfgMgmtNetEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table for Management Network definitions
+         in the new configuration block."
+    ::= { agMgmtNetConfig 3 }
+
+agNewCfgMgmtNetEntry OBJECT-TYPE
+    SYNTAX  AgNewCfgMgmtNetEntry
+    MAX-ACCESS  not-accessible 
+    STATUS current
+    DESCRIPTION
+        "A row in the management network definition table."
+    INDEX   {  agNewCfgMgmtNetIndex }
+    ::= { agNewCfgMgmtNetTable 1 }
+    
+AgNewCfgMgmtNetEntry ::= SEQUENCE {
+    agNewCfgMgmtNetIndex        Integer32,
+    agNewCfgMgmtNetSubnet       IpAddress,
+    agNewCfgMgmtNetMask         IpAddress,
+    agNewCfgMgmtNetDelete       INTEGER
+    }
+
+agNewCfgMgmtNetIndex OBJECT-TYPE 
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION 
+        "The index of the Management Network Definition table."
+    ::= { agNewCfgMgmtNetEntry 1 }
+
+agNewCfgMgmtNetSubnet OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS  read-create
+    STATUS current 
+    DESCRIPTION
+        "The Management Network Address in the new_configuration
+         block." 
+    ::= { agNewCfgMgmtNetEntry 2 }
+
+agNewCfgMgmtNetMask OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS  read-create
+    STATUS current
+    DESCRIPTION
+        "The Management Network Mask in the new_configuration
+         block." 
+    ::= { agNewCfgMgmtNetEntry 3 }
+
+agNewCfgMgmtNetDelete OBJECT-TYPE 
+    SYNTAX  INTEGER {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS current
+    DESCRIPTION
+        "By setting the value to delete(2), the entire row is deleted."
+    ::= { agNewCfgMgmtNetEntry 4 }
+
+
+agAccessUserMaxUserID OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The maximum number of Users ID."
+    ::= { agAccess 1 }
+
+agAccessUserCurCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgAccessUserCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of Access user configuration."
+    ::= { agAccess 2 }
+
+agAccessUserCurCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgAccessUserCurCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the Access user configuration table."
+    INDEX  { agAccessUserCurCfgUId }
+    ::= { agAccessUserCurCfgTable 1 }
+
+AgAccessUserCurCfgTableEntry ::= SEQUENCE {
+    agAccessUserCurCfgUId 	Integer32,
+    agAccessUserCurCos 		INTEGER,
+    agAccessUserCurCfgName 	DisplayString,
+    agAccessUserCurCfgPswd 	DisplayString,
+    agAccessUserCurCfgState	INTEGER
+    }
+
+agAccessUserCurCfgUId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The User identifier."
+    ::= { agAccessUserCurCfgTableEntry 1 }
+
+agAccessUserCurCos OBJECT-TYPE
+    SYNTAX  INTEGER {
+        user(0),
+        oper(3),
+        admin(6)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The user class of service."
+    ::= { agAccessUserCurCfgTableEntry 2 }
+
+agAccessUserCurCfgName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The user name."
+    ::= { agAccessUserCurCfgTableEntry 3 }
+
+agAccessUserCurCfgPswd OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The character string representing the user passworde."
+    ::= { agAccessUserCurCfgTableEntry 4 }
+
+agAccessUserCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	enabled(2),
+	disabled(3)
+	}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable a user."
+    ::= { agAccessUserCurCfgTableEntry 5 }
+
+agAccessUserNewCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgAccessUserNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of Access user configuration."
+    ::= { agAccess 3 }
+
+agAccessUserNewCfgTableEntry OBJECT-TYPE
+    SYNTAX  AgAccessUserNewCfgTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the Access user configuration table."
+    INDEX  { agAccessUserNewCfgUId }
+    ::= { agAccessUserNewCfgTable 1 }
+
+AgAccessUserNewCfgTableEntry ::= SEQUENCE {
+    agAccessUserNewCfgUId 	Integer32,
+    agAccessUserNewCos 		INTEGER,
+    agAccessUserNewCfgName 	DisplayString,
+    agAccessUserNewCfgPswd 	DisplayString,
+    agAccessUserNewCfgState	INTEGER,
+    agAccessUserNewCfgDelete 	INTEGER
+    }
+
+agAccessUserNewCfgUId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The User identifier."
+    ::= { agAccessUserNewCfgTableEntry 1 }
+
+agAccessUserNewCos OBJECT-TYPE
+    SYNTAX  INTEGER {
+        user(0),
+        oper(3),
+        admin(6)
+        }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The user class of service."
+    ::= { agAccessUserNewCfgTableEntry 2 }
+
+agAccessUserNewCfgName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The user name."
+    ::= { agAccessUserNewCfgTableEntry 3 }
+
+agAccessUserNewCfgPswd OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The character string representing the user passworde."
+    ::= { agAccessUserNewCfgTableEntry 4 }
+
+agAccessUserNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER  {
+	enabled(2),
+	disabled(3)
+	}
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Enable or disable a user."
+    ::= { agAccessUserNewCfgTableEntry 5 }
+
+agAccessUserNewCfgDelete OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to create or delete a User.
+         other(1) is returned always when read.
+         The following values are writable: delete(2)...to delete a User"
+    ::= { agAccessUserNewCfgTableEntry 6 }
+
+-- Statistics Group
+
+-- Packet Statistics Group
+-- This group represents Packet Statistics information
+ 
+pktStatsAllocs OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packet allocations from the packet buffer pool by 
+         the TCP/IP protocol stack."
+    ::= { pktStats 1 }
+ 
+pktStatsFrees OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of times the packet buffers are freed(released) to the
+         packet buffer pool by the TCP/IP protocol stack."
+    ::= { pktStats 2 }
+ 
+pktStatsAllocFails OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packet allocation failures from the packet buffer 
+         pool by the TCP/IP protocol stack."
+    ::= { pktStats 3}
+ 
+pktStatsMediums OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packet allocations with size greater than 128 bytes
+         and less than or equal to 1536 bytes from the packet buffer pool by 
+         the TCP/IP protocol stack."
+    ::= { pktStats 4}
+
+pktStatsJumbos OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packet allocations with size larger than 1536 bytes 
+         from the packet buffer pool by the TCP/IP protocol stack."
+    ::= { pktStats 5}
+ 
+pktStatsSmalls OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packet allocations with size less than or eqaul to 
+         128 bytes from the packet buffer pool by the TCP/IP protocol stack."
+    ::= { pktStats 6}
+
+pktStatsMediumsHiWatermark OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The highest number of packet allocations with size greater than 
+         128 bytes and less than or equal to 1536 bytes from the packet 
+         buffer pool by the TCP/IP protocol stack."
+    ::= { pktStats 7}
+
+pktStatsJumbosHiWatermark OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The highest number of packet allocations with size larger than 
+         1536 bytes from the packet buffer pool by the TCP/IP protocol stack."
+    ::= { pktStats 8}
+
+pktStatsSmallsHiWatermark OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The highest number of packet allocations with size less than or 
+         eqaul to 128 bytes from the packet buffer pool by the TCP/IP 
+         protocol stack."
+    ::= { pktStats 9}
+
+-- MP CPU Statisitics Group
+ 
+mpCpuStatsUtil1Second OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The utilization of MP CPU over 1 second. It shows the percentage."
+    ::= { mpCpuStats 1}
+ 
+mpCpuStatsUtil4Seconds OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The utilization of MP CPU  over 4 seconds. 
+	 It shows the percentage."
+    ::= { mpCpuStats 2}
+ 
+mpCpuStatsUtil64Seconds OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The utilization of MP CPU over 64 seconds. 
+	 It shows the percentage."
+    ::= { mpCpuStats 3}
+ 
+--
+-- Port statistics table
+--
+portStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of port statistics."
+    ::= { portStats 1 }
+
+portStatsTableEntry OBJECT-TYPE
+    SYNTAX  PortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the port stats table."
+    INDEX   { portStatsIndx }
+    ::= { portStatsTable 1 }
+
+PortStatsTableEntry ::=
+    SEQUENCE {
+	portStatsIndx
+	    Integer32,
+	portStatsPhyIfInOctets
+	    Counter32,
+	portStatsPhyIfInUcastPkts
+	    Counter32,
+	portStatsPhyIfInNUcastPkts
+	    Counter32,
+	portStatsPhyIfInDiscards
+	    Counter32,
+	portStatsPhyIfInErrors
+	    Counter32,
+	portStatsPhyIfInUnknownProtos
+	    Counter32,
+	portStatsPhyIfOutOctets
+	    Counter32,
+	portStatsPhyIfOutUcastPkts
+	    Counter32,
+	portStatsPhyIfOutNUcastPkts
+	    Counter32,
+	portStatsPhyIfOutDiscards
+	    Counter32,
+	portStatsPhyIfOutErrors
+	    Counter32,
+	portStatsPhyIfOutQLen
+	    Gauge32,
+        portStatsPhyIfInBroadcastPkts
+            Counter32,
+        portStatsPhyIfOutBroadcastPkts
+            Counter32,
+	portStatsPhyIfInMulticastPkts
+	    Counter32,
+	portStatsPhyIfOutMulticastPkts
+	    Counter32,
+	portStatsClear
+            INTEGER
+    }
+
+portStatsIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The port index."
+    ::= { portStatsTableEntry 1 }
+
+portStatsPhyIfInOctets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The total number of octets received on the
+	    interface, including framing characters."
+    ::= { portStatsTableEntry 2 }
+
+portStatsPhyIfInUcastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The number of subnetwork-unicast packets
+	    delivered to a higher-layer protocol."
+    ::= { portStatsTableEntry 3 }
+
+portStatsPhyIfInNUcastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The number of non-unicast (i.e., subnetwork-
+	    broadcast or subnetwork-multicast) packets
+	    delivered to a higher-layer protocol."
+    ::= { portStatsTableEntry 4 }
+
+portStatsPhyIfInDiscards OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The number of inbound packets which were chosen
+	    to be discarded even though no errors had been
+	    detected to prevent their being deliverable to a
+	    higher-layer protocol.  One possible reason for
+	    discarding such a packet could be to free up
+	    buffer space."
+    ::= { portStatsTableEntry 5 }
+
+portStatsPhyIfInErrors OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The number of inbound packets that contained
+	    errors preventing them from being deliverable to a
+	    higher-layer protocol."
+    ::= { portStatsTableEntry 6 }
+
+portStatsPhyIfInUnknownProtos OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The number of packets received via the interface
+	    which were discarded because of an unknown or
+	    unsupported protocol."
+    ::= { portStatsTableEntry 7 }
+
+portStatsPhyIfOutOctets OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The total number of octets transmitted out of the
+	    interface, including framing characters."
+    ::= { portStatsTableEntry 8 }
+
+portStatsPhyIfOutUcastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The total number of packets that higher-level
+	    protocols requested be transmitted to a
+	    subnetwork-unicast address, including those that
+	    were discarded or not sent."
+    ::= { portStatsTableEntry 9 }
+
+portStatsPhyIfOutNUcastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The total number of packets that higher-level
+	    protocols requested be transmitted to a non-
+	    unicast (i.e., a subnetwork-broadcast or
+	    subnetwork-multicast) address, including those
+	    that were discarded or not sent."
+    ::= { portStatsTableEntry 10 }
+
+portStatsPhyIfOutDiscards OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The number of outbound packets which were chosen
+	    to be discarded even though no errors had been
+	    detected to prevent their being transmitted.  One
+	    possible reason for discarding such a packet could
+	    be to free up buffer space."
+    ::= { portStatsTableEntry 11 }
+
+portStatsPhyIfOutErrors OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The number of outbound packets that could not be
+	    transmitted because of errors."
+    ::= { portStatsTableEntry 12 }
+
+portStatsPhyIfOutQLen OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	    "The length of the output packet queue (in
+	    packets)."
+    ::= { portStatsTableEntry 13 }
+
+portStatsPhyIfInBroadcastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to
+            a higher (sub-)layer, which were addressed to a
+            broadcast address at this sub-layer."
+    ::= { portStatsTableEntry 14 }
+
+portStatsPhyIfOutBroadcastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current 
+    DESCRIPTION
+	    "The total number of packets that higher-level
+            protocols requested be transmitted, and which were
+            addressed to a broadcast address at this sub-layer,
+            including those that were discarded or not sent."
+    ::= { portStatsTableEntry 15 }
+
+portStatsPhyIfInMulticastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to
+            a higher (sub-)layer, which were addressed to a
+            multicast address at this sub-layer."
+    ::= { portStatsTableEntry 17 }
+
+portStatsPhyIfOutMulticastPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The total number of packets that higher-level
+            protocols requested be transmitted, and which were
+            addressed to a multicast address at this sub-layer,
+            including those that were discarded or not sent."
+    ::= { portStatsTableEntry 18 }
+
+portStatsClear OBJECT-TYPE
+    SYNTAX  INTEGER {
+        clear(1),
+        ok(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Setting this value to clear(1) clears the stats for this port."
+    ::= { portStatsTableEntry 16 }
+
+-- 802.1x port stats table
+
+dot1xPortStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Dot1xPortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of 802.1x port statistics."
+    ::= { portStats 2 }
+
+dot1xPortStatsTableEntry OBJECT-TYPE
+    SYNTAX  Dot1xPortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the 802.1x  port stats table."
+    INDEX   { dot1xPortStatsIndx }
+    ::= { dot1xPortStatsTable 1 }
+
+Dot1xPortStatsTableEntry ::=
+    SEQUENCE {
+	dot1xPortStatsIndx Integer32,	
+	eapolFramesRx Integer32, 
+	eapolFramesTx Integer32,	
+	eapolStartFramesRx Integer32,
+	eapolLogoffFramesRx  Integer32,
+	eapolRespIdFramesRx Integer32,
+	eapolRespFramesRx  Integer32,
+	eapolReqIdFramesTx Integer32,
+	eapolReqFramesTx Integer32,	 
+	invalidEapolFramesRx Integer32,	 
+	eapLengthErrorFramesRx Integer32,
+	authEntersConnecting Integer32,
+	authEapLogoffsWhileConnecting Integer32,	
+	authEntersAuthenticating  Integer32,
+	authSuccessesWhileAuthenticating Integer32,
+	authTimeoutsWhileAuthenticating Integer32,	 
+	authFailWhileAuthenticating Integer32,	
+	authReauthsWhileAuthenticating 	Integer32, 
+	authEapStartsWhileAuthenticating Integer32,
+	authEapLogoffWhileAuthenticating Integer32,
+	authReauthsWhileAuthenticated 	Integer32, 
+	authEapStartsWhileAuthenticated  Integer32,
+	authEapLogoffWhileAuthenticated  Integer32,
+	backendResponses Integer32,	
+	backendAccessChallenges  Integer32,
+	backendOtherRequestsToSupplicant Integer32,
+	backendNonNakResponsesFromSupplicant Integer32,
+	backendAuthSuccesses 	Integer32,
+	backendAuthFails Integer32,
+        lastEapolFrameVersion Integer32,
+        lastEapolFrameSource MacAddress	
+
+    }
+
+dot1xPortStatsIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The 802.1x port stats index."
+    ::= { dot1xPortStatsTableEntry 1 }
+
+eapolFramesRx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 2 }
+
+eapolFramesTx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 3 }
+
+eapolStartFramesRx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 4 }
+
+
+eapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 5 }
+
+eapolRespIdFramesRx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 6 }
+
+eapolRespFramesRx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 7 }
+
+eapolReqIdFramesTx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 8 }
+
+
+eapolReqFramesTx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 9 }
+
+invalidEapolFramesRx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= {dot1xPortStatsTableEntry 10  }
+
+eapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 11 }
+
+authEntersConnecting  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 12 }
+
+
+authEapLogoffsWhileConnecting OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 13 }
+
+authEntersAuthenticating  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 14 }
+
+authSuccessesWhileAuthenticating  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 15 }
+
+authTimeoutsWhileAuthenticating OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 16 }
+
+authFailWhileAuthenticating OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 17 }
+
+authReauthsWhileAuthenticating  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 18 }
+
+authEapStartsWhileAuthenticating  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 19 }
+
+authEapLogoffWhileAuthenticating  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 20 }
+
+
+authReauthsWhileAuthenticated  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 21 }
+
+authEapStartsWhileAuthenticated  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 22 }
+
+authEapLogoffWhileAuthenticated  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 23 }
+
+backendResponses  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 24 }
+
+backendAccessChallenges  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 25 }
+
+backendOtherRequestsToSupplicant  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 26 }
+
+backendNonNakResponsesFromSupplicant  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 27 }
+
+backendAuthSuccesses  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 28 }
+
+backendAuthFails   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 29 }
+
+lastEapolFrameVersion   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 30 }
+
+lastEapolFrameSource   OBJECT-TYPE
+    SYNTAX MacAddress 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::= { dot1xPortStatsTableEntry 31 }
+
+
+
+
+agDiffState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        diff(1), 
+        flashdiff(2),
+        idle(3),
+        inprogress(4),
+        complete(5)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+         "When this object is read the current state is returned.
+          idle(3) indicates that there is no diff in progess.
+          complete(5) indicates that the last diff operation is completed.
+          Setting the value to diff(1), will start a new diff operation
+          Diff compares the new configuration with the current configuration
+          and shows the pending configuration changes. 
+          Setting the value to flashdiff(1), will start a new diff operation.
+          flashdiff compares new configuration with the flash configuration.
+          To read the configuration changes use the agDiffTable once the
+          state of this variable returns complete."
+    ::= { agDiff 2 }
+
+agDiffTableSize OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of strings in the diff table."
+    ::= { agDiff 3 }
+
+agDiffTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgDiffTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of URL path for URL load balancing in the current_config."
+    ::= { agDiff 4 }
+
+agDiffTableEntry OBJECT-TYPE
+    SYNTAX  AgDiffTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about an URL path for URL load balancing."
+    INDEX   { agDiffIndex }
+    ::= { agDiffTable 1 }
+
+AgDiffTableEntry ::= SEQUENCE {
+    agDiffIndex      Integer32,
+    agDiffString     OCTET STRING
+    }
+
+agDiffIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The table index."
+    ::= { agDiffTableEntry 1 }
+
+agDiffString OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A string in the diff table."
+    ::= { agDiffTableEntry 2 }
+
+-- Config Dump 
+agCfgDumpState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        dump(1), 
+        idle(2),
+        inprogress(3),
+        complete(4)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+         "When this object is read the current state is returned.
+          idle(2) indicates that there is no dump in progess.
+          complete(4) indicates that the last dump operation is completed.
+          Setting the value to dump(1), will start a new dump operation
+          Dump will show the current configuration.
+          To read the configuration dump use the agCfgDumpTable once the
+          state of this variable returns complete.
+          Once the agCfgDumpTable is read the state should be set back to 
+          'idle' which frees the dump buffer and others can issue a dump 
+          command via SNMP."
+    ::= { agCfgDump 2 }
+
+agCfgDumpTableSize OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of strings in the dump table."
+    ::= { agCfgDump 3 }
+
+agCfgDumpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgCfgDumpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of dump strings."
+    ::= { agCfgDump 4 }
+
+agCfgDumpTableEntry OBJECT-TYPE
+    SYNTAX  AgCfgDumpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry in the dump table."
+    INDEX   { agCfgDumpIndex }
+    ::= { agCfgDumpTable 1 }
+
+AgCfgDumpTableEntry ::= SEQUENCE {
+    agCfgDumpIndex      Integer32,
+    agCfgDumpString     OCTET STRING
+    }
+
+agCfgDumpIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The table index."
+    ::= { agCfgDumpTableEntry 1 }
+
+agCfgDumpString OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A string in the dump table."
+    ::= { agCfgDumpTableEntry 2 }
+
+-- GeaPort Information
+
+geaportInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF GeaportInfoTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of gea port mapping."
+    ::= { geaportInfo 1 }
+
+geaportInfoTableEntry OBJECT-TYPE
+    SYNTAX  GeaportInfoTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry in the geaport table mapping."
+    INDEX   { geaportInfoLogicalIndex }
+    ::= { geaportInfoTable 1 }
+
+GeaportInfoTableEntry ::= SEQUENCE {
+    geaportInfoLogicalIndex    Integer32,
+    geaportInfoPort            INTEGER,
+    geaportInfoUnit            INTEGER
+    }
+
+geaportInfoLogicalIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The logical port index."
+    ::= { geaportInfoTableEntry 1 }
+
+geaportInfoPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The GEA Port (0-based)."
+    ::= { geaportInfoTableEntry 2 }
+
+geaportInfoUnit OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The GEA Unit."
+    ::= { geaportInfoTableEntry 3 }
+
+-- UFDFO Information
+
+ufdInfoState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Uplink Failure Detection State."
+    ::= { ufdInfo 1 }
+
+ufdInfoLtMStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+        up(1),
+        down(2),
+        forwarding(3),
+        blocked(4)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "LtM Status."
+    ::= { ufdInfo 2 }
+
+ufdInfoLtMPorts OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The LtM port list. The ports are presented in bitmap format.
+         in receiving order:
+
+              OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx .....
+             ||    || |_ port 8
+             ||    ||
+             ||    ||___ port 7
+             ||    |____ port 6
+             ||      .    .   .
+             ||_________ port 1
+             |__________ reserved
+
+         where x : 1 - The represented port belongs to LtM
+            0 - The represented port does not belong to LtM."
+    ::= { ufdInfo 3 }
+
+ufdInfoLtMTrunks OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The LtM trunk list. The trunks are presented in bitmap format.
+         in receiving order:
+
+              OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx .....
+             ||    || |_ trunk 8
+             ||    ||
+             ||    ||___ trunk 7
+             ||    |____ trunk 6
+             ||      .    .   .
+             ||_________ trunk 1
+             |__________ reserved
+
+         where x : 1 - The represented trunk belongs to LtM
+            0 - The represented trunk does not belong to LtM."
+    ::= { ufdInfo 4 }
+
+ufdInfoLtDStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+        up(1),
+        autoDisabled(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "LtD status."
+    ::= { ufdInfo 5 }
+
+ufdInfoLtDPorts OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The LtD port list. The ports are presented in bitmap format.
+         in receiving order:
+
+              OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx .....
+             ||    || |_ port 8
+             ||    ||
+             ||    ||___ port 7
+             ||    |____ port 6
+             ||      .    .   .
+             ||_________ port 1
+             |__________ reserved
+
+         where x : 1 - The represented port belongs to LtD
+            0 - The represented port does not belong to LtD."
+    ::= { ufdInfo 6 }
+
+ufdInfoLtDTrunks OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The LtD trunk list. The trunks are presented in bitmap format.
+         in receiving order:
+
+              OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx .....
+             ||    || |_ trunk 8
+             ||    ||
+             ||    ||___ trunk 7
+             ||    |____ trunk 6
+             ||      .    .   .
+             ||_________ trunk 1
+             |__________ reserved
+
+         where x : 1 - The represented trunk belongs to LtD
+            0 - The represented trunk does not belong to LtD."
+    ::= { ufdInfo 7 }
+
+-- NTP Statisitics
+
+ntpPrimaryServerReqSent OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of NTP requests sent to Primary NTP Server."
+    ::= { ntpStats 1 }
+
+ntpPrimaryServerRespRcvd OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of NTP responces received from Primary NTP Server."
+    ::= { ntpStats 2 }
+
+ntpPrimaryServerUpdates OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of NTP Updates by Primary NTP Server."
+    ::= { ntpStats 3 }
+
+ntpSecondaryServerReqSent OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of NTP requests sent to Secondary NTP Server."
+    ::= { ntpStats 4 }
+
+ntpSecondaryServerRespRcvd OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of NTP responces received from Secondary NTP Server."
+    ::= { ntpStats 5 }
+
+ntpSecondaryServerUpdates OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of NTP Updates by Secondary NTP Server."
+    ::= { ntpStats 6 }
+
+ntpLastUpdateServer OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(0),
+        primary(1),
+        secondary(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of ntp server updated last time."
+    ::= { ntpStats 7 }
+
+ntpLastUpdateTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The last time updated by ntp server."
+    ::= { ntpStats 8 }
+
+ntpClearStats OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        clear(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Setting this value to clear(2) clears the stats for ntp."
+    ::= { ntpStats 9 }
+
+ntpSystemCurrentTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current system time."
+    ::= { ntpStats 10 }
+
+--
+-- AclPort statistics table
+--
+aclPortStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AclPortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of aclPort statistics."
+    ::= { aclPortStats 1 }
+
+aclPortStatsTableEntry OBJECT-TYPE
+    SYNTAX  AclPortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the aclPort stats table."
+    INDEX   { aclPortStatsIndx }
+    ::= { aclPortStatsTable 1 }
+
+AclPortStatsTableEntry ::=
+    SEQUENCE {
+	aclPortStatsIndx	    Integer32,
+	aclPortStatsHits            Counter32,
+	aclPortClearStats           INTEGER
+    }
+
+aclPortStatsIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The aclPort index."
+    ::= { aclPortStatsTableEntry 1 }
+
+aclPortStatsHits OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"Total number of hits for this ACL entry on given port"
+    ::= { aclPortStatsTableEntry 2 }
+
+aclPortClearStats OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        clear(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Setting this value to clear(2) clears the stats for the ACL."
+    ::= { aclPortStatsTableEntry 3 }
+
+aclMeterPortStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AclMeterPortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of aclMeterPort statistics."
+    ::= { aclMeterPortStats 1 }
+
+aclMeterPortStatsTableEntry OBJECT-TYPE
+    SYNTAX  AclMeterPortStatsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the aclMeterPort stats table."
+    INDEX   { aclMeterPortStatsIndx }
+    ::= { aclMeterPortStatsTable 1 }
+
+AclMeterPortStatsTableEntry ::=
+    SEQUENCE {
+	aclMeterPortStatsIndx	    Integer32,
+	aclMeterPortStatsHits       Counter32,
+	aclMeterPortClearStats      INTEGER
+    }
+
+aclMeterPortStatsIndx OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The aclMeterPort index."
+    ::= { aclMeterPortStatsTableEntry 1 }
+
+aclMeterPortStatsHits OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	"Total number of hits for this ACL Meter entry on given port"
+    ::= { aclMeterPortStatsTableEntry 2 }
+
+aclMeterPortClearStats OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        clear(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Setting this value to clear(2) clears the stats for the ACL meter."
+    ::= { aclMeterPortStatsTableEntry 3 }
+
+-- ----------------------------------------------------------------------------
+-- } INSERT:  bt2Switch
+-- ----------------------------------------------------------------------------
+
+END

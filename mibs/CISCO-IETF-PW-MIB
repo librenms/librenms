@@ -1,0 +1,1369 @@
+-- *****************************************************************
+-- CISCO-IETF-PW-MIB.my
+--
+-- February 2003, Tim Swanson
+--
+-- Copyright (c) 2003-2004, 2006 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- Made Cisco Proprietary based on IETF draft:
+-- http://www.ietf.org/internet-drafts/draft-ietf-pwe3-pw-mib-00.txt
+-- *****************************************************************
+
+CISCO-IETF-PW-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS 
+     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+     experimental, Integer32, Unsigned32, 
+     Counter64, TimeTicks 
+        FROM SNMPv2-SMI 
+
+     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF 
+
+     TruthValue, RowStatus, StorageType, 
+     TimeStamp 
+        FROM SNMPv2-TC 
+
+     SnmpAdminString 
+        FROM SNMP-FRAMEWORK-MIB 
+
+     CpwVcIndexType, CpwGroupID, CpwVcIDType, CpwOperStatus, 
+     CpwVcType 
+        FROM CISCO-IETF-PW-TC-MIB 
+
+    InetAddressType, InetAddress 
+        FROM INET-ADDRESS-MIB
+ 
+    ciscoExperiment
+        FROM CISCO-SMI
+  ; 
+
+  cpwVcMIB MODULE-IDENTITY 
+     LAST-UPDATED "200403171200Z"  -- 17 March 2004 12:00:00 GMT 
+     ORGANIZATION 
+        "Cisco Systems, Inc."
+     CONTACT-INFO 
+         " 
+          Thomas D. Nadeau 
+          Postal: Cisco Systems, Inc. 
+                  250 Apollo Drive 
+                  Chelmsford, MA 01824 
+          Tel:    +1-978-497-3051 
+          Email:  tnadeau@cisco.com 
+
+          MPLS MIB Development Team
+          Postal: Cisco Systems, Inc.
+                  250 Apollo Drive
+                  Chelmsford, MA 01924
+          Tel:    +1-978-497-3989
+          Email:  ch-mpls-mib-dev@cisco.com
+         " 
+
+     DESCRIPTION 
+         "This MIB contains managed object definitions for Pseudo 
+          Wire operation as in: Pate, P., et al, <draft-ietf-pwe3- 
+          framework>, Xiao, X., et al, <draft-ietf-pwe3- 
+          requirements>, Martini, L., et al, <draft-martini- 
+          l2circuit-trans-mpls>, and Martini, L., et al, 
+          <draft-martini-l2circuit-encap-mpls>. 
+
+          The indexes for this MIB are also used to index the PSN- 
+          specific tables and the VC-specific tables. The VC Type 
+          dictates which VC-specific MIB to use. For example, a  
+          'cep' VC Type requires the use the configuration and status  
+          tables within the CEP-MIB. 
+
+          This MIB enable the use of any underlying packet switched  
+          network (PSN). Specific tables for the MPLS PSN is 
+          currently defined in a separate CISCO-IETF-PW-MPLS-MIB. 
+          Tables to support other PSNs (IP, L2TP for example) will 
+          be added to this MIB in future revisions. 
+
+          At the time of publication of this version, there are no  
+          PWE3 WG documents for all features and objects in this MIB, 
+          and the MIB is therefore subject to change based on the WG  
+          progress." 
+
+     -- Revision history. 
+     REVISION "200403171200Z"  -- 17 March 2004 12:00:00 GMT 
+     DESCRIPTION
+           "1) Added notifications group:
+                 -cpwVcUpDownNotifEnable
+                 -cpwVcNotifRate
+                 -cpwVcDown
+                 -cpwVcUp
+            2) Added CANA OID value ciscoExperiment.106
+            3) updated based on MIB police comments
+               -replaced un-cisco-ized variable names w/
+                cisco-ized names in descriptions (e.g. pwVcxxx
+                replaced w/ cpwVcxxx)
+           "
+     REVISION "200302261200Z"  -- 26 Feb 2003 12:00:00 GMT 
+     DESCRIPTION
+           "Made Cisco proprietary based on the PW-MIB.my file
+            extracted from draft-ietf-pwe3-pw-mib-00.txt
+           "
+
+     REVISION 
+         "200205261200Z"  -- 26 May 2002 12:00:00 EST 
+     DESCRIPTION 
+         "Moved to draft-ietf-00 status. Changes from previous draft: 
+          1) Change name of pwVcPriority to pwVcSetUpPriority and  
+             added pwVcHoldingPriority. 
+          2) Add pwVcIdMappingTable and pwVcPeersMappingTable to help  
+             ordered query of the MIB tables for EMS applications. 
+          3) Clarification to work in progress objects. 
+          4) Editorial and typos in descriptions. 
+          5) Added pwVcPerfTotalDiscontinuityTime and  
+             pwVcPerfIntervalTimeElapsed.  
+          6) Remove 32 bit counters. 
+         " 
+     REVISION 
+         "200201301200Z"  -- 30 January 2002 12:00:00 EST 
+     DESCRIPTION 
+         " Changes from -01 draft: 
+           1) Inbound and outbound clarification and name changes. 
+           2) Removing pwVcPeerIpv4Addr and pwVcPeerIpv6Addr,   
+              replacing them with pwVcPeerAddr and adding type for  
+              address type selection. 
+           3) Adding type for VC OperStatus. 
+           4) Adding pwVcTimeElapsed and pwVcValidIntervals. 
+
+         " 
+     REVISION 
+         "200111071200Z"  -- 7 November 2001 12:00:00 EST 
+     DESCRIPTION 
+        "Changes from -00 draft: 
+        1) Remove VcInstance from tables indexes in order to simplify 
+           the MIB. 
+        2) Removing APS 1+1 table. 
+        3) Changing hdlcCisco to hdlc in pwVcType. 
+        4) Add description of VC label at pending PW signaling stage. 
+        5) Add interval valid object in interval performance tables. 
+        6) Remove VC APS notification. 
+        7) Change 'conservative'/'liberal' to 'strict'/'loose'. 
+        8) Add objects for interface MTU, use of control word, 
+           interface string. 
+        9) Ordering of objects based on functionality. 
+        10) Update operation of pwVcOperStatus.  
+        " 
+
+     REVISION 
+         "200107111200Z"  -- 11 July 2001 12:00:00 EST 
+     DESCRIPTION 
+        "draft-00 version" 
+
+     ::= { ciscoExperiment 106 } 
+
+  -- Top-level components of this MIB. 
+
+  -- Notifications 
+
+  -- Tables, Scalars 
+  cpwVcObjects       OBJECT IDENTIFIER 
+                                ::= { cpwVcMIB 1 } 
+
+  -- Notifications
+  cpwVcNotifications OBJECT IDENTIFIER 
+                                ::= { cpwVcMIB 2 }
+
+  -- Conformance 
+  cpwVcConformance   OBJECT IDENTIFIER  
+                                ::= { cpwVcMIB 3 } 
+
+  -- PW Virtual Connection (VC) Table 
+
+  cpwVcIndexNext OBJECT-TYPE 
+     SYNTAX            Unsigned32 
+     MAX-ACCESS        read-only 
+     STATUS            current 
+     DESCRIPTION 
+         "This object contains an appropriate value to be used 
+          for cpwVcIndex when creating entries in the 
+          cpwVcTable. The value 0 indicates that no 
+          unassigned entries are available.  To obtain the 
+          value of cpwVcIndex for a new entry in the 
+          cpwVcTable, the manager issues a management 
+          protocol retrieval operation to obtain the current 
+          value of cpwVcIndex.  After each retrieval 
+          operation, the agent should modify the value to 
+          reflect the next unassigned index.  After a manager 
+          retrieves a value the agent will determine through 
+          its local policy when this index value will be made 
+          available for reuse." 
+     ::= { cpwVcObjects 1 } 
+
+  cpwVcTable   OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "This table specifies information for connecting various 
+          emulated services to various tunnel type." 
+     ::= { cpwVcObjects 2 } 
+
+  cpwVcEntry   OBJECT-TYPE 
+     SYNTAX        CpwVcEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "A row in this table represents an emulated virtual 
+           connection (VC) across a packet network. It is indexed by 
+           cpwVcIndex, which uniquely identifying a singular  
+           connection. 
+          " 
+     INDEX  { cpwVcIndex } 
+
+        ::= { cpwVcTable 1 } 
+
+  CpwVcEntry ::= SEQUENCE { 
+        cpwVcIndex               CpwVcIndexType, 
+        cpwVcType                CpwVcType, 
+        cpwVcOwner               INTEGER, 
+        cpwVcPsnType             INTEGER, 
+        cpwVcSetUpPriority       Integer32, 
+        cpwVcHoldingPriority     Integer32, 
+        cpwVcInboundMode         INTEGER,       
+        cpwVcPeerAddrType        InetAddressType, 
+        cpwVcPeerAddr            InetAddress, 
+
+        cpwVcID                  CpwVcIDType, 
+        cpwVcLocalGroupID        CpwGroupID, 
+        cpwVcControlWord         TruthValue, 
+        cpwVcLocalIfMtu          Unsigned32, 
+        cpwVcLocalIfString       TruthValue,  
+        cpwVcRemoteGroupID       CpwGroupID, 
+        cpwVcRemoteControlWord   INTEGER, 
+        cpwVcRemoteIfMtu         Unsigned32, 
+        cpwVcRemoteIfString      SnmpAdminString,       
+        cpwVcOutboundVcLabel     Unsigned32, 
+        cpwVcInboundVcLabel      Unsigned32, 
+
+        cpwVcName                SnmpAdminString, 
+        cpwVcDescr               SnmpAdminString, 
+        cpwVcCreateTime          TimeStamp, 
+        cpwVcUpTime              TimeTicks, 
+        cpwVcAdminStatus         INTEGER, 
+        cpwVcOperStatus          CpwOperStatus, 
+        cpwVcInboundOperStatus   CpwOperStatus, 
+        cpwVcOutboundOperStatus  CpwOperStatus, 
+        cpwVcTimeElapsed         Integer32, 
+        cpwVcValidIntervals      Integer32, 
+        cpwVcRowStatus           RowStatus, 
+        cpwVcStorageType         StorageType 
+     } 
+
+  cpwVcIndex OBJECT-TYPE 
+     SYNTAX        CpwVcIndexType 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Index for the conceptual row identifying a VC within  
+          this PW Emulation VC table." 
+     ::= { cpwVcEntry 1 } 
+
+  cpwVcType OBJECT-TYPE 
+     SYNTAX        CpwVcType 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "This value indicate the service to be carried over 
+          this VC.  
+          Note: the exact set of VC types is yet to be worked  
+          out by the WG. 
+         " 
+     ::= { cpwVcEntry 2 } 
+
+  cpwVcOwner OBJECT-TYPE  
+     SYNTAX   INTEGER { 
+            manual                (1),  
+            maintenanceProtocol   (2), -- PW signaling 
+            other                 (3) 
+                      } 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+          "Set by the operator to indicate the protocol responsible  
+           for establishing this VC. Value 'manual' is used in all 
+           cases where no maintenance protocol (PW signaling) is used  
+           to set-up the VC, i.e. require configuration of entries in 
+           the VC tables including VC labels, etc. The value  
+           'maintenanceProtocol' is used in case of standard 
+           signaling of the VC for the specific PSN, for example LDP 
+           for MPLS PSN as specified in <draft- draft-martini- 
+           l2circuit-trans-mpls> or L2TP control protocol.  
+           Value 'other' is used for other types of signaling."  
+     ::= { cpwVcEntry 3 } 
+
+  cpwVcPsnType OBJECT-TYPE  
+     SYNTAX   INTEGER { 
+         mpls       (1),  
+         l2tp       (2), 
+         ip         (3), 
+         mplsOverIp (4), -- May be combined with 'mpls' in the future 
+         gre        (5), 
+         other      (6) 
+                      } 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+          "Set by the operator to indicate the PSN type on which this  
+           VC will be carried. Based on this object, the relevant PSN  
+           table entries are created in the in the PSN specific MIB  
+           modules. For example, if mpls(1) is defined, the agent  
+           create an entry in cpwVcMplsTable, which further define the  
+           MPLS PSN configuration. 
+           Note: the exact set of PSN types is yet to be worked  
+           out by the WG. 
+           " 
+     ::= { cpwVcEntry 4 } 
+
+  cpwVcSetUpPriority  OBJECT-TYPE 
+     SYNTAX         Integer32 (0..7) 
+     MAX-ACCESS     read-create 
+     STATUS         current 
+     DESCRIPTION 
+          "This object define the relative set-up priority of the VC   
+           in a lowest-to-highest fashion, where 0 is the highest  
+           priority. VCs with the same priority are treated with 
+           equal priority. Dropped VC will be set 'dormant' (as 
+           indicated in cpwVcOperStatus). 
+           This value is significant if there are competing resources 
+           between VCs and the implementation support this feature. 
+           If not supported or not relevant, the value of zero MUST 
+           be used."  
+     DEFVAL 
+         { 0 } 
+     ::= { cpwVcEntry 5 } 
+
+  cpwVcHoldingPriority  OBJECT-TYPE 
+     SYNTAX         Integer32 (0..7) 
+     MAX-ACCESS     read-create 
+     STATUS         current 
+     DESCRIPTION 
+          "This object define the relative holding priority of the VC   
+           in a lowest-to-highest fashion, where 0 is the highest  
+           priority. VCs with the same priority are treated with 
+           equal priority. Dropped VC will be set 'dormant' (as 
+           indicated in cpwVcOperStatus). 
+           This value is significant if there are competing resources 
+           between VCs and the implementation support this feature. 
+           If not supported or not relevant, the value of zero MUST 
+           be used."  
+     DEFVAL 
+         { 0 } 
+     ::= { cpwVcEntry 6 } 
+
+  cpwVcInboundMode OBJECT-TYPE 
+     SYNTAX        INTEGER { 
+     loose (1), 
+     strict (2) 
+     } 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "This object is used to enable greater security for  
+          implementation that use per platform VC label space. In  
+          strict mode, packets coming from the PSN are accepted only  
+          from tunnels that are associated to the same VC via the  
+          inbound tunnel table in the case of MPLS, or as identified  
+          by the source IP address in case of L2TP or IP PSN. The  
+          entries in the inbound tunnel table are either explicitly  
+          configured or implicitly known by the maintenance protocol  
+          used for VC set-up. 
+
+          If such association is not known, not configured or not  
+          desired, loose mode should be configured, and the node  
+          should accept the packet based on the VC label only  
+          regardless of the outer tunnel used to carry the VC." 
+     DEFVAL 
+          { loose } 
+     ::= { cpwVcEntry 7 } 
+
+  cpwVcPeerAddrType OBJECT-TYPE 
+     SYNTAX        InetAddressType 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+          "Denotes the address type of the peer node maintenance 
+           protocol (signaling) address if PW maintenance protocol is 
+           used for the VC creation. It should be set to  
+           'unknown' if PE/PW maintenance protocol is not used,  
+           i.e. cpwVcOwner is set to 'manual'. " 
+     DEFVAL        { ipv4 } 
+     ::= { cpwVcEntry 8 } 
+
+  cpwVcPeerAddr OBJECT-TYPE 
+     SYNTAX        InetAddress 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+          "This object contains the value of of the peer node address 
+           of the PW/PE maintenance protocol entity. This object  
+           should contain a value of 0 if not relevant (manual  
+           configuration of the VC)." 
+     ::= { cpwVcEntry 9 } 
+
+  cpwVcID OBJECT-TYPE 
+     SYNTAX        CpwVcIDType 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "Used in the outgoing VC ID field within the 'Virtual 
+          Circuit FEC Element' when LDP signaling is used or PW ID  
+          AVP for L2TP." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls>. 
+          and So, et al, <draft-so-pwe3-ethernet>.  
+          Note: as specified in l2circuit-trans: It is REQUIRED to 
+          assign the same VC ID, and VC type for a given circuit in 
+          both directions." 
+     ::= { cpwVcEntry 10 } 
+
+  cpwVcLocalGroupID OBJECT-TYPE 
+     SYNTAX        CpwGroupID 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "Used in the Group ID field sent to the peer PWES  
+         within the maintenance protocol used for VC setup,  
+         zero if not used." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+         and So, et al, <draft-so-pwe3-ethernet.txt>." 
+     ::= { cpwVcEntry 11 } 
+
+  cpwVcControlWord OBJECT-TYPE 
+     SYNTAX        TruthValue 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "Define if the control word will be sent with each packet by  
+          the local node." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls>" 
+     DEFVAL 
+         { false } 
+     ::= { cpwVcEntry 12 } 
+
+  cpwVcLocalIfMtu OBJECT-TYPE 
+     SYNTAX        Unsigned32 (0..65535) 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "If not equal zero, the optional IfMtu object in the  
+          maintenance protocol will be sent with this value,  
+          representing the locally supported MTU size over the  
+          interface (or the virtual interface) associated with the  
+          VC." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          and So, et al, <draft-so-pwe3-ethernet>." 
+
+     DEFVAL 
+         { 0 } 
+     ::= { cpwVcEntry 13 } 
+
+  cpwVcLocalIfString OBJECT-TYPE 
+     SYNTAX        TruthValue 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "Each VC is associated to an interface (or a virtual  
+          interface) in the ifTable of the node as part of the 
+          service configuration. This object defines if the  
+          maintenance protocol will send the interface's name as 
+          appears on the ifTable in the name object as part of the 
+          maintenance protocol. If set to false, the optional element 
+          will not be sent." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          and So, et al, <draft-so-pwe3-ethernet.txt>." 
+     DEFVAL 
+         { false } 
+     ::= { cpwVcEntry 14 } 
+
+  cpwVcRemoteGroupID OBJECT-TYPE 
+     SYNTAX        CpwGroupID 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "Obtained from the Group ID field as received via the  
+          maintenance protocol used for VC setup, zero if not used.  
+          Value of 0xFFFF shall be used if the object is yet to be  
+          defined by the VC maintenance protocol." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          and So, et al, <draft-so-pwe3-ethernet.txt>." 
+     ::= { cpwVcEntry 15 } 
+
+  cpwVcRemoteControlWord OBJECT-TYPE 
+     SYNTAX        INTEGER { 
+                         noControlWord (1), 
+                         withControlWord (2), 
+                         notYetKnown(3) 
+                       } 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "If maintenance protocol is used for VC establishment, this  
+          parameter indicates the received status of the control word  
+          usage, i.e. if packets will be received with control word 
+          or not. The value of 'notYetKnown' is used while the 
+          maintenance protocol has not yet received the indication  
+          from the remote node. 
+          In manual configuration of the VC this parameters indicate  
+          to the local node what is the expected encapsulation for 
+          the received packets. 
+         " 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          and So, et al, <draft-so-pwe3-ethernet.txt>." 
+     ::= { cpwVcEntry 16 } 
+
+  cpwVcRemoteIfMtu OBJECT-TYPE 
+     SYNTAX        Unsigned32  
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "The remote interface MTU as (optionally) received from the 
+          remote node via the maintenance protocol. Should be zero if 
+          this parameter is not available or not used." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          and So, et al, <draft-so-pwe3-ethernet.txt>." 
+     ::= { cpwVcEntry 17 } 
+
+  cpwVcRemoteIfString OBJECT-TYPE 
+     SYNTAX        SnmpAdminString (SIZE (0..80)) 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "Indicate the interface description string as received by 
+          the maintenance protocol, MUST be NULL string if not  
+          applicable or not known yet." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          and So, et al, <draft-so-pwe3-ethernet>." 
+     ::= { cpwVcEntry 18 } 
+
+  cpwVcOutboundVcLabel OBJECT-TYPE 
+     SYNTAX        Unsigned32 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "The VC label used in the outbound direction (i.e. toward  
+          the PSN). It may be set up manually if owner is 'manual' or  
+          automatically otherwise. Examples: For MPLS PSN, it  
+          represents the 20 bits of VC tag, for L2TP it represent the 
+          32 bits Session ID. 
+          If the label is not yet known (signaling in process), the  
+          object should return a value of 0xFFFF." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          Townsley, et al, <draft-ietf-l2tpext-l2tp-base.txt>" 
+     ::= { cpwVcEntry 19 } 
+
+  cpwVcInboundVcLabel OBJECT-TYPE 
+     SYNTAX        Unsigned32 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "The VC label used in the inbound direction (i.e. packets  
+          received from the PSN. It may be set up manually if owner 
+          is 'manual' or automatically otherwise.  
+          Examples: For MPLS PSN, it represents the 20 bits of VC 
+          tag, for L2TP it represent the 32 bits Session ID. 
+          If the label is not yet known (signaling in process), the  
+          object should return a value of 0xFFFF." 
+     REFERENCE 
+         "Martini, et al, <draft-martini-l2circuit-trans-mpls> 
+          Townsley, et al, <draft-ietf-l2tpext-l2tp-base.txt>" 
+     ::= { cpwVcEntry 20 } 
+
+  cpwVcName  OBJECT-TYPE 
+     SYNTAX        SnmpAdminString 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "The canonical name assigned to the VC." 
+     ::= { cpwVcEntry 21 } 
+
+  cpwVcDescr OBJECT-TYPE 
+     SYNTAX        SnmpAdminString 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "A textual string containing information about the VC.  
+          If there is no description this object contains a zero 
+          length string." 
+     ::= { cpwVcEntry 22 } 
+
+  cpwVcCreateTime OBJECT-TYPE 
+     SYNTAX        TimeStamp 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "System time when this VC was created." 
+     ::= { cpwVcEntry 23 } 
+
+  cpwVcUpTime  OBJECT-TYPE 
+     SYNTAX        TimeTicks 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "Number of consecutive ticks this VC has been 'up' in 
+          both directions together (i.e. 'up' is observed in  
+          cpwVcOperStatus.)" 
+     ::= { cpwVcEntry 24 } 
+
+  cpwVcAdminStatus OBJECT-TYPE 
+     SYNTAX   INTEGER { 
+                  up(1),     -- ready to pass packets 
+                  down(2), 
+                  testing(3) -- in some test mode 
+     } 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "The desired operational status of this VC." 
+     ::= { cpwVcEntry 25 } 
+
+  cpwVcOperStatus OBJECT-TYPE 
+     SYNTAX        CpwOperStatus 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "Indicates the actual combined operational status of this  
+           VC. It is 'up' if both cpwVcInboundOperStatus and  
+           cpwVcOutboundOperStatus are in 'up' state. For all other  
+           values, if the VCs in both directions are of the same 
+           value it reflects that value, otherwise it is set to the 
+           most severe status out of the two statuses. The order of  
+           severance from most severe to less severe is: unknown,  
+           notPresent, down, lowerLayerDown, dormant, testing, up. 
+           The operator may consult the per direction OperStatus for 
+           fault isolation per direction." 
+     ::= { cpwVcEntry 26 } 
+
+  cpwVcInboundOperStatus OBJECT-TYPE 
+     SYNTAX        CpwOperStatus 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "Indicates the actual operational status of this VC in the  
+           inbound direction. 
+
+           - down:           if PW signaling has not yet finished, or 
+                             indications available at the service  
+                             level indicate that the VC is not  
+                             passing packets. 
+           - testing:        if AdminStatus at the VC level is set to  
+                             test. 
+           - dormant:        The VC is not available because of the 
+                             required resources are occupied VC with  
+                             higher priority VCs . 
+           - notPresent:     Some component is missing to accomplish  
+                             the set up of the VC. 
+           - lowerLayerDown: The underlying PSN is not in OperStatus  
+                             'up'.  
+           " 
+     ::= { cpwVcEntry 27 } 
+
+  cpwVcOutboundOperStatus OBJECT-TYPE 
+     SYNTAX        CpwOperStatus 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "Indicates the actual operational status of this VC in the  
+           outbound direction 
+           - down:           if PW signaling has not yet finished, or 
+                             indications available at the service  
+                             level indicate that the VC is not 
+                             passing packets. 
+           - testing:        if AdminStatus at the VC level is set to  
+                             test. 
+           - dormant:        The VC is not available because of the 
+                             required resources are occupied VC with  
+                             higher priority VCs . 
+           - notPresent:     Some component is missing to accomplish  
+                             the set up of the VC. 
+           - lowerLayerDown: The underlying PSN is not in OperStatus  
+                             'up'.  
+           " 
+     ::= { cpwVcEntry 28 } 
+
+  cpwVcTimeElapsed OBJECT-TYPE 
+      SYNTAX  Integer32 (1..900) 
+      MAX-ACCESS  read-only 
+      STATUS  current 
+      DESCRIPTION 
+         "The number of seconds, including partial seconds, 
+         that have elapsed since the beginning of the current 
+         measurement period. If, for some reason, such as an 
+         adjustment in the system's time-of-day clock, the 
+         current interval exceeds the maximum value, the 
+         agent will return the maximum value." 
+      ::= { cpwVcEntry 29 } 
+
+  cpwVcValidIntervals OBJECT-TYPE 
+      SYNTAX  Integer32 (0..96) 
+      MAX-ACCESS  read-only 
+      STATUS  current 
+      DESCRIPTION 
+         "The number of previous 15-minute intervals 
+         for which data was collected.  
+         An agent with PW capability must be capable of supporting at  
+         least n intervals. The minimum value of n is 4, The default  
+         of n is 32 and the maximum value of n is 96. 
+         The value will be <n> unless the measurement was (re-)  
+         started within the last (<n>*15) minutes, in which case the  
+         value will be the number of complete 15 minute intervals for  
+         which the agent has at least some data. In certain cases  
+         (e.g., in the case where the agent is a proxy) it is  
+         possible that some intervals are unavailable.  In this case,  
+         this interval is the maximum interval number for which data  
+         is available. " 
+      ::= { cpwVcEntry 30 } 
+
+  cpwVcRowStatus OBJECT-TYPE 
+     SYNTAX        RowStatus 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "For creating, modifying, and deleting this row." 
+     ::= { cpwVcEntry 31 } 
+
+  cpwVcStorageType OBJECT-TYPE 
+     SYNTAX        StorageType 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "This variable indicates the storage type for this 
+          object." 
+     ::= { cpwVcEntry 32 } 
+
+  -- End of PW Virtual Connection (VC) Table 
+
+  -- Vc Performance Table. 
+
+  cpwVcPerfCurrentTable  OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcPerfCurrentEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "This table provides per-VC performance information for the  
+           current interval." 
+     ::= { cpwVcObjects 3 } 
+
+  cpwVcPerfCurrentEntry OBJECT-TYPE 
+     SYNTAX        CpwVcPerfCurrentEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "An entry in this table is created by the agent for 
+           every VC." 
+     INDEX  { cpwVcIndex } 
+     ::= { cpwVcPerfCurrentTable 1 } 
+
+  CpwVcPerfCurrentEntry ::= SEQUENCE { 
+        cpwVcPerfCurrentInHCPackets          Counter64, 
+        cpwVcPerfCurrentInHCBytes            Counter64, 
+        cpwVcPerfCurrentOutHCBytes           Counter64, 
+        cpwVcPerfCurrentOutHCPackets         Counter64       
+        } 
+
+  cpwVcPerfCurrentInHCPackets OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of packets received 
+           by the VC (from the PSN) in the current 15 minute 
+  interval." 
+     ::= { cpwVcPerfCurrentEntry 1 } 
+
+  cpwVcPerfCurrentInHCBytes OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of bytes received 
+           by the VC (from the PSN) in the current 15 minute 
+  interval." 
+     ::= { cpwVcPerfCurrentEntry 2 } 
+
+  cpwVcPerfCurrentOutHCPackets OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of packets forwarded 
+           by the VC (to the PSN) in the current 15 minute interval." 
+     ::= { cpwVcPerfCurrentEntry 3 } 
+
+  cpwVcPerfCurrentOutHCBytes OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of bytes forwarded 
+           by the VC (to the PSN) in the current 15 minute interval." 
+     ::= { cpwVcPerfCurrentEntry 4 } 
+
+  -- End of Vc Perf current Table 
+
+  -- Vc Performance Interval Table. 
+
+  cpwVcPerfIntervalTable  OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcPerfIntervalEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "This table provides per-VC performance information for  
+           each interval." 
+     ::= { cpwVcObjects 4 } 
+
+  cpwVcPerfIntervalEntry OBJECT-TYPE 
+     SYNTAX        CpwVcPerfIntervalEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "An entry in this table is created agent for every VC." 
+     INDEX  { cpwVcIndex, cpwVcPerfIntervalNumber } 
+     ::= { cpwVcPerfIntervalTable 1 } 
+
+  CpwVcPerfIntervalEntry ::= SEQUENCE { 
+        cpwVcPerfIntervalNumber               Integer32, 
+        cpwVcPerfIntervalValidData            TruthValue, 
+        cpwVcPerfIntervalTimeElapsed          Integer32, 
+
+        cpwVcPerfIntervalInHCPackets          Counter64, 
+        cpwVcPerfIntervalInHCBytes            Counter64, 
+        cpwVcPerfIntervalOutHCPackets         Counter64, 
+        cpwVcPerfIntervalOutHCBytes           Counter64 
+                          } 
+
+  cpwVcPerfIntervalNumber OBJECT-TYPE 
+      SYNTAX  Integer32 (1..96) 
+      MAX-ACCESS  not-accessible 
+      STATUS  current 
+      DESCRIPTION 
+          "A number N, between 1 and 96, which identifies the 
+           interval for which the set of statistics is available. 
+           The interval identified by 1 is the most recently 
+           completed 15 minute interval, and the interval identified 
+           by N is the interval immediately preceding the one 
+           identified by N-1. 
+           The minimum range of N is 1 through 4. The default range 
+           is 1 to 32. The maximum range of N is 1 through 96. " 
+     REFERENCE 
+         "Tesink, K. 'Definitions of Managed Objects for the 
+          SONET/SDH Interface Type', RFC 2558" 
+     ::= { cpwVcPerfIntervalEntry 1 } 
+
+  cpwVcPerfIntervalValidData OBJECT-TYPE 
+     SYNTAX        TruthValue 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "This variable indicates if the data for this interval 
+          is valid." 
+     ::= { cpwVcPerfIntervalEntry 2 } 
+
+  cpwVcPerfIntervalTimeElapsed OBJECT-TYPE 
+      SYNTAX      Integer32  
+      MAX-ACCESS  read-only 
+      STATUS      current 
+      DESCRIPTION 
+        "The duration of a particular interval in seconds. 
+         Adjustments in the system's time-of-day clock, may 
+         cause the interval to be greater or less than the 
+         normal value. Therefore this actual interval value 
+         is provided." 
+      ::= { cpwVcPerfIntervalEntry 3 } 
+
+  cpwVcPerfIntervalInHCPackets OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of packets received by 
+           the VC (from the PSN) in a particular 15-minute interval." 
+     ::= { cpwVcPerfIntervalEntry 4 } 
+
+  cpwVcPerfIntervalInHCBytes OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of bytes received by the  
+           VC (from the PSN) in a particular 15-minute interval." 
+
+     ::= { cpwVcPerfIntervalEntry 5 } 
+
+  cpwVcPerfIntervalOutHCPackets OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of packets forwarded by  
+           the VC (to the PSN) in a particular 15-minute interval." 
+     ::= { cpwVcPerfIntervalEntry 6 } 
+
+  cpwVcPerfIntervalOutHCBytes OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of bytes forwarded by the  
+           VC (to the PSN) in a particular 15-minute interval." 
+
+     ::= { cpwVcPerfIntervalEntry 7 } 
+
+  -- End of VC Performance Interval Table 
+
+  -- VC Performance Total Table. 
+  cpwVcPerfTotalTable  OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcPerfTotalEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "This table provides per-VC Performance information from VC  
+           start time." 
+     ::= { cpwVcObjects 5 } 
+
+  cpwVcPerfTotalEntry OBJECT-TYPE 
+     SYNTAX        CpwVcPerfTotalEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "An entry in this table is created agent for every VC." 
+
+     INDEX  { cpwVcIndex } 
+     ::= { cpwVcPerfTotalTable 1 } 
+
+  CpwVcPerfTotalEntry ::= SEQUENCE { 
+        cpwVcPerfTotalInHCPackets          Counter64, 
+        cpwVcPerfTotalInHCBytes            Counter64, 
+        cpwVcPerfTotalOutHCPackets         Counter64, 
+        cpwVcPerfTotalOutHCBytes           Counter64, 
+        cpwVcPerfTotalDiscontinuityTime    TimeStamp 
+                          } 
+
+  cpwVcPerfTotalInHCPackets OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "High capacity counter for number of packets received by the  
+          VC (from the PSN)." 
+     ::= { cpwVcPerfTotalEntry 1 } 
+
+  cpwVcPerfTotalInHCBytes OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of bytes received by the  
+           VC (from the PSN)." 
+     ::= { cpwVcPerfTotalEntry 2 } 
+
+  cpwVcPerfTotalOutHCPackets OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of packets forwarded by  
+           the VC (to the PSN)." 
+     ::= { cpwVcPerfTotalEntry 3 } 
+
+  cpwVcPerfTotalOutHCBytes OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "High capacity counter for number of bytes forwarded by the  
+           VC (to the PSN)." 
+     ::= { cpwVcPerfTotalEntry 4 } 
+
+  cpwVcPerfTotalDiscontinuityTime OBJECT-TYPE 
+     SYNTAX      TimeStamp 
+     MAX-ACCESS  read-only 
+     STATUS      current 
+     DESCRIPTION 
+         "The value of sysUpTime on the most recent occasion at 
+          which any one or more of this row Counter32 or 
+          Counter64 suffered a discontinuity. If no such 
+          discontinuities have occurred since the last re- 
+          initialization of the local management subsystem, then 
+          this object contains a zero value." 
+     ::= { cpwVcPerfTotalEntry 5 } 
+
+  -- End of VC Perf Total Table 
+
+  -- Error counter scalar  
+
+  cpwVcPerfTotalErrorPackets OBJECT-TYPE 
+     SYNTAX        Counter64 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "Counter for number of error at VC level processing, for  
+           example packets received with unknown VC label." 
+     ::= { cpwVcObjects 6 } 
+
+  -- Reverse mapping tables 
+
+  cpwVcIdMappingTable  OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcIdMappingEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "This table provides reverse mapping of the existing VCs  
+           based on vc type and VC ID ordering. This table is  
+           typically useful for EMS ordered query of existing VCs." 
+     ::= { cpwVcObjects 7 } 
+
+  cpwVcIdMappingEntry OBJECT-TYPE 
+     SYNTAX        CpwVcIdMappingEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "An entry in this table is created by the agent for every  
+           VC configured by the cpwVcTable." 
+
+     INDEX  { cpwVcIdMappingVcType,  cpwVcIdMappingVcID, 
+              cpwVcIdMappingPeerAddrType, cpwVcIdMappingPeerAddr, 
+              cpwVcIdMappingVcIndex} 
+     ::= { cpwVcIdMappingTable 1 } 
+
+  CpwVcIdMappingEntry ::= SEQUENCE { 
+        cpwVcIdMappingVcType               CpwVcType, 
+        cpwVcIdMappingVcID                 CpwVcIDType, 
+        cpwVcIdMappingPeerAddrType         InetAddressType, 
+        cpwVcIdMappingPeerAddr             InetAddress, 
+        cpwVcIdMappingVcIndex              CpwVcIndexType 
+                         } 
+
+  cpwVcIdMappingVcType OBJECT-TYPE 
+     SYNTAX        CpwVcType 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "The VC type (indicate the service) of this VC." 
+     ::= { cpwVcIdMappingEntry 1 } 
+
+  cpwVcIdMappingVcID OBJECT-TYPE 
+     SYNTAX        CpwVcIDType 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "The VC ID of this VC. Zero if the VC is configured  
+           manually." 
+     ::= { cpwVcIdMappingEntry 2 } 
+
+  cpwVcIdMappingPeerAddrType OBJECT-TYPE 
+     SYNTAX        InetAddressType 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "IP address type of the peer node." 
+     ::= { cpwVcIdMappingEntry 3 } 
+
+  cpwVcIdMappingPeerAddr OBJECT-TYPE 
+     SYNTAX        InetAddress 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "IP address type of the peer node." 
+     ::= { cpwVcIdMappingEntry 4 } 
+
+  cpwVcIdMappingVcIndex  OBJECT-TYPE 
+     SYNTAX        CpwVcIndexType 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "The value that represent the VC in the cpwVcTable." 
+     ::= { cpwVcIdMappingEntry 5 } 
+
+  cpwVcPeerMappingTable  OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcPeerMappingEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "This table provides reverse mapping of the existing VCs  
+           based on vc type and VC ID ordering. This table is  
+           typically useful for EMS ordered query of existing VCs." 
+     ::= { cpwVcObjects 8 } 
+
+  cpwVcPeerMappingEntry OBJECT-TYPE 
+     SYNTAX        CpwVcPeerMappingEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "An entry in this table is created by the agent for every  
+           VC configured in cpwVcTable." 
+
+     INDEX  { cpwVcPeerMappingPeerAddrType, cpwVcPeerMappingPeerAddr, 
+              cpwVcPeerMappingVcType,  cpwVcPeerMappingVcID, 
+              cpwVcPeerMappingVcIndex}  
+
+     ::= { cpwVcPeerMappingTable 1 } 
+
+  CpwVcPeerMappingEntry ::= SEQUENCE { 
+        cpwVcPeerMappingPeerAddrType         InetAddressType, 
+        cpwVcPeerMappingPeerAddr             InetAddress, 
+        cpwVcPeerMappingVcType               CpwVcType, 
+        cpwVcPeerMappingVcID                 CpwVcIDType, 
+        cpwVcPeerMappingVcIndex              CpwVcIndexType 
+                         } 
+
+  cpwVcPeerMappingPeerAddrType OBJECT-TYPE 
+     SYNTAX        InetAddressType 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "IP address type of the peer node." 
+     ::= { cpwVcPeerMappingEntry 1 } 
+
+  cpwVcPeerMappingPeerAddr OBJECT-TYPE 
+     SYNTAX        InetAddress 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "IP address type of the peer node." 
+     ::= { cpwVcPeerMappingEntry 2 } 
+
+  cpwVcPeerMappingVcType OBJECT-TYPE 
+     SYNTAX        CpwVcType 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "The VC type (indicate the service) of this VC." 
+     ::= { cpwVcPeerMappingEntry 3 } 
+
+  cpwVcPeerMappingVcID OBJECT-TYPE 
+     SYNTAX        CpwVcIDType 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "The VC ID of this VC. Zero if the VC is configured  
+           manually." 
+     ::= { cpwVcPeerMappingEntry 4 } 
+
+  cpwVcPeerMappingVcIndex  OBJECT-TYPE 
+     SYNTAX        CpwVcIndexType 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "The value that represent the VC in the cpwVcTable." 
+     ::= { cpwVcPeerMappingEntry 5 } 
+
+  -- End of reverse mapping tables 
+
+  cpwVcUpDownNotifEnable  OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If this object is set to true(1), then it enables
+          the emission of cpwVcUp and cpwVcDown
+          notifications; otherwise these notifications are not
+          emitted."
+     REFERENCE
+         "See also RFC3413 for explanation that 
+          notifications are under the ultimate control of the 
+          MIB modules in this document."
+     DEFVAL { false }
+     ::= { cpwVcObjects 9 }
+
+  cpwVcNotifRate  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This object defines the maximum number of PW VC notifications
+          that can be emitted from the device per second."
+     ::= { cpwVcObjects 10 }
+
+
+  -- Notifications - PW VCs 
+
+  cpwVcDown NOTIFICATION-TYPE
+     OBJECTS { cpwVcOperStatus, --start of range
+               cpwVcOperStatus  --end of range
+     }
+     STATUS  current
+     DESCRIPTION
+         "This notification is generated when the
+          cpwVcOperStatus object for one or more contiguous
+          entries in cpwVcTable are about to enter the
+          down(2) state from some other state. The included values
+          of cpwVcOperStatus MUST all be set equal to this
+          down(2) state.  The two instances of cpwVcOperStatus
+          in this notification indicate the range of indexes
+          that are affected.  Note that all the indexes of the
+          two ends of the range can be derived from the
+          instance identifiers of these two objects.  For
+          cases where a contiguous range of cross-connects
+          have transitioned into the down(2) state at roughly
+          the same time, the device SHOULD issue a single
+          notification for each range of contiguous indexes in
+          an effort to minimize the emission of a large number
+          of notifications.  If a notification has to be
+          issued for just a single cross-connect entry, then
+          the instance identifier (and values) of the two
+          cpwVcOperStatus objects MUST be identical."
+     ::= { cpwVcNotifications  1 }
+
+  cpwVcUp NOTIFICATION-TYPE
+     OBJECTS { cpwVcOperStatus, --start of range
+               cpwVcOperStatus  --end of range
+     } 
+     STATUS  current
+     DESCRIPTION
+         "This notification is generated when the
+          cpwVcOperStatus object for one or more contiguous
+          entries in cpwVcTable are about to enter the up(1)
+          state from some other state. The included values of
+          cpwVcOperStatus MUST both be set equal to this
+          new state (i.e: up(1)).  The two instances of 
+          cpwVcOperStatus in this notification indicate the range 
+          of indexes that are affected.  Note that all the indexes 
+          of the two ends of the range can be derived from the
+          instance identifiers of these two objects.  For
+          cases where a contiguous range of cross-connects
+          have transitioned into the up(1) state at roughly
+          the same time, the device SHOULD issue a single
+          notification for each range of contiguous indexes in
+          an effort to minimize the emission of a large number
+          of notifications.  If a notification has to be
+          issued for just a single cross-connect entry, then
+          the instance identifier (and values) of the two
+          cpwVcOperStatus objects MUST be the identical."
+     ::= { cpwVcNotifications 2 }
+
+  -- End of notifications. 
+
+  -- conformance information 
+
+     -- Note: Conformance at the object access and values level is  
+     -- still FFS, therefore current conformance is defined at the 
+     -- object existence level only. 
+  cpwVcGroups      OBJECT IDENTIFIER ::= { cpwVcConformance   1 } 
+  cpwVcCompliances OBJECT IDENTIFIER ::= { cpwVcConformance   2 } 
+
+  cpwModuleCompliance MODULE-COMPLIANCE 
+      STATUS  current 
+      DESCRIPTION 
+              "The compliance statement for agent that support PW  
+               operation." 
+
+      MODULE  -- this module 
+          MANDATORY-GROUPS { cpwVcGroup, 
+                             cpwVcPeformanceGroup } 
+
+       ::= { cpwVcCompliances 1 } 
+
+  -- Units of conformance. 
+
+  cpwVcGroup   OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcIndexNext, 
+              cpwVcType, 
+              cpwVcOwner, 
+              cpwVcPsnType, 
+              cpwVcSetUpPriority, 
+              cpwVcHoldingPriority, 
+              cpwVcInboundMode, 
+              cpwVcPeerAddrType, 
+              cpwVcPeerAddr, 
+              cpwVcID, 
+              cpwVcLocalGroupID, 
+              cpwVcControlWord, 
+              cpwVcLocalIfMtu, 
+              cpwVcLocalIfString, 
+              cpwVcRemoteGroupID, 
+              cpwVcRemoteControlWord, 
+              cpwVcRemoteIfMtu, 
+              cpwVcRemoteIfString, 
+              cpwVcOutboundVcLabel, 
+              cpwVcInboundVcLabel, 
+              cpwVcName, 
+              cpwVcDescr, 
+              cpwVcCreateTime, 
+              cpwVcUpTime, 
+              cpwVcAdminStatus, 
+              cpwVcOperStatus, 
+              cpwVcOutboundOperStatus, 
+              cpwVcInboundOperStatus, 
+              cpwVcTimeElapsed, 
+              cpwVcValidIntervals, 
+              cpwVcRowStatus, 
+              cpwVcStorageType, 
+              cpwVcUpDownNotifEnable,
+              cpwVcNotifRate              
+            } 
+
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects needed for PW VC 
+             configuration." 
+     ::= { cpwVcGroups 1 } 
+
+  cpwVcPeformanceGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcPerfCurrentInHCPackets, 
+              cpwVcPerfCurrentInHCBytes, 
+              cpwVcPerfCurrentOutHCPackets, 
+              cpwVcPerfCurrentOutHCBytes, 
+
+              cpwVcPerfIntervalValidData, 
+              cpwVcPerfIntervalTimeElapsed, 
+              cpwVcPerfIntervalInHCPackets, 
+              cpwVcPerfIntervalInHCBytes, 
+              cpwVcPerfIntervalOutHCPackets, 
+              cpwVcPerfIntervalOutHCBytes, 
+
+              cpwVcPerfTotalInHCPackets, 
+              cpwVcPerfTotalInHCBytes, 
+              cpwVcPerfTotalOutHCPackets, 
+              cpwVcPerfTotalOutHCBytes, 
+              cpwVcPerfTotalDiscontinuityTime, 
+
+              cpwVcPerfTotalErrorPackets 
+            } 
+
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects needed for PW VC 
+             performance." 
+     ::= { cpwVcGroups 2 } 
+
+  cpwVcMappingTablesGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcIdMappingVcIndex, 
+              cpwVcPeerMappingVcIndex 
+            } 
+
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects contained in the reverse 
+             mapping tables." 
+     ::= { cpwVcGroups 3 } 
+
+  cpwVcNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { 
+                     cpwVcUp,
+                     cpwVcDown
+                   }
+     STATUS  current
+     DESCRIPTION
+            "Set of notifications implemented in this module.
+             None is mandatory."
+     ::= { cpwVcGroups 4 }
+
+
+END

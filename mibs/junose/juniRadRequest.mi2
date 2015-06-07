@@ -1,0 +1,400 @@
+
+-- *****************************************************************************
+-- Juniper-RADIUS-Initiated-Request-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   RADIUS Initiated Request MIB
+--
+-- Copyright 2004 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-RADIUS-Initiated-Request-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable
+        FROM Juniper-TC;
+
+juniRadiusInitiatedRequestMIB  MODULE-IDENTITY
+    LAST-UPDATED "200406101908Z"  -- 10-Jun-04 03:08 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The RADIUS Disconnect MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200406101908Z"  -- 10-Jun-04 03:08 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Initial version of this MIB module, derived from IETF Informational Rfc
+        3576."
+    ::= { juniMibs 75 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No textual conventions are defined in this MIB
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusInitiatedRequestObjects  OBJECT IDENTIFIER
+    ::= { juniRadiusInitiatedRequestMIB 1 }
+juniRadiusInitiatedRequest  OBJECT IDENTIFIER
+    ::= { juniRadiusInitiatedRequestObjects 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for RADIUS Initiated Request
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusInitiatedRequestInvalidClientAddresses  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS initiated request packets received from unknown
+        addresses."
+    ::= { juniRadiusInitiatedRequest 1 }
+
+--
+-- Statistics for RADIUS initiated request clients
+--
+juniRadiusInitiatedRequestClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRadiusInitiatedRequestClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS authentication servers with
+        which the ERX shares a secret."
+    ::= { juniRadiusInitiatedRequest 2 }
+
+juniRadiusInitiatedRequestClientEntry  OBJECT-TYPE
+    SYNTAX      JuniRadiusInitiatedRequestClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS initiated request client
+        with which the server shares a secret."
+    INDEX     { juniRadiusInitiatedRequestClientAddress }
+    ::= { juniRadiusInitiatedRequestClientTable 1 }
+
+JuniRadiusInitiatedRequestClientEntry ::= SEQUENCE {
+    juniRadiusInitiatedRequestClientAddress                 IpAddress,
+    juniRadiusInitiatedRequestClientPortNumber              Integer32,
+    juniRadiusInitiatedRequestUnknownTypes                  Counter32,
+    juniRadiusInitiatedRequestNoSecret                      Counter32,
+    juniRadiusInitiatedRequestDisconnectRequests            Counter32,
+    juniRadiusInitiatedRequestDisconnectAccepts             Counter32,
+    juniRadiusInitiatedRequestDisconnectRejects             Counter32,
+    juniRadiusInitiatedRequestDisconnectNoSessionIds        Counter32,
+    juniRadiusInitiatedRequestDisconnectBadAuthenticators   Counter32,
+    juniRadiusInitiatedRequestDisconnectPacketsDropped      Counter32,
+    juniRadiusInitiatedRequestCoaRequests                   Counter32,
+    juniRadiusInitiatedRequestCoaAccepts                    Counter32,
+    juniRadiusInitiatedRequestCoaRejects                    Counter32,
+    juniRadiusInitiatedRequestCoaNoSessionIds               Counter32,
+    juniRadiusInitiatedRequestCoaBadAuthenticators          Counter32,
+    juniRadiusInitiatedRequestCoaPacketsDropped             Counter32 }
+
+juniRadiusInitiatedRequestClientAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the RADIUS client referred to in this table entry.  A
+        value of 0.0.0.0 indicates this entry is not in use."
+    ::= { juniRadiusInitiatedRequestClientEntry 1 }
+
+juniRadiusInitiatedRequestClientPortNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UDP port the server is listening on to recieve disconnect requests
+        from this client."
+    ::= { juniRadiusInitiatedRequestClientEntry 2 }
+
+--
+-- Request/Response statistics
+--
+-- TotalIncomingPackets = Disconnect Requests + Coa Requests + UnknownTypes
+--
+--
+juniRadiusInitiatedRequestUnknownTypes  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS packets of unknown type which were received from
+        this client on the authentication port."
+    ::= { juniRadiusInitiatedRequestClientEntry  3 }
+
+juniRadiusInitiatedRequestNoSecret  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Disconnect requests recieved from this client
+        while no secret is set."
+    ::= { juniRadiusInitiatedRequestClientEntry 4 }
+
+juniRadiusInitiatedRequestDisconnectRequests  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Disconnect packets received from this client."
+    ::= { juniRadiusInitiatedRequestClientEntry 5 }
+
+juniRadiusInitiatedRequestDisconnectAccepts  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Disconnects that were succesful."
+    ::= { juniRadiusInitiatedRequestClientEntry 6 }
+
+juniRadiusInitiatedRequestDisconnectRejects  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Disconnects not successful."
+    ::= { juniRadiusInitiatedRequestClientEntry 7 }
+
+juniRadiusInitiatedRequestDisconnectNoSessionIds  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Disconnect requests recieved from this client with
+        no session-id present."
+    ::= { juniRadiusInitiatedRequestClientEntry 8 }
+
+juniRadiusInitiatedRequestDisconnectBadAuthenticators  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS disconnect packets containing invalid
+        authenticators received from this client."
+    ::= { juniRadiusInitiatedRequestClientEntry 9 }
+
+juniRadiusInitiatedRequestDisconnectPacketsDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS disconnect packets which were received from this 
+        client on the authentication port and dropped for some other reason."
+    ::= { juniRadiusInitiatedRequestClientEntry  10 }
+
+juniRadiusInitiatedRequestCoaRequests  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Change of Authorization packets received from this client."
+    ::= { juniRadiusInitiatedRequestClientEntry 11 }
+
+juniRadiusInitiatedRequestCoaAccepts  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Change of Authorization requests that were succesful."
+    ::= { juniRadiusInitiatedRequestClientEntry 12 }
+
+juniRadiusInitiatedRequestCoaRejects  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Change of Authorization requests that were not successful."
+    ::= { juniRadiusInitiatedRequestClientEntry 13 }
+
+juniRadiusInitiatedRequestCoaNoSessionIds  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Change of Authorization requests recieved from this client with
+        no session-id present."
+    ::= { juniRadiusInitiatedRequestClientEntry 14 }
+
+juniRadiusInitiatedRequestCoaBadAuthenticators  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Change of Authorization packets containing invalid
+        authenticators received from this client."
+    ::= { juniRadiusInitiatedRequestClientEntry 15 }
+
+juniRadiusInitiatedRequestCoaPacketsDropped  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RADIUS Change of Authorization packets which were received  
+        from this client on the authentication port and dropped for some other reason."
+    ::= { juniRadiusInitiatedRequestClientEntry  16 }
+
+
+--
+-- Configuration of RADIUS initiated request clients
+--
+juniRadiusInitiatedRequestCfgClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRadiusInitiatedRequestCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS initiated request clients with which
+        the server shares a secret."
+    ::= { juniRadiusInitiatedRequest 3 }
+
+juniRadiusInitiatedRequestCfgClientEntry  OBJECT-TYPE
+    SYNTAX      JuniRadiusInitiatedRequestCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS authentication server
+        with which the ERX shares a secret."
+    INDEX     { juniRadiusInitiatedRequestCfgClientAddress }
+    ::= { juniRadiusInitiatedRequestCfgClientTable 1 }
+
+JuniRadiusInitiatedRequestCfgClientEntry ::= SEQUENCE {
+    juniRadiusInitiatedRequestCfgClientAddress        IpAddress,
+    juniRadiusInitiatedRequestCfgClientPortNumber     Integer32,
+    juniRadiusInitiatedRequestCfgKey                  DisplayString,
+    juniRadiusInitiatedRequestCfgDisconnect              JuniEnable,
+    juniRadiusInitiatedRequestCfgChangeOfAuthorization   JuniEnable,
+    juniRadiusInitiatedRequestCfgRowStatus            RowStatus }
+
+juniRadiusInitiatedRequestCfgClientAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the RADIUS disconnect client referred to in this
+        table entry."
+    ::= { juniRadiusInitiatedRequestCfgClientEntry 1 }
+
+juniRadiusInitiatedRequestCfgClientPortNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The UDP port the server is listening on to recieve requests
+        from this client."
+    DEFVAL    { 3799 }
+    ::= { juniRadiusInitiatedRequestCfgClientEntry 2 }
+
+juniRadiusInitiatedRequestCfgKey  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The secret (RADIUS authenticator) used by the serevr during exchanges
+        with this client.  The default is a zero-length string, indicating no
+        authenticator is used."
+    DEFVAL    { ''H }
+    ::= { juniRadiusInitiatedRequestCfgClientEntry 3 }
+
+juniRadiusInitiatedRequestCfgDisconnect OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When enabled, RADIUS initiated disconnect requests are processed."
+    DEFVAL    { disable }
+    ::= { juniRadiusInitiatedRequestCfgClientEntry 4 }
+
+juniRadiusInitiatedRequestCfgChangeOfAuthorization OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When enabled, RADIUS change of authorization requests are processed."
+    DEFVAL    { disable }
+    ::= { juniRadiusInitiatedRequestCfgClientEntry 5 }
+
+juniRadiusInitiatedRequestCfgRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniRadiusInitiatedRequestCfgClientEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusInitiatedRequestMIBConformance  OBJECT IDENTIFIER
+    ::= { juniRadiusInitiatedRequestMIB 2 }
+juniRadiusInitiatedRequestMIBCompliances  OBJECT IDENTIFIER
+    ::= { juniRadiusInitiatedRequestMIBConformance 1 }
+juniRadiusInitiatedRequestMIBGroups  OBJECT IDENTIFIER
+    ::= { juniRadiusInitiatedRequestMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniRadiusAuthInitiatedRequestCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        RADIUS Initiated Request MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRadiusInitiatedRequestGroup }
+    ::= { juniRadiusInitiatedRequestMIBCompliances 1 }
+
+--
+-- units of conformance
+--
+juniRadiusInitiatedRequestGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRadiusInitiatedRequestInvalidClientAddresses,
+
+        juniRadiusInitiatedRequestClientPortNumber,
+        juniRadiusInitiatedRequestUnknownTypes,
+        juniRadiusInitiatedRequestNoSecret,
+        juniRadiusInitiatedRequestDisconnectRequests,
+        juniRadiusInitiatedRequestDisconnectAccepts,
+        juniRadiusInitiatedRequestDisconnectRejects,
+        juniRadiusInitiatedRequestDisconnectNoSessionIds,
+        juniRadiusInitiatedRequestDisconnectBadAuthenticators,
+        juniRadiusInitiatedRequestDisconnectPacketsDropped,
+        juniRadiusInitiatedRequestCoaRequests,
+        juniRadiusInitiatedRequestCoaAccepts,
+        juniRadiusInitiatedRequestCoaRejects,
+        juniRadiusInitiatedRequestCoaNoSessionIds,
+        juniRadiusInitiatedRequestCoaBadAuthenticators,
+        juniRadiusInitiatedRequestCoaPacketsDropped,
+        juniRadiusInitiatedRequestCfgClientPortNumber,
+        juniRadiusInitiatedRequestCfgKey,
+        juniRadiusInitiatedRequestCfgDisconnect,
+        juniRadiusInitiatedRequestCfgChangeOfAuthorization,
+        juniRadiusInitiatedRequestCfgRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of RADIUS
+        Initiated Request."
+    ::= { juniRadiusInitiatedRequestMIBGroups 1 }
+
+END

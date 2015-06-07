@@ -1,0 +1,277 @@
+ENTERASYS-VLAN-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+              FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+              FROM SNMPv2-CONF
+    RowStatus, StorageType
+              FROM SNMPv2-TC
+    VlanIndex
+              FROM Q-BRIDGE-MIB
+    InterfaceIndexOrZero, ifIndex
+              FROM IF-MIB
+    etsysModules
+              FROM ENTERASYS-MIB-NAMES;
+
+
+etsysVlanInterfaceMIB  MODULE-IDENTITY
+    LAST-UPDATED "200206072034Z"  -- Fri Jun  7 20:34 GMT 2002
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+    "Postal: Enterasys Networks
+             500 Spaulding Turnpike
+             P.O. Box 3060
+             Portsmouth, NH 03801
+
+     Phone:  +1 603 501 5500
+     E-mail: support@enterasys.com
+     WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise 
+         MIBs under the Enterasys enterprise OID pertaining to the 
+         creation of MIB-II interfaces and their mapping to VLANs
+         for Enterasys products."
+
+    REVISION "200206072034Z"  -- Fri Jun  7 20:34 GMT 2002
+    DESCRIPTION
+        "Removed a reference to a product code name and its port
+         densities.  Corrected a typographical error."
+
+    REVISION "200206071537Z"  -- Fri Jun  7 15:37 GMT 2002
+    DESCRIPTION
+        "Changed the syntax of etsysVlanInterfaceIfIndex to
+         InterfaceIndexOrZero in order to better support row entries
+         in the notInService state.
+
+         Modified the DESCRIPTION clause of etsysVlanInterfaceRowStatus
+         to be less ambiguous." 
+
+    REVISION "200205071755Z"  -- Tue May  7 17:55 GMT 2002
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 22 }
+
+
+-- -------------------------------------------------------------
+-- MIB groupings 
+-- -------------------------------------------------------------
+
+etsysVlanInterface
+    OBJECT IDENTIFIER ::= { etsysVlanInterfaceMIB 1 }
+
+etsysVlanInterfaceVlanLookup
+    OBJECT IDENTIFIER ::= { etsysVlanInterfaceMIB 2 }
+
+-- -------------------------------------------------------------
+-- etsysVlanInterface group           
+-- -------------------------------------------------------------
+
+etsysVlanInterfaceMaximumEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries that this entity
+         supports in the etsysVlanInterfaceTable."
+    ::= { etsysVlanInterface 1 }
+
+etsysVlanInterfaceCurrentEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysVlanInterfaceTable on this entity."
+    ::= { etsysVlanInterface 2 }
+
+etsysVlanInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysVlanInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table controls the dynamic creation of MIB-II
+         interfaces and provides an associated mapping from
+         the VLAN ID to the MIB-II interface index."
+    ::= { etsysVlanInterface 3 }
+
+etsysVlanInterfaceEntry OBJECT-TYPE
+    SYNTAX      EtsysVlanInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry that allows the creation of a MIB-II interface,
+         maps it to the requested VLAN, and provides a mapping
+         from the VLAN ID to the MIB-II interface index."
+    INDEX { etsysVlanInterfaceVlanID }
+    ::= { etsysVlanInterfaceTable 1 }
+
+EtsysVlanInterfaceEntry ::= SEQUENCE {
+    etsysVlanInterfaceVlanID         VlanIndex,
+    etsysVlanInterfaceIfIndex        InterfaceIndexOrZero,
+    etsysVlanInterfaceStorageType    StorageType,
+    etsysVlanInterfaceRowStatus      RowStatus
+}
+
+etsysVlanInterfaceVlanID OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID of the VLAN associated with this interface."
+    ::= { etsysVlanInterfaceEntry 1 }
+
+etsysVlanInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For conceptual rows in the active(1) state, this object
+         returns the ifIndex of the interface mapped to this VLAN.
+         The value of the ifIndex is determined by the agent on the
+         managed entity.
+
+         This object will return 0 (zero) when the conceptual row is 
+         in the notInService(2) state."
+    ::= { etsysVlanInterfaceEntry 2 }
+
+etsysVlanInterfaceStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The memory realization of the conceptual row.
+             volatile(2)    -- is lost upon reboot.
+             nonVolatile(3) -- is persistent across reboots.
+             permanent(4)   -- there are no writable objects.
+             readOnly(5)    -- agent created rows."
+    DEFVAL { nonVolatile }
+    ::= { etsysVlanInterfaceEntry 3 }
+
+etsysVlanInterfaceRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object manages the creation and deletion this entry.
+
+         active        - Indicates that this entry is available
+                         for use by the managed device.
+                         Transitions to this state will cause a
+                         a MIB-II interface to be created by
+                         the managed entity and mapped to the
+                         specified VLAN.  The etsysVlanInterfaceIfIndex
+                         object will return the ifIndex of the newly 
+                         created MIB-II interface.  The ifEntry 
+                         associated with this entry will only be 
+                         allowed to have an ifAdminStatus and 
+                         ifOperStatus of up(1) and will be read-only.
+
+         notInService  - Indicates that this entry exists in the
+                         agent but is unavailable for use. 
+                         The etsysVlanInterfaceIfIndex object will return
+                         a value of 0 for entries in this state.
+                         State transitions from the active(1) state 
+                         will cause the MIB-II interface mapped to 
+                         this VLAN to be deleted.
+
+         notReady      - Should not be possible.
+
+         createAndWait - A new entry will be created in this table
+                         for the specified VLAN and the new entry will
+                         transition to the notInService state.
+
+         createAndGo   - A new entry will be created in this table
+                         for the specified VLAN and the new entry will
+                         transition to the active state.
+
+         destroy       - Deletes this row and any MIB-II interface
+                         that may be associated with it."
+
+    ::= { etsysVlanInterfaceEntry 4 }
+
+-- -------------------------------------------------------------
+-- etsysVlanInterfaceVlanLookup group           
+-- -------------------------------------------------------------
+
+etsysVlanInterfaceVlanLookupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysVlanInterfaceVlanLookupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides a mapping from the MIB-II interface
+         number to VLAN ID."
+    ::= { etsysVlanInterfaceVlanLookup 1 }
+
+etsysVlanInterfaceVlanLookupEntry OBJECT-TYPE
+    SYNTAX      EtsysVlanInterfaceVlanLookupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry that maps a MIB-II interface number to the
+         associated VLAN ID."
+    INDEX { ifIndex }
+    ::={ etsysVlanInterfaceVlanLookupTable 1 }
+
+EtsysVlanInterfaceVlanLookupEntry ::= SEQUENCE {
+    etsysVlanInterfaceVlanIndex      VlanIndex
+}
+
+etsysVlanInterfaceVlanIndex OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID of the VLAN that is represented by this MIB-II
+         interface."
+    ::={ etsysVlanInterfaceVlanLookupEntry 1 }
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysVlanInterfaceConformance
+    OBJECT IDENTIFIER ::= { etsysVlanInterfaceMIB 3 }
+
+etsysVlanInterfaceGroups
+    OBJECT IDENTIFIER ::= { etsysVlanInterfaceConformance 1 }
+
+etsysVlanInterfaceCompliances
+    OBJECT IDENTIFIER ::= { etsysVlanInterfaceConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+ 
+etsysVlanInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+                etsysVlanInterfaceMaximumEntries,
+                etsysVlanInterfaceCurrentEntries,
+                etsysVlanInterfaceIfIndex,
+                etsysVlanInterfaceStorageType,
+                etsysVlanInterfaceRowStatus,
+                etsysVlanInterfaceVlanIndex
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing dynamic MIB-II
+         interface creation."
+    ::= { etsysVlanInterfaceGroups 1 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+    
+etsysVlanInterfaceCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for entity support of dynamic
+         MIB-II interface creation for VLANs."
+    MODULE -- this module
+
+    MANDATORY-GROUPS { etsysVlanInterfaceGroup }
+    ::= { etsysVlanInterfaceCompliances 1 }
+
+END

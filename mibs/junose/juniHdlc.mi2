@@ -1,0 +1,478 @@
+
+-- *****************************************************************************
+-- Juniper-HDLC-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   HDLC MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-HDLC-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniNextIfIndex
+        FROM Juniper-TC;
+
+juniHdlcMIB  MODULE-IDENTITY
+    LAST-UPDATED "200310031925Z"  -- 03-Oct-03 03:25 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The HDLC MIB for the Juniper Networks enterprise.  This MIB provides
+        a means for configuring HDLC interfaces on top of various types of
+        interfaces, such as packet over SONET (POS) and high speed serial
+        interfaces (HSSI).  Management objects are provided to query for an
+        available interface index, and to create/delete interfaces of this type.
+        Creating/deleting this interface type using this MIB has the side effect
+        of creating/deleting corresponding entries in the IF-MIB.ifTable, the
+        IF-MIB.ifXTable, and the Juniper-UNI-IF-MIB.juniIfTable."
+    -- Revision History
+    REVISION    "200310031925Z"  -- 03-Oct-03 03:25 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added juniHdlcIfIdleCharacter object."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200111281343Z"  -- 28-Nov-01 08:43 AM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "Removed DEFVALs for juniHdlcIfClockMode juniHdlcIfClockRate and
+        juniHdlcIfForceDteAck.  Defaults are chosen according to the type of the
+        underlying interface."
+    REVISION    "200103221430Z"  -- 22-Mar-01 09:30 AM EST  - JUNOSe 3.1
+    DESCRIPTION
+        "Added the following objects:
+             juniHdlcIfClockMode
+             juniHdlcIfClockRate
+             juniHdlcIfForceDteAck"
+    REVISION    "200001260000Z"  -- 26-Jan-00               - JUNOSe 1.3
+    DESCRIPTION
+        "Changed the valid integer range for juniHdlcIfMru and juniHdlcIfMtu."
+    REVISION      "9907280000Z"  -- 28-Jul-99               - JUNOSe 1.1
+    DESCRIPTION
+        "o Removed DEFVALs for juniHdlcIfMru and juniHdlcIfMtu.  Defaults are
+           chosen according to the type of the underlying interface.
+         o Added juniHdlcIfDataPolarity."
+    REVISION      "9811130000Z"  -- 13-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHdlcObjects     OBJECT IDENTIFIER ::= { juniHdlcMIB 1 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- HDLC Interfaces
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- IfIndex selection for creating new HDLC interfaces.
+--
+juniHdlcNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniHdlcIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniHdlcObjects 1 }
+
+
+--
+-- The HDLC Interface Table
+--
+juniHdlcIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniHdlcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for HDLC interfaces present in the system."
+    ::= { juniHdlcObjects 2 }
+
+juniHdlcIfEntry OBJECT-TYPE
+    SYNTAX      JuniHdlcIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an HDLC interface.
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniHdlcIfIndex }
+    ::= { juniHdlcIfTable 1 }
+
+JuniHdlcIfEntry ::= SEQUENCE {
+    juniHdlcIfIndex          InterfaceIndex,
+    juniHdlcIfRowStatus      RowStatus,
+    juniHdlcIfLowerIfIndex   InterfaceIndexOrZero,
+    juniHdlcIfMtu            Integer32,
+    juniHdlcIfMru            Integer32,
+    juniHdlcIfCrcSize        INTEGER,
+    juniHdlcIfDataPolarity   INTEGER,
+    juniHdlcIfClockMode      INTEGER,
+    juniHdlcIfClockRate      INTEGER,
+    juniHdlcIfForceDteAck    INTEGER,
+    juniHdlcIfIdleCharacter  INTEGER }
+
+juniHdlcIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the HDLC interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniHdlcNextIfIndex."
+    ::= { juniHdlcIfEntry 1 }
+
+juniHdlcIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniHdlcIfRowStatus
+            juniHdlcIfLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniHdlcIfIndex must have been determined previously, by
+            reading juniHdlcNextIfIndex.
+
+            The interface identified by juniHdlcIfLowerIfIndex must exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniHdlcIfEntry 2 }
+
+juniHdlcIfLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this HDLC interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a nonzero value be configured at entry creation."
+    ::= { juniHdlcIfEntry 3 }
+
+juniHdlcIfMtu OBJECT-TYPE
+    SYNTAX      Integer32 (0..32763)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Transmission Unit (MTU) this interface is permitted to
+        transmit.
+
+        At creation, if a value for this object is not specified, a default will
+        be chosen that is suitable for the type of lower interface on which this
+        interface is stacked.
+
+        This setting plus 2 bytes for HDLC address/control plus the length
+        in bytes of the HDLC CRC cannot exceed 65535.  The maximum value for
+        this object reflects the largest possible value when no CRC is used;
+        technology constraints of a particular implementation may further
+        limit the upper bound value."
+    ::= { juniHdlcIfEntry 4 }
+
+juniHdlcIfMru OBJECT-TYPE
+    SYNTAX      Integer32 (0..32763)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Receive Unit (MRU) this interface is permitted to receive.
+
+        At creation, if a value for this object is not specified, a default will
+        be chosen that is suitable for the type of lower interface on which this
+        interface is stacked.
+
+        This setting plus 2 bytes for HDLC address/control plus the length in
+        bytes of the HDLC CRC cannot exceed 65535.  The maximum value for this
+        object reflects the largest possible value when no CRC is used;
+        technology constraints of a particular implementation may further limit
+        the upper bound value."
+    ::= { juniHdlcIfEntry 5 }
+
+juniHdlcIfCrcSize OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    crc16(1),
+                    crc32(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Selects the CRC size: none, 16 bits, or 32 bits."
+    DEFVAL    { crc16 }
+    ::= { juniHdlcIfEntry 6 }
+
+juniHdlcIfDataPolarity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    normal(0),
+                    inverted(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Polarity of data transmitted on this HDLC interface.  Inverted data is
+        used for certain line coding configurations to ensure sufficient one's
+        density for timing recovery by the remote end."
+    DEFVAL    { normal }
+    ::= { juniHdlcIfEntry 7 }
+
+juniHdlcIfClockMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    hdlcClockUnsupported(0),
+                    hdlcClockInternal(1),
+                    hdlcClockLine(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The clock mode setting for this HDLC interface.  This object is only
+        applicable to HDLC interfaces directly over a high speed serial
+        interface (HSSI).
+
+        At creation, if a value for this object is not specified, a default will
+        be chosen that is suitable for the type of lower interface on which this
+        interface is stacked.  If the lower interface is not HSSI, then the
+        default value will be hdlcClockUnsupported(0); if the lower interface is
+        HSSI then the default value will be hdlcClockLine(2)."
+    ::= { juniHdlcIfEntry 8 }
+
+juniHdlcIfClockRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    hdlcClockRateUnsupported(0),
+                    hdlcClockRate34At368Mhz(1),
+                    hdlcClockRate44At736Mhz(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The clock rate setting for this HDLC interface.  This object is only
+        applicable to HDLC interfaces directly over a high speed serial
+        interface (HSSI).
+
+        At creation, if a value for this object is not specified, a default will
+        be chosen that is suitable for the type of lower interface on which this
+        interface is stacked.  If the lower interface is not HSSI, then the
+        default value will be hdlcClockRateUnsupported(0); if the lower
+        interface is HSSI then the default value will be
+        hdlcClockRate44At736Mhz(2)."
+    ::= { juniHdlcIfEntry 9 }
+
+juniHdlcIfForceDteAck OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    forceDteAckUnsupported(0),
+                    forceDteAckNormal(1),
+                    forceDteAckForced(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The force DTE acknowledge setting.  This object is only applicable to
+        HDLC interfaces directly over a high speed serial interface (HSSI).
+        This is set to force Cisco compatibility mode, and is only valid when
+        the lower interface is configured for internal (DTE) clocking.
+
+        At creation, if a value for this object is not specified, a default will
+        be chosen that is suitable for the type of lower interface on which this
+        interface is stacked.  If the lower interface is not HSSI, then the
+        default value will be forceDteAckUnsupported(0); if the lower
+        interface is HSSI then the default value will be
+        forceDteAckNormal(1)."
+    ::= { juniHdlcIfEntry 10 }
+
+juniHdlcIfIdleCharacter OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    idleCharacterFlags(0),
+                    idleCharacterMarks(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The HDLC idle character has two possible settings.  The value can be
+        set to idleCharacterFlags which translates to 0x7E or it can be set to
+        idleCharacterMarks which translates to 0xFF.
+
+        At creation, if a value for this object is not specified, the default
+        value of idleCharacterFlags will be assigned."
+    DEFVAL    { idleCharacterFlags }
+    ::= { juniHdlcIfEntry 11 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholder OIDs are provided.
+-- juniHdlcTrapControl  OBJECT IDENTIFIER ::= { juniHdlcMIB 2 }
+-- juniHdlcTraps        OBJECT IDENTIFIER ::= { juniHdlcMIB 3 }
+-- juniHdlcTrapPrefix   OBJECT IDENTIFIER ::= { juniHdlcTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHdlcConformance OBJECT IDENTIFIER ::= { juniHdlcMIB 4 }
+juniHdlcCompliances OBJECT IDENTIFIER ::= { juniHdlcConformance 1 }
+juniHdlcGroups      OBJECT IDENTIFIER ::= { juniHdlcConformance 2 }
+
+--
+-- compliance statements
+--
+juniHdlcCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        HDLC MIB.  This compliance statement became obsolete when
+        juniHdlcIfDataPolarity was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniHdlcGroup }
+    ::= { juniHdlcCompliances 1 }                                  -- JUNOSe 1.0
+
+juniHdlcCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper HDLC
+        MIB.  This compliance statement became obsolete when
+        juniHdlcIfClockMode, juniHdlcIfClockRate, and juniHdlcIfForceDteAck were
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniHdlcGroup2 }
+    ::= { juniHdlcCompliances 2 }                                  -- JUNOSe 1.1
+
+juniHdlcCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        HDLC MIB.  This compliance statement became obsolete when
+        juniHdlcIfIdleCharacter was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniHdlcGroup3 }
+    ::= { juniHdlcCompliances 3 }                                  -- JUNOSe 3.1
+
+juniHdlcCompliance4  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper HDLC
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniHdlcGroup4 }
+    ::= { juniHdlcCompliances 4 }                                  -- JUNOSe 5.1
+
+
+--
+-- units of conformance
+--
+juniHdlcGroup  OBJECT-GROUP
+    OBJECTS {
+        juniHdlcNextIfIndex,
+
+        juniHdlcIfRowStatus,
+        juniHdlcIfLowerIfIndex,
+        juniHdlcIfMtu,
+        juniHdlcIfMru,
+        juniHdlcIfCrcSize }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of HDLC interfaces
+        in a Juniper product.  This group became obsolete when
+        juniHdlcIfDataPolarity was added."
+    ::= { juniHdlcGroups 1 }                                       -- JUNOSe 1.0
+
+juniHdlcGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniHdlcNextIfIndex,
+
+        juniHdlcIfRowStatus,
+        juniHdlcIfLowerIfIndex,
+        juniHdlcIfMtu,
+        juniHdlcIfMru,
+        juniHdlcIfCrcSize,
+        juniHdlcIfDataPolarity }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of HDLC interfaces
+        in a Juniper product.  This group became obsolete when
+        juniHdlcIfClockMode, juniHdlcIfClockRate, and juniHdlcIfForceDteAck were
+        added."
+    ::= { juniHdlcGroups 2 }                                       -- JUNOSe 1.1
+
+juniHdlcGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniHdlcNextIfIndex,
+
+        juniHdlcIfRowStatus,
+        juniHdlcIfLowerIfIndex,
+        juniHdlcIfMtu,
+        juniHdlcIfMru,
+        juniHdlcIfCrcSize,
+        juniHdlcIfDataPolarity,
+        juniHdlcIfClockMode,
+        juniHdlcIfClockRate,
+        juniHdlcIfForceDteAck }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of HDLC interfaces
+        in a Juniper product.  This group became obsolete when
+        juniHdlcIfIdleCharacter was added."
+    ::= { juniHdlcGroups 3 }                                       -- JUNOSe 3.1
+
+juniHdlcGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniHdlcNextIfIndex,
+
+        juniHdlcIfRowStatus,
+        juniHdlcIfLowerIfIndex,
+        juniHdlcIfMtu,
+        juniHdlcIfMru,
+        juniHdlcIfCrcSize,
+        juniHdlcIfDataPolarity,
+        juniHdlcIfClockMode,
+        juniHdlcIfClockRate,
+        juniHdlcIfForceDteAck,
+        juniHdlcIfIdleCharacter }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of HDLC interfaces in a
+        Juniper product."
+    ::= { juniHdlcGroups 4 }                                       -- JUNOSe 5.1
+
+END

@@ -1,0 +1,710 @@
+HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,
+        Integer32, Counter32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, TruthValue
+            FROM SNMPv2-TC
+        hpSwitch
+            FROM HP-ICF-OID
+        mldInterfaceEntry
+            FROM IPV6-MLD-MIB
+        TimeTicks
+            FROM SNMPv2-SMI
+        InetAddressIPv6
+            FROM INET-ADDRESS-MIB
+        PortList
+            FROM Q-BRIDGE-MIB
+        InterfaceIndex
+            FROM IF-MIB;
+
+    hpicfMldMIB MODULE-IDENTITY
+        LAST-UPDATED "200707020000Z"  -- July 2, 2007
+        ORGANIZATION "Hewlett-Packard Company
+                      ProCurve Networking Business"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     mib definitons for managing MLD services
+                     including extensions to the standard MLD MIB (RFC 3019)."
+        REVISION     "200707020000Z"  -- July 2, 2007
+        DESCRIPTION  "Initial revision."
+        ::= { hpSwitch 48 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+    HpicfMcastGroupTypeDefinition ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Type definition.  This type distinguishes the 
+                    different ways of tracking this device has for 
+                    multicast joins.  The method of tracking is primarily 
+                    determined by the igmp/mld feature configuration.  In 
+                    particular if the snooping feature is enabled then
+                    port level tracking is the default which results in 
+                    filtered groups.  If the snooping feature is 
+                    disabled then joins will result in standard groups
+                    being tracked by this device.  When hardware resources
+                    are exhauseted for multicast filtered bridging, joins
+                    may result in standard groups even though the snooping
+                    feature is enabled.  Mini groups may be used when 
+                    other resources, such as RAM, are low or exhausted."
+        SYNTAX       INTEGER { standard(1), filtered(2), mini(3) }  
+
+
+-- **********************************************************************
+-- The MLD MIB Groups
+-- **********************************************************************
+
+    hpicfMldObjects     OBJECT IDENTIFIER ::= { hpicfMldMIB 1 }
+    hpicfMld            OBJECT IDENTIFIER ::= { hpicfMldObjects 1 }
+
+    hpicfMldConformance OBJECT IDENTIFIER ::= { hpicfMldMIB 2 }
+    hpicfMldGroups      OBJECT IDENTIFIER ::= { hpicfMldConformance 1 }
+    hpicfMldCompliances OBJECT IDENTIFIER ::= { hpicfMldConformance 2 }
+
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+    hpicfMldControlUnknownMulticast OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When enabled along with MLD, any IPv6 Multicast 
+                     packets that are not joined by an MLD host will
+                     will be restricted to ports that have detected a
+                     multicast router or ports that are configured to 
+                     always forward IPv6 multicast.  When set to disabled
+                     or when MLD is disabled, the unjoined IPv6 multicast
+                     packets will be flooded out all ports in the VLAN.
+                     Permanently assigned multicast addresses are always
+                     flooded and so are not impacted by this object."
+        DEFVAL      { true }
+        ::= { hpicfMld 1 }
+        
+        
+    hpicfMldConfigForcedLeaveInterval OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When a port's 
+                    hpicfMldPortConfigEntryForcedLeaveFeature is
+                    enabled, this is the amount of time allowed for an
+                    MLD Report to arrive and cancel deletion of a
+                    multicast group requested by a previous MLD
+                    Leave request.  Units are tenths of seconds."
+        ::= { hpicfMld 2 }
+
+    hpicfMldEnabledCount OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of interfaces with MLD enabled." 
+        ::= { hpicfMld 3 }
+
+    hpicfMldMcastGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of Multicast groups joined." 
+        ::= { hpicfMld 4 }
+
+  
+-- **********************************************************************
+-- The Extensions to the MLD std MIB mldInterfaceTable (RFC 3019)
+-- **********************************************************************
+
+    hpicfMldIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfMldIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the MLD stadard MIB table mldIfTable."
+        ::= { hpicfMld 5 }
+
+    hpicfMldIfEntry OBJECT-TYPE
+        SYNTAX      HpicfMldIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the mldInterfaceTable."
+        AUGMENTS    { mldInterfaceEntry }
+        ::= { hpicfMldIfTable 1 }
+
+    HpicfMldIfEntry ::=
+        SEQUENCE {
+            hpicfMldIfEntryQuerierFeature       TruthValue,
+            hpicfMldIfEntrySnoopingFeature      TruthValue,
+            hpicfMldIfEntryQuerierPort          Integer32,
+            hpicfMldIfEntryFilteredJoins        Integer32,
+            hpicfMldIfEntryStandardJoins        Integer32,
+            hpicfMldIfEntryPortsWithMcastRouter PortList,
+            hpicfMldIfEntryStatGeneralQueryRx   Counter32,
+            hpicfMldIfEntryStatQueryTx          Counter32,
+            hpicfMldIfEntryStatGSQRx            Counter32,
+            hpicfMldIfEntryStatGSQTx            Counter32,
+            hpicfMldIfEntryStatMldV1ReportRx    Counter32,
+            hpicfMldIfEntryStatMldV2ReportRx    Counter32,
+            hpicfMldIfEntryStatMldV1LeaveRx     Counter32,
+            hpicfMldIfEntryStatUnknownMldTypeRx Counter32,
+            hpicfMldIfEntryStatUnknownPktRx     Counter32,
+            hpicfMldIfEntryStatForwardToRoutersTx Counter32,
+            hpicfMldIfEntryStatForwardToAllPortsTx Counter32,
+            hpicfMldIfEntryStatFastLeaves         Counter32,
+            hpicfMldIfEntryStatForcedFastLeaves   Counter32,
+            hpicfMldIfEntryStatJoinTimeouts       Counter32
+        }
+
+    hpicfMldIfEntryQuerierFeature OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Turns MLD querier functionality on and off."
+        DEFVAL      { true }
+        ::= { hpicfMldIfEntry 1 }  
+        
+        
+    hpicfMldIfEntrySnoopingFeature OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When enabled along with MLD, any IPv6 Multicast 
+                     packets that are joined by an MLD host will be
+                     be restricted to ports which have recieved the
+                     joins.  This can be overridden by other features
+                     like hpicfMldPortConfigEntryPortModeFeature."
+        DEFVAL      { true }
+        ::= { hpicfMldIfEntry 2 }
+
+    hpicfMldIfEntryQuerierPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Logical port which the querier is connected to.  This is 
+                     determined by the presence of querier packets on this port.
+                     This value is 0 if this device is querier."
+        ::= { hpicfMldIfEntry 3 }
+
+    hpicfMldIfEntryFilteredJoins OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of groups on this interface being tracked on a
+                     per port basis.  Traffic for these groups will be filtered to flow
+                     only to ports with active joins, subject to hw resource limitations
+                     such as the maximum number of groups supported by the hardware."
+        ::= { hpicfMldIfEntry 4 }
+
+    hpicfMldIfEntryStandardJoins OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of groups on this interface being traced on a
+                     per interface basis.  Traffic for these groups are flooded to the
+                     ports on the interface.  These can come form joines on interfaces
+                     which do not have mld snooping turned on.  They can also come from
+                     interfaces which have mld snooping on, but hw resources have been
+                     exhausted for bridging traffic based on joins."
+        ::= { hpicfMldIfEntry 5 }
+
+    hpicfMldIfEntryPortsWithMcastRouter OBJECT-TYPE
+        SYNTAX      PortList 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates which ports have a multicast router detected on
+                     them." 
+        ::= { hpicfMldIfEntry 6 }
+
+
+     hpicfMldIfEntryStatGeneralQueryRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times an Mld Gerneral Service Query has been received
+                     on this interface." 
+        ::= { hpicfMldIfEntry 7 }
+
+     hpicfMldIfEntryStatQueryTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a query has been sent from this interface." 
+        ::= { hpicfMldIfEntry  8}
+
+     hpicfMldIfEntryStatGSQRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a group specific query has been received from 
+                     this interface." 
+        ::= { hpicfMldIfEntry  9}
+
+     hpicfMldIfEntryStatGSQTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a group specific query has been sent from 
+                     this interface." 
+        ::= { hpicfMldIfEntry  10}
+
+     hpicfMldIfEntryStatMldV1ReportRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times an Mld version 1 report has been received on
+                     this interface." 
+        ::= { hpicfMldIfEntry  11}
+
+     hpicfMldIfEntryStatMldV2ReportRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times an Mld version 2 report has been received on 
+                     this interface." 
+        ::= { hpicfMldIfEntry  12}
+
+     hpicfMldIfEntryStatMldV1LeaveRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times an Mld version 1 leave has been received on
+                     this interface." 
+        ::= { hpicfMldIfEntry  13}
+
+     hpicfMldIfEntryStatUnknownMldTypeRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times an Mld packet of unkown type has been received
+                     on this inerface." 
+        ::= { hpicfMldIfEntry  14}
+
+     hpicfMldIfEntryStatUnknownPktRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a packet of unknown type has been sent to the
+                     Mld protocol on this device on this interface." 
+        ::= { hpicfMldIfEntry  15}
+
+     hpicfMldIfEntryStatForwardToRoutersTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a packet has been forwarded to routers on this
+                     interface." 
+        ::= { hpicfMldIfEntry  16}
+
+     hpicfMldIfEntryStatForwardToAllPortsTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a packet has been forwarded to all ports on this
+                     interface." 
+        ::= { hpicfMldIfEntry  17}
+
+     hpicfMldIfEntryStatFastLeaves OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a fast leave has occurred on this interface."
+        ::= { hpicfMldIfEntry  18}
+
+     hpicfMldIfEntryStatForcedFastLeaves OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a forced fast leave has occurred on this interface." 
+        ::= { hpicfMldIfEntry  19}
+
+     hpicfMldIfEntryStatJoinTimeouts OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of times a join has timeout out on this interface." 
+        ::= { hpicfMldIfEntry  20}
+  
+-- **********************************************************************
+-- The Extensions to the MLD std MIB mldCacheTable (RFC 3019)
+-- **********************************************************************
+
+    hpicfMldCacheTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfMldCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the MLD stadard MIB table mldCacheTable."
+        ::= { hpicfMld 6 }
+
+    hpicfMldCacheEntry OBJECT-TYPE
+        SYNTAX      HpicfMldCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the mldCacheTable."
+	INDEX      {hpicfMldCacheIfIndex, hpicfMldCacheAddress}
+        ::= { hpicfMldCacheTable 1 }
+
+    HpicfMldCacheEntry ::=
+        SEQUENCE {
+            hpicfMldCacheIfIndex            InterfaceIndex,
+            hpicfMldCacheAddress            InetAddressIPv6,
+            hpicfMldCacheSelf               TruthValue,
+            hpicfMldCacheLastReporter       InetAddressIPv6,
+            hpicfMldCacheUpTime             TimeTicks,
+            hpicfMldCacheExpiryTime         TimeTicks,
+            hpicfMldGroupType               HpicfMcastGroupTypeDefinition, 
+            hpicfJoinedPorts                PortList,
+            hpicfMldCacheStatus             RowStatus
+        }
+
+   hpicfMldCacheIfIndex OBJECT-TYPE
+       SYNTAX     InterfaceIndex
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+                "The internetwork-layer interface for which this entry
+                contains information for an IPv6 multicast group
+                address."
+       ::= { hpicfMldCacheEntry 1 }
+
+   hpicfMldCacheAddress OBJECT-TYPE
+       SYNTAX     InetAddressIPv6 (SIZE (16))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The IPv6 multicast group address for which this entry
+               contains information."
+       ::= { hpicfMldCacheEntry 2 }
+
+   hpicfMldCacheSelf OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "An indication of whether the local system is a member of
+               this group address on this interface."
+       DEFVAL     { true }
+       ::= { hpicfMldCacheEntry 3 }
+
+   hpicfMldCacheLastReporter OBJECT-TYPE
+       SYNTAX     InetAddressIPv6 (SIZE (16))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "The IPv6 address of the source of the last membership
+                report received for this IPv6 Multicast group address on
+                this interface.  If no membership report has been
+                received, this object has the value 0::0."
+       ::= { hpicfMldCacheEntry 4 }
+
+   hpicfMldCacheUpTime OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The time elapsed since this entry was created."
+       ::= { hpicfMldCacheEntry 5 }
+
+   hpicfMldCacheExpiryTime OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "The minimum amount of time remaining before this entry
+                will be aged out.  A value of 0 indicates that the entry
+                is only present because mldCacheSelf is true and that if
+                the router left the group, this entry would be aged out
+                immediately.  Note that some implementations may process
+                Membership Reports from the local system in the same way
+                as reports from other hosts, so a value of 0 is not
+                required."
+       ::= { hpicfMldCacheEntry 6 }
+
+
+    hpicfMldGroupType OBJECT-TYPE
+        SYNTAX     HpicfMcastGroupTypeDefinition
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "See HpicfMldGroupTypeDefinition description."
+        ::= { hpicfMldCacheEntry 7 }  
+        
+    hpicfJoinedPorts OBJECT-TYPE
+        SYNTAX      PortList 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Logical ports with active Mld joins on them for this
+                    entry.  For Filtered groups this will be the logical ports
+                    which have active joins.  For standard and mini groups this
+                    will include all logical ports on the interface running
+                    Mld."
+        ::= { hpicfMldCacheEntry 8 }
+
+   hpicfMldCacheStatus OBJECT-TYPE
+       SYNTAX     RowStatus
+       MAX-ACCESS read-create
+       STATUS     current
+       DESCRIPTION
+               "The status of this row, by which new entries may be
+               created, or existing entries deleted from this table."
+       ::= { hpicfMldCacheEntry 9 }
+        
+        
+-- **********************************************************************
+-- MLD Port Configuration MIB
+-- **********************************************************************
+
+    HpicfMldConfigPortModeType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Type definition.  See
+                    hpicfMldPortConfigEntryPortModeFeature for
+                    definition of this feature."
+        SYNTAX       INTEGER { auto(1), blocked(2), forward(3) }  
+          
+    hpicfMldPortConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfMldPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "This table  contains information about the MLD port
+                    configurations on this switch."
+        ::= { hpicfMld 7 }
+
+    hpicfMldPortConfigEntry OBJECT-TYPE
+        SYNTAX      HpicfMldPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "The information associated with each MLD port
+                    configuration."
+        INDEX       { hpicfMldPortConfigEntryInterfaceIfIndex, hpicfMldPortConfigEntryIndex }
+        ::= { hpicfMldPortConfigTable 1 }
+       
+    HpicfMldPortConfigEntry ::=        
+        SEQUENCE {
+            hpicfMldPortConfigEntryInterfaceIfIndex      InterfaceIndex,
+            hpicfMldPortConfigEntryIndex                 Integer32,
+            hpicfMldPortConfigEntryPortModeFeature       HpicfMldConfigPortModeType,
+            hpicfMldPortConfigEntryForcedLeaveFeature    TruthValue,
+            hpicfMldPortConfigEntryFastLeaveFeature      TruthValue
+        }
+        
+    hpicfMldPortConfigEntryInterfaceIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The internetwork-layer interface value of the interface
+                     for which MLD is enabled."
+        ::= { hpicfMldPortConfigEntry 1 }  
+
+    hpicfMldPortConfigEntryIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1 .. 65535)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex value which uniquely identifies a row in the 
+                     Interfaces Table for a port or trunk."
+        ::= { hpicfMldPortConfigEntry 2 }
+
+    hpicfMldPortConfigEntryPortModeFeature OBJECT-TYPE
+        SYNTAX      HpicfMldConfigPortModeType
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the MLD feature for this
+                    port or trunk.  1 implies that all IP Multicast traffic
+                    will be monitored on the port, 2 implies that
+                    IP Multicast traffic will be dropped on the port, and
+                    3 implies that all IP Multicast traffic will be
+                    forwarded without the switch examining it."
+        ::= { hpicfMldPortConfigEntry 3 }
+
+    hpicfMldPortConfigEntryForcedLeaveFeature OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the MLD feature for this
+                    port or trunk indicates whether any MLD Leaves
+                    received for an IPv6 Multicast group will cause the
+                    group to be deleted after the
+                    hpicfMLDConfigForcedLeaveInterval if no new MLD
+                    Reports are received for that group. Normal behavior
+                    is for a group issuing a Leave to be deleted after
+                    the Querier's Maximum Response time if no MLD 
+                    Report is received."
+        ::= { hpicfMldPortConfigEntry 4 }
+
+    hpicfMldPortConfigEntryFastLeaveFeature OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the MLD feature for this
+                    port or trunk indicates whether any MLD Leaves
+                    received for an IPv6 Multicast group will cause the
+                    group to be deleted immediately on single-
+            connection ports. Normal behavior is for a group 
+            issuing a Leave to be deleted after the Querier's 
+            Maximum Response time if no MLD Report is 
+                    received."
+        ::= { hpicfMldPortConfigEntry 5 }
+
+    
+-- **********************************************************************
+-- MLD Filtered Group Port Cache MIB
+-- **********************************************************************
+
+    hpicfMldFilteredGroupPortCacheTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfMldFilteredGroupPortCacheEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "This table  contains information about the MLD port
+                    configurations on this switch."
+        ::= { hpicfMld 8 }
+
+    hpicfMldFilteredGroupPortCacheEntry OBJECT-TYPE
+        SYNTAX      HpicfMldFilteredGroupPortCacheEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "The information associated with each MLD port
+                    configuration."
+        INDEX       { hpicfMldFilteredGroupPortCacheIfIndex,
+                      hpicfMldFilteredGroupPortCacheGroupAddress,
+                      hpicfMldFilteredGroupPortCachePortIndex }
+        ::= { hpicfMldFilteredGroupPortCacheTable 1 }
+       
+    HpicfMldFilteredGroupPortCacheEntry ::=        
+        SEQUENCE {
+            hpicfMldFilteredGroupPortCacheIfIndex        InterfaceIndex,
+            hpicfMldFilteredGroupPortCacheGroupAddress   InetAddressIPv6,
+            hpicfMldFilteredGroupPortCachePortIndex      Integer32,
+            hpicfMldFilteredGroupPortCacheExpiryTime     TimeTicks
+        }
+
+    hpicfMldFilteredGroupPortCacheIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The internetwork-layer interface value of the interface
+                     for which MLD is enabled and for which this filtered 
+                     group exists."
+        ::= { hpicfMldFilteredGroupPortCacheEntry 1 }
+
+    hpicfMldFilteredGroupPortCacheGroupAddress OBJECT-TYPE
+        SYNTAX      InetAddressIPv6
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IPv6 multicast group address for which this 
+                    entry contains information."
+        ::= { hpicfMldFilteredGroupPortCacheEntry 2 }
+
+    hpicfMldFilteredGroupPortCachePortIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1 .. 65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex value which uniquely identifies a row in the 
+                     Interfaces Table for a port or trunk."
+        ::= { hpicfMldFilteredGroupPortCacheEntry 3 }
+
+    hpicfMldFilteredGroupPortCacheExpiryTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The minimum amount of time remaining before this entry
+                will be aged out."
+        ::= { hpicfMldFilteredGroupPortCacheEntry 4 }
+
+    
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfMldBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfMldControlUnknownMulticast,
+                      hpicfMldConfigForcedLeaveInterval,
+                      hpicfMldEnabledCount,
+                      hpicfMldMcastGroupJoinsCount
+                       }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support basic MLD 
+                    configuration information on HP routers."
+        ::= { hpicfMldGroups 1 }
+
+    hpicfMldIfGroup OBJECT-GROUP
+        OBJECTS     { hpicfMldIfEntryQuerierFeature,
+                      hpicfMldIfEntrySnoopingFeature, 
+                      hpicfMldIfEntryQuerierPort,       
+                      hpicfMldIfEntryFilteredJoins,  
+                      hpicfMldIfEntryStandardJoins,   
+                      hpicfMldIfEntryPortsWithMcastRouter,
+                      hpicfMldIfEntryStatGeneralQueryRx,
+                      hpicfMldIfEntryStatQueryTx,
+                      hpicfMldIfEntryStatGSQRx,
+                      hpicfMldIfEntryStatGSQTx,
+                      hpicfMldIfEntryStatMldV1ReportRx,
+                      hpicfMldIfEntryStatMldV2ReportRx,
+                      hpicfMldIfEntryStatMldV1LeaveRx,
+                      hpicfMldIfEntryStatUnknownMldTypeRx,
+                      hpicfMldIfEntryStatUnknownPktRx,
+                      hpicfMldIfEntryStatForwardToRoutersTx,
+                      hpicfMldIfEntryStatForwardToAllPortsTx,
+                      hpicfMldIfEntryStatFastLeaves,
+                      hpicfMldIfEntryStatForcedFastLeaves,
+                      hpicfMldIfEntryStatJoinTimeouts
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in mldInterfaceTable and used to support management of 
+                    interfaces with MLD enabled."
+        ::= { hpicfMldGroups 2 }
+
+    hpicfMldCacheGroup OBJECT-GROUP
+        OBJECTS     { hpicfMldCacheSelf, 
+                      hpicfMldCacheLastReporter,  
+                      hpicfMldCacheUpTime,      
+                      hpicfMldCacheExpiryTime, 
+                      hpicfMldGroupType,            
+                      hpicfJoinedPorts,            
+                      hpicfMldCacheStatus       
+                    } 
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in mldCacheTable and used to support management of 
+                    interfaces with MLD enabled."
+        ::= { hpicfMldGroups 3 }
+        
+    hpicfMldPortGroup OBJECT-GROUP
+        OBJECTS     { hpicfMldPortConfigEntryPortModeFeature,
+                      hpicfMldPortConfigEntryForcedLeaveFeature,
+                      hpicfMldPortConfigEntryFastLeaveFeature }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in mldInterfaceTable and used to support management of 
+                    interfaces with MLD enabled."
+        ::= { hpicfMldGroups 4 }
+
+    hpicfMldFilteredGroupPortCacheGroup OBJECT-GROUP
+        OBJECTS     { hpicfMldFilteredGroupPortCacheExpiryTime }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in hpicfMldCacheTable which are of type filtered.  These
+                    are used to support management of interfaces with MLD
+                    enabled."
+        ::= { hpicfMldGroups 5 }
+
+-- **********************************************************************
+-- Compliance statements
+-- **********************************************************************
+
+    hpicfMldMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    MLD and implementing the HP-ICF-MLD MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfMldBaseGroup,
+                               hpicfMldIfGroup,
+                               hpicfMldCacheGroup,
+                               hpicfMldPortGroup,
+                               hpicfMldFilteredGroupPortCacheGroup }
+        ::= { hpicfMldCompliances 1 }
+
+END

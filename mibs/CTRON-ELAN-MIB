@@ -1,0 +1,360 @@
+CTRON-ELAN-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-elan-mib.txt
+--  Revision: 01.00.00
+--  Part Number:
+--  Date: May 5, 1997
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific trap log mib.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright January 1997 Cabletron Systems
+
+
+IMPORTS
+    ctAtmfLanEmulation
+            FROM CTRON-MIB-NAMES
+    IpAddress 
+            FROM RFC1155-SMI
+    DisplayString
+            FROM RFC1213-MIB
+    OBJECT-TYPE
+            FROM RFC-1212;
+
+    -- DisplayString ::= OCTET STRING
+
+CtLaneDebugLevel ::= INTEGER {
+        user(1),
+        all(2),
+        error(3),
+        warning(4),
+        informational(5),
+        detailed(6),
+        trace(7)
+        }
+
+
+ElanLocalIndex ::= INTEGER
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    A value which uniquely identifies a
+--     conceptual row in the elanConfTable.
+--     This number is only used locally by the agent to
+--     distinguish between ELANs.
+
+
+ctLeClient      OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 1 }
+ctElan          OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 2 }
+ctLes           OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 3 }
+ctBus           OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 4 }
+ctElanConfGroup OBJECT IDENTIFIER ::= { ctElan 1 }
+
+
+ctElanConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtElanConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table defines an extension to the elanConfTable."
+    ::= { ctElanConfGroup 1 }
+
+ctElanConfEntry OBJECT-TYPE
+    SYNTAX CtElanConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table represents an Emulated LAN.
+         Objects elanConfIndex and elanConfRowStatus are required
+         during row creation and deletion. "
+    INDEX { ctElanConfIndex }
+    ::= { ctElanConfTable 1 }
+
+CtElanConfEntry ::= SEQUENCE {
+    ctElanConfIndex 
+         ElanLocalIndex,
+    ctElanConfUnitNumber 
+         INTEGER,
+    ctElanConfPolicy 
+         INTEGER,
+    ctElanConfDelPolicyWithElan 
+         INTEGER,
+    ctElanConfRowStatus 
+        INTEGER
+    }
+
+ctElanConfIndex OBJECT-TYPE
+    SYNTAX ElanLocalIndex
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A value which uniquely identifies a
+         conceptual row in the ctElanConfTable.
+         The value corresponds to elanConfIndex."
+    ::= { ctElanConfEntry 1 }
+
+ctElanConfUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER(0..4)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Adapter unit for this ELAN, currently
+         read-only.  May expand to be read-write."
+    DEFVAL { 0 }
+    ::= { ctElanConfEntry 2 }
+
+ctElanConfPolicy OBJECT-TYPE
+    SYNTAX INTEGER {
+        secure(1),
+        nonsecure(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Policy determination of this ELAN, where
+         secure(1) ensures that cut through operation
+         will not be in operation.  When an ELAN is
+         in secure mode, it will not allow inter-elan
+         communication by restricting directory
+         services learning or lookups.  The secure(1)
+         mode also restricts the bus from proxy
+         broadcast resolution, also know as the 
+         protocol preprocessor.  When in nonsecure(2)
+         mode, the ELAN will allow cut through
+         operation, Directory Services advertisement,
+         and proxy broadcast resolution."
+    DEFVAL { nonsecure }
+    ::= { ctElanConfEntry 3 }
+
+ctElanConfDelPolicyWithElan OBJECT-TYPE
+    SYNTAX INTEGER {
+        true(1),
+        false(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This objects indicates that if an ELAN row is
+         deleted, any existing LEC->ELAN mappings must
+         also be deleted."
+    DEFVAL { true }
+    ::= { ctElanConfEntry 4 }
+
+ctElanConfRowStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to create or
+         delete entries in the elanConfTable."
+    ::= { ctElanConfEntry 5 }
+
+ctElanSFDSPeerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtElanSFDSPeerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains all Secure Fast Directory Services
+         Database IPs that have been added as peers.  Creating
+         an entry in this table will add the SFDS database at that
+         IP as a peer.  Deleting and entry in this table will drop
+         the SFDS at that IP as a peer."
+    ::= { ctElanConfGroup 2 }
+
+ctElanSFDSPeerEntry OBJECT-TYPE
+    SYNTAX CtElanSFDSPeerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry in this table represents an
+         SFDS Database that has been added as a peer.  ctElanSFDSPeerIP
+         and ctElanSFDSPeerRowStatus must be present during row creation
+         and deletion. "
+    INDEX { ctElanSFDSPeerIP }
+    ::= { ctElanSFDSPeerTable 1 }
+
+CtElanSFDSPeerEntry ::= SEQUENCE {
+    ctElanSFDSPeerIP 
+         IpAddress,
+    ctElanSFDSPeerRowStatus 
+         INTEGER
+    }
+
+ctElanSFDSPeerIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The IP Address of the Directory Services Peer Database."
+    ::= { ctElanSFDSPeerEntry 1 }
+
+ctElanSFDSPeerRowStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        notInService(2),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to create or
+         delete entries in the ctElanSFDSPeerTable."
+    ::= { ctElanSFDSPeerEntry 2 }
+
+ctElanConfDirectoryServicesIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The IP Address of the Directory Services."
+    ::= { ctElanConfGroup 3 }
+
+ctElanDSStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        connected(1),
+        connectionLost(2),
+        unknown(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Reports the current status of the Secure Fast Directory
+         Services connection."
+    DEFVAL { unknown }
+    ::= { ctElanConfGroup 4 }
+
+ctElanUNIVersion OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(1),
+        uni30(2),
+        uni31(3),
+        uni40(4)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Reports the UNI version that lane is using."
+    DEFVAL { unknown }
+    ::= { ctElanConfGroup 5 }
+
+ctElanLaneDbgOutputFile OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..255))
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Full path and file for Debug Output."
+    DEFVAL { "" }
+    ::= { ctElanConfGroup 6 }
+
+ctElanLaneDbgConnectionServices OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for Connection Services subsystem."
+    DEFVAL { user }
+    ::= { ctElanConfGroup 7 }
+
+ctElanLaneDbgDatabaseManagement OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for Database Mgr subsystem."
+    REFERENCE
+        "Cabletron Systems, Inc. private MIB extension."
+    DEFVAL { user }
+    ::= { ctElanConfGroup 8 }
+
+ctElanCtLaneDbgSNMP OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for SNMP Agent subsystem."
+    DEFVAL { user }
+    ::= { ctElanConfGroup 9 }
+
+ctElanLaneDbgLECS OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for LECS subsystem."
+    DEFVAL { user }
+    ::= { ctElanConfGroup 10 }
+
+ctElanCtLaneDbgLES OBJECT-TYPE
+    SYNTAX CtLaneDebugLevel
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Debug level specifier for LES subsystem."
+    DEFVAL { user }
+    ::= { ctElanConfGroup 11 }
+
+ctElanHotStandbyStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        initial(1),
+        active(2),
+        standby(3),
+        unknown(4)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Reports the status of this Hot Standby peer.
+         Initial means this peer has just started and is
+         determining whether it will be primary or standby.
+         Active means it is currently running as the primary.
+         Standby means it is currently in backup mode."
+    DEFVAL { unknown }
+    ::= { ctElanConfGroup 12 }
+
+ctElanConfHotStandbyIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The IP Address of the other member of this Hot Standby peer
+         group."
+    ::= { ctElanConfGroup 13 }
+
+END

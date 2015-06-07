@@ -1,0 +1,793 @@
+ALCATEL-IND1-GVRP-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		Counter32, Unsigned32, MODULE-IDENTITY, OBJECT-IDENTITY, 
+		OBJECT-TYPE, NOTIFICATION-TYPE 
+						FROM SNMPv2-SMI
+		VlanBitmap			FROM ALCATEL-IND1-VLAN-STP-MIB
+		InterfaceIndex		FROM IF-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP
+						FROM SNMPv2-CONF
+     		softentIND1Gvrp		FROM ALCATEL-IND1-BASE;
+
+
+	alcatelIND1GVRPMIB MODULE-IDENTITY
+		LAST-UPDATED "200707020000Z"
+		ORGANIZATION "Alcatel - Architects Of An Internet World"
+		CONTACT-INFO
+            "Please consult with Customer Service to insure the most appropriate
+             version of this document is used with the products in question:
+
+                 Alcatel-Lucent, Enterprise Solutions Division
+                (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+		DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 GVRP for the distribution of VLAN configuration information.
+				 
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+               Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+		REVISION      "200707020000Z"
+        DESCRIPTION
+            	"The GVRP MIB defines a set of GVRP related management objects for VLANs 
+		and ports that support GARP VLAN registration protocol (GVRP). GVRP as a 
+		protocol provides mechanisms to dynamically learn and further propagate VLAN 
+		membership information across a bridged network, as recommended in standards 
+		IEEE Draft Std. P802.1Q-REV/D5.0 and 802.1D 2004 Editions. 
+		
+		This GVRP MIB extends already existing AOS-REUSE IETF_Q_BRIDGE MIB which is based on 
+		RFC 2674 (Bridges with Traffic Classes, Multicast Filtering and Virtual LAN 
+		Extensions), to accomodate the proprietary behavior of the device and for 
+		defining objects as recommended by standards. 
+
+		This MIB comprises proprietary managed objects as well the objects required 
+		for conforming to the standards. However, the set of objects defined in this MIB, 
+		do not duplicate, nor conflict with any MIB object definitions defined in the 
+		IETF_Q_MIB."
+		::= { softentIND1Gvrp 1}
+
+-- --------------------------------------------------------------
+	alcatelIND1GVRPMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For GVRP
+            Subsystem Managed Objects."
+        ::= { alcatelIND1GVRPMIB 1 }
+
+	alcatelIND1GVRPMIBConformance OBJECT-IDENTITY
+	STATUS  current
+	DESCRIPTION
+	    "Branch for GVRP Module MIB Subsystem Conformance Information."
+	::= { alcatelIND1GVRPMIB 2 }
+
+	alcatelIND1GVRPMIBGroups OBJECT-IDENTITY
+	STATUS  current
+	DESCRIPTION
+	    "Branch for GVRP Module MIB Subsystem Units of Conformance."
+	::= { alcatelIND1GVRPMIBConformance 1 }
+
+	alcatelIND1GVRPMIBCompliances OBJECT-IDENTITY
+	STATUS  current
+	DESCRIPTION
+	    "Branch for GVRP Module MIB Subsystem Compliance Statements."
+	::= { alcatelIND1GVRPMIBConformance 2 }
+
+-- --------------------------------------------------------------
+       
+-- --------------------------------------------------------------
+-- GVRP MIB
+-- --------------------------------------------------------------
+
+	alaGvrpGlobalClearStats		OBJECT-TYPE
+		SYNTAX		INTEGER {
+				default(0),
+				reset(1)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the global clear statistics control for GVRP.  
+			The value reset (1) indicates that GVRP should clear all statistic 
+			counters related to all ports in the system. By default, this object
+			contains a zero value."
+		DEFVAL  { default }
+		::= { alcatelIND1GVRPMIBObjects 1 }
+
+      	alaGvrpTransparentSwitching		OBJECT-TYPE
+		SYNTAX		INTEGER {
+				enabled(1),
+				disabled(2)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the behavior when GVRP is globally disabled on a device.			
+			The value enabled (1) indicates that device behaves like a GVRP 
+			transparent device and the GVRP frames will be flooded transparently.
+			Value disabled (2) disabled indicates that the device will not flood 
+			GVRP frames and will simply discard the received GVRP frames."
+		DEFVAL  { disabled }
+		::= { alcatelIND1GVRPMIBObjects 2 }
+		
+	alaGvrpMaxVlanLimit		OBJECT-TYPE
+		SYNTAX		INTEGER  (32 .. 4094)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Defines the maximum number of dynamic VLANs that can be created on the system by GVRP. 
+			If the number of VLANs created by GVRP reaches this limit, the system will gradually 
+			prevent GVRP from creating additional VLANs."
+		DEFVAL  { 256 }
+		::= { alcatelIND1GVRPMIBObjects 3 }
+
+	alaGvrpVlanConflictInfo                OBJECT-TYPE
+		SYNTAX          OCTET STRING ( SIZE (0 .. 100))
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION
+			"GVRP has  recieved registration for Vlan which is configured for End To End Flow Control.
+		Notify the Management with the Port in which the GVRP PDU was recieved and the Vlan."
+		::= { alcatelIND1GVRPMIBObjects 6 }
+		
+
+-- -------------------------------------------------------------
+-- GVRP Port Config Table
+-- -------------------------------------------------------------
+        
+--      DESCRIPTION:
+--                      "Port configuration information
+--   			 data for the GVRP Module.
+--			 Implementation of this group is mandantory"
+
+
+		
+	gvrpPortConfig  OBJECT IDENTIFIER ::= { alcatelIND1GVRPMIBObjects 4 }
+       
+        
+        alaGvrpPortConfigTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaGvrpPortConfigEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table containing GVRP port configuration information."
+            ::= { gvrpPortConfig 1 }
+            
+        alaGvrpPortConfigEntry  OBJECT-TYPE
+            SYNTAX  AlaGvrpPortConfigEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A GVRP port configuration entry."
+            INDEX { alaGvrpPortConfigIfIndex }
+            ::= { alaGvrpPortConfigTable 1 }
+
+        AlaGvrpPortConfigEntry ::= SEQUENCE {
+	    alaGvrpPortConfigIfIndex 	InterfaceIndex,
+	    alaGvrpPortConfigRegistrarMode	INTEGER,
+	    alaGvrpPortConfigApplicantMode	INTEGER,
+	    alaGvrpPortConfigRestrictedRegistrationBitmap   VlanBitmap,
+	    alaGvrpPortConfigAllowRegistrationBitmap   VlanBitmap,
+	    alaGvrpPortConfigRegistrationBitmap   VlanBitmap,
+	    alaGvrpPortConfigRestrictedApplicantBitmap VlanBitmap,
+	    alaGvrpPortConfigAllowApplicantBitmap VlanBitmap,
+	    alaGvrpPortConfigApplicantBitmap VlanBitmap,
+	    alaGvrpPortConfigRegistrationToStaticVlanLearn   VlanBitmap,
+	    alaGvrpPortConfigRegistrationToStaticVlanRestrict   VlanBitmap,
+	    alaGvrpPortConfigRegistrationToStaticVlan   VlanBitmap,
+	    alaGvrpPortConfigJoinTimer	Unsigned32,
+	    alaGvrpPortConfigLeaveTimer Unsigned32,
+	    alaGvrpPortConfigLeaveAllTimer Unsigned32,
+	    alaGvrpPortConfigProviderBpduMac INTEGER 
+	    }
+	    
+	    alaGvrpPortConfigIfIndex  OBJECT-TYPE
+	    SYNTAX  InterfaceIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "The ifindex of the port on which GVRP is running"
+	    ::= { alaGvrpPortConfigEntry 1 }
+	    
+	    alaGvrpPortConfigRegistrarMode  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			normal(1),
+			fixed(2),
+			forbidden(3)                             
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Defines the mode of operation of all the registrar state machines associated to the port.
+		normal - registration as well as de-registration of VLANs are allowed. 
+		fixed  - A VLAN that was previously mapped onto such a port either dynamically or 
+		statically cannot be de-registered through GVRP.  When the port registration mode is set to fixed, 
+		VLAN(s) can only be mapped onto such port statically.
+		forbidden - dynamic VLAN registration or de-registration are not allowed on the port. 
+		
+		NOTE: The registrar state machines for the default VLAN will operate in Fixed Registration Mode 
+		for all the ports on the switch."
+		DEFVAL  { normal }
+		::= { alaGvrpPortConfigEntry 2 }
+	    
+	    
+	    alaGvrpPortConfigApplicantMode  OBJECT-TYPE
+		SYNTAX  INTEGER {
+			participant (1),
+			nonparticipant (2),
+			active (3)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Defines the mode of operation of all the applicant state machines associated to the port.
+		participant - The state machines participates normally  in GVRP protocol exchanges.
+		non_participant - The state machines does not send any GVRP PDU(s).
+		active - The state machines send GVRP frames even on ports that are in blocking state on 
+		the active spanning tree instance."
+		DEFVAL  { participant }
+		::= { alaGvrpPortConfigEntry 3 }
+	    
+	    
+	    alaGvrpPortConfigRestrictedRegistrationBitmap OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the restricted registration control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether VLAN(s) can be created in 
+		the system based on GVRP processing or only mapped to ports in case they have already been 
+		statically created in the system. The bitmap will only affect the GVRP processing if the 
+		Registrar Administrative Control alaGvrpPortConfigRegistrarMode value on the port is set 
+		normal registration (1). Each bit defines:
+		0= false, dynamic VLAN registration is not restricted
+		1= true, VLAN cannot be created in the system by GVRP processing. 
+		However, if this VLAN already exists in the system as a static VLAN, 
+		then it can be mapped to the receiving port"
+		::= { alaGvrpPortConfigEntry 4 }
+	
+	    alaGvrpPortConfigAllowRegistrationBitmap OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the restricted registration control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether VLAN(s) can be created in 
+		the system based on GVRP processing or only mapped to ports in case they have already been 
+		statically created in the system. The bitmap will only affect the GVRP processing if the 
+		Registrar Administrative Control alaGvrpPortConfigRegistrarMode value on the port is set 
+		normal registration (1). Each bit defines:
+		0= false, VLAN cannot be created in the system by GVRP processing. 
+		1= true, dynamic VLAN registration is allowed
+		However, if this VLAN already exists in the system as a static VLAN, 
+		then it can be mapped to the receiving port"
+		::= { alaGvrpPortConfigEntry 5 }
+	
+	    alaGvrpPortConfigRegistrationBitmap OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the restricted registration control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether VLAN(s) can be created in 
+		the system based on GVRP processing or only mapped to ports in case they have already been 
+		statically created in the system. The bitmap will only affect the GVRP processing if the 
+		Registrar Administrative Control alaGvrpPortConfigRegistrarMode value on the port is set 
+		normal registration (1). Each bit defines:
+		0= false, dynamic VLAN registration is not restricted
+		1= true, VLAN cannot be created in the system by GVRP processing. 
+		However, if this VLAN already exists in the system as a static VLAN, 
+		then it can be mapped to the receiving port"
+		::= { alaGvrpPortConfigEntry 6 }
+
+	    alaGvrpPortConfigRestrictedApplicantBitmap OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the restricted applicant control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether VLAN(s) can be propagated in 
+		the system based on GVRP processing. The bitmap will only affect the GVRP processing if the 
+		Applicant Administrative Control alaGvrpPortConfigApplicantMode value on the port is set 
+		participant(1) or active (3). Each bit defines:
+		0= false, VLAN propagation is not restricted
+		1= true, VLAN cannot be propagated in the system by GVRP processing."
+		::= { alaGvrpPortConfigEntry 7 }
+		
+	    alaGvrpPortConfigAllowApplicantBitmap OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the restricted applicant control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether VLAN(s) can be propagated in 
+		the system based on GVRP processing. The bitmap will only affect the GVRP processing if the 
+		Applicant Administrative Control alaGvrpPortConfigApplicantMode value on the port is set 
+		participant(1) or active (3). Each bit defines:
+		0= false, VLAN cannot be propagated in the system by GVRP processing
+		1= true, VLAN propagation is allowed."
+		::= { alaGvrpPortConfigEntry 8 }
+		
+	    alaGvrpPortConfigApplicantBitmap OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the restricted applicant control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether VLAN(s) can be propagated in 
+		the system based on GVRP processing. The bitmap will only affect the GVRP processing if the 
+		Applicant Administrative Control alaGvrpPortConfigApplicantMode value on the port is set 
+		participant(1) or active (3). Each bit defines:
+		0= false, VLAN propagation is not restricted
+		1= true, VLAN cannot be propagated in the system by GVRP processing."
+		::= { alaGvrpPortConfigEntry 9 }
+		
+	    alaGvrpPortConfigRegistrationToStaticVlanLearn OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the registration to static VLAN control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether ports can be mapped to statically 
+		configured VLAN(s) based on GVRP processing. The bitmap will only affect the GVRP processing if 
+		the Registrar Administrative Control alaGvrpPortConfigRegistrarMode value on the port is set to 
+		normal registration (1). Each bit defines:
+		0= restrict, port is not allowed to become member of VLAN.
+		1= learn, port is allowed to become member of corresponding VLAN"
+		::= { alaGvrpPortConfigEntry 10 }
+		
+	    alaGvrpPortConfigRegistrationToStaticVlanRestrict OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the registration to static VLAN control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether ports can be mapped to statically 
+		configured VLAN(s) based on GVRP processing. The bitmap will only affect the GVRP processing if 
+		the Registrar Administrative Control alaGvrpPortConfigRegistrarMode value on the port is set to 
+		normal registration (1). Each bit defines:
+		0= learn, port is allowed to become member of corresponding VLAN
+		1= restrict, port is not allowed to become member of VLAN."
+		::= { alaGvrpPortConfigEntry 11 }
+
+	    alaGvrpPortConfigRegistrationToStaticVlan OBJECT-TYPE
+		SYNTAX  VlanBitmap 
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		"An octet string of 4096 bits that defines the status of the registration to static VLAN control 
+		for all VLAN(s) in the range from 1 to 4096. It defines whether ports can be mapped to statically 
+		configured VLAN(s) based on GVRP processing. The bitmap will only affect the GVRP processing if 
+		the Registrar Administrative Control alaGvrpPortConfigRegistrarMode value on the port is set to 
+		normal registration (1). Each bit defines:
+		0= learn, port is allowed to become member of corresponding VLAN
+		1= restrict, port is not allowed to become member of VLAN."
+		::= { alaGvrpPortConfigEntry 12 }
+		
+	   alaGvrpPortConfigJoinTimer  OBJECT-TYPE
+		SYNTAX  Unsigned32  (1 .. 2147483647) 
+		UNITS "milliseconds"
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Maximum period of time that a GVRP instance waits before making declarations for VLANs."
+		DEFVAL  { 600 }
+		::= { alaGvrpPortConfigEntry 13 }
+	    
+	  
+	  alaGvrpPortConfigLeaveTimer OBJECT-TYPE
+		SYNTAX  Unsigned32  (3 .. 2147483647) 
+		UNITS "milliseconds"
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Period of time that a registrar state machine of a GVRP instance waits, after receiving 
+		a leave message on a port for a particular VLAN, to remove the registration of that VLAN 
+		on the port.
+		The value for the Leave Timer must be greater than three times the value for the Join 
+	        timer, i.e. Leave >= Join*3."
+		DEFVAL  { 1800 }
+		::= { alaGvrpPortConfigEntry 14 }
+		
+	    alaGvrpPortConfigLeaveAllTimer OBJECT-TYPE
+		SYNTAX  Unsigned32  (3 .. 2147483647) 
+		UNITS "milliseconds"
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Interval at which the Leave All state machine of a GVRP instance generates Leave All 
+		messages. A Leave All message instructs GVRP to modify the state of all VLANs registered 
+		on a port to Leaving.
+		The value for the LeaveAll Timer must be greater than the value for the Leave
+		timer, i.e. LeaveAll >= Leave."		
+		DEFVAL  { 30000  }
+		
+		::= { alaGvrpPortConfigEntry 15 }
+	   
+	    alaGvrpPortConfigProviderBpduMac OBJECT-TYPE
+		SYNTAX INTEGER 
+		{     
+                        enable (1),
+                        disable (2)
+                }
+		MAX-ACCESS  read-write
+		STATUS  current	
+	        DESCRIPTION
+		"Describes the treatment of gvrp frames ingressing on a gvrp enabled Vlan stacking network
+                ports.If disabled provider gvrp frames with provider group address are processed on the
+                port and if enabled provider gvrp frames with customer group address are processed on
+                gvrp enabled vlan stacking network port."
+		
+	        ::= { alaGvrpPortConfigEntry 16 }
+		   	
+-- -------------------------------------------------------------
+
+
+-- -------------------------------------------------------------
+-- GVRP Port Statistics Table
+-- -------------------------------------------------------------
+        
+--      DESCRIPTION:
+--                      "Port statistics information
+--   			 for the GVRP Module.
+--			 Implementation of this group is mandantory"
+
+
+	gvrpPortStats  OBJECT IDENTIFIER ::= { alcatelIND1GVRPMIBObjects 5 }
+        
+        
+        alaGvrpPortStatsTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF AlaGvrpPortStatsEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A table containing GVRP port statistics information."
+            ::= { gvrpPortStats 1 }
+
+        alaGvrpPortStatsEntry  OBJECT-TYPE
+            SYNTAX  AlaGvrpPortStatsEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A GVRP port statistics entry."
+            INDEX { alaGvrpPortStatsIfIndex }
+            ::= { alaGvrpPortStatsTable 1 }
+
+        AlaGvrpPortStatsEntry ::= SEQUENCE {    
+        	alaGvrpPortStatsIfIndex InterfaceIndex,
+	    	alaGvrpPortStatsJoinEmptyReceived Counter32,
+		alaGvrpPortStatsJoinInReceived Counter32,
+		alaGvrpPortStatsEmptyReceived Counter32,
+		alaGvrpPortStatsLeaveInReceived Counter32,
+		alaGvrpPortStatsLeaveEmptyReceived Counter32,
+		alaGvrpPortStatsLeaveAllReceived Counter32,
+		alaGvrpPortStatsJoinEmptyTransmitted Counter32,
+		alaGvrpPortStatsJoinInTransmitted Counter32,
+		alaGvrpPortStatsEmptyTransmitted Counter32,
+		alaGvrpPortStatsLeaveInTransmitted Counter32,
+		alaGvrpPortStatsLeaveEmptyTransmitted Counter32,
+		alaGvrpPortStatsLeaveAllTransmitted Counter32,
+		alaGvrpPortStatsTotalPDUReceived Counter32,
+		alaGvrpPortStatsTotalPDUTransmitted Counter32,
+		alaGvrpPortStatsTotalMsgsReceived Counter32,
+		alaGvrpPortStatsTotalMsgsTransmitted Counter32,		
+		alaGvrpPortStatsInvalidMsgsReceived Counter32,
+		alaGvrpPortStatsClearStats INTEGER
+		
+	    }                                      
+	    
+	alaGvrpPortStatsIfIndex  OBJECT-TYPE
+	    SYNTAX  InterfaceIndex
+	    MAX-ACCESS  not-accessible
+	    STATUS  current
+	    DESCRIPTION
+		 "The ifindex of the port on which GVRP is running"
+	    ::= { alaGvrpPortStatsEntry 1 } 
+	    
+	       
+	alaGvrpPortStatsJoinEmptyReceived OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Join Empty messages received."
+            ::= { alaGvrpPortStatsEntry 2}
+
+		
+	alaGvrpPortStatsJoinInReceived	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Join In messages received."
+            ::= { alaGvrpPortStatsEntry 3}
+            
+	  	
+	  alaGvrpPortStatsEmptyReceived	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Empty messages received."
+            ::= { alaGvrpPortStatsEntry 4}
+            
+	  
+	  alaGvrpPortStatsLeaveInReceived	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Leave In messages received."
+            ::= { alaGvrpPortStatsEntry 5}
+            
+	  
+	  alaGvrpPortStatsLeaveEmptyReceived	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Leave Empty messages received."
+            ::= { alaGvrpPortStatsEntry 6}
+            
+	  
+	  alaGvrpPortStatsLeaveAllReceived	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Leave all messages received."
+            ::= { alaGvrpPortStatsEntry 7}
+            
+	  
+	  alaGvrpPortStatsJoinEmptyTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Join Empty messages transmitted."
+            ::= { alaGvrpPortStatsEntry 8}
+            
+	  
+	  alaGvrpPortStatsJoinInTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Join In messages transmitted."
+            ::= { alaGvrpPortStatsEntry 9}
+            
+	  
+	  alaGvrpPortStatsEmptyTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Empty messages transmitted."
+            ::= { alaGvrpPortStatsEntry 10}
+            
+	  
+	  alaGvrpPortStatsLeaveInTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Leave In messages transmitted."
+            ::= { alaGvrpPortStatsEntry 11}
+            
+	  
+	  alaGvrpPortStatsLeaveEmptyTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Leave Empty messages transmitted."
+            ::= { alaGvrpPortStatsEntry 12}
+            
+	  
+	  alaGvrpPortStatsLeaveAllTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Leaveall messages transmitted."
+            ::= { alaGvrpPortStatsEntry 13}
+            
+	  
+	  alaGvrpPortStatsTotalPDUReceived	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The total number of GVRP PDUs received."
+            ::= { alaGvrpPortStatsEntry 14}
+            
+	  
+	  alaGvrpPortStatsTotalPDUTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The total number of GVRP PDUs transmitted."
+            ::= { alaGvrpPortStatsEntry 15}
+            	                                      
+      	  alaGvrpPortStatsTotalMsgsReceived	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The total number of GVRP messages received."
+            ::= { alaGvrpPortStatsEntry 16}
+            
+	  
+	  alaGvrpPortStatsTotalMsgsTransmitted	OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The total number of GVRP messages transmitted."
+            ::= { alaGvrpPortStatsEntry 17}
+
+	  alaGvrpPortStatsInvalidMsgsReceived OBJECT-TYPE
+              SYNTAX  Counter32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The number of Invalid messages received."
+            ::= { alaGvrpPortStatsEntry 18}
+            	     	  
+	  alaGvrpPortStatsClearStats	OBJECT-TYPE
+              SYNTAX		INTEGER {
+				default(0),
+				reset(1)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Reset all statistics parameters corresponding to this port.
+			 By default, this objects contains a zero value."
+		DEFVAL  { default }
+            ::= { alaGvrpPortStatsEntry 19}   
+	  
+-- --------------------------------------------------------------
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- whenever dynamically learnt vlans by gvrp across system reaches the defined limit
+-- and when dynamically learnt vlans by gvrp at each NI reaches a defined limit.
+-- --------------------------------------------------------------
+ 
+          alaGvrpEvents OBJECT IDENTIFIER ::= { alcatelIND1GVRPMIB 3 }
+ 
+          gvrpVlanLimitReachedEvent NOTIFICATION-TYPE
+          OBJECTS  {
+                      alaGvrpMaxVlanLimit }
+          STATUS   current
+          DESCRIPTION
+                "The number of vlans learnt dynamically by GVRP has
+                reached a configured limit. Notify the management
+                entity with number of vlans learnt dynamically by
+                GVRP and the configured GVRP vlan limit."
+          ::= { alaGvrpEvents 0 1 }
+
+	  e2eGvrpVlanConflictTrap NOTIFICATION-TYPE
+	  OBJECTS  {
+	  	      alaGvrpVlanConflictInfo }
+	  STATUS   current
+	  DESCRIPTION
+		"GVRP has recieved a registration for Vlan which is configured for End To End Flow Control.
+	  	Notify the Management with the Port in which the GVRP PDU was recieved and the Vlan."
+	  ::= { alaGvrpEvents 0 2 }
+	  
+-- -------------------------------------------------------------
+-- COMPLIANCE
+-- -------------------------------------------------------------
+alcatelIND1GVRPMIBCompliance MODULE-COMPLIANCE
+   STATUS    current
+   DESCRIPTION
+	"Compliance statement for GVRP."
+   MODULE
+	MANDATORY-GROUPS
+	{
+		gvrpPortBaseGroup,
+		gvrpPortConfigGroup,
+		gvrpPortStatsGroup
+	}
+   ::= { alcatelIND1GVRPMIBCompliances 1 }
+
+-- -------------------------------------------------------------
+-- UNITS OF CONFORMANCE
+-- -------------------------------------------------------------
+
+gvrpPortBaseGroup   OBJECT-GROUP
+OBJECTS
+{
+    alaGvrpGlobalClearStats,
+    alaGvrpTransparentSwitching,
+    alaGvrpMaxVlanLimit
+}   
+  STATUS  current
+  DESCRIPTION
+  "Collection of objects for management of GVRP Base Group."
+  ::= { alcatelIND1GVRPMIBGroups 1 }
+
+gvrpPortConfigGroup OBJECT-GROUP
+   OBJECTS
+   {
+	alaGvrpPortConfigRegistrarMode,
+	alaGvrpPortConfigApplicantMode,
+	alaGvrpPortConfigRestrictedRegistrationBitmap,
+	alaGvrpPortConfigAllowRegistrationBitmap,
+	alaGvrpPortConfigRegistrationBitmap,
+	alaGvrpPortConfigRestrictedApplicantBitmap,
+	alaGvrpPortConfigAllowApplicantBitmap,
+	alaGvrpPortConfigApplicantBitmap,
+	alaGvrpPortConfigRegistrationToStaticVlanLearn,
+	alaGvrpPortConfigRegistrationToStaticVlanRestrict,
+	alaGvrpPortConfigRegistrationToStaticVlan,
+	alaGvrpPortConfigJoinTimer,
+	alaGvrpPortConfigLeaveTimer,
+	alaGvrpPortConfigLeaveAllTimer
+   }
+   STATUS  current
+   DESCRIPTION
+	"Collection of objects for management of GVRP Port Configuration Table."
+   ::= { alcatelIND1GVRPMIBGroups 2 }
+
+
+gvrpPortStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+	alaGvrpPortStatsJoinEmptyReceived,
+	alaGvrpPortStatsJoinInReceived,
+	alaGvrpPortStatsEmptyReceived,
+	alaGvrpPortStatsLeaveInReceived,
+	alaGvrpPortStatsLeaveEmptyReceived,
+	alaGvrpPortStatsLeaveAllReceived,
+	alaGvrpPortStatsJoinEmptyTransmitted,
+	alaGvrpPortStatsJoinInTransmitted,
+	alaGvrpPortStatsEmptyTransmitted,
+	alaGvrpPortStatsLeaveInTransmitted,
+	alaGvrpPortStatsLeaveEmptyTransmitted,
+	alaGvrpPortStatsLeaveAllTransmitted,
+	alaGvrpPortStatsTotalPDUReceived,
+	alaGvrpPortStatsTotalPDUTransmitted,
+	alaGvrpPortStatsTotalMsgsReceived,
+	alaGvrpPortStatsTotalMsgsTransmitted,		
+	alaGvrpPortStatsInvalidMsgsReceived,
+	alaGvrpPortStatsClearStats
+   }			
+   STATUS  current
+   DESCRIPTION
+	"Collection of objects for management of GVRP Statistics Table."
+   ::= { alcatelIND1GVRPMIBGroups 3 }
+
+-- ------------------------------------------------------------- 
+
+END

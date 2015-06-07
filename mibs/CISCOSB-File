@@ -1,0 +1,236 @@
+CISCOSB-File DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB File Private Extension
+-- Version:    7.39.00.00
+-- Date:       23 Feb 2005
+-- 23-Sep-2003  Added field rlFileRowStatus to rlFileTable
+-- 23-Sep-2003  Removed field rlFileActionNextLine from rlFileActionTable
+-- 23-Sep-2003  Removed values "display" and "delete" of rlFileActionCommand
+-- 07-Nov-2004  Added Scalar rlFileAuditingEnable
+-- 23-Feb-2005  Added rlFileFlashSize
+-- 30-May-2011  Added MODULE-IDENTITY
+
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    DisplayString, RowStatus, TruthValue        FROM SNMPv2-TC
+    OBJECT-TYPE                                 FROM SNMPv2-SMI;
+
+rlFile MODULE-IDENTITY
+      	LAST-UPDATED "201304010000Z"  -- April 1, 2013
+		ORGANIZATION "Cisco Systems, Inc."
+
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
+
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for File Private Extension."
+      	REVISION     "201304010000Z"  -- April 1, 2013
+      	DESCRIPTION
+              "Added MODULE-IDENTITY"
+        ::= { switch001 96 }
+
+rlFileMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the File System MIB version. The current version is 1."
+    ::= {rlFile 1 }
+
+rlFileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The (conceptual) table listing all the files
+          of the flash file system."
+    ::= {rlFile 2 }
+
+rlFileEntry  OBJECT-TYPE
+    SYNTAX      RlFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry (conceptual row) in the FileTable."
+    INDEX { IMPLIED rlFileName }
+    ::= {rlFileTable  1 }
+
+RlFileEntry ::= SEQUENCE {
+    rlFileName                          OCTET STRING,
+    rlFilePermission                    INTEGER,
+    rlFileSize                          INTEGER,
+    rlFileModificationDate              DisplayString,
+    rlFileModificationTime              DisplayString,
+    rlFileRowStatus                     RowStatus,
+    rlFileFlashSize                     INTEGER,
+    rlFileFullNormalizedName            OCTET STRING
+}
+
+rlFileName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the file."
+    ::=  { rlFileEntry 1 }
+
+rlFilePermission OBJECT-TYPE
+    SYNTAX  INTEGER {
+        read(1),
+        write(2),
+        readWrite(3),
+        noReadNoWrite(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the permission level in which this file can be accessed. "
+    ::= { rlFileEntry 2 }
+
+rlFileSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size of the file in bytes (actual size)."
+    ::=  { rlFileEntry 3 }
+
+rlFileModificationDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time-stamp indicating the date of creation or last
+         modification of this file. The format of the time-stamp is
+         dd-mmm-yyyy"
+    ::= { rlFileEntry 4 }
+
+rlFileModificationTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time-stamp indicating the time of creation or last
+         modification of this file. The format of the time-stamp is
+         hh:mm:ss"
+    ::= { rlFileEntry 5 }
+
+rlFileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It is used just to delete an entry"
+    ::= { rlFileEntry 6 }
+
+rlFileFlashSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size allocated for the file in bytes (allocated size)."
+    ::=  { rlFileEntry 7 }
+
+rlFileFullNormalizedName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The full normalized name - up to max OCTET STRING length and
+         not containing '..' and '.' path components."
+    ::=  { rlFileEntry 8 }
+
+rlFileActionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlFileActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " The (conceptual) table listing only one entry at a time
+          with parameters needed for performing an action on a file."
+    ::= {rlFile 3 }
+
+rlFileActionEntry  OBJECT-TYPE
+    SYNTAX      RlFileActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry (conceptual row) in the FileActionTable."
+    INDEX {rlFileActionName }
+    ::= {rlFileActionTable  1 }
+
+RlFileActionEntry ::= SEQUENCE {
+    rlFileActionName                    OCTET STRING,
+    rlFileActionNewName                 OCTET STRING,
+    rlFileActionRowStatus               RowStatus,
+    rlFileActionCommand                 INTEGER
+}
+
+rlFileActionName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the file."
+    ::=  { rlFileActionEntry 1 }
+
+rlFileActionNewName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The new name for the file (in case of action rename)."
+    ::=  { rlFileActionEntry 2 }
+
+rlFileActionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It is used to create an entry"
+    ::= { rlFileActionEntry 3 }
+
+rlFileActionCommand OBJECT-TYPE
+    SYNTAX INTEGER {
+        rename(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Perform an action on the file."
+    ::= { rlFileActionEntry 4 }
+
+rlFileTotalSizeOfFlash OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the total size of the flash in bytes."
+    ::= {rlFile 4 }
+
+rlFileFreeSizeOfFlash OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of free bytes in the flash."
+    ::= {rlFile 5 }
+
+---         File System auditing control (SysLog)
+
+rlFileAuditingEnable  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls whether SysLog messages
+         should be issued on file rename/delete events"
+    DEFVAL { true }
+    ::= { rlFile 6 }
+
+END

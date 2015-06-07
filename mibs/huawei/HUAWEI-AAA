@@ -1,0 +1,4278 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- DESCRIPTION:  HUAWEI-AAA-MIB
+-- Reference:  
+-- Version: V3.00
+-- History:
+-- 
+-- =================================================================
+
+    HUAWEI-AAA-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS 
+            huaweiMgmt            
+                FROM HUAWEI-MIB            
+            IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString, RowStatus, TruthValue, MacAddress, DateAndTime            
+                FROM SNMPv2-TC;
+
+
+        hwAaa MODULE-IDENTITY
+            LAST-UPDATED "200311250900Z"
+            ORGANIZATION "Fix-Net Dep, Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Floor 5, Block 4, R&D Building,
+                Huawei Longgang Production Base,
+                Shenzhen,   P.R.C.
+                http://www.huawei.com
+                Zip:518057
+                "
+            DESCRIPTION 
+                "The MIB contains objects of module AAA."
+            ::= { huaweiMgmt 2 }
+
+        hwAAAMibObjects OBJECT IDENTIFIER ::= { hwAaa 1 }
+
+        hwAuthenSchemeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAuthenSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The authentication scheme table."
+            ::= { hwAAAMibObjects 1 }
+
+        hwAuthenSchemeEntry OBJECT-TYPE
+            SYNTAX HwAuthenSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The authentication scheme entry."
+            INDEX { hwAuthenSchemeName }
+            ::= { hwAuthenSchemeTable 1 }
+
+        HwAuthenSchemeEntry ::=
+            SEQUENCE {
+                hwAuthenSchemeName
+                    DisplayString,
+                hwAuthenMethod
+                    INTEGER,
+                hwAuthenRowStatus
+                    RowStatus,
+                hwAuthenFailPolicy    
+                        INTEGER,
+                hwAuthenFailDomain
+                        DisplayString
+             }
+
+        hwAuthenSchemeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The authentication scheme name."
+            ::= { hwAuthenSchemeEntry 1 }
+
+        hwAuthenMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                local(1),
+                noauth(2),
+                radius(3),
+                localRadius(4),
+                radiusLocal(5),
+                radiusNoauth(6),
+                tacacs(7),
+                tacacsLocal(8),
+                localTacacs(9),
+                tacacsNoauth(10)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The authentication method."
+            ::= { hwAuthenSchemeEntry 2 }
+
+        hwAuthenRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row administration status, only supporting add or delete."
+            ::= { hwAuthenSchemeEntry 3 }
+        
+        hwAuthenFailPolicy OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                online(1),
+                offline(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The authentication fail policy,
+                 online(1)：keeping user online,
+                 offline(2)：making user offline. 
+                "
+            ::= { hwAuthenSchemeEntry 4 }
+            
+        hwAuthenFailDomain OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The authentication fail domain."
+            ::= { hwAuthenSchemeEntry 5 }
+            
+
+        hwAcctSchemeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAcctSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The account scheme table."
+            ::= { hwAAAMibObjects 2 }
+
+        hwAcctSchemeEntry OBJECT-TYPE
+            SYNTAX HwAcctSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The account scheme entry."
+            INDEX { hwAcctSchemeName }
+            ::= { hwAcctSchemeTable 1 }
+
+        HwAcctSchemeEntry ::=
+            SEQUENCE {
+                hwAcctSchemeName
+                    DisplayString,
+                hwAccMethod
+                    INTEGER,
+                hwAcctStartFail
+                    INTEGER,
+                hwAcctOnlineFail
+                    INTEGER,
+                hwAccRealTimeInter
+                    Integer32,
+                hwAcctRowStatus
+                    RowStatus
+             }
+
+        hwAcctSchemeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The account scheme name."
+            ::= { hwAcctSchemeEntry 1 }
+
+        hwAccMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                noacct(2),
+                radius(3),
+                hwtacacs(5)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The account method."
+            ::= { hwAcctSchemeEntry 2 }
+
+        hwAcctStartFail OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                offline(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The account start fail to used scheme."
+            ::= { hwAcctSchemeEntry 3 }
+
+        hwAcctOnlineFail OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                offline(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The account realtime fail to used scheme."
+            ::= { hwAcctSchemeEntry 4 }
+
+        hwAccRealTimeInter OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The realtime account interval."
+            ::= { hwAcctSchemeEntry 5 }
+
+        hwAcctRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row administrate status,only supporting add or delet."
+            ::= { hwAcctSchemeEntry 6 }
+
+        hwDomainTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDomainEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The domain table."
+            ::= { hwAAAMibObjects 4 }
+
+        hwDomainEntry OBJECT-TYPE
+            SYNTAX HwDomainEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The domain table entry."
+            INDEX { hwDomainName }
+            ::= { hwDomainTable 1 }
+
+        HwDomainEntry ::=
+            SEQUENCE {
+                hwDomainName
+                    DisplayString,
+                hwDomainAuthenSchemeName
+                    DisplayString,
+                hwDomainAcctSchemeName
+                    DisplayString,
+                hwDomainRadiusGroupName
+                    DisplayString,
+                hwDomainAccessLimitNum
+                    Integer32,
+                hwDomainIfSrcRoute
+                    TruthValue,
+                hwDomainNextHopIP
+                    IpAddress,
+                hwDomainIdleCutTime
+                    Integer32,
+                hwDomainIdleCutFlow
+                    Integer32,
+                hwDomainRowStatus
+                    RowStatus,
+                hwDomainType
+                    INTEGER 
+                    
+                    
+             }
+
+        hwDomainName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The domain name."
+            ::= { hwDomainEntry 1 }
+
+        hwDomainAuthenSchemeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The authentication scheme name."
+            ::= { hwDomainEntry 2 }
+
+        hwDomainAcctSchemeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The account scheme name."
+            ::= { hwDomainEntry 3 }
+
+        hwDomainRadiusGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The group name of radius group table."
+            ::= { hwDomainEntry 4 }
+
+        hwDomainAccessLimitNum OBJECT-TYPE
+            SYNTAX Integer32 (0..147456)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The access limit number of domain."
+            ::= { hwDomainEntry 6 }
+
+        hwDomainIfSrcRoute OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The route of source interface."
+            ::= { hwDomainEntry 7 }
+
+        hwDomainNextHopIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The nexthop of source ip address route."
+            ::= { hwDomainEntry 8 }
+
+        hwDomainIdleCutTime OBJECT-TYPE
+            SYNTAX Integer32 (0..120)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The cut time of ilde interval."
+            ::= { hwDomainEntry 9 }
+
+        hwDomainIdleCutFlow OBJECT-TYPE
+            SYNTAX Integer32 (0..768000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The flow of ilde interval,in kbyte/min."
+            ::= { hwDomainEntry 10 }
+
+        hwDomainRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row administrate status, supporting add, delet, active or unactive."
+            ::= { hwDomainEntry 11 }
+            
+            
+        hwDomainType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                device(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The domain type."
+            ::= { hwDomainEntry 12 }
+                        
+
+        hwDomainExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDomainExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The domain extend table."
+            ::= { hwAAAMibObjects 5 }
+
+        hwDomainExtEntry OBJECT-TYPE
+            SYNTAX HwDomainExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The domain extend entry."
+            INDEX { hwDomainName }
+            ::= { hwDomainExtTable 1 }
+
+        HwDomainExtEntry ::=
+            SEQUENCE {
+                hwDomainPPPURL
+                    DisplayString,
+                hwIfDomainActive
+                    TruthValue,
+                hwPriority
+                    Integer32,
+                hwWebServerURL
+                    DisplayString,                        
+                hwIPPoolOneName
+                    DisplayString,
+                hwIPPoolTwoName
+                    DisplayString,    
+                hwIPPoolThreeName
+                    DisplayString,    
+                hwTwoLevelAcctRadiusGroupName
+                    DisplayString,
+                hwVPDNGroupIndex
+                    Integer32,
+                hwUclIndex
+                    Integer32,
+                hwIfPPPoeURL
+                    TruthValue,
+                hwUclGroupName
+                    DisplayString,
+                hwVpdnGroupName
+                    DisplayString,
+                hwDomainVrf
+                    DisplayString,
+                hwDomainGre
+                    DisplayString,
+                hwDomainRenewIPTag
+                    TruthValue,
+                hwPortalURL
+                    DisplayString,                                    
+                hwPortalServerIP
+                    IpAddress,    
+                hwRedirectTimesLimit
+                    Integer32,
+                hwDot1xTemplate
+                    Integer32,
+                hwWebServerIP
+                    IpAddress,
+                hwWebServerMode
+                    Integer32,    
+                hwPoolWarningThreshold
+                    Integer32,
+                hwTacGroupName        
+                    DisplayString,
+                hwServicePolicyName 
+                    DisplayString,
+                hwCopsGroupSSGType
+                    DisplayString,
+                hwDomainAuthorSchemeName
+                    DisplayString,               
+                hwNtvUserProfileName  
+                    DisplayString,               
+                hwDomainQoSProfile
+                    DisplayString, 
+                hwDomainZone
+                    DisplayString,
+                hwIfL2tpRadiusForce
+                    TruthValue,
+                hwDownPriority
+                    Integer32,
+                hwPPPForceAuthtype
+                    INTEGER,
+                hwDnsIPAddress 
+                    IpAddress, 
+                hwAdminUserPriority
+                    Integer32,
+                hwShapingTemplate
+                    DisplayString,
+                hwDomainDPIPolicyName 
+                    DisplayString,
+                hwCopsGroupSIGType
+                    DisplayString,
+                hwCopsGroupCIPNType
+                    DisplayString,
+                hwPCReduceCir
+                    Integer32,
+                hwValAcctType
+                    INTEGER,
+                hwValRadiusServer
+                    DisplayString,
+                hwValCopsServer
+                    DisplayString,
+                hwPCReducePir
+                    Integer32,
+                hwDomainInboundL2tpQoSProfile
+                    DisplayString, 
+                hwDomainOutboundL2tpQoSProfile    
+                    DisplayString,   
+                hwIfMulticastForward
+                    TruthValue,
+                hwMulticastVirtualSchedulRezCir
+                    Integer32,
+                hwMulticastVirtualSchedulRezPir
+                    Integer32,    
+                hwMaxMulticastListNum
+                    Integer32,
+                hwMultiProfile
+                    DisplayString,
+                hwDomainServiceType
+                    INTEGER                      
+             }
+
+        hwDomainPPPURL OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..60))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The url of portal."
+            ::= { hwDomainExtEntry 1 }
+
+        hwIfDomainActive OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether domain is usable."
+            ::= { hwDomainExtEntry 2 }
+
+         hwPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The priority of up user."
+            DEFVAL { 0 }
+            ::= { hwDomainExtEntry 3 }
+            
+        hwWebServerURL OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..60))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "THe url of force web server."
+            ::= { hwDomainExtEntry 4 }        
+        
+        hwIPPoolOneName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..255))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The ip pool name."
+            ::= { hwDomainExtEntry 5 }
+    
+        hwIPPoolTwoName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..255))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The ip pool name."
+            ::= { hwDomainExtEntry 6 }
+            
+        hwIPPoolThreeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..255))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The ip pool name."
+            ::= { hwDomainExtEntry 7 }    
+             
+        hwTwoLevelAcctRadiusGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "The radius group name."
+            ::= { hwDomainExtEntry 9 }
+
+        hwVPDNGroupIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..1000|65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "THe VPDN group name."
+            ::= { hwDomainExtEntry 10 }
+
+        hwUclIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1023|65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "UCL index
+            用户的UCL索引"
+            ::= { hwDomainExtEntry 11 }
+
+        hwIfPPPoeURL OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "Whether support offerring url for PPP0E user."
+            ::= { hwDomainExtEntry 12 }
+            
+            
+            hwUclGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The user access control group name."
+            ::= { hwDomainExtEntry 13 }
+                            
+            hwVpdnGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Vpdn group name."
+            ::= { hwDomainExtEntry 15 }
+            
+            hwDomainVrf OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The domain VPN instance name."
+            ::= { hwDomainExtEntry 16 }
+           hwDomainGre OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Gre grp name
+
+                域下GRE备份组名"
+            ::= { hwDomainExtEntry 17 }
+
+               hwDomainRenewIPTag OBJECT-TYPE
+                        SYNTAX TruthValue
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "if reallocate ip address
+                
+                                是否对WEB用户进行二次地址分配"
+                        DEFVAL { false }
+                        ::= { hwDomainExtEntry 18 } 
+
+               hwPortalURL OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (0..60))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Portal server URL for user
+                                
+                                为用户提供强制门户网站功能的门户网站URL"
+                        ::= { hwDomainExtEntry 19 }
+
+               hwPortalServerIP OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Portal server IP address
+                                
+                                 强制Portal服务器IP地址"
+                        ::= { hwDomainExtEntry 20 }
+
+
+               hwRedirectTimesLimit OBJECT-TYPE
+                        SYNTAX Integer32 (1..5)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Max times to redirect 
+                                
+                                 对需要强制的用户的最大强制次数"
+                        DEFVAL { 2 }
+                        ::= { hwDomainExtEntry 21 }
+                        
+               hwDot1xTemplate OBJECT-TYPE
+                        SYNTAX Integer32 (1..256)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                        "域下绑定的802.1X用户认证使用的模板"
+                        DEFVAL { 1 }
+                        ::= { hwDomainExtEntry 22 }    
+                        
+                hwWebServerIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "IPadress of force web server
+            强制Web服务器的IP地址"
+            ::= { hwDomainExtEntry 23 }
+        
+        hwWebServerMode OBJECT-TYPE
+            SYNTAX Integer32 (1..256)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "MODE of force web server
+            强制Web服务器的模式"
+            ::= { hwDomainExtEntry 24 }
+
+        hwPoolWarningThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..100|255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "域下地址池告警阈值， 255为无效值"
+            DEFVAL { 255 }
+            ::= { hwDomainExtEntry 25 }  
+                
+        hwTacGroupName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain TACACS group name
+                域下TACACS组名"
+            ::= { hwDomainExtEntry 26 }
+        hwServicePolicyName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain service policy name
+                域下增值业务策略名"
+            ::= { hwDomainExtEntry 27 }
+        hwCopsGroupSSGType  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain COPS group name
+                域下COPS组名"
+            ::= { hwDomainExtEntry 28 }                        
+            
+        hwDomainAuthorSchemeName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain Author Scheme
+                域下授权方案"
+            ::= { hwDomainExtEntry 29 }
+
+        hwNtvUserProfileName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS obsolete
+            DESCRIPTION
+                "Domain IPTV user profile
+
+                域下IPTV用户权限模板"
+            ::= { hwDomainExtEntry 30 }
+            
+        hwDomainQoSProfile  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain Qos profile
+
+                域下QoS模板名称"
+            ::= { hwDomainExtEntry 31 }    
+            
+        hwDomainZone  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain FWZone
+
+                域下安全区名称"
+            ::= { hwDomainExtEntry 32 }                                    
+            
+            hwIfL2tpRadiusForce OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "if force l2tp by radius
+            通过radius决定是否L2tp用户"
+            ::= { hwDomainExtEntry 33 }
+        
+        hwDownPriority OBJECT-TYPE
+                    SYNTAX Integer32 (0..255)
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                        "user down priority
+                        用户的下行优先级:
+                        0~7,
+                        trust-dscp(8),
+                        trust-8021p-inner(9),
+                        trust-8021p-outer(10),
+                        trust-exp-inner(11),
+                        trust-exp-outer(12),
+                        unchangeable(15)"
+                    DEFVAL { 0 }
+                    ::= { hwDomainExtEntry 34 }
+
+        
+        hwPPPForceAuthtype OBJECT-TYPE
+                    SYNTAX INTEGER
+                        {
+                        pap(0),
+                        chap(1),
+                        mschapv1(2),
+                        mschapv2(3),
+                        none(255)
+                        }
+                    MAX-ACCESS read-write
+                    STATUS current
+                    DESCRIPTION
+                                "Set force authtype for PPP 
+                                
+                                 设置PPP强制认证类型"
+                    ::= { hwDomainExtEntry 35 }
+                    
+                hwDnsIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "IPadress of dns
+             Dns服务器的IP地址"
+            ::= { hwDomainExtEntry 36 }
+            
+        hwAdminUserPriority OBJECT-TYPE
+            SYNTAX Integer32 (-1..15)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Priority of admin user
+
+                管理员用户权限,-1表示没有权限"
+            ::= { hwDomainExtEntry 37 }
+            
+        hwShapingTemplate  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Shaping template
+
+                 流量整形模板名称"
+            ::= { hwDomainExtEntry 38 }
+            
+        hwDomainDPIPolicyName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "DPI policy name
+                
+                域下DPI策略名"
+            ::= { hwDomainExtEntry 39 }
+                        
+               hwCopsGroupSIGType  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain COPS group name
+                域下COPS组名"
+            ::= { hwDomainExtEntry 40 }
+                
+               hwCopsGroupCIPNType  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Domain COPS group name
+                域下COPS组名"
+            ::= { hwDomainExtEntry 41 }
+            
+                    
+              hwPCReduceCir  OBJECT-TYPE
+            SYNTAX Integer32 (0..1000000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "reduce cir
+                减少带宽"
+            ::= { hwDomainExtEntry 43}
+            
+           hwValAcctType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    none(0),
+                                default(1),
+                                radius(2),
+                                cops(3)
+                                }       
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "增值业务计费策略类型
+              value added service accounting type"
+            DEFVAL {1}
+            ::= { hwDomainExtEntry 44 }
+            
+        hwValRadiusServer OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "radius服务器
+             radius server"
+            
+            ::= { hwDomainExtEntry 45 }
+            
+        hwValCopsServer OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "cops 服务器    
+             cops server"
+            ::= {hwDomainExtEntry 46 }
+            
+              hwPCReducePir  OBJECT-TYPE
+            SYNTAX Integer32 (0..1000000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "reduce pir
+                减少带宽"
+            ::= { hwDomainExtEntry 47}
+            
+          hwDomainInboundL2tpQoSProfile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Configure inbound L2TP QOS Profile
+                 配置L2TP QOS Profile"
+            ::= { hwDomainExtEntry 48}
+            
+          hwDomainOutboundL2tpQoSProfile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Configure outbound L2TP QOS Profile
+                 配置L2TP QOS Profile"
+            ::= { hwDomainExtEntry 49}
+
+           hwIfMulticastForward OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If multicast forward
+                 组播虚拟调度时是否转发数据"
+            DEFVAL {1}     
+            ::= { hwDomainExtEntry 50}    
+            
+           hwMulticastVirtualSchedulRezCir OBJECT-TYPE
+            SYNTAX Integer32 (0 | 128..1000000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast virtual schedul reserve Cir
+                 组播虚拟调度最小保留带宽"     
+            ::= { hwDomainExtEntry 51}    
+            
+           hwMulticastVirtualSchedulRezPir OBJECT-TYPE
+            SYNTAX Integer32 (0 | 128..1000000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast virtual schedul reserve Pir
+                 组播虚拟调度最小保留带宽"     
+            ::= { hwDomainExtEntry 52}    
+            
+           hwMaxMulticastListNum OBJECT-TYPE
+            SYNTAX Integer32 (1..64)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Max list num
+                 用户同时点播最大节目数"     
+            ::= { hwDomainExtEntry 53}
+            
+           hwMultiProfile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Multicast profile
+                 组播模板"     
+            ::= { hwDomainExtEntry 54}                                                            
+            
+               hwDomainServiceType  OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    stb(0),
+                    hsi(1)
+                    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Service type,0 for HSI,1 for not HSI.
+                     服务类型，0为STB，1为HSI."
+             DEFVAL {1}    
+            ::= { hwDomainExtEntry 55 }
+                        
+        hwDomainStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDomainStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Domain Stat Table
+
+                域信息统计表"
+            ::= { hwAAAMibObjects 6 }
+
+        hwDomainStatEntry OBJECT-TYPE
+            SYNTAX HwDomainStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Domain Stat Entry
+
+                域信息表实体入口，域信息表，用于用户所属的域进行配置。系统支持64个ISP，各ISP分别使用自己的认证、授权、计费策略。
+                在域信息表中，不同的ISP配置成不同的域，每个域的相关属性可以单独设置，彼此之间没有冲突。
+                索引项为节点hwDomainName。
+                操作约束描述:
+                1、域名在创建时设置，之后不能修改。
+                2、有用户在线时，该用户所属的域不允许删除。
+                3、设置域的认证方案时，所设置的认证方案名必须存在。
+                4、设置域的计费方案时，所设置的计费方案名必须存在。
+                5、设置域的RADIUS方案时，所设置的RADIUS方案名必须存在。"
+            INDEX { hwDomainName }
+            ::= { hwDomainStatTable 1 }
+
+            HwDomainStatEntry ::=
+                SEQUENCE { 
+                    hwDomainAccessedNum
+                        Integer32,
+                    hwDomainOnlineNum
+                        Integer32,
+                    hwDomainOnlinePPPUser
+                        Integer32,
+                    hwDomainFlowDnByte
+                        Counter64,
+                    hwDomainFlowDnPkt
+                        Counter64,
+                    hwDomainFlowUpByte  
+                        Counter64,
+                    hwDomainFlowUpPkt
+                        Counter64,
+                    hwDomainIPTotalNum
+                        Integer32,
+                    hwDomainIPUsedNum
+                        Integer32,
+                    hwDomainIPConflictNum                        
+                        Integer32,
+                    hwDomainIPExcludeNum
+                        Integer32,
+                    hwDomainIPIdleNum
+                        Integer32,
+                    hwDomainIPUsedPercent
+                        Integer32
+                 }
+    
+            hwDomainAccessedNum OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Accessed Num
+                    
+                    该域下用户，所有用户数目，包括在线、下线、上线等多种状态的用户"
+                ::= { hwDomainStatEntry 1 }
+            
+            hwDomainOnlineNum OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Online num
+                    
+                    该域下用户，正在在线状态的用户数目"
+                ::= { hwDomainStatEntry 2 }
+            
+            hwDomainOnlinePPPUser OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Online PPP user num
+                    
+                    该域下用户，正在在线状态的PPP用户数目"
+                ::= { hwDomainStatEntry 3 }
+    
+            hwDomainFlowDnByte OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Flow Down Byte
+                    
+                    域流量的下行字节数，单位为K"
+                ::= { hwDomainStatEntry 4 }
+            
+            hwDomainFlowDnPkt OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Flow Down Packet
+                    
+                    域流量的下行包数"
+                ::= { hwDomainStatEntry 5 }
+            
+            hwDomainFlowUpByte OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Flow Up Byte
+                    
+                    域流量的上行字节数，单位为K "
+                ::= { hwDomainStatEntry 6 }
+            
+            hwDomainFlowUpPkt OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Flow Up Packet
+                    
+                    域流量的上行包数"
+                ::= { hwDomainStatEntry 7 }
+
+            hwDomainIPTotalNum OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Total IP addresses number configed in this domain
+                    
+                    该地址池中配置的总地址数"
+                ::= { hwDomainStatEntry 8 }
+
+            hwDomainIPUsedNum OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Used IP addresses number 
+                    
+                    已使用的地址数"
+                ::= { hwDomainStatEntry 9 }
+
+            hwDomainIPConflictNum OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Conflicted IP addresses number 
+                    
+                    冲突的地址数"
+                ::= { hwDomainStatEntry 10 }
+            hwDomainIPExcludeNum OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Excluded IP addresses number 
+                    
+                    已引出的地址数"
+                ::= { hwDomainStatEntry 11 }
+
+            hwDomainIPIdleNum OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Idle IP addresses number 
+                    
+                    空闲的地址数"
+                ::= { hwDomainStatEntry 12 }
+
+        hwDomainIPUsedPercent OBJECT-TYPE
+                SYNTAX Integer32 (0..100)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "IP address used percent 
+                    
+                    地址占用率"
+                ::= { hwDomainStatEntry 13 }
+        
+        hwLocalUserTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLocalUserEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Local user table
+
+                本地用户信息表"
+            ::= { hwAAAMibObjects 10 }
+
+        hwLocalUserEntry OBJECT-TYPE
+            SYNTAX HwLocalUserEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Local user Entry
+
+                本地用户信息表实体，本地用户信息表，用于保存本地用户的相关信息。
+                索引项为节点hwLocalUserName，只能在建立时写入，此后不能修改只能删除，在接入数不为0时不能删除。
+                操作约束描述：
+                1、当前用户在线时不允许删除。
+                2、添加新记录时，用户名必须带域名，用户名的规格为 'user@domain'的格式。"
+            INDEX { hwLocalUserName }
+            ::= { hwLocalUserTable 1 }
+
+        HwLocalUserEntry ::=
+            SEQUENCE {
+                hwLocalUserName
+                    DisplayString,
+                hwLocalUserPassword
+                    DisplayString,
+                hwLocalUserAccessType
+                    Integer32,
+                hwLocalUserPriority
+                    Integer32,
+                hwftpdirction
+                    DisplayString,   
+                hwQosProfileName
+                    DisplayString,
+                hwLocalUserRowStatus
+                    RowStatus,
+                    hwLocalUserIpAddress
+                            IpAddress,
+                    hwLocalUserVpnInstance
+                            DisplayString
+             }
+
+        hwLocalUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..65))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Local user name
+
+                只能在建立时写入，此后不能修改。只能删除，在接入数不为0时不能删除；用户名的规格为 'user@domain'的格式"
+            ::= { hwLocalUserEntry 1 }
+
+        hwLocalUserPassword OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "local user's password
+
+                用户密码"
+            ::= { hwLocalUserEntry 2 }
+
+        hwLocalUserAccessType OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Local user's type
+
+                用户接入类型数值，
+                0xFFFFFFFF代表所有,
+                0x00000001表示PPP接入，                
+                0x00000002表示VLAN的WEB认证,
+                0x00000004表示VLAN绑定,
+                0x00000010表示CABLE MODEM认证
+                0x00000020表示802.1X接入方式,
+                0x00000040表示telnet接入方式,
+                0x00000080表示terminal
+                0x00000100表示ftp,
+                0x00000200表示SSH,                            
+                0x00000400表示x25pa"
+            ::= { hwLocalUserEntry 3 }
+
+        hwLocalUserPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Local user's pri
+
+                优先级，telnet用户权限优先级，
+                目前已改为0～16，其中用户优先级范围为0～15，16表示其他模块决定                
+                "
+            ::= { hwLocalUserEntry 4 }
+
+        hwftpdirction OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "ftp directory
+
+                ftp目录(只有ftp用户才有效)"
+            ::= { hwLocalUserEntry 5 }   
+            
+           hwQosProfileName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "qos profile
+
+                qos 模板"
+            ::= { hwLocalUserEntry 6 }
+
+        hwLocalUserRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "row admin status
+
+                支持添加、删除、激活、去激活"
+            ::= { hwLocalUserEntry 12 }
+            
+            hwLocalUserIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "user ip address
+
+                 用户IP地址"
+            ::= { hwLocalUserEntry 13 }
+            
+        hwLocalUserVpnInstance OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "VPN Instance name
+
+                 VPN实例名"
+            ::= { hwLocalUserEntry 14 }
+
+        hwLocalUserExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLocalUserExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "local user extend table
+
+                本地用户扩展表"
+            ::= { hwAAAMibObjects 11 }
+
+        hwLocalUserExtEntry OBJECT-TYPE
+            SYNTAX HwLocalUserExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+
+                Local user table is used to save the relevant information of the local user.
+                The index item is node hwLocalUserName, which can only be entered during the creation, 
+                and can not be modified thereafter. When its access number is 0, it can not be deleted.
+                Operation constraint description:
+                1. The present user online is not allowed to be deleted.
+                2. When adding new record, the username must contain a field name. 
+                The format of username is 'user@domain'
+                本地用户信息表实体，本地用户信息表，用于保存本地用户的相关信息。
+                索引项为节点hwLocalUserName，只能在建立时写入，此后不能修改只能删除，在接入数不为0时不能删除。
+                操作约束描述：
+                1、当前用户在线时不允许删除。
+                2、添加新记录时，用户名必须带域名，用户名的规格为 'user@domain'的格式。"
+            INDEX { hwLocalUserName }
+            ::= { hwLocalUserExtTable 1 }
+
+        HwLocalUserExtEntry ::=
+            SEQUENCE {
+                hwLocalUserState
+                    INTEGER,
+                hwLocalUserNoCallBackVerify
+                    TruthValue,
+                hwLocalUserCallBackDialStr
+                    DisplayString                    
+             }
+
+        hwLocalUserState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                block(0),
+                active(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "user status
+
+                用户状态"
+            ::= { hwLocalUserExtEntry 2 }
+            
+        hwLocalUserNoCallBackVerify OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "if verify for callback
+
+                是否回呼不验证"
+            ::= { hwLocalUserExtEntry 3 }
+            
+        hwLocalUserCallBackDialStr OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(1..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "call back number
+
+                回呼号码"
+            ::= { hwLocalUserExtEntry 4 }
+
+        hwAAASetting OBJECT IDENTIFIER ::= { hwAAAMibObjects 13 }
+
+        hwAAASettingEntry OBJECT IDENTIFIER ::= { hwAAASetting 1 }
+
+        hwRoamChar OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..1))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Roam char, inclue '/',':','*','\','<','>','|'
+
+                漫游识别字符"
+            ::= { hwAAASettingEntry 1 }
+            
+        hwGlobalControl OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If use default configuration
+
+                是否全局控制使用缺省配置"
+            ::= { hwAAASettingEntry 2 }
+
+        hwSystemRecord OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+
+                全局系统事件发送记录策略"
+            ::= { hwAAASettingEntry 3 }            
+
+        hwOutboundRecord OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+
+                全局连接事件发送记录策略"
+            ::= { hwAAASettingEntry 4 }    
+
+        hwCmdRecord OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+
+                全局命令行事件发送记录策略"
+            ::= { hwAAASettingEntry 5 }    
+            
+        hwPPPUserOfflineStandardize OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "是否将因为ppp-echo-fail而下线的用户以标准原因上报radius
+                "
+            ::= { hwAAASettingEntry 6 }
+        
+        hwDomainNameParseDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                lefttoright(0),
+                righttoleft(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "域名分析顺序
+                
+                lefttoright(0),
+                righttoleft(1)
+                "
+            ::= { hwAAASettingEntry 7 }
+        
+        hwDomainNameLocation OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                beforedelimiter(0),
+                afterdelimiter(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "域名位置先后关系
+                
+                beforedelimiter(0),
+                afterdelimiter(1)
+                "
+            ::= { hwAAASettingEntry 8 }
+        
+        hwAccessSpeedNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "接入速率限制，接入个数
+                 Access Speed Number
+                "
+            ::= { hwAAASettingEntry 9 }
+        
+        hwAccessSpeedPeriod OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "接入速率限制，周期
+                 Access Speed Period
+                "
+            ::= { hwAAASettingEntry 10 }
+            
+        hwRealmNameChar OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..1))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Realmname分隔符
+                 Realm-name-delimiter.include @,|,:,',<,>,/,\
+                "
+            ::= { hwAAASettingEntry 11 }
+            
+        hwRealmParseDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                 lefttoright(0),
+                 righttoleft(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "realm名分析顺序
+                 lefttoright(0),
+                 righttoleft(1)
+                "
+                DEFVAL {0}
+            ::= { hwAAASettingEntry 12}
+            
+          hwIPOXpassword OBJECT-TYPE
+            SYNTAX DisplayString(SIZE (1..128))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IPOX用户的密码
+                 IPOX user's password
+                "
+            ::= { hwAAASettingEntry 14 }
+            
+            
+      hwAccessDelayTransitionStep OBJECT-TYPE
+            SYNTAX Integer32(0..147456)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Access relay step,
+                 整机延时步长"
+            ::= { hwAAASettingEntry 16 }
+                    
+      hwAccessDelayTime OBJECT-TYPE
+            SYNTAX Integer32(0..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Maximum access delay time,
+                 最大整机延时时间"
+            ::= { hwAAASettingEntry 17 }
+      hwAccessDelayMinTime OBJECT-TYPE
+            SYNTAX Integer32(0..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Minimum access delay time,
+                 最小整机延时时间"
+            ::= { hwAAASettingEntry 18 }
+            
+      hwParsePriority OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                 domainfirst(0),
+                 realmfirst(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Parse priority
+                 域名解析优先级
+                "
+                DEFVAL{0 }
+            ::= { hwAAASettingEntry 19 }
+            
+      hwRealmNameLocation OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                beforedelimiter(0),
+                afterdelimiter(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "realm域名位置先后关系
+                
+                beforedelimiter(0),
+                afterdelimiter(1)
+                "
+            DEFVAL{0}
+            ::= { hwAAASettingEntry 20 }
+            
+        hwIPOXUsernameOption82 OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                  none(0),
+                  first(1),
+                  second(2),
+                  third(3),
+                  fourth(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IPOX user name gernerate type
+                "        
+            DEFVAL{0}                
+            ::= { hwAAASettingEntry 21 }
+
+        hwIPOXUsernameIP OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                  none(0),
+                  first(1),
+                  second(2),
+                  third(3),
+                  fourth(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IPOX user name gernerate type
+                "        
+            DEFVAL{0}                                
+            ::= { hwAAASettingEntry 22 }     
+            
+        hwIPOXUsernameSysname OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                  none(0),
+                  first(1),
+                  second(2),
+                  third(3),
+                  fourth(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IPOX user name gernerate type
+                "        
+            DEFVAL{0}                                
+            ::= { hwAAASettingEntry 23 }   
+            
+         hwIPOXUsernameMAC OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                  none(0),
+                  first(1),
+                  second(2),
+                  third(3),
+                  fourth(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "IPOX user name gernerate type
+                "     
+            DEFVAL{0}                                
+            ::= { hwAAASettingEntry 24 }
+
+        hwDefaultUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..255))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Configure default user name type
+
+            配置用户名生成方式"
+            ::= { hwAAASettingEntry 25 }
+
+
+        hwAAAStat OBJECT IDENTIFIER ::= { hwAAAMibObjects 14 }
+
+        hwAAAStatEntry OBJECT IDENTIFIER ::= { hwAAAStat 1 }
+
+        hwTotalOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all users
+
+                所有在线接入数目"
+            ::= { hwAAAStatEntry 1 }
+
+        hwTotalPPPoeOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all pppoe users
+
+                所有PPPOE在线接入数"
+            ::= { hwAAAStatEntry 2 }
+
+        hwTotalPPPoAOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all pppoa users
+
+                所有PPPOA在线接入数"
+            ::= { hwAAAStatEntry 3 }
+
+        hwTotalftpOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all ftp user
+
+                所有ftp在线接入数"
+            ::= { hwAAAStatEntry 4 }
+
+        hwTotalsshOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all ssh users
+
+                所有ssh在线接入数"
+            ::= { hwAAAStatEntry 5 }
+
+        hwTotaltelnetOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all telnet users
+
+                所有telnet在线接入数"
+            ::= { hwAAAStatEntry 6 }
+
+        hwTotalVLANOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all vlan users
+
+                所有vlan在线接入数"
+            ::= { hwAAAStatEntry 7 }
+                
+                hwHistoricMaxOnlineNum OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of historic max online users
+
+                历史最大在线用户数"
+            ::= { hwAAAStatEntry 8 }
+            
+            hwResetHistoricMaxOnlineNum OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    reset(0)                    
+                    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "reset the number of historic max online users
+                
+                清空历史最大在线用户数"
+            ::= { hwAAAStatEntry 9 }
+        hwResetOfflineReasonStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    reset(0)                    
+                    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "reset the number of offline reason
+                
+                清空历史用户下线原因统计"
+            ::= { hwAAAStatEntry 10 }
+            
+            hwResetOnlineFailReasonStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    reset(0)                    
+                    }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "reset the number of online fail reason statistic
+                清空历史用户上线失败原因统计"
+            ::= { hwAAAStatEntry 11 }
+        
+        hwAccessTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAccessEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "access table
+
+                接入表"
+            ::= { hwAAAMibObjects 15 }
+
+        hwAccessEntry OBJECT-TYPE
+            SYNTAX HwAccessEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "access entry
+
+                The access table is used to query the property of online users. The index item node is hwAccessIndex.
+                Notice: Read operation is not allowed for all the items in this table.
+                1. The index of hwAccessTable also uses hwAccessIndex, get operation only 
+                    supports the standard get operation with hwAccessIndex as its index.
+                2. To prevent too much interaction, getnext operation does use the standard operation that uses hwAccessIndex as its index.
+                接入表实体入口，接入表，用于查询在线用户的属性。索引项为节点hwAccessIndex。
+                注：该表中的所有表项都不允许写操作
+                1、hwAccessTable 表的索引还用hwAccessIndex，get操作只支持标准的
+                以hwAccessIndex为所引的get操作。
+                2、getnext操作为防止交互太多不实现标准的只以hwAccessIndex为所引getnext操作。
+                3、getnext操作只实现hwAccessIndex + hwAccessUserName 或（hwAccessUserIP、
+                hwAccessVLANID、hwAccessPVC）组合的getnext操作，例如：想查所有hwAccessUserName
+                为“aaa”的用户，则第一次下发的getnext报文中hwAccessIndex为0 + hwAccessUserName为
+                “aaa”，设备查找第一个用户名为“aaa”的表项，返回时将该表项的hwAccessIndex 和
+                hwAccessUserName填回getnext报文，网管则下发hwAccessIndex为返回的值 + hwAccessUserName
+                为“aaa”继续getnext，设备先跳到hwAccessIndex指定的位置再向后查找用户名为“aaa”的表项，
+                这样就可以将所有hwAccessUserName为“aaa”的表项全部getnext出来。"
+            INDEX { hwAccessIndex }
+            ::= { hwAccessTable 1 }
+
+        HwAccessEntry ::=
+            SEQUENCE {
+                hwAccessIndex
+                    Integer32,
+                hwAccessUserName
+                    DisplayString,
+                hwAccessPortType
+                    INTEGER,
+                hwAccessPriority
+                    Integer32,
+                hwAccessSlotNo
+                    Integer32,
+                hwAccessSubSlotNo
+                    Integer32,
+                hwAccessPortNo
+                    Integer32,
+                hwAccessVLANID
+                    Integer32,
+                hwAccessPVC
+                    Integer32,
+                hwAccessAuthenMethod
+                    INTEGER,
+                hwAccessAcctMethod
+                    INTEGER,
+                hwAccessIPAddress
+                    IpAddress,                    
+                hwAccessVRF
+                    DisplayString,
+                hwAccessMACAddress
+                    MacAddress,
+                hwAccessIfIdleCut
+                    TruthValue,
+                hwAccessIdleCutTime
+                    Integer32,
+                hwAccessIdleCutFlow
+                    Integer32,
+                hwAccessTimeLimit
+                    Integer32,
+                hwAccessTotalFlow64Limit
+                    Counter64,
+                hwAccessStartTime
+                    DateAndTime,
+                hwAccessCARIfUpActive
+                    TruthValue,
+                hwAccessCARIfDnActive
+                    TruthValue,
+                hwAccessUpFlow64
+                    Counter64,
+                hwAccessDnFlow64
+                    Counter64,
+                hwAccessUpPacket64
+                    Counter64,
+                hwAccessDnPacket64
+                    Counter64,
+                hwAccessCARUpCIR
+                    Integer32,
+                hwAccessCARUpPIR
+                    Integer32,
+                hwAccessCARUpCBS
+                    Integer32,
+                hwAccessCARUpPBS
+                    Integer32,
+                hwAccessCARDnCIR
+                    Integer32,
+                hwAccessCARDnPIR
+                    Integer32,
+                hwAccessCARDnCBS
+                    Integer32,
+                hwAccessCARDnPBS
+                    Integer32,            
+                hwAccessDownPriority
+                    Integer32,    
+--                hwAccessQinqVlanID
+--                    Integer32,
+--                hwAccessUserVlanID
+--                    Integer32                    
+                hwAccessQosProfile
+                                DisplayString                
+
+             }
+
+        hwAccessIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..164864)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "unqualified index
+
+                内部索引，以唯一区分"
+            ::= { hwAccessEntry 1 }
+
+        hwAccessUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..129))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access user name
+
+                接入用户名"
+            ::= { hwAccessEntry 3 }
+
+        hwAccessPortType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                all(1),
+                ppp(2),
+                vlan(3),
+                vlanweb(4),
+                vlanportal(5),
+                vlan8021x(6),
+                telnet(7),
+                ftp(8),
+                ssh(9),
+                igmp(10)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access port type
+
+                接入端口类型，细分是什么方式接入上线的用户接入类型
+                字符组合，
+                1:all,
+                2:PPP，
+                3:VLAN,
+                4:WEB of vlan,
+                5:Portal of vlan,
+                6:802.1X,
+                7:telnet,
+                8:ftp,
+                9:SSH,
+                10:igmp"
+            ::= { hwAccessEntry 5 }
+
+        hwAccessPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..15|255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access up priority
+
+                上行优先级"
+            ::= { hwAccessEntry 6 } 
+            
+        hwAccessSlotNo OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "slot No
+
+                槽号"
+            ::= { hwAccessEntry 8 }
+
+        hwAccessSubSlotNo OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "subslot No
+
+                卡板号"
+            ::= { hwAccessEntry 9 }
+
+        hwAccessPortNo OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "port No
+
+                端口号"
+            ::= { hwAccessEntry 10 }
+
+        hwAccessVLANID OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "vlan id
+
+                与hwAccessPVC互斥
+                复合VLAN ID,其中低两个字节为用户VLAN即内层VLAN,高两个字节为QinQ VLAN即外层VLAN"
+            ::= { hwAccessEntry 11 }
+
+        hwAccessPVC OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "vpi vpc
+
+                接入PVC与hwAccessVLANID互斥"
+            ::= { hwAccessEntry 12 }
+
+        hwAccessAuthenMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                                local(1),
+                                noauth(2),
+                                radius(3),
+                                localRadius(4),
+                                radiusLocal(5),
+                                radiusNoauth(6),
+                                tacacs(7),
+                                localTacacs(8),
+                                tacacsLocal(9),
+                                tacacsNone(10)         
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "authentication method
+
+                认证方式，
+                local(1)：本地认证(要验证密码)
+                simple(2)：不认证(不验证密码的特殊本地认证)
+                radius(3)：远端RADIUS认证
+                local radius(4)：先本地认证，后再到远端radius认证
+                radius local(5)：先远端radius认证，后再本地认证
+                radius noauth(6)：先远端radius认证，后再不认证    
+                tacacs(7):远端tacacs认证
+                local tacacs(8): 先本地认证，后再到远端tacacs认证
+                tacacs local(9)：先远端tacacs认证，后再本地认证
+                tacacs none(10)：先远端tacacs认证，后再不认证"
+            ::= { hwAccessEntry 13 }
+
+        hwAccessAcctMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                                local(1),
+                radius(2),               
+                noacct(3),
+                localradiusboth(4),
+                hwtacacs(5),
+                localhwtacacsboth(6)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "account method
+
+                计费方式
+                local(1)：本地计费   
+                radius(2)：远端radius计费
+                none(3)：不计费
+                local-radius(4)：本地、远端Radius都计费
+                tacacs(5): 远端tacacs计费
+                local-tacacs(6):本地、远端tacacs都计费"
+            ::= { hwAccessEntry 14 }
+
+        hwAccessIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "ip address
+
+                IP地址"
+            ::= { hwAccessEntry 15 } 
+            
+      hwAccessVRF OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "vrf name
+
+                VPN实例名"
+            ::= { hwAccessEntry 16 }
+
+         hwAccessMACAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "mac address
+
+                MAC地址"
+            ::= { hwAccessEntry 17 }
+        
+
+        hwAccessIfIdleCut OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "if idle cut
+
+                是否闲置切断"
+            ::= { hwAccessEntry 18 }
+
+        hwAccessIdleCutTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "idle cut time
+
+                闲置切断数据中的时间值"
+            ::= { hwAccessEntry 19 }
+
+        hwAccessIdleCutFlow OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "idle cut flow
+
+                闲置切断数据中的流量"
+            ::= { hwAccessEntry 20 }
+
+        hwAccessTimeLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "session time
+
+                接入时间限制"
+            ::= { hwAccessEntry 21 }
+
+        hwAccessTotalFlow64Limit OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "remain flow(64bit)
+
+                64位流量限制"
+            ::= { hwAccessEntry 22 }
+
+        hwAccessStartTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "start time
+
+                开始接入时间"
+            ::= { hwAccessEntry 25 }
+
+        hwAccessCARIfUpActive OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up car control
+
+                是否打开上行控制开关"
+            ::= { hwAccessEntry 27 }
+
+
+        hwAccessCARIfDnActive OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down car control
+
+                是否打开下行控制开关"
+            ::= { hwAccessEntry 31 }
+
+        hwAccessUpFlow64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up flow(64Byte)
+
+                上行64位字节数"
+            ::= { hwAccessEntry 36 }
+
+        hwAccessDnFlow64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down flow(64Byte)
+
+                下行64位字节数"
+            ::= { hwAccessEntry 37 }
+
+        hwAccessUpPacket64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up packet
+
+                上行64位包数"
+            ::= { hwAccessEntry 38 }
+
+        hwAccessDnPacket64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down packet
+
+                下行64位包数"
+            ::= { hwAccessEntry 39 }
+
+        hwAccessCARUpCIR OBJECT-TYPE
+            SYNTAX Integer32 (64..1048576)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up committed information rate(Kbps)
+
+                上行承诺速率，
+                单位:Kbps(kbit/s)"
+            ::= { hwAccessEntry 45 }
+
+        hwAccessCARUpPIR OBJECT-TYPE
+            SYNTAX Integer32 (64..1048576)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up peak information rate(Kbps)
+
+                上行峰值速率，
+                单位:Kbps(kbit/s)"
+            ::= { hwAccessEntry 46 }
+
+         hwAccessCARUpCBS OBJECT-TYPE
+            SYNTAX Integer32 (512..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up commited burst size(byte)
+
+                上行承诺突发尺寸
+                单位:byte"
+            ::= { hwAccessEntry 47 }
+
+            
+         hwAccessCARUpPBS OBJECT-TYPE
+            SYNTAX Integer32 (512..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up peak burst size(byte)
+
+                上行峰值突发尺寸
+                单位:byte"
+            ::= { hwAccessEntry 48 }
+            
+          hwAccessCARDnCIR OBJECT-TYPE
+            SYNTAX Integer32 (64..1048576)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down committed information rate(Kbps)
+
+                下行承诺速率，
+                单位:Kbps(kbit/s)"
+            ::= { hwAccessEntry 49 }
+
+        hwAccessCARDnPIR OBJECT-TYPE
+            SYNTAX Integer32 (64..1048576)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down peak information rate(Kbps)
+
+                下行峰值速率，
+                单位:Kbps(kbit/s)"
+            ::= { hwAccessEntry 50 }
+
+        hwAccessCARDnCBS OBJECT-TYPE
+            SYNTAX Integer32 (512..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down commited burst size(byte)
+
+                下行承诺突发尺寸
+                单位:byte"
+            ::= { hwAccessEntry 51 }
+
+            
+       hwAccessCARDnPBS OBJECT-TYPE
+            SYNTAX Integer32 (512..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down peak burst size(byte)
+
+                下行峰值突发尺寸
+                单位:byte"
+            ::= { hwAccessEntry 52 }
+
+      hwAccessDownPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..15|255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access down priority
+
+                下行优先级"
+            ::= { hwAccessEntry 53 }
+
+--        hwAccessQinqVlanID OBJECT-TYPE
+--            SYNTAX Integer32 (0..4094)
+--            MAX-ACCESS read-only
+--            STATUS current
+--            DESCRIPTION
+--                "qinq vlan
+--
+--                接入QINQ VLAN"
+--            ::= { hwAccessEntry 54 }
+
+--        hwAccessUserVlanID OBJECT-TYPE
+--            SYNTAX Integer32 (0..4094)
+--            MAX-ACCESS read-only
+--            STATUS current
+--            DESCRIPTION
+--                "user vlan
+--
+--                接入用户VLAN"
+--            ::= { hwAccessEntry 55 }
+
+        hwAccessQosProfile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "qos profile
+
+                QOS模板"
+            ::= { hwAccessEntry 56 }
+
+           
+        hwAccessExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAccessExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "access extend table
+
+                接入扩展表"
+            ::= { hwAAAMibObjects 16 }
+
+        hwAccessExtEntry OBJECT-TYPE
+            SYNTAX HwAccessExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "access extend entry
+                
+                接入扩展表，用于补充查询在线用户的一些特殊属性。索引项为节点HwAccessIndex"
+            INDEX { hwAccessIndex }
+            ::= { hwAccessExtTable 1 }
+
+            HwAccessExtEntry ::=
+                SEQUENCE { 
+                    hwAccessUCLGroup
+                        Integer32,
+                    hwAuthenticationState
+                        Integer32,
+                    hwAuthorizationState
+                        Integer32,
+                    hwAccountingState
+                        Integer32,
+                    hwAccessDomainName
+                        DisplayString,
+                    hwIdleTimeLength
+                        Integer32,
+                    hwAcctSessionID
+                        DisplayString,
+                    hwAccessStartAcctTime
+                        DateAndTime,
+                    hwAccessNormalServerGroup
+                        DisplayString,
+                    hwAccessDomainAcctCopySeverGroup
+                        DisplayString,
+                    hwAccessPVlanAcctCopyServerGroup
+                        DisplayString,
+                    hwAccessCurAuthenPlace
+                        INTEGER,
+                    hwAccessActionFlag
+                        INTEGER,
+                    hwAccessAuthtype
+                        INTEGER,
+                    hwAccessType
+                        INTEGER
+                 }
+    
+            hwAccessUCLGroup OBJECT-TYPE
+                SYNTAX Integer32 (0..1023|65535)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "user group
+                    
+                    User组号"
+                ::= { hwAccessExtEntry 2 }
+                        
+            hwAuthenticationState OBJECT-TYPE
+                SYNTAX Integer32 (1..4)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "认证状态机状态
+                    "
+                ::= { hwAccessExtEntry 4 }
+            
+            hwAuthorizationState OBJECT-TYPE
+                SYNTAX Integer32 (1..4)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "授权状态机状态"
+                ::= { hwAccessExtEntry 5 }
+            
+            hwAccountingState OBJECT-TYPE
+                SYNTAX Integer32 (1..7)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "记费状态机状态
+                    "
+                ::= { hwAccessExtEntry 6 }
+            
+            hwAccessDomainName OBJECT-TYPE
+                SYNTAX DisplayString (SIZE (1..64))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "用户所在域  
+                    "
+                ::= { hwAccessExtEntry 7 }
+            
+            hwIdleTimeLength OBJECT-TYPE
+                SYNTAX Integer32 (0..120)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "闲置开始时间
+                    "
+                ::= { hwAccessExtEntry 8 }
+            
+            hwAcctSessionID OBJECT-TYPE
+                SYNTAX DisplayString (SIZE (0..44))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "记费会话ID
+                    "
+                ::= { hwAccessExtEntry 9 }
+            
+            hwAccessStartAcctTime OBJECT-TYPE
+                SYNTAX DateAndTime
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "当前帐号开始计费时间
+                    "
+                ::= { hwAccessExtEntry 10 }
+            
+            hwAccessNormalServerGroup OBJECT-TYPE
+                SYNTAX DisplayString (SIZE (1..32))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "普通认证计费Radius服务器组名,--表示未配置
+                    "
+                ::= { hwAccessExtEntry 11 }
+            
+            hwAccessDomainAcctCopySeverGroup OBJECT-TYPE
+                SYNTAX DisplayString (SIZE (1..32))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "域下抄送计费  Radius服务器组名,--表示未配置
+                    "
+                ::= { hwAccessExtEntry 12 }
+            
+            hwAccessPVlanAcctCopyServerGroup OBJECT-TYPE
+                SYNTAX DisplayString (SIZE (1..32))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "端口下抄送计费 Radius服务器组名,--表示未配置
+                    "
+                ::= { hwAccessExtEntry 13 }
+            
+            hwAccessCurAuthenPlace OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                    none(0),
+                    local(1),
+                    radius(2),
+                    tacacs(3)
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "当前认证地点
+                    "
+                ::= { hwAccessExtEntry 14 }
+
+            hwAccessActionFlag OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                    idle(0),
+                    newuserauth(1),
+                    reauth(2),
+                    logout(3),
+                    leaving(4),
+                    authmodify(5),
+                    connectup(6)
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "动作标志，0－空闲、1－新用户认证、2－重认证、3－logout、4－用户离线、5、修改授权、6、连接UP
+                    "
+                ::= { hwAccessExtEntry 15 }
+            
+            hwAccessAuthtype OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                    none(0),
+                    ppp(1),
+                    dot1x(2),
+                    web(3),
+                    bind(4),
+                    fast(5),
+                    wlan(6),
+                    admin(7),
+                    tunnel(8)
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "用户的认证类型
+                    "
+                ::= { hwAccessExtEntry 16 }
+            
+            hwAccessType OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                    telnet(1),
+                    terminal(2),
+                    ssh(3),
+                    ftp(4),
+                    x25pad(5),
+                    ppp(6),
+                    pppoe(7),
+                    pppoeovlan(8),
+                    pppoa(9),
+                    pppoeoa(10),                                  
+                    pppolns(11),
+                    ordinaryvlan(12),
+                    eap(13),
+                    pnp(14),
+                    ip(15),
+                    staticvlan(16),
+                    layer2leasedline(17),
+                    layer2leasedlineuser(18),
+                    layer3leasedline(19),
+                    pppoeleasedline(20),
+                    nmsleasedline(21),
+                    proxyleasedline(22),
+                    relayleasedline(23),
+                    e1pos(24), 
+                    lactunnel(25),
+                    lnstunnel(26),
+                    mip(27),
+                    deviceuser(28),
+                    pppoeor(29),
+                    pppoeovlanor(30),
+                    ordinaryvlanor(31)
+                    
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "用户的接入类型
+                    1-TELNET
+            2-TERMINAL
+            3-SSH
+            4-FTP
+            5-X25PAD
+            6-PPP
+            7-PPPoE
+            8-PPPoEoVlan
+            9-PPPoA
+            10-PPPoEoA
+            --NYLD2869             
+            11-PPPOLNS
+            12-普通VLAN
+            13- EAP
+            14-PNP
+            15-IP
+            16-静态VLAN
+            17-二层专线
+            18-二层专线下用户
+            19-三层专线
+            20-PPPoE专线
+            21-网管专线
+            22-Proxy 专线
+            23-透传专线
+            24-E1POS
+            25-LAC Tunnel 
+            26-LNS Tunnel
+            27-MIP
+            28-设备用户
+            29-PPPoEoR
+            30-PPPoEoVlanoR
+            31-普通VLANoR
+                    "
+                ::= { hwAccessExtEntry 17 }
+        
+        hwAcctSchemeExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAcctSchemeExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "account Scheme Ext Table
+        
+                记费方案扩展表"
+            ::= { hwAAAMibObjects 19 }
+        
+        hwAcctSchemeExtEntry OBJECT-TYPE
+            SYNTAX HwAcctSchemeExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            INDEX { hwAcctSchemeName }
+            ::= { hwAcctSchemeExtTable 1 }
+        
+        HwAcctSchemeExtEntry ::=
+            SEQUENCE { 
+            hwIfRealtimeAcct
+                TruthValue,
+            hwRealtimeFailMaxnum
+                Integer32,
+            hwStartFailOnlineIfSendInterim
+                        TruthValue
+            }
+        
+        hwIfRealtimeAcct OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            " 是否需要实时记费    
+              if need realtime account"
+            DEFVAL { false }
+            ::= { hwAcctSchemeExtEntry 1 }
+
+        hwRealtimeFailMaxnum OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "实时记费失败最大允许的失败次数
+                Permit time of realtime account fail"
+            DEFVAL { 3 }
+            ::= { hwAcctSchemeExtEntry 2 }
+            
+                hwStartFailOnlineIfSendInterim OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "开始计费失败在线之后是否发送实时计费报文
+                if send interim accounting packet after accounting start fail "
+            DEFVAL { false }
+            ::= { hwAcctSchemeExtEntry 4 }            
+        
+        hwBillPoolTable OBJECT IDENTIFIER ::= { hwAAAMibObjects 21 }
+        
+        hwBillsPoolVolume OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "话单池容量
+                "
+            ::= { hwBillPoolTable 1 }
+        
+        hwBillsPoolNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "现有话单数
+                "
+            ::= { hwBillPoolTable 2 }
+        
+        hwBillsPoolAlarmThreshold OBJECT-TYPE
+            SYNTAX Integer32 (50..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "告警阀值"
+            DEFVAL { 75 }
+            ::= { hwBillPoolTable 3 }
+        
+        hwBillsPoolBackupMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                nobackup(1),
+                tftpmode(2),
+                hdmode(3),
+                cfcardmode(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "备份模式"
+            DEFVAL { 4 }
+            ::= { hwBillPoolTable 4 }
+        
+        hwBillsPoolBackupInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "定时备份的时间间隔"
+            DEFVAL { 1440 }
+            ::= { hwBillPoolTable 5 }
+        
+        hwBillsPoolBackupNow OBJECT-TYPE
+            SYNTAX Integer32 (1)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "立即备份的指令"
+            DEFVAL { 1 }
+            ::= { hwBillPoolTable 6 }
+        
+        hwBillsPoolReset OBJECT-TYPE
+            SYNTAX Integer32 (1)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "清除池中所有话单，复位控制；危险操作"
+            DEFVAL { 1 }
+            ::= { hwBillPoolTable 7 }
+
+--  TFTP参数配置表，于设置TFTP的参数
+        hwBillTFTPTable OBJECT IDENTIFIER ::= { hwAAAMibObjects 22 }
+        
+        hwBillsTFTPSrvIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "TFTP 服务器的IP地址,系统初始化为0
+                "
+            ::= { hwBillTFTPTable 1 }
+        
+        hwBillsTFTPMainFileName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "构成TFTP输出文件名的一个主体部分"
+            ::= { hwBillTFTPTable 2 }        
+                            
+        --  UCL,INTERGROUP配置 
+            HwUclGrpEntry ::=
+            SEQUENCE {
+                hwUclGrpName
+                    DisplayString,
+                hwUclGrpRowStatus
+                    RowStatus
+             }
+                
+            hwUclGrpTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwUclGrpEntry
+                        MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "User Group Table
+
+                用户访问控制表 "
+            ::= { hwAAAMibObjects 25 }
+            hwUclGrpEntry OBJECT-TYPE
+            SYNTAX HwUclGrpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "User Group Entry
+
+                用户访问控制表实体入口。用户访问控制表，由方案名称唯一标识。方案名称作为关键字，建立时写入，以后不能更改；只能删除.
+                索引项为节点hwUserGrpName。本表用于实现对访问控制方案名称的配置。本表中配置的访问控制方案名称将被域信息表和QOS引用。
+                操作约束描述：
+                1、创建操作输入的方案名称不可以重复。
+                2、修改操作时，方案名称创建时设置，不可修改。
+                3、当前访问控制方案正在被某个域使用时不能删除。
+                4、当前访问控制方案正在被某个QOS使用时不能删除
+                5、创建操作输入的方案名称不可以为‘any’保留字。"
+            INDEX { hwUclGrpName }
+            ::= { hwUclGrpTable 1 }
+            
+            hwUclGrpName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "User Group name
+
+                方案名称作为关键字，建立时写入，以后不能更改"
+            ::= { hwUclGrpEntry 1 }
+            
+            hwUclGrpRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "row admin status,only Add or Del
+
+                支持添加、删除"
+            ::= { hwUclGrpEntry 2 }
+            
+            hwIPAccessTable OBJECT-TYPE
+                  SYNTAX SEQUENCE OF HwIPAccessEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  ::= { hwAAAMibObjects 27 }
+        
+            hwIPAccessEntry OBJECT-TYPE
+                  SYNTAX HwIPAccessEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "IP Query Access Entry
+                            IP查询接入表入口
+                            索引项为节点hwIPAccessIPaddress和hwIPAccessVRF。
+                            本表用于实现根据用户IP地址和VRF查询ACCESS表索引。
+                            "
+                        INDEX { hwIPAccessIPaddress ,hwIPAccessVRF}
+                        ::= { hwIPAccessTable 1 }
+        
+                    HwIPAccessEntry ::=
+                        SEQUENCE { 
+                            hwIPAccessIPaddress
+                                IpAddress,
+                            hwIPAccessCID
+                                Integer32,
+                            hwIPAccessVRF  
+                                DisplayString                                       
+                          }
+
+                    hwIPAccessIPaddress OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User IP Address
+                
+                             用户IP地址作为关键字,查询时输入"
+                        ::= { hwIPAccessEntry 1 }
+
+
+                    hwIPAccessCID OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User Access Index
+                
+                             用户接入索引"
+                        ::= { hwIPAccessEntry 2 }    
+                                    
+                    hwIPAccessVRF OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..31))    
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User Access VRF
+                
+                             用户接入VRF作为关键字,查询时输入"
+                        ::= { hwIPAccessEntry 3 }    
+                        
+            
+            hwAAAMibTrap OBJECT IDENTIFIER ::= { hwAaa 2 }    
+            hwAAATrapOid OBJECT IDENTIFIER ::= { hwAAAMibTrap 1 }
+            
+
+        hwDomainIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1152)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Domain Index
+                域索引"
+            ::= { hwAAATrapOid 1 }     
+            
+        hwHdFreeamount OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Harddisk Free Amount
+                硬盘剩余总量"
+            ::= { hwAAATrapOid 2 }         
+            
+        hwHdWarningThreshold OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Harddisk warining threshold
+                硬盘告警阈值"
+            ::= { hwAAATrapOid 3 }
+         hwUserSlot OBJECT-TYPE
+                   SYNTAX Integer32
+                   MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Slot
+                槽位号"
+            ::= { hwAAATrapOid 4 }
+        hwUserSlotMaxNumThreshold OBJECT-TYPE
+                       SYNTAX Integer32
+                       MAX-ACCESS accessible-for-notify
+                   STATUS current
+                   DESCRIPTION
+                         "hwUserSlotMaxNumThreshold
+                          槽用户数告警阀值"
+                  ::= { hwAAATrapOid 5 }
+      hwOnlineUserNumThreshold OBJECT-TYPE
+                       SYNTAX Integer32
+                       MAX-ACCESS accessible-for-notify
+                   STATUS current
+                   DESCRIPTION
+                         "hwOnlineUserNumThreshold
+                          最大在线用户数阀值"
+                  ::= { hwAAATrapOid 6}
+       
+            
+            hwAAATrapsDefine OBJECT IDENTIFIER ::= { hwAAAMibTrap 2 }
+
+        hwAAATraps OBJECT IDENTIFIER ::= { hwAAATrapsDefine 0 }
+        hwUserIPAllocAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDomainIndex,hwDomainName }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach IP address Alloc Threshold 
+                2 Notice/Trap generation cause:  reach the threshold set at domain 
+                3 Repair suggestions:
+                    Check whether to renew configuring the BAS IP pool
+                    Add new IP pool to this domain .
+
+                1 通知/Trap名称：到达IP地址分配阈值
+                2 产生通知/Trap原因：到达域下设置的IP地址分配阈值
+                3 修复建议：
+                查看是否需要重新配置BAS地址池
+                域下增加BAS地址池
+                "
+            ::= { hwAAATraps 1 }
+        
+        hwUserSlotMaxNum NOTIFICATION-TYPE 
+                OBJECTS { hwUserSlot,hwUserSlotMaxNumThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach the slot user threshold
+                2 Notice/Trap generation cause:  the number of the online user in this slot reaches the threshold 
+                3 Repair suggestions:
+                    please change to another board which can support more user.
+
+                1 通知/Trap名称：到达单板上用户数分配阈值
+                2 产生通知/Trap原因：到设置单板上用户数分配阈值
+                3 修复建议：
+                请更换支持用户数更大的单板
+                "
+            ::= { hwAAATraps 2 } 
+            
+         hwOnlineUserNumAlarm NOTIFICATION-TYPE 
+                OBJECTS {  hwOnlineUserNumThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach the max online user
+                2 Notice/Trap generation cause:  the online user number reach the limit
+                3 Repair suggestions:
+                upgrade your machine,or change to another board which can support more user
+
+                1 通知/Trap名称：到达设备最大用户数
+                2 产生通知/Trap原因：到设置的设备最大在线用户数
+                3 修复建议：
+                升级设备，或更换更大License单板
+                "
+            ::= { hwAAATraps 3 }         
+        hwSetUserQosProfileFail NOTIFICATION-TYPE
+            OBJECTS { hwAccessIndex,hwAccessUserName,hwAccessQosProfile }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Set User's Qos Profile Fail
+                2 Notice/Trap generation cause:  Set User's Qos Profile Fail
+                3 Repair suggestions:
+                    Check The Vaild of Profile Name or User 
+
+                1 通知/Trap名称：设置用户的QOS模板失败
+                2 产生通知/Trap原因：针对用户设置QOS模板失败
+                3 修复建议：
+                检查Qos模板名是否有效，用户是否存在
+                "
+            ::= { hwAAATraps 4 }
+            
+            hwLAMTrapsDefine OBJECT IDENTIFIER ::= { hwAAAMibTrap 3 }
+
+        hwLAMTraps OBJECT IDENTIFIER ::= { hwLAMTrapsDefine 0 }
+        hwHarddiskoverflow NOTIFICATION-TYPE
+            OBJECTS { hwHdFreeamount,hwHdWarningThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach IP address Alloc Threshold 
+                2 Notice/Trap generation cause:  reach the threshold set at domain 
+                3 Repair suggestions:
+                    Check whether to renew configuring the BAS IP pool
+                    Add new IP pool to this domain .
+
+                1 通知/Trap名称：设备硬盘空间将满
+                2 产生通知/Trap原因：设备硬盘空间将满
+                3 修复建议：
+                将设备话单通过FTP导出
+                "
+            ::= { hwLAMTraps 1 }
+
+        hwHarddiskReachThreshold NOTIFICATION-TYPE
+            OBJECTS { hwHdFreeamount,hwHdWarningThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach IP address Alloc Threshold 
+                2 Notice/Trap generation cause:  reach the threshold set at domain 
+                3 Repair suggestions:
+                    Check whether to renew configuring the BAS IP pool
+                    Add new IP pool to this domain .
+
+                1 通知/Trap名称：设备硬盘空间超过告警阈值
+                2 产生通知/Trap原因：设备硬盘空间超过告警阈值
+                3 修复建议：
+                将设备话单通过FTP导出
+                "
+            ::= { hwLAMTraps 2 }
+      hwHarddiskOK NOTIFICATION-TYPE
+            OBJECTS { hwHdFreeamount,hwHdWarningThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach IP address Alloc Threshold 
+                2 Notice/Trap generation cause:  reach the threshold set at domain 
+                3 Repair suggestions:
+                    Check whether to renew configuring the BAS IP pool
+                    Add new IP pool to this domain .
+
+                1 通知/Trap名称：硬盘恢复正常
+                2 产生通知/Trap原因：硬盘恢复正常
+                3 修复建议：
+                无
+                "
+            ::= { hwLAMTraps 3 }
+        hwCachetoFTPFail NOTIFICATION-TYPE
+            OBJECTS { hwHdFreeamount,hwHdWarningThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach IP address Alloc Threshold 
+                2 Notice/Trap generation cause:  reach the threshold set at domain 
+                3 Repair suggestions:
+                    Check whether to renew configuring the BAS IP pool
+                    Add new IP pool to this domain .
+
+                1 通知/Trap名称：上传话单缓存中的话单到TFTP服务器失败
+                2 产生通知/Trap原因：上传话单缓存中的话单到TFTP服务器失败.
+                3 修复建议：
+                检查TFTP配置参数是否正确
+                "
+            ::= { hwLAMTraps 4 }
+     hwHDtoFTPFail NOTIFICATION-TYPE
+            OBJECTS { hwHdFreeamount,hwHdWarningThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Reach IP address Alloc Threshold 
+                2 Notice/Trap generation cause:  reach the threshold set at domain 
+                3 Repair suggestions:
+                    Check whether to renew configuring the BAS IP pool
+                    Add new IP pool to this domain .
+
+                1 通知/Trap名称：硬盘上传话单到TFTP失败
+                2 产生通知/Trap原因：硬盘上传话单到TFTP失败
+                3 修复建议：
+                检查TFTP配置参数是否正确
+                "
+            ::= { hwLAMTraps 5 }    
+            
+        hwCutAccessUserTable OBJECT IDENTIFIER  ::= { hwAAAMibObjects 28 }
+        
+        hwCutStartUserID OBJECT-TYPE
+            SYNTAX Integer32 
+                      MAX-ACCESS write-only
+                      STATUS current
+                      DESCRIPTION
+                          "Start User CID              
+                           用户起始CID"
+                      ::= { hwCutAccessUserTable 1 }
+
+        hwCutEndUserID OBJECT-TYPE
+            SYNTAX Integer32 
+                      MAX-ACCESS write-only
+                     STATUS current
+                      DESCRIPTION
+                          "End User CID              
+                           用户终止CID"
+                      ::= { hwCutAccessUserTable 2 }
+
+        hwCutIPaddress OBJECT-TYPE
+            SYNTAX IpAddress
+                      MAX-ACCESS write-only
+                      STATUS current
+                      DESCRIPTION
+                          "User IP Address              
+                           用户IP地址"
+                      ::= { hwCutAccessUserTable 3 }
+
+        hwCutMacAddres OBJECT-TYPE
+            SYNTAX MacAddress
+                      MAX-ACCESS write-only
+                      STATUS current
+                      DESCRIPTION
+                          "User MAC Address              
+                           用户MAC地址"
+                      ::= { hwCutAccessUserTable 4 }
+
+        hwCutUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..129))
+                      MAX-ACCESS write-only
+                      STATUS current
+                      DESCRIPTION
+                          "User Acess Name              
+                           接入用户名"
+                      ::= { hwCutAccessUserTable 5 }
+
+        hwCutUserAttri OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                    all(0),
+                    noauth(1),
+                    local(2),                    
+                    radiusauth(3),
+                    hwtacacs(4)
+                    }
+                    MAX-ACCESS write-only
+                    STATUS current
+                      DESCRIPTION
+                          "User Authentication attribute
+                           用户认证属性"
+                      ::= { hwCutAccessUserTable 6 }
+
+        hwCutDomain OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..64))
+                      MAX-ACCESS write-only
+                      STATUS current
+                      DESCRIPTION
+                          "domain name
+                           域名"
+                      ::= { hwCutAccessUserTable 7 }
+
+        hwCutIPPoolName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+                      MAX-ACCESS write-only
+                      STATUS current
+                      DESCRIPTION
+                          "IP Pool Name              
+                           地址池名"
+                      ::= { hwCutAccessUserTable 8 }
+
+        hwCutIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS write-only
+            STATUS current
+            DESCRIPTION
+                "IFnet Index
+    
+                 接口索引"
+            ::= { hwCutAccessUserTable 9 }    
+
+        hwCutVlanID OBJECT-TYPE
+            SYNTAX Integer32 (0..268308478)
+            MAX-ACCESS write-only
+            STATUS current
+            DESCRIPTION
+                "vlan ID
+    
+                 用户的复合VLAN ID,其中低两个字节为用户VLAN即内层VLAN,高两个字节为QinQ VLAN即外层VLAN"
+            ::= { hwCutAccessUserTable 10 }    
+            
+        hwCutVPI OBJECT-TYPE
+            SYNTAX Integer32(0..255)
+            MAX-ACCESS write-only
+            STATUS current
+            DESCRIPTION
+                "VPI
+    
+                 VPI"
+            ::= { hwCutAccessUserTable 11 }    
+            
+        hwCutVCI OBJECT-TYPE
+            SYNTAX Integer32(0..2047)
+            MAX-ACCESS write-only
+            STATUS current
+            DESCRIPTION
+                "VCI
+    
+                 VCI"
+            ::= { hwCutAccessUserTable 12 }
+                
+        hwCutVRF OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))    
+            MAX-ACCESS write-only
+            STATUS current
+            DESCRIPTION
+                 "User VRF
+                
+                 用户VRF"
+            ::= { hwCutAccessUserTable 13 }
+                        
+--        hwCutQinqVlanID OBJECT-TYPE
+--            SYNTAX Integer32(0..4094)
+--            MAX-ACCESS read-write
+--            STATUS current
+--            DESCRIPTION
+--                "qinq vlan ID
+--    
+--                 QINQ VLAN ID"
+--            ::= { hwCutAccessUserTable 14 }    
+            
+--        hwCutUserVlanID OBJECT-TYPE
+--            SYNTAX Integer32(0..4094)
+--            MAX-ACCESS read-write
+--            STATUS current
+--            DESCRIPTION
+--                "user vlan ID
+--    
+--                 用户VLAN ID"
+--            ::= { hwCutAccessUserTable 15 }    
+
+        hwAAACallRate OBJECT IDENTIFIER ::= { hwAAAMibObjects 29 }
+        
+        hwAAAUserPPP OBJECT IDENTIFIER ::= { hwAAACallRate 1 }
+        
+        hwTotalConnectNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all access  user
+                
+                所有连接数目"
+            ::= { hwAAAUserPPP 1 }
+       hwTotalSuccessNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all success access ppp user
+                
+                所有成功接入数目"
+            ::= { hwAAAUserPPP 2 }
+     hwTotalLCPFailNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all fail access ppp user during LCP 
+                
+                所有在LCP阶段接入失败数目"
+            ::= { hwAAAUserPPP 3 }
+    hwTotalAuthenFailNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all authenfail access ppp user  
+                
+                所有在认证阶段接入失败数目"
+            ::= { hwAAAUserPPP 4 }   
+     hwTotalNCPFailNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all authenfail access ppp user  
+                
+                所有在NCP阶段接入失败数目"
+            ::= { hwAAAUserPPP 5 }
+    hwTotalIPAllocFailNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all authenfail access ppp user  
+                
+                所有在地址分配接入失败数目"
+            ::= { hwAAAUserPPP 6 }
+     hwTotalOtherPPPFailNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all authenfail access ppp user  
+                
+                所有由于其他原因接入失败数目"
+            ::= { hwAAAUserPPP 7 }              
+      hwAAAUserWebandFast OBJECT IDENTIFIER ::= { hwAAACallRate 2 }
+        
+        hwTotalWebConnectNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all web and fast user
+                
+                所有在线接入数目"
+            ::= { hwAAAUserWebandFast 1 }
+       hwTotalSuccessWebConnectNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all success access web and fast user
+                
+                所有成功接入数目"
+            ::= { hwAAAUserWebandFast 2 }
+            
+     hwAAAUserDot1X OBJECT IDENTIFIER ::= { hwAAACallRate 3 }
+        
+        hwTotalDot1XConnectNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all dot1x user
+                
+                所有在线接入数目"
+            ::= { hwAAAUserDot1X 1 }
+       hwTotalSuccessDot1XConnectNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all success access dot1x user
+                
+                所有成功接入数目"
+            ::= { hwAAAUserDot1X 2 }
+            
+      hwAAAUserBind OBJECT IDENTIFIER ::= { hwAAACallRate 4 }
+        
+        hwTotalBindConnectNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of access all bind user
+                
+                所有在线接入数目"
+            ::= { hwAAAUserBind 1 }
+       hwTotalSuccessBindConnectNum OBJECT-TYPE
+            SYNTAX Counter32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "the number of all success access bind user
+                
+                所有成功接入数目"
+            ::= { hwAAAUserBind 2 }    
+            
+
+          
+        hwAuthorSchemeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAuthorSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "authorization Scheme Table
+
+                授权方案表 "
+            ::= { hwAAAMibObjects 8 }
+        hwAuthorSchemeEntry OBJECT-TYPE
+            SYNTAX HwAuthorSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "authorization Scheme Entry
+                授权方案表实体入口。授权方案表，由方案名称唯一标识。方案名称作为关键字，建立时写入，以后不能更改；系统中永远存在一个“Default”的授权方案。
+                索引项为节点hwAuthorSchemeName。本表用于实现对授权方案的配置。本表中配置的授权方案将被域信息表引用。
+                操作约束描述：
+                1、创建操作输入的方案名称不可以重复。
+                2、修改操作时，方案名称创建时设置，不可修改。
+                3、缺省授权方案不能删除。
+                4、当前授权方案正在被某个域使用时不能删除。"
+            INDEX { hwAuthorSchemeName }
+            ::= { hwAuthorSchemeTable 1 }
+        HwAuthorSchemeEntry ::=
+            SEQUENCE {
+                hwAuthorSchemeName
+                    DisplayString,
+                hwAuthorMethod
+                    INTEGER,
+                hwAuthorRowStatus
+                    RowStatus
+             }
+        hwAuthorSchemeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "authorization Scheme name
+                方案名称作为关键字，建立时写入，以后不能更改；系统中永远存在一个'Default'的授权方案"
+            ::= { hwAuthorSchemeEntry 1 }
+        hwAuthorMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                local(2),
+                hwtacacs(3),
+                ifauthenticated(4),
+                hwtacacsnone(5),
+                hwtacacslocal(6),
+                hwtacacsifauthenticated(7)                
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "authorization Scheme
+                授权方法
+
+                none(1)：不授权   
+                local(2)：本地授权 
+                hwtacacs(3)：TACACS授权
+                ifauthenticated(4)：通过认证就授权成功
+                hwtacacsnone(5):先Tac授权再不授权
+                hwtacacslocal(6):先Tac授权再本地授权
+                hwtacacsifauthenticated(7):先Tac授权再If授权
+                "
+            ::= { hwAuthorSchemeEntry 2 }
+        hwAuthorRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "row admin status,only Add or Del
+                支持添加、删除"
+            ::= { hwAuthorSchemeEntry 3 }      
+
+        hwRecordSchemeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRecordSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "record Scheme Table
+
+                记录策略表 "
+            ::= { hwAAAMibObjects 30 }
+
+        hwRecordSchemeEntry OBJECT-TYPE
+            SYNTAX HwRecordSchemeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "record Scheme Entry
+
+                记录策略表实体入口。记录策略表，由策略名称唯一标识。策略名称作为关键字，建立时写入，以后不能更改；
+                索引项为节点hwRecordSchemeName。本表用于实现对记录策略的配置。
+                操作约束描述：
+                1、创建操作输入的策略名称不可以重复。
+                2、修改操作时，策略名称创建时设置，不可修改。
+                3、当前记录策略正在被某个域使用时不能删除。"
+            INDEX { hwRecordSchemeName }
+            ::= { hwRecordSchemeTable 1 }
+
+        HwRecordSchemeEntry ::=
+            SEQUENCE {
+                hwRecordSchemeName
+                    DisplayString,
+                hwRecordTacGroupName
+                    DisplayString,
+                hwRecordRowStatus
+                    RowStatus
+             }
+
+        hwRecordSchemeName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "record scheme name
+
+                策略名称作为关键字，建立时写入，以后不能更改"
+            ::= { hwRecordSchemeEntry 1 }
+
+        hwRecordTacGroupName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "TACACS group name
+
+                TACACS组名"
+            ::= { hwRecordSchemeEntry 2 }
+
+        hwRecordRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "row admin status,only Add or Del
+
+                支持添加、删除"
+            ::= { hwRecordSchemeEntry 3 }    
+            
+            
+         hwMACAccessTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMACAccessEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            ::= { hwAAAMibObjects 31 }
+        
+            hwMACAccessEntry OBJECT-TYPE
+                  SYNTAX HwMACAccessEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "MAC Query Access Entry
+                            MAC查询接入表入口
+                            索引项为节点hwMACAccessMACAddress。
+                            本表用于实现根据用户MAC地址查询ACCESS表索引。
+                            "
+                        INDEX { hwMACAccessMACAddress }
+                        ::= { hwMACAccessTable 1 }
+        
+                    HwMACAccessEntry ::=
+                        SEQUENCE { 
+                            hwMACAccessMACAddress
+                                MacAddress,
+                            hwMACAccessCID
+                                Integer32                 
+                        }
+
+                    hwMACAccessMACAddress OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User MAC Address
+                
+                             用户MAC地址作为关键字,查询时输入"
+                        ::= { hwMACAccessEntry 1 }
+
+
+                    hwMACAccessCID OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User Access Index
+                
+                             用户接入索引"
+                        ::= { hwMACAccessEntry 2 }    
+                                
+                
+            hwSlotConnectNumTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSlotConnectNumEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            ::= { hwAAAMibObjects 32 }
+        
+            hwSlotConnectNumEntry OBJECT-TYPE
+                  SYNTAX HwSlotConnectNumEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "Slot Query Online Number Entry
+                            Slot查询在线用户数表入口
+                            索引项为节点hwSlotConnectNumSlot。
+                            本表用于实现根据Slot查询在线用户数。
+                            "
+                        INDEX { hwSlotConnectNumSlot }
+                        ::= { hwSlotConnectNumTable 1 }
+        
+                    HwSlotConnectNumEntry ::=
+                        SEQUENCE { 
+                            hwSlotConnectNumSlot
+                                Integer32,
+                            hwSlotConnectNumOnlineNum
+                                Integer32                 
+                        }
+
+                    hwSlotConnectNumSlot OBJECT-TYPE
+                        SYNTAX Integer32 (1..16)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User Slot
+                
+                             用户slot作为关键字,查询时输入"
+                        ::= { hwSlotConnectNumEntry 1 }
+
+
+                    hwSlotConnectNumOnlineNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online number
+                
+                             在线用户数"
+                        ::= { hwSlotConnectNumEntry 2 }
+                        
+                            
+                          
+              hwOfflineReasonStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOfflineReasonStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            ::= { hwAAAMibObjects 34 }
+        
+            hwOfflineReasonStatEntry OBJECT-TYPE
+                  SYNTAX HwOfflineReasonStatEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "Offline and online fail reason statistic  Entry
+                            
+                            "
+                        INDEX { hwOfflineReason }
+                        ::= {  hwOfflineReasonStatTable 1 }
+        
+                    HwOfflineReasonStatEntry ::=
+                        SEQUENCE { 
+                            hwOfflineReason
+                             Integer32,
+                            hwOfflineReasonStatistic
+                                Integer32,
+                            hwOnlineFailReasonStatistic
+                                Integer32       
+                        }
+
+                    hwOfflineReason OBJECT-TYPE
+                        SYNTAX Integer32 (1..203)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Offline reason
+                
+                             "
+                        ::= { hwOfflineReasonStatEntry 1 }
+
+                  
+                     hwOfflineReasonStatistic OBJECT-TYPE
+                        SYNTAX Integer32 
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "The offline reason statistic
+                            "
+                        ::= {hwOfflineReasonStatEntry 2 }
+            
+            
+         hwOnlineFailReasonStatistic OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The online fail reason statistic
+                                 "
+            ::= { hwOfflineReasonStatEntry 3 }
+                                  
+            hwMulticastListTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMulticastListEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            ::= { hwAAAMibObjects 35 }
+        
+            hwMulticastListEntry OBJECT-TYPE
+                  SYNTAX HwMulticastListEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "multicast list
+                            
+                            "
+                        INDEX { hwMulticastListIndex }
+                        ::= {  hwMulticastListTable 1 }
+        
+                    HwMulticastListEntry ::=
+                        SEQUENCE { 
+                            hwMulticastListIndex
+                                Integer32,
+                            hwMulticastListName
+                                DisplayString,
+                            hwMulticastListSourceIp
+                                IpAddress,
+                            hwMulticastListSourceIpMask
+                                Integer32,
+                            hwMulticastListGroupIp
+                                IpAddress,
+                            hwMulticastListGroupIpMask
+                                Integer32,
+                            hwMulticastListVpnInstance
+                                DisplayString,
+                            hwMulticastListRowStatus
+                                RowStatus    
+                        }
+
+                  hwMulticastListIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..8191)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                        "Multicast list index
+                                 "
+                    ::= {hwMulticastListEntry 1 }
+            
+                 hwMulticastListName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..32))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Multicast list name
+                
+                             "
+                        ::= { hwMulticastListEntry 2 }            
+            
+                 hwMulticastListSourceIp OBJECT-TYPE
+                        SYNTAX IpAddress 
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                        "Multicast list source ip address
+                         
+                         "
+                ::= { hwMulticastListEntry 3 }
+            
+                 hwMulticastListSourceIpMask OBJECT-TYPE
+                        SYNTAX Integer32 (0..32) 
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                        "Multicast list source ip mask
+                        
+                        "
+                ::= { hwMulticastListEntry 4 }        
+
+                 hwMulticastListGroupIp OBJECT-TYPE
+                        SYNTAX IpAddress 
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                        "Multicast list group ip address
+                                
+                        "
+                ::= { hwMulticastListEntry 5 }   
+                                     
+                 hwMulticastListGroupIpMask OBJECT-TYPE
+                    SYNTAX Integer32 (0..32) 
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Multicast list group ip mask
+                                 
+                         "
+                ::= { hwMulticastListEntry 6 }
+  
+                 hwMulticastListVpnInstance OBJECT-TYPE
+                    SYNTAX DisplayString (SIZE (1..31)) 
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Multicast list vpn instance
+                                 
+                         "
+                ::= { hwMulticastListEntry 7 }
+            
+                 hwMulticastListRowStatus OBJECT-TYPE
+                    SYNTAX RowStatus
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "row admin status,only Add or Del
+                
+                         "
+                ::= { hwMulticastListEntry 8 }    
+            
+            hwMulticastProfileTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMulticastProfileEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                ::= { hwAAAMibObjects 36 }
+        
+            hwMulticastProfileEntry OBJECT-TYPE
+                  SYNTAX HwMulticastProfileEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "multicast profile
+                            
+                            "
+                        INDEX { hwMulticastProfileIndex }
+                        ::= {  hwMulticastProfileTable 1 }
+        
+                    HwMulticastProfileEntry ::=
+                        SEQUENCE { 
+                            hwMulticastProfileIndex
+                                Integer32,
+                            hwMulticastProfileName
+                                DisplayString,
+                            hwMulticastProfileRowStatus
+                                RowStatus    
+                        }
+
+                    hwMulticastProfileIndex OBJECT-TYPE
+                        SYNTAX Integer32 (0..1023)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Multicast profile index
+                
+                             "
+                        ::= { hwMulticastProfileEntry 1 }
+                        
+                    hwMulticastProfileName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..32))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Multicast profile name
+                
+                             "
+                        ::= { hwMulticastProfileEntry 2 }
+                        
+                     hwMulticastProfileRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "row admin status,only Add or Del
+                
+                             "
+                        ::= { hwMulticastProfileEntry 3 }
+            
+        hwMulticastProfileExtTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMulticastProfileExtEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                ::= { hwAAAMibObjects 37 }
+        
+            hwMulticastProfileExtEntry OBJECT-TYPE
+                  SYNTAX HwMulticastProfileExtEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "multicast profile extern table
+                            
+                            "
+                        INDEX { hwMulticastProfileIndex, hwMulticastListIndex }
+                        ::= {  hwMulticastProfileExtTable 1 }
+        
+                    HwMulticastProfileExtEntry ::=
+                        SEQUENCE { 
+                            hwMulticastListBindName
+                                DisplayString,
+                            hwMulticastProfileExtRowStatus
+                                RowStatus    
+                        }
+                        
+                    hwMulticastListBindName OBJECT-TYPE
+                        SYNTAX DisplayString (SIZE (1..32))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Multicast list name
+                
+                             "
+                        ::= { hwMulticastProfileExtEntry 1 }
+                        
+                     hwMulticastProfileExtRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "row admin status,only Add or Del
+                
+                             "
+                        ::= { hwMulticastProfileExtEntry 2 }    
+
+            --  ============== conformance information ==============
+        hwAaaConformance OBJECT IDENTIFIER ::= { hwAaa 5 }
+        
+        
+        hwAaaCompliances OBJECT IDENTIFIER ::= { hwAaaConformance 1 }
+        hwAaaCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    { hwAuthenSchemeGroup, hwAcctSchemeGroup, hwDomainGroup,
+                                  hwDomainExtGroup, hwDomainStatGroup, hwAuthorSchemeGroup,
+                                  hwLocalUserGroup, hwLocalUserExtGroup, hwAaaSettingGroup,
+                                  hwAaaStatGroup, hwAccessGroup, hwAccessExtGroup,
+                                  hwAcctSchemeExtGroup, hwBillPoolGroup, hwBillTFTPGroup,
+                                  hwUclGrpGroup, hwIpAccessGroup, hwCutAccessUserGroup,
+                                  hwAaaUserPppGroup, hwAaaUserWebandFastGroup, hwAaaUserDot1XGroup,
+                                  hwAaaUserBindGroup, hwRecordSchemeGroup, hwMACAccessGroup,
+                                  hwSlotConnectNumGroup, hwOfflineReasonStatGroup, hwMulticastListGroup,
+                                  hwMulticastProfileGroup, hwMulticastProfileExtGroup, hwAaaTrapOidGroup,
+                                  hwAaaTrapsNotificationsGroup, hwLamTrapsNotificationsGroup,hwObsoleteGroup}  
+                                               
+              ::= { hwAaaCompliances 1 }
+                                   
+                --  ============== groups ==============  
+        hwAaaObjectGroups OBJECT IDENTIFIER ::= { hwAaaConformance 2 } 
+                                 
+        hwAuthenSchemeGroup OBJECT-GROUP
+            OBJECTS { hwAuthenSchemeName, hwAuthenMethod, hwAuthenRowStatus,
+                      hwAuthenFailPolicy, hwAuthenFailDomain }
+            STATUS current       
+            DESCRIPTION          
+                "The authentication scheme configuration."
+            ::= { hwAaaObjectGroups 1 }
+
+
+        hwAcctSchemeGroup OBJECT-GROUP
+            OBJECTS { hwAcctSchemeName, hwAccMethod, hwAcctStartFail,
+                      hwAcctOnlineFail, hwAccRealTimeInter, hwAcctRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The account scheme configuration."
+            ::= { hwAaaObjectGroups 2 }
+             
+        hwDomainGroup OBJECT-GROUP
+            OBJECTS { hwDomainName, hwDomainAuthenSchemeName, hwDomainAcctSchemeName,
+                      hwDomainRadiusGroupName, hwDomainAccessLimitNum, hwDomainIfSrcRoute,
+                      hwDomainNextHopIP, hwDomainIdleCutTime, hwDomainIdleCutFlow,
+                      hwDomainRowStatus, hwDomainType   }
+            STATUS current
+            DESCRIPTION 
+                "The domain group configuration."
+            ::= { hwAaaObjectGroups 3 } 
+            
+        hwDomainExtGroup OBJECT-GROUP
+            OBJECTS { hwDomainPPPURL, hwIfDomainActive, hwPriority,
+                      hwWebServerURL, hwIPPoolOneName, hwIPPoolTwoName,
+                      hwIPPoolThreeName, hwTwoLevelAcctRadiusGroupName, hwVPDNGroupIndex,
+                      hwUclIndex, hwIfPPPoeURL, hwUclGroupName,
+                      hwVpdnGroupName, hwDomainVrf, hwDomainGre,
+                      hwDomainRenewIPTag, hwPortalURL, hwPortalServerIP,
+                      hwRedirectTimesLimit, hwDot1xTemplate, hwWebServerIP,
+                      hwWebServerMode, hwPoolWarningThreshold, hwTacGroupName,
+                      hwServicePolicyName, hwCopsGroupSSGType, hwDomainAuthorSchemeName,
+                      hwDomainQoSProfile, hwDomainZone,
+                      hwIfL2tpRadiusForce, hwDownPriority, hwPPPForceAuthtype,
+                      hwDnsIPAddress, hwAdminUserPriority, hwShapingTemplate,
+                      hwDomainDPIPolicyName, hwCopsGroupSIGType, hwCopsGroupCIPNType,
+                      hwPCReduceCir, hwValAcctType, hwValRadiusServer,
+                      hwValCopsServer, hwPCReducePir, hwDomainInboundL2tpQoSProfile,
+                      hwDomainOutboundL2tpQoSProfile, hwIfMulticastForward, hwMulticastVirtualSchedulRezCir,
+                      hwMulticastVirtualSchedulRezPir, hwMaxMulticastListNum, hwMultiProfile,
+                      hwDomainServiceType }
+            STATUS current
+            DESCRIPTION 
+                "The domain extent table group configuration."
+            ::= { hwAaaObjectGroups 4 }
+            
+        hwDomainStatGroup OBJECT-GROUP
+            OBJECTS { hwDomainAccessedNum, hwDomainOnlineNum, hwDomainOnlinePPPUser,
+                      hwDomainFlowDnByte, hwDomainFlowDnPkt, hwDomainFlowUpByte,
+                      hwDomainFlowUpPkt, hwDomainIPTotalNum, hwDomainIPUsedNum,
+                      hwDomainIPConflictNum, hwDomainIPExcludeNum, hwDomainIPIdleNum,                             hwDomainIPUsedPercent }
+            STATUS current
+            DESCRIPTION 
+                "The domain statistics group configuration."
+            ::= { hwAaaObjectGroups 5 }
+
+        hwAuthorSchemeGroup OBJECT-GROUP
+            OBJECTS { hwAuthorSchemeName, hwAuthorMethod, hwAuthorRowStatus  }
+            STATUS current
+            DESCRIPTION 
+                "The authorization scheme group configuration."
+            ::= { hwAaaObjectGroups 6 }
+
+        hwLocalUserGroup OBJECT-GROUP
+            OBJECTS { hwLocalUserName, hwLocalUserPassword, hwLocalUserAccessType,
+                      hwLocalUserPriority, hwftpdirction, hwQosProfileName,
+                      hwLocalUserRowStatus, hwLocalUserIpAddress, hwLocalUserVpnInstance  }
+            STATUS current
+            DESCRIPTION 
+                "The local user group configuration."
+            ::= { hwAaaObjectGroups 7 }
+
+        hwLocalUserExtGroup OBJECT-GROUP
+            OBJECTS { hwLocalUserState, hwLocalUserNoCallBackVerify, hwLocalUserCallBackDialStr }
+            STATUS current
+            DESCRIPTION 
+                "The local user extent group configuration." 
+            ::= { hwAaaObjectGroups 8 }
+
+        hwAaaSettingGroup OBJECT-GROUP
+            OBJECTS { hwRoamChar, hwGlobalControl, hwSystemRecord,
+                      hwOutboundRecord, hwCmdRecord, hwPPPUserOfflineStandardize,
+                      hwDomainNameParseDirection, hwDomainNameLocation, hwAccessSpeedNumber,
+                      hwAccessSpeedPeriod, hwRealmNameChar, hwRealmParseDirection,
+                      hwIPOXpassword, hwAccessDelayTransitionStep,
+                      hwAccessDelayTime, hwAccessDelayMinTime, hwParsePriority,
+                      hwRealmNameLocation, hwIPOXUsernameOption82, hwIPOXUsernameIP,
+                      hwIPOXUsernameSysname, hwIPOXUsernameMAC,hwDefaultUserName }
+            STATUS current
+            DESCRIPTION 
+                "The aaa setting group configuration."
+            ::= { hwAaaObjectGroups 9 }
+
+        hwAaaStatGroup OBJECT-GROUP
+            OBJECTS { hwTotalOnlineNum, hwTotalPPPoeOnlineNum, hwTotalPPPoAOnlineNum,
+                      hwTotalftpOnlineNum, hwTotalsshOnlineNum, hwTotaltelnetOnlineNum,
+                      hwTotalVLANOnlineNum, hwHistoricMaxOnlineNum, hwResetHistoricMaxOnlineNum,
+                      hwResetOfflineReasonStatistic, hwResetOnlineFailReasonStatistic  }
+            STATUS current
+            DESCRIPTION 
+                "The aaa statistics group configuration."
+            ::= { hwAaaObjectGroups 10 }
+
+        hwAccessGroup OBJECT-GROUP
+            OBJECTS { hwAccessIndex, hwAccessUserName, hwAccessPortType,
+                      hwAccessPriority, hwAccessSlotNo, hwAccessSubSlotNo,
+                      hwAccessPortNo, hwAccessVLANID, hwAccessPVC,
+                      hwAccessAuthenMethod, hwAccessAcctMethod, hwAccessIPAddress,
+                      hwAccessVRF, hwAccessMACAddress, hwAccessIfIdleCut,
+                      hwAccessIdleCutTime, hwAccessIdleCutFlow, hwAccessTimeLimit, 
+                      hwAccessTotalFlow64Limit, hwAccessStartTime, hwAccessCARIfUpActive,
+                      hwAccessCARIfDnActive, hwAccessUpFlow64, hwAccessDnFlow64, 
+                      hwAccessUpPacket64, hwAccessDnPacket64, hwAccessCARUpCIR,
+                      hwAccessCARUpPIR, hwAccessCARUpCBS, hwAccessCARUpPBS,
+                      hwAccessCARDnCIR, hwAccessCARDnPIR, hwAccessCARDnCBS,
+                      hwAccessCARDnPBS, hwAccessDownPriority, hwAccessQosProfile  }
+            STATUS current
+            DESCRIPTION 
+                "The access group configuration."
+            ::= { hwAaaObjectGroups 11 }
+
+        hwAccessExtGroup OBJECT-GROUP
+            OBJECTS { hwAccessUCLGroup, hwAuthenticationState,
+                      hwAuthorizationState, hwAccountingState, hwAccessDomainName,
+                      hwIdleTimeLength, hwAcctSessionID, hwAccessStartAcctTime,
+                      hwAccessNormalServerGroup, hwAccessDomainAcctCopySeverGroup, hwAccessPVlanAcctCopyServerGroup,
+                      hwAccessCurAuthenPlace, hwAccessActionFlag, hwAccessAuthtype, hwAccessType  }
+              STATUS current
+             DESCRIPTION 
+                "The access extent group configuration."
+            ::= { hwAaaObjectGroups 12 }
+
+        hwAcctSchemeExtGroup OBJECT-GROUP
+            OBJECTS { hwIfRealtimeAcct, hwRealtimeFailMaxnum, hwStartFailOnlineIfSendInterim }
+            STATUS current
+            DESCRIPTION 
+                "The account scheme extent group configuration."
+            ::= { hwAaaObjectGroups 13 }
+
+        hwBillPoolGroup OBJECT-GROUP
+            OBJECTS { hwBillsPoolVolume, hwBillsPoolNum, hwBillsPoolAlarmThreshold,    
+                      hwBillsPoolBackupMode, hwBillsPoolBackupInterval, hwBillsPoolBackupNow,    
+                      hwBillsPoolReset  }
+            STATUS current
+            DESCRIPTION 
+                "The bill pool group configuration."
+            ::= { hwAaaObjectGroups 14 }
+
+        hwBillTFTPGroup OBJECT-GROUP
+            OBJECTS { hwBillsTFTPSrvIP, hwBillsTFTPMainFileName  }
+            STATUS current
+            DESCRIPTION 
+                "The bill tftp group configuration."
+            ::= { hwAaaObjectGroups 15 }
+
+        hwUclGrpGroup OBJECT-GROUP
+            OBJECTS { hwUclGrpName, hwUclGrpRowStatus  }
+            STATUS current
+            DESCRIPTION 
+                "The user group configuration."
+            ::= { hwAaaObjectGroups 16 }
+
+        hwIpAccessGroup OBJECT-GROUP
+            OBJECTS { hwIPAccessIPaddress, hwIPAccessCID, hwIPAccessVRF  }
+            STATUS current
+            DESCRIPTION 
+                "The IP access group configuration."
+            ::= { hwAaaObjectGroups 17 }
+
+        hwCutAccessUserGroup OBJECT-GROUP
+            OBJECTS { hwCutStartUserID, hwCutEndUserID, hwCutIPaddress,
+                      hwCutMacAddres, hwCutUserName, hwCutUserAttri,
+                      hwCutDomain, hwCutIPPoolName, hwCutIfIndex,
+                      hwCutVlanID, hwCutVPI, hwCutVCI,
+                      hwCutVRF }
+            STATUS current
+            DESCRIPTION 
+                "The cut access user scheme group configuration."
+            ::= { hwAaaObjectGroups 18 }
+    
+        hwAaaUserPppGroup OBJECT-GROUP
+            OBJECTS { hwTotalConnectNum, hwTotalSuccessNum, hwTotalLCPFailNum,
+                      hwTotalAuthenFailNum, hwTotalNCPFailNum, hwTotalIPAllocFailNum,
+                      hwTotalOtherPPPFailNum  }
+            STATUS current
+            DESCRIPTION 
+                "The aaa user ppp group configuration."
+            ::= { hwAaaObjectGroups 19 }
+
+        hwAaaUserWebandFastGroup OBJECT-GROUP
+            OBJECTS { hwTotalWebConnectNum, hwTotalSuccessWebConnectNum  }
+            STATUS current
+            DESCRIPTION 
+                "The aaa user web and fast group configuration."
+            ::= { hwAaaObjectGroups 20 }
+
+        hwAaaUserDot1XGroup OBJECT-GROUP
+            OBJECTS { hwTotalDot1XConnectNum, hwTotalSuccessDot1XConnectNum  }
+            STATUS current
+            DESCRIPTION 
+                "The aaa user dot1x group configuration."
+            ::= { hwAaaObjectGroups 21 }
+
+        hwAaaUserBindGroup OBJECT-GROUP
+            OBJECTS { hwTotalBindConnectNum, hwTotalSuccessBindConnectNum  }
+            STATUS current
+            DESCRIPTION 
+                "The aaa user bind group configuration."
+            ::= { hwAaaObjectGroups 22 }
+
+        hwRecordSchemeGroup OBJECT-GROUP
+            OBJECTS { hwRecordSchemeName, hwRecordTacGroupName, hwRecordRowStatus  }
+            STATUS current
+            DESCRIPTION 
+                "The record scheme group configuration."
+            ::= { hwAaaObjectGroups 23 }
+
+        hwMACAccessGroup OBJECT-GROUP
+            OBJECTS { hwMACAccessMACAddress, hwMACAccessCID  }
+            STATUS current
+            DESCRIPTION 
+                "The MAC access group configuration."
+            ::= { hwAaaObjectGroups 24 }
+
+        hwSlotConnectNumGroup OBJECT-GROUP
+            OBJECTS { hwSlotConnectNumSlot, hwSlotConnectNumOnlineNum  }
+            STATUS current
+            DESCRIPTION 
+                "The slot connect number group configuration."
+            ::= { hwAaaObjectGroups 25 }
+
+        hwOfflineReasonStatGroup OBJECT-GROUP
+            OBJECTS { hwOfflineReason, hwOfflineReasonStatistic, hwOnlineFailReasonStatistic  }
+            STATUS current
+            DESCRIPTION 
+                "The offline reason statistics group configuration."
+            ::= { hwAaaObjectGroups 26 }
+
+        hwMulticastListGroup OBJECT-GROUP
+            OBJECTS { hwMulticastListIndex, hwMulticastListName, hwMulticastListSourceIp,
+                      hwMulticastListSourceIpMask, hwMulticastListGroupIp, hwMulticastListGroupIpMask,
+                      hwMulticastListVpnInstance,hwMulticastListRowStatus  }
+            STATUS current
+            DESCRIPTION 
+                "The multicast list group configuration."
+            ::= { hwAaaObjectGroups 27 }
+
+        hwMulticastProfileGroup OBJECT-GROUP
+            OBJECTS { hwMulticastProfileIndex, hwMulticastProfileName, hwMulticastProfileRowStatus  }
+            STATUS current
+            DESCRIPTION 
+                "The multicast profile group configuration."
+            ::= { hwAaaObjectGroups 28 }
+
+        hwMulticastProfileExtGroup OBJECT-GROUP
+            OBJECTS { hwMulticastListBindName, hwMulticastProfileExtRowStatus  }
+            STATUS current
+            DESCRIPTION 
+                "The multicast profile extent group configuration."
+            ::= { hwAaaObjectGroups 29 }
+
+        hwAaaTrapOidGroup OBJECT-GROUP
+            OBJECTS { hwDomainIndex, hwHdFreeamount, hwHdWarningThreshold,
+                      hwUserSlot, hwUserSlotMaxNumThreshold, hwOnlineUserNumThreshold}
+            STATUS current
+            DESCRIPTION 
+                "The aaa trap oid group configuration."
+            ::= { hwAaaObjectGroups 30 }
+
+        hwAaaTrapsNotificationsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwUserIPAllocAlarm, hwUserSlotMaxNum,
+                            hwOnlineUserNumAlarm, hwSetUserQosProfileFail }
+            STATUS current
+            DESCRIPTION 
+                "The aaa traps."
+            ::= { hwAaaObjectGroups 31 }
+
+        hwLamTrapsNotificationsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwHarddiskoverflow, hwHarddiskReachThreshold, hwHarddiskOK,
+                            hwCachetoFTPFail, hwHDtoFTPFail }
+            STATUS current
+            DESCRIPTION 
+                "The lam traps."
+            ::= { hwAaaObjectGroups 32 }
+            
+        hwObsoleteGroup OBJECT-GROUP
+            OBJECTS { hwNtvUserProfileName }
+            STATUS obsolete
+            DESCRIPTION 
+                "The obsolete group configuration."
+            ::= { hwAaaObjectGroups 33 }
+        --  ============== conformance information define end ==============  
+
+    
+    END
+
+

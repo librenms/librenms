@@ -1,0 +1,273 @@
+ENTERASYS-IF-MIB-EXT-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-if-mib-ext-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Interface MIB Extensions functionality.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright 2005 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifEntry
+        FROM IF-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysIfMibExtMIB MODULE-IDENTITY
+    LAST-UPDATED "200501132135Z"  -- Thu Jan 13 21:35 GMT 2005
+    ORGANIZATION "Enterasys Networks, Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+   
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Enterasys Networks enterprise OID that provide 
+         extensions to the industry standard IF-MIB."
+
+    REVISION    "200501132135Z"  -- Thu Jan 13 21:35 GMT 2005
+    DESCRIPTION 
+        "The initial version of this MIB module."
+    ::= { etsysModules 57 } 
+
+
+-- Textual Conventions
+
+EtsysIfOperStatusCauses ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This convention specifies the variety of functionalities that
+         may cause an interface's ifOperStatus to be have a value other
+         than up(1).  A set bit indicates that the associated cause is 
+         influencing the interface's current ifOperStatus.
+
+         adminStatus(0)
+          - The ifAdminStatus for the interface is not up(1).
+
+         linkLoss(1) 
+          - The interface has physically lost link with its partner.
+
+         linkFlap(2) 
+          - The interface has been brought down by the Link Flap
+            feature as defined by etsysLinkFlapMIB.
+
+         self(3)     
+          - The interface has brought itself down.  
+
+         initialization(4)
+          - The system or interface is still in the process of
+            initializing itself.
+
+         flowLimiting(5)
+          - The interface has been brought down by the Flow Limiting 
+            feature as defined by etsysFlowLimitingMIB.
+
+         policy(6)
+          - The interface has been brought down by the Policy feature
+            as defined by etsysPolicyProfileMIB.
+
+         classOfService(7)
+          - The interface has been brought down by the rate limiting
+            feature defined by etsysCosMIB.
+
+         ieee8021x(8)
+          - The interface has been made dormant awaiting successful 
+            authentication by 802.1X.
+
+         ieee8023lag(9)
+          - The interface has been made dormant as a result of being
+            an underlying physical port in a Link Aggregation."
+    REFERENCE
+        "RFC 2863, 'The Interfaces Group MIB'
+         ENTERASYS-LINK-FLAP-MIB
+         ENTERASYS-FLOW-LIMITING-MIB
+         ENTERASYS-POLICY-PROFILE-MIB
+         ENTERASYS-CLASS-OF-SERVICE-MIB
+         IEEE Std. 802.1X-2001
+         IEEE Std. 802.3-2002"
+    SYNTAX       BITS {
+                   adminStatus(0),
+                   linkLoss(1),
+                   linkFlap(2),
+                   self(3),
+                   initialization(4),
+                   flowLimiting(5),
+                   policy(6),
+                   classOfService(7),
+                   ieee8021x(8),
+                   ieee8023lag(9)
+                 }
+
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysIfMibExtObjects      OBJECT IDENTIFIER 
+                           ::= { etsysIfMibExtMIB 1 }
+
+etsysIfMibExtSystem       OBJECT IDENTIFIER 
+                           ::= { etsysIfMibExtObjects 1 }
+
+etsysIfMibExtInterface    OBJECT IDENTIFIER 
+                           ::= { etsysIfMibExtObjects 2 }
+
+
+-- -------------------------------------------------------------
+-- The Interface MIB Extension System Group
+-- -------------------------------------------------------------
+
+etsysIfOperStateLinkChange OBJECT-TYPE
+    SYNTAX       EnabledStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object controls the system wide ability to manipulate
+         the physical link state of an interface when the interface's
+         ifOperStatus transitions into or out of the down(2) state.
+         A value of enabled(1) will cause an interface to drop physical
+         link when its ifOperStatus transitions to down(2).  If the 
+         interface would transition out of the down(2) state, assuming
+         it did have link, then physical link will be restored to the 
+         interface.  A value of disabled(2) will cause an interface to 
+         not alter its physical link regardless of the value of 
+         ifOperStatus.  This object only affects those interfaces which
+         have a concept of physical link."
+    DEFVAL      { disabled }
+    ::= { etsysIfMibExtSystem 1 }
+
+
+-- -------------------------------------------------------------
+-- The Interface MIB Extension Interface Group
+-- -------------------------------------------------------------
+
+etsysInterfaceExtTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EtsysInterfaceExtEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of per interface information that extends the base
+         ifTable defined in RFC2863."
+    ::= {  etsysIfMibExtInterface 1 }
+
+etsysInterfaceExtEntry OBJECT-TYPE
+    SYNTAX       EtsysInterfaceExtEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry containing per interface information."
+    AUGMENTS  { ifEntry }
+    ::= { etsysInterfaceExtTable 1 }
+
+EtsysInterfaceExtEntry ::=
+    SEQUENCE { 
+        etsysIfOperStatusCause
+            EtsysIfOperStatusCauses
+    }
+
+etsysIfOperStatusCause OBJECT-TYPE
+    SYNTAX       EtsysIfOperStatusCauses
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the various features that could
+         cause the ifOperStatus of an interface to not be up(1)."
+    ::= { etsysInterfaceExtEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysIfMibExtConformance OBJECT IDENTIFIER
+    ::= { etsysIfMibExtMIB 2 }
+
+etsysIfMibExtGroups      OBJECT IDENTIFIER
+    ::= { etsysIfMibExtConformance 1 }
+
+etsysIfMibExtCompliances OBJECT IDENTIFIER
+    ::= { etsysIfMibExtConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysIfMibExtOperLinkGroup OBJECT-GROUP
+    OBJECTS { etsysIfOperStateLinkChange }
+    STATUS     current
+    DESCRIPTION
+        "The group that controls physical link manipulation as a result
+         of ifOperStatus changes."
+    ::= { etsysIfMibExtGroups 1 }
+
+etsysIfMibExtOperStatusGroup OBJECT-GROUP
+    OBJECTS { etsysIfOperStatusCause }
+    STATUS     current
+    DESCRIPTION
+        "The group that provides the cause of the current ifOperStatus
+         value for a given interface."
+    ::= { etsysIfMibExtGroups 2 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysIfMibExtCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for devices that support IF-MIB
+         extensions."
+
+    MODULE
+        GROUP       etsysIfMibExtOperLinkGroup
+        DESCRIPTION
+            "This group is mandatory for all devices that support
+             manipulating the physical link state of an interface
+             in response to ifOperStatus changes."
+
+        GROUP       etsysIfMibExtOperStatusGroup
+        DESCRIPTION
+            "This group is mandatory for all devices that support
+             reporting of the underlying cause for the current
+             ifOperStatus value associated with an interface."
+    ::= { etsysIfMibExtCompliances 1 }
+
+END

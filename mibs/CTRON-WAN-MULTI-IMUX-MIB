@@ -1,0 +1,438 @@
+CTRON-WAN-MULTI-IMUX-MIB DEFINITIONS ::= BEGIN
+
+        --  CTRON-WAN-MULTI-IMUX-MIB  The Cabletron Wide area Inverse Mux MIB
+        --  used to support managed devices which use Cabletron Wide area
+        --  Inverse Multiplexing. This MIB also covers those devices executing 
+        --  multiple instances of the IMUX application for a single
+        --  IP host.  An example of this configuration is a Cabletron
+        --  SmartSwitch product configured with one or more "integrated" 
+        --  High Speed Interface Modules (commonly referred to as non-orphan
+        --  HSIMs), each of which is configured to run the IMUX application.
+        --
+        --  Revision: 01.00.00
+        --  Part Number: 
+        --  Date:  April 21, 1998
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+
+    IMPORTS
+            OBJECT-TYPE             FROM RFC-1212
+            ctWanServices           FROM CTRON-MIB-NAMES;
+
+--====================================================================
+    -- Groups
+
+    ctWanMultiMux        OBJECT IDENTIFIER   ::= { ctWanServices 2 }
+
+--
+-- Multi Inverse Multiplexer General Variables
+--
+--
+
+        ctWANMMuxGeneralGroup OBJECT IDENTIFIER ::= { ctWanMultiMux 1 }
+
+        ctWANMMuxMaxNum OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Get the maximum number of Inverse Multiplexer
+                        applications allowed to be programmed for this IP host."
+                ::= { ctWANMMuxGeneralGroup 1}
+
+--
+-- Inverse Multiplexer Table
+--
+--      These parameters apply to a specific Wan Inverse
+--      multiplexer entity.
+--
+
+        ctWanMMuxTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtWanMMuxEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Information describing the global parameters
+                        that apply to Inverse Multiplexer entities."
+                ::= { ctWanMultiMux 2 }
+        
+        ctWanMMuxEntry OBJECT-TYPE
+                SYNTAX      CtWanMMuxEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single Inverse Multiplexer entry." 
+                INDEX       { ctWanMMuxId }
+                ::= { ctWanMMuxTable 1 }
+        
+        CtWanMMuxEntry ::=
+                SEQUENCE {
+                        ctWanMMuxId
+                        INTEGER,
+                        ctWanMMuxIfIndex
+                        INTEGER,
+                        ctWanMMuxMaxNumGroups
+                        INTEGER,
+                        ctWanMMuxAdmin
+                        INTEGER
+                        }
+
+        ctWanMMuxId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        Inverse Multiplexer Applications which belong to an IP
+                        host. This value ranges from 1 to the maximum number of 
+                        programmable applications as described by
+                        ctWANMMuxMaxNum. This index is associated
+                        with a physical WAN interface containing multiple DS1
+                        connections."
+                ::= { ctWanMMuxEntry 1 }
+        
+        ctWanMMuxIfIndex    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "The value for this object is equal to the value of
+                        ifIndex from the Interfaces table of MIB II (RFC 1213).
+                        Specifically, this index is associated with the physical
+                        interface containing multiple DS1 connections to be used
+                        for Cabletron WAN Inverse Multiplexing."
+                ::= { ctWanMMuxEntry 2 }
+        
+        ctWanMMuxMaxNumGroups   OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Get the maximum number of Inverse Multiplexer groups
+                        allowed to be programmed for this IMUX entity. This value
+                        is the number of physical WAN connections, divided by
+                        the minimum number of channels for a single mux
+                        to be operational (2).  However, some devices may only
+                        support a single inverse multiplexer group."
+                ::= { ctWanMMuxEntry 3}
+
+        
+        ctWanMMuxAdmin  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable an Inverse Multiplexer
+                        Application.  This object is used to enable/disable
+                        Inverse Multiplexing for a single IMUX entity.  Inverse
+                        Multiplexer Groups may be enabled/disabled independently
+                        using ctWanMMuxGroupAdmin.  This object must be set to 
+                        enabled for any inverse multiplexing to occur on the 
+                        IMUX entity."
+                ::= { ctWanMMuxEntry 4}
+
+--
+-- Inverse Multiplexer Group Table
+--
+--      The group structure contains information concerning
+--      each specific multiplexing group contained within an
+--      inverse multiplexing entity.
+--
+
+        ctWanMMuxGroupTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtWanMMuxGroupEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Information describing the configured parameters
+                        of one of the Inverse Multiplexer groups."
+                ::= { ctWanMultiMux 3 }
+        
+        ctWanMMuxGroupEntry OBJECT-TYPE
+                SYNTAX      CtWanMMuxGroupEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single Inverse Multiplexer group 
+                        entry."
+                INDEX       { ctWanMMuxGroupMMuxId, ctWanMMuxGroupId }
+                ::= { ctWanMMuxGroupTable 1 }
+        
+        CtWanMMuxGroupEntry ::=
+                SEQUENCE {
+                        ctWanMMuxGroupMMuxId
+                        INTEGER,
+                        ctWanMMuxGroupId
+                        INTEGER,
+                        ctWanMMuxGroupAdmin
+                        INTEGER,
+                        ctWanMMuxGroupNumChannels
+                        INTEGER,
+                        ctWanMMuxGroupAddChannel
+                        INTEGER,
+                        ctWanMMuxGroupDelChannel
+                        INTEGER
+                        }
+
+        ctWanMMuxGroupMMuxId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        Inverse Multiplexer Applications which belong to an IP
+                        host. This value ranges from 1 to the maximum number of 
+                        programmable applications as described by 
+                        ctWANMMuxMaxNum.  This index is the same as
+                        ctWanMMuxId."
+                ::= { ctWanMMuxGroupEntry 1 }
+        
+        ctWanMMuxGroupId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        groups which belong to the WAN Inverse Multiplexer.  
+                        This value ranges from 1 to the maximum number of 
+                        programmable groups as described by
+                        ctWANMMuxMaxNumGroups."
+                ::= { ctWanMMuxGroupEntry 2 }
+        
+        ctWanMMuxGroupAdmin     OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                        }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Used to enable and disable an Inverse Multiplexer
+                        group which evenly distributes data traffic in a
+                        properly sequenced fashion, over two or more single 
+                        channel Wide Area Network connections such as DS1, 
+                        E1, DDS, or SYNC.  Each of the single channel 
+                        connections must be configured with an appropriate 
+                        datalink protocol. A minimum of two channels, each 
+                        assigned to it's own physical interface, is required
+                        before the Inverse Multiplexer group can be enabled."
+                ::= { ctWanMMuxGroupEntry 3}
+
+        ctWanMMuxGroupNumChannels       OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Get the number of channels currently
+                        associated with this Inverse Multiplexer group. A 
+                        minimum of two channels, each assigned to it's own
+                        physical interface, is required before the Inverse 
+                        Multiplexer group can be enabled."
+                ::= { ctWanMMuxGroupEntry 4}
+
+        ctWanMMuxGroupAddChannel   OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "Add a channel to the channel list used by this Inverse
+                        Multiplexer group.  Before a channel is added, the 
+                        channel must be assigned a MIB II ifindex, and an
+                        acceptable Datalink Protocol. When this object is set,
+                        it is set with the ifindex value. This object is always
+                        read as a 1."
+                REFERENCE
+                        "rfc-1213"
+                ::= { ctWanMMuxGroupEntry 5 }
+          
+        ctWanMMuxGroupDelChannel   OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-write
+                STATUS      mandatory
+                DESCRIPTION
+                        "Delete a channel to the channel list used by this 
+                        Inverse Multiplexer group.  Before a channel is
+                        deleted, the channel must exist in the Inverse
+                        Multiplexer group's channel table.  When this object
+                        is set, it is set with the ifindex value of the channel
+                        the user wishes to delete from the channel table. This 
+                        object is always read as a 1."
+                REFERENCE
+                        "rfc-1213"
+                ::= { ctWanMMuxGroupEntry 6 }
+          
+--
+-- Inverse Multiplexer Channel Table
+--
+--      The channel structure contains information concerning
+--      specific channels contained within an
+--      inverse multiplexing group.
+--
+        ctWanMMuxChannelTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF CtWanMMuxChannelEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "Table containing ifindex values, representing WAN 
+                        channels, used by the Inverse Multiplexer. The table 
+                        also contains statistics reported about each channel."
+                ::= { ctWanMultiMux 4 }
+        
+        ctWanMMuxChannelEntry OBJECT-TYPE
+                SYNTAX      CtWanMMuxChannelEntry
+                ACCESS      not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                        "A description of a single entry."
+                INDEX       { ctWanMMuxChannelMMuxId, ctWanMMuxChannelGroupId, 
+                                ctWanMMuxChannelId }
+                ::= { ctWanMMuxChannelTable 1 }
+        
+        CtWanMMuxChannelEntry ::=
+                SEQUENCE {
+                        ctWanMMuxChannelMMuxId
+                        INTEGER,
+                        ctWanMMuxChannelGroupId
+                        INTEGER,
+                        ctWanMMuxChannelId
+                        INTEGER,
+                        ctWanMMuxChannelIfIndex
+                        INTEGER,
+                        ctWanMMuxChannelPhysNum
+                        INTEGER,
+                        ctWanMMuxChannelBwAvail
+                        INTEGER,
+                        ctWanMMuxChannelByteCount
+                        INTEGER,
+                        ctWanMMuxChannelStatus
+                        INTEGER
+                        }
+        
+        ctWanMMuxChannelMMuxId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        Inverse Multiplexer Applications which belong to an IP
+                        host. This value ranges from 1 to the maximum number of 
+                        programmable applications as described by 
+                        ctWANMMuxMaxNum.  This index is the same as
+                        ctWanMMuxId."
+                ::= { ctWanMMuxChannelEntry 1 }
+        
+        ctWanMMuxChannelGroupId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence 
+                        of groups which belong to the WAN Inverse Multiplexer.
+                        This value ranges from 1 to the maximum number of 
+                        programmable groups as described by
+                        ctWANMMuxMaxNumGroups."
+                ::= { ctWanMMuxChannelEntry 2 }
+        
+        ctWanMMuxChannelId    OBJECT-TYPE
+                SYNTAX      INTEGER (1..65535)
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "A unique value identifying an element in a sequence of
+                        member channel ifindex values which belong to a WAN 
+                        Inverse Multiplexer group."
+                ::= { ctWanMMuxChannelEntry 3 }
+          
+        ctWanMMuxChannelIfIndex    OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Returns an ifindex associated with a WAN
+                        channel used for Inverse Multiplexing."
+                ::= { ctWanMMuxChannelEntry 4 }
+
+        ctWanMMuxChannelPhysNum    OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Returns a unique physical connection identifier 
+                        associated with this channel's physical WAN
+                        connection."
+                ::= { ctWanMMuxChannelEntry 5 }
+
+        ctWanMMuxChannelBwAvail    OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Returns a value which represents the available 
+                        bandwidth for transmitting data existing for the 
+                        physical WAN connection associated with this channel.
+                        The value is represented in bits/sec."
+                ::= { ctWanMMuxChannelEntry 6 }
+
+        ctWanMMuxChannelByteCount    OBJECT-TYPE
+                SYNTAX      INTEGER
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Returns a value which represents a cumulative count
+                        of bytes transmitted out from this interface.  The 
+                        count includes any bytes transmitted across the
+                        physical medium, less physical medium framing."
+                ::= { ctWanMMuxChannelEntry 7 }
+
+        ctWanMMuxChannelStatus    OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        inactive(1),
+                        active(2)
+                        }
+                ACCESS      read-only
+                STATUS      mandatory
+                DESCRIPTION
+                        "Returns the current status of the channel associated
+                        with an inverse multiplexer group.  The channel is 
+                        active when the group admin status is enabled, and 
+                        the channel is operational.  The channel is inactive 
+                        when either the group admin status is disabled, or 
+                        the channel is not operational."
+                ::= { ctWanMMuxChannelEntry 8 }
+
+END

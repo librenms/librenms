@@ -1,0 +1,673 @@
+
+-- *****************************************************************************
+-- Juniper-IP-PROFILE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   IP Profile MIB
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 2000, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-IP-PROFILE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable, JuniName, JuniSetMap
+        FROM Juniper-TC;
+
+juniIpProfileMIB  MODULE-IDENTITY
+    LAST-UPDATED "200609081026Z"  -- 08-Sep-06 03:56 PM EST
+    ORGANIZATION "Juniper Networks"
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The IP Profile MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200609081026Z"  -- 08-Sep-06 03:56 PM EST  - JUNOSe 8.1 
+    DESCRIPTION
+        "Added support for Blocking multicast sources on IP Interfaces -
+        juniIpProfileBlockMulticastSources."
+    REVISION    "200509131721Z"  -- 13-Sep-05 01:21 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Added support for Flow Stats a.k.a. J-Flow for IP Interfaces by 
+        including juniIpProfileFlowStats."
+    REVISION    "200410051404Z"  -- 05-Oct-04 10:04 AM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added support for IP filter options all for IP Interfaces by 
+        including juniIpProfileFilterOptionsAll."
+    REVISION    "200309241533Z"  -- 24-Sep-03 11:33 AM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Added support for TCP MSS configuration for IP interfaces by 
+        including juniIpProfileTcpMss."
+    REVISION    "200210111320Z"  -- 11-Oct-02 09:20 AM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+        In juniIpProfileTable, to support unnumbered interfaces referencing
+        numbered interfaces in addition to loopback interfaces, the
+        following object is made obsolete:
+          juniIpProfileLoopback
+        and the following object is added:
+          juniIpProfileInheritNumString"
+    REVISION    "200101242006Z"  -- 24-Jan-01 03:06 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Deprecated juniIpProfileRowStatus; the table is now dense and populated
+        as a side-effect of creation of an entry in the juniProfileNameTable in
+        Juniper-PROFILE-MIB.  Also, added juniIpProfileSetMap and
+        juniIpProfileSrcAddrValidEnable."
+    REVISION    "200005080000Z"  --  8-May-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Obsoleted juniIpProfileLoopbackIfIndex, replacing it with
+        juniIpProfileLoopback."
+    REVISION      "9908250000Z"  -- 25-Aug-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 26 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpProfileObjects  OBJECT IDENTIFIER ::= {juniIpProfileMIB 1}
+juniIpProfile         OBJECT IDENTIFIER ::= {juniIpProfileObjects 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for IP Profiles
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- This MIB defines configuration profile structure for IP interfaces.
+-- The creation/deletion of profiles and mapping of profile names to profile
+-- indices is coordinated in the Juniper-PROFILE-MIB.
+--
+--
+-- The IP Profile Table
+--
+juniIpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table describe profiles for configuring IP
+        interfaces.
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniIpProfile 1 }
+
+juniIpProfileEntry OBJECT-TYPE
+    SYNTAX      JuniIpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A profile describing configuration of an IP interface."
+    INDEX     { juniIpProfileId }
+    ::= { juniIpProfileTable 1 }
+
+JuniIpProfileEntry ::= SEQUENCE {
+    juniIpProfileId                  Unsigned32,
+    juniIpProfileRowStatus           RowStatus,
+    juniIpProfileRouterName          JuniName,
+    juniIpProfileIpAddr              IpAddress,
+    juniIpProfileIpMask              IpAddress,
+    juniIpProfileDirectedBcastEnable JuniEnable,
+    juniIpProfileIcmpRedirectEnable  JuniEnable,
+    juniIpProfileAccessRoute         JuniEnable,
+    juniIpProfileMtu                 Integer32,
+    juniIpProfileLoopbackIfIndex     InterfaceIndexOrZero,
+    juniIpProfileLoopback            Integer32,
+    juniIpProfileSetMap              JuniSetMap,
+    juniIpProfileSrcAddrValidEnable  JuniEnable,
+    juniIpProfileInheritNumString    DisplayString,
+    juniIpProfileTcpMss              Integer32,
+    juniIpProfileFilterOptionsAll    JuniEnable, 
+    juniIpProfileFlowStats           JuniEnable,
+    juniIpProfileBlockMulticastSources JuniEnable }
+
+juniIpProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniIpProfileEntry 1 }
+
+juniIpProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table.  Only the values
+        'createAndGo' and 'destroy' may be SET.
+
+        The value of juniIpProfileId must match that of a profile name
+        configured in juniProfileNameTable."
+    ::= { juniIpProfileEntry 2 }
+
+juniIpProfileRouterName OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The virtual router to which an IP interface configured by this profile
+        will be assigned, if other mechanisms do not otherwise specify a virtual
+        router assignment."
+    DEFVAL    { "" }
+    ::= { juniIpProfileEntry 3 }
+
+juniIpProfileIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An IP address to be used by an IP interface configured by this profile.
+        This object will have a value of 0.0.0.0 for an unnumbered interface."
+    DEFVAL    { 0 }
+    ::= { juniIpProfileEntry 4 }
+
+juniIpProfileIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An IP address mask to be used by an IP interface configured by this
+        profile.  This object will have a value of 0.0.0.0 for an unnumbered
+        interface."
+    DEFVAL    { 0 }
+    ::= { juniIpProfileEntry 5 }
+
+juniIpProfileDirectedBcastEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable forwarding of directed broadcasts on this IP network
+        interface."
+    DEFVAL    { disable }
+    ::= { juniIpProfileEntry 6 }
+
+juniIpProfileIcmpRedirectEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable transmission of ICMP Redirect messages on this IP
+        network interface."
+    DEFVAL    { disable }
+    ::= { juniIpProfileEntry 7 }
+
+juniIpProfileAccessRoute OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable whether a host route is automatically created for a
+        remote host attached to an IP interface that is configured using this
+        profile."
+    DEFVAL    { enable }
+    ::= { juniIpProfileEntry 8 }
+
+juniIpProfileMtu OBJECT-TYPE
+    SYNTAX      Integer32 (0|512..10240)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured MTU size for this IP network interface.  If set to zero,
+        the default MTU size, as determined by the underlying network media, is
+        used."
+    DEFVAL    { 0 }
+    ::= { juniIpProfileEntry 9 }
+
+juniIpProfileLoopbackIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "For unnumbered interfaces, the IfIndex of the IP loopback interface
+        whose IP address is used as the source address for transmitted IP
+        packets.  A value of zero means the loopback interface is unspecified
+        (e.g., when the interface is numbered)."
+    DEFVAL    { 0 }
+    ::= { juniIpProfileEntry 10 }
+
+juniIpProfileLoopback OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of the loopback interface, associated with the specified
+        virtual router, whose IP address is used as the source address when
+        transmitting IP packets on unnumbered remote access user links.
+
+        For example, if the loopback interface for the associated router was
+        configured via the console as 'loopback 2', this object would contain
+        the integer value 2.
+
+        A value of -1 indicates the loopback interface is unspecified, e.g.,
+        when the IP interface is numbered.
+
+        This object has been replaced by juniIpProfileInheritNumString.
+        This object is no longer represented in the juniIpProfileSetMap."
+    DEFVAL    { -1 }
+    ::= { juniIpProfileEntry 11 }
+
+juniIpProfileSetMap OBJECT-TYPE
+    SYNTAX      JuniSetMap
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing which objects in this entry have been explicitly
+        configured.  See the definition of the JuniSetMap TEXTUAL-CONVENTION for
+        details of use.
+
+        The INDEX object(s) and this object are excluded from representation
+        (i.e. their bits are never set).
+
+        When a SET request does not explicitly configure JuniSetMap, bits in
+        JuniSetMap are set as a side-effect of configuring other profile
+        attributes in the same entry.
+
+        If, however, a SET request explicitly configures JuniSetMap, the
+        explicitly configured value overrides 1) any previous bit settings, and
+        2) any simultaneous 'side-effect' settings that would otherwise occur.
+
+        Once set, bits can only be cleared by explicitly configuring
+        JuniSetMap."
+    ::= { juniIpProfileEntry 12 }
+
+juniIpProfileSrcAddrValidEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable whether source addresses in received IP packets are
+        validated. Validation is performed by looking up the source IP address
+        in the routing database and determining whether the packet arrived on
+        the expected interface; if not, the packet is discarded."
+    DEFVAL    { disable }
+    ::= { juniIpProfileEntry 13 }
+
+juniIpProfileInheritNumString OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The text identifier of the numbered interface, associated with the
+        specified virtual router, whose IP address is used as the source address
+        when transmitting IP packets on unnumbered remote access user links.
+        Types/formats/examples for this string include:
+
+            Loopback
+            loopback <id>
+            'loopback 0'
+
+            ATM Virtual Circuit
+            atm <slot>/<port>.<distinguisher>
+            'atm 3/1.100'
+
+            Ethernet
+            { fastEthernet | gigabitEthernet } <slot>/<port>
+            'fastEthernet 3/0'
+            'gigabitEthernet 3/0'
+
+            Ethernet VLAN
+            { fastEthernet | gigabitEthernet } <slot>/<port>:<vlanID>
+            'fastEthernet 3/0:1000'
+            'gigabitEthernet 3/0:1000'
+
+            Channelized Serial
+            serial <slot>/<port>:<channelSpecifier>[/<channelSpecifier>]*
+            'serial 3/0:4'            (T1/E1)
+            'serial 3/0:2/4'          (T3/E3)
+            'serial 3/0:2/1/1/4'      (OC3/OC12 - channelized DS3)
+            'serial 3/0:2/1/1/1/4'    (OC3/OC12 - virtual tributaries)
+
+        Other formats may be supported over time.
+
+        An empty string indicates the referenced interface is unspecified, e.g.,
+        when this IP interface is numbered."
+    DEFVAL    { "" }
+    ::= { juniIpProfileEntry 14 }
+
+juniIpProfileTcpMss OBJECT-TYPE
+    SYNTAX      Integer32 (0|160..10240)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures TCP MSS value for an IP interface.  When configured, 
+        MSS value of TCP SYN packets received or transmitted on the 
+        interface will be compared with the configured value and lowest 
+        of the two will replace the value in the packet."
+    DEFVAL    { 0 }
+    ::= { juniIpProfileEntry 15 }
+
+juniIpProfileFilterOptionsAll OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable whether IP packets containing options are to be discarded or sent
+         to the control plane for processing."
+    DEFVAL    { disable }
+    ::= { juniIpProfileEntry 16 }
+
+juniIpProfileFlowStats OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable whether J-Flow is enabled on the interface"
+    DEFVAL    { disable }
+    ::= { juniIpProfileEntry 17 }
+
+juniIpProfileBlockMulticastSources OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable Blocking Multicast traffic"
+    DEFVAL    { disable }
+    ::= { juniIpProfileEntry 18 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniIpProfileTrapControl      OBJECT IDENTIFIER ::= { juniIpProfileMIB 2 }
+-- juniIpProfileTraps            OBJECT IDENTIFIER ::= { juniIpProfileMIB 3 }
+-- juniIpProfileTrapPrefix       OBJECT IDENTIFIER ::= { juniIpProfileTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpProfileMIBConformance
+             OBJECT IDENTIFIER ::= { juniIpProfileMIB 4 }
+juniIpProfileMIBCompliances
+             OBJECT IDENTIFIER ::= { juniIpProfileMIBConformance 1 }
+juniIpProfileMIBGroups
+             OBJECT IDENTIFIER ::= { juniIpProfileMIBConformance 2 }
+
+
+--
+-- compliance statements
+--
+juniIpProfileCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting IP configuration
+        profiles.  This statement became obsolete when juniIpProfileLoopback
+        replaced juniIpProfileLoopbackIfIndex."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup }
+    ::= { juniIpProfileMIBCompliances 1 }                          -- JUNOSe 1.1
+
+juniIpProfileCompliance1  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting IP configuration
+        profiles.  This statement became obsolete when juniIpProfileRowStatus
+        was deprecate and the juniIpProfileSetMap and
+        juniIpProfileSrcAddrValidEnable objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup1 }
+    ::= { juniIpProfileMIBCompliances 2 }                          -- JUNOSe 2.0
+
+juniIpProfileCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting IP configuration
+        profiles.  This statement became obsolete when juniIpProfileLoopback was
+        obsoleted and the juniIpProfileInheritNumString object was added."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup2 }
+    ::= { juniIpProfileMIBCompliances 3 }                          -- JUNOSe 3.0
+
+juniIpProfileCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting IP configuration
+        profiles.  This statement became obsolete when juniIpProfileTcpMss was
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup3 }
+    ::= { juniIpProfileMIBCompliances 4 }                          -- JUNOSe 5.0
+
+juniIpProfileCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting IP configuration
+        profiles.  This statement became obsolete when juniIpProfileFilterOptionsAll
+        was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup4 }
+    ::= { juniIpProfileMIBCompliances 5 }                          -- JUNOSe 5.2
+
+juniIpProfileCompliance5  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting IP configuration
+        profiles, incorporating juniIpProfileFilterOptionsAll."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup5 }
+    ::= { juniIpProfileMIBCompliances 6 }                          -- JUNOSe 7.0
+
+juniIpProfileCompliance6  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting IP configuration
+        profiles, incorporating juniIpProfileFlowStats."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup6 }
+    ::= { juniIpProfileMIBCompliances 7 }                          -- JUNOSe 7.2
+
+juniIpProfileCompliance7  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting IP configuration
+        profiles, incorporating juniIpProfileBlockMulticastSources."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpProfileGroup7 }
+    ::= { juniIpProfileMIBCompliances 8 }                          -- JUNOSe 8.1
+--
+-- units of conformance
+--
+juniIpProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRowStatus,
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileLoopbackIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IP Profile
+        functionality in a Juniper product.  This group became obsolete when
+        juniIpProfileLoopback replaced juniIpProfileLoopbackIfIndex."
+    ::= { juniIpProfileMIBGroups 1 }
+
+juniIpProfileGroup1  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRowStatus,
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileLoopback }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IP Profile
+        functionality in a Juniper product.  This group became obsolete when
+        juniIpProfileRowStatus was deprecate and the juniIpProfileSetMap and
+        juniIpProfileSrcAddrValidEnable objects were added."
+    ::= { juniIpProfileMIBGroups 2 }
+
+juniIpProfileGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileLoopback,
+        juniIpProfileSetMap,
+        juniIpProfileSrcAddrValidEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IP Profile
+        functionality in a Juniper product.  This statement became obsolete
+        when juniIpProfileLoopback was obsoleted and the
+        juniIpProfileInheritNumString object was added."
+    ::= { juniIpProfileMIBGroups 3 }
+
+juniIpProfileDeprecatedGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRowStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated object providing management of IP Profile functionality in a
+        Juniper product.  This group has been deprecated but may still be
+        supported on some implementations."
+    ::= { juniIpProfileMIBGroups 4 }
+
+juniIpProfileGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileSetMap,
+        juniIpProfileSrcAddrValidEnable,
+        juniIpProfileInheritNumString }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IP Profile
+        functionality in a Juniper product.  This statement became obsolete
+        when juniIpProfileTcpMss was added."
+    ::= { juniIpProfileMIBGroups 5 }
+
+juniIpProfileGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileSetMap,
+        juniIpProfileSrcAddrValidEnable,
+        juniIpProfileInheritNumString,
+        juniIpProfileTcpMss }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IP Profile
+        functionality in a Juniper product. This statement became osolete
+        when juniIpProfileFilterOptionsAll was added."
+    ::= { juniIpProfileMIBGroups 6 }
+
+juniIpProfileGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileSetMap,
+        juniIpProfileSrcAddrValidEnable,
+        juniIpProfileInheritNumString,
+        juniIpProfileTcpMss,
+        juniIpProfileFilterOptionsAll }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IP Profile
+        functionality in a Juniper product. This statement became osolete
+        when juniIpProfileFlowStats was added."
+    ::= { juniIpProfileMIBGroups 7 }
+
+juniIpProfileGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileSetMap,
+        juniIpProfileSrcAddrValidEnable,
+        juniIpProfileInheritNumString,
+        juniIpProfileTcpMss,
+        juniIpProfileFilterOptionsAll,
+        juniIpProfileFlowStats }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IP Profile
+        functionality in a Juniper product. This statement became obsolete
+        when juniIpProfileBlockMulticastSources was added."
+    ::= { juniIpProfileMIBGroups 8 }
+
+juniIpProfileGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniIpProfileRouterName,
+        juniIpProfileIpAddr,
+        juniIpProfileIpMask,
+        juniIpProfileDirectedBcastEnable,
+        juniIpProfileIcmpRedirectEnable,
+        juniIpProfileAccessRoute,
+        juniIpProfileMtu,
+        juniIpProfileSetMap,
+        juniIpProfileSrcAddrValidEnable,
+        juniIpProfileInheritNumString,
+        juniIpProfileTcpMss,
+        juniIpProfileFilterOptionsAll,
+        juniIpProfileFlowStats,
+        juniIpProfileBlockMulticastSources }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of IP Profile
+        functionality in a Juniper product."
+    ::= { juniIpProfileMIBGroups 9 }
+
+END

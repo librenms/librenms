@@ -1,0 +1,156 @@
+-- ArubaOS 3.2.0.0_16376
+-- ***********************************************************
+--  ARUBA-MGMT-MIB
+--
+-- ************************************************************
+--
+
+ARUBA-MGMT-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+    		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+    		ObjectName, Integer32, Counter32, snmpModules
+                    FROM SNMPv2-SMI
+                TruthValue, DisplayString, TestAndIncr, TimeStamp,
+				PhysAddress
+                    FROM SNMPv2-TC
+--              TEXTUAL-CONVENTION, RowStatus, TimeStamp
+--                  FROM SNMPv2-TC
+
+	   			ArubaEnableValue
+	   				FROM ARUBA-TC
+				arubaMgmt
+					FROM ARUBA-MIB
+
+    		MODULE-COMPLIANCE, OBJECT-GROUP
+                    FROM SNMPv2-CONF;
+
+
+--  The arubaMgmtMIB is derived from the Aruba Enterprise MIB 
+--  branch under aruba.arubaMgmt as 
+--  defined under. The absolute path from root is : 
+--  .iso 
+--   .org.dod                                   
+--    .internet.private.enterprises
+--     .aruba.arubaMgmt
+--                        
+
+    arubaMgmtExtensions MODULE-IDENTITY
+    		LAST-UPDATED "0601221834Z"
+    		ORGANIZATION "Aruba Wireless Networks"
+    		CONTACT-INFO 
+				"Postal: 	1322 Crossman Avenue
+						 	Sunnyvale, CA 94089
+				E-mail:		dl-support@arubanetworks.com
+				Phone:		+1 408 227 4500"
+    DESCRIPTION
+            "A MIB module for supporting the Aruba Management 
+			 Protocol. This protocol is an extension to SNMP."
+    ::= { arubaMgmt  3 } 
+
+ 	arubaMgmtGroup		OBJECT IDENTIFIER ::= {arubaMgmtExtensions 1}
+
+-- arubaMgmtGroup begin 
+
+      arubaGetTable OBJECT-TYPE
+         SYNTAX       OBJECT IDENTIFIER
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The object is used in the Aruba Management Protocol.
+			In a GET Table request the instance of the object
+			will contain the Table/Entry OID to be retrieved.
+			The value of the object in a GET Table response is the 
+			table OID or Entry OID.
+			A Get request on this object returns <0.0>.
+            "
+        ::= { arubaMgmtGroup 1 }
+
+     arubaNumberOfRows OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The object is used in the Aruba Management Protocol.
+			This Object is used to specify the number of Objects 
+			to be retrieved in a GET Table request. Instance 
+			of the Object will contain the number of Rows.
+			In the Response to the GET Table this object will
+			contain the number of Objects returned in the response.
+			A Get request on this object returns 0.
+            "
+        ::= { arubaMgmtGroup 2 }
+
+
+     arubaRowInstance OBJECT-TYPE
+         SYNTAX       OBJECT IDENTIFIER
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The object is used in the Aruba Management Protocol.
+			This Object is used to specify the Row Instance
+			in the GET Table Request. The response will start from the
+			Next Row. Instance of the Object is the row instance of the
+			request.
+			In the Response to the GET Table this object will
+			contain the Instance of Last row included in the response.
+			A Get request on this object returns <0.0> .
+            "
+        ::= { arubaMgmtGroup 3 }
+
+     arubaGetTableStatus OBJECT-TYPE
+         SYNTAX       INTEGER{
+							endTable(1),
+							moreTable(2),
+							retrieveError(3),
+							noAmpSupport(4),
+							invalidColumnID(5),
+							resourceAllocationFailure(6)
+					 }
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The object is used in the Aruba Management Protocol.
+			This Object is used to give the status of the GetTable
+			request. 
+			endTable -- indicates that there are no more rows in 
+						the table.
+			moreTable -- indicates that there are some more rows 
+						 in the table.
+			retrieveError -- indicates an error occured while
+							processing the getTable request.
+							(Will be expanded ).
+			A Get request on this object returns 0 .
+            "
+        ::= { arubaMgmtGroup 4 }
+
+     arubaNumberOfColumns OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The object is used in the Aruba Management Protocol.
+			This Object is used to specify the number of Columns
+			per row in the Get Table Response.
+			A Get request on this object returns 0.
+            "
+        ::= { arubaMgmtGroup 5 }
+
+     arubaSwitchAMPSupport OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The object is used in the Aruba Management Protocol.
+			This Object is used to specify the number of Columns
+			per row in the Get Table Response.
+			A Get request on this object returns 0.
+            "
+        ::= { arubaMgmtGroup 6 }
+END

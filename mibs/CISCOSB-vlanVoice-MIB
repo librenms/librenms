@@ -1,0 +1,457 @@
+CISCOSB-vlanVoice-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    vlan                                        FROM CISCOSB-vlan-MIB
+    TruthValue, RowStatus,MacAddress,
+    DisplayString                               FROM SNMPv2-TC
+    ifIndex                                     FROM IF-MIB
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    VlanIndex                                   FROM Q-BRIDGE-MIB
+    VlanPriority                                FROM CISCOSB-MIB;
+
+vlanVoice MODULE-IDENTITY
+              LAST-UPDATED "201001090000Z"
+              ORGANIZATION "Cisco Systems, Inc."
+
+              CONTACT-INFO
+              "Postal: 170 West Tasman Drive
+              San Jose , CA 95134-1706
+              USA
+
+              
+              Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+              DESCRIPTION
+                      "The private MIB module definition for voice vlan support in switch devices."
+              REVISION "201009260000Z"
+              DESCRIPTION
+                       "Editorial changes to support new MIB compilers."
+              REVISION "201009260000Z"
+              DESCRIPTION
+                      "Initial version of this MIB."
+          ::= { vlan 54 }
+
+-- voice vlan
+
+-- start from 6 since 1..5 are deprecated voice
+vlanVoiceAdminState OBJECT-TYPE
+   SYNTAX INTEGER {
+        disabled(0),
+        auto-enabled(1),
+        auto-triggered(2),
+        oui-enabled(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " administrative voice vlan status "
+    ::= { vlanVoice 6 }
+
+vlanVoiceOperState OBJECT-TYPE
+   SYNTAX INTEGER {
+        disabled(0),
+        auto-enabled(1),
+        auto-triggered(2),
+        oui-enabled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " operational voice vlan status "
+    ::= { vlanVoice 7 }
+
+vlanVoiceAdminVid OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "1-4094 actual vlan (must exist in dot1qvlan static table)"
+    DEFVAL { 1 }
+    ::= { vlanVoice 8 }
+
+vlanVoiceOperVid OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " operational Voice Vlan ID"
+    ::= { vlanVoice 9 }
+
+-- Voice VLAN local configuration configuration Table
+vlanVoiceUcDeviceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanVoiceUcDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static default and UC directly connected to device configuration."
+    ::= { vlanVoice 10 }
+
+vlanVoiceUcDeviceEntry OBJECT-TYPE
+    SYNTAX      VlanVoiceUcDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static and dynamic per port information for a voice VLAN."
+    INDEX { vlanVoiceUcDeviceType, vlanVoiceUcDeviceMacAddress, vlanVoiceUcDeviceInterface }
+    ::= { vlanVoiceUcDeviceTable 1 }
+
+VlanVoiceUcDeviceEntry ::= SEQUENCE {
+    vlanVoiceUcDeviceType          INTEGER { default(0), static(1), uc(2) },
+    vlanVoiceUcDeviceMacAddress    MacAddress,
+    vlanVoiceUcDeviceInterface     INTEGER,
+    vlanVoiceUcDeviceVid           INTEGER (1..4094),
+    vlanVoiceUcDeviceVpt           INTEGER (0..7),
+    vlanVoiceUcDeviceDscp          INTEGER (0..63),
+    vlanVoiceUcDeviceIsBest        TruthValue
+}
+
+vlanVoiceUcDeviceType OBJECT-TYPE
+    SYNTAX      INTEGER { default(0),
+                          static(1),
+                          uc(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "type of entry"
+    ::= { vlanVoiceUcDeviceEntry 1 }
+
+
+vlanVoiceUcDeviceMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac address of UC"
+    ::= { vlanVoiceUcDeviceEntry 2 }
+
+vlanVoiceUcDeviceInterface OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac interface on which UC is connected"
+    ::= { vlanVoiceUcDeviceEntry 3 }
+
+vlanVoiceUcDeviceVid OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Voice Vlan ID"
+    ::= { vlanVoiceUcDeviceEntry 4 }
+
+vlanVoiceUcDeviceVpt OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entry VPT"
+    ::= { vlanVoiceUcDeviceEntry 5 }
+
+vlanVoiceUcDeviceDscp OBJECT-TYPE
+    SYNTAX      INTEGER (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entry DSCP value"
+    ::= { vlanVoiceUcDeviceEntry 6 }
+
+vlanVoiceUcDeviceIsBest OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this entry is used as best local configuration"
+    ::= { vlanVoiceUcDeviceEntry 7 }
+
+-- voice vlan auto
+vlanVoiceAuto  OBJECT IDENTIFIER ::= { vlanVoice 11 }
+
+-- voice vlan auto admin
+
+vlanVoiceAutoAdmin  OBJECT IDENTIFIER ::= { vlanVoiceAuto 1 }
+
+vlanVoiceAutoAdminVpt OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "user configured VPT for Voice Vlan operation"
+    DEFVAL { 0 }
+    ::= { vlanVoiceAutoAdmin 1 }
+
+vlanVoiceAutoAdminDscp OBJECT-TYPE
+    SYNTAX      INTEGER (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "user configured DSCP for Voice Vlan operation"
+    DEFVAL { 0 }
+    ::= { vlanVoiceAutoAdmin 2 }
+
+-- voice vlan auto oper
+
+vlanVoiceAutoOper  OBJECT IDENTIFIER ::= { vlanVoiceAuto 2 }
+
+vlanVoiceAutoOperVpt OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "operational VPT for Voice Vlan operation"
+    ::= { vlanVoiceAutoOper 1 }
+
+vlanVoiceAutoOperDscp OBJECT-TYPE
+    SYNTAX      INTEGER (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "user configured DSCP for Voice Vlan operation"
+    ::= { vlanVoiceAutoOper 2 }
+
+vlanVoiceAutoOperSource OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Mac address of the switch by which we've selected the VVID"
+    ::= {vlanVoiceAutoOper 3 }
+
+vlanVoiceAutoOperPriority OBJECT-TYPE
+    SYNTAX INTEGER {
+        staticActive(0),    -- VVID selected according to user configuration of an active device
+        staticInActive(1),  -- VVID selected according to user configuration of an inactive device
+        ucActive(2),        -- VVID selected according to UC device + UC device is active
+        ucInActive(3),      -- VVID selected according to UC device + UC device is inactive
+        default(6),         -- VVID is at default (no UC device + no static configuration in lan)
+        disabled(10)        -- Voice Vlan is disabled
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The reason for which Voice Vlan ID was selected."
+    ::= { vlanVoiceAutoOper 4 }
+
+
+vlanVoiceAutoRefresh  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "By setting the MIB to True, VSDP refresh will be executed."
+    ::= { vlanVoiceAuto 3 }
+
+vlanVoiceAutoAgreedVlanLastChange OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(12))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+        "date format is DDMMYYHHMMSS"
+    ::= { vlanVoiceAuto 4 }
+
+
+-- voice vlan OUI
+
+vlanVoiceOUIBased  OBJECT IDENTIFIER ::= { vlanVoice 12 }
+
+vlanVoiceOUIBasedAdminPriority OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An administratively assigned Priority, which will be used
+        for all traffic on the voice vlan, this gives the packets
+        the requested priority (CoS) within the bridge."
+    DEFVAL { 6 }
+     ::= { vlanVoiceOUIBased 1 }
+
+vlanVoiceOUIBasedAdminRemark OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Remark VPT on tagged frames egress the voice vlan according.
+         to priority true.false"
+    DEFVAL { false }
+    ::= { vlanVoiceOUIBased 2 }
+
+vlanVoiceOUIBasedSetToDefault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The vlanVoiceOUIBasedSetToDefault indicates that vlanVoiceOUIBasedTable
+            should be set to it's default values if existed
+            (OUI default prefixes).
+
+            To do so the vlanVoiceOUIBasedTable should be previously deleted by usual
+            entries destroying.
+
+            This object behaviors as write-only than
+            reading this object will always return 'false'."
+    DEFVAL{ false }
+    ::= { vlanVoiceOUIBased 3 }
+
+-- Voice VLAN OUI Table
+vlanVoiceOUIBasedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanVoiceOUIBasedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static global configuration information for Voice VLANs OUI MAC Prefixes.
+        All entries are permanent and will be restored after the device is reset."
+    ::= { vlanVoiceOUIBased 4 }
+
+vlanVoiceOUIBasedEntry OBJECT-TYPE
+    SYNTAX      VlanVoiceOUIBasedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a voice VLANs OUI MAC Prefixes configured into the
+        device by management."
+    INDEX   { vlanVoiceOUIBasedPrefix }
+    ::= { vlanVoiceOUIBasedTable  1 }
+
+VlanVoiceOUIBasedEntry ::= SEQUENCE {
+              vlanVoiceOUIBasedPrefix                      OCTET STRING,
+              vlanVoiceOUIBasedDescription                 DisplayString,
+              vlanVoiceOUIBasedEntryRowStatus              RowStatus
+}
+
+vlanVoiceOUIBasedPrefix   OBJECT-TYPE
+    SYNTAX         OCTET STRING(SIZE(3))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The index value used to identify the OUI MAC Prefix component
+             associated with this entry.
+
+            The value of this object is used as an index to the
+            vlanVoiceOUIBasedTable.
+
+            Voice VLANs OUI Prefix is the first 3 most significant
+            octets of the MAC address."
+    ::= { vlanVoiceOUIBasedEntry 1 }
+
+vlanVoiceOUIBasedDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An optional text that describes the OUI."
+    DEFVAL {""}
+    ::=  { vlanVoiceOUIBasedEntry 2 }
+
+vlanVoiceOUIBasedEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { vlanVoiceOUIBasedEntry 3 }
+
+-- Voice VLAN per Port configuration Table
+vlanVoiceOUIBasedPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VlanVoiceOUIBasedPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static and dynamic per port configuration information for Voice VLAN.
+        All entries are permanent and will be restored after the device is reset."
+    ::= { vlanVoiceOUIBased 5 }
+
+vlanVoiceOUIBasedPortEntry OBJECT-TYPE
+    SYNTAX      VlanVoiceOUIBasedPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static and dynamic per port information for a voice VLAN."
+    INDEX { ifIndex }
+    ::= { vlanVoiceOUIBasedPortTable 1 }
+
+VlanVoiceOUIBasedPortEntry ::= SEQUENCE {
+              vlanVoiceOUIBasedPortEnable                           TruthValue,
+              vlanVoiceOUIBasedPortVlanIndex                        VlanIndex,
+              vlanVoiceOUIBasedPortSecure                           TruthValue,
+              vlanVoiceOUIBasedPortCurrentMembership                INTEGER {active(1),notActive(2)},
+              vlanVoiceOUIBasedPortQosMode                          INTEGER {src(1),all(2)}
+}
+
+vlanVoiceOUIBasedPortEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable this port to be a candidate to be added into the Voice VLAN."
+    DEFVAL{ false }
+    ::= { vlanVoiceOUIBasedPortEntry 1 }
+
+vlanVoiceOUIBasedPortVlanIndex OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Voice VLAN-ID the port is a candidate to be in."
+    DEFVAL{ 4095 }
+    ::= { vlanVoiceOUIBasedPortEntry 2 }
+
+vlanVoiceOUIBasedPortSecure OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify this port to be in Secure Mode when entering the Voice VLAN.
+          In Secure mode only frames with MAC prefix matched to one of the OUI table prefixes
+         are accepted, otherwise dropped."
+    DEFVAL{ false }
+    ::= { vlanVoiceOUIBasedPortEntry 3 }
+
+vlanVoiceOUIBasedPortCurrentMembership OBJECT-TYPE
+    SYNTAX  INTEGER {
+            active(1),
+            notActive(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port's current status of membership in Voice VLAN.
+
+         Port's possible values of membership in Voice VLAN:
+          'Active(1)'    - Port is currently added to a Voice VLAN .
+          'NotActive(2)' - Specifies either that port is a candidate to be
+                           in Voice VLAN or disabled."
+    ::= { vlanVoiceOUIBasedPortEntry 4 }
+
+vlanVoiceOUIBasedPortQosMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            src(1),
+            all(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port's current QOS mode in Voice VLAN.
+         Possible values:
+          'src(1)' - Only traffic with OUI prefix in the source MAC received QOS of the Voice Vlan.
+          'all(2)' - All traffic through that port received QOS of the Voice Vlan."
+    ::= { vlanVoiceOUIBasedPortEntry 5 }
+
+vlanVoiceOUIBasedAgingTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (1..43200)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The vlanVoiceAgingTimeout indicates the time (in units of
+            minutes) from when the last OUI MAC was ageout from the FDB the port
+            will be removed from the Voice VLAN.
+
+            The default value for vlanVoiceAgingTimeout object is 1440 minutes (24 hours).
+
+            The value of this object must be restored from non-volatile
+            storage after a re-initialization of the management system."
+    DEFVAL      { 1440 }
+    ::= { vlanVoiceOUIBased 6 }
+
+
+END

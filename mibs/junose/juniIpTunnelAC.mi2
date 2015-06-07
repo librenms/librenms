@@ -1,0 +1,80 @@
+
+-- *****************************************************************************
+-- Juniper-IP-Tunnel-CONF
+--
+-- SNMP Agent Capabilities definitions for the IP Tunnel MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-IP-Tunnel-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniIpTunnelAgent  MODULE-IDENTITY
+    LAST-UPDATED "200209061654Z"  -- 06-Sep-02 12:54 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the IP Tunnel (GRE/DVMRP) MIB
+        component of the SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200110182100Z"  -- 18-Oct-01 05:00 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added sequence numbers object."
+    REVISION    "200103292213Z"  -- 29-Mar-01 05:13 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 47 }
+
+
+-- *****************************************************************************
+-- IP Tunnel SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniIpTunnelAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the IP Tunnel component of the JUNOSe SNMP agent.  This
+        version of the IP Tunnel component is supported in JUNOSe 3.2 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the IP Tunnel application in
+        JUNOSe.  These capabilities became obsolete when
+        juniIpTunnelSequenceNumbers was added."
+    SUPPORTS    Juniper-IP-TUNNEL-MIB
+        INCLUDES {
+            juniIpTunnelInterfaceGroup }
+    ::= { juniIpTunnelAgent 1 }
+
+juniIpTunnelAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the IP Tunnel component of the JUNOSe SNMP agent.  This
+        version of the IP Tunnel component is supported in JUNOSe 4.1 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the IP Tunnel application in
+        JUNOSe."
+    SUPPORTS    Juniper-IP-TUNNEL-MIB
+        INCLUDES {
+            juniIpTunnelInterfaceGroup2 }
+    ::= { juniIpTunnelAgent 2 }
+
+END

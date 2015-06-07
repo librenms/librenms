@@ -1,0 +1,251 @@
+ENTERASYS-IEEE8023-LAG-MIB-EXT-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-ieee8023-lag-mib-ext-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' IEEE8023-LAG-MIB extension MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright January, 2003 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    dot3adAggPortEntry
+        FROM IEEE8023-LAG-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysIeee8023LagMibExtMIB MODULE-IDENTITY
+    LAST-UPDATED "200409031514Z"  -- Fri Sep  3 15:14 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         Enterasys Networks' enterprise OID pertaining to proprietary
+         extensions to the IEEE8023-LAG-MIB as defined by the IEEE
+         802.3ad Working Group."
+
+    REVISION "200409031514Z"  -- Fri Sep  3 15:14 GMT 2004
+    DESCRIPTION
+        "Added the etsysDot3adAggGlobalFormSinglePortLags object."
+
+    REVISION "200301312316Z"  -- Fri Jan 31 23:16 GMT 2003
+    DESCRIPTION
+        "The initial version of this MIB module"
+
+    ::= { etsysModules 35 } 
+
+etsysIeee8023LagMibExt
+    OBJECT IDENTIFIER ::= { etsysIeee8023LagMibExtMIB 1 }
+
+
+-- ---------------------------------------------------------- --
+-- branches in the ENTERASYS-IETF-P-BRIDGE-MIB-EXT-MIB
+-- ---------------------------------------------------------- --
+
+etsysDot3adAggGlobal
+    OBJECT IDENTIFIER ::= { etsysIeee8023LagMibExt 1 }
+
+etsysDot3adAggPort
+    OBJECT IDENTIFIER ::= { etsysIeee8023LagMibExt 2 }
+
+
+-- -------------------------------------------------------------
+-- Extension to globally enable or disable the LAG functionality.
+-- -------------------------------------------------------------
+
+etsysDot3adAggGlobalEnable   OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of the IEEE 802.3ad link
+         aggregation functionality on the managed entity.
+         A value of disabled(2) will prevent the formation of
+         Link Aggregations, and the transmission and processing
+         of LACP BPDUs, however, all relevant MIBs will still be
+         present."
+    REFERENCE
+        "IEEE Standard 802.3-2002, Section 3, part 43."
+    DEFVAL { enabled }
+    ::= { etsysDot3adAggGlobal 1 }
+
+etsysDot3adAggGlobalFormSinglePortLags   OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ability of forming single port Link Aggregation 
+         Groups on this entity. If enabled(1) Link Aggregation 
+         Groups can form with 1 port, otherwise 2 or more ports 
+         are required."
+    REFERENCE
+        "IEEE Standard 802.3-2002, Section 3, part 43."
+    DEFVAL { disabled }
+    ::= { etsysDot3adAggGlobal 2 }
+
+-- -------------------------------------------------------------
+-- Extensions to the Aggregation Port Table
+-- -------------------------------------------------------------
+
+etsysDot3adAggPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysDot3adAggPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Extensions to the table that contains Link Aggregation
+         Control configuration information about every Aggregation
+         Port associated with this device.  A row appears in this
+         table for each physical port."
+    ::= { etsysDot3adAggPort 1 }
+
+etsysDot3adAggPortEntry OBJECT-TYPE
+    SYNTAX      EtsysDot3adAggPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of proprietary Link Aggregation Control configuration
+         parameters for each Aggregation Port on this device."
+    AUGMENTS { dot3adAggPortEntry }
+    ::= { etsysDot3adAggPortTable 1 }
+
+EtsysDot3adAggPortEntry ::=
+    SEQUENCE { 
+        etsysDot3adAggPortEnable    INTEGER
+    }
+
+etsysDot3adAggPortEnable   OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of the IEEE 802.3ad link
+         aggregation functionality on this port.
+         A value of disabled(2) will prevent the transmission
+         and processing of LACP BPDUs on this port."
+    REFERENCE
+        "IEEE Standard 802.3-2002, Section 3, part 43."
+    DEFVAL { enabled }
+    ::= { etsysDot3adAggPortEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysIeee8023LagConformance
+    OBJECT IDENTIFIER ::= { etsysIeee8023LagMibExtMIB 2 }
+
+etsysIeee8023LagGroups
+    OBJECT IDENTIFIER ::= { etsysIeee8023LagConformance 1 }
+
+etsysIeee8023LagCompliances
+    OBJECT IDENTIFIER ::= { etsysIeee8023LagConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysDot3adAggGlobalGroup OBJECT-GROUP
+    OBJECTS {
+        etsysDot3adAggGlobalEnable
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects relating to the User Priority
+         applicable to each port."
+    ::= { etsysIeee8023LagGroups 1 }
+
+
+etsysDot3adAggPortGroup OBJECT-GROUP
+    OBJECTS {
+        etsysDot3adAggPortEnable
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects relating to proprietary per port
+         configuration."
+    ::= { etsysIeee8023LagGroups 2 }
+
+etsysDot3adAggGlobalSinglePortGroup OBJECT-GROUP
+    OBJECTS {
+        etsysDot3adAggGlobalFormSinglePortLags
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects relating to forming LAG groups
+         with single ports."
+    ::= { etsysIeee8023LagGroups 3 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysIeee8023LagCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         IEEE8023-LAG-MIB Extension MIB."
+
+    MODULE
+
+        GROUP       etsysDot3adAggGlobalGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that wish to support the enabling and
+             disabling of IEEE 802.3ad Aggregation functionality 
+             on a global basis."
+
+        GROUP       etsysDot3adAggPortGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that wish to support the enabling and
+             disabling of the transmission and processing of LACP
+             BPDUs on a per port basis."
+
+        GROUP       etsysDot3adAggGlobalSinglePortGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that wish to support the formation of
+             single port Link Aggregation Groups."
+
+    ::= { etsysIeee8023LagCompliances 1 }
+
+END

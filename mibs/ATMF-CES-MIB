@@ -1,0 +1,305 @@
+-- 
+-- Converted to SMIv2 rfc 2578,2579,2580 - STD 58
+--
+ATMF-CES-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises, Counter32, Integer32,
+	OBJECT-TYPE,
+	MODULE-IDENTITY				FROM SNMPv2-SMI
+        ifIndex                                 FROM IF-MIB;
+
+
+    atmfCESmib                     MODULE-IDENTITY
+       LAST-UPDATED    "9911060000z"
+       ORGANIZATION    "The ATM Forum"
+       CONTACT-INFO
+            "Postal: The ATM Forum
+                     2570 West El Camino Real, Suite 304
+                     Mountain View, CA 94040-1313 USA
+	             Phone: +1 415-949-6700
+	             Fax:   +1 415-949-6705
+                     info@atmforum.com"
+          DESCRIPTION
+            "Circuit Emulation Specification"
+    ::= { enterprises  atmForum(353) atmForumNetworkManagement(5) 2 }
+
+    -- an OBJECT IDENTIFIER for all ATM Forum circuit emulation MIBs
+    -- has been assigned as a branch from the Forum Network Management
+    -- tree.  The DS1/E1 Circuit Emulation specification is attached
+    -- as the first branch from the overall atmfCESmib object.  Future
+    -- branches may be added in the future for further CES work, for
+    -- example, DS3/E3 circuit emulation.
+
+    atmfDS1E1CESmib OBJECT IDENTIFIER ::= { atmfCESmib 1 } 
+
+    --  this is the MIB module for the ATM Forum DS1/E1 Circuit Emulation
+    --  Interworking Function objects
+
+    -- the following TEXTUAL-CONVENTIONS are used to link the CES
+    -- interworking function to ATM interface port, plus the
+    -- associated VPI and VCI.
+
+    atmfDS1E1CESConfTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfDS1E1CESConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+          "The CES configuration table. This includes mapping channels from
+           ATM Port to CBR interfaces. There is one atmfDS1E1CESConfEntry
+           per CES Entity"
+        ::= { atmfDS1E1CESmib 1 }
+
+    atmfDS1E1CESConfEntry    OBJECT-TYPE
+        SYNTAX  AtmfDS1E1CESConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+          "An entry in the CES table. For each entry there is a corresponding
+         entry in the stack table"
+        INDEX   { ifIndex }
+        ::= { atmfDS1E1CESConfTable 1 }
+
+    AtmfDS1E1CESConfEntry ::= SEQUENCE  {
+        atmfDS1E1CESMapATMIndex                Integer32,
+        atmfDS1E1CESMapVPI                     Integer32,
+        atmfDS1E1CESMapVCI                     Integer32,
+        atmfDS1E1CESCBRService                 INTEGER,
+        atmfDS1E1CESCBRClockMode               INTEGER,
+        atmfDS1E1CESCas                        INTEGER,
+        atmfDS1E1CESPartialFill                Integer32,
+        atmfDS1E1CESBufMaxSize                 Integer32,
+        atmfDS1E1CESCDVRxT                     Integer32,
+        atmfDS1E1CESCellLossIntegrationPeriod  Integer32
+        }
+
+  
+    atmfDS1E1CESMapATMIndex     OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "The value of this object is equal to MIB II's
+           ifIndex value of the ATM Port interface mapped 
+           through this CES to a CBR interface."
+        ::= { atmfDS1E1CESConfEntry 1 }
+    
+    atmfDS1E1CESMapVPI           OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "The value of this object is equal to the VPI used
+          for the emulated circuit represented by this entry
+          in the ifTable.  If there is no connection, this
+          object is meaningless and will have the value zero."
+        ::= { atmfDS1E1CESConfEntry 2 }
+
+    atmfDS1E1CESMapVCI           OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "The value of this object is equal to the VCI used
+          for the emulated circuit represented by this entry
+          in the ifTable.  If there is no connection, this
+          object is meaningless and will have the value zero"
+        ::= { atmfDS1E1CESConfEntry 3 }
+
+    atmfDS1E1CESCBRService          OBJECT-TYPE
+        SYNTAX INTEGER {
+                       unstructured(1),
+                       structured(2)
+                       }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+         "Define if DS1/E1 service as structured or not. A
+          structured(2) interface is some nx64Kbps. An unstructured
+          (1) interface is 1.544Mbps or 2.048Mbps. unstructured(1) 
+          passes all bits through the ATM network. 
+          strucutured(2) passes data bits through the ATM network, and 
+          may also pass signalling bits"
+        ::= { atmfDS1E1CESConfEntry 4 }
+
+    atmfDS1E1CESCBRClockMode    OBJECT-TYPE
+        SYNTAX INTEGER {
+                       synchronous(1),
+                       srts(2),
+                       adaptive(3)
+                       }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+         "Define if DS1/E1 service clocking mode. This maps into
+          transmit clock source of CBR interface."
+        DEFVAL { synchronous }
+        ::= { atmfDS1E1CESConfEntry 5 }
+
+    atmfDS1E1CESCas        OBJECT-TYPE
+        SYNTAX INTEGER {
+                       basic (1),
+                       e1Cas (2),
+                       ds1SfCas (3),
+                       ds1EsfCas (4)
+                       }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+         "This parameter selects which AAL1 Format should be used:
+         Basic does not carry CAS bits, and uses a single 125 usec frame.
+         E1Cas, Ds1SfCas and DS1EsfCas carry CAS bits in a multiframe
+         structure for E1, DS1 SF and DS1 ESF respectively.
+         This applies to structured interfaces only. Default 
+          is Basic (1)."
+        DEFVAL { basic }
+        ::= { atmfDS1E1CESConfEntry 6 }
+
+    atmfDS1E1CESPartialFill     OBJECT-TYPE
+        SYNTAX Integer32 (0..47)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+         "If partial cell fill is used, the number of user octets per
+         cell must be set with this parameter.  Setting this parameter
+         to zero disables partial cell fill, and causes all cells to
+         be completely filled before they are sent."
+        DEFVAL { 0 } -- Partial Cell Fill not used
+        ::= { atmfDS1E1CESConfEntry 7 }
+
+    atmfDS1E1CESBufMaxSize      OBJECT-TYPE
+        SYNTAX       Integer32 (1..65536)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+         "Define maximum size in octets of the reassembly buffer.
+          Some implementations may want allow the maximum buffer size to 
+          programmed to a size less than the physical limit to reduce 
+          the maximum delay through a circuit."
+        DEFVAL { 256 } 
+        ::= { atmfDS1E1CESConfEntry 8 }
+
+atmfDS1E1CESCDVRxT OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "UNITS `10usec'. The maximum cell arrival jitter in 10usec increments that
+            the reassembly process will tolerate in the cell stream without
+            producing errors in the CBR service interface"
+    DEFVAL  { 100 }
+    ::= { atmfDS1E1CESConfEntry  9 }
+
+
+    atmfDS1E1CESCellLossIntegrationPeriod   OBJECT-TYPE
+        SYNTAX Integer32 (1000..65535)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+         "The time in milliseconds for the cell loss integration period. 
+          If a cells are lost for this period of time.
+          atmfDS1E1CESCellLossStatus is set to loss (2).The mandatory
+          definition is 2500
+        UNITS `msec'"
+        DEFVAL { 2500 } 
+        ::= { atmfDS1E1CESConfEntry 10 }
+
+    atmfDS1E1CESStatsTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AtmfDS1E1CESStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+          "The CES AAL1 statistical data table."
+        ::= { atmfDS1E1CESmib 2 }
+
+    atmfDS1E1CESStatsEntry    OBJECT-TYPE
+        SYNTAX  AtmfDS1E1CESStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+          "An entry in the CES AAL1 Stats table."
+        INDEX   { ifIndex }
+        ::= { atmfDS1E1CESStatsTable 1 }
+
+        AtmfDS1E1CESStatsEntry ::= SEQUENCE  {
+        atmfDS1E1CESReassCells         Counter32,
+        atmfDS1E1CESHdrErrors          Counter32,
+        atmfDS1E1CESPointerReframes    Counter32,
+        atmfDS1E1CESLostCells          Counter32,
+        atmfDS1E1CESBufUnderflows      Counter32,
+        atmfDS1E1CESBufOverflows       Counter32,
+        atmfDS1E1CESCellLossStatus     INTEGER
+        }
+
+    atmfDS1E1CESReassCells         OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+         "This count gives the number of cells played out to the DS1/E1
+         Service Interface. It excludes cells that were discarded for
+         any reason, including cells that were not used due to being
+         declared misinserted, or discarded while the reassembler was
+         waiting to achieve synchronization."
+        ::= { atmfDS1E1CESStatsEntry 1 }
+
+    atmfDS1E1CESHdrErrors         OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+         "The count of the number of AAL1 header errors detected and
+         possibly corrected.  Header errors include correctable and
+         uncorrectable CRC, plus bad parity."
+        ::= { atmfDS1E1CESStatsEntry 2 }
+
+    atmfDS1E1CESPointerReframes    OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+         "This records the count of the number of events in which the
+         AAL1 reassembler found that an SDT pointer is not where it is
+         expected, and the pointer must be reacquired."
+        ::= { atmfDS1E1CESStatsEntry 3 }
+
+    atmfDS1E1CESLostCells   OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+         "Number of lost cells."
+        ::= { atmfDS1E1CESStatsEntry 4 }
+
+    atmfDS1E1CESBufUnderflows      OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+         "Number of buffer underflows."
+        ::= { atmfDS1E1CESStatsEntry 5 }
+
+    atmfDS1E1CESBufOverflows      OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+         "Number of buffer overflows."
+        ::= { atmfDS1E1CESStatsEntry 6 }
+
+    atmfDS1E1CESCellLossStatus      OBJECT-TYPE
+        SYNTAX INTEGER {
+                       noLoss(1),
+                       loss(2),
+                       idle(3)
+                       }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+         "When cells are lost for the number of milliseconds specified
+          by atmfDS1E1CESCellLossIntegrationPeriod, the value is set to
+          loss (2). When cells are no longer lost, the value is set 
+          to noLoss (1). An additional variable idle os added to indicate
+          cbrct connections status of Idle."
+        ::= { atmfDS1E1CESStatsEntry 7 }
+END

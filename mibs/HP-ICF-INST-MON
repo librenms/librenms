@@ -1,0 +1,174 @@
+HP-ICF-INST-MON DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TruthValue, DisplayString
+        FROM SNMPv2-TC
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    hpSwitch
+        FROM HP-ICF-OID;
+
+hpicfInstMonMIB MODULE-IDENTITY
+    LAST-UPDATED "200601230000Z"
+    ORGANIZATION "Hewlett-Packard Company
+                  ProCurve Networking Business"
+    CONTACT-INFO "Hewlett-Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION  "This MIB module contains HP proprietary
+                  definitions for Instrumentation Monitor."
+
+    REVISION     "200601230000Z"
+    DESCRIPTION  "Initial revision."
+
+    ::= { hpSwitch 35 }
+
+-- **********************************************************************
+-- The Instrumentation Monitor MIB Groups
+-- **********************************************************************
+
+hpicfInstMonObjects OBJECT IDENTIFIER
+    ::= { hpicfInstMonMIB 1 }
+
+hpicfInstMonConformance OBJECT IDENTIFIER
+    ::= { hpicfInstMonMIB 2 }
+
+hpicfInstMonGroups OBJECT IDENTIFIER
+    ::= { hpicfInstMonConformance 1 }
+
+hpicfInstMonCompliances OBJECT IDENTIFIER
+    ::= { hpicfInstMonConformance 2 }
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+hpicfInstMonLogEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The operational status of the Instrumentation Monitor
+                 on this switch."
+    DEFVAL      { false }
+    ::= { hpicfInstMonObjects 1 }
+
+hpicfInstMonTrapEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The operational status of the Monitor notifications
+                 on this switch."
+    DEFVAL      { true }
+    ::= { hpicfInstMonObjects 2 }
+
+-- Start of hpicfInstMonParameterTable **********************************
+
+hpicfInstMonParameterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfInstMonParameterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Configuration of monitored instrumentation parameters."
+    ::= { hpicfInstMonObjects 3 }
+
+hpicfInstMonParameterEntry OBJECT-TYPE
+    SYNTAX      HpicfInstMonParameterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the hpicfInstMonParameterTable."
+    INDEX       { hpicfInstMonInterfaceIndex,
+                  hpicfInstMonParameterIndex }
+    ::= { hpicfInstMonParameterTable 1 }
+
+HpicfInstMonParameterEntry ::= SEQUENCE {
+    hpicfInstMonInterfaceIndex     InterfaceIndexOrZero,
+    hpicfInstMonParameterIndex     INTEGER,
+    hpicfInstMonParameterName      DisplayString,
+    hpicfInstMonParameterThreshold Integer32 }
+
+hpicfInstMonInterfaceIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "0 for global parameters, port number for per-port
+                 parameters."
+    ::= { hpicfInstMonParameterEntry 1 }
+
+hpicfInstMonParameterIndex OBJECT-TYPE
+    SYNTAX      INTEGER( 1..'FFFF'h )
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The index of the parameter."
+    ::= { hpicfInstMonParameterEntry 2 }
+
+hpicfInstMonParameterName OBJECT-TYPE
+    SYNTAX      DisplayString( SIZE( 0..20 ) )
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The name of the parameter."
+    ::= { hpicfInstMonParameterEntry 3 }
+
+hpicfInstMonParameterThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Generate notification if the limit is not 0 and
+                 parameter value is beyond this limit."
+    ::= { hpicfInstMonParameterEntry 4 }
+
+-- End of hpicfInstMonParameterTable ************************************
+
+hpicfInstMonNotificationText OBJECT-TYPE
+    SYNTAX      DisplayString( SIZE( 0..255 ) )
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This string is sent with hpicfInstMonNotification."
+    ::= { hpicfInstMonObjects 4 }
+
+hpicfInstMonNotification NOTIFICATION-TYPE
+    OBJECTS     { hpicfInstMonNotificationText }
+    STATUS      current
+    DESCRIPTION "This notification is generated when the monitored
+                 parameter is beyond the configured threshold value."
+    ::= { hpicfInstMonObjects 5 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+hpicfInstMonNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { hpicfInstMonNotification }
+    STATUS      current
+    DESCRIPTION "This notification is generated by Monitor when
+                 parameter is beyond its threshold limit."
+    ::= { hpicfInstMonGroups 1 }
+
+hpicfInstMonBaseGroup OBJECT-GROUP
+    OBJECTS   { hpicfInstMonLogEnable,
+                hpicfInstMonTrapEnable,
+                hpicfInstMonInterfaceIndex,
+                hpicfInstMonParameterIndex,
+                hpicfInstMonParameterName,
+                hpicfInstMonParameterThreshold }
+    STATUS      current
+    DESCRIPTION "A collection of objects to support basic Instrumentation
+                 Monitor configuration on ProCurve switches."
+    ::= { hpicfInstMonGroups 2 }
+
+-- **********************************************************************
+-- Compliance statements
+-- **********************************************************************
+
+hpicfInstMonBaseCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for ProCurve switches running
+                 Instrumentation Monitor and implementing the
+                 HP-ICF-INST-MON MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS { hpicfInstMonBaseGroup }
+    ::= { hpicfInstMonCompliances 1 }
+
+END

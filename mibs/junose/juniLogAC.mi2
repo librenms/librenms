@@ -1,0 +1,80 @@
+
+-- *****************************************************************************
+-- Juniper-Log-CONF
+--
+-- SNMP Agent Capabilities definitions for the Log MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Log-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniLogAgent  MODULE-IDENTITY
+    LAST-UPDATED "200209061654Z"  -- 06-Sep-02 12:54 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the logging managment component
+        of the SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200103282207Z"  -- 28-Mar-01 05:07 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 26 }
+
+
+-- *****************************************************************************
+-- Logging managment SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniLogAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the logging managment component of the JUNOSe SNMP agent.
+        This version of the logging managment component was supported in JUNOSe
+        1.3 system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the logging managment
+        application in JUNOSe.  These capabilities became obsolete when the
+        single syslog destination was replaced with a table of syslog
+        destinations and the syslog facility was added."
+    SUPPORTS    Juniper-LOG-MIB
+        INCLUDES {
+            juniLogGroup,
+            juniLogTrapGroup }
+    ::= { juniLogAgent 1 }
+
+juniLogAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the logging managment component of the JUNOSe SNMP agent.
+        This version of the logging managment component is supported in JUNOSe
+        2.0 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the logging managment
+        application in JUNOSe."
+    SUPPORTS    Juniper-LOG-MIB
+        INCLUDES {
+            juniLogGroup2,
+            juniLogTrapGroup }
+    ::= { juniLogAgent 2 }
+
+END

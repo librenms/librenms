@@ -1,0 +1,223 @@
+CISCOSB-TBI-MIB DEFINITIONS ::= BEGIN
+
+--             Time Range Infra MIBs definition
+-- Version:    7.50
+-- Date:       15 Jul 2009
+--             Initial definitions
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    TruthValue, RowStatus,
+    TEXTUAL-CONVENTION,DisplayString            FROM SNMPv2-TC
+    switch001                                   FROM CISCOSB-MIB;
+
+
+rlTBIMib MODULE-IDENTITY
+        LAST-UPDATED "200604040000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "Time Range Infrastructure MIBs initial version. "
+        REVISION "200602120000Z"
+        DESCRIPTION
+                "Time Range Infrastructure MIBs initial version. "
+    ::= { switch001 145 }
+
+
+-- Time Based Infra Table
+
+
+rlTBITimeRangeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlTBITimeRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies Time Based Infra table"
+    ::= { rlTBIMib 1 }
+
+rlTBITimeRangeEntry OBJECT-TYPE
+    SYNTAX RlTBITimeRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the new
+         time range for ACE.
+         The index is time range name"
+    INDEX { IMPLIED rlTBITimeRangeName }
+    ::= {  rlTBITimeRangeTable 1 }
+
+RlTBITimeRangeEntry ::= SEQUENCE {
+        rlTBITimeRangeName             DisplayString,
+        rlTBITimeRangeAbsoluteStart    DisplayString,
+        rlTBITimeRangeAbsoluteEnd      DisplayString,
+        rlTBITimeRangeActiveStatus     TruthValue,
+        rlTBITimeRangeRowStatus        RowStatus
+    }
+
+rlTBITimeRangeName OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE(1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Name of time range."
+    ::= { rlTBITimeRangeEntry 1 }
+
+rlTBITimeRangeAbsoluteStart OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..14))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Time of start of absolute time range in following format:
+                     month day year hh:mm
+                     month: 01-12 (January-December)
+                     day:   01-31
+                     year:  0-99 (2000-2099)
+                     hh:    0-23 (hours)
+                     mm:    0-59 (minutes)"
+    ::= { rlTBITimeRangeEntry 2 }
+
+rlTBITimeRangeAbsoluteEnd OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..14))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Time of end of absolute time range in following format:
+                     month day year hh:mm
+                     month: 01-12 (January-December)
+                     day:   01-31
+                     year:  0-99 (2000-2099)
+                     hh:    0-23 (hours)
+                     mm:    0-59 (minutes)"
+    ::= { rlTBITimeRangeEntry 3 }
+
+rlTBITimeRangeActiveStatus    OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Shows whether the current time range is active according to the current clock."
+    ::= { rlTBITimeRangeEntry 4 }
+
+rlTBITimeRangeRowStatus    OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Row Status.
+         It is used for adding/deleting entries of this table."
+    ::= { rlTBITimeRangeEntry 5 }
+
+
+
+-- Time Based Infra - Periodic Table
+
+RlTBIWeekDayList  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION  "Bitmap that includes days of week.
+                 Each bit in the bitmap associated with corresponding day of the week."
+    SYNTAX      BITS {
+            monday(0),
+            tuesday(1),
+            wednesday(2),
+            thursday(3),
+            friday(4),
+            saturday(5),
+            sunday(6)
+}
+
+rlTBIPeriodicTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlTBIPeriodicEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table specifies Time Based Infra Periodic table"
+    ::= { rlTBIMib 2 }
+
+rlTBIPeriodicEntry OBJECT-TYPE
+    SYNTAX RlTBIPeriodicEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes periodic time range."
+    INDEX {  rlTBIPeriodicTimeRangeName, rlTBIPeriodicWeekDayList, rlTBIPeriodicStart, rlTBIPeriodicEnd }
+    ::= { rlTBIPeriodicTable 1 }
+
+RlTBIPeriodicEntry ::= SEQUENCE {
+        rlTBIPeriodicTimeRangeName        DisplayString,
+        rlTBIPeriodicWeekDayList          RlTBIWeekDayList,
+        rlTBIPeriodicStart                DisplayString,
+        rlTBIPeriodicEnd                  DisplayString,
+        rlTBIPeriodicRowStatus            RowStatus
+    }
+
+
+rlTBIPeriodicTimeRangeName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Time Range Name the periodic is defined on. "
+    ::= { rlTBIPeriodicEntry 1 }
+
+rlTBIPeriodicWeekDayList  OBJECT-TYPE
+    SYNTAX      RlTBIWeekDayList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The bitmap allows to user to select periodic time range for several
+            days at once. The periodic range will be associated with specific days
+            when corresponding bits will be set. If at least one bit has been set in the
+            rlTBIPeriodicWeekDayList,
+            the weekday in rlTBIPeriodicStart and rlTBIPeriodicEnd
+            is not relevant and should be set to zero."
+    ::= { rlTBIPeriodicEntry  2 }
+
+
+rlTBIPeriodicStart OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..7))
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION "Time of start of periodic time range in following format:
+                     weekday hh:mm
+                     weekday: 0-7  (0 means the weekday is not specified,
+                                    1-7 are weekdays from Monday to Sunday)
+                     hh:    0-23 (hours)
+                     mm:    0-59 (minutes)
+                     Weekday may be 0 only if periodic time range weekdays were specified in
+                     rlTBIPeriodicWeekDayList."
+    ::= { rlTBIPeriodicEntry 3 }
+
+
+rlTBIPeriodicEnd OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..7))
+    MAX-ACCESS read-write
+    STATUS      current
+    DESCRIPTION "Time of end of periodic time range in following format:
+                     weekday hh:mm
+                     weekday: 0-7  (0 means the weekday is not specified,
+                                    1-7 are weekdays from Monday to Sunday)
+                     hh:    0-23 (hours)
+                     mm:    0-59 (minutes)
+                     Weekday may be 0 only if periodic time range weekdays were specified in
+                     rlTBIPeriodicWeekDayList."
+    ::= { rlTBIPeriodicEntry 4 }
+
+
+
+rlTBIPeriodicRowStatus  OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Row Status.
+         It is used for adding/deleting entries of this table."
+    ::= { rlTBIPeriodicEntry 5 }
+
+
+END

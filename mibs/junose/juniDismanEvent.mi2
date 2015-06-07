@@ -1,0 +1,151 @@
+
+-- *****************************************************************************
+-- Juniper-DISMAN-EVENT-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   DISMAN-EVENT MIB
+--
+-- Copyright 2003 Juniper Networks Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-DISMAN-EVENT-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    mteTriggerEntry
+        FROM DISMAN-EVENT-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniDismanEventMIB  MODULE-IDENTITY
+    LAST-UPDATED "200310301535Z"  -- 30-Oct-03 10:35 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Distributed Management (Disman) Event MIB extensions for the
+        Juniper Networks enterprise.  This MIB module extends event triggers and
+        actions defined in the IETF DISMAN-EVENT-MIB."
+-- Revision History
+    REVISION    "200310301535Z"  -- 30-Oct-03 10:35 AM EST  - JUNOSe 5.3
+        DESCRIPTION
+            "Initial version of this MIB module."
+    ::= { juniMibs 66 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDismanEventMIBObjects  OBJECT IDENTIFIER
+    ::= { juniDismanEventMIB 1 }
+-- Management Triggered Event (MTE) objects
+juniMteTrigger  OBJECT IDENTIFIER
+    ::= { juniDismanEventMIBObjects 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Trigger Section
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Trigger Table
+--
+juniMteTriggerTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniMteTriggerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of management event trigger information."
+    ::= { juniMteTrigger 1 }
+
+juniMteTriggerEntry  OBJECT-TYPE
+    SYNTAX      JuniMteTriggerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a single trigger.  Applications create and delete
+        entries using mteTriggerEntryStatus."
+    AUGMENTS  { mteTriggerEntry }
+    ::= { juniMteTriggerTable 1 }
+
+JuniMteTriggerEntry ::= SEQUENCE {
+    juniMteTriggerContextNameLimit  Unsigned32 }
+
+juniMteTriggerContextNameLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of management contexts from which to obtain
+        mteTriggerValueID."
+    DEFVAL    { 0 }
+    ::= { juniMteTriggerEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDismanEventMIBNotificationPrefix OBJECT IDENTIFIER
+    ::= { juniDismanEventMIB 2 }
+juniDismanEventMIBNotificationObjects OBJECT IDENTIFIER
+    ::= { juniDismanEventMIBNotificationPrefix 1 }
+
+--
+-- Notification Objects
+--
+juniMteExistenceTestResult  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    present(0),
+                    absent(1),
+                    changed(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of existence test when an existence trigger fired."
+    ::= { juniDismanEventMIBNotificationObjects 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDismanEventConformance  OBJECT IDENTIFIER
+    ::= { juniDismanEventMIB 3 }
+juniDismanEventCompliances  OBJECT IDENTIFIER
+    ::= { juniDismanEventConformance 1 }
+juniDismanEventGroups  OBJECT IDENTIFIER
+    ::= { juniDismanEventConformance 2 }
+
+--
+-- Compliance
+--
+juniDismanEventCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper Disman
+        Event MIB extensions."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniMteTriggerTableGroup }
+    ::= { juniDismanEventCompliances 1 }                           -- JUNOSe 5.3
+
+--
+-- Units of Conformance
+--
+juniMteTriggerTableGroup  OBJECT-GROUP
+    OBJECTS {
+        juniMteTriggerContextNameLimit,
+
+        juniMteExistenceTestResult }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects extending the DISMAN-EVENT-MIB.mteTriggerTable
+        capabilities in a Juniper product."
+    ::= { juniDismanEventGroups 1 }                                -- JUNOSe 5.3
+
+END

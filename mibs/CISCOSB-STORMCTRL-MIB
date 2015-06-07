@@ -1,0 +1,429 @@
+CISCOSB-STORMCTRL-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private STORM CTRL MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Unsigned32                FROM SNMPv2-SMI
+    TruthValue                                              FROM SNMPv2-TC
+    dot1dBasePort                                           FROM BRIDGE-MIB;
+
+    RlStormCtrlRateUnit ::= INTEGER {
+        packetsPerSecond(1),
+        bytesPerSecond(2),
+        framesPerBuffer(3),
+        precentages(4),
+        kiloBytesPerSecond(5),
+        kiloBitsPerSecond(6)
+    }
+
+rlStormCtrl MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines storm control private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 77 }
+
+rlStormCtrlSupport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Identify if the strom control protection is supported"
+    ::= { rlStormCtrl 1 }
+
+rlStormCtrlMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 3."
+    ::= { rlStormCtrl 2 }
+
+rlStormCtrlRateUnitTypeSupport OBJECT-TYPE
+--    SYNTAX      BITS {
+--            packetsPerSecond(0),
+--            bytesPerSecond(1),
+--            framesPerBuffer(2),
+--            percentages(3),
+--            kiloBytesPerSecond(4),
+--            kiloBitsPerSecond(5)
+--    }
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the supported rate unit type for the storm rate control"
+    ::= { rlStormCtrl 3 }
+
+rlStormCtrlTypeSupport  OBJECT-TYPE
+--    SYNTAX      BITS {
+--            unknownUnicast(0),
+--            unknownMulticast(1),
+--            broadcast(2),
+--            multicast(3),
+--    }
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the supported frame type for the storm control protection"
+    ::= { rlStormCtrl 4 }
+
+rlStormCtrlRateSupportPerType OBJECT-TYPE
+--    SYNTAX      BITS {
+--            unknownUnicast(0),
+--            unknownMulticast(1),
+--            broadcast(2),
+--            multicast(3),
+--    }
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "identify if rate control is supported for each frame type"
+    ::= { rlStormCtrl 5 }
+
+rlStormCtrlEnbaleDependencyBetweenTypes OBJECT-TYPE
+--    SYNTAX      BITS {
+--            unknownUnicast(0),
+--            unknownMulticast(1),
+--            broadcast(2),
+--            multicast(3),
+--    }
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "indicate enable limitation of dependency between frame types,
+         such as enabling of multicast should be with the enabling of
+         broadcast type (bcm 5632)"
+    ::= { rlStormCtrl 6 }
+
+rlStormCtrlRateDependencyBetweenTypes OBJECT-TYPE
+--    SYNTAX      BITS {
+--            unknownUnicast(0),
+--            unknownMulticast(1),
+--            broadcast(2),
+--            multicast(3),
+--    }
+    SYNTAX  OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "indicate limitation of dependency between frame types for
+         rate assignment, for example: assigning of rate limit for unicast
+         frame must assigning the same rate for multicast and bradcast
+         frame (bcm 5615), in case the device support enbale per each frame
+         type but with the same rate limitation."
+    ::= { rlStormCtrl 7 }
+
+--
+-- rlStormCtrlTable
+--
+rlStormCtrlTable   OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlStormCtrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table contains the storm control protection per port"
+    ::= { rlStormCtrl 8 }
+
+rlStormCtrlEntry   OBJECT-TYPE
+    SYNTAX  RlStormCtrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "storm control protection, defined per port,frame type and rate"
+    INDEX { dot1dBasePort }
+    ::= { rlStormCtrlTable 1 }
+
+RlStormCtrlEntry ::= SEQUENCE {
+    rlStormCtrlRateType                         RlStormCtrlRateUnit,
+    rlStormCtrlUnknownUnicastEnable             TruthValue,
+    rlStormCtrlUnknownUnicastRate               Unsigned32,
+    rlStormCtrlUnknownMulticastEnable           TruthValue,
+    rlStormCtrlUnknownMulticastRate             Unsigned32,
+    rlStormCtrlBroadcastEnable                  TruthValue,
+    rlStormCtrlBroadcastRate                    Unsigned32,
+    rlStormCtrlMulticastEnable                  TruthValue,
+    rlStormCtrlMulticastRate                    Unsigned32,
+    rlStormCtrlSetDefaultRateType               TruthValue,
+    rlStormCtrlSetDefaultUnknownUnicastEnable   TruthValue,
+    rlStormCtrlSetDefaultUnknownUnicastRate     TruthValue,
+    rlStormCtrlSetDefaultUnknownMulticastEnable TruthValue,
+    rlStormCtrlSetDefaultUnknownMulticastRate   TruthValue,
+    rlStormCtrlSetDefaultBroadcastEnable        TruthValue,
+    rlStormCtrlSetDefaultBroadcastRate          TruthValue,
+    rlStormCtrlSetDefaultMulticastEnable        TruthValue,
+    rlStormCtrlSetDefaultMulticastRate          TruthValue,
+    rlStormCtrlBroadcastOperRate                Unsigned32
+}
+
+rlStormCtrlRateType OBJECT-TYPE
+    SYNTAX  RlStormCtrlRateUnit
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate the rate unit type"
+    ::= { rlStormCtrlEntry 1 }
+
+rlStormCtrlUnknownUnicastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "enable or disable the storm control for unknown unicast frames"
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 2 }
+
+rlStormCtrlUnknownUnicastRate OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "set the storm control rate limit for the unknown unicast frames,
+        0 indicate blocking of frames from this type."
+    DEFVAL { 0 }
+    ::= { rlStormCtrlEntry 3 }
+
+rlStormCtrlUnknownMulticastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "enable or disable the storm control for unknown multicast frames"
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 4 }
+
+rlStormCtrlUnknownMulticastRate OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "set the storm control rate limit for the unknown multicast frames,
+        0 indicate blocking of frames from this type."
+    DEFVAL { 0 }
+    ::= { rlStormCtrlEntry 5 }
+
+rlStormCtrlBroadcastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "enable or disable the storm control for Broadcast frames"
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 6 }
+
+rlStormCtrlBroadcastRate OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "set the storm control rate limit for the Broadcast frames,
+        0 indicate blocking of frames from this type."
+    DEFVAL { 0 }
+    ::= { rlStormCtrlEntry 7 }
+
+rlStormCtrlMulticastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "enable or disable the storm control for multicast frames"
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 8 }
+
+rlStormCtrlMulticastRate OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "set the storm control rate limit for the multicast frames,
+        0 indicate blocking of frames from this type."
+    DEFVAL { 0 }
+    ::= { rlStormCtrlEntry 9 }
+
+rlStormCtrlSetDefaultRateType OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the rate unit type to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 10 }
+
+rlStormCtrlSetDefaultUnknownUnicastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control enable for unknown unicast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 11 }
+
+rlStormCtrlSetDefaultUnknownUnicastRate OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control rate limit for the unknown unicast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 12 }
+
+rlStormCtrlSetDefaultUnknownMulticastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control enable for unknown multicast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 13 }
+
+rlStormCtrlSetDefaultUnknownMulticastRate OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control rate limit for the unknown multicast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 14 }
+
+rlStormCtrlSetDefaultBroadcastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control enable for Broadcast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 15 }
+
+rlStormCtrlSetDefaultBroadcastRate OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control rate limit for the Broadcast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 16 }
+
+rlStormCtrlSetDefaultMulticastEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control for multicast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 17 }
+
+rlStormCtrlSetDefaultMulticastRate OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "indicate if return the storm control rate limit for the multicast frames
+         to its default."
+    DEFVAL { false }
+    ::= { rlStormCtrlEntry 18 }
+
+rlStormCtrlBroadcastOperRate OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Operative storm control rate limit for the Broadcast frames.
+         The value will be 0 if rlStormCtrlRateType is not from type precentages."
+    ::= { rlStormCtrlEntry 19 }
+
+--
+-- rlStormCtrlGroupTable
+--
+rlStormCtrlGroupTable   OBJECT-TYPE
+    SYNTAX   SEQUENCE OF RlStormCtrlGroupEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+        "The table contains per port for each supported frame type
+        to which group it belongs."
+    ::= { rlStormCtrl 9 }
+
+rlStormCtrlGroupEntry   OBJECT-TYPE
+    SYNTAX   RlStormCtrlGroupEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+        "group id for each supported frame type defined per port."
+    INDEX { dot1dBasePort }
+    ::= { rlStormCtrlGroupTable 1 }
+
+RlStormCtrlGroupEntry ::= SEQUENCE {
+    rlStormCtrlGroupUnknownUnicastId      INTEGER,
+    rlStormCtrlGroupUnknownMulticastId    INTEGER,
+    rlStormCtrlGroupBroadcastId           INTEGER,
+    rlStormCtrlGroupMulticastId           INTEGER
+}
+
+rlStormCtrlGroupUnknownUnicastId OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Indicates the id of the group for unknown unicast frame type that
+        the port belongs to,
+        0 indicates that unknown unicast frame type is not supported."
+    ::= { rlStormCtrlGroupEntry 1 }
+
+rlStormCtrlGroupUnknownMulticastId OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Indicates the id of the group for unknown multicast frame type that
+        the port belongs to,
+        0 indicates that unknown multicast frame type is not supported."
+    ::= { rlStormCtrlGroupEntry 2 }
+
+rlStormCtrlGroupBroadcastId OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Indicates the id of the group for broadcast frame type that
+        the port belongs to,
+        0 indicates that broadcast frame type is not supported."
+    ::= { rlStormCtrlGroupEntry 3 }
+
+rlStormCtrlGroupMulticastId  OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "Indicates the id of the group for multicast frame type that
+        the port belongs to,
+        0 indicates that multicast frame type is not supported."
+    ::= { rlStormCtrlGroupEntry 4 }
+
+END
+

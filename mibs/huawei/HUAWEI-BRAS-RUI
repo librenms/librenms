@@ -1,0 +1,380 @@
+-- =================================================================
+-- Copyright (C) 2005 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-RUI-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+    HUAWEI-BRAS-RUI-MIB DEFINITIONS ::= BEGIN
+
+            IMPORTS
+        hwBRASMib            
+            FROM HUAWEI-MIB
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI
+            RowStatus, TruthValue, DisplayString, MacAddress            
+                FROM SNMPv2-TC;
+    
+        hwBRASRui MODULE-IDENTITY 
+            LAST-UPDATED "200504181334Z"        -- April 18, 2005 at 13:34 GMT
+            ORGANIZATION 
+                "       
+                NanJing Institute,Huawei Technologies Co.,Ltd.
+                                HuiHong Mansion,No.91 BaiXia Rd.
+                                NanJing, P.R. of China
+                                Zipcode:210001
+                                Http://www.huawei.com                                       
+                                E-mail:support@huawei.com "
+                    CONTACT-INFO 
+                        "The MIB contains objects of module RUI."
+            DESCRIPTION 
+                "Description."
+            ::= { hwBRASMib 19}
+            
+
+        hwPeerBackupObject OBJECT IDENTIFIER ::= { hwBRASRui 1 } 
+        
+        hwPeerBackupEnableTable OBJECT IDENTIFIER ::= { hwPeerBackupObject 1 }    
+        
+        hwPeerBackupEnableEntry OBJECT IDENTIFIER ::= { hwPeerBackupEnableTable 1 }
+
+
+        hwPeerBackupEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                disable(1),
+                hotEnable(2),
+                warmEnable(3)
+                }
+
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Peer backup enable.
+
+                "
+            DEFVAL{1}
+            ::= { hwPeerBackupEnableEntry 1 }
+            
+        hwPeerBackupServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPeerBackupServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Peer backup server table.
+
+                "
+            ::= { hwPeerBackupObject 2 }
+        
+            hwPeerBackupServerEntry OBJECT-TYPE
+                  SYNTAX HwPeerBackupServerEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "Peer backup server table.
+
+                 "
+                        INDEX { hwPeerBackupServerPeerIp }
+                        ::= {  hwPeerBackupServerTable 1 }
+        
+                    HwPeerBackupServerEntry ::=
+                        SEQUENCE { 
+                            hwPeerBackupServerPeerIp
+                                IpAddress,
+                            hwPeerBackupServerLocalIp
+                                IpAddress,
+                            hwPeerBackupServerPort
+                                Integer32,
+                            hwPeerBackupServerDetectRetransmit
+                                Integer32,
+                            hwPeerBackupServerDetectInterval
+                                Integer32,
+                            hwPeerBackupServerRowStatus
+                                RowStatus      
+                        }
+
+                    hwPeerBackupServerPeerIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "IP address of the peer backup server.
+                
+                             "
+                        ::= { hwPeerBackupServerEntry 1 }
+
+                    hwPeerBackupServerLocalIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "IP address of the local backup server.
+                
+                            "
+                        ::= { hwPeerBackupServerEntry 2 }   
+                        
+                    hwPeerBackupServerPort OBJECT-TYPE
+                        SYNTAX Integer32(1024..55535)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Port of the TCP connection.
+                
+                             "
+                        ::= { hwPeerBackupServerEntry 3 }
+                  
+                    hwPeerBackupServerDetectRetransmit OBJECT-TYPE
+                        SYNTAX Integer32 (2..12)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Number of events re-transmitting the detect packet,default is 8. 
+                
+                             "
+                        DEFVAL{8}
+                        ::= { hwPeerBackupServerEntry 4 } 
+                        
+                    hwPeerBackupServerDetectInterval OBJECT-TYPE
+                        SYNTAX Integer32 (10..60)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The interval of detecting tcp connection,default is 20 seconds.
+                
+                             "
+                        DEFVAL{20}
+                        ::= { hwPeerBackupServerEntry 5 }
+
+                    hwPeerBackupServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Row admin status,only Add or Del.
+                
+                "
+            ::= { hwPeerBackupServerEntry 6 }
+            
+                 hwRemoteBackupProfileTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwRemoteBackupProfileEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Remote backup profile configuration table.
+                                
+                                "
+                        ::= { hwPeerBackupObject 3 } 
+                
+                hwRemoteBackupProfileEntry OBJECT-TYPE
+                        SYNTAX HwRemoteBackupProfileEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Remote backup profile configuration table.
+                                
+                                "
+                        INDEX { hwRemoteBackupProfileIndex }
+                        ::= { hwRemoteBackupProfileTable 1 }
+
+                HwRemoteBackupProfileEntry ::=
+                        SEQUENCE {     
+                            hwRemoteBackupProfileIndex
+                                    Integer32,
+                            hwRemoteBackupProfileName
+                                    DisplayString,
+                            hwRemoteBackupProfilePeerIP
+                                    IpAddress,
+                            hwRemoteBackupProfileVrrpID
+                                    Integer32,
+                            hwRemoteBackupProfileBackupID
+                                    Integer32,
+                            hwRemoteBackupProfileRowStatus
+                                    RowStatus
+                        } 
+                        
+               hwRemoteBackupProfileIndex OBJECT-TYPE
+                    SYNTAX Integer32(0..4095)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "Remote backup profile index.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileEntry 1 }
+
+
+                hwRemoteBackupProfileName OBJECT-TYPE
+                    SYNTAX DisplayString(SIZE(1..32))
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Remote backup profile name.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileEntry 2 }
+
+                hwRemoteBackupProfilePeerIP OBJECT-TYPE
+                    SYNTAX IpAddress
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Configure peer IP address in remote backup profile.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileEntry 3 }
+
+                hwRemoteBackupProfileVrrpID OBJECT-TYPE
+                    SYNTAX Integer32(0..255)
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Configure VrrpID in remote backup profile.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileEntry 4 }
+                   
+                hwRemoteBackupProfileBackupID OBJECT-TYPE
+                    SYNTAX Integer32(0..4095 | 65535)              
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Configure BackupID in remote backup proflie ,need configure PeerIP first.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileEntry 5 }
+                    
+                hwRemoteBackupProfileRowStatus OBJECT-TYPE
+              SYNTAX RowStatus
+              MAX-ACCESS read-create
+              STATUS current
+              DESCRIPTION
+               "Row admin status,only Add or Del.
+                
+               "
+            ::= { hwRemoteBackupProfileEntry 6 }
+            
+            hwRemoteBackupProfileExtTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwRemoteBackupProfileExtEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                                "Remote backup profile configuration extend table.
+                                
+                                "
+                ::= {  hwPeerBackupObject 4 }
+                
+                   hwRemoteBackupProfileExtEntry OBJECT-TYPE
+                        SYNTAX HwRemoteBackupProfileExtEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Remote backup profile configuration extend table.
+                                
+                                "
+                        INDEX { hwRemoteBackupProfileIndex,hwRemoteBackupProfileIPPoolBindIndex }
+                        ::= { hwRemoteBackupProfileExtTable 1 }
+
+                HwRemoteBackupProfileExtEntry ::=
+                        SEQUENCE {  
+                             hwRemoteBackupProfileIPPoolBindIndex
+                                       Integer32,
+                             hwRemoteBackupProfileIPPoolIndex
+                                    Integer32,
+                          hwRemoteBackupProfileDomainName
+                                    DisplayString,
+                          hwRemoteBackupProfileExtRowStatus
+                                    RowStatus
+                        } 
+                 
+                hwRemoteBackupProfileIPPoolBindIndex OBJECT-TYPE
+                    SYNTAX Integer32(0..15)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "Ip pool bound Index.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileExtEntry 1 }
+                                                
+                hwRemoteBackupProfileIPPoolIndex OBJECT-TYPE
+                    SYNTAX Integer32(0..4096 | 65535)
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Ip pool bound by remote backup profile.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileExtEntry 2 }
+
+
+                hwRemoteBackupProfileDomainName OBJECT-TYPE
+                    SYNTAX DisplayString(SIZE(1..64))
+                    MAX-ACCESS read-create
+                    STATUS current
+                    DESCRIPTION
+                        "Domain bound by remote backup profile, need bind ip pool first.
+                        
+                        "
+                    ::= { hwRemoteBackupProfileExtEntry 3 }
+
+                hwRemoteBackupProfileExtRowStatus OBJECT-TYPE
+              SYNTAX RowStatus
+              MAX-ACCESS read-create
+              STATUS current
+              DESCRIPTION
+               "Row admin status,only Add or Del.
+                
+               "
+            ::= { hwRemoteBackupProfileExtEntry 4 }
+            
+
+        hwRuiConformance OBJECT IDENTIFIER ::= { hwBRASRui 2 }
+        
+        hwRuiCompliances OBJECT IDENTIFIER ::= { hwRuiConformance 1 }
+        hwRuiCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwPeerBackupEnableGroup, hwPeerBackupServerGroup, hwRemoteBackupProfileGroup, hwRemoteBackupProfileExtGroup}  
+                                               
+              ::= { hwRuiCompliances 1 }  
+              
+        hwRuiGroups OBJECT IDENTIFIER ::= { hwRuiConformance 2 } 
+        
+        hwPeerBackupEnableGroup OBJECT-GROUP
+            OBJECTS { hwPeerBackupEnable }       
+            STATUS current
+            DESCRIPTION 
+                "The RUI peer backup enable group."
+            ::= { hwRuiGroups 1 }
+
+        hwPeerBackupServerGroup OBJECT-GROUP
+            OBJECTS { hwPeerBackupServerPeerIp, hwPeerBackupServerLocalIp, hwPeerBackupServerPort, 
+                      hwPeerBackupServerDetectRetransmit, hwPeerBackupServerDetectInterval, hwPeerBackupServerRowStatus }            
+            STATUS current
+            DESCRIPTION 
+                "The peer backup server group."
+            ::= { hwRuiGroups 2 }
+             
+        hwRemoteBackupProfileGroup OBJECT-GROUP
+            OBJECTS { hwRemoteBackupProfileIndex, hwRemoteBackupProfileName, hwRemoteBackupProfilePeerIP, 
+                      hwRemoteBackupProfileVrrpID, hwRemoteBackupProfileBackupID, hwRemoteBackupProfileRowStatus }       
+            STATUS current
+            DESCRIPTION 
+                "The remote backup profile group."
+            ::= { hwRuiGroups 3 }
+            
+        hwRemoteBackupProfileExtGroup OBJECT-GROUP
+            OBJECTS { hwRemoteBackupProfileIPPoolBindIndex, hwRemoteBackupProfileIPPoolIndex, hwRemoteBackupProfileDomainName, hwRemoteBackupProfileExtRowStatus }       
+            STATUS current
+            DESCRIPTION 
+                "The RUI peer backup enable extern group."
+            ::= { hwRuiGroups 4 }
+                        
+        END
+        

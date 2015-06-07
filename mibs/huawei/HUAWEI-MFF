@@ -1,0 +1,354 @@
+-- =================================================================
+-- Copyright (C) 2008 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:HUAWEI MFF(MAC-FORCED-FORWARDING) MIB
+-- Reference:
+-- Version: V1.00
+-- History:
+--    V1.0 2008-07-02, publish
+-- =================================================================
+    
+HUAWEI-MFF-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        hwDatacomm            
+            FROM HUAWEI-MIB
+        MODULE-IDENTITY, IpAddress, OBJECT-TYPE        
+            FROM SNMPv2-SMI    
+        InterfaceIndexOrZero
+            FROM IF-MIB
+        VlanId     
+            FROM Q-BRIDGE-MIB
+        EnabledStatus
+            FROM P-BRIDGE-MIB                                             
+        RowStatus,MacAddress,DisplayString            
+            FROM SNMPv2-TC;
+                
+--
+-- Textual conventions                
+--
+              
+    
+--
+-- Module Identifier                
+--
+hwMffMIB MODULE-IDENTITY 
+    LAST-UPDATED "200807021800Z"            -- Jul 2nd, 2008 at 14:00 GMT
+    ORGANIZATION 
+        "Huawei Technologies co., Ltd."
+    CONTACT-INFO 
+        " Avansys R&D Building,
+          Huawei Longgang Production Base,
+          Shenzhen P.R. China
+        Zip:518129 
+        Http://www.huawei.com                                       
+        E-mail:support@huawei.com "
+    DESCRIPTION 
+        "This MIB describes objects used for Mff,including
+        configuring mff,cofiguring network port and server's IP address, collecting
+        user and gateway information. "
+    REVISION "200807021800Z"            -- Jul 2nd, 2008 at 14:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hwDatacomm 170 }
+    
+--
+-- Objects Identifier
+--
+
+    hwMffObjects OBJECT IDENTIFIER ::= { hwMffMIB 1 }
+
+--
+-- Nodes Identifier
+--
+    
+hwMffGlobal OBJECT-TYPE
+    SYNTAX     EnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The global mff. Enable this before you want to enable vlan, port mff. "
+    DEFVAL { disable }
+    ::= { hwMffObjects 1 }
+            
+hwMffVlanCfgTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwMffVlanCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The mff vlan configuration table."
+    ::= { hwMffObjects 2 }     
+              
+    hwMffVlanCfgEntry OBJECT-TYPE
+        SYNTAX HwMffVlanCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the mff vlan configuration table."
+        INDEX { hwMffVlanIndex }
+        ::= { hwMffVlanCfgTable 1 }
+        
+    HwMffVlanCfgEntry ::=
+        SEQUENCE {                
+                    hwMffVlanIndex              VlanId,
+                    hwMffStaticGatewayIpAddr    IpAddress,
+                    hwMffGatewayDetect          EnabledStatus,
+                    hwMffVlanCfgRowStatus       RowStatus
+                }
+
+        hwMffVlanIndex OBJECT-TYPE
+            SYNTAX  VlanId
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The VLAN-ID or other identifier referring to this VLAN."
+            ::= { hwMffVlanCfgEntry 1 }
+
+        hwMffStaticGatewayIpAddr OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                "Whether to enable static mff on this vlan and configure gateway IP address . "    
+            ::= { hwMffVlanCfgEntry 2 }
+        
+        hwMffGatewayDetect OBJECT-TYPE
+            SYNTAX  EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                "Whether to enable gateway MAC address detection on this vlan. "
+            DEFVAL { disable }    
+            ::= { hwMffVlanCfgEntry 3 }
+
+        
+        hwMffVlanCfgRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+               "The row status of the mff vlan configuration table."
+            ::= { hwMffVlanCfgEntry 100 }                    
+
+
+hwMffNetworkPortTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMffNetworkPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The mff port configuration table."
+        ::= { hwMffObjects 3 }
+
+      
+    hwMffNetworkPortEntry OBJECT-TYPE
+        SYNTAX HwMffNetworkPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the mff port configuration table."
+        INDEX { hwMffPortIndex }
+        ::= { hwMffNetworkPortTable 1 }
+        
+    HwMffNetworkPortEntry ::=
+        SEQUENCE { 
+                    hwMffPortIndex               Integer32,         
+                    hwMffNetworkPortRowStatus    RowStatus
+                }
+
+        hwMffPortIndex OBJECT-TYPE
+            SYNTAX  Integer32(1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "The port index."
+            ::= { hwMffNetworkPortEntry 1 }
+               
+        hwMffNetworkPortRowStatus  OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                "The row status of the mff port configuration table."
+            ::= { hwMffNetworkPortEntry 100 } 
+           
+hwMffServerCfgTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwMffServerCfgEntry 
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The mff server IP configuration table."
+    ::= { hwMffObjects 4 }
+
+       
+    hwMffServerCfgEntry OBJECT-TYPE
+        SYNTAX HwMffServerCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the mff server IP configuration table."
+        INDEX { hwMffServerVlanIndex, hwMffIpIndex }
+        ::= { hwMffServerCfgTable 1 }
+        
+    HwMffServerCfgEntry ::=
+        SEQUENCE { 
+                    hwMffServerVlanIndex        VlanId,
+                    hwMffIpIndex                IpAddress,           
+                    hwMffServerIpRowStatus      RowStatus
+                }
+
+        hwMffServerVlanIndex OBJECT-TYPE
+            SYNTAX  VlanId
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "The VLAN-ID or other identifier referring to this VLAN."
+            ::= { hwMffServerCfgEntry 1 }
+
+        hwMffIpIndex OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "Index: IP."
+            ::= { hwMffServerCfgEntry 2 }    
+      
+        hwMffServerIpRowStatus OBJECT-TYPE
+            SYNTAX  RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                "The row status of the mff server IP configuration table."
+            ::= { hwMffServerCfgEntry 100 }    
+       
+hwMffUserGatewayTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwMffUserGatewayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The mff users and gateways table."
+    ::= { hwMffObjects 5 }
+
+    hwMffUserGatewayEntry OBJECT-TYPE
+        SYNTAX HwMffUserGatewayEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the mff users and gateways table."
+        INDEX { hwMffUserGatewayVlanIndex, hwMffUserIpIndex, 
+            hwMffGatewayIpIndex }
+        ::= { hwMffUserGatewayTable 1 }
+        
+    HwMffUserGatewayEntry ::=
+        SEQUENCE {  
+                    hwMffUserGatewayVlanIndex   VlanId,
+                    hwMffUserIpIndex            IpAddress,
+                    hwMffGatewayIpIndex         IpAddress, 
+                    hwMffUserMacAddr            MacAddress, 
+                    hwMffGatewayMacAddr         MacAddress
+                }            
+ 
+        hwMffUserGatewayVlanIndex OBJECT-TYPE
+            SYNTAX VlanId
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The VLAN-ID or other identifier referring to this VLAN."
+            ::= { hwMffUserGatewayEntry 1 } 
+              
+        hwMffUserIpIndex OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "Index: user's IP."
+            ::= { hwMffUserGatewayEntry 2 } 
+           
+        hwMffGatewayIpIndex OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "Index: gateway's IP."
+            ::= { hwMffUserGatewayEntry 3 }  
+                       
+        hwMffUserMacAddr OBJECT-TYPE
+            SYNTAX  MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+                "User's MAC address."
+            ::= { hwMffUserGatewayEntry 20 }
+                 
+        hwMffGatewayMacAddr OBJECT-TYPE
+            SYNTAX  MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+                "Gateway's MAC address."
+            ::= { hwMffUserGatewayEntry 21 }      
+
+--
+-- Traps Identifier
+--         
+   --  ============== conformance information ==============
+    hwMffConformance OBJECT IDENTIFIER ::= { hwMffMIB 2 }
+
+hwMffCompliances OBJECT IDENTIFIER ::= { hwMffConformance 1 }
+    
+    hwMffCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for systems supporting 
+        this module."
+
+        MODULE      -- this module
+        MANDATORY-GROUPS
+            {
+                hwMffVlanCfgGroup,  
+                hwMffNetworkPortGroup,
+                hwMffServerCfgGroup,
+                hwMffUserGatewayGroup
+            }                            
+        ::= { hwMffCompliances 1 }  
+          
+      
+    --  ============== groups ==============   
+
+hwMffMIBGroups OBJECT IDENTIFIER ::= { hwMffConformance 2 }   
+
+    hwMffGlobalGroup OBJECT-GROUP
+        OBJECTS { hwMffGlobal }
+        STATUS current
+        DESCRIPTION 
+            "The MFF global configuration group."
+        ::= { hwMffMIBGroups 1 }    
+
+    hwMffVlanCfgGroup OBJECT-GROUP
+        OBJECTS { hwMffStaticGatewayIpAddr, hwMffGatewayDetect, hwMffVlanCfgRowStatus }
+        STATUS current
+        DESCRIPTION 
+            "The MFF vlan configuration group."
+        ::= { hwMffMIBGroups 2 }         
+        
+    hwMffNetworkPortGroup OBJECT-GROUP
+        OBJECTS { hwMffNetworkPortRowStatus }
+        STATUS current
+        DESCRIPTION 
+            "The MFF network-port group."
+        ::= { hwMffMIBGroups 3 }
+
+    hwMffServerCfgGroup OBJECT-GROUP
+        OBJECTS { hwMffServerIpRowStatus }
+        STATUS current
+        DESCRIPTION 
+            "The MFF servers configuration group."
+        ::= { hwMffMIBGroups 4 }
+
+    hwMffUserGatewayGroup OBJECT-GROUP
+        OBJECTS { hwMffUserMacAddr, hwMffGatewayMacAddr }
+        STATUS current
+        DESCRIPTION 
+            "The MFF user and gateway group."
+        ::= { hwMffMIBGroups 5 }
+
+    --  ============== conformance information define end ==============            
+                                                                           
+END

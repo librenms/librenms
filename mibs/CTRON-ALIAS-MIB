@@ -1,0 +1,1014 @@
+CTRON-ALIAS-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-alias-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Alias MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys products.
+--
+--  Copyright August, 1999-2003 Enterasys Networks, Inc.
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter32,
+             Unsigned32, TimeTicks
+                  FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                  FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, MacAddress, TruthValue
+                  FROM SNMPv2-TC
+        SnmpAdminString
+                  FROM SNMP-FRAMEWORK-MIB
+        InterfaceIndex 
+                FROM IF-MIB
+        TimeFilter
+                FROM RMON2-MIB
+        VlanIndex
+                FROM Q-BRIDGE-MIB
+        EnabledStatus 
+                FROM P-BRIDGE-MIB
+        ctAliasMib
+                  FROM CTRON-MIB-NAMES;
+
+cabletronAliasMib MODULE-IDENTITY
+    LAST-UPDATED "200304281327Z"  -- Mon Apr 28 13:27 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+         "Postal: Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+          Phone:  +1 978 684 1000
+          E-mail: support@enterasys.com
+          WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+            "This MIB module defines a portion of the MIB tree
+             under the Enterasys enterprise OID. This branch 
+             defines Enterasys Networks' proprietary Node Alias
+             feature.
+
+             This MIB defines objects which can be used to discover 
+             end systems per port, and to map end system addresses
+             to the layer 2 address of the port."
+
+
+    REVISION    "200304221339Z"  -- Tue Apr 22 13:39 GMT 2003
+    DESCRIPTION "Added the ctAliasMacAddressTable and
+                 ctAliasProtocolAddressTable. Added the objects
+                 ctAliasEntryStatus and ctAliasEntryClearAll.
+                 Deprecated the object ctAliasMarkInactive."
+
+    REVISION    "200201301301Z"  -- Wed Jan 30 13:01 GMT 2002
+    DESCRIPTION "Added the optional ctAliasConfigurationTable."
+
+    REVISION    "200201232056Z"  -- Wed Jan 23 20:56 GMT 2002
+    DESCRIPTION "Added ctAliasAddressText leaf with the syntax of
+                 SnmpAdminString."
+
+    REVISION    "200201182022Z"  -- Fri Jan 18 20:22 GMT 2002
+    DESCRIPTION "Added textual convention AliasAddress.  Changed
+                 the syntax for ctAliasAddress from SnmpAdminString
+                 to AliasAddress.  Added ranges to ctAliasReference
+                 and ctAliasID."
+
+    REVISION    "199909260000Z"
+    DESCRIPTION "Moved the CabletronProtocolTC enumeration value 
+                 unknown to unknown(0).  Updated textual descriptions."
+
+    REVISION    "199909040000Z"
+    DESCRIPTION "Changed removed the ctAliasProtocolDirLocalID.
+                 Updated units of conformance and compliance
+                 statements."
+
+    REVISION    "199908060000Z"
+    DESCRIPTION "Changed object naming to be more cabletron-general.
+                 Changed indexing to simplify access."
+
+    REVISION    "199907280000Z"
+    DESCRIPTION "The initial version of this MIB module"
+
+         ::= { ctAliasMib 1 } 
+
+-- Textual Conventions
+
+CabletronProtocolTC ::= TEXTUAL-CONVENTION
+                STATUS  current
+                DESCRIPTION
+                    "Identifies the type of protocol address."
+                SYNTAX  INTEGER
+                {
+                   unknown(0),
+                   ip(1),
+                   apl(2),
+                   mac(3),
+                   hsrp(4),
+                   dhcps(5),
+                   dhcpc(6),
+                   bootps(7),
+                   bootpc(8),
+                   ospf(9),
+                   vrrp(10),
+                   ipx(11),
+                   xrip(12),
+                   xsap(13),
+                   xnlsp(14),
+                   ipx20(15),
+                   rtmp(16),
+                   netBios(17),
+                   nbt(18),
+                   n802q(19),
+                   bgp(20),
+                   rip(21),
+                   igrp(22),
+                   dec(23),
+                   bpdu(24),
+                   udp(25)
+                }
+
+AliasAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x "
+    STATUS       current
+    DESCRIPTION
+          "Represents layer 3 or higher addresses."
+    SYNTAX       OCTET STRING (SIZE (0..32))
+
+-- branches used in this MIB
+
+   ctAlias OBJECT IDENTIFIER ::= { cabletronAliasMib 1 }
+   
+-- Alias Table
+
+ctAliasTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtAliasEntry
+        MAX-ACCESS   not-accessible
+        STATUS  current
+        DESCRIPTION
+             "The ctAliasTable contains information about the aliases
+             known by the agent.  This table is indexed using a unique
+             and arbitrary ID and a TimeFilter to allow a management
+             station to learn all alias entries that have been modified
+             since time X.  This table is NOT designed to do a single
+             GET.  This Table is designed for MIB Walks only.
+
+             This table contains objects that map upper-layer 
+             network services and entities to the physical location 
+             of the associated port, and the MAC address of the
+             associated end-system (node).
+
+             All entries in this table are deleted when sysUpTime
+             is reset to zero.
+
+             This table allows for a time filtered view.  It is useful 
+             for determining what has been modified in the Alias Table 
+             since a specified time.
+
+             If a management station reads the ctAliasTable
+             of an entity at time X, subsequent updates can be 
+             realized by performing get-next requests of this
+             table to determine which entries have been modified 
+             since time X. Then the management station can use
+             GET requests to retrieve only the records of interest
+             from the Alias table. 
+
+             There is a delay between retrieving the Alias Reference 
+             values from this table, and a GET request to retrieve a 
+             modified row from the Alias table. The management 
+             station should be prepared for two possibilities:
+             1) the GET request may fail if the Alias table entry 
+             has been deleted during the delay, and 2) the 
+             entry may have been modified during the delay, so the
+             modification time of the retrieved entry may differ from 
+             the modification time of the Delta entry.
+
+             If the entry in the Alias Control table identified by 
+             ctAliasID is marked inactive by management request, and 
+             subsequently deleted to free resources, all corresponding 
+             entries in this table are also deleted.
+
+             If the agent needs to free resources, it can delete
+             entries from this table. It SHOULD first remove those
+             which have been marked inactive in the ctAliasControlTable, 
+             then it SHOULD remove those entries with the oldest 
+             modification times." 
+         ::= { ctAlias 1 }
+
+ctAliasEntry OBJECT-TYPE
+        SYNTAX  CtAliasEntry
+        MAX-ACCESS   not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Each entry contains information pertaining to 
+             the alias of a node."
+        INDEX   { ctAliasTimeFilter, ctAliasReference }
+        ::=     { ctAliasTable 1 }
+
+CtAliasEntry ::=
+        SEQUENCE 
+        {
+                ctAliasTimeFilter         TimeFilter,
+                ctAliasReference          Integer32,
+                ctAliasInterface          InterfaceIndex,
+                ctAliasMacAddress         MacAddress,
+                ctAliasVlanID             VlanIndex,
+                ctAliasProtocol           CabletronProtocolTC,
+                ctAliasAddress            AliasAddress,
+                ctAliasIsActive           TruthValue,
+                ctAliasAddressText        SnmpAdminString
+        }
+
+ctAliasTimeFilter  OBJECT-TYPE
+        SYNTAX  TimeFilter
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The value of sysUpTime when this entry 
+             was last modified."
+        ::= { ctAliasEntry 1 }
+
+ctAliasReference  OBJECT-TYPE
+        SYNTAX  Integer32 (0..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An integer ID assigned by the agent. The value of this
+                         object is equal to an existing ctAliasID."
+        ::= { ctAliasEntry 2 }
+
+ctAliasInterface OBJECT-TYPE
+        SYNTAX InterfaceIndex 
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The ifIndex of the interface on which this entry was 
+             discovered.
+
+             The ifIndex is an 'external value' that identifies a 
+             physical component associated with the Alias entry.
+             This object can be used to identify the physical
+             location of the interface in the ifTable [RFC2863].  
+
+             The possibility of ifIndex value re-assignment must be
+             accommodated by a management application whenever the 
+             value of sysUpTime is reset to zero.
+
+             Since ifIndex values in different 'naming scopes' are 
+             not related to one another, the interface to physical 
+             component associations are relative to the same
+             logical entity within the agent. For more discussion 
+             of naming scopes, see the ENTITY-MIB [RFC2037]"
+        ::= { ctAliasEntry 3 }
+
+ctAliasMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The MAC address associated with this alias.  
+ 
+             The TEXTUAL-CONVENTION MacAddress is defined in
+             SNMPv2-TC as an 802 MAC address represented in 
+             'canonical' order as defined by IEEE 802.1a,
+             i.e., as if it were transmitted least significant
+             bit first."
+        ::= { ctAliasEntry 4 }
+
+ctAliasVlanID OBJECT-TYPE
+        SYNTAX VlanIndex
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The VLAN ID contained in the header of the message
+             associated with this alias.
+
+             On agents which support this MIB but do not support
+             VLANs, the value for this object MUST be (1)."
+        ::= { ctAliasEntry 5 }
+
+ctAliasProtocol OBJECT-TYPE
+        SYNTAX  CabletronProtocolTC
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The address type of this alias address."
+        ::= { ctAliasEntry 6 }
+
+ctAliasAddress OBJECT-TYPE
+        SYNTAX       AliasAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The address associated with this entry.  The exact
+             format of this object will depend upon the protocol
+             type in ctAliasProtocol.  The value returned for
+             this object MUST be in a non-textual format."
+        ::= { ctAliasEntry 7 }
+
+ctAliasIsActive  OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The status of this entry.
+
+             A true(1) value indicates the alias is active.
+
+             A false(2) value indicates an entry which has 
+             been marked inactive by network management, using the
+             ctAliasEntryStatus object in the ctAliasControlTable.  
+
+             Entries which have been marked inactive may remain in 
+             the table to allow consistent mappings between network 
+             management stations until an agent needs to free 
+             resources."
+        ::= { ctAliasEntry 8 }
+
+ctAliasAddressText OBJECT-TYPE
+        SYNTAX       SnmpAdminString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The address associated with this entry in a human
+             readable textual format."
+        ::= { ctAliasEntry 9 }
+
+-- Alias Control Table
+
+ctAliasControlTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtAliasControlEntry
+        MAX-ACCESS   not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table allows for control of Alias entries.
+
+             Currently control is limited to marking entries
+             as marked for deletion.
+
+             If the entry in the Alias Control table identified by 
+             ctAliasID is marked inactive by management request, and 
+             subsequently deleted to free resources, all corresponding 
+             entries in the ctAlias table are also deleted.
+
+             All entries in this table are deleted when sysUpTime
+             is reset to zero."
+
+         ::= { ctAlias 2 }
+
+ctAliasControlEntry OBJECT-TYPE
+        SYNTAX  CtAliasControlEntry
+        MAX-ACCESS   not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Each entry contains a unique identifier of an Alias 
+             entry and a control object to mark the entry as 
+             'marked for deletion'."
+        INDEX   { ctAliasID }
+        ::=     { ctAliasControlTable 1 }
+
+CtAliasControlEntry ::=
+        SEQUENCE 
+        {
+                ctAliasID               Integer32,
+                ctAliasMarkInactive     TruthValue,
+                ctAliasEntryStatus      INTEGER
+        }
+
+ctAliasID  OBJECT-TYPE
+        SYNTAX  Integer32 (0..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A unique and arbitrary integer ID assigned
+             by the agent to identify this entry. 
+
+             Each identifier must not be reused until the agent
+             is re-initialized, i.e. sysUpTime is reset to zero."
+        ::= { ctAliasControlEntry 1 }
+
+ctAliasMarkInactive  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "This object provides the control to mark this entry
+             to inactive. 
+
+             When an entry is created by the agent, this is set to
+             false(2). A network management application can set this
+             value to true(1), indicating that the entry is no longer
+             needed. Once this object has been set to true(1), it
+             cannot be set to false(2). 
+
+             If the alias is detected again by the agent, the agent
+             may create a new entry for the Alias.
+
+             When an agent needs to free up resources, it may choose
+             to delete those entries marked inactive."
+        ::= { ctAliasControlEntry 2 }
+
+ctAliasEntryStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+               active(1),
+               inactive(2),
+               remove(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object provides the control to remove or inactivate
+             entries that are no longer needed.
+
+             active(1)   - indicates that this entry is active.
+
+             inactive(2) - indicates that this entry is no longer of any
+                           interest and can be removed, as needed, by
+                           the entity. If the alias is marked inactive
+                           and is seen again by the agent, the alias
+                           ID's status will be changed to active.
+
+             remove(3)   - indicates that the agent SHOULD immediately
+                           remove the entry from the table. If the alias
+                           is seen again by the agent after having been 
+                           removed, it will be added as a new aliasID."
+        ::= { ctAliasControlEntry 3 }
+
+         
+-- Alias Table Statistics
+
+ctAliasStats  OBJECT IDENTIFIER ::= { ctAlias 3 }
+
+ctAliasTableStatsTotalEntries  OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS      read-only
+        STATUS   current
+        DESCRIPTION
+            "The total number of entries in the ctAliasControlTable."
+        ::=      { ctAliasStats 1 }
+
+ctAliasTableStatsActiveEntries OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS      read-only
+        STATUS   current
+        DESCRIPTION
+            "The total number of active entries in the 
+             ctAliasControlTable."
+        ::=      { ctAliasStats 2 }
+
+ctAliasTableStatsPurgeTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        MAX-ACCESS      read-only
+        STATUS   current
+        DESCRIPTION
+            "System time of the most recent purge."
+        ::=      { ctAliasStats 3 }
+
+ctAliasTableStatsState OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                    notStarted(1),
+                    ready(2),
+                    full(3)
+        }
+        MAX-ACCESS      read-only
+        STATUS   current
+        DESCRIPTION
+            "Current Alias Table state.
+
+                notStarted(1) indicates the agent has not 
+                completed any required start up routines and
+                therefore the ctAliasTable and ctAliasControlTable
+                are not currently valid.
+
+                ready(2) indicates that the agent has completed 
+                all initialization procedures and that the alias 
+                MIB is running properly.
+
+                full(3) indicates that due to memory restrictions
+                on the agent, the ctaliasTable has reached the 
+                maximum number of entries possible.
+
+                NOTE: If an agent is using a circular queue design, 
+                then the state of full(3) will never be set."
+        ::=       { ctAliasStats 4 }
+
+
+-- Alias Configuration
+
+ctAliasConfiguration OBJECT IDENTIFIER ::= { ctAlias 4 }
+
+ctAliasConfigurationSystemAllocatedEntries  OBJECT-TYPE
+        SYNTAX Gauge32 
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The total number of alias entries allocated."
+        ::= { ctAliasConfiguration 1 }
+
+ctAliasConfigurationSystemTotalEntries  OBJECT-TYPE
+        SYNTAX Gauge32 
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The total number of alias entries available to be allocated
+             for this system."
+        ::= { ctAliasConfiguration 2 }
+
+ctAliasConfigurationTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtAliasConfigurationEntry
+        MAX-ACCESS   not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table is used to prevent any single chatty
+             port from monopolizing all of the available alias 
+             buffers in the system by letting an administrator
+             tune each port."
+         ::= { ctAliasConfiguration 3 }
+
+ctAliasConfigurationEntry OBJECT-TYPE
+        SYNTAX  CtAliasConfigurationEntry
+        MAX-ACCESS   not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Each entry contains an enable/disable control variable
+             and variables showing the number of maximum allowable 
+             and currently used entries."
+        INDEX   { ctAliasInterface }
+        ::=     { ctAliasConfigurationTable 1 }
+
+CtAliasConfigurationEntry ::=
+        SEQUENCE 
+        {
+            ctAliasConfigurationInterfaceTotalEntries Gauge32,
+            ctAliasConfigurationInterfaceMaxEntries   Gauge32,
+            ctAliasConfigurationInterfaceEnableState  EnabledStatus,
+            ctAliasConfigurationNumQueueWraps         Counter32
+        }
+
+ctAliasConfigurationInterfaceTotalEntries  OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The total number of alias entries currently in
+             use by this ctAliasInterface."
+        ::= { ctAliasConfigurationEntry 1 }
+
+ctAliasConfigurationInterfaceMaxEntries OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object represents the maximum number of 
+             alias entries in the ctAliasTable which were 
+             created by this ctAliasInterface. When the object
+             ctAliasConfigurationInterfaceTotalEntries
+             equals this object, the next alias appearing 
+             on this ctAliasInterface causes the oldest entry 
+             created by this ctAliasInterface to be deleted. 
+             The sum of this object across all ctAliasInterface 
+             shall not exceed ctAliasConfigurationSystemTotalEntries. 
+             If the value of this object is increased, then oldest 
+             entry removal ceases until the maximum is reached 
+             again. If management reduces the value of this 
+             object, then, starting with the oldest, alias 
+             entries are removed until the new number of 
+             entries is reached."
+        ::= { ctAliasConfigurationEntry 2 }
+
+ctAliasConfigurationInterfaceEnableState  OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The enable state of the alias agent on this
+             ctAliasInterface."
+        DEFVAL { enabled }
+        ::= { ctAliasConfigurationEntry 3 }
+
+ctAliasConfigurationNumQueueWraps  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object represents the number of times the queue for
+             this ctAliasConfigurationEntry has wrapped.  Since circular
+             queues are used for storing the entries, when all allocated
+             entries are used, the oldest entries are reused, thus
+             creating a wrap condition.  A value of zero indicates the
+             queue has not wrapped, except in the case that the counter
+             itself has wrapped."
+        ::= { ctAliasConfigurationEntry 4 }
+
+
+-- Alias Mac Address Table
+
+ctAliasMacAddressTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CtAliasMacAddressEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "The ctAliasMacAddressTable contains information about
+             the aliases known by the agent indexed by MAC address
+             and protocol.
+
+             This table contains information that is identical to
+             the ctAliasTable, but it is instanced by MAC address
+             and protocol to allow management entities to search for
+             a MAC address and protocol, or part of a MAC address
+             and protocol, using a single SNMP GetNext request."
+         ::= { ctAlias 5 }
+
+ctAliasMacAddressEntry OBJECT-TYPE
+        SYNTAX       CtAliasMacAddressEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Each entry contains information pertaining to the alias
+             of a node in a table indexed by MAC address, protocol
+             type, protocol address, and alias ID."
+        INDEX   { ctAliasMacAddress, ctAliasProtocol,
+                  ctAliasAddress, ctAliasReference }
+        ::= { ctAliasMacAddressTable 1 }
+
+CtAliasMacAddressEntry ::=
+        SEQUENCE 
+        {
+             ctAliasMacAddressInterface     InterfaceIndex,
+             ctAliasMacAddressVlanID        VlanIndex,
+             ctAliasMacAddressIsActive      TruthValue,
+             ctAliasMacAddressAddressText   SnmpAdminString,
+             ctAliasMacAddressTime          TimeTicks
+        }
+
+ctAliasMacAddressInterface OBJECT-TYPE
+        SYNTAX       InterfaceIndex 
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The ifIndex of the interface on which this entry was 
+             discovered.
+
+             The ifIndex is an 'external value' that identifies a 
+             physical component associated with the Alias entry.
+             This object can be used to identify the physical
+             location of the interface in the ifTable [RFC2863].  
+
+             The possibility of ifIndex value re-assignment must be
+             accommodated by a management application whenever the 
+             value of sysUpTime is reset to zero.
+
+             Since ifIndex values in different 'naming scopes' are 
+             not related to one another, the interface to physical 
+             component associations are relative to the same
+             logical entity within the agent. For more discussion 
+             of naming scopes, see the ENTITY-MIB [RFC2037]"
+        ::= { ctAliasMacAddressEntry 1 }
+
+ctAliasMacAddressVlanID OBJECT-TYPE
+        SYNTAX       VlanIndex
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The VLAN ID contained in the header of the message
+             associated with this alias.
+
+             On agents which support this MIB but do not support
+             VLANs, the value for this object MUST be (1)."
+        ::= { ctAliasMacAddressEntry 2 }
+
+ctAliasMacAddressIsActive  OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The status of this entry.
+
+             A true(1) value indicates the alias is active.
+
+             A false(2) value indicates an entry which has 
+             been marked inactive by network management, using the
+             ctAliasEntryStatus object in the ctAliasControlTable.  
+
+             Entries which have been marked inactive may remain in 
+             the table to allow consistent mappings between network 
+             management stations until an agent needs to free 
+             resources."
+        ::= { ctAliasMacAddressEntry 3 }
+
+ctAliasMacAddressAddressText OBJECT-TYPE
+        SYNTAX       SnmpAdminString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The address associated with this entry in a human
+             readable textual format."
+        ::= { ctAliasMacAddressEntry 4 }
+
+ctAliasMacAddressTime  OBJECT-TYPE
+        SYNTAX       TimeTicks
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The value of sysUpTime when this entry was last modified."
+        ::= { ctAliasMacAddressEntry 5 }
+
+
+-- Alias Protocol Address Table
+
+ctAliasProtocolAddressTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF CtAliasProtocolAddressEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "The ctAliasProtocolAddressTable contains information
+             about the aliases known by the agent indexed by protocol
+             and address.
+
+             This table contains information that is identical to the
+             ctAliasTable, but it is instanced by protocol and address
+             to allow management entities to search for a protocol and
+             address, or part of a protocol and address, using a
+             single SNMP GetNext request."
+        ::= { ctAlias 6 }
+
+ctAliasProtocolAddressEntry OBJECT-TYPE
+        SYNTAX       CtAliasProtocolAddressEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Each entry contains information pertaining to the alias
+             of a node in a table indexed by protocol type, protocol
+             address, MAC address, and alias ID."
+             INDEX   { ctAliasProtocol, ctAliasAddress,
+                       ctAliasMacAddress, ctAliasReference }
+        ::= { ctAliasProtocolAddressTable 1 }
+
+CtAliasProtocolAddressEntry ::=
+        SEQUENCE 
+        {
+             ctAliasProtocolAddressInterface     InterfaceIndex,
+             ctAliasProtocolAddressVlanID        VlanIndex,
+             ctAliasProtocolAddressIsActive      TruthValue,
+             ctAliasProtocolAddressAddressText   SnmpAdminString,
+             ctAliasProtocolAddressTime          TimeTicks
+        }
+
+ctAliasProtocolAddressInterface OBJECT-TYPE
+        SYNTAX       InterfaceIndex 
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The ifIndex of the interface on which this entry was 
+             discovered.
+
+             The ifIndex is an 'external value' that identifies a 
+             physical component associated with the Alias entry.
+             This object can be used to identify the physical
+             location of the interface in the ifTable [RFC2863].  
+
+             The possibility of ifIndex value re-assignment must be
+             accommodated by a management application whenever the 
+             value of sysUpTime is reset to zero.
+
+             Since ifIndex values in different 'naming scopes' are 
+             not related to one another, the interface to physical 
+             component associations are relative to the same
+             logical entity within the agent. For more discussion 
+             of naming scopes, see the ENTITY-MIB [RFC2037]"
+        ::= { ctAliasProtocolAddressEntry 1 }
+
+ctAliasProtocolAddressVlanID OBJECT-TYPE
+        SYNTAX       VlanIndex
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The VLAN ID contained in the header of the message
+             associated with this alias.
+
+             On agents which support this MIB but do not support
+             VLANs, the value for this object MUST be (1)."
+        ::= { ctAliasProtocolAddressEntry 2 }
+
+ctAliasProtocolAddressIsActive  OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The status of this entry.
+
+             A true(1) value indicates the alias is active.
+
+             A false(2) value indicates an entry which has 
+             been marked inactive by network management, using the
+             ctAliasEntryStatus object in the ctAliasControlTable.  
+
+             Entries which have been marked inactive may remain in 
+             the table to allow consistent mappings between network 
+             management stations until an agent needs to free 
+             resources."
+        ::= { ctAliasProtocolAddressEntry 3 }
+
+ctAliasProtocolAddressAddressText OBJECT-TYPE
+        SYNTAX       SnmpAdminString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The address associated with this entry in a human
+             readable textual format."
+        ::= { ctAliasProtocolAddressEntry 4 }
+
+ctAliasProtocolAddressTime  OBJECT-TYPE
+        SYNTAX       TimeTicks
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The value of sysUpTime when this entry was last modified."
+        ::= { ctAliasProtocolAddressEntry 5 }
+
+
+-- Alias Table Clear object
+
+ctAliasEntryClearAll  OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "This object is used to remove all of the alias entries
+             from all of the tables.
+
+             When set to true(1) all known aliases will be immediately
+             removed from all of their respective tables.
+
+             A read will always return false(2)."
+        ::= { ctAlias 7 }
+
+-- -------------------------------------------------------------
+--  Conformance Information
+-- -------------------------------------------------------------
+
+ctAliasConformance OBJECT IDENTIFIER
+    ::= { ctAliasMib 2 }
+
+ctAliasGroups OBJECT IDENTIFIER 
+    ::= { ctAliasConformance 1 }
+
+ctAliasCompliances OBJECT IDENTIFIER
+    ::= { ctAliasConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+ctAliasBasicGroup OBJECT-GROUP
+    OBJECTS {
+                        ctAliasInterface,
+                        ctAliasMacAddress,
+                        ctAliasVlanID,
+                        ctAliasProtocol,
+                        ctAliasAddress,
+                        ctAliasIsActive,
+                        ctAliasAddressText
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for the discovery and mapping
+         of end systems and aliases."
+    ::= { ctAliasGroups 1 }
+
+ctAliasStatsGroup OBJECT-GROUP
+    OBJECTS {
+                        ctAliasTableStatsTotalEntries,
+                        ctAliasTableStatsActiveEntries,
+                        ctAliasTableStatsPurgeTime,
+                        ctAliasTableStatsState
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects pertaining to discovery and mapping
+         of end systems and aliases."
+    ::= { ctAliasGroups 2 }
+
+
+ctAliasControlGroup OBJECT-GROUP
+    OBJECTS {
+                        ctAliasMarkInactive
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "This group has been deprecated. See ctAliasControlGroupI."
+   ::= { ctAliasGroups 3 }
+
+ctAliasConfigurationGroup OBJECT-GROUP
+    OBJECTS {
+                     ctAliasConfigurationSystemAllocatedEntries,
+                     ctAliasConfigurationSystemTotalEntries,
+                     ctAliasConfigurationInterfaceTotalEntries,
+                     ctAliasConfigurationInterfaceMaxEntries,
+                     ctAliasConfigurationInterfaceEnableState 
+
+    }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects for configuring port buffer queues."
+    ::= { ctAliasGroups 4 }
+
+ctAliasMacAddressGroup  OBJECT-GROUP
+    OBJECTS {
+             ctAliasMacAddressInterface,
+             ctAliasMacAddressVlanID,
+             ctAliasMacAddressIsActive,
+             ctAliasMacAddressAddressText,
+             ctAliasMacAddressTime
+    }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects for the discovery and mapping
+         of end systems and aliases."
+    ::= { ctAliasGroups 5 }
+
+ctAliasProtocolAddressGroup  OBJECT-GROUP
+    OBJECTS {
+             ctAliasProtocolAddressInterface,
+             ctAliasProtocolAddressVlanID,
+             ctAliasProtocolAddressIsActive,
+             ctAliasProtocolAddressAddressText,
+             ctAliasProtocolAddressTime
+    }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects for the discovery and mapping
+         of end systems and aliases."
+    ::= { ctAliasGroups 6 }
+
+ctAliasControlGroupI OBJECT-GROUP
+    OBJECTS {
+             ctAliasEntryStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects which make the Aliases accessible 
+         using the TimeFilter TEXTUAL CONVENTION."
+    ::= { ctAliasGroups 7 }
+
+ctAliasGroup OBJECT-GROUP
+     OBJECTS {
+              ctAliasEntryClearAll
+     }
+     STATUS    current
+     DESCRIPTION
+         "An object used for removing alias entries."
+    ::= { ctAliasGroups 8 }
+
+ctAliasConfigurationGroupI OBJECT-GROUP
+     OBJECTS {
+              ctAliasConfigurationNumQueueWraps
+     }
+     STATUS    current
+     DESCRIPTION
+         "An object to indicate queue usage."
+    ::= { ctAliasGroups 9 }
+
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+ctAliasCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for device support of the
+        Cabletron Directory Alias feature."
+
+    MODULE
+        MANDATORY-GROUPS { ctAliasBasicGroup,
+                           ctAliasStatsGroup,
+                           ctAliasGroup } 
+
+-- an implementation which does not support the ctAliasControlGroup 
+-- will not allow for NMS management controlled garbage collection.
+
+       ::= { ctAliasCompliances 1 }
+
+END

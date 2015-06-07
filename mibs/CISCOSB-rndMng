@@ -1,0 +1,490 @@
+CISCOSB-rndMng DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Management Private Extension
+-- Version:    7.45
+-- Date:       19 Dec 2006
+-- 28-Feb-2005  Added   rlCpuUtilEnable
+-- 28-Feb-2005  Added   rlCpuUtilDuringLastSecond
+-- 28-Feb-2005  Added   rlCpuUtilDuringLastMinute
+-- 28-Feb-2005  Added   rlCpuUtilDuringLast5Minutes
+-- 13-Jun-2006  Added   value {none} of rndAction
+-- 20-Jun-2006  Added   rlRebootDelay
+-- 19-Dec-2006  Added   resetToFactoryDefaults
+-- 04-Apr-2012  Added   rlScheduledReload
+-- 04-Dec-2012  Added   rlSysNameTable
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    Unsigned32,
+    MODULE-IDENTITY, OBJECT-TYPE, TimeTicks                 FROM SNMPv2-SMI
+    RowStatus, TruthValue, DisplayString,
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC
+    InetAddressType, InetAddress                            FROM INET-ADDRESS-MIB
+    InterfaceIndex                                          FROM IF-MIB;
+
+
+rndMng  MODULE-IDENTITY
+        LAST-UPDATED "201212040000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for switch001 general management MIB."
+        REVISION "201212040000Z"
+        DESCRIPTION
+             "Added rlSysNameTable object."
+        REVISION "201204040000Z"
+        DESCRIPTION
+             "Added rlScheduledReload object."
+        REVISION "200902240000Z"
+        DESCRIPTION
+             "Added rlRunningCDBequalToStartupCDB object."
+        REVISION "200710240000Z"
+        DESCRIPTION
+             "Added rlGroupManagement branch."
+        REVISION "200606200000Z"
+        DESCRIPTION
+             "Added rlRebootDelay object"
+        REVISION "200406010000Z"
+        DESCRIPTION
+             "Initial version of this MIB."
+        ::= { switch001 1 }
+
+
+rndSysId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Identification of an switch001 device. The device type for each
+      integer clarifies the sysObjectID in MIB - II."
+    ::= { rndMng 1  }
+
+rndAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+       reset(1),
+       sendNetworkTab(2),
+       deleteNetworkTab(3),
+       sendRoutingTab(4),    -- Level II
+       deleteRoutingTab(5),
+       sendLanTab(6),
+       deleteLanTab(7),
+       deleteArpTab(8),
+       sendArpTab(9),
+       deleteRouteTab(10),   -- Level III
+       sendRouteTab(11),
+       backupSPFRoutingTab(12),
+       backupIPRoutingTab(13),
+       backupNetworkTab(14),
+       backupLanTab(15),
+       backupArpTab(16),
+       backupIPXRipTab(17),
+       backupIPXSAPTab(18),
+       resetStartupCDB(19),
+       eraseStartupCDB(20),
+       deleteZeroHopRoutingAllocTab(21),
+       slipDisconnect(22),
+       deleteDynamicLanTab(23),
+       eraseRunningCDB(24),
+       copyStartupToRunning(25),
+       none(26),
+       resetToFactoryDefaults(27)
+     }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "This variable enables the operator to perform one of the
+      specified actions on the tables maintained by the network device.
+      Send actions require support of proprietery File exchange
+      protocol."
+   ::= { rndMng 2  }
+
+rndFileName OBJECT-TYPE
+    SYNTAX OCTET STRING -- SIZE 256
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The name of the file used internally by switch001 for transferring
+      tables maintained by network devices, using a prorietary File
+      exchange protocol."
+    ::=  { rndMng 3  }
+
+rlSnmpVersionSupported OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the snmp versions that are supported by
+        this device."
+    ::= { rndMng 4 }
+
+rlSnmpMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the snmp support version that is supported by
+        this device."
+    ::= { rndMng 5 }
+
+rlCpuUtilEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables measurement of the device CPU utilization.
+         In order to get real values for rlCpuUtilDuringLastSecond, rlCpuUtilDuringLastMinute
+         and rlCpuUtilDuringLast5Minutes, the value of this object must be true."
+    DEFVAL { true }
+    ::= { rndMng 6 }
+
+rlCpuUtilDuringLastSecond OBJECT-TYPE
+    SYNTAX INTEGER (0..101)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the device CPU utilization during last second.
+         The value 101 is a dummy value, indicating that the CPU utilization was
+         not measured (since measurement is disabled or was disabled during last second)."
+    ::= { rndMng 7 }
+
+rlCpuUtilDuringLastMinute OBJECT-TYPE
+    SYNTAX INTEGER (0..101)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the device CPU utilization during last minute.
+         The value 101 is a dummy value, indicating that the CPU utilization was
+         not measured (since measurement is disabled or was disabled during last minute)."
+    ::= { rndMng 8 }
+
+rlCpuUtilDuringLast5Minutes OBJECT-TYPE
+    SYNTAX INTEGER (0..101)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the device CPU utilization during the last 5 minutes.
+         The value 101 is a dummy value, indicating that the CPU utilization was
+         not measured (since measurement is disabled or was disabled during last 5 minutes)."
+    ::= { rndMng 9 }
+
+rlRebootDelay OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting the variable will cause the device to reboot rlRebootDelay timeticks
+         from the moment this variable was set.
+         If not set, the variable will return a value of 4294967295.
+         If set to 4294967295, reboot action is cancelled.
+         The maximum delay is set by the host parameter: reboot_delay_max"
+    ::= { rndMng 10 }
+
+rlGroupManagement OBJECT IDENTIFIER ::= { rndMng 11 }
+
+rlGroupMngQuery OBJECT-TYPE
+    SYNTAX INTEGER {query(1), idle(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting value query will cause the device to query for UPNP devices on the network.
+         The device will always return value idle for GET."
+    ::= { rlGroupManagement 1 }
+
+rlGroupMngQueryPeriod OBJECT-TYPE
+    SYNTAX      INTEGER
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets desired interval between queries for UPNP devices on the network.
+         Setting 0 will result in no such query.
+         Note that the actual query interval might be less than the set value
+         if another application running in the device requested a shorter interval.
+         Likewise setting 0 will not necessarily stop periodic queries if another
+         application is still interested in periodic polling."
+    DEFVAL { 0 }
+    ::= { rlGroupManagement 2 }
+
+rlGroupMngLastUpdate OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last time rlGroupMng MIB was updated."
+    ::= { rlGroupManagement 3 }
+
+
+rlGroupMngDevicesTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlGroupMngDeviceEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The table showing the discovered  devices."
+     ::= { rlGroupManagement 4 }
+
+rlGroupMngDeviceEntry  OBJECT-TYPE
+
+   SYNTAX RlGroupMngDeviceEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX {  rlGroupMngDeviceIdType, rlGroupMngDeviceId,  rlGroupMngSubdevice }
+
+::= { rlGroupMngDevicesTable 1 }
+
+
+RlGroupMngDeviceEntry ::= SEQUENCE {
+   rlGroupMngDeviceIdType                InetAddressType,
+   rlGroupMngDeviceId                    InetAddress,
+   rlGroupMngSubdevice                   INTEGER,
+   rlGroupMngDeviceDescription           DisplayString,
+   rlGroupMngGroupMngEnabled             TruthValue,
+   rlGroupMngGroupLLDPDeviceId           DisplayString,
+   rlGroupMngDeviceVendor                DisplayString,
+   rlGroupMngDeviceAdvertisedCachingTime  INTEGER,
+   rlGroupMngDeviceLocationURL           DisplayString,
+   rlGroupMngDeviceLastSeen              TimeTicks
+}
+
+rlGroupMngDeviceIdType OBJECT-TYPE
+   SYNTAX     InetAddressType
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The IP address type of the discovered device  "
+     ::=  { rlGroupMngDeviceEntry 1 }
+
+rlGroupMngDeviceId OBJECT-TYPE
+   SYNTAX     InetAddress
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "The IP address of the discovered device  "
+     ::=  { rlGroupMngDeviceEntry 2 }
+
+rlGroupMngSubdevice    OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "A subdevice within the rlGroupMngDeviceId. Only subdevices with greatest
+     specifity will be kept (specific UUID device is more specific than  basic device which is in turn
+     more specific than root device.  "
+     ::=  { rlGroupMngDeviceEntry 3 }
+
+rlGroupMngDeviceDescription OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "The discovery protocol description of the device."
+     ::=  { rlGroupMngDeviceEntry 4 }
+
+
+rlGroupMngGroupMngEnabled           OBJECT-TYPE
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "Indicates whether the device has Group Management enable."
+     ::=  { rlGroupMngDeviceEntry 5 }
+
+rlGroupMngGroupLLDPDeviceId        OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "The LLDP device id. If  it  is empty the device id is not known (either it is a non-MTS device or  a non-LLDP supporting MTS device."
+     ::=  { rlGroupMngDeviceEntry 6 }
+
+rlGroupMngDeviceVendor OBJECT-TYPE
+   SYNTAX     DisplayString
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "The vendor of the device. If empty the vendor is not known."
+     ::=  { rlGroupMngDeviceEntry 7 }
+
+rlGroupMngDeviceAdvertisedCachingTime OBJECT-TYPE
+   SYNTAX     INTEGER
+   UNITS      "seconds"
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+        "The caching time advertised by the device. If no update for this
+         device has been received during this caching time the system will assume
+         that the device has left the network and will therefore remove its entry
+         from the table."
+     ::=  { rlGroupMngDeviceEntry 8 }
+
+rlGroupMngDeviceLocationURL OBJECT-TYPE
+   SYNTAX     DisplayString
+   UNITS      "seconds"
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+        "The URL inidicating the location of the XML presenting the details of  the device."
+     ::=  { rlGroupMngDeviceEntry 9 }
+
+rlGroupMngDeviceLastSeen  OBJECT-TYPE
+   SYNTAX     TimeTicks
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "The value of sysUpTime at the moment of last reception of an  update for
+       this device. "
+     ::=  { rlGroupMngDeviceEntry 10 }
+
+rlRunningCDBequalToStartupCDB OBJECT-TYPE
+
+   SYNTAX     TruthValue
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "Indicates whether there are changes in running CDB that were not saved in flash."
+     ::=  { rndMng 13 }
+
+rlClearMib OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Clear MIB value for scalars or tables:
+     Delete all entries for tables with dynamic entries.
+     Set table entries default values for table with static entries.
+     Set scalar default value."
+    ::=  { rndMng 14  }
+
+-------------------------------------------------------------------------------
+-- Scheduled Reload
+-------------------------------------------------------------------------------
+rlScheduledReload OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used for requesting a delayed reload of the device in a
+        specific desired time, should be configured in one of the following formats:
+        'athhmmddMM' , 'inhhhmmm' or '', setting this value to an empty string
+        will result in request for cancellation of a (previously) committed system reload.
+        to complete the request, the 'rlScheduledReloadCommit' must also be set to either
+        TRUE (apply) or FALSE (discard) for completion of the transaction.
+        failing from doing so will result in an indefinite lock of the API"
+    ::= { rndMng 15 }
+
+rlScheduledReloadPendingDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the most recently requested scheduled-reload due date
+         in 'inhhhmmathhmmssddMMYYYYw' format. where 'w' stands for weekDay (1-7).
+         if there is no pending/scheduled reload request, string will be empty"
+    ::= { rndMng 16 }
+
+rlScheduledReloadApprovedDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the most recently approved/committed scheduled-reload date
+         in 'inhhhmmathhmmssddMMYYYYw' format. where 'w' stands for weekDay (1-7).
+         if there is no committed scheduled-reload , string will be empty"
+    ::= { rndMng 17 }
+
+rlScheduledReloadCommit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "commits the pending scheduled-reload request, and completes the transaction.
+        when this value is set to TRUE, the system is instructed to perform the
+        requested reload operation at the requested date/time
+        as was given in 'rlScheduledReload'.
+        setting this value to FALSE will discard the request."
+    ::= { rndMng 18 }
+
+-------------------------------------------------------------------------------
+-- System Name Configuration Table
+-------------------------------------------------------------------------------
+rlSysNameTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSysNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Holds the current system name configuration."
+    ::= { rndMng 19 }
+
+rlSysNameEntry OBJECT-TYPE
+    SYNTAX RlSysNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The row definition of this table."
+    INDEX { rlSysNameSource,
+            rlSysNameIfIndex }
+    ::= { rlSysNameTable 1 }
+
+RlSysNameEntry ::= SEQUENCE {
+    rlSysNameSource    INTEGER,
+    rlSysNameIfIndex   InterfaceIndex,
+    rlSysNameName      DisplayString (SIZE (0..255)),
+    rlSysNameRowStatus RowStatus
+}
+
+rlSysNameSource OBJECT-TYPE
+    SYNTAX INTEGER {
+        dhcpv6(1),
+        dhcpv4(2),
+        static(3)
+    }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "The system name source. 'static' if defined by user through CLI,
+        'dhcpv6' or 'dhcpv4' if received by DHCP network protocol."
+    DEFVAL  { static }
+    ::=   { rlSysNameEntry 1 }
+
+rlSysNameIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The IfIndex from which the system-name configuration was received,
+         for static entries, value will always be 1."
+    DEFVAL { 1 }
+    ::=   { rlSysNameEntry 2 }
+
+rlSysNameName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "An administratively-assigned name for this managed node.
+         By convention, this is the node's fully-qualified domain
+         name.  If the name is unknown, the value is the zero-length
+         string."
+    ::=   { rlSysNameEntry 3 }
+
+rlSysNameRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status variable, used according to
+         row installation and removal conventions."
+    ::= { rlSysNameEntry 4 }
+
+
+END
+

@@ -1,0 +1,435 @@
+SSH-MIB DEFINITIONS ::= BEGIN
+
+
+-- SSH module MIB      Ver 1.1
+
+-- -------------------------------------------------------------
+-- SSH System Access Control MIB
+-- -------------------------------------------------------------
+
+
+IMPORTS
+ 	IpAddress
+ 	    FROM RFC1155-SMI
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowStatus,DisplayString
+            FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+	privateMgmt     FROM SWPRIMGMT-MIB;
+
+
+swSSHMIB MODULE-IDENTITY
+    LAST-UPDATED "9911220000Z"
+    ORGANIZATION "Working Group"
+    CONTACT-INFO
+        "  "
+    DESCRIPTION
+        "The Secure Shell module MIB."
+    ::= { privateMgmt 5}
+
+swSSHMgmt OBJECT IDENTIFIER ::= { swSSHMIB 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+        
+    swSSHAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the Secure Shell is enable or disable."
+        ::= { swSSHMgmt 1}
+
+    swSSHMaxConnections OBJECT-TYPE
+        SYNTAX  INTEGER (1..3)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the tolerance of connections at the same
+            time."
+        ::= { swSSHMgmt 2}
+        
+    swSSHConnectionTimeout OBJECT-TYPE
+        SYNTAX  INTEGER (1..120)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the value of connection timeout. This 
+            value is in units of seconds."
+        ::= { swSSHMgmt 3}
+   
+    swSSHMaxAuthFailAttempts OBJECT-TYPE
+        SYNTAX  INTEGER (2..20)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the tolerance in times of Authentication
+            failure."
+        ::= { swSSHMgmt 4}
+    swSSHSessionKeyRekeying OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        never(0),
+                        ten-min(10),
+                        thirty-min(30),
+                        sixty-min(60)
+                       }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the time interval in minutes to negotiate
+            new session key for client and server. "
+
+        ::= { swSSHMgmt 5}
+        
+    swSSHPortNumber OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the listened tcp port number."
+        ::= { swSSHMgmt 6}
+        
+    swSSHRegenerateHostKey OBJECT-TYPE
+        SYNTAX  INTEGER {
+               normal(1),
+               active(2)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "As the object is set to active means to regenerate hostkey in
+            SSH server. If set to normal, do nothing."
+        ::= { swSSHMgmt 7}
+
+-- -------------------------------------------------------------
+-- groups in the SSH MIB
+-- -------------------------------------------------------------
+
+
+-- -------------------------------------------------------------
+ swSSHCtrlAlgGroup OBJECT IDENTIFIER ::= { swSSHMIB 2 }
+-- -------------------------------------------------------------
+    swSSHEncryptAlgCtrl OBJECT IDENTIFIER ::= { swSSHCtrlAlgGroup 1 }
+
+    swSSHEncryptAlg3DESAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the TDES encryption algorithm is enable
+            or disable."
+        ::= { swSSHEncryptAlgCtrl 1}
+
+    swSSHEncryptAlgBlowfishAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the Blowfish encryption algorithm is 
+            enable or disable."
+        ::= { swSSHEncryptAlgCtrl 2}
+
+    swSSHEncryptAlgAES128Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the AES128 encryption algorithm is enable
+            or disable."
+        ::= { swSSHEncryptAlgCtrl 3}
+
+    swSSHEncryptAlgAES192Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the AES192 encryption algorithm is enable
+            or disable."
+        ::= { swSSHEncryptAlgCtrl 4}
+
+    swSSHEncryptAlgAES256Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the AES256 encryption algorithm is enable
+            or disable."
+        ::= { swSSHEncryptAlgCtrl 5}
+
+    swSSHEncryptAlgArcfourAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the Arcfour encryption algorithm is 
+            enable or disable."
+        ::= { swSSHEncryptAlgCtrl 6}
+
+    swSSHEncryptAlgCAST128Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the CAST128 encryption algorithm is 
+            enable or disable."
+        ::= { swSSHEncryptAlgCtrl 7}
+
+    swSSHEncryptAlgTwofish128Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the Twofish128 encryption algorithm is
+            enable or disable."
+        ::= { swSSHEncryptAlgCtrl 8}
+
+    swSSHEncryptAlgTwofish192Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the Twofish192 encryption algorithm is
+            enable or disable."
+        ::= { swSSHEncryptAlgCtrl 9}
+
+    swSSHEncryptAlgTwofish256Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the Twofish256 encryption algorithm is
+            enable or disable."
+        ::= { swSSHEncryptAlgCtrl 10}
+
+
+-- ------------------------------------------------------------------
+  swSSHAuthenMethodCtrl OBJECT IDENTIFIER ::= { swSSHCtrlAlgGroup 2 }
+-- ------------------------------------------------------------------
+
+    swSSHAuthenMethodPasswdAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates password authentication enable or 
+            disable."
+        ::= { swSSHAuthenMethodCtrl 1}
+
+    swSSHAuthenMethodPubKeyAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates Public Key authentication enable or 
+            disable."
+        ::= { swSSHAuthenMethodCtrl 2}
+
+    swSSHAuthenMethodHostBaseAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates Host Base authentication enable or 
+            disable."
+        ::= { swSSHAuthenMethodCtrl 3}
+        
+        
+-- ----------------------------------------------------------------
+   swSSHInteAlgCtrl OBJECT IDENTIFIER ::= { swSSHCtrlAlgGroup 3 }
+-- ----------------------------------------------------------------
+    swSSHInteAlgSHA1Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates HMAC-SHA1 algorithm enable or disable
+			."
+        ::= { swSSHInteAlgCtrl 1}
+
+    swSSHInteAlgMD5Admin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates HMAC-MD5 algorithm enable or disable
+			."
+        ::= { swSSHInteAlgCtrl 2}
+
+
+
+-- ------------------------------------------------------------------
+   swSSHPubKeyAlgCtrl OBJECT IDENTIFIER ::= { swSSHCtrlAlgGroup 4 }
+-- ------------------------------------------------------------------
+    swSSHPubKeyAlgDSAAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates DSA algorithm enable or disable
+			."
+        ::= { swSSHPubKeyAlgCtrl 1}
+
+    swSSHPubKeyAlgRSAAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates RSA algorithm enable or disable
+			."
+        ::= { swSSHPubKeyAlgCtrl 2}
+
+
+
+-- -------------------------------------------------------------
+-- swSSHUserCtrlTable OBJECT IDENTIFIER ::= { swSSHMIB 3 }
+-- -------------------------------------------------------------
+
+    swSSHUserCtrlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SwSSHUserCtrlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains information about authentication method lists.."
+        ::= { swSSHMIB 3 }
+        
+    swSSHUserCtrlEntry OBJECT-TYPE
+        SYNTAX SwSSHUserCtrlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of the Authentication methods."
+        INDEX { swSSHUserCtrlUserName }
+        ::= { swSSHUserCtrlTable 1 }
+    
+    SwSSHUserCtrlEntry ::=
+        SEQUENCE {
+            swSSHUserCtrlUserName
+                DisplayString,        
+        	swSSHUserCtrlAuthMode
+    			INTEGER,    	                    
+            swSSHUserCtrlHostName
+                DisplayString,
+            swSSHUserCtrlHostIp
+                IpAddress
+        }
+    
+    swSSHUserCtrlUserName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..15))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the user name."
+        ::= { swSSHUserCtrlEntry 1 }
+    
+    swSSHUserCtrlAuthMode  OBJECT-TYPE
+	    SYNTAX  INTEGER {
+               none(1),
+               publickey(2),
+               password(3),
+               hostbased(4)
+               }
+	    MAX-ACCESS read-write
+	    STATUS     current
+	    DESCRIPTION
+	        "This object indicates user authentication method."
+	    ::= { swSSHUserCtrlEntry 2 }   
+	     
+    
+    swSSHUserCtrlHostName  OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE(0..31))
+	    MAX-ACCESS read-write
+	    STATUS     current
+	    DESCRIPTION
+	        "This object indicates the host domain name. If the 
+	        swSSHUserCtrlAuthMode is not hostbased(4), it must be NULL."
+	    ::= { swSSHUserCtrlEntry 3 }       
+
+    swSSHUserCtrlHostIp OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the host IP address. If the 
+	        swSSHUserCtrlAuthMode is not hostbased(4), it must be 0.0.0.0."
+        ::= { swSSHUserCtrlEntry 4 } 
+
+
+-- -------------------------------------------------------------------------------------
+
+END

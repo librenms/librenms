@@ -1,0 +1,133 @@
+--
+-- Juniper Enterprise Specific MIB: Source Class Usage MIB
+-- 
+-- Copyright (c) 2002-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-SCU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI               -- RFC 2578
+    InterfaceIndex
+        FROM IF-MIB                   -- RFC 2863
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB       -- RFC 2571
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxScu MODULE-IDENTITY
+    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:59 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+    DESCRIPTION
+            "This is Juniper Networks' enterprise-specific MIB for 
+             Source Class Usage (SCU)"
+    REVISION     "200202250000Z"
+    DESCRIPTION
+            "Initial revision"
+    ::= { jnxMibs 16 }
+
+
+    jnxScuStats     OBJECT IDENTIFIER ::= { jnxScu 1 }
+
+    jnxScuStatsTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxScuStatsEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "A list of SCUs entries."
+        ::= { jnxScuStats 1 }
+
+    jnxScuStatsEntry    OBJECT-TYPE
+        SYNTAX      JnxScuStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An entry of SCUs table."
+        INDEX   { jnxScuStatsDstIfIndex, jnxScuStatsAddrFamily, 
+                  jnxScuStatsClassName }
+        ::= { jnxScuStatsTable 1 }
+
+    JnxScuStatsEntry ::=
+        SEQUENCE {
+            jnxScuStatsDstIfIndex       InterfaceIndex,
+            jnxScuStatsAddrFamily       INTEGER,
+            jnxScuStatsClassName        SnmpAdminString,
+            jnxScuStatsPackets          Counter64,
+            jnxScuStatsBytes            Counter64,
+            jnxScuStatsClName           SnmpAdminString
+        }
+
+    jnxScuStatsDstIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The destination interface index.  This is the egress interface 
+                of traffic that is counted by this table entry."
+        ::= { jnxScuStatsEntry 1 }
+
+    jnxScuStatsAddrFamily OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ipv4 (1),
+                        ipv6 (2)
+        }
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+                "The address family of this entry's traffic."
+        ::= { jnxScuStatsEntry 2 }
+
+    jnxScuStatsClassName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..112))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The name of the source class.  All traffic counted in this
+                table entry satisfies the requirements defined by this
+                source class."
+        ::= { jnxScuStatsEntry 3 }
+
+    jnxScuStatsPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of packets sent out of jnxScuStatsDstIfIndex that
+                match the source class (jnxScuStatsClassName) and match
+                the address type (jnxScuStatsAddrFamily) defined for this 
+                table entry."
+        ::= { jnxScuStatsEntry 4 }
+
+    jnxScuStatsBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of bytes sent out of jnxScuStatsDstIfIndex that
+                match the source class (jnxScuStatsClassName) and match
+                the address type (jnxScuStatsAddrFamily) defined for this 
+                table entry."
+        ::= { jnxScuStatsEntry 5 }
+
+    jnxScuStatsClName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE(0..112))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The name of the source class.  This object is a duplicate
+                of jnxScuStatsClassName and is included to satisfy those
+                NM applications that can't extract the class name from the
+                instance portion of the OID."
+        ::= { jnxScuStatsEntry 6 }
+
+END

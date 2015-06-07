@@ -1,0 +1,924 @@
+-- *****************************************************************
+-- CISCO-IETF-PW-MPLS-MIB.my
+--
+-- February 2003, Tim Swanson
+--
+-- Copyright (c) 2003, 2006 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- Made Cisco Proprietary based on IETF draft:
+-- draft-ietf-pwe3-pw-mpls-mib-00.txt
+-- *****************************************************************
+
+CISCO-IETF-PW-MPLS-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS 
+     MODULE-IDENTITY, OBJECT-TYPE,  
+     Unsigned32 
+        FROM SNMPv2-SMI 
+
+     MODULE-COMPLIANCE, OBJECT-GROUP 
+        FROM SNMPv2-CONF 
+
+     RowStatus, StorageType 
+        FROM SNMPv2-TC 
+
+     InterfaceIndexOrZero 
+        FROM IF-MIB 
+
+     MplsTunnelIndex, MplsTunnelInstanceIndex, 
+     MplsLdpIdentifier, MplsLsrIdentifier 
+        FROM MPLS-TC-STD-MIB 
+
+     CpwVcIndexType 
+        FROM CISCO-IETF-PW-TC-MIB 
+
+     cpwVcIndex 
+        FROM CISCO-IETF-PW-MIB 
+
+     ciscoExperiment
+        FROM CISCO-SMI
+  ; 
+
+  cpwVcMplsMIB MODULE-IDENTITY 
+     LAST-UPDATED "200302261200Z"  -- 26 Feb 2003 12:00:00 GMT 
+     ORGANIZATION 
+        "Cisco Systems, Inc."
+     CONTACT-INFO 
+         " 
+          Thomas D. Nadeau 
+          Postal: Cisco Systems, Inc. 
+                  250 Apollo Drive 
+                  Chelmsford, MA 01824 
+          Tel:    +1-978-497-3051 
+          Email:  tnadeau@cisco.com 
+
+          MPLS MIB Development Team
+          Postal: Cisco Systems, Inc.
+                  250 Apollo Drive
+                  Chelmsford, MA 01924
+          Tel:    +1-978-497-3989
+          Email:  ch-mpls-mib-dev@cisco.com
+         " 
+
+     DESCRIPTION 
+         "This MIB complements the CISCO-IETF-PW-MIB for PW operation 
+          over MPLS. 
+         " 
+
+     -- Revision history. 
+     REVISION "200302261200Z"  -- 26 Feb 2003 12:00:00 GMT 
+     DESCRIPTION
+           "Made Cisco proprietary based on the PW-MPLS-MIB.my file
+            extracted from draft-ietf-pwe3-pw-mpls-mib-00.txt
+           "
+
+     REVISION 
+         "200206021200Z"  -- 02 June 2002 12:00:00 EST 
+     DESCRIPTION 
+        "Draft-ietf-pwe3-pw-mpls-mib-00 version. Changes from  
+         previous version: 
+         1) Spliting the mapping table into two tables, one for 
+            Non TE application and one for TE application. 
+         2) Object types alignment with MPLS MIBs. 
+
+        " 
+     REVISION 
+         "200201291200Z"  -- 29 January 2002 12:00:00 EST 
+     DESCRIPTION 
+        "Changes from previous version: 
+         1) Add LDP entity association. 
+         2) Clarify inbound/outbound directions. 
+         3) Simplify indexing of outbound and inbound tables 
+            and providing get next variables. 
+        " 
+     REVISION 
+         "200107111200Z"  -- 7 November 2001 12:00:00 EST 
+     DESCRIPTION 
+        "Changes from previous version: 
+         1) Remove Vc instance from table indexing. 
+         2) Update descriptions of indexing and protection. 
+         3) Remove the need for MPLS-LSR in case of VC only. 
+         4) Change pwVcMplsMplsType to BITS in order to enable 
+            multiple types of outer tunnel. 
+         5) Add ifindex to outer tunnel tables to support vcOnly  
+            option. 
+         6) change naming of outbound, inbound and mapping tables to  
+            reflect addition of VC only port ifindexes. 
+         7) Adapt order of items in mapping table to SNMP convention. 
+        " 
+     REVISION 
+         "200107111200Z"  -- July 11 2001 12:00:00 EST 
+     DESCRIPTION 
+        "draft-zelig-pw-mib-00.txt - initial version" 
+
+     ::= { ciscoExperiment 107 } 
+
+  -- Top-level components of this MIB. 
+
+  -- Traps 
+  cpwVcMplsNotifications OBJECT IDENTIFIER  
+                                ::= { cpwVcMplsMIB 0 } 
+  cpwVcMplsNotifyPrefix  OBJECT IDENTIFIER 
+                                ::= { cpwVcMplsNotifications 0 } 
+  -- Tables, Scalars 
+  cpwVcMplsObjects       OBJECT IDENTIFIER 
+                                ::= { cpwVcMplsMIB 1 } 
+
+  -- Conformance 
+  cpwVcMplsConformance   OBJECT IDENTIFIER  
+                                ::= { cpwVcMplsMIB 2 } 
+
+  -- PW VC MPLS table 
+
+  cpwVcMplsTable   OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcMplsEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "This table specifies information for VC to be carried over  
+          MPLS PSN." 
+     ::= { cpwVcMplsObjects 1 } 
+
+  cpwVcMplsEntry   OBJECT-TYPE 
+     SYNTAX        CpwVcMplsEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+          "A row in this table represents parameters specific to MPLS  
+           PSN for a pseudo wire connection (VC). The row is created  
+           automatically by the local agent if the cpwVcPsnType is  
+           MPLS. It is indexed by cpwVcIndex, which uniquely  
+           identifying a singular connection. 
+          " 
+
+     INDEX  { cpwVcIndex } 
+        ::= { cpwVcMplsTable 1 } 
+
+  CpwVcMplsEntry ::= SEQUENCE { 
+        cpwVcMplsMplsType          BITS, 
+        cpwVcMplsExpBitsMode       INTEGER, 
+        cpwVcMplsExpBits           Unsigned32, 
+        cpwVcMplsTtl               Unsigned32, 
+        cpwVcMplsLocalLdpID        MplsLdpIdentifier, 
+        cpwVcMplsLocalLdpEntityID  Unsigned32, 
+        cpwVcMplsPeerLdpID         MplsLdpIdentifier, 
+        cpwVcMplsStorageType       StorageType 
+     } 
+
+  cpwVcMplsMplsType OBJECT-TYPE  
+     SYNTAX   BITS { 
+         mplsTe    (0), 
+         mplsNonTe (1), 
+         vcOnly    (2) 
+              } 
+     MAX-ACCESS    read-write 
+     STATUS        current 
+     DESCRIPTION 
+          "Set by the operator to indicate the outer tunnel types, if 
+           exists. mplsTe is used if the outer tunnel was set-up by  
+           MPLS-TE, and mplsNonTe is used the outer tunnel was set up 
+           by LDP or manually. Combination of mplsTe and mplsNonTe  
+           may exist in case of outer tunnel protection. 
+           vcOnly is used if there is no outer tunnel label. vcOnly  
+           cannot be combined with mplsNonTe or mplsTe." 
+     ::= { cpwVcMplsEntry 1 } 
+
+  cpwVcMplsExpBitsMode OBJECT-TYPE  
+     SYNTAX   INTEGER { 
+         outerTunnel      (1), 
+         specifiedValue   (2), 
+         serviceDependant (3) 
+              } 
+
+     MAX-ACCESS    read-write 
+     STATUS        current 
+     DESCRIPTION 
+         "Set by the operator to indicate the way the VC shim label 
+          EXP bits are to be determined. The value of outerTunnel(1) 
+          is used where there is an outer tunnel - cpwVcMplsMplsType  
+          is mplsTe or mplsNonTe. Note that in this case there is no 
+          need to mark the VC label with the EXP bits since the VC  
+          label is not visible to the intermediate nodes. 
+          If there is no outer tunnel, specifiedValue(2) indicate  
+          that the value is specified by cpwVcMplsExpBits, and  
+          serviceDependant(3) indicate that the EXP bits are setup  
+          based on a rule specified in the emulated service specific  
+          tables, for example when the EXP bits are a function of  
+          802.1p marking for Ethernet emulated service." 
+     REFERENCE 
+          "martini et al, <draft-martini-l2circuit-encap-mpls.txt>"  
+     DEFVAL { outerTunnel } 
+     ::= { cpwVcMplsEntry 2 } 
+
+  cpwVcMplsExpBits OBJECT-TYPE  
+     SYNTAX     Unsigned32 (0..7) 
+     MAX-ACCESS    read-write 
+     STATUS        current 
+     DESCRIPTION 
+          "Set by the operator to indicate the MPLS EXP bits to be  
+           used on the VC shim label if cpwVcMplsExpBitsMode is   
+           specifiedValue(2), zero otherwise." 
+     DEFVAL { 0 } 
+     ::= { cpwVcMplsEntry 3 } 
+
+  cpwVcMplsTtl OBJECT-TYPE  
+     SYNTAX        Unsigned32 (0..255) 
+     MAX-ACCESS    read-write 
+     STATUS        current 
+     DESCRIPTION 
+          "Set by the operator to indicate the VC TTL bits to be used 
+           on the VC shim label." 
+     REFERENCE 
+          "martini et al, <draft-martini-l2circuit-encap-mpls> "  
+     DEFVAL { 2 } 
+     ::= { cpwVcMplsEntry 4 } 
+
+  cpwVcMplsLocalLdpID OBJECT-TYPE  
+     SYNTAX        MplsLdpIdentifier 
+     MAX-ACCESS    read-write 
+     STATUS        current 
+     DESCRIPTION 
+          "The local LDP identifier of the LDP entity creating 
+           this VC in the local node. As the VC labels are always 
+           set from the per platform label space, the last two octets  
+           in the LDP ID MUST be always both zeros." 
+     REFERENCE 
+          "<draft-ietf-ldp-mib>, 
+           <draft-martini-l2circuit-encap-mpls>. 
+          " 
+     ::= { cpwVcMplsEntry 5 } 
+
+  cpwVcMplsLocalLdpEntityID OBJECT-TYPE  
+     SYNTAX        Unsigned32 
+     MAX-ACCESS    read-write 
+     STATUS        current 
+     DESCRIPTION 
+          "The local LDP Entity index of the LDP entity to be used  
+           for this VC on the local node. Should be set to all zeros  
+           if not used." 
+     REFERENCE 
+          "<draft-ietf-ldp-mib> 
+          " 
+     ::= { cpwVcMplsEntry 6 } 
+
+  cpwVcMplsPeerLdpID OBJECT-TYPE  
+     SYNTAX        MplsLdpIdentifier 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+          "The peer LDP identifier as identified from the LDP  
+           session. Should be zero if not relevant or not known yet." 
+     REFERENCE 
+          "<draft-ietf-ldp-mib>, 
+           <draft-martini-l2circuit-encap-mpls>. 
+          " 
+     ::= { cpwVcMplsEntry 7 } 
+
+  cpwVcMplsStorageType OBJECT-TYPE  
+     SYNTAX                      StorageType 
+     MAX-ACCESS                  read-write 
+     STATUS                      current 
+     DESCRIPTION 
+         "This variable indicates the storage type for this row." 
+     ::= { cpwVcMplsEntry 8 } 
+
+  -- End of PW MPLS VC table 
+
+  -- Pseudo Wire VC MPLS Outbound Tunnel table 
+
+  cpwVcMplsOutboundIndexNext   OBJECT-TYPE 
+     SYNTAX      Unsigned32 (0..4294967295) 
+     MAX-ACCESS     read-only 
+     STATUS         current 
+     DESCRIPTION 
+         "This object contains an appropriate value to 
+          be used for cpwVcMplsOutboundIndex when creating 
+          entries in the cpwVcMplsOutboundTable. The value 
+          0 indicates that no unassigned entries are 
+          available. To obtain the cpwVcMplsOutboundIndex 
+          value for a new entry, the manager issues a 
+          management protocol retrieval operation to obtain 
+          the current value of this object.  After each 
+          retrieval, the agent should modify the value to 
+          the next unassigned index, however the agent MUST 
+          NOT assume such retrieval will be done for each  
+          row created." 
+  ::= { cpwVcMplsObjects 2 } 
+
+  cpwVcMplsOutboundTable   OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcMplsOutboundEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "This table associates VCs using MPLS PSN with the outbound 
+          MPLS tunnels (i.e. toward the PSN) or the physical  
+          interface in case of VC only." 
+     ::= { cpwVcMplsObjects 3 } 
+
+  cpwVcMplsOutboundEntry OBJECT-TYPE 
+     SYNTAX        CpwVcMplsOutboundEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "A row in this table represents a link between PW VC (that 
+          require MPLS tunnels) and MPLS tunnel toward the PSN. 
+          In the case of VC only, it associate the VC with the  
+          interface that shall carry the VC. 
+          This table is indexed by the pwVcIndex and an additional 
+          index enabling multiple rows for the same VC index. 
+
+          At least one entry is created in this table by the operator  
+          for each PW VC that requires MPLS PSN. Note that the first 
+          entry for each VC can be indexed by cpwVcMplsOutboundIndex  
+          equal zero without a need for retrieval of  
+          cpwVcMplsOutboundIndexNext. 
+
+          This table points to the appropriate MPLS MIB. In the case  
+          of MPLS-TE, the 4 variables relevant to the indexing of  
+          a TE MPLS tunnel are set as in Srinivasan, et al, <draft- 
+          ietf-mpls-te-mib>. 
+          In case of Non-TE MPLS (an outer tunnel label assigned by  
+          LDP or manually) the table points to the XC entry in the  
+          LSR MIB as in Srinivasan, et al, <draft-ietf-mpls-lsr-mib>. 
+          In case of VC only (no outer tunnel) the ifIndex of the 
+          port to carry the VC is configured.  
+
+          Each VC may have multiple rows in this tables if protection  
+          is available at the outer tunnel level, each row may be of 
+          different type except for VC only, on which only rows with 
+          ifIndex of the port are allowed. 
+          " 
+
+     INDEX { cpwVcIndex, cpwVcMplsOutboundIndex } 
+
+        ::= { cpwVcMplsOutboundTable 1 } 
+
+  CpwVcMplsOutboundEntry ::= SEQUENCE { 
+        cpwVcMplsOutboundIndex             Unsigned32, 
+        cpwVcMplsOutboundLsrXcIndex        Unsigned32, 
+        cpwVcMplsOutboundTunnelIndex       MplsTunnelIndex, 
+        cpwVcMplsOutboundTunnelInstance    MplsTunnelInstanceIndex, 
+        cpwVcMplsOutboundTunnelLclLSR      MplsLsrIdentifier, 
+        cpwVcMplsOutboundTunnelPeerLSR     MplsLsrIdentifier, 
+        cpwVcMplsOutboundIfIndex           InterfaceIndexOrZero, 
+        cpwVcMplsOutboundRowStatus         RowStatus, 
+        cpwVcMplsOutboundStorageType       StorageType 
+        } 
+
+  cpwVcMplsOutboundIndex OBJECT-TYPE 
+     SYNTAX        Unsigned32 (0..4294967295) 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Arbitrary index for enabling multiple rows per VC in 
+          this table. Next available free index can be retrieved  
+          using cpwVcMplsOutboundIndexNext. 
+          " 
+     ::= { cpwVcMplsOutboundEntry 1 } 
+
+  cpwVcMplsOutboundLsrXcIndex           OBJECT-TYPE 
+     SYNTAX        Unsigned32 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "This object will be set by the operator. If the outer 
+          label is defined in the MPL-LSR-MIB, i.e. set by LDP 
+          or manually, this object points to the XC index  
+          of the outer tunnel. Otherwise, it is set to zero." 
+     ::= { cpwVcMplsOutboundEntry 2 } 
+
+  cpwVcMplsOutboundTunnelIndex         OBJECT-TYPE 
+     SYNTAX                           MplsTunnelIndex 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION 
+          "Part of set of indexes for outbound tunnel in the case of  
+           MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsOutboundEntry  3 }  
+
+  cpwVcMplsOutboundTunnelInstance      OBJECT-TYPE 
+     SYNTAX                           MplsTunnelInstanceIndex 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION 
+          "Part of set of indexes for outbound tunnel in the case of  
+           MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsOutboundEntry   4 }  
+
+  cpwVcMplsOutboundTunnelLclLSR        OBJECT-TYPE 
+     SYNTAX                           MplsLsrIdentifier 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION  
+          "Part of set of indexes for outbound tunnel in the case of  
+           MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsOutboundEntry   5 }  
+
+  cpwVcMplsOutboundTunnelPeerLSR       OBJECT-TYPE 
+     SYNTAX                           MplsLsrIdentifier 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION 
+          "Part of set of indexes for outbound tunnel in the case of  
+           MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsOutboundEntry   6 }  
+
+  cpwVcMplsOutboundIfIndex       OBJECT-TYPE 
+     SYNTAX                           InterfaceIndexOrZero 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION 
+          "In case of VC only (no outer tunnel), this object holds 
+           the ifIndex of the outbound port, otherwise set to zero." 
+     ::= { cpwVcMplsOutboundEntry   7 }  
+
+  cpwVcMplsOutboundRowStatus   OBJECT-TYPE 
+     SYNTAX                      RowStatus 
+     MAX-ACCESS                  read-create 
+     STATUS                      current 
+     DESCRIPTION 
+         "For creating, modifying, and deleting this row." 
+     ::= { cpwVcMplsOutboundEntry   8 } 
+
+  cpwVcMplsOutboundStorageType OBJECT-TYPE 
+     SYNTAX                      StorageType 
+     MAX-ACCESS                  read-create 
+     STATUS                      current 
+     DESCRIPTION 
+         "This variable indicates the storage type for this object." 
+     ::= { cpwVcMplsOutboundEntry   9 } 
+
+  -- End of Pseudo Wire VC MPLS Outbound Tunnel table 
+
+  -- Pseudo Wire VC MPLS Inbound Tunnel table 
+
+  cpwVcMplsInboundIndexNext   OBJECT-TYPE 
+     SYNTAX      Unsigned32 (0..4294967295) 
+     MAX-ACCESS     read-only 
+     STATUS         current 
+     DESCRIPTION 
+         "This object contains an appropriate value to 
+          be used for cpwVcMplsInboundIndex when creating 
+          entries in the cpwVcMplsInboundTable. The value 
+          0 indicates that no unassigned entries are 
+          available. To obtain the cpwVcMplsInboundIndex 
+          value for a new entry, the manager issues a 
+          management protocol retrieval operation to obtain 
+          the current value of this object.  After each 
+          retrieval, the agent should modify the value to 
+          the next unassigned index, however the agent MUST 
+          NOT assume such retrieval will be done for each  
+          row created." 
+  ::= { cpwVcMplsObjects 4 } 
+
+  cpwVcMplsInboundTable   OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF CpwVcMplsInboundEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+        "This table associates VCs using MPLS PSN with the inbound 
+         MPLS tunnels (i.e. for packets coming from the PSN),  
+         if such association is desired (mainly for security  
+         reasons)." 
+     ::= { cpwVcMplsObjects 5 } 
+
+  cpwVcMplsInboundEntry OBJECT-TYPE 
+     SYNTAX        CpwVcMplsInboundEntry 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "A row in this table represents a link between PW VCs (that 
+          require MPLS tunnels) and MPLS tunnel for packets arriving 
+          from the PSN. 
+          This table is indexed by the set of indexes used to 
+          identify the VC - cpwVcIndex and an additional 
+          index enabling multiple rows for the same VC index. 
+
+          Note that the first entry for each VC can be indexed by  
+          cpwVcMplsOutboundIndex equal zero without a need for  
+          retrieval of cpwVcMplsInboundIndexNext. 
+
+          An entry is created in this table either automatically by  
+          the local agent or created manually by the operator in  
+          cases that strict mode is required. 
+
+          Note that the control messages contain VC ID and VC type,  
+          which together with the remote IP address identify the 
+          cpwVcIndex in the local node. 
+          This table points to the appropriate MPLS MIB. In the case  
+          of MPLS-TE, the 4 variables relevant to the indexing of a 
+          TE MPLS tunnel are set as in Srinivasan, et al, <draft- 
+          ietf-mpls-te-mib>. 
+
+          In case of non-TE MPLS tunnel (an outer tunnel label  
+          assigned by LDP or manually) the table points to the XC  
+          entry in the MPLS-LSR-MIB as in Srinivasan, et al, <draft- 
+          ietf-mpls-lsr-mib>. 
+
+          Each VC may have multiple rows in this tables if protection  
+          is available at the outer tunnel level, each row may be of 
+          different type except for VC only, on which only rows with 
+          ifIndex of the port are allowed. 
+         " 
+
+     INDEX  { cpwVcIndex, cpwVcMplsInboundIndex } 
+
+        ::= { cpwVcMplsInboundTable 1 } 
+
+  CpwVcMplsInboundEntry ::= SEQUENCE { 
+        cpwVcMplsInboundIndex               Unsigned32, 
+        cpwVcMplsInboundLsrXcIndex          Unsigned32, 
+        cpwVcMplsInboundTunnelIndex         MplsTunnelIndex, 
+        cpwVcMplsInboundTunnelInstance      MplsTunnelInstanceIndex, 
+        cpwVcMplsInboundTunnelLclLSR        MplsLsrIdentifier, 
+        cpwVcMplsInboundTunnelPeerLSR       MplsLsrIdentifier, 
+        cpwVcMplsInboundIfIndex             InterfaceIndexOrZero, 
+        cpwVcMplsInboundRowStatus           RowStatus, 
+        cpwVcMplsInboundStorageType         StorageType 
+       } 
+
+  cpwVcMplsInboundIndex OBJECT-TYPE 
+     SYNTAX        Unsigned32 (0..4294967295) 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Arbitrary index for enabling multiple rows per VC in 
+          this table. Next available free index can be retrieved 
+          using cpwVcMplsInboundIndexNext. 
+          " 
+     ::= { cpwVcMplsInboundEntry 1 } 
+
+  cpwVcMplsInboundLsrXcIndex OBJECT-TYPE 
+     SYNTAX        Unsigned32 
+     MAX-ACCESS    read-create 
+     STATUS        current 
+     DESCRIPTION 
+         "If the outer label is defined in the MPL-LSR-MIB, i.e. set  
+          by LDP or manually, this object points to the XC index  
+          of the outer tunnel. Otherwise, it is set to zero." 
+     ::= { cpwVcMplsInboundEntry 2 } 
+
+  cpwVcMplsInboundTunnelIndex         OBJECT-TYPE 
+     SYNTAX                           MplsTunnelIndex 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION 
+         "Part of set of indexes for outbound tunnel in the case of  
+          MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsInboundEntry  3 }  
+
+  cpwVcMplsInboundTunnelInstance      OBJECT-TYPE 
+     SYNTAX                           MplsTunnelInstanceIndex 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION 
+         "Part of set of indexes for outbound tunnel in the case of  
+          MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsInboundEntry   4 }  
+
+  cpwVcMplsInboundTunnelLclLSR        OBJECT-TYPE 
+     SYNTAX                           MplsLsrIdentifier 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION  
+         "Part of set of indexes for outbound tunnel in the case of  
+          MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsInboundEntry   5 }  
+
+  cpwVcMplsInboundTunnelPeerLSR       OBJECT-TYPE 
+     SYNTAX                           MplsLsrIdentifier 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION  
+         "Part of set of indexes for outbound tunnel in the case of  
+          MPLS-TE outer tunnel, otherwise set to zero." 
+     ::= { cpwVcMplsInboundEntry   6 }  
+
+  cpwVcMplsInboundIfIndex              OBJECT-TYPE 
+     SYNTAX                           InterfaceIndexOrZero 
+     MAX-ACCESS                       read-create 
+     STATUS                           current 
+     DESCRIPTION 
+         "In case of VC only (no outer tunnel), this object holds the 
+          ifIndex of the inbound port, otherwise set to zero." 
+     ::= { cpwVcMplsInboundEntry   7 }  
+
+  cpwVcMplsInboundRowStatus   OBJECT-TYPE 
+     SYNTAX                      RowStatus 
+     MAX-ACCESS                  read-create 
+     STATUS                      current 
+     DESCRIPTION 
+         "For creating, modifying, and deleting this row." 
+     ::= { cpwVcMplsInboundEntry   8 } 
+
+  cpwVcMplsInboundStorageType OBJECT-TYPE 
+     SYNTAX                      StorageType 
+     MAX-ACCESS                  read-create 
+     STATUS                      current 
+     DESCRIPTION 
+         "This variable indicates the storage type for this row." 
+     ::= { cpwVcMplsInboundEntry   9 } 
+
+  -- End of Pseudo Wire VC MPLS Inbound Tunnel table 
+
+  -- MPLS to VC Mapping Tables. 
+
+  cpwVcMplsNonTeMappingTable OBJECT-TYPE  
+     SYNTAX           SEQUENCE OF CpwVcMplsNonTeMappingEntry 
+     MAX-ACCESS       not-accessible 
+     STATUS           current 
+     DESCRIPTION 
+         "This table maps an inbound/outbound Tunnel to a VC in non- 
+          TE applications." 
+     ::= { cpwVcMplsObjects 6 } 
+
+  cpwVcMplsNonTeMappingEntry OBJECT-TYPE 
+     SYNTAX           CpwVcMplsNonTeMappingEntry 
+     MAX-ACCESS       not-accessible 
+     STATUS           current 
+     DESCRIPTION 
+          "A row in this table represents the association 
+           between the PW VC and it's non TE MPLS outer Tunnel 
+           it's physical interface if there is no outer tunnel  
+           (VC only). 
+
+           An application can use this table to quickly retrieve the  
+           PW carried over specific non-TE MPLS outer tunnel or  
+           physical interface. 
+
+           The table in indexed by the XC index for MPLS Non-TE  
+           tunnel, or ifIndex of the port in VC only case, the  
+           direction of the VC in the specific entry and the VCIndex. 
+
+           The same table is used in both inbound and outbound 
+           directions, but in a different row for each direction. If  
+           the inbound association is not known, no rows should exist  
+           for it. 
+
+           Rows are created by the local agent when all the  
+           association data is available for display." 
+
+     INDEX  { cpwVcMplsNonTeMappingTunnelDirection, 
+              cpwVcMplsNonTeMappingXcTunnelIndex, 
+              cpwVcMplsNonTeMappingIfIndex, 
+              cpwVcMplsNonTeMappingVcIndex } 
+
+        ::= { cpwVcMplsNonTeMappingTable 1 } 
+
+  CpwVcMplsNonTeMappingEntry ::= SEQUENCE { 
+        cpwVcMplsNonTeMappingTunnelDirection   INTEGER, 
+        cpwVcMplsNonTeMappingXcTunnelIndex     Unsigned32, 
+        cpwVcMplsNonTeMappingIfIndex           InterfaceIndexOrZero, 
+        cpwVcMplsNonTeMappingVcIndex           CpwVcIndexType 
+     } 
+
+  cpwVcMplsNonTeMappingTunnelDirection OBJECT-TYPE 
+     SYNTAX        INTEGER  { 
+        outbound (1), -- From the PE toward the PSN 
+        inbound  (2)  -- From the PSN into the PE 
+     } 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Identifies if the row represent an outbound or inbound  
+          mapping." 
+     ::= { cpwVcMplsNonTeMappingEntry 1 } 
+
+  cpwVcMplsNonTeMappingXcTunnelIndex OBJECT-TYPE 
+     SYNTAX        Unsigned32 (0..4294967295) 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Index for the conceptual XC row identifying Tunnel to VC  
+          mappings when the outer tunnel is created by the MPLS-LSR- 
+          MIB, Zero otherwise." 
+     ::= { cpwVcMplsNonTeMappingEntry 2 } 
+
+  cpwVcMplsNonTeMappingIfIndex  OBJECT-TYPE 
+     SYNTAX        InterfaceIndexOrZero 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Identify the port on which the VC is carried for VC only  
+          case." 
+     ::= { cpwVcMplsNonTeMappingEntry 3 } 
+
+  cpwVcMplsNonTeMappingVcIndex  OBJECT-TYPE 
+     SYNTAX        CpwVcIndexType 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "The value that represent the VC in the cpwVcTable." 
+     ::= { cpwVcMplsNonTeMappingEntry 4 } 
+
+  -- End of Non-TE MPLS Tunnel to VC Mapping Table 
+
+  cpwVcMplsTeMappingTable OBJECT-TYPE  
+     SYNTAX           SEQUENCE OF CpwVcMplsTeMappingEntry 
+     MAX-ACCESS       not-accessible 
+     STATUS           current 
+     DESCRIPTION 
+         "This table maps an inbound/outbound Tunnel to a VC in  
+          MPLS-TE applications." 
+     ::= { cpwVcMplsObjects 7 } 
+
+  cpwVcMplsTeMappingEntry OBJECT-TYPE 
+     SYNTAX           CpwVcMplsTeMappingEntry 
+     MAX-ACCESS       not-accessible 
+     STATUS           current 
+     DESCRIPTION 
+          "A row in this table represents the association 
+           between a PW VC and it's MPLS-TE outer Tunnel. 
+
+           An application can use this table to quickly retrieve the  
+           PW carried over specific TE MPLS outer tunnel. 
+
+           The table in indexed by the 4 indexes of a TE tunnel, 
+           the direction of the VC specific entry and the VcIndex. 
+
+           The same table is used in both inbound and outbound 
+           directions, a different row for each direction. If the  
+           inbound association is not known, no rows should exist for  
+           it. 
+
+           Rows are created by the local agent when all the  
+           association data is available for display." 
+
+     INDEX  { cpwVcMplsTeMappingTunnelDirection, 
+              cpwVcMplsTeMappingTunnelIndex,  
+              cpwVcMplsTeMappingTunnelInstance, 
+              cpwVcMplsTeMappingTunnelPeerLsrID, 
+              cpwVcMplsTeMappingTunnelLocalLsrID, 
+              cpwVcMplsTeMappingVcIndex } 
+
+        ::= { cpwVcMplsTeMappingTable 1 } 
+
+  CpwVcMplsTeMappingEntry ::= SEQUENCE { 
+        cpwVcMplsTeMappingTunnelDirection   INTEGER, 
+        cpwVcMplsTeMappingTunnelIndex       MplsTunnelIndex, 
+        cpwVcMplsTeMappingTunnelInstance    MplsTunnelInstanceIndex, 
+        cpwVcMplsTeMappingTunnelPeerLsrID   MplsLsrIdentifier, 
+        cpwVcMplsTeMappingTunnelLocalLsrID  MplsLsrIdentifier, 
+        cpwVcMplsTeMappingVcIndex           CpwVcIndexType 
+     } 
+
+  cpwVcMplsTeMappingTunnelDirection OBJECT-TYPE 
+     SYNTAX        INTEGER  { 
+        outbound (1), -- From the PE toward the PSN 
+        inbound  (2)  -- From the PSN into the PE 
+     } 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Identifies if the row represent an outbound or inbound  
+          mapping." 
+     ::= { cpwVcMplsTeMappingEntry 1 } 
+
+  cpwVcMplsTeMappingTunnelIndex OBJECT-TYPE 
+     SYNTAX        MplsTunnelIndex 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Primary index for the conceptual row identifying the  
+          MPLS-TE tunnel." 
+     ::= { cpwVcMplsTeMappingEntry 2 } 
+
+  cpwVcMplsTeMappingTunnelInstance OBJECT-TYPE 
+     SYNTAX        MplsTunnelInstanceIndex 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Identifies an instance of the MPLS-TE tunnel." 
+     ::= { cpwVcMplsTeMappingEntry 3 } 
+
+  cpwVcMplsTeMappingTunnelPeerLsrID  OBJECT-TYPE 
+     SYNTAX        MplsLsrIdentifier 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Identifies an Peer LSR when the outer tunnel is MPLS-TE  
+          based." 
+     ::= { cpwVcMplsTeMappingEntry 4 } 
+
+  cpwVcMplsTeMappingTunnelLocalLsrID  OBJECT-TYPE 
+     SYNTAX        MplsLsrIdentifier 
+     MAX-ACCESS    not-accessible 
+     STATUS        current 
+     DESCRIPTION 
+         "Identifies the local LSR." 
+     ::= { cpwVcMplsTeMappingEntry 5 } 
+
+  cpwVcMplsTeMappingVcIndex  OBJECT-TYPE 
+     SYNTAX        CpwVcIndexType 
+     MAX-ACCESS    read-only 
+     STATUS        current 
+     DESCRIPTION 
+         "The value that represent the VC in the cpwVcTable." 
+     ::= { cpwVcMplsTeMappingEntry 6 } 
+
+  -- End of TE MPLS Tunnel to VC Mapping Table 
+
+  -- Notifications - PW over MPLS - FFS 
+  -- End of notifications. 
+
+  -- conformance information 
+
+     -- Note: Conformance at the object access and values level is  
+     -- still FFS, therefore current conformance is defined at the 
+     -- object existence level only. 
+
+  cpwVcMplsGroups      OBJECT IDENTIFIER ::= { cpwVcMplsConformance 1 } 
+  cpwVcMplsCompliances OBJECT IDENTIFIER ::= { cpwVcMplsConformance 2 } 
+
+  cpwMplsModuleCompliance MODULE-COMPLIANCE 
+      STATUS  current 
+      DESCRIPTION 
+              "The compliance statement for agent that support PW  
+               over MPLS PSN operation." 
+
+      MODULE  -- this module 
+          MANDATORY-GROUPS { cpwVcMplsGroup, 
+                             cpwVcMplsOutboundGroup, 
+                             cpwVcMplsMappingGroup 
+                           } 
+
+          GROUP       cpwVcMplsInboundGroup 
+          DESCRIPTION 
+              "This group is mandatory for those PE that support PW  
+               over MPLS PSN." 
+
+      ::= { cpwVcMplsCompliances 1 } 
+
+  -- Units of conformance. 
+
+  cpwVcMplsGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcMplsMplsType, 
+              cpwVcMplsExpBitsMode, 
+              cpwVcMplsExpBits, 
+              cpwVcMplsTtl, 
+              cpwVcMplsLocalLdpID, 
+              cpwVcMplsLocalLdpEntityID, 
+              cpwVcMplsPeerLdpID, 
+              cpwVcMplsStorageType 
+            } 
+
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects needed for PW VC 
+             over MPLS PSN configuration." 
+     ::= { cpwVcMplsGroups 1 } 
+
+  cpwVcMplsOutboundGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcMplsOutboundIndexNext, 
+              cpwVcMplsOutboundLsrXcIndex, 
+              cpwVcMplsOutboundTunnelIndex, 
+              cpwVcMplsOutboundTunnelInstance, 
+              cpwVcMplsOutboundTunnelLclLSR, 
+              cpwVcMplsOutboundTunnelPeerLSR, 
+              cpwVcMplsOutboundIfIndex, 
+              cpwVcMplsOutboundRowStatus, 
+              cpwVcMplsOutboundStorageType 
+            } 
+
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects needed for outbound association of  
+             VC and MPLS tunnel." 
+     ::= { cpwVcMplsGroups 2 } 
+
+  cpwVcMplsInboundGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcMplsInboundIndexNext, 
+              cpwVcMplsInboundLsrXcIndex, 
+              cpwVcMplsInboundTunnelIndex, 
+              cpwVcMplsInboundTunnelInstance, 
+              cpwVcMplsInboundTunnelLclLSR, 
+              cpwVcMplsInboundTunnelPeerLSR, 
+              cpwVcMplsInboundIfIndex, 
+              cpwVcMplsInboundRowStatus, 
+              cpwVcMplsInboundStorageType 
+            } 
+
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects needed for inbound association of  
+             VC and MPLS tunnel. This group is mandatory if strict  
+             mode is implemented." 
+     ::= { cpwVcMplsGroups 3 } 
+
+  cpwVcMplsMappingGroup OBJECT-GROUP  
+     OBJECTS { 
+              cpwVcMplsNonTeMappingVcIndex, 
+              cpwVcMplsTeMappingVcIndex 
+            } 
+
+     STATUS  current 
+     DESCRIPTION 
+            "Collection of objects used for mapping of tunnels and VC 
+             labels to VC index." 
+     ::= { cpwVcMplsGroups 4 } 
+
+END

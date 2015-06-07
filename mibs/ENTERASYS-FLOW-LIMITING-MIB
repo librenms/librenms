@@ -1,0 +1,1157 @@
+ENTERASYS-FLOW-LIMITING-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-flow-limiting-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Flow Limiting MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright November, (2003-2004) Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TimeTicks, Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, ifName
+        FROM IF-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysFlowLimitingMIB MODULE-IDENTITY
+    LAST-UPDATED "200407261916Z"  -- Mon Jul 26 19:16 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines the portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to
+         the Flow Limiting feature."
+
+    REVISION "200407261916Z"  -- Mon Jul 26 19:16 GMT 2004
+    DESCRIPTION
+        "Added the ifName object to all of the Notifications."
+
+    REVISION "200402051449Z"  -- Thu Feb  5 14:49 GMT 2004
+    DESCRIPTION
+        "Added the etsysFlowLimitingIntfFlowProcessingLayer object to
+         indicate the highest OSI layer at which flows are processed."
+
+    REVISION "200401271856Z"  -- Tue Jan 27 18:56 GMT 2004
+    DESCRIPTION
+        "Added additional descriptive text to the FlowLmtIntfClass
+         textual convention and modified, enhanced, or corrected the
+         description clauses for a number of other objects."
+
+    REVISION "200311201834Z"  -- Thu Nov 20 18:34 GMT 2003
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 43 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+FlowLmtIntfClass ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The classes of interfaces, or ports, available under the
+         Flow Limiting feature.
+         
+         userPort
+             A port with a single user (workstation, PC, etc.)
+             attached to it.
+ 
+         serverPort
+             A port with a server attached to it.  This class may
+             encompass a wide range of server types from a small
+             workgroup print server to an enterprise exchange
+             server.  Alternately, an administrator may choose to
+             configure an interface with a small print server as
+             a userPort since their flow setup needs may be
+             similar to that of a user port.
+ 
+         aggregatedUserPort
+             A port likely to have multiple end stations attached
+             either through a wireless access point or an
+             unmanaged low cost hub or switch.   It is expected that
+             this class may also be used instead of interSwitchLink
+             when switches are interconnected using a lower
+             speed link.
+ 
+         interSwitchLink
+             A port that is used as a high-speed interconnect
+             between two intelligent switches or routers.
+ 
+         Unspecified
+             A port in which nothing can be assumed about its
+             intended use.
+         
+         These classes are only guides.  The classes can be configured
+         with any limits, and any interface can associated with any
+         class."
+    SYNTAX INTEGER {
+        userPort(1),
+        serverPort(2),
+        aggregatedUserPort(3),
+        interSwitchLink(4),
+        unspecified(5)
+    }
+
+FlowLmtIntfAction ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The possible actions that the Flow Limiting feature can
+         take when flow activity exceeds the associated action
+         limits.
+
+           generateNotification(0)
+             - Generate the respective SNMP notification.
+
+           dropExcessFlows(1)
+             - Drop flow setup requests in excess of the configured
+               limit and discard the associated packets.  The use of
+               this option could cause the entity to repetitively
+               process setup requests for the dropped flows.  The
+               process of dropping flow setup requests and their
+               associated packets could cause end stations attached
+               to this interface to behave in an indeterminate manner.
+               The use of this option may also prevent the entity from
+               being able to count additional flows and from reaching
+               any additional configured limit.
+
+           createDiscardFlows(2)
+             - Create discard flows and discard the associated packets.
+               The use of this option could cause end stations attached
+               to this interface to behave in an indeterminate manner.
+
+           disableInterface(3)
+             - Operationally disable the interface, ifOperStatus for
+               the interface MUST go into the 'down' state, and MUST
+               remain in that state until the associated
+               etsysFlowLimitingIntfStatus is set to operational, the
+               Flow Limiting feature is disabled, or the entity is
+               reset.
+
+         The 'generateNotification(0)' will always be performed if
+         it is a selected action, is globally enabled, and does not
+         exceed the global rate limit for such notifications.  It
+         MUST be generated in such a way that the information in the
+         notification indicates the condition on the interface after
+         any other indicated action has been taken.  If one or more
+         other actions are selected only the one with the highest
+         precedence will be taken.  The order of precedence, from
+         highest to lowest, of the actions are 'disableInterface',
+         'createDiscardFlows', and finally 'dropExcessFlows'.  If
+         etsysFlowLimitingSystemInterfaceShutdown is disabled the
+         selected action with the next highest precedence will be
+         taken."
+    SYNTAX BITS {
+        generateNotification(0),
+        dropExcessFlows(1),
+        createDiscardFlows(2),
+        disableInterface(3)
+    }
+
+FlowLmtIntfLayer ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "A shorthand listing of OSI layers that may be used in
+         processing flows on an interface."
+    SYNTAX INTEGER {
+        none(1),
+        l2(2),
+        l3(3),
+        l4(4)
+    }
+
+-- -------------------------------------------------------------
+-- Branches of the Enterasys Flow Limiting MIB
+-- -------------------------------------------------------------
+
+etsysFlowLimitingObjects
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingMIB 1 }
+
+etsysFlowLimitingSystemBranch
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingObjects 1 }
+
+etsysFlowLimitingClassBranch
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingObjects 2 }
+
+etsysFlowLimitingInterfaceBranch
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingObjects 3 }
+
+etsysFlowLimitingNotificationBranch
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingObjects 0 }
+
+
+-- -------------------------------------------------------------
+-- Flow Limiting System Branch
+-- -------------------------------------------------------------
+
+etsysFlowLimitingSystemState  OBJECT-TYPE
+    SYNTAX        EnabledStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The current state of the active part of the Flow Limiting
+         feature.
+
+         enabled  (1) - All aspects of Flow Limiting are operational.
+
+         disabled (2) - Flow Limiting is configurable but no actions
+                        are taken, no notifications are generated
+                        and no interfaces will be disabled.
+                        All statistical information is still gathered
+                        and available.
+
+         When this object is set to disabled the Flow Limiting feature
+         MUST release its control on all interfaces.  Any interfaces
+         that had been operationally held in the 'down' state MUST be
+         allowed to attain their currently correct operational state.
+
+         Any flows created by the Flow Limiting feature MUST be removed.
+
+         Maintaining the value of this object across agent reboots is
+         REQUIRED."
+    DEFVAL { disabled }
+    ::= { etsysFlowLimitingSystemBranch 1 }
+
+etsysFlowLimitingSystemSnmpNotifications  OBJECT-TYPE
+    SYNTAX        EnabledStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The current state of the SNMP Notification functionality in
+         the Flow Limiting feature.
+
+         enabled  (1) - Flow Limiting will generate SNMP Notifications
+                        for flow counts and setup rates that exceed the
+                        configured limits.  The Flow Limiting feature
+                        MUST be enabled for SNMP Notifications to be
+                        generated.
+
+         disabled (2) - Flow Limiting will not generate SNMP
+                        Notifications under any conditions.
+
+         A notification is generated when a value is first detected
+         above its respective configured limit.  That notification
+         MUST NOT be generated again until the respective value has
+         transitioned through its respective limit in both directions.
+
+         Agents are not required to generate SNMP Notifications for
+         conditions that exist when this object is set to enabled.
+         SNMP Notifications MAY only be generated after additional
+         flow setups are detected that exceed the configured limits
+         on that interface.
+
+         Maintaining the value of this object across agent reboots is
+         REQUIRED."
+    DEFVAL { enabled }
+    ::= { etsysFlowLimitingSystemBranch 2 }
+
+etsysFlowLimitingSystemInterfaceShutdown  OBJECT-TYPE
+    SYNTAX        EnabledStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The current state of the interface shutdown functionality in
+         the Flow Limiting feature.
+
+         enabled  (1) - Flow Limiting will shutdown an interface when
+                        the conditions on that interface exceed the
+                        configured values, one of the specified actions
+                        is to disable the interface, and the Flow
+                        Limiting feature is enabled.
+
+         disabled (2) - Flow Limiting will not shutdown any interface
+                        under any conditions.
+
+         When this object is set to disabled the Flow Limiting feature
+         MUST release its control on all interfaces.  Any interfaces
+         that had been operationally held in the 'down' state MUST be
+         allowed to attain their currently correct operational state.
+
+         Agents are not required to shutdown interfaces for conditions
+         that exist when this object is set to enabled.  Interfaces
+         MAY only be shutdown after additional flow setups are detected
+         that exceed the configured limits on that interface.
+
+         Maintaining the value of this object across agent reboots is
+         REQUIRED."
+    DEFVAL { disabled }
+    ::= { etsysFlowLimitingSystemBranch 3 }
+
+etsysFlowLimitingSystemNotificationInterval  OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The number of seconds to wait before generating another
+         notification of the same type for the same interface.
+         This allows notification generation to be throttled in
+         the case of a flow counter or rate that is repeatedly
+         transitioning across a threshold.  A value of zero
+         indicates that the entity should not suppress any
+         notifications related to the Flow Limiting feature.
+         Maintaining the value of this object across agent reboots
+         is REQUIRED."
+    DEFVAL { 120 }
+    ::= { etsysFlowLimitingSystemBranch 4 }
+
+etsysFlowLimitingSystemClearStats            OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When set to true(1) the following objects in all rows of
+         the etsysFlowLimitingInterfaceTable MUST be set to zero:
+
+           etsysFlowLimitingIntfFlowCountMaxTime
+           etsysFlowLimitingIntfFlowCountEvents
+
+           etsysFlowLimitingIntfSetupRateMax
+           etsysFlowLimitingIntfSetupRateMaxTime
+           etsysFlowLimitingIntfSetupRateCurrent
+           etsysFlowLimitingIntfSetupRateEvents
+
+         and the etsysFlowLimitingIntfFlowCountMax objects MUST be
+         set to the value of their respective
+         etsysFlowLimitingIntfFlowCountCurrent objects.
+
+         Setting this object to false(2) will have no effect.
+         When read this object will always return false(2).
+         Maintaining the value of this object across agent reboots
+         is NOT RECOMMENDED."
+    ::= { etsysFlowLimitingSystemBranch 5 }
+
+etsysFlowLimitingSystemMaxSupportedFlowCount OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "flows"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of flows supported on this entity."
+    ::= { etsysFlowLimitingSystemBranch 6 }
+
+etsysFlowLimitingSystemMaxSupportedSetupRate OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "flows/second"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum flow setup rate supported on this entity."
+    ::= { etsysFlowLimitingSystemBranch 7 }
+
+
+-- -------------------------------------------------------------
+-- Flow Limiting Class Configuration Branch
+-- -------------------------------------------------------------
+
+etsysFlowLimitingClassTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysFlowLimitingClassEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Provides for the configuration of the Flow Limiting features
+         various interface classes.
+
+         Maintaining the value of the objects in this table across
+         agent reboots is REQUIRED."
+    ::= { etsysFlowLimitingClassBranch 1 }
+
+etsysFlowLimitingClassEntry OBJECT-TYPE
+    SYNTAX        EtsysFlowLimitingClassEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Provides an override to the default thresholds configured
+         for the interface class corresponding to the row.  This
+         table MUST be populated with default values that are
+         reasonable for the entity.  The default values for all
+         leaves in the 'unspecified' class MUST be zero."
+    INDEX { etsysFlowLimitingClassType }
+    ::= { etsysFlowLimitingClassTable 1 }
+
+EtsysFlowLimitingClassEntry::=
+    SEQUENCE {
+        etsysFlowLimitingClassType                    FlowLmtIntfClass,
+        etsysFlowLimitingClassFlowCountActionLimit1   Unsigned32,
+        etsysFlowLimitingClassFlowCountActionTaken1   FlowLmtIntfAction,
+        etsysFlowLimitingClassFlowCountActionLimit2   Unsigned32,
+        etsysFlowLimitingClassFlowCountActionTaken2   FlowLmtIntfAction,
+        etsysFlowLimitingClassSetupRateNotifyLimit    Unsigned32,
+        etsysFlowLimitingClassSetupRateActionLimit    Unsigned32,
+        etsysFlowLimitingClassSetupRateActionTaken    FlowLmtIntfAction
+    }
+
+etsysFlowLimitingClassType                  OBJECT-TYPE
+    SYNTAX        FlowLmtIntfClass
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The class of interface that this row represents."
+    ::= { etsysFlowLimitingClassEntry 1 }
+
+etsysFlowLimitingClassFlowCountActionLimit1 OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "flows"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When the number of active flows on an associated interface
+         reaches this level the Flow Limiting feature will invoke
+         the action(s) specified by the
+         etsysFlowLimitingClassFlowCountActionTaken1 object.  A value
+         of zero indicates that this limit is disabled.  While this
+         limit is disabled the associated action MUST NOT be taken."
+    ::= { etsysFlowLimitingClassEntry 2 }
+ 
+etsysFlowLimitingClassFlowCountActionTaken1 OBJECT-TYPE
+    SYNTAX        FlowLmtIntfAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The action(s) to be taken on an associated interface when
+         the number of active flows on that interface reach the
+         value of etsysFlowLimitingClassFlowCountActionLimit1."
+    ::= { etsysFlowLimitingClassEntry 3 }
+ 
+etsysFlowLimitingClassFlowCountActionLimit2 OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "flows"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When the number of active flows on an associated interface
+         reaches this level the Flow Limiting feature will invoke
+         the action(s) specified by the
+         etsysFlowLimitingClassFlowCountActionTaken2 object.  A value
+         of zero indicates that this limit is disabled.  While this
+         limit is disabled the associated action MUST NOT be taken."
+    ::= { etsysFlowLimitingClassEntry 4 }
+ 
+etsysFlowLimitingClassFlowCountActionTaken2 OBJECT-TYPE
+    SYNTAX        FlowLmtIntfAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The action(s) to be taken on an associated interface when
+         the number of active flows on that interface reach the
+         value of etsysFlowLimitingClassFlowCountActionLimit2."
+    ::= { etsysFlowLimitingClassEntry 5 }
+ 
+etsysFlowLimitingClassSetupRateNotifyLimit  OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "flows/second"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The flow setup rate on an associated interface at which the
+         Flow Limiting feature will generate an
+         etsysFlowlimitingSetupRateNotifyLimit notification.  A value
+         of zero indicates that this limit is disabled.  While this
+         limit is disabled the associated notification MUST NOT be
+         generated."
+    ::= { etsysFlowLimitingClassEntry 6 }
+
+etsysFlowLimitingClassSetupRateActionLimit  OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..4294967295)
+    UNITS         "flows/second"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The flow setup rate on an associated interface at which the
+         Flow Limiting feature will invoke the action(s) specified by
+         the etsysFlowLimitingClassSetupRateActionTaken object.  A
+         value of zero indicates that this limit is disabled.  While
+         this limit is disabled the associated action MUST NOT be
+         taken."
+    ::= { etsysFlowLimitingClassEntry 7 }
+
+etsysFlowLimitingClassSetupRateActionTaken  OBJECT-TYPE
+    SYNTAX        FlowLmtIntfAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The action(s) to be taken on an associated interface when
+         the flow setup rate on that interface reachs the value of
+         the etsysFlowLimitingClassSetupRateActionLimit object."
+    ::= { etsysFlowLimitingClassEntry 8 }
+ 
+
+-- -------------------------------------------------------------
+-- Flow Limiting Interface Table
+-- -------------------------------------------------------------
+
+etsysFlowLimitingInterfaceTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysFlowLimitingInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table that provides for the configuration, status,
+         and statistics related to, the Flow Limiting feature
+         on a per interface basis."
+    ::= { etsysFlowLimitingInterfaceBranch 1 }
+
+etsysFlowLimitingInterfaceEntry OBJECT-TYPE
+    SYNTAX        EtsysFlowLimitingInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The configuration, status, and statistics related to,
+         the Flow Limiting feature for an individual interface."
+    INDEX { ifIndex }
+    ::= { etsysFlowLimitingInterfaceTable 1 }
+
+EtsysFlowLimitingInterfaceEntry::=
+    SEQUENCE {
+        etsysFlowLimitingIntfClassType                FlowLmtIntfClass,
+        etsysFlowLimitingIntfFlowLimitingState        EnabledStatus,
+        etsysFlowLimitingIntfStatus                   INTEGER,
+        etsysFlowLimitingIntfReason                   INTEGER,
+        etsysFlowLimitingIntfClearStats               TruthValue,
+
+        etsysFlowLimitingIntfFlowCountCurrent         Gauge32,
+        etsysFlowLimitingIntfFlowCountMax             Gauge32,
+        etsysFlowLimitingIntfFlowCountMaxTime         TimeTicks,
+        etsysFlowLimitingIntfFlowCountEvents          Gauge32,
+
+        etsysFlowLimitingIntfSetupRateCurrent         Gauge32,
+        etsysFlowLimitingIntfSetupRateMax             Gauge32,
+        etsysFlowLimitingIntfSetupRateMaxTime         TimeTicks,
+        etsysFlowLimitingIntfSetupRateEvents          Gauge32,
+
+        etsysFlowLimitingIntfFlowProcessingLayer      FlowLmtIntfLayer
+    }
+
+etsysFlowLimitingIntfClassType           OBJECT-TYPE
+    SYNTAX        FlowLmtIntfClass
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The Flow Limiting interface class associated with this
+         interface.  The class defines the flow limits and actions
+         to be taken when those limits are exceeded.
+
+         When the value of this object changes and flow limiting is
+         currently enabled, both globally and on this interface, the
+         agent MUST perform the following steps prior to enforcing
+         the new limits:
+
+         1)  If the interface had been operationally held in the 'down'
+             state due to prior flow conditions it MUST be allowed to
+             attain its currently correct operational state.
+
+         2)  Any flows created by the Flow Limiting feature for this
+             interface must be removed.
+
+         3)  The respective etsysFlowLimitingIntfFlowCountEvents and
+             etsysFlowLimitingIntfSetupRateEvents objects MUST be set
+             to zero.
+
+         4)  etsysFlowLimitingIntfStatus and etsysFlowLimitingIntfReason
+             MUST be set to operational(1) and noAction(1) respectively.
+
+         Maintaining the value of this object across agent reboots
+         is REQUIRED."
+    DEFVAL { unspecified }
+    ::= { etsysFlowLimitingInterfaceEntry 1 }
+
+etsysFlowLimitingIntfFlowLimitingState   OBJECT-TYPE
+    SYNTAX        EnabledStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The enable state of Flow Limiting on this interface.
+
+         Setting this object to disabled(2) will disable the
+         active part of the Flow Limiting feature as defined
+         for the etsysFlowLimitingSystemState object on this
+         interface.
+
+         When the value of this object changes from enabled(1)
+         to disabled(2) the agent MUST:
+
+         1)  Release its control on this interface.  If it had
+             been operationally held in the 'down' state it MUST
+             be allowed to attain its currently correct operational
+             state.
+
+         2)  Remove any flows created by the Flow Limiting feature
+             for this interface.
+
+         3)  The respective etsysFlowLimitingIntfFlowCountEvents and
+             etsysFlowLimitingIntfSetupRateEvents objects MUST be set
+             to zero.
+
+         4)  etsysFlowLimitingIntfStatus and etsysFlowLimitingIntfReason
+             MUST be set to operational(1) and noAction(1) respectively.
+
+         Maintaining the value of this object across agent reboots
+         is REQUIRED."
+    DEFVAL { enabled }
+    ::= { etsysFlowLimitingInterfaceEntry 2 }
+
+etsysFlowLimitingIntfStatus              OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      operational(1),
+                      disabled(2),
+                      droppingExcessFlows(3),
+                      creatingDiscardFlows(4)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The current status of the interface with respect to Flow
+         Limiting.
+
+         A read of operational(1) indicates that the Flow Limiting
+         feature has not taken any action to operationally limit
+         this interface.
+
+         A read of disabled(2) indicates that the Flow Limiting
+         feature has taken action to operationally disable
+         this interface due to ...
+
+         A read of droppingExcessFlows(3) indicates that this
+         interface ...
+
+         A read of creatingDiscardFlows(4) indicates that this
+         interface ...
+
+         Setting this object to operational(1) when it is disabled(2)
+         will cause Flow Limiting to release it's control that is
+         keeping this interface operationally disabled.  Any other
+         write of this object will have no effect.
+
+         Maintaining the value of this object across agent reboots
+         is NOT RECOMMENDED."
+    ::= { etsysFlowLimitingInterfaceEntry 3 }
+
+etsysFlowLimitingIntfReason              OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      noAction(1),
+                      flowCount(2),
+                      setupRate(3)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The reason the last action was taken on this interface
+         by the Flow Limiting feature.  Maintaining the value of
+         this object across agent reboots is NOT RECOMMENDED."
+    ::= { etsysFlowLimitingInterfaceEntry 4 }
+
+etsysFlowLimitingIntfClearStats          OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When set to true(1) the following objects in this row MUST
+         be set to zero:
+
+           etsysFlowLimitingIntfFlowCountMaxTime
+           etsysFlowLimitingIntfFlowCountEvents
+
+           etsysFlowLimitingIntfSetupRateMax
+           etsysFlowLimitingIntfSetupRateMaxTime
+           etsysFlowLimitingIntfSetupRateCurrent
+           etsysFlowLimitingIntfSetupRateEvents
+
+         and the etsysFlowLimitingIntfFlowCountMax object MUST be set
+         to the value of the etsysFlowLimitingIntfFlowCountCurrent
+         object.
+
+         Setting this object to false(2) will have no effect.
+         When read this object will always return false(2)."
+    ::= { etsysFlowLimitingInterfaceEntry 5 }
+
+etsysFlowLimitingIntfFlowCountCurrent    OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "flows"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current number of flows active on this interface.
+         This information is always available and current."
+    ::= { etsysFlowLimitingInterfaceEntry 6 }
+
+etsysFlowLimitingIntfFlowCountMax        OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "flows"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of flows that have been active on this
+         interface since the last agent reset.  This information is
+         always available and current."
+    ::= { etsysFlowLimitingInterfaceEntry 7 }
+
+etsysFlowLimitingIntfFlowCountMaxTime    OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The TimeTicks since the maximum number of flows was recorded.
+         This information is always available and current."
+    ::= { etsysFlowLimitingInterfaceEntry 8 }
+
+etsysFlowLimitingIntfFlowCountEvents     OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times that the number of flows on this interface
+         exceeded any associated limit."
+    ::= { etsysFlowLimitingInterfaceEntry 9 }
+
+etsysFlowLimitingIntfSetupRateCurrent    OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "flows/second"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current flow setup rate on this interface.
+         This information is always available and current."
+    ::= { etsysFlowLimitingInterfaceEntry 10 }
+
+etsysFlowLimitingIntfSetupRateMax        OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "flows/second"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum flow setup rate on this interface since the
+         last agent reset.  This information is always available
+         and current."
+    ::= { etsysFlowLimitingInterfaceEntry 11 }
+
+etsysFlowLimitingIntfSetupRateMaxTime    OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The TimeTicks since the maximum flow setup rate was recorded.
+         This information is always available and current."
+    ::= { etsysFlowLimitingInterfaceEntry 12 }
+
+etsysFlowLimitingIntfSetupRateEvents     OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times that the setup rate on this interface
+         exceeded any associated limit."
+    ::= { etsysFlowLimitingInterfaceEntry 13 }
+
+etsysFlowLimitingIntfFlowProcessingLayer OBJECT-TYPE
+    SYNTAX        FlowLmtIntfLayer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The highest OSI layer at which flows are processed.  This is
+         used to give an indication of how much detail is contained in 
+         the flows created on the interface.  An interface reporting
+         that flows being processed at L4 will create flows that
+         have information from L2, L3, and L4.  In general, interfaces
+         reporting processing at L4 would be expected to have a higher
+         number of flows than interfaces reporting processing at L2 
+         assuming all else equal."
+    ::= { etsysFlowLimitingInterfaceEntry 14 }
+
+-- -------------------------------------------------------------
+--  Flow Limiting Notification Branch
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+--  Deprecated Notifications
+-- -------------------------------------------------------------
+
+etsysFlowlimitingFlowCountActionLimit1 NOTIFICATION-TYPE
+    OBJECTS { etsysFlowLimitingIntfStatus,
+              etsysFlowLimitingIntfFlowCountCurrent }
+    STATUS  deprecated
+    DESCRIPTION
+        "An etsysFlowlimitingFlowCountActionLimit1 notification
+         indicates that the number of flows on the interface has
+         exceeded the currently configured limit in the associated
+         etsysFlowLimitingClassFlowCountActionLimit1 for the
+         interface."
+    ::= { etsysFlowLimitingNotificationBranch 1 }
+
+etsysFlowlimitingFlowCountActionLimit2 NOTIFICATION-TYPE
+    OBJECTS { etsysFlowLimitingIntfStatus,
+              etsysFlowLimitingIntfFlowCountCurrent }
+    STATUS  deprecated
+    DESCRIPTION
+        "An etsysFlowlimitingFlowCountActionLimit2 notification
+         indicates that the number of flows on the interface has
+         exceeded the currently configured limit in the associated
+         etsysFlowLimitingClassFlowCountActionLimit2 for the
+         interface."
+    ::= { etsysFlowLimitingNotificationBranch 2 }
+
+etsysFlowLimitingSetupRateNotifyLimit  NOTIFICATION-TYPE
+    OBJECTS { etsysFlowLimitingIntfSetupRateCurrent }
+    STATUS  deprecated
+    DESCRIPTION
+        "An etsysFlowLimitingSetupRateNotifyLimit notification
+         indicates that the flow setup rate on the interface has
+         exceeded the currently configured limit for generating
+         a notification."
+    ::= { etsysFlowLimitingNotificationBranch 3 }
+
+etsysFlowLimitingSetupRateActionLimit  NOTIFICATION-TYPE
+    OBJECTS { etsysFlowLimitingIntfStatus,
+              etsysFlowLimitingIntfSetupRateCurrent }
+    STATUS  deprecated
+    DESCRIPTION
+        "An etsysFlowLimitingSetupRateExceeded notification
+         indicates that the flow setup rate on the interface has
+         exceeded the currently configured limit for taking an
+         action."
+    ::= { etsysFlowLimitingNotificationBranch 4 }
+
+
+-- -------------------------------------------------------------
+--  Current Notifications
+-- -------------------------------------------------------------
+
+etsysFlowlimitingFlowCountActionLimit1V2 NOTIFICATION-TYPE
+    OBJECTS { ifName,
+              etsysFlowLimitingIntfStatus,
+              etsysFlowLimitingIntfFlowCountCurrent }
+    STATUS  current
+    DESCRIPTION
+        "An etsysFlowlimitingFlowCountActionLimit1 notification
+         indicates that the number of flows on the interface has
+         exceeded the currently configured limit in the associated
+         etsysFlowLimitingClassFlowCountActionLimit1 for the
+         interface."
+    ::= { etsysFlowLimitingNotificationBranch 5 }
+
+etsysFlowlimitingFlowCountActionLimit2V2 NOTIFICATION-TYPE
+    OBJECTS { ifName,
+              etsysFlowLimitingIntfStatus,
+              etsysFlowLimitingIntfFlowCountCurrent }
+    STATUS  current
+    DESCRIPTION
+        "An etsysFlowlimitingFlowCountActionLimit2 notification
+         indicates that the number of flows on the interface has
+         exceeded the currently configured limit in the associated
+         etsysFlowLimitingClassFlowCountActionLimit2 for the
+         interface."
+    ::= { etsysFlowLimitingNotificationBranch 6 }
+
+etsysFlowLimitingSetupRateNotifyLimitV2  NOTIFICATION-TYPE
+    OBJECTS { ifName,
+              etsysFlowLimitingIntfSetupRateCurrent }
+    STATUS  current
+    DESCRIPTION
+        "An etsysFlowLimitingSetupRateNotifyLimit notification
+         indicates that the flow setup rate on the interface has
+         exceeded the currently configured limit for generating
+         a notification."
+    ::= { etsysFlowLimitingNotificationBranch 7 }
+
+etsysFlowLimitingSetupRateActionLimitV2  NOTIFICATION-TYPE
+    OBJECTS { ifName,
+              etsysFlowLimitingIntfStatus,
+              etsysFlowLimitingIntfSetupRateCurrent }
+    STATUS  current
+    DESCRIPTION
+        "An etsysFlowLimitingSetupRateExceeded notification
+         indicates that the flow setup rate on the interface has
+         exceeded the currently configured limit for taking an
+         action."
+    ::= { etsysFlowLimitingNotificationBranch 8 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysFlowLimitingConformance
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingMIB 2 }
+
+etsysFlowLimitingGroups
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingConformance 1 }
+
+etsysFlowLimitingCompliances
+        OBJECT IDENTIFIER ::= { etsysFlowLimitingConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of Conformance
+-- -------------------------------------------------------------
+
+etsysFlowLimitingSystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFlowLimitingSystemState,
+        etsysFlowLimitingSystemSnmpNotifications,
+        etsysFlowLimitingSystemInterfaceShutdown,
+        etsysFlowLimitingSystemNotificationInterval,
+        etsysFlowLimitingSystemClearStats,
+        etsysFlowLimitingSystemMaxSupportedFlowCount,
+        etsysFlowLimitingSystemMaxSupportedSetupRate
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing global configuration,
+         statistics, and status for the Flow Limiting feature."
+    ::= { etsysFlowLimitingGroups 1 }
+
+etsysFlowLimitingInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFlowLimitingIntfClassType,
+        etsysFlowLimitingIntfFlowLimitingState,
+        etsysFlowLimitingIntfStatus,
+        etsysFlowLimitingIntfReason,
+        etsysFlowLimitingIntfClearStats
+    }
+    STATUS  deprecated
+    DESCRIPTION
+        "A collection of objects providing interface based
+         configuration and status of the Flow Limiting feature."
+    ::= { etsysFlowLimitingGroups 2 }
+
+etsysFlowLimitingFlowCountGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFlowLimitingClassFlowCountActionLimit1,
+        etsysFlowLimitingClassFlowCountActionTaken1,
+        etsysFlowLimitingClassFlowCountActionLimit2,
+        etsysFlowLimitingClassFlowCountActionTaken2,
+
+        etsysFlowLimitingIntfFlowCountMax,
+        etsysFlowLimitingIntfFlowCountMaxTime,
+        etsysFlowLimitingIntfFlowCountCurrent,
+        etsysFlowLimitingIntfFlowCountEvents
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects related to understanding and
+         limiting the number of flows on individual interfaces."
+    ::= { etsysFlowLimitingGroups 3 }
+
+etsysFlowLimitingSetupRateGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFlowLimitingClassSetupRateNotifyLimit,
+        etsysFlowLimitingClassSetupRateActionLimit,
+        etsysFlowLimitingClassSetupRateActionTaken,
+
+        etsysFlowLimitingIntfSetupRateMax,
+        etsysFlowLimitingIntfSetupRateMaxTime,
+        etsysFlowLimitingIntfSetupRateCurrent,
+        etsysFlowLimitingIntfSetupRateEvents
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects related to understanding and
+         limiting interface flow setup rates on individual
+         interfaces."
+    ::= { etsysFlowLimitingGroups 4 }
+
+etsysFlowLimitingFlowCountNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysFlowlimitingFlowCountActionLimit1,
+        etsysFlowlimitingFlowCountActionLimit2
+    }
+    STATUS  deprecated
+    DESCRIPTION
+        "A collection of notifications related to the number of
+         flows on individual interfaces."
+    ::= { etsysFlowLimitingGroups 5 }
+
+etsysFlowLimitingSetupRateNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysFlowLimitingSetupRateNotifyLimit,
+        etsysFlowLimitingSetupRateActionLimit
+    }
+    STATUS  deprecated
+    DESCRIPTION
+        "A collection of notifications related to flow setup rates
+         on individual interfaces."
+    ::= { etsysFlowLimitingGroups 6 }
+
+etsysFlowLimitingInterfaceGroupV2 OBJECT-GROUP
+    OBJECTS {
+        etsysFlowLimitingIntfClassType,
+        etsysFlowLimitingIntfFlowLimitingState,
+        etsysFlowLimitingIntfStatus,
+        etsysFlowLimitingIntfReason,
+        etsysFlowLimitingIntfClearStats,
+        etsysFlowLimitingIntfFlowProcessingLayer
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing interface based
+         configuration and status of the Flow Limiting feature."
+    ::= { etsysFlowLimitingGroups 7 }
+
+etsysFlowLimitingFlowCountNotificationGroupV2 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysFlowlimitingFlowCountActionLimit1V2,
+        etsysFlowlimitingFlowCountActionLimit2V2
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications related to the number of
+         flows on individual interfaces."
+    ::= { etsysFlowLimitingGroups 8 }
+
+etsysFlowLimitingSetupRateNotificationGroupV2 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysFlowLimitingSetupRateNotifyLimitV2,
+        etsysFlowLimitingSetupRateActionLimitV2
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications related to flow setup rates
+         on individual interfaces."
+    ::= { etsysFlowLimitingGroups 9 }
+
+
+-- -------------------------------------------------------------
+-- Compliance Statements
+-- -------------------------------------------------------------
+
+etsysFlowLimitingCompliance MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for devices that support
+         Flow Limiting."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            etsysFlowLimitingSystemGroup,
+            etsysFlowLimitingInterfaceGroup
+        }
+
+    GROUP   etsysFlowLimitingFlowCountGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow counts on a per interface basis."
+
+    GROUP   etsysFlowLimitingFlowCountNotificationGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow counts on a per interface basis."
+
+    GROUP   etsysFlowLimitingSetupRateGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow setup rates on a per interface basis."
+
+    GROUP   etsysFlowLimitingSetupRateNotificationGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow setup rates on a per interface basis."
+
+    ::= { etsysFlowLimitingCompliances 1 }
+
+etsysFlowLimitingComplianceV2 MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for devices that support
+         Flow Limiting."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            etsysFlowLimitingSystemGroup,
+            etsysFlowLimitingInterfaceGroupV2
+        }
+
+    GROUP   etsysFlowLimitingFlowCountGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow counts on a per interface basis."
+
+    GROUP   etsysFlowLimitingFlowCountNotificationGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow counts on a per interface basis."
+
+    GROUP   etsysFlowLimitingSetupRateGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow setup rates on a per interface basis."
+
+    GROUP   etsysFlowLimitingSetupRateNotificationGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow setup rates on a per interface basis."
+
+    ::= { etsysFlowLimitingCompliances 2 }
+
+etsysFlowLimitingComplianceV3 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices that support
+         Flow Limiting."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            etsysFlowLimitingSystemGroup,
+            etsysFlowLimitingInterfaceGroupV2
+        }
+
+    GROUP   etsysFlowLimitingFlowCountGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow counts on a per interface basis."
+
+    GROUP   etsysFlowLimitingFlowCountNotificationGroupV2
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow counts on a per interface basis."
+
+    GROUP   etsysFlowLimitingSetupRateGroup
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow setup rates on a per interface basis."
+
+    GROUP   etsysFlowLimitingSetupRateNotificationGroupV2
+    DESCRIPTION
+        "This group is REQUIRED for entities that support limiting
+         flow setup rates on a per interface basis."
+
+    ::= { etsysFlowLimitingCompliances 3 }
+END

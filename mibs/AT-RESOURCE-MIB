@@ -1,0 +1,234 @@
+--  ============================================================================
+-- AT-RESOURCE.MIB, Allied Telesis enterprise MIB
+-- 
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+	AT-RESOURCE-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			sysinfo			
+				FROM AT-SMI-MIB			
+			Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString			
+				FROM SNMPv2-TC;
+	
+	
+		resource MODULE-IDENTITY 
+			LAST-UPDATED "200811251000Z"		-- November 25, 2008 at 10:00 GMT
+			ORGANIZATION 
+				"Allied Telesis, Inc."
+			CONTACT-INFO 
+				"  http://www.alliedtelesis.com"
+			DESCRIPTION 
+				"The AT-RESOURCE-MIB contains objects for displaying system 
+				hardware resource information."
+			REVISION "200810201000Z"		-- October 20, 2008 at 10:00 GMT
+			DESCRIPTION 
+				"Add objects for displaying host information. "
+			REVISION "192008090400Z"		-- August 09, 1920 at 04:00 GMT
+			DESCRIPTION 
+				"Initial version."
+			::= { sysinfo 21 }
+
+		
+--		
+--  Node definitions
+-- 
+		rscBoardTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF RscBoardEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A table of information about boards installed in a device."
+			::= { resource 1 }
+
+		
+		rscBoardEntry OBJECT-TYPE
+			SYNTAX RscBoardEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A conceptual row of entries of rscBoardTable."
+			INDEX { rscStkId, rscResourceId }
+			::= { rscBoardTable 1 }
+
+		
+		RscBoardEntry ::=
+			SEQUENCE { 
+				rscStkId
+					Unsigned32,
+				rscResourceId
+					Unsigned32,
+				rscBoardType
+					DisplayString,
+				rscBoardName
+					DisplayString,
+				rscBoardID
+					Unsigned32,
+				rscBoardBay
+					DisplayString,
+				rscBoardRevision
+					DisplayString,
+				rscBoardSerialNumber
+					DisplayString
+			 }
+
+		rscStkId OBJECT-TYPE
+			SYNTAX Unsigned32 (1..8)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The ID of the stack member. It is a number assigned to 
+				 a stackable unit by the operating system when it is stacked.
+				 A default value of 1 is given to a stand alone unit."
+			::= { rscBoardEntry 1 }
+
+		
+		rscResourceId OBJECT-TYPE
+			SYNTAX Unsigned32 (1..4294967294)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The resource ID number of the board. It is a number assigned to
+				 a hardware resource when the operating system detects 
+				 its existence."
+			::= { rscBoardEntry 2 }
+
+		
+		rscBoardType OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of the board. Its value can be
+				 'Base', 'Expansion', 'Fan module' or 'PSU', etc."
+			::= { rscBoardEntry 3 }
+
+		
+		rscBoardName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object represents the name of the board. Its value can be 
+				 'SwitchBlade x908', 'XEM-12S' or 'AT-PWR05-AC', etc."
+			::= { rscBoardEntry 4 }
+
+		
+		rscBoardID OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object represents the ID number of the board. Its value is an 
+				 Allied Telesis assigned number, such as 274 for the XEM-12S, or 255
+				 for the AT-9924Ts. "
+			::= { rscBoardEntry 5 }
+
+		
+		rscBoardBay OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the board installation location. Its
+				 value can be 'Bay1', 'Bay2' or 'PSU1', etc. For a base board,
+				 it has a value of a single character space. "
+			::= { rscBoardEntry 6 }
+
+		
+		rscBoardRevision OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..5))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object represents the revision number of the board."
+			::= { rscBoardEntry 7 }
+
+		
+		rscBoardSerialNumber OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object represents the serial number of the board."
+			::= { rscBoardEntry 8 }
+		
+	
+		hostInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HostInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { resource 2 }
+
+		
+		hostInfoEntry OBJECT-TYPE
+			SYNTAX HostInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { rscStkId }
+			::= { hostInfoTable 1 }
+
+		
+		HostInfoEntry ::=
+			SEQUENCE { 
+				hostInfoDRAM
+					DisplayString,
+				hostInfoFlash
+					DisplayString,
+				hostInfoUptime
+					DisplayString,
+				hostInfoBootloaderVersion
+					DisplayString
+			 }
+
+		hostInfoDRAM OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the host DRAM information."
+			::= { hostInfoEntry 1 }
+
+		
+		hostInfoFlash OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the host Flash information."
+			::= { hostInfoEntry 2 }
+
+		
+		hostInfoUptime OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object represents the host up time."
+			::= { hostInfoEntry 3 }
+
+		
+		hostInfoBootloaderVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object represents the host boot loader version."
+			::= { hostInfoEntry 4 }
+
+		
+	
+	END
+
+--
+-- at-resource.mib
+--

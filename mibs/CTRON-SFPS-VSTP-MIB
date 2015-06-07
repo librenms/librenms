@@ -1,0 +1,316 @@
+CTRON-SFPS-VSTP-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-vstp-mib.txt
+--  Revision: 0.0.05
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+--      DisplayString
+--                FROM RFC1213-MIB
+--      enterprises,
+        TimeTicks 
+--        IpAddress,
+--        Counter,
+--        Gauge
+                FROM RFC1155-SMI
+ 
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.1
+        vlanSpanningTreePort, vlanSpanningTreeSwitch 
+                FROM CTRON-SFPS-INCLUDE-MIB; 
+ 
+
+--  Textual Conventions
+
+SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+
+HexInteger ::= INTEGER
+
+
+
+-- begin Vlan Spanning Tree Port Table
+-- VLAN Switch Configuration Group
+-- This group contains a sequence of spanning tree entries
+
+vlanSpanningTreePortTable    OBJECT-TYPE
+       SYNTAX     SEQUENCE OF VlanSpanningTreePortEntry
+       ACCESS     not-accessible
+       STATUS     mandatory
+       DESCRIPTION 
+                "This table contains information used by the spanning tree algorithm
+                 for each port instance."
+       ::= { vlanSpanningTreePort 1 }
+
+vlanSpanningTreePortEntry   OBJECT-TYPE
+      SYNTAX   VlanSpanningTreePortEntry
+      ACCESS   not-accessible
+      STATUS   mandatory
+      DESCRIPTION
+                "Each entry contains spanning tree information for that port instance."
+      INDEX    { vlanSpanningTreePortPortNumber }
+      ::= { vlanSpanningTreePortTable 1 }
+
+VlanSpanningTreePortEntry ::=
+     SEQUENCE  {
+                vlanSpanningTreePortPortNumber                  SfpsSwitchPort,
+                vlanSpanningTreePortPortState                   INTEGER,
+                vlanSpanningTreePortPortIdentifier              HexInteger,
+                vlanSpanningTreePortPathCost                    INTEGER,
+                vlanSpanningTreePortDesignatedRoot              OCTET STRING,
+                vlanSpanningTreePortDesignatedCost              INTEGER,
+                vlanSpanningTreePortDesignatedBridge            OCTET STRING,
+                vlanSpanningTreePortDesignatedPort              HexInteger
+        }
+
+
+ vlanSpanningTreePortPortNumber           OBJECT-TYPE
+     SYNTAX       SfpsSwitchPort
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "The port number of the port instance. This value is also the 
+                 primary index for the table."
+     ::= { vlanSpanningTreePortEntry 1 }
+
+vlanSpanningTreePortPortState             OBJECT-TYPE
+     SYNTAX          INTEGER  {
+                              enabled(1),   
+                              disabled(2),
+                              blocking(3),
+                              listening(4),
+                              learning(5),
+                              forwarding(6),
+                              broken(7)
+                              }
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION
+                "The spanning tree port state for this port."
+     ::= { vlanSpanningTreePortEntry 2 }       
+
+vlanSpanningTreePortPortIdentifier        OBJECT-TYPE
+     SYNTAX             HexInteger 
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION
+                "The spanning tree port identifier for this port."
+     ::= { vlanSpanningTreePortEntry 3 }        
+
+vlanSpanningTreePortPathCost              OBJECT-TYPE
+     SYNTAX             INTEGER 
+     ACCESS             read-write
+     STATUS             mandatory
+     DESCRIPTION
+                "The spanning tree path cost for this port."
+     ::= { vlanSpanningTreePortEntry 4 }
+
+vlanSpanningTreePortDesignatedRoot        OBJECT-TYPE
+     SYNTAX             OCTET STRING
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION
+                "The spanning tree designated root for this port."
+     ::= { vlanSpanningTreePortEntry 5 }
+
+vlanSpanningTreePortDesignatedCost        OBJECT-TYPE
+     SYNTAX             INTEGER 
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION
+                "The spanning tree designated cost for this port."
+     ::= { vlanSpanningTreePortEntry 6 }
+
+vlanSpanningTreePortDesignatedBridge      OBJECT-TYPE
+     SYNTAX             OCTET STRING 
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION
+                "The spanning tree designated bridge for this port."
+     ::= { vlanSpanningTreePortEntry 7 }
+
+vlanSpanningTreePortDesignatedPort      OBJECT-TYPE
+     SYNTAX             HexInteger 
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION
+                "The spanning tree designated port."
+     ::= { vlanSpanningTreePortEntry 8 }
+
+
+
+-- begin Vlan Spanning Tree Switch Table
+-- Table contains sequence of spaning tree switch entries
+
+vlanSpanningTreeSwitchTable    OBJECT-TYPE
+       SYNTAX     SEQUENCE OF VlanSpanningTreeSwitchEntry
+       ACCESS     not-accessible
+       STATUS     mandatory
+       DESCRIPTION 
+                "This table contains information used by the spanning tree
+                 algorithm specific to the switch on which the algorithm is
+                 running."
+       ::= { vlanSpanningTreeSwitch 1 }
+
+vlanSpanningTreeSwitchEntry    OBJECT-TYPE
+      SYNTAX   VlanSpanningTreeSwitchEntry
+      ACCESS   not-accessible
+      STATUS   mandatory
+      DESCRIPTION
+                "Each entry specifies switch specific spanning tree information."
+      INDEX    { vlanSpanningTreeSwitchIndex }
+      ::= { vlanSpanningTreeSwitchTable 1 }
+
+VlanSpanningTreeSwitchEntry ::=
+     SEQUENCE  {
+                vlanSpanningTreeSwitchIndex                 INTEGER,
+                vlanSpanningTreeSwitchBridgePriority        HexInteger,
+                vlanSpanningTreeSwitchBridgeId              OCTET STRING,
+                vlanSpanningTreeSwitchDesignatedRoot        OCTET STRING,
+                vlanSpanningTreeSwitchRootPathCost          INTEGER,
+                vlanSpanningTreeSwitchOperTime              TimeTicks,
+                vlanSpanningTreeSwitchRootPort              SfpsSwitchPort,
+                vlanSpanningTreeSwitchRootPortTime          TimeTicks,
+                vlanSpanningTreeSwitchPrevRootPort          SfpsSwitchPort,
+                vlanSpanningTreeSwitchPrevRootPortTime      TimeTicks,
+                vlanSpanningTreeSwitchMaxAge                INTEGER,
+                vlanSpanningTreeSwitchHelloTime             INTEGER,
+                vlanSpanningTreeSwitchForwardDelay          INTEGER
+        }
+
+
+ vlanSpanningTreeSwitchIndex               OBJECT-TYPE
+     SYNTAX       INTEGER
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Table index value."
+     ::= { vlanSpanningTreeSwitchEntry 1 }
+
+vlanSpanningTreeSwitchBridgePriority       OBJECT-TYPE
+     SYNTAX       HexInteger
+     ACCESS       read-write
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree designated bridge priority."
+     ::= { vlanSpanningTreeSwitchEntry 2 }
+
+vlanSpanningTreeSwitchBridgeId             OBJECT-TYPE
+     SYNTAX       OCTET STRING
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree bridge id value."
+     ::= { vlanSpanningTreeSwitchEntry 3 }
+
+vlanSpanningTreeSwitchDesignatedRoot       OBJECT-TYPE
+     SYNTAX       OCTET STRING
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree designated root value."
+     ::= { vlanSpanningTreeSwitchEntry 4 }
+
+vlanSpanningTreeSwitchRootPathCost         OBJECT-TYPE
+     SYNTAX       INTEGER
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree root path cost."
+     ::= { vlanSpanningTreeSwitchEntry 5 }
+
+vlanSpanningTreeSwitchOperTime       OBJECT-TYPE
+     SYNTAX       TimeTicks
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION
+                "Spanning tree operational time."
+     ::= { vlanSpanningTreeSwitchEntry 6 }
+
+vlanSpanningTreeSwitchRootPort             OBJECT-TYPE
+     SYNTAX       SfpsSwitchPort
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree root port."
+     ::= { vlanSpanningTreeSwitchEntry 7 }
+
+vlanSpanningTreeSwitchRootPortTime             OBJECT-TYPE
+     SYNTAX       TimeTicks
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree root port time."
+     ::= { vlanSpanningTreeSwitchEntry 8 }
+
+vlanSpanningTreeSwitchPrevRootPort             OBJECT-TYPE
+     SYNTAX       SfpsSwitchPort
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree previous root port."
+     ::= { vlanSpanningTreeSwitchEntry 9 }
+
+vlanSpanningTreeSwitchPrevRootPortTime             OBJECT-TYPE
+     SYNTAX       TimeTicks
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree previous root port time."
+     ::= { vlanSpanningTreeSwitchEntry 10 }
+
+vlanSpanningTreeSwitchMaxAge               OBJECT-TYPE
+     SYNTAX       INTEGER
+     ACCESS       read-write
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree max age value."
+     ::= { vlanSpanningTreeSwitchEntry 11 }
+
+vlanSpanningTreeSwitchHelloTime            OBJECT-TYPE
+     SYNTAX       INTEGER
+     ACCESS       read-write
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree hello time value."
+     ::= { vlanSpanningTreeSwitchEntry 12 }
+
+vlanSpanningTreeSwitchForwardDelay         OBJECT-TYPE
+     SYNTAX       INTEGER
+     ACCESS       read-write
+     STATUS       mandatory
+     DESCRIPTION
+                "Spanning tree forward delay value."
+     ::= { vlanSpanningTreeSwitchEntry 13 }
+
+END 

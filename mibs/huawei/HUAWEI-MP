@@ -1,0 +1,426 @@
+--     =================================================================
+-- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: This mib file is used for inquiring for MP (Multilink PPP)
+--              link status information.
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              tianli,2004.5.18,publish 
+-- =================================================================
+
+HUAWEI-MP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        ifIndex            
+            FROM RFC1213-MIB
+        ifName
+            FROM IF-MIB    
+        hwDatacomm
+            FROM HUAWEI-MIB                                                     
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP                 
+            FROM SNMPv2-CONF     
+        Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE                  
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC;        
+
+    -- 1.3.6.1.4.1.2011.5.25.18
+    hwMultilinkPPP MODULE-IDENTITY 
+        LAST-UPDATED "200405180000Z"            -- May 18, 2004 at 00:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            " R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+        DESCRIPTION 
+            "The HUAWEI-MP-MIB provides read access to MP(Multilink PPP) link
+            status information. The information available through this MIB includes:
+            the father channel, the bundled son channel, the slot on which MP bundled, 
+            the number of son channels, the bundle name,
+            the statistic of lost fragments, reordered packets, unassigned packets, 
+            interleaved packets, and the received/sent sequence, etc.
+            "
+        ::= { hwDatacomm 33 }
+
+    --
+    -- Node definitions
+    --        
+        
+                  
+    hwMpObjects OBJECT IDENTIFIER ::= { hwMultilinkPPP  1 }
+    
+    hwMpMultilinkTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMpMultilinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the information of MP link. 
+            The index of this table is the interface index of MP group or 
+            VT(Virtual Template)."
+        ::= { hwMpObjects 1 }
+
+    hwMpMultilinkEntry OBJECT-TYPE
+        SYNTAX HwMpMultilinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry in this table describes the information of MP link.
+            The available information includes: 
+            the father channel, the slot on which MP bundled, 
+            the number of bundled son channels, 
+            the statistics of lost fragments, reordered packets, 
+            unassigned packets, interleaved packets, 
+            and received/sent sequence.             
+            "
+        INDEX { ifIndex }
+        ::= { hwMpMultilinkTable 1 }
+    
+    HwMpMultilinkEntry ::=
+        SEQUENCE {
+            hwMpMultilinkDescr
+                DisplayString,   
+            hwMpBundleName
+                DisplayString,                           
+            hwMpBundledSlot
+                Integer32,
+            hwMpBundledMemberCnt
+                Integer32,
+            hwMpLostFragments
+                Counter32,
+            hwMpReorderedPkts
+                Counter32,
+            hwMpUnassignedPkts
+                Counter32,
+            hwMpInterleavedPkts
+                Counter32,
+            hwMpRcvdSequence
+                Integer32,
+            hwMpSentSequence
+                Integer32, 
+            hwMpDetectTime
+                Integer32,
+            hwMpFlappingCnt
+                Integer32,
+            hwMpDampingTime
+                Integer32,
+            hwMpBundleThreshold   
+                Integer32,
+            hwMpSequenceReorder
+                INTEGER                                            
+             } 
+                     
+    hwMpMultilinkDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The interface name of the father interface on which MP bundled. 
+            It is the name of a Virtual Template or a MP group."
+        ::= { hwMpMultilinkEntry 1 } 
+        
+    hwMpBundleName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bundle name of the multilink. 
+            when authentication is configured, the bundle name is the authenticated
+            user name; when authentication not configured, the bundle name is
+            multilink.
+            "
+        ::= { hwMpMultilinkEntry 2 }         
+        
+    hwMpBundledSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The slot on which MP bundled. 
+            "
+        ::= { hwMpMultilinkEntry 3 }
+    
+    hwMpBundledMemberCnt OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of the bundled son channel of the MP link. "
+        ::= { hwMpMultilinkEntry 4 }
+
+    hwMpLostFragments OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of fragments of the MP link discarded because 
+            bad fragments received, or assembling packet failed, etc."
+        ::= { hwMpMultilinkEntry 5 }
+
+     hwMpReorderedPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of received packets of the MP link reordered.
+            "
+        ::= { hwMpMultilinkEntry 6 }               
+
+     hwMpUnassignedPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of received packets of the MP link waiting for reordering.
+            "
+        ::= { hwMpMultilinkEntry 7 }      
+        
+     hwMpInterleavedPkts OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of received packets of the MP link interleaved by the 
+            packets queued in RTPQ(Real-time Transport Protocol Queue) or 
+            LLQ(Low Latency Queue).
+            "
+        ::= { hwMpMultilinkEntry 8 }  
+        
+     hwMpRcvdSequence OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current sequence number of the MP link for receiving.
+            "
+        ::= { hwMpMultilinkEntry 9 }   
+
+     hwMpSentSequence OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current sequence number of the MP link for sending.
+            "
+        ::= { hwMpMultilinkEntry 10 }
+
+     hwMpDetectTime OBJECT-TYPE
+        SYNTAX Integer32 (0|30..3600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time of detecting the flapping of the son channel of the MP link 
+            to determine whether the son channel should be damped.
+            "
+        ::= { hwMpMultilinkEntry 11 }
+        
+     hwMpFlappingCnt OBJECT-TYPE
+        SYNTAX Integer32 (0..64)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum number of the flapping in the detect-time; if the flapping
+            number is more than the maximum number, the son channel will be damped.
+            "
+        ::= { hwMpMultilinkEntry 12 }
+        
+     hwMpDampingTime OBJECT-TYPE
+        SYNTAX Integer32 (0|60..86400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time of damping the son channel of the MP link.
+            "
+        ::= { hwMpMultilinkEntry 13 }
+        
+     hwMpBundleThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..128)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The minimum number of the bundled son channel of the MP link; if the number
+            of the bundled son channel is less than the minimum number, the MP link can
+            not be used.
+            "
+        ::= { hwMpMultilinkEntry 14 }
+        
+     hwMpSequenceReorder OBJECT-TYPE
+        SYNTAX INTEGER { 
+            enable(1),
+            disable(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It shows the reorder feature on MP interface. 
+            1 shows enable ; 2 shows disable.
+            "
+        ::= { hwMpMultilinkEntry 15 }
+                
+    hwMpMemberlinkTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMpMemberlinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the information of son channels of the MP link.
+            The index of this table is the interface index of MP group or
+            VT(Virtual Template). 
+            "
+        ::= { hwMpObjects 2 }
+
+    hwMpMemberlinkEntry OBJECT-TYPE
+        SYNTAX HwMpMemberlinkEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry in this table describes the information of the bundled
+            son channels of MP link. The available information includes: 
+            the interface index of the son channel, 
+            the interface name of the son channel.
+            "
+        INDEX { ifIndex, hwMpMemberlinkSeqNumber }
+        ::= { hwMpMemberlinkTable 1 }
+    
+    HwMpMemberlinkEntry ::=
+        SEQUENCE {
+            hwMpMemberlinkSeqNumber
+                Integer32,
+            hwMpMemberlinkIfIndex
+                Integer32,
+            hwMpMemberlinkDescr
+                DisplayString,
+            hwMpMemberlinkMpStatus
+                Integer32                                                            
+            } 
+
+    hwMpMemberlinkSeqNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bundled sequence number of the son channels of the MP link.
+            This object is one of the index of the table.
+            "
+        ::= { hwMpMemberlinkEntry 1 }  
+
+    hwMpMemberlinkIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The interface index of the son channels of the MP link.
+            "
+        ::= { hwMpMemberlinkEntry 2 } 
+        
+    hwMpMemberlinkDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The interface name of the son channels of the MP link.
+            "
+        ::= { hwMpMemberlinkEntry 3 } 
+        
+    hwMpMemberlinkMpStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The MP status of the son channels of the MP link.
+            0 shows failed bind; 1 shows successful bind.
+            "
+        ::= { hwMpMemberlinkEntry 4 } 
+                
+     -- 1.3.6.1.4.1.2011.5.25.33.2
+     hwMpNotifications OBJECT IDENTIFIER ::= { hwMultilinkPPP 2 }
+
+        hwMpTraps OBJECT IDENTIFIER ::= { hwMpNotifications 1 }
+       
+        hwMpSonChannelDampingDetect NOTIFICATION-TYPE
+            OBJECTS { hwMpMemberlinkIfIndex }
+            STATUS current
+            DESCRIPTION 
+                "The son channel of the MP link is damped."
+            ::= { hwMpTraps 1 }
+            
+        hwMpSonChannelDampingResume  NOTIFICATION-TYPE
+            OBJECTS { hwMpMemberlinkIfIndex }
+            STATUS current
+            DESCRIPTION 
+                "The son channel of the MP link is recovered from damping."
+            ::= { hwMpTraps 2 }
+        hwMpThresholdControlDetect  NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName }
+            STATUS current
+            DESCRIPTION 
+                "The MP link is controlled for threshold."
+            ::= { hwMpTraps 3 }
+            
+            
+        hwMpThresholdControlDetectClear  NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName }
+            STATUS current
+            DESCRIPTION 
+                "The MP link is recovered from controlling for threshold."
+            ::= { hwMpTraps 4 }
+            
+     -- 1.3.6.1.4.1.2011.5.25.33.3
+     hwMpConformance OBJECT IDENTIFIER ::= { hwMultilinkPPP 3 }
+
+     
+     -- 1.3.6.1.4.1.2011.5.25.33.3.1
+     hwMpCompliances OBJECT IDENTIFIER ::= { hwMpConformance 1 }
+
+     
+     -- 1.3.6.1.4.1.2011.5.25.33.3.1.1
+     hwMpCompliance MODULE-COMPLIANCE
+         STATUS current
+         DESCRIPTION 
+             "The compliance statement for entities which 
+             implement the Huawei Multilink PPP mib."
+         MODULE -- this module
+             MANDATORY-GROUPS { hwMpMandatoryGroup }
+         ::= { hwMpCompliances 1 }
+
+     
+     -- 1.3.6.1.4.1.2011.5.25.33.3.2      
+     hwMpGroups OBJECT IDENTIFIER ::= { hwMpConformance 2 }
+
+     
+     -- 1.3.6.1.4.1.2011.5.25.33.3.2.1
+     hwMpMandatoryGroup OBJECT-GROUP
+         OBJECTS { hwMpBundledMemberCnt, hwMpMemberlinkSeqNumber, hwMpMemberlinkIfIndex }
+         STATUS current
+         DESCRIPTION 
+             "A collection of objects providing mandatory MP information."
+         ::= { hwMpGroups 1 }
+     
+     -- 1.3.6.1.4.1.2011.5.25.33.3.2.3
+     hwMpInfoGroup OBJECT-GROUP
+         OBJECTS { hwMpMultilinkDescr, hwMpBundleName, 
+             hwMpBundledSlot, hwMpBundledMemberCnt,
+             hwMpLostFragments, hwMpReorderedPkts, 
+             hwMpUnassignedPkts, hwMpInterleavedPkts, 
+             hwMpRcvdSequence, hwMpSentSequence,
+             hwMpDetectTime, hwMpFlappingCnt,
+             hwMpDampingTime, hwMpBundleThreshold,
+             hwMpSequenceReorder,hwMpMemberlinkDescr,
+             hwMpMemberlinkMpStatus }
+         STATUS current
+         DESCRIPTION 
+             "All running information of MP feature."
+         ::= { hwMpGroups 2 }
+         
+     hwMpTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMpSonChannelDampingDetect, hwMpSonChannelDampingResume, hwMpThresholdControlDetect, hwMpThresholdControlDetectClear}
+            STATUS current
+            DESCRIPTION 
+                "Group for all MP traps."
+            ::= { hwMpGroups 3 }                                            
+                                                                                            
+END

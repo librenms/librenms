@@ -1,0 +1,755 @@
+
+-- *****************************************************************************
+-- Juniper-SSC-CLIENT-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Service Selection Center (SSC) Client
+--
+-- Copyright (c) 2000, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-SSC-CLIENT-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Counter32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    JuniName
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniSscClientMIB  MODULE-IDENTITY
+    LAST-UPDATED "200312181629Z"  -- 18-Dec-03 11:29 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Service Selection Center (SSC) Client MIB for the Juniper Networks
+        enterprise."
+    -- Revision History
+    REVISION    "200312181629Z"  -- 18-Dec-03 11:29 AM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Obsoleted token and added discover scalar statistics."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200201142015Z"  -- 14-Jan-02 03:15 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added version number, local address and transport router name objects."
+    REVISION    "200101232130Z"  -- 23-Jan-01 04:30 PM EST  - JUNOSe 3.1
+    DESCRIPTION
+        "Added DHCP-LS, Web and SSC support."
+    REVISION    "200002172310Z"  -- 17-Feb-00  6:10 PM EST  - JUNOSe 2.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 36 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSscClientObjects      OBJECT IDENTIFIER ::= { juniSscClientMIB 1 }
+
+juniSscClientCfg          OBJECT IDENTIFIER ::= { juniSscClientObjects 1 }
+juniSscClientStatus       OBJECT IDENTIFIER ::= { juniSscClientObjects 2 }
+juniSscClientStatistics   OBJECT IDENTIFIER ::= { juniSscClientObjects 3 }
+
+
+--
+-- Configuration scalars
+--
+juniSscClientCfgScalars   OBJECT IDENTIFIER ::= { juniSscClientCfg 1 }
+
+juniSscClientServerSwitchoverTimeout  OBJECT-TYPE
+    SYNTAX      Integer32 (5..300)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The server switchover timeout in seconds.  The SSC Client begins with
+        the primary server and proceeds rotationally to secondary, tertiary,
+        primary, etc. as timeouts occur."
+    ::= { juniSscClientCfgScalars 1 }
+
+juniSscClientPrimaryAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the primary SSC server.  A value of 0.0.0.0 indicates
+        the server address is unconfigured."
+    ::= { juniSscClientCfgScalars 2 }
+
+juniSscClientPrimaryPort  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The TCP port number for the primary SSC server.  A value of zero
+        indicates the port is unconfigured."
+    ::= { juniSscClientCfgScalars 3 }
+
+juniSscClientSecondaryAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the secondary SSC server.  A value of 0.0.0.0
+        indicates the server address is unconfigured."
+    ::= { juniSscClientCfgScalars 4 }
+
+juniSscClientSecondaryPort  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The TCP port number of the secondary SSC server.  A value of zero
+        indicates the port is unconfigured."
+    ::= { juniSscClientCfgScalars 5 }
+
+juniSscClientTertiaryAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the tertiary SSC server.  A value of 0.0.0.0
+        indicates the server address is unconfigured."
+    ::= { juniSscClientCfgScalars 6 }
+
+juniSscClientTertiaryPort  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The TCP port number of the tertiary SSC server.  A value of zero
+        indicates the port is unconfigured."
+    ::= { juniSscClientCfgScalars 7 }
+
+juniSscClientLocalAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The local IP address binding of the server connection.  A value of
+        0.0.0.0 indicates the local address is unconfigured."
+    ::= { juniSscClientCfgScalars 8 }
+
+juniSscClientTransportRouterName  OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the router to be used as the transport for the server
+        connection."
+    ::= { juniSscClientCfgScalars 9 }
+
+
+--
+-- Status objects
+--
+juniSscClientStatusScalars    OBJECT IDENTIFIER ::= { juniSscClientStatus 1 }
+
+juniSscClientConnectionState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disconnected(0),
+                    trying(1),
+                    connected(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The connection state of the SSC Client:
+            disconnected    Not connected to a SSC server.
+            trying          Attempting a connection to a server.
+            connected       Connected to a server.
+
+        When this object has the value 'connected', the active server address
+        and TCP port are reported in juniSscClientActiveAddress and
+        juniSscClientActivePort, respectively."
+    ::= { juniSscClientStatusScalars 1 }
+
+juniSscClientActiveAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the SSC server currently in use.  A value of 0.0.0.0
+        indicates no server is in use."
+    ::= { juniSscClientStatusScalars 2 }
+
+juniSscClientActivePort  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TCP port number for the SSC server currently in use.  A value of
+        zero indicates no server is in use."
+    ::= { juniSscClientStatusScalars 3 }
+
+juniSscClientVersion  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number for the SSC server currently in use."
+    ::= { juniSscClientStatusScalars 4 }
+
+
+--
+-- Statistics Objects
+--
+juniSscClientStatisticsScalars  OBJECT IDENTIFIER
+    ::= { juniSscClientStatistics 1 }
+
+juniSscClientPolicyCommandsReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of policy command packets received from the SSC."
+    ::= { juniSscClientStatisticsScalars 1 }
+
+juniSscClientPolicyCommandsListReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of policy command packets received from the SSC with subtype
+        LIST."
+    ::= { juniSscClientStatisticsScalars 2 }
+
+juniSscClientPolicyCommandsAcctReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of policy command packets received from the SSC with subtype
+        ACCOUTING."
+    ::= { juniSscClientStatisticsScalars 3 }
+
+juniSscClientBadPolicyCommandsReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of policy command packets received from the SSC that
+        included rules that were in error."
+    ::= { juniSscClientStatisticsScalars 4 }
+
+juniSscClientErrorPolicyCommandsReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of policy command packets received from the SSC indicating
+        an error from the SSC."
+    ::= { juniSscClientStatisticsScalars 5 }
+
+juniSscClientPolicyReportsSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of policy report packets sent to the SSC."
+    ::= { juniSscClientStatisticsScalars 6 }
+
+juniSscClientConnectionOpenRequests  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of connection open requests sent to the SSC."
+    ::= { juniSscClientStatisticsScalars 7 }
+
+juniSscClientConnectionOpenCompletes  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of connections to the SSC that open successfully."
+    ::= { juniSscClientStatisticsScalars 8 }
+
+juniSscClientConnectionClosedSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of connection close indications that were sent to the SSC."
+    ::= { juniSscClientStatisticsScalars 9 }
+
+juniSscClientConnectionClosedRemotely  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of connection close indications that were received from the
+        SSC."
+    ::= { juniSscClientStatisticsScalars 10 }
+
+juniSscClientCreateInterfacesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of interface creation indications that were sent to the SSC.
+        This indicates the transition of an interface to an UP state."
+    ::= { juniSscClientStatisticsScalars 11 }
+
+juniSscClientDeleteInterfacesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of delete interface indications that were sent to the SSC.
+        This indicates the transition of an interface to an DOWN state."
+    ::= { juniSscClientStatisticsScalars 12 }
+
+juniSscClientActiveIpInterfaces  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of currently active IP interfaces that the SSC Client is
+        aware of."
+    ::= { juniSscClientStatisticsScalars 13 }
+
+juniSscClientIpInterfaceTransitions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IP interface transitions that have been tracked by the
+        SSC Client."
+    ::= { juniSscClientStatisticsScalars 14 }
+
+juniSscClientSynchronizesReceived  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of synchronization requests received from the SSC."
+    ::= { juniSscClientStatisticsScalars 15 }
+
+juniSscClientSynchronizeCompletesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of synchronization complete packets sent to the SSC."
+    ::= { juniSscClientStatisticsScalars 16 }
+
+juniSscClientInternalErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of internal errors tracked by the SSC Client."
+    ::= { juniSscClientStatisticsScalars 17 }
+
+juniSscClientCommunicationErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lower layer communication errors tracked by the SSC
+        Client."
+    ::= { juniSscClientStatisticsScalars 18 }
+
+juniSscClientTokensSeen  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of tokens seen by the SSC client."
+    ::= { juniSscClientStatisticsScalars 19 }
+
+juniSscClientActiveTokens  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of tokens that the SSC client is currently aware of."
+    ::= { juniSscClientStatisticsScalars 20 }
+
+juniSscClientTokenTransitions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of tokens transitions that have occurred."
+    ::= { juniSscClientStatisticsScalars 21 }
+
+juniSscClientCreateTokensSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of token creation indications that were sent to the SSC.
+        This indicates the transition of a token to an UP state."
+    ::= { juniSscClientStatisticsScalars 22 }
+
+juniSscClientDeleteTokensSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of delete token indications that were sent to the SSC.  This
+        indicates the transition of a token to an DOWN state."
+    ::= { juniSscClientStatisticsScalars 23 }
+
+juniSscClientActiveAddresses  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of addresses that the SSC client is currently aware of."
+    ::= { juniSscClientStatisticsScalars 24 }
+
+juniSscClientAddressTransitions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of address transitions that have occurred."
+    ::= { juniSscClientStatisticsScalars 25 }
+
+juniSscClientCreateAddressesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of address creation indications that were sent to the SSC.
+        This indicates the transition of an address to an UP state."
+    ::= { juniSscClientStatisticsScalars 26 }
+
+juniSscClientDeleteAddressesSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of delete address indications that were sent to the SSC.
+        This indicates the transition of an address to an DOWN state."
+    ::= { juniSscClientStatisticsScalars 27 }
+
+juniSscClientAuthenticationSuccesses  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of tokens which were authenticated successfully."
+    ::= { juniSscClientStatisticsScalars 28 }
+
+juniSscClientAuthenticationFailures  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of tokens which were not authenticated successfully."
+    ::= { juniSscClientStatisticsScalars 29 }
+
+juniSscClientDiscoversSeen  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discovers seen by the SSC client."
+    ::= { juniSscClientStatisticsScalars 30 }
+
+juniSscClientActiveDiscovers  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discovers that the SSC client is currently aware of."
+    ::= { juniSscClientStatisticsScalars 31 }
+
+juniSscClientDiscoverTransitions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover transitions that have occurred."
+    ::= { juniSscClientStatisticsScalars 32 }
+
+juniSscClientCreateDiscoversSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover creation indications that were sent to the SSC."
+    ::= { juniSscClientStatisticsScalars 33 }
+
+juniSscClientDeleteDiscoversSent  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of delete discover indications that were sent to the SSC."
+    ::= { juniSscClientStatisticsScalars 34 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniSscClientTrapControl      OBJECT IDENTIFIER ::= { juniSscClientMIB 2 }
+-- juniSscClientTraps            OBJECT IDENTIFIER ::= { juniSscClientMIB 3 }
+-- juniSscClientTrapPrefix       OBJECT IDENTIFIER ::= { juniSscClientTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSscClientMIBConformance  OBJECT IDENTIFIER
+    ::= { juniSscClientMIB 4 }
+juniSscClientMIBCompliances  OBJECT IDENTIFIER
+    ::= { juniSscClientMIBConformance 1 }
+juniSscClientMIBGroups       OBJECT IDENTIFIER
+    ::= { juniSscClientMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniSscClientAuthCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for authentication clients implementing
+        the Juniper SSC Client MIB authentication functionality.  This statement
+        became obsolete when DHCP-LS, Web and SSC support objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSscClientGroup }
+    ::= { juniSscClientMIBCompliances 1 }                          -- JUNOSe 2.0
+
+juniSscClientAuthCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for authentication clients implementing
+        the Juniper SSC Client MIB authentication functionality.  This statement
+        became obsolete when the version number, local address and transport
+        router name objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSscClientGroup2 }
+    ::= { juniSscClientMIBCompliances 2 }                          -- JUNOSe 3.1
+
+juniSscClientAuthCompliance3 MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for clients implementing the Juniper SSC
+        Client MIB functionality.  This statement became obsolete when token
+        scalar statistics were obsoleted and discover scalar statistics were
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSscClientGroup3 }
+    ::= { juniSscClientMIBCompliances 3 }                          -- JUNOSe 4.0
+
+juniSscClientAuthCompliance4 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for clients implementing the Juniper SSC
+        Client MIB functionality."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSscClientGroup4 }
+    ::= { juniSscClientMIBCompliances 4 }                          -- JUNOSe 5.3
+
+
+--
+-- units of conformance
+--
+juniSscClientGroup OBJECT-GROUP
+    OBJECTS {
+        juniSscClientServerSwitchoverTimeout,
+        juniSscClientPrimaryAddress,
+        juniSscClientPrimaryPort,
+        juniSscClientSecondaryAddress,
+        juniSscClientSecondaryPort,
+        juniSscClientTertiaryAddress,
+        juniSscClientTertiaryPort,
+        juniSscClientActiveAddress,
+        juniSscClientConnectionState,
+        juniSscClientActivePort,
+        juniSscClientPolicyCommandsReceived,
+        juniSscClientPolicyCommandsListReceived,
+        juniSscClientPolicyCommandsAcctReceived,
+        juniSscClientBadPolicyCommandsReceived,
+        juniSscClientErrorPolicyCommandsReceived,
+        juniSscClientPolicyReportsSent,
+        juniSscClientConnectionOpenRequests,
+        juniSscClientConnectionOpenCompletes,
+        juniSscClientConnectionClosedSent,
+        juniSscClientConnectionClosedRemotely,
+        juniSscClientCreateInterfacesSent,
+        juniSscClientDeleteInterfacesSent,
+        juniSscClientActiveIpInterfaces,
+        juniSscClientIpInterfaceTransitions,
+        juniSscClientSynchronizesReceived,
+        juniSscClientSynchronizeCompletesSent,
+        juniSscClientInternalErrors,
+        juniSscClientCommunicationErrors }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SSC Clients.
+        This group became obsolete when DHCP-LS, Web and SSC support objects
+        were added."
+    ::= { juniSscClientMIBGroups 1 }                               -- JUNOSe 2.0
+
+juniSscClientGroup2 OBJECT-GROUP
+    OBJECTS {
+        juniSscClientServerSwitchoverTimeout,
+        juniSscClientPrimaryAddress,
+        juniSscClientPrimaryPort,
+        juniSscClientSecondaryAddress,
+        juniSscClientSecondaryPort,
+        juniSscClientTertiaryAddress,
+        juniSscClientTertiaryPort,
+        juniSscClientActiveAddress,
+        juniSscClientConnectionState,
+        juniSscClientActivePort,
+        juniSscClientPolicyCommandsReceived,
+        juniSscClientPolicyCommandsListReceived,
+        juniSscClientPolicyCommandsAcctReceived,
+        juniSscClientBadPolicyCommandsReceived,
+        juniSscClientErrorPolicyCommandsReceived,
+        juniSscClientPolicyReportsSent,
+        juniSscClientConnectionOpenRequests,
+        juniSscClientConnectionOpenCompletes,
+        juniSscClientConnectionClosedSent,
+        juniSscClientConnectionClosedRemotely,
+        juniSscClientCreateInterfacesSent,
+        juniSscClientDeleteInterfacesSent,
+        juniSscClientActiveIpInterfaces,
+        juniSscClientIpInterfaceTransitions,
+        juniSscClientSynchronizesReceived,
+        juniSscClientSynchronizeCompletesSent,
+        juniSscClientInternalErrors,
+        juniSscClientCommunicationErrors,
+        juniSscClientTokensSeen,
+        juniSscClientActiveTokens,
+        juniSscClientTokenTransitions,
+        juniSscClientCreateTokensSent,
+        juniSscClientDeleteTokensSent,
+        juniSscClientActiveAddresses,
+        juniSscClientAddressTransitions,
+        juniSscClientCreateAddressesSent,
+        juniSscClientDeleteAddressesSent,
+        juniSscClientAuthenticationSuccesses,
+        juniSscClientAuthenticationFailures }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SSC Clients.
+        This group became obsolete when version number, local address and
+        transport router name objects were added."
+    ::= { juniSscClientMIBGroups 2 }                               -- JUNOSe 3.1
+
+juniSscClientGroup3 OBJECT-GROUP
+    OBJECTS {
+        juniSscClientServerSwitchoverTimeout,
+        juniSscClientPrimaryAddress,
+        juniSscClientPrimaryPort,
+        juniSscClientSecondaryAddress,
+        juniSscClientSecondaryPort,
+        juniSscClientTertiaryAddress,
+        juniSscClientTertiaryPort,
+        juniSscClientLocalAddress,
+        juniSscClientTransportRouterName,
+        juniSscClientActiveAddress,
+        juniSscClientConnectionState,
+        juniSscClientActivePort,
+        juniSscClientVersion,
+        juniSscClientPolicyCommandsReceived,
+        juniSscClientPolicyCommandsListReceived,
+        juniSscClientPolicyCommandsAcctReceived,
+        juniSscClientBadPolicyCommandsReceived,
+        juniSscClientErrorPolicyCommandsReceived,
+        juniSscClientPolicyReportsSent,
+        juniSscClientConnectionOpenRequests,
+        juniSscClientConnectionOpenCompletes,
+        juniSscClientConnectionClosedSent,
+        juniSscClientConnectionClosedRemotely,
+        juniSscClientCreateInterfacesSent,
+        juniSscClientDeleteInterfacesSent,
+        juniSscClientActiveIpInterfaces,
+        juniSscClientIpInterfaceTransitions,
+        juniSscClientSynchronizesReceived,
+        juniSscClientSynchronizeCompletesSent,
+        juniSscClientInternalErrors,
+        juniSscClientCommunicationErrors,
+        juniSscClientTokensSeen,
+        juniSscClientActiveTokens,
+        juniSscClientTokenTransitions,
+        juniSscClientCreateTokensSent,
+        juniSscClientDeleteTokensSent,
+        juniSscClientActiveAddresses,
+        juniSscClientAddressTransitions,
+        juniSscClientCreateAddressesSent,
+        juniSscClientDeleteAddressesSent,
+        juniSscClientAuthenticationSuccesses,
+        juniSscClientAuthenticationFailures }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SSC Clients.
+        This group became obsolete when token scalar statistics were obsoleted
+        and discover scalar statistics were added."
+    ::= { juniSscClientMIBGroups 3 }                               -- JUNOSe 4.0
+
+juniSscClientGroup4 OBJECT-GROUP
+    OBJECTS {
+        juniSscClientServerSwitchoverTimeout,
+        juniSscClientPrimaryAddress,
+        juniSscClientPrimaryPort,
+        juniSscClientSecondaryAddress,
+        juniSscClientSecondaryPort,
+        juniSscClientTertiaryAddress,
+        juniSscClientTertiaryPort,
+        juniSscClientLocalAddress,
+        juniSscClientTransportRouterName,
+        juniSscClientActiveAddress,
+        juniSscClientConnectionState,
+        juniSscClientActivePort,
+        juniSscClientVersion,
+        juniSscClientPolicyCommandsReceived,
+        juniSscClientPolicyCommandsListReceived,
+        juniSscClientPolicyCommandsAcctReceived,
+        juniSscClientBadPolicyCommandsReceived,
+        juniSscClientErrorPolicyCommandsReceived,
+        juniSscClientPolicyReportsSent,
+        juniSscClientConnectionOpenRequests,
+        juniSscClientConnectionOpenCompletes,
+        juniSscClientConnectionClosedSent,
+        juniSscClientConnectionClosedRemotely,
+        juniSscClientCreateInterfacesSent,
+        juniSscClientDeleteInterfacesSent,
+        juniSscClientActiveIpInterfaces,
+        juniSscClientIpInterfaceTransitions,
+        juniSscClientSynchronizesReceived,
+        juniSscClientSynchronizeCompletesSent,
+        juniSscClientInternalErrors,
+        juniSscClientCommunicationErrors,
+        juniSscClientActiveAddresses,
+        juniSscClientAddressTransitions,
+        juniSscClientCreateAddressesSent,
+        juniSscClientDeleteAddressesSent,
+        juniSscClientDiscoversSeen,
+        juniSscClientActiveDiscovers,
+        juniSscClientDiscoverTransitions,
+        juniSscClientCreateDiscoversSent,
+        juniSscClientDeleteDiscoversSent }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of SSC Clients."
+    ::= { juniSscClientMIBGroups 4 }                               -- JUNOSe 5.3
+
+END

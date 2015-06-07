@@ -1,0 +1,2855 @@
+-- =================================================================
+-- Copyright (C) 1996-2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei IF QOS MIB
+-- Reference:   HUAWEI Enterprise MIB
+-- Version:     V3.10
+-- History:
+--  2005-04-25  V3.10 Chen Xia(31603) Revision for Correcting the 
+--              DESCRIPTION of nodes. NE05/NE08/NE16 not supports 
+--              the following tables: 
+--                      qosIfBandwidthTable
+--                      qosRTPIfApplyTable
+--                      qosRTPIfQueueRunInfoTable
+--              And not supports dscp-mask(3) in type qosCarlParaType
+--              All of above are required by AR series & Lanswitch(H3C).
+--  2002-10-14  V3.00 Chen Xia(31603) Revision for NE05/NE08/NE16 from
+--              the old huawei-qos-mib.mib
+-- =================================================================
+
+HUAWEI-IF-QOS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        hwDatacomm 
+            FROM HUAWEI-MIB
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, Counter32
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC;        
+    
+    -- 1.3.6.1.4.1.2011.5.25.32.2            
+    hwIfQoSMib MODULE-IDENTITY 
+        LAST-UPDATED "200409150000Z"        -- September 15, 2004 at 00:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            " R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+        DESCRIPTION 
+           "The HUAWEI-IF-QOS-MIB contains objects to apply 
+           on interface for congestion management.  "
+        ::= { hwQoS 2 }
+    
+    --
+    -- Node definitions
+    --
+
+    -- 1.3.6.1.4.1.2011.5.25.32
+    hwQoS OBJECT IDENTIFIER ::= { hwDatacomm 32 }
+    
+    -- HUAWEI QOS config group
+    
+    -- qos fifo 1
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1
+    qosFIFOTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosFIFOEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "FIFO(First In First Out) queuing table.
+             FIFO is a kind of queuing strategy applied on interface for congestion management.
+             And It's the default queuing strategy when other queuing strategy not configured on interface.
+             This table is about the FIFO configuration and running infomation."
+        ::= { hwIfQoSMib 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1.1
+    qosFIFOEntry OBJECT-TYPE
+        SYNTAX QosFIFOEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "FIFO configuration and running information Command:qos fifo queue-length"
+        INDEX { qosFIFOIfIndex }
+        ::= { qosFIFOTable 1 }
+
+    QosFIFOEntry ::=
+        SEQUENCE { 
+            qosFIFOIfIndex
+                INTEGER,
+            qosFIFOIfName
+                OCTET STRING,
+            qosFIFOMaxQueueLen
+                INTEGER,
+            qosFIFOCurQueueLen
+                INTEGER,
+            qosFIFODiscardPkt
+                Counter,
+            qosUndoFIFO
+                INTEGER
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1.1.1
+    qosFIFOIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of interface applying FIFO queuing strategy. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of ifIndex."
+        ::= { qosFIFOEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1.1.2
+    qosFIFOIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of interface identified by the value of qosFIFOIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosFIFOEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1.1.3
+    qosFIFOMaxQueueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of fifo queue which means the maximum count of packets 
+             that can be cached in the fifo queue."
+        ::= { qosFIFOEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1.1.4
+    qosFIFOCurQueueLen OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The current length of queue which means the count of packets cached 
+             in the fifo queue when the interface is congesting."
+        ::= { qosFIFOEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1.1.5
+    qosFIFODiscardPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of discarded packets which can't be enqueued fifo queue
+             because the fifo queue is full."
+        ::= { qosFIFOEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.1.1.6
+    qosUndoFIFO OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosFIFO(0),
+            qosNoFIFO(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: Set default value of the maximum length of fifo queue."
+        ::= { qosFIFOEntry 6 }
+        
+    -- qos pql default-queue 2
+    -- ListNum          1-16
+    -- QueueType        0-3    corresponding top,middle,normal,bottom
+    -- UndoPqlDefault   1
+    -- ListNum is index
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.2
+    qosPqlDefaultTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosPqlDefaultEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL(Priority Queue List) default-queue table.
+             There are four priority queues:top,middle,normal,bottom. 
+             The priority level of these queues is from high to low.
+             A type of priority queue is assigned for those packets that do not match any other rule
+             in each PQL whose number is from 1 to 16. Such queue is the default queue. For 
+             each PQL the default queue may be different. The default queue is normal if other 
+             type of queue is not configured."
+        ::= { hwIfQoSMib 2 }
+              
+    -- 1.3.6.1.4.1.2011.5.25.32.2.2.1
+    qosPqlDefaultEntry OBJECT-TYPE
+        SYNTAX QosPqlDefaultEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL default-queue configuration information.
+             Command:qos pql group-number default-queue { top | middle | normal | bottom }"
+        INDEX { qosPqlDefaultListNum }
+        ::= { qosPqlDefaultTable 1 }
+
+            
+    QosPqlDefaultEntry ::=
+        SEQUENCE { 
+            qosPqlDefaultListNum
+                INTEGER,
+            qosPqlDefaultQueueType
+                INTEGER,
+            qosUndoPqlDefault
+                INTEGER
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.2.1.1
+    qosPqlDefaultListNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the PQL number.
+             Any number from 1 to 16 identifies the priority queue list."
+        ::= { qosPqlDefaultEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.2.1.2
+    qosPqlDefaultQueueType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            top(0),
+            middle(1),
+            normal(2),
+            bottom(3)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The type of default priority queue,the default value is normal."
+        DEFVAL { 2 }
+        ::= { qosPqlDefaultEntry 2 }
+            
+    -- 1.3.6.1.4.1.2011.5.25.32.2.2.1.3
+    qosUndoPqlDefault OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosPqlDefault(0),
+            qosNoPqlDefault(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: Set default value of the defualt priority queue."
+        ::= { qosPqlDefaultEntry 3 }
+
+    -- qos pql queue-length  3
+    -- ListNum          1-16
+    -- QueueType        0-3    corresponding top,middle,normal,bottom
+    -- QueLenValue      1-1024
+    -- UndoPqlQueLen    1
+    -- ListNum and QueueType is index
+    -- 1.3.6.1.4.1.2011.5.25.32.2.3              
+    qosPqlQueueLenTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosPqlQueueLenEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL(Priority Queue List) queue-length table
+             There are four priority queues:top,middle,normal,bottom. 
+             The priority level of these queues is from high to low.
+             The maximum queue length of each queue can be configured in each PQL whose number is from 1 to 16. 
+             Each priority queue has individual default maximum queue length."
+        ::= { hwIfQoSMib 3 }
+            
+    qosPqlQueueLenEntry OBJECT-TYPE
+        SYNTAX QosPqlQueueLenEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL queue-length configuration information.
+             Command:qos pql pql-index queue { top | middle | normal | bottom } queue-length queue-length"
+        INDEX { qosPqlQueLenListNum, qosPqlQueLenQueueType }
+        ::= { qosPqlQueueLenTable 1 }
+
+    QosPqlQueueLenEntry ::=
+        SEQUENCE { 
+            qosPqlQueLenListNum
+                INTEGER,
+            qosPqlQueLenQueueType
+                INTEGER,
+            qosPqlQueLenValue
+                INTEGER,
+            qosUndoPqlQueLen
+                INTEGER    
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.3.1.1
+    qosPqlQueLenListNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "The index of table, which is the PQL number.
+             Any number from 1 to 16 identifies the priority queue list."
+        ::= { qosPqlQueueLenEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.3.1.2
+    qosPqlQueLenQueueType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            top(0),
+            middle(1),
+            normal(2),
+            bottom(3)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the type of priority queue."
+        ::= { qosPqlQueueLenEntry 2 }
+            
+    -- 1.3.6.1.4.1.2011.5.25.32.2.3.1.3
+    qosPqlQueLenValue OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of specified queue.
+             Each priority queue has individual default maximum queue length:
+             Top : 20
+             Middle: 40
+             Normal: 60
+             Bottom: 80"
+        ::= { qosPqlQueueLenEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.3.1.4
+    qosUndoPqlQueLen OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosPqlQueLen(0),
+            qosNoPqlQueLen(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: Set default value of the maximum length of specified queue."
+        ::= { qosPqlQueueLenEntry 4 }
+
+    -- qos pql inbound-interface    4
+    -- ListNum          1-16
+    -- IfIndex          interface index
+    -- IfName           (read-only)
+    -- QueueType        0-3 corresponding top,middle,normal,bottom
+    -- UndoPqlIf        1
+    -- ListNum and IfIndex are the index of the table
+    -- 1.3.6.1.4.1.2011.5.25.32.2.4
+    qosPqlIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosPqlIfEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL(Priority Queue List) inbound-interface table
+             There are four priority queues:top,middle,normal,bottom. 
+             The priority level of these queues is from high to low.
+             The packets received from the specified interface can be configured to enqueue specified priority queue 
+             in each PQL whose number is from 1 to 16."
+        ::= { hwIfQoSMib 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.4.1
+    qosPqlIfEntry OBJECT-TYPE
+        SYNTAX QosPqlIfEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL inbound-interface configuration information.
+             Command:qos pql pql-index inbound-interface interface-type interface-number queue { top | middle | normal | bottom }"
+        INDEX { qosPqlIfListNum, qosPqlIfIndex }
+        ::= { qosPqlIfTable 1 }
+
+            
+    QosPqlIfEntry ::=
+        SEQUENCE { 
+            qosPqlIfListNum
+                INTEGER,
+            qosPqlIfIndex
+                INTEGER,
+            qosPqlIfName
+                OCTET STRING,
+            qosPqlIfQueueType
+                INTEGER,
+            qosUndoPqlIf
+                INTEGER
+            }
+    -- 1.3.6.1.4.1.2011.5.25.32.2.4.1.1
+    qosPqlIfListNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the PQL number.
+             Any number from 1 to 16 identifies the priority queue list."
+        ::= { qosPqlIfEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.4.1.2
+    qosPqlIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the index of interface that the enqueuing 
+             packets are received from. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of ifIndex."
+        ::= { qosPqlIfEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.4.1.3
+    qosPqlIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of interface identified by the value of qosPqlIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosPqlIfEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.4.1.4
+    qosPqlIfQueueType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            top(0),
+            middle(1),
+            normal(2),
+            bottom(3)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The type of priority queue which the packets received from the specified interface 
+             will be put in."
+        ::= { qosPqlIfEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.4.1.5
+    qosUndoPqlIf OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosPqlIF(0),
+            qosNoPqlIF(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: delete the corresponding inbound-interface rule of the specified PQL number"
+        ::= { qosPqlIfEntry 5 }
+
+    -- qos pql protocol    5                
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5
+    qosPqlProtocolTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosPqlProtocolEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL(Priority Queue List) protocol table
+             There are four priority queues:top,middle,normal,bottom. 
+             The priority level of these queues is from high to low.
+             The packets which belong to the specified protocol type and match the specified 
+             traffic-classifying rule can be configured to enqueue specified priority queue in each
+             PQL whose number is from 1 to 16."
+        ::= { hwIfQoSMib 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5.1
+    qosPqlProtocolEntry OBJECT-TYPE
+        SYNTAX QosPqlProtocolEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQL protocol configuration information.
+             Command:qos pql pql-index protocol protocol-name queue-key key-value  queue { top | middle | normal | bottom }"
+        INDEX { qosPqlProListNum, qosPqlProName, qosPqlProQueKey, qosPqlProQueKeyValue }
+        ::= { qosPqlProtocolTable 1 }
+
+            
+    QosPqlProtocolEntry ::=
+        SEQUENCE { 
+            qosPqlProListNum
+                INTEGER,
+            qosPqlProName
+                INTEGER,
+            qosPqlProQueKey
+                INTEGER,
+            qosPqlProQueKeyValue
+                INTEGER,
+            qosPqlProQueType
+                INTEGER,
+            qosUndoPqlProtocol
+                INTEGER
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5.1.1
+    qosPqlProListNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the PQL number.
+             Any number from 1 to 16 identifies the priority queue list."
+        ::= { qosPqlProtocolEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5.1.2
+    qosPqlProName OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            ip(1),
+            mpls(2) 
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the protocol type the enqueuing packets having." 
+        ::= { qosPqlProtocolEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5.1.3
+    qosPqlProQueKey OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            null(1),
+            fragment(2),
+            acl(3),
+            less-than(4),
+            greater-than(5),
+            tcp(6),
+            udp(7),
+            exp-mask(8)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the key words of traffic-classify rule."
+        ::= { qosPqlProtocolEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5.1.4
+    qosPqlProQueKeyValue OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the value of key words.
+             for greater-than,less-than,tcp,udp:0~65535 
+             for acl:2000~3999
+             for NULL and fragment: 0
+             for exp-mask: 0~255"
+        ::= { qosPqlProtocolEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5.1.5
+    qosPqlProQueType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            top(0),
+            middle(1),
+            normal(2),
+            bottom(3)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The type of priority queue which the packets belong to the specified protocol type
+             and match the specified traffic-classifying rule will be put in."
+        ::= { qosPqlProtocolEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.5.1.6
+    qosUndoPqlProtocol OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosPqlProtocol(0),
+            qosNoPqlProtocol(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: delete the corresponding protocol rule of the specified PQL number"
+        ::= { qosPqlProtocolEntry 6 }
+
+    -- qos pq / display qos pq interface   6                
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6
+    qosPQTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosPQEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQ(Priority Queuing) table
+             PQ is a kind of queuing strategy applied on interface for congestion management.
+             PQ provides a mechanism to prioritize packets sent on an interface.
+             If the specified priority list is applied to an interface the Priority Queuing strategy
+             is applied on this interface. Only one list can be assigned per interface. 
+             This table is about the PQ configuration and running infomation."
+        ::= { hwIfQoSMib 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1
+    qosPQEntry OBJECT-TYPE
+        SYNTAX QosPQEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "PQ configuration and running infomation
+             Command:qos pq pql
+                     display qos pq interface"
+        INDEX { qosPQIfIndex }
+        ::= { qosPQTable 1 }
+
+            
+    QosPQEntry ::=
+        SEQUENCE { 
+            qosPQIfIndex
+                INTEGER,
+            qosPQListNum
+                INTEGER,
+            qosPQIfName
+                OCTET STRING,
+            qosPQTopPkt
+                INTEGER,
+            qosPQTopDiscard
+                Counter,
+            qosPQTopMaxQueLen
+                INTEGER,
+            qosPQMiddlePkt
+                INTEGER,
+            qosPQMiddleDiscard
+                Counter,
+            qosPQMiddleMaxQueLen
+                INTEGER,
+            qosPQNormalPkt
+                INTEGER,
+            qosPQNormalDiscard
+                Counter,
+            qosPQNormalMaxQueLen
+                INTEGER,
+            qosPQBottomPkt
+                INTEGER,
+            qosPQBottomDiscard
+                Counter,
+            qosPQBottomMaxQueLen
+                INTEGER,
+            qosUndoPQ
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.1
+    qosPQIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the index of interface applying Priority Queuing strategy. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of ifIndex."
+        ::= { qosPQEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.2
+    qosPQListNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The number of PQL applied to an interface identified by the value of qosPQIfIndex."
+        ::= { qosPQEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.3
+    qosPQIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface by the value of qosPQIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosPQEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.4
+    qosPQTopPkt OBJECT-TYPE
+        SYNTAX INTEGER (0..32767)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of packets enqueued the top priority queue when congestion occoured in the interface."
+        ::= { qosPQEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.5
+    qosPQTopDiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of discarded packets which can't be enqueued top priority queue 
+             because the top priority queue is full."
+        ::= { qosPQEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.6
+    qosPQTopMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of top priority queue.
+             The default value of maximum queue length is 20."
+        ::= { qosPQEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.7
+    qosPQMiddlePkt OBJECT-TYPE
+        SYNTAX INTEGER (0..32767)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of packets enqueued the middle priority queue when congestion occoured in the interface."
+        ::= { qosPQEntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.8
+    qosPQMiddleDiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of discarded packets which can't be enqueued middle priority queue 
+             because the middle priority queue is full."
+        ::= { qosPQEntry 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.9
+    qosPQMiddleMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of middle priority queue.
+             The default value of maximum queue length is 40."
+        ::= { qosPQEntry 9 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.10
+    qosPQNormalPkt OBJECT-TYPE
+        SYNTAX INTEGER (0..32767)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of packets enqueued the normal priority queue when congestion occoured in the interface."
+        ::= { qosPQEntry 10 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.11
+    qosPQNormalDiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of discarded packets which can't be enqueued normal priority queue 
+             because the normal priority queue is full."
+        ::= { qosPQEntry 11 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.12
+    qosPQNormalMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of normal priority queue.
+             The default value of maximum queue length is 60."
+        ::= { qosPQEntry 12 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.13
+    qosPQBottomPkt OBJECT-TYPE
+        SYNTAX INTEGER (0..32767)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of packets enqueued the bottom priority queue when congestion occoured in the interface."
+        ::= { qosPQEntry 13 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.14
+    qosPQBottomDiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of discarded packets which can't be enqueued bottom priority queue 
+             because the bottom priority queue is full."
+        ::= { qosPQEntry 14 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.15
+    qosPQBottomMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of bottom priority queue.
+             The default value of maximum queue length is 80."
+        ::= { qosPQEntry 15 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.6.1.16
+    qosUndoPQ OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosPQ(0),
+            qosNoPQ(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Set the default queuing on interface: FIFO."
+        ::= { qosPQEntry 16 }
+
+            
+    -- qos cql default-queue 7
+    -- ListNum          1-16
+    -- QueueNum         0-16
+    -- UndoCqlDefault   1
+    -- ListNum is index
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.7
+    qosCqlDefaultTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCqlDefaultEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL(Custom Queue List) default-queue table.
+             There are sixteen custom queues whose queue number is from 1 to 16.
+             A custom queue is assigned for those packets that do not match any other rule
+             in each CQL whose number is from 1 to 16. Such queue is the default queue. For 
+             each CQL the default queue may be different. The default queue is queue number 1 
+             if other queue is not configured."
+        ::= { hwIfQoSMib 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.7.1
+    qosCqlDefaultEntry OBJECT-TYPE
+        SYNTAX QosCqlDefaultEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL default-queue configuration information.
+             Command:qos cql group-number default-queue queue-number"
+        INDEX { qosCqlListNum }
+        ::= { qosCqlDefaultTable 1 }
+
+            
+    QosCqlDefaultEntry ::=
+        SEQUENCE { 
+            qosCqlListNum
+                INTEGER,
+            qosCqlQueueNum
+                INTEGER,
+            qosUndoCqlDefault
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.7.1.1
+    qosCqlListNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the CQL number.
+             Any number from 1 to 16 identifies the custom queue list."
+        ::= { qosCqlDefaultEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.7.1.2
+    qosCqlQueueNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The number of default custom queue,the default value is queue number 1."
+        DEFVAL { 1 }
+        ::= { qosCqlDefaultEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.7.1.3
+    qosUndoCqlDefault OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosCqlDefault(0),
+            qosNoCqlDefault(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: Set default value of the defualt custom queue."
+        ::= { qosCqlDefaultEntry 3 }
+
+    -- qos cql inbound-interface   8
+    -- ListNum          1-16
+    -- IfIndex          index of interface
+    -- IfName           (read-only)
+    -- QueueNum         1-16
+    -- UndoCqlIf        1
+    -- GroupNum and IfIndex are index.
+    -- 1.3.6.1.4.1.2011.5.25.32.2.8
+    qosCqlIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCqlIfEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL(Custom Queue List) inbound-interface table
+             There are sixteen custom queues whose queue number is from 1 to 16.
+             The packets received from the specified interface can be configured to enqueue 
+             specified custom queue in each CQL whose number is from 1 to 16."
+        ::= { hwIfQoSMib 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.8.1
+    qosCqlIfEntry OBJECT-TYPE
+        SYNTAX QosCqlIfEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL inbound-interface configuration information.
+             Command:qos cql cql-index inbound-interface interface-type interface-number queue queue-number"
+        INDEX { qosCqlIfListNum, qosCqlIfIndex }
+        ::= { qosCqlIfTable 1 }
+
+            
+    QosCqlIfEntry ::=
+        SEQUENCE { 
+            qosCqlIfListNum
+                INTEGER,
+            qosCqlIfIndex
+                INTEGER,
+            qosCqlIfName
+                OCTET STRING,
+            qosCqlIfQueueNum
+                INTEGER,
+            qosUndoCqlIf
+                INTEGER
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.8.1.1
+    qosCqlIfListNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the CQL number.
+             Any number from 1 to 16 identifies the custom queue list."
+        ::= { qosCqlIfEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.8.1.2
+    qosCqlIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the index of interface that the enqueuing 
+             packets are received from. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of ifIndex."
+        ::= { qosCqlIfEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.8.1.3
+    qosCqlIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of interface identified by the value of qosCqlIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosCqlIfEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.8.1.4
+    qosCqlIfQueueNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The number of custom queue which the packets received from the specified interface 
+             will be put in."
+        DEFVAL { 1 }
+        ::= { qosCqlIfEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.8.1.5
+    qosUndoCqlIf OBJECT-TYPE
+        SYNTAX INTEGER
+            {               
+            qosCqlIf(0),
+            qosNoCqlIf(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: delete the corresponding inbound-interface rule of the specified CQL number"
+        ::= { qosCqlIfEntry 5 }
+
+    -- qos cql protocol   9                
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9
+    qosCqlProtocolTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCqlProtocolEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL(Custom Queue List) protocol table.
+             There are sixteen custom queues whose queue number is from 1 to 16.
+             The packets which belong to the specified protocol type and match the specified 
+             traffic-classifying rule can be configured to enqueue specified custom queue in each
+             CQL whose number is from 1 to 16."
+        ::= { hwIfQoSMib 9 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9.1
+    qosCqlProtocolEntry OBJECT-TYPE
+        SYNTAX QosCqlProtocolEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL protocol configuration information.
+             Command:qos cql cql-index protocol protocol-name queue-key key-value  queue queue-number."
+             INDEX { qosCqlProListNum, qosCqlProName, qosCqlProQueKey, qosCqlProQueKeyValue }
+        ::= { qosCqlProtocolTable 1 }
+
+            
+    QosCqlProtocolEntry ::=
+        SEQUENCE { 
+            qosCqlProListNum
+                INTEGER,
+            qosCqlProName
+                INTEGER,
+            qosCqlProQueKey
+                INTEGER,
+            qosCqlProQueKeyValue
+                INTEGER,
+            qosCqlProQueNum
+                INTEGER,
+            qosUndoCqlProtocol
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9.1.1
+    qosCqlProListNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the CQL number.
+             Any number from 1 to 16 identifies the custom queue list."
+        ::= { qosCqlProtocolEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9.1.2
+    qosCqlProName OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            ip(1),
+            mpls(2)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the protocol type the enqueuing packets having." 
+        ::= { qosCqlProtocolEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9.1.3
+    qosCqlProQueKey OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            null(1),
+            fragment(2),
+            acl(3),
+            less-than(4),
+            greater-than(5),
+            tcp(6),
+            udp(7),
+            exp-mask(8)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the key words of traffic-classify rule."
+        ::= { qosCqlProtocolEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9.1.4
+    qosCqlProQueKeyValue OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the value of key words.
+             for greater-than,less-than,tcp,udp:0~65535 
+             for acl:2000~3999
+             for NULL and fragment: null
+             for exp-mask: 0~255 "
+        ::= { qosCqlProtocolEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9.1.5
+    qosCqlProQueNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The number of custom queue which the packets belong to the specified protocol type
+             and match the specified traffic-classifying rule will be put in."
+        ::= { qosCqlProtocolEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.9.1.6
+    qosUndoCqlProtocol OBJECT-TYPE
+        SYNTAX INTEGER
+            {                
+            qosCqlProtocol(0),
+            qosNoCqlProtocol(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: delete the corresponding protocol rule of the specified CQL number"
+        ::= { qosCqlProtocolEntry 6 }
+
+    
+    -- qos cql serving/queue-length   10                
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10
+    qosCqlQueParaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCqlQueParaEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL(Custom Queue List) serving/queue-length table
+             There are sixteen custom queues whose queue number is from 1 to 16.
+             The maximum queue length of each queue and serving can be configured
+             in each CQL whose number is from 1 to 16. Each custom queue has individual default maximum
+             queue length and serving."
+        ::= { hwIfQoSMib 10 }
+
+            
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10.1
+    qosCqlQueParaEntry OBJECT-TYPE
+        SYNTAX QosCqlQueParaEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQL serving/queue-length configuration information.
+             Command:qos cql cql-index queue queue-number serving byte-number
+                     qos cql cql-index queue queue-number queue-length queue-length"
+        INDEX { qosCqlQueParaListNum, qosCqlQueParaQueNum }
+        ::= { qosCqlQueParaTable  1 }
+
+            
+    QosCqlQueParaEntry ::=
+        SEQUENCE { 
+            qosCqlQueParaListNum
+                INTEGER,
+            qosCqlQueParaQueNum
+                INTEGER,
+            qosCqlQueParaServing
+                INTEGER,
+            qosCqlQueParaMaxQueLen
+                INTEGER,
+            qosUndoCqlQueParaServing
+                INTEGER,
+            qosUndoCqlQueParaMaxQueLen
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10.1.1
+    qosCqlQueParaListNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the CQL number.
+             Any number from 1 to 16 identifies the custom queue list."
+        ::= { qosCqlQueParaEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10.1.2
+    qosCqlQueParaQueNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the queue number."
+        ::= { qosCqlQueParaEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10.1.3
+    qosCqlQueParaServing OBJECT-TYPE
+        SYNTAX INTEGER (1..16777215)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum bytes that the specified queue can transmit in each turn.
+             The default value is 1500."
+        DEFVAL { 1500 }
+        ::= { qosCqlQueParaEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10.1.4
+    qosCqlQueParaMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of the specified queue."
+        DEFVAL { 20 }
+        ::= { qosCqlQueParaEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10.1.5
+    qosUndoCqlQueParaServing OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosCqlQueParaServing(0),
+            qosNoCqlQueParaServing(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: Set the defualt value of the maximum bytes that the specified queue can transmit in each turn."
+        ::= { qosCqlQueParaEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.10.1.6
+    qosUndoCqlQueParaMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosCqlQueParaMaxQueLen(0),
+            qosNoCqlQueParaMaxQueLen(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Only for get.
+             1: Set the defualt value of the maximum length of the specified queue."
+        ::= { qosCqlQueParaEntry 6 }
+
+
+    -- qos cq   11
+    -- 1.3.6.1.4.1.2011.5.25.32.2.11
+    qosCQTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCQEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQ(Custom Queuing) table
+             CQ is a kind of queuing strategy applied on interface for congestion management.
+             CQ allows a fairness not provided with PQ. Associated with each custom queue is a configurable
+             serving, which specifies how many bytes of data should be delivered from the current queue by 
+             the system before the system moves on to the next queue. When a particular queue is being 
+             processed, packets are sent until the number of bytes sent exceeds the queue serving or until
+             the queue is empty.
+             If the specified custom list is applied to an interface the Custom Queuing strategy
+             is applied on this interface. Only one list can be assigned per interface. 
+             This table is about the CQ configuration infomation."
+        ::= { hwIfQoSMib 11 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.11.1
+    qosCQEntry OBJECT-TYPE
+        SYNTAX QosCQEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQ configuration infomation
+             Command:qos cq cql"
+        INDEX { qosCQIfIndex }
+        ::= { qosCQTable 1 }
+
+            
+    QosCQEntry ::=
+        SEQUENCE { 
+            qosCQIfIndex
+                INTEGER,
+            qosCQListNum
+                INTEGER,
+            qosCQIfName
+                OCTET STRING,
+            qosUndoCQ
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.11.1.1
+    qosCQIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of table, which is the index of interface applying Custom Queuing strategy. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of ifIndex."
+        ::= { qosCQEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.11.1.2
+    qosCQListNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+             "The number of CQL applied to an interface identified by the value of qosCQIfIndex."
+        ::= { qosCQEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.11.1.3
+    qosCQIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface by the value of qosCQIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosCQEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.11.1.4
+    qosUndoCQ OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosCQ(0),
+            qosNoCQ(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Set the default queuing on interface: FIFO"
+        ::= { qosCQEntry 4 }
+
+
+    -- display qos cq interface   12                
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12
+    qosCQRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCQRunInfoEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQ(Custom Queuing) statistics table
+             This table is about the running infomation of CQ applied on interface for congestion management."
+        ::= { hwIfQoSMib 12 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12.1
+    qosCQRunInfoEntry OBJECT-TYPE
+        SYNTAX QosCQRunInfoEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CQ running infomation
+             Command:display qos cq interface"
+        INDEX { qosCQRunInfoIfIndex, qosCQRunInfoQueNum }
+        ::= { qosCQRunInfoTable 1 }
+
+            
+    QosCQRunInfoEntry ::=
+        SEQUENCE { 
+            qosCQRunInfoIfIndex
+                INTEGER,
+            qosCQRunInfoQueNum
+                INTEGER,
+            qosCQRunInfoIfName
+                OCTET STRING,
+            qosCQRunInfoQuePkt
+                INTEGER,
+            qosCQRunInfoQueDiscard
+                Counter,
+            qosCQRunInfoMaxQueLen
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12.1.1
+    qosCQRunInfoIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of the table, which is the index of interface applying Custom Queuing strategy. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of ifIndex."
+        ::= { qosCQRunInfoEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12.1.2
+    qosCQRunInfoQueNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of the table, which is the custom queue number"
+        ::= { qosCQRunInfoEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12.1.3
+    qosCQRunInfoIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface by the value of qosCQRunInfoIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosCQRunInfoEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12.1.4
+    qosCQRunInfoQuePkt OBJECT-TYPE
+        SYNTAX INTEGER (0..32767)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of packets enqueued the spceified custom queue when congestion occoured in the interface."
+        ::= { qosCQRunInfoEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12.1.5
+    qosCQRunInfoQueDiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of discarded packets which can't be enqueued the specified custom queue 
+             because the custom queue is full."
+        ::= { qosCQRunInfoEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.12.1.6
+    qosCQRunInfoMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of the specified queue.
+             The default value of maximum queue length is 20."
+        ::= { qosCQRunInfoEntry 6 }
+
+    -- qos wfq / display qos wfq interface  13                   
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13
+    qosWFQTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosWFQEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "WFQ(Weighted Fair Queuing) table
+             WFQ is a kind of queuing strategy applied on interface for congestion management.
+             With WFQ, packets are classified by flow. For example, packets with the same source IP address,
+             destination IP address, source TCP or UDP port, destination TCP or UDP port, and protocol 
+             belong to the same flow.
+             When enabled for an interface, WFQ provides traffic priority management that automatically sorts
+             among individual traffic flows without requiring first defined match rule lists.
+             This table is about the WFQ configuration and running infomation."
+        ::= { hwIfQoSMib 13 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1
+    qosWFQEntry OBJECT-TYPE
+        SYNTAX QosWFQEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "WFQ configuration and running infomation
+             Command:qos wfq [ queue-length max-queue-length [ queue-number  total-queue-number ] ]
+                     display qos wfq interface"
+        INDEX { qosWFQIfIndex }
+        ::= { qosWFQTable 1 }
+
+            
+    QosWFQEntry ::=
+        SEQUENCE { 
+            qosWFQIfIndex
+                INTEGER,
+            qosWFQIfName
+                OCTET STRING,
+            qosWFQMaxQueLen
+                INTEGER,
+            qosWFQTotalQueNum
+                INTEGER,
+            qosWFQCurQueLen
+                INTEGER,
+            qosWFQTotalDiscard
+                Counter,
+            qosWFQActiveQueNum
+                INTEGER,
+            qosWFQMaxActiveQueNum
+                INTEGER,
+            qosUndoWFQ
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.1
+    qosWFQIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of the table, which is the index of interface applying Weighted Fair Queuing strategy. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of ifIndex."
+        ::= { qosWFQEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.2
+    qosWFQIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface by the value of qosWFQIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosWFQEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.3
+    qosWFQMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum length of the queue."
+        ::= { qosWFQEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.4
+    qosWFQTotalQueNum OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            a16(16),
+            a32(32),
+            a64(64),
+            a128(128),
+            a256(256),
+            a512(512),
+            a1024(1024),
+            a2048(2048),
+            a4096(4096)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The total number of queues. The default value is a256(256)."
+        ::= { qosWFQEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.5
+    qosWFQCurQueLen OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of packets enqueued all the queues when congestion occoured in the interface."
+        ::= { qosWFQEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.6
+    qosWFQTotalDiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The count of discarded packets which can't be enqueued all the queues
+             because the queue is full."
+        ::= { qosWFQEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.7
+    qosWFQActiveQueNum OBJECT-TYPE
+        SYNTAX INTEGER (0..32767)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "A queue becomes active when the queue is not empty.
+             The count of current active queues when WFQ was enabled in the interface."
+        ::= { qosWFQEntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.8
+    qosWFQMaxActiveQueNum OBJECT-TYPE
+        SYNTAX INTEGER (0..32767)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum count of active queues.
+             It is the count of active queues that have occurred since WFQ was enabled in the interface."
+        ::= { qosWFQEntry 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.13.1.9
+    qosUndoWFQ OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosWFQ(0),
+            qosNoWFQ(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Set the default queuing on interface: FIFO"
+        ::= { qosWFQEntry 9 }
+  
+-- Reserved for H3C            
+--                qosWFQQueueType OBJECT-TYPE
+--                        SYNTAX INTEGER
+--                                {
+--                                ip-precedence(1),
+--                                dscp(2)
+--                                }
+--                        MAX-ACCESS read-write
+--                        STATUS current
+--                        DESCRIPTION
+--                                "
+--                                1: hashed by ip precedence
+--                                2: hashed by dscp
+--                                "
+--                        ::= { qosWFQEntry 10 }
+
+    -- qos wred / qos wred weighting-constant  13      
+    -- 1.3.6.1.4.1.2011.5.25.32.2.14
+    qosWREDTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosWREDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "WRED(Weighted Random Early Detect) table.
+             WRED is a congestion avoidance mechanism that slows traffic by randomly dropping packets when
+             congestion exists. WRED can be enabled only when Weighted Fair Queuing strategy was enable on 
+             the interface.
+             This table is about the WRED configuration infomation."
+        ::= { hwIfQoSMib 14 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.14.1
+    qosWREDEntry OBJECT-TYPE
+        SYNTAX QosWREDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "WRED configuration infomation
+             Command:qos wred
+                     qos wred weighting-constant exponent"
+        INDEX { qosWREDIfIndex }
+        ::= { qosWREDTable 1 }
+
+            
+    QosWREDEntry ::=
+        SEQUENCE { 
+            qosWREDIfIndex
+                INTEGER,
+            qosWREDIfName
+                OCTET STRING,
+            qosWREDWeightConstant
+                INTEGER,
+            qosWREDEnable
+                INTEGER,
+            qosUndoWREDWeightConstant
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.14.1.1
+    qosWREDIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of the table, which is the index of interface applying Weighted Random Early Detection. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of qosWFQIfIndex."
+        ::= { qosWREDEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.14.1.2
+    qosWREDIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface by the value of qosWREDIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosWREDEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.14.1.3
+    qosWREDWeightConstant OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Weighted factor in formula for calculating the mean length of queue. From 1 to 16, the default value is 9"
+        DEFVAL { 9 }
+        ::= { qosWREDEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.14.1.4
+    qosWREDEnable OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disable(0),
+            enable(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0: Disable WRED feature. Recover to tail-drop.
+             1: Enable WRED feature for the specified interface."
+        ::= { qosWREDEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.14.1.5
+    qosUndoWREDWeightConstant OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosWREDExponent(0),
+            qosNoWREDExponent(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Recover the default value of weighted factor: 9"
+        ::= { qosWREDEntry 5 }
+
+
+    -- qos wred ip-precedence   15                
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15
+    qosWREDPreTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosWREDPreEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "WRED(Weighted Random Early Detect) precedence table.
+             Weighted Random Early Detection(WRED) parameters for a particular IP Precedence
+             can be configured.
+             This table is about the WRED precedence configuration and running infomation."
+        ::= { hwIfQoSMib 15 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1
+    qosWREDPreEntry OBJECT-TYPE
+        SYNTAX QosWREDPreEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "WRED precedence configuration infomation
+             Command:qos wred ip-precedence ip-precedence low-limit low-limit high-limit  high-limit discard-probability   discard-prob"
+        INDEX { qosWREDPreIfIndex, qosWREDPrecedence }
+        ::= { qosWREDPreTable 1 }
+
+            
+    QosWREDPreEntry ::=
+        SEQUENCE { 
+            qosWREDPreIfIndex
+                INTEGER,
+            qosWREDPrecedence
+                INTEGER,
+            qosWREDPreIfName
+                OCTET STRING,
+            qosWREDPreLowLimit
+                INTEGER,
+            qosWREDPreHighLimit
+                INTEGER,
+            qosWREDPreDiscardProbability
+                INTEGER,
+            qosWREDPreRandomDropNum
+                Counter,
+            qosWREDPreTailDropNum
+                Counter,
+            qosUndoWREDPre
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.1
+    qosWREDPreIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of the table, which is the index of interface applying Weighted Random Early Detection. 
+             The interface identified by the value of this index is the same interface 
+             as identified by the same value of qosWREDIfIndex."
+        ::= { qosWREDPreEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.2
+    qosWREDPrecedence OBJECT-TYPE
+        SYNTAX INTEGER (0..7)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "IP precedence, from 0 to 7"
+        ::= { qosWREDPreEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.3
+    qosWREDPreIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface by the value of qosWREDPreIfIndex.
+             It's a textual string containing information about the interface type and the interface number."
+        ::= { qosWREDPreEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.4
+    qosWREDPreLowLimit OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Low Limit in number of packets. When the average queue length reaches the
+             low limit, WRED randomly drops some packets with the specified IP Precedence.
+             For all precedences, the default value is 10."
+        ::= { qosWREDPreEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.5
+    qosWREDPreHighLimit OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "High limit in number of packets. When the average queue length exceeds the 
+             high limit, WRED drops all packets with the specified IP Precedence.
+             For all precedences, the default value is 30."
+        ::= { qosWREDPreEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.6
+    qosWREDPreDiscardProbability OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Discard probability denominator.
+             It is for the fraction of packets dropped when the average queue depth is at the high limit.
+             For example, if the denominator is 128, 1 out of every 128 packets is dropped when the 
+             average queue is at the high limit.
+             For all precedences, the default value is 10."
+        DEFVAL { 10 }
+        ::= { qosWREDPreEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.7
+    qosWREDPreRandomDropNum OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Number of packets random-dropped for WRED"
+        ::= { qosWREDPreEntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.8
+    qosWREDPreTailDropNum OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Number of packets tail-dropped for WRED"
+        ::= { qosWREDPreEntry 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.15.1.9
+    qosUndoWREDPre OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosWREDPre(0),
+            qosNoWREDPre(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Recover the default value of low-limit,high-limit and discard-probability on relevant precedence."
+        ::= { qosWREDPreEntry 9 }
+
+    -- qos carl  16   
+    -- the CARL table
+    -- CARL(Committed Access Rate List) is the list of CAR. The traffic matching the 
+    -- CARL will apply the CAR policy.   
+    -- The CARL table contains CAR List configuration.
+    -- 1.3.6.1.4.1.2011.5.25.32.2.16
+    qosCarlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCarlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CARL(Committed Access Rate List) table"
+        ::= { hwIfQoSMib 16 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.16.1
+    qosCarlEntry OBJECT-TYPE
+        SYNTAX QosCarlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CARL configuration infomation
+             Command:qos carl carl-index { precedence precedence-value | mac mac-address }"
+        INDEX { qosCarlListNum }
+        ::= { qosCarlTable 1 }
+
+            
+    QosCarlEntry ::=
+        SEQUENCE { 
+            qosCarlListNum
+                INTEGER,
+            qosCarlParaType
+                INTEGER,
+            qosCarlParaValue
+                OCTET STRING,
+            qosUndoCarl
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.16.1.1
+    qosCarlListNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of the CARL table, which is the CARL number"
+        ::= { qosCarlEntry 1 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.16.1.2
+    qosCarlParaType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            mac-address(1),
+            prec-mask(2),
+            dscp-mask(3)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The matching type of the CARL. The types are as follows:
+             Mac-address(1) -- matching the MAC address of the ethernet frame.
+             prec-mask(2) -- matching the IP precedence of the IP packet.
+             dscp-mask(3) -- matching the IP DSCP of the IP packet.
+             "
+        ::= { qosCarlEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.16.1.3
+    qosCarlParaValue OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The parameter value of CARL.
+             When CarlParaType=mac-address(1), this value is the MAC address 
+             with the format HHHHHH(hex). 
+             When CarlParaType=prec-mask(2), this value is the IP precedence mask.
+             The value range is 0x00000000 ~ 0x11111111. The bit is corresponding 
+             to IP precedence.
+             For example, in value 0x00100010, the bit 0 and bit 5 is set, that means
+             IP precedenc 1 and 5."
+        ::= { qosCarlEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.16.1.4
+    qosUndoCarl OBJECT-TYPE
+        SYNTAX INTEGER
+            {                
+            qosCARL(0),
+            qosNoCARL(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+            1:Delete the specified CARL"
+        ::= { qosCarlEntry 4 }
+
+
+    -- qos car / display qos car interface 17
+    -- the CAR table
+    -- CAR(Committed Access Rate) is the feature for limiting the traffic to a committed rate. 
+    -- The CAR table contains configuration and running information of the CAR policy
+    -- which applied on an interface.
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17
+    qosCARTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosCAREntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CAR(Committed Access Rate) table"
+        ::= { hwIfQoSMib 17 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1
+    qosCAREntry OBJECT-TYPE
+        SYNTAX QosCAREntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "CAR configuration and running infomation.
+             Command:qos car { inbound | outbound } { any | acl  acl-index | carl carl-index } cir committed-rate cbs burst-size ebs excess-burst-size conform action exceed action
+                     display qos car interface"
+        INDEX { qosCARIfIndex, qosCARPktDirection, qosCARType, qosCARListNum, qosCARCIR, 
+                qosCARBurstSize, qosCARExcessBurstSize }
+        ::= { qosCARTable 1 }
+
+            
+    QosCAREntry ::=
+        SEQUENCE { 
+            qosCARIfIndex
+                INTEGER,
+            qosCARIfName
+                OCTET STRING,
+            qosCARPktDirection
+                INTEGER,
+            qosCARType
+                INTEGER,
+            qosCARListNum
+                INTEGER,
+            qosCARCIR
+                INTEGER,
+            qosCARBurstSize
+                INTEGER,
+            qosCARExcessBurstSize
+                INTEGER,
+            qosCARConformAction
+                INTEGER,
+            qosCARExceedAction
+                INTEGER,
+            qosCARConformNewPrec
+                INTEGER,
+            qosCARExceedNewPrec
+                INTEGER,
+            qosCARConformPkt
+                Counter,
+            qosCARConformByte
+                Counter,
+            qosCARExceedPkt
+                Counter,
+            qosCARExceedByte
+                Counter,
+            qosUndoCAR
+                INTEGER    
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.1
+    qosCARIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the CAR table. This is the index of the interface 
+             on which CAR policy applied."
+        ::= { qosCAREntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.2
+    qosCARIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface."
+        ::= { qosCAREntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.3
+    qosCARPktDirection OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            inbound(1),
+            outbound(2)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the CAR table. This is the direction of traffic.
+             There are two directions: inbound(1) and outbound(2)  "
+        ::= { qosCAREntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.4
+    qosCARType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            acl(1),
+            carl(2),
+            all(3)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the CAR table. This is the matching type 
+             for the traffic. 
+             The value acl(1) means that the traffic matching the 
+             configured ACL is applicable to the CAR policy.
+             The value carl(2) means that the traffic matching the 
+             configured CARL is applicable to the CAR policy.            
+             The value all(3) means that all the traffic passing the interface
+             is applicable to the CAR policy."
+        ::= { qosCAREntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.5
+    qosCARListNum OBJECT-TYPE
+        SYNTAX INTEGER (0..199|2000..3999)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the CAR table. This is the ACL number or CARL number. 
+             When CARType=1,this number is ACL number, the range is 2000..3999;
+             When CARType=2,this number is CARL number, the range is 1..199;
+             When CARType=3,this parameter is invalid"
+        ::= { qosCAREntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.6
+    qosCARCIR OBJECT-TYPE
+        SYNTAX INTEGER (8000..155000000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the CAR table. The Committed Information Rate.
+             Unit: bps. This is the target rate which the CAR policy limits. "
+        ::= { qosCAREntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.7
+    qosCARBurstSize OBJECT-TYPE
+        SYNTAX INTEGER (15000..155000000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the CAR table. Burst traffic size. Unit: bit. 
+             This is the amount of traffic in excess of the committed information 
+             rate that will be permitted by the CAR policy."
+        ::= { qosCAREntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.8
+    qosCARExcessBurstSize OBJECT-TYPE
+        SYNTAX INTEGER (0..155000000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the CAR table. Excess Burst Size. Unit: bit. 
+             This is the amount of traffic in excess of the burst size, 
+             which may be conditionally permitted by the CAR policy."
+        ::= { qosCAREntry 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.9
+    qosCARConformAction OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            continue(1),
+            discard(2),
+            remark-prec-continue(3),
+            remark-prec-pass(4),
+            pass(5),
+            remark-mplsexp-continue(6),
+            remark-mplsexp-pass(7)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Action to be taken by the traffic, when the traffic  
+             conforms CIR. There are the following actions:
+             Continue(1) -- Continue to be processed by the following 
+                            CAR policy which applied on the interface.
+             Discard(2) -- Discard the packet.
+             remark-prec-continue(3) -- Remark the IP precedence of IP packet,
+                                        and then continue to be processed by 
+                                        the following CAR policy.
+             remark-prec-pass(4) -- Remark the IP precedence of IP packet,
+                                    and then send the packet.
+             pass(5) -- Send the packet directly.                            
+             remark-mplsexp-continue(6) -- Remark the mpls exp field of mpls packet,
+                                           and then continue to be processed by 
+                                           the following CAR policy.
+             remark-mplsexp-pass(7) -- Remark the mpls exp field of mpls packet,
+                                       and then send the packet.
+             "
+        ::= { qosCAREntry 9 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.10
+    qosCARExceedAction OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            continue(1),
+            discard(2),
+            remark-prec-continue(3),
+            remark-prec-pass(4),
+            pass(5),
+            remark-mplsexp-continue(6),
+            remark-mplsexp-pass(7)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Action to be taken by the traffic, when the traffic is 
+             exceeds the CIR. There are the following actions:
+             Continue(1) -- Continue to be processed by the following 
+                            CAR policy which applied on the interface.
+             Discard(2) -- Discard the packet.
+             remark-prec-continue(3) -- Remark the IP precedence of IP packet,
+                                        and then continue to be processed by 
+                                        the following CAR policy.
+             remark-prec-pass(4) -- Remark the IP precedence of IP packet,
+                                    and then send the packet.
+             pass(5) -- Send the packet directly.                            
+             remark-mplsexp-continue(6) -- Remark the mpls exp field of mpls packet,
+                                           and then continue to be processed by 
+                                           the following CAR policy.
+             remark-mplsexp-pass(7) -- Remark the mpls exp field of mpls packet,
+                                       and then send the packet.
+             "
+        ::= { qosCAREntry 10 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.11
+    qosCARConformNewPrec OBJECT-TYPE
+        SYNTAX INTEGER (0..7)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Rewrite the precedence value on packets when traffic is within the CIR"
+        ::= { qosCAREntry 11 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.12
+    qosCARExceedNewPrec OBJECT-TYPE
+        SYNTAX INTEGER (0..7)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Rewrite the precedence value on packets when traffic is out of CIR"
+        ::= { qosCAREntry 12 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.13
+    qosCARConformPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of packets which conformed CIR."
+        ::= { qosCAREntry 13 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.14
+    qosCARConformByte OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The bytes of packets which conformed CIR."
+        ::= { qosCAREntry 14 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.15
+    qosCARExceedPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of packets which exceeded CIR."
+            ::= { qosCAREntry 15 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.16
+    qosCARExceedByte OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "the bytes of packets which exceeded CIR."
+        ::= { qosCAREntry 16 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.17.1.17
+    qosUndoCAR OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosCAR(0),
+            qosNoCAR(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Cancel the CAR policy applied on the interface."
+        ::= { qosCAREntry 17 }
+
+
+    -- qos gts / display qos gts interface  18
+
+    -- the GTS table
+    -- GTS(Generic Traffic Shaping) is the feature for shaping the traffic. 
+    -- The GTS table contains configuration and running information of GTS policy
+    -- which applied on an interface. 
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18
+    qosGTSTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosGTSEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "GTS(Generic Traffic Shaping) table"
+        ::= { hwIfQoSMib 18 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1
+    qosGTSEntry OBJECT-TYPE
+        SYNTAX QosGTSEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "GTS configuration and running information
+             Command:qos gts { any | acl acl-index } cir committed-rate [ cbs burst-size [ ebs excess-burst-size [ queue-length queue-length ] ] ]
+                     display qos gts interface"
+        INDEX { qosGTSIfIndex, qosGTSType, qosGTSACLNum }
+        ::= { qosGTSTable 1 }
+
+    
+    QosGTSEntry ::=
+        SEQUENCE { 
+            qosGTSIfIndex
+                INTEGER,
+            qosGTSIfName
+                OCTET STRING,
+            qosGTSType
+                INTEGER,
+            qosGTSACLNum
+                INTEGER,
+            qosGTSCIR
+                INTEGER,
+            qosGTSBurstSize
+                INTEGER,
+            qosGTSExcessBurstSize
+                INTEGER,
+            qosGTSMaxQueLen
+                INTEGER,
+            qosGTSCurQueLen
+                INTEGER,
+            qosGTSPassPkt
+                Counter,
+            qosGTSPassByte
+                Counter,
+            qosGTSDelayPkt
+                Counter,
+            qosGTSDelayByte
+                Counter,
+            qosGTSDiscardPkt
+                Counter,
+            qosGTSDiscardByte
+                Counter,
+            qosUndoGTS
+                INTEGER
+            }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.1
+    qosGTSIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the GTS table. This is the index of the interface 
+             on which GTS policy applied."
+        ::= { qosGTSEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.2
+    qosGTSIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface on which GTS policy applied."
+        ::= { qosGTSEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.3
+    qosGTSType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            acl(1),
+            all(2)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the GTS table. This is the matching type 
+             for the traffic. 
+             The value acl(1) means that the traffic matching the 
+             configured ACL is applicable to the GTS policy.
+             The value all(2) means that all the traffic passing the interface
+             is applicable to the GTS policy."
+        ::= { qosGTSEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.4
+    qosGTSACLNum OBJECT-TYPE
+        SYNTAX INTEGER (0|2000..3999)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "One of the index of the GTS table. This is the ACL number 
+             for the shaping traffic to match. "
+        ::= { qosGTSEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.5
+    qosGTSCIR OBJECT-TYPE
+        SYNTAX INTEGER (8000..155000000)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The Committed Information Rate. This is the target sustained 
+             rate which the GTS policy will shape. Unit: bps."
+        ::= { qosGTSEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.6
+    qosGTSBurstSize OBJECT-TYPE
+        SYNTAX INTEGER (15000..155000000)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Burst traffic size. Unit: bit. This is the amount of traffic 
+             in excess of the committed information rate that will be permitted 
+             by the GTS policy."
+        ::= { qosGTSEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.7
+    qosGTSExcessBurstSize OBJECT-TYPE
+        SYNTAX INTEGER (0..155000000)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Excess Burst Size. Unit: bit. This is the amount of traffic 
+             in excess of the burst size, which may be conditionally permitted
+             by the GTS policy."
+        ::= { qosGTSEntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.8
+    qosGTSMaxQueLen OBJECT-TYPE
+        SYNTAX INTEGER (1..1024)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The maximum queue length for the GTS buffer."
+        ::= { qosGTSEntry 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.9
+    qosGTSCurQueLen OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The current queue length for the GTS buffer, i.e. the 
+             number of packets queuing in the GTS buffer."
+        ::= { qosGTSEntry 9 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.10
+    qosGTSPassPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+             "The number of packets which passed by the GTS policy."
+        ::= { qosGTSEntry 10 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.11
+    qosGTSPassByte OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The bytes of packets which passed by the GTS policy."
+        ::= { qosGTSEntry 11 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.12
+    qosGTSDelayPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of packets which delayed by the GTS policy."
+        ::= { qosGTSEntry 12 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.13
+    qosGTSDelayByte OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The bytes of packets which delayed by the GTS policy."
+        ::= { qosGTSEntry 13 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.14
+    qosGTSDiscardPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of packets which discarded by the GTS policy."
+    ::= { qosGTSEntry 14 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.15
+    qosGTSDiscardByte OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The bytes of packets which discarded by the GTS policy."
+        ::= { qosGTSEntry 15 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.18.1.16
+    qosUndoGTS OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosGTS(0),
+            qosNoGTS(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Cancel the GTS policy applied on the interface."
+        ::= { qosGTSEntry 16 }
+
+                
+    -- LR    19
+    -- IfIndex          interface index
+    -- IfName           (read-only)
+    -- CIR              8000-155000000
+    -- BurstSize        15000-155000000
+    -- ExcessBurstSize  0-155000000
+    -- PassPkt          number of transmitted packet(read-only)
+    -- PassByte         bytes of transmitted packet(read-only)
+    -- DelayPkt         number of delayed packet(read-only)
+    -- DelayByte        bytes of delayed packet(read-only) 
+    -- UndoLR           1
+    -- IfIndex is index
+
+    -- the LR table
+    -- LR(Line Rate) is a feature for limiting the rate of a physical interface
+    -- to make the rate of upstream router adapted for the interface capability
+    -- of downstream router.
+    -- The LR table contains configuration and running information of LR policy
+    -- which applied on an interface.  
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19
+    qosLRTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosLREntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "LR(Line Rate) table."
+        ::= { hwIfQoSMib 19 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1
+    qosLREntry OBJECT-TYPE
+        SYNTAX QosLREntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "LR configuration and running information.
+             Command:qos lr
+                     display qos lr interface"
+        INDEX { qosLRIfIndex }
+        ::= { qosLRTable 1 }
+
+            
+    QosLREntry ::=
+        SEQUENCE { 
+            qosLRIfIndex
+                INTEGER,
+            qosLRIfName
+                OCTET STRING,
+            qosLRCIR
+                INTEGER,
+            qosLRBurstSize
+                INTEGER,
+            qosLRExcessBurstSize
+                INTEGER,
+            qosLRPassPkt
+                Counter,
+            qosLRPassByte
+                Counter,
+            qosLRDelayPkt
+                Counter,
+            qosLRDelayByte
+                Counter,
+            qosUndoLR
+                INTEGER
+             }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.1
+    qosLRIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The index of the LR table, which is the index of the interface 
+             on which LR policy is applied."
+        ::= { qosLREntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.2
+    qosLRIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the interface on which LR policy is applied."
+        ::= { qosLREntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.3
+    qosLRCIR OBJECT-TYPE
+        SYNTAX INTEGER (8000..155000000)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The Committed Information Rate on the physical port. This is the target sustained rate 
+             which the LR policy limits. Unit: bps."
+        ::= { qosLREntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.4
+    qosLRBurstSize OBJECT-TYPE
+        SYNTAX INTEGER (15000..155000000)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Burst traffic size. Unit: bit. This is the amount of traffic 
+             in excess of the committed information rate that will be permitted 
+             by the LR policy."
+        ::= { qosLREntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.5
+    qosLRExcessBurstSize OBJECT-TYPE
+        SYNTAX INTEGER (0..155000000)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Excess Burst Size. Unit: bit. This is the amount of traffic 
+             in excess of the burst size, which may be conditionally permitted
+             by the LR policy."
+        ::= { qosLREntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.6
+    qosLRPassPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The Number of packets which passed by LR policy."
+        ::= { qosLREntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.7
+    qosLRPassByte OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The bytes of packets which passed by LR policy."
+        ::= { qosLREntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.8
+    qosLRDelayPkt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The number of packets which delayed by LR policy."
+        ::= { qosLREntry 8 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.9
+    qosLRDelayByte OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The bytes of packets which delayed by LR policy."
+        ::= { qosLREntry 9 }
+
+    -- 1.3.6.1.4.1.2011.5.25.32.2.19.1.10
+    qosUndoLR OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            qosLR(0),
+            qosNoLR(1)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "0:Only for get.
+             1:Cancel the LR policy applied on the interface."
+        ::= { qosLREntry 10 }
+            
+    -- bandwidth parameter on interface                
+    qosIfBandwidthTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosIfBandwidthEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of bandwidth parameter on interface.
+            "
+        ::= { hwIfQoSMib 20 }
+        
+    qosIfBandwidthEntry OBJECT-TYPE
+        SYNTAX QosIfBandwidthEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Bandwidth parameter applied on Interface."
+        INDEX { qosIfBandwidthIfIndex }
+        ::= { qosIfBandwidthTable 1 }
+        
+    QosIfBandwidthEntry ::=
+        SEQUENCE {                
+            qosIfBandwidthIfIndex
+                Integer32,
+            qosIFBandwidthMaxBW
+                Integer32,                                                
+            qosIFBandwidthMaxReservedBWPct
+                Integer32,
+            qosIFBandwidthMaxReservedBW
+                Integer32,
+            qosIFBandwidthAvailable
+                Integer32,    
+            qosIFBandwidthRowStatus 
+                RowStatus                                                         
+            }    
+                              
+    qosIfBandwidthIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interface Index, equal to ifIndex."
+        ::= { qosIfBandwidthEntry 1 }
+        
+    qosIFBandwidthMaxBW OBJECT-TYPE
+        SYNTAX Integer32 (1..1000000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max bandwidth Value (Unit: Kbps) applied on the interface."
+        ::= { qosIfBandwidthEntry 2 }            
+        
+    qosIFBandwidthMaxReservedBWPct OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max reserved bandwidth as percent of the interface bandwidth (Unit: percent)."
+        ::= { qosIfBandwidthEntry 3 }  
+            
+    qosIFBandwidthMaxReservedBW OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max reserved bandwidth. Unit : Kbps"
+        ::= { qosIfBandwidthEntry 4 }    
+        
+    qosIFBandwidthAvailable OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Available bandwidth. Unit : Kbps"
+        ::= { qosIfBandwidthEntry 5 }              
+        
+    qosIFBandwidthRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus for qosIfBandwidthTable Table. 
+            Three actions are used: active, createAndGo, destroy"
+        ::= { qosIfBandwidthEntry 6 }        
+        
+    -- Rtpq applied on the interface               
+    qosRTPIfApplyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosRTPIfApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of QoS rtpq instance."
+        ::= { hwIfQoSMib 21 }
+        
+    qosRTPIfApplyEntry OBJECT-TYPE
+        SYNTAX QosRTPIfApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Rtpq Configuration Information Entry."
+        INDEX { qosRTPIfApplyIfIndex }
+        ::= { qosRTPIfApplyTable 1 }
+        
+    QosRTPIfApplyEntry ::=
+        SEQUENCE { 
+            qosRTPIfApplyIfIndex
+                Integer32,
+            qosRTPIfApplyStartPort
+                Integer32,
+            qosRTPIfApplyEndPort 
+                Integer32,
+            qosRTPIfApplyBandWidth 
+                Integer32,
+            qosRTPIfApplyCbs 
+                Integer32,    
+            qosRTPIfApplyRowStatus 
+                RowStatus                        
+        }  
+        
+    qosRTPIfApplyIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interface Index, equal to ifIndex."
+        ::= { qosRTPIfApplyEntry 1 }    
+        
+    qosRTPIfApplyStartPort OBJECT-TYPE
+        SYNTAX Integer32(2000..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                                
+            RTP-PORT(3): start-port: 2000~65535   
+            "                 
+        ::= { qosRTPIfApplyEntry 2 }
+        
+    qosRTPIfApplyEndPort OBJECT-TYPE
+        SYNTAX Integer32(2000..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                 
+            RTP-PORT(3): end-port: 2000~65535
+            "                 
+        ::= { qosRTPIfApplyEntry 3 }
+        
+    qosRTPIfApplyBandWidth OBJECT-TYPE
+        SYNTAX Integer32 (8..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Max bandwidth Value:
+            Absolute value: 8..1000000. Unit: Kbps             
+            "                
+        ::= { qosRTPIfApplyEntry 4 }  
+        
+    qosRTPIfApplyCbs OBJECT-TYPE
+        SYNTAX Integer32 (1500..2000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Committed Burst Size: 1500..2000000. Unit: bytes             
+            "                
+        ::= { qosRTPIfApplyEntry 5 }        
+        
+    qosRTPIfApplyRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus for RTPQoSIfApply Table. 
+            Three actions are used: active, createAndGo, destroy"
+        ::= { qosRTPIfApplyEntry 6 } 
+                
+    -- RTPQ statistics on the interface               
+    qosRTPIfQueueRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosRTPIfQueueRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Running statistics for RTP(Realtime Transport Protocol) Queue
+            applied on the interface."
+        ::= { hwIfQoSMib 22 }
+        
+    qosRTPIfQueueRunInfoEntry OBJECT-TYPE
+        SYNTAX QosRTPIfQueueRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "RTP(Realtime Transport Protocol) Queue statistics entry."
+        INDEX { qosRTPIfApplyIfIndex    }
+        ::= { qosRTPIfQueueRunInfoTable 1 }
+        
+    QosRTPIfQueueRunInfoEntry ::=
+        SEQUENCE {
+            qosRTPIfQueueSize
+                Counter32,
+            qosRTPIfQueueMaxSize
+                Counter32, 
+            qosRTPIfQueueOutputs
+                Counter32,
+            qosRTPIfQueueDiscards
+                Counter32                                                                    
+        }  
+            
+    qosRTPIfQueueSize OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Size of Rtpq Queue."
+        ::= { qosRTPIfQueueRunInfoEntry 1 }    
+                             
+    qosRTPIfQueueMaxSize OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Max packet number of RTP(Realtime Transport Protocol) Queue."
+        ::= { qosRTPIfQueueRunInfoEntry 2 }
+        
+    qosRTPIfQueueOutputs OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output packet number of RTP(Realtime Transport Protocol) Queue."
+        ::= { qosRTPIfQueueRunInfoEntry 3 } 
+                 
+    qosRTPIfQueueDiscards OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Discarded packet number of RTP(Realtime Transport Protocol) Queue."
+        ::= { qosRTPIfQueueRunInfoEntry 4 }                   
+       
+END
+
+--
+-- HUAWEI-IF-QOS-MIB.mib
+--
+
+
+
+

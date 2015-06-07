@@ -1,0 +1,278 @@
+
+BAY-STACK-VRRP-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, NOTIFICATION-TYPE,
+    IpAddress, Counter32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus, MacAddress
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    ipAdEntAddr
+        FROM IP-MIB
+    vrrpOperVrId, vrrpOperPrimaryIpAddr
+        FROM VRRP-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackVrrpExtMib MODULE-IDENTITY
+    LAST-UPDATED    "200507010000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "Nortel Networks VRRP Extension MIB
+
+         Copyright 2005 Nortel Networks, Inc.
+         All rights reserved.
+         This Nortel Networks SNMP Management Information Base
+         Specification embodies Nortel Networks' confidential and
+         proprietary intellectual property. Nortel Networks retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Nortel Networks
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200507010000Z" -- 01 July 2005
+    DESCRIPTION "v1:  Initial version."
+
+    ::= { bayStackMibs 11 }
+
+bsveNotifications OBJECT IDENTIFIER ::= { bayStackVrrpExtMib 0 }
+bsveObjects       OBJECT IDENTIFIER ::= { bayStackVrrpExtMib 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Scalar Objects
+-- -------------------------------------------------------------
+
+bsveScalars OBJECT IDENTIFIER ::= { bsveObjects 1 }
+
+bsveVrrpEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether VRRP is globally enabled for the system."
+    ::= { bsveScalars 1 }
+
+bsveVrrpPingVirtualAddrEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this device should respond to pings
+         directed to a virtual router's IP address."
+    DEFVAL { true }
+    ::= { bsveScalars 2 }
+
+-- -------------------------------------------------------------
+-- VRRP Operations Extensions Table
+-- -------------------------------------------------------------
+
+bsveVrrpOperExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsveVrrpOperExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Extensions to the vrrpOperTable from RFC 2787."
+    ::= { bsveObjects 2 }
+
+bsveVrrpOperExtEntry OBJECT-TYPE
+    SYNTAX BsveVrrpOperExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A set of objects that augments the vrrpOperTable."
+    INDEX { ifIndex, vrrpOperVrId }
+    ::= { bsveVrrpOperExtTable 1 }
+
+BsveVrrpOperExtEntry ::=
+    SEQUENCE {
+        bsveVrrpOperExtCriticalIpAddr           IpAddress,
+        bsveVrrpOperExtCriticalIpAddrEnabled    TruthValue,
+        bsveVrrpOperExtHoldDownTimer            INTEGER,
+        bsveVrrpOperExtHoldDownState            INTEGER,
+        bsveVrrpOperExtHoldDownTimeRemaining    INTEGER,
+        bsveVrrpOperExtAction                   INTEGER,
+        bsveVrrpOperExtBackUpMasterEnabled      TruthValue,
+        bsveVrrpOperExtBackUpMasterState        INTEGER,
+        bsveVrrpOperExtFasterAdvInterval        Integer32,
+        bsveVrrpOperExtFasterAdvIntervalEnabled TruthValue
+    }
+
+bsveVrrpOperExtCriticalIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address of the interface that will cause a
+		     shutdown event."
+    ::= { bsveVrrpOperExtEntry 1 }
+ 
+bsveVrrpOperExtCriticalIpAddrEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the user-defined critical IP address is
+         enabled.  If the user-defined critical IP address is not
+         enabled, a default critical IP address of 0.0.0.0 will be used.
+         No effect if an user-defined IP address does not exist."
+    DEFVAL      { false }
+    ::= { bsveVrrpOperExtEntry 2 }
+
+bsveVrrpOperExtHoldDownTimer OBJECT-TYPE
+    SYNTAX      INTEGER (0..21600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to configure the amount of time (in seconds)
+        to wait before preempting the current vrrp master."
+    ::= { bsveVrrpOperExtEntry 3 }
+
+bsveVrrpOperExtHoldDownState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dormant(1),
+                    active(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used to indicate the hold-down state of this vrrp
+         interface.  If the hold-down timer is operational
+         this variable will be set to 'active'.  'dormant'
+         otherwise."
+    ::= { bsveVrrpOperExtEntry 4 }
+
+bsveVrrpOperExtHoldDownTimeRemaining OBJECT-TYPE
+    SYNTAX      INTEGER (0..21600)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used to indicate the amount of time (in seconds)
+        left before the bsveVrrpOperExtHoldDownTimer will expire."
+    ::= { bsveVrrpOperExtEntry 5 }
+
+bsveVrrpOperExtAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    preemptHoldDownTimer(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to trigger an action on this vrrp interface."
+    ::= { bsveVrrpOperExtEntry 6 }
+
+bsveVrrpOperExtBackUpMasterEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    DEFVAL      { false }
+    ::= { bsveVrrpOperExtEntry 7 }
+
+bsveVrrpOperExtBackUpMasterState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(1),
+                    down(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    DEFVAL      { down }
+    ::= { bsveVrrpOperExtEntry 8 }
+
+bsveVrrpOperExtFasterAdvInterval OBJECT-TYPE
+    SYNTAX      Integer32 (200..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This is the faster advertisement interval, in
+                 milliseconds, between sending advertisement
+                 messages. When the faster advertisement interval
+                 enable is checked, the faster advertisement interval
+                 is being used instead of the regular advertisement
+                 interval"
+    DEFVAL      { 200 }
+    ::= { bsveVrrpOperExtEntry 9 }
+
+bsveVrrpOperExtFasterAdvIntervalEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to indicate if the Faster Advertisement Interval
+                 should be used. 'Disable' means use regular
+                 Advertisement interval."
+    DEFVAL      { false }
+    ::= { bsveVrrpOperExtEntry 10 }
+
+-- -------------------------------------------------------------
+-- Notifications
+-- -------------------------------------------------------------
+
+bsveNotificationObjects OBJECT IDENTIFIER ::= { bsveObjects 4 }
+
+bsveVrrpTrapStateTransitionType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        none(1),
+        masterToBackup(2),
+        backupToMaster(3),
+        initializeToMaster(4),
+        masterToInitialize(5),
+        initializeToBackup(6),
+        backupToInitialize(7),
+        backupToBackUpMaster(8),
+        backUpMasterToBackup(9)
+    }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Potential types of state transitions.
+        Used by bsveVrrpTrapStateTransition trap."
+    ::= { bsveNotificationObjects 1 }
+
+bsveVrrpTrapStateTransitionCause OBJECT-TYPE
+    SYNTAX        INTEGER {
+        none(1),
+        higherPriorityAdvertizeReceived(2),
+        shutdownReceived(3),
+        vrrpAddrAndPhysicalAddrMatch(4),
+        masterDownInterval(5),
+        preempted(6),
+        criticalIPFail(7),
+        usrConfig(8),
+        syncFromPrimary(9),
+        iPInterfaceDown(10),
+        lowerPrioAdvReceived(11),
+        higherSrcIPEqualPrioAdvReceived(12),
+        lowerSrcIPEqualPrioAdvReceived(13),
+        startVR(14),
+        other(15)
+    }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Potential types of causes that will
+        generate a bsveVrrpTrapStateTransition trap."
+    ::= { bsveNotificationObjects 2 }
+
+bsveVrrpTrapStateTransition NOTIFICATION-TYPE
+    OBJECTS      { bsveVrrpTrapStateTransitionType,
+                   bsveVrrpTrapStateTransitionCause,
+                   vrrpOperPrimaryIpAddr,
+                   ipAdEntAddr
+                 }
+    STATUS       current
+    DESCRIPTION
+        "A vrrpTrapStateTransition trap signifies a state
+        transition has occurred on a particular vrrp interface.
+        Implementation of this trap is optional."
+    ::= { bsveNotifications 1 }
+
+END
+

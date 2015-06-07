@@ -1,0 +1,117 @@
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenProducts
+        FROM NETSCREEN-SMI
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    ;
+
+netscreenProductsMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object identifiers that are assigned
+         to various hardware platforms, and hence are returned as values
+         for sysObjectID"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200401200000Z" -- January 20, 2004
+    DESCRIPTION
+        "Add netscreenHardwareSecurity Client"
+    REVISION      "200008020000Z" -- August 02, 2000
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenProducts 0 }
+
+netscreenGeneric OBJECT IDENTIFIER ::= { netscreenProducts 1 }
+
+netscreenNs5 OBJECT IDENTIFIER ::= { netscreenProducts 2 }
+
+netscreenNs10 OBJECT IDENTIFIER ::= { netscreenProducts 3 }
+
+netscreenNs100 OBJECT IDENTIFIER ::= { netscreenProducts 4 }
+
+netscreenNs1000 OBJECT IDENTIFIER ::= { netscreenProducts 5 }
+
+netscreenNs500 OBJECT IDENTIFIER ::= { netscreenProducts 6 }
+
+netscreenNs50 OBJECT IDENTIFIER ::= { netscreenProducts 7 }
+
+netscreenNs25 OBJECT IDENTIFIER ::= { netscreenProducts 8 }
+
+netscreenNs204 OBJECT IDENTIFIER ::= { netscreenProducts 9 }
+
+netscreenNs208 OBJECT IDENTIFIER ::= { netscreenProducts 10 }
+
+netscreenNs5XT OBJECT IDENTIFIER ::= { netscreenProducts 11 }
+
+netscreenNs5XP OBJECT IDENTIFIER ::= { netscreenProducts 12 }
+
+netscreenNs5000 OBJECT IDENTIFIER ::= { netscreenProducts 13 }
+
+netscreenNs5GT OBJECT IDENTIFIER ::= { netscreenProducts 14 }
+
+netscreenHardwareSecurityClient OBJECT IDENTIFIER ::= { netscreenProducts 15 }
+
+netscreenISG2000    OBJECT IDENTIFIER ::= { netscreenProducts 16 }
+
+netscreen-5GT-ADSL-AnnexA OBJECT IDENTIFIER ::= { netscreenProducts 17 }
+
+netscreen-5GT-ADSL-AnnexB OBJECT IDENTIFIER ::= { netscreenProducts 19 }
+
+netscreen-5GT-WLAN OBJECT IDENTIFIER ::= { netscreenProducts 21 }
+
+netscreen-5GT-ADSL-AnnexA-WLAN OBJECT IDENTIFIER ::= { netscreenProducts 23 }
+
+netscreen-5GT-ADSL-AnnexB-WLAN OBJECT IDENTIFIER ::= { netscreenProducts 25 }
+
+netscreenISG1000    OBJECT IDENTIFIER ::= { netscreenProducts 28 }
+
+netscreenSSG5 	OBJECT IDENTIFIER ::= { netscreenProducts 29 }
+
+netscreenSSG5-ISDN 	OBJECT IDENTIFIER ::= { netscreenProducts 30 }
+
+netscreenSSG5-v92 	OBJECT IDENTIFIER ::= { netscreenProducts 31 }
+
+netscreenSSG5-Serial-WLAN 	OBJECT IDENTIFIER ::= { netscreenProducts 32 }
+
+netscreenSSG5-ISDN-WLAN 	OBJECT IDENTIFIER ::= { netscreenProducts 33 }
+
+netscreenSSG5-v92-WLAN 	OBJECT IDENTIFIER ::= { netscreenProducts 34 }
+
+netscreenSSG20 	OBJECT IDENTIFIER ::= { netscreenProducts 35 }
+
+netscreenSSG20-WLAN 	OBJECT IDENTIFIER ::= { netscreenProducts 36 }
+
+netscreenSSG520    OBJECT IDENTIFIER ::= { netscreenProducts 50 }
+
+netscreenSSG550    OBJECT IDENTIFIER ::= { netscreenProducts 51 }
+
+netscreenSSG140    OBJECT IDENTIFIER ::= { netscreenProducts 52 }
+
+netscreenSSG320    OBJECT IDENTIFIER ::= { netscreenProducts 54 }
+
+netscreenSSG350    OBJECT IDENTIFIER ::= { netscreenProducts 55 }
+
+END
+
+

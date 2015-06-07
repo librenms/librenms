@@ -1,0 +1,101 @@
+
+BAY-STACK-MULTICAST-FLOODING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress, RowStatus
+        FROM SNMPv2-TC
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackMulticastFloodingMib MODULE-IDENTITY
+    LAST-UPDATED    "200608070000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "BayStack Multicast Flooding MIB
+
+         Copyright 2003 Nortel Networks, Inc.
+         All rights reserved.
+         This Bay Networks SNMP Management Information Base Specification
+         (Specification) embodies Bay Networks' confidential and
+         proprietary intellectual property. Bay Networks retains all
+         title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Bay Networks makes
+         no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200608070000Z" -- 07 August 2006
+    DESCRIPTION "v002:  Cleaned up some descriptions."
+
+    REVISION "200405190000Z" -- 19 May 2004
+    DESCRIPTION "v001:  Initial version."
+
+    ::= { bayStackMibs 6 }
+
+bsmfNotifications OBJECT IDENTIFIER ::= { bayStackMulticastFloodingMib 0 }
+bsmfObjects OBJECT IDENTIFIER ::= { bayStackMulticastFloodingMib 1 }
+
+bsmfMulticastFloodingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether filtering of multicast MAC addresses to be
+        flooded is enabled.  If the value of this object is false(2), then
+        multicast packets are always flooded to all ports.  Otherwise, if the
+        value is true(1), multicast packets that do not match an address in the
+        bsmfAllowedAddressTable are flooded only to IGMP multicast router
+        ports, and multicast packets that do match an address in the
+        bsmfAllowedAddressTable are flooded to all ports."
+    ::= { bsmfObjects 1 }
+
+--
+-- Multicast Flooding Allowed Address Configuration Table
+--
+
+bsmfAllowedAddressTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BsmfAllowedAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to specify particular multicast MAC addresses
+         that are allowed to be flooded to all ports."
+    ::= { bayStackMulticastFloodingMib 2 }
+
+bsmfAllowedAddressEntry OBJECT-TYPE
+    SYNTAX BsmfAllowedAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the bsmfAllowedAddressTable."
+    INDEX { bsmfAllowedAddressMacAddr }
+    ::= { bsmfAllowedAddressTable 1 }
+
+BsmfAllowedAddressEntry ::=
+    SEQUENCE {
+        bsmfAllowedAddressMacAddr   MacAddress,
+        bsmfAllowedAddressRowStatus RowStatus
+    }
+
+bsmfAllowedAddressMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A MAC address that is allowed to flood all ports."
+    ::= { bsmfAllowedAddressEntry 1 }
+
+bsmfAllowedAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object controls creation and deletion of rows in the table."
+    ::= { bsmfAllowedAddressEntry 2 }
+
+END
+

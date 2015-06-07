@@ -1,0 +1,67 @@
+RBTWS-ROOT-MIB DEFINITIONS ::= BEGIN
+
+-- Enterasys Wireless Switch Root MIB Release 1.0
+-- Revision Date April 14th
+
+-- Copyright 2005, Enterasys Networks, Inc.
+-- All rights reserved.
+
+-- This Specification is supplied "AS IS," and Enterasys Networks makes
+-- no warranty, either express or implied, as to the use,  
+-- operation, condition, or performance of the Specification.
+
+-- Imports
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+--    ctronTrapeze 
+--        FROM CTRON-MIB-NAMES; 
+    enterprises
+	FROM RFC1155-SMI;
+
+cabletron           OBJECT IDENTIFIER ::= { enterprises 52 }
+mibs                OBJECT IDENTIFIER ::= { cabletron 4 }
+ctronTrapeze        OBJECT IDENTIFIER ::= { mibs 15 }
+
+rbtwsRootMib MODULE-IDENTITY 
+       LAST-UPDATED    "200505070000Z" 
+       ORGANIZATION    "Enterasys Networks" 
+       CONTACT-INFO    "Enterasys Networks" 
+       DESCRIPTION 
+           "Enterasys Wireless Switch Root MIB 
+
+            Copyright 1996 - 2005 Enterasys Networks, Inc. 
+            All rights reserved. 
+            This Enterasys Networks SNMP Management Information Base Specification 
+            (Specification) embodies Enterasys Networks' confidential and 
+            proprietary intellectual property. Enterasys Networks retains all 
+            title and ownership in the Specification, including any 
+            revisions. 
+
+            This Specification is supplied 'AS IS,' and Enterasys Networks makes 
+            no warranty, either express or implied, as to the use, 
+            operation, condition, or performance of the Specification." 
+
+       REVISION "200505070000Z" -- 07 May 2005 
+       DESCRIPTION "v1:  Initial version." 
+
+       ::= { ctronTrapeze 1 } 
+
+-- Textual Conventions
+
+-- Top level Branches
+
+rbtwsProducts        OBJECT IDENTIFIER ::= { rbtwsRootMib 1 }
+rbtwsTemporary       OBJECT IDENTIFIER ::= { rbtwsRootMib 2 }
+rbtwsRegistration    OBJECT IDENTIFIER ::= { rbtwsRootMib 3 }
+rbtwsMibs        OBJECT IDENTIFIER ::= { rbtwsRootMib 4 }
+rbtwsTraps       OBJECT IDENTIFIER ::= { rbtwsRootMib 5 }
+
+-- Branches under "products"
+
+-- Branches under "temporary"
+
+-- Branches under "registration"
+
+END

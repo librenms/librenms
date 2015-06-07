@@ -1,0 +1,137 @@
+BROCADE-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32
+      FROM SNMPv2-SMI                  -- [RFC2578]
+    RowStatus
+      FROM SNMPv2-TC                   -- [RFC2579]
+    InetAddress, InetAddressType
+      FROM INET-ADDRESS-MIB            -- [RFC4001]
+    brcdSysLog
+      FROM FOUNDRY-SN-ROOT-MIB;        -- [snroo101]
+
+brocadeSysLogMIB MODULE-IDENTITY
+    LAST-UPDATED "201111040000Z"  -- Novemeber 4, 2011
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "This MIB module contains the managed object definitions for
+              syslog
+
+              Copyright 1996-2011 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information
+              Base Specification embodies Brocade Communications Systems'
+              confidential and proprietary intellectual property.
+              Brocade Communications Systems retains all title and ownership
+              in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications
+              Systems makes no warranty, either express or implied, as to the
+              use, operation, condition, or performance of the specification,
+              and any unintended consequence it may on the user environment."
+
+    REVISION     "201111040000Z"          -- November 04, 2011
+    DESCRIPTION
+            "Initial revision"
+    ::= { brcdSysLog 1 }
+
+
+    --
+    -- Top level components of this MIB.
+    --
+    brcdSysLogGroup OBJECT IDENTIFIER ::= { brocadeSysLogMIB 1 }
+
+    --
+    -- IPv4/IPv6 SysLog Server table
+    --
+    -- snAgSysLogServerTable will be deprecated and will be replaced by
+    -- brcdSysLogServerTable.
+
+    brcdSysLogServerTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF BrcdSysLogServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "System Log Server table."
+        ::= { brcdSysLogGroup 1 }
+
+    brcdSysLogServerEntry OBJECT-TYPE
+        SYNTAX        BrcdSysLogServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                "A row in the System Log Server table."
+        INDEX        {
+                brcdSysLogServerAddrType,
+                brcdSysLogServerAddr,
+                brcdSysLogServerUDPPort
+        }
+        ::= { brcdSysLogServerTable 1 }
+
+    BrcdSysLogServerEntry ::= SEQUENCE {
+        brcdSysLogServerAddrType
+                InetAddressType,
+        brcdSysLogServerAddr
+                InetAddress,
+        brcdSysLogServerUDPPort
+                Unsigned32,
+        brcdSysLogServerOutPkts
+                Counter32,
+        brcdSysLogServerRowStatus
+                RowStatus
+        }
+
+    brcdSysLogServerAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The syslog server address type. The supported address types
+                 are ipv4(1) and ipv6(2)."
+        ::= { brcdSysLogServerEntry 1 }
+
+    brcdSysLogServerAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "IP address of syslog server."
+        ::= { brcdSysLogServerEntry 2 }
+
+    brcdSysLogServerUDPPort OBJECT-TYPE
+        SYNTAX      Unsigned32  (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "UDP port number of syslog server."
+        ::= { brcdSysLogServerEntry 3 }
+
+    brcdSysLogServerOutPkts OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Number of sylog packets sent to this syslog server."
+        ::= { brcdSysLogServerEntry 4 }
+
+    brcdSysLogServerRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                "Setting this object to createAndGo(4) results in addition
+                 of new row. Setting this object to destroy( 6)results in
+                 removal of a row. The value active(1) is returned for
+                 get and get-next requests.
+                 Other values in the enumeration are not used."
+        ::= { brcdSysLogServerEntry 5 }
+
+END
+

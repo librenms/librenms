@@ -1,0 +1,1831 @@
+WATCHGUARD-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+       Integer32, Integer32, NOTIFICATION-TYPE,
+       OBJECT-IDENTITY, enterprises 
+                                       FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, TruthValue
+                                       FROM SNMPv2-TC
+       ifIndex                         FROM RFC1213-MIB
+       IpsecDoiIdentType,
+       IpsecDoiEncapsulationMode,
+       IpsecDoiEspTransform,
+       IpsecDoiAhTransform,
+       IpsecDoiAuthAlgorithm,
+       IpsecDoiIpcompTransform,
+       IpsecDoiSecProtocolId
+                                       FROM IPSEC-ISAKMP-IKE-DOI-TC
+       watchguard
+                                       FROM WATCHGUARD-SMI;
+
+    wgIpsecSaMonModule MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                   "  WatchGuard Technologies, Inc.
+                      505 Fifth Avenue South
+                      Suite 500
+                      Seattle, WA 98104
+                      United States
+
+                      +1.206.613.6600 "
+
+        DESCRIPTION
+            "The MIB module describes generic IPSec objects
+            defined in IETF working draft 
+            'draft-ieft-ipsec-monitor-mib-01' and WatchGuard's
+            extension."
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 3 }
+
+    IpsecSaCreatorIdent ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "d"
+        STATUS      current
+        DESCRIPTION
+            "A value indicating how an SA was created."
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        static(1),     -- statically created
+                        ike(2),        -- IKE
+                        other(3)
+                    }
+
+    IpsecIpv6Address ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "2x:2x:2x:2x:2x:2x:1d.1d.1d.1d"
+        STATUS      current
+        DESCRIPTION
+            "This data type is used to model IPv6 address prefixes. This
+            is a binary string of 16 octets in network byte-order."
+        SYNTAX      OCTET STRING (SIZE (16))
+
+    wgIpsecSaMonitorMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all IPSec branches."
+        ::= { wgIpsecSaMonModule 1 }
+
+   -- significant branches
+
+    wgSaTables OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all SA tables."
+        ::= { wgIpsecSaMonitorMIB 1 }
+
+    wgSaStatistics OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are global counters for IPSec security associations."
+        ::= { wgIpsecSaMonitorMIB 2 }
+
+    wgSaErrors OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are global error counters for IPSec security associations."
+        ::= { wgIpsecSaMonitorMIB 3 }
+
+    -- the IPSec Inbound ESP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Inbound ESP SAs
+
+    wgIpsecSaEspInTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecSaEspInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            inbound ESP SAs.
+
+            There should be one row for every inbound ESP security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { wgSaTables 1 }
+
+    wgIpsecSaEspInEntry OBJECT-TYPE
+        SYNTAX      WGIpsecSaEspInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec inbound ESP SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ wgIpsecSaEspInAddress, wgIpsecSaEspInSpi }
+        ::= { wgIpsecSaEspInTable 1 }
+
+    WGIpsecSaEspInEntry ::= SEQUENCE {
+
+    wgIpsecSaEspInAddress       IpAddress,
+    wgIpsecSaEspInSpi           Unsigned32,
+
+    wgIpsecSaEspInDestId        OCTET STRING,
+    wgIpsecSaEspInDestIdType    IpsecDoiIdentType,
+    wgIpsecSaEspInSourceId      OCTET STRING,
+    wgIpsecSaEspInSourceIdType  IpsecDoiIdentType,
+    wgIpsecSaEspInProtocol      Integer32,
+    wgIpsecSaEspInDestPort      Integer32,
+    wgIpsecSaEspInSourcePort    Integer32,
+
+    wgIpsecSaEspInCreator       IpsecSaCreatorIdent,
+
+    wgIpsecSaEspInEncapsulation IpsecDoiEncapsulationMode,
+    wgIpsecSaEspInEncAlg        IpsecDoiEspTransform,
+    wgIpsecSaEspInEncKeyLength  Integer32,
+    wgIpsecSaEspInAuthAlg       IpsecDoiAuthAlgorithm,
+
+    wgIpsecSaEspInLimitSeconds  Integer32,
+    wgIpsecSaEspInLimitKbytes   Integer32,
+
+    wgIpsecSaEspInAccSeconds    Counter32,
+    wgIpsecSaEspInAccKbytes     Counter32,
+    wgIpsecSaEspInUserOctets    Counter32,
+    wgIpsecSaEspInPackets       Counter32,
+
+    wgIpsecSaEspInDecryptErrors Counter32,
+    wgIpsecSaEspInAuthErrors    Counter32,
+    wgIpsecSaEspInReplayErrors  Counter32,
+    wgIpsecSaEspInPolicyErrors  Counter32,
+    wgIpsecSaEspInPadErrors     Counter32,
+    wgIpsecSaEspInOtherReceiveErrors Counter32
+
+    
+    }
+
+    wgIpsecSaEspInAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { wgIpsecSaEspInEntry 1 }
+
+    wgIpsecSaEspInSpi OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE "RFC 2406 Section 2.1"
+        ::= { wgIpsecSaEspInEntry 2 }
+
+   wgIpsecSaEspInDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchanged during SA creation negotiation."
+        ::= { wgIpsecSaEspInEntry 3 }
+
+   wgIpsecSaEspInDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'wgIpsecSaEspInDestId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { wgIpsecSaEspInEntry 4 }
+
+    wgIpsecSaEspInSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during SA creation negotiation."
+        ::= { wgIpsecSaEspInEntry 5 }
+
+    wgIpsecSaEspInSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'wgIpsecSaEspInSourceId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { wgIpsecSaEspInEntry 6 }
+
+    wgIpsecSaEspInProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE  "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaEspInEntry 7 }
+
+   wgIpsecSaEspInDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE  "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaEspInEntry 8 }
+
+   wgIpsecSaEspInSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE  "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaEspInEntry 9 }
+
+    wgIpsecSaEspInCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { wgIpsecSaEspInEntry 10 }
+
+   wgIpsecSaEspInEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { wgIpsecSaEspInEntry 11 }
+
+   wgIpsecSaEspInEncAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiEspTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the encryption algorithm
+            applied to traffic or 0 if there is no encryption used."
+        ::= { wgIpsecSaEspInEntry 12 }
+
+   wgIpsecSaEspInEncKeyLength OBJECT-TYPE
+        SYNTAX      Integer32 (0..65531)
+        UNITS       "bits"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The length of the encryption key in bits used for the
+            algorithm specified in the 'wgIpsecSaEspInEncAlg' object, or 0
+            if the key length is implicit in the specified algorithm or
+            there is no encryption specified."
+        ::= { wgIpsecSaEspInEntry 13 }
+
+    wgIpsecSaEspInAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAuthAlgorithm
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic or 0 if there is no authentication used."
+        ::= { wgIpsecSaEspInEntry 14 }
+
+    wgIpsecSaEspInLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { wgIpsecSaEspInEntry 15 }
+
+    wgIpsecSaEspInLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in kilobytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { wgIpsecSaEspInEntry 16 }
+
+    wgIpsecSaEspInAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { wgIpsecSaEspInEntry 17 }
+
+    wgIpsecSaEspInAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { wgIpsecSaEspInEntry 18 }
+
+   wgIpsecSaEspInUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { wgIpsecSaEspInEntry 19 }
+
+    wgIpsecSaEspInPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { wgIpsecSaEspInEntry 20 }
+
+   wgIpsecSaEspInDecryptErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaEspInEntry 21 }
+
+   wgIpsecSaEspInAuthErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to
+            authentication errors."
+        ::= { wgIpsecSaEspInEntry 22 }
+
+   wgIpsecSaEspInReplayErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to replay
+            errors."
+        ::= { wgIpsecSaEspInEntry 23 }
+
+   wgIpsecSaEspInPolicyErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaEspInEntry 24 }
+
+   wgIpsecSaEspInPadErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaEspInEntry 25 }
+
+    wgIpsecSaEspInOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaEspInEntry 26 }
+
+   -- the IPSec Inbound AH MIB-Group
+   --
+   -- a collection of objects providing information about
+    -- IPSec Inbound AH SAs
+
+    wgIpsecSaAhInTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecSaAhInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            inbound AH SAs.
+            There should be one row for every inbound AH security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { wgSaTables 2 }
+
+    wgIpsecSaAhInEntry OBJECT-TYPE
+        SYNTAX      WGIpsecSaAhInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec inbound AH SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ wgIpsecSaAhInAddress, wgIpsecSaAhInSpi }
+        ::= { wgIpsecSaAhInTable 1 }
+
+    WGIpsecSaAhInEntry ::= SEQUENCE {
+
+    wgIpsecSaAhInAddress        IpAddress,
+    wgIpsecSaAhInSpi            Integer32,
+
+    wgIpsecSaAhInDestId         OCTET STRING,
+    wgIpsecSaAhInDestIdType     IpsecDoiIdentType,
+    wgIpsecSaAhInSourceId       OCTET STRING,
+    wgIpsecSaAhInSourceIdType   IpsecDoiIdentType,
+    wgIpsecSaAhInProtocol       Integer32,
+    wgIpsecSaAhInDestPort       Integer32,
+    wgIpsecSaAhInSourcePort     Integer32,
+
+    wgIpsecSaAhInCreator        IpsecSaCreatorIdent,
+
+    wgIpsecSaAhInEncapsulation  IpsecDoiEncapsulationMode,
+    wgIpsecSaAhInAuthAlg        IpsecDoiAhTransform,
+
+    wgIpsecSaAhInLimitSeconds   Integer32,
+    wgIpsecSaAhInLimitKbytes    Integer32,
+
+    wgIpsecSaAhInAccSeconds     Counter32,
+    wgIpsecSaAhInAccKbytes      Counter32,
+    wgIpsecSaAhInUserOctets     Counter32,
+    wgIpsecSaAhInPackets        Counter32,
+
+    -- error statistics
+    wgIpsecSaAhInAuthErrors     Counter32,
+    wgIpsecSaAhInReplayErrors   Counter32,
+    wgIpsecSaAhInPolicyErrors   Counter32,
+    wgIpsecSaAhInOtherReceiveErrors   Counter32
+    }
+
+    wgIpsecSaAhInAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { wgIpsecSaAhInEntry 1 }
+
+   wgIpsecSaAhInSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE   "RFC 2402 Section 2.4"
+        ::= { wgIpsecSaAhInEntry 2 }
+
+    wgIpsecSaAhInDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during SA creation negotiation."
+        ::= { wgIpsecSaAhInEntry 3 }
+
+    wgIpsecSaAhInDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'wgIpsecSaAhInDestId', or
+            0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { wgIpsecSaAhInEntry 4 }
+
+    wgIpsecSaAhInSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during SA creation negotiation."
+        ::= { wgIpsecSaAhInEntry 5 }
+
+    wgIpsecSaAhInSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'wgIpsecSaAhInSourceId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { wgIpsecSaAhInEntry 6 }
+
+   wgIpsecSaAhInProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaAhInEntry 7 }
+
+   wgIpsecSaAhInDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaAhInEntry 8 }
+
+   wgIpsecSaAhInSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaAhInEntry 9 }
+
+    wgIpsecSaAhInCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { wgIpsecSaAhInEntry 10 }
+
+   wgIpsecSaAhInEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { wgIpsecSaAhInEntry 11 }
+
+    wgIpsecSaAhInAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAhTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic carried by this SA if it uses ESP or 0 if there is
+            no authentication applied by ESP."
+        ::= { wgIpsecSaAhInEntry 12 }
+
+    wgIpsecSaAhInLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { wgIpsecSaAhInEntry 13 }
+
+    wgIpsecSaAhInLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in Kbytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { wgIpsecSaAhInEntry 14 }
+
+    wgIpsecSaAhInAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { wgIpsecSaAhInEntry 15 }
+
+   wgIpsecSaAhInAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { wgIpsecSaAhInEntry 16 }
+
+   wgIpsecSaAhInUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { wgIpsecSaAhInEntry 17 }
+
+    wgIpsecSaAhInPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { wgIpsecSaAhInEntry 18 }
+
+   wgIpsecSaAhInAuthErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to
+            authentication errors."
+        ::= { wgIpsecSaAhInEntry 19 }
+
+   wgIpsecSaAhInReplayErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to replay
+            errors."
+        ::= { wgIpsecSaAhInEntry 20 }
+
+   wgIpsecSaAhInPolicyErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaAhInEntry 21 }
+
+    wgIpsecSaAhInOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaAhInEntry 22 }
+
+
+    -- the IPSec Inbound IPCOMP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Inbound IPCOMP SAs
+
+    wgIpsecSaIpcompInTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecSaIpcompInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            inbound IPCOMP SAs.
+
+            There should be one row for every inbound IPCOMP (security)
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { wgSaTables 3 }
+
+   wgIpsecSaIpcompInEntry OBJECT-TYPE
+        SYNTAX      WGIpsecSaIpcompInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec inbound IPCOMP SA.
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ wgIpsecSaIpcompInAddress, wgIpsecSaIpcompInCpi }
+        ::= { wgIpsecSaIpcompInTable 1 }
+
+    WGIpsecSaIpcompInEntry ::= SEQUENCE {
+
+    wgIpsecSaIpcompInAddress             IpAddress,
+    wgIpsecSaIpcompInCpi                 IpsecDoiIpcompTransform,
+
+    wgIpsecSaIpcompInDestId              OCTET STRING,
+    wgIpsecSaIpcompInDestIdType          IpsecDoiIdentType,
+    wgIpsecSaIpcompInSourceId            OCTET STRING,
+    wgIpsecSaIpcompInSourceIdType        IpsecDoiIdentType,
+    wgIpsecSaIpcompInProtocol            Integer32,
+    wgIpsecSaIpcompInDestPort            Integer32,
+    wgIpsecSaIpcompInSourcePort          Integer32,
+
+    wgIpsecSaIpcompInCreator             IpsecSaCreatorIdent,
+
+    wgIpsecSaIpcompInEncapsulation       IpsecDoiEncapsulationMode,
+    wgIpsecSaIpcompInDecompAlg           IpsecDoiIpcompTransform,
+
+    wgIpsecSaIpcompInSeconds             Counter32,
+    wgIpsecSaIpcompInUserOctets          Counter32,
+    wgIpsecSaIpcompInPackets             Counter32,
+
+    wgIpsecSaIpcompInDecompErrors        Counter32,
+    wgIpsecSaIpcompInOtherReceiveErrors  Counter32
+    }
+
+    wgIpsecSaIpcompInAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 1 }
+
+    wgIpsecSaIpcompInCpi OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        REFERENCE   "RFC 2393 Section 3.3"
+        ::= { wgIpsecSaIpcompInEntry 2 }
+
+   wgIpsecSaIpcompInDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 3 }
+
+   wgIpsecSaIpcompInDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 4 }
+
+    wgIpsecSaIpcompInSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 5 }
+
+    wgIpsecSaIpcompInSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 6 }
+
+   wgIpsecSaIpcompInProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 7 }
+
+    wgIpsecSaIpcompInDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 8 }
+
+    wgIpsecSaIpcompInSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 9 }
+
+   wgIpsecSaIpcompInCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 10 }
+
+   wgIpsecSaIpcompInEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 11 }
+
+   wgIpsecSaIpcompInDecompAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 12 }
+
+   wgIpsecSaIpcompInSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 13 }
+
+    wgIpsecSaIpcompInUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 14 }
+
+    wgIpsecSaIpcompInPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 15 }
+
+    wgIpsecSaIpcompInDecompErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 16 }
+
+    wgIpsecSaIpcompInOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompInEntry 17 }
+
+
+    -- the IPSec Outbound ESP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Outbound ESP SAs
+
+    wgIpsecSaEspOutTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecSaEspOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            Outbound ESP SAs.
+
+            There should be one row for every outbound ESP security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { wgSaTables 4 }
+
+   wgIpsecSaEspOutEntry OBJECT-TYPE
+        SYNTAX      WGIpsecSaEspOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec Outbound ESP SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ wgIpsecSaEspOutAddress, wgIpsecSaEspOutSpi }
+        ::= { wgIpsecSaEspOutTable 1 }
+
+   WGIpsecSaEspOutEntry ::= SEQUENCE {
+
+    wgIpsecSaEspOutAddress         IpAddress,
+    wgIpsecSaEspOutSpi             Unsigned32,
+
+    wgIpsecSaEspOutSourceId        OCTET STRING,
+    wgIpsecSaEspOutSourceIdType    IpsecDoiIdentType,
+    wgIpsecSaEspOutDestId          OCTET STRING,
+    wgIpsecSaEspOutDestIdType      IpsecDoiIdentType,
+    wgIpsecSaEspOutProtocol        Integer32,
+    wgIpsecSaEspOutSourcePort      Integer32,
+    wgIpsecSaEspOutDestPort        Integer32,
+
+    wgIpsecSaEspOutCreator         IpsecSaCreatorIdent,
+
+    wgIpsecSaEspOutEncapsulation   IpsecDoiEncapsulationMode,
+    wgIpsecSaEspOutEncAlg          IpsecDoiEspTransform,
+    wgIpsecSaEspOutEncKeyLength    Integer32,
+    wgIpsecSaEspOutAuthAlg         IpsecDoiAuthAlgorithm,
+
+    wgIpsecSaEspOutLimitSeconds    Integer32,
+    wgIpsecSaEspOutLimitKbytes     Integer32,
+
+    wgIpsecSaEspOutAccSeconds      Counter32,
+    wgIpsecSaEspOutAccKbytes       Counter32,
+    wgIpsecSaEspOutUserOctets      Counter32,
+    wgIpsecSaEspOutPackets         Counter32,
+
+    wgIpsecSaEspOutSendErrors      Counter32
+    }
+
+
+   wgIpsecSaEspOutAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { wgIpsecSaEspOutEntry 1 }
+
+    wgIpsecSaEspOutSpi OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE "RFC 2406 Section 2.1"
+        ::= { wgIpsecSaEspOutEntry 2 }
+
+    wgIpsecSaEspOutSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { wgIpsecSaEspOutEntry 3 }
+
+    wgIpsecSaEspOutSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by
+            'wgIpsecSaEspOutSourceId', or 0 if unknown or if the SA uses
+            transport mode encapsulation."
+        ::= { wgIpsecSaEspOutEntry 4 }
+
+   wgIpsecSaEspOutDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { wgIpsecSaEspOutEntry 5 }
+
+    wgIpsecSaEspOutDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'wgIpsecSaEspOutDestId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { wgIpsecSaEspOutEntry 6 }
+
+    wgIpsecSaEspOutProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaEspOutEntry 7 }
+
+    wgIpsecSaEspOutSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaEspOutEntry 8 }
+
+    wgIpsecSaEspOutDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaEspOutEntry 9 }
+
+    wgIpsecSaEspOutCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { wgIpsecSaEspOutEntry 10 }
+
+    wgIpsecSaEspOutEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { wgIpsecSaEspOutEntry 11 }
+
+   wgIpsecSaEspOutEncAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiEspTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the encryption algorithm
+            applied to traffic or 0 if there is no encryption used."
+        ::= { wgIpsecSaEspOutEntry 12 }
+
+   wgIpsecSaEspOutEncKeyLength OBJECT-TYPE
+        SYNTAX      Integer32 (0..65531)
+        UNITS       "bits"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The length of the encryption key in bits used for the
+            algorithm specified in the 'wgIpsecSaEspOutEncAlg' object, or
+            0 if the key length is implicit in the specified algorithm
+            or there is no encryption specified."
+        ::= { wgIpsecSaEspOutEntry 13 }
+
+    wgIpsecSaEspOutAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAuthAlgorithm
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic or 0 if there is no authentication used."
+        ::= { wgIpsecSaEspOutEntry 14 }
+
+    wgIpsecSaEspOutLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { wgIpsecSaEspOutEntry 15 }
+
+   wgIpsecSaEspOutLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in kbytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { wgIpsecSaEspOutEntry 16 }
+
+    wgIpsecSaEspOutAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { wgIpsecSaEspOutEntry 17 }
+
+    wgIpsecSaEspOutAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { wgIpsecSaEspOutEntry 18 }
+
+    wgIpsecSaEspOutUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { wgIpsecSaEspOutEntry 19 }
+
+    wgIpsecSaEspOutPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { wgIpsecSaEspOutEntry 20 }
+
+    wgIpsecSaEspOutSendErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaEspOutEntry 21 }
+
+
+    -- the IPSec Outbound AH MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Outbound AH SAs
+
+    wgIpsecSaAhOutTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecSaAhOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            Outbound AH SAs.
+
+            There should be one row for every outbound AH security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { wgSaTables 5 }
+
+    wgIpsecSaAhOutEntry OBJECT-TYPE
+        SYNTAX      WGIpsecSaAhOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec Outbound AH SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ wgIpsecSaAhOutAddress, wgIpsecSaAhOutSpi }
+        ::= { wgIpsecSaAhOutTable 1 }
+
+    WGIpsecSaAhOutEntry ::= SEQUENCE {
+
+    wgIpsecSaAhOutAddress          IpAddress,
+    wgIpsecSaAhOutSpi              Integer32,
+
+    wgIpsecSaAhOutSourceId         OCTET STRING,
+    wgIpsecSaAhOutSourceIdType     IpsecDoiIdentType,
+    wgIpsecSaAhOutDestId           OCTET STRING,
+    wgIpsecSaAhOutDestIdType       IpsecDoiIdentType,
+    wgIpsecSaAhOutProtocol         Integer32,
+    wgIpsecSaAhOutSourcePort       Integer32,
+    wgIpsecSaAhOutDestPort         Integer32,
+
+    wgIpsecSaAhOutCreator          IpsecSaCreatorIdent,
+
+    wgIpsecSaAhOutEncapsulation    IpsecDoiEncapsulationMode,
+    wgIpsecSaAhOutAuthAlg          IpsecDoiAhTransform,
+
+    wgIpsecSaAhOutLimitSeconds     Integer32,
+    wgIpsecSaAhOutLimitKbytes      Integer32,
+
+    wgIpsecSaAhOutAccSeconds       Counter32,
+    wgIpsecSaAhOutAccKbytes        Counter32,
+    wgIpsecSaAhOutUserOctets       Counter32,
+    wgIpsecSaAhOutPackets          Counter32,
+
+    wgIpsecSaAhOutSendErrors       Counter32
+    }
+
+
+    wgIpsecSaAhOutAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { wgIpsecSaAhOutEntry 1 }
+
+    wgIpsecSaAhOutSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE "RFC 2402 Section 2.4"
+        ::= { wgIpsecSaAhOutEntry 2 }
+
+    wgIpsecSaAhOutSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { wgIpsecSaAhOutEntry 3 }
+
+    wgIpsecSaAhOutSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'wgIpsecSaAhOutSourceId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { wgIpsecSaAhOutEntry 4 }
+
+    wgIpsecSaAhOutDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { wgIpsecSaAhOutEntry 5 }
+
+    wgIpsecSaAhOutDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'wgIpsecSaAhOutDestId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { wgIpsecSaAhOutEntry 6 }
+
+    wgIpsecSaAhOutProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaAhOutEntry 7 }
+
+    wgIpsecSaAhOutSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaAhOutEntry 8 }
+
+    wgIpsecSaAhOutDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaAhOutEntry 9 }
+
+    wgIpsecSaAhOutCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { wgIpsecSaAhOutEntry 10 }
+
+    wgIpsecSaAhOutEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { wgIpsecSaAhOutEntry 11 }
+
+    wgIpsecSaAhOutAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAhTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic or 0 if there is no authentication used."
+        ::= { wgIpsecSaAhOutEntry 12 }
+
+    wgIpsecSaAhOutLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { wgIpsecSaAhOutEntry 13 }
+
+    wgIpsecSaAhOutLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in Kbytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { wgIpsecSaAhOutEntry 14 }
+
+    wgIpsecSaAhOutAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { wgIpsecSaAhOutEntry 15 }
+
+    wgIpsecSaAhOutAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { wgIpsecSaAhOutEntry 16 }
+
+    wgIpsecSaAhOutUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { wgIpsecSaAhOutEntry 17 }
+
+    wgIpsecSaAhOutPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { wgIpsecSaAhOutEntry 18 }
+
+    wgIpsecSaAhOutSendErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaAhOutEntry 19 }
+
+
+    -- the IPSec Outbound IPCOMP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Outbound IPCOMP SAs
+
+    wgIpsecSaIpcompOutTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecSaIpcompOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaTables 6 }
+
+    wgIpsecSaIpcompOutEntry OBJECT-TYPE
+        SYNTAX      WGIpsecSaIpcompOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        INDEX{ wgIpsecSaIpcompOutAddress, wgIpsecSaIpcompOutCpi }
+        ::= { wgIpsecSaIpcompOutTable 1 }
+
+    WGIpsecSaIpcompOutEntry ::= SEQUENCE {
+
+    wgIpsecSaIpcompOutAddress         IpAddress,
+    wgIpsecSaIpcompOutCpi             IpsecDoiIpcompTransform,
+
+    wgIpsecSaIpcompOutSourceId        OCTET STRING,
+    wgIpsecSaIpcompOutSourceIdType    IpsecDoiIdentType,
+    wgIpsecSaIpcompOutDestId          OCTET STRING,
+    wgIpsecSaIpcompOutDestIdType      IpsecDoiIdentType,
+    wgIpsecSaIpcompOutProtocol        Integer32,
+    wgIpsecSaIpcompOutSourcePort      Integer32,
+    wgIpsecSaIpcompOutDestPort        Integer32,
+
+    wgIpsecSaIpcompOutCreator         IpsecSaCreatorIdent,
+
+    wgIpsecSaIpcompOutEncapsulation   IpsecDoiEncapsulationMode,
+    wgIpsecSaIpcompOutCompAlg         IpsecDoiIpcompTransform,
+
+    wgIpsecSaIpcompOutSeconds         Counter32,
+    wgIpsecSaIpcompOutUserOctets      Counter32,
+    wgIpsecSaIpcompOutPackets         Counter32
+    }
+
+    wgIpsecSaIpcompOutAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 1 }
+
+    wgIpsecSaIpcompOutCpi OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 2 }
+
+    wgIpsecSaIpcompOutSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 3 }
+
+    wgIpsecSaIpcompOutSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 4 }
+
+    wgIpsecSaIpcompOutDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 5 }
+
+    wgIpsecSaIpcompOutDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 6 }
+
+    wgIpsecSaIpcompOutProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { wgIpsecSaIpcompOutEntry 7 }
+
+    wgIpsecSaIpcompOutSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 8 }
+
+    wgIpsecSaIpcompOutDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 9 }
+
+    wgIpsecSaIpcompOutCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 10 }
+
+    wgIpsecSaIpcompOutEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 11 }
+
+    wgIpsecSaIpcompOutCompAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 12 }
+
+    wgIpsecSaIpcompOutSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 13 }
+
+    wgIpsecSaIpcompOutUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecSaIpcompOutEntry 14 }
+
+    wgIpsecSaIpcompOutPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { wgIpsecSaIpcompOutEntry 15 }
+
+
+    --
+    -- entity IPSec statistics
+    --
+    wgIpsecEspCurrentInboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of inbound ESP SAs in the entity."
+        ::= { wgSaStatistics 1 }
+
+    wgIpsecEspTotalInboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 2 }
+
+    wgIpsecEspCurrentOutboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of outbound ESP SAs in the entity."
+        ::= { wgSaStatistics 3 }
+
+    wgIpsecEspTotalOutboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 4 }
+
+    wgIpsecAhCurrentInboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of inbound AH SAs in the entity."
+        ::= { wgSaStatistics 5 }
+
+    wgIpsecAhTotalInboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 6 }
+
+    wgIpsecAhCurrentOutboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of outbound AH SAs in the entity."
+        ::= { wgSaStatistics 7 }
+
+    wgIpsecAhTotalOutboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 8 }
+
+    wgIpsecIpcompCurrentInboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 9 }
+
+    wgIpsecIpcompTotalInboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 10 }
+
+    wgIpsecIpcompCurrentOutboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 11 }
+
+    wgIpsecIpcompTotalOutboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaStatistics 12 }
+
+
+    --
+    -- IPSec error counts
+    --
+
+    wgIpsecDecryptionErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaErrors 1 }
+
+    wgIpsecAuthenticationErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaErrors 2 }
+
+    wgIpsecReplayErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaErrors 3 }
+
+    wgIpsecPolicyErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaErrors 4 }
+
+    wgIpsecOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaErrors 5 }
+
+    wgIpsecSendErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaErrors 6 }
+
+    wgIpsecUnknownSpiErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSaErrors 7 }
+
+END
+

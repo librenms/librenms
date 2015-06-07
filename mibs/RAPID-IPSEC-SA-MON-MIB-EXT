@@ -1,0 +1,2259 @@
+RAPID-IPSEC-SA-MON-MIB-EXT DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+       Integer32, Integer32, NOTIFICATION-TYPE,
+       OBJECT-IDENTITY, enterprises 
+                                       FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, TruthValue
+                                       FROM SNMPv2-TC
+       ifIndex                         FROM RFC1213-MIB
+       IpsecDoiIdentType,
+       IpsecDoiEncapsulationMode,
+       IpsecDoiEspTransform,
+       IpsecDoiAhTransform,
+       IpsecDoiAuthAlgorithm,
+       IpsecDoiIpcompTransform,
+       IpsecDoiSecProtocolId
+                                       FROM IPSEC-ISAKMP-IKE-DOI-TC
+       rapidstream
+                                       FROM RAPID-MIB;
+
+    rsIpsecSaMonModule MODULE-IDENTITY
+        LAST-UPDATED "200003211200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module describes generic IPSec objects
+            defined in IETF working draft 
+            'draft-ieft-ipsec-monitor-mib-01' and RapidStream's
+            extension."
+        REVISION      "200003211200Z"
+        DESCRIPTION
+            "Initial revision."
+        REVISION      "200211011200Z"
+        DESCRIPTION
+            "Changed CONTACT-INFO."
+        ::= { rapidstream 3 }
+
+    IpsecSaCreatorIdent ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "d"
+        STATUS      current
+        DESCRIPTION
+            "A value indicating how an SA was created."
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        static(1),     -- statically created
+                        ike(2),        -- IKE
+                        other(3)
+                    }
+
+    IpsecIpv6Address ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "2x:2x:2x:2x:2x:2x:1d.1d.1d.1d"
+        STATUS      current
+        DESCRIPTION
+            "This data type is used to model IPv6 address prefixes. This
+            is a binary string of 16 octets in network byte-order."
+        SYNTAX      OCTET STRING (SIZE (16))
+
+    rsIpsecSaMonitorMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all IPSec branches."
+        ::= { rsIpsecSaMonModule 1 }
+
+   -- significant branches
+
+    rsSaTables OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all SA tables."
+        ::= { rsIpsecSaMonitorMIB 1 }
+
+    rsSaStatistics OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are global counters for IPSec security associations."
+        ::= { rsIpsecSaMonitorMIB 2 }
+
+    rsSaErrors OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are global error counters for IPSec security associations."
+        ::= { rsIpsecSaMonitorMIB 3 }
+
+    rsSaTraps OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are traps for IPSec security associations."
+        ::= { rsIpsecSaMonitorMIB 4 }
+
+    rsSaTrapObjects OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for objects which are
+            used as part of traps."
+        ::= { rsIpsecSaMonitorMIB 5 }
+
+    rsSaTrapControl OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are trap controls for IPSec security associations."
+        ::= { rsIpsecSaMonitorMIB 6 }
+
+    rsSaGroups        OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            describe the groups in this MIB."
+        ::= { rsIpsecSaMonitorMIB 7 }
+
+   rsSaConformance  OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            describe the conformance for this MIB."
+        ::= { rsIpsecSaMonitorMIB 8 }
+
+    -- the IPSec Inbound ESP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Inbound ESP SAs
+
+    rsIpsecSaEspInTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecSaEspInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            inbound ESP SAs.
+
+            There should be one row for every inbound ESP security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { rsSaTables 1 }
+
+    rsIpsecSaEspInEntry OBJECT-TYPE
+        SYNTAX      RSIpsecSaEspInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec inbound ESP SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ rsIpsecSaEspInAddress, rsIpsecSaEspInSpi }
+        ::= { rsIpsecSaEspInTable 1 }
+
+    RSIpsecSaEspInEntry ::= SEQUENCE {
+
+    rsIpsecSaEspInAddress       IpAddress,
+    rsIpsecSaEspInSpi           Integer32,
+
+    rsIpsecSaEspInDestId        OCTET STRING,
+    rsIpsecSaEspInDestIdType    IpsecDoiIdentType,
+    rsIpsecSaEspInSourceId      OCTET STRING,
+    rsIpsecSaEspInSourceIdType  IpsecDoiIdentType,
+    rsIpsecSaEspInProtocol      Integer32,
+    rsIpsecSaEspInDestPort      Integer32,
+    rsIpsecSaEspInSourcePort    Integer32,
+
+    rsIpsecSaEspInCreator       IpsecSaCreatorIdent,
+
+    rsIpsecSaEspInEncapsulation IpsecDoiEncapsulationMode,
+    rsIpsecSaEspInEncAlg        IpsecDoiEspTransform,
+    rsIpsecSaEspInEncKeyLength  Integer32,
+    rsIpsecSaEspInAuthAlg       IpsecDoiAuthAlgorithm,
+
+    rsIpsecSaEspInLimitSeconds  Integer32,
+    rsIpsecSaEspInLimitKbytes   Integer32,
+
+    rsIpsecSaEspInAccSeconds    Counter32,
+    rsIpsecSaEspInAccKbytes     Counter32,
+    rsIpsecSaEspInUserOctets    Counter32,
+    rsIpsecSaEspInPackets       Counter32,
+
+    rsIpsecSaEspInDecryptErrors Counter32,
+    rsIpsecSaEspInAuthErrors    Counter32,
+    rsIpsecSaEspInReplayErrors  Counter32,
+    rsIpsecSaEspInPolicyErrors  Counter32,
+    rsIpsecSaEspInPadErrors     Counter32,
+    rsIpsecSaEspInOtherReceiveErrors Counter32
+
+    
+    }
+
+    rsIpsecSaEspInAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { rsIpsecSaEspInEntry 1 }
+
+    rsIpsecSaEspInSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE "RFC 2406 Section 2.1"
+        ::= { rsIpsecSaEspInEntry 2 }
+
+   rsIpsecSaEspInDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchanged during SA creation negotiation."
+        ::= { rsIpsecSaEspInEntry 3 }
+
+   rsIpsecSaEspInDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'rsIpsecSaEspInDestId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { rsIpsecSaEspInEntry 4 }
+
+    rsIpsecSaEspInSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during SA creation negotiation."
+        ::= { rsIpsecSaEspInEntry 5 }
+
+    rsIpsecSaEspInSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'rsIpsecSaEspInSourceId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { rsIpsecSaEspInEntry 6 }
+
+    rsIpsecSaEspInProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE  "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaEspInEntry 7 }
+
+   rsIpsecSaEspInDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE  "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaEspInEntry 8 }
+
+   rsIpsecSaEspInSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE  "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaEspInEntry 9 }
+
+    rsIpsecSaEspInCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { rsIpsecSaEspInEntry 10 }
+
+   rsIpsecSaEspInEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { rsIpsecSaEspInEntry 11 }
+
+   rsIpsecSaEspInEncAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiEspTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the encryption algorithm
+            applied to traffic or 0 if there is no encryption used."
+        ::= { rsIpsecSaEspInEntry 12 }
+
+   rsIpsecSaEspInEncKeyLength OBJECT-TYPE
+        SYNTAX      Integer32 (0..65531)
+        UNITS       "bits"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The length of the encryption key in bits used for the
+            algorithm specified in the 'rsIpsecSaEspInEncAlg' object, or 0
+            if the key length is implicit in the specified algorithm or
+            there is no encryption specified."
+        ::= { rsIpsecSaEspInEntry 13 }
+
+    rsIpsecSaEspInAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAuthAlgorithm
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic or 0 if there is no authentication used."
+        ::= { rsIpsecSaEspInEntry 14 }
+
+    rsIpsecSaEspInLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { rsIpsecSaEspInEntry 15 }
+
+    rsIpsecSaEspInLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in kilobytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { rsIpsecSaEspInEntry 16 }
+
+    rsIpsecSaEspInAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { rsIpsecSaEspInEntry 17 }
+
+    rsIpsecSaEspInAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { rsIpsecSaEspInEntry 18 }
+
+   rsIpsecSaEspInUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { rsIpsecSaEspInEntry 19 }
+
+    rsIpsecSaEspInPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { rsIpsecSaEspInEntry 20 }
+
+   rsIpsecSaEspInDecryptErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to decryption
+            errors."
+        ::= { rsIpsecSaEspInEntry 21 }
+
+   rsIpsecSaEspInAuthErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to
+            authentication errors."
+        ::= { rsIpsecSaEspInEntry 22 }
+
+   rsIpsecSaEspInReplayErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to replay
+            errors."
+        ::= { rsIpsecSaEspInEntry 23 }
+
+   rsIpsecSaEspInPolicyErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to policy
+            errors. This includes packets where the next protocol is
+            invalid."
+        ::= { rsIpsecSaEspInEntry 24 }
+
+   rsIpsecSaEspInPadErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to pad value
+            errors.
+
+            Implementations that do not check this must not support this
+            object."
+        REFERENCE   "RFC 2406 section 2.4"
+        ::= { rsIpsecSaEspInEntry 25 }
+
+    rsIpsecSaEspInOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to errors
+            other than decryption, authentication or replay errors. This
+            may include packets dropped due to a lack of receive
+            buffers, and may include packets dropped due to congestion
+            at the decryption element."
+        ::= { rsIpsecSaEspInEntry 26 }
+
+   -- the IPSec Inbound AH MIB-Group
+   --
+   -- a collection of objects providing information about
+    -- IPSec Inbound AH SAs
+
+    rsIpsecSaAhInTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecSaAhInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            inbound AH SAs.
+            There should be one row for every inbound AH security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { rsSaTables 2 }
+
+    rsIpsecSaAhInEntry OBJECT-TYPE
+        SYNTAX      RSIpsecSaAhInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec inbound AH SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ rsIpsecSaAhInAddress, rsIpsecSaAhInSpi }
+        ::= { rsIpsecSaAhInTable 1 }
+
+    RSIpsecSaAhInEntry ::= SEQUENCE {
+
+    rsIpsecSaAhInAddress        IpAddress,
+    rsIpsecSaAhInSpi            Integer32,
+
+    rsIpsecSaAhInDestId         OCTET STRING,
+    rsIpsecSaAhInDestIdType     IpsecDoiIdentType,
+    rsIpsecSaAhInSourceId       OCTET STRING,
+    rsIpsecSaAhInSourceIdType   IpsecDoiIdentType,
+    rsIpsecSaAhInProtocol       Integer32,
+    rsIpsecSaAhInDestPort       Integer32,
+    rsIpsecSaAhInSourcePort     Integer32,
+
+    rsIpsecSaAhInCreator        IpsecSaCreatorIdent,
+
+    rsIpsecSaAhInEncapsulation  IpsecDoiEncapsulationMode,
+    rsIpsecSaAhInAuthAlg        IpsecDoiAhTransform,
+
+    rsIpsecSaAhInLimitSeconds   Integer32,
+    rsIpsecSaAhInLimitKbytes    Integer32,
+
+    rsIpsecSaAhInAccSeconds     Counter32,
+    rsIpsecSaAhInAccKbytes      Counter32,
+    rsIpsecSaAhInUserOctets     Counter32,
+    rsIpsecSaAhInPackets        Counter32,
+
+    -- error statistics
+    rsIpsecSaAhInAuthErrors     Counter32,
+    rsIpsecSaAhInReplayErrors   Counter32,
+    rsIpsecSaAhInPolicyErrors   Counter32,
+    rsIpsecSaAhInOtherReceiveErrors   Counter32
+    }
+
+    rsIpsecSaAhInAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { rsIpsecSaAhInEntry 1 }
+
+   rsIpsecSaAhInSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE   "RFC 2402 Section 2.4"
+        ::= { rsIpsecSaAhInEntry 2 }
+
+    rsIpsecSaAhInDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during SA creation negotiation."
+        ::= { rsIpsecSaAhInEntry 3 }
+
+    rsIpsecSaAhInDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'rsIpsecSaAhInDestId', or
+            0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { rsIpsecSaAhInEntry 4 }
+
+    rsIpsecSaAhInSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during SA creation negotiation."
+        ::= { rsIpsecSaAhInEntry 5 }
+
+    rsIpsecSaAhInSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'rsIpsecSaAhInSourceId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { rsIpsecSaAhInEntry 6 }
+
+   rsIpsecSaAhInProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaAhInEntry 7 }
+
+   rsIpsecSaAhInDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaAhInEntry 8 }
+
+   rsIpsecSaAhInSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaAhInEntry 9 }
+
+    rsIpsecSaAhInCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { rsIpsecSaAhInEntry 10 }
+
+   rsIpsecSaAhInEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { rsIpsecSaAhInEntry 11 }
+
+    rsIpsecSaAhInAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAhTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic carried by this SA if it uses ESP or 0 if there is
+            no authentication applied by ESP."
+        ::= { rsIpsecSaAhInEntry 12 }
+
+    rsIpsecSaAhInLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { rsIpsecSaAhInEntry 13 }
+
+    rsIpsecSaAhInLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in Kbytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { rsIpsecSaAhInEntry 14 }
+
+    rsIpsecSaAhInAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { rsIpsecSaAhInEntry 15 }
+
+   rsIpsecSaAhInAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { rsIpsecSaAhInEntry 16 }
+
+   rsIpsecSaAhInUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { rsIpsecSaAhInEntry 17 }
+
+    rsIpsecSaAhInPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { rsIpsecSaAhInEntry 18 }
+
+   rsIpsecSaAhInAuthErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to
+            authentication errors."
+        ::= { rsIpsecSaAhInEntry 19 }
+
+   rsIpsecSaAhInReplayErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to replay
+            errors."
+        ::= { rsIpsecSaAhInEntry 20 }
+
+   rsIpsecSaAhInPolicyErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to policy
+            errors. This includes packets where the next protocol is
+            invalid."
+        ::= { rsIpsecSaAhInEntry 21 }
+
+    rsIpsecSaAhInOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to errors
+            other than decryption, authentication or replay errors. This
+            may include packets dropped due to a lack of receive
+            buffers, and may include packets dropped due to congestion
+            at the authentication element."
+        ::= { rsIpsecSaAhInEntry 22 }
+
+
+    -- the IPSec Inbound IPCOMP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Inbound IPCOMP SAs
+
+    rsIpsecSaIpcompInTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecSaIpcompInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            inbound IPCOMP SAs.
+
+            There should be one row for every inbound IPCOMP (security)
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { rsSaTables 3 }
+
+   rsIpsecSaIpcompInEntry OBJECT-TYPE
+        SYNTAX      RSIpsecSaIpcompInEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec inbound IPCOMP SA.
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ rsIpsecSaIpcompInAddress, rsIpsecSaIpcompInCpi }
+        ::= { rsIpsecSaIpcompInTable 1 }
+
+    RSIpsecSaIpcompInEntry ::= SEQUENCE {
+
+    rsIpsecSaIpcompInAddress             IpAddress,
+    rsIpsecSaIpcompInCpi                 IpsecDoiIpcompTransform,
+
+    rsIpsecSaIpcompInDestId              OCTET STRING,
+    rsIpsecSaIpcompInDestIdType          IpsecDoiIdentType,
+    rsIpsecSaIpcompInSourceId            OCTET STRING,
+    rsIpsecSaIpcompInSourceIdType        IpsecDoiIdentType,
+    rsIpsecSaIpcompInProtocol            Integer32,
+    rsIpsecSaIpcompInDestPort            Integer32,
+    rsIpsecSaIpcompInSourcePort          Integer32,
+
+    rsIpsecSaIpcompInCreator             IpsecSaCreatorIdent,
+
+    rsIpsecSaIpcompInEncapsulation       IpsecDoiEncapsulationMode,
+    rsIpsecSaIpcompInDecompAlg           IpsecDoiIpcompTransform,
+
+    rsIpsecSaIpcompInSeconds             Counter32,
+    rsIpsecSaIpcompInUserOctets          Counter32,
+    rsIpsecSaIpcompInPackets             Counter32,
+
+    rsIpsecSaIpcompInDecompErrors        Counter32,
+    rsIpsecSaIpcompInOtherReceiveErrors  Counter32
+    }
+
+    rsIpsecSaIpcompInAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { rsIpsecSaIpcompInEntry 1 }
+
+    rsIpsecSaIpcompInCpi OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPI of the SA. Since the lower values of CPIs are
+            reserved to be the same as the algorithm, the syntax for
+            this object is the same as the transform."
+        REFERENCE   "RFC 2393 Section 3.3"
+        ::= { rsIpsecSaIpcompInEntry 2 }
+
+   rsIpsecSaIpcompInDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode, or 0 if this SA is used with
+            multiple SAs in protection suites.
+
+            This value, if non-zero, is taken directly from the optional
+            ID payloads that are exchange during SA creation
+            negotiation."
+        ::= { rsIpsecSaIpcompInEntry 3 }
+
+   rsIpsecSaIpcompInDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by
+            'rsIpsecSaIpcompInDestId', or 0 if unknown or if the SA uses
+            transport mode, or 0 if this SA is used with multiple SAs in
+            protection suites."
+        ::= { rsIpsecSaIpcompInEntry 4 }
+
+    rsIpsecSaIpcompInSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation, or 0 if this SA is
+            used with multiple SAs in protection suites.
+
+            This value, if non-zero, is taken directly from the optional
+            ID payloads that are exchange during SA creation
+            negotiation."
+        ::= { rsIpsecSaIpcompInEntry 5 }
+
+    rsIpsecSaIpcompInSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by
+            'rsIpsecSaIpcompInSourceId', or 0 if unknown or if the SA uses
+            transport mode encapsulation, or 0 if this SA is used with
+            multiple SAs in protection suites."
+        ::= { rsIpsecSaIpcompInEntry 6 }
+
+   rsIpsecSaIpcompInProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaIpcompInEntry 7 }
+
+    rsIpsecSaIpcompInDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaIpcompInEntry 8 }
+
+    rsIpsecSaIpcompInSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaIpcompInEntry 9 }
+
+   rsIpsecSaIpcompInCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { rsIpsecSaIpcompInEntry 10 }
+
+   rsIpsecSaIpcompInEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { rsIpsecSaIpcompInEntry 11 }
+
+   rsIpsecSaIpcompInDecompAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the decompression algorithm
+            applied to traffic."
+        ::= { rsIpsecSaIpcompInEntry 12 }
+
+   rsIpsecSaIpcompInSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds that the SA has existed."
+        ::= { rsIpsecSaIpcompInEntry 13 }
+
+    rsIpsecSaIpcompInUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA."
+        ::= { rsIpsecSaIpcompInEntry 14 }
+
+    rsIpsecSaIpcompInPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { rsIpsecSaIpcompInEntry 15 }
+
+    rsIpsecSaIpcompInDecompErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to
+            decompression errors."
+        ::= { rsIpsecSaIpcompInEntry 16 }
+
+    rsIpsecSaIpcompInOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to errors
+            other than decompression errors. This may include packets
+            dropped due to a lack of receive buffers, and packets
+            dropped due to congestion at the decompression element."
+        ::= { rsIpsecSaIpcompInEntry 17 }
+
+
+    -- the IPSec Outbound ESP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Outbound ESP SAs
+
+    rsIpsecSaEspOutTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecSaEspOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            Outbound ESP SAs.
+
+            There should be one row for every outbound ESP security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { rsSaTables 4 }
+
+   rsIpsecSaEspOutEntry OBJECT-TYPE
+        SYNTAX      RSIpsecSaEspOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec Outbound ESP SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ rsIpsecSaEspOutAddress, rsIpsecSaEspOutSpi }
+        ::= { rsIpsecSaEspOutTable 1 }
+
+   RSIpsecSaEspOutEntry ::= SEQUENCE {
+
+    rsIpsecSaEspOutAddress         IpAddress,
+    rsIpsecSaEspOutSpi             Integer32,
+
+    rsIpsecSaEspOutSourceId        OCTET STRING,
+    rsIpsecSaEspOutSourceIdType    IpsecDoiIdentType,
+    rsIpsecSaEspOutDestId          OCTET STRING,
+    rsIpsecSaEspOutDestIdType      IpsecDoiIdentType,
+    rsIpsecSaEspOutProtocol        Integer32,
+    rsIpsecSaEspOutSourcePort      Integer32,
+    rsIpsecSaEspOutDestPort        Integer32,
+
+    rsIpsecSaEspOutCreator         IpsecSaCreatorIdent,
+
+    rsIpsecSaEspOutEncapsulation   IpsecDoiEncapsulationMode,
+    rsIpsecSaEspOutEncAlg          IpsecDoiEspTransform,
+    rsIpsecSaEspOutEncKeyLength    Integer32,
+    rsIpsecSaEspOutAuthAlg         IpsecDoiAuthAlgorithm,
+
+    rsIpsecSaEspOutLimitSeconds    Integer32,
+    rsIpsecSaEspOutLimitKbytes     Integer32,
+
+    rsIpsecSaEspOutAccSeconds      Counter32,
+    rsIpsecSaEspOutAccKbytes       Counter32,
+    rsIpsecSaEspOutUserOctets      Counter32,
+    rsIpsecSaEspOutPackets         Counter32,
+
+    rsIpsecSaEspOutSendErrors      Counter32
+    }
+
+
+   rsIpsecSaEspOutAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { rsIpsecSaEspOutEntry 1 }
+
+    rsIpsecSaEspOutSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE "RFC 2406 Section 2.1"
+        ::= { rsIpsecSaEspOutEntry 2 }
+
+    rsIpsecSaEspOutSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { rsIpsecSaEspOutEntry 3 }
+
+    rsIpsecSaEspOutSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by
+            'rsIpsecSaEspOutSourceId', or 0 if unknown or if the SA uses
+            transport mode encapsulation."
+        ::= { rsIpsecSaEspOutEntry 4 }
+
+   rsIpsecSaEspOutDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { rsIpsecSaEspOutEntry 5 }
+
+    rsIpsecSaEspOutDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'rsIpsecSaEspOutDestId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { rsIpsecSaEspOutEntry 6 }
+
+    rsIpsecSaEspOutProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaEspOutEntry 7 }
+
+    rsIpsecSaEspOutSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaEspOutEntry 8 }
+
+    rsIpsecSaEspOutDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaEspOutEntry 9 }
+
+    rsIpsecSaEspOutCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { rsIpsecSaEspOutEntry 10 }
+
+    rsIpsecSaEspOutEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { rsIpsecSaEspOutEntry 11 }
+
+   rsIpsecSaEspOutEncAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiEspTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the encryption algorithm
+            applied to traffic or 0 if there is no encryption used."
+        ::= { rsIpsecSaEspOutEntry 12 }
+
+   rsIpsecSaEspOutEncKeyLength OBJECT-TYPE
+        SYNTAX      Integer32 (0..65531)
+        UNITS       "bits"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The length of the encryption key in bits used for the
+            algorithm specified in the 'rsIpsecSaEspOutEncAlg' object, or
+            0 if the key length is implicit in the specified algorithm
+            or there is no encryption specified."
+        ::= { rsIpsecSaEspOutEntry 13 }
+
+    rsIpsecSaEspOutAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAuthAlgorithm
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic or 0 if there is no authentication used."
+        ::= { rsIpsecSaEspOutEntry 14 }
+
+    rsIpsecSaEspOutLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { rsIpsecSaEspOutEntry 15 }
+
+   rsIpsecSaEspOutLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in kbytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { rsIpsecSaEspOutEntry 16 }
+
+    rsIpsecSaEspOutAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { rsIpsecSaEspOutEntry 17 }
+
+    rsIpsecSaEspOutAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { rsIpsecSaEspOutEntry 18 }
+
+    rsIpsecSaEspOutUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { rsIpsecSaEspOutEntry 19 }
+
+    rsIpsecSaEspOutPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { rsIpsecSaEspOutEntry 20 }
+
+    rsIpsecSaEspOutSendErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to any error.
+            This may include errors due to a lack of transmit buffers."
+        ::= { rsIpsecSaEspOutEntry 21 }
+
+
+    -- the IPSec Outbound AH MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Outbound AH SAs
+
+    rsIpsecSaAhOutTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecSaAhOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            Outbound AH SAs.
+
+            There should be one row for every outbound AH security
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { rsSaTables 5 }
+
+    rsIpsecSaAhOutEntry OBJECT-TYPE
+        SYNTAX      RSIpsecSaAhOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec Outbound AH SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ rsIpsecSaAhOutAddress, rsIpsecSaAhOutSpi }
+        ::= { rsIpsecSaAhOutTable 1 }
+
+    RSIpsecSaAhOutEntry ::= SEQUENCE {
+
+    rsIpsecSaAhOutAddress          IpAddress,
+    rsIpsecSaAhOutSpi              Integer32,
+
+    rsIpsecSaAhOutSourceId         OCTET STRING,
+    rsIpsecSaAhOutSourceIdType     IpsecDoiIdentType,
+    rsIpsecSaAhOutDestId           OCTET STRING,
+    rsIpsecSaAhOutDestIdType       IpsecDoiIdentType,
+    rsIpsecSaAhOutProtocol         Integer32,
+    rsIpsecSaAhOutSourcePort       Integer32,
+    rsIpsecSaAhOutDestPort         Integer32,
+
+    rsIpsecSaAhOutCreator          IpsecSaCreatorIdent,
+
+    rsIpsecSaAhOutEncapsulation    IpsecDoiEncapsulationMode,
+    rsIpsecSaAhOutAuthAlg          IpsecDoiAhTransform,
+
+    rsIpsecSaAhOutLimitSeconds     Integer32,
+    rsIpsecSaAhOutLimitKbytes      Integer32,
+
+    rsIpsecSaAhOutAccSeconds       Counter32,
+    rsIpsecSaAhOutAccKbytes        Counter32,
+    rsIpsecSaAhOutUserOctets       Counter32,
+    rsIpsecSaAhOutPackets          Counter32,
+
+    rsIpsecSaAhOutSendErrors       Counter32
+    }
+
+
+    rsIpsecSaAhOutAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { rsIpsecSaAhOutEntry 1 }
+
+    rsIpsecSaAhOutSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of the SA."
+        REFERENCE "RFC 2402 Section 2.4"
+        ::= { rsIpsecSaAhOutEntry 2 }
+
+    rsIpsecSaAhOutSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { rsIpsecSaAhOutEntry 3 }
+
+    rsIpsecSaAhOutSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'rsIpsecSaAhOutSourceId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { rsIpsecSaAhOutEntry 4 }
+
+    rsIpsecSaAhOutDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation.
+
+            This value is taken directly from the optional ID payloads
+            that are exchange during phase 2 negotiations."
+        ::= { rsIpsecSaAhOutEntry 5 }
+
+    rsIpsecSaAhOutDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by 'rsIpsecSaAhOutDestId',
+            or 0 if unknown or if the SA uses transport mode
+            encapsulation."
+        ::= { rsIpsecSaAhOutEntry 6 }
+
+    rsIpsecSaAhOutProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaAhOutEntry 7 }
+
+    rsIpsecSaAhOutSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaAhOutEntry 8 }
+
+    rsIpsecSaAhOutDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaAhOutEntry 9 }
+
+    rsIpsecSaAhOutCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { rsIpsecSaAhOutEntry 10 }
+
+    rsIpsecSaAhOutEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { rsIpsecSaAhOutEntry 11 }
+
+    rsIpsecSaAhOutAuthAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiAhTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the hash algorithm applied to
+            traffic or 0 if there is no authentication used."
+        ::= { rsIpsecSaAhOutEntry 12 }
+
+    rsIpsecSaAhOutLimitSeconds OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum lifetime in seconds of the SA, or 0 if there is
+            no time constraint on its expiration.
+
+            The display value is limited to 4294967295 seconds (more
+            than 136 years); values greater than that value will be
+            truncated."
+        ::= { rsIpsecSaAhOutEntry 13 }
+
+    rsIpsecSaAhOutLimitKbytes OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in Kbytes that the SA is allowed to
+            support, or 0 if there is no traffic constraint on its
+            expiration.
+
+            The display value is limited to 4294967295 kilobytes; values
+            greater than that value will be truncated."
+        ::= { rsIpsecSaAhOutEntry 14 }
+
+    rsIpsecSaAhOutAccSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds accumulated against the SA's
+            expiration by time.
+
+            This is also the number of seconds that the SA has existed."
+        ::= { rsIpsecSaAhOutEntry 15 }
+
+    rsIpsecSaAhOutAccKbytes OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "kilobytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of traffic accumulated that counts against the
+            SA's expiration by traffic limitation, measured in Kbytes.
+
+            This value may be 0 if the SA does not expire based on
+            traffic."
+        ::= { rsIpsecSaAhOutEntry 16 }
+
+    rsIpsecSaAhOutUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { rsIpsecSaAhOutEntry 17 }
+
+    rsIpsecSaAhOutPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { rsIpsecSaAhOutEntry 18 }
+
+    rsIpsecSaAhOutSendErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded by the SA due to any error.
+            This may include errors due to a lack of transmit buffers."
+        ::= { rsIpsecSaAhOutEntry 19 }
+
+
+    -- the IPSec Outbound IPCOMP MIB-Group
+    --
+    -- a collection of objects providing information about
+    -- IPSec Outbound IPCOMP SAs
+
+    rsIpsecSaIpcompOutTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecSaIpcompOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The (conceptual) table containing information on IPSec
+            Outbound IPCOMP SAs.
+
+            There should be one row for every outbound IPCOMP (security)
+            association that exists in the entity. The maximum number of
+            rows is implementation dependent."
+        ::= { rsSaTables 6 }
+
+    rsIpsecSaIpcompOutEntry OBJECT-TYPE
+        SYNTAX      RSIpsecSaIpcompOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            particular IPSec Outbound IPCOMP SA.
+
+            A row in this table cannot be created or deleted by SNMP
+            operations on columns of the table."
+        INDEX{ rsIpsecSaIpcompOutAddress, rsIpsecSaIpcompOutCpi }
+        ::= { rsIpsecSaIpcompOutTable 1 }
+
+    RSIpsecSaIpcompOutEntry ::= SEQUENCE {
+
+    rsIpsecSaIpcompOutAddress         IpAddress,
+    rsIpsecSaIpcompOutCpi             IpsecDoiIpcompTransform,
+
+    rsIpsecSaIpcompOutSourceId        OCTET STRING,
+    rsIpsecSaIpcompOutSourceIdType    IpsecDoiIdentType,
+    rsIpsecSaIpcompOutDestId          OCTET STRING,
+    rsIpsecSaIpcompOutDestIdType      IpsecDoiIdentType,
+    rsIpsecSaIpcompOutProtocol        Integer32,
+    rsIpsecSaIpcompOutSourcePort      Integer32,
+    rsIpsecSaIpcompOutDestPort        Integer32,
+
+    rsIpsecSaIpcompOutCreator         IpsecSaCreatorIdent,
+
+    rsIpsecSaIpcompOutEncapsulation   IpsecDoiEncapsulationMode,
+    rsIpsecSaIpcompOutCompAlg         IpsecDoiIpcompTransform,
+
+    rsIpsecSaIpcompOutSeconds         Counter32,
+    rsIpsecSaIpcompOutUserOctets      Counter32,
+    rsIpsecSaIpcompOutPackets         Counter32
+    }
+
+    rsIpsecSaIpcompOutAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination address of the SA.
+
+            If the IPCOMP SA is shared across multiple SAs in protection
+            suites, this value may be 0.
+
+            For implementations that do not support IPv6, this address
+            should appear as one of the IPv4-mapped IPv6 addresses as
+            defined in Section 2.5.4 of [IPV6AA].
+
+            Specifically, the prefix '0000:0000:0000:0000:0000:FFFF:' is
+            used for IPv4 only nodes, while the prefix
+            '0000:0000:0000:0000:0000:0000:' is used for bi-lingual
+            nodes."
+        ::= { rsIpsecSaIpcompOutEntry 1 }
+
+    rsIpsecSaIpcompOutCpi OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPI of the SA. Since the lower values of CPIs are
+            reserved to be the same as the algorithm, the syntax for
+            this object is the same as the transform."
+        REFERENCE "RFC 2393 Section 3.3"
+        ::= { rsIpsecSaIpcompOutEntry 2 }
+
+    rsIpsecSaIpcompOutSourceId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source identifier of the SA, or 0 if unknown or if the
+            SA uses transport mode encapsulation, or 0 if this SA is
+            used with multiple SAs in protection suites.
+
+            This value, if non-zero, is taken directly from the optional
+            ID payloads that are exchange during phase 2 negotiations."
+        ::= { rsIpsecSaIpcompOutEntry 3 }
+
+    rsIpsecSaIpcompOutSourceIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by
+            'rsIpsecSaIpcompOutSourceId', or 0 if unknown or if the SA
+            uses transport mode encapsulation, or 0 if this SA is used
+            with multiple SAs in protection suites."
+        ::= { rsIpsecSaIpcompOutEntry 4 }
+
+    rsIpsecSaIpcompOutDestId OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (4..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination identifier of the SA, or 0 if unknown or if
+            the SA uses transport mode encapsulation, or 0 if this SA is
+            used with multiple SAs in protection suites.
+
+            This value, if non-zero, is taken directly from the optional
+            ID payloads that are exchange during phase 2 negotiations."
+        ::= { rsIpsecSaIpcompOutEntry 5 }
+
+    rsIpsecSaIpcompOutDestIdType OBJECT-TYPE
+        SYNTAX      IpsecDoiIdentType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of identifier presented by
+            'rsIpsecSaIpcompOutDestId', or 0 if unknown or if the SA uses
+            transport mode encapsulation, or 0 if this SA is used with
+            multiple SAs in protection suites."
+        ::= { rsIpsecSaIpcompOutEntry 6 }
+
+    rsIpsecSaIpcompOutProtocol OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The transport-layer protocol number that this SA carries,
+            or 0 if it carries any protocol."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaIpcompOutEntry 7 }
+
+    rsIpsecSaIpcompOutSourcePort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The source port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaIpcompOutEntry 8 }
+
+    rsIpsecSaIpcompOutDestPort OBJECT-TYPE
+        SYNTAX      Integer32 (0.. 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The destination port number of the protocol that this SA
+            carries, or 0 if it carries any port number."
+        REFERENCE   "RFC2401 section 4.4.2"
+        ::= { rsIpsecSaIpcompOutEntry 9 }
+
+    rsIpsecSaIpcompOutCreator OBJECT-TYPE
+        SYNTAX      IpsecSaCreatorIdent
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The creator of this SA.
+
+            This MIB makes no assumptions about how the SAs are created.
+            They may be created statically, or by a key exchange
+            protocol such as IKE, or by some other method."
+        ::= { rsIpsecSaIpcompOutEntry 10 }
+
+    rsIpsecSaIpcompOutEncapsulation OBJECT-TYPE
+        SYNTAX      IpsecDoiEncapsulationMode
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of encapsulation used by this SA."
+        ::= { rsIpsecSaIpcompOutEntry 11 }
+
+    rsIpsecSaIpcompOutCompAlg OBJECT-TYPE
+        SYNTAX      IpsecDoiIpcompTransform
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value representing the compression algorithm
+            applied to traffic."
+        ::= { rsIpsecSaIpcompOutEntry 12 }
+
+    rsIpsecSaIpcompOutSeconds OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds that the SA has existed."
+        ::= { rsIpsecSaIpcompOutEntry 13 }
+
+    rsIpsecSaIpcompOutUserOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of user level traffic measured in bytes handled
+            by the SA.
+
+            This is not necessarily the same as the amount of traffic
+            applied against the traffic expiration limit."
+        ::= { rsIpsecSaIpcompOutEntry 14 }
+
+    rsIpsecSaIpcompOutPackets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets handled by the SA."
+        ::= { rsIpsecSaIpcompOutEntry 15 }
+
+
+    --
+    -- entity IPSec statistics
+    --
+    rsIpsecEspCurrentInboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of inbound ESP SAs in the entity."
+        ::= { rsSaStatistics 1 }
+
+    rsIpsecEspTotalInboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound ESP SAs created in the entity
+            since boot time."
+        ::= { rsSaStatistics 2 }
+
+    rsIpsecEspCurrentOutboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of outbound ESP SAs in the entity."
+        ::= { rsSaStatistics 3 }
+
+    rsIpsecEspTotalOutboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound ESP SAs created in the entity
+            since boot time."
+        ::= { rsSaStatistics 4 }
+
+    rsIpsecAhCurrentInboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of inbound AH SAs in the entity."
+        ::= { rsSaStatistics 5 }
+
+    rsIpsecAhTotalInboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound AH SAs created in the entity
+            since boot time."
+        ::= { rsSaStatistics 6 }
+
+    rsIpsecAhCurrentOutboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of outbound AH SAs in the entity."
+        ::= { rsSaStatistics 7 }
+
+    rsIpsecAhTotalOutboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound AH SAs created in the entity
+            since boot time."
+        ::= { rsSaStatistics 8 }
+
+    rsIpsecIpcompCurrentInboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of inbound IPCOMP SAs in the entity."
+        ::= { rsSaStatistics 9 }
+
+    rsIpsecIpcompTotalInboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound IPCOMP SAs created in the
+            entity since boot time."
+        ::= { rsSaStatistics 10 }
+
+    rsIpsecIpcompCurrentOutboundSAs OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current number of outbound IPCOMP SAs in the entity."
+        ::= { rsSaStatistics 11 }
+
+    rsIpsecIpcompTotalOutboundSAs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound IPCOMP SAs created in the
+            entity since boot time."
+        ::= { rsSaStatistics 12 }
+
+
+    --
+    -- IPSec error counts
+    --
+
+    rsIpsecDecryptionErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets received by the entity in SAs
+            since boot time with decryption errors."
+        ::= { rsSaErrors 1 }
+
+    rsIpsecAuthenticationErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets received by the entity in SAs
+            since boot time with authentication errors.
+
+            This includes all packets in which the hash value is
+            determined to be invalid, for both ESP and AH SAs."
+        ::= { rsSaErrors 2 }
+
+    rsIpsecReplayErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets received by the entity in SAs
+            since boot time with replay errors."
+        ::= { rsSaErrors 3 }
+
+    rsIpsecPolicyErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets received by the entity in SAs
+            since boot time and discarded due to policy errors. This
+            includes packets that had selectors that were invalid for
+            the SA that carried them."
+        ::= { rsSaErrors 4 }
+
+    rsIpsecOtherReceiveErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets received by the entity in SAs
+            since boot time and discarded due to errors not due to
+            decryption, authentication, replay or policy."
+        ::= { rsSaErrors 5 }
+
+    rsIpsecSendErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets to be sent by the entity in SAs
+            since boot time and discarded due to errors."
+        ::= { rsSaErrors 6 }
+
+    rsIpsecUnknownSpiErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of packets received by the entity since
+            boot time with SPIs or CPIs that were not valid."
+        ::= { rsSaErrors 7 }
+
+
+    --
+    -- traps
+    --
+
+    --
+    -- some objects used in trap reporting
+    --
+    -- NOTE: A MAX-ACCESS value of 'accessible-for-notify' was wanted
+    -- for these objects; this would not compile with smicng 2.2.07
+    --
+
+    rsIpsecSecurityProtocol OBJECT-TYPE
+        SYNTAX      IpsecDoiSecProtocolId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A security protocol associated with the trap."
+        ::= { rsSaTrapObjects 1 }
+
+    rsIpsecSPI OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An SPI associated with a trap. Where the security protocol
+            associated with the trap is IPCOMP, this value has a maximum
+            of 65535."
+        ::= { rsSaTrapObjects 2 }
+
+    rsIpsecLocalAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A local IP address associated with the trap."
+        ::= { rsSaTrapObjects 3 }
+
+    rsIpsecPeerAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A peer IP address associated with the trap."
+        ::= { rsSaTrapObjects 4 }
+
+    --
+    -- trap control
+    --
+
+    rsEspAuthFailureTrapEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether espAuthFailureTrap traps should be
+            generated."
+        DEFVAL { false }
+        ::= { rsSaTrapControl 1 }
+
+    rsAhAuthFailureTrapEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether ahAuthFailureTrap traps should be
+            generated."
+        DEFVAL { false }
+        ::= { rsSaTrapControl 2 }
+
+    rsEspReplayFailureTrapEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether espReplayFailureTrap traps should be
+            generated."
+        DEFVAL { false }
+        ::= { rsSaTrapControl 3 }
+
+    rsAhReplayFailureTrapEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether ahReplayFailureTrap traps should be
+            generated."
+        DEFVAL { false }
+        ::= { rsSaTrapControl 4 }
+
+    rsEspPolicyFailureTrapEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether espPolicyFailureTrap traps should be
+            generated."
+        DEFVAL { false }
+        ::= { rsSaTrapControl 5 }
+
+    rsAhPolicyFailureTrapEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether ahPolicyFailureTrap traps should be
+            generated."
+        DEFVAL { false }
+        ::= { rsSaTrapControl 6 }
+
+    rsInvalidSpiTrapEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether invalidSpiTrap traps should be
+            generated."
+        DEFVAL { false }
+        ::= { rsSaTrapControl 7 }
+
+    --
+    -- the traps themselves
+    --
+
+    rsEspAuthFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+            rsIpsecSaEspInAuthErrors
+        }
+        STATUS      current
+        DESCRIPTION
+            "IPSec packets with invalid hashes were found in an inbound
+            ESP SA. The total number of authentication errors
+            accumulated is sent for the specific row of the
+            'rsIpsecSaEspInTable' table for the SA; this provides the
+            identity of the SA in which the error occurred.
+
+            Implementations SHOULD send one trap per SA (within a
+            reasonable time period), rather than sending one trap per
+            packet."
+        ::= { rsSaTraps 0 1 }
+
+    rsAhAuthFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+            rsIpsecSaAhInAuthErrors
+        }
+        STATUS      current
+        DESCRIPTION
+            "IPSec packets with invalid hashes were found in an inbound
+            AH SA. The total number of authentication errors accumulated
+            is sent for the specific row of the 'rsIpsecSaAhInTable' table
+            for the SA; this provides the identity of the SA in which
+            the error occurred.
+
+            Implementations SHOULD send one trap per SA (within a
+            reasonable time period), rather than sending one trap per
+            packet."
+        ::= { rsSaTraps 0 2 }
+
+    rsEspReplayFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+            rsIpsecSaEspInReplayErrors
+        }
+        STATUS      current
+        DESCRIPTION
+            "IPSec packets with invalid sequence numbers were found in
+            an inbound ESP SA. The total number of replay errors
+            accumulated is sent for the specific row of the
+            'rsIpsecSaEspInTable' table for the SA; this provides the
+            identity of the SA in which the error occurred.
+
+            Implementations SHOULD send one trap per SA (within a
+            reasonable time period), rather than sending one trap per
+            packet."
+        ::= { rsSaTraps 0 3 }
+
+    rsAhReplayFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+            rsIpsecSaAhInReplayErrors
+        }
+        STATUS      current
+        DESCRIPTION
+            "IPSec packets with invalid sequence numbers were found in
+            the specified AH SA. The total number of replay errors
+            accumulated is sent for the specific row of the
+            'rsIpsecSaAhInTable' table for the SA; this provides the
+            identity of the SA in which the error occurred.
+
+            Implementations SHOULD send one trap per SA (within a
+            reasonable time period), rather than sending one trap per
+            packet."
+        ::= { rsSaTraps 0 4 }
+
+    rsEspPolicyFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+            rsIpsecSaEspInPolicyErrors
+        }
+        STATUS      current
+        DESCRIPTION
+            "IPSec packets carrying packets with invalid selectors for
+            the specified ESP SA were found. The total number of policy
+            errors accumulated is sent for the specific row of the
+
+            'rsIpsecSaEspInTable' table for the SA; this provides the
+            identity of the SA in which the error occurred.
+
+            Implementations SHOULD send one trap per SA (within a
+            reasonable time period), rather than sending one trap per
+            packet."
+        ::= { rsSaTraps 0 5 }
+
+    rsAhPolicyFailureTrap NOTIFICATION-TYPE
+        OBJECTS {
+            rsIpsecSaAhInPolicyErrors
+        }
+        STATUS      current
+        DESCRIPTION
+            "IPSec packets carrying packets with invalid selectors for
+            the specified AH SA were found. The total number of policy
+            errors accumulated is sent for the specific row of the
+            'rsIpsecSaAhInTable' table for the SA; this provides the
+            identity of the SA in which the error occurred.
+
+            Implementations SHOULD send one trap per SA (within a
+            reasonable time period), rather than sending one trap per
+            packet."
+        ::= { rsSaTraps 0 6 }
+
+    rsInvalidSpiTrap NOTIFICATION-TYPE
+        OBJECTS {
+            rsIpsecLocalAddress,
+            rsIpsecSecurityProtocol,
+            rsIpsecPeerAddress,
+            rsIpsecSPI,
+            ifIndex
+        }
+        STATUS      current
+        DESCRIPTION
+            "A packet with an unknown SPI was detected from the
+            specified peer with the specified SPI using the specified
+            protocol. The destination address of the received packet is
+            specified by 'ipsecLocalAddress'.
+
+            The value 'ifIndex' may be 0 if this optional linkage is
+            unsupported.
+
+            If the object 'ipsecSecurityProtocol' has the value for
+            IPCOMP, then the 'ipsecSPI' object is the CPI of the packet.
+            Implementations SHOULD send one trap per peer (within a
+            reasonable time period), rather than sending one trap per
+            packet."
+        ::= { rsSaTraps 0 7 }
+
+
+    END
+

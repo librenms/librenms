@@ -1,0 +1,190 @@
+
+S5-TCS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    s5Tcs
+        FROM S5-ROOT-MIB;
+
+s5TcsMib MODULE-IDENTITY
+       LAST-UPDATED    "200407200000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "5000 Common Textual Conventions MIB
+
+            Copyright 1993-2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Nortel Networks SNMP Management Information Base Specification
+            (Specification) embodies Nortel Networks' confidential and
+            proprietary intellectual property. Nortel Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Nortel Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+
+       REVISION "200407200000Z" -- 20 July 2004
+       DESCRIPTION "Version 113:  Conversion to SMIv2"
+
+       ::= { s5Tcs 0 }
+
+IpxAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "A textual convention for IPX addresses. The first four bytes
+         are the network number in 'network order'. The last 6 bytes
+         are the MAC address."
+    SYNTAX      OCTET STRING (SIZE (10))
+
+TimeIntervalHrd ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "A textual convention for a period of time measured
+         in units of 0.01 seconds."
+    SYNTAX      Integer32
+
+TimeIntervalSec ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "A textual convention for a period of time measured
+         in units of seconds."
+    SYNTAX      Integer32
+
+SrcIndx ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "A textual convention for an Index of a 'source'.
+         The values are encoded so that the same MIB object
+         can be used to describe the same type of data, but
+         from different sources.
+         For the 5000 Chassis, this is encoded in the
+         following base 10 fields:
+           1bbiii - identifies an interface on an NMM
+                      where 'bb' is the board index and
+                      'iii' is the interface number.
+        
+           2bbppp - identifies a connectivity port on
+                      a board where 'bb' is the board INDEX
+                      and 'ppp' is the port INDEX.
+        
+           3bblll - identifies a local channel on a
+                      board where 'bb' is the board INDEX
+                      and 'll' is the local channel INDEX.
+        
+           4bbccc - identifies a cluster on a board
+                      where 'bb' is the board INDEX and
+                      'cc' is the cluster INDEX.
+        
+           5bbfff - identifies a FPU on a board where
+                      'bb' is the board INDEX, and 'fff' is
+                      the FPU INDEX.
+        
+           6bbnnn - identifies host board backplane counters
+                      where 'bb' is the board INDEX, and
+                      'nnn' is the segment INDEX.
+        
+           7bbccc - identifies a NULL segment on a board
+                      where 'bb' is the board INDEX, and
+                      'ccc' is the cluster INDEX.
+        
+           8mmnnn - identifies a sum across all host board(s)
+                      connected to a given backplane segment
+                      where 'mm' is media type, and 'nnn' is
+                      the segment INDEX. (NOTE: This is currently
+                      only valid for Ethernet.)"
+    SYNTAX      INTEGER (1..999999)
+
+MediaType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "A textual convention for Media types"
+    SYNTAX      INTEGER {
+	other(1),	-- unknown or other type
+	eth(2),		-- ethernet
+	tok(3),		-- token ring
+	fddi(4)		-- FDDI
+	}		-- ATM later
+
+FddiBkNetMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "The FDDI backplane mode."
+    SYNTAX      INTEGER {
+	other(1),	-- other or unknown
+	thruLow(2),
+	thruHigh(3),
+	thruLowThruHigh(4)
+	}
+
+BkNetId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "The backplane network ID. This is a numeric assignment
+         made to a backplane channel, a piece of a divided
+         backplane channel, or a grouping of several backplane
+         channels (which is done for FDDI). The number (and values)
+         of the backplane networks is determined by the setting
+         of the channel divider(s) which split some or all
+         the backplane channels into networks, and by
+         grouping when allowed by the media (such as FDDI).
+         Different media and backplane implementations may
+         have a divider or not. Also, there may be different
+         mappings of backplane network IDs to a divided (or
+         undivided) backplane channel.
+        
+         Note to agent implementors - you must map the divided
+         (or undivided) backplane channel to the numbering here
+         based on the setting of the backplane channel divider(s),
+         and/or the grouping of the channels for FDDI."
+    SYNTAX      INTEGER (1..255)
+
+BkChan ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "The physical backplane channel identification.
+         This does not change when a backplane is divided.
+         A value of zero means no channel. Otherwise, the
+         channels are numbered starting at one."
+    SYNTAX      INTEGER (0..255)
+
+LocChan ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "The physical local channel identification.
+         A value of zero means no channel. Otherwise, the
+         channels are numbered starting at one."
+    SYNTAX      INTEGER (0..255)
+
+AttId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "The attachment ID. This is either a backplane
+         network ID, a local channel, or as an indication
+         of no backplane network attachment. Negative numbers
+         are used to identify local channels on a board.
+         Where used, the board must also be specified
+         (or implied). A value of zero is used to indicate
+         no (or null) attachment. Positive numbers are the
+         backplane network IDs. The number (and values) of
+         the backplane networks is determined by the setting
+         of the channel divider(s) which split some or all
+         the backplane channels into backplane networks,
+         and by grouping when allowed by the media (such as
+         FDDI). Different media and implementations may have
+         a divider or not. Also, there may be different
+         mappings of backplane network IDs to a divided
+         (or undivided) backplane channel.
+        
+         Note to agent implementors - you must map the divided
+         (or undivided) backplane channel to the numbering here
+         based on the setting of the backplane channel divider(s),
+         and/or the grouping of the channels for FDDI."
+    SYNTAX      INTEGER (-255..255)
+
+END
+

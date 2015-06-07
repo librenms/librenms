@@ -1,0 +1,2846 @@
+-- Date: 	28March2000
+
+-- Information in this document is subject to change without notice
+-- and does not represent a commitment on the part of
+-- Asante Technologies, Inc.  No part of this document, or any
+-- associated software, product design or design concept,
+-- may be copied, reproduced or stored, in whole or in part, in any
+-- form or by any means mechanical, electronic, optical, photocopying,
+-- recording or otherwise, including translation to another language
+-- or format, except for your own internal use, without the express
+-- written consent of Asante Technologies, Inc.
+
+
+-- Copyright 1994-2000 by Asante Technologies, Inc.  All rights
+-- reserved.
+
+
+ ASANTE-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	IpAddress, TimeTicks, enterprises
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	DisplayString
+		FROM RFC1213-MIB
+	TRAP-TYPE
+		FROM RFC-1215;
+
+-- *******************************************************************
+-- Type Aliases
+-- *******************************************************************
+
+MacAddress ::= OCTET STRING (SIZE(6))
+
+
+-- *******************************************************************
+-- High-level identifiers
+-- *******************************************************************
+
+asante			OBJECT IDENTIFIER ::= { enterprises 298 }
+products		OBJECT IDENTIFIER ::= { asante 1 }
+
+snmpAgent		OBJECT IDENTIFIER ::= { products 1 }
+agentSw			OBJECT IDENTIFIER ::= { snmpAgent 1 }
+agentFw			OBJECT IDENTIFIER ::= { snmpAgent 2 }
+agentHw			OBJECT IDENTIFIER ::= { snmpAgent 3 }
+
+agentNetProtocol	OBJECT IDENTIFIER ::= { snmpAgent 5 }
+ipagentProtocol		OBJECT IDENTIFIER ::= { agentNetProtocol 1 }
+
+switch			OBJECT IDENTIFIER ::= { products 5 }
+eAsntSwitch 		OBJECT IDENTIFIER ::= { switch 1 }
+eSWAgent 		OBJECT IDENTIFIER ::= { eAsntSwitch 1 }
+eSWAgentSW		OBJECT IDENTIFIER ::= { eSWAgent 1 }
+eSWAgentHW		OBJECT IDENTIFIER ::= { eSWAgent 2 }
+eSWAgentFW		OBJECT IDENTIFIER ::= { eSWAgent 3 }
+eSWBasic		OBJECT IDENTIFIER ::= { eAsntSwitch 2 }
+eSWCtrl			OBJECT IDENTIFIER ::= { eAsntSwitch 3 }
+eSWMonitor		OBJECT IDENTIFIER ::= { eAsntSwitch 4 }
+
+productId		OBJECT IDENTIFIER ::= { asante 2 }
+concProductId		OBJECT IDENTIFIER ::= { productId 2 }
+intraswitch		OBJECT IDENTIFIER ::= { concProductId 11 }
+intrastack		OBJECT IDENTIFIER ::= { concProductId 12 }
+friendlyswitch		OBJECT IDENTIFIER ::= { concProductId 13 }
+intraSwitch6216M   	OBJECT IDENTIFIER ::= { concProductId 16 }
+intraSwitch6224     	OBJECT IDENTIFIER ::= { concProductId 17 }
+
+intraCore8000		OBJECT IDENTIFIER ::= { concProductId 22 }
+intraCore9000		OBJECT IDENTIFIER ::= { concProductId 23 }
+
+	-- the agent Sw group
+
+	agentRunTimeImageMajorVer OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The major software version number of the agent
+			runtime image."
+	::= { agentSw 1 }
+
+	agentRunTimeImageMinorVer OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The minor software version number of the agent
+			runtime image."
+	::= { agentSw 2 }
+
+	agentImageLoadMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),	-- Unknown
+			localBoot(2),	-- Load image from local
+			netBoot(3)	-- Load image from remote
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Tells agent device whether the software image
+			is to be loaded from the FLASH EPROM or from
+			over the network."
+	::= { agentSw 3 }
+
+	agentRemoteBootInfo OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),		-- use boot protocol
+			eepromBootInfo(2) -- use EEPROM boot parameters
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The method for getting boot information."
+	::= { agentSw 4 }
+
+	agentRemoteBootProtocol OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),	-- Unknown boot protocol
+			bootp-tftp(2),	-- use bootp-tftp protocol
+            		tftp-only(3)    -- use tftp protocol
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The boot protocol that is used to load the
+			agent image software."
+	::= { agentSw 5 }
+
+	agentRemoteBootFile OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..64))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The boot file name that is sent to the boot
+			file server by agent boot code during boot time.
+			For IntraStack switch, this file is the image
+			file."
+	::= { agentSw 6 }
+
+	agentOutBandDialString OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..64))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This is the initialization string used by
+			the Network Management station to establish an
+			out-of-band connection."
+	::= { agentSw 7 }
+
+	agentOutBandBaudRate OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),	-- Unknown baud rate
+			b1200(2),	-- 1200 baud rate
+			b2400(3),	-- 2400 baud rate
+			b4800(4),	-- 4800 baud rate
+			b9600(5),	-- 9600 baud rate
+			b19200(6)	-- 19200 baud rate
+			}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The baud rate setting for the out-of-band
+			port."
+	::= { agentSw 8 }
+
+
+	 agentReset OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),		-- Unknown
+			reset(2),		-- system reset
+			not-reset(3)	-- normal operation
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The object to allow software to perform
+			'push-button' system reset."
+	::= { agentSw 9 }
+
+	-- the agent Hw group
+
+	agentHwReVer	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The hardware version number of the switch."
+	::= { agentHw 1 }
+
+	agentHwVer	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The hardware model number of the switch."
+	::= { agentHw 2 }
+
+	-- the agent Fw group
+
+	agentFwMajorVer OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The major firmware version number of the agent
+			PROM code."
+	::= { agentFw 1 }
+
+	agentFwMinorVer OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The minor firmware version number of the agent
+			PROM code."
+	::= { agentFw 2 }
+
+	-- the agent network protocol stack capability map
+
+	agentNetProtoStkCapMap OBJECT-TYPE
+		SYNTAX  OCTET STRING(SIZE(4))
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"This octet string represents the current
+			protocol stack configuration supported
+			by the agent, encoded as a bit string.
+			Each protocol statck is represented
+			by a single bit. When the value of a
+			bit = 1, it indicates that the protocol
+			stack on the agent represented by that
+			bit is supported; when zero, the protocol
+			stack is not supported. The first protocol
+			stack will encode in the least significant
+			bit of the first octet. Currently, only
+			IP Stack(bit 0) and IPX Stack(bit 1) are
+			defined; all other bits should be zero."
+	::= { snmpAgent 4 }
+
+
+	-- the ipagent protocol group
+
+	ipagentIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP agent's administrative IP address.
+			The current operational IP address can be
+			obtained from ipAdEntAddr in the ipAddrTable.
+			This parameter will take effect only after an
+			agent restart or reset.  This parameter will
+			always be updated in EEPROM."
+	::= { ipagentProtocol 1 }
+
+	ipagentIpNetMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The ipagent's administrative IP subnet mask.
+			The current operational IP subnet mask can be
+			obtained from ipAdEntMask in the ipAddrTable.
+			This parameter will take effect only after a
+			agent restart or agent reset.  This parameter
+			will always be updated in the EEPROM."
+	::= { ipagentProtocol 2 }
+
+	ipagentDefaultGateway OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The ip agent's administrative default
+			gateway IP address. The current operational IP
+			default gateway IP address can be obtained from
+			ipRouteDest in the ipRouteTable. This parameter
+			will take effect only after an agent restart
+			or reset.  This parameter will always be updated
+			in EEPROM."
+	::= { ipagentProtocol 3 }
+
+	ipagentBootServerAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP address of the boot server that is used
+			to boot this ipagent. This parameter will always
+			be updated in the EEPROM."
+	::= { ipagentProtocol 4 }
+
+	ipagentUnAuthIP OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP address of the last station that tried
+			to access this ipagent with an invalid community
+			string."
+	::= { ipagentProtocol 5 }
+
+	ipagentUnAuthComm OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The community string of the last station that
+			tried to access this ipagent with an invalid
+			community string."
+	::= { ipagentProtocol 6 }
+
+	-- the ipagent trap receiver table group
+
+	ipagentTrapRcvrTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF IpagentTrapRcvrEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"Table listing the Network Management Stations
+			that are to receive traps generated by this
+			agent."
+	::= { agentNetProtocol 2 }
+
+	ipagentTrapRcvrEntry OBJECT-TYPE
+		SYNTAX  IpagentTrapRcvrEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"Destination IP address and community string for a
+			particular trap receiver.  Entries can be added or
+			deleted. To add an entry, all objects which have
+			read-write access defined in the same table should
+			be set in one set request with a valid value in
+			the object ipagentTrapRcvrStatus. To delete an
+			entry, set ipagentTrapRcvrStatus to invalid."
+		INDEX { ipagentTrapRcvrIpAddr }
+	::= { ipagentTrapRcvrTable 1 }
+
+	IpagentTrapRcvrEntry ::= SEQUENCE {
+		ipagentTrapRcvrIpAddr
+			IpAddress,
+		ipagentTrapRcvrStatus
+			INTEGER,
+		ipagentTrapRcvrComm
+			DisplayString
+		}
+
+	ipagentTrapRcvrIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"IP address of the management station to receive
+			traps."
+	::= { ipagentTrapRcvrEntry 1 }
+
+	ipagentTrapRcvrStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),
+			valid(2),
+			invalid(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Validation status of this entry.  If the
+			value of this object is set to invalid(3),
+			then that particular entry is deemed invalid,
+			meaning that the address for that entry is no
+			longer valid because the entry has been removed
+			from the table."
+	::= { ipagentTrapRcvrEntry 2 }
+
+	ipagentTrapRcvrComm OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Community string for traps sent to this trap
+			receiver."
+	::= { ipagentTrapRcvrEntry 3 }
+
+
+    -- switch agent information
+
+	eSWUpDownloadAction OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			off(2),		-- agent not in Up/download mode
+			download(3),	-- agent in the downloading mode
+			upload(4)	-- agent in the uploading mode
+			}
+        ACCESS  read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Agent upload/download action. May refer to the
+			configuration file or image file. The upload
+			action is valid only for the configuration file."
+	::= { eSWAgentSW 1 }
+
+		eSWUpDownloadStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			action-Success(2),	-- action result, success
+			action-Failure(3),	-- action result, failure
+			in-Progress(4),
+			no-Action(5),
+			configError(6) -- Tftp Download successful but
+			               -- Configuration File Error
+			}
+
+			ACCESS	read-only
+			STATUS  mandatory
+			DESCRIPTION
+			"Result of the last upload/download request by
+			this agent."
+	::= { eSWAgentSW 2 }
+
+        eSWRemoteDownloadFile OBJECT-TYPE
+		SYNTAX	INTEGER	{
+			other(1),
+			config-File(2),	-- configuration file
+			image-File(3)	-- image file
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Downloading what kind of file. The
+			configuration file name should be stored in the
+			agentRemoteBootFile MIB object, and the image file
+			name should be stored in the eSWImageFileName
+			MIB object.  If this object has the value
+			Config-File(1), agentRemoteBootProtocol cannot be
+			set to bootp-tftp(2).  If agentRemoteBootProtocol
+			is set to bootp-tftp(2), this object cannot be
+			set to Config-File(1).
+
+			This object value is meaningful only at download
+			time."
+	::= { eSWAgentSW 3 }
+
+	eSWRemoteConfigServer	OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The IP address of the configuration file server."
+	::= { eSWAgentSW 4 }
+
+	eSWRemoteConfigFileName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..64))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The name of switch configuration file. The
+			server's IP address is in eSWRemoteConfigServer."
+	::= { eSWAgentSW 5 }
+
+	eSWConfigRetryCounter OBJECT-TYPE
+		SYNTAX  INTEGER (1..20)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of times the agent will retry a
+			failed image file download."
+	::= { eSWAgentSW 6 }
+
+	eSWRemoteImageServer	OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The IP address of the image file server."
+	::= { eSWAgentSW 7 }
+
+	eSWRemoteImageFileName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..64))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The name of the switch image file."
+	::= { eSWAgentSW 8 }
+
+	eSWImageRetryCounter OBJECT-TYPE
+		SYNTAX  INTEGER (1..20)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of times the agent will retry a
+			failed configuration file download."
+	::= { eSWAgentSW 9 }
+
+	eSWActiveImageBank OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			bank1(2),	-- First Bank
+			bank2(3)	-- Second Bank
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The image bank from which runtime code will
+			be loaded at next boot. If the value is set to
+			other(1) the agent will boot from the default
+			bank, i.e. Bank1(2)."
+	::= { eSWAgentSW 10 }
+
+	eSWRemoteDownloadImageBank OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),
+			bank1(2),	-- First Bank
+			bank2(3)	-- Second Bank
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of the destination bank to which
+			the image will be downloaded. 'other' will be
+			recognized as the default bank, i.e. bank 1."
+	::= { eSWAgentSW 11 }
+
+	eSWResetWaitTime      OBJECT-TYPE
+		SYNTAX  INTEGER(1..86400)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The time to wait before executing a reset of
+			the agent.  The time is in seconds, with a range
+			of 1 second to 1 day."
+	::= { eSWAgentSW 12 }
+
+	eSWResetLeftTime OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Time left until the agent will reset. If a
+			reset request is not in progress, this should
+			have a value of 0."
+	::= { eSWAgentSW 13 }
+
+	eSWBankImageInfoTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWBankImageInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table of information about the switch's
+			image banks."
+	::= { eSWAgentSW 14 }
+
+
+	eSWBankImageInfoEntry OBJECT-TYPE
+		SYNTAX	ESWBankImageInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A row in the image bank table containing
+			information about a specific bank."
+		INDEX	{ eSWBankIndex }
+	::= { eSWBankImageInfoTable 1 }
+
+	ESWBankImageInfoEntry ::= SEQUENCE {
+		eSWBankIndex
+			INTEGER,
+		eSWMajorVer
+			INTEGER,
+		eSWMinorVer
+			INTEGER,
+		eSWDateTime
+			DisplayString
+	}
+
+	eSWBankIndex  OBJECT-TYPE
+		SYNTAX	INTEGER (1..2)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The index of bank image information table. It
+			is the number of the image bank. Currently the
+			IntraSwitch 62xx family supports 2 image banks."
+	::= { eSWBankImageInfoEntry 1 }
+
+	eSWMajorVer OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The major version of the image file loaded in
+			the bank. If this object and eSWMinorVer both have
+			zero values, the bank has no image code loaded."
+	::= { eSWBankImageInfoEntry 2 }
+
+	eSWMinorVer OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The minor version number of the bank image
+			software.  If this object and eSWMajorVer both
+			have zero values, the bank has no image code
+			loaded."
+	::= { eSWBankImageInfoEntry 3 }
+
+	eSWDateTime     OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The date and time of the image software loaded
+			in this bank."
+	::= { eSWBankImageInfoEntry 4 }
+
+	eSWTelnetSessions OBJECT-TYPE
+		SYNTAX	INTEGER (1..4)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Number of concurrent Telnet sessions the agent
+			will support."
+	::= { eSWAgentSW 15 }
+
+	eSWTelnetSessionActive OBJECT-TYPE
+		SYNTAX	INTEGER (1..4)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Number of Telnet sessions active. This
+			value cannot be greater than the value of
+			eSWTelnetSessions."
+	::= { eSWAgentSW 16 }
+
+	eSWTelnetTimeOut OBJECT-TYPE
+		SYNTAX	INTEGER (1..60)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Telnet session time-out value, in minutes. The
+			default for this object is 5 minutes."
+	::= { eSWAgentSW 17 }
+
+	eSWSTP			OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			enable(2),	-- Spanning Tree Task is running
+			disable(3)	-- Spanning Tree Task is suspended
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Setting this value to enable(2) will cause the
+			switch to perform the Spanning Tree Algorithm as
+			described in IEEE 802.1d.Setting it to disable(3)
+			will stop the Spanning Tree Algorithm for all
+			ports on the switch. If STP is disabled, the
+			state of all ports in this switch should be set to
+			Forwarding.  When STP is changed from Disabled(3)
+			to Enabled(2), the state of all enabled ports
+			will be changed from forwarding to blocking, and
+			the switch will recalculate the spanning tree."
+	::= { eSWAgentSW 18 }
+
+	eSWUserInterfaceTimeOut OBJECT-TYPE
+		SYNTAX	INTEGER (0..60)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The console interface time-out value, in minutes.
+			A value of 0 means that the console interface
+			will not time out. The default is 5 minutes."
+	::= { eSWAgentSW 19 }
+
+	eSWBCastMcastThreshold OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The switch will detect a Broadcast or Multicast
+			storm on the network based on the value of this
+			object.  This value is represented as number of
+			packets per second.  The value must be greater
+			than or equal to 7000 packets per second."
+	::= { eSWAgentSW 20 }
+
+	eSWBCastMcastDuration OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The switch will detect a Broadcast or
+			Multicast storm on the network based on the
+			value represented by this object. The switch
+			will declare that a storm is present if the
+			bcast/mcast	 rate is over the threshold
+			defined by eSWBCastMcastThreshold for this
+			duration of time. The value must be greater than
+			or equal to 2 seconds."
+	::= { eSWAgentSW 21 }
+
+	eSWCfgFileErrStatus OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(2)) ACCESS  read-only STATUS
+		mandatory DESCRIPTION
+			"This object represents the results of previous
+			Config File download operation. Each bit from
+			least Significant bit represent a configuration
+			section in the switch. Value 1 for a bit
+			indicates that the corresponding section had
+			error in previous config file configuration
+			operation. Following is the detatiled section
+			information.
+
+	    		Bit 0 - System Administration section
+			Bit 1 - IP section
+	    		Bit 2 - Bootstrap section
+			Bit 3 - SNMP section
+			Bit 4 - Port section
+			Bit 5 - STP section
+			Bit 6 - VLAN section
+			Bit 7 - NW Security section
+			Bit 8 - Switch Stats and Duplicate IP Trap section
+			Bit 9:15 - Reserved."
+
+    		::= { eSWAgentSW 22 }
+
+
+
+	eSWDRAMSize	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"DRAM installed on the switch, in bytes."
+	::= { eSWAgentHW 1 }
+
+	eSWFlashRAMSize OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Flash RAM installed on the switch, in bytes."
+	::= { eSWAgentHW 2 }
+
+	eSWEEPROMSize	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"EEPROM installed on the switch, in bytes."
+	::= { eSWAgentHW 3 }
+
+
+	-- switch basic information group
+
+	eSWType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),
+			thunderBird(2),		-- ThunderBird Project
+			intraStack(3),		-- IntraStack
+            		intraSwitch(4),         -- Asante ASIC
+            		intraCore8000(5),
+            		intraCore9000(6)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The ethernet switch type."
+	::= { eSWBasic 1 }
+
+
+	eSWBkpType OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			no-Bkp(2),
+			intraStack(3),
+            		intraSwitch6216M(4),
+            		intraSwitch6224(5),
+            		intraSwitch6224M(6),
+            		intraCore8000(7),
+            		intraCore9000(8)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The backplane type of this switch."
+	::= { eSWBasic 2 }
+
+	eSWGroupCapacity OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of groups that can be contained
+			within the switch."
+	::= { eSWBasic 3 }
+
+	eSWStackLastChange OBJECT-TYPE
+		SYNTAX	TimeTicks
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The value of sysUpTime at the last change of
+			stack status.  If no change has occurred since
+			the stack was in operation, the value is zero."
+	::= { eSWBasic 4 }
+
+	eSWGroupInfoTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWGroupInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"This is the table to describe basic information
+			for each group of ports in the switch."
+	::= { eSWBasic 5 }
+
+	eSWGroupInfoEntry OBJECT-TYPE
+		SYNTAX	ESWGroupInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"This is the entry to describe basic information
+			for a particular group of ports."
+		INDEX { eSWGrpIndex }
+	::= { eSWGroupInfoTable 1 }
+
+	ESWGroupInfoEntry ::= SEQUENCE {
+		eSWGrpIndex		INTEGER,
+		eSWGrpID		MacAddress,
+		eSWGrpState		INTEGER,
+		eSWGrpNumofPorts	INTEGER,
+		eSWGrpType		INTEGER,
+		eSWGrpDescrption	DisplayString,
+		eSWGrpLED		OCTET STRING,
+		eSWGrpFanStatus		INTEGER,
+		eSWGrpNumofExpPorts	INTEGER,
+		eSWGrpLastChange	TimeTicks,
+		eSWGrpReset		INTEGER
+	}
+
+	eSWGrpIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The group number, which is the index of the table."
+	::= { eSWGroupInfoEntry 1 }
+
+	eSWGrpID OBJECT-TYPE
+		SYNTAX	MacAddress
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The ID of this group module. This is the MAC address
+			of the first port in the group."
+	::= { eSWGroupInfoEntry 2 }
+
+	eSWGrpState OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),
+			enable(2),
+			disable(3)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			"A command to disable or enable a physical module
+			in the switch device stack."
+	::= { eSWGroupInfoEntry 3 }
+
+
+	eSWGrpNumofPorts OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The number of ports including expansion ports
+			in the group."
+	::= { eSWGroupInfoEntry 4 }
+
+	eSWGrpType OBJECT-TYPE
+		SYNTAX  INTEGER  {
+			other(1),		-- unknown
+			empty(2),		-- group empty
+			intraSwitch(3),		-- IntraSwitch switch
+			intraStack-Base(4),	-- IntraStack switch
+			intraStack-FX8(5),	-- IntraStack FX module
+			intraStack-TX16(6),	-- IntraStack TX module
+			enterprise6216M-TX16(7),-- Enterprise TX 16 Port module
+                        enterprise6224M-TX24(8),-- Enterprise TX 24 Port module
+                        intraCore8000(9),	-- IC8000 base module
+                        intraCore-RJ45(10),	-- IC9000 24 Port RJ45 module
+                        intraCore-RJ21(11),	-- IC9000 24 Port RJ21 module
+                        intraCore-GIGA(12)	-- IC9000 Giga Port module
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The type of group module described by this entry."
+	::= { eSWGroupInfoEntry 5 }
+
+	eSWGrpDescrption OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"A description of the group module described by
+			this entry."
+	::= { eSWGroupInfoEntry 6 }
+
+    -- Group LED Status
+
+	eSWGrpLED OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(128))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string represents the current LED
+			setting for this slot/group.  Each octet in the
+			string represents one led.  LEDs on the front
+			panel of the slot module are ordered from the top
+			to the bottom and order in left to right.
+			Each LED  uses two bits for its action and state,
+			two bits for color, and has four reserved bits.
+
+			Bits 0-1:
+				00  -- LED on
+				01  -- LED off
+				10  -- LED blink.
+			Bits 6-7:
+				00 -- unknown color,
+				01 -- green,
+				10 -- yellow,
+				11 -- amber.
+
+			Bits 2-5 are reserved.
+
+			The 62XX LEDs on the front panel are ordered by port
+			LEDs followed by power, two MII (for 6216) and eight
+			utilization LEDs(for 6224).
+
+			The Octet String will be
+			Port1, Port2, port3 ... , PortN
+			0 - 3, 4 - 7, 8 -11 ... , (N - 1) * 4 - (( N * 4) - 1).
+
+			For the 6216, LED#65 is the power LED and 66 & 67
+			are MII LEDs.
+			For the 6224, LED#97 represents the power and
+			LEDs 98 - 105 represent utilization information.
+
+			Port octets meaning :
+				Octet 3 : Link Status.
+				Octet 2 : Data RX/TX.
+				Octet 1 : FDP.
+				Octet 0 : Speed.
+
+			Utilization octets meaning:
+				Octet 7 : 90+ %
+				Octet 6 : 75 - 90 %
+				Octet 5 : 50 - 75 %
+				Octet 4 : 25 - 50 %
+				Octet 3 : 10 - 25 %
+				Octet 2 :  5 - 10 %
+				Octet 1 :  3 -  5 %
+				Octet 0 :  1 -  3 %."
+
+	::= { eSWGroupInfoEntry 7 }
+
+	--  Group Fan Status
+
+	eSWGrpFanStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),	-- unknown, cannot read status
+			no-fan(2),	-- no fan is found in this module
+			normal(3),	-- fan in good condition
+			fail(4),	-- fan in failed condition
+			fan-1-bad(5),
+			fan-2-bad(6),
+			fan-1-2-bad(7)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The value of this object describes the fan status.
+			If there is more than one fan within the device,
+			the indication shows any failure among the fans."
+	::= { eSWGroupInfoEntry 8 }
+
+
+	eSWGrpNumofExpPorts OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The number of expansion ports in this group."
+	::= { eSWGroupInfoEntry 9 }
+
+	eSWGrpLastChange OBJECT-TYPE
+		SYNTAX	TimeTicks
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The value of sysUpTime at the last change
+			in status of the group since it has been in
+			operation.  If no change has occurred since this
+			group became operational, its value is zero. In
+			IntraStack, this object is useful only for the
+			base module."
+	::= { eSWGroupInfoEntry 10 }
+
+	eSWGrpReset OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			noReset(2),
+			reset(3)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This object represents the current group
+			reset state."
+	::= { eSWGroupInfoEntry 11 }
+
+	-- Port information table
+
+	eSWPortInfoTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWPortInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table containing basic information for each
+			port in this switch."
+	::= { eSWBasic 6 }
+
+	eSWPortInfoEntry OBJECT-TYPE
+		SYNTAX	ESWPortInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table entry containing information about a
+			specific port."
+		INDEX { eSWPortGrpIndex, eSWPortIndex }
+	::= { eSWPortInfoTable 1 }
+
+	ESWPortInfoEntry ::= SEQUENCE {
+		eSWPortGrpIndex		INTEGER,
+		eSWPortIndex 		INTEGER,
+		eSWPortType 		INTEGER,
+		eSWPortAutoNegAbility	INTEGER,
+		eSWPortLink 		INTEGER,
+		eSWPortSpeed		INTEGER,
+		eSWPortDuplex 		INTEGER
+	}
+
+	eSWPortGrpIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The number of the group containing the port."
+	::= { eSWPortInfoEntry 1 }
+
+	eSWPortIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The number of the port which this entry
+			describes."
+	::= { eSWPortInfoEntry 2 }
+
+
+	eSWPortType OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			mii-Empty(2),	-- expansion port empty
+			mii-FL(3),	-- expansion FL
+			mii-RJ45(4),	-- expansion TX
+			mii-FX(5),	-- expansion FX
+			rj45(6),	-- regular TX port
+			foil(7)		-- regular FX port
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The type port in this switch. MII-Empty(1)
+			means there is no expansion module plugged in."
+	::= { eSWPortInfoEntry 3 }
+
+	eSWPortAutoNegAbility	OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),
+			with(2),
+			without(3)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Indicates whether the port has Auto Negotiation
+			signaling ability."
+	::= { eSWPortInfoEntry 4 }
+
+
+	eSWPortLink OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			up(2),
+			down(3)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The link status of this port."
+	::= { eSWPortInfoEntry 5 }
+
+	eSWPortSpeed OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			m10-Mbps(2),
+			m100-Mbps(3),
+			g1-Gbps(4)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The working speed of this port. If the port's
+			link is not up, this object should show the
+			configured speed."
+	::= { eSWPortInfoEntry 6 }
+
+	eSWPortDuplex OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			half-Duplex(2),
+			full-Duplex(3)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The duplex state of this port. When the port
+			link is not up, this object should show the
+			configured duplex information."
+	::= { eSWPortInfoEntry 7 }
+
+
+	eSWGpPtInfoTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWGpPtInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table describing the port information for each
+			group in BYTE mapping method. The main purpose
+			of creating this table is to reduce the SNMP
+			parsing time and the load of network traffic."
+	::= { eSWBasic 7 }
+
+	eSWGpPtInfoEntry OBJECT-TYPE
+		SYNTAX	ESWGpPtInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"This is an entry of eSWGroupPortInfoTable."
+		INDEX	{ eSWGpPtInfoIndex }
+	::= { eSWGpPtInfoTable 1 }
+
+	ESWGpPtInfoEntry ::= SEQUENCE {
+		eSWGpPtInfoIndex	INTEGER,
+		eSWGpPtInfoType		OCTET STRING,
+		eSWGpPtInfoAutoNegAbility OCTET STRING,
+		eSWGpPtInfoLink		OCTET STRING,
+		eSWGpPtInfoSpeed	OCTET STRING,
+		eSWGpPtInfoDuplex	OCTET STRING
+	}
+
+	eSWGpPtInfoIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The group number ."
+	::= { eSWGpPtInfoEntry 1 }
+
+
+	eSWGpPtInfoType	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string is for the type of each port
+			in this group. Each octet represents one port;
+			therefore, octet 0 is port 1 and octet 9 is port
+			10.  Each octet stores the data from eSWPortType."
+	::= { eSWGpPtInfoEntry 2 }
+
+	eSWGpPtInfoAutoNegAbility OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string is for the auto negotiation
+			ability of each port in this group. Each octet
+			represents one port; therefore, octet 0 is port
+			1 and octet 9 is port 10. Each octet stores the
+			data from eSWPortAutoNegAbility."
+	::= { eSWGpPtInfoEntry 3 }
+
+	eSWGpPtInfoLink	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string is for the link status of
+			each port in this group. Each octet represents
+			one port; therefore, octet 0 is port 1 and octet
+			9 is port 10.  Each octet stores the data from
+			eSWPortLink."
+	::= { eSWGpPtInfoEntry 4 }
+
+	eSWGpPtInfoSpeed OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string is for the operating speed of
+			each port in this group. Each octet represents
+			one port; therefore, octet 0 is port 1 and octet
+			9 is port 10.  Each octet stores the data from
+			eSWPortSpeed."
+	::= { eSWGpPtInfoEntry 5 }
+
+
+	eSWGpPtInfoDuplex OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string is for the Duplex state of
+			each port in this group. Each octet represents
+			one port; therefore, octet 0 is port 1 and octet
+			9 is port 10.  Each octet stores the data from
+			eSWPortDuplex."
+	::= { eSWGpPtInfoEntry 6 }
+
+
+	eSWPtMacInfoTable OBJECT-TYPE
+		SYNTAX   SEQUENCE OF ESWPtMacInfoEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" A table describing the MAC addresses learned
+			on each port."
+	::= { eSWBasic 8 }
+
+
+	eSWPtMacInfoEntry OBJECT-TYPE
+		SYNTAX   ESWPtMacInfoEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" Entry of eSWPtMacInfoTable."
+		INDEX   { eSWPtMacPort, eSWPtMacMACADDR }
+	::= { eSWPtMacInfoTable 1 }
+
+	ESWPtMacInfoEntry  ::= SEQUENCE {
+		eSWPtMacPort		INTEGER,
+		eSWPtMacMACADDR		MacAddress
+	}
+
+
+	eSWPtMacPort   OBJECT-TYPE
+		SYNTAX   INTEGER
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION
+			"The port number in the switch."
+	::={ eSWPtMacInfoEntry 1 }
+
+
+	eSWPtMacMACADDR   OBJECT-TYPE
+		SYNTAX   MacAddress
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION
+			"MAC address."
+	::={ eSWPtMacInfoEntry 2 }
+
+
+	eSWVlanInfo	OBJECT IDENTIFIER ::= { eSWBasic 9 }
+
+
+	eSWVlanVersion  OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The version of VLAN implementation in the switch"
+	::= { eSWVlanInfo 1 }
+
+
+	eSWVlanMaxCapacity OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The maximum number of VLANs that can be supported
+			within the switch."
+	::= { eSWVlanInfo 2 }
+
+
+	eSWVlanTypesSupported OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The types of VLAN supported by the switch. Here
+			each bit position indicates the type of VLAN
+			supported by the switch.
+			Bit 0 - Port based VLAN
+			Bit 1 - MAC Address based VLAN
+			Bit 3 - Protocol based VLAN"
+	::= { eSWVlanInfo 3}
+
+    -- VLAN Configuration Table
+
+	eSWVlanTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWVlanEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table describing the information about every
+			VLAN associated with the switch."
+	::= { eSWVlanInfo 4 }
+
+	eSWVlanEntry OBJECT-TYPE
+		SYNTAX  ESWVlanEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A list of information for each VLAN within the
+			switch."
+		INDEX	{ eSWVLANIndex }
+	::= { eSWVlanTable 1 }
+
+	ESWVlanEntry ::= SEQUENCE {
+		eSWVLANIndex		INTEGER,
+		eSWVlanName  		DisplayString,
+		eSWVlanID		INTEGER,
+		eSWVlanMemberSet	OCTET STRING,
+        eSWVlanMgmAccess    INTEGER
+	}
+
+	eSWVLANIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Index in VLAN Configuration Table within the
+			switch."
+	::= { eSWVlanEntry 1 }
+
+	eSWVlanName	OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..32))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string is the name of the VLAN. The
+			length of the name can be up to 32 printable
+			characters."
+	::= { eSWVlanEntry 2 }
+
+	eSWVlanID OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"A 12 bit indentifier for this VLAN.
+
+			0  -   The NULL VLAN ID. It is used when the
+			       tagging header contains only user
+			       priority information; no VLAN identifier
+			       is present in the frame. This number is
+			       not allowed here.
+
+			1 -    The default VLAN ID; To be used as
+			       default PVID for the port through
+			       which tagged frames will be sent within
+			       the switch.
+
+			4095 - Reserved for implementation use."
+	::= { eSWVlanEntry 3 }
+
+	eSWVlanMemberSet OBJECT-TYPE
+		SYNTAX  OCTET STRING
+		ACCESS  read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The set of ports to which traffic destined for
+			this VLAN may be transmitted. Each octet within
+			the value of this object specifies a set of eight
+			ports, with the first octet specifying ports 1
+			through 8, the second specifying ports 9 through
+			16, etc. Within each octet, the most significant
+			bit represents the lowest numbered port, and
+			the least significant bit represents the highest
+			numbered port. Thus, ech port of the switch is
+			represented by a single bit within the value of
+			this object. Bit value 1 means the corresponding
+			port is included in the member set and bit value
+			0 represents the port is not included."
+
+	::= { eSWVlanEntry 4 }
+
+    eSWVlanMgmAccess      OBJECT-TYPE
+		SYNTAX	INTEGER {
+                enable(1),
+                disable (2)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"This object provides enabling and disabling of
+			switch management access. When this object for
+			a VLAN entry is set to Enable(1), the switch
+			management (Telnet, SNMP Agent, HTTP Server and
+			ICMP serverices can be accessed by a corresponding
+			manager in the VLAN.  If this object of a VLAN
+			entry is set to Disable(2), the switch management
+			cannot be accessed in the VLAN."
+
+	::= { eSWVlanEntry 5 }
+
+	eSWTrunkBundleCapacity OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of Trunk Bundles that can be supported
+			within the switch."
+	::= { eSWBasic 10 }
+
+	eSWTrunkBundleTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWTrunkBundleEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table describing the Trunk Bundles information
+			of the switch."
+	::= { eSWBasic 11 }
+
+	eSWTrunkBundleEntry OBJECT-TYPE
+		SYNTAX	ESWTrunkBundleEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"This is an entry of eSWTrunkBundleTable."
+		INDEX	{ eSWTrunkBundleIndex }
+	::= { eSWTrunkBundleTable 1 }
+
+	ESWTrunkBundleEntry ::= SEQUENCE {
+		eSWTrunkBundleIndex     INTEGER,
+		eSWTrunkBundlePortA	INTEGER,
+		eSWTrunkBundlePortB	INTEGER,
+		eSWTrunkBundleState     INTEGER
+	}
+
+	eSWTrunkBundleIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			" The index of eSWTrunkBundleTable table."
+	::= { eSWTrunkBundleEntry 1 }
+
+	eSWTrunkBundlePortA	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The ID of the first port of the Trunk Bundles. "
+	::= { eSWTrunkBundleEntry 2 }
+
+	eSWTrunkBundlePortB	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The ID of the second port of the Trunk Bundles. "
+	::= { eSWTrunkBundleEntry 3 }
+
+	eSWTrunkBundleState	OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			enable(2),
+			disable(3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"When this function is enabled, ports specified
+			by port A and port B will form a Trunk Bundle
+			to provide a fat communications channel. "
+	::= { eSWTrunkBundleEntry 4 }
+
+	eSWNetSecurityInfo	OBJECT IDENTIFIER ::= { eSWBasic 13 }
+
+	eSWNetworkSecurityVersion  OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The version of Network Security implementation
+			in the switch"
+	::= { eSWNetSecurityInfo 1 }
+
+	eSWNetworkSecurityMAXLevels OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The maximum number of Security Levels that can
+			be supported within the switch."
+	::= { eSWNetSecurityInfo 2 }
+
+	eSWSecurityTypesSupported	 OBJECT-TYPE
+	 	SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS mandatory
+
+		DESCRIPTION
+			" The type of network security supported by the
+			switch.  Here each bit position indicates the type
+			of Network Security Levels supported by the Switch
+
+			Bit 0 - VLAN Level Security
+			Bit 1 - Port Level Security "
+
+     		::= { eSWNetSecurityInfo 3 }
+
+	eSWSecConfigTable    OBJECT-TYPE
+        	SYNTAX        SEQUENCE OF ESWSecConfigEntry
+        	ACCESS         not-accessible
+        	STATUS         mandatory
+        	DESCRIPTION
+			"A table that contains information about the
+			Security Configuration that is associated with
+			each port of the switch."
+
+		::= { eSWNetSecurityInfo 4 }
+
+	eSWSecConfigEntry      OBJECT-TYPE
+		SYNTAX           ESWSecConfigEntry
+		ACCESS           not-accessible
+		STATUS           mandatory
+		DESCRIPTION
+
+			" A list of information for each port within
+			the switch."
+
+        	INDEX            { eSWSecPortIndex }
+    		::=  { eSWSecConfigTable 1 }
+
+	ESWSecConfigEntry  ::= SEQUENCE {
+       		eSWSecPortIndex         INTEGER ,
+         	eSWSecurityLevel	INTEGER
+    		}
+
+	eSWSecPortIndex		OBJECT-TYPE
+		SYNTAX          INTEGER
+		ACCESS          read-only
+		STATUS          mandatory
+		DESCRIPTION
+			"The number of the port which this entry
+			describes."
+    		::= { eSWSecConfigEntry 1 }
+
+	eSWSecurityLevel          OBJECT-TYPE
+		SYNTAX  INTEGER {
+			newNodeDetection(1),
+			knownMACAddressForwarding(2),
+			restrictedKnownMACAddressForwarding(3),
+			knownMACAddressForwardingWithIntruderLock(4),
+			normalPort(5),
+			other(6)
+           		}
+           	ACCESS    read-write
+           	STATUS    mandatory
+           	DESCRIPTION
+             		"Security Level Configured for the port."
+		::= { eSWSecConfigEntry 2 }
+
+	eSWSecMonitorPort      OBJECT-TYPE
+		SYNTAX          INTEGER
+		ACCESS          read-write
+		STATUS          mandatory
+		DESCRIPTION
+			"The port number within the switch which is
+			configured as the monitor port.  All the traffic
+			from the Intruder Detection and Monitoring
+			secured port will be also forwarded to the
+			monitor port. Value of 0 indicates that no
+			monitored port is been configured by the switch."
+		::= { eSWNetSecurityInfo 5 }
+
+	eSWSecurityTrapEnable      OBJECT-TYPE
+		SYNTAX   INTEGER {
+			enable(1),
+			disable(2),
+			other(3)
+			}
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"The object is to allow the management to control
+			the Security generated Enterprise
+			Specific Trap."
+
+		::= { eSWNetSecurityInfo 6 }
+
+	eSWSecIncSetConfigTable       OBJECT-TYPE
+		SYNTAX   SEQUENCE OF ESWSecIncSetConfigEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			"A table describing the MAC addresses configured
+			by the management for a port.  This entries of
+			the MAC Address are static entries
+			(No aging will be performed on these MAC
+			Addresses)."
+		::= { eSWNetSecurityInfo 7 }
+
+	eSWSecIncSetConfigEntry OBJECT-TYPE
+		SYNTAX ESWSecIncSetConfigEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			"Entry of eSWSecIncSetConfigTable."
+		INDEX   { eSWIncSetPort,eSWIncSetMACAddr }
+		::= { eSWSecIncSetConfigTable 1 }
+
+	ESWSecIncSetConfigEntry ::= SEQUENCE {
+		eSWIncSetPort		INTEGER,
+		eSWIncSetMACAddr	MacAddress,
+		eSWIncSetMACStatus      INTEGER
+		}
+
+	eSWIncSetPort        OBJECT-TYPE
+		SYNTAX   INTEGER
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION
+			"The port number in the switch associated with
+			the Inclusive Set MAC Address."
+		::={ eSWSecIncSetConfigEntry 1 }
+
+	eSWIncSetMACAddr     OBJECT-TYPE
+		SYNTAX   MacAddress
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION
+			"MAC address which is part of the Inclusive Set.
+			This MAC Address when appears in the source
+			MAC Address field in the ethernet frame will be
+			forwarded by the Associated Port if the Port is
+			set for Security Level 2 , Level 3 , Level 4."
+		::= { eSWSecIncSetConfigEntry 2 }
+
+	eSWIncSetMACStatus    OBJECT-TYPE
+		SYNTAX   INTEGER {
+			valid(1),
+			invalid(2)
+			}
+		ACCESS   read-write
+		STATUS   mandatory
+		DESCRIPTION
+			"MAC address which is part of the Inclusive Set.
+			This MAC Address when appears in the source
+			MAC Address field in the ethernet frame will be
+			forwarded by the Associated Port if the Port is
+			set for Security Level 2 , Level 3 , Level 4."
+		::= { eSWSecIncSetConfigEntry 3 }
+
+	eSWSecIntMACAddrTable       OBJECT-TYPE
+		SYNTAX   SEQUENCE OF ESWSecIntMACAddrEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" A table containing Intruder MAC Addresses when
+			any port is set to Security Level 2 or Security
+			Level 4.  In case of  a Port set to Security Level
+			4 this table indicating the Intruder MAC Addresses
+			are locked ( that is any station with its MAC
+			Address in the table will not able to forward \
+			transmits using any of the switch Ports."
+		::= { eSWNetSecurityInfo 8 }
+
+	eSWSecIntMACAddrEntry 	OBJECT-TYPE
+		SYNTAX	 ESWSecIntMACAddrEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" Entry of eSWSecIntMACAddrTable."
+		INDEX   { eSWIntMACAddrPort, eSWIntMACAddr }
+		::= { eSWSecIntMACAddrTable 1 }
+
+		ESWSecIntMACAddrEntry ::= SEQUENCE {
+			eSWIntMACAddrPort	INTEGER,
+			eSWIntMACAddr		MacAddress
+			}
+
+	eSWIntMACAddrPort        OBJECT-TYPE
+		SYNTAX   INTEGER
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION   
+			"The port number in the switch associated with
+			the Inturder MAC Address."
+		::={ eSWSecIntMACAddrEntry 1 }
+
+	eSWIntMACAddr       OBJECT-TYPE
+		SYNTAX	   MacAddress
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION
+			"Intruder MAC Address."
+		::={ eSWSecIntMACAddrEntry  2 }
+
+	eSWFilteringInfo	OBJECT IDENTIFIER ::= { eSWBasic 14 }
+
+	eSWFilteringTypesSupported        OBJECT-TYPE
+		SYNTAX           INTEGER
+		ACCESS             read-only
+		STATUS             mandatory
+		DESCRIPTION
+			"The type of Filtering Configuration supported
+			by the switch.	Here each bit position indicates
+			the type of Filtering Configuration Levels
+			supported by the Switch
+
+			Bit 0 - VLAN Level MAC Address Filtering
+			Bit 1 - Port Level MAC Address Filtering
+			Bit 2 - VLAN Level Protocol Type Filtering
+			Bit 3 - Port Level Protocol Type Filtering "
+		::= { eSWFilteringInfo 1 }
+
+	eSWFiltMACVLANBasedConfigTable       OBJECT-TYPE
+		SYNTAX   SEQUENCE OF ESWFiltMACVLANBasedConfigEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			"A table describing the filtering MAC addresses
+			configured by the management for a VLAN. This
+			entries of the MAC Address are static entries.
+			No aging will be performed on these MAC
+			Addresses."
+		::= { eSWFilteringInfo 2 }
+
+	eSWFiltMACVLANBasedConfigEntry OBJECT-TYPE
+		SYNTAX   ESWFiltMACVLANBasedConfigEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" Entryof eSWFiltMACVLANBasedConfigTable."
+		INDEX   { eSWVLANIndex , eSWFiltMACAddr }
+		::= { eSWFiltMACVLANBasedConfigTable 1 }
+
+	ESWFiltMACVLANBasedConfigEntry ::= SEQUENCE {
+		eSWVIDIndex	    INTEGER,
+		eSWFiltMACAddr      MacAddress,
+		eSWFiltMACSts       INTEGER
+		}
+
+	eSWVIDIndex     OBJECT-TYPE
+		SYNTAX   INTEGER
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION
+			"Index in VLAN Configuration Table within the
+			switch for which the Filtering MAC Address
+			is associated."
+	::= { eSWFiltMACVLANBasedConfigEntry 1 }
+
+	eSWFiltMACAddr   OBJECT-TYPE
+		SYNTAX   MacAddress
+		ACCESS   read-only
+		STATUS   mandatory
+		DESCRIPTION
+			"MAC Address which will be filtered in the
+			indexed VID, when appear in source MAC Address
+			field of the frame."
+	::= { eSWFiltMACVLANBasedConfigEntry  2 }
+
+	eSWFiltMACSts    OBJECT-TYPE
+		SYNTAX   INTEGER {
+		valid(1),
+		invalid(2)
+		}
+		ACCESS   read-write
+		STATUS   mandatory
+		DESCRIPTION
+			"MAC address which is part of the VLAN Based
+			Filtering MAC Address Set.  This MAC Address
+			when appears in the source MAC Address field
+			in the ethernet frame will be filtered in the
+			indexed VID."
+	::= { eSWFiltMACVLANBasedConfigEntry 3 }
+
+	eSWFiltMACPortBasedConfigTable       OBJECT-TYPE
+		SYNTAX   SEQUENCE OF ESWFiltMACPortBasedConfigEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" A table describing the filtering MAC addresses
+			configured by the management for a port.  This
+			entries of the MAC Address are static entries
+			No aging will be performed on this MAC Addresses."
+	::= { eSWFilteringInfo 3 }
+
+	eSWFiltMACPortBasedConfigEntry OBJECT-TYPE
+		SYNTAX ESWFiltMACPortBasedConfigEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			"Entry of eSWFiltMACPortBasedConfigTable."
+		INDEX   { eSWFiltPortIndex , eSWFiltPMACAddr }
+	::= { eSWFiltMACPortBasedConfigTable 1 }
+
+	ESWFiltMACPortBasedConfigEntry ::= SEQUENCE {
+		eSWFiltPortIndex      INTEGER,
+		eSWFiltPMACAddr       MacAddress,
+		eSWFiltPMACStatus     INTEGER
+		}
+
+	eSWFiltPortIndex     OBJECT-TYPE
+		SYNTAX   INTEGER
+		ACCESS   read-write
+		STATUS   mandatory
+		DESCRIPTION
+			"The Port number in the switch."
+	::= { eSWFiltMACPortBasedConfigEntry 1 }
+
+	eSWFiltPMACAddr   OBJECT-TYPE
+		SYNTAX   MacAddress
+		ACCESS   read-write
+		STATUS   mandatory
+		DESCRIPTION
+			"MAC Address which will be filtered in the
+			indexed Port, when appear in destination MAC
+			Address field of the frame."
+	::= { eSWFiltMACPortBasedConfigEntry  2 }
+
+	eSWFiltPMACStatus    OBJECT-TYPE
+		SYNTAX   INTEGER {
+			 valid(1),
+			 invalid(2)
+			}
+		ACCESS   read-write
+		STATUS   mandatory
+		DESCRIPTION
+			"This field indicates status associated with
+			the MAC Address."
+	::= { eSWFiltMACPortBasedConfigEntry 3 }
+
+	eSWFiltProtVLANBasedCFGTable       OBJECT-TYPE
+		SYNTAX   SEQUENCE OF ESWFiltProtVLANBasedCFGEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			"A table describing the filtering Protocol Type
+			configured by the management for a port."
+	::= { eSWFilteringInfo 4}
+
+	eSWFiltProtVLANBasedCFGEntry OBJECT-TYPE
+		SYNTAX ESWFiltProtVLANBasedCFGEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" Entry of eSWFiltProtVLANBasedCFGTable."
+		INDEX   { eSWVLANIndex }
+	::= { eSWFiltProtVLANBasedCFGTable 1 }
+
+	ESWFiltProtVLANBasedCFGEntry ::= SEQUENCE {
+		eSWFiltProtocolVID	          INTEGER,
+		eSWFiltVLANProtocolType       OCTET STRING
+		}
+
+	eSWFiltProtocolVID     OBJECT-TYPE
+		SYNTAX   INTEGER
+		ACCESS   read-write
+		STATUS   mandatory
+		DESCRIPTION
+			"Index in VLAN Configuration Table within the
+			switch for which the Filtering Protocol Type
+			is associated."
+	::= { eSWFiltProtVLANBasedCFGEntry 1 }
+
+	eSWFiltVLANProtocolType        OBJECT-TYPE
+		SYNTAX 		OCTET STRING (SIZE(1))
+		ACCESS  	read-write
+		STATUS    	mandatory
+		DESCRIPTION
+			"This object represents the Protocol Type Filter
+			as applied to the Indexed VID.	The Filtering
+			capabilities is indicated by each bit in this
+			2 bytes octet string.
+
+			1 - Filter OUT     0  -  Do not Filter
+			Bit 0 : Filter OUT All AppleTalk Protocol Packets
+			Bit 1 : Filter OUT All Banyan VINES Protocol
+			Packets
+			Bit 2 : Filter OUT All IBM Netbios Protocol
+			Packets
+			Bit 3 : Filter OUT All IPX/SPX Novell Protocol
+			Packets
+			Bit 4 : Filter OUT All IP Protocol Packets
+			Bit 5 : Filter OUT All Unknown Protocol Packets
+			that are not defined by the above protocol
+			Filtering bits ( Bit 0-4)
+			Bit 6 - 7 - Reserved."
+
+	::= { eSWFiltProtVLANBasedCFGEntry 2 }
+
+
+	eSWFiltProtPortBasedCFGTable       OBJECT-TYPE
+        	SYNTAX   SEQUENCE OF ESWFiltProtPortBasedCFGEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			"A table describing the filtering Protocol Type
+			configured by the management for a port."
+	::= { eSWFilteringInfo 5}
+
+	eSWFiltProtPortBasedCFGEntry OBJECT-TYPE
+		SYNTAX ESWFiltProtPortBasedCFGEntry
+		ACCESS   not-accessible
+		STATUS   mandatory
+		DESCRIPTION
+			" Entry of eSWFiltProtPortBasedCFGTable."
+		INDEX   { eSWPortIndex }
+		::= { eSWFiltProtPortBasedCFGTable 1 }
+
+	ESWFiltProtPortBasedCFGEntry ::= SEQUENCE {
+		eSWFiltProtPort		INTEGER,
+		eSWFiltProtcolType	OCTET STRING
+		}
+
+	eSWFiltProtPort     OBJECT-TYPE
+		SYNTAX   INTEGER
+		ACCESS   read-write
+		STATUS   mandatory
+		DESCRIPTION
+			"The Port number in the switch."
+	::= { eSWFiltProtPortBasedCFGEntry 1 }
+
+	eSWFiltProtcolType 	 OBJECT-TYPE
+		SYNTAX		 OCTET STRING (SIZE(1))
+		ACCESS		 read-write
+		STATUS		 mandatory
+		DESCRIPTION
+			"This object represents the Protocol Type Filter
+			as applied to the Indexed Port.  The Filtering
+			capabilities is indicated by each bit in this
+			2 bytes octet string.
+
+			1 - Filter OUT    0  -  Do not Filter
+			Bit 0 : Filter OUT All AppleTalk Protocol Packets
+			Bit 1 : Filter OUT All Banyan VINES Protocol
+			Packets
+			Bit 2 : Filter OUT All IBM Netbios Protocol
+			Packets
+			Bit 3 : Filter OUT All IPX/SPX Novell Protocol
+			Packets
+			Bit 4 : Filter OUT All IP Protocol Packets
+			Bit 5 : Filter OUT All Unknown Protocol Packets
+			that are not defined by the above protocol
+			Filtering bits ( Bit 0-4)
+			Bit 6 - 7 - Reserved."
+
+	::= { eSWFiltProtPortBasedCFGEntry 2 }
+
+--	Switch Control Information
+
+	eSWPortCtrlTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWPortCtrlEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table describing the port control information
+			for each port in this group."
+	::= { eSWCtrl 1 }
+
+
+	eSWPortCtrlEntry OBJECT-TYPE
+		SYNTAX	ESWPortCtrlEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"An entry describing control information for a
+			specific port."
+		INDEX	{ eSWGrpPtCtrlIndex, eSWPortCtrlIndex }
+	::= { eSWPortCtrlTable 1 }
+
+
+	ESWPortCtrlEntry ::= SEQUENCE {
+
+		eSWGrpPtCtrlIndex		INTEGER,
+		eSWPortCtrlIndex		INTEGER,
+		eSWPortCtrlState		INTEGER,
+		eSWPortCtrlBcastFilter		INTEGER,
+		eSWPortCtrlStNFw		INTEGER,
+		eSWPortCtrlSTP  		INTEGER,
+		eSWPortCtrlVlanID		INTEGER,
+		eSWPortCtrlVlanTagging		INTEGER,
+        	eSWPortCtrlVlanGroups    	OCTET STRING,
+		eSWPortCtrlTrunkBundleIndex  	INTEGER,
+		eSWPortCtrlGVRPEnable		INTEGER,
+		eSWPortCtrlSecurityLevel 	INTEGER,
+		eSWPortProtocolFilter   	OCTET STRING
+	}
+
+	eSWGrpPtCtrlIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The group containing the port for which this
+			entry has information."
+	::= { eSWPortCtrlEntry 1 }
+
+	eSWPortCtrlIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The port number for this entry."
+	::= { eSWPortCtrlEntry 2 }
+
+
+	eSWPortCtrlState OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			enable(2),
+			disable(3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Identifies whether the port is administratively
+			enabled or disabled."
+	::= { eSWPortCtrlEntry 3 }
+
+	eSWPortCtrlBcastFilter OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			enable(2),
+			disable(3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Broadcast packet filtering control. If this is
+			enabled, broadcast packets received on this port
+			will be filtered out. The default is Disable(3)."
+	::= { eSWPortCtrlEntry 4 }
+
+
+	eSWPortCtrlStNFw OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			enable(2),
+			disable(3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Enables or disables store-and-forward switching
+			for this port When set to Enable(2) the frame
+			will be forwarded after it has been completely
+			received and checksummed. When set to Disable(3),
+			the port will use fragment-free switching."
+	::= { eSWPortCtrlEntry 5 }
+
+
+	eSWPortCtrlSTP	OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			enable(2),
+			disable(3)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"If this function is enable(1) and
+			eSWPortCtrlState is also enable(1), that means
+			this port will join the Spanning Tree Algorithm
+			(STP) caculation.  Asante 6016/6024 switches do
+			not support individual port STP participation
+			enable/disable, therefore this object will have
+			the same value for all ports."
+
+	::= { eSWPortCtrlEntry 6 }
+
+
+    eSWPortCtrlVlanID    OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The 12 bit port VLAN indentifier for this port
+			within the switch.
+
+			0  -   The NULL VLAN ID. It is used when the
+			tagging header contains only user priority
+			information; no VLAN identifier is present in
+			the frame.  This number is not allowed here.
+
+			1  -   The default VLAN ID; To be used as default
+			PVID for the port through which tagged frames
+			will be sent within the switch.
+
+			4095 - Reserved for implementation use."
+
+	::= { eSWPortCtrlEntry 7 }
+
+
+	eSWPortCtrlVlanTagging	OBJECT-TYPE
+		SYNTAX	INTEGER {
+				enable(1),
+				enable8021Q(2),
+				disable (3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Whether a frame should be tagged with VLAN
+			Tagging Header when transmitted through this
+			port within the switch.
+			Enable - Use Asante proprietary tagging mechanism
+			on this port wihtin the switch.
+			Enable8021Q - Use 802.1Q standard tagging on
+			this port within the switch.
+			Disable - Disable the tagging on this port within
+			the switch."
+
+	::= { eSWPortCtrlEntry 8 }
+
+	eSWPortCtrlVlanGroups OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(2))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"This object represents the port vlan map in
+			2 octets.  The octets meaning is as follow: If 2
+			octets are considered together as 16 bit field,
+			then the least significant bit (bit0) represents
+			VLAN Group1, bit1 represents VLAN Group2, ...,
+			bit14 represents VLAN Group15. If a bit is set
+			(bit value = 1) then the port in question is a
+			member of the VLAN Group represented by the bit."
+
+	::= { eSWPortCtrlEntry 9 }
+
+
+	eSWPortCtrlTrunkBundleIndex	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"A value of 0 means that the port does not belong
+			to any trunk Bundle. A non-zero value is the index
+			of the Trunk Bundle to which this port belongs. "
+
+	::= { eSWPortCtrlEntry 10 }
+
+
+	eSWPortCtrlGVRPEnable   OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enable(1),
+			disable(2)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This entry when set to enable, means GVRP
+			frames can be transmitted and received on this
+			port. If disabled, it means GVRP frames cannot
+			be transmitted on this port and the received
+			GVRP frames should be discarded.  Default value
+			for this entry is disable(2)."
+
+    ::= {eSWPortCtrlEntry 11 }
+
+	eSWPortCtrlSecurityLevel   OBJECT-TYPE
+		SYNTAX   INTEGER {
+			newNodeDetection(1),
+			knownMACAddressForwarding(2),
+			restrictedKnownMACAddressForwarding(3),
+			knownMACAddressForwardingWithIntruderLock(4),
+			normalPort(5),
+			other(6)
+			}
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Security Level associated with the port. When
+			set to Normal Port (5) , the Security Level
+			(if present) will be cleared."
+
+	::= { eSWPortCtrlEntry 12 }
+
+	eSWPortProtocolFilter  OBJECT-TYPE
+		SYNTAX   OCTET STRING (SIZE(2))
+		ACCESS  read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"This object represents the Protocol Level
+			Security Filter as applied to the Port.
+			The Filtering capabilities is indicated by each
+			bit in this 2 bytes octet string.
+			1 - Filter OUT    0  -  Do not Filter
+			Bit 0 : Filter OUT All AppleTalk Protocol Packets
+			Bit 1 : Filter OUT All Banyan VINES Protocol
+			Packets
+			Bit 2 : Filter OUT All IBM Netbios Protocol
+			Packets
+			Bit 3 : Filter OUT All IPX/SPX Novell Protocol
+			Packets
+			Bit 4 : Filter OUT All IP Protocol Packets
+			Bit 5 : Filter OUT All Unknown Protocol Packets
+			that are not defined by the above protocol
+			Filtering bits (Bit 0-4)
+			Bit 6 - 7 - Reserved."
+
+
+	::= { eSWPortCtrlEntry 13 }
+
+	eSWGpPtCtrlTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWGpPtCtrlEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table containing control information for
+			each port in a group. This table is indexed
+			by the group number.  It uses a BYTE mapping
+			method. Each byte represents control information
+			for a port in this group.  The main purpose of
+			creating this table is to reduce the SNMP engine
+			parsing time and the load of network traffic."
+
+	::= { eSWCtrl 2 }
+
+	eSWGpPtCtrlEntry OBJECT-TYPE
+		SYNTAX	ESWGpPtCtrlEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"An entry of table eSWGpPtCtrlTable."
+		INDEX { eSWGpPtCtrlIndex }
+	::= { eSWGpPtCtrlTable 1 }
+
+	ESWGpPtCtrlEntry ::= SEQUENCE {
+		eSWGpPtCtrlIndex		INTEGER,
+		eSWGpPtCtrlState		OCTET STRING,
+		eSWGpPtCtrlBcastFilter		OCTET STRING,
+		eSWGpPtCtrlStNFw		OCTET STRING,
+		eSWGpPtCtrlSTP			OCTET STRING,
+		eSWGpPtCtrlSecurityLevel 	OCTET STRING,
+		eSWGpPtProtocolFilter   	OCTET STRING
+	}
+
+	eSWGpPtCtrlIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The index of this table. It is the group number."
+
+	::= { eSWGpPtCtrlEntry 1 }
+
+
+	eSWGpPtCtrlState OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string displays the administrative
+			enable/disable state of each port in the group.
+			Each octet represents one port; therefore, octet
+			0 is port 1 and octet 9 is port 10. Each octet
+			stores the data from eSWPortCtrlState."
+
+		::= { eSWGpPtCtrlEntry 2 }
+
+	eSWGpPtCtrlBcastFilter OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string displays the broadcast filter
+			state for each port in this group. Each octet
+			represents one port; therefore, octet 0 is port
+			1 and octet 9 is port 10. Each octet stores the
+			data from eSWPortCtrlBcastFilter."
+
+		::= { eSWGpPtCtrlEntry 3 }
+
+	eSWGpPtCtrlStNFw OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS  	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string displays the switching
+			technique (store-and-forward or fragment-free)
+			being used by each port in the group. Each octet
+			represents one port; therefore, octet 0 is port
+			1 and octet 9 is port 10.  Each octet stores
+			the data from eSWPortCtrlStNFw."
+
+		::= { eSWGpPtCtrlEntry 4 }
+
+
+	eSWGpPtCtrlSTP OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(64))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This octet string displays the individual
+			port's participation in the Spanning Tree
+			Algorithm. Asante 62xx switches do not support
+			individual port STP participation, so all ports
+			should show the same value.  Each octet stores
+			the value from eSWPortCtrlSTP."
+
+		::= { eSWGpPtCtrlEntry 5 }
+
+	eSWGpPtCtrlSecurityLevel   OBJECT-TYPE
+		SYNTAX   OCTET STRING ( SIZE (64) )
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"This octet string is for the Security Level
+			information of each port in the group.	Each octet
+			represents one port; therefore , the octet 0 is
+			port 1 and the octet 9 is port 10.  Each octet
+			stores the data from eSWPortCtrlSecurityLevel."
+
+	::= { eSWGpPtCtrlEntry 6 }
+
+	eSWGpPtProtocolFilter OBJECT-TYPE
+		SYNTAX OCTET STRING  ( SIZE(64) )
+		ACCESS  read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"This octet string represents the Protocol Level
+			Security Filter as applied to each Port.  Each
+			octet represents one port; therefore , the octet 0
+			is port 1 and the octet 9 is port 10.  Each octet
+			stores the data from eSWPortProtocolFilter."
+
+	::= { eSWGpPtCtrlEntry 7 }
+
+	-- Auto-Negotiation table for each port
+
+	eSWAutoPortCtrlTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWAutoPortCtrlEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A table containing information about each port's
+			auto- negotiation information."
+	::= { eSWCtrl 3 }
+
+
+	eSWAutoPortCtrlEntry OBJECT-TYPE
+		SYNTAX	ESWAutoPortCtrlEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A entry of eSWAutoPortControlTable. It uses
+			eSWAutoNegGrpIndex and eSWAutoNegPortIndex to
+			find the table entry."
+
+		INDEX { eSWAutoNegGrpIndex, eSWAutoNegPortIndex }
+	::= { eSWAutoPortCtrlTable 1 }
+
+	ESWAutoPortCtrlEntry ::= SEQUENCE {
+		eSWAutoNegGrpIndex
+			INTEGER,
+		eSWAutoNegPortIndex
+			INTEGER,
+		eSWAutoNegAdminState
+			INTEGER,
+		eSWAutoNegRemoteAble
+			INTEGER,
+		eSWAutoNegAutoConfig
+			INTEGER,
+		eSWAutoNegLocalAbility
+			OCTET STRING,
+		eSWAutoNegAdvertisedAbility
+			OCTET STRING,
+		eSWAutoNegReceivedAbility
+			OCTET STRING,
+		eSWAutoNegRestartAutoConfig
+			INTEGER
+	}
+
+	eSWAutoNegGrpIndex	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The value of this object identifies the group for
+			which this entry contains port auto-negotiation
+			information."
+	::= { eSWAutoPortCtrlEntry 1 }
+
+	eSWAutoNegPortIndex	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The value of this object identifies the port for
+			which this entry contains auto-negotiation
+			information."
+	::= { eSWAutoPortCtrlEntry 2 }
+
+	eSWAutoNegAdminState	OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),
+			enabled(2),
+			disable(3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"A port which has auto-negotiation signaling
+			ability will be enabled to do so when this object
+			is set to enabled(2). If the object is set to
+			disable(3) the port will operate as if it had
+			no auto-negotiation ability."
+	::= { eSWAutoPortCtrlEntry 3 }
+
+
+	eSWAutoNegRemoteAble	OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			able(2),
+			not-able(3)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"This object will be set to able(2) if the
+			port has detected that the link partner has
+			auto-negotiation ability."
+	::= { eSWAutoPortCtrlEntry 4 }
+
+	eSWAutoNegAutoConfig	OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			configuring(2),
+			complete(3),
+			disable(4),
+			parallel-detect-fail(5),
+			remote-fault(6)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+            "Indicates whether Auto Negotiation signaling is in
+			progress or has completed."
+	::= { eSWAutoPortCtrlEntry 5 }
+
+
+	eSWAutoNegLocalAbility	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(2))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The connecting ability of local port. The
+			capability of the  local port will be represented
+			by each bit in this 2 byte  octet string. The
+			meaning of each bit is as follows:
+
+			0: is not capable	1: is capable
+				Bit 0 : undefined
+				Bit 1 : 10Mbps Ethernet capable
+				Bit 2 : 10Mbps Ethernet full duplex
+				capable
+				Bit 3 : 100BASE-TX capable
+				Bit 4 : 100BASE-TX full duplex capable
+				Bit 5 : 100BASE-FX full duplex capable
+				Bit 6 : 100BASE-T4 capable
+				Bit 7 : 802.9 capable
+				Bit 8 - 15 : reserved
+
+			Note that the bit ordering is such that the most
+			significant bit (in network order) is bit 0."
+
+	::= { eSWAutoPortCtrlEntry 6 }
+
+
+	eSWAutoNegAdvertisedAbility	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(2))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"This object represents the capabilities which will
+			be advertised in the Auto-Negotiation sequence. The
+			capability is indicated by each bit in this 2 byte
+			octet string.
+ 			0: is not capable	1: is capable
+			 Bit 0 : default capabilities
+			 Bit 1 : 10Mbps Ethernet capable
+			 Bit 2 : 10Mbps Ethernet full duplex capable
+			 Bit 3 : 100BASE-TX capable
+			 Bit 4 : 100BASE-TX full duplex capable
+			 Bit 5 : 100BASE-FX full duplex capable
+			 Bit 6 : 100BASE-T4 capable
+			 Bit 7 : 802.9 capable
+			 Bit 8 - 15 : reserved
+
+			Note that Auto-Negotiation will restart
+			automatically if the  supported capabilities
+			are set. The bit ordering is such that the most
+			significant bit (in network order) is Bit 0."
+	::= { eSWAutoPortCtrlEntry 7 }
+
+
+	eSWAutoNegReceivedAbility		OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(2))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Indicates the advertised capabilities of link
+			partner.
+			The capability will be represented by each bit
+			in this 2 byte octet string. The meaning of
+			each bit is  as follows:
+
+			 0: is not capable	1: is capable
+			 Bit 0 : undefined
+			 Bit 1 : 10Mbps Ethernet capable
+			 Bit 2 : 10Mbps Ethernet full duplex capable
+			 Bit 3 : 100BASE-TX capable
+			 Bit 4 : 100BASE-TX full duplex capable
+			 Bit 5 : 100BASE-FX full duplex capable
+			 Bit 6 : 100BASE-T4 capable
+			 Bit 7 : 802.9 capable
+			 Bit 8 - 15 : reserved
+			 Note that the bit ordering is such that the most
+			 significant bit (in network order) is bit 0."
+
+	::= { eSWAutoPortCtrlEntry 8 }
+
+	eSWAutoNegRestartAutoConfig	OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			reStart(2),
+			noRestart(3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Forces auto-negotiation to begin link
+			negotiation.  Has no effect if auto-negotiation
+			signaling is diabled.  Always returns
+			noRestart(3)."
+	::= { eSWAutoPortCtrlEntry 9 }
+
+	-- IP address monitoring table
+
+	eSWMonIPTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ESWMonIPEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"This table describes the source IP address and
+			source MAC address mapping pair. It also provides
+			a function to detect IP address duplication. This
+			table can show that 2 MAC addresses map to the
+			same IP address. It is an important function
+			to help the system administrator to do network
+			administration."
+	::= { eSWMonitor 1 }
+
+
+	eSWMonIPEntry	OBJECT-TYPE
+		SYNTAX	ESWMonIPEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"The entry of this table. The table is
+			indexed by the MAC address."
+		INDEX	{ eSWMonIP }
+	::= { eSWMonIPTable 1 }
+
+	ESWMonIPEntry ::= SEQUENCE {
+		eSWMonIP	IpAddress,
+		eSWMonMAC	MacAddress,
+		eSWMonVLANID	INTEGER,
+		eSWMonGrp	INTEGER,
+		eSWMonPort	INTEGER
+	}
+
+	eSWMonIP	OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The IP address corresponding to the MAC address
+			in eSWMonMAC."
+	::= { eSWMonIPEntry 1 }
+
+	eSWMonMAC	OBJECT-TYPE
+		SYNTAX	MacAddress
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The source MAC address of the monitor entry."
+	::= { eSWMonIPEntry 2 }
+
+	eSWMonVLANID	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The VLAN number of this monitor address entry."
+	::= { eSWMonIPEntry 3 }
+
+	eSWMonGrp	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The IP address is learned from which group
+			number."
+	::= { eSWMonIPEntry 4 }
+
+	eSWMonPort	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The port on which the IP address was learned
+			The agent should display value = (maximum number
+			of ports in the system + 1) when reflecting the
+			System's Management IP address."
+	::= { eSWMonIPEntry 5 }
+
+
+	-- Traps for use by Asante products
+
+	-- Traps are defined using the conventions in RFC1215.
+
+
+	-- Fan  Failure trap
+
+	eSWFanFail TRAP-TYPE
+        	ENTERPRISE asante
+		VARIABLES { eSWGrpIndex }
+		DESCRIPTION
+			"The SNMP trap that is generated when a fan in
+			the switch fails."
+	::= 3
+
+	-- Expansion port Connection State Change, Send Trap
+
+	eSWExpPortConnectStateChange TRAP-TYPE
+        	ENTERPRISE asante
+		VARIABLES { eSWGrpIndex, eSWPortIndex }
+		DESCRIPTION
+			"This trap will be sent when an MII module is
+			inserted or removed from the MII slot The trap
+			contains the port number of the MII slot whose
+			state has changed."
+	::= 4
+
+    -- IP Spoofing TRAP
+
+	eSWIPSpoofing	TRAP-TYPE
+        	ENTERPRISE asante
+		VARIABLES { eSWMonIP, eSWMonMAC, eSWMonPort,
+			    eSWMonIP, eSWMonMAC, eSWMonPort }
+		DESCRIPTION
+			"This trap is caused by the detection of a
+			duplicate IP address. It means that there are 2
+			or more stations using the same IP address. The
+			first three parameters are the IP address,
+			MAC address, and port number of the existing
+			workstation. The remaining three parameters are
+			the IP address, MAC address, and port number of
+			to the workstation which is trying to spoof the
+			network environment. Therefore, the IP addresses
+			should be the same, but the MAC addresses are
+			different."
+	::= 5
+
+    -- Station Movement Trap
+
+	eSWStationMove	TRAP-TYPE
+        	ENTERPRISE asante
+		VARIABLES { eSWMonIP, eSWMonMAC, eSWMonPort }
+		DESCRIPTION
+			"The trap is caused by the detection of station
+			moving."
+	::= 6
+
+	--  New Node Detection Trap
+	eSWNewNodeDetected                TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonPort , eSWMonMAC, eSWMonIP }
+
+		DESCRIPTION
+			"The trap is generated when any port which is set
+			for New Node Detection Security levels detects
+			any New Node."
+	::= 7
+
+	--  Intruder Detection Trap
+	eSWIntruderDetected                TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonPort, eSWMonMAC, eSWMonIP,
+		            eSWSecurityLevel }
+
+
+		DESCRIPTION
+			"The trap is generated when any port which is
+			set for security levels
+			1) Known MAC Address Forwarding
+			2) Known MAC Address Forwarding with Intruder
+			Lock detects any Intruder MAC Address."
+	::= 8
+
+	--  Intruder Port Disable Trap
+	eSWIntruderPortDisable                TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonPort , eSWMonMAC , eSWMonIP }
+
+		DESCRIPTION
+			"The trap is generated when any port which is
+			set for security levels restricted Known MAC
+			Address Forwarding detects Intruder MAC Address
+			and disables the Port."
+	::= 9
+
+	-- IP Spoofing TRAP
+
+	eSWEnhIPSpoofing	TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonIP, 
+                eSWMonMAC, eSWMonVLANID, eSWMonGrp, eSWMonPort,
+			    eSWMonMAC, eSWMonVLANID, eSWMonGrp, eSWMonPort }
+
+
+		DESCRIPTION
+			"This trap is caused by the detection of a
+			duplicate IP address. It means that there are
+			2 or more stations using the same IP address.
+			The first parameter is the IP Address which
+			is duplicated.	The next three parameters are
+			the MAC address, VLAN ID, Group number and port
+			number of the switch from where the original 
+			IP-MAC Address binding was detected.  The 
+			remaining three parameters are the MAC address, 
+			VLAN ID, Group number and Port number of the 
+			switch from where the spoofed IP-MAC Address 
+			binding was detected."
+	::= 10
+
+	-- Station Movement Trap
+
+	eSWEnhStationMove	TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonIP, eSWMonMAC, eSWMonVLANID, eSWMonGrp,
+		            eSWMonPort, eSWMonGrp, eSWMonPort }
+
+		DESCRIPTION
+			"The trap is caused by the detection of station
+			movement.  The first two parameters are the IP
+			Address and MAC Address of the station which
+			was moved across the switch ports.  The next 
+			parameter is the VLAN ID to which eSWMonMAC MAC 
+			Address has been classified.The next two 
+			parameters are the Group number and Port number
+			within the switch where the station was originally
+			(first) detected.  The next two parameters are
+			the Group number and Port number within the
+			switch where the station was moved."
+	::= 11
+
+	--  New Node Detection Trap
+	eSWEnhNewNodeDetected	TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonGrp, eSWMonPort, eSWMonMAC, 
+		            eSWMonVLANID, eSWMonIP }
+
+		DESCRIPTION
+			"The trap is generated when any port which is set
+			for New Node Detection Security level detects
+			any New Node. The two parameters are the Group
+			number and Port number. The next three parameters
+			are the MAC Address ,VLAN ID (to which eSWMonMAC MAC
+			Address has been classifiedand) and IP Address of the
+			newly detected node."
+	::= 12
+
+	--  Intruder Detection Trap
+	eSWEnhIntruderDetected	TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonGrp, eSWMonPort, eSWMonMAC, 
+		            eSWMonVLANID, eSWMonIP }
+		DESCRIPTION
+			"The trap is generated when any secured port
+			detects Intruder node. For the secured port
+			Intruder nodes are the nodes whose MAC Address
+			is not part of port trusted MAC Address set.
+			The first two parameters are the Group number
+			and Port number. The next three parameters are the
+			MAC Address ,VLAN ID (to which eSWMonMAC MAC
+			Address has been classifiedand) and IP Address of 
+			the Intruder Node."
+
+	::= 13
+
+	--  Intruder Port Disable Trap
+	eSWEnhIntruderPortDisable	TRAP-TYPE
+		ENTERPRISE asante
+		VARIABLES { eSWMonGrp, eSWMonPort, eSWMonMAC, 
+		            eSWMonVLANID, eSWMonIP }
+		DESCRIPTION
+			"The trap is generated when any port which is
+			set for Intruder Port Disable security level
+			detects Intruder MAC Address and disables the
+			secured Port. For the secured port Intruder
+			nodes are the nodes whose MAC Address is not
+			part of port trusted MAC Address set.  The first
+			two parameters are the Group number and Port
+			number. The next three parameters are the MAC
+			Address ,VLAN ID (to which eSWMonMAC MAC Address
+			has been classifiedand) and IP Address of the 
+			Intruder Node which caused the port to be disabled."
+
+	::= 14
+
+	END
+

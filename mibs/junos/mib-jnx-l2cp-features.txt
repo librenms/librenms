@@ -1,0 +1,374 @@
+
+JUNIPER-L2CP-FEATURES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY,
+    NOTIFICATION-TYPE FROM SNMPv2-SMI
+    DisplayString, TruthValue  FROM SNMPv2-TC
+    InterfaceIndex, ifIndex  FROM IF-MIB
+    dot1dStpPort, dot1dStpPortEntry  FROM BRIDGE-MIB
+    jnxL2cpMibRoot FROM JUNIPER-SMI;
+
+jnxL2cpFeaturesMIB MODULE-IDENTITY
+    LAST-UPDATED "201206250000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION
+        "This mib module is for Juniper Networks Proprietory
+         Layer 2 control protocol (L2CP) features"
+
+    REVISION     "201206250000Z"    -- June 25, 2012
+    DESCRIPTION  "Modifying max access for LacpTimeOut trap objects."
+
+    REVISION     "201208150000Z"    -- Aug 15, 2012
+    DESCRIPTION  "Added new mib jnxLacpAggTimeout."
+
+    REVISION     "201006110000Z"    -- June 11, 2010
+    DESCRIPTION  "Added new trap jnxLacpTimeOut."
+
+    ::= { jnxL2cpMibRoot 1 }
+
+
+jnxL2cpObjects  OBJECT IDENTIFIER ::=  { jnxL2cpFeaturesMIB 1 }
+
+jnxL2cpNotifications  OBJECT IDENTIFIER ::=  { jnxL2cpFeaturesMIB 2 }
+
+jnxL2cpStpProtectObjects  OBJECT IDENTIFIER ::=  { jnxL2cpObjects 1 }
+
+jnxL2cpBpduProtectObjects  OBJECT IDENTIFIER ::=  { jnxL2cpObjects 2 }
+
+jnxDot1dStpPortProtectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxDot1dStpPortProtectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the jnxDot1dStp Port Table for providing enterprise specific
+         extensions for Root Protect and Loop Protect to the corresponding 
+         dot1dStpPortTable entry."
+   ::= { jnxL2cpStpProtectObjects 1 }
+
+jnxDot1dStpPortProtectEntry OBJECT-TYPE
+    SYNTAX      JnxDot1dStpPortProtectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the jnxDot1dStpPortProtectTable.  This essentially
+         augments the dot1dStpPortTable with additional objects."
+    AUGMENTS    { dot1dStpPortEntry }
+    ::= { jnxDot1dStpPortProtectTable 1 }
+
+JnxDot1dStpPortProtectEntry ::=
+    SEQUENCE {
+        jnxDot1dStpPortRootProtectEnabled  TruthValue,
+        jnxDot1dStpPortRootProtectState    INTEGER,    
+        jnxDot1dStpPortLoopProtectEnabled  TruthValue,
+        jnxDot1dStpPortLoopProtectState    INTEGER    
+    }
+
+jnxDot1dStpPortRootProtectEnabled  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management indicating whether Root protect 
+         functionality is enabled on the port. If TRUE causes the Port not
+         to be selected as Root Port, even it has the best spanning tree 
+         priority vector. This parameter should be FALSE by default. "
+    ::= { jnxDot1dStpPortProtectEntry 1 }
+
+jnxDot1dStpPortRootProtectState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    root-prevented (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the port was prevented from being a root port.
+         This parameter will always return 'no-error (0)' if 
+         jnxDot1dStpPortRootProtectEnabled is FALSE. "
+    ::= { jnxDot1dStpPortProtectEntry 2 }
+
+jnxDot1dStpPortLoopProtectEnabled  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management indicating whether Loop protect 
+         functionality is enabled on the port. If TRUE causes the Port not
+         to be selected as Designated Port when the received superior BPDU 
+         is aged out. This parameter should be FALSE by default. "
+    ::= { jnxDot1dStpPortProtectEntry 3 }
+
+jnxDot1dStpPortLoopProtectState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    loop-prevented (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a potential Loop was prevented on the port
+         This parameter will always return 'no-error (0)' if 
+         jnxDot1dStpPortLoopProtectEnabled is FALSE. "
+    ::= { jnxDot1dStpPortProtectEntry 4 }
+
+jnxL2cpBpduProtectPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxL2cpBpduProtectPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines a Port Table for BPDU Protect information. This contains 
+         only those ports on which BPDU Protect can be configured."
+    ::= { jnxL2cpBpduProtectObjects 1 }
+
+jnxL2cpBpduProtectPortEntry OBJECT-TYPE
+    SYNTAX      JnxL2cpBpduProtectPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the jnxL2cpBpduProtectPortTable.  A list
+         containing BPDU Protect information for each Port."
+    INDEX  { ifIndex }
+    ::= { jnxL2cpBpduProtectPortTable 1 }
+
+JnxL2cpBpduProtectPortEntry ::=
+    SEQUENCE {
+        jnxL2cpBpduProtectPortEnabled  TruthValue,
+        jnxL2cpPortBpduError           INTEGER
+    }
+
+jnxL2cpBpduProtectPortEnabled  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management indicating whether BPDU protect 
+         functionality is enabled on the port. If TRUE causes the Port to be
+         disabled (link down) upon receipt of a BPDU. This parameter should be
+         FALSE by default. "
+    ::= { jnxL2cpBpduProtectPortEntry 1 }
+
+jnxL2cpPortBpduError OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    detected (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a BPDU was received on the port.
+         This parameter will always return 'no-error (0)' if 
+         jnxL2cpBpduProtectPortEnabled is FALSE. "
+    ::= { jnxL2cpBpduProtectPortEntry 2 }
+
+jnxL2cpBpduProtectDisableTimeout OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Returns the value of time (in seconds) after which a port on
+         which BPDU error was detected will be re-enabled. A returned
+         value of 0 indicates that port will not be re-enabled 
+         automatically."
+    ::= { jnxL2cpBpduProtectObjects 2 }
+
+jnxL2cpProtectTraps  OBJECT IDENTIFIER ::= { jnxL2cpNotifications 0 }
+
+jnxPortRootProtectStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxDot1dStpPortRootProtectState
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when the ports Root-protect state (no-error or root-prevented) 
+         changes."
+   ::= { jnxL2cpProtectTraps 1 }
+
+jnxPortLoopProtectStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxDot1dStpPortLoopProtectState
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when the ports Loop-protect state (no-error or loop-prevented) 
+         changes."
+   ::= { jnxL2cpProtectTraps 2 }
+
+jnxPortBpduErrorStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxL2cpPortBpduError
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when the ports BPDU error state (no-error or detected) 
+         changes."
+   ::= { jnxL2cpProtectTraps 3 }
+
+    -- ***************************************************************
+    --  Lacp Traps / Notifications Section
+    -- ***************************************************************
+
+    -- Lacp Notification Variables/Objects
+
+    jnxLacpNotifyVars OBJECT IDENTIFIER ::=  { jnxL2cpObjects 3 }
+
+    jnxLacpAggTimeout OBJECT IDENTIFIER ::=  { jnxL2cpObjects 4 }
+
+    jnxLacpNotificationsPrefix OBJECT IDENTIFIER ::= { jnxL2cpNotifications 1 }
+
+LacpState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Actor and Partner State values from the LACPDU."
+    SYNTAX      BITS {
+                    lacpActivity(0),
+                    lacpTimeout(1),
+                    aggregation(2),
+                    synchronization(3),
+                    collecting(4),
+                    distributing(5),
+                    defaulted(6),
+                    expired(7)
+                }
+
+    jnxLacpInterfaceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Lacp member interface."
+        ::= { jnxLacpNotifyVars 1 }
+
+    jnxLacpifIndex  OBJECT-TYPE 
+        SYNTAX      InterfaceIndex 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current 
+        DESCRIPTION 
+            "Snmp ifIndex of member interface." 
+        ::= { jnxLacpNotifyVars 2 } 
+
+    jnxLacpAggregateInterfaceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Lacp Aggregate interface."
+        ::= { jnxLacpNotifyVars 3 }
+
+    jnxLacpAggregateifIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Snmp ifIndex of Aggregator."
+        ::= { jnxLacpNotifyVars 4 } 
+
+    jnxLacpAggPortActorOperState OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "Port actor operational state."
+        ::= { jnxLacpNotifyVars 5 }
+
+    jnxLacpTimeOut NOTIFICATION-TYPE
+        OBJECTS         { jnxLacpInterfaceName,
+                          jnxLacpifIndex,
+                          jnxLacpAggregateInterfaceName,
+                          jnxLacpAggregateifIndex,
+                          jnxLacpAggPortActorOperState
+                        }
+        STATUS          current
+        DESCRIPTION
+            "Lacp times out"
+        ::= { jnxLacpNotificationsPrefix  1 }
+
+dot3adAggPortTimeoutTable OBJECT-TYPE  
+    SYNTAX      SEQUENCE OF Dot3adAggPortTimeoutEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains Link Aggregation Timeout information
+        about a port that is associated with this device.
+        A row appears in this table for each physical port."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { jnxLacpAggTimeout 1 }
+
+dot3adAggPortTimeoutEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggPortTimeoutEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Link Aggregation Control Protocol timeout information
+        for a port on this device."
+    INDEX { ifIndex }
+    ::= { dot3adAggPortTimeoutTable 1 }
+    
+Dot3adAggPortTimeoutEntry ::=
+    SEQUENCE {
+        dot3adInterfaceName
+            DisplayString,
+        dot3adOperState
+            LacpState,
+        dot3adAggname
+            DisplayString,
+        dot3adInterfaceTimeout
+            TimeTicks
+    }
+
+dot3adInterfaceName OBJECT-TYPE
+    SYNTAX       DisplayString 
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Physical port that is associated with
+        Aggregation Port. This value is read-only."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { dot3adAggPortTimeoutEntry 1 }
+
+dot3adOperState OBJECT-TYPE
+    SYNTAX       LacpState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A string of 8 bits, corresponding to the current
+        operational values of Actor_State as transmitted by the
+        Actor in LACPDUs. The bit allocations are as defined in
+        30.7.2.1.20. This attribute value is read-only."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.2.1.21"
+    ::= { dot3adAggPortTimeoutEntry 2 }
+
+dot3adAggname OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Aggregation Port where Physical port 
+        is associated with. This value is read-only."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { dot3adAggPortTimeoutEntry 3 }
+
+dot3adInterfaceTimeout OBJECT-TYPE
+    SYNTAX       TimeTicks
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object represents the time elapsed in seconds
+         since lacp experienced timeout.
+         This value is read-only."
+    REFERENCE
+        "IEEE 802.3"
+    ::= { dot3adAggPortTimeoutEntry 4 }
+
+END

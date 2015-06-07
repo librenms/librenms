@@ -1,0 +1,396 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-COPS-MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+    HUAWEI-BRAS-COPS-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+        hwBRASMib            
+            FROM HUAWEI-MIB
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+                FROM SNMPv2-SMI
+            RowStatus, TruthValue            
+                FROM SNMPv2-TC;
+    
+        hwBRASCops MODULE-IDENTITY 
+            LAST-UPDATED "200504181334Z"        -- April 18, 2005 at 13:34 GMT
+            ORGANIZATION 
+                "       
+                NanJing Institute,Huawei Technologies Co.,Ltd.
+                HuiHong Mansion,No.91 BaiXia Rd.
+                NanJing, P.R. of China
+                Zipcode:210001
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            CONTACT-INFO 
+                "The MIB contains objects of module COPS."
+            DESCRIPTION 
+                "Description."
+            ::= { hwBRASMib 7 }
+        
+    
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+        
+        hwCopsGroupObject OBJECT IDENTIFIER ::= { hwBRASCops 1 }
+        
+        
+    --  ============== hwCopsGroupTable  define beginning ==============
+        hwCopsGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCopsGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "COPS group table."
+            ::= { hwCopsGroupObject 1 }
+        
+        
+        hwCopsGroupEntry OBJECT-TYPE
+            SYNTAX HwCopsGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "COPS group configration."
+            INDEX { hwCopsGroupIndex }
+            ::= { hwCopsGroupTable 1 }
+        
+        HwCopsGroupEntry ::=
+            SEQUENCE { 
+                hwCopsGroupIndex
+                    Integer32,
+                hwCopsGroupName
+                    OCTET STRING,
+                hwCopsGroupClientType
+                    Integer32,
+                hwCopsGroupIfActive
+                    Integer32,
+                hwCopsGroupFlowKeepingTime
+                    Integer32,
+                hwCopsGroupSecret
+                    OCTET STRING,
+                hwCopsGroupPepid
+                    OCTET STRING,
+                hwCopsGroupRowStatus
+                    RowStatus,
+                hwCopsGroupSrcIf
+                    OCTET STRING,
+                hwCopsGroupClientOption82Info
+                    TruthValue                                        
+             }
+
+        
+        hwCopsGroupIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1023)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "COPS group index."
+            ::= { hwCopsGroupEntry 1 }
+        
+        
+        hwCopsGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "COPS group name."
+            ::= { hwCopsGroupEntry 2 }
+        
+        
+        hwCopsGroupClientType OBJECT-TYPE
+            SYNTAX Integer32 (1..6)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "COPS client type."
+            ::= { hwCopsGroupEntry 3 }
+        
+        
+        hwCopsGroupIfActive OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS server active or inactive."
+            DEFVAL { 2 }
+            ::= { hwCopsGroupEntry 4 }
+        
+    
+        hwCopsGroupFlowKeepingTime OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS connection flow keeping time."
+            DEFVAL { 300 }
+            ::= { hwCopsGroupEntry 5 }
+        
+        
+        hwCopsGroupSecret OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS connection shared-key."
+            ::= { hwCopsGroupEntry 6 }
+        
+        
+        hwCopsGroupPepid OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS pep ID."
+            ::= { hwCopsGroupEntry 7 }
+            
+        
+        hwCopsGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The operating state of the row, only can be Added or Deleted."
+            ::= { hwCopsGroupEntry 8 }
+            
+        
+        hwCopsGroupSrcIf OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS group source interface."
+            ::= { hwCopsGroupEntry 9 }                        
+
+    
+        hwCopsGroupClientOption82Info OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS group client option82 information."
+            DEFVAL { false }
+            ::= { hwCopsGroupEntry 10 }                        
+    --  ============== hwCopsGroupTable  define end ==============        
+
+        
+    --  ============== hwCopsserverTable  define beginning ==============
+        hwCopsServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCopsServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "COPS server table."
+            ::= { hwCopsGroupObject 2 }
+        
+        
+        hwCopsServerEntry OBJECT-TYPE
+            SYNTAX HwCopsServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "COPS server configration."
+            INDEX { hwCopsServerGroupIndex, hwCopsGroupServerIndex }
+            ::= { hwCopsServerTable 1 }
+        
+        HwCopsServerEntry ::=
+            SEQUENCE { 
+                hwCopsServerGroupIndex
+                    Integer32,
+                hwCopsGroupServerIndex
+                    Integer32,
+                hwCopsServerVpnInstance
+                    OCTET STRING,
+                hwCopsServerIp
+                    IpAddress,
+                hwCopsServerPort
+                    Integer32,
+                hwCopsServerWeight
+                    Integer32,
+                hwCopsServerClientPort
+                    Integer32,
+                hwCopsServerRowStatus
+                    RowStatus,
+                hwCopsServerSecret
+                    OCTET STRING                
+             }
+
+        
+        hwCopsServerGroupIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1023)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "COPS group index."
+            ::= { hwCopsServerEntry 1 }
+            
+        
+        hwCopsGroupServerIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "COPS server index in the group."
+            ::= { hwCopsServerEntry 2 }
+
+    
+        hwCopsServerVpnInstance OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS server VPN instance name."
+            ::= { hwCopsServerEntry 3 }
+                        
+        
+        hwCopsServerIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS server ip address."
+            ::= { hwCopsServerEntry 4 }
+        
+        
+        hwCopsServerPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS server port."  
+            DEFVAL { 3288 }        
+            ::= { hwCopsServerEntry 5 }
+        
+        
+        hwCopsServerWeight OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS server weight."
+            DEFVAL { 0 }
+            ::= { hwCopsServerEntry 6 }
+        
+        
+        hwCopsServerClientPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS client port."
+            DEFVAL { 0 }
+            ::= { hwCopsServerEntry 7 }
+
+            
+        hwCopsServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The operating state of the row, only can be Added or Deleted."
+            ::= { hwCopsServerEntry 8 }   
+        
+        
+        hwCopsServerSecret OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS server shared-key."
+            ::= { hwCopsServerEntry 9 }              
+    --  ============== hwCopsServerTable  define end ==============
+            
+    --  ============== hwCopsConfigTable  define beginning ==============
+        
+        hwCopsConfigTable OBJECT IDENTIFIER ::= { hwCopsGroupObject 3 }
+        
+        
+        hwCopsConfigOpenTimeout OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS open timeout."  
+            DEFVAL { 15 }
+            ::= { hwCopsConfigTable 1 }
+        
+        
+        hwCopsConfigKaTimeout OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "COPS KA timeout."
+            ::= { hwCopsConfigTable 2 }
+        
+                    
+        hwCopsConfigSrcIfDesc OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "COPS source interface."
+            ::= { hwCopsConfigTable 3 }            
+                    
+    
+    --  ============== hwCopsConfigTable  define end ==============
+                
+    --  ============== conformance information ==============
+        hwCopsConformance OBJECT IDENTIFIER ::= { hwBRASCops 2 }
+        
+        
+        hwCopsCompliances OBJECT IDENTIFIER ::= { hwCopsConformance 1 }
+        hwCopsCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwCopsGroupGroup, hwCopsServerGroup, 
+                                    hwCopsConfigTableGroup }  
+                                               
+              ::= { hwCopsCompliances 1 }
+              
+    --  ============== groups ==============  
+        hwCopsObjectGroups OBJECT IDENTIFIER ::= { hwCopsConformance 2 } 
+        
+        hwCopsGroupGroup OBJECT-GROUP
+            OBJECTS { hwCopsGroupName, hwCopsGroupClientType, hwCopsGroupIfActive,
+                      hwCopsGroupFlowKeepingTime, hwCopsGroupSecret, hwCopsGroupPepid ,
+                      hwCopsGroupRowStatus, hwCopsGroupSrcIf, hwCopsGroupClientOption82Info}
+            STATUS current
+            DESCRIPTION 
+                "The COPS group objects."
+            ::= { hwCopsObjectGroups 1 }
+
+
+        hwCopsServerGroup OBJECT-GROUP
+            OBJECTS { hwCopsServerIp, hwCopsServerPort, hwCopsServerWeight,
+                      hwCopsServerVpnInstance, hwCopsServerClientPort, hwCopsServerRowStatus,
+                      hwCopsServerSecret }
+            STATUS current
+            DESCRIPTION 
+                "The COPS Server group."
+            ::= { hwCopsObjectGroups 2 }
+             
+        hwCopsConfigTableGroup OBJECT-GROUP
+            OBJECTS { hwCopsConfigOpenTimeout, hwCopsConfigKaTimeout, hwCopsConfigSrcIfDesc }
+            STATUS current
+            DESCRIPTION 
+                "The COPS config table group."
+            ::= { hwCopsObjectGroups 3 } 
+        
+    --  ============== conformance information define end ==============          
+    END

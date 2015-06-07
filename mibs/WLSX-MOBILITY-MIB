@@ -1,0 +1,769 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+	   ArubaEnableValue,
+	   ArubaFrameType,
+	   ArubaActiveState,
+	   ArubaRogueApType,
+	   ArubaAuthenticationMethods,
+	   ArubaEncryptionMethods,
+	   ArubaEncryptionMethods,
+	   ArubaPhyType
+	   		FROM ARUBA-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxMobilityMIB MODULE-IDENTITY 
+       LAST-UPDATED "0611040527Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about the mobility subsystem in the
+			Aruba controller."
+       REVISION        "0611040527Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 9 }
+
+   wlsxMobilityConfigGroup     	OBJECT IDENTIFIER ::= { wlsxMobilityMIB 1 }
+-- The above group deals with Mobility Domain, HAT, HOST display/config.
+
+   wlsxMobilityProxyStatsGroup     		OBJECT IDENTIFIER ::= { wlsxMobilityMIB 2 }
+-- The above group deals with Proxy State machine statistics.
+
+   wlsxMobilityProxyDHCPStatsGroup 	    	OBJECT IDENTIFIER ::= { wlsxMobilityMIB 3 }
+-- The above group deals with Proxy DHCP State machine statistics.
+
+   wlsxMobilityHAStatsGroup     			OBJECT IDENTIFIER ::= { wlsxMobilityMIB 4 }
+-- The above group deals with MobileIP Home Agent statistics
+
+   wlsxMobilityFAStatsGroup     			OBJECT IDENTIFIER ::= { wlsxMobilityMIB 5 }
+-- The above group deals with MobileIP Foreign Agent statistics
+
+   wlsxMobilityHAFARevocationStatsGroup     			OBJECT IDENTIFIER ::= { wlsxMobilityMIB 6 }
+-- The above group deals with MobileIP HA-FA revocation messages exchange statistics
+
+   wlsxMobilityDomainTable  OBJECT-TYPE 
+         SYNTAX       SEQUENCE OF WlsxMobilityDomainEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			This table lists all mobility domains configured on the controller.
+            "
+        ::= { wlsxMobilityConfigGroup 1 }
+
+	wlsxMobilityDomainEntry OBJECT-TYPE
+		SYNTAX		WlsxMobilityDomainEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Mobility Domain Entry"
+			INDEX { mobilityDomainName }
+		::= { wlsxMobilityDomainTable 1 }
+
+		WlsxMobilityDomainEntry ::= 
+		SEQUENCE {
+			mobilityDomainName			DisplayString,
+			mobilityDomainIsExclusive	ArubaEnableValue,
+			mobilityDomainStatus		RowStatus
+		}
+
+	mobilityDomainName OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The name of the active mobility domain(s) this controller belongs to"
+		::= { wlsxMobilityDomainEntry 1 }
+
+	mobilityDomainIsExclusive OBJECT-TYPE
+		SYNTAX		ArubaEnableValue
+		MAX-ACCESS	read-only
+		STATUS		deprecated
+		DESCRIPTION
+			"Indicates whether this mobility domain is exclusive or not."
+		::= { wlsxMobilityDomainEntry 2 }
+
+	mobilityDomainStatus OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		    "Row status object used to indicate the status of the row"
+		::= { wlsxMobilityDomainEntry 3 }
+
+   wlsxMobilityHomeAgentTable  OBJECT-TYPE 
+         SYNTAX       SEQUENCE OF WlsxMobilityHomeAgentEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			This table lists all Home Agents visible to the controller.
+            "
+        ::= { wlsxMobilityConfigGroup 3 }
+
+	wlsxMobilityHomeAgentEntry OBJECT-TYPE
+		SYNTAX		WlsxMobilityHomeAgentEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Mobility Home Agent Entry"
+			INDEX { mobilityHomeAgentSubnet, mobilityHomeAgentMask, mobilityHomeAgentIp }
+		::= { wlsxMobilityHomeAgentTable 1 }
+
+		WlsxMobilityHomeAgentEntry ::= 
+		SEQUENCE {
+			mobilityHomeAgentSubnet			IpAddress,
+			mobilityHomeAgentMask			IpAddress,
+			mobilityHomeAgentIp				IpAddress,
+			mobilityHomeAgentVlan 			Integer32
+		}
+
+	mobilityHomeAgentSubnet OBJECT-TYPE
+		SYNTAX	    IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Subnet of the home agent"
+		::= { wlsxMobilityHomeAgentEntry 1 }
+
+	mobilityHomeAgentMask OBJECT-TYPE
+		SYNTAX	    IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Subnet mask of the home agent"
+		::= { wlsxMobilityHomeAgentEntry 2 }
+
+	mobilityHomeAgentIp OBJECT-TYPE
+		SYNTAX	    IpAddress
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"IP address of the home agent"
+		::= { wlsxMobilityHomeAgentEntry 3 }
+
+	mobilityHomeAgentVlan OBJECT-TYPE
+		SYNTAX	    Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Vlan of the home agent"
+		::= { wlsxMobilityHomeAgentEntry 4 }
+
+   wlsxMobilityHostTable  OBJECT-TYPE 
+         SYNTAX       SEQUENCE OF WlsxMobilityHostEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			This table lists all mobile hosts on the controller.
+            "
+        ::= { wlsxMobilityConfigGroup 4 }
+
+	wlsxMobilityHostEntry OBJECT-TYPE
+		SYNTAX		WlsxMobilityHostEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Mobility Host Home Agent Entry"
+			INDEX { mobilityHostMac }
+		::= { wlsxMobilityHostTable 1 }
+
+		WlsxMobilityHostEntry ::= 
+		SEQUENCE {
+			mobilityHostMac				MacAddress,
+			mobilityHostIp				IpAddress,
+			mobilityHostStatus			DisplayString,
+			mobilityHostServiceTime		Integer32,
+			mobilityHostHomeVlan		Integer32,
+			mobilityHostHomeNetwork		IpAddress,
+			mobilityHostHomeMask		IpAddress,
+			mobilityHostDhcpInfo 		DisplayString
+		}
+
+	mobilityHostMac OBJECT-TYPE
+		SYNTAX	    MacAddress
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"MAC address of the mobile host"
+		::= { wlsxMobilityHostEntry 1 }
+
+	mobilityHostIp OBJECT-TYPE
+		SYNTAX	    IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"IP address of the mobile host"
+		::= { wlsxMobilityHostEntry 2 }
+
+	mobilityHostStatus OBJECT-TYPE
+		SYNTAX	    DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Roaming status of the mobile host"
+		::= { wlsxMobilityHostEntry 3 }
+
+	mobilityHostServiceTime OBJECT-TYPE
+		SYNTAX	    Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Time in seconds mobility service is provided to the mobile host"
+		::= { wlsxMobilityHostEntry 4 }
+
+	mobilityHostHomeVlan OBJECT-TYPE
+		SYNTAX	    Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Home VLAN of the mobile host"
+		::= { wlsxMobilityHostEntry 5 }
+
+	mobilityHostHomeNetwork OBJECT-TYPE
+		SYNTAX	    IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Home network of the mobile host"
+		::= { wlsxMobilityHostEntry 6 }
+
+
+	mobilityHostHomeMask OBJECT-TYPE
+		SYNTAX	    IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Home network mask of the mobile host"
+		::= { wlsxMobilityHostEntry 7 }
+
+	mobilityHostDhcpInfo OBJECT-TYPE
+		SYNTAX	    DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"DHCP details of the mobile host"
+		::= { wlsxMobilityHostEntry 8 }
+
+-- wlsxMobilityProxyStatsGroup Begins
+
+	mobilityProxyPktRx	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of packet Proxy State machine Received
+            "
+        ::= { wlsxMobilityProxyStatsGroup 1 }
+
+	mobilityProxyPktHandled	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of packet Proxy State machine Processed
+            "
+        ::= { wlsxMobilityProxyStatsGroup 2 }
+
+	mobilityProxyPktFwd	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of packet Proxy State machine Forwarded back to Datapath
+            "
+        ::= { wlsxMobilityProxyStatsGroup 3 }
+
+	mobilityProxyPktDrop	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of packet Proxy State machine Dropped
+            "
+        ::= { wlsxMobilityProxyStatsGroup 4 }
+
+	mobilityProxyBusy	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of mobility events Proxy State machine ignored as it is busy.
+            "
+        ::= { wlsxMobilityProxyStatsGroup 5 }
+
+	mobilityProxyNoMobility	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of mobility clients with <No Mobility Service>
+			
+            "
+        ::= { wlsxMobilityProxyStatsGroup 6 }
+
+	mobilityProxyClientIPChg	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of times mobility detected client IP change
+            "
+        ::= { wlsxMobilityProxyStatsGroup 7 }
+
+	mobilityProxyClientEssidChg	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of times mobility detected client ESSID change
+            "
+        ::= { wlsxMobilityProxyStatsGroup 8 }
+
+-- wlsxMobilityProxyDHCPStatsGroup Begins
+
+	mobilityProxyDhcpBootpRx	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of DHCP Bootp messages received
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup 1 }
+
+
+	mobilityProxyDhcpPktProc	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of DHCP messages Processed
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup 2 }
+
+
+	mobilityProxyDhcpPktFwd	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of DHCP messages forwarded
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup 3 }
+
+
+	mobilityProxyDhcpPktDrop	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of DHCP messages Dropped
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup  4 }
+
+	mobilityProxyDHCPNak	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of DHCP NAK received from the server.
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup  5 }
+
+
+	mobilityProxyBadDHCPPkt  OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of DHCP packets marked invalid by mobility
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup  6 }
+
+
+	mobilityProxyNotDHCP	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Non-DHCP frames received by DHCP state machine
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup  7 }
+
+
+	mobilityProxyDHCPNoHomeVlan	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of DHCP requested IP for which home vlan does not exist.
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup  8 }
+
+
+	mobilityProxyDHCPUnexpFrame	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of unexpected DHCP frames received from client
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup  9 }
+
+	mobilityProxyDHCPUnexpRemote	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of unexpected DHCP frames received from remote HA/FA.
+            "
+        ::= { wlsxMobilityProxyDHCPStatsGroup  10 }
+
+-- wlsxMobilityHAStatsGroup Begins
+
+
+	mobilityHARxRRQ	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request received by HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  1 }
+
+
+	mobilityHASentRRP	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request reply sent by HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  2 }
+
+
+	mobilityHARRQAccept	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request accepted by HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  3 }
+
+
+	mobilityHARRQDenied	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request denied by HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  4 }
+
+
+	mobilityHARRQIgnore	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request Ignored by HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  5 }
+
+
+	mobilityHARRQAdminDeny	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request denied for Administrative reasons by HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  6 }
+
+
+	mobilityHARRQNoResource	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request denied due to lack of resources by HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  7 }
+
+
+	mobilityHAMNauthFail	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of times MN-HA authentication failed
+            "
+        ::= { wlsxMobilityHAStatsGroup  8 }
+
+
+	mobilityHAFAauthFail	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of HA-FA authentication failed
+            "
+        ::= { wlsxMobilityHAStatsGroup  9 }
+
+
+	mobilityHABadID	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of mobileIP messages rejected by HA due to bad Identication
+            "
+        ::= { wlsxMobilityHAStatsGroup  10 }
+
+	mobilityHAMalform	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of mobileIP messages rejected by HA as they are poorly formed
+            "
+        ::= { wlsxMobilityHAStatsGroup  11 }
+
+	mobilityHATooManyBnd	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration Request rejected due to too many bindings at HA
+            "
+        ::= { wlsxMobilityHAStatsGroup  12 }
+
+	mobilityHABndExpire	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of times binding expired
+            "
+        ::= { wlsxMobilityHAStatsGroup  13 }
+
+-- wlsxMobilityFAStatsGroup Begins
+
+	mobilityFASentRRQ	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request sent by FA
+            "
+        ::= { wlsxMobilityFAStatsGroup  1 }
+
+
+	mobilityFARcvRRP	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request reply received by FA
+            "
+        ::= { wlsxMobilityFAStatsGroup  2 }
+
+
+	mobilityFARRQAccept	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request accepted by HA
+            "
+        ::= { wlsxMobilityFAStatsGroup  3 }
+
+
+	mobilityFARRQReject	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration request rejected by HA
+            "
+        ::= { wlsxMobilityFAStatsGroup  4 }
+
+
+	mobilityMNHAauthFAIL	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of times MN-HA authentication failed
+            "
+        ::= { wlsxMobilityFAStatsGroup  5 }
+
+
+	mobilityFAHAauthFAIL	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of FA-HA authentication failed
+            "
+        ::= { wlsxMobilityFAStatsGroup  6 }
+
+
+	mobilityFABadID	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of mobileIP messages rejected by FA due to bad Identication
+            "
+        ::= { wlsxMobilityFAStatsGroup  7 }
+
+	mobilityFAMalform	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of mobileIP messages rejected by FA as they are poorly formed
+            "
+        ::= { wlsxMobilityFAStatsGroup  8 }
+
+-- wlsxMobilityHAFARevocationStatsGroup Begins
+
+
+	mobilitySentRRVRQ	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration revocation request sent 
+            "
+        ::= { wlsxMobilityHAFARevocationStatsGroup  1 }
+
+	mobilityRcvRRVAck	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration revocation ack received
+            "
+        ::= { wlsxMobilityHAFARevocationStatsGroup  2 }
+
+	mobilityRcvRRV	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration revocation request received
+            "
+        ::= { wlsxMobilityHAFARevocationStatsGroup  3 }
+
+	mobilitySentRRVAck	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of received Registration revocation request ack sent
+            "
+        ::= { wlsxMobilityHAFARevocationStatsGroup  4 }
+
+	mobilityRRVRQIgnore	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration revocation request ignored
+            "
+        ::= { wlsxMobilityHAFARevocationStatsGroup  5 }
+
+	mobilityRRVAckIgnore	 OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This desribes the number of Registration revocation ack Ignored
+            "
+        ::= { wlsxMobilityHAFARevocationStatsGroup  6 }
+
+END

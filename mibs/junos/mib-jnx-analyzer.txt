@@ -1,0 +1,407 @@
+JUNIPER-ANALYZER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32 
+	FROM SNMPv2-SMI
+    TruthValue, DisplayString
+	FROM SNMPv2-TC
+    jnxExAnalyzer
+	FROM JUNIPER-EX-SMI;
+
+jnxAnalyzerMIB MODULE-IDENTITY
+    LAST-UPDATED "201407170000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise specific 
+	    MIB for Analyzer and Remote Analyzer. Port mirroring is widely 
+	    used in enterprise switches to send a copy of all or sampled 
+	    packets seen on a port to an anlyzer on the same or different 
+	    switch."
+
+    REVISION
+        "200808010000Z" -- Fri Aug 01 00:00:00 2008 UTC
+
+    DESCRIPTION
+        "Initial version"
+
+    REVISION
+        "200904220000Z" -- Wed April 22 00:00:00 2009 UTC
+
+    DESCRIPTION
+        "Marking jnxAnalyzerStatus as deprecated"
+
+    REVISION
+        "201007300000Z" -- Fri July 30 00:00:00 2009 UTC
+
+    DESCRIPTION
+        "Marking deprecated OIDs as obsolete"
+
+    REVISION
+        "201407170000Z" -- THU July 17  00:00:00 2014 UTC
+
+    DESCRIPTION
+        "Rectifying typo errors from 'Anlayzer' to 'Analyzer'"
+
+    ::= { jnxExAnalyzer 1 }
+
+jnxAnalyzerMIBObjects      OBJECT IDENTIFIER ::= { jnxAnalyzerMIB 1 }
+
+-- The Analyzer Table
+
+jnxAnalyzerTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF JnxAnalyzerEntry
+    MAX-ACCESS	not-accessible	
+    STATUS	current
+    DESCRIPTION	
+	"Network traffic passing through ports is analyzed by sending a
+	copy of the traffic to another port on the same or different switch. 
+	This table contains the analyzer parameters."
+    ::= { jnxAnalyzerMIBObjects 1 }
+
+jnxAnalyzerEntry OBJECT-TYPE
+    SYNTAX	JnxAnalyzerEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A row instance contains the Analyzer Name, Analyzer Status, Mirroring 
+	Ratio, Loss Priority."
+    INDEX { jnxAnalyzerName }
+    ::= { jnxAnalyzerTable 1 }
+
+JnxAnalyzerEntry ::=
+    SEQUENCE {
+	jnxAnalyzerName         DisplayString,
+	jnxAnalyzerStatus       TruthValue,
+	jnxMirroringRatio       Unsigned32,
+	jnxLossPriority	        INTEGER
+    }
+
+jnxAnalyzerName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies a unique Analyzer configured on the switch." 
+    ::= { jnxAnalyzerEntry 1 }
+
+jnxAnalyzerStatus OBJECT-TYPE
+    SYNTAX 	TruthValue
+    MAX-ACCESS	read-only
+    STATUS	obsolete
+    DESCRIPTION
+	"This object identifies whether the mirroring associated with a 
+	particular analyzer is enabled or disabled."
+    ::= { jnxAnalyzerEntry 2 }
+
+jnxMirroringRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"This object will specify the mirroring ratio. User can configure 
+	the analyzer to mirror only one out of X packets [1:X packets] in 
+	the ingress/egress side based on whether the port is configured for
+	ingress or egress mirroring. The configuration supports a range from
+	1: X [0 <= X <= 2047].Default value is 1."
+    DEFVAL { 1 }
+    ::= { jnxAnalyzerEntry 3 }
+
+jnxLossPriority OBJECT-TYPE
+    SYNTAX 	INTEGER {
+	low (0),
+	high (1) }
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The analyzer port may be congested when the number of 
+	packets exceeds the bandwidth of the analyzer port. So the 
+	loss-priority parameter is enabled. The switched packets 
+	will not get affected by this. The value 0 corresponds to low 
+	priority.The value 1 corresponds to high loss priority. "
+    ::= { jnxAnalyzerEntry 4 }
+
+
+-- The ANALYZER INPUT Table
+
+jnxAnalyzerInputTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF JnxAnalyzerInputEntry
+    MAX-ACCESS	not-accessible
+    STATUS 	obsolete
+    DESCRIPTION
+	"An analyzer Session is an association of several source ports to 
+	a destination port.A range or series of ports can be mirrored in
+	a session."
+    ::= { jnxAnalyzerMIBObjects 2 }
+
+jnxAnalyzerInputEntry OBJECT-TYPE
+    SYNTAX	JnxAnalyzerInputEntry
+    MAX-ACCESS	not-accessible
+    STATUS	obsolete
+    DESCRIPTION	
+	"An Entry is created for each Input Source port."
+    INDEX { jnxAnalyzerName, jnxAnalyzerInputValue } 
+    ::= { jnxAnalyzerInputTable 1 }
+
+JnxAnalyzerInputEntry ::= 
+    SEQUENCE {
+	jnxAnalyzerInputValue 			DisplayString,
+	jnxAnalyzerInputOption			INTEGER,
+	jnxAnalyzerInputType			INTEGER
+    }
+
+jnxAnalyzerInputValue OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(0..255))
+    MAX-ACCESS	not-accessible
+    STATUS	obsolete
+    DESCRIPTION
+	"This identifies each different analyzer input source.
+	
+	If the value of jnxAnalyzerInputType is 1 then jnxAnalyzerInputValue
+	refers to the input source Interface Name.
+	
+	If the value of jnxAnalyzerInputType is 2 then jnxAnalyzerInputValue
+	refers to the input source vlan name."
+    ::= { jnxAnalyzerInputEntry 1 }
+
+jnxAnalyzerInputOption	OBJECT-TYPE
+    SYNTAX	INTEGER {
+	ingress (1),
+	egress	(2) 
+    }
+    MAX-ACCESS	read-only
+    STATUS	obsolete
+    DESCRIPTION
+	"A source port is a switch port that is been mirrored. It can be 
+	mirrored based either on Ingress(received) traffic or egress
+	(transmitted) traffic.
+	
+	The goal of receive (or ingress) Analyzer is to monitor as much as 
+	possible all the packets received by the source interface. The amount
+	of received packets  mirrored to the destination port depends on the 
+	mirroring ratio. A series or range of ingress ports can be mirrored 
+	in an analyzer session.
+	
+	The goal of transmit (or egress) analyzer is to monitor as much as 
+	possible all the packets sent by the source interface. The amount 
+	of egress packets mirrored to the destination port depends on the 
+	mirroring ratio.The copy is provided after the packet is modified. 
+	A range of egress ports can be mirrored in an analyzer session. 
+	The value 1 corresponds to mirroring ingress traffic. The value 2 
+	corresponds to mirroring egress traffic."
+    ::= { jnxAnalyzerInputEntry 2 }
+
+jnxAnalyzerInputType OBJECT-TYPE
+    SYNTAX	INTEGER {
+	interface (1),
+	vlanname  (2)
+    }
+    MAX-ACCESS	read-only
+    STATUS	obsolete
+    DESCRIPTION
+	"This specifies whether interfaces or VLANs is mirrored. 
+        
+        Mirroring can be done on the basis of the interface name.All packets
+	received on a port configured for ingress mirroring is sent to the 
+	analyzer port.All packets sent out on a port configured for egress 
+	mirroring is sent to the analyzer port.Any number of network ports 
+	can be configured for ingress or egress mirroring.The value one of
+	jnxAnalayzerInputType corresponds to mirroring the interface traffic.
+
+	On a particular switch, the user can choose to monitor all the ports 
+	that belong to a particular VLAN. It is needed in order to analyze 
+	the network traffic in one or more VLANs.Mirroring can be configured 
+	in ingress direction only for VLAN.
+	
+	Mirroring can be done on the basis of VLAN name (supported only in
+        ingress). All packets received on a particular VLAN are sent out to
+        the analyzer.The value two of jnxAnalyzerInputType corresponds to 
+	mirroring vlan traffic."
+    ::= { jnxAnalyzerInputEntry 3 }
+
+
+-- The ANALYZER OUTPUT Table		
+
+jnxAnalyzerOutputTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF JnxAnalyzerOutputEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This table describes the destination port to which the traffic from 
+	the source ports are copied."
+    ::= { jnxAnalyzerMIBObjects 3 }
+
+jnxAnalyzerOutputEntry OBJECT-TYPE
+    SYNTAX	JnxAnalyzerOutputEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"An Entry is created for each destination port or destination vlan."
+    INDEX { jnxAnalyzerName, jnxAnalyzerOutputValue }
+    ::= { jnxAnalyzerOutputTable 1 }
+
+JnxAnalyzerOutputEntry ::=
+    SEQUENCE {
+	jnxAnalyzerOutputValue			DisplayString,
+        jnxAnalyzerOutputType			INTEGER
+    }
+
+jnxAnalyzerOutputValue	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(0..255))
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This object identifies each different destination port or 
+	destination vlan.
+	
+	If the value of jnxAnalyzerOutputType is 1 then jnxAnalyzerOutputValue
+	gives the destination interface name.
+	
+	If the value of jnxAnalyzerOutputType is 2 then jnxAnalyzerOutputValue
+	gives the destination vlan name."
+    ::= { jnxAnalyzerOutputEntry 1 }
+
+jnxAnalyzerOutputType OBJECT-TYPE
+    SYNTAX	INTEGER {
+	interface  (1),
+	vlanname   (2)
+    }
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The destination port can be on the same switch or on a	different 
+	switch(Remote Analyzer).
+
+	Value 1 specifies that the destination interface is on the same 
+	switch and it receives a copy of traffic from the source ports.
+	The port does not transmit any traffic except that required for
+	the analyzer session.
+	
+	The traffic for each Remote Analyzer session is carried over a 
+	user-specified Remote Analyzer VLAN that is dedicated for that 
+	Remote Analyzer session in all participating switches. A special 
+	vlan is confgiured exclusively for remote mirroring by marking it 
+	as analyzer vlan.  Intermediate switches will have a few ports
+ 	(minimum of 2 ports )as members of the analyzer vlan. These
+	are the trunk ports which act as the link between the switches.
+	The analyzer ports on the destination switch are also added to 
+	the Analyzer VLAN. 
+
+	Value  2 specifies  that the traffic from all the source ports is 
+	copied into the Remote Analyzer vlan specified by the vlan name.
+
+        In the source switch the analyzer session destination is given 
+	as the analyzer vlan. In the intermediate switches the analyzer 
+	sessions have the source and the destination as the analyzer vlan. 
+	The packet will reach the destination ports as it will be a part 
+	of the analyzer vlan."	
+    ::= { jnxAnalyzerOutputEntry 2 }
+
+-- jnxExAnalyzerInputTable Table
+
+jnxExAnalyzerInputTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxExAnalyzerInputEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An analyzer Session is an association of several source ports to
+        a destination port.A range or series of ports can be mirrored in
+        a session."
+    ::= { jnxAnalyzerMIBObjects 4 }
+
+jnxExAnalyzerInputEntry OBJECT-TYPE
+    SYNTAX      JnxExAnalyzerInputEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An Entry is created for each Input Source port."
+    INDEX { jnxAnalyzerName, jnxExAnalyzerInputOption, jnxExAnalyzerInputValue }
+    ::= { jnxExAnalyzerInputTable 1 }
+
+JnxExAnalyzerInputEntry ::=
+    SEQUENCE {
+        jnxExAnalyzerInputOption                  INTEGER,
+        jnxExAnalyzerInputValue                   DisplayString,
+        jnxExAnalyzerInputType                    INTEGER
+    }
+
+jnxExAnalyzerInputOption  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ingress        (1),
+        egress         (2),
+        vlan           (3),
+        egress-vlan    (4)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A source port is a switch port that is been mirrored. It can be
+        mirrored based either on Ingress(received) traffic or egress
+        (transmitted) traffic.
+
+        The goal of receive (or ingress) Analyzer is to monitor as much as
+        possible all the packets received by the source interface. The amount
+        of received packets  mirrored to the destination port depends on the
+        mirroring ratio. A series or range of ingress ports can be mirrored
+        in an analyzer session.
+
+        The goal of transmit (or egress) analyzer is to monitor as much as
+        possible all the packets sent by the source interface. The amount
+        of egress packets mirrored to the destination port depends on the
+        mirroring ratio.The copy is provided after the packet is modified.
+        A range of egress ports can be mirrored in an analyzer session.
+        The value 1 corresponds to mirroring ingress traffic. The value 2
+        corresponds to mirroring egress traffic. The value 3 corresponds to
+        mirroring vlan ingress traffic. The value 4 corresponds to mirroring 
+        vlan egress traffic."
+    ::= { jnxExAnalyzerInputEntry 1 }
+
+jnxExAnalyzerInputValue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This identifies each different analyzer input source.
+
+        If the value of jnxExAnalyzerInputType is 1 then jnxExAnalyzerInputValue
+        refers to the input source Interface Name.
+
+        If the value of jnxExAnalyzerInputType is 2 then jnxExAnalyzerInputValue
+        refers to the input source vlan name."
+    ::= { jnxExAnalyzerInputEntry 2 }
+
+jnxExAnalyzerInputType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        interface (1),
+        vlanname  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies whether interfaces or VLANs is mirrored.
+
+        Mirroring can be done on the basis of the interface name.All packets
+        received on a port configured for ingress mirroring is sent to the
+        analyzer port.All packets sent out on a port configured for egress
+        mirroring is sent to the analyzer port.Any number of network ports
+        can be configured for ingress or egress mirroring.The value one of
+        jnxAnalyzerInputType corresponds to mirroring the interface traffic.
+
+        On a particular switch, the user can choose to monitor all the ports
+        that belong to a particular VLAN. It is needed in order to analyze
+        the network traffic in one or more VLANs.Mirroring can be configured
+        in ingress direction only for VLAN.
+
+        Mirroring can be done on the basis of VLAN name (supported only in
+        ingress). All packets received on a particular VLAN are sent out to
+        the analyzer.The value two of jnxExAnalyzerInputType corresponds to
+        mirroring vlan traffic."
+    ::= { jnxExAnalyzerInputEntry 3 }
+
+END

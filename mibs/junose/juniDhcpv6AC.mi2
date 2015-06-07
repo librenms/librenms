@@ -1,0 +1,57 @@
+
+-- *****************************************************************************
+-- Juniper-DHCPv6-CONF
+--
+-- SNMP Agent Capabilities definitions for the DHCPv6 MIB.
+--
+-- Copyright (c) 2003 Juniper Networks, Inc.  All rights reserved.
+-- *****************************************************************************
+
+Juniper-DHCPv6-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniDhcpv6Agent  MODULE-IDENTITY
+    LAST-UPDATED "200305081755Z"  -- 08-May-03 01:55 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the DHCPv6 component of the SNMP
+        agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200305081755Z"  -- 08-May-03 01:55 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 64 }
+
+
+-- *****************************************************************************
+-- DHCPv6 SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniDhcpv6AgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the DHCPv6 component of the Juniper JUNOSe SNMP agent.
+        This version of the DHCPv6 component is supported in JUNOSe 5.1 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the DHCPv6 application in
+        JUNOSe."
+    SUPPORTS    Juniper-DHCPv6-MIB
+        INCLUDES  {
+            juniDhcpv6LocalServerGroup }
+    ::= { juniDhcpv6Agent 1 }
+
+END

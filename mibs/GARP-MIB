@@ -1,0 +1,396 @@
+GARP-MIB DEFINITIONS ::= BEGIN
+
+-- Revision: 00.00.00
+-- Part Number:
+-- Date: Feb 16, 1998
+
+-- Cabletron Systems, Inc.
+-- 35 Industrial Way, P.O. Box 5005
+-- Rochester, NH 03867-5005
+-- (603) 332-9400
+-- support@ctron.com
+
+-- This module provides definitions for the 802.1p
+-- GARP MIB objects.
+-- All managed objects are defined in 802.1p DRAFT D15
+
+-- This module will be extended, as required.
+--
+
+-- Cabletron Systems reserves the right to make changes in
+-- specification and other information contained in this document
+-- without prior notice.  The reader should consult Cabletron Systems
+-- to determine whether any such changes have been made.
+--
+-- In no event shall Cabletron Systems be liable for any incidental,
+-- indirect, special, or consequential damages whatsoever (including
+-- but not limited to lost profits) arising out of or related to this
+-- document or the information contained in it, even if Cabletron
+-- Systems has been advised of, known, or should have known, the
+-- possibility of such damages.
+--
+-- Cabletron grants vendors, end-users, and other interested parties
+-- a non-exclusive license to use this Specification in connection
+-- with the management of Cabletron products.
+
+-- Copyright February 1998 Cabletron Systems
+
+IMPORTS
+
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString, PhysAddress
+                FROM RFC1213-MIB
+      enterprises, IpAddress, Counter, TimeTicks, Gauge
+                FROM RFC1155-SMI;
+
+cabletron                   OBJECT IDENTIFIER ::= { enterprises 52 }
+mibs                        OBJECT IDENTIFIER ::= { cabletron 4 }
+ctronExp                    OBJECT IDENTIFIER ::= { mibs 2 }
+ctVLANMib                   OBJECT IDENTIFIER ::= { ctronExp 12 }
+ctVLANMgr                   OBJECT IDENTIFIER ::= { ctVLANMib 1 }
+ctGarp                      OBJECT IDENTIFIER ::= { ctVLANMgr 3 }
+ctGarpTables                OBJECT IDENTIFIER ::= { ctGarp 2 }
+
+
+garpApplicationTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GarpApplicationEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of GarpApplicationEntries"
+        ::= { ctGarpTables 1 }
+
+garpApplicationEntry    OBJECT-TYPE
+        SYNTAX  GarpApplicationEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An interface containing the objects associated with
+                 GARP Applications."
+        INDEX  { garpApplicationAppType }
+        ::= { garpApplicationTable 1 }
+
+GarpApplicationEntry ::=
+        SEQUENCE {
+                garpApplicationAppType
+                        INTEGER,
+                garpApplicationName
+                        PhysAddress,  -- MACAddress
+                garpApplicationFailedRegistrations
+                        INTEGER,
+                garpApplicationOperationStatus
+                    INTEGER
+                }
+
+garpApplicationAppType    OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Protocol that this application belongs to. A 1 represents
+                 GMRP and a 2 represents GVRP."
+        ::= { garpApplicationEntry 1}
+
+garpApplicationName     OBJECT-TYPE
+        SYNTAX  PhysAddress  -- MACAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC Address associated with this GARP Application."
+        ::= { garpApplicationEntry 2 }
+
+garpApplicationFailedRegistrations OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The current value of the Failed Registrations counter
+                 maintained for a GARP Attribute type."
+        ::= { garpApplicationEntry 3 }
+
+garpApplicationOperationStatus OBJECT-TYPE
+        SYNTAX  INTEGER     
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational status of this application for all participants.
+                 1 represents enabled and a 2 represents disabled."
+        ::= { garpApplicationEntry 4 }
+
+
+garpPortOperationTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF GarpPortOperationEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of GarpPortOperationEntry."
+    ::= { ctGarpTables 2 }
+
+garpPortOperationEntry OBJECT-TYPE
+        SYNTAX  GarpPortOperationEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An interface containing the objects associated with
+                 Garp Applications operation status"
+        INDEX   { garpPortOperationAppType, garpPortOperationPort }
+        ::= { garpPortOperationTable 1 }
+
+GarpPortOperationEntry ::=
+    SEQUENCE {
+        garpPortOperationAppType
+            INTEGER,
+        garpPortOperationPort
+            INTEGER,
+        garpPortOperationStatus
+            INTEGER
+        }
+
+garpPortOperationAppType         OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Protocol that this operation status belongs to. A
+                 1 represents GMRP and 2 represents GVRP."
+        ::= { garpPortOperationEntry 1 }
+
+garpPortOperationPort    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number that this operation status belongs to."
+        ::= { garpPortOperationEntry 2 }
+
+garpPortOperationStatus  OBJECT-TYPE
+        SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The port operational status for this application. A 
+                 1 represents enabled and 2 represents disabled."
+        ::= { garpPortOperationEntry 3 }
+
+garpTimerTable          OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GarpTimerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of GarpTimerEntry"
+        ::= { ctGarpTables 3 }
+
+garpTimerEntry  OBJECT-TYPE
+        SYNTAX  GarpTimerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An interface containing the objects associated with
+                Garp timers."
+        INDEX   { garpTimerAttributeAppType, garpTimerAttributePort }
+        ::= { garpTimerTable 1}
+
+GarpTimerEntry ::=
+        SEQUENCE {
+                garpTimerAttributeAppType
+                        INTEGER,
+                garpTimerAttributePort
+                        INTEGER,
+                garpTimerAttributeJoin
+                        INTEGER,
+                garpTimerAttributeLeave
+                        INTEGER,
+                garpTimerAttributeLeaveAll
+                        INTEGER
+                }
+
+garpTimerAttributeAppType        OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Protocol that this timer belongs to. A 
+                 1 represents GMRP and a 2 represents GVRP."
+        ::= { garpTimerEntry 1 }
+
+garpTimerAttributePort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number  that this timer belongs to."
+        ::= { garpTimerEntry 2 }
+
+garpTimerAttributeJoin   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The current value of the join time in use by
+                 a GARP Particicpant. The value is in centiseconds."
+        ::= { garpTimerEntry 3 }
+
+garpTimerAttributeLeave  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+         DESCRIPTION
+                "The current value of the leave time in use by
+                 a GARP Particicpant. The value is in centiseconds."
+        ::= { garpTimerEntry 4 }
+
+garpTimerAttributeLeaveAll    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The current value of the leaveAll time in use by
+                 a GARP Particicpant. The value is in centiseconds."
+        ::= { garpTimerEntry 5 }
+
+garpAttributeTable      OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GarpAttributeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of GARP Attributes"
+        ::= { ctGarpTables 4 }
+
+garpAttributeEntry      OBJECT-TYPE
+        SYNTAX  GarpAttributeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An interface containing the objects associated with
+                 GARP Attributes."
+        INDEX   { garpAttributeAppType, garpAttributePort, garpAttributeValue, garpAttributeGIPContextID }
+        ::= { garpAttributeTable 1 }
+
+GarpAttributeEntry ::=
+        SEQUENCE {
+                garpAttributeAppType
+                        INTEGER,
+                garpAttributePort
+                        INTEGER,
+                garpAttributeValue
+                        OCTET STRING,
+                garpAttributeGIPContextID
+                        INTEGER,
+                garpAttributeType
+                        INTEGER,
+                garpAttributeProtoAdminCtrl
+                        INTEGER,
+                garpAttributeRegisControl
+                        INTEGER,
+                garpAttributeStateValue
+                        INTEGER,
+                garpAttributeOrigOfLastPDU
+                        PhysAddress  -- MACAddress
+                }
+
+garpAttributeAppType    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                 "Protocol that this attribute belongs to. A
+                  1 represents GMRP and 2 represents GVRP."
+        ::= { garpAttributeEntry 1 }
+
+garpAttributePort       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number that this attribute belongs to."
+        ::= { garpAttributeEntry 2 }
+
+garpAttributeValue OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Value associated with this GARP Attribute."
+        ::= { garpAttributeEntry 3 }
+
+garpAttributeGIPContextID OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "GIP Context ID for this GARP Application."
+        ::= { garpAttributeEntry 4 }
+
+garpAttributeType       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The GARP Attribute type for a given GARP Application."
+        ::= { garpAttributeEntry 5 }
+
+garpAttributeProtoAdminCtrl    OBJECT-TYPE
+        SYNTAX  INTEGER { normal-Participan(0),
+                          non-Participan(1)
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The Attributes protocol administrative control parameter."
+        ::= { garpAttributeEntry 6 }
+
+garpAttributeRegisControl OBJECT-TYPE
+        SYNTAX  INTEGER { garpRegistrarNormal(0),
+                          garpRegistrarFixed(1),
+                          garpRegistrarForbidden(2)
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The attributes registrar admin control parameter."
+        ::= { garpAttributeEntry 7 }
+
+garpAttributeStateValue OBJECT-TYPE
+        SYNTAX  INTEGER { va-mt(0),
+                         va-lv(1),
+                         vp-mt(2),
+                         vp-lv(3),
+                         vo-mt(4),
+                         vo-lv(5),
+                         va-in(6),
+                         vp-in(7),
+                         vo-in(8),
+                         aa-mt(9),
+                         aa-lv(10),
+                         aa-in(11),
+                         ap-in(12),
+                         ao-in(13),
+                         qa-mt(14),
+                         qa-lv(15),
+                         qa-in(16),
+                         qp-in(17),
+                         qo-in(18),
+                         la-mt(19),
+                         la-lv(20),
+                         lo-mt(21),
+                         lo-lv(22),
+                         la-in(23)
+                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value of the combined Applicant and Registrar
+                 state for a GARP ATtribute."
+        ::= { garpAttributeEntry 8 }
+
+garpAttributeOrigOfLastPDU      OBJECT-TYPE
+        SYNTAX  PhysAddress  -- MACAddress
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+                "MAC Address of the last pdu that caused a state change
+                 for a given GARP Attribute."
+        ::= { garpAttributeEntry 9 }
+
+END

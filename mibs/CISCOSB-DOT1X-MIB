@@ -1,0 +1,1322 @@
+CISCOSB-DOT1X-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private DOT1X MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                                                       FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Counter32, Counter64, TimeTicks, Unsigned32       FROM SNMPv2-SMI
+    TruthValue, RowStatus                                                           FROM SNMPv2-TC
+    VlanIndex, PortList, dot1qFdbId                                                 FROM Q-BRIDGE-MIB
+    MacAddress                                                                      FROM BRIDGE-MIB
+    SnmpAdminString                                                                 FROM SNMP-FRAMEWORK-MIB
+    PaeControlledPortStatus, dot1xAuthSessionStatsEntry, dot1xPaePortNumber         FROM IEEE8021-PAE-MIB;
+
+rldot1x MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines dot1x private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 95 }
+
+rldot1xMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rldot1x 1 }
+
+rldot1xExtAuthSessionStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1xExtAuthSessionStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the session statistics objects
+        for the Authenticator PAE associated with each Port.
+        An entry appears in this table for each port that may
+        authenticate access to itself."
+    ::= { rldot1x 2 }
+
+rldot1xExtAuthSessionStatsEntry OBJECT-TYPE
+    SYNTAX      Rldot1xExtAuthSessionStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The session statistics information for an Authenticator
+        PAE.  This shows the current values being collected for
+        each session that is still in progress, or the final
+        values for the last valid session on each port where
+        there is no session currently active."
+    AUGMENTS    { dot1xAuthSessionStatsEntry }
+    ::= { rldot1xExtAuthSessionStatsTable 1 }
+
+Rldot1xExtAuthSessionStatsEntry ::= SEQUENCE {
+        rlDot1xAuthSessionAuthenticMethod INTEGER
+}
+
+rlDot1xAuthSessionAuthenticMethod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    remoteAuthServer(1),
+                    localAuthServer(2),
+                    none(3)
+                }
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The authentication method used to establish the
+        session."
+    ::= { rldot1xExtAuthSessionStatsEntry 1 }
+
+rldot1xGuestVlanSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "indicate if guest vlan is supported."
+    ::= { rldot1x  3 }
+
+rldot1xGuestVlanVID OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "specify the guest vlan tag , 0 for non exiting."
+    ::= { rldot1x  4 }
+
+rldot1xGuestVlanPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "the ports that can be members in the guest vlan"
+    ::= { rldot1x  5 }
+
+rldot1xUnAuthenticatedVlanSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "indicate if unauthenticated Vlan is supported."
+    ::= { rldot1x  6 }
+
+rldot1xUnAuthenticatedVlanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1xUnAuthenticatedVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "port belong to vlan in all port authenticated state except force unauthenticated table"
+    ::= { rldot1x  7 }
+
+rldot1xUnAuthenticatedVlanEntry OBJECT-TYPE
+    SYNTAX  Rldot1xUnAuthenticatedVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " port belong to vlan in all port authenticated state except force unauthenticated entry"
+    INDEX   { dot1qFdbId  }
+    ::= { rldot1xUnAuthenticatedVlanTable 1 }
+
+Rldot1xUnAuthenticatedVlanEntry ::= SEQUENCE {
+        rldot1xUnAuthenticatedVlanStatus  RowStatus
+    }
+
+rldot1xUnAuthenticatedVlanStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { rldot1xUnAuthenticatedVlanEntry 1 }
+
+rldot1xUserBasedVlanSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "indicate if user based Vlan is supported."
+    ::= { rldot1x  8 }
+
+rldot1xUserBasedVlanPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "the ports that can be members in the user based vlan"
+    ::= { rldot1x  9 }
+
+rldot1xAuthenticationPortTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1xAuthenticationPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    ::= { rldot1x  10 }
+
+rldot1xAuthenticationPortEntry OBJECT-TYPE
+    SYNTAX  Rldot1xAuthenticationPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS   current
+    DESCRIPTION
+        "The Port number and mac method"
+    INDEX { dot1xPaePortNumber }
+    ::= { rldot1xAuthenticationPortTable  1 }
+
+Rldot1xAuthenticationPortEntry::=
+    SEQUENCE {
+        rldot1xAuthenticationPortMethod
+            INTEGER,
+        rldot1xRadiusAttrVlanIdEnabled
+            TruthValue,
+        rldot1xRadiusAttAclNameEnabled
+            TruthValue,
+        rldot1xTimeBasedName
+            SnmpAdminString,
+        rldot1xTimeBasedActive
+            TruthValue,
+        rldot1xRadiusAttrVlanIdentifier
+            VlanIndex,
+        rldot1xMaxHosts
+            Unsigned32,
+        rldot1xMaxLoginAttempts
+            INTEGER,
+        rldot1xTimeoutSilencePeriod
+            INTEGER,
+        rldot1xNumOfAuthorizedHosts
+            INTEGER,
+        rldot1xAuthenticationOpenEnabled
+            TruthValue
+    }
+
+rldot1xAuthenticationPortMethod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    eapolOnly(1),
+                    macAndEapol(2),
+                    macOnly(3),
+                    webOnly(4),
+                    webAndEapol(5),
+                    webAndMac(6),
+                    webAndMacAndEapol(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the 802.1x-based, mac-based and web-based authentication."
+    DEFVAL   { eapolOnly }
+     ::= { rldot1xAuthenticationPortEntry 1 }
+
+rldot1xRadiusAttrVlanIdEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Defines if treat VLAN ID that received from Radius attributes
+         in Radius-Accept message."
+    ::= { rldot1xAuthenticationPortEntry 2 }
+
+rldot1xRadiusAttAclNameEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "Defines if treat ACL Names that received from Radius attributes
+          in Radius-Accept message."
+    ::= { rldot1xAuthenticationPortEntry 3 }
+
+rldot1xTimeBasedName OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "Specifies a time range. When the Time Range is not in effect the port state would be Unauthorized."
+    ::= { rldot1xAuthenticationPortEntry 4 }
+
+rldot1xTimeBasedActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "Specifies if time range is active now or not."
+    ::= { rldot1xAuthenticationPortEntry 5 }
+
+rldot1xRadiusAttrVlanIdentifier OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "In case that value is not 0,
+         This field will define the VLAN ID in case that it is not received from Radius attributes
+         in Radius-Accept message."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 6 }
+
+rldot1xMaxHosts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of authenticated hosts allowed on the interface.
+         A value of 0 means no limitation."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 7 }
+
+rldot1xMaxLoginAttempts OBJECT-TYPE
+    SYNTAX      INTEGER (0.. 10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowedlogin attempts on the interface.
+         A value of 0 means the infinite number of attemtps.
+         The configuration is applied only to Web-Based authentication."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 8 }
+
+rldot1xTimeoutSilencePeriod OBJECT-TYPE
+    SYNTAX      INTEGER (0.. 65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set the number of seconds that if an authorized client did not send traffic during this period,
+         then the client is changed to unauthrized.
+         The configuration is applied only to Web-Based authentication."
+    DEFVAL { 0 }
+    ::= { rldot1xAuthenticationPortEntry 9 }
+
+rldot1xNumOfAuthorizedHosts OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "Number of authorized host in multi-sessions mode."
+    ::= { rldot1xAuthenticationPortEntry 10 }
+
+rldot1xAuthenticationOpenEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Open access allows clients or devices to gain network access before authentication is performed.
+         In the mode the switch performs failure replies received from a Radius server as success."
+    DEFVAL { false }
+    ::= { rldot1xAuthenticationPortEntry 11 }
+
+ --------------------------------------------------------------
+ -- The Authenticator Statistics Table
+ --------------------------------------------------------------
+
+ rldot1xAuthMultiStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1xAuthMultiStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the statistics objects for the
+         Authenticator PAE associated with each Port and MAC for
+         multisession 802.1x mode of operation.
+         An entry appears in this table for each port and MAC that have an
+         authentication session currently running under way for them."
+    REFERENCE
+        "9.4.2 Authenticator Statistics"
+    ::= { rldot1x 11 }
+
+ rldot1xAuthMultiStatsEntry OBJECT-TYPE
+    SYNTAX      Rldot1xAuthMultiStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics information for an Authenticator PAE."
+    INDEX { rldot1xAuthMultiStatsPortNumber, rldot1xAuthMultiStatsSourceMac }
+    ::= { rldot1xAuthMultiStatsTable 1 }
+
+ Rldot1xAuthMultiStatsEntry ::=
+    SEQUENCE {
+        rldot1xAuthMultiStatsPortNumber
+            INTEGER,
+        rldot1xAuthMultiStatsSourceMac
+            MacAddress,
+        rldot1xAuthMultiEapolFramesRx
+            Counter32,
+        rldot1xAuthMultiEapolFramesTx
+            Counter32,
+        rldot1xAuthMultiEapolStartFramesRx
+            Counter32,
+        rldot1xAuthMultiEapolLogoffFramesRx
+            Counter32,
+        rldot1xAuthMultiEapolRespIdFramesRx
+            Counter32,
+        rldot1xAuthMultiEapolRespFramesRx
+            Counter32,
+        rldot1xAuthMultiEapolReqIdFramesTx
+            Counter32,
+        rldot1xAuthMultiEapolReqFramesTx
+            Counter32,
+        rldot1xAuthMultiInvalidEapolFramesRx
+            Counter32,
+        rldot1xAuthMultiEapLengthErrorFramesRx
+            Counter32
+        }
+
+ rldot1xAuthMultiStatsPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Number."
+    ::= { rldot1xAuthMultiStatsEntry 1 }
+
+  rldot1xAuthMultiStatsSourceMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac of the authentication session."
+    ::= { rldot1xAuthMultiStatsEntry 2 }
+
+ rldot1xAuthMultiEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid EAPOL frames of any type
+        that have been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL frames received"
+    ::= { rldot1xAuthMultiStatsEntry 3 }
+
+ rldot1xAuthMultiEapolFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames of any type
+        that have been transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL frames transmitted"
+    ::= { rldot1xAuthMultiStatsEntry 4 }
+
+ rldot1xAuthMultiEapolStartFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Start frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Start frames received"
+    ::= { rldot1xAuthMultiStatsEntry 5 }
+
+ rldot1xAuthMultiEapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Logoff frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Logoff frames received"
+    ::= { rldot1xAuthMultiStatsEntry 6 }
+
+ rldot1xAuthMultiEapolRespIdFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Resp/Id frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Resp/Id frames received"
+    ::= { rldot1xAuthMultiStatsEntry 7 }
+
+ rldot1xAuthMultiEapolRespFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid EAP Response frames
+        (other than Resp/Id frames) that have been
+        received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Response frames received"
+    ::= { rldot1xAuthMultiStatsEntry 8 }
+
+ rldot1xAuthMultiEapolReqIdFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Req/Id frames that have been
+        transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Req/Id frames transmitted"
+    ::= { rldot1xAuthMultiStatsEntry 9 }
+
+ rldot1xAuthMultiEapolReqFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Request frames
+        (other than Rq/Id frames) that have been
+        transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Request frames transmitted"
+    ::= { rldot1xAuthMultiStatsEntry 10 }
+
+ rldot1xAuthMultiInvalidEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been
+        received by this Authenticator in which the
+        frame type is not recognized."
+    REFERENCE
+        "9.4.2, Invalid EAPOL frames received"
+    ::= { rldot1xAuthMultiStatsEntry 11 }
+
+ rldot1xAuthMultiEapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been received
+        by this Authenticator in which the Packet Body
+        Length field is invalid."
+    REFERENCE
+        "9.4.2, EAP length error frames received"
+    ::= { rldot1xAuthMultiStatsEntry 12 }
+
+ --------------------------------------------------------------
+ -- The Authenticator Diagnostics Table
+ --------------------------------------------------------------
+
+ rldot1xAuthMultiDiagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1xAuthMultiDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the diagnostics objects for the
+         Authenticator PAE associated with each Port and MAC.
+         An entry appears in this table for each port and MAC that have an
+         authentication session currently running under way for them."
+    REFERENCE
+        "9.4.3 Authenticator Diagnostics"
+    ::= { rldot1x 12 }
+
+ rldot1xAuthMultiDiagEntry OBJECT-TYPE
+    SYNTAX      Rldot1xAuthMultiDiagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The diagnostics information for an Authenticator PAE."
+    INDEX { rldot1xAuthMultiDiagPortNumber, rldot1xAuthMultiDiagSourceMac }
+    ::= { rldot1xAuthMultiDiagTable 1 }
+
+ Rldot1xAuthMultiDiagEntry ::=
+    SEQUENCE {
+        rldot1xAuthMultiDiagPortNumber
+            INTEGER,
+        rldot1xAuthMultiDiagSourceMac
+            MacAddress,
+        rldot1xAuthMultiEntersConnecting
+            Counter32,
+ ----------             rldot1xAuthMultiEapLogoffsWhileConnecting
+ ----------                 Counter32,
+        rldot1xAuthMultiEntersAuthenticating
+            Counter32,
+        rldot1xAuthMultiAuthSuccessWhileAuthenticating
+            Counter32,
+ ----------             rldot1xAuthMultiAuthTimeoutsWhileAuthenticating
+ ----------                Counter32,
+         rldot1xAuthMultiAuthFailWhileAuthenticating
+            Counter32,
+        rldot1xAuthMultiAuthReauthsWhileAuthenticating
+            Counter32,
+        rldot1xAuthMultiAuthEapStartsWhileAuthenticating
+            Counter32,
+ ----------             rldot1xAuthMultiAuthEapLogoffWhileAuthenticating
+ ----------                 Counter32,
+        rldot1xAuthMultiAuthReauthsWhileAuthenticated
+            Counter32,
+        rldot1xAuthMultiAuthEapStartsWhileAuthenticated
+            Counter32,
+ ----------        rldot1xAuthMultiAuthEapLogoffWhileAuthenticated
+ ----------           Counter32,
+        rldot1xAuthMultiBackendResponses
+            Counter32,
+        rldot1xAuthMultiBackendAccessChallenges
+            Counter32,
+        rldot1xAuthMultiBackendOtherRequestsToSupplicant
+            Counter32,
+        rldot1xAuthMultiBackendNonNakResponsesFromSupplicant
+            Counter32,
+        rldot1xAuthMultiBackendAuthSuccesses
+            Counter32
+ ----------        rldot1xAuthMultiBackendAuthFails
+ ----------            Counter32
+        }
+
+ rldot1xAuthMultiDiagPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Number."
+    ::= { rldot1xAuthMultiDiagEntry 1 }
+
+  rldot1xAuthMultiDiagSourceMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac of the authentication session."
+    ::= { rldot1xAuthMultiDiagEntry 2 }
+
+ rldot1xAuthMultiEntersConnecting OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions to the CONNECTING state from any other
+        state."
+    REFERENCE
+        "9.4.2, 8.5.4.2.1"
+    ::= { rldot1xAuthMultiDiagEntry 3 }
+
+ rldot1xAuthMultiEntersAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from CONNECTING to AUTHENTICATING, as a
+        result of an EAP-Response/Identity message being
+        received from the Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.3"
+    ::= { rldot1xAuthMultiDiagEntry 4 }
+
+ rldot1xAuthMultiAuthSuccessWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to AUTHENTICATED, as a
+        result of the Backend Authentication state machine
+        indicating successful authentication of the Supplicant
+        (authSuccess = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.4"
+    ::= { rldot1xAuthMultiDiagEntry 5 }
+
+ rldot1xAuthMultiAuthFailWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to HELD, as a result
+        of the Backend Authentication state machine indicating
+        authentication failure (authFail = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.6"
+    ::= { rldot1xAuthMultiDiagEntry 6 }
+
+ rldot1xAuthMultiAuthReauthsWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to ABORTING, as a result
+        of a reauthentication request (reAuthenticate = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.7"
+    ::= { rldot1xAuthMultiDiagEntry 7 }
+
+ rldot1xAuthMultiAuthEapStartsWhileAuthenticating OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATING to ABORTING, as a result
+        of an EAPOL-Start message being received
+        from the Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.8"
+    ::= { rldot1xAuthMultiDiagEntry 8 }
+
+ rldot1xAuthMultiAuthReauthsWhileAuthenticated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATED to CONNECTING, as a
+        result of a reauthentication request
+        (reAuthenticate = TRUE)."
+    REFERENCE
+        "9.4.2, 8.5.4.2.10"
+    ::= { rldot1xAuthMultiDiagEntry 9 }
+
+ rldot1xAuthMultiAuthEapStartsWhileAuthenticated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        transitions from AUTHENTICATED to CONNECTING, as a
+        result of an EAPOL-Start message being received from the
+        Supplicant."
+    REFERENCE
+        "9.4.2, 8.5.4.2.11"
+    ::= { rldot1xAuthMultiDiagEntry 10 }
+
+ rldot1xAuthMultiBackendResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine sends
+        an initial Access-Request packet to the Authentication
+        server (i.e., executes sendRespToServer on entry to the
+        RESPONSE state). Indicates that the Authenticator
+        attempted communication with the Authentication Server."
+    REFERENCE
+        "9.4.2, 8.5.6.2.1"
+    ::= { rldot1xAuthMultiDiagEntry 11 }
+
+ rldot1xAuthMultiBackendAccessChallenges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        receives an initial Access-Challenge packet from the
+        Authentication server (i.e., aReq becomes TRUE,
+        causing exit from the RESPONSE state). Indicates that
+        the Authentication Server has communication with
+        the Authenticator."
+    REFERENCE
+        "9.4.2, 8.5.6.2.2"
+    ::= { rldot1xAuthMultiDiagEntry 12 }
+
+ rldot1xAuthMultiBackendOtherRequestsToSupplicant OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        sends an EAP-Request packet (other than an Identity,
+        Notification, Failure or Success message) to the
+        Supplicant (i.e., executes txReq on entry to the
+        REQUEST state). Indicates that the Authenticator chose
+        an EAP-method."
+    REFERENCE
+        "9.4.2, 8.5.6.2.3"
+    ::= { rldot1xAuthMultiDiagEntry 13 }
+
+ rldot1xAuthMultiBackendNonNakResponsesFromSupplicant OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        receives a response from the Supplicant to an initial
+        EAP-Request, and the response is something other than
+        EAP-NAK (i.e., rxResp becomes TRUE, causing the state
+        machine to transition from REQUEST to RESPONSE,
+        and the response is not an EAP-NAK). Indicates that
+        the Supplicant can respond to the Authenticators
+        chosen EAP-method."
+    REFERENCE
+        "9.4.2, 8.5.6.2.4"
+    ::= { rldot1xAuthMultiDiagEntry 14 }
+
+ rldot1xAuthMultiBackendAuthSuccesses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counts the number of times that the state machine
+        receives an EAP-Success message from the Authentication
+        Server (i.e., aSuccess becomes TRUE, causing a
+        transition from RESPONSE to SUCCESS). Indicates that
+        the Supplicant has successfully authenticated to
+        the Authentication Server."
+    REFERENCE
+        "9.4.2, 8.5.6.2.5"
+    ::= { rldot1xAuthMultiDiagEntry 15 }
+
+ --------------------------------------------------------------
+ -- The Authenticator Session Statistics Table
+ --------------------------------------------------------------
+
+ rldot1xAuthMultiSessionStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1xAuthMultiSessionStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the session statistics objects
+        for the Authenticator PAE associated with each Port.
+        An entry appears in this table for each port that may
+        authenticate access to itself."
+    REFERENCE
+        "9.4.4"
+    ::= { rldot1x 13 }
+
+ rldot1xAuthMultiSessionStatsEntry OBJECT-TYPE
+    SYNTAX      Rldot1xAuthMultiSessionStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The session statistics information for an Authenticator
+        PAE.  This shows the current values being collected for
+        each session that is still in progress, or the final
+        values for the last valid session on each port where
+        there is no session currently active."
+    INDEX { rldot1xAuthMultiSessionStatsPortNumber,
+            rldot1xAuthMultiSessionStatsSourceMac }
+    ::= { rldot1xAuthMultiSessionStatsTable 1 }
+
+ Rldot1xAuthMultiSessionStatsEntry ::=
+    SEQUENCE {
+        rldot1xAuthMultiSessionStatsPortNumber
+            INTEGER,
+        rldot1xAuthMultiSessionStatsSourceMac
+            MacAddress,
+        rldot1xAuthMultiSessionOctetsRx
+            Counter64,
+        rldot1xAuthMultiSessionOctetsTx
+            Counter64,
+        rldot1xAuthMultiSessionFramesRx
+            Counter32,
+        rldot1xAuthMultiSessionFramesTx
+            Counter32,
+        rldot1xAuthMultiSessionId
+            SnmpAdminString,
+ ----------        rldot1xAuthMultiSessionAuthenticMethod
+ ----------            INTEGER,
+        rldot1xAuthMultiSessionTime
+            TimeTicks,
+ ----------        rldot1xAuthMultiSessionTerminateCause
+ ----------            INTEGER,
+        rldot1xAuthMultiSessionUserName
+            SnmpAdminString,
+        rldot1xAuthMultiSessionRadiusAttrVlan
+            INTEGER,
+        rldot1xAuthMultiSessionRadiusAttrFilterId
+            SnmpAdminString,
+        rldot1xAuthMultiSessionRadiusAttrSecondFilterId
+            SnmpAdminString,
+        rlDot1xAuthMultiSessionMonitorResultsReason
+            INTEGER,
+        rlDot1xAuthMultiSessionMethodType
+            INTEGER     }
+
+ rldot1xAuthMultiSessionStatsPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Number."
+    ::= { rldot1xAuthMultiSessionStatsEntry 1 }
+
+  rldot1xAuthMultiSessionStatsSourceMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac of the authentication session."
+    ::= { rldot1xAuthMultiSessionStatsEntry 2 }
+
+
+ rldot1xAuthMultiSessionOctetsRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets received in user data
+        frames on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Octets Received"
+    ::= { rldot1xAuthMultiSessionStatsEntry 3 }
+
+ rldot1xAuthMultiSessionOctetsTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets transmitted in user data
+        frames on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Octets Transmitted"
+    ::= { rldot1xAuthMultiSessionStatsEntry 4 }
+
+ rldot1xAuthMultiSessionFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user data frames received
+        on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Frames Received"
+    ::= { rldot1xAuthMultiSessionStatsEntry 5 }
+
+ rldot1xAuthMultiSessionFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user data frames transmitted
+        on this Port during the session."
+    REFERENCE
+        "9.4.4, Session Frames Transmitted"
+    ::= { rldot1xAuthMultiSessionStatsEntry 6 }
+
+ rldot1xAuthMultiSessionId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique identifier for the session, in the
+        form of a printable ASCII string of at least
+        three characters."
+    REFERENCE
+        "9.4.4, Session Identifier"
+    ::= { rldot1xAuthMultiSessionStatsEntry 7 }
+
+ rldot1xAuthMultiSessionTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The duration of the session in seconds."
+    REFERENCE
+        "9.4.4, Session Time"
+    ::= { rldot1xAuthMultiSessionStatsEntry 8 }
+
+ rldot1xAuthMultiSessionUserName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The User-Name representing the identity of the
+        Supplicant PAE."
+    REFERENCE
+        "9.4.4, Session User Name"
+    ::= { rldot1xAuthMultiSessionStatsEntry 9 }
+
+ rldot1xAuthMultiSessionRadiusAttrVlan OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID that received from Radius attributes."
+    ::= { rldot1xAuthMultiSessionStatsEntry 10 }
+
+ rldot1xAuthMultiSessionRadiusAttrFilterId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "First filter ID that received from Radius attributes."
+    ::= { rldot1xAuthMultiSessionStatsEntry 11 }
+
+ rldot1xAuthMultiSessionRadiusAttrSecondFilterId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Second filter ID that received from Radius attributes."
+    ::= { rldot1xAuthMultiSessionStatsEntry 12 }
+
+ rlDot1xAuthMultiSessionMonitorResultsReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notRejected(0),
+                    aclNotExst(1),    -- ACL sent by radius Server does not exist on the device
+                    aclOvrfl(2),      -- ACL sent by radius server can not be applied because of TCAM overflow
+                    authErr(3),       -- Rejected by Radius due wrong user name or password in Radius server
+                    fltrErr(4),       -- Radius accept message contains more than 2 filter-id
+                    ipv6WithMac(5),   -- Radius accept message contains filter with IPv6 DIP and MAC addresses
+                    ipv6WithNotIp(6), -- Radius accept message contains IPv6 and not IP simultaneously
+                    polBasicMode(7),  -- Policy Map is not supported in the QoS basic mode
+                    aclDel(8),        -- ACL was deleted by user
+                    polDel(9),        -- Policy Map was deleted by user
+                    vlanDfly(10),     -- VLAN sent by radius server can not be applied because it is the Default VLAN
+                    vlanDynam(11),    -- VLAN sent by radius server can not be applied because it is a Dynamic VLAN
+                    vlanGuest(12),    -- VLAN sent by radius server can not be applied because it is the Guest VLAN
+                    vlanNoInMsg(13),  -- VLAN was not sent by Radius
+                    vlanNotExst(14),  -- VLAN sent by radius Server does not exist on the device
+                    vlanOvfl(15),     -- VLAN sent by radius server can not be applied because of TCAM overflow
+                    vlanVoice(16),    -- VLAN sent by radius server can not be applied because it is a Voice VLAN
+                    vlanUnauth(17),   -- VLAN sent by radius server can not be applied because it is a
+                                      -- Unauthenticated VLAN
+                    frsMthDeny(18),   -- First method is "deny"
+                    radApierr(19),    -- RADIUS API returned error (e.g. No RADIUS server is configured).
+                    radInvlres(20),   -- RADIUS server returned invalid packet (e.g. EAP Attribute is missing)
+                    radNoresp(21),    -- RADIUS server is not responding
+                    aclEgress(22),    -- ACL sent by radius Server is already bound as egress acl
+                    maxHosts(23),     -- Max hosts allowed per port are reached
+                    noActivity(24)    -- There is no traffic from this host
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The monitor result reason of the session."
+    ::= { rldot1xAuthMultiSessionStatsEntry 13 }
+
+ rlDot1xAuthMultiSessionMethodType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    eapol(1),
+                    mac(2),
+                    web(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current session method type."
+     ::= { rldot1xAuthMultiSessionStatsEntry 14 }
+
+ --------------------------------------------------------------
+ -- The Authenticator Configuration Table
+ --------------------------------------------------------------
+
+ rldot1xAuthMultiConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1xAuthMultiConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the configuration objects for the
+        Authenticator PAE associated with each port and MAC.
+        An entry appears in this table for each port and MAC that may
+        authenticate access to itself."
+    REFERENCE
+        "9.4.1 Authenticator Configuration"
+    ::= { rldot1x 14 }
+
+ rldot1xAuthMultiConfigEntry OBJECT-TYPE
+    SYNTAX      Rldot1xAuthMultiConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The configuration information for an Authenticator
+        PAE."
+    INDEX { rldot1xAuthMultiPortNumber, rldot1xAuthMultiSourceMac }
+    ::= { rldot1xAuthMultiConfigTable 1 }
+
+ Rldot1xAuthMultiConfigEntry ::=
+    SEQUENCE {
+        rldot1xAuthMultiPortNumber
+            INTEGER,
+        rldot1xAuthMultiSourceMac
+            MacAddress,
+        rldot1xAuthMultiPaeState
+            INTEGER,
+        rldot1xAuthMultiBackendAuthState
+            INTEGER,
+        rldot1xAuthMultiControlledPortStatus
+            PaeControlledPortStatus
+        }
+
+ rldot1xAuthMultiPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Number."
+    ::= { rldot1xAuthMultiConfigEntry 1 }
+
+ rldot1xAuthMultiSourceMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac of the authentication session."
+    ::= { rldot1xAuthMultiConfigEntry 2 }
+
+ rldot1xAuthMultiPaeState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    initialize(1),
+                    disconnected(2),
+                    connecting(3),
+                    authenticating(4),
+                    authenticated(5),
+                    aborting(6),
+                    held(7),
+                    forceAuth(8),
+                    forceUnauth(9)
+                }
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, Authenticator PAE state"
+    ::= { rldot1xAuthMultiConfigEntry 3 }
+
+ rldot1xAuthMultiBackendAuthState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    request(1),
+                    response(2),
+                    success(3),
+                    fail(4),
+                    timeout(5),
+                    idle(6),
+                    initialize(7)
+                }
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Backend Authentication
+        state machine."
+    REFERENCE
+        "9.4.1, Backend Authentication state"
+    ::= { rldot1xAuthMultiConfigEntry 4 }
+
+ rldot1xAuthMultiControlledPortStatus OBJECT-TYPE
+    SYNTAX      PaeControlledPortStatus
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the controlled Port
+        status parameter for the Port."
+    REFERENCE
+        "9.4.1, AuthControlledPortStatus"
+    ::= { rldot1xAuthMultiConfigEntry 5 }
+
+rldot1xBpduFilteringEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify that when 802.1x is globally disabled,
+        802.1x BPDU packets would be filtered or bridged."
+    ::= { rldot1x 15 }
+
+rldot1xRadiusAttributesErrorsAclReject OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify ACL error handling for the Radius attributes feature."
+    ::= { rldot1x 18 }
+----------------------------------------------------------------
+-- Added guest vlan timeout interval VeredK 15-04-2007, 19:39 --
+----------------------------------------------------------------
+
+rldot1xGuestVlanTimeInterval OBJECT-TYPE
+    SYNTAX INTEGER (0..180)
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+         "indicate the guest vlan timeout interval."
+    ::= { rldot1x  19 }
+
+rldot1xMacAuthSuccessTrapEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps when a MAC address is successfully
+         authenticated by the 802.1X mac-authentication access control."
+    ::= { rldot1x 20 }
+
+rldot1xMacAuthFailureTrapEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps when MAC address was failed
+         in authentication of the 802.1X MAC authentication access control."
+    ::= { rldot1x 21 }
+
+ --------------------------------------------------------------
+ -- The Legacy Port Table
+ --------------------------------------------------------------
+
+rldot1xLegacyPortTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Rldot1xLegacyPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    ::= { rldot1x  22 }
+
+rldot1xLegacyPortEntry OBJECT-TYPE
+    SYNTAX  Rldot1xLegacyPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS   current
+    DESCRIPTION
+        "The Port number and leagcy mode"
+    INDEX { dot1xPaePortNumber }
+    ::= { rldot1xLegacyPortTable  1 }
+
+Rldot1xLegacyPortEntry::=
+    SEQUENCE {
+        rldot1xLegacyPortModeEnabled
+            TruthValue
+    }
+
+rldot1xLegacyPortModeEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "Indicates whether in multiple sessions mode
+          work according to legacy devices mode or not."
+    ::= { rldot1xLegacyPortEntry 1 }
+
+rldot1xSystemAuthControlMonitorVlan OBJECT-TYPE
+    SYNTAX      INTEGER (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN Tag of 802.1x monitoring VLAN in the System.
+         value of 0 means that the monitoring mode is disabled."
+    ::= { rldot1x  23 }
+
+rldot1xClearPortMibCounters OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Each bit that is set in this portList represent a port that
+         its mib counters should be reset."
+    ::= { rldot1x  24 }
+
+rldot1xWebQuietFailureTrapEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps when a client is set in quiet state
+         after the maximum sequential attempts of login."
+    ::= { rldot1x 25 }
+
+rldot1xMacWebAuthSuccessTrapEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    eapolOnly(1),
+                    macAndEapol(2),
+                    macOnly(3),
+                    webOnly(4),
+                    webAndEapol(5),
+                    webAndMac(6),
+                    webAndMacAndEapol(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps per authentication method
+         when a session is successfully authenticated."
+    ::= { rldot1x 26 }
+
+rldot1xMacWebAuthFailureTrapEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    eapolOnly(1),
+                    macAndEapol(2),
+                    macOnly(3),
+                    webOnly(4),
+                    webAndEapol(5),
+                    webAndMac(6),
+                    webAndMacAndEapol(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specify if sending traps per authentication method when a session was failed."
+    ::= { rldot1x 27 }
+
+ --------------------------------------------------------------
+ -- The Locked Cients Table
+ --------------------------------------------------------------
+
+ rldot1xLockedCientsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Rldot1xLockedCientsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the locked clients information for Web-based authentication."
+    REFERENCE
+        "9.4.2 Authenticator Statistics"
+    ::= { rldot1x 28 }
+
+ rldot1xLockedCientsEntry OBJECT-TYPE
+    SYNTAX      Rldot1xLockedCientsEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The locked clients entry that entered silence period timeout for Web-based authentication."
+    INDEX { rldot1xLockedCientsPortNumber, rldot1xLockedCientsSourceMac }
+    ::= { rldot1xLockedCientsTable 1 }
+
+ Rldot1xLockedCientsEntry ::=
+    SEQUENCE {
+        rldot1xLockedCientsPortNumber
+            INTEGER,
+        rldot1xLockedCientsSourceMac
+            MacAddress,
+        rldot1xLockedCientsRemainedTime
+            INTEGER,
+        rldot1xLockedCientsRowStatus
+            RowStatus
+        }
+
+ rldot1xLockedCientsPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Number."
+    ::= { rldot1xLockedCientsEntry 1 }
+
+ rldot1xLockedCientsSourceMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Mac of the locked client."
+    ::= { rldot1xLockedCientsEntry 2 }
+
+ rldot1xLockedCientsRemainedTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time that is remained till the expiry of silence period."
+    ::= { rldot1xLockedCientsEntry 3 }
+
+ rldot1xLockedCientsRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Row status."
+    ::= { rldot1xLockedCientsEntry 4 }
+
+END

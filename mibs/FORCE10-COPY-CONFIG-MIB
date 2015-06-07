@@ -1,0 +1,489 @@
+-- *****************************************************************
+-- FORCE10-COPY-CONFIG-MIB
+--
+--
+-- Copyright (c) 2003-2005 by Force10 Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+FORCE10-COPY-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+        MODULE-IDENTITY, OBJECT-TYPE,
+        IpAddress, TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+		RowStatus,
+        DisplayString
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        f10Mgmt
+            FROM FORCE10-SMI
+        ;
+ 
+f10CopyConfigMib   MODULE-IDENTITY
+        LAST-UPDATED    "200905141300Z"
+        ORGANIZATION    "Force10 Networks, Inc."
+        CONTACT-INFO
+            "Force10 Networks, Inc
+            1440 McCarthy Blvd
+            Milpitas, CA 95035
+            (408) 571-3500
+            support@force10networks.com
+            http://www.force10networks.com"
+        DESCRIPTION
+            "Force10 Copy Config MIB provides copying of running-config to
+            to startup-config and vice-versa, and FTOS files to local
+            disk or other system via ftp or tftp.  
+            "
+        REVISION     "200905141300Z"
+        DESCRIPTION 
+            "Added New enum for usbflash filesystem in Exascale"
+        REVISION     "200706191200Z"
+        DESCRIPTION
+            "Update description to copy from remote server to local"
+        REVISION     "200303011200Z"
+        DESCRIPTION
+            "Initial Revision"
+        ::= { f10Mgmt 5 }   
+
+
+f10CopyConfigObjects    OBJECT IDENTIFIER ::= { f10CopyConfigMib 1 }
+f10CopyConfig           OBJECT IDENTIFIER ::= { f10CopyConfigObjects 1 } 
+f10CopyConfigTraps      OBJECT IDENTIFIER ::= { f10CopyConfigObjects 2 } 
+
+
+F10ConfigFileLocation ::= INTEGER {
+	flash(1),
+	slot0(2),
+    tftp(3),
+        ftp(4),
+        scp(5),
+        usbflash(6)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    The various location of the files on which a config-copy
+--    request can be performed.
+--    The option currently is limited to the master RPM.
+--    RPM1 location will be supported in near future.
+--    usbflash option is supported only on Exascale E-Series.
+
+
+F10ConfigFileType ::= INTEGER {
+	ftosFile (1),
+        runningConfig(2),
+        startupConfig(3)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    The various types of files on which a config-copy
+--    request can be performed.
+--    ftosFile can be any text or binary files as long
+--    the file is a valid files
+
+F10ConfigCopyState ::= INTEGER {
+        running(1),
+        successful(2),
+        failed(3)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    The state of a tftp config-copy operation. 
+--     The description of each state is given below:
+--    
+--     running:     only one config-copy request can run 
+--                  at any time. A newly activated 
+--                  config request will received state as failed  
+--                  if another request is in progress.
+--                  But, if the current request is queried, 
+--                  the state is set to running. 
+--    
+--     successsful: the state when a config-copy request is
+--                  successfully completed.
+--    
+--     failed:      to verify if there is a copy request in progress,
+--                  query the system with the copy mib.
+--                  Otherwise, the config-copy request failed.
+
+
+F10ConfigCopyFailCause ::= INTEGER {
+        badFileName(1),
+        copyInProgress(2),
+	diskFull(3),
+	fileExist(4),
+	fileNotFound(5),
+        timeout(6),
+        unknown(7)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    The reason a config-copy request failed.
+
+
+
+f10CopyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF F10CopyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of config-copy requests."
+    ::= { f10CopyConfig 1 }
+
+f10CopyEntry OBJECT-TYPE
+    SYNTAX F10CopyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A config-copy request.
+        
+	To use this copy on NMS, user must first query the MIB.
+        if the query returns the result of the previous copied and
+        there is no pending copy operation, user can submit a SNMP
+        SET with a random number as index with the appropraite
+        information as specified by this MIB and the row status as
+        CreateAndGo.  
+
+        The system will only keep the last 5 copy requests as the history.
+        If there are ten entries in the copy request table,  the subsequent 
+        copy request will replace the existing one in the copy table. 
+
+	1) To copy running-config from local directory to startup-config. Set the following
+	mib objects in the copy table
+
+	copySrcFileType		: runningConfig (2)
+	copyDestFileType	: startupConfig (3)
+
+	2) To copy startup-config from local directory to a remote site. Set the following
+	mib objects in the copy table
+
+	copySrcFileType		: startupConfig (3)
+	copyDestFileType	: ftosFile (1)
+	copyDestFileLocation	: ftp (4)
+	copyDestFileName	: /user/tester1/ftp/
+    	copyServerAddress 	: 172.20.10.123
+    	copyUserName 		: tester1
+    	copyUserPassword 	: mypasswd
+
+	3) To copy a file from local directory to a remote site. Set the following
+	mib objects in the copy table
+
+	copySrcFileType		: ftosFile (1)
+	copySrcFileLocation	: slot0 (2)
+	copySrcFileName		: NVTRACE_LOG_DIR/LP4-nvtrace-0
+	copyDestFileType	: ftosFile (1)
+	copyDestFileLocation	: ftp (4)
+	copyDestFileName	: /usr/tester1/trace/backup/LP4-nvtrace-0
+    	copyServerAddress 	: 172.20.10.123
+    	copyUserName 		: tester1
+    	copyUserPassword 	: mypasswd
+	"
+
+    INDEX { copyConfigIndex }
+    ::= { f10CopyTable 1 }
+
+
+F10CopyEntry ::= SEQUENCE {
+    copyConfigIndex 		INTEGER,
+    copySrcFileType 		F10ConfigFileType,
+    copySrcFileLocation 	F10ConfigFileLocation,
+    copySrcFileName 		DisplayString,
+    copyDestFileType 		F10ConfigFileType,
+    copyDestFileLocation	F10ConfigFileLocation,
+    copyDestFileName 		DisplayString,
+    copyServerAddress 		IpAddress,
+    copyUserName 		DisplayString,
+    copyUserPassword 		DisplayString,
+    copyState 			F10ConfigCopyState,
+    copyTimeStarted 		TimeTicks,
+    copyTimeCompleted 		TimeTicks,
+    copyFailCause 		F10ConfigCopyFailCause,
+    copyEntryRowStatus 		RowStatus
+
+    }
+
+copyConfigIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "To initiate a config copy request, user should
+         assign a positive random value as an index.
+        "
+    ::= { f10CopyEntry 1 }
+
+copySrcFileType OBJECT-TYPE
+    SYNTAX F10ConfigFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the type of file to copy from. 
+
+        if the copySrcFileType is runningConfig(2) or
+        startupConfig(3), the default F10ConfigFileLocation is 
+        flash(1).
+        
+        If the copySrcFileType has the value of 
+        ftosFile(1), it is expected that the copySrcFileLocation
+        and copySrcFileName must also be spcified. The three 
+        objects together will uniquely identify the source file.
+        
+        "
+    ::= { f10CopyEntry 2 }
+
+copySrcFileLocation OBJECT-TYPE
+    SYNTAX F10ConfigFileLocation
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the location of source file.
+
+        If the copySrcFileType has the value of 
+        ftosFile(1), it is expected that the copySrcFileType
+        and copySrcFileName must also be spcified. The three
+        objects together will uniquely identify the source file.
+
+        If the copySrcFileLocation has the value of
+        ftp(4) or scp(5), it is expected the login information liked 
+        copyServerAddress, copyUserName, and copyUserPassword
+        also be spcified. 
+        
+        "
+    ::= { f10CopyEntry 3 }
+
+copySrcFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The file name (including the path, if applicable) of
+        the file. If copySourceFileType is set to runningConfig or
+        startupConfig, copySrcFileName is not needed.
+        "
+    ::= { f10CopyEntry 4 }
+
+copyDestFileType OBJECT-TYPE
+    SYNTAX F10ConfigFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the type of file to copy to. 
+
+        if the copyDestFileType is runningConfig(2) or
+        startupConfig(3), the default f10DestFileLocation is 
+        flash(1).
+        
+        If the copyDestFileType has the value of 
+        ftosFile(1), it is expected that the copyDestFileLocation
+        and copyDestFileName must also be spcified. The three 
+        objects together will uniquely identify the destination file.
+        
+        "
+    ::= { f10CopyEntry 5 }
+
+copyDestFileLocation OBJECT-TYPE
+    SYNTAX F10ConfigFileLocation
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the location of destination file.
+
+        If the copyDestFileType has the value of 
+        ftosFile(1), it is expected that the copyDestFileType
+        and copyDestFileName must also be spcified. The three
+        objects together will uniquely identify the destination file.
+
+        If the copyDestFileLocation has the value of
+        ftp(4) or scp(5), it is expected the login information liked 
+        copyServerAddress, copyUserName, and copyUserPassword
+        also be spcified. 
+
+        "
+    ::= { f10CopyEntry 6 }
+
+copyDestFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the location of destination file.
+
+        If the copyDestFileType has the value of
+        ftosFile(1), it is expected that the f10CopyDestFileTyp
+        and copyDestFileLocation must also be spcified. The three
+        objects together will uniquely identify the source file.
+
+        If the copyDestFileLocation has the value of
+        ftp(4) or scp(5), it is expected the login information liked 
+        copyServerAddress, copyUserName, and copyUserPassword
+        also be spcified. 
+
+        "
+    ::= { f10CopyEntry 7 }
+
+copyServerAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The ip address of the tftp server from (or to) 
+        which to copy the configuration file. 
+
+        Values of 0.0.0.0 or FF.FF.FF.FF for
+        copyServerAddress are not allowed.
+
+        If the copyDestFileLocation has the value of
+        ftp(4) or scp(5), it is expected the login information liked 
+        copyServerAddress, copyUserName, and copyUserPassword
+        also be spcified. 
+
+        "
+    ::= { f10CopyEntry 8 }
+
+copyUserName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..15))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Remote user name for copy via ftp, or scp. 
+
+        If the copyDestFileLocation has the value of
+        ftp(4) or scp(5), it is expected the login information liked 
+        copyServerAddress, copyUserName, and copyUserPassword
+        also be spcified. 
+
+        "
+    ::= { f10CopyEntry 9 }
+
+copyUserPassword OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..15))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Password used by ftp, scp for copying a 
+        file to an ftp/scp server. 
+
+        If the copyDestFileLocation has the value of
+        ftp(4) or scp(5), it is expected the login information liked 
+        copyServerAddress, copyUserName, and copyUserPassword
+        also be spcified. 
+
+        "
+    ::= { f10CopyEntry 10 }
+
+copyState OBJECT-TYPE
+    SYNTAX F10ConfigCopyState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The state of config-copy operation.
+        "
+    ::= { f10CopyEntry 11 }
+
+copyTimeStarted OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The timetick when the copy started.
+        "
+    ::= { f10CopyEntry 12 }
+
+copyTimeCompleted OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The timetick when the copy completed.
+        "
+    ::= { f10CopyEntry 13 }
+
+copyFailCause OBJECT-TYPE
+    SYNTAX F10ConfigCopyFailCause
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The reason a config-copy request failed.
+        "
+    ::= { f10CopyEntry 14 }
+
+copyEntryRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        The state of the copy operation.
+
+        Uses CreateAndGo when you are performing the copy.
+        The state is set to active when the copy is completed.
+        "
+    ::= { f10CopyEntry 15 }
+
+    --
+    -- ## Alarm Group or Traps
+    --
+   
+    copyAlarmMibNotifications     OBJECT IDENTIFIER ::= { f10CopyConfigTraps 0 }
+    copyAlarmVariable             OBJECT IDENTIFIER ::= { f10CopyConfigTraps 1 }
+   
+    --
+    -- TRAP VarBind Data
+    --
+   
+    copyAlarmLevel OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "the message warning level"
+        ::= { copyAlarmVariable 1 }
+   
+    copyAlarmString OBJECT-TYPE
+        SYNTAX       OCTET STRING
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "An generic string value in the TRAP object"
+        ::= { copyAlarmVariable 2 }
+
+    copyAlarmIndex OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "the index of the current copy, copyAlarmIndex"
+        ::= { copyAlarmVariable 3 }
+
+    --
+    -- TRAPS
+    --
+
+    copyConfigCompleted  NOTIFICATION-TYPE
+        OBJECTS         {   copyAlarmLevel,
+                            copyAlarmString,
+                            copyAlarmIndex
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a
+             copy operational is completed."
+        ::= { copyAlarmMibNotifications 1 }
+
+END

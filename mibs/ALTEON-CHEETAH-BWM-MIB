@@ -1,0 +1,1749 @@
+-- COPYRIGHT NOTICE
+-- Copyright (c) Alteon WebSystems, Inc. 2001
+-- All rights reserved
+-- 
+-- HISTORY
+-- $Log: aosbwm.mib,v $
+-- Revision 1.1  2007/10/17 01:09:52  jeneric
+-- 10/07 mib updates
+--
+-- Revision submit_cheetah_21390/1 2006/10/24 21:56:40 ramude
+-- Added sessions rejected mib object.
+-- 
+-- Revision submit_cheetah_15409/2 2005/10/28 09:45:59 rvakkala
+-- Corrected check in comment.
+-- 
+-- Revision submit_cheetah_15409/1 2005/10/28 09:45:06 rvakkala
+-- Added SNMP support for /c/bwm/cont<x>/maxsess.
+-- 
+-- Revision submit_cheetah_13563/1 2005/08/05 17:39:17 rrekha
+-- Moved all the BWM related flags into the raw files.
+-- 
+-- Revision submit_cheetah_12078/1 2005/05/17 08:55:22 rvakkala
+-- Added MIB support for /cfg/bwm/report
+-- 
+-- Revision submit_cheetah_11383/2 2005/04/20 15:24:30 angamuth
+-- Merged with previous submit changes.
+-- 
+-- Revision submit_cheetah_11564/2 2005/04/20 07:22:24 hponnuru
+-- Merged with previous changes.
+-- 
+-- Revision submit_cheetah_11504/1 2005/04/13 09:02:08 hponnuru
+-- Added SNMP support for /c/bwm/cont #/iptcpwin.
+-- 
+-- $Log: aosbwm.mib,v $
+-- Revision 1.1  2007/10/17 01:09:52  jeneric
+-- 10/07 mib updates
+--
+-- Revision submit_cheetah_11564/1 2005/04/20 04:32:14 hponnuru
+-- Added SNMP support for IPSoft.
+-- 
+-- $Log: aosbwm.mib,v $
+-- Revision 1.1  2007/10/17 01:09:52  jeneric
+-- 10/07 mib updates
+--
+-- Revision submit_cheetah_11383/1 2005/04/20 14:18:36 angamuth
+-- Added OIDs for Total Packets (BWM_PKT_COUNT) in BWM Contract Stats Tables.
+-- 
+-- Revision submit_cheetah_11091/1 2005/03/02 23:49:08 rrekha
+-- Added SNMP support for /c/bwm/email command.
+-- 
+-- Revision submit_cheetah_10393/1 2005/01/05 21:01:25 mmacnt
+-- code reorg - moved from lib/agent
+-- 
+-- Revision submit_cheetah_9196/1 2004/09/01 21:50:06 rrekha
+-- Minor changes for SMIv2 compliance.
+-- 
+-- Revision submit_cheetah_8759/1 2004/08/06 00:27:17 abhijitk
+-- Added new MIB variable requested by Wendell.
+-- 
+-- Revision submit_cheetah_8731/1 2004/08/05 02:27:11 abhijitk
+-- Extended MIB support asked for by Wendell & Mike.
+-- 
+-- Revision submit_cheetah_8691/1 2004/08/04 18:31:22 abhijitk
+-- Added support for contract group name via SNMP.
+-- 
+-- Revision submit_cheetah_8677/1 2004/08/03 20:16:00 abhijitk
+-- Brought back bwmNewCfgContractGroupDelete to the MIB.
+-- 
+-- Revision submit_cheetah_8219/1 2004/07/08 07:15:17 dillibab
+-- Added format for bwm ip user table entries.
+-- 
+-- Revision submit_cheetah_8078/1 2004/07/07 15:27:36 dillibab
+-- Added mib objects for entries,frequency,monitor-only mode.
+-- 
+-- Revision submit_cheetah_7764/1 2004/06/09 22:07:54 kanil
+-- size of bwmCur/New CfgContractName objects are set to 31 
+-- 
+-- Revision submit_cheetah_5839/1 2003/12/05 02:10:08 abhijitk
+-- Changed BWM contract name to be 32 characters long (effectively 31           
+-- characters as the last character is '\0') from 16 characters.
+-- 
+-- Revision submit_cheetah_5753/1 2003/11/21 03:08:13 abhijitk
+-- Removed bwmNewCfgContractGroupDelete from the MIB.
+-- 
+-- Revision submit_cheetah_5749/1 2003/11/20 23:52:13 abhijitk
+-- Removed bwmCurCfgContractGroupState and bwmNewCfgContractGroupState from
+-- the MIB - as they did not make any sense and because of which the EMS
+-- is not able to configure BWM contract group.
+-- 
+-- Revision submit_cheetah_5693/1 2003/11/16 19:34:29 rrekha
+-- Converted MIBs to SMIv2.
+-- 
+-- Revision submit_cheetah_5111/1 2003/09/23 18:15:35 rrekha
+-- Fixed Q00753762: Remove the range for bwmCurCfgContractPolicy and
+-- bwmNewCfgContractPolicy. They should be obtained using mib object
+-- bwmPolicyTableMaxEnt.
+-- 
+-- Revision submit_cheetah_4435/1 2003/08/12 22:59:48 rrekha
+-- Changed name of mib file for cheetah*.mib to aos*.mib.
+-- 
+-- Revision submit_cheetah_3132/1 2003/05/15 01:54:29 abhijitk
+-- Updated MIB to reflect changes as suggested by Wendell.
+-- 
+-- Revision submit_cheetah_2911/1 2003/05/06 01:38:01 abhijitk
+-- Added MIBs for the time policy and the contract group tables.
+-- 
+-- Revision submit_cheetah_2846/1 2003/04/30 00:23:03 abhijitk
+-- Added the MIB for some of the new 21.0 BWM features.
+-- 
+-- Revision submit_cheetah_1919/1 2003/02/05 20:02:16 rrekha
+-- Changed the include paths for integrating support
+-- for SNMP V3 Windmanage Stack.
+-- 
+-- Revision submit_cheetah_1402/1 2002/10/29 22:43:24 rrekha
+-- bwmStatTcBufferUsed/bwmStatTcrBufferUsed and 
+-- bwmStatPortTcBufferUsed/bwmStatPortTcrBufferUsed should be of type
+-- integer instead of counter.
+-- 
+-- Revision submit_cheetah_796/1 2002/08/29 18:33:30 rrekha
+-- BWM contract and contract rate statistics are per port not
+-- per SP.
+-- 
+-- Revision submit_cheetah_776/1 2002/08/28 01:15:59 rrekha
+-- Added bwmCurCfgContractShaping/bwmNewCfgContractShaping.
+-- Modified some mib descriptions to better explain the variables.
+-- 
+-- Revision submit_cheetah_181/1 2002/06/24 18:23:45 rrekha
+-- Added mib object to clear BWM statistics.
+-- 
+-- Revision ch_1_0_0_dev/1 2002/04/23 21:46:59 smiao
+-- Renamed node cheetah to aws-switches.
+-- 
+-- Revision ch10latest_smiao/2 2002/02/13 01:41:23 smiao
+-- 	Initial checked in for cheetah MIB files.
+-- 
+-- Revision genie_rekha/8 2001/05/25 00:11:10 rekha
+-- 	Removed 'other' from enumerations.
+-- 
+-- Revision genie_rekha/6 2001/05/01 18:18:06 rekha
+-- 	Fixed CR11426: Modified policy buffer limit range to 8192-128000.
+-- 
+-- Revision genie_rekha/4 2001/05/01 00:27:35 rekha
+-- 	Fixed CR11422: Remove incorrect range for contract and policy
+-- 	tables. The range for these tables should be obtained via the 
+-- 	respective MaxEnt MIB objects.
+-- 
+-- Revision genie_rekha/2 2001/02/08 18:18:02 rekha
+-- 	As part of the code cleanup split the Tigon MIB into smaller
+-- 	modules. Instead of altswitch.mib these 5 new modules should be
+-- 	used.
+-- 
+-- $EndLog$
+-- 
+
+ALTEON-CHEETAH-BWM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32,
+    IpAddress    FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    aws-switch 
+        FROM ALTEON-ROOT-MIB;
+
+bwm MODULE-IDENTITY
+    LAST-UPDATED "200409010000Z" --  1 September, 2004
+    ORGANIZATION "Nortel Networks"
+    CONTACT-INFO "Rekha Singamsetty
+                  Suresh Batchu
+
+                  Nortel Networks
+                  4655 Great America Parkway
+                  Santa Clara CA 95054
+
+                  +1 408 495 2400
+                  rrekha@nortelnetworks.com
+                  sbatchu@nortelnetworks.com"
+    DESCRIPTION
+        "The MIB module for the Alteon OS BWM configuration, statistics and 
+         information ."
+    REVISION "200409010000Z"     -- 1 September, 2004
+    DESCRIPTION
+        "Added revision clause for SMIv2 compliance."
+    ::= { aws-switch 6 }
+
+bwmConfigs	  OBJECT IDENTIFIER ::= { bwm 1 }
+bwmStats	  OBJECT IDENTIFIER ::= { bwm 2 }
+bwmOpers	  OBJECT IDENTIFIER ::= { bwm 3 }
+
+bwmGeneralConfig        OBJECT IDENTIFIER ::= { bwmConfigs 1 }
+bwmPolicyConfig         OBJECT IDENTIFIER ::= { bwmConfigs 2 }
+bwmContractConfig       OBJECT IDENTIFIER ::= { bwmConfigs 3 }
+bwmContTimePolicyConfig OBJECT IDENTIFIER ::= { bwmConfigs 4 }
+bwmContractGroupConfig  OBJECT IDENTIFIER ::= { bwmConfigs 5 }
+
+bwmCurCfgGenState OBJECT-TYPE
+    SYNTAX INTEGER {
+	on(2),
+	off(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of BWM on the switch."
+    ::= { bwmGeneralConfig 1 }
+
+bwmNewCfgGenState OBJECT-TYPE
+    SYNTAX INTEGER {
+	on(2),
+	off(3)
+	}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The state of BWM in the switch."
+    ::= { bwmGeneralConfig 2 }
+
+bwmCurCfgGenEnforcePolicy OBJECT-TYPE
+    SYNTAX INTEGER {
+	enabled(2),
+	disabled(3)
+	}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of BWM enforce policies. When disabled, no bandwidth limits
+         will be applied on the queues."
+    ::= { bwmGeneralConfig 3 }
+
+bwmNewCfgGenEnforcePolicy OBJECT-TYPE
+    SYNTAX INTEGER {
+	enabled(2),
+	disabled(3)
+	}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The state of BWM enforce policies. When disabled, no bandwidth limits
+         will be applied on the queues."
+    ::= { bwmGeneralConfig 4 }
+
+bwmCurCfgGenSmtpUser OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..127))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The SMTP user name tp whom the history statistics will be mailed."
+    ::= { bwmGeneralConfig 5 }
+ 
+bwmNewCfgGenSmtpUser OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SMTP user name tp whom the history statistics will be mailed."
+    ::= { bwmGeneralConfig 6 }
+
+bwmCurCfgGenEmailFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..1440) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The frequency of BWM email in minutes." 
+    ::= { bwmGeneralConfig 7 }
+
+bwmNewCfgGenEmailFrequency OBJECT-TYPE
+    SYNTAX INTEGER (0..1440) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The frequency of BWM email in minutes." 
+    ::= { bwmGeneralConfig 8 }
+
+bwmCurCfgGenIPUserLimit OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..4))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of entries in the BWM IP user table in 64k|128k|256k|512k format." 
+    ::= { bwmGeneralConfig 9 }
+ 
+bwmNewCfgGenIPUserLimit OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..4))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of entries in the BWM IP user table in 64k|128k|256k|512k format." 
+    ::= { bwmGeneralConfig 10 }
+ 
+bwmCurCfgGenEmail OBJECT-TYPE
+    SYNTAX INTEGER {
+	enabled(2),
+	disabled(3)
+	}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies whether BWM history statistics are sent using email. 
+         When disabled, the history statistics are sent using socket based 
+         mechanism."
+    ::= { bwmGeneralConfig 11 }
+
+bwmNewCfgGenEmail OBJECT-TYPE
+    SYNTAX INTEGER {
+	enabled(2),
+	disabled(3)
+	}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies whether BWM history statistics are sent using email. 
+         When disabled, the history statistics are sent using socket based 
+         mechanism."
+    ::= { bwmGeneralConfig 12 }
+
+bwmCurCfgGenReport OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "IP address of the reporting server."
+    ::= { bwmGeneralConfig 13 }
+
+bwmNewCfgGenReport OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "IP address of the reporting server."
+    ::= { bwmGeneralConfig 14 }
+
+bwmPolicyTableMaxEnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of rows in the BWM policy configuration table."
+    ::= { bwmPolicyConfig 1 }
+
+bwmCurCfgPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmCurCfgPolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic policy configuration."
+    ::= { bwmPolicyConfig 2 }
+ 
+bwmCurCfgPolicyTableEntry OBJECT-TYPE
+    SYNTAX BwmCurCfgPolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic policy configuration table."
+    INDEX { bwmCurCfgPolicyIndx }
+    ::= { bwmCurCfgPolicyTable 1 }
+ 
+BwmCurCfgPolicyTableEntry ::= SEQUENCE {
+    bwmCurCfgPolicyIndx       Integer32,
+    bwmCurCfgPolicyTosIn      INTEGER,
+    bwmCurCfgPolicyTosOut     INTEGER,
+    bwmCurCfgPolicyHard       DisplayString,
+    bwmCurCfgPolicySoft       DisplayString,
+    bwmCurCfgPolicyResv       DisplayString,
+    bwmCurCfgPolicyUserLimit  DisplayString,
+    bwmCurCfgPolicyBuffer     INTEGER
+    }
+ 
+bwmCurCfgPolicyIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index of the row in BWM traffic policy configurations table."
+    ::= { bwmCurCfgPolicyTableEntry 1 }
+ 
+bwmCurCfgPolicyTosIn OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 'utos' value which overwrites the original TOS value if the 
+         traffic for this contract is under the soft limit. With this option
+         set to the default value of '0' the switch will not overwrite the
+         TOS value."
+    ::= { bwmCurCfgPolicyTableEntry 2 }
+
+bwmCurCfgPolicyTosOut OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 'otos' value which overwrites the original TOS value if the 
+         traffic is over the soft limit. With this option set to the default 
+         value of '0' the switch will not overwrite the TOS value."
+    ::= { bwmCurCfgPolicyTableEntry 3 }
+
+bwmCurCfgPolicyHard OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The hard bandwidth limit for this traffic policy. This is the highest
+         amount of bandwidth available to the policy."
+    ::= { bwmCurCfgPolicyTableEntry 4 }
+ 
+bwmCurCfgPolicySoft OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The soft bandwidth limit for this traffic policy."
+    ::= { bwmCurCfgPolicyTableEntry 5 }
+ 
+bwmCurCfgPolicyResv OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The reserve bandwidth limit for this traffic policy. This is the 
+         amount of bandwidth always available to this policy."
+    ::= { bwmCurCfgPolicyTableEntry 6 }
+ 
+bwmCurCfgPolicyBuffer OBJECT-TYPE
+    SYNTAX INTEGER (8192..128000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The buffer limit for the traffic policy."
+    ::= { bwmCurCfgPolicyTableEntry 7 }
+ 
+bwmCurCfgPolicyUserLimit OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The per user (IP address) bandwidth limit for this traffic policy.
+         This is the maximum amount of bandwidth available for each distinct
+	 user (IP address) if the contract performs per user rate limiting."
+    ::= { bwmCurCfgPolicyTableEntry 8 }
+
+
+bwmNewCfgPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmNewCfgPolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffi policy configuration."
+    ::= { bwmPolicyConfig 3 }
+ 
+bwmNewCfgPolicyTableEntry OBJECT-TYPE
+    SYNTAX BwmNewCfgPolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic policy configuration table."
+    INDEX   { bwmNewCfgPolicyIndx }
+    ::= { bwmNewCfgPolicyTable 1 }
+ 
+BwmNewCfgPolicyTableEntry ::= SEQUENCE {
+    bwmNewCfgPolicyIndx       Integer32,
+    bwmNewCfgPolicyTosIn      INTEGER,
+    bwmNewCfgPolicyTosOut     INTEGER,
+    bwmNewCfgPolicyHard       DisplayString,
+    bwmNewCfgPolicySoft       DisplayString,
+    bwmNewCfgPolicyResv       DisplayString,
+    bwmNewCfgPolicyBuffer     INTEGER,
+    bwmNewCfgPolicyUserLimit  DisplayString,
+    bwmNewCfgPolicyDelete     INTEGER
+    }
+
+bwmNewCfgPolicyIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index of the row in BWM traffic policy configurations table."
+    ::= { bwmNewCfgPolicyTableEntry 1 }
+ 
+bwmNewCfgPolicyTosIn OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The 'utos' value which overwrites the original TOS value if the 
+         traffic for this contract is under the soft limit. With this option
+         set to the default value of '0' the switch will not overwrite the
+         TOS value."
+    ::= { bwmNewCfgPolicyTableEntry 2 }
+
+bwmNewCfgPolicyTosOut OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The 'otos' value which overwrites the original TOS value if the 
+         traffic is over the soft limit. With this option set to the default 
+         value of '0' the switch will not overwrite the TOS value."
+    ::= { bwmNewCfgPolicyTableEntry 3 }
+
+bwmNewCfgPolicyHard OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5)) 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The hard bandwidth limit for this traffic policy. This is the highest
+         amount of bandwidth available to the policy."
+::= { bwmNewCfgPolicyTableEntry 4 }
+ 
+bwmNewCfgPolicySoft OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The soft bandwidth limit for this traffic policy."
+    ::= { bwmNewCfgPolicyTableEntry 5 }
+ 
+bwmNewCfgPolicyResv OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The reserve bandwidth limit for this traffic policy. This is the 
+         amount of bandwidth always available to this policy."
+    ::= { bwmNewCfgPolicyTableEntry 6 }
+ 
+bwmNewCfgPolicyBuffer OBJECT-TYPE
+    SYNTAX INTEGER (8192..128000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The buffer limit for the traffic policy."
+    ::= { bwmNewCfgPolicyTableEntry 7 }
+ 
+bwmNewCfgPolicyDelete OBJECT-TYPE
+    SYNTAX INTEGER { 
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row
+	 is deleted. When read, other(1) is returned. Setting the value
+	 to anything other than 2(delete) has no effect on the state
+	 of the row."
+    ::= { bwmNewCfgPolicyTableEntry 8 }
+
+bwmNewCfgPolicyUserLimit OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..5))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The per user (IP address) bandwidth limit for this traffic policy.
+         This is the maximum amount of bandwidth available for each distinct
+	 user (IP address) if the contract performs per user rate limiting."
+    ::= { bwmNewCfgPolicyTableEntry 9 }
+
+ 
+-- BWM Contract Config Table
+ 
+bwmContractTableMaxEnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of rows in the BWM contract configuration table."
+    ::= { bwmContractConfig 1 }
+ 
+bwmCurCfgContractTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmContractCurCfgTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic contract configuration."
+    ::= { bwmContractConfig 2 }
+ 
+bwmCurCfgContractTableEntry OBJECT-TYPE
+    SYNTAX BwmContractCurCfgTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic contract configuration table."
+    INDEX   { bwmCurCfgContractIndx }
+    ::= { bwmCurCfgContractTable 1 }
+ 
+BwmContractCurCfgTableEntry ::= SEQUENCE {
+    bwmCurCfgContractIndx        Integer32,
+    bwmCurCfgContractName        DisplayString,
+    bwmCurCfgContractState       INTEGER,
+    bwmCurCfgContractPolicy      Integer32,
+    bwmCurCfgContractPrec	 INTEGER,
+    bwmCurCfgContractUseTos      INTEGER,
+    bwmCurCfgContractHistory     INTEGER,
+    bwmCurCfgContractShaping     INTEGER,
+    bwmCurCfgContractResizeTcp   INTEGER,
+    bwmCurCfgContractIpLimit     INTEGER,
+    bwmCurCfgContractIpType      INTEGER,
+    bwmCurCfgContractMonitorMode INTEGER,
+    bwmCurCfgContractMaxSess     INTEGER,
+    bwmCurCfgContractGroup       Integer32
+    }
+ 
+bwmCurCfgContractIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index of the row in BWM traffic contract configurations table."
+    ::= { bwmCurCfgContractTableEntry 1 }
+ 
+bwmCurCfgContractName   OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The traffic contract name."
+    ::= { bwmCurCfgContractTableEntry 2 }
+ 
+bwmCurCfgContractState OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This is the state of the traffic contract."
+    ::= { bwmCurCfgContractTableEntry 3 }
+ 
+bwmCurCfgContractPolicy OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The policy number of the traffic contract"
+    ::= { bwmCurCfgContractTableEntry 4 }
+ 
+bwmCurCfgContractPrec OBJECT-TYPE
+    SYNTAX INTEGER (1..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The precedence value of the traffic contract"
+    ::= { bwmCurCfgContractTableEntry 5 }
+ 
+bwmCurCfgContractUseTos OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable overwriting the IP Type Of Service (TOS) for this 
+         traffic contract."
+    ::= { bwmCurCfgContractTableEntry 6 }
+ 
+bwmCurCfgContractHistory OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable saving statistics for this contract on the TFTP 
+         server."
+    ::= { bwmCurCfgContractTableEntry 7 }
+ 
+bwmCurCfgContractShaping OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable traffic shaping for this contract."
+    ::= { bwmCurCfgContractTableEntry 8 }
+
+bwmCurCfgContractResizeTcp OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable overwriting the TCP window size for this 
+         traffic contract."
+    ::= { bwmCurCfgContractTableEntry 9 }
+ 
+bwmCurCfgContractIpLimit OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable per user rate limiting based on IP address
+         for this traffic contract."
+    ::= { bwmCurCfgContractTableEntry 10 }
+ 
+bwmCurCfgContractIpType OBJECT-TYPE
+    SYNTAX INTEGER {
+	sip(1),
+	dip(2)
+	}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Per user rate limiting done based on source/destination
+	 IP address."
+    ::= { bwmCurCfgContractTableEntry 11 }
+ 
+bwmCurCfgContractMonitorMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable monitor-only mode for this contract."
+    ::= { bwmCurCfgContractTableEntry 12 }
+
+bwmCurCfgContractGroup OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The group number of the contract (zero if not part of a group)"
+    ::= { bwmCurCfgContractTableEntry 13 }
+
+
+bwmCurCfgContractMaxSess OBJECT-TYPE
+    SYNTAX INTEGER(0..65534) 
+    MAX-ACCESS read-only 
+    STATUS current
+    DESCRIPTION
+        "Maximum number of sessions per user or contract."
+    ::= { bwmCurCfgContractTableEntry 15 }
+ 
+bwmNewCfgContractTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmContractNewCfgTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic contract configuration."
+    ::= { bwmContractConfig 3 }
+ 
+bwmNewCfgContractTableEntry OBJECT-TYPE
+    SYNTAX BwmContractNewCfgTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic contract configuration table."
+    INDEX { bwmNewCfgContractIndx }
+    ::= { bwmNewCfgContractTable 1 }
+ 
+BwmContractNewCfgTableEntry ::= SEQUENCE {
+    bwmNewCfgContractIndx        Integer32,
+    bwmNewCfgContractName        DisplayString,
+    bwmNewCfgContractState       INTEGER,
+    bwmNewCfgContractPolicy      Integer32,
+    bwmNewCfgContractDelete      INTEGER,
+    bwmNewCfgContractPrec	 INTEGER,
+    bwmNewCfgContractUseTos      INTEGER,
+    bwmNewCfgContractHistory     INTEGER,
+    bwmNewCfgContractShaping     INTEGER,
+    bwmNewCfgContractResizeTcp   INTEGER,
+    bwmNewCfgContractIpLimit     INTEGER,
+    bwmNewCfgContractIpType      INTEGER,
+    bwmNewCfgContractMonitorMode INTEGER,
+    bwmNewCfgContractMaxSess     INTEGER,
+    bwmNewCfgContractGroup       Integer32
+    }
+ 
+bwmNewCfgContractIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index of the row in BWM traffic contract configuration table."
+    ::= { bwmNewCfgContractTableEntry 1 }
+
+bwmNewCfgContractName   OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The traffic contract name."
+    ::= { bwmNewCfgContractTableEntry 2 }
+ 
+bwmNewCfgContractState OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This is the state of the traffic contract."
+    ::= { bwmNewCfgContractTableEntry 3 }
+ 
+bwmNewCfgContractPolicy OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This is policy number of the traffic contract"
+    ::= { bwmNewCfgContractTableEntry 4 }
+ 
+bwmNewCfgContractDelete OBJECT-TYPE
+    SYNTAX INTEGER  {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row
+         is deleted. When read, other(1) is returned. Setting the value
+         to anything other than 2(delete) has no effect on the state
+         of the row."
+    ::= { bwmNewCfgContractTableEntry 5 }
+ 
+bwmNewCfgContractPrec OBJECT-TYPE
+    SYNTAX INTEGER (1..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The precedence value of the traffic contract"
+    ::= { bwmNewCfgContractTableEntry 6 }
+ 
+bwmNewCfgContractUseTos OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable overwriting the IP Type Of Service (TOS) for this 
+         traffic contract."
+    ::= { bwmNewCfgContractTableEntry 7 }
+ 
+bwmNewCfgContractHistory OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable saving statistics for this contract on the TFTP 
+         server."
+    ::= { bwmNewCfgContractTableEntry 8 }
+ 
+bwmNewCfgContractShaping OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable traffic shaping for this contract."
+    ::= { bwmNewCfgContractTableEntry 9 }
+
+bwmNewCfgContractResizeTcp OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable overwriting the TCP window size for this 
+         traffic contract."
+    ::= { bwmNewCfgContractTableEntry 10 }
+ 
+bwmNewCfgContractIpLimit OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable per user rate limiting based on IP address
+         for this traffic contract."
+    ::= { bwmNewCfgContractTableEntry 11 }
+ 
+bwmNewCfgContractIpType OBJECT-TYPE
+    SYNTAX INTEGER {
+	sip(1),
+	dip(2)
+	}
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Per user rate limiting done based on source/destination
+	 IP address."
+    ::= { bwmNewCfgContractTableEntry 12 }
+ 
+bwmNewCfgContractMonitorMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Enable/disable monitor-only mode for this contract."
+    ::= { bwmNewCfgContractTableEntry 13 }
+
+bwmNewCfgContractGroup OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The group number of the contract (zero if not part of a group)"
+    ::= { bwmNewCfgContractTableEntry 14 }
+
+
+bwmNewCfgContractMaxSess OBJECT-TYPE
+    SYNTAX INTEGER(0..65534)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Maximum number of sessions per user or contract."
+    ::= { bwmNewCfgContractTableEntry 16 }
+ 
+-- BWM Contract Time Policy Config Table
+ 
+bwmContTimePolicyTableMaxEnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of rows in the BWM contract configuration table."
+    ::= { bwmContTimePolicyConfig 1 }
+ 
+bwmCurCfgContTimePolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmCurCfgContTimePolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic contract time policy configuration."
+    ::= { bwmContTimePolicyConfig 2 }
+ 
+bwmCurCfgContTimePolicyTableEntry OBJECT-TYPE
+    SYNTAX BwmCurCfgContTimePolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM contract time policy configuration table."
+    INDEX   { bwmCurCfgContTimePolicyContIndx, bwmCurCfgContTimePolicyIndx }
+    ::= { bwmCurCfgContTimePolicyTable 1 }
+ 
+BwmCurCfgContTimePolicyTableEntry ::= SEQUENCE {
+    bwmCurCfgContTimePolicyContIndx   Integer32,
+    bwmCurCfgContTimePolicyIndx       Integer32,
+    bwmCurCfgContTimePolicyDay        INTEGER,
+    bwmCurCfgContTimePolicyFrom       INTEGER,
+    bwmCurCfgContTimePolicyTo         INTEGER,
+    bwmCurCfgContTimePolicyPol        Integer32,
+    bwmCurCfgContTimePolicyState      INTEGER
+    }
+ 
+bwmCurCfgContTimePolicyContIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM contract number of the contract time policy."
+    ::= { bwmCurCfgContTimePolicyTableEntry 1 }
+ 
+bwmCurCfgContTimePolicyIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy number of the contract time policy."
+    ::= { bwmCurCfgContTimePolicyTableEntry 2 }
+ 
+bwmCurCfgContTimePolicyDay OBJECT-TYPE
+    SYNTAX INTEGER {
+        sunday(1),
+        monday(2),
+        tuesday(3),
+        wednesday(4),
+        thursday(5),
+        friday(6),
+        saturday(7),
+        weekday(8),
+        weekend(9),
+        everyday(10)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy day."
+    ::= { bwmCurCfgContTimePolicyTableEntry 3 }
+ 
+bwmCurCfgContTimePolicyFrom OBJECT-TYPE
+    SYNTAX INTEGER (0..24)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy starting time in hours"
+    ::= { bwmCurCfgContTimePolicyTableEntry 4 }
+ 
+bwmCurCfgContTimePolicyTo OBJECT-TYPE
+    SYNTAX INTEGER (0..24)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy ending time in hours"
+    ::= { bwmCurCfgContTimePolicyTableEntry 5 }
+ 
+bwmCurCfgContTimePolicyPol OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The policy number of the traffic contract time policy"
+    ::= { bwmCurCfgContTimePolicyTableEntry 6 }
+ 
+bwmCurCfgContTimePolicyState OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the contract time policy."
+    ::= { bwmCurCfgContTimePolicyTableEntry 7 }
+ 
+bwmNewCfgContTimePolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmNewCfgContTimePolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic contract time policy configuration."
+    ::= { bwmContTimePolicyConfig 3 }
+ 
+bwmNewCfgContTimePolicyTableEntry OBJECT-TYPE
+    SYNTAX BwmNewCfgContTimePolicyTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM contract time policy configuration table."
+    INDEX   { bwmNewCfgContTimePolicyContIndx, bwmNewCfgContTimePolicyIndx }
+    ::= { bwmNewCfgContTimePolicyTable 1 }
+ 
+BwmNewCfgContTimePolicyTableEntry ::= SEQUENCE {
+    bwmNewCfgContTimePolicyContIndx   Integer32,
+    bwmNewCfgContTimePolicyIndx       Integer32,
+    bwmNewCfgContTimePolicyDay        INTEGER,
+    bwmNewCfgContTimePolicyFrom       INTEGER,
+    bwmNewCfgContTimePolicyTo         INTEGER,
+    bwmNewCfgContTimePolicyPol        Integer32,
+    bwmNewCfgContTimePolicyState      INTEGER,
+    bwmNewCfgContTimePolicyDelete     INTEGER
+    }
+ 
+bwmNewCfgContTimePolicyContIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM contract number of the contract time policy."
+    ::= { bwmNewCfgContTimePolicyTableEntry 1 }
+ 
+bwmNewCfgContTimePolicyIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy number of the contract time policy."
+    ::= { bwmNewCfgContTimePolicyTableEntry 2 }
+ 
+bwmNewCfgContTimePolicyDay OBJECT-TYPE
+    SYNTAX INTEGER {
+        sunday(1),
+        monday(2),
+        tuesday(3),
+        wednesday(4),
+        thursday(5),
+        friday(6),
+        saturday(7),
+        weekday(8),
+        weekend(9),
+        everyday(10)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy day."
+    ::= { bwmNewCfgContTimePolicyTableEntry 3 }
+ 
+bwmNewCfgContTimePolicyFrom OBJECT-TYPE
+    SYNTAX INTEGER (0..24)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy starting time in hours"
+    ::= { bwmNewCfgContTimePolicyTableEntry 4 }
+ 
+bwmNewCfgContTimePolicyTo OBJECT-TYPE
+    SYNTAX INTEGER (0..24)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The BWM time policy ending time in hours"
+    ::= { bwmNewCfgContTimePolicyTableEntry 5 }
+ 
+bwmNewCfgContTimePolicyPol OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The policy number of the traffic contract time policy"
+    ::= { bwmNewCfgContTimePolicyTableEntry 6 }
+ 
+bwmNewCfgContTimePolicyState OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The state of the contract time policy."
+    ::= { bwmNewCfgContTimePolicyTableEntry 7 }
+ 
+bwmNewCfgContTimePolicyDelete OBJECT-TYPE
+    SYNTAX INTEGER  {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row
+         is deleted. When read, other(1) is returned. Setting the value
+         to anything other than 2(delete) has no effect on the state
+         of the row."
+    ::= { bwmNewCfgContTimePolicyTableEntry 8 }
+ 
+-- BWM Contract Group Config Table
+
+bwmContractGroupTableMaxEnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of rows in BWM contract group configuration table."
+    ::= { bwmContractGroupConfig 1 }
+ 
+bwmCurCfgContractGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmCurCfgContractGroupTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic contract group configuration."
+    ::= { bwmContractGroupConfig 2 }
+ 
+bwmCurCfgContractGroupTableEntry OBJECT-TYPE
+    SYNTAX BwmCurCfgContractGroupTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM contract group configuration table."
+    INDEX   { bwmCurCfgContractGroupIndx }
+    ::= { bwmCurCfgContractGroupTable 1 }
+ 
+BwmCurCfgContractGroupTableEntry ::= SEQUENCE {
+    bwmCurCfgContractGroupIndx       Integer32,
+    bwmCurCfgContractGroupContracts  OCTET STRING,
+    bwmCurCfgContractGroupName       DisplayString
+    }
+ 
+bwmCurCfgContractGroupIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM contract group number."
+    ::= { bwmCurCfgContractGroupTableEntry 1 }
+ 
+bwmCurCfgContractGroupContracts OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM contracts in the group.  The contracts are presented
+         in bitmap format.
+
+         in receiving order:
+
+             OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             |     || |_ contract 9
+             |     ||  
+             |     ||___ contract 8
+             |     |____ contract 7
+             |       .    .   .
+             |__________ contract 1
+ 
+         where x : 1 - The represented contract belongs to the group
+                   0 - The represented contract does not belong to the group"
+    ::= { bwmCurCfgContractGroupTableEntry 2 }
+ 
+bwmCurCfgContractGroupName   OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The traffic contract group name."
+    ::= { bwmCurCfgContractGroupTableEntry 3 }
+ 
+bwmNewCfgContractGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmNewCfgContractGroupTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic contract group configuration."
+    ::= { bwmContractGroupConfig 3 }
+ 
+bwmNewCfgContractGroupTableEntry OBJECT-TYPE
+    SYNTAX BwmNewCfgContractGroupTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM contract group configuration table."
+    INDEX   { bwmNewCfgContractGroupIndx }
+    ::= { bwmNewCfgContractGroupTable 1 }
+ 
+BwmNewCfgContractGroupTableEntry ::= SEQUENCE {
+    bwmNewCfgContractGroupIndx       Integer32,
+    bwmNewCfgContractGroupContracts  OCTET STRING,
+    bwmNewCfgContractGroupAddCont    Integer32,
+    bwmNewCfgContractGroupRemCont    Integer32,
+    bwmNewCfgContractGroupDelete     INTEGER,
+    bwmNewCfgContractGroupName       DisplayString
+    }
+ 
+bwmNewCfgContractGroupIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM contract group number."
+    ::= { bwmNewCfgContractGroupTableEntry 1 }
+ 
+bwmNewCfgContractGroupContracts OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM contracts in the group.  The contracts are presented
+         in bitmap format.
+
+         in receiving order:
+
+             OCTET 1  OCTET 2  .....
+             xxxxxxxx xxxxxxxx ..... 
+             |     || |_ contract 9
+             |     ||  
+             |     ||___ contract 8
+             |     |____ contract 7
+             |       .    .   .
+             |__________ contract 1
+ 
+         where x : 1 - The represented contract belongs to the group
+                   0 - The represented contract does not belong to the group"
+    ::= { bwmNewCfgContractGroupTableEntry 2 }
+ 
+bwmNewCfgContractGroupAddCont OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The BWM contract to be added to the group. A zero value
+         is returned when read."
+    ::= { bwmNewCfgContractGroupTableEntry 3 }
+ 
+bwmNewCfgContractGroupRemCont OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The BWM contract to be removed from the group. A zero value
+         is returned when read."
+    ::= { bwmNewCfgContractGroupTableEntry 4 }
+ 
+
+bwmNewCfgContractGroupDelete OBJECT-TYPE
+    SYNTAX INTEGER  {
+        other(1),
+        delete(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row
+         is deleted. When read, other(1) is returned. Setting the value
+         to anything other than 2(delete) has no effect on the state
+         of the row."
+    ::= { bwmNewCfgContractGroupTableEntry 5 } 
+
+bwmNewCfgContractGroupName   OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The traffic contract group name."
+    ::= { bwmNewCfgContractGroupTableEntry 6 }
+ 
+bwmContractGroupTableMaxCont OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of contracts in any BWM contract group."
+    ::= { bwmContractGroupConfig 4 }
+
+-- Statistics
+
+-- BWM Traffic Contract Statistics Table
+ 
+bwmStatTcTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmStatTcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of Bandwidth Management Traffic Contract statistics." 
+    ::= { bwmStats 1 }
+ 
+bwmStatTcEntry OBJECT-TYPE
+    SYNTAX BwmStatTcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic contract table."
+    INDEX { bwmStatTcContractIndex }
+    ::= { bwmStatTcTable 1 }
+
+BwmStatTcEntry ::= SEQUENCE {
+    bwmStatTcContractIndex     Integer32,
+    bwmStatTcName              DisplayString,
+    bwmStatTcOutoct            Counter32,
+    bwmStatTcOutdisoct         Counter32,
+    bwmStatTcBufferUsed        Integer32,
+    bwmStatTcTotalPackets      Counter32,
+    bwmStatTcSessRejected      Counter32,
+    bwmStatTcBufferMax         Counter32 
+    }
+ 
+bwmStatTcContractIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The contract queue number for which the statistics apply."
+    ::= { bwmStatTcEntry 1 }
+ 
+bwmStatTcName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the traffic contract queue."
+    ::= { bwmStatTcEntry 2 }
+ 
+bwmStatTcOutoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets sent out from the traffic contract queue."
+    ::= { bwmStatTcEntry 3 }
+ 
+bwmStatTcOutdisoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets dropped from the traffic contract queue."
+    ::= { bwmStatTcEntry 4 }
+ 
+bwmStatTcBufferUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers used by the traffic contract queue."
+    ::= { bwmStatTcEntry 5 }
+ 
+bwmStatTcBufferMax OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers assigned to the traffic contract queue."
+    ::= { bwmStatTcEntry 6 }
+
+bwmStatTcTotalPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of packets for a particular contract."
+    ::= { bwmStatTcEntry 7 }
+ 
+bwmStatTcSessRejected OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of sessions rejected for a particular contract."
+    ::= { bwmStatTcEntry 8 }
+
+
+-- BWM Traffic Contract Rate Statistics Table
+ 
+bwmStatTcrTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmStatTcrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of Bandwidth Management Traffic Contract Rate statistics."
+    ::= { bwmStats 2 }
+ 
+bwmStatTcrEntry OBJECT-TYPE
+    SYNTAX BwmStatTcrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic contract rate table."
+    INDEX { bwmStatTcrContractIndex }
+    ::= { bwmStatTcrTable 1 }
+ 
+BwmStatTcrEntry ::= SEQUENCE {
+    bwmStatTcrContractIndex     Integer32,
+    bwmStatTcrName              DisplayString,
+    bwmStatTcrRate              Integer32,
+    bwmStatTcrOutoct            Counter32,
+    bwmStatTcrOutdisoct         Counter32,
+    bwmStatTcrBufferUsed        Integer32,
+    bwmStatTcrTotalPackets      Counter32,
+    bwmStatTcrBufferMax         Counter32
+    }
+ 
+bwmStatTcrContractIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The contract queue number for which the statistics apply."
+    ::= { bwmStatTcrEntry 1 }
+ 
+bwmStatTcrName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the traffic contract queue."
+    ::= { bwmStatTcrEntry 2 }
+ 
+bwmStatTcrRate OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The rate of octets sent out from the traffic contract queue."
+    ::= { bwmStatTcrEntry 3 }
+ 
+bwmStatTcrOutoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The of octets sent out from the traffic contract queue."
+    ::= { bwmStatTcrEntry 4 }
+ 
+bwmStatTcrOutdisoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets dropped from the traffic contract queue."
+    ::= { bwmStatTcrEntry 5 }
+
+bwmStatTcrBufferUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers used by the traffic contract queue."
+    ::= { bwmStatTcrEntry 6 }
+ 
+bwmStatTcrBufferMax OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers assigned to the traffic contract queue."
+    ::= { bwmStatTcrEntry 7 }
+
+bwmStatTcrTotalPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of packets for a particular contract."
+    ::= { bwmStatTcrEntry 8 }
+
+-- BWM Switch Port Traffic Contract Statistics Table
+ 
+bwmStatPortTcTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmStatPortTcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM Switch Port Traffic Contract statistics."
+    ::= { bwmStats 3 }
+ 
+bwmStatPortTcEntry OBJECT-TYPE
+    SYNTAX BwmStatPortTcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "A row in the BWM SP traffic contract table."
+    INDEX   { bwmStatPortTcPortIndex, bwmStatPortTcContractIndex }
+    ::= { bwmStatPortTcTable 1 }
+ 
+BwmStatPortTcEntry ::= SEQUENCE {
+    bwmStatPortTcPortIndex          Integer32,
+    bwmStatPortTcContractIndex      Integer32,
+    bwmStatPortTcName               DisplayString,
+    bwmStatPortTcOutoct             Counter32,
+    bwmStatPortTcOutdisoct          Counter32,
+    bwmStatPortTcBufferUsed         Integer32,
+    bwmStatPortTcTotalPackets       Counter32,
+    bwmStatPortTcBufferMax          Counter32
+    }
+ 
+bwmStatPortTcPortIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Switch Port number for which the statistics apply."
+    ::= { bwmStatPortTcEntry 1 }
+ 
+bwmStatPortTcContractIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The contract queue number for which the statistics apply."
+    ::= { bwmStatPortTcEntry 2 }
+ 
+bwmStatPortTcName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the traffic contract queue."
+    ::= { bwmStatPortTcEntry 3 }
+ 
+bwmStatPortTcOutoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets sent out from the traffic contract queue."
+    ::= { bwmStatPortTcEntry 4 }
+ 
+bwmStatPortTcOutdisoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets dropped from the traffic contract queue."
+    ::= { bwmStatPortTcEntry 5 }
+ 
+bwmStatPortTcBufferUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers used by the traffic contract queue."
+    ::= { bwmStatPortTcEntry 6 }
+ 
+bwmStatPortTcBufferMax OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers assigned to the traffic contract queue."
+    ::= { bwmStatPortTcEntry 7 }
+
+bwmStatPortTcTotalPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of packets for a particular contract."
+    ::= { bwmStatPortTcEntry 8 }
+ 
+-- BWM Switch Port Traffic Contract Rate Statistics Table
+ 
+bwmStatPortTcrTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmStatPortTcrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of Bandwidth Management Switch Port Traffic Contract Rate 
+         statistics."
+    ::= { bwmStats 4 }
+ 
+bwmStatPortTcrEntry OBJECT-TYPE
+    SYNTAX BwmStatPortTcrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic contract rate table."
+    INDEX { bwmStatPortTcrPortIndex, bwmStatPortTcrContractIndex }
+    ::= { bwmStatPortTcrTable 1 }
+ 
+BwmStatPortTcrEntry ::= SEQUENCE {
+    bwmStatPortTcrPortIndex          Integer32,
+    bwmStatPortTcrContractIndex      Integer32,
+    bwmStatPortTcrName               DisplayString,
+    bwmStatPortTcrRate               Integer32,
+    bwmStatPortTcrOutoct             Counter32,
+    bwmStatPortTcrOutdisoct          Counter32,
+    bwmStatPortTcrBufferUsed         Integer32,
+    bwmStatPortTcrTotalPackets       Counter32,
+    bwmStatPortTcrBufferMax          Counter32
+    }
+ 
+bwmStatPortTcrPortIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The switch port number for which the statistics apply."
+    ::= { bwmStatPortTcrEntry 1 }
+ 
+bwmStatPortTcrContractIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The contract queue number for which the statistics apply."
+    ::= { bwmStatPortTcrEntry 2 }
+ 
+bwmStatPortTcrName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the traffic contract queue."
+    ::= { bwmStatPortTcrEntry 3 }
+ 
+bwmStatPortTcrRate OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The rate of octets sent out from the traffic contract queue."
+    ::= { bwmStatPortTcrEntry 4 }
+ 
+bwmStatPortTcrOutoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The of octets sent out from the traffic contract queue."
+    ::= { bwmStatPortTcrEntry 5 }
+ 
+bwmStatPortTcrOutdisoct OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets dropped from the traffic contract queue."
+    ::= { bwmStatPortTcrEntry 6 }
+ 
+bwmStatPortTcrBufferUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers used by the traffic contract queue."
+    ::= { bwmStatPortTcrEntry 7 }
+ 
+bwmStatPortTcrBufferMax OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of buffers assigned to the traffic contract queue."
+    ::= { bwmStatPortTcrEntry 8 }
+
+bwmStatPortTcrTotalPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of packets for a particular contract."
+    ::= { bwmStatPortTcrEntry 9 }
+
+bwmStatsClear OBJECT-TYPE
+    SYNTAX INTEGER {
+	ok(1),
+	clear(2)
+	}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This is an action object to clear the BWM statistics. 
+         ok(1) is returned when read."
+    ::= { bwmStats 5 }
+
+
+-- Bandwidth Management - Operational Commands
+  
+bwmOperSendSMTP OBJECT-TYPE
+    SYNTAX INTEGER {
+	other(1),
+	send(2)
+	}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This is an action object to send BWM history to SMTP server. 
+         other(1) is returned when read."
+    ::= { bwmOpers 1 }
+
+END

@@ -1,0 +1,122 @@
+-- This module defines enterprise MIBs for security zones
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-ZONE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenZone
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenZoneMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         the security zones"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "no comment"
+    REVISION      "200005080000Z" -- May 08, 2000
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenZone 0 }
+
+NsZoneCfgEntry ::= SEQUENCE
+{
+    nsZoneCfgId   Integer32,
+    nsZoneCfgName DisplayString,
+    nsZoneCfgType INTEGER,
+    nsZoneCfgVsys Integer32
+}
+
+nsZoneCfg OBJECT IDENTIFIER ::= { netscreenZone 1 }
+
+nsZoneCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsZoneCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen device can have lots of secure zone. This table
+         collects the zones exiting in NetScreen device."
+    ::= { nsZoneCfg 1 }
+
+nsZoneCfgEntry OBJECT-TYPE
+    SYNTAX        NsZoneCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the table holds a set of configuration
+         parameters associated  with an instance of secure zone."
+    INDEX
+        { nsZoneCfgId }
+    ::= { nsZoneCfgTable 1 }
+
+nsZoneCfgId OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for zone table.  Its value ranges between 1 and
+         65535 and may not be contiguous.  the index has no other
+         meaning but a pure index"
+    ::= { nsZoneCfgEntry 1 }
+
+nsZoneCfgName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure zone name."
+    ::= { nsZoneCfgEntry 2 }
+
+nsZoneCfgType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        regular(0),
+        layer2(1),
+        tunnel(2),
+        null(3),
+        func(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure zone type. Regular is sec(L3) and layer2 is sec(L2) type"
+    ::= { nsZoneCfgEntry 3 }
+
+nsZoneCfgVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VSYS this security zone belongs to."
+    ::= { nsZoneCfgEntry 4 }
+END
+
+

@@ -1,0 +1,948 @@
+CTRON-FDDI-FNB-MIB DEFINITIONS ::= BEGIN
+
+        --  CTRON-FDDI-FNB-mib.txt The FDDI FNB backplane control MIB
+        --  Revision: 1.01.00
+        --  Date: September 13, 1995 
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific connection MIB.
+        --
+        --  This module will be extended, as needed.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+        IMPORTS
+                Counter
+                        FROM RFC1155-SMI
+                ctFDDIFnb
+                        FROM CTRON-MIB-NAMES
+                DisplayString
+                        FROM RFC1213-MIB
+                OBJECT-TYPE
+                        FROM RFC-1212;
+
+        --  DisplayString ::= OCTET STRING
+
+
+--  This MIB module uses the extended OBJECT-TYPE macro as defined
+--  RFC 1212
+
+
+        --======    group definitions     ===========
+
+        ctFDDIResource  OBJECT IDENTIFIER ::= { ctFDDIFnb 1 }
+        ctFDDINonMux    OBJECT IDENTIFIER ::= { ctFDDIFnb 2 }
+        ctFDDIMux       OBJECT IDENTIFIER ::= { ctFDDIFnb 3 }
+        ctFDDISerialConfig      OBJECT IDENTIFIER ::= { ctFDDIFnb 4 }
+
+        --=====    ctFDDIResource group       ========
+        
+        
+        ctFDDIResourceTable     OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDIResourceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table specifies the physical resources
+                associated with the FNB and general FNB operation for a 
+                particular module in a particular slot."
+        ::= { ctFDDIResource 1 }
+
+        ctFDDIResourceEntry     OBJECT-TYPE
+            SYNTAX      CtFDDIResourceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines a specific physical resource entry"
+            INDEX { ctFDDIResourceSlotID, ctFDDIResourceID }
+        ::= { ctFDDIResourceTable 1 }
+
+        CtFDDIResourceEntry     ::= SEQUENCE {
+                ctFDDIResourceSlotID
+                        INTEGER,
+                ctFDDIResourceID
+                        INTEGER,
+                ctFDDIResourceType
+                        OBJECT IDENTIFIER,
+                ctFDDIResourceNumbInstance
+                        INTEGER
+                }
+
+        ctFDDIResourceSlotID    OBJECT-TYPE
+            SYNTAX      INTEGER (1..255)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific instance of a slot as defined by chSlotID
+                as defined in the chassis MIB."
+        ::= { ctFDDIResourceEntry 1 }
+
+        ctFDDIResourceID        OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A unique index that defines a specific physcial resource for
+                which this relationship exists.  The value of this is as
+                defined by chResourceID in the chassis MIB."
+        ::= { ctFDDIResourceEntry 2 }
+
+        ctFDDIResourceType      OBJECT-TYPE
+            SYNTAX      OBJECT IDENTIFIER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines the type of resource.  This is the same value as
+                chResourceType in the chassis MIB."
+            ::= { ctFDDIResourceEntry 3 }
+
+        ctFDDIResourceNumbInstance      OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "This object defines the number of instances of a physical
+                resource.
+
+                Specific resource instances are physically located from 
+                top-to-bottom on a particular module. If there are multiple 
+                'columns' of a resource from the top to the bottom, then 
+                the numbering will start from the left side and proceed 
+                top-to-bottom in each column.
+
+                For instance, the first FNB ring will be instance 1 (top 
+                in the chassis) while the second FNB ring is instance 2 
+                (below FNB 1 in the backplane)."
+        ::= { ctFDDIResourceEntry 4 }
+
+--      The ctFDDINonMuxGroup
+--      This group pertains to all devices that provide FDDI conectivity
+--      which are not multiplexed.
+
+        ctFDDINonMuxCapTable    OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDINonMuxCapEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table describes all possible capabilities/configurations
+                for all non-muxed FDDI configurations within the chassis."
+        ::= { ctFDDINonMux 1 }
+
+        ctFDDINonMuxCapEntry    OBJECT-TYPE
+            SYNTAX      CtFDDINonMuxCapEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a particular capability/configuration entry."
+            INDEX { ctFDDINMSlot, ctFDDINMConfigID }
+            ::= { ctFDDINonMuxCapTable 1 }
+
+        CtFDDINonMuxCapEntry    ::= SEQUENCE {
+                ctFDDINMSlot
+                        INTEGER,
+                ctFDDINMConfigID
+                        INTEGER,
+                ctFDDINMConfig
+                        DisplayString,
+                ctFDDINMConfigDesc
+                        DisplayString
+                }
+
+        ctFDDINMSlot    OBJECT-TYPE
+            SYNTAX      INTEGER (1..256)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The slot within the chassis for which this 
+                configuration information is defined."
+            ::= { ctFDDINonMuxCapEntry 1 }
+
+        ctFDDINMConfigID        OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The instance of a particular configuration."
+            ::= { ctFDDINonMuxCapEntry 2 }
+
+        ctFDDINMConfig  OBJECT-TYPE
+            SYNTAX      DisplayString
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "This object defines a specific valid connection
+                configuration.  It will specify the connection state of all 
+                resource instances.  If an instance of a resource is
+                not specified, then it is disconnected.
+
+                Each valid configuration is encoded in an ascii string, using 
+                a specified format for interpretation.  The connection 
+                specifications are in groups of four where each group defines 
+                a specific connection configuration.  The terms of a connection
+                group is defined as follows:
+
+                        1st - The resource ID as defined by 
+                        ctFDDIResourceID.
+
+                        2nd - A specific instance of the physical 
+                        resource.  This will be a value between 1 and 
+                        ctFDDIResourceNumbInstance for the particular 
+                        resource ID in the first term.  If a resource ID
+                        has more than one specific resource instance, but
+                        the whole resource can be connected, then this 
+                        term will have the value '0' to signify all instances 
+                        of the resource.
+
+                        3rd - The connection ID for this specific 
+                        physical resource.  This value is the same as 
+                        ctFDDINMConnectionID, and through the 
+                        ctFDDINonMuxConnectionTable maps to a specific
+                        instance of SMT and MAC.
+
+                For example if the value of this object is '1.1.2.2.1.1',
+                then it states that resource 1, instance 1 is connected to 
+                connection ID 2 and resource 2, instance 1 is connected to 
+                connection ID 1 and is inserted into its FDDI ring.
+
+                If a valid configuration is no connections then this 
+                object will have a value of '0.0.0'"
+            ::= { ctFDDINonMuxCapEntry 3 }
+
+        ctFDDINMConfigDesc      OBJECT-TYPE
+            SYNTAX      DisplayString
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "This object contains a textual description of a valid 
+                connection configuration.  This is a more user-friendly 
+                representation of the configuration than the ctFDDINMConfig
+                object."
+            ::= { ctFDDINonMuxCapEntry 4 } 
+
+
+        ctFDDINonMuxCapEnableTable      OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDINonMuxCapEnableEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table describes the currently enabled configuration
+                for each module."
+            ::= { ctFDDINonMux 2 }
+
+        ctFDDINonMuxCapEnableEntry      OBJECT-TYPE
+            SYNTAX      CtFDDINonMuxCapEnableEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a specific configuration enable entry."
+            INDEX { ctFDDINMEnableSlot }
+            ::= { ctFDDINonMuxCapEnableTable 1 }
+
+        CtFDDINonMuxCapEnableEntry ::= SEQUENCE {
+                ctFDDINMEnableSlot
+                        INTEGER,
+                ctFDDINMCapEnable
+                        INTEGER
+                }
+
+        ctFDDINMEnableSlot      OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific slot for which this configuration enable
+                pertains."
+            ::= { ctFDDINonMuxCapEnableEntry 1 }
+
+        ctFDDINMCapEnable       OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific configuration that is enabled.  
+
+                Enabling a configuration is done by writing the value of 
+                ctFDDINMConfigID for a specific configuration to this object.
+
+                This object, when read, will return the value of 
+                ctFDDINMConfigID for the presently enabled configuration."
+            ::= { ctFDDINonMuxCapEnableEntry 2 }
+
+
+        ctFDDINonMuxConnectionTable     OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDINonMuxConnectionEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table defines specific information for each defined
+                FDDI/FNB connection.  This maps the third sub identifier 
+                of ctFDDINMConfig to a particular SMT and MAC instance in
+                the 1512 FDDI MIB."
+            ::= { ctFDDINonMux 3 }
+
+        ctFDDINonMuxConnectionEntry     OBJECT-TYPE
+            SYNTAX      CtFDDINonMuxConnectionEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines a specific configuration connection entry."
+            INDEX { ctFDDINMConnectionSlot, ctFDDINMConnectionID }
+            ::= { ctFDDINonMuxConnectionTable 1 }
+
+        CtFDDINonMuxConnectionEntry ::= SEQUENCE {
+                ctFDDINMConnectionSlot
+                        INTEGER,
+                ctFDDINMConnectionID
+                        INTEGER,
+                ctFDDINMSMT
+                        INTEGER,
+                ctFDDINMMAC
+                        INTEGER,
+                ctFDDINMBytes
+                        INTEGER,
+                ctFDDINMFrames
+                        INTEGER
+                }
+
+        ctFDDINMConnectionSlot  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific slot for which this connection entry is
+                defined."
+            ::= { ctFDDINonMuxConnectionEntry 1 }
+
+        ctFDDINMConnectionID    OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a specific connection identifier.  Valid
+                connection identifiers are defined by the third
+                sub-identifier in ctFDDINMConfig as identified by
+                ctFDDINMCapEnable."
+            ::= { ctFDDINonMuxConnectionEntry 2 }
+
+        ctFDDINMSMT             OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific instance of SMT for which this entry pertains."
+            REFERENCE
+                "The IETF RFC FDDI-SMT73-MIB, fddimibSMTIndex"
+            ::= { ctFDDINonMuxConnectionEntry 3 }
+
+        ctFDDINMMAC             OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific MAC that this connection entry pertains."
+            REFERENCE
+                "The IETF RFC FDDI-SMT73-MIB, fddimibMACIndex"
+            ::= { ctFDDINonMuxConnectionEntry 4 }
+
+        ctFDDINMBytes   OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The bandwidth utilization in bytes per second."
+        ::= { ctFDDINonMuxConnectionEntry 5 }
+
+        ctFDDINMFrames  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The bandwidth utilization in frames per second."
+        ::= { ctFDDINonMuxConnectionEntry 6 }
+
+
+        
+        ctFDDINonMuxInterfaceTable      OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDINonMuxInterfaceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table describs the number of interfaces defined by
+                each non multiplexing FDDI FNB module."
+            ::= { ctFDDINonMux 4 }
+
+        ctFDDINonMuxInterfaceEntry      OBJECT-TYPE
+            SYNTAX      CtFDDINonMuxInterfaceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "A specfic non multiplexing module interface definition."
+            INDEX { ctFDDINMInterSlot }
+            ::= { ctFDDINonMuxInterfaceTable 1 }
+
+        CtFDDINonMuxInterfaceEntry ::= SEQUENCE {
+                ctFDDINMInterSlot
+                        INTEGER,
+                ctFDDINMNumbInterfaces
+                        INTEGER
+        }
+
+        ctFDDINMInterSlot       OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific slot for which this inteface entry is
+                defined."
+            ::= { ctFDDINonMuxInterfaceEntry 1 }
+
+        ctFDDINMNumbInterfaces  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The number of interfaces defined on this particular
+                module."
+        ::= { ctFDDINonMuxInterfaceEntry 2 }
+
+
+--      the ctFDDIMuxGroup
+--      This groups controls those devices that perform a FDDI multiplexing
+--      operation
+
+        ctFDDIMuxCapTable       OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDIMuxCapEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table describes all possible configuration/capabilities
+                defined for a FDDI multiplexing module."
+            ::= { ctFDDIMux 1 }
+
+        ctFDDIMuxCapEntry       OBJECT-TYPE
+            SYNTAX      CtFDDIMuxCapEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a specfic FDDI multiplexor capability/configuration
+                entry."
+            INDEX { ctFDDIMuxSlot, ctFDDIMuxConfig }
+            ::= { ctFDDIMuxCapTable 1 }
+
+        CtFDDIMuxCapEntry       ::= SEQUENCE {
+                ctFDDIMuxSlot
+                        INTEGER,
+                ctFDDIMuxConfigID
+                        INTEGER,
+                ctFDDIMuxConfig
+                        DisplayString,
+                ctFDDIMuxConfigDesc
+                        DisplayString
+                }
+
+        ctFDDIMuxSlot   OBJECT-TYPE
+            SYNTAX      INTEGER (1..256)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines the slot within the chassis for which this
+                multiplexed capability/configuration entry pertains."
+            ::= { ctFDDIMuxCapEntry 1 }
+
+        ctFDDIMuxConfigID       OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The instance of a particular configuration."
+            ::= { ctFDDIMuxCapEntry 2 }
+
+        ctFDDIMuxConfig OBJECT-TYPE
+            SYNTAX      DisplayString
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "This object defines a specific valid connection
+                configuration.  It will specify the connection state of all
+                resource instances.  If an instance of a resource is
+                not specified, then it is disconnected.
+
+                Each valid configuration is encoded in an ascii string, using
+                a specified format for interpretation.  The specific 
+                connections are in groups of four where each group defines a 
+                specific connection configuration.  The terms of the connection 
+                group are defined as follows:
+
+                        1st - Resource ID.  The value is the same as 
+                        ctFDDIResourceID for a specific resource entry.
+
+                        2nd - Instance of the resource.  This has a value in
+                        the range of 1 to ctFDDIResourceNumbInstance.
+
+                        3rd - Path of the resource as input to the
+                        multiplexor.  Paths are specified as 1
+                        for the primary ring and 2 for the secondary.
+
+                        4th - This is the multiplexor output channel 
+                        that this resource comes out of the multiplexor.
+                        This value is the same as a value of ctFDDIMuxOutID.
+
+                        5th - Ring Connectivity.  This sub-identifier
+                        describes if the given mux-in resource 
+                        (sub-identifiers 1-3) is inserted into the backplane
+                        FNB ring.  Valid values are 0 for no 1 for yes.
+
+                So for example a value of 1.1.1.1.0.2.2.2.2.1 is resource 1,
+                instance 1 (primary) is on mux-out 1 and it's not inserted;
+                resource 2, instance 2 (secondary) is on mux-out 2 and
+                is inserted into the backplane.
+
+                If a valid configuration is no connections then this
+                object will have a value of '0.0.0.0.0'"
+            ::= { ctFDDIMuxCapEntry 3 }
+
+        ctFDDIMuxConfigDesc      OBJECT-TYPE
+            SYNTAX      DisplayString
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "This object contains a textual description of a valid 
+                connection configuration.  This is a more user-friendly
+                representation of the configuration than the ctFDDIMuxConfig
+                object."
+            ::= { ctFDDIMuxCapEntry 4 }
+
+
+        ctFDDIMuxCapEnableTable OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDIMuxCapEnableEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table describes the currently enabled configuration
+                for each module."
+            ::= { ctFDDIMux 2 }
+
+        ctFDDIMuxCapEnableEntry OBJECT-TYPE
+            SYNTAX      CtFDDIMuxCapEnableEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a specific configuration enable entry."
+            INDEX { ctFDDIMuxEnableSlot }
+            ::= { ctFDDIMuxCapEnableTable 1 }
+
+        CtFDDIMuxCapEnableEntry ::= SEQUENCE {
+                ctFDDIMuxEnableSlot
+                        INTEGER,
+                ctFDDIMuxCapEnable
+                        INTEGER,
+                ctFDDIMuxMasterPortAssignmentChange
+                        Counter
+                }
+
+        ctFDDIMuxEnableSlot     OBJECT-TYPE
+            SYNTAX      INTEGER (1..256)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific slot for which this configuration enable
+                pertains."
+            ::= { ctFDDIMuxCapEnableEntry 1 }
+
+        ctFDDIMuxCapEnable      OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific instance of the configuration that is
+                enabled.
+
+                Setting this object with a specific value of ctFDDIMuxConfigID
+                enabled that configuration.  A request of the value of this
+                object will return the value of ctFDDIMuxConfigID for the
+                presently enabled configuration."
+            ::= { ctFDDIMuxCapEnableEntry 2 }
+
+        ctFDDIMuxMasterPortAssignmentChange OBJECT-TYPE
+           SYNTAX       Counter
+           ACCESS       read-only
+           STATUS       mandatory
+           DESCRIPTION
+                "Depicts the number of changes to the master port to multiplexor
+                output mapping."
+        ::= { ctFDDIMuxCapEnableEntry 3 }
+
+        ctFDDIMuxOutTable       OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDIMuxOutEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes the multiplexor outputs for each of the
+                FNB multiplexor modules.  This maps the multiplexor output
+                to a specific instance of MAC and SMT in the FDDI MIB."
+            ::= { ctFDDIMux 3 }
+
+        ctFDDIMuxOutEntry       OBJECT-TYPE
+            SYNTAX      CtFDDIMuxOutEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a particular multiplexor output."
+            INDEX { ctFDDIMuxOutSlot, ctFDDIMuxOutID }
+            ::= { ctFDDIMuxOutTable 1 }
+
+        CtFDDIMuxOutEntry       ::= SEQUENCE {
+                ctFDDIMuxOutSlot
+                        INTEGER,
+                ctFDDIMuxOutID
+                        INTEGER,
+                ctFDDIMuxOutMACIndex
+                        INTEGER,
+                ctFDDIMuxOutSMTIndex
+                        INTEGER,
+                ctFDDIMuxBytes
+                        INTEGER,
+                ctFDDIMuxFrames
+                        INTEGER
+                }
+
+        ctFDDIMuxOutSlot        OBJECT-TYPE
+            SYNTAX      INTEGER (1..255)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The given slot for which this multiplexor output information
+                pertains."
+            ::= { ctFDDIMuxOutEntry 1 }
+
+        ctFDDIMuxOutID  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The specific instance of the multiplexor output.  Instances
+                of this object are used by the values of ctFDDIMuxConfig."
+            ::= { ctFDDIMuxOutEntry 2 }
+
+        ctFDDIMuxOutMACIndex    OBJECT-TYPE
+            SYNTAX      INTEGER (1..65535)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The MAC instance of this multiplexor output.  If this
+                this object has a value greater than 0, then this 
+                value is the same as fddimibMACIndex.  If this object has the 
+                value of 0, the given mux-out does not have a MAC."
+            REFERENCE
+                "The IETF RFC FDDI-SMT73-MIB, fddimibMACIndex"
+            ::= { ctFDDIMuxOutEntry 3 }
+
+        ctFDDIMuxOutSMTIndex    OBJECT-TYPE
+            SYNTAX      INTEGER (1..65535)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Identifies the instance of SMT as defined within the
+                FDDI MIB."
+            REFERENCE
+                "The IETF RFC FDDI-SMT73-MIB, fddimibSMTIndex"
+            ::= { ctFDDIMuxOutEntry 4 }
+
+        ctFDDIMuxBytes  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The bandwidth utilization in bytes per second."
+        ::= { ctFDDIMuxOutEntry 5 }
+
+        ctFDDIMuxFrames OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The bandwidth utilization in frames per second."
+        ::= { ctFDDIMuxOutEntry 6 }
+
+
+
+        ctFDDIMuxMasterPortTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CtFDDIMuxMasterPortEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of entries that define master ports as they are
+                defined for the given multiplexed FDDI connection."
+            ::= { ctFDDIMux 4 }
+
+        ctFDDIMuxMasterPortEntry        OBJECT-TYPE
+            SYNTAX CtFDDIMuxMasterPortEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific FDDI-FNB multiplexed master port definition."
+            INDEX { ctFDDIMuxMasterPortSlotID, ctFDDIMuxMasterPortID }
+        ::= { ctFDDIMuxMasterPortTable 1 }
+
+        CtFDDIMuxMasterPortEntry        ::= SEQUENCE {
+                ctFDDIMuxMasterPortSlotID
+                        INTEGER,
+                ctFDDIMuxMasterPortID
+                        INTEGER,
+                ctFDDIMuxMasterPortAssignment
+                        INTEGER,
+                ctFDDIMuxMasterPortIndex
+                        INTEGER
+                }
+
+        ctFDDIMuxMasterPortSlotID       OBJECT-TYPE
+            SYNTAX      INTEGER (1..255)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A specific instance of a slot as defined by chSlotID."
+        ::= { ctFDDIMuxMasterPortEntry 1 }
+
+        ctFDDIMuxMasterPortID   OBJECT-TYPE
+            SYNTAX      INTEGER (1..65535)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A unique identifier for this specific master port."
+        ::= { ctFDDIMuxMasterPortEntry 2 }
+
+        ctFDDIMuxMasterPortAssignment   OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                "Provides the masterport to multiplexor output mapping.
+                This is as defined by ctFDDIMuxOutMacAssignment."
+        ::= { ctFDDIMuxMasterPortEntry 3 }
+
+        ctFDDIMuxMasterPortIndex        OBJECT-TYPE
+            SYNTAX      INTEGER (1..65535)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines a specific port within the FDDI MIBs fddimibPORTTable."
+            REFERENCE
+                "The IETF RFC FDDI-SMT73-MIB, fddimibPORTIndex"
+            ::= { ctFDDIMuxMasterPortEntry 4 }
+
+--      The ctFDDISerialControl group
+--      This group describes the control over the FDDI serial controlled
+--      modules. 
+
+        ctFDDINumbModules       OBJECT-TYPE
+            SYNTAX      INTEGER (0..14)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes the number of modules that are present configurable
+                thru the serial control portion of this MIB.
+
+                This directly reflects the number of rows found within the
+                ctFDDISerialConfigTable."
+            ::= { ctFDDISerialConfig 1 }
+
+        ctFDDISerialConfigTable OBJECT-TYPE
+           SYNTAX       SEQUENCE OF CtFDDISerialConfigEntry
+           ACCESS       not-accessible
+           STATUS       mandatory
+           DESCRIPTION
+                "This table describes the adminstrative control over each
+                of the FNB serial control modules."
+            ::= { ctFDDISerialConfig 2 }
+
+        ctFDDISerialConfigEntry OBJECT-TYPE
+            SYNTAX      CtFDDISerialConfigEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes the controls over a single FNB serial control
+                entry."
+            INDEX { ctFDDISerialSlotID }
+            ::= { ctFDDISerialConfigTable 1 }
+
+        CtFDDISerialConfigEntry ::= SEQUENCE {
+                ctFDDISerialSlotID
+                        INTEGER,
+                ctFDDISerialAdminStatus
+                        INTEGER,
+                ctFDDISerialOperStatus
+                        INTEGER
+                }
+
+        ctFDDISerialSlotID      OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines the slot that this FNB serial control module is in.
+                 This is an instance of chSlotID as defined in the chassis MIB."
+           ::= { ctFDDISerialConfigEntry 1 }
+
+        ctFDDISerialAdminStatus OBJECT-TYPE
+            SYNTAX      INTEGER {
+                insertFNB1(1),
+                insertFNB2(2),
+                insertFNB1FNB2(3),
+                bypass(4),
+                hwControlFNB1(5),
+                hwControlFNB2(6),
+                hwControl(7)            -- Use hardware control
+                }
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes the adminstrative desired state for this FNB
+                serial control module.
+        
+                        insertFNB1(1) - The serial controlled module should be
+                        inserted into FNB-1 and bypass FNB-2.
+
+                        insertFNB2(2) - The serial contolled module should be
+                        inserted into FNB-2 and bypass FNB-1.
+
+                        insertFNB1FNB2(3) - Insert the serial controlled module
+                        on both FNBs.
+
+                        bypass(4) - Bypass the connection to both FNBs.
+
+                        hwControlFNB1(5) - Use hardware settings for FNB-1.
+
+                        hwControlFNB2(6) - Use hardware settings for FNB-2.
+
+                        hwControl(7) - Use the hardware settings for both
+                        FNBs."
+            ::= { ctFDDISerialConfigEntry 2 }
+
+        ctFDDISerialOperStatus  OBJECT-TYPE
+            SYNTAX      INTEGER {
+                insertFNB1(1),
+                insertFNB2(2),
+                insertFNB1FNB2(3),
+                bypass(4)
+                }
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes the operational status of this FDDI serial
+                controlled module.
+
+                        insertFNB1(1) - The serial controlled module is
+                        inserted into FNB-1 and bypassed from FNB-2.
+
+                        insertFNB2(2) - The serial controlled module is
+                        bypassed from FNB-1 and inserted into FNB-2.
+
+                        insertFNB1FNB2(3) - The serial controlled module is
+                        inserted into both FNB-1 and FNB-2.
+
+                        bypass(4) - The serial controlled module is bypassed
+                        from both FNB-1 and FNB-2."
+            ::= { ctFDDISerialConfigEntry 3 }
+
+
+        ctFDDIModuleFPIMTable   OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFDDIModuleFPIMEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table describes the FPIMs that are on the front panel of
+                each FDDI serial control module, if that module supports FPIMs."
+            ::= { ctFDDISerialConfig 3 }
+
+        ctFDDIModuleFPIMEntry   OBJECT-TYPE
+            SYNTAX      CtFDDIModuleFPIMEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a single FDDI FPIM on a module."
+            INDEX { ctFddiFPIMSlotID, ctFddiFPIM }
+            ::= { ctFDDIModuleFPIMTable 1 }
+
+        CtFDDIModuleFPIMEntry ::= SEQUENCE {
+                ctFddiFPIMSlotID
+                        INTEGER,
+                ctFddiFPIM
+                        INTEGER,
+                ctFddiFPIMStatus
+                        INTEGER,
+                ctFddiFPIMType
+                        OBJECT IDENTIFIER
+                }
+
+        ctFddiFPIMSlotID        OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines the slot in which this module exists.  This
+                is an instance of chSlotID as found in the chassis MIB."
+            ::= { ctFDDIModuleFPIMEntry 1 }
+
+        ctFddiFPIM      OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines the instance of the port for which this definition
+                is made.  Ports are physically located from top-to-bottom on a 
+                particular module. If there are multiple 'columns' of ports
+                from the top to the bottom, then the numbering will start 
+                from the left side and proceed top-to-bottom in each column."
+            ::= { ctFDDIModuleFPIMEntry 2 }
+
+        ctFddiFPIMStatus        OBJECT-TYPE
+            SYNTAX      INTEGER {
+                        link(1),
+                        noLink(2),
+                        notSupported(3)
+                }
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes the link status of the given FPIM.
+
+                A value of link(1) states that a link is present.
+
+                A value of noLink(2) states that no link is present.
+
+                A value of notSupported(3) means that link status is not 
+                supported by this port and is unknown."
+            ::= { ctFDDIModuleFPIMEntry 4 }
+
+        ctFddiFPIMType  OBJECT-TYPE
+            SYNTAX      OBJECT IDENTIFIER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes the type of FPIM as found in ctron-oids."
+            ::= { ctFDDIModuleFPIMEntry 5 }
+
+END

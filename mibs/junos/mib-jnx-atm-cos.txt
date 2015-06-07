@@ -1,0 +1,670 @@
+-- *******************************************************************
+-- Juniper enterprise specific ATM Class Of Service MIB. 
+--
+-- Copyright (c) 2002-2004, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+    JUNIPER-ATM-COS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter64                 FROM SNMPv2-SMI
+
+        ifIndex                              FROM IF-MIB
+        atmVclVpi, atmVclVci                 FROM ATM-MIB
+        jnxMibs                              FROM JUNIPER-SMI
+        jnxCosFcId                           FROM JUNIPER-COS-MIB;
+
+
+    jnxAtmCos MODULE-IDENTITY
+        LAST-UPDATED "200304090000Z" -- Fri Apr 09 2004 UTC
+        ORGANIZATION "Juniper Networks, Inc."
+        CONTACT-INFO
+                "Juniper Technical Assistance Center
+                      Juniper Networks, Inc.
+                      1194 N. Mathilda Avenue
+                      Sunnyvale, CA 94089
+                      E-mail: support@juniper.net"
+
+        DESCRIPTION
+                "The Juniper enterprise MIB for ATM COS (Class Of
+                Service) infrastructure. For detailed information on ATM
+                COS, Junos Documentation is recommended as the
+                reference.
+
+                 Abbreviations:
+                     COS  - Class Of Service
+                     RED  - Random Early Detection
+                     PLP  - Packet Loss Priority"
+
+        REVISION     "200304090000Z" -- Fri Apr 09 2004 UTC
+        DESCRIPTION  "Exposed jnxCosAtmTrunkTable for COS enabled Trunks."
+
+        REVISION     "200306200000Z"   -- Jun 20th 2003
+        DESCRIPTION  "Add Per queue PLP stats for COS enabled VCs."
+
+        REVISION     "200209040000Z"   -- Sep 4th 2002 
+        DESCRIPTION  "Initial Version."
+
+        ::= { jnxMibs 21 }
+
+
+    -- 
+    -- ATM COS VC Table : represents VCs that have COS configured. 
+    --
+    jnxCosAtmVcTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxCosAtmVcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of ATM VCs which have COS configured."
+
+
+    ::= { jnxAtmCos 1 }
+
+    jnxCosAtmVcEntry OBJECT-TYPE
+        SYNTAX      JnxCosAtmVcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This entry contains COS info specific to an ATM VC.
+	    Each entry is indexed using ifIndex, vpi and vci of
+	    the VC."
+        INDEX       { ifIndex, atmVclVpi, atmVclVci}
+    ::= { jnxCosAtmVcTable 1 }
+
+    JnxCosAtmVcEntry ::= 
+        SEQUENCE {
+            jnxCosAtmVcCosMode  INTEGER
+    }
+
+    jnxCosAtmVcCosMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        strict(0),
+                        alternate(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The mode of COS queue priority for the VC.
+
+             strict mode :
+             One queue of the four queues has strict high priority and
+             is always serviced before the rest of the queues. The
+             remaining queues are serviced in round robin fashion.
+
+             alternate mode :
+	     One queue has high priority, but the servicing of the
+	     queues alternates between the high priority queue and the
+	     rest of the queues."
+    ::= { jnxCosAtmVcEntry 1 }
+
+    --
+    -- ATM VC scheduler table
+    -- 
+    jnxCosAtmVcScTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxCosAtmVcScEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of rows representing atm-scheduler config
+            parameters for each forwarding class within a specified VC.
+            
+            NOTE: These schedulers are specific to an atm interface and
+            are different from the typical schedulers specified under
+            class-of-service config in CLI. Hence, hereafter, through
+            out this mib, scheduler will be referred to as atm-scheduler
+            to avoid any confusion."
+
+
+    ::= { jnxAtmCos 2 }
+
+    jnxCosAtmVcScEntry OBJECT-TYPE
+        SYNTAX      JnxCosAtmVcScEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This entry represents atm-scheduler config parameters per
+            forwarding class and per VC."
+        INDEX       { ifIndex, atmVclVpi, atmVclVci, jnxCosFcId }
+
+    ::= { jnxCosAtmVcScTable 1 }
+
+    JnxCosAtmVcScEntry ::= 
+        SEQUENCE {
+             -- Scheduler parameters
+             jnxCosAtmVcScPriority             INTEGER,
+             jnxCosAtmVcScTxWeightType         INTEGER,
+             jnxCosAtmVcScTxWeight             Integer32,
+
+             -- Drop profile type
+             jnxCosAtmVcScDpType               INTEGER,
+
+             -- Linear RED drop profile info
+             jnxCosAtmVcScLrdpQueueDepth       Integer32,
+             jnxCosAtmVcScLrdpLowPlpThresh     Integer32,
+             jnxCosAtmVcScLrdpHighPlpThresh    Integer32,
+
+             -- Epd Drop profile
+             jnxCosAtmVcEpdThreshold           Integer32
+    }
+
+    -- Atm-scheduler parameters
+    jnxCosAtmVcScPriority OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        low(0),
+                        high(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The atm-scheduler priority for the queue associated with
+            the specified forwarding class within the specified VC."
+    ::= { jnxCosAtmVcScEntry 1 }
+
+    jnxCosAtmVcScTxWeightType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        cells(0),
+                        percent(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The atm-scheduler transmit-weight-type for the queue
+            associated with the specified forwarding class inside the
+            specified VC.
+
+            An atm-scheduler can specify the transmit-weight-type either
+            as number of cells or as a percentage of the queue size."  
+    ::= { jnxCosAtmVcScEntry 2 }
+
+    jnxCosAtmVcScTxWeight OBJECT-TYPE
+        SYNTAX      Integer32(0..32000)  
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The atm-scheduler's transmit weight for the queue
+            associated with the specified forwarding class and the
+            specified VC. This object value is either expressed in
+            units of cells or as a percentage of the total VC
+            bandwidth. The unit (value-type) can be determined using
+            the object jnxCosAtmVcScTxWeightType." 
+    ::= { jnxCosAtmVcScEntry 3 }
+
+    jnxCosAtmVcScDpType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        linearRed(0),
+                        epd(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of RED drop profile configured for the specified
+            forwarding class within the specified VC. A scheduler can
+            specify either linear or constant drop profile.
+
+            A constant type drop profile (aka EPD) specifies that when
+            the number of queued cells exceeds a threshold, all the
+            cells should be dropped. Whereas a linear type drop profile
+            specifies that only a percentage of cells be dropped based
+            on the number of queued cells at any time."
+    ::= { jnxCosAtmVcScEntry 4 }
+             
+    jnxCosAtmVcScLrdpQueueDepth OBJECT-TYPE
+        SYNTAX      Integer32(0..32000) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The maximum queue size in cells, as specified by the linear
+            RED drop profile associated with the specified forwarding
+            class within the specified VC.
+
+            This object is valid only when value of object
+            jnxCosAtmVcScDpType is 'linearRed(0)'."
+    ::= { jnxCosAtmVcScEntry 5 }
+
+    jnxCosAtmVcScLrdpLowPlpThresh OBJECT-TYPE
+        SYNTAX      Integer32(0..32000) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+	    "The threshold percentage of fill-level beyond which low PLP
+	    (Packet Loss Priority) packets belonging to the specified
+	    forwarding class within the specified VC are randomly
+	    dropped. This value is specified by linear RED drop profile
+	    config. 
+            
+            This object is valid only when value of object
+            jnxCosAtmVcScDpType is 'linearRed(0)'."
+    ::= { jnxCosAtmVcScEntry 6 }
+
+    jnxCosAtmVcScLrdpHighPlpThresh OBJECT-TYPE
+        SYNTAX      Integer32(0..32000) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+	    "The threshold percentage of fill-level beyond which high
+	    PLP (Packet Loss Priority) packets belonging to the
+	    specified forwarding class within the specified VC are
+	    randomly dropped. This value is specified by linear RED drop
+	    profile config. 
+            
+            This object is valid only when jnxCosAtmVcScDpType is
+            'linearRed(0)'."
+    ::= { jnxCosAtmVcScEntry 7 }
+
+    jnxCosAtmVcEpdThreshold OBJECT-TYPE
+        SYNTAX      Integer32(0..32000) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "If a EPD type drop profile is configured for this scheduler
+            and if the number of cells queued exceeds this threshold
+            value, all the cells in the queue are dropped.
+            
+            This object has valid value only when jnxCosAtmVcScDpType
+            is 'epd(1)'."
+    ::= { jnxCosAtmVcScEntry 8 }
+
+
+    -- 
+    -- ATM COS Queue Stats Table.
+    --
+    jnxCosAtmVcQstatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxCosAtmVcQstatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of per VC and per forwarding class queue stats
+            entries." 
+
+
+    ::= { jnxAtmCos 3 }
+
+    jnxCosAtmVcQstatsEntry OBJECT-TYPE
+        SYNTAX      JnxCosAtmVcQstatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This entry contains queue stats for a specified
+            forwarding class and specified VC."
+        INDEX       { ifIndex, atmVclVpi, atmVclVci, jnxCosFcId }
+    ::= { jnxCosAtmVcQstatsTable 1 }
+
+    JnxCosAtmVcQstatsEntry ::= 
+        SEQUENCE {
+            jnxCosAtmVcQstatsOutPackets        Counter64,
+            jnxCosAtmVcQstatsOutBytes          Counter64,
+            jnxCosAtmVcQstatsOutRedDropPkts    Counter64,
+            jnxCosAtmVcQstatsOutNonRedDrops    Counter64,
+
+            -- PLP traffic stats
+            jnxCosAtmVcQstatsOutLpBytes        Counter64,
+            jnxCosAtmVcQstatsOutLpPkts         Counter64,
+
+            -- PLP drop stats
+            jnxCosAtmVcQstatsOutLpDropBytes    Counter64,
+            jnxCosAtmVcQstatsOutHpDropBytes    Counter64,
+            jnxCosAtmVcQstatsOutLpDropPkts     Counter64,
+            jnxCosAtmVcQstatsOutHpDropPkts     Counter64
+    }
+
+    jnxCosAtmVcQstatsOutPackets OBJECT-TYPE
+        SYNTAX      Counter64 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of packets belonging to the specified
+            forwarding class transmitted on the specified VC."
+    ::= { jnxCosAtmVcQstatsEntry 1 }
+
+    jnxCosAtmVcQstatsOutBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of bytes belonging to the specified forwarding
+            class that were transmitted on the specified VC."
+    ::= { jnxCosAtmVcQstatsEntry 2 }
+
+    jnxCosAtmVcQstatsOutRedDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of outgoing packets on the specified VC and
+            belonging to the specified forwarding class, that were
+            RED-dropped."
+    ::= { jnxCosAtmVcQstatsEntry 3 }
+
+    jnxCosAtmVcQstatsOutNonRedDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of outgoing packets on the specified VC and
+            belonging to the specified forwarding class, that were
+            dropped not as a result of RED mechanism, but because of
+            errors in packets."
+    ::= { jnxCosAtmVcQstatsEntry 4 }
+
+    -- PLP traffic stats
+    jnxCosAtmVcQstatsOutLpBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) bytes transmitted." 
+    ::= { jnxCosAtmVcQstatsEntry 5 }
+
+    jnxCosAtmVcQstatsOutLpPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) packets transmitted." 
+    ::= { jnxCosAtmVcQstatsEntry 6 }
+
+    -- PLP drop stats
+    jnxCosAtmVcQstatsOutLpDropBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) bytes dropped at the output
+            queue." 
+    ::= { jnxCosAtmVcQstatsEntry 7 }
+
+    jnxCosAtmVcQstatsOutHpDropBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of high PLP (PLP1) bytes dropped at the output
+            queue." 
+    ::= { jnxCosAtmVcQstatsEntry 8 }
+
+    jnxCosAtmVcQstatsOutLpDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) packets dropped at the
+            output queue." 
+    ::= { jnxCosAtmVcQstatsEntry 9 }
+
+    jnxCosAtmVcQstatsOutHpDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of high PLP (PLP1) packets dropped at the
+            output queue." 
+    ::= { jnxCosAtmVcQstatsEntry 10 }
+
+
+    --
+    -- Juniper ATM Trunk Class of Service Table
+    --
+    jnxCosAtmTrunkTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF JnxCosAtmTrunkEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A table of all ATM Trunk CoS entries. Stats and configuration
+            information is provided for each ATM Trunk CoS interface."
+
+
+        ::= { jnxAtmCos 4 }
+    
+    jnxCosAtmTrunkEntry OBJECT-TYPE
+        SYNTAX     JnxCosAtmTrunkEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "A single ATM Trunk CoS Entry."
+
+        INDEX  { ifIndex, jnxCosFcId }
+        ::= { jnxCosAtmTrunkTable 1 }
+
+
+    JnxCosAtmTrunkEntry ::= 
+        SEQUENCE {
+            -- Trunk CoS parameters
+            jnxCosAtmTrunkMode                   INTEGER,
+
+            -- Scheduler parameters
+            jnxCosAtmTrunkScPriority             INTEGER,
+            jnxCosAtmTrunkScTxWeightType         INTEGER,
+            jnxCosAtmTrunkScTxWeight             Integer32,
+            jnxCosAtmTrunkQaType                 INTEGER,
+
+            -- Epd Drop profile
+            jnxCosAtmTrunkEpdThresholdPlp0       Integer32,
+            jnxCosAtmTrunkEpdThresholdPlp1       Integer32,
+
+            -- Queue stats
+            jnxCosAtmTrunkQstatsOutPackets        Counter64,
+            jnxCosAtmTrunkQstatsOutBytes          Counter64,
+            jnxCosAtmTrunkQstatsOutDrops          Counter64,
+
+            -- Low PLP (PLP0) traffic stats
+            jnxCosAtmTrunkQstatsOutLpBytes        Counter64,
+            jnxCosAtmTrunkQstatsOutLpPkts         Counter64,
+
+            -- PLP drop stats
+            jnxCosAtmTrunkQstatsOutLpDropBytes    Counter64,
+            jnxCosAtmTrunkQstatsOutHpDropBytes    Counter64,
+            jnxCosAtmTrunkQstatsOutLpDropPkts     Counter64,
+            jnxCosAtmTrunkQstatsOutHpDropPkts     Counter64,
+
+            -- High PLP (PLP1) traffic stats
+            jnxCosAtmTrunkQstatsOutHpBytes        Counter64,
+            jnxCosAtmTrunkQstatsOutHpPkts         Counter64
+        }
+
+    jnxCosAtmTrunkMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        strict(1),
+                        alternate(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The mode of COS queue priority for the Trunk.
+
+             strict mode :
+             One queue of the four queues has strict high priority and
+             is always serviced before the rest of the queues. The
+             remaining queues are serviced in round robin fashion.
+
+             alternate mode :
+             One queue has high priority, but the servicing of the
+             queues alternates between the high priority queue and the
+             rest of the queues."
+    ::= { jnxCosAtmTrunkEntry 1 }
+
+    -- Atm-scheduler parameters
+    jnxCosAtmTrunkScPriority OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        low(1),
+                        high(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The atm-scheduler priority for the queue associated with
+            the specified forwarding class within the specified Trunk."
+    ::= { jnxCosAtmTrunkEntry 2 }
+
+    jnxCosAtmTrunkScTxWeightType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        cells(1),
+                        percent(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The atm-scheduler transmit-weight-type for the queue
+            associated with the specified forwarding class inside the
+            specified Trunk.
+
+            An atm-scheduler can specify the transmit-weight-type either
+            as number of cells or as a percentage of the queue size."  
+    ::= { jnxCosAtmTrunkEntry 3 }
+
+    jnxCosAtmTrunkScTxWeight OBJECT-TYPE
+        SYNTAX      Integer32(0..32000)  
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The atm-scheduler's transmit weight for the queue
+            associated with the specified forwarding class and the
+            specified Trunk. This object value is either expressed in
+            units of cells or as a percentage of the total Trunk
+            bandwidth. The unit (value-type) can be determined using
+            the object jnxCosAtmTrunkScTxWeightType." 
+    ::= { jnxCosAtmTrunkEntry 4 }
+
+    jnxCosAtmTrunkQaType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        red(1),
+                        singleEpd(2),
+                        dualEpd(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The atm queue admission type used for the specified Trunk."
+    ::= { jnxCosAtmTrunkEntry 5 }
+
+    jnxCosAtmTrunkEpdThresholdPlp0 OBJECT-TYPE
+        SYNTAX      Integer32(0..32000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If an EPD type drop profile is configured for this
+            scheduler and if the number of cells queued exceeds this 
+            threshold value, all the cells which have plp equal to 0 
+            will be dropped.
+
+            This object has valid value only when jnxCosAtmTrunkQaType
+            is singleEpd or dualEpd."
+    ::= { jnxCosAtmTrunkEntry 6 }
+            
+    jnxCosAtmTrunkEpdThresholdPlp1 OBJECT-TYPE
+        SYNTAX      Integer32(0..32000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If a EPD type drop profile is configured for this scheduler
+            and if the number of cells queued exceeds this threshold
+            value, all the cells which have plp equal to 1 will be
+            dropped.
+
+            This object has valid value only when jnxCosAtmTrunkQaType
+            is dualEpd."
+    ::= { jnxCosAtmTrunkEntry 7 }
+
+    jnxCosAtmTrunkQstatsOutPackets OBJECT-TYPE
+        SYNTAX      Counter64 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of packets belonging to the specified
+            forwarding class transmitted on the specified Trunk."
+    ::= { jnxCosAtmTrunkEntry 8 }
+
+    jnxCosAtmTrunkQstatsOutBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of bytes belonging to the specified forwarding
+            class that were transmitted on the specified Trunk."
+    ::= { jnxCosAtmTrunkEntry 9 }
+
+    jnxCosAtmTrunkQstatsOutDrops OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of outgoing packets on the specified Trunk and
+            belonging to the specified forwarding class, that were
+            dropped." 
+    ::= { jnxCosAtmTrunkEntry 10 }
+
+    -- PLP traffic stats
+    jnxCosAtmTrunkQstatsOutLpBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) bytes transmitted." 
+    ::= { jnxCosAtmTrunkEntry 11 }
+
+    jnxCosAtmTrunkQstatsOutLpPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) packets transmitted." 
+    ::= { jnxCosAtmTrunkEntry 12 }
+
+    -- PLP drop stats
+    jnxCosAtmTrunkQstatsOutLpDropBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) bytes dropped at the output
+            queue." 
+    ::= { jnxCosAtmTrunkEntry 13 }
+
+    jnxCosAtmTrunkQstatsOutHpDropBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of high PLP (PLP1) bytes dropped at the output
+            queue." 
+    ::= { jnxCosAtmTrunkEntry 14 }
+
+    jnxCosAtmTrunkQstatsOutLpDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of low PLP (PLP0) packets dropped at the
+            output queue." 
+    ::= { jnxCosAtmTrunkEntry 15 }
+
+    jnxCosAtmTrunkQstatsOutHpDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of high PLP (PLP1) packets dropped at the
+            output queue." 
+    ::= { jnxCosAtmTrunkEntry 16 }
+
+    jnxCosAtmTrunkQstatsOutHpBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of high PLP (PLP1) bytes transmitted." 
+    ::= { jnxCosAtmTrunkEntry 17 }
+
+    jnxCosAtmTrunkQstatsOutHpPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The number of high PLP (PLP1) packets transmitted." 
+    ::= { jnxCosAtmTrunkEntry 18 }
+
+END

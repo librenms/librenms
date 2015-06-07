@@ -1,0 +1,779 @@
+	DEVFILTER-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		IpAddress
+			FROM RFC1155-SMI
+		OBJECT-TYPE, MODULE-IDENTITY, Integer32
+			FROM SNMPv2-SMI
+		MacAddress, DisplayString, RowStatus
+			FROM SNMPv2-TC
+		device
+			FROM ANIROOT-MIB;
+
+aniDevFilter  MODULE-IDENTITY
+	LAST-UPDATED "0105091130Z"      -- Wed May 9 11:30:00 PDT 2001
+	ORGANIZATION "Aperto Networks"
+	CONTACT-INFO
+	  "       
+	  Postal:  Aperto Networks Inc
+		   1637 S Main Street 
+		   Milpitas, California 95035
+	  Tel:	   +1 408 719 9977
+	  "       
+	DESCRIPTION
+	"This group provides Filter related information for BSU or SU.
+	"
+	::= { device 8 }
+
+
+aniDevFilterTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF AniDevFilterEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	   "This table allows the user to view the configured IP 
+	    Filters.
+	   "
+	::= { aniDevFilter 1 }
+
+aniDevFilterEntry OBJECT-TYPE
+	SYNTAX      AniDevFilterEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	   "An entry containing objects for each IP Filter
+	    configured.
+	   "
+	INDEX { aniDevFilterIfIndex, aniDevFilterIdentifier }
+	::= { aniDevFilterTable 1 }
+
+AniDevFilterEntry ::= SEQUENCE {
+	aniDevFilterIfIndex		INTEGER,
+	aniDevFilterIdentifier		Integer32,
+	aniDevFilterName		DisplayString,
+	aniDevFilterPriority		Integer32,
+	aniDevFilterActivationState	INTEGER,
+	aniDevFilterPermission		INTEGER,
+	aniDevFilterIpProtocol		Integer32,    
+	aniDevFilterIpSaddr		IpAddress,
+	aniDevFilterIpSmask		IpAddress,
+	aniDevFilterIpDaddr		IpAddress,
+	aniDevFilterIpDmask		IpAddress,
+	aniDevFilterIpSourceStart	INTEGER,
+	aniDevFilterIpSourceEnd		INTEGER,
+	aniDevFilterIpDestStart		INTEGER,
+	aniDevFilterIpDestEnd		INTEGER,
+	aniDevFilterIpOptions		Integer32,
+	aniDevFilterIpSecOptions	INTEGER,
+	aniDevFilterIcmpMsgType		INTEGER,
+	aniDevFilterIcmpSubcode		INTEGER,
+	aniDevFilterTcpFlags		Integer32,
+	aniDevFilterDestMacMask		OCTET STRING,
+	aniDevFilterSourceMac		MacAddress,
+	aniDevFilterEnetType		DisplayString,
+	aniDevFilterLlcDSAP		DisplayString,
+	aniDevFilterLlcSSAP		DisplayString,
+	aniDevFilterLlcControl		DisplayString,
+	aniDevFilterLocalCode		DisplayString,
+	aniDevFilterRowStatus		RowStatus,
+	aniDevFilterUserPriorityHi     	INTEGER,
+	aniDevFilterUserPriorityLo     	INTEGER,
+	aniDevFilterVlanIdStart      	INTEGER,
+	aniDevFilterVlanIdEnd      	INTEGER
+        }
+
+aniDevFilterIfIndex OBJECT-TYPE
+	SYNTAX INTEGER {
+			ethernet(1),
+			wireless-port1(2),
+			wireless-port2(3),
+			wireless-port3(4),
+			wireless-port4(5),
+			wireless-port5(6),
+			wireless-port6(7)
+		}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Interface Type.
+	    On SU, only ethernet(1) and wireless-port1(2) are valid.
+
+	    On BSU, ethernet(1) and all configured wireless interfaces  
+	    -- wireless-port1(2), wireless-port2(3), wireless-port3(4), 
+	    wireless-port4(5), wireless-port5(6), wireless-port6(7) are valid, 
+	    that is, filtering should be allowed on these wireless 
+	    interfaces only if they are configured.
+	   "
+	DEFVAL { 1 }
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 1 }
+
+aniDevFilterIdentifier OBJECT-TYPE
+	SYNTAX      Integer32 (0..255)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "A unique number which identifies the filtering rule.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 2 }
+
+aniDevFilterName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..31))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "A name which identifies the filtering rule.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 3 }
+
+aniDevFilterPriority OBJECT-TYPE
+	SYNTAX      Integer32 (0..255)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The priority for the filtering rule. It should be unique. 
+	    A higher number means higher priority.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 4 }
+
+aniDevFilterActivationState OBJECT-TYPE
+	SYNTAX INTEGER {
+			inactive(1),
+			active(2)
+		}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The state of the filtering rule.
+	   "
+	DEFVAL { 2 }
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 5 }
+
+aniDevFilterPermission OBJECT-TYPE
+	SYNTAX INTEGER {
+			block(1),
+			pass(2)
+		}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The permissions for the filtering rule.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 6 }
+
+aniDevFilterIpProtocol OBJECT-TYPE
+	SYNTAX		Integer32 (0..257)
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+	   "The IP protocol value.
+
+	    List of well known IP Protocols:
+	
+		Protocol	Value
+		--------	-----
+		ICMP		1
+		IGMP		2
+		TCP		6
+		EGP		8
+		UDP		17
+		IPIP		94
+		RSVP		46
+		GRE		47
+		TCP or UDP	257
+	    
+	    Apart from the above protocols, the user can also specify 
+	    other values.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 7 }
+
+aniDevFilterIpSaddr OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The source IP address for this Filter.
+	    IP Source Address and Subnet Mask go in a pair.
+	    So if aniDevFilterIpSaddr is configured, then 
+	    aniDevFilterIpSmask should be configured as well and 
+	    vice versa.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 8 }
+
+aniDevFilterIpSmask OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Subnet mask for the source IP Address.
+	    IP Source Address and Subnet Mask go in a pair.
+	    So if aniDevFilterIpSaddr is configured, then 
+	    aniDevFilterIpSmask should be configured as well and 
+	    vice versa.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 9 }
+
+aniDevFilterIpDaddr OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The destination IP address for this Filter.
+	    IP Destination Address and Subnet Mask go in a pair.
+	    So if aniDevFilterIpDaddr is configured, then 
+	    aniDevFilterIpDmask should be configured as well and 
+	    vice versa.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 10 }
+
+aniDevFilterIpDmask OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Subnet mask for the destination IP Address.
+	    IP Destination Address and Subnet Mask go in a pair.
+	    So if aniDevFilterIpDaddr is configured, then 
+	    aniDevFilterIpDmask should be configured as well and 
+	    vice versa.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 11 }
+
+aniDevFilterIpSourceStart OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The lowest bound value for the source port number.
+
+	    List of Some Well Known Ports:
+
+		Application		Port
+		-----------		----
+		Ftp Data		20
+		Ftp Control		21
+		HTTP			80
+		IMAP2			143
+		SNMP			161
+		POP3			110
+		SMTP			25
+		Telnet			23
+		TFTP			69
+		BootP Server		67
+		BootP Client		68
+		Gopher			70
+		Finger			79
+		BGP			179
+	    
+	    In addition to the list, the user can enter any other
+	    value as well.
+
+	    This field is valid only if the aniDevFilterIpProtocol
+	    field is set to TCP, UDP, (TCP or UDP) or not specified by the user.
+
+	    aniIpFilterIpSourceEnd should be >= 
+	    aniIpFilterIpSourceStart. 
+	    Whenever aniIpFilterIpSourceEnd is configured,
+	    aniIpFilterIpSourceStart should be configured as well.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 12 }
+
+aniDevFilterIpSourceEnd OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The highest bound value for the source port number.
+
+	    Refer to the Well known ports list under 
+	    aniIpFilterIpSourceStart description.
+	    In addition to the list, the user can enter any other
+	    value as well.
+
+	    This field is valid only if the aniDevFilterIpProtocol is 
+	    set to TCP, UDP, (TCP or UDP) or not specified by the user.
+	    aniDevFilterIpSourceEnd should be >= aniDevFilterIpSourceStart.
+	    Whenever aniDevFilterIpSourceEnd is configured, 
+	    aniDevFilterIpSourceStart should be configured as well.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 13 }
+
+aniDevFilterIpDestStart OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The lowest bound value for the destination port number.
+
+	    Refer to the Well known ports list under 
+	    aniIpFilterIpSourceStart description.
+	    In addition to the list, the user can enter any other
+	    value as well.
+
+	    This field is valid only if the aniDevFilterIpProtocol 
+	    is set to TCP, UDP, (TCP or UDP) or not specified by the user.
+	    aniDevFilterIpDestEnd should be >= aniDevFilterIpDestStart.
+	    Whenever aniDevFilterIpDestStart is configured, 
+	    aniDevFilterIpDestEnd should be configured as well.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 14 }
+
+aniDevFilterIpDestEnd OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The highest bound value for the destination port number.
+
+	    Refer to the Well known ports list under 
+	    aniIpFilterIpSourceStart description.
+	    In addition to the list, the user can enter any other
+	    value as well.
+
+	    This field is valid only if the aniDevFilterIpProtocol 
+	    is set to TCP, UDP, (TCP or UDP) or not specified by the user.
+	    aniDevFilterIpDestEnd should be >= aniDevFilterIpDestStart.
+	    Whenever aniDevFilterIpDestStart is configured, 
+	    aniDevFilterIpDestEnd should be configured as well.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 15 }
+
+aniDevFilterIpOptions OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Mask value for the IP Options.
+	    No Operation	(0x000001)
+	    Route Record 	(0x000002)
+	    Time Stamp   	(0x000040)
+	    MTU Probe 		(0x000008)
+	    MTU Reply 		(0x000010)
+	    Trace Route 	(0x000080)
+	    Address Extension 	(0x004000)
+	    Loose Source Route 	(0x000200)
+	    Strict Source Route (0x002000)
+	    Extended Security 	(0x000400)
+	    Security 		(0x000100)
+	    Commercial Security (0x000800)
+	    Experimental Measurement 	(0x000004)
+	    Experimental Flow Control 	(0x040000)
+	    Experimental Access Control (0x008000)
+	    Stream Id 		(0x001000)
+	    IMI Traffic Descriptor	(0x010000)
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 16 }
+
+aniDevFilterIpSecOptions OBJECT-TYPE
+	SYNTAX INTEGER {
+			top-secret(1),
+			secret(2),
+			confidential(3),
+			unclassified(4)
+		}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The IP Security Value.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 17 }
+
+aniDevFilterIcmpMsgType OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Message Type for ICMP Protocol.
+
+	    This field is valid only if the aniDevFilterIpProtocol 
+	    is set to ICMP or not specified by the user.
+
+	    Valid Range:
+
+		ICMP Message	Type	SubCode
+		------------    ----    ----
+		Echo reply	0	
+		------------------------------------------------------------
+		Destination 
+		Unreachable	3	0 = net unreachable; 
+					1 = host unreachable; 
+					2 = protocol unreachable; 
+					3 = port unreachable; 
+					4 = fragmentation needed and DF set; 
+					5 = source route failed. 
+		------------------------------------------------------------
+		Source Quench	4
+		------------------------------------------------------------
+		Redirect	5	0 = Redirect datagrams for the Network. 
+					1 = Redirect datagrams for the Host. 
+					2 = Redirect datagrams for the Type of 
+						Service and Network. 
+					3 = Redirect datagrams for the Type of 
+						Service and Host. 
+		------------------------------------------------------------
+		Echo		8	
+		------------------------------------------------------------
+		Time Exceeded 
+		Message		11	0 = time to live exceeded in transit; 
+					1 = fragment reassembly time exceeded. 
+		------------------------------------------------------------
+		Parameter 
+		Problem		12	0 = pointer indicates the error.
+		------------------------------------------------------------
+		Timestamp 
+		message		13	
+		------------------------------------------------------------
+		Timestamp 
+		reply message	14	
+		------------------------------------------------------------
+		Information 
+		Request		15	
+		------------------------------------------------------------
+		Information 
+		Reply		16	
+		------------------------------------------------------------
+		Address Mask 
+		request 	17	
+		------------------------------------------------------------
+		Address Mask 
+		reply		18	
+		------------------------------------------------------------
+
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 18 }
+
+aniDevFilterIcmpSubcode OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Subcode for ICMP Protocol.
+
+	    This field is valid only if the aniDevFilterIpProtocol is 
+	    set to ICMP or not specified by the user. 
+	    If this field is specified then aniDevFilterIcmpMsgType 
+	    should already be specified. The values allowed for ICMP Code 
+	    depend on aniDevFilterIcmpMsgType.
+	    Refer to the description under aniDevFilterIcmpMsgType for a
+	    detail list of values.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 19 }
+
+aniDevFilterTcpFlags OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The TCP Flags.
+
+	    The valid range:
+	    Urgent (0x20)
+	    Acknowledgement (0x10)
+	    Push (0x08)
+	    Reset (0x04)
+	    Sync (0x02)
+	    Sync-Ack (0x12)
+	    Finish (0x01)
+	    Finish-Ack (0x11)
+
+	    This field is valid only if the aniDevFilterIpProtocol 
+	    is set to ICMP or not specified by the user.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 20 }
+
+aniDevFilterDestMacMask OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE(0..12))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The MAC address and mask value for destination.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 21 }
+
+aniDevFilterSourceMac OBJECT-TYPE
+	SYNTAX      MacAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The MAC Address of the source.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 22 }
+
+aniDevFilterEnetType OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+ 	DESCRIPTION
+	   "The Ethernet type value in the ethernet header.
+	    
+	    The maximum length of the ethernet packet is 1500 (0x5DC).
+	    The value of the ethernet type must be greater than 1500.
+	    
+	    Appicable for Ethernet Version II frame type. If this type 
+	    is being used then, DSAP (LLC Header), SSAP (LLC Header), 
+	    Control Byte (LLC Header) and Local Code (SNAP) cannot be 
+	    used and vice-versa.
+
+	    Valid Range: 0x5DD to 0xFFFF
+
+	    List of Ethernet Types:
+
+		-----------------------------------------------------------
+		0x800	DOD Internet Protocol (IP)
+		-----------------------------------------------------------
+		0x806	Address Resolution Protocol (ARP) 
+			(for IP and for CHAOS)
+
+
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 23 }
+
+aniDevFilterLlcDSAP OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The DSAP (Destination Service Access Point) value 
+	    in LLC Header.
+	    
+	    Valid Range: 0 to 0xFF
+	    Applicable for IEEE 802.3 Frame Format only.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 24 }
+
+aniDevFilterLlcSSAP OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The SSAP (Source Service Access Point) value 
+	    in LLC Header.
+	    
+	    Valid Range: 0 to 0xFF
+	    Applicable for IEEE 802.3 Frame Format only.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 25 }
+
+aniDevFilterLlcControl OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Control Byte of the LLC Header.
+
+	    Valid Range: 0 to 0xFF
+	    Applicable for IEEE 802.3 Frame Format only.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 26 }
+
+aniDevFilterLocalCode OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Local Code for SNAP ethernet type.
+	    Applicable for IEEE 802.3 Frame Format only.
+	    DSAP should be set to 0xAA, SSAP should be set to 0xAA,
+	    Control Byte should be set to 0x03.
+			    
+	    Valid range: 0 - 0xFFFF.
+
+	    List of Ethernet Types:
+
+		--------------------------------------------------------
+		0x800	DOD Internet Protocol (IP)
+		--------------------------------------------------------
+		0x806	Address Resolution Protocol (ARP) 
+			(for IP and for CHAOS)
+
+
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 27 }
+
+aniDevFilterRowStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "This represents the state of an entry within the 
+	    table.  It is used to manage creation and deletion of rows.
+	    The values include:
+	    active(1)
+	    notInService(2)
+	    notReady(3)
+	    createAndGo(4)
+	    createAndWait(5)
+	    destroy(6)
+
+	    When a Get request is sent, this object returns either 
+	    active(1), notInService(2) or notReady(3) depending on
+	    the state of this row.
+	    A new row can be Created using either createAndGo(4) or
+	    createAndWait(5).
+	    For Deleting a row, this field should be set to destroy(6).
+	   "
+	::= { aniDevFilterEntry 28 }
+
+aniDevFilterUserPriorityHi OBJECT-TYPE
+	SYNTAX      INTEGER (0..7)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The high priority byte of the user priority.
+
+	    The user priority specifies the matching 
+	    parameters for the IEEE 802.1P user_priority
+	    bits. An Ethernet packet with IEEE 802.1P 
+	    user_priority value 'priority' matches these
+	    parameters if pri-low <= priority <= pri_high.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 29 }
+
+aniDevFilterUserPriorityLo OBJECT-TYPE
+	SYNTAX      INTEGER (0..7)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The low priority byte of the user priority.
+
+	    The user priority specifies the matching 
+	    parameters for the IEEE 802.1P user_priority
+	    bits. An Ethernet packet with IEEE 802.1P 
+	    user_priority value 'priority' matches these
+	    parameters if pri-low <= priority <= pri_high.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 30 }
+
+aniDevFilterVlanIdStart OBJECT-TYPE
+	SYNTAX      INTEGER (0..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The lower limit for the VLAN ID.
+	    This value is used to specify the lower limit in the 
+	    range. Any IEEE 802.1P packet from a customer's VLAN
+	    that falls into the range matches the rule.
+	    aniDevFilterVlanIdStart and aniDevFilterVlanIdEnd 
+	    must be defined in a pair.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 31 }
+
+aniDevFilterVlanIdEnd OBJECT-TYPE
+	SYNTAX      INTEGER (0..4095)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The upper limit for the VLAN ID.
+	    This value is used to specify the upper limit in the 
+	    range. Any IEEE 802.1P packet from a customer's VLAN
+	    that falls into the range matches the rule.
+	    aniUSClassifierVlanIdStart and aniUSClassifierVlanIdEnd 
+	    must be defined in a pair.
+	   "
+	--DEFAULT next-function-async     aniDevFilterEntry_next
+	::= { aniDevFilterEntry 32 }
+
+
+aniDevFilterIfTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF AniDevFilterIfEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	   "This table allows the user to enable/disable Filtering
+	    per interface basis.
+	   "
+	::= { aniDevFilter 2 }
+
+aniDevFilterIfEntry OBJECT-TYPE
+	SYNTAX      AniDevFilterIfEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	   "An entry containing objects for each IP Filter
+	    interface configured.
+	   "
+	INDEX { aniDevFilterIfIdentifier }
+	::= { aniDevFilterIfTable 1 }
+
+AniDevFilterIfEntry ::= SEQUENCE {
+	aniDevFilterIfIdentifier	INTEGER,
+	aniDevFilterIfFlag		INTEGER
+	}
+
+aniDevFilterIfIdentifier OBJECT-TYPE
+	SYNTAX INTEGER {
+			ethernet(1),
+			wireless-port1(2),
+			wireless-port2(3),
+			wireless-port3(4),
+			wireless-port4(5),
+			wireless-port5(6),
+			wireless-port6(7)
+		}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The Interface Type.
+	    On SU, only ethernet(1) and wireless-port1(2) are valid.
+
+	    On BSU, ethernet(1) and all configured wireless interfaces  
+	    -- wireless-port1(2), wireless-port2(3), wireless-port3(4), 
+	    wireless-port4(5), wireless-port5(6), wireless-port6(7) are valid, 
+	    that is, filtering should be allowed on these wireless 
+	    interfaces only if they are configured.
+	   "
+	DEFVAL { 1 }
+	--DEFAULT next-function-async     aniDevFilterIfEntry_next
+	::= { aniDevFilterIfEntry 1 }
+
+aniDevFilterIfFlag OBJECT-TYPE
+	SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+		}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "The flag to enable or disable filtering on
+	    a particular interface.
+
+	    The default value depends on whether a rule is configured 
+	    on the particular interface or not. When a rule is configured
+	    on the interface, this flag will be set to enable(1)
+	    automatically. If no rule is configured, this flag should
+	    be disabled by default.
+	   "
+	--DEFAULT next-function-async     aniDevFilterIfEntry_next
+	::= { aniDevFilterIfEntry 2 }
+
+          END
+

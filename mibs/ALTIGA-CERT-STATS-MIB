@@ -1,0 +1,260 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-CERT-STATS-MIB.my:  Altiga Digital Certificates Statistics.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-CERT-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Counter32, Gauge32
+                   FROM SNMPv2-SMI
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsCert, alCertGroup
+         FROM ALTIGA-MIB
+      alCertMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaCertStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200209051300Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga Digital Certificates Statistics MIB models counters and objects that are
+          of management interest for digital certificates.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            CA:         Certificate Authority
+
+            CRL:        Certificate Revocation List
+
+            IP:         Internet Protocol
+
+            MIB:        Management Information Base
+
+         "
+
+        REVISION "200209051300Z"
+        DESCRIPTION
+                "Added module compliance."
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alCertMibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+alStatsCertGlobal OBJECT IDENTIFIER ::= { alStatsCert 1 }
+
+alCertStatsServerTable     OBJECT-TYPE
+   SYNTAX         SEQUENCE OF AlCertStatsServerEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+          "List table listing the CA servers."
+   ::= { alStatsCert 2 }
+
+alCertStatsServerEntry     OBJECT-TYPE
+   SYNTAX         AlCertStatsServerEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+          "An entry representing a CA server."
+   INDEX    { alCertStatsServerIndex }
+   ::= { alCertStatsServerTable 1 }
+
+AlCertStatsServerEntry ::= SEQUENCE {
+        alCertStatsServerIndex               Integer32,
+        alCertStatsServerAddress             IpAddress,
+        alCertStatsServerPortNumber          Integer32,
+        alCertStatsServerCertRequests        Counter32,
+        alCertStatsServerCertRetransmissions Counter32,
+        alCertStatsServerCertRcvd            Counter32,
+        alCertStatsServerCertPendingRequests Gauge32,
+        alCertStatsServerCertTimeouts        Counter32,
+        alCertStatsServerCRLRequests         Counter32,
+        alCertStatsServerCRLRetransmissions  Counter32,
+        alCertStatsServerCRLRcvd             Counter32,
+        alCertStatsServerCRLPendingRequests  Gauge32,
+        alCertStatsServerCRLTimeouts         Counter32
+}
+
+alCertStatsServerIndex     OBJECT-TYPE
+   SYNTAX         Integer32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "Index of this CA."
+   ::= { alCertStatsServerEntry 1 }
+
+alCertStatsServerAddress   OBJECT-TYPE
+   SYNTAX         IpAddress
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The IP address of this CA."
+   ::= { alCertStatsServerEntry 2 }
+
+alCertStatsServerPortNumber     OBJECT-TYPE
+   SYNTAX         Integer32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The port number of this CA."
+   ::= { alCertStatsServerEntry 3 }
+
+alCertStatsServerCertRequests OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of certificate request packets sent
+                to this CA since client start-up. This does not
+                include retransmissions."
+   ::= { alCertStatsServerEntry 4 }
+
+alCertStatsServerCertRetransmissions OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of certificate request packets
+                retransmitted to this CA since client start-up."
+   ::= { alCertStatsServerEntry 5 }
+
+alCertStatsServerCertRcvd       OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of certificates received from
+                this server since client start-up."
+   ::= { alCertStatsServerEntry 6 }
+
+alCertStatsServerCertPendingRequests OBJECT-TYPE
+   SYNTAX         Gauge32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of certificate request packets
+                destined for this server that have not yet timed out
+                or received a response. This variable is incremented
+                when certificate request is sent and decremented due to
+                receipt of a certificate, a timeout or retransmission."
+   ::= { alCertStatsServerEntry 7 }
+
+alCertStatsServerCertTimeouts   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of certificate timeouts to this
+                server since client startup."
+   ::= { alCertStatsServerEntry 8 }
+
+alCertStatsServerCRLRequests    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of CRL request packets sent
+                to this CA since client start-up. This does not
+                include retransmissions."
+   ::= { alCertStatsServerEntry 9 }
+
+alCertStatsServerCRLRetransmissions OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of CRL request packets
+                retransmitted to this CA since client start-up."
+   ::= { alCertStatsServerEntry 10 }
+
+alCertStatsServerCRLRcvd        OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of CRL received from
+                this server since client start-up."
+   ::= { alCertStatsServerEntry 11 }
+
+alCertStatsServerCRLPendingRequests OBJECT-TYPE
+   SYNTAX         Gauge32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of CRL request packets
+                destined for this server that have not yet timed out
+                or received a response. This variable is incremented
+                when certificate request is sent and decremented due to
+                receipt of a certificate, a timeout or retransmission."
+   ::= { alCertStatsServerEntry 12 }
+
+alCertStatsServerCRLTimeouts    OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+               "The total number of CRL timeouts to this server since
+                client startup."
+   ::= { alCertStatsServerEntry 13 }
+
+altigaCertStatsMibConformance OBJECT IDENTIFIER ::= { altigaCertStatsMibModule 1 }
+altigaCertStatsMibCompliances OBJECT IDENTIFIER ::= { altigaCertStatsMibConformance 1 }
+
+altigaCertStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga Digital Certificates Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaCertStatsGroup
+   }
+   ::= { altigaCertStatsMibCompliances 1 }
+
+altigaCertStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alCertStatsServerIndex,
+      alCertStatsServerAddress,
+      alCertStatsServerPortNumber,
+      alCertStatsServerCertRequests,
+      alCertStatsServerCertRetransmissions,
+      alCertStatsServerCertRcvd,
+      alCertStatsServerCertPendingRequests,
+      alCertStatsServerCertTimeouts,
+      alCertStatsServerCRLRequests,
+      alCertStatsServerCRLRetransmissions,
+      alCertStatsServerCRLRcvd,
+      alCertStatsServerCRLPendingRequests,
+      alCertStatsServerCRLTimeouts
+   }
+   STATUS   current
+   DESCRIPTION
+      "The objects for Cert statistics."
+   ::= { alCertGroup 2 }
+
+END
+

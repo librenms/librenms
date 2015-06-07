@@ -1,0 +1,587 @@
+-- SECTION 1: Top Level Definitions
+
+
+
+
+CENTILLION-ROOT-MIB DEFINITIONS ::= BEGIN
+
+
+-- Centillion Root MIB Release 2.1.7
+-- Revision 8/01/00
+
+-- Copyright 1994-00 Nortel Networks, Inc.
+-- All rights reserved.
+-- This Bay Networks SNMP Management Information Base Specification
+-- (Specification) embodies Bay Networks' confidential and
+-- proprietary intellectual property. Bay Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Bay Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+
+-- Imports
+
+IMPORTS
+	enterprises			FROM RFC1155-SMI
+	DisplayString			FROM RFC1213-MIB
+	Counter32			FROM SNMPv2-SMI-v1
+	OBJECT-TYPE			FROM RFC-1212;
+
+
+-- Textual Conventions
+
+--
+-- All MIBs within this domain use the following textual convention
+-- to describe the status of an entry in a row.
+--
+
+StatusIndicator ::=
+	INTEGER {
+		valid(1),
+		invalid(2)
+	}
+
+-- This type is used to specify a concentrator backplane.
+
+SsBackplaneType ::=
+	INTEGER {
+		other(1),		-- none of the following
+		atmBus(2)		-- ATM Bus
+	}
+
+-- This type is used to specify the switch chassis.
+
+SsChassisType ::=
+	INTEGER {
+		other(1),	-- none of the following
+		six-slot(2),	-- 6 slot Chassis
+		twelve-slot(3),	-- 12 slot Chassis
+		workgroup(4),	-- Workgroup chassis (single slot)
+                three-slotC50N(5),  -- 3 slot C50N Chassis
+		three-slotC50T(6),  -- 3 slot C50T Chassis
+		six-slotBH5005(7)   -- 6 slot BH5005 Chassis
+	}
+
+-- This type is used to specify a mother card module.
+-- NOTE: this module type is OBSELETE and should not be 
+--       supported in any new development. USE the
+--       s5000 registration MIB instead.
+SsModuleType ::=
+	INTEGER {
+		empty(1),		-- nothing installed
+		other(2),		-- none of the following
+		mTR4PC(3),		-- Token-Ring Module (4 port)
+		mTRMCP4PC(4),		-- MCP with Token-Ring (4 port) Card
+		mATM(5),		-- ATM 2-port Multi Mode Fiber
+		mTRFiber(6),		-- Token-Ring Fiber Module
+		mTRMCPFiber(7),		-- MCP Token-Ring Fiber
+		mEther16PC10BT(8),	-- Ethernet Module (16 port) 10 BaseT
+		mEtherMCP8PC10BT(9),	-- MCP Ethernet 8 port 10 BaseT
+		mATM2PSMFiber(10),	-- ATM 2-port Single Mode Fiber
+		mATM2PCopper(11),	-- ATM 2-port Copper
+		mATM4PMMFiber(12),	-- ATM 4-port Multi Mode Fiber
+		mATM4PSMFiber(13),	-- ATM 4-port Single Mode Fiber
+		mATM4PCopper(14),	-- ATM 4-port Copper
+		mATMMCP2PSMFiber(15),	-- ATM MCP 2-port Single Mode Fiber
+		mATMMCP2PMMFiber(16),	-- ATM MCP 2-port Multi Mode Fiber
+		mATMMCP2PCopper(17),	-- ATM MCP 2-port Copper
+		mATMMCP4PSMFiber(18),	-- ATM MCP 4-port Single Mode Fiber
+		mATMMCP4PMMFiber(19),	-- ATM MCP 4-port Multi Mode Fiber
+		mATMMCP4PCopper(20),	-- ATM MCP 4-port Copper
+		mATM2PC(21),		-- ATM 2-port card
+		mATM4PC(22),		-- ATM 4-port card
+		mATMMCP2PC(23),		-- ATM MCP 2-port card
+		mATMMCP4PC(24),		-- ATM MCP 4-port card
+        	mEther16P10BT100BTCopper(25), -- Ethernet 16 port (14 10MB, 2 10/100MB)
+        	mEther14P10BT100BF(26), -- Ethernet 14 port (12 10MB, 2 100MB)
+        	mEther8P10BF(27),	-- Ethernet 8 port 10BF
+		mEther10P10BT100BT(28),	-- Ethernet 10 port (8 10MB, 2 10/100MB)
+		mEther16P10BT100BTMixed(29),	-- Ethernet 10 port (8 10MB, 2 10/100MB)
+		mEther10P10BT100BTMIX(30),	-- Ethernet 10 port (8 10MB, 2 10/100MB)
+		mEther12PBFL(32),	-- 5324 12 Port BFL Enet Switch Module
+		mEther16P4x4(33),	-- 5455 Ethernet 4x4 bank switching
+                mTRMCP8PC(34),          -- 8 port Copper Token-Ring MCP
+		mTR8PC(35),             -- 8 port UTP TokenSpeed Card
+                mEther24PC(36),         -- 5328HD 24 port slave 10Mb 
+		mEther24P10BT100BT(37),	-- 5625 Enet 24 port 10/100Mb
+		mEther24P100BFx(38),	-- 5424 Enet 24 port 100BaseFx
+                mTR8PFiber(39),         -- 5524 8 port TR Fiber
+                mATM4PMDA(40),          -- 5720 4 port ATM MDA 
+                mATMMCP4PMDA(41),       -- 5720M 4 port ATM MDA MCP 
+                mEther4P100BT(42),      -- 5425 4 port Ethernet 100Mb 
+		mTR24PC(43),		-- Token-Ring Module 24 port
+		mTR16PC(44),		-- Token-Ring Module 16 port
+		mATMMCP1PSMFiber(45),	-- ATM MCP 1-port Single Mode Fiber
+		mATMMCP1PMMFiber(46),	-- ATM MCP 1-port Multi Mode Fiber
+		mATM1PMMFiber(47),	-- ATM 1-port Multi Mode Fiber
+		mATM1PVNR(48),		-- BH 5782 VNR 5000BH i int. OC3 port
+		mEther24P10BT100BTx(49),   -- 5625H Enet 24 port 10/100Mb
+		mEther24P100BFX(50)     -- 5424H Enet 24 port 100BaseFx
+	}
+
+SsMediaType ::=
+	INTEGER {
+		mediaUnkown(1),		-- none of the following
+		mediaTokenRing(2),
+		mediaFDDI(3),
+		mediaEthernet(4),
+		mediaATM(5)
+	}
+		
+
+-- All representations of MAC addresses in this MIB Module
+-- use, as a textual convention (i.e. this convention does
+-- not affect their encoding), the data type:
+ 
+MacAddress ::= OCTET STRING (SIZE (6))  -- a 6 octet address in
+                                        -- the "canonical" order
+-- defined by IEEE 802.1a, i.e., as if it were transmitted
+-- least significant bit first, even though 802.5 (in
+-- contrast to other 802.x protocols) requires MAC addresses
+-- to be transmitted most significant bit first.
+--
+-- 16-bit addresses, if needed, are represented by setting
+-- their upper 4 octets to all 0's, i.e., AAFF would be
+-- represented as 00000000AAFF.
+
+-- Represents a boolean value.
+ 
+Boolean ::= INTEGER { true(1), false(2) }
+ 
+-- Represents a single bit field.
+ 
+BitField ::= INTEGER { clear(1), set(2) }
+ 
+-- Port Identifier
+
+PortId ::= INTEGER (1..65535)
+
+-- Card Identifier
+
+CardId ::= INTEGER (1..16)
+
+-- System failure status indication type
+
+FailIndicator ::= INTEGER { on(1), off(2) }
+
+
+EnableIndicator ::= INTEGER { disabled(1), enabled(2) }
+
+
+-- Top Branches under "centillion"
+
+centillion		OBJECT IDENTIFIER ::=	{ enterprises 930 }
+
+cnProducts		OBJECT IDENTIFIER ::=	{ centillion 1 }
+proprietary		OBJECT IDENTIFIER ::=	{ centillion 2 }
+extensions		OBJECT IDENTIFIER ::=	{ centillion 3 }
+cnTemporary		OBJECT IDENTIFIER ::=	{ centillion 4 }
+
+
+
+-- Branches under "proprietary"
+
+cnSystem		OBJECT IDENTIFIER ::=	{ proprietary 1 }
+cnATM			OBJECT IDENTIFIER ::=	{ proprietary 2 }
+
+sysChassis		OBJECT IDENTIFIER ::=	{ cnSystem 1 }
+sysConfig		OBJECT IDENTIFIER ::=	{ cnSystem 2 }
+sysMonitor		OBJECT IDENTIFIER ::=	{ cnSystem 3 }
+sysTrap                 OBJECT IDENTIFIER ::=   { cnSystem 4 }
+sysEvtLogMgmt	OBJECT IDENTIFIER ::=	{ cnSystem 5 }
+ 
+atmConfig		OBJECT IDENTIFIER ::=	{ cnATM 1 }
+atmMonitor		OBJECT IDENTIFIER ::=	{ cnATM 2 }
+--
+-- LAN Emulation Extentions
+--
+atmLane         	OBJECT IDENTIFIER ::=   { cnATM 3 }
+
+-- Centillion SONET/SDH MIB
+--
+atmSonet        	OBJECT IDENTIFIER ::=   { cnATM 4 }
+
+--
+-- Centillion unique traps
+--
+sysMcpRedundTrap        OBJECT IDENTIFIER ::=   {sysTrap 1}
+cnPvcTraps              OBJECT IDENTIFIER ::=   {sysTrap 2}
+
+
+
+-- Branches under "cnProducts"
+
+-- These object identifiers are for use as values for sysObjectId.
+
+cnCentillion100		OBJECT IDENTIFIER ::=	{ cnProducts 1 }
+cnIBM8251		OBJECT IDENTIFIER ::=	{ cnProducts 2 }
+cnBayStack301           OBJECT IDENTIFIER ::=   { cnProducts 3 }
+cn5000BH-MCP            OBJECT IDENTIFIER ::=   { cnProducts 4 }
+cnCentillion50N         OBJECT IDENTIFIER ::=   { cnProducts 5 }
+cnCentillion50T         OBJECT IDENTIFIER ::=   { cnProducts 6 }
+cn5005BH-MCP            OBJECT IDENTIFIER ::=   { cnProducts 7 }
+
+
+
+
+-- SECTION 2: System Group
+--
+-- This section contains system level information.
+-- System Chassis information 
+--
+-- Implementation of this group is mandatory for all Centillion agents.
+
+chassisType OBJECT-TYPE
+	SYNTAX	SsChassisType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis type."
+	::= { sysChassis 1 }
+
+chassisBkplType OBJECT-TYPE
+	SYNTAX	SsBackplaneType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis backplane type."
+	::= { sysChassis 2 }
+
+chassisPs1FailStatus OBJECT-TYPE
+	SYNTAX	FailIndicator
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power supply 1 failure indicator. A value of on (1)
+		indicates a failure on power supply 1."
+	::= { sysChassis 3 }
+
+chassisPs2FailStatus OBJECT-TYPE
+	SYNTAX	FailIndicator
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Power supply 2 failure indicator. A value of on (1)
+		indicates a failure on power supply 2."
+	::= { sysChassis 4 }
+
+chassisFanFailStatus OBJECT-TYPE
+	SYNTAX	FailIndicator
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"System chassis fan failure indicator. A value of on (1)
+		indicates a failure on one or both of the system fans."
+	::= { sysChassis 5 }
+
+chassisSerialNumber OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE (3))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Chassis serial number."
+	::= { sysChassis 6 }
+
+chassisPartNumber OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE (6))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Chassis part number."
+	::= { sysChassis 7 }
+	
+
+-- Chassis Slot Configuration Table
+
+-- This table contains information about the modules currently inserted in
+-- the chassis. The information and configuration contained here is common
+-- for all modules.
+
+slotConfigTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SlotConfigEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis slot configuration table."
+	::= { sysChassis 9 }
+
+slotConfigEntry OBJECT-TYPE
+	SYNTAX	SlotConfigEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"What type of module is in each slot of the chassis."
+	INDEX	{ slotNumber }
+	::= { slotConfigTable 1 }
+
+
+SlotConfigEntry ::= SEQUENCE {
+	slotNumber
+		INTEGER,
+	slotModuleType
+		SsModuleType,
+	slotModuleSerialNumber
+		OCTET STRING,
+	slotModuleHwVer
+		OCTET STRING,
+	slotModuleSwVer
+		DisplayString,
+	slotModuleStatus
+		INTEGER,
+	slotModuleLeds
+		OCTET STRING,
+	slotModuleReset
+		INTEGER,
+	slotConfigDelete
+		Boolean,
+	slotConfigMediaType
+		SsMediaType,
+        slotModuleMaxRAM
+                INTEGER,
+        slotModuleInstalledRAM
+                INTEGER,
+        slotModuleFlashSize
+                INTEGER,
+        slotModuleProductImageId
+                INTEGER,
+	slotModuleBaseMacAddress
+		MacAddress,
+        slotLastResetEPC
+		Counter32,
+        slotLastResetCause
+		Counter32,
+        slotLastResetVirtualAddress
+		Counter32,
+        slotLastResetTimeStamp
+		Counter32,
+	slotConfigAdd
+		Boolean,
+	slotConfigExtClockSource
+		INTEGER,
+	slotConfigTrafficShapingRate
+		INTEGER
+	}
+
+slotNumber OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis slot number. Valid entries are system dependent
+		based on the chassis type."
+	::= { slotConfigEntry 1 }
+
+slotModuleType OBJECT-TYPE
+	SYNTAX	SsModuleType
+	ACCESS	read-only
+	STATUS	deprecated	-- 08/07/98
+	DESCRIPTION
+		"Module type."
+	::= { slotConfigEntry 2 }
+
+slotModuleHwVer OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE (6))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The hardware revision of the module."
+	::= { slotConfigEntry 3 }
+
+slotModuleSerialNumber OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE (3))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Module serial number. Format is 3 BCD digits."
+	::= { slotConfigEntry 4 }
+
+slotModuleSwVer OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The software revision of the module."
+	::= { slotConfigEntry 5 }
+
+slotModuleStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		ok(1),		-- good status
+		fail(2)		-- bad status
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the operational status of the module."
+	::= { slotConfigEntry 6 }
+
+slotModuleLeds OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Status of the module LEDs. Each LED bank is encoded
+		in four	bits (nibble), one bit for each LED. The least 
+		significant bit of each nibble represents the bottom LED
+		of each bank. The first octet in the string, as read from 
+		left to right represents the first LED banks."
+	::= { slotConfigEntry 7 }
+
+slotModuleReset OBJECT-TYPE
+	SYNTAX	INTEGER {
+		noReset(1),	-- not resetting
+		reset(2)	-- resetting
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the reset state of the module. Writing with 
+		the value reset (2) will reset the module."
+	::= { slotConfigEntry 8 }
+
+slotConfigDelete OBJECT-TYPE
+	SYNTAX	Boolean
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Setting this object causes the configuration of the
+		slot to be deleted. When read, this object has a value
+		of false(2)."
+	::= { slotConfigEntry 9 }
+
+slotConfigMediaType OBJECT-TYPE
+	SYNTAX	SsMediaType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The configured card media type. In the case of a card
+		mismatch, the configured media type and the module type
+		will not match."
+	::= { slotConfigEntry 10 }
+
+
+slotModuleMaxRAM OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This indicates maximum RAM size in KB can be installed in
+                this module."
+        ::= { slotConfigEntry 11 }
+ 
+slotModuleInstalledRAM OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This indicates installed RAM in KB of this module."
+        ::= { slotConfigEntry 12 }
+ 
+slotModuleFlashSize OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This indicates installed flash size in KB of this module."
+        ::= { slotConfigEntry 13 }
+ 
+ 
+slotModuleProductImageId OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notApplicable(1),
+                noAtmLanEmulation(2),
+                minAtmLanEmulation(3),
+                fullAtmLanEmulation(4),
+                pnnifullAtmLanEmulation(5)
+	}
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This indicates the product target image id of this module."
+        ::= { slotConfigEntry 14 }
+
+
+slotModuleBaseMacAddress OBJECT-TYPE
+        SYNTAX  MacAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object returns the module base Mac address. A physical
+		port's default Mac address can be computed based on this address
+		by using following computation:
+
+		Port(n)MacAddress = Moudle base Mac address + Port(n); where (n)
+		is the 0-based port number."
+
+        ::= { slotConfigEntry 15 }
+
+slotLastResetEPC OBJECT-TYPE
+       	SYNTAX  Counter32
+       	ACCESS  read-only
+       	STATUS  mandatory
+    	DESCRIPTION
+           "The programe counter realated to the last reset."
+  ::= { slotConfigEntry 16 }
+
+slotLastResetVirtualAddress OBJECT-TYPE
+       	SYNTAX  Counter32
+      	ACCESS  read-only
+     	STATUS  mandatory
+    	DESCRIPTION
+           "The bus address."
+  ::= { slotConfigEntry 17 }
+
+slotLastResetCause OBJECT-TYPE
+        SYNTAX  Counter32
+        ACCESS  read-only
+        STATUS  mandatory
+       	DESCRIPTION
+              "Register value related to the last reset"
+        ::= { slotConfigEntry 18 }
+ 
+slotLastResetTimeStamp OBJECT-TYPE
+        SYNTAX  Counter32
+        ACCESS  read-only
+       	STATUS  mandatory
+      	DESCRIPTION
+                "A integer value of the system clock since last reset."
+        ::= { slotConfigEntry 19 }
+
+slotConfigAdd OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Setting this object causes the configuration of the
+                slot to be updated to match the module currently in
+                the slot.  When read, this object always returns
+		false(2)."
+ 
+        ::= { slotConfigEntry 20 }
+
+slotConfigExtClockSource OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This field indicates the external clock source.  
+		 0 = Local Oscillator, 1..N = ATM port id for 
+		 external clock source.  This object only applies 
+		 to ATM MDA modules with SM, MM, or UTP media types."
+    	DEFVAL { 0 }
+	::= { slotConfigEntry 21 }
+
+slotConfigTrafficShapingRate OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Configured traffic shaping rate in kilo bits per second
+		 on an ATM module.  The actual rate may be different
+		 from the configured rate depending upon the physical
+		 interface of ports in the module."
+	::= { slotConfigEntry 22 }
+
+END

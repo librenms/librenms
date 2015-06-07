@@ -1,0 +1,150 @@
+CABLETRON-TRAPS-IRM DEFINITIONS ::= BEGIN
+
+        --  cabletron-traps-irm.txt
+        --  Revision: 01.00.00
+        --  Part Number:  
+        --  Date: May 31, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  use of IETF and enterprise-specific snmp traps.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright (c)1995 Cabletron Systems
+
+--  ---------------------
+--  Top Level Definitions
+--  ---------------------
+
+-- Imports
+
+IMPORTS
+        TRAP-TYPE
+                        FROM RFC-1215
+        enterprises
+                        FROM RFC1155-SMI
+
+        deviceTimeBase, devTrafficThreshold, 
+        devCollsThreshold, devErrorThreshold, 
+        devErrorSource, deviceSrcAddrLocked,
+        devBroadThreshold
+                        FROM REPEATER-MIB-2
+
+        ifIndex
+                        FROM RFC1213-MIB
+
+        boardIndex, boardSrcAddrLocked
+                        FROM IRM3-MIB;
+
+        cabletron       OBJECT IDENTIFIER ::= { enterprises 52 }
+
+srcAddressPortGrpLockStatusChange TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { boardIndex,
+                      boardSrcAddrLocked }
+        DESCRIPTION
+                "This trap is generated when a change to the 
+                source address locking is detected at the port 
+                group level."
+        ::= 308 -- 0x0134
+
+deviceTrafficThresholdExceeded TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { devTrafficThreshold,
+                      deviceTimeBase }
+        DESCRIPTION
+                "This trap  will be  generated when  the  traffic  (good
+                packets per  time interval)  has been  exceed for the entire
+                MMAC."
+            --#SUMMARY 'Device Traffic Threshold Exceeded: Threshold $1, Timebase $2'
+            --#SEVERITY MINOR
+            --#GENERIC 6
+            --#CATEGORY "Threshold Events"
+            --#SOURCE_ID "A"
+        ::= 268 -- 0x010C
+
+deviceErrorThresholdExceeded TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { devErrorThreshold,
+                      devErrorSource,
+                      deviceTimeBase }
+        DESCRIPTION
+                "This  trap  will  be  generated  when  packets  of
+                the selected error  type exceeds  a threshold
+                percentage of the good packets for a particular 
+                interval for the entire MMAC."
+            --#SUMMARY 'Device Error Threshold Exceeded: Threshold $1, Timebase $2'
+            --#SEVERITY MINOR
+            --#GENERIC 6
+            --#CATEGORY "Threshold Events"
+            --#SOURCE_ID "A"
+        ::= 269 -- 0x010D
+
+deviceCollsionThresholdExceeded TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { devCollsThreshold,
+                      deviceTimeBase }
+        DESCRIPTION
+                "This trap  will be  generated when  collsions exceed
+                a threshold percentage  of the  good packets  for a
+                particular interval for the entire MMAC."
+            --#SUMMARY 'Device Collision Threshold Exceeded: Threshold $1, Timebase $2'
+            --#SEVERITY MINOR
+            --#GENERIC 6
+            --#CATEGORY "Threshold Events"
+            --#SOURCE_ID "A"
+        ::= 270 -- 0x010E
+
+
+deviceBroadcastThresholdExceeded TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { devBroadThreshold,
+                      deviceTimeBase }
+        DESCRIPTION
+                "This trap is generated when the broadcast packets
+                (per time interval) have exceeded the threshold for
+                the entire MMAC."
+            --#SUMMARY 'Device Broadcast Threshold Exceeded: Value $1, Timebase $2'
+            --#SEVERITY WARNING
+            --#GENERIC 6
+            --#CATEGORY "Threshold Events"
+            --#SOURCE_ID "A"
+        ::= 288 -- 0x0120
+
+lockStatusChanged TRAP-TYPE
+        ENTERPRISE cabletron
+        VARIABLES { deviceSrcAddrLocked }
+        DESCRIPTION
+                "This trap is generated when the status of the address
+                lock changes."
+            --#SUMMARY 'Source Address Lock Changed: Status $1'
+            --#SEVERITY WARNING
+            --#GENERIC 6
+            --#CATEGORY "Threshold Events"
+            --#SOURCE_ID "A"
+        ::= 278 -- 0x0116
+
+END

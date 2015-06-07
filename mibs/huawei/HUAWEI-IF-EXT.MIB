@@ -1,0 +1,3247 @@
+-- ==================================================================
+-- Copyright (C) 2005 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Private Extended Interface MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--      V1.0 
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+-- 
+-- ==================================================================
+
+    HUAWEI-IF-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            ifIndex, ifName, InterfaceIndex,InterfaceIndexOrZero,ifAdminStatus,ifOperStatus,ifDescr          
+                FROM IF-MIB            
+            VlanIdOrNone, PortList            
+                FROM Q-BRIDGE-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI           
+            sysUpTime
+                FROM SNMPv2-MIB                 
+            RowStatus, TruthValue, DisplayString,PhysAddress,TEXTUAL-CONVENTION         
+                FROM SNMPv2-TC
+            AtmVpIdentifier, AtmVcIdentifier            
+                FROM ATM-TC-MIB;
+    
+    
+        hwIFExtMib MODULE-IDENTITY 
+            LAST-UPDATED "200610312230Z"        -- October 31, 2006 at 22:30 GMT
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "Some attribute of interface extended content, information of 
+                interface IP, interface of trunk interface."
+            ::= { hwDatacomm 41 }
+
+        
+    
+--
+-- Textual conventions
+--
+    
+--  Textual Convention
+        EnabledStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "A simple status value for the object."
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+
+        SnmpPasswdString ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "16a"
+            STATUS current
+            DESCRIPTION 
+                "The password string"
+            SYNTAX OCTET STRING (SIZE (0..16))
+            
+        HWDirectionType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "The Direction Flux Limit apply on."
+        SYNTAX INTEGER
+            {
+            inbound(1),
+            outbound(2)
+            }
+
+--  ============================================================================                        
+-- interface IP address group
+-- ============================================================================
+        HwIpAddressType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The type of IP address."
+            SYNTAX INTEGER
+                {
+                primary(1),
+                sub(2)
+                }
+
+    
+--
+-- Node definitions
+--
+    
+        hwIFExtObjects OBJECT IDENTIFIER ::= { hwIFExtMib 1 }
+
+        
+--  ====================================================================    
+-- basic interface extended definition group
+-- ====================================================================
+        hwIFExtBase OBJECT IDENTIFIER ::= { hwIFExtObjects 1 }
+
+        
+--  ===========================================================================
+-- interfacce extended group
+-- ============================================================================  
+        hwIFExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIFExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Interface extended table of private mib."
+            ::= { hwIFExtBase 1 }
+
+        
+        hwIFExtEntry OBJECT-TYPE
+            SYNTAX HwIFExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries of private extended interface table."
+            INDEX { hwIFExtIndex }
+            ::= { hwIFExtTable 1 }
+
+        
+        HwIFExtEntry ::=
+            SEQUENCE { 
+                hwIFExtIndex
+                    InterfaceIndex,
+                hwIFExtLayer
+                    INTEGER,
+                hwIFExtFrameType
+                    INTEGER,
+                hwIFExtFlowStatInterval
+                    Integer32,
+                hwIFExtFlushReceiveEnable
+                    EnabledStatus,
+                hwIFExtFlushVlanId
+                    VlanIdOrNone,
+                hwIFExtFlushPasswd
+                    SnmpPasswdString,
+                hwIFExtFlowStatus
+                    INTEGER,                    
+                hwIFExtMtu
+                    Integer32,
+                hwIFExtMacAddr
+                    PhysAddress,
+                hwIFExtBlockPriority
+                    Integer32                    
+             }
+
+        hwIFExtIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of extended table of interface."
+            ::= { hwIFExtEntry 1 }
+
+        
+        hwIFExtLayer OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                layer2(1),
+                layer3(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Switch the port between Layer3 and Layer2. Corresponding to the 
+                port switch command.Layer2(1) is 1 when the port switch from layer3
+                 to layer2.Layer3(1) is 1 when the port switch from lyaer2 to  
+                layer3."
+            ::= { hwIFExtEntry 2 }
+
+        
+        hwIFExtFrameType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ethernetII(1),
+                ethernetSnap(2),
+                ethernet8022(3),
+                ethernet8023(4),
+                other(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Frame type is accepted by VLAN virtual interfaces.Frame format 
+                contains ethernetII(1),ethernetII(2),ethernet8022(3),ethernet8023.
+                The type location setting 1 when the ethernetII(1) type is
+                 accepted.Now only surpport the first(ethernetII(1))"
+            ::= { hwIFExtEntry 3 }
+
+        
+-- metric: second
+        hwIFExtFlowStatInterval OBJECT-TYPE
+            SYNTAX Integer32 (10..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Interval of interface flow stat.The value of interval must be divided 
+                exactly by 10.The interface interval is effective,when both interface 
+                interval and global interval are config.Globle interval is only effective 
+                in interfaces,which interface interval is not configured. The real time 
+                property of interface flow stat rate will be affected by the value of 
+                interval."
+            DEFVAL { 300 }
+            ::= { hwIFExtEntry 4 }
+
+        
+        hwIFExtFlushReceiveEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether or not permit the port to take over FLUSHDUs. Once it is enabled,
+                the port will take over SmartLink FlushDUs from related vlans so as to delete
+                the MAC forwarding table in the local equipment."
+            DEFVAL { disabled }
+            ::= { hwIFExtEntry 5 }
+
+        
+        hwIFExtFlushVlanId OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The ID of Vlan the port belongs to.When it is 0, it indicates 
+                the function of receiving FlushPDU is disabled."
+            DEFVAL { 0 }
+            ::= { hwIFExtEntry 6 }
+
+        
+        hwIFExtFlushPasswd OBJECT-TYPE
+            SYNTAX SnmpPasswdString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "A 16-octet read-write value used to define the password for negotiation."
+            DEFVAL { '00'h }
+            ::= { hwIFExtEntry 7 }
+            
+        hwIFExtFlowStatus OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              flowUp(1),
+              flowDown(2)
+            }       
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+           " Current flow status of interface.
+               1:flow up
+               2:flow down"
+            ::= { hwIFExtEntry 8 }            
+            
+        hwIFExtMtu OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+           "The Max Transmit Unit of the interface."
+            ::= { hwIFExtEntry 9 }  
+            
+        hwIFExtMacAddr  OBJECT-TYPE
+               SYNTAX PhysAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The MAC address of the interface ."
+            ::= { hwIFExtEntry 10 }
+
+        hwIFExtBlockPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..255)      
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+           "The blocked priority of the interface."
+            ::= { hwIFExtEntry 11 }            
+
+        hwIFExtPhyStatus OBJECT-TYPE
+            SYNTAX INTEGER { up(1), down(2) }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The physical status of member interface."
+            ::= { hwIFExtBase 2 }
+
+
+        hwIFExtMemberOf OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The description of the main interface which has the membership with the member interface."
+            ::= { hwIFExtBase 3 }
+
+    hwLinkModeChangeAutoCreateIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLinkModeChangeAutoCreateIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Interface extended table of private mib."
+            ::= { hwIFExtBase 4 }
+
+        
+        hwLinkModeChangeAutoCreateIfEntry OBJECT-TYPE
+            SYNTAX HwLinkModeChangeAutoCreateIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries of private extended interface table."
+            INDEX { hwAutoIfIndex }
+            ::= { hwLinkModeChangeAutoCreateIfTable 1 } 
+            
+        HwLinkModeChangeAutoCreateIfEntry ::=
+            SEQUENCE { 
+                hwAutoIfIndex
+                    InterfaceIndex,
+                hwNewIfTimeslot
+                    BITS,
+             } 
+             
+        hwAutoIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of extended table of interface."
+            ::= { hwLinkModeChangeAutoCreateIfEntry 1 }
+            
+        hwNewIfTimeslot OBJECT-TYPE
+            SYNTAX BITS{
+                      timeslot0(0),
+                      timeslot1(1),
+                      timeslot2(2),
+                      timeslot3(3),
+                      timeslot4(4),
+                      timeslot5(5),
+                      timeslot6(6),
+                      timeslot7(7),
+                      timeslot8(8),
+                      timeslot9(9),
+                      timeslot10(10),
+                      timeslot11(11),
+                      timeslot12(12),
+                      timeslot13(13),
+                      timeslot14(14),
+                      timeslot15(15),
+                      timeslot16(16),
+                      timeslot17(17),
+                      timeslot18(18),
+                      timeslot19(19),
+                      timeslot20(20),
+                      timeslot21(21),
+                      timeslot22(22),
+                      timeslot23(23),
+                      timeslot24(24),
+                      timeslot25(25),
+                      timeslot26(26),
+                      timeslot27(27),
+                      timeslot28(28),
+                      timeslot29(29),
+                      timeslot30(30),
+                      timeslot31(31)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time slot of the TDM interface:
+                      timeslot0(0):The time slot 0 on the TDM interface,
+                      timeslot1(1):The time slot 1 on the TDM interface,
+                      timeslot2(2):The time slot 2 on the TDM interface,
+                      timeslot3(3):The time slot 3 on the TDM interface,
+                      timeslot4(4):The time slot 4 on the TDM interface,
+                      timeslot5(5):The time slot 5 on the TDM interface,
+                      timeslot6(6):The time slot 6 on the TDM interface,
+                      timeslot7(7):The time slot 7 on the TDM interface,
+                      timeslot8(8):The time slot 8 on the TDM interface,
+                      timeslot9(9):The time slot 9 on the TDM interface,
+                      timeslot10(10):The time slot 10 on the TDM interface,
+                      timeslot11(11):The time slot 11 on the TDM interface,
+                      timeslot12(12):The time slot 12 on the TDM interface,
+                      timeslot13(13):The time slot 13 on the TDM interface,
+                      timeslot14(14):The time slot 14 on the TDM interface,
+                      timeslot15(15):The time slot 15 on the TDM interface,
+                      timeslot16(16):The time slot 16 on the TDM interface,
+                      timeslot17(17):The time slot 17 on the TDM interface,
+                      timeslot18(18):The time slot 18 on the TDM interface,
+                      timeslot19(19):The time slot 19 on the TDM interface,
+                      timeslot20(20):The time slot 20 on the TDM interface,
+                      timeslot21(21):The time slot 21 on the TDM interface,
+                      timeslot22(22):The time slot 22 on the TDM interface,
+                      timeslot23(23):The time slot 23 on the TDM interface,
+                      timeslot24(24):The time slot 24 on the TDM interface,
+                      timeslot25(25):The time slot 25 on the TDM interface,
+                      timeslot26(26):The time slot 26 on the TDM interface,
+                      timeslot27(27):The time slot 27 on the TDM interface,
+                      timeslot28(28):The time slot 28 on the TDM interface,
+                      timeslot29(29):The time slot 29 on the TDM interface,
+                      timeslot30(30):The time slot 30 on the TDM interface,
+                      timeslot31(31):The time slot 31 on the TDM interface."
+            ::= { hwLinkModeChangeAutoCreateIfEntry 2 }
+
+        
+        hwInterfaceIp OBJECT IDENTIFIER ::= { hwIFExtObjects 2 }
+
+        
+        hwIfIpTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIfIpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Interface IP address configuration table .It contains IP address,
+                IP address mask, IP address acquiring method."
+            ::= { hwInterfaceIp 1 }
+
+        
+        hwIfIpEntry OBJECT-TYPE
+            SYNTAX HwIfIpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Interface IP address configuration  "
+            INDEX { hwIpAdEntAddr }
+            ::= { hwIfIpTable 1 }
+
+        
+        HwIfIpEntry ::=
+            SEQUENCE { 
+                hwIpAdEntAddr
+                    IpAddress,
+                hwIpAdEntIfIndex
+                    Integer32,
+                hwIpAdEntNetMask
+                    IpAddress,
+                hwIpAdEntBcastAddr
+                    Integer32,
+                hwIpAdEntReasmMaxSize
+                    Integer32,
+                hwIpAdEntAddressType
+                    HwIpAddressType,
+                hwIfIpMethod
+                    INTEGER,
+                hwIpAdEntAddrStatus
+                    RowStatus
+             }
+
+        hwIpAdEntAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address to which this entry's addressing
+                information pertains."
+            ::= { hwIfIpEntry 1 }
+
+        
+        hwIpAdEntIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The index value which uniquely identifies the
+                interface to which this entry is applicable.  The
+                interface identified by a particular value of this
+                index is the same interface as identified by the
+                same value of ifIndex."
+            ::= { hwIfIpEntry 2 }
+
+        
+        hwIpAdEntNetMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The subnet mask associated with the IP address of
+                this entry.  The value of the mask is an IP
+                address with all the network bits set to 1 and all
+                the host bits set to 0."
+            ::= { hwIfIpEntry 3 }
+
+        
+        hwIpAdEntBcastAddr OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of the least-significant bit in the IP
+                broadcast address used for sending datagrams on
+                the (logical) interface associated with the IP
+                address of this entry.  For example, when the
+                Internet standard all-ones broadcast address is
+                used, the value will be 1.  This value applies to
+                both the subnet and network broadcasts addresses
+                used by the entity on this (logical) interface."
+            ::= { hwIfIpEntry 4 }
+
+        
+        hwIpAdEntReasmMaxSize OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The size of the largest IP datagram which this
+                entity can re-assemble from incoming IP fragmented
+                datagrams received on this interface."
+            ::= { hwIfIpEntry 5 }
+
+        
+        hwIpAdEntAddressType OBJECT-TYPE
+            SYNTAX HwIpAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The flag indicates whether the IP address is primary IP address.
+                One interface has only one primary IP address,but can have many sub IP address.
+                So when add a primary IP address to an interface that has already a primary IP address,
+                the new primary address will replace old primary address and the old primary address will be deleted."
+            ::= { hwIfIpEntry 6 }
+
+        
+        hwIfIpMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                assignedIp(1),
+                dhcpIp(2),
+                bootpIp(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Interface IP address acquiring method ,which contains assigned-ip
+                (1),dhcp-ip(2) and bootp-ip(3).assigned-ip(1) means manual,dhcp-ip(2)
+                is Dynamic Host Configuration Protocol,the terminal put forward 
+                request after,DHCP supplies IP Address,Gateway,DNS server Address 
+                to the terminal.Now only surpport the first(assigned-ip(1) )"
+            ::= { hwIfIpEntry 7 }
+
+        
+        hwIpAdEntAddrStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status variable."
+            ::= { hwIfIpEntry 8 }  
+            
+            
+        hwIfIpUnnumberedTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIfIpUnnumberedEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                "Interface IP address unnumbered table.
+                It contains lend IP address and lend IP address mask."
+            ::= { hwInterfaceIp  2}
+                    
+                    
+        hwIfIpUnnumberedEntry OBJECT-TYPE
+            SYNTAX HwIfIpUnnumberedEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION 
+                " Interface IP address unnumbered configuration  "
+            INDEX   { hwUnnumberedIfIndex } 
+            ::= {hwIfIpUnnumberedTable 1}
+                    
+                    
+        HwIfIpUnnumberedEntry    ::=
+        SEQUENCE {  
+            hwUnnumberedIfIndex
+                InterfaceIndex,
+            hwLendIfIndex 
+                InterfaceIndex,
+            hwLendIpAddr 
+                IpAddress,
+            hwLendIpAddrNetMask  
+                IpAddress,
+            hwUnnumberedRowStatus
+                RowStatus
+    
+            }    
+            
+         hwUnnumberedIfIndex OBJECT-TYPE  
+            SYNTAX  InterfaceIndex
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "The index value of the unnumbered interface."
+            ::= { hwIfIpUnnumberedEntry 1 }
+               
+               
+         hwLendIfIndex OBJECT-TYPE    
+            SYNTAX  InterfaceIndex
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                    "The index value of the lend interface."
+            ::= { hwIfIpUnnumberedEntry 11 }
+                 
+                 
+         hwLendIpAddr OBJECT-TYPE      
+            SYNTAX  IpAddress
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "The IP address of the lend interface."
+            ::= { hwIfIpUnnumberedEntry 12 }
+                 
+                 
+         hwLendIpAddrNetMask OBJECT-TYPE    
+            SYNTAX  IpAddress
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "The IP address mask of the lend interface."
+            ::= { hwIfIpUnnumberedEntry 13 }
+                    
+                    
+         hwUnnumberedRowStatus OBJECT-TYPE        
+            SYNTAX  RowStatus
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                    "The row status variable."
+            ::= { hwIfIpUnnumberedEntry 51 } 
+            
+--  ============================================================================
+-- interface trunk attribute group
+-- ============================================================================
+        hwTrunkAttr OBJECT IDENTIFIER ::= { hwIFExtObjects 3 }
+
+        
+        hwTrunkIfMax OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum of Trunk interface"
+            ::= { hwTrunkAttr 1 }
+
+        
+        hwTrunkNextIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The nextindex of Trunk interface,that means its position"
+            ::= { hwTrunkAttr 2 }
+
+        
+        hwTrunkIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTrunkIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The trunk table."
+            ::= { hwTrunkAttr 3 }
+
+        
+        hwTrunkIfEntry OBJECT-TYPE
+            SYNTAX HwTrunkIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries of the trunk table."
+            INDEX { hwTrunkIndex }
+            ::= { hwTrunkIfTable 1 }
+
+        
+        HwTrunkIfEntry ::=
+            SEQUENCE { 
+                hwTrunkIndex
+                    Integer32,
+                hwTrunkIfID
+                    INTEGER,
+                hwTrunkIfType
+                    INTEGER,
+                hwTrunkIfIndex
+                    InterfaceIndex,
+                hwTrunkIfModel
+                    INTEGER,
+                hwTrunkIfBandWidthAffectLinkNum
+                    INTEGER,
+                hwTrunkIfMinLinkNum
+                    Integer32,
+                hwTrunkIfRowStatus
+                    RowStatus,
+                hwTrunkIfWorkingMode
+                    INTEGER,
+                hwTrunkIfWorkingState
+                    INTEGER,
+                hwTrunkIfAutoRecover
+                    INTEGER,
+                hwTrunkIfPreemptEnable
+                    EnabledStatus,
+                hwTrunkIfPreemptDelay
+                    Integer32,
+                hwTrunkIfTimeoutReceive
+                    INTEGER,
+                hwTrunkIfFlushSendEnable
+                    EnabledStatus,
+                hwTrunkIfFlushVlanId
+                    VlanIdOrNone,
+                hwTrunkIfFlushPasswd
+                    SnmpPasswdString,
+                hwTrunkIfForceSwitchEnable
+                    EnabledStatus,
+                hwTrunkIfStatReset
+                    INTEGER,
+                hwTrunkBandwidth                        -- the band width of the trunk interface
+                    Integer32,
+                hwTrunkIfArpSendSpeed                        
+                    Integer32,
+                hwTrunkIfLagSelectedPortStd
+                    INTEGER,
+                hwTrunkIfLagMaxActiveLinkNum
+                    Integer32,
+                hwTrunkMcTrunkPriority
+                    Integer32,
+                hwTrunkMcTrunkSysID
+                    PhysAddress    
+             }
+
+--  the max bandwidth-affected-linknumber
+-- the least active-linknumber of the up port
+        hwTrunkIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The number of the Trunk interface "
+            ::= { hwTrunkIfEntry 1 }
+
+        
+        hwTrunkIfID OBJECT-TYPE
+            SYNTAX INTEGER (0..63)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The identification of the Trunk interface.It may identify Trunk
+                and is an index of the interface."
+            ::= { hwTrunkIfEntry 2 }
+
+        
+        hwTrunkIfType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ethTrunk(1),
+                ipTrunk(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The type of the Trunk interface includes eth-trunk and ip-trunk.
+                The ip-trunk is only comprised by pos link, otherwise the eth-trunk
+                 is only comprised by ethernet link."
+            ::= { hwTrunkIfEntry 3 }
+
+        
+        hwTrunkIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Index number of the Trunk interface,it is consistent with ifIndex
+                of ifTable in IF-MIB."
+            ::= { hwTrunkIfEntry 4 }
+
+        hwTrunkIfModel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                packetAll(1),
+                sourceDesMac(2),
+                packetUdp(3),
+                packetTcp(4),
+                sourceDesIp(5),
+                sourceMacIpv6(6),
+                sourceIpIpv6(7),
+                sourceIp(8),
+                desIp(9),
+                sourceMac(10),
+                desMac(11),
+                sourcePort(12),
+                desPort(13),
+                sourceDesPort(14),
+                label(15),
+        ipOrLabel(16)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Participated model of interface load. sourceDesMac(1) and 
+                sourceMac(10) and desMac(11) are Layer2 hash arithmetic."
+            ::= { hwTrunkIfEntry 5 }
+
+        
+        hwTrunkIfBandWidthAffectLinkNum OBJECT-TYPE
+            SYNTAX INTEGER (1..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The max bandwidth-affected-linknumber, One Trunk interface may 
+                contain no more than 16 items of physical link. Only in layer 2,
+                can set this value."
+            ::= { hwTrunkIfEntry 6 }
+
+        
+        hwTrunkIfMinLinkNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The Trunk port changes to up when the number of the up port reach hwTrunkIfMinLinkNum. "
+            ::= { hwTrunkIfEntry 7 }
+
+        
+        hwTrunkIfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " Current operation status of the row "
+            ::= { hwTrunkIfEntry 8 }
+
+        
+        hwTrunkIfWorkingMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                masterBackup(1),
+                normalMode(2),
+                lacpStaticMode(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " Current working mode of trunk.
+                1:master/backup access mode
+                2:normal mode
+                3:lacp static mode"
+            ::= { hwTrunkIfEntry 9 }
+
+        
+        hwTrunkIfWorkingState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                generalMode(1),
+                initialization(2),
+                masterWorking(3),
+                backupWorking(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Current working state of backup-access trunk.
+                1:general mode working state
+                2:initialization 
+                3:master working
+                4:backup working"
+            ::= { hwTrunkIfEntry 10 }
+
+        
+        hwTrunkIfAutoRecover OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                generalMode(1),
+                autoRecover(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " If auto-recover has been set, the master port will be
+                working instead of the other port when it changes from 
+                down state to up state.
+                1: don't support auto-recover
+                2: support auto-recover"
+            ::= { hwTrunkIfEntry 11 }
+
+        
+        hwTrunkIfPreemptEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The preemption according to the priority will be and only be enabled  when the lag port is working in static mode(M:N backup mode)
+                In default condition, the preemption is disabled."
+            DEFVAL { disabled }
+            ::= { hwTrunkIfEntry 12 }
+
+        
+        hwTrunkIfPreemptDelay OBJECT-TYPE
+            SYNTAX Integer32 (10..180)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The waiting time for priority preemption; Unit: second.
+                It is enabled only when the priority preemption is enabled.
+                It indicates, When it comes to priority preemption, the operation 
+                of preemption will be delayed for hwTrunkIfPreemptDelay time."
+            DEFVAL { 30 }
+            ::= { hwTrunkIfEntry 13 }
+
+        
+        hwTrunkIfTimeoutReceive OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                fast(1),
+                slow(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The expired time for the port to receive LACPDUS.
+                There are two types:
+                1.fast: 3 seconds
+                2.slow: 90 seconds
+                The default type is fast."
+            DEFVAL { fast }
+            ::= { hwTrunkIfEntry 14 }
+
+        
+        hwTrunkIfFlushSendEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Whether or not permit the trunk to transmit FlushDUs.It is only used 
+                when it is in the handwork 1:1 mode.Once it is enabled, the newly active 
+                interface in the trunk will send SmartLink FlushDUs so as to delete the 
+                related MAC forwarding table of the layer2 equipment in network.Otherwise, 
+                SmartLink FlushDUs will not be sent."
+            DEFVAL { disabled }
+            ::= { hwTrunkIfEntry 15 }
+
+        
+        hwTrunkIfFlushVlanId OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The ID of Vlan the partner port belongs to.When it is 0, it indicates 
+                the function of sending FlushPDU is disabled. "
+            DEFVAL { 0 }
+            ::= { hwTrunkIfEntry 16 }
+
+        
+        hwTrunkIfFlushPasswd OBJECT-TYPE
+            SYNTAX SnmpPasswdString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "A 16-octet read-create value used to define the password for negotiation."
+            DEFVAL { '00'h }
+            ::= { hwTrunkIfEntry 17 }
+
+        
+        hwTrunkIfForceSwitchEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is only used when it is in the handwork 1:1 mode and the current 
+                working link is the backup link. At that time, working link will move 
+                from backup link to master link. However, if the master link is down, 
+                the operation will be forbidden."
+            ::= { hwTrunkIfEntry 18 }
+
+        
+        hwTrunkIfStatReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                reset(1),
+                ready(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Reset the statistic information of LACPDUsRx,MarkerPDUsRx,LACPDUsTx,
+                MarkerResponsePDUsTx for all the ports in the current trunk."
+            ::= { hwTrunkIfEntry 19 }
+        
+        hwTrunkBandwidth  OBJECT-TYPE
+            SYNTAX Integer32(0..10000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                " Current bandwidth of trunk."
+            ::= { hwTrunkIfEntry 20 }        
+
+        
+        hwTrunkIfArpSendSpeed  OBJECT-TYPE
+            SYNTAX Integer32(800..3000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                "Indicates the rate of sending gratuitous ARP packets (in pkts/sec) on the trunk member interface."
+            DEFVAL { 2000 }                
+            ::= { hwTrunkIfEntry 21 }  
+
+        hwTrunkIfLagSelectedPortStd OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                speed(1),
+                priority(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The static mode Eth-trunk selected port standard.
+                There are two types:
+                1.speed : selected by port's speed
+                2.priority: selected by port's priority
+                The default type is priority."
+            DEFVAL { priority }
+            ::= { hwTrunkIfEntry 22 }
+
+       hwTrunkIfLagMaxActiveLinkNum  OBJECT-TYPE
+            SYNTAX Integer32(1..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+                "The statci mode Eth-trunk selected ports can not more than the value."
+            DEFVAL { 16 }                
+            ::= { hwTrunkIfEntry 23 } 
+         
+        hwTrunkMcTrunkPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The priority of the Mc-Trunk."
+            ::= { hwTrunkIfEntry 24 }
+            
+        hwTrunkMcTrunkSysID OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The system ID of the Mc-Trunk. If set ffff-ffff-ffff the system ID will be to default."
+            ::= { hwTrunkIfEntry 25 }
+         
+
+        hwTrunkSystemPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The priority of the system."
+            ::= { hwTrunkAttr 4 }
+            
+       hwTrunkUnknownUnicastIfModel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                packetAll(1),
+                sourceDesMac(2),
+                packetUdp(3),
+                packetTcp(4),
+                sourceDesIp(5),
+                sourceMacIpv6(6),
+                sourceIpIpv6(7),
+                sourceIp(8),
+                desIp(9),
+                sourceMac(10),
+                desMac(11),
+                sourcePort(12),
+                desPort(13),
+                sourceDesPort(14),
+                label(15),
+        ipOrLabel(16)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Participated model of load for unknown unicast. sourceDesMac(2) and 
+                sourceMac(10) and desMac(11) are Layer2 hash arithmetic."
+            ::= { hwTrunkAttr 5 }
+
+
+            hwTrunkMcTrunkSystemPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The system priority of the Mc-Trunk."
+            ::= { hwTrunkAttr 6 }
+            
+            
+            hwTrunkMcTrunkSystemID OBJECT-TYPE
+            SYNTAX PhysAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The system ID of the Mc-Trunk. If set ffff-ffff-ffff the system ID will be to default."
+            ::= { hwTrunkAttr 7 }   
+        
+--  ----------------------------------------------------------------------------
+-- Trunk member attribute Group
+-- ----------------------------------------------------------------------------
+        hwTrunkMemAttr OBJECT IDENTIFIER ::= { hwIFExtObjects 4 }
+
+        
+        hwTrunkMemTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTrunkMemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Trunk member attribute information table."
+            ::= { hwTrunkMemAttr 1 }
+
+        
+        hwTrunkMemEntry OBJECT-TYPE
+            SYNTAX HwTrunkMemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Trunk member attribute information"
+            INDEX { hwTrunkIndex, hwTrunkMemifIndex }
+            ::= { hwTrunkMemTable 1 }
+
+        
+        HwTrunkMemEntry ::=
+            SEQUENCE { 
+                hwTrunkMemifIndex
+                    Integer32,
+                hwTrunkValidEntry
+                    INTEGER,
+                hwTrunkSelectStatus
+                    INTEGER,
+                hwTrunkLacpStatus
+                    EnabledStatus,
+                hwTrunkDeleteFlag
+                    EnabledStatus,
+                hwTrunkOperstatus
+                    INTEGER,
+                hwTrunkIsDefaultLagRecv
+                    TruthValue,
+                hwTrunkPortWeight
+                    Unsigned32,
+                hwTrunkPortStandby
+                    Unsigned32,
+                hwTrunkRowStatus
+                    RowStatus,
+                hwTrunkPortMaster
+                    INTEGER,
+                hwTrunkPortPriority
+                    Integer32,
+                hwTrunkPortStatReset
+                    INTEGER
+             }
+
+        hwTrunkMemifIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Trunk port index"
+            ::= { hwTrunkMemEntry 1 }
+
+        
+        hwTrunkValidEntry OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                valid(1),
+                invalid(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Valid Entries of Trunk interface "
+            DEFVAL { invalid }
+            ::= { hwTrunkMemEntry 2 }
+
+        
+        hwTrunkSelectStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                trunkSelected(1),
+                trunkDeselected(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Selected Status of Trunk Port.It is used LACP."
+            DEFVAL { trunkDeselected }
+            ::= { hwTrunkMemEntry 3 }
+
+        
+        hwTrunkLacpStatus OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is status of the LACP."
+            DEFVAL { disabled }
+            ::= { hwTrunkMemEntry 4 }
+
+        
+        hwTrunkDeleteFlag OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Flag is set trunk_del_enable(1) or trunk_del_disable(2),
+                according to operation."
+            DEFVAL { disabled }
+            ::= { hwTrunkMemEntry 5 }
+
+        
+        hwTrunkOperstatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Status of operation, indicates port status. There are trunk_up(1)
+                and trunk_down(2).It expresses whether port is shutdown."
+            DEFVAL { down }
+            ::= { hwTrunkMemEntry 6 }
+
+        
+        hwTrunkIsDefaultLagRecv OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "We don't sustain now, default value is false."
+            DEFVAL { false }
+            ::= { hwTrunkMemEntry 7 }
+
+        
+        hwTrunkPortWeight OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Port weight, it expresses proportion of port in Trunk interface table"
+            DEFVAL { 1 }
+            ::= { hwTrunkMemEntry 8 }
+
+        
+        hwTrunkPortStandby OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value is backup of Trunk Port."
+            DEFVAL { 0 }
+            ::= { hwTrunkMemEntry 9 }
+
+        
+        hwTrunkRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row. "
+            ::= { hwTrunkMemEntry 10 }
+
+        
+        hwTrunkPortMaster OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                portSlave(1),
+                portMaster(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Master port of backup-access eth-trunk or not
+                1: port-slave
+                2: port-master"
+            ::= { hwTrunkMemEntry 11 }
+
+        
+        hwTrunkPortPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The priority value assigned to this Trunk Port.
+                This 16-bit value is read-write."
+            ::= { hwTrunkMemEntry 12 }
+
+        
+        hwTrunkPortStatReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                reset(1),
+                ready(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Reset the statistic information of LACPDUsRx,MarkerPDUsRx,LACPDUsTx,
+                MarkerResponsePDUsTx for the current port."
+            ::= { hwTrunkMemEntry 13 }
+
+        
+--  ===========================================================================
+-- Global interfacce flow stat interval group 
+-- ===========================================================================
+        hwIFFlowStat OBJECT IDENTIFIER ::= { hwIFExtObjects 5 }
+
+        
+-- metric: second
+        hwIFFlowStatGlobalInterval OBJECT-TYPE
+            SYNTAX Integer32 (10..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Global interval of interface flow stat.The interface interval is effective,
+                when both interface interval and global interval are config.Globle interval 
+                is only effective in interfaces,which interface interval is not configged.
+                Flow stat rate of interface will be affected by the value of interval."
+            DEFVAL { 300 }
+            ::= { hwIFFlowStat 1 }
+
+
+   
+        
+        
+        
+--  ===========================================================================
+-- Global interface flow stat interval group 
+-- ===========================================================================
+        hwIfStatistics OBJECT IDENTIFIER ::= { hwIFExtObjects 6 }
+
+        
+        hwIfEtherStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIfEtherStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Ethernet Interface Statistic Table "
+            ::= { hwIfStatistics 1 }
+
+        
+        hwIfEtherStatEntry OBJECT-TYPE
+            SYNTAX HwIfEtherStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Entry of Ethernet Interface Statistic Table "
+            INDEX { hwIfEtherStatIfIndex }
+            ::= { hwIfEtherStatTable 1 }
+
+        
+        HwIfEtherStatEntry ::=
+            SEQUENCE { 
+                hwIfEtherStatIfIndex
+                    InterfaceIndex,
+                hwIfEtherStatInJumboPkts
+                    Counter64,
+                hwIfEtherStatInCRCPkts
+                    Counter64,
+                hwIfEtherStatInLongPkts
+                    Counter64,
+                hwIfEtherStatInJabberPkts
+                    Counter64,
+                hwIfEtherStatInFragmentPkts
+                    Counter64,
+                hwIfEtherStatInUnderSizePkts
+                    Counter64,
+                hwIfEtherStatInOverRunPkts
+                    Counter64,
+                hwIfEtherStatInPausePkts
+                    Counter64,
+                hwIfEtherStatOutJumboPkts
+                    Counter64,
+                hwIfEtherStatOutOverflowPkts
+                    Counter64,
+                hwIfEtherStatOutUnderRunPkts
+                    Counter64,
+                hwIfEtherStatOutPausePkts
+                    Counter64,
+                hwIfEthIfStatReset
+                    INTEGER
+             }
+
+        hwIfEtherStatIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The index of L2 interface "
+            ::= { hwIfEtherStatEntry 1 }
+
+        
+        hwIfEtherStatInJumboPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved Packets whose size over 1518 bytes "
+            ::= { hwIfEtherStatEntry 11 }
+
+        
+        hwIfEtherStatInCRCPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved Packets which have CRC checking errors "
+            ::= { hwIfEtherStatEntry 12 }
+
+        
+        hwIfEtherStatInLongPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved Packets whose length is over maximum length "
+            ::= { hwIfEtherStatEntry 13 }
+
+        
+        hwIfEtherStatInJabberPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved Packets whose length is over maximum length 
+                and wrong CRC checking "
+            ::= { hwIfEtherStatEntry 14 }
+
+        
+        hwIfEtherStatInFragmentPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved Packets which have short size and wrong CRC checking  "
+            ::= { hwIfEtherStatEntry 15 }
+
+        
+        hwIfEtherStatInUnderSizePkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved Packets which have short size but right CRC checking  "
+            ::= { hwIfEtherStatEntry 16 }
+
+        
+        hwIfEtherStatInOverRunPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved Packets whose queue overflow "
+            ::= { hwIfEtherStatEntry 17 }
+
+        
+        hwIfEtherStatInPausePkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of recieved control Frames "
+            ::= { hwIfEtherStatEntry 18 }
+
+        
+        hwIfEtherStatOutJumboPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of sended Packets whose size over 1518 bytes "
+            ::= { hwIfEtherStatEntry 19 }
+
+        
+        hwIfEtherStatOutOverflowPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of Packets whitch happen FIFO overflow error"
+            ::= { hwIfEtherStatEntry 20 }
+
+        
+        hwIfEtherStatOutUnderRunPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of Packets whitch happen FIFO empty"
+            ::= { hwIfEtherStatEntry 21 }
+
+        
+        hwIfEtherStatOutPausePkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The number of sended control Frames  "
+            ::= { hwIfEtherStatEntry 22 }
+
+        
+        hwIfEthIfStatReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                reset(1),
+                ready(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " Reset the Statistic information Counter "
+            ::= { hwIfEtherStatEntry 23 }
+
+
+ 
+    hwIfMonitorObject OBJECT IDENTIFIER ::= { hwIFExtObjects 7 }
+    
+    hwIfMonitorThresholdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIfMonitorThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            " Alarm monitor table "
+        ::= { hwIfMonitorObject 1 }
+    hwIfMonitorThresholdEntry OBJECT-TYPE  
+        SYNTAX  HwIfMonitorThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+             " Entry of alarm monitor table "
+        INDEX { hwIfMonitorIndex }
+        ::= { hwIfMonitorThresholdTable 1 }
+    
+    HwIfMonitorThresholdEntry::=
+        SEQUENCE { 
+            hwIfMonitorIndex
+                InterfaceIndex,
+                        hwIfMonitorCrcErrorStatistics
+                                 Counter64,
+                        hwIfMonitorCrcErrorThreshold
+                                 Integer32,
+                        hwIfMonitorCrcErrorInterval
+                                 Integer32,
+                        hwIfMonitorSdhErrorStatistics
+                                 Counter64,
+                        hwIfMonitorSdhErrorThreshold
+                                 Integer32,
+                        hwIfMonitorSdhErrorInterval
+                                 Integer32,
+                        hwIfMonitorInputRatePercentage
+                                 Integer32,
+                        hwIfMonitorInputRateThreshold
+                                 Integer32,
+                        hwIfMonitorOutputRatePercentage
+                                 Integer32,
+                        hwIfMonitorOutputRateThreshold
+                                 Integer32,
+                        hwIfMonitorPauseFrameStatistics
+                                 Counter64,
+                        hwIfMonitorPauseFrameThreshold
+                                 Integer32,
+                        hwIfMonitorPauseFrameInterval
+                                 Integer32
+                }
+
+hwIfMonitorIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " Index of alarm monitor table "
+        ::= { hwIfMonitorThresholdEntry 1 }
+
+hwIfMonitorCrcErrorStatistics OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Crc error statistics value "
+        ::= { hwIfMonitorThresholdEntry 2 }
+
+    hwIfMonitorCrcErrorThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Crc error alarm threshold,default value is 3 "
+        ::= { hwIfMonitorThresholdEntry 3 }
+
+    hwIfMonitorCrcErrorInterval OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Crc error alarm interval time(unit is second),default value is 10s"
+        ::= { hwIfMonitorThresholdEntry 4 }
+        
+hwIfMonitorSdhErrorStatistics OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Sdh error statistics value only for B3"
+             ::= { hwIfMonitorThresholdEntry 5 }
+
+    hwIfMonitorSdhErrorThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Sdh error alarm threshold,only for B3,default value is 3"  
+        ::= { hwIfMonitorThresholdEntry 6 }
+
+    hwIfMonitorSdhErrorInterval OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Sdh error alarm interval time(unit is second),only for B3,default value is 10s"
+        ::= { hwIfMonitorThresholdEntry 7 }
+    
+hwIfMonitorInputRatePercentage OBJECT-TYPE
+        SYNTAX Integer32 (0..100) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Input rate percentage value "
+        ::= { hwIfMonitorThresholdEntry 8 }
+
+hwIfMonitorInputRateThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Input rate alarm threshold,default value is 100 "
+        ::= { hwIfMonitorThresholdEntry 9 }
+   
+hwIfMonitorOutputRatePercentage OBJECT-TYPE
+        SYNTAX Integer32 (0..100) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Output rate percentage value "
+        ::= { hwIfMonitorThresholdEntry 10 }
+
+ hwIfMonitorOutputRateThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Output rate alarm threshold,default value is 100 "
+        ::= { hwIfMonitorThresholdEntry 11 }   
+hwIfMonitorPauseFrameStatistics OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Pause frame statistics value "
+             ::= { hwIfMonitorThresholdEntry 12 }  
+             
+hwIfMonitorPauseFrameThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Pause frame alarm threshold "
+        ::= { hwIfMonitorThresholdEntry 13 }
+hwIfMonitorPauseFrameInterval OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Pause frame alarm interval time(unit is second) "
+        ::= { hwIfMonitorThresholdEntry 14 }     
+        
+hwIfMonitorGeneral OBJECT IDENTIFIER ::= { hwIFExtObjects 8 }
+    
+hwIfMonitorCrcEnabledStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enalbe or disable the crc error monitor, and the default value is disable."
+        ::= { hwIfMonitorGeneral 1 }
+        
+hwIfMonitorSdhEnabledStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enalbe or disable the sdh error monitor, and the default value is disable."
+        ::= { hwIfMonitorGeneral 2 }
+        
+hwIfMonitorInputRateEnabledStatus  OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enalbe or disable the input rate monitor, and the default value is disable."
+        ::= { hwIfMonitorGeneral 3}
+        
+hwIfMonitorOutputRateEnabledStatus  OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enalbe or disable the output rate monitor, and the default value is disable."
+        ::= { hwIfMonitorGeneral 4 }
+
+hwIfMonitorHalfDuplexEnabledStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enalbe or disable the half duplex monitor, and the default value is disable."
+        ::= { hwIfMonitorGeneral 5}
+        
+hwIfMonitorPauseRisingEnabledStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enalbe or disable the pause frame rising monitor, and the default value is disable."
+        ::= { hwIfMonitorGeneral 6 } 
+        
+hwIfMonitorPauseContinuingEnabledStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Enalbe or disable the pause frame continuing monitor, and the default value is disable."
+        ::= { hwIfMonitorGeneral 7 }
+        
+        
+hwAdminVrrpMemberIf OBJECT IDENTIFIER ::= { hwIFExtObjects 9 }    
+
+    hwIfFlowChangeTime OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS  accessible-for-notify
+        STATUS  obsolete
+        DESCRIPTION
+                "The time indicates when the interface's flow status changes."
+        ::= { hwAdminVrrpMemberIf 1 }
+        
+        
+   hwAdminVrrpMemberIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAdminVrrpMemberIfEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+        "The interface bound to VRRP table."
+        ::= { hwAdminVrrpMemberIf  2 }
+        
+    hwAdminVrrpMemberIfEntry  OBJECT-TYPE
+        SYNTAX HwAdminVrrpMemberIfEntry
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+               "Entries of the interface bound to VRRP table."
+        INDEX{ hwAdminVrrpMemberIfIndex }
+        ::= { hwAdminVrrpMemberIfTable 1}
+
+    HwAdminVrrpMemberIfEntry  ::=
+    SEQUENCE {
+        hwAdminVrrpMemberIfIndex
+                        InterfaceIndex,
+        hwAdminVrrpVrid
+                Integer32,
+        hwAdminVrrpIfIndex
+                InterfaceIndex,
+        hwAdminVrrpMemberIfFlowStatus 
+            INTEGER,                                
+        hwAdminVrrpMemberIfRowStatus     
+                        RowStatus          
+        }
+
+    hwAdminVrrpMemberIfIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS obsolete
+        DESCRIPTION 
+            "The number of the interface."
+        ::= { hwAdminVrrpMemberIfEntry 1 }    
+
+    hwAdminVrrpVrid  OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-create
+        STATUS obsolete
+        DESCRIPTION 
+            "The administrator VRRP vrid."
+        ::= { hwAdminVrrpMemberIfEntry 2 }
+
+    hwAdminVrrpIfIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS read-create
+        STATUS obsolete
+        DESCRIPTION 
+            "The administrator VRRP's configure interface index."
+        ::= { hwAdminVrrpMemberIfEntry 3 }
+
+    hwAdminVrrpMemberIfFlowStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+          up(1),
+          down(2)
+        }       
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION 
+       " Current flow status of interface.
+           1:up
+           2:down"
+        ::= { hwAdminVrrpMemberIfEntry 4 }         
+                        
+    hwAdminVrrpMemberIfRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS obsolete
+        DESCRIPTION 
+        "Current operation status of the row."
+        ::= { hwAdminVrrpMemberIfEntry 5 }
+        
+    hwIfFluxLimit OBJECT IDENTIFIER ::= { hwIFExtObjects 10 }
+    
+    hwIfFluxLimitTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIfFluxLimitEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            " Flux limit table "
+        ::= { hwIfFluxLimit  1 }
+
+    hwIfFluxLimitEntry  OBJECT-TYPE  
+        SYNTAX  HwIfFluxLimitEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+             " Entry of flux limit table "
+        INDEX   { hwIfFluxIfIndex,hwIfFluxVlanId }
+        ::= { hwIfFluxLimitTable 1}
+    
+    HwIfFluxLimitEntry ::=
+        SEQUENCE { 
+            hwIfFluxIfIndex
+                InterfaceIndex,
+            hwIfFluxVlanId
+                VlanIdOrNone,
+            hwIfFluxDirection
+                HWDirectionType,
+            hwIfFluxLimitType
+                INTEGER,
+            hwIfFluxCir
+                Integer32,
+            hwIfFluxCbs
+                Integer32,
+            hwIfFluxRowStatus
+                RowStatus
+         }
+
+    hwIfFluxIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Interface Index, same as ifIndex."
+        ::= { hwIfFluxLimitEntry 1 }
+
+    hwIfFluxVlanId OBJECT-TYPE
+        SYNTAX VlanIdOrNone
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Vlan ID.
+            0 is the default value"
+        ::= { hwIfFluxLimitEntry 2 }
+        
+    hwIfFluxDirection OBJECT-TYPE
+        SYNTAX HWDirectionType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Limit direction:
+            inbound (1)
+            outbound (2)"
+        ::= { hwIfFluxLimitEntry 3 }
+        
+    hwIfFluxLimitType OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+          broadcastSuppression(1),
+          multicastSuppression(2),
+          unknownUnicastSuppression(3)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Flux limit type: broadcastSuppression(1),multicastSuppression(2),unknownUnicastSuppression(3)."
+        ::= { hwIfFluxLimitEntry 4 }
+
+    hwIfFluxCir OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Committed Information Rate. Unit: kbps.
+            software QoS: 8..155000
+            hardware QoS: 100..10000000"
+        ::= { hwIfFluxLimitEntry 5 }
+
+    
+    hwIfFluxCbs OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Committed Burst Size. Unit: byte
+            software QoS: 1875..19375000 
+            hardware QoS: 64..33554432"
+        ::= { hwIfFluxLimitEntry 6 }
+
+ 
+    hwIfFluxRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus. Three actions are used: active,
+            createAndGo, destroy"
+        ::= { hwIfFluxLimitEntry 7 }
+        
+        
+        hwIfDiffServ OBJECT IDENTIFIER ::= { hwIFExtObjects 11 }
+    
+     hwIfDiffServTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIfDiffServEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The table describes the different service mode of interfaces."
+        ::= { hwIfDiffServ  1}
+
+
+     hwIfDiffServEntry OBJECT-TYPE
+        SYNTAX HwIfDiffServEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Interface different service mode attribute configuration."
+        INDEX   { hwIfDiffServIndex } 
+        ::= {hwIfDiffServTable 1}
+
+     HwIfDiffServEntry    ::=
+        SEQUENCE { 
+            hwIfDiffServIndex
+                     InterfaceIndex,
+            hwIfDiffServMode
+                     INTEGER,
+            hwIfDiffServServiceClass
+                     INTEGER,
+            hwIfDiffServColor
+                     INTEGER
+                 }
+      hwIfDiffServIndex    OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION   
+            " The index of L2 interface. "
+        ::= { hwIfDiffServEntry 1 }   
+      
+      hwIfDiffServMode OBJECT-TYPE
+         SYNTAX  INTEGER
+        {
+                pipe(1),
+                uniform(2)
+        }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                "Different service mode of the interface binding to a 
+                 VLL, default is uniform."
+        ::= { hwIfDiffServEntry 2 }
+    
+      hwIfDiffServServiceClass OBJECT-TYPE
+         SYNTAX INTEGER {
+                                   default(0),
+                                   be(1),
+                                af1(2),
+                                af2(3),
+                                af3(4),
+                                af4(5),
+                                ef(6),
+                                cs6(7),
+                                cs7(8)
+                        }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                "PHB in the ingress PE, the value must be 
+                 be,af1,af2,af3,af4,ef,cs6,cs7."
+        ::= { hwIfDiffServEntry 3 }
+    
+      hwIfDiffServColor OBJECT-TYPE
+         SYNTAX    INTEGER
+            {
+                default(0),
+                green(1),
+                yellow(2), 
+                red(3)
+            }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                "Remarked color of packet in the ingress 
+                 PE, the value must be green,yellow,red."
+        ::= { hwIfDiffServEntry 4 }
+        
+-- ===========================================================================
+--  ifname 4K VRF
+-- ============================================================================ 
+        hwIfQuery OBJECT IDENTIFIER ::= { hwIFExtObjects 12 }
+         
+        hwIfQueryTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIfQueryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Interface name table of private MIB."
+            ::= { hwIfQuery 1 }
+
+        
+        hwIfQueryEntry OBJECT-TYPE
+            SYNTAX HwIfQueryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries of private interface name table."
+            INDEX { hwIfName }
+            ::= { hwIfQueryTable 1 }
+
+        
+        HwIfQueryEntry ::=
+            SEQUENCE {
+                hwIfName
+                    OCTET STRING,
+                hwIfIndex
+                    InterfaceIndex
+             }
+             
+    hwIfName OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (1..47))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+           "The name of the interface.The value of this object must
+            be the interface name assigned by the local device."
+    ::= { hwIfQueryEntry 1 }
+                    
+        hwIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               "The index of the interface. An index uniquely identifies 
+               an interface."
+            ::= { hwIfQueryEntry 2 }
+     
+ --  ----------------------------------------------------------------------------
+-- Logic interface attribute Group
+-- ----------------------------------------------------------------------------
+        hwLogicIfAttrib OBJECT IDENTIFIER ::= { hwIFExtObjects 13 }
+
+        
+       hwLogicIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLogicIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logic interface table."
+            ::= { hwLogicIfAttrib 1 }
+
+        
+        hwLogicIfEntry OBJECT-TYPE
+            SYNTAX HwLogicIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logic interface table."
+            INDEX { hwLogicIfIndex }
+            ::= { hwLogicIfTable 1 }
+
+        
+        HwLogicIfEntry ::=
+            SEQUENCE { 
+                hwLogicIfIndex
+                    InterfaceIndexOrZero,
+                hwLogicIfMainIndex
+                    InterfaceIndexOrZero,
+                hwLogicIfType
+                    INTEGER,
+                hwLogicIfName
+                    DisplayString, 
+                hwLogicIfParaOne 
+                    INTEGER ,
+                hwLogicIfRowStatus
+                    RowStatus
+             }
+
+        hwLogicIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index. The interface index to be created must be 0. Then the system automatically allocates an interface index."
+            ::= { hwLogicIfEntry 1 }
+
+        
+        hwLogicIfMainIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index of the main interface to which the sub-interface belongs. For other interfaces, the interface index is 0."
+            ::= { hwLogicIfEntry 11 }
+
+        
+        hwLogicIfType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ve(1),
+                loopback(2),
+                vlanif(3),
+                subVe(4),
+                subEthTrunk(5),
+                subEthernet(6),
+                subAtm(7),
+                ima-Group(8),
+                subIma-Group(9),
+                subSerial(10)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface type."
+            ::= { hwLogicIfEntry 12 }         
+
+        
+        hwLogicIfName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(1..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface name. The interface name must be a name without blank spaces and Tab characters."
+            ::= { hwLogicIfEntry 13 }  
+              
+            
+        hwLogicIfParaOne OBJECT-TYPE
+            SYNTAX INTEGER  
+                {
+                p2p(1),
+                p2mp(2),
+                none(255)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the extended attribute of the logical interface. The extended attribute takes effect only on the ATM sub-interface. The default extended attribute is P2MP. For sub-interfaces of other types, none is returned after the Get operation."
+            ::= { hwLogicIfEntry 14 }
+
+
+        
+        hwLogicIfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the status of the row."
+            ::= { hwLogicIfEntry 51 }       
+        
+        
+        
+ 
+
+-- ============================================================================
+-- cpu packet statistic table
+-- ============================================================================
+
+        hwCppsObjects OBJECT IDENTIFIER ::= { hwIFExtObjects 14 }      
+
+
+        hwCppsGlobalEnable  OBJECT-TYPE
+             SYNTAX  EnabledStatus 
+             MAX-ACCESS read-write
+             STATUS current
+             DESCRIPTION "Whether statistic function is enabled globally."
+             DEFVAL      { disable }
+             ::= { hwCppsObjects 1 }
+             
+       
+-- ======================= Cpps interface table =========================              
+        hwCppsInterfaceTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCppsInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "CPU packet and byte statistic interface configuration table."
+            ::= { hwCppsObjects  2 }
+
+
+        hwCppsInterfaceEntry  OBJECT-TYPE
+            SYNTAX HwCppsInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The entry of hwCppsInterfaceTable."
+            INDEX   { hwCppsInterfaceIndex }
+            ::= { hwCppsInterfaceTable 1}
+
+    
+        HwCppsInterfaceEntry  ::=
+        SEQUENCE {
+              hwCppsInterfaceIndex    InterfaceIndex  ,
+              hwCppsPortPvcEnable   EnabledStatus   ,
+              hwCppsPortVlanEnable   EnabledStatus   
+              }
+
+
+        hwCppsInterfaceIndex  OBJECT-TYPE
+             SYNTAX    InterfaceIndex 
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION "Index number of the interface."
+             ::= { hwCppsInterfaceEntry 1 }
+
+
+        hwCppsPortPvcEnable  OBJECT-TYPE
+             SYNTAX  EnabledStatus 
+             MAX-ACCESS read-write
+             STATUS current
+             DESCRIPTION "Whether statistic function is enabled on PVC."
+             DEFVAL      { disable }
+             ::= { hwCppsInterfaceEntry 2 }
+
+
+        hwCppsPortVlanEnable  OBJECT-TYPE
+             SYNTAX  EnabledStatus 
+             MAX-ACCESS read-write
+             STATUS current
+             DESCRIPTION "Whether statistic function is enabled on VLAN."
+             DEFVAL      { disable }
+             ::= { hwCppsInterfaceEntry 3 }
+
+
+-- ======================= Cpps interface statistics table =========================              
+        hwCppsIfStatisticsTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCppsIfStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "CPU packet and byte statistic interface table."
+            ::= { hwCppsObjects  3 }
+
+
+        hwCppsIfStatisticsEntry  OBJECT-TYPE
+            SYNTAX HwCppsIfStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The entry of hwCppsIfStatisticsTable."
+            INDEX   { hwCppsIfStatisticsIndex }
+            ::= {  hwCppsIfStatisticsTable 1}
+
+       
+       HwCppsIfStatisticsEntry ::=
+        SEQUENCE {
+              hwCppsIfStatisticsIndex   InterfaceIndex  ,
+              hwCppsInterfacePktStatisic  Counter64   ,
+              hwCppsInterfaceByteStatisic  Counter64   ,
+              hwCppsResetInterfaceStatisic  INTEGER
+              }
+
+
+       hwCppsIfStatisticsIndex   OBJECT-TYPE
+             SYNTAX    InterfaceIndex 
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION "Index number of the interface."
+             ::= { hwCppsIfStatisticsEntry  1 }
+
+
+       hwCppsInterfacePktStatisic OBJECT-TYPE
+            SYNTAX  Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION   "Packet statistic information of the interface sent to CPU."
+            ::= { hwCppsIfStatisticsEntry  2 }
+
+
+      hwCppsInterfaceByteStatisic OBJECT-TYPE
+            SYNTAX  Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION   "Byte statistic information of the interface sent to CPU."
+            ::= { hwCppsIfStatisticsEntry  3 } 
+
+
+      hwCppsResetInterfaceStatisic OBJECT-TYPE
+            SYNTAX  INTEGER{
+            reset(1),
+            unreset(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION   "Whether to reset statistics."
+            DEFVAL      { 2 }
+            ::= { hwCppsIfStatisticsEntry  4 }
+
+
+-- ======================= Cpps ATM+pvc table ========================= 
+        hwCppsAtmPvcTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCppsAtmPvcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "CPU packet and byte statistic ATM PVC table."
+            ::= { hwCppsObjects  4 }
+
+
+        hwCppsAtmPvcEntry  OBJECT-TYPE
+            SYNTAX HwCppsAtmPvcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The entry of hwCppsAtmPvcTable."
+            INDEX   { hwCppsAtmIfIndex, hwCppsAtmVpi, hwCppsAtmVci }
+            ::= { hwCppsAtmPvcTable 1}
+
+
+        HwCppsAtmPvcEntry  ::=
+            SEQUENCE {                 
+            hwCppsAtmIfIndex   InterfaceIndex  ,
+            hwCppsAtmVpi    AtmVpIdentifier   ,
+            hwCppsAtmVci  AtmVcIdentifier   ,
+            hwCppsAtmPvcPktStatisic  Counter64   ,
+            hwCppsAtmPvcByteStatisic  Counter64   ,
+            hwCppsResetAtmPvcStatisic  INTEGER
+            }
+
+
+       hwCppsAtmIfIndex  OBJECT-TYPE
+             SYNTAX    InterfaceIndex 
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION "Index number of the interface."
+             ::= { hwCppsAtmPvcEntry 1 }
+
+
+       hwCppsAtmVpi  OBJECT-TYPE
+             SYNTAX    AtmVpIdentifier 
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION "VPI."
+             ::= { hwCppsAtmPvcEntry 2 }
+
+
+       hwCppsAtmVci  OBJECT-TYPE
+             SYNTAX    AtmVcIdentifier 
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION "VCI."
+             ::= { hwCppsAtmPvcEntry 3 }
+
+
+       hwCppsAtmPvcPktStatisic OBJECT-TYPE
+            SYNTAX  Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION   "Packet statistic information of the PVC sent to CPU."
+            ::= { hwCppsAtmPvcEntry 4 } 
+
+       hwCppsAtmPvcByteStatisic OBJECT-TYPE
+            SYNTAX  Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION   "Byte statistic information of the PVC sent to CPU."
+            ::= { hwCppsAtmPvcEntry 5 } 
+
+
+       hwCppsResetAtmPvcStatisic OBJECT-TYPE
+            SYNTAX  INTEGER{
+            reset(1),
+            unreset(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION   "Whether to reset statistics."
+            DEFVAL      { 2 }
+            ::= { hwCppsAtmPvcEntry 6 }
+
+
+-- ======================= Cpps port+vlan table ========================= 
+        hwCppsPortVlanTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCppsPortVlanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "CPU packet and byte statistic port VLAN table."
+            ::= { hwCppsObjects  5 }
+
+
+        hwCppsPortVlanEntry  OBJECT-TYPE
+            SYNTAX HwCppsPortVlanEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "The entry of hwCppsPortVlanTable."
+            INDEX   { hwCppsPortIndex, hwCppsVlanId }
+            ::= { hwCppsPortVlanTable 1}
+
+
+        HwCppsPortVlanEntry  ::=
+            SEQUENCE {                 
+            hwCppsPortIndex   InterfaceIndex  ,
+            hwCppsVlanId    VlanIdOrNone   ,
+            hwCppsPortVlanPktStatisic  Counter64   ,
+            hwCppsPortVlanByteStatisic  Counter64   ,
+            hwCppsResetPortVlanStatisic  INTEGER
+            }
+
+
+        hwCppsPortIndex  OBJECT-TYPE
+             SYNTAX    InterfaceIndex 
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION "Index number of the interface."
+             ::= { hwCppsPortVlanEntry 1 }
+
+
+        hwCppsVlanId  OBJECT-TYPE
+             SYNTAX    VlanIdOrNone 
+             MAX-ACCESS not-accessible
+             STATUS current
+             DESCRIPTION "VLAN ID."
+             ::= { hwCppsPortVlanEntry 2 }
+
+
+        hwCppsPortVlanPktStatisic OBJECT-TYPE
+            SYNTAX  Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION   "Packet statistic information of the port sent to CPU."
+            ::= { hwCppsPortVlanEntry 3 } 
+
+
+        hwCppsPortVlanByteStatisic OBJECT-TYPE
+            SYNTAX  Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION   "Byte statistic information of the port sent to CPU."
+            ::= { hwCppsPortVlanEntry 4 } 
+
+
+       hwCppsResetPortVlanStatisic OBJECT-TYPE
+            SYNTAX  INTEGER{
+            reset(1),
+            unreset(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION   "Whether to reset statistics."
+            DEFVAL      { 2 }
+            ::= { hwCppsPortVlanEntry 5 }
+
+                        
+                        
+ --  ----------------------------------------------------------------------------
+-- PortIsolation Group
+-- ----------------------------------------------------------------------------
+        hwPortIsolationGroupAttrib OBJECT IDENTIFIER ::= { hwIFExtObjects 15 }
+
+        
+       hwPortIsolationGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortIsolationGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logic interface table."
+            ::= { hwPortIsolationGroupAttrib 1 }
+
+        
+        hwPortIsolationGroupEntry OBJECT-TYPE
+            SYNTAX HwPortIsolationGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Logic interface table."
+            INDEX { hwPortIsolationGroupIndex }
+            ::= { hwPortIsolationGroupTable 1 }
+
+        
+        HwPortIsolationGroupEntry ::=
+            SEQUENCE { 
+                hwPortIsolationGroupIndex
+                    Integer32 (0..63),
+                hwPortIsolationGroupPortList
+                    PortList, 
+                hwPortIsolationGroupRowStatus
+                    RowStatus
+             }
+
+        hwPortIsolationGroupIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "ID of Port-Isolation-Group."
+            ::= { hwPortIsolationGroupEntry 1 }
+
+        
+        hwPortIsolationGroupPortList OBJECT-TYPE
+            SYNTAX PortList
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "PortList of Port-Isolation-Group."
+            ::= { hwPortIsolationGroupEntry 2 }
+
+                
+        hwPortIsolationGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the status of the row."
+            ::= { hwPortIsolationGroupEntry 3 }       
+        
+
+--  ============================================================================
+-- interface vtrunk attribute group
+-- ============================================================================
+        hwVTrunkAttr OBJECT IDENTIFIER ::= { hwIFExtObjects 16 }
+
+        
+        hwVTrunkIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVTrunkIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The vtrunk table."
+            ::= { hwVTrunkAttr 1 }
+
+        
+        hwVTrunkIfEntry OBJECT-TYPE
+            SYNTAX HwVTrunkIfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries of the vtrunk table."
+            INDEX { hwVTrunkIfIndex }
+            ::= { hwVTrunkIfTable 1 }
+
+        
+        HwVTrunkIfEntry ::=
+            SEQUENCE { 
+                hwVTrunkIfIndex
+                    InterfaceIndex,
+                hwVTrunkIfID
+                    INTEGER,
+                hwVTrunkIfType
+                    INTEGER,
+                hwVTrunkIfRowStatus
+                    RowStatus                
+             }
+
+        hwVTrunkIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The IfIndex of the VTrunk interface "
+            ::= { hwVTrunkIfEntry 1 }
+
+        
+        hwVTrunkIfID OBJECT-TYPE
+            SYNTAX INTEGER (0..63)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The identification of the VTrunk interface.It may identify VTrunk
+                and is an index of the interface."
+            ::= { hwVTrunkIfEntry 2 }
+
+        
+        hwVTrunkIfType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pos-Trunk(1),
+                cpos-Trunk(2),
+                atm-Trunk(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The type of the VTrunk interface includes pos-Trunk, cpos-Trunk 
+                and atm-trunk."
+            ::= { hwVTrunkIfEntry 3 }      
+        
+        
+        hwVTrunkIfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " Current operation status of the row "
+            ::= { hwVTrunkIfEntry 50 }
+
+
+--  ----------------------------------------------------------------------------
+-- VTrunk member attribute Group
+-- ----------------------------------------------------------------------------
+        hwVTrunkMemAttr OBJECT IDENTIFIER ::= { hwIFExtObjects 17 }
+
+        
+        hwVTrunkMemTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVTrunkMemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VTrunk member attribute information table."
+            ::= { hwVTrunkMemAttr 1 }
+
+        
+        hwVTrunkMemEntry OBJECT-TYPE
+            SYNTAX HwVTrunkMemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VTrunk member attribute information"
+            INDEX { hwVTrunkMemIfIndex }
+            ::= { hwVTrunkMemTable 1 }
+
+        
+        HwVTrunkMemEntry ::=
+            SEQUENCE { 
+                hwVTrunkMemIfIndex
+                    Integer32,
+                hwVTrunkID
+                    INTEGER,
+                hwVTrunkValidEntry
+                    INTEGER,
+                hwVTrunkOperstatus
+                    INTEGER,
+                hwVTrunkPortActive
+                    INTEGER,
+                hwVTrunkRowStatus
+                    RowStatus
+             }
+
+        hwVTrunkMemIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VTrunk port index"
+            ::= { hwVTrunkMemEntry 1 }
+
+        hwVTrunkID OBJECT-TYPE
+            SYNTAX INTEGER (0..63)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The identification of the VTrunk interface.It may identify VTrunk
+                and is an index of the interface."
+            ::= { hwVTrunkMemEntry 2 }
+
+        hwVTrunkValidEntry OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                valid(1),
+                invalid(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Valid Entries of VTrunk interface "
+            DEFVAL { invalid }
+            ::= { hwVTrunkMemEntry 3 }
+
+        
+        hwVTrunkOperstatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Status of operation, indicates port status. There are vtrunk_up(1)
+                and vtrunk_down(2).It expresses whether port is shutdown."
+            DEFVAL { down }
+            ::= { hwVTrunkMemEntry 4 }
+
+        
+        hwVTrunkPortActive OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                portInactive(1),
+                portActive(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Active port of backup-access vtrunk or not
+                1: portInactive
+                2: portActive"
+            ::= { hwVTrunkMemEntry 5 }
+
+        
+        hwVTrunkRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Current operation status of the row. "
+            ::= { hwVTrunkMemEntry 50 }
+        
+                         
+--  ============================================================================   
+        hwIFExtConformance OBJECT IDENTIFIER ::= { hwIFExtMib 2 }
+
+        
+        hwIFExtGroups OBJECT IDENTIFIER ::= { hwIFExtConformance 1 }
+
+        
+--  hwIFExtTraps OBJECT IDENTIFIER ::= { hwIFExtMib 2 }
+-- hwIFExtConformance OBJECT IDENTIFIER ::= { hwIFExtMib 3 }
+-- hwIFExtCompliances OBJECT IDENTIFIER ::= { hwIFExtConformance 1 }
+-- ============================================================================    
+        hwTrunkIfGroup OBJECT-GROUP
+            OBJECTS { hwIFExtPhyStatus, hwIFExtMemberOf, hwTrunkIfMax, hwTrunkNextIndex, hwTrunkIndex, hwTrunkIfID, hwTrunkIfType, 
+                hwTrunkIfIndex, hwTrunkIfModel, hwTrunkIfBandWidthAffectLinkNum, hwTrunkIfMinLinkNum, hwTrunkIfRowStatus, 
+                hwTrunkIfWorkingMode, hwTrunkIfWorkingState, hwTrunkIfAutoRecover, hwTrunkIfPreemptEnable, hwTrunkIfPreemptDelay, 
+                hwTrunkIfTimeoutReceive, hwTrunkBandwidth, hwTrunkIfFlushSendEnable, hwTrunkIfFlushVlanId, hwTrunkIfFlushPasswd, hwTrunkIfForceSwitchEnable, 
+                hwTrunkIfStatReset, hwTrunkIfLagSelectedPortStd, hwTrunkIfLagMaxActiveLinkNum, hwTrunkMcTrunkPriority, hwTrunkMcTrunkSysID }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating information of IP address of interface,
+                contain IP address, IP address mask and IP address acquiring method."
+            ::= { hwIFExtGroups 1 }
+
+        
+        hwIfIpAddressGroup OBJECT-GROUP
+            OBJECTS { hwIpAdEntAddr, hwIpAdEntIfIndex, hwIpAdEntNetMask, hwIpAdEntBcastAddr, hwIpAdEntReasmMaxSize, 
+                hwIpAdEntAddressType, hwIfIpMethod, hwIpAdEntAddrStatus }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating attribute of the Trunk interface."
+            ::= { hwIFExtGroups 2 }
+
+        
+-- hwIFExtHoldTime ,
+        hwIFExtGroup OBJECT-GROUP
+            OBJECTS { hwIFExtLayer, hwIFExtFrameType, hwIFExtFlowStatInterval, hwIFExtFlushReceiveEnable, hwIFExtFlushVlanId, 
+hwIFExtFlushPasswd, hwTrunkSystemPriority, hwTrunkUnknownUnicastIfModel,
+hwTrunkMcTrunkSystemPriority, hwTrunkMcTrunkSystemID, hwIFExtFlowStatus,
+hwIFExtMtu,hwIFExtMacAddr, hwIFExtBlockPriority }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating attribute of  interface extended."
+            ::= { hwIFExtGroups 3 }
+
+        
+        hwTrunkMemGroup OBJECT-GROUP
+            OBJECTS { hwTrunkMemifIndex, hwTrunkValidEntry, hwTrunkSelectStatus, hwTrunkLacpStatus, hwTrunkDeleteFlag, 
+                hwTrunkOperstatus, hwTrunkIsDefaultLagRecv, hwTrunkPortWeight, hwTrunkPortStandby, hwTrunkPortMaster, 
+                hwTrunkPortPriority, hwTrunkPortStatReset, hwTrunkRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Trunk member attribute Group, now only can set hwTrunkPortWeight and hwTrunkPortStandby. hwTrunkSelectStatus and hwTrunkDeleteFlag can't be set. These attributes are for extend."
+            ::= { hwIFExtGroups 4 }
+
+        
+        hwIFFlowStatGroup OBJECT-GROUP
+            OBJECTS { hwIFFlowStatGlobalInterval }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating interval time of interface flow stat."
+            ::= { hwIFExtGroups 5 }
+
+    hwAdminVrrpMemberIfGroup OBJECT-GROUP
+        OBJECTS {
+            hwIfFlowChangeTime,
+            hwAdminVrrpVrid,
+            hwAdminVrrpIfIndex,
+            hwAdminVrrpMemberIfFlowStatus,
+            hwAdminVrrpMemberIfRowStatus          
+        }
+        STATUS      obsolete
+        DESCRIPTION
+            "A collection of objects indicating attribute of the interface track administrator VRRP."
+        ::= { hwIFExtGroups 6 }  
+        
+        hwIfEtherStatGroup OBJECT-GROUP
+            OBJECTS { hwIfEtherStatInJumboPkts, hwIfEtherStatInCRCPkts, hwIfEtherStatInLongPkts, hwIfEtherStatInJabberPkts, hwIfEtherStatInFragmentPkts, 
+                hwIfEtherStatInUnderSizePkts, hwIfEtherStatInOverRunPkts, hwIfEtherStatInPausePkts, hwIfEtherStatOutJumboPkts, hwIfEtherStatOutOverflowPkts, 
+                hwIfEtherStatOutUnderRunPkts, hwIfEtherStatOutPausePkts, hwIfEthIfStatReset }
+            STATUS current
+            DESCRIPTION 
+                "Interface statistic Group."
+            ::= { hwIFExtGroups 7 }
+
+        
+        hwIFExtCompliances OBJECT IDENTIFIER ::= { hwIFExtConformance 2 }
+
+hwIfMonitorThresholdGroup OBJECT-GROUP
+OBJECTS{
+        hwIfMonitorCrcErrorStatistics   ,
+        hwIfMonitorCrcErrorThreshold  ,
+        hwIfMonitorCrcErrorInterval    ,
+        hwIfMonitorSdhErrorStatistics   ,
+        hwIfMonitorSdhErrorThreshold   ,
+        hwIfMonitorSdhErrorInterval    ,
+        hwIfMonitorInputRatePercentage  ,
+        hwIfMonitorInputRateThreshold  ,
+        hwIfMonitorOutputRatePercentage  ,
+        hwIfMonitorOutputRateThreshold,
+        hwIfMonitorPauseFrameStatistics,
+        hwIfMonitorPauseFrameThreshold,
+        hwIfMonitorPauseFrameInterval  
+    }
+    STATUS current
+    DESCRIPTION
+    "Alarm Monitor Group."
+    ::= { hwIFExtGroups 8 } 
+hwIfMonitorGeneralGroup OBJECT-GROUP
+OBJECTS{
+        hwIfMonitorCrcEnabledStatus ,    
+        hwIfMonitorSdhEnabledStatus ,     
+        hwIfMonitorInputRateEnabledStatus ,   
+        hwIfMonitorOutputRateEnabledStatus ,    
+        hwIfMonitorHalfDuplexEnabledStatus,
+        hwIfMonitorPauseRisingEnabledStatus,
+        hwIfMonitorPauseContinuingEnabledStatus
+    }
+    STATUS current    
+    DESCRIPTION
+    "Alarm Monitor Enable Group."    
+    ::= { hwIFExtGroups 9 }
+    
+    hwIfFluxLimitGroup OBJECT-GROUP
+    OBJECTS{     
+        hwIfFluxDirection ,   
+        hwIfFluxLimitType ,    
+        hwIfFluxCir,
+        hwIfFluxCbs,
+        hwIfFluxRowStatus
+    }
+    STATUS current    
+    DESCRIPTION
+    "Flux limit Group."    
+    ::= { hwIFExtGroups 10 } 
+
+
+    hwIfDiffServGroup OBJECT-GROUP
+OBJECTS{
+       hwIfDiffServMode, 
+    hwIfDiffServServiceClass,
+    hwIfDiffServColor    
+    }
+    STATUS current
+    DESCRIPTION
+    "Interface statistic Group."
+    ::= { hwIFExtGroups 11 }    
+
+    hwIfQueryGroup OBJECT-GROUP
+ OBJECTS{
+           hwIfIndex
+    }
+    STATUS current
+    DESCRIPTION
+    "Interface name Group."
+    ::= { hwIFExtGroups 12 }
+    
+    hwLogicIfAttrGroup OBJECT-GROUP
+ OBJECTS{
+           hwLogicIfMainIndex,
+           hwLogicIfType,
+           hwLogicIfName,   
+           hwLogicIfParaOne,
+           hwLogicIfRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+    "Logic interface table Group."
+    ::= { hwIFExtGroups 13 }      
+    
+    hwIfIpUnnumberedGroup OBJECT-GROUP
+ OBJECTS{
+           hwLendIfIndex,
+           hwLendIpAddr,
+           hwLendIpAddrNetMask,
+           hwUnnumberedRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+    "Logic interface table Group."
+    ::= { hwIFExtGroups 14 }
+
+    hwLinkModeChangeAutoCreateIfGroup OBJECT-GROUP  
+  OBJECTS{
+           hwNewIfTimeslot
+    }
+    STATUS current
+    DESCRIPTION
+    "Interface time slot Group."
+    ::= { hwIFExtGroups 15 }
+
+    hwCppsGlobalEnableGroup OBJECT-GROUP
+            OBJECTS { hwCppsGlobalEnable }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating global CPU packet statistic function."
+            ::= { hwIFExtGroups 15 }
+
+    
+    hwCppsInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        hwCppsPortPvcEnable   ,
+        hwCppsPortVlanEnable   
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing interface configuration function."
+    ::= { hwIFExtGroups 16 }
+
+ 
+    hwCppsIfStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+        hwCppsInterfacePktStatisic   ,
+        hwCppsInterfaceByteStatisic   ,
+        hwCppsResetInterfaceStatisic
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing packet and byte statistic of the interface sent to CPU."
+    ::= { hwIFExtGroups 17 }
+
+
+    hwCppsAtmPvcGroup OBJECT-GROUP
+    OBJECTS {
+        hwCppsAtmPvcPktStatisic   ,
+        hwCppsAtmPvcByteStatisic   ,
+        hwCppsResetAtmPvcStatisic 
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing packet and byte statistic for the pvc sent to CPU."
+    ::= { hwIFExtGroups 18 }
+
+
+    hwCppsPortVlanGroup OBJECT-GROUP
+    OBJECTS {
+        hwCppsPortVlanPktStatisic   ,
+        hwCppsPortVlanByteStatisic   ,
+        hwCppsResetPortVlanStatisic
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing packet and byte statistic for the port sent to CPU."
+    ::= { hwIFExtGroups 19 }
+    hwPortIsolationGroup OBJECT-GROUP
+    OBJECTS {
+        hwPortIsolationGroupPortList , 
+        hwPortIsolationGroupRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "Port Isolation Group."
+    ::= { hwIFExtGroups 20 }    
+    
+    
+    hwVTrunkIfGroup OBJECT-GROUP
+            OBJECTS { hwVTrunkIfIndex, hwVTrunkIfID, hwVTrunkIfType, hwVTrunkIfRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "VTrunk attribute Group."
+            ::= { hwIFExtGroups 21 }
+
+
+    hwVTrunkMemGroup OBJECT-GROUP
+            OBJECTS { hwVTrunkMemIfIndex, hwVTrunkValidEntry, hwVTrunkOperstatus, hwVTrunkPortActive, hwVTrunkRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "VTrunk member attribute Group."
+            ::= { hwIFExtGroups 22 }
+                                                       
+--  ----------------------------------------------------------------------------
+-- compliance statements
+-- ----------------------------------------------------------------------------            
+        hwIFExtCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities implementing
+                Huawei extended interface management MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwTrunkIfGroup, hwIfIpAddressGroup, hwIFExtGroup, hwTrunkMemGroup, hwIFFlowStatGroup,
+                hwIfQueryGroup,hwLogicIfAttrGroup, hwVTrunkIfGroup, hwVTrunkMemGroup
+                     }
+            ::= { hwIFExtCompliances 1 }
+
+        
+        hwIFExtTraps OBJECT IDENTIFIER ::= { hwIFExtMib 3 }
+
+        
+        hwTrunkWorkingSwitch NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfID, hwTrunkIfWorkingState }
+            STATUS current
+            DESCRIPTION 
+                "hwTrunkWorkingSwitch.
+                1.hwTrunkIfID: The identification of the Trunk interface;
+                2.hwTrunkIfWorkingState: Current working state of backup-access trunk.
+                Index: hwTrunkIndex."
+            ::= { hwIFExtTraps 1 }
+
+        
+        hwLacpNegotiateFailed NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfID, ifName, ifName }
+            STATUS current
+            DESCRIPTION 
+                "The member of LAG neither can take over PDU nor transmit PDUs. Send this trap when LACP protocol negotiation fails.           
+                1.hwTrunkIfID: The identification of the Trunk interface;
+                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1.hwTrunkIndex;
+                         2.ifIndex. "
+            ::= { hwIFExtTraps 2 }
+
+        
+        hwLacpTotalLinkLoss NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfID, ifName }
+            STATUS current
+            DESCRIPTION 
+                "Total loss of link bandwidth: it means that there is no member in the LAG group and the trap of MNCD(Member not Collecting/Distributing) occurs.
+                1.hwTrunkIfID: The identification of the Trunk interface;
+                2.ifName: It is in the ifXTable of IF-MIB.
+                Index: hwTrunkIndex."
+            ::= { hwIFExtTraps 3 }
+
+    
+        
+        hwLacpPartialLinkLoss NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfID, ifName }
+            STATUS current
+            DESCRIPTION 
+                "Part loss of link bandwidth: it means that some members in the LAG group aren't in the working-state, 
+                making the number of ports in working-state smaller than the hwTrunkIfMinLinkNum. The trap of PLL(Partial Link Loss)
+                will be restrained by the trap of TLL(Total Link Loss).            
+                1.hwTrunkIfID: The identification of the Trunk interface;
+                2.ifName: It is in the ifXTable of IF-MIB.
+                Index: hwTrunkIndex."
+            ::= { hwIFExtTraps 4 }
+
+    hwIfFlowDown NOTIFICATION-TYPE
+            OBJECTS { sysUpTime, hwIFExtFlowStatus }
+        STATUS current
+        DESCRIPTION 
+        "This notification indicates the time when the interface's flow status changes
+         to flow down,and the reason."
+        ::=  {hwIFExtTraps 5}    
+
+    hwIfFlowUp NOTIFICATION-TYPE
+            OBJECTS { sysUpTime, hwIFExtFlowStatus }
+        STATUS current
+        DESCRIPTION 
+        "This notification indicates the time when the interface's flow status changes
+         to flow up,and the reason."
+        ::=  {hwIFExtTraps 6}    
+        
+    hwIfNameChange NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+        "When a single-chassis device is upgraded to a multi-chassis device, the interface 
+        information is changed and then the system sends a trap."
+        ::=  {hwIFExtTraps 7}
+        
+    hwIfNameChangeResume NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+        "When a multi-chassis restore a single-chassis device, the interface information 
+        is changed and then the system sends a trap."
+        ::=  {hwIFExtTraps 8}
+    hwExtLinkDown NOTIFICATION-TYPE
+           OBJECTS { ifIndex, ifAdminStatus, ifOperStatus, ifDescr, hwIFExtPhyStatus, hwIFExtMemberOf }
+           STATUS  current
+           DESCRIPTION
+           "This notification indicates the time when the member interface link status changes
+         to down.The ifDescr indicates the name of the member interface,the hwIFExtMemberOf indicates
+          the name of main interface."
+           ::=  {hwIFExtTraps 9} 
+       
+        hwExtLinkUp NOTIFICATION-TYPE
+           OBJECTS { ifIndex, ifAdminStatus, ifOperStatus, ifDescr, hwIFExtPhyStatus, hwIFExtMemberOf }
+           STATUS  current
+           DESCRIPTION
+               "This notification indicates the time when the member interface link status changes
+         to up.The ifDescr indicates the name of the member interface,the hwIFExtMemberOf indicates
+          the name of main interface."
+           ::=  {hwIFExtTraps 10}
+    
+     hwLinkModeChangeAddNewIf NOTIFICATION-TYPE
+            OBJECTS { ifDescr, hwNewIfTimeslot }
+        STATUS current
+        DESCRIPTION 
+        "This notification indicates the interface mode has changed between E1 and T1."
+        ::=  {hwIFExtTraps 11}
+    
+        
+    hwMonitorNotifications OBJECT IDENTIFIER ::= { hwIFExtMib 4 }        
+
+        hwIfMonitorCrcErrorRising NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorCrcErrorStatistics, hwIfMonitorCrcErrorThreshold,
+                      hwIfMonitorCrcErrorInterval }
+            STATUS current
+            DESCRIPTION 
+                " Crc error alarm notification "
+            ::= { hwMonitorNotifications 1 }
+        
+        hwIfMonitorCrcErrorResume NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorCrcErrorStatistics, hwIfMonitorCrcErrorThreshold,
+                      hwIfMonitorCrcErrorInterval }
+            STATUS current
+            DESCRIPTION 
+                " Crc error alarm resume "
+            ::= { hwMonitorNotifications  2 }
+
+        hwIfMonitorSdhErrorRising NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorSdhErrorStatistics, hwIfMonitorSdhErrorThreshold
+                      , hwIfMonitorSdhErrorInterval }
+            STATUS current
+            DESCRIPTION 
+                " Sdh error alarm notification only for B3"
+            ::= { hwMonitorNotifications 3 }
+        
+        hwIfMonitorSdhErrorResume NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorSdhErrorStatistics, hwIfMonitorSdhErrorThreshold
+                      , hwIfMonitorSdhErrorInterval }
+            STATUS current
+            DESCRIPTION 
+                " Sdh error alarm resume only for B3"
+            ::= { hwMonitorNotifications 4 }
+        
+        hwIfMonitorInputRateRising NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorInputRatePercentage, hwIfMonitorInputRateThreshold }
+            STATUS current
+            DESCRIPTION 
+                " Input rate alarm notification "
+            ::= { hwMonitorNotifications 5 }  
+
+        hwIfMonitorInputRateResume NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorInputRatePercentage, hwIfMonitorInputRateThreshold }
+            STATUS current
+            DESCRIPTION 
+                " Input rate alarm resume "
+            ::= { hwMonitorNotifications 6}
+
+         hwIfMonitorOutputRateRising NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorOutputRatePercentage, hwIfMonitorOutputRateThreshold }
+            STATUS current
+            DESCRIPTION 
+                " Output rate alarm notification "
+            ::= { hwMonitorNotifications 7}
+
+         hwIfMonitorOutputRateResume NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorOutputRatePercentage, hwIfMonitorOutputRateThreshold }
+            STATUS current
+            DESCRIPTION 
+                " Output rate alarm resume "
+            ::= { hwMonitorNotifications 8 }
+          
+         hwIfMonitorHalfDuplexRising NOTIFICATION-TYPE
+            OBJECTS { ifDescr }
+            STATUS current
+            DESCRIPTION 
+                " Interface half duplex alarm norification "
+            ::= { hwMonitorNotifications 9 }
+            
+        hwIfMonitorPauseFrameRising NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorPauseFrameStatistics, hwIfMonitorPauseFrameThreshold,
+                      hwIfMonitorPauseFrameInterval }
+            STATUS current
+            DESCRIPTION 
+                " Pause frame alarm notification "
+            ::= { hwMonitorNotifications 10 }
+
+        hwIfMonitorPauseFrameRisingResume NOTIFICATION-TYPE
+            OBJECTS { hwIfMonitorPauseFrameStatistics, hwIfMonitorPauseFrameThreshold,
+                      hwIfMonitorPauseFrameInterval }
+            STATUS current
+            DESCRIPTION 
+                " Pause frame alarm resume "
+            ::= { hwMonitorNotifications 11 }
+        
+        hwIFExtTrapConformance OBJECT IDENTIFIER ::= { hwIFExtMib 5 }
+
+        
+        hwIFExtTrapGroups OBJECT IDENTIFIER ::= { hwIFExtTrapConformance 1 }
+
+        
+        hwIFExtTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwTrunkWorkingSwitch, hwLacpNegotiateFailed, hwLacpTotalLinkLoss, hwLacpPartialLinkLoss,hwIfFlowDown,
+                        hwIfFlowUp, hwIfNameChange, hwIfNameChangeResume, hwExtLinkDown, hwExtLinkUp,hwLinkModeChangeAddNewIf}
+            STATUS current
+            DESCRIPTION 
+                "IF Trap Group."
+            ::= { hwIFExtTrapGroups 1 }
+
+        hwMonitorTrapGroup NOTIFICATION-GROUP
+NOTIFICATIONS {
+        hwIfMonitorCrcErrorRising ,
+        hwIfMonitorCrcErrorResume ,
+        hwIfMonitorSdhErrorRising ,
+        hwIfMonitorSdhErrorResume ,    
+        hwIfMonitorInputRateRising ,
+        hwIfMonitorInputRateResume ,
+        hwIfMonitorOutputRateRising ,
+        hwIfMonitorOutputRateResume , 
+        hwIfMonitorHalfDuplexRising,
+        hwIfMonitorPauseFrameRising,
+        hwIfMonitorPauseFrameRisingResume
+     }
+    STATUS current
+    DESCRIPTION
+    "Monitor Trap Group."
+    ::= { hwIFExtTrapGroups 2 }
+    
+    END
+
+--
+-- HUAWEI-IF-EXT-MIB.my
+--

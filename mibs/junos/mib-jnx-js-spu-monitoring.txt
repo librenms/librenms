@@ -1,0 +1,257 @@
+--
+-- Juniper Enterprise specific MIB: SRX5000 SPU monitoring MIB
+--
+-- Copyright (c) 2008-2010, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-SRX5000-SPU-MONITORING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Unsigned32
+        FROM SNMPv2-SMI
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    DisplayString 
+        FROM SNMPv2-TC
+    jnxJsSPUMonitoringRoot
+        FROM JUNIPER-JS-SMI;
+
+jnxJsSPUMonitoringMIB MODULE-IDENTITY
+    LAST-UPDATED "201003250000Z" -- Mar 25 00:00:00 2010 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+    DESCRIPTION
+        "This is Juniper Networks' implementation of enterprise
+                 specific MIB for SRX5000 SPU monitoring."
+    REVISION
+        "201003250000Z" -- Mar 25 00:00:00 2010 UTC
+    DESCRIPTION
+        "add MIB for session creation per second."
+
+    ::= { jnxJsSPUMonitoringRoot 1 }
+
+    jnxJsSPUMonitoringObjectsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsSPUMonitoringObjectsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes SPUs utilization statistics." 
+        ::= { jnxJsSPUMonitoringMIB 1 }
+
+    jnxJsSPUMonitoringObjectsEntry OBJECT-TYPE
+        SYNTAX        JnxJsSPUMonitoringObjectsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Each entry collects CPU/Memory utilization for a SPU."
+        INDEX   { jnxJsSPUMonitoringIndex }
+        ::= { jnxJsSPUMonitoringObjectsTable 1 }
+
+    JnxJsSPUMonitoringObjectsEntry ::= SEQUENCE
+    {
+        jnxJsSPUMonitoringIndex         Unsigned32,
+        jnxJsSPUMonitoringFPCIndex      Unsigned32,
+        jnxJsSPUMonitoringSPUIndex      Unsigned32,
+        jnxJsSPUMonitoringCPUUsage      Unsigned32,
+        jnxJsSPUMonitoringMemoryUsage   Unsigned32,
+        jnxJsSPUMonitoringCurrentFlowSession	Unsigned32,
+        jnxJsSPUMonitoringMaxFlowSession	Unsigned32,
+        jnxJsSPUMonitoringCurrentCPSession	Unsigned32,
+        jnxJsSPUMonitoringMaxCPSession	Unsigned32,
+        jnxJsSPUMonitoringNodeIndex     Unsigned32,
+        jnxJsSPUMonitoringNodeDescr     DisplayString
+    }
+
+    jnxJsSPUMonitoringIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "SPU's overall index in platform."
+        ::= { jnxJsSPUMonitoringObjectsEntry 1 }
+
+    jnxJsSPUMonitoringFPCIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Which FPC SPU is on."
+        ::= { jnxJsSPUMonitoringObjectsEntry 2 }
+
+    jnxJsSPUMonitoringSPUIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "SPU'Index inside the FPC."
+        ::= { jnxJsSPUMonitoringObjectsEntry 3 }
+
+    jnxJsSPUMonitoringCPUUsage OBJECT-TYPE
+        SYNTAX  Unsigned32
+        UNITS   "percent"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Current SPU(CPU) Utilization in percentage."
+        ::= { jnxJsSPUMonitoringObjectsEntry 4 }
+
+    jnxJsSPUMonitoringMemoryUsage OBJECT-TYPE
+        SYNTAX  Unsigned32
+        UNITS   "percent"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Current memory usage of SPU(CPU) in percentage."
+        ::= { jnxJsSPUMonitoringObjectsEntry 5 }
+	
+    jnxJsSPUMonitoringCurrentFlowSession OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Current flow session number of SPU."
+        ::= { jnxJsSPUMonitoringObjectsEntry 6 }
+
+    jnxJsSPUMonitoringMaxFlowSession OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Max flow session number of SPU."
+        ::= { jnxJsSPUMonitoringObjectsEntry 7 }
+
+    jnxJsSPUMonitoringCurrentCPSession OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Current CP session number of SPU."
+        ::= { jnxJsSPUMonitoringObjectsEntry 8 }
+
+    jnxJsSPUMonitoringMaxCPSession OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Max CP session number of SPU."
+        ::= { jnxJsSPUMonitoringObjectsEntry 9 }
+
+    jnxJsSPUMonitoringNodeIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This attribute is used to identify a chassis. A chassis can 
+                 be configured in a single or cluster mode.  When it is in a 
+                 cluster mode, the chassis can be denote as a cluster node."
+        ::= { jnxJsSPUMonitoringObjectsEntry 10 }
+
+    jnxJsSPUMonitoringNodeDescr OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This attribute is used to describe the chassis/cluster 
+             node information.  Chassis can be configured as a single, or 
+             cluster node.  When it is cluster mode, the chassis can be 
+             denoted as a cluster node."
+        ::= { jnxJsSPUMonitoringObjectsEntry 11 }
+
+    jnxJsSPUMonitoringCurrentTotalSession OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "System level total session in use."
+        ::= { jnxJsSPUMonitoringMIB 2 }
+
+    jnxJsSPUMonitoringMaxTotalSession OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "System level max session possible."
+        ::= { jnxJsSPUMonitoringMIB 3 }
+
+    jnxSPUClusterObjectsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxSPUClusterObjectsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes SPU monitoring objects in HA cluster."
+        ::= { jnxJsSPUMonitoringMIB 4 }
+
+
+    jnxSPUClusterObjectsEntry OBJECT-TYPE
+        SYNTAX        JnxSPUClusterObjectsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Each entry collects SPU monitoring contents in HA cluster."
+        INDEX   { jnxJsClusterMonitoringNodeIndex }
+        ::= { jnxSPUClusterObjectsTable 1 }
+
+    JnxSPUClusterObjectsEntry ::= SEQUENCE
+    {
+        jnxJsClusterMonitoringNodeIndex     Unsigned32,
+        jnxJsClusterMonitoringNodeDescr     DisplayString,
+        jnxJsNodeCurrentTotalSession 	Unsigned32,
+        jnxJsNodeMaxTotalSession	Unsigned32,
+        jnxJsNodeSessionCreationPerSecond	CounterBasedGauge64
+    }
+
+    jnxJsClusterMonitoringNodeIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+                "This attribute is used to identify a chassis. A chassis can 
+                 be configured in a single or cluster mode.  When it is in a 
+                 cluster mode, the chassis can be denote as a cluster node."
+        ::= { jnxSPUClusterObjectsEntry 1 }
+
+    jnxJsClusterMonitoringNodeDescr OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This attribute is used to describe the chassis/cluster 
+             node information.  Chassis can be configured as a single, or 
+             cluster node.  When it is cluster mode, the chassis can be 
+             denoted as a cluster node."
+        ::= { jnxSPUClusterObjectsEntry 2 }
+	
+    jnxJsNodeCurrentTotalSession OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Node total session in use."
+        ::= { jnxSPUClusterObjectsEntry 3 }
+
+    jnxJsNodeMaxTotalSession OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Node max session possible."
+        ::= { jnxSPUClusterObjectsEntry 4 }
+	
+    jnxJsNodeSessionCreationPerSecond OBJECT-TYPE
+	SYNTAX CounterBasedGauge64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Node average session created in last 96 seconds."
+	::= { jnxSPUClusterObjectsEntry 5 }
+
+END
+

@@ -1,0 +1,232 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: BRI module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-BRI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+bri MODULE-IDENTITY
+    LAST-UPDATED "200606281222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	     BRI module. "
+
+    REVISION "200606281222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 41 }
+
+-- This group consists of a table of BRI interfaces indexed
+-- by ifIndex which provide MIB objects not given in a convenient form by
+-- other standard MIBs. There is also a BRI channel MIB indexed by ifIndex
+-- and channel index which gives information about the channels on the
+-- interface.
+
+-- The BRI interface table. Each entry is a BRI interface on the router.
+
+briIntTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BriIntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of BRI interfaces."
+    ::= { bri 1 }
+
+briIntEntry OBJECT-TYPE
+    SYNTAX      BriIntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the BRI interfaces table."
+    INDEX   { briIntIndex }
+    ::= { briIntTable 1 }
+
+BriIntEntry ::=
+    SEQUENCE {
+        briIntIndex
+            INTEGER,
+        briIntBoardIndex
+            INTEGER,
+        briIntBoardPosition
+            INTEGER,
+        briIntMode
+            INTEGER,
+        briIntTdmChannelMap
+            INTEGER,
+        briIntIsdnChannelMap
+            INTEGER
+    }
+
+briIntIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of the BRI interface."
+    ::= { briIntEntry 1 }
+
+briIntBoardIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index in the arBoardTable of the board on which this BRI
+            interface resides."
+    ::= { briIntEntry 2 }
+
+briIntBoardPosition OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The position on this BRI interface's board of this BRI
+            interface."
+    ::= { briIntEntry 3 }
+
+briIntMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                isdn (1),
+                tdm (2),
+                mixed (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The mode of operation of this BRI interface. The value isdn
+            means that the entire interface is operating as an ISDN
+            interface, the value tdm means that the entire interface is
+            operating as TDM groups and the value mixed means that some
+            channels in the interface are dedicated to ISDN and some to TDM
+            groups."
+    ::= { briIntEntry 4 }
+
+briIntTdmChannelMap OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A bit map of the channels in the BRI interface which are
+            dedicated to TDM. Channel B1 has channel map value of 1,
+            channel B2 has a channel map value of 2."
+    ::= { briIntEntry 5 }
+
+briIntIsdnChannelMap OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A bit map of the channels in the BRI interface which are
+            dedicated to ISDN. Channel B1 has channel map value of 1,
+            channel B2 has a channel map value of 2."
+    ::= { briIntEntry 6 }
+
+-- The BRI channel table. Each entry is a channel on a BRI interface.
+
+briChanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BriChanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of channels on BRI interfaces."
+    ::= { bri 2 }
+
+briChanEntry OBJECT-TYPE
+    SYNTAX      BriChanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the BRI channels table."
+    INDEX   { briChanIntIndex, briChanChannelIndex }
+    ::= { briChanTable 1 }
+
+BriChanEntry ::=
+    SEQUENCE {
+        briChanIntIndex
+            INTEGER,
+        briChanChannelIndex
+            INTEGER,
+        briChanMode
+            INTEGER,
+        briChanState
+            INTEGER
+    }
+
+briChanIntIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of the BRI interface."
+    ::= { briChanEntry 1 }
+
+briChanChannelIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The channel index of the BRI channel. Channel B1 has index 1,
+            channel B2 has index 2 and the D channel has index 3."
+    ::= { briChanEntry 2 }
+
+briChanMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                isdn (1),
+                tdm (2),
+                none (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The mode of this BRI channel. The value isdn means that the
+            channel is reserved for use in ISDN calls. The value tdm
+            means that the channel is reserved for use by TDM. For the D
+            channel, this object will always have the value isdn."
+    ::= { briChanEntry 3 }
+
+briChanState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                inactive (1),
+                active (2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of this BRI channel. The value inactive means that
+            the channel does not currently have an active user, either an
+            ISDN call or an active TDM group. The value active means that
+            the channel is in use, either by an ISDN call or an active TDM
+            group. For the D channel, this object will have the value
+            active if LAPD is using the D channel (either for call control
+            or X.25), or the value inactive otherwise."
+    ::= { briChanEntry 4 }
+
+END

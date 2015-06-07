@@ -1,0 +1,1316 @@
+--  =================================================================
+-- Copyright (C) 2003 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei Entity extent MIB File for environment
+-- Reference:   
+-- Version:     V1.10
+-- History:
+-- 
+--  2005-04-16  V1.10   Cui Kemao(20339), Added replaceable unit Information
+--  2003-07-28  V1.00   Chen baojiang & Ma ye, Initial Version
+-- =================================================================
+
+    HUAWEI-ENTITY-EXTENT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            entPhysicalIndex            
+                FROM ENTITY-MIB            
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            SnmpAdminString            
+                FROM SNMP-FRAMEWORK-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, BITS, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DateAndTime, TEXTUAL-CONVENTION,  RowStatus, DisplayString           
+                FROM SNMPv2-TC
+            EnabledStatus
+                FROM P-BRIDGE-MIB 
+            InterfaceIndex
+                FROM IF-MIB;    
+    
+        hwEntityExtentMIB MODULE-IDENTITY 
+            LAST-UPDATED "200606290000Z"        -- June 29, 2006 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                " R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+        DESCRIPTION 
+            "The private mib file includes the general extent 
+            information of the device."
+        ::= { hwDatacomm 31 }
+
+    --
+    -- Textual conventions
+    --
+    HwAdminState ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            " Represents the various possible administrative states.
+            A value of locked means the resource is administratively
+            prohibited from use. A value of shuttingDown means that
+            usage is administratively limited to current instances of
+            use. A value of unlocked means the resource is not
+            administratively prohibited from use. A value of up means
+            that the port is not administratively shut down and a value 
+            of down is the oppsite. A value of loopback here means the
+            port is working in the loopback local mode. When a port is
+            both shut down and looped back, we user the vale of down."
+        REFERENCE 
+            "ITU Recommendation X.731, 'Information Technology - Open
+            Systems Interconnection - System Management: State
+            Management Function', 1992"
+        SYNTAX INTEGER
+            {
+            notSupported(1),
+            locked(2),
+            shuttingDown(3),
+            unlocked(4),
+            up(11),
+            down(12),
+            loopback(13)
+            }
+        
+    HwOperState ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            " Represents the possible values of operational states.
+            A value of disabled means the resource is totally
+            inoperable. A value of enabled means the resource
+            is partially or fully operable. The values up(11),down(12) and
+            connect(13) is used only for NE5000E BTB or it's extended system.
+            A value of protocolUp means the port is available in the protocol
+            lay or has already prepared for transmitting or receiving data.
+            A value of linkUp means the port is only available in the physical
+            lay. A value of linkDown means the port is not available physically."
+        REFERENCE 
+            "ITU Recommendation X.731, 'Information Technology - Open
+            Systems Interconnection - System Management: State
+            Management Function', 1992"
+        SYNTAX INTEGER
+            {
+            notSupported(1),
+            disabled(2),
+            enabled(3),
+            offline(4),
+            up(11),
+            down(12),
+            connect(13),
+            protocolUp(15),
+            linkUp(16),
+            linkDown(17)    
+            }
+     
+  HWLevelState ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "The normal state of input line ."
+        SYNTAX INTEGER
+            {
+            lowLevel(1),
+            highLevel(2)
+                }
+            
+        HwStandbyStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                " Represents the possible values of standby status.
+                
+            A value of hotStandby means the resource is not providing
+            service, but is will be immediately able to take over the
+            role of the resource to be backed-up, without the need for
+            initialization activity, and will contain the same
+            information as the resource to be backed up. A value of
+            coldStandy means that the resource is to back-up another
+            resource, but will not be immediately able to take over
+            the role of a resource to be backed up, and will require
+            some initialization activity. A value of providingService
+            means the resource is providing service."
+        REFERENCE 
+            "ITU Recommendation X.731, 'Information Technology - Open
+            Systems Interconnection - System Management: State
+            Management Function', 1992"
+        SYNTAX INTEGER
+            {
+                notSupported(1),
+                hotStandby(2),
+                coldStandby(3),
+                providingService(4)
+                }
+            
+--     Not defined in X.731
+        HwAlarmStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Represents the possible values of alarm status.
+                When no bits of this attribute are set, then none of the
+                status conditions described below are present. When the
+                value of under repair is set, the resource is currently
+                being repaired.
+                
+                When the value of critical is set, one or more critical
+                alarms are active against the resource. When the value of
+                major is set, one or more major alarms are active against
+                the resource. When the value of minor is set, one or more
+                minor alarms are active against the resource. When the
+                value of warning is set, one or more warning alarms are
+                active against the resource. When the value of
+                indeterminate is set, one or more  alarms of indeterminate
+                severity are active against the resource.
+                
+                When the value of alarm outstanding is set, one or more
+                alarms is active against the resource. The fault may or may
+                not be disabling. "
+            REFERENCE 
+                "ITU Recommendation X.731, 'Information Technology - Open
+                Systems Interconnection - System Management: State
+                Management Function', 1992"
+            SYNTAX BITS
+                {
+                notSupported(0),
+                underRepair(1),
+                critical(2),
+                major(3),
+                minor(4),
+                alarmOutstanding(5),
+                warning(6),
+                indeterminate(7)
+                }
+            
+    
+--
+-- Node definitions
+--
+    
+        hwEntityExtObjects OBJECT IDENTIFIER ::= { hwEntityExtentMIB 1 }
+        
+--     MIB contains four groups      
+-- 
+        hwEntityState OBJECT IDENTIFIER ::= { hwEntityExtObjects 1 }
+        
+        hwEntityStateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEntityStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains one row per physical entity, There is
+                always at least one row for an 'overall' physical entity.
+                The information in each row may be not include all the object
+                in this table, because of the entity need not some of the 
+                information here. "
+            ::= { hwEntityState 1 }
+        
+        hwEntityStateEntry OBJECT-TYPE
+            SYNTAX HwEntityStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about a particular physical entity.
+            Each entry provides objects (entPhysicalDescr,
+            entPhysicalVendorType, and entPhysicalClass) to help an NMS
+            identify and characterize the entry, and objects
+            (entPhysicalContainedIn and entPhysicalParentRelPos) to help
+            an NMS relate the particular entry to other entries in this
+            table."
+        INDEX { entPhysicalIndex }
+        ::= { hwEntityStateTable 1 }
+    
+    HwEntityStateEntry ::=
+        SEQUENCE { 
+            hwEntityAdminStatus
+                HwAdminState,
+            hwEntityOperStatus
+                HwOperState,
+            hwEntityStandbyStatus
+                HwStandbyStatus,
+            hwEntityAlarmLight
+                HwAlarmStatus,
+            hwEntityCpuUsage
+                INTEGER,
+            hwEntityCpuUsageThreshold
+                    INTEGER,
+                hwEntityMemUsage
+                    INTEGER,
+                hwEntityMemUsageThreshold
+                    INTEGER,
+                hwEntityMemSize
+                    Integer32,
+                hwEntityUpTime
+                    Integer32,
+                hwEntityTemperature
+                    Integer32,
+                hwEntityTemperatureThreshold
+                    Integer32,
+                hwEntityVoltage
+                    Integer32,
+                hwEntityVoltageLowThreshold
+                    Integer32,
+                hwEntityVoltageHighThreshold
+                    Integer32,        
+                hwEntityTemperatureLowThreshold
+                    Integer32,                    
+                hwEntityOpticalPower    
+                    Integer32,
+                hwEntityCurrent
+                    Integer32,
+                hwEntityMemSizeMega
+                    Integer32, 
+                hwEntityPortType 
+                    INTEGER, 
+                hwEntityDuplex
+                    INTEGER,
+                hwEntityOpticalPowerRx    
+                    Integer32,
+                hwEntityCpuUsageLowThreshold
+                    Integer32
+
+             }
+
+        hwEntityAdminStatus OBJECT-TYPE
+            SYNTAX HwAdminState
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The administrative state for this object, and it is possible to set
+                the state when needed. "
+            ::= { hwEntityStateEntry 1 }
+        
+        hwEntityOperStatus OBJECT-TYPE
+            SYNTAX HwOperState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The operational state for this object. "
+            ::= { hwEntityStateEntry 2 }
+        
+        hwEntityStandbyStatus OBJECT-TYPE
+            SYNTAX HwStandbyStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Some entity in a device can support standby mode,
+                This object is used for monitoring standby status. "
+            ::= { hwEntityStateEntry 3 }
+        
+        hwEntityAlarmLight OBJECT-TYPE
+            SYNTAX HwAlarmStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The alarm status for this entity. It does not include
+                the severity of alarms raised on child components. On 
+                the condition, there are a alarm light on the entity, 
+                the object should have the same status with it."
+            ::= { hwEntityStateEntry 4 }
+        
+        hwEntityCpuUsage OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The CPU usage for this entity. Generally, the CPU usage 
+                will calculate the overall CPU usage on the entity, and it 
+                is not sensible with the number of CPU on the entity. "
+            ::= { hwEntityStateEntry 5 }
+        
+        hwEntityCpuUsageThreshold OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The threshold for the CPU usage. When the CPU usage exceed
+                the threshold, a notification will be sent. "
+            ::= { hwEntityStateEntry 6 }
+        
+        hwEntityMemUsage OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The memory usage for the entity. This object point out how
+                many percent of memory has been used. "
+            ::= { hwEntityStateEntry 7 }
+        
+        hwEntityMemUsageThreshold OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The threshold for the Memory usage, When the memory usage 
+                exceed the threshold, a notification will be sent. "
+            ::= { hwEntityStateEntry 8 }
+        
+        hwEntityMemSize OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "bytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The size of memory for the entity. "
+            ::= { hwEntityStateEntry 9 }
+        
+        hwEntityUpTime OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "seconds"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The up time for the entity. The mean of up time is
+                when the entity is up, and the value of the object 
+                will add one per seconds while the entity running. "
+            ::= { hwEntityStateEntry 10 }
+        
+        hwEntityTemperature OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The temperature for the entity. "
+            ::= { hwEntityStateEntry 11 }
+        
+        hwEntityTemperatureThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The threshold for the temperature. When the temperature
+                exceed the threshold, a notification will be sent. "
+            ::= { hwEntityStateEntry 12 }
+        
+        hwEntityVoltage OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The voltage for the entity. "
+            ::= { hwEntityStateEntry 13 }
+        
+        hwEntityVoltageLowThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The low-threshold for the voltage. Generally, we have two 
+                threshold for the voltage, one is low-threshold, and the other
+                is high-threshold. the normal status of voltage should be
+                greater than the low-threshold, and lower than the high-threshold.
+                When the voltage low than the low-threshold, a notification
+                will be sent. "
+            ::= { hwEntityStateEntry 14 }
+        
+        hwEntityVoltageHighThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The low-threshold for the voltage. Generally, we have two 
+                threshold for the voltage, one is low-threshold, and the other
+                is high-threshold. the normal status of voltage should be
+                greater than the low-threshold, and lower than the high-threshold.
+                When the voltage greater than the high-threshold, a notification
+                will be sent. "
+            ::= { hwEntityStateEntry 15 }
+            
+        hwEntityTemperatureLowThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The low-threshold of temperature. If the device temperature is 
+                 lower than the threshold, an alarm is raised.
+                "
+            ::= { hwEntityStateEntry 16 }
+            
+        hwEntityOpticalPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The optical power of the optical module. Unit: uW"
+            ::= { hwEntityStateEntry 17 }      
+          
+
+        hwEntityCurrent OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "A"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The current for the entity. "
+            ::= { hwEntityStateEntry 18 }
+        
+        hwEntityMemSizeMega OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "M bytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The size of SDRAM(Synchronous Dynamic Random Access Memory) memory for the entity. Unit: M bytes"
+            ::= { hwEntityStateEntry 19 }            
+        hwEntityPortType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                    notSupported(1),
+                    copper(2),
+                    fiber100(3),
+                    fiber1000(4)
+                   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Indicates the type of the Ethernet interface: an optical interface or an electrical interface. "
+            ::= { hwEntityStateEntry 20 }
+        hwEntityDuplex OBJECT-TYPE
+            SYNTAX INTEGER {
+                    notSupported(1), 
+                    full(2),
+                    half(3)
+                   }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Indicates the duplex mode of the Ethernet interface. An electrical Ethernet interface can 
+                work in half-duplex mode or full-duplex mode. An optical Ethernet can work only in full-duplex mode. "
+            ::= { hwEntityStateEntry 21 }
+
+        hwEntityOpticalPowerRx OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The optical power(Rx) of the optical module. Unit: uW"   
+            ::= { hwEntityStateEntry 22 }
+        hwEntityCpuUsageLowThreshold OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The threshold for the CPU usage. When the CPU usage exceed
+                the threshold, a notification will be sent. "
+            ::= { hwEntityStateEntry 23 }
+                  
+        hwRUModuleInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRUModuleInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains one row per replaceable unit physical entity.
+                The row with the field 'entPhysicalIsFRU' sets to 'true' in 
+                table 'entPhysicalTable' will be mapped to one row in this 
+                table."
+            ::= { hwEntityState 2 }
+        
+        hwRUModuleInfoEntry OBJECT-TYPE
+            SYNTAX HwRUModuleInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about a replaceable unit physical entity.
+            Each entry provides objects of a replaceable unit to help 
+            an NMS identify and characterize the entry in this table.
+            "
+        INDEX { entPhysicalIndex }
+        ::= { hwRUModuleInfoTable 1 }
+    
+    HwRUModuleInfoEntry ::=
+        SEQUENCE { 
+            hwEntityBomId
+                SnmpAdminString,
+            hwEntityBomEnDesc
+                    SnmpAdminString,
+                hwEntityBomLocalDesc
+                    SnmpAdminString,
+                hwEntityManufacturedDate
+                    DateAndTime,
+                hwEntityManufactureCode
+                    Integer32,
+                hwEntityCLEICode
+                    SnmpAdminString,
+                hwEntityUpdateLog
+                    SnmpAdminString,
+                hwEntityArchivesInfoVersion
+                    SnmpAdminString,
+                hwEntityOpenBomId
+                    SnmpAdminString,
+                hwEntityIssueNum
+                    SnmpAdminString,
+                hwEntityBoardType
+                    SnmpAdminString
+             }
+
+        hwEntityBomId OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The identity of the Bill of Material about this replaceable 
+                unit which coded by vendor. This node is mapping to 'ITEM' 
+                in the information file.
+                "
+            ::= { hwRUModuleInfoEntry 1 }
+        
+        hwEntityBomEnDesc OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The English description of the Bill of Material about this 
+                replaceable unit.
+                "
+            ::= { hwRUModuleInfoEntry 2 }
+        
+        hwEntityBomLocalDesc OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS obsolete
+            DESCRIPTION
+                "The local description of the Bill of Material about this 
+                replaceable unit.
+                "
+            ::= { hwRUModuleInfoEntry 3 }
+        
+        hwEntityManufacturedDate OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date when this physical entity is Manufactured.
+                "
+            ::= { hwRUModuleInfoEntry 4 }
+        
+        hwEntityManufactureCode OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS obsolete
+            DESCRIPTION
+                "The code of the place where this physical entity is Manufactured.
+                "
+            ::= { hwRUModuleInfoEntry 5 }
+        
+        hwEntityCLEICode OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The string code of CLEI which was granted by America.
+                "
+            ::= { hwRUModuleInfoEntry 6 }
+        
+        hwEntityUpdateLog OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS obsolete
+            DESCRIPTION
+                "The maintenance log of this replaceable unit.
+                "
+            ::= { hwRUModuleInfoEntry 7 }
+        
+        hwEntityArchivesInfoVersion OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Version of Archives Information.
+                "
+            ::= { hwRUModuleInfoEntry 8 }
+        
+        hwEntityOpenBomId OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The BomId for distribution. It is different from hwEntityBomId."
+            ::= { hwRUModuleInfoEntry 9 }
+        
+        hwEntityIssueNum OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The issue number for hardware change."
+            ::= { hwRUModuleInfoEntry 10 }
+        
+        hwEntityBoardType OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type code for entity."
+            ::= { hwRUModuleInfoEntry 11 }
+        hwOpticalModuleInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOpticalModuleInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of optical module properties."
+            ::= { hwEntityState 3 }
+        
+        hwOpticalModuleInfoEntry OBJECT-TYPE
+            SYNTAX HwOpticalModuleInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table of optical module properties for each optical module."
+        INDEX { entPhysicalIndex }
+        ::= { hwOpticalModuleInfoTable 1 }
+    
+        HwOpticalModuleInfoEntry ::=
+            SEQUENCE { 
+                hwEntityOpticalMode
+                    INTEGER,
+                hwEntityOpticalWaveLength
+                    Integer32,
+                hwEntityOpticalTransDistance
+                    Integer32,
+                hwEntityOpticalVendorSn
+                    SnmpAdminString,
+                hwEntityOpticalTemperature
+                    Integer32,
+                hwEntityOpticalVoltage
+                    Integer32,
+                hwEntityOpticalBiasCurrent
+                    Integer32,
+                hwEntityOpticalRxPower
+                    Integer32,
+                hwEntityOpticalTxPower
+                    Integer32                                                                                
+            }   
+                  
+        hwEntityOpticalMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                notSupported(1),
+                singleMode(2),
+                multiMode5(3),
+                multiMode6(4),
+                noValue(5)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The mode of the optical module."
+            DEFVAL { notSupported }
+            ::= { hwOpticalModuleInfoEntry 1 }
+
+        hwEntityOpticalWaveLength OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The wave length of the optical module. Unit: nm."
+            ::= { hwOpticalModuleInfoEntry 2 }
+
+        hwEntityOpticalTransDistance OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The max transmission distance of the optical module. Unit: m."
+            ::= { hwOpticalModuleInfoEntry 3 }
+
+        hwEntityOpticalVendorSn   OBJECT-TYPE
+            SYNTAX      SnmpAdminString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The vendor serial number (vendor SN) of the optical module. Length: 16 bytes."
+        ::= { hwOpticalModuleInfoEntry 4 }
+                         
+        hwEntityOpticalTemperature   OBJECT-TYPE
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The current temperature of the optical module. Unit: ¡æ."
+        ::= { hwOpticalModuleInfoEntry 5 }        
+        
+        hwEntityOpticalVoltage   OBJECT-TYPE
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The current voltage of the optical module. Unit: mV."
+        ::= { hwOpticalModuleInfoEntry 6 }
+        
+        hwEntityOpticalBiasCurrent   OBJECT-TYPE
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The bias current of the optical module. Unit: mA."
+        ::= { hwOpticalModuleInfoEntry 7 }        
+        
+        hwEntityOpticalRxPower   OBJECT-TYPE
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The receive power of the optical module. Unit: uW."
+        ::= { hwOpticalModuleInfoEntry 8 }
+        
+        hwEntityOpticalTxPower   OBJECT-TYPE
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The transmit power of the optical module. Unit: uW."
+        ::= { hwOpticalModuleInfoEntry 9 }                               
+                    
+        hwMonitorInputTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMonitorInputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains one row per replaceable unit physical entity.
+                This table is used to set the status of monitor port."
+            ::= { hwEntityState 4 }
+        
+        hwMonitorInputEntry OBJECT-TYPE
+            SYNTAX HwMonitorInputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is a replaceable unit physical entity."
+        INDEX { hwMonitorInputIndex }
+        ::= { hwMonitorInputTable 1 }
+    
+    HwMonitorInputEntry ::=
+        SEQUENCE { 
+                hwMonitorInputIndex
+                    Integer32,
+                hwMonitorInputName
+                    DisplayString,
+                hwMonitorInputState
+                    HWLevelState,
+                hwMonitorInputStateEnable
+                    EnabledStatus,
+                hwMonitorInputRowStatus
+                    RowStatus
+             }
+
+        hwMonitorInputIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..4)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Monitor port index.
+                 This is a number of input line,ranging from 1 to 4.
+                "
+            ::= { hwMonitorInputEntry 1 }
+        
+        hwMonitorInputName OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Monitor line name.
+                "
+            ::= { hwMonitorInputEntry 2 }
+        
+        hwMonitorInputState OBJECT-TYPE
+            SYNTAX HWLevelState
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Monitor line status.  
+                 The value is high or low.
+                "
+            ::= { hwMonitorInputEntry 3 }
+        
+        hwMonitorInputStateEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enable monitor line. 
+                "
+            ::= { hwMonitorInputEntry 4 }
+            
+        hwMonitorInputRowStatus OBJECT-TYPE
+            SYNTAX RowStatus                                     
+            MAX-ACCESS read-create                           
+            STATUS current                                   
+            DESCRIPTION                                      
+               "Status of monitor input row.
+            "      
+            ::= { hwMonitorInputEntry 5 }                
+        
+
+hwMonitorOutputTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMonitorOutputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains one row per replaceable unit physical entity.
+                This table is used to create a output view."
+            ::= { hwEntityState 5}
+        
+        hwMonitorOutputEntry OBJECT-TYPE
+            SYNTAX HwMonitorOutputEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is a replaceable unit physical entity."
+        INDEX { hwMonitorOutputIndex, hwMonitorOutputRuleIndex }
+        ::= { hwMonitorOutputTable 1 }
+    
+    HwMonitorOutputEntry ::=
+        SEQUENCE { 
+                hwMonitorOutputIndex
+                    Integer32,
+                hwMonitorOutputRuleIndex
+                    Integer32,
+                hwMonitorOutputMask
+                    DisplayString,
+                hwMonitorOutputKey
+                    DisplayString,                
+                hwMonitorOutputRowStatus
+                    RowStatus  
+             }
+
+        hwMonitorOutputIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..3)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Monitor output view index. 
+                 Through this index ,you can turn into the output view.
+                "
+            ::= { hwMonitorOutputEntry 1 }
+            
+        hwMonitorOutputRuleIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Monitor output rule index. 
+                 This is used to set the rules about all of the input line.
+                "
+            ::= { hwMonitorOutputEntry 2 }
+            
+            hwMonitorOutputMask OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Monitor output mask . 
+                 This is used to matching the level of monitor input line.
+                "
+            ::= { hwMonitorOutputEntry 3 }
+        
+        hwMonitorOutputKey OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Normal level value of this output line.
+                "
+            ::= { hwMonitorOutputEntry 4 }            
+
+        hwMonitorOutputRowStatus OBJECT-TYPE 
+            SYNTAX RowStatus                
+            MAX-ACCESS read-create          
+            STATUS current                  
+            DESCRIPTION                     
+            "Status of monitor input row
+            "                          
+            ::= { hwMonitorOutputEntry 5 }
+                             
+hwEntPowerUsedInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwEntPowerUsedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of information that displays the power use of entity ."
+    ::= { hwEntityState 6 }
+
+    hwEntPowerUsedInfoEntry OBJECT-TYPE
+        SYNTAX HwEntPowerUsedInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of the table of information that displays the power use of entity."
+        INDEX { entPhysicalIndex }
+        ::= { hwEntPowerUsedInfoTable 1 }
+        
+    HwEntPowerUsedInfoEntry ::=
+        SEQUENCE { 
+            hwEntPowerUsedInfoBoardName
+                OCTET STRING,
+            hwEntPowerUsedInfoBoardType
+                OCTET STRING,
+            hwEntPowerUsedInfoBoardSlot
+                Integer32,
+            hwEntPowerUsedInfoPower
+                Integer32
+                }
+
+        hwEntPowerUsedInfoBoardName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Board name."
+            ::= { hwEntPowerUsedInfoEntry 1 }
+        
+        hwEntPowerUsedInfoBoardType OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Board type."
+            ::= { hwEntPowerUsedInfoEntry 2 }
+        
+        hwEntPowerUsedInfoBoardSlot OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Board's slot number."
+            ::= { hwEntPowerUsedInfoEntry 3 }
+        
+        hwEntPowerUsedInfoPower OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Used power of board."
+            ::= { hwEntPowerUsedInfoEntry 4 }
+--  **********************************************************
+--  *         Vitrual Cable Test   ( Begin )                 *
+--  **********************************************************
+    hwVirtualCableTestTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVirtualCableTestEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains one row per replaceable unit physical entity.
+                 This table is used to display VCT result."
+            ::= { hwEntityState 7}
+        
+        hwVirtualCableTestEntry OBJECT-TYPE
+            SYNTAX HwVirtualCableTestEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is a replaceable unit physical entity."
+        INDEX { hwVirtualCableTestIfIndex}
+        ::= { hwVirtualCableTestTable 1 }
+    
+    HwVirtualCableTestEntry ::=
+        SEQUENCE { 
+                hwVirtualCableTestIfIndex
+                    InterfaceIndex,
+                hwVirtualCableTestPairStatus
+                    INTEGER,
+                hwVirtualCableTestPairLength
+                    Integer32    
+             }
+
+        hwVirtualCableTestIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "IfIndex of port that you want to test cable."
+            ::= { hwVirtualCableTestEntry 1 }
+                        
+    hwVirtualCableTestPairStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                    normal(1),
+                    abnormalOpen(2),     
+                    abnormalShort(3),
+                    abnormalOpenShort(4),    
+                    abnormalCrossTalk(5),
+                    unknown(6),
+                    notSupport(7)
+                }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Pair status. 
+             This indicate the status of cable.
+             "
+        ::= { hwVirtualCableTestEntry 2 }
+        
+        hwVirtualCableTestPairLength OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Pair Length.
+                 This indicate the length of cable.
+                "
+            ::= { hwVirtualCableTestEntry 3 }            
+      
+--  **********************************************************
+--  *         Vitrual Cable Test  ( End )                    *
+--  **********************************************************
+                             
+--     Notifications
+--  
+        hwEntityExtTraps OBJECT IDENTIFIER ::= { hwEntityExtentMIB 2 }
+        
+        hwEntityExtTrapsPrefix OBJECT IDENTIFIER ::= { hwEntityExtTraps 0 }
+        
+        hwEntityExtTemperatureThresholdNotification NOTIFICATION-TYPE
+            OBJECTS { hwEntityTemperature, hwEntityTemperatureThreshold, hwEntityAdminStatus, hwEntityAlarmLight }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityEnvTemperatureThresholdNotification
+                indicates the temperature have been exceed the threshold.
+                In the condition, user should check the hardware and the 
+                environment of the entity, sometimes it happened because
+                of the failture of air-condition. Anyway, the threshold
+                should lower than the value that most service work fine. "
+            ::= { hwEntityExtTrapsPrefix 1 }
+        
+        hwEntityExtVoltageLowThresholdNotification NOTIFICATION-TYPE
+            OBJECTS { hwEntityVoltage, hwEntityVoltageLowThreshold, hwEntityAdminStatus, hwEntityAlarmLight }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtVoltageLowThresholdNotification indicates
+                the voltage is lower than the threshold. This may decrease
+                the usability of the entity. If the voltage is lower too much 
+                than the hardware needed, the entity will stop working. 
+                Anyway, the threshold should higher than the value that 
+                most service work fine. "
+            ::= { hwEntityExtTrapsPrefix 2 }
+        
+        hwEntityExtVoltageHighThresholdNotification NOTIFICATION-TYPE
+            OBJECTS { hwEntityVoltage, hwEntityVoltageHighThreshold, hwEntityAdminStatus, hwEntityAlarmLight }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtVoltageHighThresholdNotification indicates
+                the voltage is higher than the threshold. This may decrease
+                the usability of the entity. If the voltage is higher too much 
+                than the hardware needed, the entity may be destroyed by the high
+                voltage. Anyway, the threshold should lower than the value 
+                that most service work fine. "
+            ::= { hwEntityExtTrapsPrefix 3 }
+        
+        hwEntityExtCpuUsageThresholdNotfication NOTIFICATION-TYPE
+            OBJECTS { hwEntityCpuUsage, hwEntityCpuUsageThreshold, hwEntityTemperature, hwEntityTemperatureThreshold, hwEntityAdminStatus, 
+                hwEntityAlarmLight }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtCpuUsageThresholdNotfication indicates
+                the entity is overload, and the service running in the entity
+                will not get the performance it should because of CPU's 
+                performance. Anyway, the threshold should lower than the 
+                value that most service work fine. "
+            ::= { hwEntityExtTrapsPrefix 4 }
+        
+        hwEntityExtMemUsageThresholdNotification NOTIFICATION-TYPE
+            OBJECTS { hwEntityMemUsage, hwEntityMemUsageThreshold, hwEntityMemSize, hwEntityAdminStatus, hwEntityAlarmLight
+                 }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtMemUsageThresholdNotification indicates
+                the entity is overload, and the service running in the entity
+                will not get the performance it should because of lower 
+                memory. Anyway, the threshold should lower than the 
+                value that most service work fine. "
+            ::= { hwEntityExtTrapsPrefix 5 }
+        
+        hwEntityExtOperEnabled NOTIFICATION-TYPE
+            OBJECTS { hwEntityAdminStatus, hwEntityAlarmLight }
+            STATUS current
+            DESCRIPTION 
+                "The entity is operational. The entity this
+                notification refers can be identified by
+                extracting the entPhysicalIndex from one of the
+                variable bindings."
+            ::= { hwEntityExtTrapsPrefix 6 }
+        
+        hwEntityExtOperDisabled NOTIFICATION-TYPE
+            OBJECTS { hwEntityAdminStatus, hwEntityAlarmLight }
+            STATUS current
+            DESCRIPTION 
+                "The entity is operational. The entity this
+                notification refers can be identified by
+                extracting the entPhysicalIndex from one of the
+                variable bindings."
+            ::= { hwEntityExtTrapsPrefix 7 }
+
+        hwEntityExtMonitorBoardAbnormalNotification NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "The monitor board turns normal to abnormal."
+            ::= { hwEntityExtTrapsPrefix 8 } 
+
+        hwEntityExtMonitorBoardNormalNotification NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "The monitor board turns abnormal to normal."
+            ::= { hwEntityExtTrapsPrefix 9 }
+
+        hwEntityExtMonitorPortAbnormalNotification NOTIFICATION-TYPE
+            OBJECTS { hwMonitorInputState, hwMonitorInputName }
+            STATUS current
+            DESCRIPTION 
+                "The monitor port turns normal to abnormal."
+            ::= { hwEntityExtTrapsPrefix 10 }
+
+        hwEntityExtMonitorPortNormalNotification NOTIFICATION-TYPE
+            OBJECTS { hwMonitorInputState, hwMonitorInputName }
+            STATUS current
+            DESCRIPTION 
+                "The monitor port turns abnormal to normal."
+            ::= { hwEntityExtTrapsPrefix 11 }   
+            
+            hwEntityExtCpuUsageLowThresholdNotfication NOTIFICATION-TYPE
+                OBJECTS { hwEntityCpuUsage, hwEntityCpuUsageThreshold, hwEntityTemperature, hwEntityTemperatureThreshold, hwEntityAdminStatus, 
+                            hwEntityAlarmLight }
+                STATUS current
+                DESCRIPTION 
+                    " The hwEntityExtCpuUsageThresholdNotfication indicates
+                    the entity is overload, and the service running in the entity
+                    will not get the performance it should because of CPU's 
+                    performance. Anyway, the threshold should lower than the 
+                    value that most service work fine. "
+                ::= { hwEntityExtTrapsPrefix 12 }                
+            
+hwDevicePowerInfoObjects OBJECT IDENTIFIER ::= { hwEntityExtentMIB 3 }
+    
+    hwDevicePowerInfoTotalPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Device total power."
+        ::= { hwDevicePowerInfoObjects 1 }
+    
+    hwDevicePowerInfoUsedPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Device used power."
+        ::= { hwDevicePowerInfoObjects 2 }   
+
+--     Conformance and Compliance
+-- 
+        hwEntityExtConformance OBJECT IDENTIFIER ::= { hwEntityExtentMIB 4 }
+        
+        hwEntityExtCompliances OBJECT IDENTIFIER ::= { hwEntityExtConformance 1 }
+        
+--  this module
+        hwEntityExtCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting
+                the HUAWEI Entity extent MIB."
+            MODULE -- this module
+            MANDATORY-GROUPS { hwEntityExtGroup }
+            OBJECT hwEntityAdminStatus
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwEntityCpuUsageThreshold
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwEntityMemUsageThreshold
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwEntityTemperatureThreshold
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwEntityVoltageLowThreshold
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+                OBJECT hwEntityVoltageHighThreshold
+                    MIN-ACCESS read-only
+                    DESCRIPTION 
+                        "Write access is not required."
+            ::= { hwEntityExtCompliances 1 }
+        
+        hwEntityExtGroups OBJECT IDENTIFIER ::= { hwEntityExtConformance 2 }
+        
+        hwEntityExtGroup OBJECT-GROUP
+            OBJECTS { hwEntityAdminStatus, hwEntityOperStatus, hwEntityStandbyStatus, hwEntityAlarmLight, hwEntityCpuUsage, 
+                hwEntityCpuUsageThreshold, hwEntityMemUsage, hwEntityMemUsageThreshold, hwEntityMemSize, hwEntityUpTime, 
+                hwEntityTemperature, hwEntityTemperatureThreshold, hwEntityVoltage, hwEntityVoltageLowThreshold, hwEntityVoltageHighThreshold,
+                hwEntityTemperatureLowThreshold, hwEntityOpticalPower, hwEntityCurrent, hwEntityMemSizeMega,hwEntityPortType,hwEntityDuplex,hwEntityOpticalPowerRx, hwEntityCpuUsageLowThreshold  }
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI Entity Extent group."
+            ::= { hwEntityExtGroups 1 }
+        
+        hwEntityExtNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwEntityExtTemperatureThresholdNotification, hwEntityExtVoltageLowThresholdNotification, hwEntityExtVoltageHighThresholdNotification, hwEntityExtCpuUsageThresholdNotfication, hwEntityExtMemUsageThresholdNotification, 
+                hwEntityExtOperEnabled, hwEntityExtOperDisabled, hwEntityExtMonitorBoardAbnormalNotification,hwEntityExtMonitorBoardNormalNotification,hwEntityExtMonitorPortAbnormalNotification, hwEntityExtMonitorPortNormalNotification , hwEntityExtCpuUsageLowThresholdNotfication}
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI Entity Extent Notification group."
+            ::= { hwEntityExtGroups 2 }
+        
+        hwRUModuleInfoGroup OBJECT-GROUP
+            OBJECTS { hwEntityBomId, hwEntityBomEnDesc, hwEntityManufacturedDate, hwEntityCLEICode, hwEntityArchivesInfoVersion, 
+                hwEntityOpenBomId, hwEntityIssueNum, hwEntityBoardType }
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI Entity Extent group."
+            ::= { hwEntityExtGroups 3 }
+        
+        hwEntityExtOldObjectsGroup OBJECT-GROUP
+            OBJECTS { hwEntityBomLocalDesc, hwEntityManufactureCode, hwEntityUpdateLog }
+            STATUS obsolete
+            DESCRIPTION 
+                "Group for old objects that may be obsoleted."
+            ::= { hwEntityExtGroups 4 }
+
+        hwOpticalModuleInfoGroup OBJECT-GROUP
+            OBJECTS { hwEntityOpticalMode, hwEntityOpticalWaveLength, hwEntityOpticalTransDistance, hwEntityOpticalVendorSn,hwEntityOpticalTemperature, hwEntityOpticalVoltage, hwEntityOpticalBiasCurrent, hwEntityOpticalRxPower, hwEntityOpticalTxPower }
+            STATUS current
+            DESCRIPTION 
+                "Collection of objects that display the fiber module working information."
+            ::= { hwEntityExtGroups 5 }        
+        hwMonitorInputGroup OBJECT-GROUP
+            OBJECTS { hwMonitorInputName, hwMonitorInputState, hwMonitorInputStateEnable, hwMonitorInputRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI Entity Extent group."
+            ::= { hwEntityExtGroups 6 }        
+        hwMonitorOutputGroup OBJECT-GROUP
+            OBJECTS { hwMonitorOutputMask, hwMonitorOutputKey, hwMonitorOutputRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI Entity Extent group."
+            ::= { hwEntityExtGroups 7 }
+    
+    hwEntPowerUsedInfoGroup OBJECT-GROUP
+        OBJECTS { hwEntPowerUsedInfoBoardName, hwEntPowerUsedInfoBoardType, hwEntPowerUsedInfoBoardSlot, hwEntPowerUsedInfoPower }
+        STATUS current
+        DESCRIPTION 
+            "Collection of objects that display the power informations of entity."
+        ::= { hwEntityExtGroups 8 }
+    
+    hwDevicePowerInfoGroup OBJECT-GROUP
+        OBJECTS { hwDevicePowerInfoTotalPower, hwDevicePowerInfoUsedPower }
+        STATUS current
+        DESCRIPTION 
+            "Collection of objects that display the power informations of device."
+        ::= { hwEntityExtGroups 9 }
+        hwVirtualCableTestGroup OBJECT-GROUP
+            OBJECTS { hwVirtualCableTestPairStatus, hwVirtualCableTestPairLength }
+            STATUS current
+            DESCRIPTION 
+                "Collection of objects that display the status of cable."
+            ::= { hwEntityExtGroups 10 }        
+    END
+
+--
+-- HUAWEI-ENTITY-EXTENT-MIB.mib
+--

@@ -1,0 +1,1949 @@
+CISCOSB-IPv6 DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB IPv6 Private Extension
+-- Version:    7.60.00.00
+-- Date:       25 Sep 2011
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter32, IpAddress,
+    mib-2, Unsigned32, Counter64,
+    zeroDotZero, Gauge32               FROM SNMPv2-SMI
+    TimeInterval, TruthValue, DisplayString, RowStatus
+                                       FROM SNMPv2-TC
+    switch001                          FROM CISCOSB-MIB
+    ipSpec                             FROM CISCOSB-IP
+    ipAddressEntry, ipv6InterfaceEntry FROM IP-MIB
+    ipNetToPhysicalEntry               FROM IP-MIB
+    inetCidrRouteEntry                 FROM IP-FORWARD-MIB
+    InterfaceIndex, InterfaceIndexOrZero
+                                       FROM IF-MIB
+    InetAddressPrefixLength, InetAddressType, InetAddress,
+    InetAutonomousSystemNumber
+                                       FROM INET-ADDRESS-MIB
+    ipv6RouterAdvertEntry              FROM IP-MIB
+    IANAipRouteProtocol                FROM IANA-RTPROTO-MIB
+    IANAtunnelType                     FROM IANAifType-MIB; 
+
+
+rlIPv6  MODULE-IDENTITY
+        LAST-UPDATED "200809250000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for IPv6 MIB."
+        REVISION "200809250000Z"
+        DESCRIPTION
+                "Initial version of this MIB."
+        ::= { switch001 129 }
+
+
+--- IpAddressTable augmentation
+
+rlIpAddressTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlIpAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table is parallel to ipAddressTable, and is used to
+            add/delete IPv6 entries to/from that table. It contains
+            private objects."
+    ::= { ipSpec 19 }
+
+rlIpAddressEntry OBJECT-TYPE
+    SYNTAX     RlIpAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An address mapping for a particular interface."
+    AUGMENTS { ipAddressEntry }
+    ::= { rlIpAddressTable 1 }
+
+RlIpAddressEntry ::= SEQUENCE {
+        rlIpAddressPrefixLength         InetAddressPrefixLength,
+        rlIpAddressType                 INTEGER
+    }
+
+rlIpAddressPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The prefix length of this address."
+    DEFVAL { 64 }
+    ::= { rlIpAddressEntry 1 }
+
+rlIpAddressType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 unicast(1),
+                 anycast(2),
+                 broadcast(3),
+                 multicast(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Extend standard field ipAddressType to multicast"
+    DEFVAL { unicast }
+    ::= { rlIpAddressEntry 2 }
+
+--- ipv6InterfaceTable augmentation
+
+rlipv6InterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Rlipv6InterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table is parallel to ipv6InterfaceTable, and is used to
+            configure additional interface parameters."
+    ::= { ipSpec 20 }
+
+rlipv6InterfaceEntry OBJECT-TYPE
+    SYNTAX     Rlipv6InterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Additional configuration parameters for a particular interface."
+    AUGMENTS { ipv6InterfaceEntry }
+    ::= { rlipv6InterfaceTable 1 }
+
+Rlipv6InterfaceEntry ::= SEQUENCE {
+        rlipv6InterfaceNdDadAttemps             INTEGER,
+        rlipv6InterfaceAutoconfigEnable         INTEGER,
+        rlipv6InterfaceIcmpUnreachSendEnable    INTEGER,
+        rlipv6InterfaceLinkMTU                  Unsigned32,
+        rlipv6InterfaceMLDVersion               Unsigned32,
+        rlipv6InterfaceRetransmitTime           Unsigned32,
+        rlipv6InterfaceIcmpRedirectSendEnable   INTEGER
+    }
+
+rlipv6InterfaceNdDadAttemps OBJECT-TYPE
+    SYNTAX     INTEGER (0..600)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "ND Duplicated address detection number of attempts."
+    DEFVAL { 0 }
+    ::= { rlipv6InterfaceEntry 1 }
+
+rlipv6InterfaceAutoconfigEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables Stateless Address Auto configuration
+         on specific interface."
+    DEFVAL { enable }
+    ::=  { rlipv6InterfaceEntry 2 }
+
+rlipv6InterfaceIcmpUnreachSendEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables sending of ICMP Destination Unreachable
+         Error on specific interface."
+    DEFVAL { enable }
+       ::= { rlipv6InterfaceEntry 3 }
+
+rlipv6InterfaceLinkMTU OBJECT-TYPE
+    SYNTAX     Unsigned32 (1280..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The maximum transmission unit (MTU) size of IPv6 packets
+            sent on an interface in bytes."
+    DEFVAL { 1500 }
+    ::= { rlipv6InterfaceEntry 4 }
+
+rlipv6InterfaceMLDVersion OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..2)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set version of MLD protocol on specific interface."
+    DEFVAL { 2 }
+    ::=  { rlipv6InterfaceEntry 5 }
+
+rlipv6InterfaceRetransmitTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0 | 1000..3600000)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "This value will be included in all IPv6 router advertisements sent
+            out this interface. Very short intervals are not recommended in
+            normal IPv6 operation. When a nondefault value is configured, the
+            configured time is both advertised and used by the router itself.
+            When value 0 is configured, 0 seconds (unspecified) advertised in
+            router advertisements and the value 1000 milliseconds is used for
+            the neighbor discovery activity of the router itself."
+    DEFVAL { 0 }
+    ::= { rlipv6InterfaceEntry 6 }
+
+rlipv6InterfaceIcmpRedirectSendEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables sending of ICMP IPv6 redirect messages to
+         re-send a packet through the same interface on which the packet was
+         received."
+    DEFVAL { enable }
+       ::= { rlipv6InterfaceEntry 7 }
+
+--- inetCidrRoutetable augmentation
+
+rlinetCidrRouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlinetCidrRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table is parallel to inetCidrRouteTable, and is used to
+            configure or display additional route parameters."
+    ::= { ipSpec 21 }
+
+rlinetCidrRouteEntry OBJECT-TYPE
+    SYNTAX     RlinetCidrRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Additional parameters for a particular route."
+    AUGMENTS { inetCidrRouteEntry }
+    ::= { rlinetCidrRouteTable 1 }
+
+RlinetCidrRouteEntry ::= SEQUENCE {
+        rlinetCidrRouteLifetime         Unsigned32,
+        rlinetCidrRouteInfo             INTEGER
+    }
+
+rlinetCidrRouteLifetime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The remaining length of time, in seconds, that this route
+            will continue to be valid, i.e., time until deprecation.
+            A value of 4,294,967,295 represents infinity."
+    DEFVAL { 4294967295 }
+    ::= { rlinetCidrRouteEntry 1 }
+
+rlinetCidrRouteInfo OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        ospfIntraArea(1),
+        ospfInterArea(2),
+        ospfExternalType1(3),
+        ospfExternalType2(4)
+    }
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+            "A reference to MIB definitions specific to the particular routing
+            protocol which is responsible for this route, as determined by the
+            value specified  in the route's inetCidrRouteProto value."
+    DEFVAL { none }
+    ::= { rlinetCidrRouteEntry 2 }
+
+
+--- ipNetToPhysicalTable augmentation
+
+rlipNetToPhysicalTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlipNetToPhysicalEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table is parallel to ipNetToPhysicalTable, and is used to
+            configure or display additional neighbor parameters."
+    ::= { ipSpec 22 }
+
+rlipNetToPhysicalEntry OBJECT-TYPE
+    SYNTAX     RlipNetToPhysicalEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Additional parameters for a neighbor"
+    AUGMENTS { ipNetToPhysicalEntry }
+    ::= { rlipNetToPhysicalTable 1 }
+
+RlipNetToPhysicalEntry ::= SEQUENCE {
+        rlipNetToPhysicalIsRouter               TruthValue,
+        rlipNetToPhysicalReachableConfirmed     Unsigned32
+    }
+
+rlipNetToPhysicalIsRouter OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "This object has the value 'true(1)', if the neighbor
+            is router; otherwise, the value is 'false(2)'."
+    ::= { rlipNetToPhysicalEntry 1 }
+
+rlipNetToPhysicalReachableConfirmed OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time (in seconds) since the address was confirmed to be reachable.
+            Only, relevant for dynamic entries."
+    ::= { rlipNetToPhysicalEntry 2 }
+
+
+--- ICMPv6 Rate Limiting
+
+rlipv6IcmpErrorRatelimitInterval OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time interval between tokens being placed in the bucket,
+         each token represents a single ICMP error message.
+         The interval measured in milliseconds."
+    DEFVAL { 100 }
+    ::= { rlIPv6 1 }
+
+rlipv6IcmpErrorRatelimitBucketSize OBJECT-TYPE
+    SYNTAX      INTEGER(1..200)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of tokens stored in the bucket,
+         each token represents a single ICMP error message."
+    DEFVAL { 10 }
+    ::= { rlIPv6 2 }
+
+
+--- IPv6 Link Local Default Zone
+
+rlipv6LLDefaultZone OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interface which would be used as the egress interface
+        for packets sent without a specified IPv6Z interface identifier
+        or with the default '0' identifier. Zero value means no default
+        interface specified."
+    DEFVAL { 0 }
+    ::= { rlIPv6 3 }
+
+--- rlIpv6GeneralPrefixTable
+
+rlIpv6GeneralPrefixTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlIpv6GeneralPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table defines general prefix description,
+            based on which a number of longer, more specific, prefixes can
+            be defined."
+    ::= { rlIPv6 4 }
+
+rlIpv6GeneralPrefixEntry OBJECT-TYPE
+    SYNTAX     RlIpv6GeneralPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Single entry in general prefix table."
+    INDEX  {rlIpv6GeneralPrefixName}
+    ::= { rlIpv6GeneralPrefixTable 1 }
+
+RlIpv6GeneralPrefixEntry ::= SEQUENCE {
+        rlIpv6GeneralPrefixName                     DisplayString,
+        rlIpv6GeneralPrefixInetAddrType             InetAddressType,
+        rlIpv6GeneralPrefixInetAddr                 InetAddress,
+        rlIpv6GeneralPrefixInetAddrPrefixLength     InetAddressPrefixLength,
+        rlIpv6GeneralPrefixInterfaceId              Unsigned32,
+        rlIpv6GeneralPrefixRowStatus                RowStatus
+    }
+
+rlIpv6GeneralPrefixName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name assigned to the prefix."
+    ::= { rlIpv6GeneralPrefixEntry 1 }
+
+rlIpv6GeneralPrefixInetAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Prefix inet address type. Has to be IPv6."
+    ::= { rlIpv6GeneralPrefixEntry 2 }
+
+rlIpv6GeneralPrefixInetAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IPv6 network assigned to the general prefix.
+         This argument must be in the form documented in RFC4293
+         where the address is specified in hexadecimal using 16-bit values
+         between colons."
+    ::= { rlIpv6GeneralPrefixEntry 3 }
+
+rlIpv6GeneralPrefixInetAddrPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "Indicates the number of leading one bits that form the
+        mask to be logical-ANDed with the inet address
+        before being compared to the value in the
+        rlIpv6GeneralPrefixInetAddr field."
+    ::= { rlIpv6GeneralPrefixEntry 4 }
+
+rlIpv6GeneralPrefixInterfaceId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Interface id to use when creating prefix based on point-to-point interface."
+    ::= { rlIpv6GeneralPrefixEntry 5 }
+
+rlIpv6GeneralPrefixRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Row status."
+    ::= { rlIpv6GeneralPrefixEntry 6 }
+
+
+--- IPv6 maximum number of hops
+
+rlipv6MaximumHopsNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of hops used in router advertisements and all IPv6 packets that
+         are originated by the router."
+    DEFVAL { 64 }
+    ::= { rlIPv6 5 }
+
+--- rlIpv6RouterAdvertPrefixTable
+
+rlIpv6RouterAdvertPrefixTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlIpv6RouterAdvertPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table defines IPv6 prefixes which are included in IPv6 Neighbor
+           Discovery (ND) router advertisements."
+    ::= { rlIPv6 6 }
+
+rlIpv6RouterAdvertPrefixEntry OBJECT-TYPE
+    SYNTAX     RlIpv6RouterAdvertPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Single entry in Neighbor Discovery Prefix table."
+    INDEX  {rlIpv6RouterAdvertPrefixIfIndex,
+            rlIpv6RouterAdvertPrefixIsDefault,
+            rlIpv6RouterAdvertPrefixInetAddrType,
+            rlIpv6RouterAdvertPrefixInetAddr,
+            rlIpv6RouterAdvertPrefixInetAddrPrefixLength}
+    ::= { rlIpv6RouterAdvertPrefixTable 1 }
+
+RlIpv6RouterAdvertPrefixEntry ::= SEQUENCE {
+        rlIpv6RouterAdvertPrefixIfIndex                   InterfaceIndex,
+        rlIpv6RouterAdvertPrefixIsDefault                 TruthValue,
+        rlIpv6RouterAdvertPrefixInetAddrType              InetAddressType,
+        rlIpv6RouterAdvertPrefixInetAddr                  InetAddress,
+        rlIpv6RouterAdvertPrefixInetAddrPrefixLength      InetAddressPrefixLength,
+        rlIpv6RouterAdvertPrefixAdminStatus               INTEGER,
+        rlIpv6RouterAdvertPrefixAdvertise                 TruthValue,
+        rlIpv6RouterAdvertPrefixOnLinkStatus              INTEGER,
+        rlIpv6RouterAdvertPrefixAutonomousFlag            TruthValue,
+        rlIpv6RouterAdvertPrefixAdvPreferredLifetime      Unsigned32,
+        rlIpv6RouterAdvertPrefixAdvValidLifetime          Unsigned32,
+        rlIpv6RouterAdvertPrefixRowStatus                 RowStatus
+    }
+
+rlIpv6RouterAdvertPrefixIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface on
+            which this prefix is configured.  The interface identified
+            by a particular value of this index is the same interface as
+            identified by the same value of the IF-MIB's ifIndex."
+    ::= { rlIpv6RouterAdvertPrefixEntry 1 }
+
+rlIpv6RouterAdvertPrefixIsDefault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "Indicates whether this object belongs to 'default' entry.
+            Default entry contains specifics about advertising prefixes which
+            were created from local ipv6 addresses."
+    ::= { rlIpv6RouterAdvertPrefixEntry 2 }
+
+rlIpv6RouterAdvertPrefixInetAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Prefix inet address type. Has to be IPv6."
+    ::= { rlIpv6RouterAdvertPrefixEntry 3 }
+
+rlIpv6RouterAdvertPrefixInetAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The IPv6 network prefix to include in router advertisements.
+          This argument must be in the form documented in RFC4293 where
+          the address is specified in hexadecimal using 16-bit values between
+          colons."
+    ::= { rlIpv6RouterAdvertPrefixEntry 4 }
+
+rlIpv6RouterAdvertPrefixInetAddrPrefixLength OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The length of the IPv6 prefix. A decimal value that indicates
+          how many of the high-order contiguous bits of the address comprise
+          the prefix (the network portion of the address)."
+    ::= { rlIpv6RouterAdvertPrefixEntry 5 }
+
+rlIpv6RouterAdvertPrefixAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+           enable(1),
+           disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Admin status of the entry. Relevant only for default entry."
+    DEFVAL { enable }
+    ::= { rlIpv6RouterAdvertPrefixEntry 6 }
+
+rlIpv6RouterAdvertPrefixAdvertise OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Whether the prefix is included in router advertisements."
+    DEFVAL { true }
+    ::= { rlIpv6RouterAdvertPrefixEntry 7 }
+
+rlIpv6RouterAdvertPrefixOnLinkStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        onlink      (1), -- connected prefix
+        not-onlink  (2), -- connected state of the prefix is not specified
+        off-link    (3)  -- not connected prefix
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "If object has the value 'onlink(1)', this prefix is confidered as on-link.
+           This prefix will be advertised with the L-bit set and will be present
+           in the Routing Table.
+           If object has the value 'not-onlink(2)', this prefix will be advertised
+           with the L-bit clear, but connected state of the prefix will not be changed.
+           If object has the value 'offlink(3)', this prefix is confidered as on-link.
+           This prefix will be advertised with the L-bit clear, and will be
+           not present in the Routing Table."
+    DEFVAL { onlink }
+    ::= { rlIpv6RouterAdvertPrefixEntry 8 }
+
+rlIpv6RouterAdvertPrefixAutonomousFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "If object has the value 'true(1)', this prefix indicates to hosts on
+           the local link that the specified prefix can be used for IPv6
+           autoconfiguration. The prefix will be advertised with the A-bit set."
+    DEFVAL { true }
+    ::= { rlIpv6RouterAdvertPrefixEntry 9 }
+
+rlIpv6RouterAdvertPrefixAdvPreferredLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The amount of time (in seconds) that the specified IPv6 prefix is
+          advertised as being preferred."
+    DEFVAL { 604800 }
+    ::= { rlIpv6RouterAdvertPrefixEntry 10 }
+
+rlIpv6RouterAdvertPrefixAdvValidLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The amount of time (in seconds) that the specified IPv6 prefix is
+          advertised as being valid."
+    DEFVAL { 2592000 }
+    ::= { rlIpv6RouterAdvertPrefixEntry 11 }
+
+rlIpv6RouterAdvertPrefixRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Row status."
+    ::= { rlIpv6RouterAdvertPrefixEntry 12 }
+
+
+--- ipv6RouterAdvertTable augmentation
+
+rlIpv6RouterAdvertTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlIpv6RouterAdvertEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table is parallel to inetCidrRouteTable, and is used to
+            configure or display additional route parameters."
+    ::= { rlIPv6 7 }
+
+rlIpv6RouterAdvertEntry OBJECT-TYPE
+    SYNTAX     RlIpv6RouterAdvertEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Additional parameters for a particular route."
+    AUGMENTS { ipv6RouterAdvertEntry }
+    ::= { rlIpv6RouterAdvertTable 1 }
+
+RlIpv6RouterAdvertEntry ::= SEQUENCE {
+        rlIpv6RouterAdvertAdvIntervalOption         TruthValue,
+        rlIpv6RouterAdvertRouterPreference          INTEGER,
+        rlIpv6RouterAdvertIsCurHopLimitUserConfigured  TruthValue
+    }
+
+rlIpv6RouterAdvertAdvIntervalOption OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Indicates to a visiting mobile node the interval at which that node
+            may expect to receive RAs. The node may use this information in its
+            movement detection algorithm."
+    DEFVAL { false }
+    ::= { rlIpv6RouterAdvertEntry 1 }
+
+rlIpv6RouterAdvertRouterPreference OBJECT-TYPE
+    SYNTAX  INTEGER {
+        low(1),
+        medium(2),
+        high(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures a default router preference (DRP) for the router on a specific interface."
+    DEFVAL { medium }
+       ::= { rlIpv6RouterAdvertEntry 2 }
+
+rlIpv6RouterAdvertIsCurHopLimitUserConfigured OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Indicates that hop limit value used in router advertisement is
+            an user configured value and not necessarily value that is used by
+            router itself."
+    DEFVAL { false }
+    ::= { rlIpv6RouterAdvertEntry 3 }
+
+--- Clear IPv6 routes
+
+rlipv6InetCidrTableClear OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar indicates to clear all ipv6 routes from inetCidrTable."
+    ::= { rlIPv6 8 }
+
+
+--- rlIpv6PathMtuTable
+
+rlIpv6PathMtuTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlIpv6PathMtuEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table used to represent all Path MTU changes to specific destination
+            received from 'packet-too-big' messages."
+    ::= { rlIPv6 9 }
+
+rlIpv6PathMtuEntry OBJECT-TYPE
+    SYNTAX     RlIpv6PathMtuEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Single entry in Path MTU table."
+    INDEX  {rlIpv6PathMtuEntryInetDestAddrType,
+            rlIpv6PathMtuEntryInetDestAddr}
+    ::= { rlIpv6PathMtuTable 1 }
+
+RlIpv6PathMtuEntry ::= SEQUENCE {
+        rlIpv6PathMtuEntryInetDestAddrType  InetAddressType,
+        rlIpv6PathMtuEntryInetDestAddr      InetAddress,
+        rlIpv6PathMtuEntryMtu               Unsigned32,
+        rlIpv6PathMtuEntryAge               Unsigned32
+    }
+
+rlIpv6PathMtuEntryInetDestAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Prefix inet address type. Has to be IPv6."
+    ::= { rlIpv6PathMtuEntry 1 }
+
+rlIpv6PathMtuEntryInetDestAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The IPv6 destination address for which packet-too-big message
+         was received.
+         This argument must be in the form documented in RFC4293
+         where the address is specified in hexadecimal using 16-bit values
+         between colons."
+    ::= { rlIpv6PathMtuEntry 2 }
+
+rlIpv6PathMtuEntryMtu OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The MTU value that was received in packet-too-bug message for
+         specific destination."
+    ::= { rlIpv6PathMtuEntry 3 }
+
+rlIpv6PathMtuEntryAge OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This entry's age (seconds)"
+    ::= { rlIpv6PathMtuEntry 4 }
+
+
+
+--- Inet IP Static Route Table
+
+
+rlInetStaticRouteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlInetStaticRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entity's static (user configured) Inet Routing table.
+         Entries are MAX-ACCESSible even if not used for forwarding "
+    ::= { ipSpec 28 }
+
+
+rlInetStaticRouteEntry OBJECT-TYPE
+    SYNTAX      RlInetStaticRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular Static(user configured) route to a particular destination."
+    INDEX {
+        rlInetStaticRouteDestType,
+        rlInetStaticRouteDest,
+        rlInetStaticRoutePfxLen,
+        rlInetStaticRouteNextHopType,
+        rlInetStaticRouteNextHop,
+        rlInetStaticRouteIfIndex
+    }
+    ::= { rlInetStaticRouteTable 1 }
+
+
+RlInetStaticRouteEntry ::= SEQUENCE {
+        rlInetStaticRouteDestType              InetAddressType,
+        rlInetStaticRouteDest                  InetAddress,
+        rlInetStaticRoutePfxLen                InetAddressPrefixLength,
+        rlInetStaticRouteNextHopType           InetAddressType,
+        rlInetStaticRouteNextHop               InetAddress,
+        rlInetStaticRouteIfIndex               InterfaceIndexOrZero,
+        rlInetStaticRoutePathCost              Unsigned32,
+        rlInetStaticRouteType                  INTEGER,
+        rlInetStaticRouteOwner                 INTEGER,
+        rlInetStaticRouteRowStatus             RowStatus,
+        rlInetStaticRouteForwardingStatus      INTEGER
+    }
+
+
+rlInetStaticRouteDestType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The type of the address used as the destination
+       internetwork address or subnet address."
+    ::= { rlInetStaticRouteEntry 1 }
+
+
+rlInetStaticRouteDest OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Destination internetwork address or subnet address.  The
+        destination prefix length is applied to this value, and to a
+        particular destination address, to determine whether the route
+        applies to the particular address.
+        If the prefix length is L, then applying the length to an address
+        means taking the first L bits of the address."
+    ::= { rlInetStaticRouteEntry 2 }
+
+
+rlInetStaticRoutePfxLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Indicates the number of leading one bits that form the
+        mask to be logical-ANDed with the destination address
+        before being compared to the value in the
+        rlInetStaticRouteDest field."
+    ::= { rlInetStaticRouteEntry 3 }
+
+
+rlInetStaticRouteNextHopType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The type of the address used as the next-hop address
+        for this route."
+   ::= { rlInetStaticRouteEntry 4 }
+
+
+rlInetStaticRouteNextHop OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The next-hop IP address, if any.
+        If rlInetStaticRouteAction is 'forward', there may or may not be
+        a next-hop IP address.
+        A next-hop IP address is not required if an output interface
+        index is specified (in other words, if rlInetStaticRouteIfIndex is
+        non-zero).
+        If rlInetStaticRouteAction is not 'forward', there is no next-hop
+        IP address.
+        If there is no next-hop IP address, the rlInetStaticRouteNextHop
+        object is set to all zeroes."
+   ::= { rlInetStaticRouteEntry 5 }
+
+
+rlInetStaticRouteIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The ifIndex value that identifies the local interface
+        through which the next hop of this route should be
+        reached.  A value of 0 is valid and represents the
+        scenario where no interface is specified."
+    DEFVAL { 0 }
+    ::= { rlInetStaticRouteEntry 6 }
+
+
+rlInetStaticRoutePathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Path cost for this static route."
+    DEFVAL { 1 }
+    ::= { rlInetStaticRouteEntry 7 }
+
+
+rlInetStaticRouteType OBJECT-TYPE
+    SYNTAX INTEGER {
+        reject   (2), -- route that discards traffic and
+                      --   returns ICMP notification
+        local    (3), -- local interface
+        remote   (4), -- remote destination
+        blackhole(5), -- route that discards traffic
+                      --   silently
+        nd       (6)  -- route that is configred through
+                      --   neighbor discovery (relevant only for icmp owner)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Same as inetCidrRouteType  MIB (excluded 'other' route type)"
+    DEFVAL { remote }
+    ::= { rlInetStaticRouteEntry 8 }
+
+
+rlInetStaticRouteOwner OBJECT-TYPE
+    SYNTAX INTEGER {
+        static  (1),
+        dhcp    (2),
+        default (3),
+        icmp    (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Static  - The route is configured over Static IP.
+                  This route is written to configuration files.
+        Dhcp    - The route is Configured by DHCP
+                  (received as part of DHCP configuration)
+                  This route IS NOT written to configuration files
+        Default - The route is Configured by default system config
+                  exists till any other configuration is applied.
+        Icmp    - The route is Configured by ICMP protocol either by
+                  router advertisements or to be advertised in router
+                  advertisements ."
+    ::= { rlInetStaticRouteEntry 9 }
+
+
+rlInetStaticRouteRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to row
+        installation and removal conventions.
+        A row entry cannot be modified when the status is
+        marked as active(1)."
+    ::= { rlInetStaticRouteEntry 10 }
+
+rlInetStaticRouteForwardingStatus OBJECT-TYPE
+    SYNTAX   INTEGER {
+                active   (1),
+                inactive (2)
+             }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "active - An indication that the route has implication on routing
+       inactive - the route is a backup route or it is down. It is not used
+                  in forwarding decision.
+       Down means that the Ip interface on which it is configured is down.
+       (Note: ip interface down may be for two reason - its admin status or
+       the L2 interface , on which the ip interface is configured, status"
+    ::= { rlInetStaticRouteEntry 11 }
+
+
+--- Clear entries from ipNetToPhysicalTable
+
+rlIpNetToPhysicalTableClearTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlIpNetToPhysicalTableClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entity is used to clear all or specific-type entries from ipNetToPhysicalTable."
+    ::= { rlIPv6 10 }
+
+rlIpNetToPhysicalTableClearEntry OBJECT-TYPE
+    SYNTAX      RlIpNetToPhysicalTableClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular entry in this table."
+    INDEX {
+        rlIpNetToPhysicalTableClearIfIndex
+    }
+    ::= { rlIpNetToPhysicalTableClearTable 1 }
+
+RlIpNetToPhysicalTableClearEntry ::= SEQUENCE {
+        rlIpNetToPhysicalTableClearIfIndex  InterfaceIndexOrZero,
+        rlIpNetToPhysicalTableClearScope    INTEGER
+    }
+
+rlIpNetToPhysicalTableClearIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Interface index of to clear or zero in case of whole table."
+    ::= { rlIpNetToPhysicalTableClearEntry 1 }
+
+
+rlIpNetToPhysicalTableClearScope OBJECT-TYPE
+    SYNTAX  INTEGER {
+       all(1),
+       dynamicOnly(2),
+       staticOnly(3)
+     }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Scope of the action - type of entries to delete."
+    ::= { rlIpNetToPhysicalTableClearEntry 2 }
+
+
+
+
+--- Inet IP Distance Table
+
+
+rlInetRoutingDistanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlInetRoutingDistanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines administrative distances for
+         different protocol routes that are inserted into
+         the routing table."
+    ::= { ipSpec 29 }
+
+
+rlInetRoutingDistanceEntry OBJECT-TYPE
+    SYNTAX      RlInetRoutingDistanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A set of distances per inet address type."
+    INDEX {
+        rlInetRoutingDistanceType
+    }
+    ::= { rlInetRoutingDistanceTable 1 }
+
+
+RlInetRoutingDistanceEntry ::= SEQUENCE {
+        rlInetRoutingDistanceType               INTEGER,
+        rlInetRoutingDistanceConnected          INTEGER,
+        rlInetRoutingDistanceStatic             INTEGER,
+        rlInetRoutingDistanceRip                INTEGER,
+        rlInetRoutingDistanceOspfInternal       INTEGER,
+        rlInetRoutingDistanceOspfExternal       INTEGER
+    }
+
+
+rlInetRoutingDistanceType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ipv4(1),
+        ipv6(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The inet address type for distance definitions set,
+       either IPv4 or IPv6."
+    ::= { rlInetRoutingDistanceEntry 1 }
+
+
+rlInetRoutingDistanceConnected OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The administrative distance used for directly connected routes."
+    ::= { rlInetRoutingDistanceEntry 2 }
+
+
+rlInetRoutingDistanceStatic OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The administrative distance used for static routes."
+    ::= { rlInetRoutingDistanceEntry 3 }
+
+
+rlInetRoutingDistanceRip OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The administrative distance used for RIP routes."
+    ::= { rlInetRoutingDistanceEntry 4 }
+
+
+rlInetRoutingDistanceOspfInternal OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The administrative distance used for OSPF internal routes."
+    ::= { rlInetRoutingDistanceEntry 5 }
+
+
+rlInetRoutingDistanceOspfExternal OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The administrative distance used for OSPF Autonomous System external routes."
+    ::= { rlInetRoutingDistanceEntry 6 }
+
+
+
+--- Internal inetCidrRouteTable (including custom rlInetCidrRouteEntry objects)
+
+
+rlInternInetCidrRouteTable OBJECT-TYPE
+SYNTAX     SEQUENCE OF RlInternInetCidrRouteEntry
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "Internal inetCidrRouteTable - this entity's IP Routing table."
+REFERENCE
+       "RFC 1213 Section 6.6, The IP Group"
+    ::= { ipSpec 30 }
+
+rlInternInetCidrRouteEntry OBJECT-TYPE
+SYNTAX     RlInternInetCidrRouteEntry
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "A particular route to a particular destination, under a
+        particular policy (as reflected in the
+        rlInternInetCidrRoutePolicy object).
+
+        Dynamically created rows will survive an agent reboot.
+
+        Implementers need to be aware that if the total number
+        of elements (octets or sub-identifiers) in
+        rlInternInetCidrRouteDest, rlInternInetCidrRoutePolicy, and
+        rlInternInetCidrRouteNextHop exceeds 111, then OIDs of column
+        instances in this table will have more than 128 sub-
+        identifiers and cannot be accessed using SNMPv1,
+        SNMPv2c, or SNMPv3."
+INDEX {
+    rlInternInetCidrRouteDestType,
+    rlInternInetCidrRouteDest,
+    rlInternInetCidrRoutePfxLen,
+    rlInternInetCidrRoutePolicy,
+    rlInternInetCidrRouteNextHopType,
+    rlInternInetCidrRouteNextHop
+    }
+::= { rlInternInetCidrRouteTable 1 }
+
+RlInternInetCidrRouteEntry ::= SEQUENCE {
+    rlInternInetCidrRouteDestType     InetAddressType,
+    rlInternInetCidrRouteDest         InetAddress,
+    rlInternInetCidrRoutePfxLen       InetAddressPrefixLength,
+    rlInternInetCidrRoutePolicy       OBJECT IDENTIFIER,
+    rlInternInetCidrRouteNextHopType  InetAddressType,
+    rlInternInetCidrRouteNextHop      InetAddress,
+    rlInternInetCidrRouteIfIndex      InterfaceIndexOrZero,
+    rlInternInetCidrRouteType         INTEGER,
+    rlInternInetCidrRouteProto        IANAipRouteProtocol,
+    rlInternInetCidrRouteAge          Gauge32,
+    rlInternInetCidrRouteNextHopAS    InetAutonomousSystemNumber,
+    rlInternInetCidrRouteMetric1      Integer32,
+    rlInternInetCidrRouteMetric2      Integer32,
+    rlInternInetCidrRouteMetric3      Integer32,
+    rlInternInetCidrRouteMetric4      Integer32,
+    rlInternInetCidrRouteMetric5      Integer32,
+    rlInternInetCidrRouteStatus       RowStatus,
+    rlInternInetCidrRouteLifetime     Unsigned32,
+    rlInternInetCidrRouteInfo         INTEGER
+
+}
+
+rlInternInetCidrRouteDestType OBJECT-TYPE
+SYNTAX     InetAddressType
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "The type of the rlInternInetCidrRouteDest address, as defined
+        in the InetAddress MIB.
+
+        Only those address types that may appear in an actual
+        routing table are allowed as values of this object."
+REFERENCE "RFC 4001"
+::= { rlInternInetCidrRouteEntry 1 }
+
+rlInternInetCidrRouteDest OBJECT-TYPE
+SYNTAX     InetAddress
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "The destination IP address of this route.
+
+        The type of this address is determined by the value of
+        the rlInternInetCidrRouteDestType object.
+
+        The values for the index objects rlInternInetCidrRouteDest and
+        rlInternInetCidrRoutePfxLen must be consistent.  When the value
+        of rlInternInetCidrRouteDest (excluding the zone index, if one
+        is present) is x, then the bitwise logical-AND
+        of x with the value of the mask formed from the
+        corresponding index object rlInternInetCidrRoutePfxLen MUST be
+        equal to x.  If not, then the index pair is not
+        consistent and an inconsistentName error must be
+        returned on SET or CREATE requests."
+
+::= { rlInternInetCidrRouteEntry 2 }
+
+rlInternInetCidrRoutePfxLen OBJECT-TYPE
+SYNTAX     InetAddressPrefixLength
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "Indicates the number of leading one bits that form the
+        mask to be logical-ANDed with the destination address
+        before being compared to the value in the
+        rlInternInetCidrRouteDest field.
+
+        The values for the index objects rlInternInetCidrRouteDest and
+        rlInternInetCidrRoutePfxLen must be consistent.  When the value
+        of rlInternInetCidrRouteDest (excluding the zone index, if one
+        is present) is x, then the bitwise logical-AND
+        of x with the value of the mask formed from the
+        corresponding index object rlInternInetCidrRoutePfxLen MUST be
+        equal to x.  If not, then the index pair is not
+        consistent and an inconsistentName error must be
+        returned on SET or CREATE requests."
+
+::= { rlInternInetCidrRouteEntry 3 }
+
+rlInternInetCidrRoutePolicy OBJECT-TYPE
+SYNTAX     OBJECT IDENTIFIER
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "This object is an opaque object without any defined
+        semantics.  Its purpose is to serve as an additional
+        index that may delineate between multiple entries to
+        the same destination.  The value { 0 0 } shall be used
+        as the default value for this object."
+::= { rlInternInetCidrRouteEntry 4 }
+
+rlInternInetCidrRouteNextHopType OBJECT-TYPE
+SYNTAX     InetAddressType
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "The type of the rlInternInetCidrRouteNextHop address, as
+        defined in the InetAddress MIB.
+
+        Value should be set to unknown(0) for non-remote
+        routes.
+
+        Only those address types that may appear in an actual
+        routing table are allowed as values of this object."
+REFERENCE "RFC 4001"
+::= { rlInternInetCidrRouteEntry 5 }
+
+rlInternInetCidrRouteNextHop OBJECT-TYPE
+SYNTAX     InetAddress
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "On remote routes, the address of the next system en
+       route.  For non-remote routes, a zero length string.
+
+        The type of this address is determined by the value of
+        the rlInternInetCidrRouteNextHopType object."
+::= { rlInternInetCidrRouteEntry 6 }
+
+rlInternInetCidrRouteIfIndex OBJECT-TYPE
+SYNTAX     InterfaceIndexOrZero
+MAX-ACCESS not-accessible
+STATUS     current
+DESCRIPTION
+       "The ifIndex value that identifies the local interface
+        through which the next hop of this route should be
+        reached.  A value of 0 is valid and represents the
+        scenario where no interface is specified."
+::= { rlInternInetCidrRouteEntry 7 }
+
+rlInternInetCidrRouteType OBJECT-TYPE
+SYNTAX     INTEGER {
+            other    (1), -- not specified by this MIB
+            reject   (2), -- route that discards traffic and
+                          --   returns ICMP notification
+            local    (3), -- local interface
+            remote   (4), -- remote destination
+            blackhole(5)  -- route that discards traffic
+                          --   silently
+         }
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "The type of route.  Note that local(3) refers to a
+        route for which the next hop is the final destination;
+        remote(4) refers to a route for which the next hop is
+        not the final destination.
+
+        Routes that do not result in traffic forwarding or
+        rejection should not be displayed, even if the
+        implementation keeps them stored internally.
+
+        reject(2) refers to a route that, if matched, discards
+        the message as unreachable and returns a notification
+        (e.g., ICMP error) to the message sender.  This is used
+        in some protocols as a means of correctly aggregating
+        routes.
+
+        blackhole(5) refers to a route that, if matched,
+        discards the message silently."
+::= { rlInternInetCidrRouteEntry 8 }
+
+rlInternInetCidrRouteProto OBJECT-TYPE
+SYNTAX     IANAipRouteProtocol
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "The routing mechanism via which this route was learned.
+        Inclusion of values for gateway routing protocols is
+        not intended to imply that hosts should support those
+        protocols."
+::= { rlInternInetCidrRouteEntry 9 }
+
+rlInternInetCidrRouteAge OBJECT-TYPE
+SYNTAX     Gauge32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "The number of seconds since this route was last updated
+        or otherwise determined to be correct.  Note that no
+        semantics of 'too old' can be implied, except through
+        knowledge of the routing protocol by which the route
+        was learned."
+::= { rlInternInetCidrRouteEntry 10 }
+
+rlInternInetCidrRouteNextHopAS OBJECT-TYPE
+SYNTAX     InetAutonomousSystemNumber
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "The Autonomous System Number of the Next Hop.  The
+        semantics of this object are determined by the routing-
+        protocol specified in the route's rlInternInetCidrRouteProto
+        value.  When this object is unknown or not relevant, its
+        value should be set to zero."
+DEFVAL { 0 }
+::= { rlInternInetCidrRouteEntry 11 }
+
+rlInternInetCidrRouteMetric1 OBJECT-TYPE
+SYNTAX     Integer32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "The primary routing metric for this route.  The
+        semantics of this metric are determined by the routing-
+        protocol specified in the route's rlInternInetCidrRouteProto
+        value.  If this metric is not used, its value should be
+        set to -1."
+DEFVAL { -1 }
+::= { rlInternInetCidrRouteEntry 12 }
+
+rlInternInetCidrRouteMetric2 OBJECT-TYPE
+SYNTAX     Integer32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "An alternate routing metric for this route.  The
+        semantics of this metric are determined by the routing-
+        protocol specified in the route's rlInternInetCidrRouteProto
+        value.  If this metric is not used, its value should be
+        set to -1."
+DEFVAL { -1 }
+::= { rlInternInetCidrRouteEntry 13 }
+
+rlInternInetCidrRouteMetric3 OBJECT-TYPE
+SYNTAX     Integer32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "An alternate routing metric for this route.  The
+        semantics of this metric are determined by the routing-
+        protocol specified in the route's rlInternInetCidrRouteProto
+        value.  If this metric is not used, its value should be
+        set to -1."
+DEFVAL { -1 }
+::= { rlInternInetCidrRouteEntry 14 }
+
+rlInternInetCidrRouteMetric4 OBJECT-TYPE
+SYNTAX     Integer32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "An alternate routing metric for this route.  The
+        semantics of this metric are determined by the routing-
+        protocol specified in the route's rlInternInetCidrRouteProto
+        value.  If this metric is not used, its value should be
+        set to -1."
+DEFVAL { -1 }
+::= { rlInternInetCidrRouteEntry 15 }
+
+rlInternInetCidrRouteMetric5 OBJECT-TYPE
+SYNTAX     Integer32
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "An alternate routing metric for this route.  The
+        semantics of this metric are determined by the routing-
+        protocol specified in the route's rlInternInetCidrRouteProto
+        value.  If this metric is not used, its value should be
+        set to -1."
+DEFVAL { -1 }
+::= { rlInternInetCidrRouteEntry 16 }
+
+rlInternInetCidrRouteStatus OBJECT-TYPE
+SYNTAX     RowStatus
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+       "The row status variable, used according to row
+        installation and removal conventions.
+
+        A row entry cannot be modified when the status is
+        marked as active(1)."
+::= { rlInternInetCidrRouteEntry 17 }
+
+
+rlInternInetCidrRouteLifetime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The remaining length of time, in seconds, that this route
+            will continue to be valid, i.e., time until deprecation.
+            A value of 4,294,967,295 represents infinity."
+    DEFVAL { 4294967295 }
+    ::= { rlInternInetCidrRouteEntry 18 }
+
+rlInternInetCidrRouteInfo OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        ospfIntraArea(1),
+        ospfInterArea(2),
+        ospfExternalType1(3),
+        ospfExternalType2(4)
+    }
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+            "A reference to MIB definitions specific to the particular routing
+            protocol which is responsible for this route, as determined by the
+            value specified  in the route's inetCidrRouteProto value."
+    DEFVAL { none }
+    ::= { rlInternInetCidrRouteEntry 19 }
+
+
+
+--- Internal Inet IP Static Route Table
+
+
+rlInternInetStaticRouteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlInternInetStaticRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entity's static (user configured) Inet Routing table.
+         Entries are MAX-ACCESSible even if not used for forwarding "
+    ::= { ipSpec 31 }
+
+
+rlInternInetStaticRouteEntry OBJECT-TYPE
+    SYNTAX      RlInternInetStaticRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular Static(user configured) route to a particular destination."
+    INDEX {
+        rlInternInetStaticRouteDestType,
+        rlInternInetStaticRouteDest,
+        rlInternInetStaticRoutePfxLen,
+        rlInternInetStaticRouteNextHopType,
+        rlInternInetStaticRouteNextHop,
+        rlInternInetStaticRouteIfIndex
+    }
+    ::= { rlInternInetStaticRouteTable 1 }
+
+
+RlInternInetStaticRouteEntry ::= SEQUENCE {
+        rlInternInetStaticRouteDestType              InetAddressType,
+        rlInternInetStaticRouteDest                  InetAddress,
+        rlInternInetStaticRoutePfxLen                InetAddressPrefixLength,
+        rlInternInetStaticRouteNextHopType           InetAddressType,
+        rlInternInetStaticRouteNextHop               InetAddress,
+        rlInternInetStaticRouteIfIndex               InterfaceIndexOrZero,
+        rlInternInetStaticRoutePathCost              Unsigned32,
+        rlInternInetStaticRouteType                  INTEGER,
+        rlInternInetStaticRouteOwner                 INTEGER,
+        rlInternInetStaticRouteRowStatus             RowStatus,
+        rlInternInetStaticRouteForwardingStatus      INTEGER
+    }
+
+
+rlInternInetStaticRouteDestType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The type of the address used as the destination
+       internetwork address or subnet address."
+    ::= { rlInternInetStaticRouteEntry 1 }
+
+
+rlInternInetStaticRouteDest OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Destination internetwork address or subnet address.  The
+        destination prefix length is applied to this value, and to a
+        particular destination address, to determine whether the route
+        applies to the particular address.
+        If the prefix length is L, then applying the length to an address
+        means taking the first L bits of the address."
+    ::= { rlInternInetStaticRouteEntry 2 }
+
+
+rlInternInetStaticRoutePfxLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Indicates the number of leading one bits that form the
+        mask to be logical-ANDed with the destination address
+        before being compared to the value in the
+        rlInternInetStaticRouteDest field."
+    ::= { rlInternInetStaticRouteEntry 3 }
+
+
+rlInternInetStaticRouteNextHopType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The type of the address used as the next-hop address
+        for this route."
+   ::= { rlInternInetStaticRouteEntry 4 }
+
+
+rlInternInetStaticRouteNextHop OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The next-hop IP address, if any.
+        If rlInternInetStaticRouteAction is 'forward', there may or may not be
+        a next-hop IP address.
+        A next-hop IP address is not required if an output interface
+        index is specified (in other words, if rlInternInetStaticRouteIfIndex is
+        non-zero).
+        If rlInternInetStaticRouteAction is not 'forward', there is no next-hop
+        IP address.
+        If there is no next-hop IP address, the rlInternInetStaticRouteNextHop
+        object is set to all zeroes."
+   ::= { rlInternInetStaticRouteEntry 5 }
+
+
+rlInternInetStaticRouteIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The ifIndex value that identifies the local interface
+        through which the next hop of this route should be
+        reached.  A value of 0 is valid and represents the
+        scenario where no interface is specified."
+    DEFVAL { 0 }
+    ::= { rlInternInetStaticRouteEntry 6 }
+
+
+rlInternInetStaticRoutePathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Path cost for this static route."
+    DEFVAL { 1 }
+    ::= { rlInternInetStaticRouteEntry 7 }
+
+
+rlInternInetStaticRouteType OBJECT-TYPE
+    SYNTAX INTEGER {
+        reject   (2), -- route that discards traffic and
+                      --   returns ICMP notification
+        local    (3), -- local interface
+        remote   (4), -- remote destination
+        blackhole(5), -- route that discards traffic
+                      --   silently
+        nd       (6)  -- route that is configred through
+                      --   neighbor discovery (relevant only for icmp owner)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Same as inetCidrRouteType  MIB (excluded 'other' route type)"
+    DEFVAL { remote }
+    ::= { rlInternInetStaticRouteEntry 8 }
+
+
+rlInternInetStaticRouteOwner OBJECT-TYPE
+    SYNTAX INTEGER {
+        static  (1),
+        dhcp    (2),
+        default (3),
+        icmp    (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Static  - The route is configured over Static IP.
+                  This route is written to configuration files.
+        Dhcp    - The route is Configured by DHCP
+                  (received as part of DHCP configuration)
+                  This route IS NOT written to configuration files
+        Default - The route is Configured by default system config
+                  exists till any other configuration is applied.
+        Icmp    - The route is Configured by ICMP protocol either by
+                  router advertisements or to be advertised in router
+                  advertisements ."
+    ::= { rlInternInetStaticRouteEntry 9 }
+
+
+rlInternInetStaticRouteRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to row
+        installation and removal conventions.
+        A row entry cannot be modified when the status is
+        marked as active(1)."
+    ::= { rlInternInetStaticRouteEntry 10 }
+
+rlInternInetStaticRouteForwardingStatus OBJECT-TYPE
+    SYNTAX   INTEGER {
+                active   (1),
+                inactive (2)
+             }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "active - An indication that the route has implication on routing
+       inactive - the route is a backup route or it is down. It is not used
+                  in forwarding decision.
+       Down means that the Ip interface on which it is configured is down."
+    ::= { rlInternInetStaticRouteEntry 11 }
+
+--- IPv6 Host Forwarding Table
+
+
+rlIpv6HostForwardingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlIpv6HostForwardingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entity's IPv6 host forwarding table."
+    ::= { rlIPv6 11 }
+
+
+rlIpv6HostForwardingEntry OBJECT-TYPE
+    SYNTAX      RlIpv6HostForwardingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular Static(user configured) route to a particular destination."
+    INDEX {
+        rlIpv6HostForwardingDestType,
+        rlIpv6HostForwardingDest,
+        rlIpv6HostForwardingPfxLen,
+        rlIpv6HostForwardingNextHopType,
+        rlIpv6HostForwardingNextHop,
+        rlIpv6HostForwardingIfIndex,
+        rlIpv6HostForwardingType
+    }
+    ::= { rlIpv6HostForwardingTable 1 }
+
+
+RlIpv6HostForwardingEntry ::= SEQUENCE {
+        rlIpv6HostForwardingDestType              InetAddressType,
+        rlIpv6HostForwardingDest                  InetAddress,
+        rlIpv6HostForwardingPfxLen                InetAddressPrefixLength,
+        rlIpv6HostForwardingNextHopType           InetAddressType,
+        rlIpv6HostForwardingNextHop               InetAddress,
+        rlIpv6HostForwardingIfIndex               InterfaceIndexOrZero,
+        rlIpv6HostForwardingType                  INTEGER,
+        rlIpv6HostForwardingPathCost              Unsigned32
+    }
+
+rlIpv6HostForwardingDestType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The type of the address used as the destination
+       internetwork address or subnet address."
+    ::= { rlIpv6HostForwardingEntry 1 }
+
+
+rlIpv6HostForwardingDest OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Destination internetwork address or subnet address."
+    ::= { rlIpv6HostForwardingEntry 2 }
+
+
+rlIpv6HostForwardingPfxLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Indicates the number of leading one bits that form the
+        mask to be logical-ANDed with the destination address
+        before being compared to the value in the
+        rlIpv6HostForwardingDest field."
+    ::= { rlIpv6HostForwardingEntry 3 }
+
+
+rlIpv6HostForwardingNextHopType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The type of the address used as the next-hop address
+        for this route."
+   ::= { rlIpv6HostForwardingEntry 4 }
+
+
+rlIpv6HostForwardingNextHop OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The next-hop IP address, if any.
+        A next-hop IP address is not required if an output interface
+        index is specified (in other words, if rlIpv6HostForwardingIfIndex is
+        non-zero).
+        If there is no next-hop IP address, the rlIpv6HostForwardingNextHop
+        object is set to all zeroes."
+   ::= { rlIpv6HostForwardingEntry 5 }
+
+
+rlIpv6HostForwardingIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The ifIndex value that identifies the local interface
+        through which the next hop of this route should be
+        reached.  A value of 0 is valid and represents the
+        scenario where no interface is specified."
+    DEFVAL { 0 }
+    ::= { rlIpv6HostForwardingEntry 6 }
+
+
+rlIpv6HostForwardingType OBJECT-TYPE
+    SYNTAX INTEGER {
+        redirect        (1), -- ICMP redirect
+        local           (2), -- local interface (subnet)
+        nd              (3), -- route that is configred through router advertisment (on-link prefix)
+        remote-static   (4), -- default static route
+        remote-dynamic  (5)  -- default dynamic route
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Forwarding type"
+    ::= { rlIpv6HostForwardingEntry 7 }
+
+rlIpv6HostForwardingPathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Path cost for this route."
+    ::= { rlIpv6HostForwardingEntry 8 }
+
+
+
+rlipv6EnabledByDefaultRemovedIfindex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "the MIB is relevant when mtsc parameter DHCPv6_client_enabled_by_default is TRUE.
+                 If the MIB has non zero value the meaning is that ipv6 interface has removed from configuration by the user
+                 on the interface and signs to application not to add ipv6 interface. Otherwise (zero value) - the meaning is
+                 that Ipv6 interface must be added. "
+    DEFVAL{ 0 }
+    ::= { rlIPv6 12 }
+
+--- rlManagementIPv6
+
+rlManagementIpv6 OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The system management IPv6 address which is kept between system mode changes"
+    ::= { rlIPv6 13 }
+
+rlManagementIpv6Action OBJECT-TYPE
+    SYNTAX   INTEGER {
+                clear   (1)
+             }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The system management IPv6 action:
+             clear - delete all ipv6 interfaces from startup configuration database except rlManagementIpv6"
+
+    ::= { rlIPv6 14 }
+
+
+--- IPv6 Tunnel if/addr/prefix Table (internal mib)
+
+rlIpv6TunnelToIPv6DbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlIpv6TunnelToIPv6DbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entity's IPv6 Tunnel if/addr/prefix table."
+    ::= { rlIPv6 15 }
+
+
+rlIpv6TunnelToIPv6DbEntry OBJECT-TYPE
+    SYNTAX      RlIpv6TunnelToIPv6DbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A particular tunnel configured data to IPv6 db."
+    INDEX {
+        rlIpv6TunnelToIPv6IfIndex
+    }
+    ::= { rlIpv6TunnelToIPv6DbTable 1 }
+
+
+RlIpv6TunnelToIPv6DbEntry ::= SEQUENCE {
+        rlIpv6TunnelToIPv6IfIndex                       InterfaceIndex,
+        rlIpv6TunnelToIPv6Action                        INTEGER,
+        rlIpv6TunnelToIPv6TunnelType                    IANAtunnelType,
+        rlIpv6TunnelToIPv6Address                       InetAddress,
+        rlIpv6TunnelToIPv6PrefixLength                  Unsigned32,
+        rlIpv6TunnelToIPv6Mtu                           Unsigned32,
+        rlIpv6TunnelToIPv6MinRtrSolicitationInterval    Unsigned32,
+        rlIpv6TunnelToIPv6LinkLayerIPv4                 IpAddress
+    }
+
+rlIpv6TunnelToIPv6IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "IfIndex of tunnel interface"
+    ::= { rlIpv6TunnelToIPv6DbEntry 1 }
+
+
+rlIpv6TunnelToIPv6Action OBJECT-TYPE
+    SYNTAX INTEGER {
+        createTunnel      (1), -- create Tunnel interface
+        destroyTunnel     (2), -- destroy Tunnel interface
+        addAddress        (3), -- add IPv6 Address
+        deleteAddress     (4), -- delete IPv6 Address
+        updateAddresses   (5), -- refresh IPv6 Address on tunnel interface (if link-layer address was changed)
+        six2fourCfgRestore(6), -- restore lost 6to4 configuration
+        six2fourCfgClear  (7)  -- clear stale 6to4 configuration
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Action of the entry. All other fields relevant for appropriate actions."
+    ::= { rlIpv6TunnelToIPv6DbEntry 2 }
+
+
+rlIpv6TunnelToIPv6TunnelType OBJECT-TYPE
+    SYNTAX      IANAtunnelType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Tunnel type (manual/isatap/6to4/...)."
+    ::= { rlIpv6TunnelToIPv6DbEntry 3 }
+
+rlIpv6TunnelToIPv6Address OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The address used for this tunnel. Could be local IPv4 of the tunnel."
+   ::= { rlIpv6TunnelToIPv6DbEntry 4 }
+
+rlIpv6TunnelToIPv6PrefixLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The address/prefix length used for above address if applicable."
+   ::= { rlIpv6TunnelToIPv6DbEntry 5 }
+
+rlIpv6TunnelToIPv6Mtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Mtu of this interface. Used for host isatap tunnels"
+   ::= { rlIpv6TunnelToIPv6DbEntry 6 }
+
+rlIpv6TunnelToIPv6MinRtrSolicitationInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Minimal router solicitation interval. Used for host isatap tunnels"
+   ::= { rlIpv6TunnelToIPv6DbEntry 7 }
+
+rlIpv6TunnelToIPv6LinkLayerIPv4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "IPv4 address used for link-layer of ipv6 over ipv4 tunnel"
+   ::= { rlIpv6TunnelToIPv6DbEntry 8 }
+
+rlIpv6DefaultTC OBJECT-TYPE
+    SYNTAX      INTEGER(0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The default value inserted into the TC
+      field of the IPv6 header of datagrams originated at
+      this entity, whenever a TC value is not supplied
+      by the application."
+    ::= { rlIPv6 16 }
+
+rlIpv6DefaultUP OBJECT-TYPE
+    SYNTAX  INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The default value inserted into the User Priority
+      field in the 802.1q VLAN tag of IPv4 frames sent by the
+      CPU."
+    ::= { rlIPv6 17 }
+    
+END

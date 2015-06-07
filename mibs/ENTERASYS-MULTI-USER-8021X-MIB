@@ -1,0 +1,1110 @@
+ENTERASYS-MULTI-USER-8021X-MIB DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Multi User 802.1X MIB module.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright August, 2004 Enterasys Networks, Inc.
+
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64, Unsigned32,
+    TimeTicks
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString 
+        FROM SNMP-FRAMEWORK-MIB
+    dot1xPaePortNumber
+        FROM IEEE8021-PAE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysMultiUser8021xMIB MODULE-IDENTITY
+    LAST-UPDATED "200411111531Z"  -- Thu Nov 11 15:31 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+  
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         Multi-User IEEE 802.1X authentication.
+
+         This MIB is designed to supplement and be used in connection
+         with the standard IEEE 802.1X-2001 MIB."
+
+    REVISION    "200411111531Z"  -- Thu Nov 11 15:31 GMT 2004
+    DESCRIPTION "The initial version of this MIB module."
+    ::= { etsysModules 53 }
+
+
+-- -------------------------------------------------------------
+-- Branches of the Enterasys 802.1X Extensions MIB
+-- -------------------------------------------------------------
+
+etsysMultiUser8021xObjects        OBJECT IDENTIFIER
+        ::= { etsysMultiUser8021xMIB 1 }
+
+etsysMultiUser8021xSystem         OBJECT IDENTIFIER
+        ::= { etsysMultiUser8021xObjects 1 }
+
+etsysMultiUser8021xAccessEntity   OBJECT IDENTIFIER
+        ::= { etsysMultiUser8021xObjects 2 }
+
+
+-- -------------------------------------------------------------
+-- The 802.1X Access Entity Table
+-- -------------------------------------------------------------
+
+etsysMulti1xAccessEntityTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysMulti1xAccessEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The system and configuration information for all the
+         Access Entities."
+    REFERENCE   "9.6.1"
+    ::= { etsysMultiUser8021xAccessEntity 1 }
+
+etsysMulti1xAccessEntityEntry OBJECT-TYPE
+    SYNTAX     EtsysMulti1xAccessEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The system and configuration information for an
+         individual Access Entity."
+    INDEX { dot1xPaePortNumber, etsysMulti1xAeIndex }
+    ::= { etsysMulti1xAccessEntityTable 1 }
+
+EtsysMulti1xAccessEntityEntry ::=
+    SEQUENCE {
+        etsysMulti1xAeIndex                    Unsigned32,
+        etsysMulti1xAeActive                   TruthValue,
+        etsysMulti1xAeState                    INTEGER,
+        etsysMulti1xAeBackendAuthState         INTEGER,
+        etsysMulti1xAeInitialize               TruthValue,
+        etsysMulti1xAeReauthenticate           TruthValue,
+        etsysMulti1xAeReAuthPeriod             Unsigned32,
+        etsysMulti1xAeSupplicantAddress        MacAddress,
+        etsysMulti1xAeUserName                 SnmpAdminString
+    }
+
+etsysMulti1xAeIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Indicates if this Access Entity is currently active."
+    ::= { etsysMulti1xAccessEntityEntry 1 }
+
+etsysMulti1xAeActive OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates if this Access Entity is currently active."
+    ::= { etsysMulti1xAccessEntityEntry 2 }
+
+etsysMulti1xAeState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   initialize(1),
+                   disconnected(2),
+                   connecting(3),
+                   authenticating(4),
+                   authenticated(5),
+                   aborting(6),
+                   held(7),
+                   forceAuth(8),
+                   forceUnauth(9)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current value of the Access Entity state machine."
+    REFERENCE  "9.4.1, Authenticator PAE state"
+    ::= { etsysMulti1xAccessEntityEntry 3 }
+
+etsysMulti1xAeBackendAuthState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   request(1),
+                   response(2),
+                   success(3),
+                   fail(4),
+                   timeout(5),
+                   idle(6),
+                   initialize(7)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current state of the Backend Authentication state machine."
+    REFERENCE  "9.4.1, Backend Authentication state"
+    ::= { etsysMulti1xAccessEntityEntry 4 }
+
+etsysMulti1xAeInitialize OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The initialization control for this Access Entity.
+         Setting this attribute TRUE causes the Access Entity to be
+         initialized.  The attribute value reverts to FALSE once
+         initialization has completed."
+    REFERENCE      "9.6.1.2, Initialize Port"
+    ::= { etsysMulti1xAccessEntityEntry 5 }
+
+etsysMulti1xAeReauthenticate OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The reauthentication control for this Access Entity.
+         Setting this attribute TRUE causes the Access Entity state
+         machine to reauthenticate the Supplicant.  Setting this
+         attribute FALSE has no effect.  This attribute always
+         returns FALSE when it is read."
+    REFERENCE   "9.4.1.3 Reauthenticate"
+    ::= { etsysMulti1xAccessEntityEntry 6 }
+
+etsysMulti1xAeReAuthPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS     "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value, in seconds, of the reAuthPeriod constant currently
+         in use by the Reauthentication Timer state machine."
+    REFERENCE  "9.4.1, reAuthPeriod"
+    DEFVAL { 3600 }
+    ::= { etsysMulti1xAccessEntityEntry 7 }
+
+etsysMulti1xAeSupplicantAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The MAC address that this Access Entity is currently bound to."
+    ::= { etsysMulti1xAccessEntityEntry 8 }
+
+etsysMulti1xAeUserName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The User-Name representing the identity of the Supplicant PAE."
+    REFERENCE  "9.4.4, Session User Name"
+    ::= { etsysMulti1xAccessEntityEntry 9 }
+
+
+-- -------------------------------------------------------------
+-- The 802.1X Access Entity Statistics Table
+-- -------------------------------------------------------------
+
+etsysMulti1xAccessEntityStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysMulti1xAccessEntityStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The statistics objects for the all the Access Entities."
+    REFERENCE   "9.4.2 Authenticator Statistics"
+    ::= { etsysMultiUser8021xAccessEntity 2 }
+
+etsysMulti1xAccessEntityStatsEntry OBJECT-TYPE
+    SYNTAX     EtsysMulti1xAccessEntityStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The statistics information for an individual Access Entity."
+    AUGMENTS { etsysMulti1xAccessEntityEntry }
+    ::= { etsysMulti1xAccessEntityStatsTable 1 }
+
+EtsysMulti1xAccessEntityStatsEntry ::=
+    SEQUENCE { 
+        etsysMulti1xAeEapolFramesRx             Counter32,
+        etsysMulti1xAeEapolFramesTx             Counter32,
+        etsysMulti1xAeEapolStartFramesRx        Counter32,
+        etsysMulti1xAeEapolLogoffFramesRx       Counter32,
+        etsysMulti1xAeEapolRespIdFramesRx       Counter32,
+        etsysMulti1xAeEapolRespFramesRx         Counter32,
+        etsysMulti1xAeEapolReqIdFramesTx        Counter32,
+        etsysMulti1xAeEapolReqFramesTx          Counter32,
+        etsysMulti1xAeInvalidEapolFramesRx      Counter32,
+        etsysMulti1xAeEapLengthErrorFramesRx    Counter32,
+        etsysMulti1xAeEapolFrameVersion         Unsigned32,
+        etsysMulti1xAeEapolFrameSource          MacAddress
+    }
+
+etsysMulti1xAeEapolFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of valid EAPOL frames of any type that have been
+         received by this Access Entity."
+    REFERENCE   "9.4.2, EAPOL frames received"
+    ::= { etsysMulti1xAccessEntityStatsEntry 1 }
+
+etsysMulti1xAeEapolFramesTx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of EAPOL frames of any type that have been
+         transmitted by this Access Entity."
+    REFERENCE   "9.4.2, EAPOL frames transmitted"
+    ::= { etsysMulti1xAccessEntityStatsEntry 2 }
+
+etsysMulti1xAeEapolStartFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of EAPOL Start frames that have been received by
+         this Access Entity."
+    REFERENCE  "9.4.2, EAPOL Start frames received"
+    ::= { etsysMulti1xAccessEntityStatsEntry 3 }
+
+etsysMulti1xAeEapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "The number of EAPOL Logoff frames that have been received by
+        this Access Entity."
+    REFERENCE  "9.4.2, EAPOL Logoff frames received"
+    ::= { etsysMulti1xAccessEntityStatsEntry 4 }
+
+etsysMulti1xAeEapolRespIdFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of EAP Resp/Id frames that have been received by
+         this Access Entity."
+    REFERENCE   "9.4.2, EAPOL Resp/Id frames received"
+    ::= { etsysMulti1xAccessEntityStatsEntry 5 }
+
+etsysMulti1xAeEapolRespFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of valid EAP Response frames (other than Resp/Id
+         frames) that have been received by this Access Entity."
+    REFERENCE   "9.4.2, EAPOL Response frames received"
+    ::= { etsysMulti1xAccessEntityStatsEntry 6 }
+
+etsysMulti1xAeEapolReqIdFramesTx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of EAP Req/Id frames that have been transmitted
+         by this Access Entity."
+    REFERENCE   "9.4.2, EAPOL Req/Id frames transmitted"
+    ::= { etsysMulti1xAccessEntityStatsEntry 7 }
+
+etsysMulti1xAeEapolReqFramesTx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of EAP Request frames (other than Rq/Id frames)
+         that have been transmitted by this Access Entity."
+    REFERENCE  "9.4.2, EAPOL Request frames transmitted"
+    ::= { etsysMulti1xAccessEntityStatsEntry 8 }
+
+etsysMulti1xAeInvalidEapolFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of EAPOL frames that have been received by this
+         Access Entity in which the frame type is not recognized."
+    REFERENCE   "9.4.2, Invalid EAPOL frames received"
+    ::= { etsysMulti1xAccessEntityStatsEntry 9 }
+
+etsysMulti1xAeEapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "The number of EAPOL frames that have been received by this
+        Access Entity in which the Packet Body Length field is invalid."
+    REFERENCE  "9.4.2, EAP length error frames received"
+    ::= { etsysMulti1xAccessEntityStatsEntry 10 }
+
+etsysMulti1xAeEapolFrameVersion OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The protocol version number carried in the most recently
+         received EAPOL frame."
+    REFERENCE   "9.4.2, Last EAPOL frame version"
+    ::= { etsysMulti1xAccessEntityStatsEntry 11 }
+
+etsysMulti1xAeEapolFrameSource OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The source MAC address carried in the most recently received
+         EAPOL frame."
+    REFERENCE   "9.4.2, Last EAPOL frame source"
+    ::= { etsysMulti1xAccessEntityStatsEntry 12 }
+
+
+-- -------------------------------------------------------------
+-- The 802.1X Access Entity Diagnostic Table
+-- -------------------------------------------------------------
+
+etsysMulti1xAeDiagTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysMulti1xAeDiagEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The diagnostics objects for all the Access Entities."
+    REFERENCE  "9.4.3 Authenticator Diagnostics"
+    ::= { etsysMultiUser8021xAccessEntity 3 }
+
+etsysMulti1xAeDiagEntry OBJECT-TYPE
+    SYNTAX     EtsysMulti1xAeDiagEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The diagnostics information for an individual Access
+         Entity."
+    AUGMENTS { etsysMulti1xAccessEntityEntry }
+    ::= { etsysMulti1xAeDiagTable 1 }
+
+EtsysMulti1xAeDiagEntry ::=
+    SEQUENCE { 
+        etsysMulti1xAeEntersConnecting                     Counter32,
+        etsysMulti1xAeEapLogoffsWhileConnecting            Counter32,
+        etsysMulti1xAeEntersAuthenticating                 Counter32,
+        etsysMulti1xAeAuthSuccessWhileAuthenticating       Counter32,
+        etsysMulti1xAeAuthTimeoutsWhileAuthenticating      Counter32,
+        etsysMulti1xAeAuthFailWhileAuthenticating          Counter32,
+        etsysMulti1xAeAuthReauthsWhileAuthenticating       Counter32,
+        etsysMulti1xAeAuthEapStartsWhileAuthenticating     Counter32,
+        etsysMulti1xAeAuthEapLogoffWhileAuthenticating     Counter32,
+        etsysMulti1xAeAuthReauthsWhileAuthenticated        Counter32,
+        etsysMulti1xAeAuthEapStartsWhileAuthenticated      Counter32,
+        etsysMulti1xAeAuthEapLogoffWhileAuthenticated      Counter32,
+        etsysMulti1xAeBackendResponses                     Counter32,
+        etsysMulti1xAeBackendAccessChallenges              Counter32,
+        etsysMulti1xAeBackendOtherRequestsToSupplicant     Counter32,
+        etsysMulti1xAeBackendNonNakResponsesFromSupplicant Counter32,
+        etsysMulti1xAeBackendAuthSuccesses                 Counter32,
+        etsysMulti1xAeBackendAuthFails                     Counter32
+    }
+
+etsysMulti1xAeEntersConnecting OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         to the CONNECTING state from any other state."
+    REFERENCE   "9.4.2, 8.5.4.2.1"
+    ::= { etsysMulti1xAeDiagEntry 1 }
+
+etsysMulti1xAeEapLogoffsWhileConnecting OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from CONNECTING to DISCONNECTED as a result of receiving an
+         EAPOL-Logoff message."
+    REFERENCE   "9.4.2, 8.5.4.2.2"
+    ::= { etsysMulti1xAeDiagEntry 2 }
+
+etsysMulti1xAeEntersAuthenticating OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from CONNECTING to AUTHENTICATING, as a result of an
+         EAP-Response/Identity message being received from the
+         Supplicant."
+    REFERENCE  "9.4.2, 8.5.4.2.3"
+    ::= { etsysMulti1xAeDiagEntry 3 }
+
+etsysMulti1xAeAuthSuccessWhileAuthenticating OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATING to AUTHENTICATED, as a result of the
+         Backend Authentication state machine indicating successful
+         authentication of the Supplicant (authSuccess = TRUE)."
+    REFERENCE   "9.4.2, 8.5.4.2.4"
+    ::= { etsysMulti1xAeDiagEntry 4 }
+
+etsysMulti1xAeAuthTimeoutsWhileAuthenticating OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATING to ABORTING, as a result of the Backend
+         Authentication state machine indicating authentication
+         timeout (authTimeout = TRUE)."
+    REFERENCE   "9.4.2, 8.5.4.2.5"
+    ::= { etsysMulti1xAeDiagEntry 5 }
+
+etsysMulti1xAeAuthFailWhileAuthenticating OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATING to HELD, as a result of the Backend
+         Authentication state machine indicating authentication
+         failure (authFail = TRUE)."
+    REFERENCE  "9.4.2, 8.5.4.2.6"
+    ::= { etsysMulti1xAeDiagEntry 6 }
+
+etsysMulti1xAeAuthReauthsWhileAuthenticating OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATING to ABORTING, as a result of a
+         reauthentication request (reAuthenticate = TRUE)."
+    REFERENCE   "9.4.2, 8.5.4.2.7"
+    ::= { etsysMulti1xAeDiagEntry 7 }
+
+etsysMulti1xAeAuthEapStartsWhileAuthenticating OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATING to ABORTING, as a result of an
+         EAPOL-Start message being received from the Supplicant."
+    REFERENCE   "9.4.2, 8.5.4.2.8"
+    ::= { etsysMulti1xAeDiagEntry 8 }
+
+etsysMulti1xAeAuthEapLogoffWhileAuthenticating OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATING to ABORTING, as a result of an
+         EAPOL-Logoff message being received from the Supplicant."
+    REFERENCE  "9.4.2, 8.5.4.2.9"
+    ::= { etsysMulti1xAeDiagEntry 9 }
+
+etsysMulti1xAeAuthReauthsWhileAuthenticated OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATED to CONNECTING, as a result of a
+         reauthentication request (reAuthenticate = TRUE)."
+    REFERENCE  "9.4.2, 8.5.4.2.10"
+    ::= { etsysMulti1xAeDiagEntry 10 }
+
+etsysMulti1xAeAuthEapStartsWhileAuthenticated OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATED to CONNECTING, as a result of an
+         EAPOL-Start message being received from the Supplicant."
+    REFERENCE "9.4.2, 8.5.4.2.11"
+    ::= { etsysMulti1xAeDiagEntry 11 }
+
+etsysMulti1xAeAuthEapLogoffWhileAuthenticated OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine transitions
+         from AUTHENTICATED to DISCONNECTED, as a result of an
+         EAPOL-Logoff message being received from the Supplicant."
+    REFERENCE  "9.4.2, 8.5.4.2.12"
+    ::= { etsysMulti1xAeDiagEntry 12 }
+
+etsysMulti1xAeBackendResponses OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine sends an
+         initial Access-Request packet to the Authentication server
+         (i.e., executes sendRespToServer on entry to the RESPONSE
+         state). Indicates that the Authenticator attempted
+         communication with the Authentication Server."
+    REFERENCE  "9.4.2, 8.5.6.2.1"
+    ::= { etsysMulti1xAeDiagEntry 13 }
+
+etsysMulti1xAeBackendAccessChallenges OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine receives
+         an initial Access-Challenge packet from the Authentication
+         server (i.e., aReq becomes TRUE, causing exit from the
+         RESPONSE state). Indicates that the Authentication Server
+         has communication with the Authenticator."
+    REFERENCE  "9.4.2, 8.5.6.2.2"
+    ::= { etsysMulti1xAeDiagEntry 14 }
+
+etsysMulti1xAeBackendOtherRequestsToSupplicant OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Counts the number of times that the state machine sends
+          an EAP-Request packet (other than an Identity, Notification,
+          Failure or Success message) to the Supplicant (i.e., executes
+          txReq on entry to the REQUEST state). Indicates that the
+          Authenticator chose an EAP-method."
+     REFERENCE "9.4.2, 8.5.6.2.3"
+::= { etsysMulti1xAeDiagEntry 15 }
+
+etsysMulti1xAeBackendNonNakResponsesFromSupplicant OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Counts the number of times that the state machine receives a
+          response from the Supplicant to an initial EAP-Request, and
+          the response is something other than EAP-NAK (i.e., rxResp
+          becomes TRUE, causing the state machine to transition from
+          REQUEST to RESPONSE, and the response is not an EAP-NAK).
+          Indicates that the Supplicant can respond to the
+          Authenticator's chosen EAP-method."
+    REFERENCE "9.4.2, 8.5.6.2.4"
+    ::= { etsysMulti1xAeDiagEntry 16 }
+
+etsysMulti1xAeBackendAuthSuccesses OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine receives an
+         EAP-Success message from the Authentication Server (i.e.,
+         aSuccess becomes TRUE, causing a transition from RESPONSE to
+         SUCCESS). Indicates that the Supplicant has successfully
+         authenticated to the Authentication Server."
+    REFERENCE  "9.4.2, 8.5.6.2.5"
+    ::= { etsysMulti1xAeDiagEntry 17 }
+
+etsysMulti1xAeBackendAuthFails OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Counts the number of times that the state machine receives an
+         EAP-Failure message from the Authentication Server (i.e.,
+         aFail becomes TRUE, causing a transition from RESPONSE to
+         FAIL). Indicates that the Supplicant has not authenticated to
+         the Authentication Server."
+    REFERENCE  "9.4.2, 8.5.6.2.6"
+    ::= { etsysMulti1xAeDiagEntry 18 }
+
+
+-- ---------------------------------------------------------- --
+-- The 802.1X Session Statistics Table
+-- ---------------------------------------------------------- --
+
+etsysMulti1xSessionStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysMulti1xSessionStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The session statistics for all the Access Entities."
+    REFERENCE  "9.4.4"
+    ::= { etsysMultiUser8021xAccessEntity 4 }
+
+etsysMulti1xSessionStatsEntry OBJECT-TYPE
+    SYNTAX     EtsysMulti1xSessionStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The session statistics for an individual Access Entity.
+         This shows the current values being collected for each session
+         that is still in progress, or the final values for the last
+         valid session on each Access Entity where there is no session
+         currently active."
+    AUGMENTS { etsysMulti1xAccessEntityEntry }
+    ::= { etsysMulti1xSessionStatsTable 1 }
+
+EtsysMulti1xSessionStatsEntry ::=
+    SEQUENCE {
+        etsysMulti1xSessionOctetsRx          Counter64,
+        etsysMulti1xSessionOctetsTx          Counter64,
+        etsysMulti1xSessionFramesRx          Counter32,
+        etsysMulti1xSessionFramesTx          Counter32,
+        etsysMulti1xSessionId                SnmpAdminString,
+        etsysMulti1xSessionAuthenticMethod   INTEGER,
+        etsysMulti1xSessionTime              TimeTicks,
+        etsysMulti1xSessionTerminateCause    INTEGER,
+        etsysMulti1xSessionUserName          SnmpAdminString,
+        etsysMulti1xSessionActive            TruthValue
+    }
+
+etsysMulti1xSessionOctetsRx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets of user data received on this port
+         for this session."
+    REFERENCE   "9.4.4, Session Octets Received"
+    ::= { etsysMulti1xSessionStatsEntry 1 }
+
+etsysMulti1xSessionOctetsTx OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of octets of user data transmitted on this port
+         for this session."
+    REFERENCE  "9.4.4, Session Octets Transmitted"
+    ::= { etsysMulti1xSessionStatsEntry 2 }
+
+etsysMulti1xSessionFramesRx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of user data frames received on this port for this
+         session."
+    REFERENCE   "9.4.4, Session Frames Received"
+    ::= { etsysMulti1xSessionStatsEntry 3 }
+
+etsysMulti1xSessionFramesTx OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of user data frames transmitted on this port for
+         this session."
+    REFERENCE  "9.4.4, Session Frames Transmitted"
+    ::= { etsysMulti1xSessionStatsEntry 4 }
+
+etsysMulti1xSessionId OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique identifier for the session, in the form of a
+         printable ASCII string of at least three characters."
+    REFERENCE   "9.4.4, Session Identifier"
+    ::= { etsysMulti1xSessionStatsEntry 5 }
+
+etsysMulti1xSessionAuthenticMethod OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   remoteAuthServer(1),
+                   localAuthServer(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The authentication method used to establish the session."
+    REFERENCE "9.4.4, Session Authentication Method"
+    ::= { etsysMulti1xSessionStatsEntry 6 }
+
+etsysMulti1xSessionTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The duration of the session in seconds."
+    REFERENCE  "9.4.4, Session Time"
+    ::= { etsysMulti1xSessionStatsEntry 7 }
+
+etsysMulti1xSessionTerminateCause OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   supplicantLogoff(1),
+                   portFailure(2),
+                   supplicantRestart(3),
+                   reauthFailed(4),
+                   authControlForceUnauth(5),
+                   portReInit(6),
+                   portAdminDisabled(7),
+                   notTerminatedYet(999)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+                "The reason for the session termination."
+    REFERENCE   "9.4.4, Session Terminate Cause"
+    ::= { etsysMulti1xSessionStatsEntry 8 }
+
+etsysMulti1xSessionUserName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The User-Name representing the identity of the Supplicant PAE."
+    REFERENCE  "9.4.4, Session User Name"
+    ::= { etsysMulti1xSessionStatsEntry 9 }
+
+etsysMulti1xSessionActive OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates if this session is currently active."
+    ::= { etsysMulti1xSessionStatsEntry 10 }
+
+
+-- ---------------------------------------------------------- --
+-- The 802.1X Supplicant Address Table
+-- ---------------------------------------------------------- --
+
+etsysMulti1xSupplicantAddressTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysMulti1xSupplicantAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The Access Entities relative to the supplicant MAC address,
+         port, and access entity index."
+    ::= { etsysMultiUser8021xAccessEntity 5 }
+
+etsysMulti1xSupplicantAddressEntry OBJECT-TYPE
+    SYNTAX     EtsysMulti1xSupplicantAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Some basic information about an individual Access Entity."
+    INDEX { etsysMulti1xAeSupplicantAddress,
+            dot1xPaePortNumber,
+            etsysMulti1xAeIndex }
+    ::= { etsysMulti1xSupplicantAddressTable 1 }
+
+EtsysMulti1xSupplicantAddressEntry ::=
+    SEQUENCE {
+      etsysMulti1xSupplicantActive           INTEGER,
+      etsysMulti1xSupplicantUserName         SnmpAdminString
+    }
+
+etsysMulti1xSupplicantActive OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates if the associated Access Entity is currently active."
+    ::= { etsysMulti1xSupplicantAddressEntry 1 }
+
+etsysMulti1xSupplicantUserName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The User-Name representing the identity of the Supplicant PAE."
+    REFERENCE  "9.4.4, Session User Name"
+    ::= { etsysMulti1xSupplicantAddressEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- The 802.1X User Name Table
+-- -------------------------------------------------------------
+
+etsysMulti1xUserNameTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysMulti1xUserNameEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The Access Entities relative to the supplicant user name,
+         or the initial part of the supplicant user name, port,
+         and access entity index."
+    ::= { etsysMultiUser8021xAccessEntity 6 }
+
+etsysMulti1xUserNameEntry OBJECT-TYPE
+    SYNTAX     EtsysMulti1xUserNameEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Some basic information about an individual Access Entity."
+    INDEX { etsysMulti1xUserNameIndex,
+            dot1xPaePortNumber,
+            etsysMulti1xAeIndex }
+    ::= { etsysMulti1xUserNameTable 1 }
+
+EtsysMulti1xUserNameEntry ::=
+    SEQUENCE {
+      etsysMulti1xUserNameIndex         SnmpAdminString,
+      etsysMulti1xUserName              SnmpAdminString,
+      etsysMulti1xUserActive            TruthValue,
+      etsysMulti1xUserAddress           MacAddress
+    }
+
+etsysMulti1xUserNameIndex OBJECT-TYPE
+    SYNTAX     SnmpAdminString ( SIZE( 8 ) )
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The fixed length equivalent of the etsysMulti1xUserName object.
+         When the length of the corresponding etsysMulti1xUserName object
+         is less then 8 octets this object is padded with null octets.
+         When the length of the corresponding etsysMulti1xUserName object
+         is greater than 8 octets this object has the value of the
+         etsysMulti1xUserName object truncated to 20 octets."
+    ::= { etsysMulti1xUserNameEntry 1 }
+
+etsysMulti1xUserName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The User-Name representing the identity of the Supplicant PAE."
+    REFERENCE  "9.4.4, Session User Name"
+    ::= { etsysMulti1xUserNameEntry 2 }
+
+etsysMulti1xUserActive OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates if the associated Access Entity is currently active."
+    ::= { etsysMulti1xUserNameEntry 3 }
+
+etsysMulti1xUserAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The User-Name representing the identity of the Supplicant PAE."
+    REFERENCE  "9.4.4, Session User Name"
+    ::= { etsysMulti1xUserNameEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- The 802.1X Active Access Entity Table
+-- -------------------------------------------------------------
+
+etsysMulti1xActiveAccessEntityTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtsysMulti1xActiveAccessEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The active Access Entities."
+    REFERENCE   "9.6.1"
+    ::= { etsysMultiUser8021xAccessEntity 7 }
+
+etsysMulti1xActiveAccessEntityEntry OBJECT-TYPE
+    SYNTAX     EtsysMulti1xActiveAccessEntityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An individual active Access Entity."
+    INDEX { dot1xPaePortNumber, etsysMulti1xAeIndex }
+    ::= { etsysMulti1xActiveAccessEntityTable 1 }
+
+EtsysMulti1xActiveAccessEntityEntry ::=
+    SEQUENCE {
+        etsysMulti1xActiveSupplicantAddress        MacAddress
+    }
+
+etsysMulti1xActiveSupplicantAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The MAC address that this active Access Entity is currently
+         bound to."
+    ::= { etsysMulti1xActiveAccessEntityEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysMultiUser8021xConformance OBJECT IDENTIFIER
+                ::= { etsysMultiUser8021xMIB 2 }
+
+etsysMultiUser8021xGroups      OBJECT IDENTIFIER
+                ::= { etsysMultiUser8021xConformance 1 }
+
+etsysMultiUser8021xCompliances OBJECT IDENTIFIER
+                ::= { etsysMultiUser8021xConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysMultiUser8021xAccessEntityGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMulti1xAeActive,
+        etsysMulti1xAeState,
+        etsysMulti1xAeBackendAuthState,
+        etsysMulti1xAeInitialize,
+        etsysMulti1xAeReauthenticate,
+        etsysMulti1xAeReAuthPeriod,
+        etsysMulti1xAeSupplicantAddress,
+        etsysMulti1xAeUserName
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing system and configuration
+         information for all the Access Entities running on all the
+         ports."
+    ::= { etsysMultiUser8021xGroups 1 }
+
+etsysMultiUser8021xAccessEntityStatsGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMulti1xAeEapolFramesRx,
+        etsysMulti1xAeEapolFramesTx,
+        etsysMulti1xAeEapolStartFramesRx,
+        etsysMulti1xAeEapolLogoffFramesRx,
+        etsysMulti1xAeEapolRespIdFramesRx,
+        etsysMulti1xAeEapolRespFramesRx,
+        etsysMulti1xAeEapolReqIdFramesTx,
+        etsysMulti1xAeEapolReqFramesTx,
+        etsysMulti1xAeInvalidEapolFramesRx,
+        etsysMulti1xAeEapLengthErrorFramesRx,
+        etsysMulti1xAeEapolFrameVersion,
+        etsysMulti1xAeEapolFrameSource
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing statistics information
+         for all the Access Entities running on all the ports."
+    ::= { etsysMultiUser8021xGroups 2 }
+
+etsysMultiUser8021xAccessEntityDiagGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMulti1xAeEntersConnecting,
+        etsysMulti1xAeEapLogoffsWhileConnecting,
+        etsysMulti1xAeEntersAuthenticating,
+        etsysMulti1xAeAuthSuccessWhileAuthenticating,
+        etsysMulti1xAeAuthTimeoutsWhileAuthenticating,
+        etsysMulti1xAeAuthFailWhileAuthenticating,
+        etsysMulti1xAeAuthReauthsWhileAuthenticating,
+        etsysMulti1xAeAuthEapStartsWhileAuthenticating,
+        etsysMulti1xAeAuthEapLogoffWhileAuthenticating,
+        etsysMulti1xAeAuthReauthsWhileAuthenticated,
+        etsysMulti1xAeAuthEapStartsWhileAuthenticated,
+        etsysMulti1xAeAuthEapLogoffWhileAuthenticated,
+        etsysMulti1xAeBackendResponses,
+        etsysMulti1xAeBackendAccessChallenges,
+        etsysMulti1xAeBackendOtherRequestsToSupplicant,
+        etsysMulti1xAeBackendNonNakResponsesFromSupplicant,
+        etsysMulti1xAeBackendAuthSuccesses,
+        etsysMulti1xAeBackendAuthFails
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing diagnostic statistics
+         for all the Access Entities running on all the ports."
+    ::= { etsysMultiUser8021xGroups 3 }
+
+etsysMultiUser8021xAccessEntitySessionGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMulti1xSessionOctetsRx,
+        etsysMulti1xSessionOctetsTx,
+        etsysMulti1xSessionFramesRx,
+        etsysMulti1xSessionFramesTx,
+        etsysMulti1xSessionId,
+        etsysMulti1xSessionAuthenticMethod,
+        etsysMulti1xSessionTime,
+        etsysMulti1xSessionTerminateCause,
+        etsysMulti1xSessionUserName,
+        etsysMulti1xSessionActive
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing session statistics
+         for all the Access Entities running on all the ports."
+    ::= { etsysMultiUser8021xGroups 4 }
+
+etsysMultiUser8021xSupplicantAddressGroup OBJECT-GROUP
+    OBJECTS {
+      etsysMulti1xSupplicantActive,
+      etsysMulti1xSupplicantUserName
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing a means to look up
+         all of the Access Entities that are associated with
+         a particular supplicant address."
+    ::= { etsysMultiUser8021xGroups 5 }
+
+etsysMultiUser8021xUserNameGroup OBJECT-GROUP
+    OBJECTS {
+      etsysMulti1xUserName,
+      etsysMulti1xUserActive,
+      etsysMulti1xUserAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing a means to look up
+         all of the Access Entities that are associated with
+         a particular user name."
+    ::= { etsysMultiUser8021xGroups 6 }
+
+etsysMultiUser8021xActiveAccessEntityGroup OBJECT-GROUP
+    OBJECTS {
+      etsysMulti1xActiveSupplicantAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "The Supplicant Address for each active Access Entity."
+    ::= { etsysMultiUser8021xGroups 7 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysMulti8021xCompliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+            "The compliance statement for devices that support the
+             Enterasys Multi User IEEE 802.1x MIB."
+    MODULE
+    MANDATORY-GROUPS {
+        etsysMultiUser8021xAccessEntityGroup,
+        etsysMultiUser8021xAccessEntityStatsGroup,
+        etsysMultiUser8021xAccessEntityDiagGroup,
+        etsysMultiUser8021xAccessEntitySessionGroup,
+        etsysMultiUser8021xSupplicantAddressGroup,
+        etsysMultiUser8021xUserNameGroup,
+        etsysMultiUser8021xActiveAccessEntityGroup
+    }
+   ::= { etsysMultiUser8021xCompliances 1 }
+
+END

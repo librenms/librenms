@@ -1,0 +1,389 @@
+HP-ICF-OSPF DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, IpAddress
+            FROM SNMPv2-SMI
+        TruthValue, RowStatus
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        BigMetric
+            FROM OSPF-MIB
+        IANAipRouteProtocol
+            FROM IANA-RTPROTO-MIB
+        hpSwitch
+            FROM HP-ICF-OID
+        ospfIfEntry
+            FROM OSPF-MIB;
+
+    hpicfOspf MODULE-IDENTITY
+        LAST-UPDATED "200607102010Z" -- July 10, 2006
+        ORGANIZATION "Hewlett-Packard Company,
+                      Workgroup Networks Division"
+        CONTACT-INFO "John Flick
+
+             Postal: Hewlett-Packard Company
+                     8000 Foothills Blvd. M/S 5557
+                     Roseville, CA 95747-5557
+             Tel:    +1 916 785 4018
+             Fax:    +1 916 785 1199
+
+             E-mail: johnf@rose.hp.com"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     extensions to the OSPF-MIB module."
+
+        REVISION     "200704020933Z" -- April 2, 2007
+        DESCRIPTION  "Added object to indicate if ospf 
+                      interface is passive or active"
+
+        REVISION     "200607102010Z" -- July 10, 2006
+        DESCRIPTION  "Added objects to display the NSSA route 
+                     metric types."
+
+        REVISION     "200305130202Z" -- May 13, 2003
+        DESCRIPTION  "Added objects for configuring a default
+                     administrative distance per route type."
+
+        REVISION     "200111130339Z" -- November 13, 2001
+        DESCRIPTION  "Initial revision."
+        ::= { hpSwitch 14 }
+
+    hpicfOspfObjects OBJECT IDENTIFIER ::= { hpicfOspf 1 }
+
+    hpicfOspfGeneral OBJECT IDENTIFIER ::= { hpicfOspfObjects 1 }
+
+    hpicfOspf1583CompatibilityMode OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Controls the preference rules used when
+                    choosing among multiple AS-external-LSAs
+                    advertising the same destination.  When set to
+                    'true', the preference rules remain those
+                    specified in RFC 1583.  When set to 'false',
+                    the preference rules are those stated in RFC
+                    2328, which prevent routing loops when
+                    AS-external-LSAs for the same destination have
+                    been originated from different areas.  Set to
+                    'true' by default.
+
+                    In order to minimize the chance of routing
+                    loops, all OSPF routers in an OSPF routing
+                    domain should have this object set identically.
+                    When there are fouters present that have not
+                    been updated with the functionality specified
+                    in RFC 2328, all routers should have this
+                    object set to 'true'.  Otherwise, all routers
+                    should have this object set to 'false',
+                    preventing all routing loops."
+        REFERENCE   "RFC 2328, Appendix C.1  Global Parameters."
+        ::= { hpicfOspfGeneral 1 }
+
+    hpicfOspfDefaultImportMetric OBJECT-TYPE
+        SYNTAX      BigMetric
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The default metric used for advertising
+                    external routes imported into OSPF by this
+                    router."
+        ::= { hpicfOspfGeneral 2 }
+
+    hpicfOspfDefaultImportMetricType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        externalType1(1),
+                        externalType2(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The default metric type used for advertising
+                    external routes imported into OSPF by this
+                    router."
+        ::= { hpicfOspfGeneral 3 }
+
+    hpicfOspfIntraAreaDistance OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The default administrative distance to associate
+                    with intra-area routes learned by OSPF.  Routes
+                    with lower distances are preferred.  By default,
+                    OSPF routes have an administrative distance of 110.
+
+                    Note that the administrative distance settings
+                    for OSPF do not affect the choice of routes
+                    within OSPF.  OSPF will still prefer intra-area
+                    routes over inter-area or AS-external routes even
+                    if hpicfOspfInterAreaDistance or
+                    hpicfOspfExternalDistance is lower than
+                    hpicfOspfIntraAreaDistance.  The appropriate 
+                    administrative distance value is applied to the
+                    route that OSPF selects as its best route to a
+                    destination and is used to decide whether OSPF's
+                    route is preferred over a route from some other
+                    source."
+        ::= { hpicfOspfGeneral 4 }
+
+    hpicfOspfInterAreaDistance OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The default administrative distance to associate
+                    with inter-area routes learned by OSPF.  Routes
+                    with lower distances are preferred.  By default,
+                    OSPF routes have an administrative distance of 110.
+
+                    Note that the administrative distance settings
+                    for OSPF do not affect the choice of routes
+                    within OSPF.  OSPF will still prefer intra-area
+                    routes over inter-area routes, even if
+                    hpicfOspfInterAreaDistance is lower than
+                    hpicfOspfIntraAreaDistance.  It will also still
+                    prefer inter-area routes over AS-external routes
+                    even if hpicfOspfExternalDistance is lower than
+                    hpicfOspfInterAreaDistance.  The appropriate 
+                    administrative distance value is applied to the
+                    route that OSPF selects as its best route to a
+                    destination and is used to decide whether OSPF's
+                    route is preferred over a route from some other
+                    source."
+        ::= { hpicfOspfGeneral 5 }
+
+    hpicfOspfExternalDistance OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The default administrative distance to associate
+                    with AS-external routes learned by OSPF.  Routes
+                    with lower distances are preferred.  By default,
+                    OSPF routes have an administrative distance of 110.
+
+                    Note that the administrative distance settings
+                    for OSPF do not affect the choice of routes
+                    within OSPF.  OSPF will still prefer intra-area
+                    routes and inter-area routes over AS-external
+                    routes even if hpicfOspfExternalDistance is lower
+                    than the hpicfOspfIntraAreaDistance or
+                    hpicfOspfInterAreaDistance.  The appropriate 
+                    administrative distance value is applied to the
+                    route that OSPF selects as its best route to a
+                    destination and is used to decide whether OSPF's
+                    route is preferred over a route from some other
+                    source."
+        ::= { hpicfOspfGeneral 6 }
+
+
+    hpicfOspfRedistTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfOspfRedistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for configuring route redistribution
+                    into OSPF."
+        ::= { hpicfOspfObjects 2 }
+
+    hpicfOspfRedistEntry OBJECT-TYPE
+        SYNTAX      HpicfOspfRedistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table for configuring route
+                    redistribution into OSPF from a single source
+                    protocol.  Entries in this table are not
+                    created dynamically.  There will be a single
+                    entry for each supported source protocol."
+        INDEX       { hpicfOspfRedistSrcProto }
+        ::= { hpicfOspfRedistTable 1 }
+
+    HpicfOspfRedistEntry ::=
+        SEQUENCE {
+            hpicfOspfRedistSrcProto          IANAipRouteProtocol,
+            hpicfOspfRedistEnabled           TruthValue
+        }
+
+    hpicfOspfRedistSrcProto OBJECT-TYPE
+        SYNTAX      IANAipRouteProtocol
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Source protocol to redistribute routes from."
+        ::= { hpicfOspfRedistEntry 1 }
+
+    hpicfOspfRedistEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "A flag indicating whether OSPF should
+                    redistribute routes from this source protocol."
+        ::= { hpicfOspfRedistEntry 2 }
+
+
+    hpicfOspfRedistRestrictTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfOspfRedistRestrictEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table of route prefixes for filtering out
+                    routes that OSPF should not redistribute.  Any
+                    route that is contained by a range in this table
+                    (in other words, has a longer mask than that
+                    specified by hpicfOspfRedistRestrictMask and
+                    where the route destination ANDed with the
+                    hpicfOspfRedistRestrictMask is equal to
+                    hpicfOspfRedistRestrictAddr) will not be
+                    redistributed as an AS-external LSA by OSPF."
+        ::= { hpicfOspfObjects 3 }
+
+    hpicfOspfRedistRestrictEntry OBJECT-TYPE
+        SYNTAX      HpicfOspfRedistRestrictEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A single entry in the table.  Any route,
+                    regardless of source protocol which is
+                    contained within the specified range will not
+                    be redistributed into OSPF.  Entries in this
+                    table are created dynamically using the
+                    hpicfOspfRedistRestrictStatus object."
+        INDEX       { hpicfOspfRedistRestrictAddr,
+                      hpicfOspfRedistRestrictMask }
+        ::= { hpicfOspfRedistRestrictTable 1 }
+
+    HpicfOspfRedistRestrictEntry ::=
+        SEQUENCE {
+            hpicfOspfRedistRestrictAddr      IpAddress,
+            hpicfOspfRedistRestrictMask      IpAddress,
+            hpicfOspfRedistRestrictStatus    RowStatus
+        }
+
+    hpicfOspfRedistRestrictAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address of the range of route entries
+                    to exclude from redistribution into OSPF."
+        ::= { hpicfOspfRedistRestrictEntry 1 }
+
+    hpicfOspfRedistRestrictMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The mask for the range of route entries to
+                    exclude from redistribution into OSPF."
+        ::= { hpicfOspfRedistRestrictEntry 2 }
+
+    hpicfOspfRedistRestrictStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of this entry."
+        ::= { hpicfOspfRedistRestrictEntry 3 }
+
+
+    hpicfOspfConformance OBJECT IDENTIFIER ::= { hpicfOspf 2 }
+
+    hpicfOspfGroups OBJECT IDENTIFIER ::= { hpicfOspfConformance 1 }
+
+    hpicfOspfBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfOspf1583CompatibilityMode,
+                      hpicfOspfDefaultImportMetric,
+                      hpicfOspfDefaultImportMetricType }
+        STATUS      current
+        DESCRIPTION "Basic OSPF configuration information that is
+                    not in the standard OSPF MIB."
+        ::= { hpicfOspfGroups 1 }
+
+    hpicfOspfRedistGroup OBJECT-GROUP
+        OBJECTS     { hpicfOspfRedistEnabled,
+                      hpicfOspfRedistRestrictStatus }
+        STATUS      current
+        DESCRIPTION "A collection of objects for controlling the
+                    redistribution of external routes by OSPF."
+        ::= { hpicfOspfGroups 2 }
+
+    hpicfOspfDistanceGroup OBJECT-GROUP
+        OBJECTS     { hpicfOspfIntraAreaDistance,
+                      hpicfOspfInterAreaDistance,
+                      hpicfOspfExternalDistance }
+        STATUS      current
+        DESCRIPTION "A collection of objects for configuring the
+                    administrative distance of routes learned by
+                    OSPF."
+        ::= { hpicfOspfGroups 3 }
+
+
+    hpicfOspfCompliances OBJECT IDENTIFIER ::=
+         { hpicfOspfConformance 2 }
+
+    hpicfOspfCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Routing
+                    Switches that support OSPF."
+        MODULE
+            MANDATORY-GROUPS { hpicfOspfBaseGroup }
+
+            GROUP        hpicfOspfRedistGroup
+            DESCRIPTION  "This group is mandatory for systems
+                         that support route redistribution."
+        ::= { hpicfOspfCompliances 1 }
+
+--  OSPF route classification used in CIDR Route Table with extensions for 
+--  NSSA route types.
+--  Please refer the ospfRouteGroup OID in RFC 1850 for a detailed description 
+--  of the route types.
+--  hpicfOspfNssaType1 and hpicfOspfNssaType2 are type 1 and type 2 metrics 
+--  associated with the routes imported into OSPF from a different protocol. 
+--  As with external metrics, type 1 is comparable and type 2 is non-comparable.
+
+
+hpicfOspfRouteGroup          OBJECT IDENTIFIER ::= { hpicfOspf 3 }
+
+hpicfOspfNssaType1      OBJECT IDENTIFIER ::= { hpicfOspfRouteGroup 1 }
+hpicfOspfNssaType2      OBJECT IDENTIFIER ::= { hpicfOspfRouteGroup 2 }
+
+-- ---------------------------------------------------------- --
+-- Extensions to the ospfIfTable
+-- ---------------------------------------------------------- --
+
+hpicfOspfIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfOspfIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Extensions to the table that contains OSPF Interface specific
+         information."
+    ::= { hpicfOspf 4 }
+
+hpicfOspfIfEntry OBJECT-TYPE
+    SYNTAX      HpicfOspfIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of extensions to the information maintained
+         for an OSPF interface."
+    AUGMENTS { ospfIfEntry }
+    ::= { hpicfOspfIfTable 1 }
+
+HpicfOspfIfEntry ::=
+    SEQUENCE { 
+        hpicfOspfIfPassive  TruthValue
+    }
+
+
+hpicfOspfIfPassive   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The passive state configuration of the OSPF interface. 
+          In the passive mode no OSPF protocol messages are exchanged on
+          this interface.
+
+          true  (1)   -  The interface is configured to work in Passive mode
+          false (2)   -  The interface is configured to work in normal mode.
+                         This is the default configuration.
+
+         Changing the value will cause OSPF to reset on this interface and
+         make necessary adjustments to the link state database.
+
+         All other operations are not defined and will not affect the state of
+         the protocol."
+
+    DEFVAL { false }
+    ::= { hpicfOspfIfEntry 1 }
+
+END

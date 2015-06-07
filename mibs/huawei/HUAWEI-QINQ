@@ -1,0 +1,2256 @@
+--==================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Q(802.1Q) IN Q(802.1Q) MIB
+-- Reference:
+-- Version: V1.0
+--          V1.1
+--          V1.2
+-- History: modified by xieyuan  2006-10-11
+-- <author>,  <date>,  <contents>
+-- Zhanglei   2006-3-10
+-- Xieyuan    2006-8-10 
+-- Xieyuan    2006-12-14
+-- Xieyuan    2007-06-25
+-- Hexingjian 2009-01-20
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Varibles and types be imported
+--
+-- ==================================================================
+
+HUAWEI-QINQ-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    
+    RowStatus, MacAddress
+        FROM SNMPv2-TC
+
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY, IpAddress, Counter64
+        FROM SNMPv2-SMI  
+    
+    OBJECT-GROUP                        
+        FROM SNMPv2-CONF    
+        
+    hwDatacomm
+        FROM HUAWEI-MIB
+        
+    VlanId
+        FROM Q-BRIDGE-MIB
+           
+    InterfaceIndex
+        FROM IF-MIB
+        
+
+    EnabledStatus
+        FROM P-BRIDGE-MIB         
+    
+   VlanList 
+        FROM HUAWEI-L2IF-MIB; 
+    
+    hwQinQ MODULE-IDENTITY
+        LAST-UPDATED "200612141629Z"        
+         ORGANIZATION 
+          "Huawei Technologies co.,Ltd."
+         CONTACT-INFO 
+          "VRP PlatForm Team Huawei Technologies co.,Ltd.
+          Huawei Bld.,NO.3 Xinxi Rd., 
+          Shang-Di Information Industry Base,
+          Hai-Dian District Beijing P.R. China
+            http://www.huawei.com
+           Zip:100085
+                "
+                DESCRIPTION
+            "The QinQ MIB module is defined to manage the configuration under system or interface view."
+            ::= {  hwDatacomm  116}
+    
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+BpduIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A list value for bpdu. "
+    SYNTAX           INTEGER {	stp01(1),
+				pauseFrame(2),
+				reserved02(3),
+				reserved03(4),
+				reserved04(5),
+				reserved05(6),
+				reserved06(7),
+				reserved07(8),
+				stp02(9),
+				reserved08(10),
+				hgmp(11),
+				reserved09(12),
+				reserved10(13),
+				reserved11(14),
+				reserved12(15),
+				reserved13(16),
+				reserved14(17),
+				reserved15(18),
+				reserved16(19),
+				reserved17(20),
+				isisLevel01(21),
+				isisLevel02(22),
+				reserved18(23),
+				reserved19(24),
+				reserved20(25),
+				reserved21(26),
+				reserved22(27),
+				reserved23(28),
+				reserved24(29),
+				reserved25(30),
+				reserved26(31),
+				reserved27(32),
+				gmrp(33),
+				gvrp(34),
+				reserved28(35),
+				reserved29(36),
+				reserved30(37),
+				reserved31(38),
+				reserved32(39),
+				reserved33(40),
+				reserved34(41),
+				reserved35(42),
+				reserved36(43),
+				reserved37(44),
+				reserved38(45),
+				reserved39(46),
+				reserved40(47),
+				reserved41(48),
+				lacp(49),
+				cdp(50),
+				pagp(51),
+				udld(52),
+				vtp(53),
+				}
+ 
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+    
+        hwQinQSystemBase OBJECT IDENTIFIER ::= { hwQinQ 1 }
+    
+
+                 hwQinQSystemWellKnowMac  OBJECT-TYPE
+                      SYNTAX  MacAddress
+                      MAX-ACCESS read-write
+                      STATUS current
+                      DESCRIPTION
+                            "The destination  MAC address that is replaced the original destination
+                            macAddress is a wellknown multicast macAddress  to hide the inner details of the BPDU
+                            in order to that it can be transmitted with a tag through the services'network."
+             ::= { hwQinQSystemBase 1 }
+        
+        
+               hwQinQSystemBridgeRole OBJECT-TYPE
+                       SYNTAX INTEGER
+                            {
+                            provider(2),
+                            customer(1)
+                            }
+                      MAX-ACCESS read-write
+                      STATUS current
+                      DESCRIPTION
+                            "It indicates the Bridge 's location, having two possible values :Customers' Bridge
+                            and Providers' Bridge."
+                     ::= { hwQinQSystemBase 2 } 
+                       
+               hwBpduSystemDropPacketSta OBJECT-TYPE
+                      SYNTAX  Integer32(0..65535)
+                      MAX-ACCESS read-write
+                      STATUS current
+                      DESCRIPTION
+                            "View statistics about the discarded BPDUs."
+                     ::= { hwQinQSystemBase 3 }  
+        
+        
+               hwQinQMngObjects OBJECT IDENTIFIER ::= { hwQinQ 2 }
+        
+            
+               hwQinQBpduTunnelTable OBJECT-TYPE
+                       SYNTAX SEQUENCE OF HwQinQBpduTunnelEntry
+                       MAX-ACCESS not-accessible
+                       STATUS current
+                       DESCRIPTION
+                            "QinQ-port configuration table."
+                       ::= { hwQinQMngObjects 1 }
+                    
+               hwQinQBpduTunnelEntry OBJECT-TYPE
+                       SYNTAX HwQinQBpduTunnelEntry
+                       MAX-ACCESS not-accessible
+                       STATUS current
+                      DESCRIPTION
+                              "The entry of an interface enabled the QinQ function."
+                     INDEX { hwQinQBpduTunnelIndex }
+                     ::= { hwQinQBpduTunnelTable 1 }
+
+
+                HwQinQBpduTunnelEntry ::=
+                     SEQUENCE { 
+                            hwQinQBpduTunnelIndex
+                                     INTEGER,
+                            hwQinQEtherEncpsType
+                                     OCTET STRING,
+                            hwQinQBpduTunnelEnableOneQBpduTunnel
+                                     EnabledStatus,
+                            hwQinQBpduTunnelEnableBpduTag
+                                     EnabledStatus,
+                            hwQinQBpduTunnelEnableTwoQBpduTunnel
+                                     EnabledStatus,
+                            hwQinQBpduTunnelCustomerBpduTag
+                                     VlanId,
+                            hwQinQBpduTunnelCustomerBpduTagListLow
+                                     OCTET STRING,
+                            hwQinQBpduTunnelCustomerBpduTagListHigh
+                                     OCTET STRING,
+                            hwQinQRemarkOuterTpid
+                                     INTEGER,
+                            hwQinQBpduTunnelEnableBpduFilter
+                                     EnabledStatus
+                            }
+
+                 hwQinQBpduTunnelIndex OBJECT-TYPE
+                        SYNTAX INTEGER (1..512)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the interface."
+                        ::= { hwQinQBpduTunnelEntry 1 }
+
+
+                 hwQinQEtherEncpsType OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE(2))
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value of tag type is encapsulated in the head of the Ethernet frame
+                            To distinguish the encapsulated mode between the 802.1Q and QinQ."
+                        ::= { hwQinQBpduTunnelEntry 2 }
+        
+
+                 hwQinQBpduTunnelEnableOneQBpduTunnel OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value indicates whether the 1Q-bpdutunnel is opened,
+                            If hwQinQBpduTunnelEnableTwoQBpduTunnel is enabling, then this value should be disable."
+                        DEFVAL {disabled}
+                        ::= { hwQinQBpduTunnelEntry 3 }
+        
+        
+                 hwQinQBpduTunnelEnableBpduTag OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Whether to enable the setting of BPDU Tunnel tag."
+                        DEFVAL {disabled}
+                        ::= { hwQinQBpduTunnelEntry 4 }
+
+    
+                 hwQinQBpduTunnelEnableTwoQBpduTunnel OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "The value indicates whether the 2Q-bpdutunnel is opened,
+                            If hwQinQBpduTunnelEnableOneQBpduTunnel is enabling, then this value should be disable."
+                        DEFVAL {disabled}
+                        ::= { hwQinQBpduTunnelEntry 5 }
+        
+             
+    
+                 hwQinQBpduTunnelCustomerBpduTag OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The tag  is inserted into the head of the BPDU ,to support
+                             that can be transmitted through the services' network."
+                        DEFVAL {0}
+                        ::= { hwQinQBpduTunnelEntry 6 }
+        
+        
+                 hwQinQBpduTunnelCustomerBpduTagListLow OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (256))
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The list describes accessible bode from different vlan (0 to 2047)."
+                        ::= { hwQinQBpduTunnelEntry 7 }
+        
+    
+                 hwQinQBpduTunnelCustomerBpduTagListHigh OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (256))
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The list describes accessible bpdu from different vlan (2048 to 4094)."
+                        ::= { hwQinQBpduTunnelEntry 8 }
+                        
+                 hwQinQRemarkOuterTpid OBJECT-TYPE
+                        SYNTAX INTEGER
+                        	{
+                       		   hexffff(1),
+                       		   hex88a8(2),
+                       		   hex9100(3),
+                       		   hex8100(4) 	
+                        	}
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value indicates the TPID of outer tag of packets that have two tag and output from the output interface of vlan-switch,
+                            If hwQinQEtherEncpsType is enabling, then this value should be 0xffff."                        
+                        ::= { hwQinQBpduTunnelEntry 9 }
+                          
+               hwQinQBpduTunnelEnableBpduFilter OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value indicates whether the BPDU filter function is enabled. 
+                            If hwQinQBpduTunnelEnableBpduFilter is enabled, then this value should be enable."
+                        DEFVAL {disabled}
+                        ::= { hwQinQBpduTunnelEntry 10 }
+               
+                 hwQinQSubIfVlanStackingTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQSubIfVlanStackingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Used to configure packets'vlan stacking in sub interface, receive one-tag
+                            packets and transmit two-tag packets, where the outer-tag inserted is in
+                            hwQinQSubIfVlanStackingTable."
+                        ::= { hwQinQMngObjects 2 }
+        
+                 hwQinQSubIfVlanStackingEntry OBJECT-TYPE
+                        SYNTAX HwQinQSubIfVlanStackingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface enabled the QinQ-stacking function."
+                        INDEX { hwQinQSubIfStackingIfIndex,  hwQinQSubIfStackingCEVlanStart }
+                        ::= { hwQinQSubIfVlanStackingTable 1 }
+        
+                 HwQinQSubIfVlanStackingEntry ::=
+                        SEQUENCE { 
+                            hwQinQSubIfStackingIfIndex
+                                  InterfaceIndex,
+                            hwQinQSubIfStackingCEVlanStart
+                                  VlanId,
+                            hwQinQSubIfStackingCEVlanEnd
+                                  VlanId,
+                            hwQinQSubIfStackGroupId
+                                  Integer32,
+                            hwQinQSubIfStackingRowStatus
+                                  RowStatus,
+                            hwQinQSubIfStackingPEVlan
+                                  Integer32                                  
+                         }
+
+                 hwQinQSubIfStackingIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the QinQ-stacking interface."
+                        ::= { hwQinQSubIfVlanStackingEntry 1 }
+        
+                                   
+                 hwQinQSubIfStackingCEVlanStart OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "When configure ce vlan as a range, hwQinQSubIfStackingCEVlanStart is the
+                            start vlan id and hwQinQSubIfStackingCEVlanEnd is the end vlan id."
+                        ::= { hwQinQSubIfVlanStackingEntry 2 }
+        
+                hwQinQSubIfStackingCEVlanEnd OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "When configure ce vlan as a range, hwQinQSubIfStackingCEVlanStart is the
+                            start vlan id and hwQinQSubIfStackingCEVlanEnd is the end vlan id."
+                        ::= { hwQinQSubIfVlanStackingEntry 3 }
+                        
+                hwQinQSubIfStackGroupId OBJECT-TYPE
+                        SYNTAX Integer32 (0..16)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Group-management id."
+                        ::= { hwQinQSubIfVlanStackingEntry 4 }
+         
+                hwQinQSubIfStackingRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Used for controlling the creation and deletion of this
+                            row. All writable objects in this row may be modified at any time.
+                            If a Network Management Application  attempts to delete a conceptual
+                             row by setting this  object to 'destroy' and there are one or more entries
+                            in hwQinQSubIfVlanStackingTable pointing to the row, the agent must also
+                            destroy the corresponding entries in hwQinQSubIfVlanStackingTable."
+                        ::= { hwQinQSubIfVlanStackingEntry 5 }
+                        
+                hwQinQSubIfStackingPEVlan OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "PE vlan id."
+                        ::= { hwQinQSubIfVlanStackingEntry 6 }                        
+        
+                hwQinQSubIfStackingStatTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQSubIfStackingStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "When a sub interface configured QinQ-stacking function, hwQinQSubIfStackingStatTable is used to
+                            statistic total number of the out packets and in packets."
+                        ::= { hwQinQMngObjects 3 }
+        
+                 hwQinQSubIfStackingStatEntry OBJECT-TYPE
+                        SYNTAX HwQinQSubIfStackingStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface enabled the QinQ-stacking function."
+                        INDEX { hwQinQSubIfStackingStatIfIndex, hwQinQSubIfStackingStatCEVlan }
+                        ::= { hwQinQSubIfStackingStatTable 1 }
+        
+                HwQinQSubIfStackingStatEntry ::=
+                        SEQUENCE { 
+                            hwQinQSubIfStackingStatIfIndex
+                                 InterfaceIndex,
+                            hwQinQSubIfStackingStatCEVlan
+                                 VlanId,
+                            hwQinQSubIfStackStatGroupId
+                                 Integer32,
+                            hwQinQSubIfStackingStatOutPackets
+                                 Counter64,
+                            hwQinQSubIfStackingStatInPackets
+                                 Counter64,
+                            hwQinQSubIfStackingStatOutBytes
+                                 Counter64,                            
+                            hwQinQSubIfStackingStatInBytes
+                                 Counter64,
+                            hwQinQSubIfStackStatOutBdPackets
+                                 Counter64,
+                            hwQinQSubIfStackStatInBdPackets
+                                 Counter64,
+                            hwQinQSubIfStackStatOutMuPackets
+                                 Counter64,
+                            hwQinQSubIfStackStatInMuPackets
+                                 Counter64,
+                            hwQinQSubIfStackStatOutUniPackets
+                                 Counter64,
+                            hwQinQSubIfStackStatInUniPackets
+                                 Counter64
+                         }
+
+                hwQinQSubIfStackingStatIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the QinQ-stacking interface."
+                        ::= { hwQinQSubIfStackingStatEntry 1 }
+        
+                hwQinQSubIfStackingStatCEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Inner vlan in packets which input the QinQ sub interface,
+                            used to indicate the packets as an index."
+                        ::= { hwQinQSubIfStackingStatEntry 2 }
+        
+                 hwQinQSubIfStackStatGroupId OBJECT-TYPE
+                        SYNTAX Integer32 (1..16)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "The group-management id. The statistic number of packets can not get if 
+                            the statistic funtion is not enabled."
+                        ::= { hwQinQSubIfStackingStatEntry 3 }
+        
+                hwQinQSubIfStackingStatOutPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of out packets of the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 4 }
+        
+                hwQinQSubIfStackingStatOutBytes OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of out bytes of the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 5 }
+        
+                hwQinQSubIfStackingStatInPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of in packets of the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 6 }
+        
+                hwQinQSubIfStackingStatInBytes OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of in bytes of the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 7 }
+        
+                hwQinQSubIfStackStatOutBdPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of broadcast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 8 }
+        
+               hwQinQSubIfStackStatInBdPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of broadcast packets received from the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 9 }
+        
+                hwQinQSubIfStackStatOutMuPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of multicast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 10 }
+        
+                hwQinQSubIfStackStatInMuPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of multicast packets received from the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 11 }
+        
+                 hwQinQSubIfStackStatOutUniPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of unicast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 12 }
+        
+                 hwQinQSubIfStackStatInUniPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of unicast packets received from the sub interface."
+                        ::= { hwQinQSubIfStackingStatEntry 13 }
+        
+               hwQinQSubIfTermTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQSubIfTermEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The table is used to configure QinQ-termination function in sub interface, then packets
+                            transmitted from this sub interface input with two tags will be terminated."
+                        ::= { hwQinQMngObjects 4 }
+        
+                hwQinQSubIfTermEntry OBJECT-TYPE
+                        SYNTAX HwQinQSubIfTermEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface enabled the QinQ-termination function."
+                        INDEX { hwQinQSubIfTermIfIndex,  hwQinQSubIfTermPEVlan, hwQinQSubIfTermCEVlanStart}
+                        ::= { hwQinQSubIfTermTable 1 }
+        
+                HwQinQSubIfTermEntry ::=
+                        SEQUENCE { 
+                            hwQinQSubIfTermIfIndex
+                                InterfaceIndex,                            
+                            hwQinQSubIfTermPEVlan
+                                VlanId,
+                            hwQinQSubIfTermCEVlanStart
+                                VlanId,
+                            hwQinQSubIfTermCEVlanEnd
+                                VlanId,
+                            hwQinQSubIfTermGroupId
+                                Integer32,
+                            hwQinQSubIfTermRowStatus
+                                RowStatus,    
+                            hwQinQSubIfTermSubscriberGroupName
+                                OCTET STRING                                
+                         }
+
+                hwQinQSubIfTermIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the QinQ-termination interface."
+                        ::= { hwQinQSubIfTermEntry 1 }
+                          
+       
+                 hwQinQSubIfTermPEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Outer vlan id of the packets which have two tags before being terminated."
+                        ::= { hwQinQSubIfTermEntry 2 }
+        
+               hwQinQSubIfTermCEVlanStart OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "When configure ce vlan as a range, hwQinQSubIfTermCEVlanStart
+                            is the start vlan id and hwQinQSubIfTermCEVlanEnd is the end vlan id."
+                        ::= { hwQinQSubIfTermEntry 3 }
+        
+                hwQinQSubIfTermCEVlanEnd OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "When configure ce vlan as a range, hwQinQSubIfTermCEVlanStart is 
+                            the start vlan id and hwQinQSubIfTermCEVlanEnd is the end vlan id."
+                        ::= { hwQinQSubIfTermEntry 4 }
+                             
+                hwQinQSubIfTermGroupId OBJECT-TYPE
+                        SYNTAX Integer32 (0..16)
+                        MAX-ACCESS  read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Group-management id."
+                        DEFVAL { 0 }
+                        ::= { hwQinQSubIfTermEntry 5 }
+                            
+        
+                hwQinQSubIfTermRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Used for controlling the creation and deletion of this
+                            row. All writeable objects in this row may be modified at any time.
+                            If a Network Management Application  attempts to delete a conceptual
+                             row by setting this  object to 'destroy' and there are one or more entries
+                            in hwQinQSubIfTermTable pointing to the row, the agent must also
+                            destroy the corresponding entries in hwQinQSubIfTermTable."
+                        ::= { hwQinQSubIfTermEntry 6 }
+        
+        
+                hwQinQSubIfTermSubscriberGroupName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..31))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Name of Subscriber Group."
+                        ::= { hwQinQSubIfTermEntry 7 }
+        
+        
+                 hwQinQSubIfTermStatTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQSubIfTermStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "When a sub interface configured QinQ-termination function, hwQinQSubIfTermStatTable used to
+                            statistic total number of the out packets and in packets."
+                        ::= { hwQinQMngObjects 5 }
+        
+                 hwQinQSubIfTermStatEntry OBJECT-TYPE
+                        SYNTAX HwQinQSubIfTermStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface enabled the QinQ-termination function."
+                        INDEX { hwQinQSubIfTermStatIfIndex, hwQinQSubIfTermStatPEVlan, hwQinQSubIfTermStatCEVlan }
+                        ::= { hwQinQSubIfTermStatTable 1 }
+        
+                 HwQinQSubIfTermStatEntry ::=
+                        SEQUENCE { 
+                            hwQinQSubIfTermStatIfIndex
+                                     InterfaceIndex,
+                            hwQinQSubIfTermStatPEVlan
+                                     VlanId,
+                            hwQinQSubIfTermStatCEVlan
+                                     VlanId,
+                            hwQinQSubIfTermStatGroupId
+                                     Integer32,
+                            hwQinQSubIfTermStatOutPackets
+                                     Counter64,
+                            hwQinQSubIfTermStatOutBytes
+                                    Counter64,
+                            hwQinQSubIfTermStatInPackets
+                                    Counter64,
+                            hwQinQSubIfTermStatInBytes
+                                    Counter64,
+                            hwQinQSubIfTermStatOutBdPackets
+                                    Counter64,
+                            hwQinQSubIfTermStatInBdPackets
+                                    Counter64,
+                            hwQinQSubIfTermStatOutMuPackets
+                                    Counter64,
+                            hwQinQSubIfTermStatInMuPackets
+                                    Counter64,
+                            hwQinQSubIfTermStatOutUniPackets
+                                   Counter64,
+                            hwQinQSubIfTermStatInUniPackets
+                                   Counter64
+                         }
+
+                 hwQinQSubIfTermStatIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the QinQ-termination interface."
+                        ::= { hwQinQSubIfTermStatEntry 1 }
+        
+                  hwQinQSubIfTermStatPEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Outer vlan in packets which input the QinQ sub interface,
+                            used to indicate the packets as an index."
+                        ::= { hwQinQSubIfTermStatEntry 2 }
+        
+                 hwQinQSubIfTermStatCEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Inner vlan in packets which input the QinQ sub interface,
+                            used to indicate the packets as an index."
+                        ::= { hwQinQSubIfTermStatEntry 3 }
+        
+                 hwQinQSubIfTermStatGroupId OBJECT-TYPE
+                        SYNTAX Integer32 (1..16)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "The group-management id. The statistic number of packets can not get if 
+                            the statistic funtion is not enabled."
+                        ::= { hwQinQSubIfTermStatEntry 4 }
+        
+                  hwQinQSubIfTermStatOutPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of out packets of the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 5 }
+        
+                 hwQinQSubIfTermStatOutBytes OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of out bytes of the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 6 }
+        
+                 hwQinQSubIfTermStatInPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of in packets of the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 7 }
+        
+                 hwQinQSubIfTermStatInBytes OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of in bytes of the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 8 }
+        
+                hwQinQSubIfTermStatOutBdPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of broadcast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 9 }
+        
+                 hwQinQSubIfTermStatInBdPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of broadcast packets received from the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 10 }
+        
+                 hwQinQSubIfTermStatOutMuPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of multicast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 11 }
+        
+                 hwQinQSubIfTermStatInMuPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of multicast packets received from the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 12 }
+        
+                  hwQinQSubIfTermStatOutUniPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of unicast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 13 }
+        
+                 hwQinQSubIfTermStatInUniPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of unicast packets received from the sub interface."
+                        ::= { hwQinQSubIfTermStatEntry 14 }
+        
+                 hwQinQStaticARPCfgTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQStaticARPCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The table is used to configure QinQ static ARP."
+                        ::= { hwQinQMngObjects 6 }
+        
+                  hwQinQStaticARPCfgEntry OBJECT-TYPE
+                        SYNTAX HwQinQStaticARPCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface enabled the QinQ function."
+                        INDEX {hwQinQStaticARPCfgIfIndex, hwQinQStaticARPCfgIp}
+                        ::= { hwQinQStaticARPCfgTable 1 }
+        
+                  HwQinQStaticARPCfgEntry ::=
+                        SEQUENCE {                             
+                            hwQinQStaticARPCfgIfIndex
+                                    InterfaceIndex,
+                            hwQinQStaticARPCfgIp
+                                   IpAddress,                      
+                            hwQinQStaticARPCfgMac
+                                   MacAddress,
+                            hwQinQStaticARPCfgVlan
+                                   VlanId,
+                            hwQinQStaticARPCfgCEVlan
+                                   VlanId,
+                            hwQinQStaticARPCfgRowStatus
+                                   RowStatus
+                         }
+
+
+                  hwQinQStaticARPCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The interface's Index."
+                        ::= { hwQinQStaticARPCfgEntry 1 }
+                        
+                        
+                  hwQinQStaticARPCfgIp OBJECT-TYPE
+                        SYNTAX IpAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The IP address."
+                        ::= { hwQinQStaticARPCfgEntry 2 }
+                      
+        
+                 hwQinQStaticARPCfgMac OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The MAC address."
+                        ::= { hwQinQStaticARPCfgEntry 3 }
+        
+                 hwQinQStaticARPCfgVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The first vlan id."
+                        ::= { hwQinQStaticARPCfgEntry 4 }
+        
+                 hwQinQStaticARPCfgCEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The second vlan id."
+                        ::= { hwQinQStaticARPCfgEntry 5 }
+        
+
+                 hwQinQStaticARPCfgRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Used for controlling the creation and deletion of this
+                            row. All writeable objects in this row may be modified at any time.
+                            If a Network Management Application  attempts to delete a conceptual
+                             row by setting this  object to 'destroy' and there are one or more entries
+                            in hwQinQStaticARPCfgTable pointing to the row ,the agent must also
+                            destroy the corresponding entries in hwQinQStaticARPCfgTable."
+                        ::= { hwQinQStaticARPCfgEntry 6}
+        
+                 hwQinQStaticMACCfgTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQStaticMACCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The table is used to configure static MAC."
+                        ::= { hwQinQMngObjects 7 }
+        
+                 hwQinQStaticMACCfgEntry OBJECT-TYPE
+                        SYNTAX HwQinQStaticMACCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface enabled the QinQ function."
+                        INDEX { hwQinQStaticMACCfgMac, hwQinQStaticMACCfgVsiName, hwQinQStaticMACCfgVlan }
+                        ::= { hwQinQStaticMACCfgTable 1 }
+        
+                 HwQinQStaticMACCfgEntry ::=
+                        SEQUENCE { 
+                            hwQinQStaticMACCfgMac
+                                    MacAddress,                            
+                            hwQinQStaticMACCfgVlan
+                                    VlanId,
+                            hwQinQStaticMACCfgVsiName
+                                    OCTET STRING,
+                            hwQinQStaticMACCfgPEVlan
+                                    VlanId,
+                            hwQinQStaticMACCfgCEVlan
+                                    VlanId,
+                            hwQinQStaticMACCfgType
+                                    INTEGER,    
+                            hwQinQStaticMACCfgIfIndex
+                                    InterfaceIndex,
+                            hwQinQStaticMACCfgFlag
+                                    INTEGER,
+                            hwQinQStaticMACCfgRowStatus
+                                    RowStatus
+                         }
+
+                  hwQinQStaticMACCfgMac OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The MAC address."
+                        ::= { hwQinQStaticMACCfgEntry 1 }
+                        
+                        
+                   hwQinQStaticMACCfgVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Vlan id that the MAC address belongs to."
+                        ::= { hwQinQStaticMACCfgEntry 2 }
+                        
+                        
+                 hwQinQStaticMACCfgVsiName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..31))
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Name of VSI that the MAC address belongs to."
+                        ::= { hwQinQStaticMACCfgEntry 3 }
+                      
+
+                 hwQinQStaticMACCfgPEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "PE vlan id for a Network Management Application  attempts to configure  hwQinQStaticMACCfgTable."
+                        ::= { hwQinQStaticMACCfgEntry 4 }
+        
+                 hwQinQStaticMACCfgCEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "CE vlan id."
+                        ::= { hwQinQStaticMACCfgEntry 5 }
+                        
+                hwQinQStaticMACCfgType  OBJECT-TYPE
+                SYNTAX INTEGER
+                       {
+                           invalid(0),
+                           dynamid(1),
+                           static(2),
+                           blackhole(3),
+                           toobig(4)
+                       } 
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The type of the MAC."
+                        ::= { hwQinQStaticMACCfgEntry 6}
+        
+                 hwQinQStaticMACCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the interface."
+                        ::= { hwQinQStaticMACCfgEntry 7 }
+                        
+                  hwQinQStaticMACCfgFlag OBJECT-TYPE
+                        SYNTAX  INTEGER
+                                {
+                                    vlan(1),
+                                    vsi(2),
+                                    mapping(3),
+                                    qinqtermination(4), 
+                                    dot1qtermination(5)   
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The config type."
+                        ::= { hwQinQStaticMACCfgEntry 8 }
+        
+                  hwQinQStaticMACCfgRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Used for controlling the creation and deletion of this
+                            row. All writeable objects in this row may be modified at any time.
+                            If a Network Management Application  attempts to delete a conceptual
+                             row by setting this  object to 'destroy' and there are one or more entries
+                            in hwQinQStaticMACCfgTable pointing to the row ,the agent must also
+                            destroy the corresponding entries in hwQinQStaticMACCfgTable."
+                        ::= { hwQinQStaticMACCfgEntry 9 }
+        
+                  hwQinQSubIfDot1qTermTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQSubIfDot1qTermEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Used to configure Dot1q-termination function in sub interface ,then packets
+                            transmitted from this sub interface input with one tag will be terminated."
+                        ::= { hwQinQMngObjects 8 }
+        
+                 hwQinQSubIfDot1qTermEntry OBJECT-TYPE
+                        SYNTAX HwQinQSubIfDot1qTermEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface enabled the Dot1q-termination function."
+                        INDEX { hwQinQSubIfDot1qTermIfIndex, hwQinQSubIfDot1qTermVidStart}
+                        ::= { hwQinQSubIfDot1qTermTable 1 }
+        
+                 HwQinQSubIfDot1qTermEntry ::=
+                        SEQUENCE { 
+                            hwQinQSubIfDot1qTermIfIndex
+                                      InterfaceIndex,                            
+                            hwQinQSubIfDot1qTermVidStart
+                                      VlanId,
+                            hwQinQSubIfDot1qTermVidEnd
+                                      VlanId,
+                            hwQinQSubIfDot1qTermGroupId
+                                      Integer32,
+                            hwQinQSubIfDot1qTermRowStatus
+                                      RowStatus
+                         }
+
+                  hwQinQSubIfDot1qTermIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the Dot1q-termination interface."
+                        ::= { hwQinQSubIfDot1qTermEntry 1 }                                                            
+        
+                   hwQinQSubIfDot1qTermVidStart OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "When configure ce vlan as a range, hwQinQSubIfDot1qTermCEVlanStart
+                            is the start vlan id and hwQinQSubIfDot1qTermCEVlanEnd is the end vlan id."
+                        ::= { hwQinQSubIfDot1qTermEntry 2 }
+        
+                  hwQinQSubIfDot1qTermVidEnd OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "When configure ce vlan as a range, hwQinQSubIfDot1qTermCEVlanStart is 
+                            the start vlan id and hwQinQSubIfDot1qTermCEVlanEnd is the end vlan id."
+                        ::= { hwQinQSubIfDot1qTermEntry 3 }
+                        
+                   hwQinQSubIfDot1qTermGroupId OBJECT-TYPE
+                        SYNTAX Integer32 (0..16)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Group-management id."
+                        DEFVAL { 0 }
+                        ::= { hwQinQSubIfDot1qTermEntry 4 }
+        
+                  hwQinQSubIfDot1qTermRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Used for controlling the creation and deletion of this
+                            row. All writeable objects in this row may be modified at any time.
+                            If a Network Management Application  attempts to delete a conceptual
+                             row by setting this  object to 'destroy' and there are one or more entries
+                            in hwQinQSubIfDot1qTermTable pointing to the row ,the agent must also
+                            destroy the corresponding entries in hwQinQSubIfDot1qTermTable."
+                        ::= { hwQinQSubIfDot1qTermEntry 5 }
+        
+                  hwQinQSubIfDot1qTermStatTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQSubIfDot1qTermStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "When a sub interface configured Dot1q-termination, hwQinQSubIfDot1qTermStatTable used to
+                            statistic total number of the out packets and in packets."
+                        ::= { hwQinQMngObjects 9 }
+        
+                  hwQinQSubIfDot1qTermStatEntry OBJECT-TYPE
+                        SYNTAX HwQinQSubIfDot1qTermStatEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of an interface configured Dot1q-termination function."
+                        INDEX { hwQinQSubIfDot1qTermStatIfIndex, hwQinQSubIfDot1qTermStatCEVlan }
+                        ::= { hwQinQSubIfDot1qTermStatTable 1 }
+        
+                  HwQinQSubIfDot1qTermStatEntry ::=
+                        SEQUENCE { 
+                            hwQinQSubIfDot1qTermStatIfIndex
+                                   InterfaceIndex,
+                            hwQinQSubIfDot1qTermStatCEVlan
+                                   VlanId,
+                            hwQinQSubIfDot1qTermStatGroupId
+                                   Integer32,
+                            hwQinQSubIfDot1qTermStatOutPackets
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatOutBytes
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatInPackets
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatInBytes
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatOutBdPackets
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatInBdPackets
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatOutMuPackets
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatInMuPackets
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatOutUniPackets
+                                   Counter64,
+                            hwQinQSubIfDot1qTermStatInUniPackets
+                                   Counter64
+                         }
+
+                  hwQinQSubIfDot1qTermStatIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the Dot1q-termination interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 1 }
+        
+                  hwQinQSubIfDot1qTermStatCEVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Inner vlan in packets which input the Dot1q-termination sub interface,
+                            used to indicate the packets as an index."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 2 }
+        
+                  hwQinQSubIfDot1qTermStatGroupId OBJECT-TYPE
+                        SYNTAX Integer32 (1..16)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "The group-management id. The statistic number of packets can not get if 
+                            the statistic funtion is not enabled."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 3 }
+        
+                  hwQinQSubIfDot1qTermStatOutPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of out packets of the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 4 }
+        
+                 hwQinQSubIfDot1qTermStatOutBytes OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of out bytes of the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 5 }
+        
+                 hwQinQSubIfDot1qTermStatInPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of in packets of the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 6 }
+        
+                  hwQinQSubIfDot1qTermStatInBytes OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of in bytes of the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 7 }
+        
+                  hwQinQSubIfDot1qTermStatOutBdPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of broadcast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 8 }
+        
+                 hwQinQSubIfDot1qTermStatInBdPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of broadcast packets received from the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 9 }
+        
+                 hwQinQSubIfDot1qTermStatOutMuPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of multicast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 10 }
+        
+                 hwQinQSubIfDot1qTermStatInMuPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of multicast packets received from the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 11 }
+        
+                 hwQinQSubIfDot1qTermStatOutUniPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of unicast packets transmitted out of the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 12 }
+        
+                hwQinQSubIfDot1qTermStatInUniPackets OBJECT-TYPE
+                        SYNTAX Counter64
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Total number of unicast packets received from the sub interface."
+                        ::= { hwQinQSubIfDot1qTermStatEntry 13 }
+        
+                 hwQinQModeCfgTable  OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQModeCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The table contains mode type and ethernet encapsulation type."
+                        ::= { hwQinQMngObjects 10 }
+        
+                 hwQinQModeCfgEntry OBJECT-TYPE
+                        SYNTAX HwQinQModeCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The mode type and ethernet encapsulation type of an interface entry."
+                        INDEX { hwQinQModeCfgIfIndex }
+                        ::= { hwQinQModeCfgTable 1 }
+        
+                 HwQinQModeCfgEntry ::=
+                        SEQUENCE { 
+                            hwQinQModeCfgIfIndex
+                                    InterfaceIndex,
+                            hwQinQModeCfgMode
+                                    INTEGER,
+                            hwQinQEtherType
+                                   Unsigned32
+                             }
+
+                  hwQinQModeCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the interface."
+                        ::= { hwQinQModeCfgEntry 1 }    
+                        
+                        
+                  hwQinQModeCfgMode OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                            common(1),
+                            qinq(2)
+                            }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "Mode type of the interface."
+                        DEFVAL{ common }
+                        ::= { hwQinQModeCfgEntry 2 }
+                        
+                        
+                  hwQinQEtherType OBJECT-TYPE
+                        SYNTAX Unsigned32 ('600'h..'ffff'h)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value of tag type is encapsulated in the head of the ethernet frame
+                            to distinguish the encapsulated mode between the 802.1Q and QinQ."
+                            DEFVAL{ '8100'h }
+                        ::= { hwQinQModeCfgEntry 3 }                        
+                        
+                        
+                 hwQinQCtrlVlanCfgTable  OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQCtrlVlanCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The control-vlan id and control-vlan's attributes can be configured in sub interface.
+                             You must designate control-vlan as QinQ or Dot1q before configuring QinQ-termination 
+                             function or Dot1q-termination function."
+                        ::= { hwQinQMngObjects 11 }
+        
+                 hwQinQCtrlVlanCfgEntry OBJECT-TYPE
+                        SYNTAX HwQinQCtrlVlanCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The Control-vlan configuration entry."
+                        INDEX { hwQinQCtrlVlanCfgIfIndex }
+                        ::= { hwQinQCtrlVlanCfgTable 1 }
+        
+                  HwQinQCtrlVlanCfgEntry ::=
+                        SEQUENCE { 
+                            hwQinQCtrlVlanCfgIfIndex
+                                    InterfaceIndex,
+                            hwQinQCtrlVlan
+                                    VlanId,
+                            hwQinQSubIfType
+                                    INTEGER,
+                            hwQinQCtrlVlanFlag
+                                    INTEGER,
+                            hwQinQCtrlVlanRowStatus
+                                    RowStatus,
+                            hwQinQFlexibleFlag
+                            	    EnabledStatus      
+                         }
+
+                  hwQinQCtrlVlanCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the sub interface."
+                        ::= { hwQinQCtrlVlanCfgEntry 1 }    
+                        
+                        
+                  hwQinQCtrlVlan OBJECT-TYPE
+                        SYNTAX VlanId
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Control-Vlan id."
+                        ::= { hwQinQCtrlVlanCfgEntry 2 }
+                        
+                        
+                  hwQinQSubIfType OBJECT-TYPE
+                        SYNTAX INTEGER
+                               {
+                                   qinq(1),
+                                   dot1q(2)
+                               }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The type of sub interface."
+                        ::= { hwQinQCtrlVlanCfgEntry 3 }
+                        
+                        
+                  hwQinQCtrlVlanFlag OBJECT-TYPE
+                        SYNTAX INTEGER
+                               {
+                                   rtprotocolenable(1),
+                                   original(2),
+                                   localswitch(3)
+                               }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The service type of the sub interface, by setting hwQinQCtrlVlanFlag to the value (rtprotocolenable),
+                            the route-protocol attribute enabled; and by setting hwQinQCtrlVlanFlag to the value (localswitch), 
+                            the localswitch attribute enabled, which means two tags of packets will be pruned. 
+                            So if you set hwQinQSubIfType to be dot1q type, you can not specify hwQinQCtrlVlanFlag as localswitch."
+                        ::= { hwQinQCtrlVlanCfgEntry 4 }
+                        
+                        
+                  hwQinQCtrlVlanRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "This table can be created and deleted."
+                        ::= { hwQinQCtrlVlanCfgEntry 5 }
+               
+                  hwQinQFlexibleFlag OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The service type of the sub interface, by setting hwQinQFlexibleFlag to the value (flexibleenable),
+                            the flexible attribute enabled; 
+                            So if you set hwQinQSubIfType to be dot1q type, you can not specify hwQinQFlexibleFlag as flexibledisable."
+                        ::= { hwQinQCtrlVlanCfgEntry 6 }         
+                        
+                  hwQinQGroupCfgTable  OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQGroupCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The group-management id and group's attributes can be configured in sub interface."
+                        ::= { hwQinQMngObjects 12 }
+        
+                  hwQinQGroupCfgEntry OBJECT-TYPE
+                        SYNTAX HwQinQGroupCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Group configuration entry."
+                        INDEX { hwQinQGroupCfgIfIndex, hwQinQGroupId}
+                        ::= { hwQinQGroupCfgTable 1 }
+        
+                  HwQinQGroupCfgEntry ::=
+                        SEQUENCE { 
+                            hwQinQGroupCfgIfIndex
+                                    InterfaceIndex,
+                            hwQinQGroupId
+                                    Integer32,
+                            hwQinQGroupType
+                                    INTEGER,
+                            hwQinQGroupStat
+                                    EnabledStatus,
+                            hwQinQGroupRowStatus
+                                    RowStatus
+                         }
+
+                  hwQinQGroupCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the interface."
+                        ::= { hwQinQGroupCfgEntry 1 }    
+                        
+                        
+                  hwQinQGroupId OBJECT-TYPE
+                        SYNTAX Integer32 (1..16)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Group-management id."
+                        ::= { hwQinQGroupCfgEntry 2 }
+                        
+                        
+                  hwQinQGroupType OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                            single(1),
+                            multi(2)
+                            }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "The type of the group."
+                        DEFVAL{single }
+                        ::= { hwQinQGroupCfgEntry 3 }
+                        
+                        
+                  hwQinQGroupStat OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "Whether the statistic function is enabled."
+                        DEFVAL{ DISABLE }
+                        ::= { hwQinQGroupCfgEntry 4 }
+                        
+                        
+                  hwQinQGroupRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "This table can be created and deleted."
+                        ::= { hwQinQGroupCfgEntry 5 }
+                        
+                  hwQinQAsymmetryCfgTable  OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQAsymmetryCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The table to configure asymmetry attribution of the interface."
+                        ::= { hwQinQMngObjects 13 }
+        
+                  hwQinQAsymmetryCfgEntry OBJECT-TYPE
+                        SYNTAX HwQinQAsymmetryCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of the asymmetry configure table."
+                        INDEX {hwQinQAsymmetryCfgIfIndex}
+                        ::= { hwQinQAsymmetryCfgTable 1 }
+        
+                   HwQinQAsymmetryCfgEntry ::=
+                        SEQUENCE { 
+                            hwQinQAsymmetryCfgIfIndex
+                                    InterfaceIndex,
+                            hwQinQSubIfAsymmetry
+                                    INTEGER,
+                            hwQinQAsymmetryUserMode
+                            	    EnabledStatus
+                         }
+
+                  hwQinQAsymmetryCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the QinQ-termination interface."
+                        ::= { hwQinQAsymmetryCfgEntry 1 }    
+                        
+                        
+                  hwQinQSubIfAsymmetry OBJECT-TYPE
+                        SYNTAX INTEGER
+                               {
+                                   symmetry(1),
+                                   asymmetry(2)                        
+                               }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The asymmetry attribution of the QinQ-termination interface."
+                        DEFVAL{ asymmetry }
+                        ::= { hwQinQAsymmetryCfgEntry 2 }
+                        
+                  hwQinQAsymmetryUserMode OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The user mode attribute of the QinQ-termination sub interface."
+                        DEFVAL{ disable }
+                        ::= { hwQinQAsymmetryCfgEntry 3 }                        
+                        
+                  hwQinQRemarkCfgTable  OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwQinQRemarkCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Interface remark config."
+                        ::= { hwQinQMngObjects 14 }
+        
+                  hwQinQRemarkCfgEntry OBJECT-TYPE
+                        SYNTAX HwQinQRemarkCfgEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "The entry of the interface remark configuration table."
+                        INDEX { hwQinQRemarkCfgIfIndex }
+                        ::= { hwQinQRemarkCfgTable 1 }
+        
+                  HwQinQRemarkCfgEntry ::=
+                        SEQUENCE { 
+                            hwQinQRemarkCfgIfIndex
+                                 InterfaceIndex,
+                            hwQinQPriorityRemark
+                                INTEGER                            
+                         }
+
+                  hwQinQRemarkCfgIfIndex OBJECT-TYPE
+                        SYNTAX InterfaceIndex
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                            "Index number of the sub interface, 
+                             which should configure QinQ-termination function first."
+                        ::= { hwQinQRemarkCfgEntry 1 }    
+                        
+                        
+                  hwQinQPriorityRemark OBJECT-TYPE
+                        SYNTAX INTEGER
+                               {
+                            specify0(0),
+                            specify1(1),
+                            specify2(2),
+                            specify3(3),
+                            specify4(4),
+                            specify5(5),
+                            specify6(6),
+                            specify7(7),
+                            cevid(8),
+                            pevid(9)
+                            }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The service policy map to set the 802.1P bits. By default(pevid), 
+                             copy the P bits that were in the outer PE VLAN tag to the trunk VLAN tag,
+                             by setting object to (cevid), copy the P bits that were in inner CE VALN
+                             tag to the trunk VLAN tag."
+                        DEFVAL{pevid}
+                        ::= { hwQinQRemarkCfgEntry 2 }
+                hwBpduTunnelIngressTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwBpduTunnelIngressEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table of bpdu tunnel ingress. "
+			::= { hwQinQMngObjects 15 }
+		
+		hwBpduTunnelIngressEntry OBJECT-TYPE
+			SYNTAX HwBpduTunnelIngressEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The entry of of bpdu tunnel ingress. "
+			INDEX {hwBpduTunnelIngressPortIndex,hwBpduTunnelBpduIngressMacIndex}
+			::= { hwBpduTunnelIngressTable 1 }
+		
+		HwBpduTunnelIngressEntry ::=
+			SEQUENCE { 
+			                hwBpduTunnelIngressPortIndex
+			                        Integer32,
+					hwBpduTunnelBpduIngressMacIndex
+						BpduIndex,
+					hwBpduTunnelIngressAddress
+						MacAddress,
+					hwBpduTunnelIngressRowStatus
+				                RowStatus	
+				}
+				
+		hwBpduTunnelIngressPortIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..65535) 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Port index in interface. "
+			::= { hwBpduTunnelIngressEntry 1 }		
+				
+		hwBpduTunnelBpduIngressMacIndex OBJECT-TYPE
+			SYNTAX BpduIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" bpdu mac address list
+				BPDU Dmac		protocol
+				01-80-C2-00-00-00	stp01
+				01-80-C2-00-00-01	pauseFrame
+				01-80-C2-00-00-02	reserved02
+				01-80-C2-00-00-03	reserved03
+				01-80-C2-00-00-04	reserved04
+				01-80-C2-00-00-05	reserved05
+				01-80-C2-00-00-06	reserved06
+				01-80-C2-00-00-07	reserved07
+				01-80-C2-00-00-08	stp02
+				01-80-C2-00-00-09	reserved08
+				01-80-C2-00-00-0a	hgmp
+				01-80-C2-00-00-0b	reserved09
+				01-80-C2-00-00-0c	reserved10
+				01-80-C2-00-00-0d	reserved11
+				01-80-C2-00-00-0e	reserved12
+				01-80-C2-00-00-0f	reserved13
+				01-80-C2-00-00-10	reserved14
+				01-80-C2-00-00-11	reserved15
+				01-80-C2-00-00-12	reserved16
+				01-80-C2-00-00-13	reserved17
+				01-80-C2-00-00-14	isisLevel01
+				01-80-C2-00-00-15	isisLevel02
+				01-80-C2-00-00-16	reserved18
+				01-80-C2-00-00-17	reserved19
+				01-80-C2-00-00-18	reserved20
+				01-80-C2-00-00-19	reserved21
+				01-80-C2-00-00-1a	reserved22
+				01-80-C2-00-00-1b	reserved23
+				01-80-C2-00-00-1c	reserved24
+				01-80-C2-00-00-1d	reserved25
+				01-80-C2-00-00-1e	reserved26
+				01-80-C2-00-00-1f	reserved27
+				01-80-C2-00-00-20	gmrp
+				01-80-C2-00-00-21	gvrp
+				01-80-C2-00-00-22	reserved28
+				01-80-C2-00-00-23	reserved29
+				01-80-C2-00-00-24	reserved30
+				01-80-C2-00-00-25	reserved31
+				01-80-C2-00-00-26	reserved32
+				01-80-C2-00-00-27	reserved33
+				01-80-C2-00-00-28	reserved34
+				01-80-C2-00-00-29	reserved35
+				01-80-C2-00-00-2a	reserved36
+				01-80-C2-00-00-2b	reserved37
+				01-80-C2-00-00-2c	reserved38
+				01-80-C2-00-00-2d	reserved39
+				01-80-C2-00-00-2e	reserved40
+				01-80-C2-00-00-2f	reserved41"
+			::= { hwBpduTunnelIngressEntry 2 }
+						
+		hwBpduTunnelIngressAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Group mac address."
+			::= { hwBpduTunnelIngressEntry 3 }		
+	        hwBpduTunnelIngressRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Bpdu tunnek ingress row status."
+			::= { hwBpduTunnelIngressEntry 4}
+					
+		hwBpduTunnelEgressTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwBpduTunnelEgressEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table of bpdu tunnel egress."
+			::= { hwQinQMngObjects 16 }
+		
+
+		hwBpduTunnelEgressEntry OBJECT-TYPE
+			SYNTAX HwBpduTunnelEgressEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The entry of bpdu tunnel egress."
+			INDEX {hwBpduTunnelEgressPortIndex,hwBpduTunnelBpduEgressMacIndex}
+			::= { hwBpduTunnelEgressTable 1 }
+		
+		HwBpduTunnelEgressEntry ::=
+			SEQUENCE { 
+			                hwBpduTunnelEgressPortIndex
+			                        Integer32,
+					hwBpduTunnelBpduEgressMacIndex
+						BpduIndex,
+					hwBpduTunnelEgressAddress
+						MacAddress,
+					hwBpduTunnelEgressRowStatus
+				                RowStatus	
+				}
+				
+		hwBpduTunnelEgressPortIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..65535) 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Port index in interface."
+			::= { hwBpduTunnelEgressEntry 1 }		
+				
+		hwBpduTunnelBpduEgressMacIndex OBJECT-TYPE
+			SYNTAX BpduIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Bpdu MAC address list
+				BPDU DMAC		   protocol
+				01-80-C2-00-00-00	stp01
+				01-80-C2-00-00-01	pauseFrame
+				01-80-C2-00-00-02	reserved02
+				01-80-C2-00-00-03	reserved03
+				01-80-C2-00-00-04	reserved04
+				01-80-C2-00-00-05	reserved05
+				01-80-C2-00-00-06	reserved06
+				01-80-C2-00-00-07	reserved07
+				01-80-C2-00-00-08	stp02
+				01-80-C2-00-00-09	reserved08
+				01-80-C2-00-00-0a	hgmp
+				01-80-C2-00-00-0b	reserved09
+				01-80-C2-00-00-0c	reserved10
+				01-80-C2-00-00-0d	reserved11
+				01-80-C2-00-00-0e	reserved12
+				01-80-C2-00-00-0f	reserved13
+				01-80-C2-00-00-10	reserved14
+				01-80-C2-00-00-11	reserved15
+				01-80-C2-00-00-12	reserved16
+				01-80-C2-00-00-13	reserved17
+				01-80-C2-00-00-14	isisLevel01
+				01-80-C2-00-00-15	isisLevel02
+				01-80-C2-00-00-16	reserved18
+				01-80-C2-00-00-17	reserved19
+				01-80-C2-00-00-18	reserved20
+				01-80-C2-00-00-19	reserved21
+				01-80-C2-00-00-1a	reserved22
+				01-80-C2-00-00-1b	reserved23
+				01-80-C2-00-00-1c	reserved24
+				01-80-C2-00-00-1d	reserved25
+				01-80-C2-00-00-1e	reserved26
+				01-80-C2-00-00-1f	reserved27
+				01-80-C2-00-00-20	gmrp
+				01-80-C2-00-00-21	gvrp
+				01-80-C2-00-00-22	reserved28
+				01-80-C2-00-00-23	reserved29
+				01-80-C2-00-00-24	reserved30
+				01-80-C2-00-00-25	reserved31
+				01-80-C2-00-00-26	reserved32
+				01-80-C2-00-00-27	reserved33
+				01-80-C2-00-00-28	reserved34
+				01-80-C2-00-00-29	reserved35
+				01-80-C2-00-00-2a	reserved36
+				01-80-C2-00-00-2b	reserved37
+				01-80-C2-00-00-2c	reserved38
+				01-80-C2-00-00-2d	reserved39
+				01-80-C2-00-00-2e	reserved40
+				01-80-C2-00-00-2f	reserved41."
+			::= { hwBpduTunnelEgressEntry 2 }		
+		hwBpduTunnelEgressAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Group mac address."
+			::= { hwBpduTunnelEgressEntry 3 }		
+	        hwBpduTunnelEgressRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Row Status."
+			::= { hwBpduTunnelEgressEntry 4}		
+		hwBpduTunnelVlanTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwBpduTunnelVlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table of port bpdu tunnel."
+			::= { hwQinQMngObjects 17 }
+
+		hwBpduTunnelVlanEntry OBJECT-TYPE
+			SYNTAX HwBpduTunnelVlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The entry of port bpdu tunnel vlan."
+			INDEX { hwBpduTunnelPortIndex }
+			::= { hwBpduTunnelVlanTable 1 }
+
+		HwBpduTunnelVlanEntry ::=
+			SEQUENCE { 
+				hwBpduTunnelPortIndex  
+					Integer32,
+				hwBpduTunnelEnable
+				        INTEGER,  
+				hwBpduTunnelVlanListLow
+					VlanList,
+				hwBpduTunnelVlanListHigh 
+					VlanList
+				}
+
+		hwBpduTunnelPortIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..65535) 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Port index in interface."
+			::= { hwBpduTunnelVlanEntry 1 }	
+		hwBpduTunnelEnable OBJECT-TYPE
+			SYNTAX  INTEGER
+			{
+				enabled(1),
+				disabled(2)
+			} 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Bpdu tunnel enable."
+			::= { hwBpduTunnelVlanEntry 2 }	
+		hwBpduTunnelVlanListLow OBJECT-TYPE
+			SYNTAX VlanList
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Vlan bpdu tunnel in port."
+			::= { hwBpduTunnelVlanEntry 3 }	
+		hwBpduTunnelVlanListHigh OBJECT-TYPE
+			SYNTAX VlanList
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Vlan bpdu tunnel in port."
+			::= { hwBpduTunnelVlanEntry 4 }
+ 
+		hwBpduTunnelTable  OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwBpduTunnelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table of bpdu tunnel."
+			::= { hwQinQMngObjects 18 }
+		
+		hwBpduTunnelEntry OBJECT-TYPE
+			SYNTAX HwBpduTunnelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The entry of of bpdu tunnel."
+			INDEX {hwBpduTunnelBpduIndex}
+			::= { hwBpduTunnelTable 1 }
+		
+		HwBpduTunnelEntry ::=
+			SEQUENCE { 
+					hwBpduTunnelBpduIndex
+						BpduIndex,
+					hwBpduTunnelBpduEnable
+						INTEGER,     
+					hwBpduTunnelMultiAddress
+						MacAddress,
+                    hwBpduTunnelRowStatus
+				        RowStatus
+						
+				}
+						
+		hwBpduTunnelBpduIndex OBJECT-TYPE
+			SYNTAX BpduIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Bpdu mac address list
+				 BPDU Dmac		    protocol
+				01-80-C2-00-00-00	stp01       (1) 
+				01-80-C2-00-00-01	pauseFrame  (2)  
+				01-80-C2-00-00-02	reserved02  (3)
+				01-80-C2-00-00-03	reserved03  (4)  
+				01-80-C2-00-00-04	reserved04  (5)  
+				01-80-C2-00-00-05	reserved05  (6)  
+				01-80-C2-00-00-06	reserved06  (7)  
+				01-80-C2-00-00-07	reserved07  (8)  
+				01-80-C2-00-00-08	stp02       (9)  
+				01-80-C2-00-00-09	reserved08  (10) 
+				01-80-C2-00-00-0a	hgmp        (11) 
+				01-80-C2-00-00-0b	reserved09  (12) 
+				01-80-C2-00-00-0c	reserved10  (13) 
+				01-80-C2-00-00-0d	reserved11  (14) 
+				01-80-C2-00-00-0e	reserved12  (15) 
+				01-80-C2-00-00-0f	reserved13  (16) 
+				01-80-C2-00-00-10	reserved14  (17) 
+				01-80-C2-00-00-11	reserved15  (18) 
+				01-80-C2-00-00-12	reserved16  (19) 
+				01-80-C2-00-00-13	reserved17  (20)
+				01-80-C2-00-00-14	isisLevel01 (21)
+				01-80-C2-00-00-15	isisLevel02 (22) 
+				01-80-C2-00-00-16	reserved18  (23) 
+				01-80-C2-00-00-17	reserved19  (24) 
+				01-80-C2-00-00-18	reserved20  (25) 
+				01-80-C2-00-00-19	reserved21  (26) 
+				01-80-C2-00-00-1a	reserved22  (27) 
+				01-80-C2-00-00-1b	reserved23  (28) 
+				01-80-C2-00-00-1c	reserved24  (29) 
+				01-80-C2-00-00-1d	reserved25  (30) 
+				01-80-C2-00-00-1e	reserved26  (31) 
+				01-80-C2-00-00-1f	reserved27  (32)
+				01-80-C2-00-00-20	gmrp (33)
+				01-80-C2-00-00-21	gvrp (34)
+				01-80-C2-00-00-22	reserved28 (35)
+				01-80-C2-00-00-23	reserved29 (36)
+				01-80-C2-00-00-24	reserved30 (37)
+				01-80-C2-00-00-25	reserved31 (38)
+				01-80-C2-00-00-26	reserved32 (39)
+			    01-80-C2-00-00-27	reserved33 (40)
+				01-80-C2-00-00-28	reserved34 (41)
+				01-80-C2-00-00-29	reserved35 (42)
+				01-80-C2-00-00-2a	reserved36 (43)
+				01-80-C2-00-00-2b	reserved37 (44)
+				01-80-C2-00-00-2c	reserved38 (45)
+				01-80-C2-00-00-2d	reserved39 (46)
+				01-80-C2-00-00-2e	reserved40 (47)
+				01-80-C2-00-00-2f	reserved41 (48)
+				01-80-C2-00-00-02	lacp (49)
+				01-00-0C-CC-CC-CC   cdp  (50)
+				01-00-0C-CC-CC-CC   pagp (51)
+				01-00-0C-CC-CC-CC   udld (52)
+				01-00-0C-CC-CC-CC   vtp  (53) ."
+			::= { hwBpduTunnelEntry 1 }
+		
+		 hwBpduTunnelBpduEnable OBJECT-TYPE
+            SYNTAX  INTEGER
+			{
+				enabled(1),
+				disabled(2)
+			}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION "Bpdu tunnel enable or disable."
+            ::= { hwBpduTunnelEntry 2 }  
+            
+         hwBpduTunnelMultiAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Group MAC address."
+			::= { hwBpduTunnelEntry 3 }    
+         hwBpduTunnelRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Row Status."
+			::= { hwBpduTunnelEntry 4}			
+			
+						
+        hwQinQSwapCfgTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwQinQSwapCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION	"This table describes the vlan swap configurations of interfaces."
+            	::= { hwQinQMngObjects 19 }
+        
+        hwQinQSwapCfgEntry OBJECT-TYPE
+            SYNTAX HwQinQSwapCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "An entry is created for each active ethernet type interface in the device 
+         and deleted when the interface been not exist."
+            INDEX { hwQinQSwapCfgIfIndex }
+            	::= { hwQinQSwapCfgTable 1 }
+        
+        HwQinQSwapCfgEntry ::=
+            SEQUENCE { 
+            		hwQinQSwapCfgIfIndex
+                            InterfaceIndex,
+                        hwQinQSwapCfgFlag
+                            EnabledStatus
+                     }
+
+        hwQinQSwapCfgIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Index number of the interface."
+            	::= { hwQinQSwapCfgEntry 1 }    
+                        
+        hwQinQSwapCfgFlag OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            	"QinQ swap flag of the interface, which indicates whether to swap the two vlan tags or not when the interface receives a packet with two 802.1q tags."
+            DEFVAL{ disable }
+            ::= { hwQinQSwapCfgEntry 2 }   
+
+    
+--  -------------------------------------------------------------
+-- HUAWEI-QINQ-MIB MIB - Conformance Information
+-- -------------------------------------------------------------
+        hwQinQConformance OBJECT IDENTIFIER ::= { hwQinQ 3 }
+        
+        hwQinQGroups OBJECT IDENTIFIER ::= { hwQinQConformance 1 }
+        
+--  -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+                 hwQinQSystemBaseGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSystemWellKnowMac, hwQinQSystemBridgeRole, hwBpduSystemDropPacketSta }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of objects providing device level control
+                            and status information for the system."
+                        ::= { hwQinQGroups 1 }
+        
+                 hwQinQBpduTunnelGroup OBJECT-GROUP
+                        OBJECTS { hwQinQEtherEncpsType, hwQinQBpduTunnelEnableOneQBpduTunnel, hwQinQBpduTunnelEnableBpduTag, hwQinQBpduTunnelEnableTwoQBpduTunnel, hwQinQBpduTunnelCustomerBpduTag, 
+                            hwQinQBpduTunnelCustomerBpduTagListLow, hwQinQBpduTunnelCustomerBpduTagListHigh,hwQinQRemarkOuterTpid, hwQinQBpduTunnelEnableBpduFilter}
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of objects providing device level control
+                            and status information for the interface."
+                        ::= { hwQinQGroups 2 }
+        
+                  hwQinQSubIfVlanStackingGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSubIfStackingCEVlanEnd, hwQinQSubIfStackGroupId, hwQinQSubIfStackingRowStatus, hwQinQSubIfStackingPEVlan }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of objects providing device level control
+                            and status information for the sub interface."
+                        ::= { hwQinQGroups 3 }
+        
+                  hwQinQSubIfStackingStatGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSubIfStackStatGroupId, hwQinQSubIfStackingStatOutPackets, hwQinQSubIfStackingStatOutBytes, hwQinQSubIfStackingStatInPackets, hwQinQSubIfStackingStatInBytes, 
+                            hwQinQSubIfStackStatOutBdPackets, hwQinQSubIfStackStatInBdPackets, hwQinQSubIfStackStatOutMuPackets, hwQinQSubIfStackStatInMuPackets, hwQinQSubIfStackStatOutUniPackets, 
+                            hwQinQSubIfStackStatInUniPackets }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of objects providing device level control
+                            and status information for the sub interface."
+                        ::= { hwQinQGroups 4 }
+        
+                  hwQinQSubIfTermGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSubIfTermCEVlanEnd, hwQinQSubIfTermGroupId,  hwQinQSubIfTermRowStatus,hwQinQSubIfTermSubscriberGroupName }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of objects providing device level control
+                            and status information for the sub interface."
+                        ::= { hwQinQGroups 5 }
+        
+                  hwQinQSubIfTermStatGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSubIfTermStatGroupId, hwQinQSubIfTermStatOutPackets, hwQinQSubIfTermStatOutBytes, hwQinQSubIfTermStatInPackets, hwQinQSubIfTermStatInBytes, 
+                            hwQinQSubIfTermStatOutBdPackets, hwQinQSubIfTermStatInBdPackets, hwQinQSubIfTermStatOutMuPackets, hwQinQSubIfTermStatInMuPackets, hwQinQSubIfTermStatOutUniPackets, 
+                            hwQinQSubIfTermStatInUniPackets }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of objects providing device level control
+                            and status information for the sub interface."
+                        ::= { hwQinQGroups 6 }
+        
+                 hwQinQStaticARPCfgGroup OBJECT-GROUP
+                        OBJECTS { hwQinQStaticARPCfgMac, hwQinQStaticARPCfgVlan, hwQinQStaticARPCfgCEVlan, hwQinQStaticARPCfgRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of static ARP table."
+                        ::= { hwQinQGroups 7 }
+        
+                  hwQinQStaticMACCfgGroup OBJECT-GROUP
+                        OBJECTS { hwQinQStaticMACCfgPEVlan, hwQinQStaticMACCfgCEVlan, hwQinQStaticMACCfgType, hwQinQStaticMACCfgIfIndex, hwQinQStaticMACCfgFlag,hwQinQStaticMACCfgRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of static MAC table."
+                        ::= { hwQinQGroups 8 }
+        
+                  hwQinQSubIfDot1qTermGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSubIfDot1qTermVidEnd, hwQinQSubIfDot1qTermGroupId, hwQinQSubIfDot1qTermRowStatus}
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of Dot1q-termination table."
+                        ::= { hwQinQGroups 9 }
+        
+                   hwQinQSubIfDot1qTermStatGroup OBJECT-GROUP
+                        OBJECTS { hwQinQSubIfDot1qTermStatGroupId, hwQinQSubIfDot1qTermStatOutPackets, hwQinQSubIfDot1qTermStatOutBytes, hwQinQSubIfDot1qTermStatInPackets, hwQinQSubIfDot1qTermStatInBytes, 
+                            hwQinQSubIfDot1qTermStatOutBdPackets, hwQinQSubIfDot1qTermStatInBdPackets, hwQinQSubIfDot1qTermStatOutMuPackets, hwQinQSubIfDot1qTermStatInMuPackets, hwQinQSubIfDot1qTermStatOutUniPackets, 
+                            hwQinQSubIfDot1qTermStatInUniPackets }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of Dot1q-termination statistic table."
+                        ::= { hwQinQGroups 10 }
+                        
+                  hwQinQModeCfgGroup OBJECT-GROUP
+                        OBJECTS {hwQinQModeCfgMode ,hwQinQEtherType}
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of Mode config table."
+                        ::= { hwQinQGroups 11 }
+                        
+                  hwQinQCtrlVlanCfgGroup OBJECT-GROUP
+                        OBJECTS {hwQinQCtrlVlan, hwQinQSubIfType, hwQinQCtrlVlanFlag, hwQinQCtrlVlanRowStatus, hwQinQFlexibleFlag}
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of Control vlan table."
+                        ::= { hwQinQGroups 12 }
+                        
+                        
+                 hwQinQGroupCfgGroup OBJECT-GROUP
+                        OBJECTS {hwQinQGroupType, hwQinQGroupStat, hwQinQGroupRowStatus }
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of group table."
+                        ::= { hwQinQGroups 13 }
+        
+                 hwQinQAsymmetryCfgGroup OBJECT-GROUP
+                        OBJECTS {hwQinQSubIfAsymmetry, hwQinQAsymmetryUserMode}
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of asymmetry config table."
+                        ::= { hwQinQGroups 14 }
+                 hwQinQRemarkCfgGroup OBJECT-GROUP
+                        OBJECTS {hwQinQPriorityRemark}
+                        STATUS current
+                        DESCRIPTION 
+                            "A collection of items of Mode config table."
+                        ::= { hwQinQGroups 15 }
+		hwBpduTunnelIngressGroup OBJECT-GROUP
+			OBJECTS {hwBpduTunnelIngressAddress,hwBpduTunnelIngressRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"A collection of items of Group Mac table."
+			::= { hwQinQGroups 16 }
+		hwBpduTunnelEgressGroup OBJECT-GROUP
+			OBJECTS {hwBpduTunnelEgressAddress,hwBpduTunnelEgressRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"A collection of items of Group Mac table."
+			::= { hwQinQGroups 17 }
+		hwBpduTunnelVlanGroup OBJECT-GROUP
+			OBJECTS {hwBpduTunnelEnable,hwBpduTunnelVlanListLow,hwBpduTunnelVlanListHigh}
+			STATUS current
+			DESCRIPTION 
+				"A collection of items of Mode port bpdu tunnel table."
+			::= { hwQinQGroups 18 } 
+			
+		hwBpduTunnelGroup OBJECT-GROUP
+			OBJECTS {hwBpduTunnelBpduEnable,hwBpduTunnelMultiAddress,hwBpduTunnelRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"A collection of items of bpdu tunnel mac table."
+			::= { hwQinQGroups 19 } 
+					
+		hwQinQSwapCfgGroup OBJECT-GROUP
+			OBJECTS {hwQinQSwapCfgFlag}
+			STATUS current
+			DESCRIPTION 
+				"A collection of items of Swap config table."
+			::= { hwQinQGroups 20 }
+ 
+    END
+
+--
+-- HUAWEI-QINQ-MIB.mib
+--

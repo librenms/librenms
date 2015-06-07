@@ -1,0 +1,1547 @@
+CTRON-SFPS-ESYS-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-esys.mib.txt
+--  Revision: 0.0.17
+--              
+--  Cabletron Systems, Inc.
+--  35 Industria Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises, 
+        IpAddress, 
+        Counter, TimeTicks
+--        Gauge
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.1
+        sfpsSystemConfig, sfpsSystemStats, sfpsATMResolver, sfpsSystemPool,
+    sfpsATMAnibIfoStats, sfpsMemHeapStats, sfpsATMResolverCounters,
+    sfpsATMPorts, sfpsATMPortsMgr, sfpsATMElan, sfpsATMSvcHistoryMgr,
+    sfpsATMSvcHistoryEvent
+
+
+                FROM CTRON-SFPS-INCLUDE-MIB;
+ 
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+SfpsSwitchInstance ::= INTEGER
+--  this will map to chassis.module index value
+
+--SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+
+--
+
+--  SFPS Switch Engine System Group
+--  This group contains the objects that pertain to SFPS switching
+--  engines at a SFPS switch module single-instance level.  This group 
+--  contains two sub-groups:  configuration and statistics.
+
+sfpsSysConfigTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsSysConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the configuration and aministrative
+                 information of each SFPS instance.  Essentially, a
+                 separate SFPS instance exists for each switch module.
+                 If SFPS is not configured on a module, than an entry
+                 will not exist." 
+        ::= { sfpsSystemConfig 1 }
+
+sfpsSysConfigEntry    OBJECT-TYPE
+        SYNTAX  SfpsSysConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry specifies the SFPS configuration for the
+                 SFPS instance."
+        INDEX   { sfpsSysConfigSwitchInstance }
+        ::= { sfpsSysConfigTable 1 }
+
+SfpsSysConfigEntry ::=
+
+        SEQUENCE {
+                sfpsSysConfigSwitchInstance             INTEGER,
+                sfpsSysConfigAdminStatus                INTEGER,
+                sfpsSysConfigAdminReset                 INTEGER,
+                sfpsSysConfigOperStatus                 INTEGER,
+                sfpsSysConfigOperTime                   TimeTicks,
+                sfpsSysConfigLastChange                 TimeTicks,
+                sfpsSysConfigVersion                    DisplayString,
+                sfpsSysConfigMIBRev                     DisplayString,
+                sfpsSysConfigHostMgmtPort               INTEGER,
+                sfpsSysConfigHostCtrlPort               INTEGER,
+                sfpsSysConfigHostDataPort               INTEGER,
+                sfpsSysConfigHostCtrlThrottleCount      INTEGER,
+                sfpsSysConfigHostDataThrottleCount      INTEGER,
+                sfpsSysConfigTrunkSwitch                INTEGER,
+                sfpsSysConfigSwitchMode                 INTEGER,
+                sfpsSysConfigSwitchMAC                  SfpsAddress,
+                sfpsSysConfigMgmtAccessType             INTEGER,
+                sfpsSysConfigChassisMAC                 SfpsAddress,
+                sfpsSysConfigChassisIP                  IpAddress
+                }
+
+sfpsSysConfigSwitchInstance     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Switch Identifier to designate the instance of this entry."
+         ::= { sfpsSysConfigEntry 1 }
+
+sfpsSysConfigAdminStatus        OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                other (1),
+                disabled (2),
+                enabled (3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "The administrative status of the switch."
+         ::= { sfpsSysConfigEntry 2 }
+
+sfpsSysConfigAdminReset OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                other (1),
+                reset (2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Setting reset will cause a soft reset of the switch."
+         ::= { sfpsSysConfigEntry 3 }
+
+sfpsSysConfigOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                other (1),
+                disabled (2),
+                enabled (3),
+                pending-disable (4),
+                pending-enable (5),
+                invalid-config (6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the operational status of the switch."
+         ::= { sfpsSysConfigEntry 4 }
+
+sfpsSysConfigOperTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the operation uptime of the switch."
+         ::= { sfpsSysConfigEntry 5 }
+
+sfpsSysConfigLastChange OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the number of time ticks since the last operational
+                status change."
+         ::= { sfpsSysConfigEntry 6 }
+
+sfpsSysConfigVersion    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the version of this image."
+         ::= { sfpsSysConfigEntry 7 }
+
+sfpsSysConfigMIBRev     OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the MIB version of the Engine component."
+         ::= { sfpsSysConfigEntry 8 }
+
+sfpsSysConfigHostMgmtPort       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the Host Management port."
+         ::= { sfpsSysConfigEntry 9 }
+
+sfpsSysConfigHostCtrlPort       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the logical port number for the Host Control Port.
+                The Host Control Port is the port that unknown packets are
+                sent to for call processing."
+         ::= { sfpsSysConfigEntry 10 }
+
+sfpsSysConfigHostDataPort       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSysConfigEntry 11 }
+
+sfpsSysConfigHostCtrlThrottleCount      OBJECT-TYPE
+                SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSysConfigEntry 12 }
+
+sfpsSysConfigHostDataThrottleCount      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSysConfigEntry 13 }
+
+sfpsSysConfigTrunkSwitch        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSysConfigEntry 14 }
+
+sfpsSysConfigSwitchMode OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                vNET (1),
+                vLAN (2),
+                aNVLLobo (3),
+                aNVLFrontEnd (4)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the mode that the switch is running."
+         ::= { sfpsSysConfigEntry 20 }
+
+sfpsSysConfigSwitchMAC  OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Displays the Switch's Base MAC address."
+         ::= { sfpsSysConfigEntry 21 }
+
+sfpsSysConfigMgmtAccessType     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                mgmt-Only (1),
+                mgmt-and-Access (2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION     
+                "Determines whether the port can be used for management only
+                or to be also used as an Access port."
+         ::= { sfpsSysConfigEntry 22 }
+
+sfpsSysConfigChassisMAC OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSysConfigEntry 23 }
+
+sfpsSysConfigChassisIP  OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                ""
+         ::= { sfpsSysConfigEntry 24 }
+
+
+ --
+
+--  SFPS Switch Statistics Group
+--  This group contains the objects that pertain to the performance
+--  monitoring and statistics of a single instance of an SFPS switch.
+
+sfpsSysStatsTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsSysStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the statistics information fo
+                 each SFPS switch instance.  Essentially, a separate
+                 SFPS instance exists for each switch module.  If SFPS
+                 is not configured on a module, than an entry will not
+                 exist." 
+        ::= { sfpsSystemStats 1 }
+
+sfpsSysStatsEntry    OBJECT-TYPE
+        SYNTAX  SfpsSysStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the SFPS statistics for the SFPS
+                instance."
+        INDEX   { sfpsSysStatsSwitchInstance }
+        ::= { sfpsSysStatsTable 1 }
+
+SfpsSysStatsEntry ::=
+        SEQUENCE {
+                sfpsSysStatsSwitchInstance      SfpsSwitchInstance,
+                sfpsSysStatsAdminStatus         INTEGER,
+                sfpsSysStatsReset               INTEGER,
+                sfpsSysStatsOperTime            TimeTicks,
+                sfpsSysStatsInPkts              Counter,
+                sfpsSysStatsOutPkts             Counter,
+                sfpsSysStatsDiscardPkts         Counter,
+                sfpsSysStatsFilteredPkts        Counter,
+                sfpsSysStatsInOctets            Counter,
+                sfpsSysStatsOutOctets           Counter,
+                sfpsSysStatsDiscardOctets       Counter,
+                sfpsSysStatsFilteredOctets      Counter
+--  Do we need to count redirect bcast and unknown dest packets/bytes ?
+
+        }
+
+sfpsSysStatsSwitchInstance    OBJECT-TYPE
+        SYNTAX  SfpsSwitchInstance
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The primary index to the SFPS switch table.  This
+                 identifies the SFPS switch for which the entry
+                 exists." 
+        ::= { sfpsSysStatsEntry 1 }
+
+sfpsSysStatsAdminStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Sets the administrative state of the SFPS switch
+                 statistics.  Writing a value of enabled(3) causes
+                 these counters to become active for this SFPS switch
+                 instance.  Writing a value of disabled(2) causes
+                 these counters to become inactive for this SFPS
+                 switch instance." 
+        ::= { sfpsSysStatsEntry 2 }
+
+sfpsSysStatsReset        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+                "Resets the SFPS switch counters for this SFPS switch
+                 instance. Writing a value of reset(2) resets the SFPS
+                 switch counters to 0 and causes sfpsSysStatsOperTime
+                 to also be reset to 0." 
+        ::= { sfpsSysStatsEntry 3 }
+
+sfpsSysStatsOperTime       OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the amount of time (# of time ticks) that
+                 the SFPS switch statistics have been active for this
+                 SFPS swtich instance."
+        ::= { sfpsSysStatsEntry 4 }
+
+sfpsSysStatsInPkts       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have
+                 been received, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime."
+        ::= { sfpsSysStatsEntry 5 }
+
+sfpsSysStatsOutPkts      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have
+                 been switched, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime." 
+        ::= { sfpsSysStatsEntry 6 }
+
+sfpsSysStatsDiscardPkts  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have
+                 been discarded, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime."
+        ::= { sfpsSysStatsEntry 7 }
+
+sfpsSysStatsFilteredPkts  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS packets that have
+                 been filtered, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime."
+        ::= { sfpsSysStatsEntry 8 }
+
+sfpsSysStatsInOctets       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS octets that have
+                 been received, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime."
+        ::= { sfpsSysStatsEntry 9 }
+
+sfpsSysStatsOutOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS octets that have
+                 been switched, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime."
+        ::= { sfpsSysStatsEntry 10 }
+
+sfpsSysStatsDiscardOctets  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS octets that have
+                 been discarded, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime."
+        ::= { sfpsSysStatsEntry 11 }
+
+sfpsSysStatsFilteredOctets  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Indicates the total number of SFPS octets that have
+                 been filtered, on this SFPS switch instance, during
+                 the time of sfpsSysStatsOperTime."
+        ::= { sfpsSysStatsEntry 12 }
+
+
+-- vcc port table
+
+sfpsVccPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsVccPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMElan 6 }
+
+sfpsVccPortEntry    OBJECT-TYPE
+        SYNTAX  SfpsVccPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsVccPortLogPort }
+        ::= { sfpsVccPortTable 1 }
+
+SfpsVccPortEntry ::=
+        SEQUENCE {
+                sfpsVccPortLogPort                      INTEGER,
+                sfpsVccPortPhyPort                      INTEGER,
+                sfpsVccPortVpi                          INTEGER,
+                sfpsVccPortVci                          INTEGER,
+                sfpsVccPortPortType                     INTEGER,
+                sfpsVccPortLogPortType          INTEGER,
+                sfpsVccPortPhyLinkState         INTEGER
+                                }
+
+sfpsVccPortLogPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsVccPortEntry 1 }
+
+sfpsVccPortPhyPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsVccPortEntry 2 }
+
+sfpsVccPortVpi    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsVccPortEntry 3 }
+
+sfpsVccPortVci    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsVccPortEntry 4 }
+
+sfpsVccPortPortType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        atmLec(1),
+                        atmSvc(2),
+                        atmPvc(3),
+                        other(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsVccPortEntry 5 }
+
+sfpsVccPortLogPortType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        pendingUp(1),
+                        portUp(2),
+                        portDown(3),
+                        other(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsVccPortEntry 6 }
+
+sfpsVccPortPhyLinkState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        linkUp(1),
+                        linkDown(2),
+                        other(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsVccPortEntry 7 }
+
+
+--  ATM Resolve System
+
+sfpsATMResolveSystemLearnTableSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolver 1 }
+
+--  ATM Resolve Counters
+
+sfpsATMResolveCountersVerb    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        reset(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 1 }
+
+sfpsATMResolveCountersUptime    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 2 }
+
+sfpsATMResolveCountersQueryMACReq    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 3 }
+
+sfpsATMResolveCountersQueryMACFail    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 4 }
+
+sfpsATMResolveCountersQueryMACGood    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 5 }
+
+sfpsATMResolveCountersQueryMACDaSaChecks    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 6 }
+
+sfpsATMResolveCountersQueryMACDaSaHits    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 7 }
+
+sfpsATMResolveCountersQueryMACDaSaMissess    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 8 }
+
+sfpsATMResolveCountersQueryMACVdirChecks    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 9 }
+
+sfpsATMResolveCountersQueryMACVdirHits    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 10 }
+
+sfpsATMResolveCountersQueryMACVdirMisses    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 11 }
+
+sfpsATMResolveCountersQueryMACErrors    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 12 }
+
+sfpsATMResolveCountersQueryMACLecPortSuppress    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 13 }
+
+sfpsATMResolveCountersQueryMACStandbyDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 14 }
+
+sfpsATMResolveCountersQueryDaSaRequests    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 15 }
+
+sfpsATMResolveCountersQueryDaSaHits    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 16 }
+
+sfpsATMResolveCountersQueryDaSaMisses    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 17 }
+
+sfpsATMResolveCountersQueryDaSaErrors    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolverCounters 18 }
+
+
+--  ATM Resolve Diag API
+
+sfpsATMResolveDiagAPIVerb    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolver 3 }
+
+sfpsATMResolveDiagAPIInDA    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolver 8 }
+
+sfpsATMResolveDiagAPIInSA    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolver 9 }
+
+sfpsATMResolveDiagAPIInSrcLecPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolver 10 }
+
+sfpsATMResolveDiagAPIOutStatus    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolver 11 }
+
+sfpsATMResolveDiagAPIOutPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMResolver 12 }
+
+-- Pool Table
+
+sfpsPoolTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsPoolTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsSystemPool 1 }
+
+sfpsPoolTableEntry    OBJECT-TYPE
+        SYNTAX  SfpsPoolTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsPoolTableIndex }
+        ::= { sfpsPoolTable 1 }
+
+SfpsPoolTableEntry ::=
+        SEQUENCE {
+                sfpsPoolTableIndex                      INTEGER,
+                sfpsPoolTableName                       DisplayString,
+                sfpsPoolTableRAM                        INTEGER,
+                sfpsPoolTableBlockSize          INTEGER,
+                sfpsPoolTableBlockCount         INTEGER,
+                sfpsPoolTableBlockMax           INTEGER,
+                sfpsPoolTableObjSize            INTEGER,
+                sfpsPoolTableObjInUse           INTEGER,
+                sfpsPoolTableObjMax                     INTEGER,
+                sfpsPoolTableObjInBlock         INTEGER
+                                }
+
+sfpsPoolTableIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 1 }
+
+sfpsPoolTableName    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 2 }
+
+sfpsPoolTableRAM    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 3 }
+
+sfpsPoolTableBlockSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 4 }
+
+sfpsPoolTableBlockCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 5 }
+
+sfpsPoolTableBlockMax    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 6 }
+
+sfpsPoolTableObjSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 7 }
+
+sfpsPoolTableObjInUse    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 8 }
+
+sfpsPoolTableObjMax    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 9 }
+
+sfpsPoolTableObjInBlock    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPoolTableEntry 10 }
+
+-- AnibIfo Stats
+
+sfpsAnibIfoStatsTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsAnibIfoStatsTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMAnibIfoStats 1 }
+
+sfpsAnibIfoStatsTableEntry    OBJECT-TYPE
+        SYNTAX  SfpsAnibIfoStatsTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsAnibIfoStatsPhysIntf }
+        ::= { sfpsAnibIfoStatsTable 1 }
+
+SfpsAnibIfoStatsTableEntry ::=
+        SEQUENCE {
+                sfpsAnibIfoStatsPhysIntf        INTEGER,
+                sfpsAnibIfoStatsCtrlMessages    INTEGER,
+                sfpsAnibIfoStatsIlmiMessages    INTEGER,
+                sfpsAnibIfoStatsUniMessages     INTEGER,
+                sfpsAnibIfoStatsLaneMessages    INTEGER,
+                sfpsAnibIfoStatsPCSPoolSize     INTEGER,
+                sfpsAnibIfoStatsPCSPoolDrops    INTEGER,
+                sfpsAnibIfoStatsPoolIlmiDrops   INTEGER,
+                sfpsAnibIfoStatsPoolUniDrops    INTEGER,
+                sfpsAnibIfoStatsPoolLaneDrops   INTEGER,
+                sfpsAnibIfoStatsPCSAvail        INTEGER,
+                sfpsAnibIfoStatsPCSInUse        INTEGER,
+                sfpsAnibIfoStatsStandbyLeArpsDrops        INTEGER,
+                sfpsAnibIfoStatsStandbyUnknownsDrops        INTEGER,
+                sfpsAnibIfoStatsStandbyANIBUnknownsDrops        INTEGER
+                                }
+
+sfpsAnibIfoStatsPhysIntf    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 1 }
+
+sfpsAnibIfoStatsCtrlMessages    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 2 }
+
+sfpsAnibIfoStatsIlmiMessages  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 3 }
+
+sfpsAnibIfoStatsUniMessages    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 4 }
+
+sfpsAnibIfoStatsLaneMessages    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 5 }
+
+sfpsAnibIfoStatsPCSPoolSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 6 }
+
+sfpsAnibIfoStatsPCSPoolDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 7 }
+
+sfpsAnibIfoStatsPoolIlmiDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 8 }
+
+sfpsAnibIfoStatsPoolUniDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 9 }
+
+sfpsAnibIfoStatsPoolLaneDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 19 }
+
+sfpsAnibIfoStatsPCSAvail    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 11 }
+
+sfpsAnibIfoStatsPCSInUse    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 12 }
+
+sfpsAnibIfoStatsStandbyLeArpsDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 13 }
+
+sfpsAnibIfoStatsStandbyUnknownsDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 14 }
+
+sfpsAnibIfoStatsStandbyANIBUnknownsDrops    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsAnibIfoStatsTableEntry 15 }
+
+
+--
+-- This Table reserved for Memory Usage
+
+sfpsMemHeapStatsHeapInit     OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 1 }
+
+sfpsMemHeapStatsHeapMax     OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 2 }
+
+sfpsMemHeapStatsHeapEnd     OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 3 }
+
+sfpsMemHeapStatsHeapSize     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 4 }
+
+sfpsMemHeapStatsFragCount     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 5 }
+
+sfpsMemHeapStatsFragLargest     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 6 }
+
+sfpsMemHeapStatsFragBytes     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 7 }
+
+sfpsMemHeapStatsHeapUsed     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 8 }
+
+sfpsMemHeapStatsHeapAvail     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 9 }
+
+sfpsMemHeapStatsHeapUseMax     OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 10 }
+
+sfpsMemHeapStatsHeapUsePercent     OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsMemHeapStats 11 }
+
+--
+
+sfpsATMPortsTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsATMPortsTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPorts 1 }
+
+sfpsATMPortsTableEntry    OBJECT-TYPE
+        SYNTAX  SfpsATMPortsTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsATMPortsPhysIntf }
+        ::= { sfpsATMPortsTable 1 }
+
+SfpsATMPortsTableEntry ::=
+        SEQUENCE {
+                sfpsATMPortsPhysIntf         INTEGER,
+                sfpsATMPortsTotalLECPorts    INTEGER,
+                sfpsATMPortsTotalPVCPorts    INTEGER,
+                sfpsATMPortsTotalSVCPorts    INTEGER,
+                sfpsATMPortsBaseIntfNum      INTEGER,
+                sfpsATMPortsInUse            INTEGER
+                                }
+
+sfpsATMPortsPhysIntf    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsTableEntry 1 }
+
+sfpsATMPortsTotalLECPorts    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsTableEntry 2 }
+
+sfpsATMPortsTotalPVCPorts    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsTableEntry 3 }
+
+sfpsATMPortsTotalSVCPorts    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsTableEntry 4 }
+
+sfpsATMPortsBaseIntfNum    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsTableEntry 5 }
+
+sfpsATMPortsInUse    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsTableEntry 6 }
+
+--
+
+sfpsATMPortsMgrVerb    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                set(2),
+                setToDefaults(3),
+                coldResetNV(4),
+                warmResetNB(5)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsMgr 1 }
+
+sfpsATMPortsMgrPhysIntf    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsMgr 2 }
+
+sfpsATMPortsMgrTotalLECPorts    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsMgr 3 }
+
+sfpsATMPortsMgrTotalPVCPorts    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsMgr 4 }
+
+sfpsATMPortsMgrTotalSVCPorts    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsMgr 5 }
+
+sfpsATMPortsMgrVerbStatus    OBJECT-TYPE
+        SYNTAX  INTEGER{
+                ok(1),
+                exceededMaxAllotment(2),
+                badIf(3),
+                error(4)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMPortsMgr 6 }
+
+--
+
+sfpsATMLecPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsATMLecPortTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMElan 7 }
+
+sfpsATMLecPortTableEntry    OBJECT-TYPE
+        SYNTAX  SfpsATMLecPortTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsATMLecPortLogPort }
+        ::= { sfpsATMLecPortTable 1 }
+
+SfpsATMLecPortTableEntry ::=
+        SEQUENCE {
+                sfpsATMLecPortLogPort         INTEGER,
+                sfpsATMLecPortPhyPort         INTEGER,
+                sfpsATMLecPortElanName        INTEGER,
+                sfpsATMLecPortPhyLinkState    INTEGER,
+                sfpsATMLecPortLECType         INTEGER
+                                }
+
+sfpsATMLecPortLogPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMLecPortTableEntry 1 }
+
+sfpsATMLecPortPhyPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMLecPortTableEntry 2 }
+
+sfpsATMLecPortElanName    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMLecPortTableEntry 3 }
+
+sfpsATMLecPortPhyLinkState    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMLecPortTableEntry 4 }
+
+sfpsATMLecPortLECType    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMLecPortTableEntry 5 }
+
+--
+
+sfpsATMSvcHistoryEventTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsATMSvcHistoryEventTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsATMSvcHistoryEvent 1 }
+
+sfpsATMSvcHistoryEventTableEntry    OBJECT-TYPE
+        SYNTAX  SfpsATMSvcHistoryEventTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsATMSvcHistoryEventIndex }
+        ::= { sfpsATMSvcHistoryEventTable 1 }
+
+SfpsATMSvcHistoryEventTableEntry ::=
+        SEQUENCE {
+                sfpsATMSvcHistoryEventIndex             INTEGER,
+                sfpsATMSvcHistoryEventATMAddr           OCTET STRING,
+                sfpsATMSvcHistoryEventPortNumber        INTEGER,
+                sfpsATMSvcHistoryEventEvent             INTEGER,
+                sfpsATMSvcHistoryEventEventChange       INTEGER,        
+                sfpsATMSvcHistoryEventVccHand           INTEGER,
+                sfpsATMSvcHistoryEventVpi               INTEGER,
+                sfpsATMSvcHistoryEventVci               INTEGER,
+                sfpsATMSvcHistoryEventTime              TimeTicks
+                }
+
+sfpsATMSvcHistoryEventIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "incrementing value based on number of events" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 1 }
+
+sfpsATMSvcHistoryEventATMAddr    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "the atm address for the port manager port based on the lec
+                 client mib." 
+        ::= { sfpsATMSvcHistoryEventTableEntry 2 }
+
+
+sfpsATMSvcHistoryEventPortNumber    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "port manager port" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 3 }
+
+
+sfpsATMSvcHistoryEventEvent    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                idle(1),
+                opening(2),
+                openResponse(3),
+                peerOpenResponse(4),
+                openAck(5),
+                open(6),
+                closeResponse(7),
+                closeAck(8), 
+                close(9),
+                clean(10),
+                cleanCloseResp(11),
+                cleanCloseAck(12)
+                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "state change logged to the Event Log" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 4 }
+
+
+sfpsATMSvcHistoryEventEventChange    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                error(1),
+                normal(2)
+                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "reason for the Event" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 5 }
+
+
+sfpsATMSvcHistoryEventVccHand    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "value associated with a connection on Port Number" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 6 }
+
+
+sfpsATMSvcHistoryEventVpi    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "vpi associated with connection on Port Number" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 7 }
+
+
+sfpsATMSvcHistoryEventVci    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "vci associated with connection on Port Number" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 8 }
+
+
+sfpsATMSvcHistoryEventTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "system time when Event occurs" 
+        ::= { sfpsATMSvcHistoryEventTableEntry 9 }
+
+
+--
+sfpsATMSvcHistoryMgrVerb    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                resetSvcHistory(2),
+                isableSvcLogging(3),
+                enableSvcLogging(4),
+                enableSvcLogsNoWrapping(5)
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "allows you to reset the SvcHistoryEvent table
+                 disable logging so no new entries are compiled in the
+                 SvcHistoryEvent table enable logging so new entries are
+                 added to the SvcHistoryEvent table enable logging in the
+                 SvcHistoryEvent table so that when the max number of entries
+                 is reached the table is full and doesn't wrap around and
+                 continue adding entries" 
+        ::= { sfpsATMSvcHistoryMgr 1 }
+
+
+sfpsATMSvcHistoryMgrSvcHistoryWraps    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "displays if the table is going to wrap" 
+        ::= { sfpsATMSvcHistoryMgr 2 }
+
+sfpsATMSvcHistoryMgrLogState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        enabled(1),
+                        enabledNoWrap(2),
+                        disabled(3)
+                        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "displays whether the table is enabled to log new entries
+                  or not and if it is enabled whether the table will wrap" 
+        ::= { sfpsATMSvcHistoryMgr 3 }
+
+sfpsATMSvcHistoryMgrEntriesCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "displays the number of current entries from the beginnning
+                 of the table (not from before it wrapped)" 
+        ::= { sfpsATMSvcHistoryMgr 4 }
+
+END

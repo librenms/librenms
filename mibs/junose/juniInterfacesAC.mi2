@@ -1,0 +1,171 @@
+
+-- *****************************************************************************
+-- Juniper-Interfaces-CONF
+--
+-- SNMP Agent Capabilities definitions for the Interfaces MIBs.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+-- Copyright (c) 2004 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Interfaces-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniInterfacesAgent  MODULE-IDENTITY
+    LAST-UPDATED "200307162138Z"  -- 16-Jul-03 05:38 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Interfaces component of the
+        SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200402042138Z"  -- 04-Feb-04 05:38 PM EDT  - JUNOSe 6.1
+    DESCRIPTION
+        "Added mib table rsIfCountTable to count systemwide interfaces by if type."
+    REVISION    "200307162138Z"  -- 16-Jul-03 05:38 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "IF-INVERTED-STACK-MIB:
+         Added support for RFC 2864, the Inverted Stack Table."
+    REVISION    "200212161443Z"  -- 16-Dec-02 09:43 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-UNI-IF-MIB:
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200104271424Z"  -- 27-Apr-01 10:24 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 20 }
+
+
+-- *****************************************************************************
+-- Interfaces SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniInterfacesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the Interfaces component of the JUNOSe SNMP agent.  This
+        version of the Interfaces component was supported in JUNOSe 1.0 thru 5.0
+        system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Interfaces application in
+        JUNOSe.  These capabilities became obsolete when support was added for
+        the IF-INVERTED-STACK-MIB."
+    SUPPORTS    IF-MIB
+        INCLUDES {
+            ifGeneralInformationGroup,
+            ifFixedLengthGroup,
+            ifHCFixedLengthGroup,
+            ifPacketGroup,
+            ifHCPacketGroup,
+            ifVHCPacketGroup,
+            ifStackGroup2,
+            ifCounterDiscontinuityGroup,
+            linkUpDownNotificationsGroup }
+        VARIATION   ifAlias
+            DESCRIPTION
+                "This Agent limits the lenght of an alias to 15 octets excect
+                for IP, ATM and ATM 1483 interfaces, which may have a length of
+                up to 255 octets."
+        VARIATION   ifStackStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The ifStackTable cannot be modified with this Agent."
+    SUPPORTS    Juniper-UNI-IF-MIB
+        INCLUDES {
+            juniIfGroup,
+            juniIfInvStackGroup }
+    ::= { juniInterfacesAgent 1 }
+
+juniInterfacesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the Interfaces component of the JUNOSe SNMP agent.  This
+        version of the Interfaces component is supported in JUNOSe 1.0 and
+        subsequent 2.0, 3.x, 4.x and 5.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+       "The MIBs supported by the SNMP agent for the Interfaces application in
+       JUNOSe.  These capabilities became obsolete when support was added for
+       the ifCountTable."
+    SUPPORTS    IF-MIB
+        INCLUDES {
+            ifGeneralInformationGroup,
+            ifFixedLengthGroup,
+            ifHCFixedLengthGroup,
+            ifPacketGroup,
+            ifHCPacketGroup,
+            ifVHCPacketGroup,
+            ifStackGroup2,
+            ifCounterDiscontinuityGroup,
+            linkUpDownNotificationsGroup }
+        VARIATION   ifAlias
+            DESCRIPTION
+                "This Agent limits the lenght of an alias to 15 octets excect
+                for IP, ATM and ATM 1483 interfaces, which may have a length of
+                up to 255 octets."
+        VARIATION   ifStackStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The ifStackTable cannot be modified with this Agent."
+    SUPPORTS    IF-INVERTED-STACK-MIB
+        INCLUDES {
+            ifInvStackGroup }
+    SUPPORTS    Juniper-UNI-IF-MIB
+        INCLUDES {
+            juniIfGroup,
+            juniIfInvStackGroup }
+    ::= { juniInterfacesAgent 2 }
+
+juniInterfacesAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the Interfaces component of the JUNOSe SNMP agent.  This
+        version of the Interfaces component is supported in JUNOSe 1.0 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Interfaces application in
+        JUNOSe."
+    SUPPORTS    IF-MIB
+        INCLUDES {
+            ifGeneralInformationGroup,
+            ifFixedLengthGroup,
+            ifHCFixedLengthGroup,
+            ifPacketGroup,
+            ifHCPacketGroup,
+            ifVHCPacketGroup,
+            ifStackGroup2,
+            ifCounterDiscontinuityGroup,
+            linkUpDownNotificationsGroup }
+        VARIATION   ifAlias
+            DESCRIPTION
+                "This Agent limits the lenght of an alias to 15 octets excect
+                for IP, ATM and ATM 1483 interfaces, which may have a length of
+                up to 255 octets."
+        VARIATION   ifStackStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The ifStackTable cannot be modified with this Agent."
+    SUPPORTS    IF-INVERTED-STACK-MIB
+        INCLUDES {
+            ifInvStackGroup }
+    SUPPORTS    Juniper-UNI-IF-MIB
+        INCLUDES {
+            juniIfGroup,
+            juniIfInvStackGroup,
+            juniIfCountGroup }
+    ::= { juniInterfacesAgent 3 }
+
+END

@@ -1,0 +1,181 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-USERVLAN-MIB DEFINITIONS
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+HUAWEI-BRAS-USERVLAN-MIB    DEFINITIONS ::= BEGIN
+    
+    IMPORTS
+           hwBRASMib            
+                    FROM HUAWEI-MIB
+           InterfaceIndex, ifIndex                  
+                    FROM IF-MIB
+           VlanIdOrNone, VlanId 
+                    FROM Q-BRIDGE-MIB;
+           hwUSERVLAN MODULE-IDENTITY 
+                    LAST-UPDATED "200508101200Z"
+                    ORGANIZATION 
+                        "Huawei Technologies Co., Ltd.
+                        "
+                    CONTACT-INFO 
+                        "
+                        NanJing Institute,Huawei Technologies Co.,Ltd.
+                        HuiHong Mansion,No.91 BaiXia Rd.
+                        NanJing, P.R. of China
+                        Zipcode:210001
+                         
+                        Http://www.huawei.com                                       
+                        E-mail:support@huawei.com "
+            DESCRIPTION 
+                "
+                The USERVLAN mib is for all datacomm product.
+                "
+            ::= { hwBRASMib 12 }
+
+    
+    hwhwUSERVLANMibObjects OBJECT IDENTIFIER ::= { hwUSERVLAN 1 }    
+
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+
+
+    hwUserVlanTable OBJECT IDENTIFIER ::= { hwhwUSERVLANMibObjects 1 }
+    --  ============== hwUserVlanTable  define beginning ==============
+
+      hwUserVlanIfIndex   OBJECT-TYPE
+       SYNTAX        InterfaceIndex
+       ACCESS        read-write
+       STATUS        current
+       DESCRIPTION    "Interface Index(es)."
+       ::= { hwUserVlanTable 1 }
+   
+      hwUserInnerStartVlan   OBJECT-TYPE
+       SYNTAX        VlanId
+       ACCESS        read-write
+       STATUS        current
+       DESCRIPTION    "The start inner-vlan's of uservlan."
+       ::= { hwUserVlanTable 2 }
+
+      hwUserInnerEndVlan   OBJECT-TYPE
+       SYNTAX        VlanId
+       ACCESS        read-write
+       STATUS        current
+       DESCRIPTION    "The end inner-vlan of uservlan."
+       ::= { hwUserVlanTable 3 }    
+   
+      hwUserVlanOuterVlan   OBJECT-TYPE
+       SYNTAX        VlanId
+       ACCESS        read-write
+       STATUS        current
+       DESCRIPTION    "The outer-vlan of uservlan."
+       ::= { hwUserVlanTable 4 }
+
+      hwUserVlanOpType   OBJECT-TYPE
+       SYNTAX        INTEGER {
+                                set(1),
+                                undo(2)
+                                }
+       ACCESS        read-write
+       STATUS        current
+       DESCRIPTION    
+       " 1 : set uservlan, 2 : undo userlvlan."
+       ::= { hwUserVlanTable 5 }      
+
+    --  ============== hwUserVlanTable  define end ============== 
+
+    --  ============== hwQueryUserVlanTable  define beginning ==============
+    hwQueryUserVlanTable   OBJECT-TYPE
+    SYNTAX        SEQUENCE OF HWQueryUserVlanEntry
+    ACCESS        not-accessible
+    STATUS        current    
+    ::=  { hwhwUSERVLANMibObjects 2 }
+    
+   hwQueryUserVlanEntry OBJECT-TYPE
+    SYNTAX        HWQueryUserVlanEntry
+    ACCESS        not-accessible
+    STATUS        current
+    DESCRIPTION    "Entry of hwQueryUserVlanTable."
+        INDEX           { hwQueryUserVlanIfIndex, hwQueryUserInnerVlan, hwQueryUserOuterVlan }
+    ::= { hwQueryUserVlanTable 1 }
+   
+    HWQueryUserVlanEntry ::=
+        SEQUENCE {
+                hwQueryUserVlanIfIndex
+                        Integer32,
+                hwQueryUserInnerVlan
+                        VlanIdOrNone,
+                hwQueryUserOuterVlan
+                        VlanIdOrNone
+                 }          
+
+      hwQueryUserVlanIfIndex   OBJECT-TYPE
+       SYNTAX        Integer32
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION    "Interface Index(es)."
+       ::= { hwQueryUserVlanEntry 1 }
+   
+      hwQueryUserInnerVlan   OBJECT-TYPE
+       SYNTAX        VlanIdOrNone
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION    "The inner-vlan of uservlan."
+       ::= { hwQueryUserVlanEntry 2 }
+   
+      hwQueryUserOuterVlan   OBJECT-TYPE
+       SYNTAX        VlanIdOrNone
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION    "The outer-vlan of uservlan."
+       ::= { hwQueryUserVlanEntry 3 }
+
+    --  ============== hwQueryUserVlanTable  define end ============== 
+       --  ============== conformance information ==============
+        hwUserVlanConformance OBJECT IDENTIFIER ::= { hwUSERVLAN 2 }
+        
+        
+        hwUserVlanCompliances OBJECT IDENTIFIER ::= { hwUserVlanConformance 1 }
+        hwUserVlanCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwUserVlanTableGroup, hwQueryUserVlanTableGroup}  
+                                               
+              ::= { hwUserVlanCompliances 1 }
+              
+    --  ============== groups ==============  
+        hwUserVlanObjectGroups OBJECT IDENTIFIER ::= { hwUserVlanCompliances 2 } 
+        
+        hwUserVlanTableGroup OBJECT-GROUP
+            OBJECTS {hwUserVlanIfIndex, hwUserInnerStartVlan,hwUserInnerEndVlan,
+                     hwUserVlanOuterVlan,hwUserVlanOpType}
+            STATUS current
+            DESCRIPTION 
+                "User vlan table."
+            ::= { hwUserVlanObjectGroups 1 }
+            
+        hwQueryUserVlanTableGroup OBJECT-GROUP
+            OBJECTS {hwQueryUserVlanIfIndex, hwQueryUserInnerVlan, hwQueryUserOuterVlan}
+            STATUS current
+            DESCRIPTION 
+                "Query user vlan table."
+            ::= { hwUserVlanObjectGroups 2 }            
+    --  ============== conformance information define end ============== 
+END
+
+   

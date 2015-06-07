@@ -1,0 +1,360 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: Huawei Attack defence MIB, this MIB is for firewall only.
+-- Reference:
+-- Version:     V1.20
+-- History:
+--  
+--  V1.20 2005-05-30 Wei Rixi(22510) added mplsVpnVrfName as table index,
+--              changed the region of ApplyZoneID(hwNatEudmZoneApplyZoneID1
+--              and hwNatEudmZoneApplyZoneID2) from 1~16 to 0~128.
+--              Added fields to HwAspfEudmAppEnableEntry and hwAspfEudmAppEnableGroup.
+--  V1.10 2004-06-30 Xin Jianfeng(37631) altered the region of 
+--              hwAtkZoneSynFloodSynSpeed, hwAtkZoneUdpFloodSpeed & 
+--              hwAtkZoneSynFloodHalfAge to 0~1000000, 
+--              hwAtkZoneSynFloodHalfAge to 0~65535
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =================================================================
+
+HUAWEI-ATK-EUDM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        RowStatus            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwATKEudm MODULE-IDENTITY 
+        LAST-UPDATED "200303190900Z"        -- March 19, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            The HUAWEI-ATCKDF_EUDM-MIB contains objects to
+            manage the ATCKDF(Attack Defence)
+            configuration for firewall.
+            "
+        ::= { hwATK 2 }
+
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.10
+    hwATK OBJECT IDENTIFIER ::= { hwDatacomm 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1
+    hwAtkZoneMibObjects OBJECT IDENTIFIER ::= { hwATKEudm 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1
+    hwAtkSynFloodZoneTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtkSynFloodZoneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            SYN Flood configuration table for a security zone. 
+            which consists of a sequence of hwAtckDfSynFloodZoneEntry items.
+            "
+        ::= { hwAtkZoneMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1.1
+    hwAtkSynFloodZoneEntry OBJECT-TYPE
+        SYNTAX HwAtkSynFloodZoneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            An entry in the hwAtckDfSynFloodZoneTable containing the parameters
+            of SYN flood defence for all hosts behind a security zone.
+            this table is for firewall only.
+            "
+        INDEX { mplsVpnVrfName, hwAtkSynFloodZoneID }
+        ::= { hwAtkSynFloodZoneTable 1 }
+    
+    HwAtkSynFloodZoneEntry ::=
+        SEQUENCE { 
+            hwAtkSynFloodZoneID
+                Integer32,
+            hwAtkZoneSynFloodSynSpeed
+                Integer32,
+            hwAtkZoneSynFloodHalfMax
+                Integer32,
+            hwAtkZoneSynFloodHalfAge
+                Integer32,
+            hwAtkZoneSynFloodProxy
+                INTEGER,
+            hwAtkZoneSynFloodStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1.1.1
+    hwAtkSynFloodZoneID OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The internal ID of security zone to be protected."
+        ::= { hwAtkSynFloodZoneEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1.1.2
+    hwAtkZoneSynFloodSynSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The threshold value of SYN packets speed.
+            when the speed of SYN packets to one host in this zone readch this value,
+            the firewall will startup TCP proxy.
+            "
+        ::= { hwAtkSynFloodZoneEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1.1.3
+    hwAtkZoneSynFloodHalfMax OBJECT-TYPE
+        SYNTAX Integer32 (0..10000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This is the maximum half connection for each host in the zone."
+        ::= { hwAtkSynFloodZoneEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1.1.4
+    hwAtkZoneSynFloodHalfAge OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The age of TCP half connection."
+        ::= { hwAtkSynFloodZoneEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1.1.5
+    hwAtkZoneSynFloodProxy OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            auto(1),
+            on(2),
+            off(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The switch of TCP proxy, this switch decides the action of proxy.
+            The switch has three status: auto, on, off.
+            "
+        DEFVAL { auto }
+        ::= { hwAtkSynFloodZoneEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.1.1.6
+    hwAtkZoneSynFloodStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The row status variable, current support CreateAndGo and Destroy.
+            "
+        ::= { hwAtkSynFloodZoneEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.2
+    hwAtkUdpFloodZoneTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtkUdpFloodZoneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            UDP Flood configuration table for a security zone. 
+            which consists of a sequence of hwAtckDfUdpFloodZoneEntry items.
+            "
+        ::= { hwAtkZoneMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.2.1
+    hwAtkUdpFloodZoneEntry OBJECT-TYPE
+        SYNTAX HwAtkUdpFloodZoneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            An entry in the hwAtckDfUdpFloodZoneTable containing the parameters
+            of UDP flood defence for all hosts behind a security zone.
+            this table is for firewall only.
+            "
+        INDEX { mplsVpnVrfName, hwAtkUdpFloodZoneID }
+        ::= { hwAtkUdpFloodZoneTable 1 }
+    
+    HwAtkUdpFloodZoneEntry ::=
+        SEQUENCE { 
+            hwAtkUdpFloodZoneID
+                Integer32,
+            hwAtkZoneUdpFloodSpeed
+                Integer32,
+            hwAtkZoneUdpFloodStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.2.1.1
+    hwAtkUdpFloodZoneID OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of security zone to be protected."
+        ::= { hwAtkUdpFloodZoneEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.2.1.2
+    hwAtkZoneUdpFloodSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The threshold value of UDP packets speed.
+            when the speed of UDP packets to one host in this zone reach this value,
+            the firewall will drops the subsequence UDP packets to this host.
+            "
+        ::= { hwAtkUdpFloodZoneEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.2.1.3
+    hwAtkZoneUdpFloodStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The row status variable, current support CreateAndGo and Destroy.
+            "
+        ::= { hwAtkUdpFloodZoneEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.3
+    hwAtkIcmpFloodZoneTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtkIcmpFloodZoneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            ICMP Flood configuration table for a security zone. 
+            which consists of a sequence of hwAtckDfIcmpFloodZoneEntry items.
+            "
+        ::= { hwAtkZoneMibObjects 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.3.1
+    hwAtkIcmpFloodZoneEntry OBJECT-TYPE
+        SYNTAX HwAtkIcmpFloodZoneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            An entry in the hwAtckDfIcmpFloodZoneTable containing the parameters
+            of ICMP flood defence for all hosts behind a security zone.
+            this table is for firewall only.
+            "
+        INDEX { mplsVpnVrfName, hwAtkIcmpFloodZoneID }
+        ::= { hwAtkIcmpFloodZoneTable 1 }
+    
+    HwAtkIcmpFloodZoneEntry ::=
+        SEQUENCE { 
+            hwAtkIcmpFloodZoneID
+                Integer32,
+            hwAtkZoneIcmpFloodSpeed
+                Integer32,
+            hwAtkZoneIcmpFloodStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.3.1.1
+    hwAtkIcmpFloodZoneID OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of security zone to be protected."
+        ::= { hwAtkIcmpFloodZoneEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.3.1.2
+    hwAtkZoneIcmpFloodSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The threshold value of ICMP packets speed.
+            when the speed of ICMP packets to one host in this zone reach this value,
+            the firewall will drops the subsequence ICMP packets to this host.
+            "
+        ::= { hwAtkIcmpFloodZoneEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.1.3.1.3
+    hwAtkZoneIcmpFloodStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The row status variable, current support CreateAndGo and Destroy.
+            "
+        ::= { hwAtkIcmpFloodZoneEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.2
+    hwAtkEudmConformance OBJECT IDENTIFIER ::= { hwATKEudm 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.2.1
+    hwAtkEudmCompliance OBJECT IDENTIFIER ::= { hwAtkEudmConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.2.2
+    hwAtkEudmMibGroups OBJECT IDENTIFIER ::= { hwAtkEudmConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.2.2.1
+    hwAtkEudmSynFloodGroup OBJECT-GROUP
+        OBJECTS { 
+            hwAtkZoneSynFloodSynSpeed, 
+            hwAtkZoneSynFloodHalfMax, 
+            hwAtkZoneSynFloodHalfAge, 
+            hwAtkZoneSynFloodProxy, 
+            hwAtkZoneSynFloodStatus
+            }
+        STATUS current
+        DESCRIPTION 
+            "
+            The MIB objects need for SYN flood defence"
+        ::= { hwAtkEudmMibGroups 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.2.2.2
+    hwAtkEudmUdpFloodGroup OBJECT-GROUP
+        OBJECTS { hwAtkZoneUdpFloodSpeed, hwAtkZoneUdpFloodStatus }
+        STATUS current
+        DESCRIPTION 
+            "
+            The MIB objects need for UDP flood defence
+            "
+        ::= { hwAtkEudmMibGroups 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.2.2.2.3
+    hwAtkEudmIcmpFloodGroup OBJECT-GROUP
+        OBJECTS { 
+            hwAtkZoneIcmpFloodSpeed, 
+            hwAtkZoneIcmpFloodStatus }
+        STATUS current
+        DESCRIPTION 
+            "
+            The MIB objects need for ICMP flood defence
+            "
+        ::= { hwAtkEudmMibGroups 3 }
+    
+END

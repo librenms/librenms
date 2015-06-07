@@ -1,0 +1,1796 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei DHCP Server MIB
+-- Reference:   HUAWEI Enterprise MIB
+-- Version:     V1.0
+-- History:
+--
+-- =================================================================
+
+HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDhcp            
+            FROM HUAWEI-MIB            
+        ifIndex            
+            FROM RFC1213-MIB            
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        RowStatus, MacAddress            
+            FROM SNMPv2-TC;
+
+
+    hwDHCPServerMib MODULE-IDENTITY 
+        LAST-UPDATED "200303010000Z"        -- March 01, 2003 at 00:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co., Ltd."
+        CONTACT-INFO 
+            " R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                       
+            E-mail:support@huawei.com "
+        DESCRIPTION 
+            "This MIB describes objects used for managing DHCP server,
+             including objects used for DHCP server global pool, 
+             interface pool and informations of ip address used and conflicted
+             in DHCP server, some Statistic informations about DHCP server"
+        REVISION "200302120000Z"        -- February 12, 2003 at 00:00 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hwDhcp 2 }
+    
+    --
+    -- Textual Conventions 
+    --
+
+    EnabledStatus ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION "To describe the status of some function is Enabled or 
+                    Disabled"
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(0)
+                }    
+
+    --
+    -- Node definitions
+    --
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1
+    hwDHCPServerMibObject OBJECT IDENTIFIER ::= { hwDHCPServerMib 1 }
+    
+    --  Part 1: For DHCP server global pool 
+    -- 
+    -- =================================================================
+    -- 1st Table of hwDHCPServerMibObject: hwDHCPSGlobalPoolTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.1
+    hwDHCPSGlobalPoolTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSGlobalPoolEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DHCP Server Global Pool table for creating 
+            and deleting DHCP server global pool"
+        ::= { hwDHCPServerMibObject 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.1.1
+    hwDHCPSGlobalPoolEntry OBJECT-TYPE
+        SYNTAX HwDHCPSGlobalPoolEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in DHCP Server Global Pool table 
+             containing objects for creating or
+            deleting a global pool for the DHCP server"
+        INDEX { hwDHCPSGlobalPoolName }
+        ::= { hwDHCPSGlobalPoolTable 1 }
+    
+    HwDHCPSGlobalPoolEntry ::=
+        SEQUENCE { 
+            hwDHCPSGlobalPoolName
+                OCTET STRING,
+            hwDHCPSGlobalPoolRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.1.1.1
+    hwDHCPSGlobalPoolName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..35))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DHCP server global pool name for creating or deleting
+            DHCP server global pool "
+        ::= { hwDHCPSGlobalPoolEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.1.1.2
+    hwDHCPSGlobalPoolRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+               "This object is used to create new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6).While the hwDHCPSGlobalPoolRowStatus 
+            object is in the `createAndGo(4),The DHCP server global pool to
+            be deleted must be exist"
+        ::= { hwDHCPSGlobalPoolEntry 2 }
+    
+    --  =================================================================
+    -- 2nd Table of hwDHCPServerMibObject: hwDHCPSGlobalPoolConfigTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2
+    hwDHCPSGlobalPoolConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSGlobalPoolConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table containing the configuration informations of DHCP 
+            server global pools, such as pool type, ip address, mask"
+        ::= { hwDHCPServerMibObject 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1
+    hwDHCPSGlobalPoolConfigEntry OBJECT-TYPE
+        SYNTAX HwDHCPSGlobalPoolConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry containing the objects for configuring
+            the network ip or host ip etc. to global pools for
+            DHCP server"
+        INDEX { hwDHCPSGlobalPoolName }
+        ::= { hwDHCPSGlobalPoolConfigTable 1 }
+    
+    HwDHCPSGlobalPoolConfigEntry ::=
+        SEQUENCE { 
+            hwDHCPSGlobalPoolType
+                INTEGER,
+            hwDHCPSGlobalPoolNetwork
+                IpAddress,
+            hwDHCPSGlobalPoolNetworkMask
+                IpAddress,
+            hwDHCPSGlobalPoolHostIPAddr
+                IpAddress,
+            hwDHCPSGlobalPoolHostMask
+                IpAddress,
+            hwDHCPSGlobalPoolHostHAddr
+                MacAddress,
+            hwDHCPSGlobalPoolConfigUndoFlag
+                INTEGER
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1.1
+    hwDHCPSGlobalPoolType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            null(0),
+            host(1),
+            network(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Type of a DHCP global pool. Any operations of
+            this object will be bound with the operations
+            of hwDHCPSGlobalPoolNetwork and
+            hwDHCPSGlobalPoolNetworkMask or with the 
+            operations of hwDHCPSGlobalPoolHostIPAddr,
+            hwDHCPSGlobalPoolMask and
+            hwDHCPSGlobalPoolHostHAddr. That means any
+            operation of this object alone will be regarded
+            as invalid operation.
+            The value means:
+            null(0)- It is a pool without ip address,
+            host(1)- It is a pool with manual allocation,
+            network(2)- It is a pool with automatic allocation"
+        ::= { hwDHCPSGlobalPoolConfigEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1.2
+    hwDHCPSGlobalPoolNetwork OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Network ip address of a DHCP Server global pool. 
+            To delete a configured network ip, please set
+            hwDHCPSGlobalPoolConfigUndoFlag to 1"
+        ::= { hwDHCPSGlobalPoolConfigEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1.3
+    hwDHCPSGlobalPoolNetworkMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Net mask of a DHCP Server global pool(network).
+            The SET operation to this object ought to be with
+            the SET of hwDHCPSGlobalPoolNetwork together, and
+            any SET operation alone to this object will be
+            regarded as an invalid operation.
+            When a network ip of a DHCP server global pool was 
+            deleted, the net mask would also be deleted
+            automatically, and no further operation needed"
+        ::= { hwDHCPSGlobalPoolConfigEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1.4
+    hwDHCPSGlobalPoolHostIPAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Host ip of a DHCP server global pool
+            To detete a configured Host ip, please set
+            hwDHCPSGlobalPoolConfigUndoFlag to 2"
+        ::= { hwDHCPSGlobalPoolConfigEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1.5
+    hwDHCPSGlobalPoolHostMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Host mask of a DHCP server global pool(host)
+            The SET operation to this object ought to be with
+            the SET of hwDHCPSGlobalPoolHostIPAddr together,
+            and any SET operation alone to this object will be
+            regarded as an invalid operation.
+            When a host ip of a DHCP server global pool was 
+            deleted, the Host mask would also be deleted
+            automatically, and no further operation needed"
+        ::= { hwDHCPSGlobalPoolConfigEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1.6
+    hwDHCPSGlobalPoolHostHAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Hardware address of a DHCP server global pool(host).
+            To delete a configured hardware address, please
+            set hwDHCPSGlobalPoolConfigUndoFlag to 3"
+        ::= { hwDHCPSGlobalPoolConfigEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.2.1.7
+    hwDHCPSGlobalPoolConfigUndoFlag OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            undonetworkip(1),
+            undohostip(2),
+            undohosthaddr(3),
+            invalid(4)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Flag of undo operation for
+            hwDHCPSGlobalPoolConfigTable
+            
+            Each value has the following meaning:
+            undonetworkip(1): The value identifies the flag to delete a configured network ip
+            undohostip(2): The value identifies the flag to delete a configured host ip
+            undohosthaddr(3):The value identifies the flag to delete a configured hardware address
+            invalid(4):The value is a default value,do nothing 
+            "
+        ::= { hwDHCPSGlobalPoolConfigEntry 7 }
+    
+    --  =================================================================
+    -- 3rd Table of hwDHCPServerMibObject: hwDHCPSGlobalPoolParaTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3
+    hwDHCPSGlobalPoolParaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSGlobalPoolParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring parameters to DHCP server global
+            pool, include lease, Domain name,GateWayIP,DNSIP and so on"
+        ::= { hwDHCPServerMibObject 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1
+    hwDHCPSGlobalPoolParaEntry OBJECT-TYPE
+        SYNTAX HwDHCPSGlobalPoolParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry containing the objects for the
+            configurations of parameters of DHCP server global pools"
+        INDEX { hwDHCPSGlobalPoolName }
+        ::= { hwDHCPSGlobalPoolParaTable 1 }
+    
+    HwDHCPSGlobalPoolParaEntry ::=
+        SEQUENCE { 
+            hwDHCPSGlobalPoolLeaseDay
+                INTEGER,
+            hwDHCPSGlobalPoolLeaseHour
+                INTEGER,
+            hwDHCPSGlobalPoolLeaseMinute
+                INTEGER,
+            hwDHCPSGlobalPoolLeaseUnlimited
+                INTEGER,
+            hwDHCPSGlobalPoolDomainName
+                OCTET STRING,
+            hwDHCPSGlobalPoolClientGatewayIPString
+                OCTET STRING,
+            hwDHCPSGlobalPoolClientGatewayIPUndo
+                IpAddress,
+            hwDHCPSGlobalPoolClientDNSIPString
+                OCTET STRING,
+            hwDHCPSGlobalPoolClientDNSIPUndo
+                IpAddress,
+            hwDHCPSGlobalPoolClientNetbiosType
+                INTEGER,
+            hwDHCPSGlobalPoolClientNbnsIPString
+                OCTET STRING,
+            hwDHCPSGlobalPoolClientNbnsIPUndo
+                IpAddress,
+            hwDHCPSGlobalPoolParaUndoFlag
+                INTEGER,
+            hwDHCPSGlobalPoolIPInUseReset
+                INTEGER
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.1
+    hwDHCPSGlobalPoolLeaseDay OBJECT-TYPE
+        SYNTAX INTEGER (0..365)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A value which indicates number of days of the lease,
+             The period over which a network address
+             is allocated to a client is referred to as a 'lease'."
+        DEFVAL { 1 }
+        ::= { hwDHCPSGlobalPoolParaEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.2
+    hwDHCPSGlobalPoolLeaseHour OBJECT-TYPE
+        SYNTAX INTEGER (0..23)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A value which indicates number of hours of the lease,
+            The period over which a network address
+            is allocated to a client is referred to as a 'lease'."
+        DEFVAL { 0 }
+        ::= { hwDHCPSGlobalPoolParaEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.3
+    hwDHCPSGlobalPoolLeaseMinute OBJECT-TYPE
+        SYNTAX INTEGER (0..59)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A value which indicates number of minutes of the lease,
+            The period over which a network address
+            is allocated to a client is referred to as a 'lease'."
+        DEFVAL { 0 }
+        ::= { hwDHCPSGlobalPoolParaEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.4
+    hwDHCPSGlobalPoolLeaseUnlimited OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            invalid(0),
+            unlimited(1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A flag denoting if the lease of a pool is
+            unlimited.
+            
+            The value means:
+            invalid(0)- The lease of the network address that clients be assigned is finite, 
+                        the period is decided by hwDHCPSGlobalPoolLeaseDay,hwDHCPSGlobalPoolLeaseHour and
+                        hwDHCPSGlobalPoolLeaseMinute
+                        
+            unlimited(1)-The lease of the network address that clients be assigned is infinite"
+        ::= { hwDHCPSGlobalPoolParaEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.5
+    hwDHCPSGlobalPoolDomainName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (3..50))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Domain name for DHCP Clients,
+            the domain name that client should use when
+            resolving hostnames via the Domain Name System."
+        ::= { hwDHCPSGlobalPoolParaEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.6
+    hwDHCPSGlobalPoolClientGatewayIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "String of gateway ip addresses for DHCP clients.
+            Since mostly 8 ip addresses can be configured for a pool
+            totally, a string is defined to get or configure 8 ip
+            addresses at a time"
+        ::= { hwDHCPSGlobalPoolParaEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.7
+    hwDHCPSGlobalPoolClientGatewayIPUndo OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A gateway ip address to be deleted. This object is
+                only for deleting a given ip address of gateway router"
+        ::= { hwDHCPSGlobalPoolParaEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.8
+    hwDHCPSGlobalPoolClientDNSIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "String of DNS server ip addresses for DHCP clients.
+            Since mostly 8 ip addresses can be configured for a pool
+            totally, a string is defined to get or configure 8
+            ip addresses at a time"
+        ::= { hwDHCPSGlobalPoolParaEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.9
+    hwDHCPSGlobalPoolClientDNSIPUndo OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A DNS server ip address to be deleted. This object
+                is only for deleting a given ip address of DNS server"
+        ::= { hwDHCPSGlobalPoolParaEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.10
+    hwDHCPSGlobalPoolClientNetbiosType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            null(0),
+            bnode(1),
+            pnode(2),
+            mnode(4),
+            hnode(8)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "NetBios node type for DHCP Clients
+            
+            Each value has the following meaning:
+            null(0)-  no type designated
+            bnode(1)- Broadcast ('B') nodes,Broadcast (or 'B') nodes communicate using a mix of UDP datagrams
+                      (both broadcast and directed) and TCP connections.
+            pnode(2)- Point-to-point ('P') nodes,Point-to-point (or 'P') nodes communicate using only directed UDP
+                      datagrams and TCP sessions. 
+            mnode(4)- Mixed mode ('M') nodes,Mixed mode nodes (or 'M') nodes are P nodes which have been given
+                      certain B node characteristics.
+            hnode(8)- Hybrid mode ('H') nodes.
+            "
+        DEFVAL { 0 }
+        ::= { hwDHCPSGlobalPoolParaEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.11
+    hwDHCPSGlobalPoolClientNbnsIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "String of NetBios server ip addresses for DHCP
+            clients. Since mostly 8 ip addresses can be configured for
+            a pool totally, so a string is defined to get or
+            configure 8 ip addresses at a time"
+        ::= { hwDHCPSGlobalPoolParaEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.12
+    hwDHCPSGlobalPoolClientNbnsIPUndo OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A NetBios server ip address to delete. This
+            object is only for deleting a given ip address of NetBios
+            server"
+        ::= { hwDHCPSGlobalPoolParaEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.13
+    hwDHCPSGlobalPoolParaUndoFlag OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            undoDomain(1),
+            undoLease(2),
+            undoGateway(3),
+            undoDns(4),
+            undoNbns(5),
+            undoNbType(6),
+            invalid(7)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Flag of undo-operation for
+            hwDHCPSGlobalPoolParaTable
+            
+            Each value has the following meaning:                
+            undoDomain(1)  - It means to delete Domain,
+            undoLease(2)   - It means to delete lease of a given ip address,
+            undoGateway(3) - It means to delete a given ip address of gateway router,
+            undoDns(4)     - It means to delete a given ip address of DNS server,
+            undoNbns(5)    - It means to deletd a given ip address of NetBios
+                             server,
+            undoNbType(6)  - It means to delete NetBios node type ,
+            invalid(7)     - The value is a default value,do nothing"
+        ::= { hwDHCPSGlobalPoolParaEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.14
+    hwDHCPSGlobalPoolIPInUseReset OBJECT-TYPE
+        SYNTAX INTEGER { reset(1),invalid(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset the auto binding ip of the given global
+                pool for DHCP server. The invalid(2) is a 
+                default vlaue, do nothing"
+        ::= { hwDHCPSGlobalPoolParaEntry 14 }
+    
+    --  =================================================================
+    -- 4th Table of hwDHCPServerMibObject: hwDHCPSGlobalPoolOptionTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4
+    hwDHCPSGlobalPoolOptionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSGlobalPoolOptionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring options to DHCP server global pools,
+            include option code type and value and so on "
+        ::= { hwDHCPServerMibObject 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4.1
+    hwDHCPSGlobalPoolOptionEntry OBJECT-TYPE
+        SYNTAX HwDHCPSGlobalPoolOptionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry containing the objects for configuring
+            options to DHCP global pools"
+        INDEX { hwDHCPSGlobalPoolName, hwDHCPSGlobalPoolOptionCode }
+        ::= { hwDHCPSGlobalPoolOptionTable 1 }
+    
+    HwDHCPSGlobalPoolOptionEntry ::=
+        SEQUENCE { 
+            hwDHCPSGlobalPoolOptionCode
+                INTEGER,
+            hwDHCPSGlobalPoolOptionType
+                INTEGER,
+            hwDHCPSGlobalPoolOptionAscii
+                OCTET STRING,
+            hwDHCPSGlobalPoolOptionHexString
+                OCTET STRING,
+            hwDHCPSGlobalPoolOptionIPString
+                OCTET STRING,
+            hwDHCPSGlobalPoolOptionRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.1
+    hwDHCPSGlobalPoolOptionCode OBJECT-TYPE
+        SYNTAX INTEGER (2..254)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Option code, All options begin with a tag octet, which uniquely
+              identifies the option."
+        ::= { hwDHCPSGlobalPoolOptionEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.2
+    hwDHCPSGlobalPoolOptionType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ascii(1),
+            hex(2),
+            ip(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object means option type in DHCP server global pool
+            
+            The value means :
+            ascii(1)- The option type is ascii string
+            hex(2)  - The option type is hex number
+            ip(3)   - The option type is ip address"
+        ::= { hwDHCPSGlobalPoolOptionEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.3
+    hwDHCPSGlobalPoolOptionAscii OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..63))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ascii string of a option"
+        ::= { hwDHCPSGlobalPoolOptionEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.4
+    hwDHCPSGlobalPoolOptionHexString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Hex string of a option. 1 to 10 2 bytes or 4 bytes
+            hex string can be configured at most simultaneously"
+        ::= { hwDHCPSGlobalPoolOptionEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.5
+    hwDHCPSGlobalPoolOptionIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ip string of a option. 1 to 8 ip addresses  can
+            be configured at most simultaneously"
+        ::= { hwDHCPSGlobalPoolOptionEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.6
+    hwDHCPSGlobalPoolOptionRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6).
+            while configuration new option, you must specify option type 
+            and value"
+        ::= { hwDHCPSGlobalPoolOptionEntry 6 }
+    
+    --  =================================================================
+    -- 5th Table of hwDHCPServerMibObject:hwDHCPSGlobalTreeTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.5
+    hwDHCPSGlobalTreeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSGlobalTreeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table containing the information of the tree of
+            DHCP global pools, and the relationship between the pools,"
+        ::= { hwDHCPServerMibObject 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.5.1
+    hwDHCPSGlobalTreeEntry OBJECT-TYPE
+        SYNTAX HwDHCPSGlobalTreeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry of objects containing the information
+            for displaying the tree of DHCP global pools"
+        INDEX { hwDHCPSGlobalPoolName }
+        ::= { hwDHCPSGlobalTreeTable 1 }
+    
+    HwDHCPSGlobalTreeEntry ::=
+        SEQUENCE { 
+            hwDHCPSGlobalTreeParentNodeName
+                OCTET STRING,
+            hwDHCPSGlobalTreeChildNodeName
+                OCTET STRING,
+            hwDHCPSGlobalTreePreSiblingNodeName
+                OCTET STRING,
+            hwDHCPSGlobalTreeSiblingNodeName
+                OCTET STRING
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.5.1.1
+    hwDHCPSGlobalTreeParentNodeName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..35))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Pool name of the parent node"
+        ::= { hwDHCPSGlobalTreeEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.5.1.2
+    hwDHCPSGlobalTreeChildNodeName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..35))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Pool name of the child node"
+        ::= { hwDHCPSGlobalTreeEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.5.1.3
+    hwDHCPSGlobalTreePreSiblingNodeName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..35))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Pool name of the presibling node"
+        ::= { hwDHCPSGlobalTreeEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.5.1.4
+    hwDHCPSGlobalTreeSiblingNodeName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..35))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Pool name of the sibling node"
+        ::= { hwDHCPSGlobalTreeEntry 4 }
+    
+    --  Part 2: For DHCP server interface pool
+    -- 
+    -- =================================================================
+    -- 6th Table of hwDHCPServerMibObject: hwDHCPSInterfacePoolParaTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6
+    hwDHCPSInterfacePoolParaTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSInterfacePoolParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring parameters to DHCP server interface
+            pools, include lease, Domain Name, DNS and so on"
+        ::= { hwDHCPServerMibObject 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1
+    hwDHCPSInterfacePoolParaEntry OBJECT-TYPE
+        SYNTAX HwDHCPSInterfacePoolParaEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry of objects for configuring parameters
+            to DHCP interface pools.
+            The index of this entry is the ifIndex of ethernet"
+        INDEX { ifIndex }
+        ::= { hwDHCPSInterfacePoolParaTable 1 }
+    
+    HwDHCPSInterfacePoolParaEntry ::=
+        SEQUENCE { 
+            hwDHCPSInterfacePoolLeaseDay
+                INTEGER,
+            hwDHCPSInterfacePoolLeaseHour
+                INTEGER,
+            hwDHCPSInterfacePoolLeaseMinute
+                INTEGER,
+            hwDHCPSInterfacePoolLeaseUnlimited
+                INTEGER,
+            hwDHCPSInterfacePoolDomainName
+                OCTET STRING,
+            hwDHCPSInterfacePoolClientDNSIPString
+                OCTET STRING,
+            hwDHCPSInterfacePoolClientDNSIPUndo
+                IpAddress,
+            hwDHCPSInterfacePoolClientNetbiosType
+                INTEGER,
+            hwDHCPSInterfacePoolClientNbnsIPString
+                OCTET STRING,
+            hwDHCPSInterfacePoolClientNbnsIPUndo
+                IpAddress,
+            hwDHCPSInterfacePoolParaUndoFlag
+                INTEGER,
+            hwDHCPSInterfacePoolIPInUseReset
+                INTEGER
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.1
+    hwDHCPSInterfacePoolLeaseDay OBJECT-TYPE
+        SYNTAX INTEGER (0..365)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A value which indicates number of days of the lease,
+             The period over which a network address
+             is allocated to a client is referred to as a 'lease'."
+        DEFVAL { 1 }
+        ::= { hwDHCPSInterfacePoolParaEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.2
+    hwDHCPSInterfacePoolLeaseHour OBJECT-TYPE
+        SYNTAX INTEGER (0..23)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A value which indicates number of hours of the lease,
+            The period over which a network address
+            is allocated to a client is referred to as a 'lease'."
+        DEFVAL { 0 }
+        ::= { hwDHCPSInterfacePoolParaEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.3
+    hwDHCPSInterfacePoolLeaseMinute OBJECT-TYPE
+        SYNTAX INTEGER (0..59)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A value which indicates number of minutes of the lease,
+            The period over which a network address
+            is allocated to a client is referred to as a 'lease'."
+        DEFVAL { 0 }
+        ::= { hwDHCPSInterfacePoolParaEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.4
+    hwDHCPSInterfacePoolLeaseUnlimited OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            invalid(0),
+            unlimited(1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A flag denoting if the lease of a pool is unlimited.
+            
+            The value means:
+            invalid(0)- The lease of the network address that clients be assigned is finite, 
+                        the period is decided by hwDHCPSGlobalPoolLeaseDay,hwDHCPSGlobalPoolLeaseHour and
+                        hwDHCPSGlobalPoolLeaseMinute
+                        
+            unlimited(1)-The lease of the network address that clients be assigned is infinite"
+        ::= { hwDHCPSInterfacePoolParaEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.5
+    hwDHCPSInterfacePoolDomainName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (3..50))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Domain name for DHCP Clients,
+            the domain name that client should use when
+            resolving hostnames via the Domain Name System."
+        ::= { hwDHCPSInterfacePoolParaEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.6
+    hwDHCPSInterfacePoolClientDNSIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "String of DNS server ip addresses for DHCP clients.
+            Since mostly 8 ip can be configured for a pool
+            totally, a string is defined to get or configure 8
+            ip at a time"
+        ::= { hwDHCPSInterfacePoolParaEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.7
+    hwDHCPSInterfacePoolClientDNSIPUndo OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A DNS server ip address to delete. This object
+                is only for deleting a given ip of DNS server"
+        ::= { hwDHCPSInterfacePoolParaEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.8
+    hwDHCPSInterfacePoolClientNetbiosType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            null(0),
+            bnode(1),
+            pnode(2),
+            mnode(4),
+            hnode(8)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "NetBios node type for DHCP Clients
+            
+            Each value has the following meaning:
+            null(0)-  no type designated
+            bnode(1)- Broadcast ('B') nodes,Broadcast (or 'B') nodes communicate
+                      using a mix of UDP datagrams (both broadcast and directed)
+                      and TCP connections.
+            pnode(2)- Point-to-point ('P') nodes,Point-to-point (or 'P') nodes 
+                      communicate using only directed UDP datagrams and TCP sessions. 
+            mnode(4)- Mixed mode ('M') nodes,Mixed mode nodes (or 'M') nodes are
+                      P nodes which have been given certain B node characteristics.
+            hnode(8)- Hybrid mode ('H') nodes.
+            "
+        DEFVAL { 8 }
+        ::= { hwDHCPSInterfacePoolParaEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.9
+    hwDHCPSInterfacePoolClientNbnsIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "String of NetBios server ip addresses for DHCP
+            clients. Since mostly 8 ip can be configured for
+            a pool totally, so a string is defined to get or
+            configure 8 ip at a time"
+        ::= { hwDHCPSInterfacePoolParaEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.10
+    hwDHCPSInterfacePoolClientNbnsIPUndo OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A NetBios server ip address to delete. This
+            object is only for deleting a given ip of NetBios
+            server"
+        ::= { hwDHCPSInterfacePoolParaEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.11
+    hwDHCPSInterfacePoolParaUndoFlag OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            undoDomain(1),
+            undoLease(2),
+            undoDns(4),
+            undoNbns(5),
+            undoNbType(6),
+            invalid(7)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Flag of undo-operation for
+            hwDHCPSInterfacePoolParaTable
+            
+            Each value has the following meaning:                
+            undoDomain(1)  - It means to delete Domain,
+            undoLease(2)   - It means to delete lease of a given ip address,
+            undoGateway(3) - It means to delete a given ip address of gateway router,
+            undoDns(4)     - It means to delete a given ip address of DNS server,
+            undoNbns(5)    - It means to deletd a given ip address of NetBios
+                             server,
+            undoNbType(6)  - It means to delete NetBios node type
+            invalid(7)     - The value is a default value,do nothing 
+            "
+        ::= { hwDHCPSInterfacePoolParaEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.12
+    hwDHCPSInterfacePoolIPInUseReset OBJECT-TYPE
+        SYNTAX INTEGER { reset(1),invalid(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset the auto or manual binding ip of the given interface
+                pool for DHCP server. The invalid(2) is a default 
+                vlaue, do nothing"
+        ::= { hwDHCPSInterfacePoolParaEntry 12 }
+    
+    --  =====================================================================
+    -- 7th Table of hwDHCPServerMibObject: hwDHCPSInterfacePoolOptionTable
+    -- =====================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7
+    hwDHCPSInterfacePoolOptionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSInterfacePoolOptionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring options to DHCP interface pools,
+            include option code type and value and so on"
+        ::= { hwDHCPServerMibObject 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7.1
+    hwDHCPSInterfacePoolOptionEntry OBJECT-TYPE
+        SYNTAX HwDHCPSInterfacePoolOptionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry fo objects for configuring options
+            to DHCP interface pools.
+            The index of this entry is the inIndex of ethernet"
+        INDEX { ifIndex, hwDHCPSInterfacePoolOptionCode }
+        ::= { hwDHCPSInterfacePoolOptionTable 1 }
+    
+    HwDHCPSInterfacePoolOptionEntry ::=
+        SEQUENCE { 
+            hwDHCPSInterfacePoolOptionCode
+                INTEGER,
+            hwDHCPSInterfacePoolOptionType
+                INTEGER,
+            hwDHCPSInterfacePoolOptionAscii
+                OCTET STRING,
+            hwDHCPSInterfacePoolOptionHexString
+                OCTET STRING,
+            hwDHCPSInterfacePoolOptionIPString
+                OCTET STRING,
+            hwDHCPSInterfacePoolOptionRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7.1.1
+    hwDHCPSInterfacePoolOptionCode OBJECT-TYPE
+        SYNTAX INTEGER (2..254)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Option Code,All options begin with a tag octet, which uniquely
+              identifies the option."
+        ::= { hwDHCPSInterfacePoolOptionEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7.1.2
+    hwDHCPSInterfacePoolOptionType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ascii(1),
+            hex(2),
+            ip(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object means option type in DHCP server interface pool
+            
+            The value means :
+            ascii(1)- The option type is ascii string
+            hex(2)  - The option type is hex number
+            ip(3)   - The option type is ip address
+            "
+        ::= { hwDHCPSInterfacePoolOptionEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7.1.3
+    hwDHCPSInterfacePoolOptionAscii OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..63))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ascii string of an option"
+        ::= { hwDHCPSInterfacePoolOptionEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7.1.4
+    hwDHCPSInterfacePoolOptionHexString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Hex string of a option. 1 to 10 2 bytes or 4 bytes
+            hex string can be configured at most simultaneously"
+        ::= { hwDHCPSInterfacePoolOptionEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7.1.5
+    hwDHCPSInterfacePoolOptionIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..129))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ip string of a option. 1 to 8 ip addresses  can
+            be configured at most simultaneously"
+        ::= { hwDHCPSInterfacePoolOptionEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.7.1.6
+    hwDHCPSInterfacePoolOptionRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6).
+            while configuration new option, you must specify option type 
+            and value"
+        ::= { hwDHCPSInterfacePoolOptionEntry 6 }
+    
+    --  =========================================================================
+    -- 8th Table of hwDHCPServerMibObject: hwDHCPSInterfacePoolStaticBindTable
+    -- =========================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.8
+    hwDHCPSInterfacePoolStaticBindTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSInterfacePoolStaticBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring static binding to DHCP
+            interface pools,which manual binding ip address and Hardware address"
+        ::= { hwDHCPServerMibObject 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.8.1
+    hwDHCPSInterfacePoolStaticBindEntry OBJECT-TYPE
+        SYNTAX HwDHCPSInterfacePoolStaticBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry of objects for configuring static
+            binding to DHCP interface pools.
+            The index of this entry is the inIndex of ethernet"
+        INDEX { ifIndex, hwDHCPSInterfacePoolStaticBindIP }
+        ::= { hwDHCPSInterfacePoolStaticBindTable 1 }
+    
+    HwDHCPSInterfacePoolStaticBindEntry ::=
+        SEQUENCE { 
+            hwDHCPSInterfacePoolStaticBindIP
+                IpAddress,
+            hwDHCPSInterfacePoolStaticBindMac
+                MacAddress,
+            hwDHCPSInterfacePoolStaticBindRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.8.1.1
+    hwDHCPSInterfacePoolStaticBindIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ip address in static binding for DHCP
+            interface pools"
+        ::= { hwDHCPSInterfacePoolStaticBindEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.8.1.2
+    hwDHCPSInterfacePoolStaticBindMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Hardware address in static binding for DHCP 
+            interface pools"
+        ::= { hwDHCPSInterfacePoolStaticBindEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.8.1.3
+    hwDHCPSInterfacePoolStaticBindRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6).
+            while configuration static binding, you must specify ip address
+            and hardware address
+            "
+        ::= { hwDHCPSInterfacePoolStaticBindEntry 3 }
+    
+    --  Part 3: For DHCP server
+    -- 
+    -- =================================================================
+    -- 9th Table of hwDHCPServerMibObject: hwDHCPSIPInUseTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9
+    hwDHCPSIPInUseTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSIPInUseEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for displaying the information of ip allocation to clients
+            for DHCP server pools"
+        ::= { hwDHCPServerMibObject 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1
+    hwDHCPSIPInUseEntry OBJECT-TYPE
+        SYNTAX HwDHCPSIPInUseEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry of objects for displaying information
+            of ip in use for DHCP server pools"
+        INDEX { hwDHCPSIPInUseHAddr }
+        ::= { hwDHCPSIPInUseTable 1 }
+    
+    HwDHCPSIPInUseEntry ::=
+        SEQUENCE { 
+            hwDHCPSIPInUseHAddr
+                MacAddress,
+            hwDHCPSIPInUseIP
+                IpAddress,
+            hwDHCPSIPInUseEndLease
+                OCTET STRING,
+            hwDHCPSIPInUseType
+                INTEGER,
+            hwDHCPSIPInUsePoolName
+                OCTET STRING,
+            hwDHCPSIPInUseInterface
+                INTEGER,
+            hwDHCPSIPInUseVlan
+                INTEGER,
+            hwDHCPSIPInUseAtmpvc
+                INTEGER
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.1
+    hwDHCPSIPInUseHAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The MAC addreess of host use the ip address in DHCP pools"
+        ::= { hwDHCPSIPInUseEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.2
+    hwDHCPSIPInUseIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ip address allocation to clients in DHCP pools"
+        ::= { hwDHCPSIPInUseEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.3
+    hwDHCPSIPInUseEndLease OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..20))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "End time of ip address leasese.
+            The structure of the OCTET STRING is
+            year/month/day:hour:munite:second --
+            YYYY/MM/DD:hh:mm:ss"
+        ::= { hwDHCPSIPInUseEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.4
+    hwDHCPSIPInUseType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            manual(1),
+            auto(2),
+            release(3),
+            offered(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Type of binding
+            
+            The value means
+                manual(1) - manual allocation
+                auto(2)   - automatic allocation
+                release(3)- The ip is automatic allocation,but it is already released            
+                offered(4)-The ip is offered to client          
+            "
+        ::= { hwDHCPSIPInUseEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.5
+    hwDHCPSIPInUsePoolName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..35))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Name of the DHCP server pool that allocated ip belongs to"
+        ::= { hwDHCPSIPInUseEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.6
+    hwDHCPSIPInUseInterface OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interface index information that ip address belong to"
+        ::= { hwDHCPSIPInUseEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.7
+    hwDHCPSIPInUseVlan OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Vlan informationg that ip address belong to"
+        ::= { hwDHCPSIPInUseEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.8
+    hwDHCPSIPInUseAtmpvc OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "ATM Pvc informationg that ip address belong to"
+        ::= { hwDHCPSIPInUseEntry 8 }
+    
+    --  =================================================================
+    -- 10th Table of hwDHCPServerMibObject: hwDHCPSForbiddenIPTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.10
+    hwDHCPSForbiddenIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSForbiddenIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring forbidden ip to DHCP server, which 
+            don't allow to allocate to clients"
+        ::= { hwDHCPServerMibObject 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.10.1
+    hwDHCPSForbiddenIPEntry OBJECT-TYPE
+        SYNTAX HwDHCPSForbiddenIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring forbidden ip to DHCP
+            server"
+        INDEX { hwDHCPSForbiddenIPStart, hwDHCPSForbiddenIPEnd }
+        ::= { hwDHCPSForbiddenIPTable 1 }
+    
+    HwDHCPSForbiddenIPEntry ::=
+        SEQUENCE { 
+            hwDHCPSForbiddenIPStart
+                IpAddress,
+            hwDHCPSForbiddenIPEnd
+                IpAddress,
+            hwDHCPSForbiddenIPRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.10.1.1
+    hwDHCPSForbiddenIPStart OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Start ip address of forbidden ip"
+        ::= { hwDHCPSForbiddenIPEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.10.1.2
+    hwDHCPSForbiddenIPEnd OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "End ip address of forbidden ip"
+        ::= { hwDHCPSForbiddenIPEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.10.1.3
+    hwDHCPSForbiddenIPRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6)
+            "
+        ::= { hwDHCPSForbiddenIPEntry 3 }
+    
+    --  =================================================================
+    -- 11th Table of hwDHCPServerMibObject: hwDHCPSConflictIPTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.11
+    hwDHCPSConflictIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSConflictIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            A table for displaying the information of conflict
+            ip for DHCP server,ip address is uesed by others 
+            when allocate the address.
+            "
+        ::= { hwDHCPServerMibObject 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.11.1
+    hwDHCPSConflictIPEntry OBJECT-TYPE
+        SYNTAX HwDHCPSConflictIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for displaying the information of
+            conflict ip for DHCP server"
+        INDEX { hwDHCPSConflictIP }
+        ::= { hwDHCPSConflictIPTable 1 }
+    
+    HwDHCPSConflictIPEntry ::=
+        SEQUENCE { 
+            hwDHCPSConflictIP
+                IpAddress,
+            hwDHCPSConflictIPType
+                INTEGER,
+            hwDHCPSConflictIPDetectTime
+                OCTET STRING
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.11.1.1
+    hwDHCPSConflictIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Conflict ip address"
+        ::= { hwDHCPSConflictIPEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.11.1.2
+    hwDHCPSConflictIPType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ping(1),
+            arp(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Type of the detection of conflict ip,
+             As a consistency check, the allocating
+             server SHOULD probe the reused address before allocating the address,
+             e.g., with ping or ARP"
+        ::= { hwDHCPSConflictIPEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.11.1.3
+    hwDHCPSConflictIPDetectTime OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (20))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Time when the confict is detected.
+            The structure of the OCTET STRING is
+            year/month/day:hour:munite:second --
+            YYYY/MM/DD:hh:mm:ss"
+        ::= { hwDHCPSConflictIPEntry 3 }
+    
+    --  Part 4: Non-table object
+    -- 
+    -- 1.3.6.1.4.1.2011.5.7.2.1.12
+    hwDHCPSServiceStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status of DHCP service, The default value is enabled, which
+            mean enable the DHCP service; the other value is disabled, which
+            mean disabled the DHCP service"
+        DEFVAL { enabled }
+        ::= { hwDHCPServerMibObject 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.13
+    hwDHCPSDetectingServerStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status of DHCP servers detecting function.
+             If the value is enabled, It will check whether have other DHCP Servers.
+             The default value is disabled"
+        DEFVAL { disabled }
+        ::= { hwDHCPServerMibObject 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.14
+    hwDHCPSPingNum OBJECT-TYPE
+        SYNTAX INTEGER (0..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of ping packets sent out when check address conflict"
+        DEFVAL { 2 }
+        ::= { hwDHCPServerMibObject 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.15
+    hwDHCPSPingTimeout OBJECT-TYPE
+        SYNTAX INTEGER (0..10000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The delay for the reply of a ping packet when check address conflict.
+            Unit: millisecond"
+        DEFVAL { 500 }
+        ::= { hwDHCPServerMibObject 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.16
+    hwDHCPSWriteDataStatus OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status of the function writing data to the
+            harddisk, It does not write data to the harddisk default,
+            The information that written are the content that hwDHCPSConflictIPTable and hwDHCPSIPInUseTable"
+        DEFVAL { disabled }
+        ::= { hwDHCPServerMibObject 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.17
+    hwDHCPSWriteDataDirection OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The directory of writing data to a harddisk, The format is
+             directory and file name"
+        ::= { hwDHCPServerMibObject 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.18
+    hwDHCPSWriteDataDelay OBJECT-TYPE
+        SYNTAX INTEGER (300..86400)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The allowable delay of writing data to the
+            harddisk. Unit: second"
+        DEFVAL { 300 }
+        ::= { hwDHCPServerMibObject 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.19
+    hwDHCPSWriteDataRecover OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The flag used to recover DHCP data with the data on
+            the harddisk,It means whether recover data from the data on
+            the harddisk when system startup.
+            The default value is disabled
+            "
+        ::= { hwDHCPServerMibObject 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.20
+    hwDHCPSIPInUseResetIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "An ip in use that will be cleared. 0 returned for SET
+            operation"
+        ::= { hwDHCPServerMibObject 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.21
+    hwDHCPSConflictIPResetIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "An conflict ip that will be cleared. 0 returned for
+            SET operation"
+        ::= { hwDHCPServerMibObject 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.22
+    hwDHCPSIPResetFlag OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ipInUse(1),
+            conflictIp(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A flag that descript the reset operation,
+            1 means deleting ip in use
+            2 means deleting conflict ip addresses"
+        ::= { hwDHCPServerMibObject 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.23
+    hwDHCPSGlobalPoolNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of DHCP server global pools"
+        ::= { hwDHCPServerMibObject 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.24
+    hwDHCPSGlobalPoolAutoBindingNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of auto binding ip in DHCP server"
+        ::= { hwDHCPServerMibObject 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.25
+    hwDHCPSGlobalPoolManualBindingNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of manual binding ip in DHCP server"
+        ::= { hwDHCPServerMibObject 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.26
+    hwDHCPSGlobalPoolExpiredBindingNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of expired binding ip in DHCP server"
+        ::= { hwDHCPServerMibObject 26 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.27
+    hwDHCPSInterfacePoolNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of DHCP server interface pools"
+        ::= { hwDHCPServerMibObject 27 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.28
+    hwDHCPSInterfacePoolAutoBindingNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of auto binding ip in DHCP server interface pools"
+        ::= { hwDHCPServerMibObject 28 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.29
+    hwDHCPSInterfacePoolManualBindingNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of manual binding ip in DHCP server interface pool"
+        ::= { hwDHCPServerMibObject 29 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.30
+    hwDHCPSInterfacePoolExpiredBindingNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of expired binding ip in DHCP server interface pool"
+        ::= { hwDHCPServerMibObject 30 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.31
+    hwDHCPSBadPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the bad packets received by DHCP server"
+        ::= { hwDHCPServerMibObject 31 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.32
+    hwDHCPSBootRequestPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the boot request packets recieved by DHCP
+            Server from DHCP clients"
+        ::= { hwDHCPServerMibObject 32 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.33
+    hwDHCPSDiscoverPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Discover packets 
+            received from the DHCP clients"
+        ::= { hwDHCPServerMibObject 33 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.34
+    hwDHCPSRequestPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Request packets 
+            received from the DHCP clients"
+        ::= { hwDHCPServerMibObject 34 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.35
+    hwDHCPSDeclinePktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Decline packets 
+            received from the DHCP clients"
+        ::= { hwDHCPServerMibObject 35 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.36
+    hwDHCPSReleasePktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Release packets 
+            received from the DHCP clients"
+        ::= { hwDHCPServerMibObject 36 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.37
+    hwDHCPSInformPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Inform packets 
+            received from the DHCP clients"
+        ::= { hwDHCPServerMibObject 37 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.38
+    hwDHCPSBootReplyPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the boot reply packets sent by DHCP server
+            to DHCP clients"
+        ::= { hwDHCPServerMibObject 38 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.39
+    hwDHCPSOfferPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Offer packets 
+            sent by the DHCP server"
+        ::= { hwDHCPServerMibObject 39 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.40
+    hwDHCPSAckPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Ack packets 
+            sent by the DHCP server"
+        ::= { hwDHCPServerMibObject 40 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.41
+    hwDHCPSNakPktNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of the DHCP Nak packets 
+            sent by the DHCP server"
+        ::= { hwDHCPServerMibObject 41 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.42
+    hwDHCPSStatisticsReset OBJECT-TYPE
+        SYNTAX INTEGER { invalid(0),
+                reset(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset the above statictics information of packets
+            received and sent by the DHCP server.
+            The value 1 means clear the statictics information"
+        ::= { hwDHCPServerMibObject 42 }
+    
+
+-- Reserved for H3C
+--    hwDHCPSIPInUseExTable OBJECT-TYPE
+--        SYNTAX SEQUENCE OF HwDHCPSIPInUseExEntry
+--        MAX-ACCESS not-accessible
+--        STATUS current
+--        DESCRIPTION
+--            "A table for displaying the information of ip in use
+--            for DHCP Server pools. "
+--        ::= { hwDHCPServerMibObject 43 }
+        
+        
+    --  Conformance information
+    -- 
+    -- 1.3.6.1.4.1.2011.5.7.2.2
+    hwDHCPServerMIBConformance OBJECT IDENTIFIER ::= { hwDHCPServerMib 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.2.1
+    hwDHCPServerMIBCompliances OBJECT IDENTIFIER ::= { hwDHCPServerMIBConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.2.2
+    hwDHCPServerMIBGroups OBJECT IDENTIFIER ::= { hwDHCPServerMIBConformance 2 }
+    
+    --  Units of conformance
+    -- 
+    -- 1.3.6.1.4.1.2011.5.7.2.2.2.1
+    hwDHCPServerMIBGroup OBJECT-GROUP
+        OBJECTS { hwDHCPSGlobalPoolName, hwDHCPSGlobalPoolRowStatus, hwDHCPSGlobalPoolType, hwDHCPSGlobalPoolNetwork, hwDHCPSGlobalPoolNetworkMask, 
+            hwDHCPSGlobalPoolHostIPAddr, hwDHCPSGlobalPoolHostMask, hwDHCPSGlobalPoolHostHAddr, hwDHCPSGlobalPoolConfigUndoFlag, hwDHCPSGlobalPoolLeaseDay, 
+            hwDHCPSGlobalPoolLeaseHour, hwDHCPSGlobalPoolLeaseMinute, hwDHCPSGlobalPoolLeaseUnlimited, hwDHCPSGlobalPoolDomainName, hwDHCPSGlobalPoolClientGatewayIPString, 
+            hwDHCPSGlobalPoolClientGatewayIPUndo, hwDHCPSGlobalPoolClientDNSIPString, hwDHCPSGlobalPoolClientDNSIPUndo, hwDHCPSGlobalPoolClientNetbiosType, hwDHCPSGlobalPoolClientNbnsIPString, 
+            hwDHCPSGlobalPoolClientNbnsIPUndo, hwDHCPSGlobalPoolParaUndoFlag, hwDHCPSGlobalPoolIPInUseReset, hwDHCPSGlobalPoolOptionCode, hwDHCPSGlobalPoolOptionType, 
+            hwDHCPSGlobalPoolOptionAscii, hwDHCPSGlobalPoolOptionHexString, hwDHCPSGlobalPoolOptionIPString, hwDHCPSGlobalPoolOptionRowStatus, hwDHCPSGlobalTreeParentNodeName, 
+            hwDHCPSGlobalTreeChildNodeName, hwDHCPSGlobalTreePreSiblingNodeName, hwDHCPSGlobalTreeSiblingNodeName, hwDHCPSInterfacePoolLeaseDay, hwDHCPSInterfacePoolLeaseHour, 
+            hwDHCPSInterfacePoolLeaseMinute, hwDHCPSInterfacePoolLeaseUnlimited, hwDHCPSInterfacePoolDomainName, hwDHCPSInterfacePoolClientDNSIPString, hwDHCPSInterfacePoolClientDNSIPUndo, 
+            hwDHCPSInterfacePoolClientNetbiosType, hwDHCPSInterfacePoolClientNbnsIPString, hwDHCPSInterfacePoolClientNbnsIPUndo, hwDHCPSInterfacePoolParaUndoFlag, hwDHCPSInterfacePoolIPInUseReset, 
+            hwDHCPSInterfacePoolOptionCode, hwDHCPSInterfacePoolOptionType, hwDHCPSInterfacePoolOptionAscii, hwDHCPSInterfacePoolOptionHexString, hwDHCPSInterfacePoolOptionIPString, 
+            hwDHCPSInterfacePoolOptionRowStatus, hwDHCPSInterfacePoolStaticBindIP, hwDHCPSInterfacePoolStaticBindMac, hwDHCPSInterfacePoolStaticBindRowStatus, hwDHCPSIPInUseHAddr, 
+            hwDHCPSIPInUseIP, hwDHCPSIPInUseEndLease, hwDHCPSIPInUseType, hwDHCPSIPInUsePoolName, hwDHCPSIPInUseInterface, 
+            hwDHCPSIPInUseVlan, hwDHCPSIPInUseAtmpvc, hwDHCPSForbiddenIPStart, hwDHCPSForbiddenIPEnd, hwDHCPSForbiddenIPRowStatus, 
+            hwDHCPSConflictIP, hwDHCPSConflictIPType, hwDHCPSConflictIPDetectTime, hwDHCPSServiceStatus, hwDHCPSDetectingServerStatus, 
+            hwDHCPSPingNum, hwDHCPSPingTimeout, hwDHCPSWriteDataStatus, hwDHCPSWriteDataDirection, hwDHCPSWriteDataDelay, 
+            hwDHCPSWriteDataRecover, hwDHCPSIPInUseResetIP, hwDHCPSConflictIPResetIP, hwDHCPSIPResetFlag, hwDHCPSGlobalPoolNumber, 
+            hwDHCPSGlobalPoolAutoBindingNum, hwDHCPSGlobalPoolManualBindingNum, hwDHCPSGlobalPoolExpiredBindingNum, hwDHCPSInterfacePoolNumber, hwDHCPSInterfacePoolAutoBindingNum, 
+            hwDHCPSInterfacePoolManualBindingNum, hwDHCPSInterfacePoolExpiredBindingNum, hwDHCPSBadPktNum, hwDHCPSBootRequestPktNum, hwDHCPSDiscoverPktNum, 
+            hwDHCPSRequestPktNum, hwDHCPSDeclinePktNum, hwDHCPSReleasePktNum, hwDHCPSInformPktNum, hwDHCPSBootReplyPktNum, 
+            hwDHCPSOfferPktNum, hwDHCPSAckPktNum, hwDHCPSNakPktNum, hwDHCPSStatisticsReset }
+        STATUS current
+        DESCRIPTION 
+            "The basic collection of objects providing management of
+            DHCP server."
+        ::= { hwDHCPServerMIBGroups 1 }
+    
+
+END

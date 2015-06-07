@@ -1,0 +1,347 @@
+FOUNDRY-SN-MRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32
+      FROM SNMPv2-SMI
+    InterfaceIndex
+      FROM IF-MIB
+    DisplayString
+      FROM SNMPv2-TC;
+
+snMetroRing MODULE-IDENTITY
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "Management Information Base module for metro ring
+              configuration and statistics.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
+    REVISION     "200705160000Z" -- May 16, 2007
+    DESCRIPTION
+            ""
+   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) foundry(1991) products(1) switch(1) snSwitch(3) 29 }
+
+snMetroRingGlobalObjects OBJECT IDENTIFIER ::= { snMetroRing 1 }
+snMetroRingTableObjects  OBJECT IDENTIFIER ::= { snMetroRing 2 }
+
+-- Metro Ring Global Scalar Object Section
+
+-- Metro Ring Table Object Section
+
+--
+-- Metro Ring Table
+--
+
+snMetroRingTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SnMetroRingEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Metro ring table."
+    ::= { snMetroRingTableObjects 1 }
+
+snMetroRingEntry OBJECT-TYPE
+    SYNTAX     SnMetroRingEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry of the metro ring table."
+    INDEX { snMetroRingVLanId, snMetroRingId }
+    ::= { snMetroRingTable 1 }
+
+SnMetroRingEntry ::= SEQUENCE {
+    snMetroRingVLanId              Integer32,
+    snMetroRingId                  Integer32,
+    snMetroRingConfigState         INTEGER,
+    snMetroRingRole                INTEGER,
+    snMetroRingHelloTime           Integer32,
+    snMetroRingPreforwardingTime   Integer32,
+    snMetroRingPort1               InterfaceIndex,
+    snMetroRingPort2               InterfaceIndex,
+    snMetroRingName                DisplayString,
+    snMetroRingRowStatus           INTEGER,
+    snMetroRingOperState           INTEGER,
+    snMetroRingTopoGroupId         Integer32,
+    snMetroRingRHPTransmitted      Counter32,
+    snMetroRingRHPReceived         Counter32,
+    snMetroRingStateChanged        Counter32,
+    snMetroRingTCRBPDUReceived     Counter32,
+    snMetroRingPriPort             InterfaceIndex,
+    snMetroRingSecPort             InterfaceIndex,
+    snMetroRingPriPortState        INTEGER,
+    snMetroRingSecPortState        INTEGER,
+    snMetroRingPriPortType         INTEGER,
+    snMetroRingSecPortType         INTEGER,
+    snMetroRingPriPortActivePort   InterfaceIndex,
+    snMetroRingSecPortActivePort   InterfaceIndex
+}
+
+snMetroRingVLanId OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Identifier of a VLAN that controls the metro ring."
+    ::= { snMetroRingEntry 1 }
+
+snMetroRingId OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Metro ring identifier."
+    ::= { snMetroRingEntry 2 }
+
+snMetroRingConfigState OBJECT-TYPE
+    SYNTAX     INTEGER { other(1), enabled(2), disabled(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Metro ring state."
+    ::= { snMetroRingEntry 3 }
+
+snMetroRingRole OBJECT-TYPE
+    SYNTAX     INTEGER { other(1), master(2), member(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Metro ring role.
+            other(1).........none of the cases in below.
+            master(2)........device which originates RHP packets.
+            member(3)........device which forwards RHP packets."
+    ::= { snMetroRingEntry 4 }
+
+snMetroRingHelloTime OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The time interval to periodically transmit ring health
+            protocol (RHP). Each unit is millisecond."
+    ::= { snMetroRingEntry 5 }
+
+snMetroRingPreforwardingTime OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The time interval of which a metro ring port is staying
+            in preforwarding state before changing to forwarding state.
+            Each unit is millisecond."
+    ::= { snMetroRingEntry 6 }
+
+snMetroRingPort1 OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of port 1 to configure into the metro ring."
+    ::= { snMetroRingEntry 7 }
+
+snMetroRingPort2 OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of port 2 to configure into the metro ring."
+    ::= { snMetroRingEntry 8 }
+
+snMetroRingName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The metro ring description."
+    ::= { snMetroRingEntry 9 }
+
+snMetroRingRowStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 other(1),
+                 valid(2),
+                 delete(3),
+                 create(4)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object is used to create and delete row in the
+            table and control if they are used. The values that
+            can be written are:
+            delete(3)...deletes the row
+            create(4)...creates a new row
+
+            If the row exists, then a SET with value of create(4)
+            returns error 'badValue'. Deleted rows go away immediately.
+            The following values can be returned on reads:
+            noSuchName...no such row
+            other(1).....some other cases
+            valid(2)....the row exists and is valid"
+    ::= { snMetroRingEntry 10 }
+
+snMetroRingOperState OBJECT-TYPE
+    SYNTAX     INTEGER { other(1), enabled(2), disabled(3) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Metro ring operational state."
+    ::= { snMetroRingEntry 11 }
+
+snMetroRingTopoGroupId OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Topology group ID that controls the metro ring."
+    ::= { snMetroRingEntry 12 }
+
+snMetroRingRHPTransmitted OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Ring health protocol (RHP) transmitted counter."
+    ::= { snMetroRingEntry 13 }
+
+snMetroRingRHPReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Ring health protocol (RHP) received counter."
+    ::= { snMetroRingEntry 14 }
+
+snMetroRingStateChanged OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Ring state changed counter."
+    ::= { snMetroRingEntry 15 }
+
+snMetroRingTCRBPDUReceived OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Topology change protocol received counter."
+    ::= { snMetroRingEntry 16 }
+
+snMetroRingPriPort OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of primary port."
+    ::= { snMetroRingEntry 17 }
+
+snMetroRingSecPort OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of secondary port."
+    ::= { snMetroRingEntry 18 }
+
+snMetroRingPriPortState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 other(1),
+                 preforwarding(2),
+                 forwarding(3),
+                 blocking(4),
+                 disabled(5)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Metro ring primary port state.
+            other(1)...........none of the cases in below.
+            preforwarding(2)...port transmits RHP packets,
+                               port does not transmit data packets.
+            forwarding(3)......port transmits RHP and data packets.
+            blocking(4)........port receives RHP packets,
+                               port does not receive data packets.
+            disabled(5)........port is disabled from metro ring."
+    ::= { snMetroRingEntry 19 }
+
+snMetroRingSecPortState OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 other(1),
+                 preforwarding(2),
+                 forwarding(3),
+                 blocking(4),
+                 disabled(5)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Metro ring secondary port state.
+            other(1)...........none of the cases in below.
+            preforwarding(2)...port transmits RHP packets,
+                               port does not transmit data packets.
+            forwarding(3)......port transmits RHP and data packets.
+            blocking(4)........port receives RHP packets,
+                               port does not receive data packets.
+            disabled(5)........port is disabled from metro ring."
+    ::= { snMetroRingEntry 20 }
+
+snMetroRingPriPortType OBJECT-TYPE
+    SYNTAX     INTEGER { other(1), regular(2), tunnel(3) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Metro ring primary port type.
+            other(1).....none of the cases in below.
+            regular(2)...port is configured to operate on a single ring.
+            tunnel(3)....port is configured to operate on multiple rings."
+    ::= { snMetroRingEntry 21 }
+
+snMetroRingSecPortType OBJECT-TYPE
+    SYNTAX     INTEGER { other(1), regular(2), tunnel(3) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Metro ring secondary port type.
+            other(1).....none of the cases in below.
+            regular(2)...port is configured to operate on a single ring.
+            tunnel(3)....port is configured to operate on multiple rings."
+    ::= { snMetroRingEntry 22 }
+
+snMetroRingPriPortActivePort OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of active primary port."
+    ::= { snMetroRingEntry 23 }
+
+snMetroRingSecPortActivePort OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of active secondary port."
+    ::= { snMetroRingEntry 24 }
+
+END
