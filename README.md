@@ -106,21 +106,14 @@ Actually Guzzle is used as HTTP client library
 
 ```php
 <?php
+$http = new \GuzzleHttp\Client();
 
 $options = new Options();
-$adapter = new HttpAdapter($options);
+$adapter = new HttpAdapter($http, $options);
 
 $client = new Client();
 $client->setAdapter($adapter);
 ```
-
-#### Supported types of exceptions
-
-* InfluxGeneralException
-* InfluxAuthorizationException (extends InfluxGeneralException)
-* InfluxBadResponseException (extends InfluxGeneralException)
-* InfluxNoSeriesException (extends InfluxGeneralException)
-* InfluxUnexpectedResponseException (extends InfluxGeneralException)
 
 ### Create your client with the factory method
 
@@ -130,13 +123,14 @@ reason you can you the factory method provided with the library.
 ```php
 $options = [
     "adapter" => [
-        "name" => "InfluxDB\\Adapter\\HttpAdapter",
+        "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
         "options" => [
             // guzzle options
         ],
     ],
     "options" => [
         "host" => "my.influx.domain.tld",
+        "db" => "mydb",
     ]
 ];
 $client = \InfluxDB\ClientFactory::create($options);
@@ -152,7 +146,7 @@ a valid client instance.
 You can query the time series database using the query method.
 
 ```php
-$influx->query("select * from mine");
+$influx->query('select * from "mine"');
 ```
 
 You can query the database only if the adapter is queryable (implements
@@ -163,29 +157,13 @@ like:
 
 ```
 array(1) {
-  [0] =>
-  class stdClass#1 (3) {
-    public $name =>
-    string(8) "tcp.test"
-    public $columns =>
-    array(3) {
-      [0] =>
-      string(4) "time"
-      [1] =>
-      string(15) "sequence_number"
-      [2] =>
-      string(4) "mark"
-    }
-    public $points =>
+  'results' =>
+  array(1) {
+    [0] =>
     array(1) {
-      [0] =>
-      array(3) {
-        [0] =>
-        int(1410545635590)
-        [1] =>
-        int(2390001)
-        [2] =>
-        string(7) "element"
+      'series' =>
+      array(1) {
+        ...
       }
     }
   }
