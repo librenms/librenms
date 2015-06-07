@@ -1,23 +1,22 @@
 language: php
 php:
-- 5.4
-- 5.5
-- 5.6
+  - 5.4
+  - 5.5
+  - 5.6
 before_install:
-- sudo apt-get update
-- sudo apt-get install libcurl4-openssl-dev libjson0-dev
-- wget http://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb
-- sudo useradd influxdb
-- sudo dpkg -i influxdb_latest_amd64.deb
-- sudo cp ./scripts/influxdb_conf.toml /opt/influxdb/shared/config.toml
-- travis_retry sudo service influxdb restart
-- sudo service influxdb status
+  - sudo apt-get update
+  - sudo apt-get install libcurl4-openssl-dev libjson0-dev
+  - wget http://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb
+  - sudo useradd influxdb
+  - sudo dpkg -i influxdb_latest_amd64.deb
+  - sudo cp ./scripts/influxdb_conf.toml /etc/opt/influxdb/influxdb.conf
+  - travis_retry sudo service influxdb restart
+  - sudo service influxdb status
 before_script:
-- composer selfupdate
-- composer install --prefer-source
+  - composer selfupdate
+  - composer install --prefer-source
 script:
-- vendor/bin/phpspec run -n
-- vendor/bin/phpunit
+  - vendor/bin/phpunit
 notifications:
   slack:
     secure: UN4V33CfLzEcb+5/LWcfcbwROZobbUawgFSiM3TzagBC+7w0DH2rK8DczxkUBs5rNAaYBj+DkxmmF9tiDb0BLB7Jezlq0vmrNBOhregLodOG44/bFwg58YOwTGxt/Iak38A+8VskGj0sSybNq4TB1/K0040wXS5bA+M/9NqyQeo=
