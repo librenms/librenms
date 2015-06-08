@@ -11,5 +11,5 @@ interface AdapterInterface
      * @param mixed $message
      * @param string|boolean $timePrecision
      */
-    public function send($message);
+    public function send(array $message);
 }
