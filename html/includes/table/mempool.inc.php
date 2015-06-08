@@ -12,9 +12,9 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`hostname` LIKE '%$searchPhrase%' OR `mempool_descr` LIKE '%$searchPhrase%')";
 }
 $count_sql = "SELECT COUNT(`mempool_id`) $sql";
-$total = dbFetchCell($count_sql,$param);
-if (empty($total)) {
-    $total = 0;
+$count = dbFetchCell($count_sql,$param);
+if (empty($count)) {
+    $count = 0;
 }
 if (!isset($sort) || empty($sort)) {
     $sort = '`D`.`hostname`, `M`.`mempool_descr`';
@@ -68,5 +68,5 @@ foreach (dbFetchRows($sql,$param) as $mempool) {
                                 'mempool_perc' => '');
         } # endif graphs
 }
-$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
+$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$count);
 echo _json_encode($output);
