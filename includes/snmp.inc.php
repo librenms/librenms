@@ -953,34 +953,104 @@ function snmp_translate($oid, $module, $mibdir = null)
     }
 
     d_echo("SNMP translated: $module::$oid -> $matches[1]::$matches[2]");
-    return $matches;
+    return array($matches[1], $matches[2]);
 }
 
 /*
- * Validate MIBs and set $device['mibs'][$name] = $module based on the results.
- * Can be slow due to use of snmptranslate - call only during discovery.
+ * check if the type of the oid is a numeric type, and if so,
+ * @return the name of RRD type that is best suited to saving it
  */
-function set_mibs($list, &$device)
+function oid_rrd_type($oid, $mibdefs) {
+    if (!isset($mibdefs[$oid])) {
+        return false;
+    }
+    switch ($mibdefs[$oid]['syntax']) {
+
+    case 'OCTET':
+    case 'IpAddress':
+        return false;
+
+    case 'TimeTicks':
+        // Need to find a way to flag that this should be parsed
+        //return 'COUNTER';
+        return false;
+
+    case 'Counter64':
+        return 'COUNTER:600:0:U';
+
+    case 'Unsigned32':
+        return 'GAUGE:600:U:U';
+
+    }
+    return false;
+}
+
+/*
+ * Shorten the RRD variable name to less than 19 characters
+ * Substitute for "mibval" if necessary.
+ */
+function rrd_shorten($name, $prefix)
 {
-    foreach ($list as $name => $module) {
-        $matches = snmp_translate($name, $module);
-        if ($matches) {
-            $device['mibs'][$matches[2]] = $matches[1];
+    if (strlen($name) > 19 && strpos($name, $prefix) == 0) {
+        $newname = str_replace($prefix, '', $name);
+        d_echo("Shortened $name to $newname");
+        $name = $newname;
+    }
+    if (strlen($name) > 19) {
+        d_echo("Shortened $name to mibval");
+        $name = "mibval";
+    }
+    return $name;
+}
+
+/*
+ * Save all of the measurable oids for the device in their own RRDs.
+ */
+function save_mibs($device, $mibname, $oids, $mibdefs)
+{
+    foreach ($oids as $index => $array) {
+        foreach ($array as $oid => $val) {
+            $type = oid_rrd_type($oid, $mibdefs);
+            if (!$type) {
+                continue;
+            }
+            rrd_create_update(
+                $device,
+                array($mibname, $oid, $index),
+                array("DS:".rrd_shorten($oid, $mibname).":$type"),
+                "N:$val"
+            );
         }
     }
 }
 
 /*
- * Validate the MIB given in sysObjectId against our MIB collection.  If none is found, do nothing.
- * If one is found, call set_mibs() for the given MIB name & module.
+ * Take a list of MIB name => module pairs.
+ * Validate MIBs and poll based on the results.
+ * Can be slow due to use of snmptranslate.
  */
-function set_os_mib(&$device)
+function poll_mibs($list, $device)
 {
-    $sysObjectId = trim(snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn"));
-    if ($sysObjectId === false || $sysObjectID === "") {
+    if (!is_dev_attrib_enabled($device, "poll_mib")) {
+        d_echo("MIB module disabled for ".$device['hostname']);
         return;
     }
-    set_mibs(array($sysObjectId => "all"), $device);
+    $mibdefs = array();
+    foreach ($list as $name => $module) {
+        d_echo("MIB searching: $module::$name");
+        $translated = snmp_translate($name, $module);
+        if ($translated) {
+            $mod = $translated[0];
+            $nam = $translated[1];
+            d_echo("MIB found: $mod::$nam");
+            $mibdefs[$nam] = snmp_mib_load($nam, $mod);
+            $oids = snmpwalk_cache_oid($device, "$mod::$nam", array(), $mod);
+            save_mibs($device, $nam, $oids, $mibdefs[$nam]);
+        }
+        else {
+            d_echo("MIB: no match for $module::$name");
+        }
+    }
 }
 
 ?>
