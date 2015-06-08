@@ -1182,6 +1182,14 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['icon']              = "pbn";
 
+// Enterasys 
+$os = "enterasys";
+$config['os'][$os]['text']              = "Enterasys";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['icon']              = "enterasys";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
