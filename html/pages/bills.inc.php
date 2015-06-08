@@ -271,7 +271,7 @@ for ($x=1;$x<32;$x++) {
              <td>$allowed</td>
              <td>$used</td>
              <td style=\"text-align: center;\">$overuse</td>
-             <td>".print_percentage_bar (250, 20, $perc, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>
+             <td>".print_percentage_bar (250, 20, $percent, NULL, "ffffff", $background['left'], $percent . "%", "ffffff", $background['right'])."</td>
              <td><a href='".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id'], 'view' => "edit"))."'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
