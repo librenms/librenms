@@ -20,9 +20,9 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $count_sql = "SELECT COUNT(`storage_id`) $sql";
 
-$total = dbFetchCell($count_sql,$param);
-if (empty($total)) {
-    $total = 0;
+$count = dbFetchCell($count_sql,$param);
+if (empty($count)) {
+    $count = 0;
 }
 
 if (!isset($sort) || empty($sort)) {
@@ -87,5 +87,5 @@ foreach (dbFetchRows($sql,$param) as $drive) {
         } # endif graphs
 }
 
-$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
+$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$count);
 echo _json_encode($output);
