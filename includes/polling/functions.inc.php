@@ -201,11 +201,11 @@ function poll_device($device, $options)
 
       foreach (dbFetch("SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?", array($device['device_id'])) as $graph)
       {
-        if (!isset($graphs[$graph["graph"]]))
+        if (isset($graphs[$graph["graph"]]))
         {
-          dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph["graph"]));
-        } else {
           $oldgraphs[$graph["graph"]] = TRUE;
+        } else {
+          dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph["graph"]));
         }
       }
 
