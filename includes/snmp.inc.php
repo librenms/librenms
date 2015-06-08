@@ -322,9 +322,9 @@ function snmp_cache_ifIndex($device)
   return $array;
 }
 
-function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
+function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL, $snmpflags = "-OQUs")
 {
-  $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
+  $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
   foreach (explode("\n", $data) as $entry)
   {
     list($oid,$value) = explode("=", $entry, 2);
@@ -345,20 +345,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 // to be the same.
 function snmpwalk_cache_oid_num($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 {
-  $data = snmp_walk($device, $oid, "-OQUn", $mib, $mibdir);
-
-  foreach (explode("\n", $data) as $entry)
-  {
-    list($oid,$value) = explode("=", $entry, 2);
-    $oid = trim($oid); $value = trim($value);
-    list($oid, $index) = explode(".", $oid, 2);
-    if (!strstr($value, "at this OID") && isset($oid) && isset($index))
-    {
-      $array[$index][$oid] = $value;
-    }
-  }
-
-  return $array;
+    return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = "-OQUn");
 }
 
 
