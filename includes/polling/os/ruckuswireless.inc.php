@@ -39,4 +39,10 @@ $ruckuscountry = first_oid_match($device, $ruckuscountries);
 if (isset($ruckuscountry) && $ruckuscountry != "") {
     $version .= " ($ruckuscountry)";
 }
+
+$ruckus_mibs = array(
+    "ruckusZDSystemStats" => "RUCKUS-ZD-SYSTEM-MIB",
+);
+poll_mibs($ruckus_mibs, $device);
+
 ?>

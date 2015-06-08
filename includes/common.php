@@ -453,6 +453,16 @@ function get_dev_attribs($device)
   return $attribs;
 }
 
+function is_dev_attrib_enabled($device, $attrib)
+{
+    foreach (get_dev_attribs($device) as $name => $val) {
+        if ($name == $attrib && $val == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function get_dev_entity_state($device)
 {
   $state = array();
