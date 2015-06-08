@@ -11,10 +11,8 @@ Polling:
     - walk that MIB on the device
     - store any numeric results in individual RRD files
     - update/add graph definitions in the database
-  - Individual OSes can add extra MIBs that should be there for a given
-    OS (includes/polling/os/*.inc.php).  The MIB poller will poll, 
-    store, and update graph definitions for them after attempting the
-    sysObjectID-based MIB poll.
+  - Individual OSes (includes/polling/os/*.inc.php) can poll extra MIBs
+    that should be there for a given OS by calling poll_mib().
   - Devices may be excluded from MIB polling by adding poll_mib = 0 to
     devices_attribs (see /device/device=ID/tab=edit/section=modules/)
 
