@@ -10,77 +10,46 @@ use InfluxDB\Options;
  *
  * @deprecated
  */
-class GuzzleAdapter implements AdapterInterface, QueryableInterface
+class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
 {
-    /**
-     * @var GuzzleHttp\Client
-     */
     private $httpClient;
 
-    /**
-     * @var \InfluxDB\Options
-     */
-    private $options;
-
-    /**
-     * @param Client $httpClient
-     * @param Options $options
-     */
     public function __construct(Client $httpClient, Options $options)
     {
+        parent::__construct($options);
+
         $this->httpClient = $httpClient;
-        $this->options = $options;
     }
 
-    /**
-     * @return Options
-     */
-    public function getOptions()
+    public function send(array $message)
     {
-        return $this->options;
-    }
+        $message = array_replace_recursive($this->getMessageDefaults(), $message);
 
-    /**
-     * {@inheritDoc}
-     */
-    public function send($message, $timePrecision = false)
-    {
         $httpMessage = [
-            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
+            "auth" => [$this->getOptions()->getUsername(), $this->getOptions()->getPassword()],
             "body" => json_encode($message)
         ];
 
-        if ($timePrecision) {
-            $httpMessage["query"]["time_precision"] = $timePrecision;
-        }
-
-        $endpoint = $this->options->getHttpSeriesEndpoint();
+        $endpoint = $this->getOptions()->getHttpSeriesEndpoint();
         return $this->httpClient->post($endpoint, $httpMessage);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function query($query, $timePrecision = false)
+    public function query($query)
     {
         $options = [
-            "auth" => [$this->options->getUsername(), $this->options->getPassword()],
+            "auth" => [$this->getOptions()->getUsername(), $this->getOptions()->getPassword()],
             'query' => [
                 "q" => $query,
                 "db" => $this->getOptions()->getDatabase(),
             ]
         ];
 
-        if ($timePrecision) {
-            $options["query"]["time_precision"] = $timePrecision;
-        }
-
         return $this->get($options);
     }
 
     private function get(array $httpMessage)
     {
-        $endpoint = $this->options->getHttpQueryEndpoint();
+        $endpoint = $this->getOptions()->getHttpQueryEndpoint();
         return $this->httpClient->get($endpoint, $httpMessage)->json();
     }
 }
