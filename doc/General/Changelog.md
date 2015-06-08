@@ -15,6 +15,7 @@
   - Issued alerts and transport now logged to eventlog (PR1194)
   - Added basic support for Enterasys devices (PR1211)
   - Added dynamic config to configure alerting (PR1153)
+  - Added basic support for Multimatic USV (PR1215)
 
 ### May 2015
 
