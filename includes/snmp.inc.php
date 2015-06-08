@@ -1005,6 +1005,7 @@ function rrd_shorten($name, $prefix)
 
 /*
  * Save all of the measurable oids for the device in their own RRDs.
+ * FIXME: Do we have to save the shortened name in order to get it back for graphing?
  */
 function save_mibs($device, $mibname, $oids, $mibdefs)
 {
@@ -1016,7 +1017,7 @@ function save_mibs($device, $mibname, $oids, $mibdefs)
             }
             rrd_create_update(
                 $device,
-                array($mibname, $oid, $index),
+                array($mibname, str_replace($mibname, '', $oid), $index),
                 array("DS:".rrd_shorten($oid, $mibname).":$type"),
                 "N:$val"
             );
