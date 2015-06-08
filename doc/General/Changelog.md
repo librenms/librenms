@@ -1,3 +1,22 @@
+### June 2015
+
+#### Bug fixes
+  - Fixed services list SQL issue (PR1181)
+  - Fixed negative values for storage when volume is > 2TB (PR1185)
+  - Fixed visual display for input fields on /syslog/ (PR1193)
+  - Fixed fatal php issue in shoutcast.php (PR1203)
+  - Fixed percent bars in /bills/ (PR1208)
+  - Fixed item count in memory and storage pages (PR1210)
+
+#### Improvements
+  - Updated Syslog docs to include syslog-ng 3.5.1 updates (PR1171)
+  - Added Pushover Transport (PR1180, PR1191)
+  - Converted processors and memory table to bootgrid (PR1188, PR1192)
+  - Issued alerts and transport now logged to eventlog (PR1194)
+  - Added basic support for Enterasys devices (PR1211)
+  - Added dynamic config to configure alerting (PR1153)
+  - Added basic support for Multimatic USV (PR1215)
+
 ### May 2015
 
 #### Bug fixes
@@ -31,6 +50,9 @@
   - Fixed ARP search graph type reference (PR1131)
   - Fixed showing state=X in device list (PR1144)
   - Removed ability for demo user to delete users (PR1151)
+  - Fixed user / port perms for top X front page boxes (PR1156)
+  - Fixed truncating UTF-8 strings (PR1166)
+  - Fixed attaching templates due to JS issue (PR1167)
 
 #### Improvements
   - Added loading bar to top nav (PR893)
@@ -105,6 +127,8 @@
   - Added config options for region and resolution on globe map (PR1137)
   - Addded RRDCached example docs (PR1148)
   - Updated support for additional NetBotz models (PR1152)
+  - Updated /iftype/ page to include speed/circuit/notes (PR1155)
+  - Added detection for PowerConnect 55XX devices (PR1165)
 
 ### Apr 2015
 
