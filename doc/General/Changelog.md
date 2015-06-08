@@ -69,7 +69,7 @@
   - Added disk temperature for Synology DSM (PR986)
   - Added ICMP, TLS/SSL and Domain expiry service checks (PR987, PR1040, PR1041)
   - Added IPMI detection (PR988)
-  - Miktrotik MIB update (PR991)
+  - Mikrotik MIB update (PR991)
   - Set better timeperiod for caching graphs (PR992)
   - Added config option to disable port relationship in ports list (PR996)
   - Added support for custom customer description parse (PR998)
