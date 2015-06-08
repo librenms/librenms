@@ -43,6 +43,6 @@ if (isset($ruckuscountry) && $ruckuscountry != "") {
 $ruckus_mibs = array(
     "ruckusZDSystemStats" => "RUCKUS-ZD-SYSTEM-MIB",
 );
-poll_mibs($ruckus_mibs, $device);
+poll_mibs($ruckus_mibs, $device, $graphs);
 
 ?>
