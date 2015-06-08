@@ -266,7 +266,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 
   global $config;
 
-  echo("This is mag_poll_mib_def Processing\n");
+  echo("This is poll_mib_def Processing\n");
   $mib      = NULL;
 
   if (stristr($mib_name_table, "UBNT")) {

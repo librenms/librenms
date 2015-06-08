@@ -112,7 +112,7 @@ $config['poller_modules']['cisco-asa-firewall']           = 1;
 
 `ospf`: OSPF Support.
 
-`cisco-ipsec-flow-monitor': IPSec statistics support.
+`cisco-ipsec-flow-monitor`: IPSec statistics support.
 
 `cisco-remote-access-monitor`: Cisco remote access support.
 
