@@ -226,8 +226,8 @@ foreach ($ports as $data)
       <div class="form-group">
         <label for="ignore">Ignored</label>
         <input type=checkbox id="ignore" name="ignore" value="1" class="" <?php if ($vars['ignore']) { echo("checked"); } ?> ></input>
-        <label for="disable">Disabled</label>
-        <input type=checkbox id="disable" name="disable" value=1 class="" <?php if ($vars['disable']) { echo("checked"); } ?> ></input>
+        <label for="disabled">Disabled</label>
+        <input type=checkbox id="disabled" name="disabled" value=1 class="" <?php if ($vars['disabled']) { echo("checked"); } ?> ></input>
         </label>
         <label for="deleted">Deleted</label>
         <input type=checkbox id="deleted" name="deleted" value=1 class="" <?php if ($vars['deleted']) { echo("checked"); } ?> ></input>
@@ -303,7 +303,7 @@ foreach ($vars as $var => $value)
           $where .= " AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0";
         }
         break;
-      case 'disable':
+      case 'disabled':
       case 'ifSpeed':
         if (is_numeric($value))
         {
