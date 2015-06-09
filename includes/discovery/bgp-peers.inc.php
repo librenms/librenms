@@ -37,6 +37,11 @@ if ($config['enable_bgp'])
           list($ver, $peer) = explode(".", $peer,2);
       }
       list($peer_ip, $peer_as) = explode(" ",  $peer);
+      if (strstr($peer_ip, ":")) {
+          $peer_ip_snmp = preg_replace("/:/", ' ', $peer_ip);
+          $peer_ip = preg_replace("/(\S+\s+\S+)\s/", '$1:', $peer_ip_snmp);
+          $peer_ip = str_replace('"','',str_replace(' ','',$peer_ip));
+      }
 
       if ($peer && $peer_ip != "0.0.0.0")
       {

@@ -23,7 +23,7 @@ if ($config['enable_bgp'])
         }
 
         if ($peer2 === TRUE) {
-            $bgp_peer_ident = ip_to_dec($peer['bgpPeerIdentifier']);
+            $bgp_peer_ident = ipv62snmp($peer['bgpPeerIdentifier']);
             if (strstr($peer['bgpPeerIdentifier'],":")) {
                 $ip_type = 2;
                 $ip_len = 16;
@@ -49,9 +49,11 @@ if ($config['enable_bgp'])
             foreach ($peer_data_tmp[$ident] as $k => $v) {
                 if (strstr($k, "cbgpPeer2LocalAddr")) {
                     if ($ip_ver == 'ipv6') {
-                        $v = preg_replace("/ /", ":", $v);
+                        $v = str_replace('"','',$v);
+                        $v = rtrim($v);
+                       echo "YEAH $v\n";
+                        $v = preg_replace("/(\S+\s+\S+)\s/", '$1:', $v);
                         $v = strtolower($v);
-                        rtrim($v,":");
                     } else {
                         $v = hex_to_ip($v);
                     }
@@ -66,6 +68,7 @@ if ($config['enable_bgp'])
             $peer_data = trim(`$peer_cmd`);
         }
       list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
+      $bgpLocalAddr = str_replace('"','',str_replace(' ','',$bgpLocalAddr));
     }
     else
     if ($device['os'] == "junos")
@@ -179,7 +182,7 @@ if ($config['enable_bgp'])
         if ($debug) { echo("$afi $safi\n"); }
 
         if ($device['os_group'] == "cisco") {
-            $bgp_peer_ident = ip_to_dec($peer['bgpPeerIdentifier']);
+            $bgp_peer_ident = ipv62snmp($peer['bgpPeerIdentifier']);
             if (strstr($peer['bgpPeerIdentifier'], ":")) {
                 $ip_type = 2;
                 $ip_len = 16;
