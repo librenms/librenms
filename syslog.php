@@ -16,10 +16,10 @@
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/definitions.inc.php");
-include("includes/syslog.php");
-include("includes/dbFacile.php");
-include("includes/common.php");
-include("includes/functions.php");
+include_once("includes/syslog.php");
+include_once("includes/dbFacile.php");
+include_once("includes/common.php");
+include_once("includes/functions.php");
 
 $i = "1";
 
