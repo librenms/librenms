@@ -39,6 +39,7 @@ foreach ($menu_options as $option => $text)
 
 $menu_options = array('bits'      => 'Bits',
                       'processor' => 'CPU',
+                      'ucd_load'  => 'Load',
                       'mempool'   => 'Memory',
                       'uptime'    => 'Uptime',
                       'storage'   => 'Storage',
@@ -89,7 +90,7 @@ print_optionbar_end();
 
 <?php
 
-list($format, $subformat) = explode("_", $vars['format']);
+list($format, $subformat) = explode("_", $vars['format'], 2);
 
 if($format == "graph")
 {
