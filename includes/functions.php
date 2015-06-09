@@ -1213,7 +1213,7 @@ function hex_to_ip($hex) {
         }
         $return = substr($return, 0, -1);
     } else {
-        $return = $return;
+        $return = $hex;
     }
     return $return;
 }
