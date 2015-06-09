@@ -126,6 +126,9 @@ if ($config['enable_bgp'])
             $safi = array_pop($afisafi_tmp);
             $afi = array_pop($afisafi_tmp);
             $bgp_ip = str_replace(".$afi.$safi", "", $k);
+            $bgp_ip = preg_replace("/:/"," ", $bgp_ip);
+            $bgp_ip = preg_replace("/(\S+\s+\S+)\s/", '$1:', $bgp_ip);
+            $bgp_ip = str_replace('"','',str_replace(' ','',$bgp_ip));
             if ($afi && $safi && $bgp_ip == $peer['ip'])
             {
               $af_list[$bgp_ip][$afi][$safi] = 1;
