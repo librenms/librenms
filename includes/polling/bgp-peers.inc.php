@@ -23,7 +23,11 @@ if ($config['enable_bgp'])
         }
 
         if ($peer2 === TRUE) {
-            $bgp_peer_ident = ipv62snmp($peer['bgpPeerIdentifier']);
+            if (strstr($peer['bgpPeerIdentifier'], ":")) {
+                $bgp_peer_ident = ipv62snmp($peer['bgpPeerIdentifier']);
+            } else {
+                $bgp_peer_ident = $peer['bgpPeerIdentifier'];
+            }
             if (strstr($peer['bgpPeerIdentifier'],":")) {
                 $ip_type = 2;
                 $ip_len = 16;
@@ -69,7 +73,6 @@ if ($config['enable_bgp'])
         }
       list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
       $bgpLocalAddr = str_replace('"','',str_replace(' ','',$bgpLocalAddr));
-      echo "NOW $bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr\n";
     }
     else
     if ($device['os'] == "junos")
@@ -216,8 +219,21 @@ if ($config['enable_bgp'])
                     " cbgpPeer2WithdrawnPrefixes." . $cgp_peer_identifier, "-OQUs", "CISCO-BGP4-MIB",$config['mibdir']);
                 $ident = "$ip_ver.\"".$peer['bgpPeerIdentifier'].'"'. '.' . $ip_type . '.' . $ip_cast;
                 unset($cbgp_data);
-                foreach ($cbgp_data_tmp[$ident] as $k => $v) {
+                $temp_keys = array_keys($cbgp_data_tmp);
+                unset($temp_data);
+                $temp_data['cbgpPeer2AcceptedPrefixes'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2AcceptedPrefixes'];
+                $temp_data['cbgpPeer2DeniedPrefixes'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2DeniedPrefixes'];
+                $temp_data['cbgpPeer2PrefixAdminLimit'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2PrefixAdminLimit'];
+                $temp_data['cbgpPeer2PrefixThreshold'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2PrefixThreshold'];
+                $temp_data['cbgpPeer2PrefixClearThreshold'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2PrefixClearThreshold'];
+                $temp_data['cbgpPeer2AdvertisedPrefixes'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2AdvertisedPrefixes'];
+                $temp_data['cbgpPeer2SuppressedPrefixes'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2SuppressedPrefixes'];
+                $temp_data['cbgpPeer2WithdrawnPrefixes'] = $cbgp_data_tmp[$temp_keys[0]]['cbgpPeer2WithdrawnPrefixes'];
+                foreach ($temp_data as $k => $v) {
                     $cbgp_data .= "$v\n";
+                }
+                if ($debug) {
+                    echo("$cbgp_data\n");
                 }
 
             } else {
