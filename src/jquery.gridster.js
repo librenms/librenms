@@ -3664,7 +3664,7 @@
 	 */
 	fn.get_responsive_col_width = function () {
 		var cols = this.cols || this.options.max_cols;
-		return (this.$el.width() - ((cols + 1) * this.options.widget_margins[0])) / cols;
+		return (this.$el[0].scrollWidth - ((cols + 1) * this.options.widget_margins[0])) / cols;
 	};
 
 	/**
