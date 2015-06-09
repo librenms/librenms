@@ -31,6 +31,10 @@ if (is_array($hrDevice_array))
       if ($device['os'] == "engenius" && empty($entry['hrDeviceDescr'])) { $descr = "Processor"; }
       // Workaround to set fake description for Ubiquiti EdgeOS who don't populate hrDeviceDescr
       if ($device['os'] == "edgeos" && empty($entry['hrDeviceDescr'])) { $descr = "Processor"; }
+      // Workaround to set fake description for Windows who use Unknown Processor Type
+      if ($device['os'] == "windows" && $entry['hrDeviceDescr'] == "Unknown Processor Type") {
+          $descr = "Processor";
+      }
 
       $descr = str_replace("CPU ", "", $descr);
       $descr = str_replace("(TM)", "", $descr);
