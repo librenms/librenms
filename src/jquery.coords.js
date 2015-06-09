@@ -59,8 +59,8 @@
 
         if (el && !update) {
             this.data = el.offset();
-            this.data.width = el.width();
-            this.data.height = el.height();
+            this.data.width = el[0].scrollWidth;
+            this.data.height = el[0].scrollHeight;
         }
 
         if (el && update && !not_update_offsets) {
@@ -124,7 +124,7 @@
             return this.data('coords');
         }
 
-        var ins = new Coords(this, arguments[0]);
+        var ins = new Coords(this);
         this.data('coords', ins);
         return ins;
     };
