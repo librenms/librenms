@@ -44,14 +44,14 @@ if ($config['enable_bgp'])
                 " cbgpPeer2FsmEstablishedTime." . $peer_identifier .
                 " cbgpPeer2InUpdateElapsedTime." . $peer_identifier .
                 " cbgpPeer2LocalAddr." . $peer_identifier, "-OQUs", "CISCO-BGP4-MIB",$config['mibdir']);
-            $ident = "$ip_ver.\"".$peer['bgpPeerIdentifier'].'"';
+            $ident = "$ip_ver.\"".$bgp_peer_ident.'"';
             unset($peer_data);
-            foreach ($peer_data_tmp[$ident] as $k => $v) {
+            $ident_key = array_keys($peer_data_tmp);
+            foreach ($peer_data_tmp[$ident_key[0]] as $k => $v) {
                 if (strstr($k, "cbgpPeer2LocalAddr")) {
                     if ($ip_ver == 'ipv6') {
                         $v = str_replace('"','',$v);
                         $v = rtrim($v);
-                       echo "YEAH $v\n";
                         $v = preg_replace("/(\S+\s+\S+)\s/", '$1:', $v);
                         $v = strtolower($v);
                     } else {
@@ -69,6 +69,7 @@ if ($config['enable_bgp'])
         }
       list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
       $bgpLocalAddr = str_replace('"','',str_replace(' ','',$bgpLocalAddr));
+      echo "NOW $bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr\n";
     }
     else
     if ($device['os'] == "junos")

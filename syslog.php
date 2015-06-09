@@ -28,6 +28,7 @@ while ($line = fgets($s))
 {
   #logfile($line);
   list($entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']) = explode("||", trim($line));
+  system("echo '$line' >> /tmp/syslog");
   process_syslog($entry, 1);
   unset($entry); unset($line);
   $i++;
