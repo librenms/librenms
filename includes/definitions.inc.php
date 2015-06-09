@@ -1,5 +1,71 @@
 <?php
 
+// Observium Includes
+include_once($config['install_dir'] . "/includes/dbFacile.php");
+
+// Connect to database
+$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (!$database_link)
+{
+        echo("<h2>MySQL Error</h2>");
+        echo(mysql_error());
+        die;
+}
+$database_db = mysql_select_db($config['db_name'], $database_link);
+
+function mergecnf($obj) {
+/* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
+/**
+ * Merge config function
+ * @author f0o <f0o@devilcode.org>
+ * @copyright 2015 f0o, LibreNMS
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Config
+ */
+
+  $pointer = array();
+  $val = $obj['config_value'];
+  $obj = $obj['config_name'];
+  $obj = explode('.',$obj,2);
+  if( !isset($obj[1]) ) {
+    if( filter_var($val,FILTER_VALIDATE_INT) ) {
+      $val = (int) $val;
+    } elseif( filter_var($val,FILTER_VALIDATE_FLOAT) ) {
+      $val = (float) $val;
+    } elseif( filter_var($val,FILTER_VALIDATE_BOOLEAN,FILTER_NULL_ON_FAILURE) !== NULL ) {
+      $val = filter_var($val,FILTER_VALIDATE_BOOLEAN);
+    }
+    if( !empty($obj[0]) ) {
+      return array($obj[0] => $val);
+    } else {
+      return array($val);
+    }
+  } else {
+    $pointer[$obj[0]] = mergecnf(array('config_name'=>$obj[1],'config_value'=>$val));
+  }
+  return $pointer;
+}
+
+$clone = $config;
+foreach( dbFetchRows('select config_name,config_value from config') as $obj ) {
+    $clone = array_replace_recursive($clone,mergecnf($obj));
+}
+$config = array_replace_recursive($clone,$config);
+
 /////////////////////////////////////////////////////////
 #    NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
 /////////////////////////////////////////////////////////
@@ -670,13 +736,6 @@ $config['os'][$os]['text']              = "D-Link Access Point";
 $config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['icon']              = "dlink";
 
-//$os = "ubiquitiap";
-//$config['os'][$os]['text']              = "Ubiquiti Networks Wireless";
-//$config['os'][$os]['type']              = "wireless";
-//$config['os'][$os]['icon']              = "ubiquiti";
-//$config['os'][$os]['over'][0]['graph']  = "device_bits";
-//$config['os'][$os]['over'][0]['text']   = "Device Traffic";
-
 $os = "axiscam";
 $config['os'][$os]['text']              = "AXIS Network Camera";
 $config['os'][$os]['icon']              = "axis";
@@ -1122,6 +1181,20 @@ $config['os'][$os]['ifXmcbc']           = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['icon']              = "pbn";
+
+// Enterasys 
+$os = "enterasys";
+$config['os'][$os]['text']              = "Enterasys";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['icon']              = "enterasys";
+
+// Multimatic UPS (Generex CS121 SNMP Adapter)
+$os = "multimatic";
+$config['os'][$os]['text']              = "Multimatic UPS";
+$config['os'][$os]['type']              = "power";
+$config['os'][$os]['icon']              = "multimatic";
 
 foreach ($config['os'] as $this_os => $blah)
 {
@@ -1749,17 +1822,7 @@ if (isset($_SERVER['HTTPS']))
   $config['base_url'] = preg_replace('/^http:/','https:', $config['base_url']);
 }
 
-// Connect to database
-$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
-if (!$database_link)
-{
-        echo("<h2>MySQL Error</h2>");
-        echo(mysql_error());
-        die;
-}
-$database_db = mysql_select_db($config['db_name'], $database_link);
-
-if ($config['memcached']['enable'])
+if ($config['memcached']['enable'] === TRUE)
 {
   if (class_exists("Memcached"))
   {

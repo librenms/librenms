@@ -247,11 +247,12 @@ function ExtTransports($obj) {
 	global $config;
 	$tmp = false; //To keep scrutinizer from naging because it doesnt understand eval
 	foreach( $config['alert']['transports'] as $transport=>$opts ) {
-		if( ($opts === true || !empty($opts)) && file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php") ) {
+		if( ($opts === true || !empty($opts)) && $opts != false && file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php") ) {
 			echo $transport." => ";
 			eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir']."/includes/alerts/transport.".$transport.".php").' };');
 			$tmp = $tmp($obj,$opts);
 			echo ($tmp ? "OK" : "ERROR")."; ";
+			log_event("Issued ".$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'",$obj['device_id']);
 		}
 	}
 }

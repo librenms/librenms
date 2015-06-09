@@ -62,10 +62,10 @@ var grid = $("#syslog").bootgrid({
                 "</select>"+
                 "</div>"+
                 "<div class=\"form-group\">"+
-                "<input name=\"from\" type=\"text\" class=\"form-control\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"<?php echo $vars['from']; ?>\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
+                "<input name=\"from\" type=\"text\" class=\"form-control input-sm\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"<?php echo $vars['from']; ?>\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
                 "</div>"+
                 "<div class=\"form-group\">"+
-                "<input name=\"to\" type=\"text\" class=\"form-control\" id=\"dtpickerto\" maxlength=\"16\" value=\"<?php echo $vars['to']; ?>\" placeholder=\"To\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
+                "<input name=\"to\" type=\"text\" class=\"form-control input-sm\" id=\"dtpickerto\" maxlength=\"16\" value=\"<?php echo $vars['to']; ?>\" placeholder=\"To\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
                 "</div>"+
                 "<button type=\"submit\" class=\"btn btn-default input-sm\">Filter</button>"+
                 "</form></span></div>"+

@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,11 +23,53 @@
  * @subpackage Page
  */
 
+?>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <span id="message"></span>
+        </div>
+    </div>
+</div>
+
+<?php
+
+if (isset($vars['sub'])) {
+
+    if (file_exists("pages/settings/".mres($vars['sub']).".inc.php")) {
+        require_once "pages/settings/".mres($vars['sub']).".inc.php";
+    } else {
+        print_error("This settings page doesn't exist, please go to the main settings page");
+    }
+
+} else {
+
+?>
+
+<div class="container-fluid">
+    <div class="row">
+<?php
+foreach (dbFetchRows("SELECT `config_group` FROM `config` GROUP BY `config_group`") as $sub_page) {
+    $sub_page = $sub_page['config_group'];
+?>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+            <a class="btn btn-primary" href="<?php echo(generate_url(array('page'=>'settings','sub'=>$sub_page))); ?>"><?php echo ucfirst($sub_page); ?> Settings</a>
+        </div>
+<?php
+}
+?>
+    </div>
+</div>
+<br />
+<?php
+
 /**
  * Array-To-Table
  * @param array $a N-Dimensional, Associative Array
  * @return string
  */
+
 function a2t($a) {
 	$r = "<table class='table table-condensed table-hover'><tbody>";
 	foreach( $a as $k=>$v ) {
@@ -37,10 +80,21 @@ function a2t($a) {
 	$r .= '</tbody></table>';
 	return $r;
 }
-
 if( $_SESSION['userlevel'] >= 10 ) {
 	echo "<div class='table-responsive'>".a2t($config)."</div>";
 } else {
 	include("includes/error-no-perm.inc.php");
+}
+
+    if ($_SESSION['userlevel'] >= '10') {
+
+        if ($debug) {
+            echo("<pre>");
+            print_r($config);
+            echo("</pre>");
+        }
+    } else {
+        include("includes/error-no-perm.inc.php");
+    }
 }
 ?>
