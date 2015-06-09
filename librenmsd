@@ -45,6 +45,7 @@ $BASEDIR="/opt/librenms";
 
 declare(ticks=1);
 pcntl_signal(SIGCHLD, 'cleanup');
+register_shutdown_function('catchFatal');
 chdir($BASEDIR);
 
 // Load config
@@ -268,6 +269,16 @@ function spawn($job) {
 		$jobs[$pid] = $job;
 		logger("'".$job."' / '".$pid."' - Spawned",LOG_INFO,'jobctl');
 		return $pid;
+	}
+}
+
+/**
+*/
+function catchFatal() {
+	$last_error = error_get_last();
+	if ($last_error['type'] == 1) {
+		$log_error = array($last_error['type'],$last_error['message'],$last_error['file'],$last_error['line']);
+		logger($last_error['file'].'#'.$last_error['line'].': '.$last_error['message'],LOG_EMERG,'main');
 	}
 }
 
