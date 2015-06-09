@@ -1,0 +1,96 @@
+#!/bin/bash
+# Copyright (C) 2015 Daniel Preussker <f0o@librenms.org>
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# This is a munin-plugin to be used with the unix-agent on a host that
+# is running the LibreNMS daemon to gather statistics about it.
+#
+# Symlink librenmsd_ to your active munin-plugins directory with the
+# following names:
+#  librenms_mem       Gather VSZ and RSS statistics
+#  librenms_cpu       Gather CPU-Time statistics
+#  librenms_uptime    Gather Uptime statistics
+#
+
+INSTALLDIR="/opt/librenms"
+
+self=$(basename $0)
+pid=$(cat $INSTALLDIR/librenmsd.pid);
+if [ ! -d /proc/$pid ]; then
+	exit 128
+fi
+
+if [ "$self" = "librenmsd_mem" ]; then
+
+	if [ "$1" = "config" ]; then
+		echo 'graph_title Memory Usage'
+		echo 'graph_vlabel Kilobytes'
+		echo 'graph_scale no'
+		echo 'graph_category librenmsd'
+		echo 'graph_info This graph shows the amount of memory used by the LibreNMS Daemon'
+		echo 'vsz.label Virtual Memory'
+		echo 'rss.label Resident Memory'
+		exit 0
+	fi
+
+	echo -n "vsz.value "
+	awk '/VmSize:/{ print $2 }' /proc/$pid/status
+	echo -n "rss.value "
+	awk '/VmRSS:/{ print $2 }' /proc/$pid/status
+
+elif [ "$self" = "librenmsd_cpu" ]; then
+
+	if [ "$1" = "config" ]; then
+		echo 'graph_title CPU-Time'
+		echo 'graph_vlabel CPU-Time'
+		echo 'graph_scale no'
+		echo 'graph_category librenmsd'
+		echo 'graph_info This graph shows the amount of cputime used by the LibreNMS Daemon'
+		echo 'total.label Total CPU-Time'
+		echo 'total.type DERIVE'
+		echo 'utime.label User-Time'
+		echo 'utime.type DERIVE'
+		echo 'stime.label System-Time'
+		echo 'stime.type DERIVE'
+		echo 'cutime.label ChildUser-Time'
+		echo 'cutime.type DERIVE'
+		echo 'cstime.label ChildSystem-Time'
+		echo 'cstime.type DERIVE'
+		exit 0
+	fi
+	total=0
+	for x in $(cut -d ' ' -f 14-17 /proc/$pid/stat); do
+		total=$((total+x))
+	done;
+	echo 'total.value '$total
+	awk '{ print "utime.value " $14 "\r\nstime.value " $15 "\r\ncutime.value " $16 "\r\ncstime.value " $17 }' /proc/$pid/stat
+
+elif [ "$self" = "librenmsd_uptime" ]; then
+
+	if [ "$1" = "config" ]; then
+		echo 'graph_title Uptime'
+		echo 'graph_vlabel Seconds'
+		echo 'graph_scale no'
+		echo 'graph_category librenmsd'
+		echo 'graph_info This graph shows the uptime of the LibreNMS Daemon'
+		echo 'val.label Uptime'
+		exit 0
+	fi
+
+	echo 'val.value '$(( $(cut -d . -f 1 /proc/uptime) - ($(cut -d ' ' -f 22 /proc/$pid/stat)/$(getconf CLK_TCK)) ))
+
+else
+	exit 128
+fi
