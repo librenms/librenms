@@ -1,56 +1,37 @@
 <?php
-
-$graph_type = "storage_usage";
-
+$graph_type = "processor_usage";
 $where = 1;
-
-$sql = " FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id`";
-
+$sql = " FROM `processors` AS `P` LEFT JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id`";
 if (is_admin() === FALSE && is_read() === FALSE) {
-    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `S`.`device_id` = `DP`.`device_id`";
+    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `P`.`device_id` = `DP`.`device_id`";
     $where .= " AND `DP`.`user_id`=?";
     $param[] = $_SESSION['user_id'];
 }
-
 $sql .= " WHERE $where";
-
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`hostname` LIKE '%$searchPhrase%' OR `storage_descr` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`hostname` LIKE '%$searchPhrase%' OR `processor_descr` LIKE '%$searchPhrase%')";
 }
-
-$count_sql = "SELECT COUNT(`storage_id`) $sql";
-
-$count = dbFetchCell($count_sql,$param);
-if (empty($count)) {
-    $count = 0;
+$count_sql = "SELECT COUNT(`processor_id`) $sql";
+$total = dbFetchCell($count_sql,$param);
+if (empty($total)) {
+    $total = 0;
 }
-
 if (!isset($sort) || empty($sort)) {
-    $sort = '`D`.`hostname`, `S`.`storage_descr`';
+    $sort = '`D`.`hostname`, `P`.`processor_descr`';
 }
-
 $sql .= " ORDER BY $sort";
-
 if (isset($current)) {
     $limit_low = ($current * $rowCount) - ($rowCount);
     $limit_high = $rowCount;
 }
-
 if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
-
 $sql = "SELECT * $sql";
-
-foreach (dbFetchRows($sql,$param) as $drive) {
-
-        $perc  = round($drive['storage_perc'], 0);
-        $total = formatStorage($drive['storage_size']);
-        $free = formatStorage($drive['storage_free']);
-        $used = formatStorage($drive['storage_used']);
-
+foreach (dbFetchRows($sql,$param) as $processor) {
+        $perc                       = round($processor['processor_usage'], 0);
         $graph_array['type']        = $graph_type;
-        $graph_array['id']          = $drive['storage_id'];
+        $graph_array['id']          = $processor['processor_id'];
         $graph_array['from']        = $config['time']['day'];
         $graph_array['to']          = $config['time']['now'];
         $graph_array['height']      = "20";
@@ -61,31 +42,26 @@ foreach (dbFetchRows($sql,$param) as $drive) {
         $link = "graphs/id=" . $graph_array['id'] . "/type=" . $graph_array['type'] . "/from=" . $graph_array['from'] . "/to=" . $graph_array['to'] . "/";
         $mini_graph = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
         $background = get_percentage_colours($perc);
-        $bar_link = overlib_link($link, print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $background['left'], $free, "ffffff", $background['right']), generate_graph_tag($graph_array_zoom), NULL);
+        $bar_link = overlib_link($link, print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $background['left'], (100 - $perc)."%" , "ffffff", $background['right']), generate_graph_tag($graph_array_zoom), NULL);
 
-        $response[] = array('hostname' => generate_device_link($drive),
-                            'storage_descr' => $drive['storage_descr'],
+        $response[] = array('hostname' => generate_device_link($processor),
+                            'processor_descr' => $processor['processor_descr'],
                             'graph' => $mini_graph,
-                            'storage_used' => $bar_link,
-                            'storage_perc' => $perc . "%");
+                            'processor_usage' => $bar_link);
         if ($_POST['view'] == "graphs") {
             $graph_array['height'] = "100";
             $graph_array['width']  = "216";
             $graph_array['to']     = $config['time']['now'];
-            $graph_array['id']     = $drive['storage_id'];
+            $graph_array['id']     = $processor['processor_id'];
             $graph_array['type']   = $graph_type;
-
             $return_data = true;
             include("includes/print-graphrow.inc.php");
             unset($return_data);
             $response[] = array('hostname' => $graph_data[0],
-                                'storage_descr' => $graph_data[1],
+                                'processor_descr' => $graph_data[1],
                                 'graph' => $graph_data[2],
-                                'storage_used' => $graph_data[3],
-                                'storage_perc' => '');
-
+                                'processor_usage' => $graph_data[3]);
         } # endif graphs
 }
-
-$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$count);
+$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
 echo _json_encode($output);

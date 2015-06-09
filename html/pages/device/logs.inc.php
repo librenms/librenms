@@ -6,17 +6,25 @@ print_optionbar_start();
 
 echo("<strong>Logging</strong>  &#187; ");
 
-if ($vars['section'] == "eventlog")
-{ echo('<span class="pagemenu-selected">'); }
+if ($vars['section'] == "eventlog") {
+    echo('<span class="pagemenu-selected">');
+}
 echo(generate_link("Event Log" , $vars, array('section'=>'eventlog')));
-if ($vars['section'] == "eventlog") { echo("</span>"); }
+if ($vars['section'] == "eventlog") {
+   echo("</span>");
+}
 
-echo(" | ");
+if (isset($config['enable_syslog']) && $config['enable_syslog'] == 1) {
+    echo(" | ");
 
-if ($vars['section'] == "syslog")
-{ echo('<span class="pagemenu-selected">'); }
-echo(generate_link("Syslog" , $vars, array('section'=>'syslog')));
-if ($vars['section'] == "syslog") { echo("</span>"); }
+    if ($vars['section'] == "syslog") {
+        echo('<span class="pagemenu-selected">');
+    }
+    echo(generate_link("Syslog" , $vars, array('section'=>'syslog')));
+    if ($vars['section'] == "syslog") {
+        echo("</span>");
+    }
+}
 
 switch ($vars['section'])
 {

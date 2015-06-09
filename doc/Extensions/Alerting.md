@@ -139,6 +139,8 @@ $config['alert']['admins']  = true; //Include Adminstrators into alert-contacts
 
 ## <a name="transports-email">E-Mail</a>
 
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
 E-Mail transport is enabled with adding the following to your `config.php`:  
 ```php
 $config['alert']['transports']['mail'] = true;
@@ -165,6 +167,8 @@ $config['alert']['default_mail']           = '';                   //Default ema
 
 ## <a name="transports-api">API</a>
 
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
 API transports definitions are a bit more complex than the E-Mail configuration.  
 The basis for configuration is `$config['alert']['transports']['api'][METHOD]` where `METHOD` can be `get`,`post` or `put`.  
 This basis has to contain an array with URLs of each API to call.  
@@ -180,6 +184,8 @@ $config['alert']['transports']['api']['get'][] = "https://api.thirdparti.es/issu
 
 ## <a name="transports-nagios">Nagios Compatible</a>
 
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
 The nagios transport will feed a FIFO at the defined location with the same format that nagios would.  
 This allows you to use other Alerting-Systems to work with LibreNMS, for example [Flapjack](http://flapjack.io).
 ```php
@@ -188,6 +194,8 @@ $config['alert']['transports']['nagios'] = "/path/to/my.fifo"; //Flapjack expect
 
 ## <a name="transports-irc">IRC</a>
 
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
+
 The IRC transports only works together with the LibreNMS IRC-Bot.  
 Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/librenms/librenms/blob/master/doc/Extensions/IRC-Bot.md).  
 ```php
@@ -195,6 +203,8 @@ $config['alert']['transports']['irc'] = true;
 ```
 
 ## <a name="transports-slack">Slack</a>
+
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 The Slack transport will POST the alert message to your Slack Incoming WebHook, you are able to specify multiple webhooks along with the relevant options to go with it. All options are optional, the only required value is for url, without this then no call to Slack will be made. Below is an example of how to send alerts to two channels with different customised options:
 
@@ -206,6 +216,8 @@ $config['alert']['transports']['slack'][] = array('url' => "https://hooks.slack.
 ```
 
 ## <a name="transports-hipchat">HipChat</a>
+
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 The HipChat transport requires the following:
 
@@ -251,6 +263,8 @@ $config['alert']['transports']['hipchat'][] = array("url" => "https://api.hipcha
 > `>`).
 
 ## <a name="transports-pagerduty">PagerDuty</a>
+
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 Enabling PagerDuty transports is almost as easy as enabling email-transports.
 

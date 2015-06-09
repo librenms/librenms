@@ -24,7 +24,7 @@ $pagetitle[] = "Alert Log";
             <th data-column-id="time_logged" data-order="desc">Time logged</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
-            <th data-column-id="alert">alert</th>
+            <th data-column-id="alert">Alert</th>
             <th data-column-id="status" data-sortable="false">Status</th>
         </tr>
     </thead>
