@@ -1202,20 +1202,6 @@ function first_oid_match($device, $list) {
     }
 }
 
-function ip_to_dec($ip) {
-    $return = '';
-    if (strstr($ip, ":")) {
-        $ipv6 = explode(':', $ip);
-        foreach ($ipv6 as $item) {
-            $return .= hexdec($item).'.';
-        }
-        $return = substr($return, 0, -1);
-    } else {
-        $return = $ip;
-    }
-    return $return;
-}
-
 function hex_to_ip($hex) {
     $return = "";
     if (filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === FALSE && filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === FALSE) {
