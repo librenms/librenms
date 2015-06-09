@@ -240,4 +240,3 @@ if ($config['enable_bgp'])
   echo("\n");
 }
 
-?>

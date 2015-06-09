@@ -334,4 +334,3 @@ if ($config['enable_bgp'])
   } // End While loop on peers
 } // End check for BGP support
 
-?>

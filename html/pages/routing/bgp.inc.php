@@ -258,4 +258,3 @@ else
   echo("</table>");
 }
 
-?>
