@@ -51,7 +51,7 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @group factory
      * @group tcp
-     * @dataProvider getTcpAdapters
+     * @dataProvider getHttpAdapters
      */
     public function testCreateTcpClient($adapter)
     {
@@ -75,19 +75,11 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("pass", $client->getAdapter()->getOptions()->getPassword());
     }
 
-    public function getTcpAdapters()
-    {
-        return [
-            ["InfluxDB\\Adapter\\GuzzleAdapter"],
-            ["InfluxDB\\Adapter\\HttpAdapter"],
-        ];
-    }
-
     /**
      * @group factory
-     * @dataProvider getTcpAdapters
+     * @dataProvider getHttpAdapters
      */
-    public function testCreateTcpClientWithFilter($adapter)
+    public function testCreateTcpClientWithAllOptions($adapter)
     {
         $options = [
             "adapter" => [
@@ -97,6 +89,11 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
                 "host" => "127.0.0.1",
                 "username" => "user",
                 "password" => "pass",
+                "retention_policy" => "too_many_data",
+                "tags" => [
+                    "region" => "eu",
+                    "env" => "prod",
+                ],
             ],
         ];
 
@@ -107,5 +104,14 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("127.0.0.1", $client->getAdapter()->getOptions()->getHost());
         $this->assertEquals("user", $client->getAdapter()->getOptions()->getUsername());
         $this->assertEquals("pass", $client->getAdapter()->getOptions()->getPassword());
+        $this->assertEquals(["region" => "eu", "env" => "prod"], $client->getAdapter()->getOptions()->getTags());
+        $this->assertEquals("too_many_data", $client->getAdapter()->getOptions()->getRetentionPolicy());
+    }
+
+    public function getHttpAdapters()
+    {
+        return [
+            ["InfluxDB\\Adapter\\GuzzleAdapter"],
+        ];
     }
 }

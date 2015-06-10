@@ -10,7 +10,6 @@
          "zendframework/zend-servicemanager": "~2"
     },
     "require-dev": {
-        "phpspec/phpspec": "2.*",
         "phpunit/phpunit": "4.*",
         "athletic/athletic": "~0.1",
         "ext-sockets": "*"
@@ -32,9 +31,14 @@
         }
     ],
     "autoload": {
-        "psr-0": {
-            "InfluxDB\\": ["./src/", "./tests"],
+        "psr-4": {
+            "InfluxDB\\": ["./src/"],
             "Corley\\": ["./benchmarks/"]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "InfluxDB\\": ["./tests/"]
         }
     },
     "suggest": {
