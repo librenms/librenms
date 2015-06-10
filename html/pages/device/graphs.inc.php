@@ -1,6 +1,5 @@
 <?php
 
-// Sections are printed in the order they exist in $config['graph_sections']
 // Graphs are printed in the order they exist in $config['graph_types']
 
 $link_array = array('page'    => 'device',
@@ -20,14 +19,15 @@ $sep = "";
 foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph", array($device['device_id'])) as $graph)
 {
   $section = $config['graph_types']['device'][$graph['graph']]['section'];
-  $graph_enable[$section][$graph['graph']] = $graph['graph'];
+  if ($section != "") {
+    $graph_enable[$section][$graph['graph']] = $graph['graph'];
+  }
 }
 
 // These are standard graphs we should have for all systems
 $graph_enable['poller']['poller_perf'] = 'device_poller_perf';
 $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
 
-#foreach ($config['graph_sections'] as $section)
 foreach ($graph_enable as $section => $nothing)
 {
   if (isset($graph_enable) && is_array($graph_enable[$section]))
