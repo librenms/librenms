@@ -18,17 +18,11 @@ Supported adapters:
 
 Just use composer
 
-```shell
-php composer.phar require corley/influxdb-sdk:dev-master
-```
-
-Or place it in your require section
-
 ```json
 {
   "require": {
     // ...
-    "corley/influxdb-sdk": "dev-master"
+    "corley/influxdb-sdk": ">=0.4"
   }
 }
 ```
@@ -100,8 +94,7 @@ If you don't have the `sockets` extension, you can proceed in two ways:
 $options = new Options();
 $adapter = new UdpAdapter($options);
 
-$client = new Client();
-$client->setAdapter($adapter);
+$client = new Client($adapter);
 ```
 
 ### Using HTTP Adapters
@@ -115,8 +108,7 @@ $http = new \GuzzleHttp\Client();
 $options = new Options();
 $adapter = new GuzzleAdapter($http, $options);
 
-$client = new Client();
-$client->setAdapter($adapter);
+$client = new Client($adapter);
 ```
 
 ## Create your client with the factory method
@@ -183,7 +175,7 @@ As you know InfluxDB support UDP/IP with a "line protocol", that is a string
 line, like:
 
 ```
-cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000
+cpu,region=us-west,env=prod,zone=1c cpu=18.12,free=712432 1257894000
 ```
 
 In order to simplify the SDK usage, you will use a single method signature
