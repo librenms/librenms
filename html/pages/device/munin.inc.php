@@ -1,6 +1,5 @@
 <?php
 
-// Sections are printed in the order they exist in $config['graph_sections']
 // Graphs are printed in the order they exist in $config['graph_types']
 
 $link_array = array('page'    => 'device',
