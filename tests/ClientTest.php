@@ -194,6 +194,56 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * @group udp
      */
+    public function testSendMultipleMeasurementWithUdpIp()
+    {
+        $rawOptions = $this->rawOptions;
+        $options = new Options();
+        $options->setHost($rawOptions["udp"]["host"]);
+        $options->setUsername($rawOptions["udp"]["username"]);
+        $options->setPassword($rawOptions["udp"]["password"]);
+        $options->setPort($rawOptions["udp"]["port"]);
+        $options->setDatabase($rawOptions["udp"]["database"]);
+
+        $adapter = new UdpAdapter($options);
+        $object = new Client();
+        $object->setAdapter($adapter);
+
+        $object->mark([
+            "points" => [
+                [
+                    "measurement" => "mem",
+                    "fields" => [
+                        "free" => 712423,
+                    ],
+                ],
+                [
+                    "measurement" => "cpu",
+                    "fields" => [
+                        "cpu" => 18.12,
+                    ],
+                ],
+            ]
+        ]);
+
+        sleep(2);
+
+        $this->options->setDatabase("udp.test");
+        $body = $this->object->query("select * from \"cpu\"");
+
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
+        $this->assertEquals(18.12, $body["results"][0]["series"][0]["values"][0][1]);
+
+        $body = $this->object->query("select * from \"mem\"");
+
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("free", $body["results"][0]["series"][0]["columns"][1]);
+        $this->assertEquals(712423, $body["results"][0]["series"][0]["values"][0][1]);
+    }
+
+    /**
+     * @group udp
+     */
     public function testWriteDirectMessageWithUdpIp()
     {
         $rawOptions = $this->rawOptions;

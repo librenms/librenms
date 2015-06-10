@@ -58,7 +58,37 @@ class UdpAdapterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 "cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000"
-            ]
+            ],
+            [
+                [
+                    "tags" => [
+                        "region" => "us-west",
+                        "host" => "serverA",
+                        "env" => "prod",
+                        "target" => "servers",
+                        "zone" => "1c",
+                    ],
+                    "time" => "2009-11-10T23:00:00Z",
+                    "points" => [
+                        [
+                            "measurement" => "cpu",
+                            "fields" => [
+                                "cpu" => 18.12,
+                            ],
+                        ],
+                        [
+                            "measurement" => "mem",
+                            "fields" => [
+                                "free" => 712432,
+                            ],
+                        ],
+                    ],
+                ],
+                <<<EOF
+cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12 1257894000
+mem,region=us-west,host=serverA,env=prod,target=servers,zone=1c free=712432 1257894000
+EOF
+            ],
         ];
     }
 }
