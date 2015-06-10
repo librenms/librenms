@@ -7,6 +7,13 @@
 
 Send metrics to InfluxDB and query for any data.
 
+This project support InfluxDB API `>= 0.9` - **For InfluxDB v0.8 checkout branch 0.3**
+
+Supported adapters:
+
+ * HTTP
+ * UDP/IP
+
 ## Install it
 
 Just use composer
@@ -34,21 +41,40 @@ $client->mark("app.search", [
 ]);
 ```
 
+Or use InfluxDB direct messages
+
+```php
+$client->mark([
+    "tags" => [
+        "dc" => "eu-west-1",
+    ],
+    "points" => [
+        [
+            "measurement" => "instance",
+            "fields" => [
+                "cpu" => 18.12,
+                "free" => 712423,
+            ],
+        ],
+    ]
+]);
+```
+
+
 Retrieve existing points:
 
 ```php
-$results = $client->query("select * from app.search");
+$results = $client->query('select * from "app.search"');
 ```
 
 ## InfluxDB client adapters
 
-Actually we supports two adapters
+Actually we supports two network adapters
 
- * UDP/IP - in order to send data via UDP (datagram)
- * HTTP JSON - in order to send/retrieve using HTTP (connection oriented)
+ * UDP/IP - in order to send data via UDP/IP (datagram)
+ * HTTP JSON - in order to send/retrieve using HTTP messages (connection oriented)
 
 ### Using UDP/IP Adapter
-
 
 In order to use the UDP/IP adapter your must have PHP compiled with the `sockets` extension.
 
@@ -60,8 +86,9 @@ php -m | grep sockets
 
 If you don't have the `sockets` extension, you can proceed in two ways:
 
-- Recompile your PHP whith the `--enable-sockets` flag
-- Or just compile the `sockets` extension extracting it from the PHP source.  
+  - Recompile your PHP whith the `--enable-sockets` flag
+  - Or just compile the `sockets` extension extracting it from the PHP source.
+
   1. Download the source relative to the PHP version that you on from [here](https://github.com/php/php-src/releases)
   2. Enter in the `ext/sockets` directory
   3. Issue a `phpize && ./configure && make -j && sudo make install`
@@ -83,23 +110,16 @@ Actually Guzzle is used as HTTP client library
 
 ```php
 <?php
+$http = new \GuzzleHttp\Client();
 
 $options = new Options();
-$adapter = new HttpAdapter($options);
+$adapter = new GuzzleAdapter($http, $options);
 
 $client = new Client();
 $client->setAdapter($adapter);
 ```
 
-#### Supported types of exceptions
-
-* InfluxGeneralException
-* InfluxAuthorizationException (extends InfluxGeneralException)
-* InfluxBadResponseException (extends InfluxGeneralException)
-* InfluxNoSeriesException (extends InfluxGeneralException)
-* InfluxUnexpectedResponseException (extends InfluxGeneralException)
-
-### Create your client with the factory method
+## Create your client with the factory method
 
 Effectively the client creation is not so simple, for that
 reason you can you the factory method provided with the library.
@@ -107,79 +127,106 @@ reason you can you the factory method provided with the library.
 ```php
 $options = [
     "adapter" => [
-        "name" => "InfluxDB\\Adapter\\HttpAdapter",
+        "name" => "InfluxDB\\Adapter\\GuzzleAdapter",
         "options" => [
             // guzzle options
         ],
     ],
     "options" => [
         "host" => "my.influx.domain.tld",
+        "db" => "mydb",
+        "retention_policy" => "myPolicy",
+        "tags" => [
+            "env" => "prod",
+            "app" => "myApp",
+        ],
     ]
 ];
 $client = \InfluxDB\ClientFactory::create($options);
-
-$client->mark("error.404", ["page" => "/a-missing-page"]);
 ```
 
-Of course you can always use the DiC or your service manager in order to create
+Of course you can always use a DiC (eg `symfony/dependency-injection`) or your service manager in order to create
 a valid client instance.
-
-### Time Precision write/read queries
-
-You can set the `time_precision` for query query
-
-```php
-$client->mark("app.search", $points, "s"); //points contains "time" that is in seconds
-```
-
-```php
-$client->query("select * from app.search", "s"); // retrieve points using seconds for time column
-```
 
 ### Query InfluxDB
 
 You can query the time series database using the query method.
 
 ```php
-$influx->query("select * from mine");
-$influx->query("select * from mine", "s"); // with time_precision
+$influx->query('select * from "mine"');
 ```
 
 You can query the database only if the adapter is queryable (implements
-`QueryableInterface`), actually `HttpAdapter`.
+`QueryableInterface`), actually `GuzzleAdapter`.
 
 The adapter returns the json decoded body of the InfluxDB response, something
 like:
 
 ```
 array(1) {
-  [0] =>
-  class stdClass#1 (3) {
-    public $name =>
-    string(8) "tcp.test"
-    public $columns =>
-    array(3) {
-      [0] =>
-      string(4) "time"
-      [1] =>
-      string(15) "sequence_number"
-      [2] =>
-      string(4) "mark"
-    }
-    public $points =>
+  'results' =>
+  array(1) {
+    [0] =>
     array(1) {
-      [0] =>
-      array(3) {
-        [0] =>
-        int(1410545635590)
-        [1] =>
-        int(2390001)
-        [2] =>
-        string(7) "element"
+      'series' =>
+      array(1) {
+        ...
       }
     }
   }
 }
+```
+
+## UDP/IP support
+
+As you know InfluxDB support UDP/IP with a "line protocol", that is a string
+line, like:
+
+```
+cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000
+```
+
+In order to simplify the SDK usage, you will use a single method signature
+for both adapters, UDP/IP and HTTP:
+
+**Concise Format**
+
+```php
+$client->mark("serie-name", [
+    "power" => 124.21,
+    "voltage" => 12.4,
+]);
+```
+
+**Extended Format**
+
+```php
+$client->mark([
+    "tags" => [
+        "region" => "us-west",
+        "host" => "serverA",
+        "env" => "prod",
+        "target" => "servers",
+        "zone" => "1c",
+    ],
+    "time" => "2009-11-10T23:00:00Z",
+    "points" => [
+        [
+            "measurement" => "cpu",
+            "fields" => [
+                "cpu" => 18.12,
+                "free" => 712432,
+            ],
+        ],
+    ],
+]);
+```
+
+If you want to use the inline protocol directly you have to use the UDP/IP adapter directly
+
+```
+$udp = new UdpAdapter($options);
+$udp->write("cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000");
 ```
 
 ## Database operations
@@ -195,16 +242,57 @@ $client->deleteDatabase("my.name"); // delete an existing database with name "my
 Actually only queryable adapters can handle databases (implements the
 `QueryableInterface`)
 
+## Global tags and retention policy
+
+You can set a set of default tags, that the SDK will add to your metrics:
+
+```php
+$options = new Options();
+$options->setTags([
+    "env" => "prod",
+    "region" => "eu-west-1",
+]);
+```
+
+The SDK mark all point adding those tags.
+
+You can set a default retentionPolicy using
+
+```
+$options->setRetentionPolicy("myPolicy");
+```
+
+In that way the SDK use that policy instead of `default` policy.
+
 ## Benchmarks
+
+Simple benchmarks executed on a Sony Vaio T13 (SVT1311C5E)
 
 ### Adapters
 
-The impact using UDP or HTTP adapters
+The impact using UDP/IP or HTTP adapters
 
 ```
 Corley\Benchmarks\InfluxDB\AdapterEvent
     Method Name                Iterations    Average Time      Ops/second
     ------------------------  ------------  --------------    -------------
-    sendDataUsingHttpAdapter: [1,000     ] [0.0026700308323] [374.52751]
-    sendDataUsingUdpAdapter : [1,000     ] [0.0000436344147] [22,917.69026]
+    sendDataUsingHttpAdapter: [1,000     ] [0.0162619416714] [61.49327]
+    sendDataUsingUdpAdapter : [1,000     ] [0.0000890662670] [11,227.59529]
 ```
+
+### Message to inline protocol conversion
+
+As you know the SDK will provide a single interface in order to send data to
+InfluxDB (concise or expanded).
+
+The impact of message to inline protocol conversion is:
+
+```
+Corley\Benchmarks\InfluxDB\MessageToInlineProtocolEvent
+    Method Name                                            Iterations    Average Time      Ops/second
+    ----------------------------------------------------  ------------  --------------    -------------
+    convertMessageToInlineProtocolWithNoTags            : [10,000    ] [0.0000230122805] [43,455.05877]
+    convertMessageToInlineProtocolWithGlobalTags        : [10,000    ] [0.0000301691532] [33,146.43911]
+    convertMessageToInlineProtocolWithDifferentTagLevels: [10,000    ] [0.0000327563763] [30,528.40741]
+```
+
