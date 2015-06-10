@@ -161,16 +161,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testUdpIpWriteData()
     {
-        $rawOptions = $this->rawOptions;
-        $options = new Options();
-        $options->setHost($rawOptions["udp"]["host"]);
-        $options->setUsername($rawOptions["udp"]["username"]);
-        $options->setPassword($rawOptions["udp"]["password"]);
-        $options->setPort($rawOptions["udp"]["port"]);
-        $options->setDatabase($rawOptions["udp"]["database"]);
-
-        $adapter = new UdpAdapter($options);
-        $object = new Client($adapter);
+        $object = $this->createClientWithUdpAdapter();
 
         $object->mark("udp.test", ["mark" => "element"]);
         sleep(1);
@@ -194,16 +185,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendMultipleMeasurementWithUdpIp()
     {
-        $rawOptions = $this->rawOptions;
-        $options = new Options();
-        $options->setHost($rawOptions["udp"]["host"]);
-        $options->setUsername($rawOptions["udp"]["username"]);
-        $options->setPassword($rawOptions["udp"]["password"]);
-        $options->setPort($rawOptions["udp"]["port"]);
-        $options->setDatabase($rawOptions["udp"]["database"]);
-
-        $adapter = new UdpAdapter($options);
-        $object = new Client($adapter);
+        $object = $this->createClientWithUdpAdapter();
 
         $object->mark([
             "points" => [
@@ -243,16 +225,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testWriteDirectMessageWithUdpIp()
     {
-        $rawOptions = $this->rawOptions;
-        $options = new Options();
-        $options->setHost($rawOptions["udp"]["host"]);
-        $options->setUsername($rawOptions["udp"]["username"]);
-        $options->setPassword($rawOptions["udp"]["password"]);
-        $options->setPort($rawOptions["udp"]["port"]);
-        $options->setDatabase($rawOptions["udp"]["database"]);
-
-        $adapter = new UdpAdapter($options);
-        $object = new Client($adapter);
+        $object = $this->createClientWithUdpAdapter();
 
         $object->mark([
             "points" => [
@@ -283,16 +256,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testTagsAreWrittenCorrectly()
     {
-        $rawOptions = $this->rawOptions;
-        $options = new Options();
-        $options->setHost($rawOptions["udp"]["host"]);
-        $options->setUsername($rawOptions["udp"]["username"]);
-        $options->setPassword($rawOptions["udp"]["password"]);
-        $options->setPort($rawOptions["udp"]["port"]);
-        $options->setDatabase($rawOptions["udp"]["database"]);
-
-        $adapter = new UdpAdapter($options);
-        $object = new Client($adapter);
+        $object = $this->createClientWithUdpAdapter();
 
         $object->mark([
             "tags" => [
@@ -352,5 +316,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $databases["results"][0]["series"][0]["values"]);
 
         $this->object->deleteDatabase("walter");
+    }
+
+    private function createClientWithUdpAdapter()
+    {
+        $rawOptions = $this->rawOptions;
+        $options = new Options();
+        $options->setHost($rawOptions["udp"]["host"]);
+        $options->setUsername($rawOptions["udp"]["username"]);
+        $options->setPassword($rawOptions["udp"]["password"]);
+        $options->setPort($rawOptions["udp"]["port"]);
+        $options->setDatabase($rawOptions["udp"]["database"]);
+
+        $adapter = new UdpAdapter($options);
+        $object = new Client($adapter);
+
+        return $object;
     }
 }
