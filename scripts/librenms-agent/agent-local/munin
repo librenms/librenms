@@ -1,4 +1,5 @@
 # Lokale Einzelchecks
+export MUNIN_LIBDIR=/usr/share/munin
 if cd munin-scripts
 then
   for skript in $(ls)
