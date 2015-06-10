@@ -7,41 +7,22 @@ namespace InfluxDB;
  */
 class Options
 {
-    /**
-     * @var string
-     */
     private $host;
 
-    /**
-     * @var string|int
-     */
     private $port;
 
-    /**
-     * @var string
-     */
     private $username;
 
-    /**
-     * @var string
-     */
     private $password;
 
-    /**
-     * @var string
-     */
     private $protocol;
 
-    /**
-     * @var string
-     */
     private $database;
 
     private $retentionPolicy;
 
-    /**
-     * Set default options
-     */
+    private $tags;
+
     public function __construct()
     {
         $this->setHost("localhost");
@@ -51,6 +32,18 @@ class Options
         $this->setProtocol("http");
 
         $this->setRetentionPolicy("default");
+        $this->setTags([]);
+    }
+
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+        return $this;
     }
 
     public function getRetentionPolicy()

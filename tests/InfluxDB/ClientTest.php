@@ -108,7 +108,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ],
             "points" => [
                 [
-                    "name" => "vm-serie",
+                    "measurement" => "vm-serie",
                     "fields" => [
                         "cpu" => 18.12,
                         "free" => 712423,
@@ -124,6 +124,37 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
         $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
         $this->assertEquals(18.12, $body["results"][0]["series"][0]["values"][0][1]);
+    }
+
+    /**
+     * @group tcp
+     */
+    public function testOverrideDatabaseNameViaMessage()
+    {
+        $this->options->setDatabase("a-wrong-database");
+
+        $this->object->mark([
+            "database" => "tcp.test",
+            "points" => [
+                [
+                    "measurement" => "vm-serie",
+                    "fields" => [
+                        "cpu" => 18.12,
+                        "free" => 712423,
+                    ],
+                ],
+            ]
+        ]);
+
+        sleep(1);
+
+        $this->options->setDatabase("tcp.test");
+        $body = $this->object->query("select * from \"vm-serie\"");
+
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
+        $this->assertEquals(18.12, $body["results"][0]["series"][0]["values"][0][1]);
+        $this->assertEquals(712423, $body["results"][0]["series"][0]["values"][0][2]);
     }
 
     /**
@@ -144,60 +175,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $object->setAdapter($adapter);
 
         $object->mark("udp.test", ["mark" => "element"]);
+        sleep(1);
         $object->mark("udp.test", ["mark" => "element1"]);
+        sleep(1);
         $object->mark("udp.test", ["mark" => "element2"]);
+        sleep(1);
         $object->mark("udp.test", ["mark" => "element3"]);
 
         // Wait UDP/IP message arrives
-        sleep(1);
+        sleep(2);
 
         $this->options->setDatabase("udp.test");
         $body = $this->object->query("select * from \"udp.test\"");
 
         $this->assertCount(4, $body["results"][0]["series"][0]["values"]);
-        $this->assertEquals("mark", $body["results"][0]["series"][0]["columns"][1]);
-        $this->assertEquals("element", $body["results"][0]["series"][0]["values"][0][1]);
-    }
-
-    /**
-     * @group udp
-     */
-    public function testOverrideDatabaseNameViaMessage()
-    {
-        $rawOptions = $this->rawOptions;
-        $options = new Options();
-        $options->setHost($rawOptions["udp"]["host"]);
-        $options->setUsername($rawOptions["udp"]["username"]);
-        $options->setPassword($rawOptions["udp"]["password"]);
-        $options->setPort($rawOptions["udp"]["port"]);
-        $options->setDatabase("a-wrong-database");
-
-        $adapter = new UdpAdapter($options);
-        $object = new Client();
-        $object->setAdapter($adapter);
-
-        $object->mark([
-            "database" => "{$rawOptions["udp"]["database"]}",
-            "points" => [
-                [
-                    "name" => "vm-serie",
-                    "fields" => [
-                        "cpu" => 18.12,
-                        "free" => 712423,
-                    ],
-                ],
-            ]
-        ]);
-
-        sleep(1);
-
-        $this->options->setDatabase($rawOptions["udp"]["database"]);
-        $body = $this->object->query("select * from \"vm-serie\"");
-
-        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
-        $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
-        $this->assertEquals(18.12, $body["results"][0]["series"][0]["values"][0][1]);
-        $this->assertEquals(712423, $body["results"][0]["series"][0]["values"][0][2]);
     }
 
     /**
@@ -220,7 +211,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $object->mark([
             "points" => [
                 [
-                    "name" => "vm-serie",
+                    "measurement" => "vm-serie",
                     "fields" => [
                         "cpu" => 18.12,
                         "free" => 712423,
@@ -229,7 +220,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
-        sleep(1);
+        sleep(2);
 
         $this->options->setDatabase("udp.test");
         $body = $this->object->query("select * from \"vm-serie\"");
@@ -264,7 +255,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ],
             "points" => [
                 [
-                    "name" => "vm-serie",
+                    "measurement" => "vm-serie",
                     "tags" => [
                         "dc"  => "eu-west-1",
                         "one"  => "two",
@@ -275,7 +266,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 [
-                    "name" => "vm-serie",
+                    "measurement" => "vm-serie",
                     "tags" => [
                         "dc"  => "us-east-1",
                     ],
@@ -287,7 +278,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
-        sleep(1);
+        sleep(2);
 
         $this->options->setDatabase("udp.test");
         $body = $this->object->query("select * from \"vm-serie\" where dc='eu-west-1'");

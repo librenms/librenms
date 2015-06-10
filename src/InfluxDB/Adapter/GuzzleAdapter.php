@@ -25,6 +25,10 @@ class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
     {
         $message = array_replace_recursive($this->getMessageDefaults(), $message);
 
+        if (!count($message["tags"])) {
+            unset($message["tags"]);
+        }
+
         $httpMessage = [
             "auth" => [$this->getOptions()->getUsername(), $this->getOptions()->getPassword()],
             "body" => json_encode($message)

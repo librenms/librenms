@@ -28,6 +28,7 @@ abstract class AdapterAbstract implements AdapterInterface
         return [
             "database" => $this->getOptions()->getDatabase(),
             "retentionPolicy" => $this->getOptions()->getRetentionPolicy(),
+            "tags" => $this->getOptions()->getTags(),
         ];
     }
 

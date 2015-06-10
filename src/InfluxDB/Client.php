@@ -29,7 +29,7 @@ class Client
         if (!is_array($name)) {
             $data =[];
 
-            $data['points'][0]['name'] = $name;
+            $data['points'][0]['measurement'] = $name;
             $data['points'][0]['fields'] = $values;
         }
 
