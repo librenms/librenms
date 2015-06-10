@@ -170,6 +170,59 @@ array(1) {
 }
 ```
 
+## UDP/IP support
+
+As you know InfluxDB support UDP/IP using a "line protocol", that is a string
+line, like:
+
+```
+cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000
+```
+
+<small>More points could be added and are separated by commas.</small>
+
+In order to simplify the SDK operations you will use a single format:
+
+**Concise Format**
+
+```php
+$client->mark("serie-name", [
+    "power" => 124.21,
+    "voltage" => 12.4,
+]);
+```
+
+**Extended Format**
+
+```php
+$client->mark([
+    "tags" => [
+        "region" => "us-west",
+        "host" => "serverA",
+        "env" => "prod",
+        "target" => "servers",
+        "zone" => "1c",
+    ],
+    "time" => "2009-11-10T23:00:00Z",
+    "points" => [
+        [
+            "measurement" => "cpu",
+            "fields" => [
+                "cpu" => 18.12,
+                "free" => 712432,
+            ],
+        ],
+    ],
+]);
+```
+
+If you want to use the inline protocol directly you have to use the UDP/IP adapter directly
+
+```
+$udp = new UdpAdapter($options);
+$udp->write("cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000");
+```
+
 ## Database operations
 
 You can create, list or destroy databases using dedicated methods
