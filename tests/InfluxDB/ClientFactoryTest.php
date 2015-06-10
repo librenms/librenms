@@ -51,7 +51,7 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @group factory
      * @group tcp
-     * @dataProvider getTcpAdapters
+     * @dataProvider getHttpAdapters
      */
     public function testCreateTcpClient($adapter)
     {
@@ -75,16 +75,9 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("pass", $client->getAdapter()->getOptions()->getPassword());
     }
 
-    public function getTcpAdapters()
-    {
-        return [
-            ["InfluxDB\\Adapter\\GuzzleAdapter"],
-        ];
-    }
-
     /**
      * @group factory
-     * @dataProvider getTcpAdapters
+     * @dataProvider getHttpAdapters
      */
     public function testCreateTcpClientWithFilter($adapter)
     {
@@ -106,5 +99,12 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("127.0.0.1", $client->getAdapter()->getOptions()->getHost());
         $this->assertEquals("user", $client->getAdapter()->getOptions()->getUsername());
         $this->assertEquals("pass", $client->getAdapter()->getOptions()->getPassword());
+    }
+
+    public function getHttpAdapters()
+    {
+        return [
+            ["InfluxDB\\Adapter\\GuzzleAdapter"],
+        ];
     }
 }
