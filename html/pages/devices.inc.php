@@ -37,12 +37,15 @@ foreach ($menu_options as $option => $text)
 
 <?php
 
-$menu_options = array('bits'      => 'Bits',
-                      'processor' => 'CPU',
-                      'mempool'   => 'Memory',
-                      'uptime'    => 'Uptime',
-                      'storage'   => 'Storage',
-                      'diskio'    => 'Disk I/O'
+$menu_options = array('bits'        => 'Bits',
+                      'processor'   => 'CPU',
+                      'ucd_load'    => 'Load',
+                      'mempool'     => 'Memory',
+                      'uptime'      => 'Uptime',
+                      'storage'     => 'Storage',
+                      'diskio'      => 'Disk I/O',
+                      'poller_perf' => 'Poller',
+                      'ping_perf'   => 'Ping'
                       );
 $sep = "";
 foreach ($menu_options as $option => $text)
@@ -89,7 +92,7 @@ print_optionbar_end();
 
 <?php
 
-list($format, $subformat) = explode("_", $vars['format']);
+list($format, $subformat) = explode("_", $vars['format'], 2);
 
 if($format == "graph")
 {
