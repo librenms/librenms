@@ -9,6 +9,11 @@ Send metrics to InfluxDB and query for any data.
 
 **For InfluxDB v0.8 checkout branch 0.3**
 
+Supported adapters:
+
+ * HTTP
+ * UDP/IP
+
 ## Install it
 
 Just use composer
@@ -72,7 +77,6 @@ Actually we supports two adapters
 
 ### Using UDP/IP Adapter
 
-
 In order to use the UDP/IP adapter your must have PHP compiled with the `sockets` extension.
 
 To verify if you have the `sockets` extension just issue a:
@@ -83,8 +87,9 @@ php -m | grep sockets
 
 If you don't have the `sockets` extension, you can proceed in two ways:
 
-- Recompile your PHP whith the `--enable-sockets` flag
-- Or just compile the `sockets` extension extracting it from the PHP source.
+  - Recompile your PHP whith the `--enable-sockets` flag
+  - Or just compile the `sockets` extension extracting it from the PHP source.
+
   1. Download the source relative to the PHP version that you on from [here](https://github.com/php/php-src/releases)
   2. Enter in the `ext/sockets` directory
   3. Issue a `phpize && ./configure && make -j && sudo make install`
@@ -109,7 +114,7 @@ Actually Guzzle is used as HTTP client library
 $http = new \GuzzleHttp\Client();
 
 $options = new Options();
-$adapter = new HttpAdapter($http, $options);
+$adapter = new GuzzleAdapter($http, $options);
 
 $client = new Client();
 $client->setAdapter($adapter);
@@ -131,6 +136,11 @@ $options = [
     "options" => [
         "host" => "my.influx.domain.tld",
         "db" => "mydb",
+        "retention_policy" => "myPolicy",
+        "tags" => [
+            "env" => "prod",
+            "app" => "myApp",
+        ],
     ]
 ];
 $client = \InfluxDB\ClientFactory::create($options);
@@ -236,17 +246,41 @@ $client->deleteDatabase("my.name"); // delete an existing database with name "my
 Actually only queryable adapters can handle databases (implements the
 `QueryableInterface`)
 
+## Global tags and retention policy
+
+You can set a set of default tags, that the SDK will add to your metrics:
+
+```php
+$options = new Options();
+$options->setTags([
+    "env" => "prod",
+    "region" => "eu-west-1",
+]);
+```
+
+The SDK mark all point adding those tags.
+
+You can set a default retentionPolicy using
+
+```
+$options->setRetentionPolicy("myPolicy");
+```
+
+In that way the SDK use that policy instead of `default` policy.
+
 ## Benchmarks
+
+Simple benchmarks executed on a Sony Vaio T13 (SVT1311C5E)
 
 ### Adapters
 
-The impact using UDP or HTTP adapters
+The impact using UDP/IP or HTTP adapters
 
 ```
 Corley\Benchmarks\InfluxDB\AdapterEvent
     Method Name                Iterations    Average Time      Ops/second
     ------------------------  ------------  --------------    -------------
-    sendDataUsingHttpAdapter: [1,000     ] [0.0098177127838] [101.85672]
-    sendDataUsingUdpAdapter : [1,000     ] [0.0000694372654] [14,401.48880]
+    sendDataUsingHttpAdapter: [1,000     ] [0.0162619416714] [61.49327]
+    sendDataUsingUdpAdapter : [1,000     ] [0.0000890662670] [11,227.59529]
 ```
 
