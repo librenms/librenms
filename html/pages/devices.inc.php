@@ -44,7 +44,8 @@ $menu_options = array('bits'        => 'Bits',
                       'uptime'      => 'Uptime',
                       'storage'     => 'Storage',
                       'diskio'      => 'Disk I/O',
-                      'poller_perf' => 'Poller'
+                      'poller_perf' => 'Poller',
+                      'ping_perf'   => 'Ping'
                       );
 $sep = "";
 foreach ($menu_options as $option => $text)
