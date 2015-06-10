@@ -1,6 +1,7 @@
 <?php
 namespace InfluxDB;
 
+use DateTime;
 use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
 use InfluxDB\Options;
 use InfluxDB\Adapter\UdpAdapter;
@@ -248,6 +249,68 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("cpu", $body["results"][0]["series"][0]["columns"][1]);
         $this->assertEquals(18.12, $body["results"][0]["series"][0]["values"][0][1]);
         $this->assertEquals(712423, $body["results"][0]["series"][0]["values"][0][2]);
+    }
+
+    /**
+     * @group udp
+     * @group date
+     */
+    public function testWriteDirectMessageWillPreserveActualTime()
+    {
+        $object = $this->createClientWithUdpAdapter();
+
+        $object->mark([
+            "points" => [
+                [
+                    "measurement" => "vm-serie",
+                    "fields" => [
+                        "cpu" => 18.12,
+                        "free" => 712423,
+                    ],
+                ],
+            ]
+        ]);
+
+        sleep(2);
+
+        $this->options->setDatabase("udp.test");
+        $body = $this->object->query("select * from \"vm-serie\"");
+
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("time", $body["results"][0]["series"][0]["columns"][0]);
+        $saved = new DateTime($body["results"][0]["series"][0]["values"][0][0]);
+        $this->assertEquals(date("Y-m-d"), $saved->format("Y-m-d"));
+    }
+
+    /**
+     * @group udp
+     * @group date
+     */
+    public function testWriteDirectMessageWillPreserveDatetime()
+    {
+        $object = $this->createClientWithUdpAdapter();
+
+        $object->mark([
+            "time" => "2009-11-10T23:00:00Z",
+            "points" => [
+                [
+                    "measurement" => "vm-serie",
+                    "fields" => [
+                        "cpu" => 18.12,
+                        "free" => 712423,
+                    ],
+                ],
+            ]
+        ]);
+
+        sleep(2);
+
+        $this->options->setDatabase("udp.test");
+        $body = $this->object->query("select * from \"vm-serie\"");
+
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("time", $body["results"][0]["series"][0]["columns"][0]);
+        $this->assertEquals("2009-11-10T23:00:00Z", $body["results"][0]["series"][0]["values"][0][0]);
     }
 
     /**
