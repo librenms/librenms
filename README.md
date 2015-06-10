@@ -7,7 +7,7 @@
 
 Send metrics to InfluxDB and query for any data.
 
-**For InfluxDB v0.8 checkout branch 0.3**
+This project support InfluxDB API `>= 0.9` - **For InfluxDB v0.8 checkout branch 0.3**
 
 Supported adapters:
 
@@ -45,13 +45,12 @@ Or use InfluxDB direct messages
 
 ```php
 $client->mark([
-    "database" => "mydb",
     "tags" => [
         "dc" => "eu-west-1",
     ],
     "points" => [
         [
-            "name" => "vm-serie",
+            "measurement" => "instance",
             "fields" => [
                 "cpu" => 18.12,
                 "free" => 712423,
@@ -65,15 +64,15 @@ $client->mark([
 Retrieve existing points:
 
 ```php
-$results = $client->query("select * from app.search");
+$results = $client->query('select * from "app.search"');
 ```
 
 ## InfluxDB client adapters
 
-Actually we supports two adapters
+Actually we supports two network adapters
 
- * UDP/IP - in order to send data via UDP (datagram)
- * HTTP JSON - in order to send/retrieve using HTTP (connection oriented)
+ * UDP/IP - in order to send data via UDP/IP (datagram)
+ * HTTP JSON - in order to send/retrieve using HTTP messages (connection oriented)
 
 ### Using UDP/IP Adapter
 
@@ -120,7 +119,7 @@ $client = new Client();
 $client->setAdapter($adapter);
 ```
 
-### Create your client with the factory method
+## Create your client with the factory method
 
 Effectively the client creation is not so simple, for that
 reason you can you the factory method provided with the library.
@@ -144,11 +143,9 @@ $options = [
     ]
 ];
 $client = \InfluxDB\ClientFactory::create($options);
-
-$client->mark("error.404", ["page" => "/a-missing-page"]);
 ```
 
-Of course you can always use the DiC or your service manager in order to create
+Of course you can always use a DiC (eg `symfony/dependency-injection`) or your service manager in order to create
 a valid client instance.
 
 ### Query InfluxDB
@@ -160,7 +157,7 @@ $influx->query('select * from "mine"');
 ```
 
 You can query the database only if the adapter is queryable (implements
-`QueryableInterface`), actually `HttpAdapter`.
+`QueryableInterface`), actually `GuzzleAdapter`.
 
 The adapter returns the json decoded body of the InfluxDB response, something
 like:
@@ -182,16 +179,15 @@ array(1) {
 
 ## UDP/IP support
 
-As you know InfluxDB support UDP/IP using a "line protocol", that is a string
+As you know InfluxDB support UDP/IP with a "line protocol", that is a string
 line, like:
 
 ```
 cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000
 ```
 
-<small>More points could be added and are separated by commas.</small>
-
-In order to simplify the SDK operations you will use a single format:
+In order to simplify the SDK usage, you will use a single method signature
+for both adapters, UDP/IP and HTTP:
 
 **Concise Format**
 

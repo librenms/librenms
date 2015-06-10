@@ -12,7 +12,7 @@ class Client
 {
     private $adapter;
 
-    public function setAdapter(Adapter\AdapterInterface $adapter)
+    public function __construct(Adapter\AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
         return $this;

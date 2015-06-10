@@ -48,8 +48,7 @@ abstract class ClientFactory
                 throw new \InvalidArgumentException("Missing adapter {$adapter}");
         }
 
-        $client = new Client();
-        $client->setAdapter($adapter);
+        $client = new Client($adapter);
 
         return $client;
     }
