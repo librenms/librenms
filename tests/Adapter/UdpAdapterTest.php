@@ -35,7 +35,7 @@ class UdpAdapterTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-                "cpu value=1 1257894000"
+                "cpu value=1 1257894000000000000"
             ],
             [
                 [
@@ -57,7 +57,7 @@ class UdpAdapterTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-                "cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000"
+                "cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12,free=712432 1257894000000000000"
             ],
             [
                 [
@@ -85,8 +85,8 @@ class UdpAdapterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 <<<EOF
-cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12 1257894000
-mem,region=us-west,host=serverA,env=prod,target=servers,zone=1c free=712432 1257894000
+cpu,region=us-west,host=serverA,env=prod,target=servers,zone=1c cpu=18.12 1257894000000000000
+mem,region=us-west,host=serverA,env=prod,target=servers,zone=1c free=712432 1257894000000000000
 EOF
             ],
         ];
