@@ -31,9 +31,14 @@
         }
     ],
     "autoload": {
-        "psr-0": {
-            "InfluxDB\\": ["./src/", "./tests"],
+        "psr-4": {
+            "InfluxDB\\": ["./src/"],
             "Corley\\": ["./benchmarks/"]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "InfluxDB\\": ["./tests/"]
         }
     },
     "suggest": {
