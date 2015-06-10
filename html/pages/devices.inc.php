@@ -37,13 +37,14 @@ foreach ($menu_options as $option => $text)
 
 <?php
 
-$menu_options = array('bits'      => 'Bits',
-                      'processor' => 'CPU',
-                      'ucd_load'  => 'Load',
-                      'mempool'   => 'Memory',
-                      'uptime'    => 'Uptime',
-                      'storage'   => 'Storage',
-                      'diskio'    => 'Disk I/O'
+$menu_options = array('bits'        => 'Bits',
+                      'processor'   => 'CPU',
+                      'ucd_load'    => 'Load',
+                      'mempool'     => 'Memory',
+                      'uptime'      => 'Uptime',
+                      'storage'     => 'Storage',
+                      'diskio'      => 'Disk I/O',
+                      'poller_perf' => 'Poller'
                       );
 $sep = "";
 foreach ($menu_options as $option => $text)
