@@ -16,7 +16,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $options = include __DIR__ . '/../bootstrap.php';
+        $options = include __DIR__ . '/bootstrap.php';
         $this->rawOptions = $options;
 
         $tcpOptions = $options["tcp"];
