@@ -1,6 +1,7 @@
 <?php
 namespace InfluxDB\Adapter;
 
+use DateTime;
 use InfluxDB\Options;
 
 final class UdpAdapter extends AdapterAbstract
@@ -28,10 +29,11 @@ final class UdpAdapter extends AdapterAbstract
             $tags = array_replace_recursive($tags, $message["tags"]);
         }
 
-        $unixepoch = (int)microtime(true);
+        $now = new DateTime();
+        $unixepoch = (int)($now->format("U") * 1e9);
         if (array_key_exists("time", $message)) {
-            $dt = new \DateTime($message["time"]);
-            $unixepoch = $dt->format("U");
+            $dt = new DateTime($message["time"]);
+            $unixepoch = (int)($dt->format("U") * 1e9);
         }
 
         $lines = [];
