@@ -284,3 +284,19 @@ Corley\Benchmarks\InfluxDB\AdapterEvent
     sendDataUsingUdpAdapter : [1,000     ] [0.0000890662670] [11,227.59529]
 ```
 
+### Message to inline protocol conversion
+
+As you know the SDK will provide a single interface in order to send data to
+InfluxDB (concise or expanded).
+
+The impact of message to inline protocol conversion is:
+
+```
+Corley\Benchmarks\InfluxDB\MessageToInlineProtocolEvent
+    Method Name                                            Iterations    Average Time      Ops/second
+    ----------------------------------------------------  ------------  --------------    -------------
+    convertMessageToInlineProtocolWithNoTags            : [10,000    ] [0.0000230122805] [43,455.05877]
+    convertMessageToInlineProtocolWithGlobalTags        : [10,000    ] [0.0000301691532] [33,146.43911]
+    convertMessageToInlineProtocolWithDifferentTagLevels: [10,000    ] [0.0000327563763] [30,528.40741]
+```
+
