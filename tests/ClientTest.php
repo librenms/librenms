@@ -33,8 +33,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $guzzleHttp = new GuzzleHttpClient();
         $adapter = new InfluxHttpAdapter($guzzleHttp, $options);
 
-        $influx = new Client();
-        $influx->setAdapter($adapter);
+        $influx = new Client($adapter);
         $this->object = $influx;
 
         $databases = $this->object->getDatabases();
@@ -171,8 +170,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $options->setDatabase($rawOptions["udp"]["database"]);
 
         $adapter = new UdpAdapter($options);
-        $object = new Client();
-        $object->setAdapter($adapter);
+        $object = new Client($adapter);
 
         $object->mark("udp.test", ["mark" => "element"]);
         sleep(1);
@@ -205,8 +203,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $options->setDatabase($rawOptions["udp"]["database"]);
 
         $adapter = new UdpAdapter($options);
-        $object = new Client();
-        $object->setAdapter($adapter);
+        $object = new Client($adapter);
 
         $object->mark([
             "points" => [
@@ -255,8 +252,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $options->setDatabase($rawOptions["udp"]["database"]);
 
         $adapter = new UdpAdapter($options);
-        $object = new Client();
-        $object->setAdapter($adapter);
+        $object = new Client($adapter);
 
         $object->mark([
             "points" => [
@@ -296,8 +292,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $options->setDatabase($rawOptions["udp"]["database"]);
 
         $adapter = new UdpAdapter($options);
-        $object = new Client();
-        $object->setAdapter($adapter);
+        $object = new Client($adapter);
 
         $object->mark([
             "tags" => [
