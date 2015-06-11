@@ -14,7 +14,6 @@ abstract class ClientFactory
      * @param array $options
      * @return Client
      * @throws InvalidArgumentException If not exist adapter name
-     * or not find adapter
      */
     public static function create(array $options)
     {
@@ -24,9 +23,6 @@ abstract class ClientFactory
                 "options" => [],
             ],
             "options" => [],
-            "filters" => [
-                "query" => false
-            ],
         ];
 
         $options = array_replace_recursive($defaultOptions, $options);
@@ -48,19 +44,11 @@ abstract class ClientFactory
             case 'InfluxDB\\Adapter\\GuzzleAdapter':
                 $adapter = new $adapterName(new GuzzleClient($options["adapter"]["options"]), $adapterOptions);
                 break;
-            case 'InfluxDB\\Adapter\\HttpAdapter':
-                $adapter = new $adapterName($adapterOptions, new GuzzleClient($options["adapter"]["options"]));
-                break;
             default:
                 throw new \InvalidArgumentException("Missing adapter {$adapter}");
         }
 
-        $client = new Client();
-        $client->setAdapter($adapter);
-
-        if ($options["filters"]["query"]) {
-            $client->setFilter(new $options["filters"]["query"]["name"]);
-        }
+        $client = new Client($adapter);
 
         return $client;
     }
