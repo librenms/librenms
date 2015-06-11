@@ -1,7 +1,6 @@
 <phpunit
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/3.7/phpunit.xsd"
-         bootstrap="tests/bootstrap.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -13,7 +12,7 @@
         </testsuite>
     </testsuites>
     <php>
-        <env name="UDP_PORT" value="5551"/>
+        <env name="UDP_PORT" value="4444"/>
         <env name="UDP_DB" value="udp.test"/>
 
         <env name="TCP_PORT" value="8086"/>
