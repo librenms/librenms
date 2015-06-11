@@ -7,9 +7,9 @@ php:
 before_install:
   - sudo apt-get update
   - sudo apt-get install libcurl4-openssl-dev libjson0-dev
-  - wget http://get.influxdb.org/influxdb_0.9.0-rc33_amd64.deb
+  - wget https://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb
   - sudo useradd influxdb
-  - sudo dpkg -i influxdb_0.9.0-rc33_amd64.deb
+  - sudo dpkg -i influxdb_latest_amd64.deb
   - sudo cp ./scripts/influxdb_conf.toml /etc/opt/influxdb/influxdb.conf
   - travis_retry sudo service influxdb restart
   - sudo service influxdb status
