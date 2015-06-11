@@ -31,3 +31,4 @@ if ($device['os'] == "dsm") {
 		discover_sensor($valid['sensor'], 'load', $device, $ups_load_oid, 'UPSLoad', $ups_device_manufacturer.' '.$ups_device_model, 'UPS Load', '1', '1', 0, NULL, NULL, 100, intval($ups_load));
 	}
 }
+
