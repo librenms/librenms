@@ -285,7 +285,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
   // Test Database Exists
   if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
-    if (filter_var($host, FILTER_VALIDATE_IP) && ip_exists($host) === false) {
+    if (ip_exists($host) === false) {
       // Test reachability
       if ($force_add == 1 || isPingable($host))
       {
@@ -1228,6 +1228,8 @@ function ip_exists($ip) {
         if (!dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip))) {
             $return = false;
         }
+    } else {
+        $return = false;
     }
     return $return;
 }
