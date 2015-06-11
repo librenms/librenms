@@ -55,7 +55,7 @@
 
         echo("
                <tr style=\"background: $row_colour;\">
-                 <td><a href=\"".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id']))."/\"><span style=\"font-weight: bold;\" class=\"interface\">".$bill['bill_name']."</a></span><br />from ".strftime("%x", strtotime($datefrom))." to ".strftime("%x", strtotime($dateto))."</td>
+                 <td><a href=\"".generate_url(array('page' => "bill", 'bill_id' => $bill['bill_id']))."\"><span style=\"font-weight: bold;\" class=\"interface\">".$bill['bill_name']."</a></span><br />from ".strftime("%x", strtotime($datefrom))." to ".strftime("%x", strtotime($dateto))."</td>
                  <td>$type</td>
                  <td>$allowed</td>
                  <td>$in</td>
