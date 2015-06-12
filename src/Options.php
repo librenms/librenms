@@ -125,26 +125,4 @@ class Options
         $this->database = $database;
         return $this;
     }
-
-    public function getHttpSeriesEndpoint()
-    {
-        return sprintf(
-            "%s://%s:%d/write",
-            $this->getProtocol(),
-            $this->getHost(),
-            $this->getPort()
-        );
-    }
-
-    public function getHttpQueryEndpoint($name = false)
-    {
-        $url = sprintf(
-            "%s://%s:%d/query",
-            $this->getProtocol(),
-            $this->getHost(),
-            $this->getPort()
-        );
-
-        return $url;
-    }
 }
