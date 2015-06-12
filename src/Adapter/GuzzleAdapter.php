@@ -34,7 +34,7 @@ class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
             "body" => json_encode($message)
         ];
 
-        $endpoint = $this->getOptions()->getHttpSeriesEndpoint();
+        $endpoint = $this->getHttpSeriesEndpoint();
         return $this->httpClient->post($endpoint, $httpMessage);
     }
 
@@ -53,7 +53,29 @@ class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
 
     private function get(array $httpMessage)
     {
-        $endpoint = $this->getOptions()->getHttpQueryEndpoint();
+        $endpoint = $this->getHttpQueryEndpoint();
         return $this->httpClient->get($endpoint, $httpMessage)->json();
+    }
+
+    protected function getHttpSeriesEndpoint()
+    {
+        return sprintf(
+            "%s://%s:%d/write",
+            $this->getOptions()->getProtocol(),
+            $this->getOptions()->getHost(),
+            $this->getOptions()->getPort()
+        );
+    }
+
+    protected function getHttpQueryEndpoint($name = false)
+    {
+        $url = sprintf(
+            "%s://%s:%d/query",
+            $this->getOptions()->getProtocol(),
+            $this->getOptions()->getHost(),
+            $this->getOptions()->getPort()
+        );
+
+        return $url;
     }
 }
