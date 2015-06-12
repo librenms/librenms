@@ -1219,17 +1219,16 @@ function fix_integer_value($value) {
 
 function ip_exists($ip) {
     // Function to check if an IP exists in the DB already
-    $return = true; // Default to assuming it does.
     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== FALSE) {
         if (!dbFetchRow("SELECT `ipv6_address_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip,$ip))) {
-            $return = false;
+            return false;
         }
     } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== FALSE) {
         if (!dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip))) {
-            $return = false;
+            return false;
         }
     } else {
-        $return = false;
+        return false;
     }
-    return $return;
+    return true;
 }
