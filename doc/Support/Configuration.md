@@ -418,10 +418,23 @@ This array can be used to filter out syslog messages that you don't want to be s
 #### Virtualization
 
 ```php
-$config['enable_libvirt'] = 0;
+$config['enable_libvirt'] = 1;
 $config['libvirt_protocols']    = array("qemu+ssh","xen+ssh");
 ```
-Enable this to switch on support for libvirt along with `libvirt_protocols` to indicate how you connect to libvirt.
+Enable this to switch on support for libvirt along with `libvirt_protocols`
+to indicate how you connect to libvirt.  You also need to:
+
+ 1. Generate a non-password-protected ssh key for use by LibreNMS, as the
+    user which runs polling & discovery (usually `librenms`).
+ 2. On each VM host you wish to monitor:
+   - Configure public key authentication from your LibreNMS server/poller by
+     adding the librenms public key to `~root/.ssh/authorized_keys`.
+   - (xen+ssh only) Enable libvirtd to gather data from xend by setting
+     `(xend-unix-server yes)` in `/etc/xen/xend-config.sxp` and
+     restarting xend and libvirtd.
+
+To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
+`virsh -c xen+ssh://vmhost list` as your librenms polling user.
  
 #### BGP Support
 
