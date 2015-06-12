@@ -453,16 +453,6 @@ function get_dev_attribs($device)
   return $attribs;
 }
 
-function is_dev_attrib_enabled($device, $attrib)
-{
-    foreach (get_dev_attribs($device) as $name => $val) {
-        if ($name == $attrib && $val == 0) {
-            return false;
-        }
-    }
-    return true;
-}
-
 function get_dev_entity_state($device)
 {
   $state = array();
@@ -484,6 +474,19 @@ function get_dev_attrib($device, $attrib_type)
   {
     return NULL;
   }
+}
+
+function is_dev_attrib_enabled($device, $attrib, $default = true)
+{
+    $val = get_dev_attrib($device, $attrib);
+    if ($val != NULL) {
+        // attribute is set
+        return ($val != 0);
+    }
+    else {
+        // attribute not set
+        return $default;
+    }
 }
 
 function del_dev_attrib($device, $attrib_type)
