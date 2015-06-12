@@ -3,7 +3,6 @@
 namespace InfluxDB;
 
 use InfluxDb\Adapter\QueryableInterface;
-use InfluxDB\Filter\FilterInterface;
 
 /**
  * Client to manage request at InfluxDB
@@ -69,19 +68,5 @@ class Client
             throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
         }
         return $this->getAdapter()->query("drop database \"{$name}\"");
-    }
-
-    private function clearTimePrecision($timePrecision)
-    {
-        switch ($timePrecision) {
-            case 's':
-            case 'u':
-            case 'ms':
-                break;
-            default:
-                $timePrecision = false;
-        }
-
-        return $timePrecision;
     }
 }
