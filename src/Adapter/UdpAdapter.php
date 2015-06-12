@@ -2,7 +2,6 @@
 namespace InfluxDB\Adapter;
 
 use DateTime;
-use InfluxDB\Options;
 
 final class UdpAdapter extends AdapterAbstract
 {
