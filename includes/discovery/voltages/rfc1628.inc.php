@@ -22,7 +22,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
       $volt = snmp_get($device, $volt_oid, "-O vq") / $divisor;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "rfc1628";
-      $index = "1.2.5.".$volt_id;
+      $index = 500+$current_id;
 
       discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
     }
@@ -38,7 +38,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     $type     = "rfc1628";
     $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
-    $index    = $i;
+    $index    = 300+$i;
 
     discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }

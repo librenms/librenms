@@ -37,7 +37,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     $current    = snmp_get($device, $current_oid, "-Oqv");
     $type       = "rfc1628";
     $precision  = 1;
-    $index      = $i;
+    $index      = 300+$i;
 
     discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
