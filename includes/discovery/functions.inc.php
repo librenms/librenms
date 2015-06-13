@@ -81,12 +81,12 @@ function discover_device($device, $options = NULL)
 
   echo("\n");
  
-  // If we've specified a module, use that, else walk the modules array
-  if ($options['m'])
-  {
-    if (is_file("includes/discovery/".$options['m'].".inc.php"))
-    {
-      include("includes/discovery/".$options['m'].".inc.php");
+  // If we've specified modules, use them, else walk the modules array
+  if ($options['m']) {
+    foreach (explode(',', $options['m']) as $module) {
+        if (is_file("includes/discovery/$module.inc.php")) {
+          include("includes/discovery/$module.inc.php");
+        }
     }
   } else {
     foreach ($config['discovery_modules'] as $module => $module_status)
