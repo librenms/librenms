@@ -359,7 +359,7 @@ function rrd_create_update($device, $name, $def, $val, $step = 300)
     global $config;
     $rrd = implode("/", array($config['rrd_dir'], $device['hostname'], safename(implode("-", $name)).".rrd"));
 
-    if (!is_file($rrd)) {
+    if (!is_file($rrd) && $def != null) {
         // add the --step and the rra definitions to the array
         $newdef = "--step $step ".implode(' ', $def).$config['rrd_rra'];
         d_echo("Creating RRD $rrd: $newdef");
