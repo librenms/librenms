@@ -44,8 +44,10 @@ include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
 if ($auth && is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
     include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
 }
-else
-{
+elseif ($auth && is_mib_graph($type, $subtype)) {
+    include($config['install_dir'] . "/html/includes/graphs/$type/mib.inc.php");
+}
+else {
   graph_error("$type*$subtype ");//Graph Template Missing");
 }
 
