@@ -15,23 +15,21 @@ class AdapterEvent extends AthleticEvent
 
     public function setUp()
     {
-        $client = new Client();
         $options = new Options();
         $options->setHost("localhost");
         $options->setPort(8086);
         $options->setUsername("root");
         $options->setPassword("root");
         $options->setDatabase("tcp.test");
-        $client->setAdapter(
-            new GuzzleAdapter(new HttpClient(), $options)
-        );
+
+        $client = new Client(new GuzzleAdapter(new HttpClient(), $options));
+
         $this->httpClient = $client;
 
         $opts = new Options();
         $opts->setPort(4444);
 
-        $client = new Client();
-        $client->setAdapter(new UdpAdapter($opts));
+        $client = new Client(new UdpAdapter($opts));
 
         $this->udpClient = $client;
     }

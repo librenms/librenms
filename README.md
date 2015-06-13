@@ -268,8 +268,8 @@ The impact using UDP/IP or HTTP adapters
 Corley\Benchmarks\InfluxDB\AdapterEvent
     Method Name                Iterations    Average Time      Ops/second
     ------------------------  ------------  --------------    -------------
-    sendDataUsingHttpAdapter: [1,000     ] [0.0162619416714] [61.49327]
-    sendDataUsingUdpAdapter : [1,000     ] [0.0000890662670] [11,227.59529]
+    sendDataUsingHttpAdapter: [1,000     ] [0.0167509446144] [59.69813]
+    sendDataUsingUdpAdapter : [1,000     ] [0.0000905156136] [11,047.81773]
 ```
 
 ### Message to inline protocol conversion
@@ -283,8 +283,8 @@ The impact of message to inline protocol conversion is:
 Corley\Benchmarks\InfluxDB\MessageToInlineProtocolEvent
     Method Name                                            Iterations    Average Time      Ops/second
     ----------------------------------------------------  ------------  --------------    -------------
-    convertMessageToInlineProtocolWithNoTags            : [10,000    ] [0.0000230122805] [43,455.05877]
-    convertMessageToInlineProtocolWithGlobalTags        : [10,000    ] [0.0000301691532] [33,146.43911]
-    convertMessageToInlineProtocolWithDifferentTagLevels: [10,000    ] [0.0000327563763] [30,528.40741]
+    convertMessageToInlineProtocolWithNoTags            : [10,000    ] [0.0000237422466] [42,119.01324]
+    convertMessageToInlineProtocolWithGlobalTags        : [10,000    ] [0.0000306700468] [32,605.10185]
+    convertMessageToInlineProtocolWithDifferentTagLevels: [10,000    ] [0.0000343942404] [29,074.63543]
 ```
 
