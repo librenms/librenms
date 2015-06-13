@@ -4,12 +4,6 @@ namespace InfluxDB\Adapter;
 use GuzzleHttp\Client;
 use InfluxDB\Options;
 
-/**
- * Class GuzzleAdapter
- * @package InfluxDB\Adapter
- *
- * @deprecated
- */
 class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
 {
     private $httpClient;
