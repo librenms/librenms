@@ -1533,7 +1533,7 @@ $config['graph_types']['device']['siklu_rfinterfaceOtherOctets'] = array(
 );
 
 $config['graph_types']['device']['ruckusZD1000-SystemLicensedAPs'] = array(
-    'section' => 'MIB',
+    'section' => 'mib',
     'order'   => '1',
     'descr'   => 'Licensed APs',
     'file'    => 'ruckusZD1000-SystemLicensedAPs-0.rrd',
