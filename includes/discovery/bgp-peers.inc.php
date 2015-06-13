@@ -20,18 +20,33 @@ if ($config['enable_bgp'])
       echo("Updated AS ");
     }
 
-    $peers_data = snmp_walk($device, "BGP4-MIB::bgpPeerRemoteAs", "-Oq", "BGP4-MIB", $config['mibdir']);
+    $peer2 = FALSE;
+    $peers_data = snmp_walk($device, "cbgpPeer2RemoteAs", "-Oq", "CISCO-BGP4-MIB", $config['mibdir']);
+    if (empty($peers_data)) {
+        $peers_data = snmp_walk($device, "BGP4-MIB::bgpPeerRemoteAs", "-Oq", "BGP4-MIB", $config['mibdir']);
+    } else {
+        $peer2 = TRUE;
+    }
     if ($debug) { echo("Peers : $peers_data \n"); }
-    $peers = trim(str_replace("BGP4-MIB::bgpPeerRemoteAs.", "", $peers_data));
+    $peers = trim(str_replace("CISCO-BGP4-MIB::cbgpPeer2RemoteAs.", "", $peers_data));
+    $peers = trim(str_replace("BGP4-MIB::bgpPeerRemoteAs.", "", $peers));
 
     foreach (explode("\n", $peers) as $peer)
     {
+      if ($peer2 === TRUE) {
+          list($ver, $peer) = explode(".", $peer,2);
+      }
       list($peer_ip, $peer_as) = explode(" ",  $peer);
+      if (strstr($peer_ip, ":")) {
+          $peer_ip_snmp = preg_replace("/:/", ' ', $peer_ip);
+          $peer_ip = preg_replace("/(\S+\s+\S+)\s/", '$1:', $peer_ip_snmp);
+          $peer_ip = str_replace('"','',str_replace(' ','',$peer_ip));
+      }
 
       if ($peer && $peer_ip != "0.0.0.0")
       {
         if ($debug) { echo("Found peer $peer_ip (AS$peer_as)\n"); }
-        $peerlist[] = array('ip' => $peer_ip, 'as' => $peer_as);
+        $peerlist[] = array('ip' => $peer_ip, 'as' => $peer_as, 'ver' => $ver);
       }
     } # Foreach
 
@@ -92,18 +107,31 @@ if ($config['enable_bgp'])
           // Get afi/safi and populate cbgp on cisco ios (xe/xr)
           unset($af_list);
 
-          $af_data = snmp_walk($device, "cbgpPeerAddrFamilyName." . $peer['ip'], "-OsQ", "CISCO-BGP4-MIB", $config['mibdir']);
-          if ($debug) { echo("afi data :: $af_data \n"); }
-
-          $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer['ip'].".", "", $af_data));
-          foreach (explode("\n", $afs) as $af)
+          if ($peer2 === TRUE) {
+              $af_data = snmpwalk_cache_oid($device, "cbgpPeer2AddrFamilyEntry", $cbgp, "CISCO-BGP4-MIB", $config['mibdir']);
+          } else {
+              $af_data = snmpwalk_cache_oid($device, "cbgpPeerAddrFamilyEntry", $cbgp, "CISCO-BGP4-MIB", $config['mibdir']);
+          }
+          if ($debug) {
+              echo("afi data :: ");
+              print_r($af_data);
+          }
+          foreach ($af_data as $k => $v)
           {
-            if ($debug) { echo("AFISAFI = $af\n"); }
-            list($afisafi, $text) = explode(" = ", $af);
-            list($afi, $safi) = explode(".", $afisafi);
-            if ($afi && $safi)
+            if ($peer2 === TRUE) {
+                list(,$k) = explode('.',$k,2);
+            }
+            if ($debug) { echo("AFISAFI = $k\n"); }
+            $afisafi_tmp = explode('.', $k);
+            $safi = array_pop($afisafi_tmp);
+            $afi = array_pop($afisafi_tmp);
+            $bgp_ip = str_replace(".$afi.$safi", "", $k);
+            $bgp_ip = preg_replace("/:/"," ", $bgp_ip);
+            $bgp_ip = preg_replace("/(\S+\s+\S+)\s/", '$1:', $bgp_ip);
+            $bgp_ip = str_replace('"','',str_replace(' ','',$bgp_ip));
+            if ($afi && $safi && $bgp_ip == $peer['ip'])
             {
-              $af_list[$afi][$safi] = 1;
+              $af_list[$bgp_ip][$afi][$safi] = 1;
               if (dbFetchCell("SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ?, AND afi=? AND safi=?",array($device['device_id'], $peer['ip'],$afi,$safi)) == 0)
               {
                 dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'afi' => $afi, 'safi' => $safi), 'bgpPeers_cbgp');
@@ -170,7 +198,7 @@ if ($config['enable_bgp'])
         {
           $afi = $entry['afi'];
           $safi = $entry['safi'];
-          if (!$af_list[$afi][$safi])
+          if (!$af_list[$afi][$safi] || !$af_list[$entry['bgpPeerIdentifier']][$afi][$safi])
           {
             dbDelete('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeerIdentifier` = ?, afi=?, safi=?', array($device['device_id'],$peer['ip'],$afi,$safi));
           }
@@ -212,4 +240,3 @@ if ($config['enable_bgp'])
   echo("\n");
 }
 
-?>

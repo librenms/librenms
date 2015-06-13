@@ -1208,6 +1208,21 @@ function first_oid_match($device, $list) {
     }
 }
 
+function hex_to_ip($hex) {
+    $return = "";
+    if (filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === FALSE && filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === FALSE) {
+        $hex_exp = explode(' ', $hex);
+        foreach ($hex_exp as $item) {
+            if (!empty($item) && $item != "\"") {
+                $return .= hexdec($item).'.';
+            }
+        }
+        $return = substr($return, 0, -1);
+    } else {
+        $return = $hex;
+    }
+    return $return;
+}
 function fix_integer_value($value) {
     if ($value < 0) {
         $return = 4294967296+$value;
