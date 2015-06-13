@@ -1247,37 +1247,3 @@ function ip_exists($ip) {
     }
     return true;
 }
-
-/*
- * convenience function - please use this instead of 'if ($debug) { echo ...; }'
- */
-function d_echo($text)
-{
-    global $debug;
-    if ($debug) {
-        echo "$text\n";
-    }
-}
-
-/*
- * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
- */
-function d_print_r($var)
-{
-    global $debug;
-    if ($debug) {
-        print_r($var);
-    }
-}
-
-/*
- * @return the name of the rrd file for $host's $extra component
- * @param host Host name
- * @param extra Components of RRD filename - will be separated with "-"
- */
-function rrdname($host, $extra)
-{
-    global $config;
-    return implode("/", array($config['rrd_dir'], $host, safename(implode("-", $extra)).".rrd"));
-}
-

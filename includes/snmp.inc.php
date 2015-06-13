@@ -806,23 +806,6 @@ function snmp_gen_auth (&$device)
 }
 
 /*
- * Shorten the name to so it works as an RRD data source.
- * Substitute for $subst if necessary.
- * @return the shortened name
- */
-function name_shorten($name, $common, $subst = "mibval", $len = 19)
-{
-    if (strlen($name) > $len && strpos($name, $common) >= 0) {
-        $newname = str_replace($common, '', $name);
-        $name = $newname;
-    }
-    if (strlen($name) > $len) {
-        $name = $subst;
-    }
-    return $name;
-}
-
-/*
  * Translate the given MIB into a vaguely useful PHP array.  Each keyword becomes an array index.
  *
  * Example:

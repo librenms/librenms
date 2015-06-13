@@ -605,4 +605,94 @@ function edit_service($service, $descr, $service_ip, $service_param = "", $servi
 
 }
 
+/*
+ * convenience function - please use this instead of 'if ($debug) { echo ...; }'
+ */
+function d_echo($text, $no_debug_text = null)
+{
+    global $debug;
+    if ($debug) {
+        echo "$text";
+    }
+    elseif ($no_debug_text) {
+        echo "$no_debug_text";
+    }
+}
+
+/*
+ * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
+ */
+function d_print_r($var, $no_debug_text = null)
+{
+    global $debug;
+    if ($debug) {
+        print_r($var);
+    }
+    elseif ($no_debug_text) {
+        echo "$no_debug_text";
+    }
+}
+
+/*
+ * Shorten the name so it works as an RRD data source name (limited to 19 chars by default).
+ * Substitute for $subst if necessary.
+ * @return the shortened name
+ */
+function name_shorten($name, $common, $subst = "mibval", $len = 19)
+{
+    if (strlen($name) > $len && strpos($name, $common) >= 0) {
+        $newname = str_replace($common, '', $name);
+        $name = $newname;
+    }
+    if (strlen($name) > $len) {
+        $name = $subst;
+    }
+    return $name;
+}
+
+/*
+ * @return the name of the rrd file for $host's $extra component
+ * @param host Host name
+ * @param extra Components of RRD filename - will be separated with "-"
+ */
+function rrd_name($host, $extra, $exten = ".rrd")
+{
+    global $config;
+    $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
+    return implode("/", array($config['rrd_dir'], $host, $filename.$exten));
+}
+
+/*
+ * @return true if the given graph type is a dynamic MIB graph
+ */
+function is_mib_graph($type, $subtype)
+{
+    global $config;
+    return $config['graph_types'][$type][$subtype]['section'] == 'mib';
+}
+
+/*
+ * @return true if client IP address is authorized to access graphs
+ */
+function is_client_authorized($clientip)
+{
+
+    global $config;
+    if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs']) {
+        d_echo("Unauthorized graphs allowed\n");
+        return true;
+    }
+
+    if (isset($config['allow_unauth_graphs_cidr'])) {
+        foreach ($config['allow_unauth_graphs_cidr'] as $range) {
+            if (Net_IPv4::ipInNetwork($clientip, $range)) {
+                d_echo("Unauthorized graphs allowed from $range\n");
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 ?>
