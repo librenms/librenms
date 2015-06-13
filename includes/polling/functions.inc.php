@@ -183,6 +183,7 @@ function poll_device($device, $options)
       {
         if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module])))
         {
+          // TODO per-module polling stats
           include('includes/polling/'.$module.'.inc.php');
         } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == "0") {
           echo("Module [ $module ] disabled on host.\n");
@@ -222,6 +223,7 @@ function poll_device($device, $options)
 
     $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
 
+    // TODO: These should be easy converts to rrd_create_update()
     // Poller performance rrd
     $poller_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/poller-perf.rrd";
     if (!is_file($poller_rrd))
