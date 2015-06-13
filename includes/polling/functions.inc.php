@@ -349,7 +349,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 /*
  * Please use this instead of creating & updating RRD files manually.
  * @param device Device object - only 'hostname' is used at present
- * @param name Array of name objects - filename will be constructed using this with a "-" delimiter
+ * @param name Array of rrdname components
  * @param def Array of data definitions
  * @param val Array of value definitions
  *
@@ -357,7 +357,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 function rrd_create_update($device, $name, $def, $val, $step = 300)
 {
     global $config;
-    $rrd = implode("/", array($config['rrd_dir'], $device['hostname'], safename(implode("-", $name)).".rrd"));
+    $rrd = rrd_name($device['hostname'], $name);
 
     if (!is_file($rrd) && $def != null) {
         // add the --step and the rra definitions to the array
