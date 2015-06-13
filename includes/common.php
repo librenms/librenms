@@ -695,4 +695,39 @@ function is_client_authorized($clientip)
     return false;
 }
 
+/*
+ * @return an array of all graph subtypes for the given type
+ * FIXME not all of these are going to be valid
+ */
+function get_graph_subtypes($type)
+{
+    global $config;
+
+    $types = array();
+
+    // find the subtypes defined in files
+    if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/$type/")) {
+        while (false !== ($file = readdir($handle))) {
+            if ($file != "." && $file != ".." && $file != "auth.inc.php" && strstr($file, ".inc.php")) {
+                $types[] = str_replace(".inc.php", "", $file);
+            }
+        }
+        closedir($handle);
+    }
+
+    // find the MIB subtypes
+    foreach ($config['graph_types'] as $type => $unused1) {
+        print_r($type);
+        foreach ($config['graph_types'][$type] as $subtype => $unused2) {
+            print_r($subtype);
+            if (is_mib_graph($type, $subtype)) {
+                $types[] = $subtype;
+            }
+        }
+    }
+
+    sort($types);
+    return $types;
+}
+
 ?>
