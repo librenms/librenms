@@ -165,7 +165,7 @@ echo('
 if ($config['enable_syslog'])
 {
 
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
+  $sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
   $query = mysql_query($sql);
 
   echo('<div class="container-fluid">
@@ -198,10 +198,10 @@ if ($config['enable_syslog'])
 
   if ($_SESSION['userlevel'] >= '10')
   {
-    $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %T') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
+    $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     $alertquery = "SELECT devices.device_id,name,state,time_logged FROM alert_log LEFT JOIN devices ON alert_log.device_id=devices.device_id LEFT JOIN alert_rules ON alert_log.rule_id=alert_rules.id ORDER BY `time_logged` DESC LIMIT 0,15";
   } else {
-    $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %T') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host = P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
+    $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host = P.device_id AND P.user_id = " . $_SESSION['user_id'] . " ORDER BY `datetime` DESC LIMIT 0,15";
     $alertquery = "SELECT devices.device_id,name,state,time_logged FROM alert_log LEFT JOIN devices ON alert_log.device_id=devices.device_id LEFT JOIN alert_rules ON alert_log.rule_id=alert_rules.id RIGHT JOIN devices_perms ON alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = " . $_SESSION['user_id'] . " ORDER BY `time_logged` DESC LIMIT 0,15";
   }
 

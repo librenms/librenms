@@ -32,7 +32,7 @@ $pdf->AddPage('L');
         $numresults = 250;
     }
 
-    $full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged, '%D %b %Y %T') as humandate $query LIMIT $start,$numresults";
+    $full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged, '".$config['dateformat']['mysql']['compact']."') as humandate $query LIMIT $start,$numresults";
 
     foreach (dbFetchRows($full_query, $param) as $alert_entry) {
         $hostname = gethostbyid(mres($alert_entry['device_id']));

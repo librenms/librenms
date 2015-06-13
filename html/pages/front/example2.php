@@ -96,7 +96,7 @@ echo("
 
 ");
 
-$sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
+$sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 foreach (dbFetchRows($sql) as $entry)
 {
