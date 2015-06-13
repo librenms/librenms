@@ -2,6 +2,7 @@
 namespace InfluxDB;
 
 use DateTime;
+use DateTimeZone;
 use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
 use InfluxDB\Options;
 use InfluxDB\Adapter\UdpAdapter;
@@ -165,11 +166,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $object = $this->createClientWithUdpAdapter();
 
         $object->mark("udp.test", ["mark" => "element"]);
-        sleep(1);
         $object->mark("udp.test", ["mark" => "element1"]);
-        sleep(1);
         $object->mark("udp.test", ["mark" => "element2"]);
-        sleep(1);
         $object->mark("udp.test", ["mark" => "element3"]);
 
         // Wait UDP/IP message arrives
@@ -278,8 +276,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
         $this->assertEquals("time", $body["results"][0]["series"][0]["columns"][0]);
-        $saved = new DateTime($body["results"][0]["series"][0]["values"][0][0]);
-        $this->assertEquals(date("Y-m-d"), $saved->format("Y-m-d"));
+        $saved = $body["results"][0]["series"][0]["values"][0][0];
+        $this->assertRegExp("/".date("Y-m-d")."/i", $saved);
     }
 
     /**
