@@ -942,7 +942,7 @@ function snmp_translate($oid, $module, $mibdir = null)
     $cmd .= " -m $module $oid";                 // load all the MIBs looking for our object
     $cmd .= " 2>/dev/null";                     // ignore invalid MIBs
 
-    $lines = preg_split('/\n+/', shell_exec($cmd));
+    $lines = preg_split('/\n+/', external_exec($cmd));
     if (!$lines) {
         d_echo("No results from snmptranslate\n");
         return null;
@@ -1075,19 +1075,27 @@ function poll_mibs($list, $device, &$graphs)
         return;
     }
     $mibdefs = array();
+    echo("MIB-based polling:");
+    d_echo("\n");
+
     foreach ($list as $name => $module) {
         $translated = snmp_translate($name, $module);
         if ($translated) {
+            echo(" $module::$name");
+            d_echo("\n");
             $mod = $translated[0];
             $nam = $translated[1];
             $mibdefs[$nam] = snmp_mib_load($nam, $mod);
-            $oids = snmpwalk_cache_oid($device, "$mod::$nam", array(), $mod);
+            $oids = snmpwalk_cache_oid($device, $nam, array(), $mod, null, "-OQUsb");
+            d_print_r($oids);
             save_mibs($device, $nam, $oids, $mibdefs[$nam], $graphs);
         }
         else {
             d_echo("MIB: no match for $module::$name\n");
         }
     }
+    d_echo("Done MIB-based polling");
+    echo("\n");
 }
 
 ?>
