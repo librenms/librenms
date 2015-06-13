@@ -142,7 +142,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     list($warn_limit, $low_warn_limit) = array($low_warn_limit, $warn_limit);
   }
 
-  if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ?", array($poller_type, $class, $device['device_id'], $type, $index)) == '0')
+  if (dbFetchCell("SELECT COUNT(sensor_id) FROM `sensors` WHERE `poller_type`= ? AND `sensor_class` = ? AND `device_id` = ? AND sensor_type = ? AND `sensor_index` = ? AND `sensor_oid` = ?", array($poller_type, $class, $device['device_id'], $type, $index, $oid)) == '0')
   {
     if (!$high_limit) { $high_limit = sensor_limit($class, $current); }
     if (!$low_limit)  { $low_limit  = sensor_low_limit($class, $current); }
@@ -186,7 +186,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
   }
   else
   {
-    $sensor_entry = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?", array($class, $device['device_id'], $type, $index));
+    $sensor_entry = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ? AND `sensor_oid` = ?", array($class, $device['device_id'], $type, $index, $oid));
 
     if (!isset($high_limit))
     {
