@@ -14,7 +14,6 @@ class Client
     public function __construct(Adapter\AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
-        return $this;
     }
 
     public function getAdapter()
