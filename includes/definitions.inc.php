@@ -1177,8 +1177,6 @@ foreach ($config['os'] as $this_os => $blah)
 // Graph Types
 
 
-// FIXME: Load graph_types from database here so that config overrides database
-
 // Device - Wireless - AirMAX
 $config['graph_types']['device']['ubnt_airmax_WlStatStaCount'] = array(
   'section'   => 'wireless',
