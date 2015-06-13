@@ -14,8 +14,6 @@ print_optionbar_start();
 
 echo("<span style='font-weight: bold;'>Graphs</span> &#187; ");
 
-$sep = "";
-
 foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph", array($device['device_id'])) as $graph)
 {
   $section = $config['graph_types']['device'][$graph['graph']]['section'];
@@ -28,6 +26,7 @@ foreach (dbFetchRows("SELECT * FROM device_graphs WHERE device_id = ? ORDER BY g
 $graph_enable['poller']['poller_perf'] = 'device_poller_perf';
 $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
 
+$sep = "";
 foreach ($graph_enable as $section => $nothing)
 {
   if (isset($graph_enable) && is_array($graph_enable[$section]))
@@ -47,8 +46,8 @@ foreach ($graph_enable as $section => $nothing)
     $sep = " | ";
   }
 }
-
 unset ($sep);
+
 print_optionbar_end();
 
 $graph_enable = $graph_enable[$vars['group']];
