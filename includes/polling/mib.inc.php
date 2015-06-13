@@ -11,12 +11,7 @@
  * the source code distribution for details.
  */
 
-echo("MIB-based polling");
-d_echo("\n", ": ");
-
 $devicemib = array($device['sysObjectID'] => "all");
 poll_mibs($devicemib, $device, $graphs);
 
-d_echo("Done MIB-based polling");
-echo("\n");
 ?>
