@@ -40,7 +40,7 @@ if ($_POST['program'])
   $param[] = $_POST['program'];
 }
 
-$sql =  "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog WHERE device_id = ? $where";
+$sql =  "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog WHERE device_id = ? $where";
 $sql .= " ORDER BY timestamp DESC LIMIT 1000";
 echo('      <div class="panel panel-default panel-condensed">
               <div class="panel-heading">

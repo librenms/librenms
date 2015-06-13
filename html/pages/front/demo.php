@@ -161,7 +161,7 @@ echo("
 <h3>Recent Syslog Messages</h3>
 ");
 
-$sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from `syslog` ORDER BY seq DESC LIMIT 20";
+$sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from `syslog` ORDER BY seq DESC LIMIT 20";
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 foreach (dbFetchRows($sql) as $entry)
 {
