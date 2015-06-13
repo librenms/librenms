@@ -1176,6 +1176,8 @@ foreach ($config['os'] as $this_os => $blah)
 
 // Graph Types
 
+include_once($config['install_dir'] . "/includes/load_db_graph_types.inc.php");
+
 
 // Device - Wireless - AirMAX
 $config['graph_types']['device']['ubnt_airmax_WlStatStaCount'] = array(
@@ -1529,18 +1531,6 @@ $config['graph_types']['device']['siklu_rfinterfaceOtherOctets'] = array(
         'rfOutIdleOctets' => array('label' => 'Out Idle', 'draw' => 'LINE', 'line' => TRUE),
         'rfInGoodOctets' => array('label' => 'Good Octets', 'draw' => 'LINE', 'line' => TRUE),
         'rfInErroredOctetts' => array('label' => 'Errored Octets', 'draw' => 'LINE', 'line' => TRUE),
-    )
-);
-
-$config['graph_types']['device']['ruckusZD1000-SystemLicensedAPs'] = array(
-    'section' => 'mib',
-    'order'   => '1',
-    'descr'   => 'Licensed APs',
-    'file'    => 'ruckusZD1000-SystemLicensedAPs-0.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'Number',
-    'ds'        => array(
-        'SystemLicensedAPs' => array('label' => 'LicensedAPs', 'draw' => 'LINE', 'line' => TRUE)
     )
 );
 
