@@ -2,6 +2,7 @@
 
 namespace InfluxDB;
 
+use InfluxDB\Adapter\WritableInterface;
 use InfluxDb\Adapter\QueryableInterface;
 
 /**
@@ -11,10 +12,9 @@ class Client
 {
     private $adapter;
 
-    public function __construct(Adapter\AdapterInterface $adapter)
+    public function __construct($adapter)
     {
         $this->adapter = $adapter;
-        return $this;
     }
 
     public function getAdapter()
@@ -24,6 +24,10 @@ class Client
 
     public function mark($name, array $values = [])
     {
+        if (!($this->getAdapter() instanceOf WritableInterface)) {
+            throw new  \BadMethodCallException("You can write data to database only if the adapter supports it!");
+        }
+
         $data = $name;
         if (!is_array($name)) {
             $data =[];
