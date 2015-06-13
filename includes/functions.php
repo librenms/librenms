@@ -285,6 +285,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
   // Test Database Exists
   if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
+    if (ip_exists($host) === false) {
       // Test reachability
       if ($force_add == 1 || isPingable($host))
       {
@@ -369,6 +370,11 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         // failed Reachability
         if($quiet == '0') { print_error("Could not ping $host"); }
       }
+    } else {
+        if ($quiet == 0) {
+            print_error("Already have host with this IP $host");
+        }
+    }
   } else {
     // found in database
     if($quiet == '0') { print_error("Already got host $host"); }
@@ -1209,4 +1215,20 @@ function fix_integer_value($value) {
         $return = $value;
     }
     return $return;
+}
+
+function ip_exists($ip) {
+    // Function to check if an IP exists in the DB already
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== FALSE) {
+        if (!dbFetchRow("SELECT `ipv6_address_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip,$ip))) {
+            return false;
+        }
+    } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== FALSE) {
+        if (!dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip))) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
 }
