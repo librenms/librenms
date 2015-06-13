@@ -944,17 +944,17 @@ function snmp_translate($oid, $module, $mibdir = null)
 
     $lines = preg_split('/\n+/', shell_exec($cmd));
     if (!$lines) {
-        d_echo("No results from snmptranslate");
+        d_echo("No results from snmptranslate\n");
         return null;
     }
 
     $matches = array();
     if (!preg_match('/(.*)::(.*)/', $lines[0], $matches)) {
-        d_echo("This doesn't look like a MIB: ".$lines[0]);
+        d_echo("This doesn't look like a MIB: $lines[0]\n");
         return null;
     }
 
-    d_echo("SNMP translated: $module::$oid -> $matches[1]::$matches[2]");
+    d_echo("SNMP translated: $module::$oid -> $matches[1]::$matches[2]\n");
     return array($matches[1], $matches[2]);
 }
 
@@ -1071,7 +1071,7 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
 function poll_mibs($list, $device, &$graphs)
 {
     if (!is_dev_attrib_enabled($device, "poll_mib")) {
-        d_echo("MIB module disabled for ".$device['hostname']);
+        d_echo("MIB module disabled for ".$device['hostname']."\n");
         return;
     }
     $mibdefs = array();
@@ -1085,7 +1085,7 @@ function poll_mibs($list, $device, &$graphs)
             save_mibs($device, $nam, $oids, $mibdefs[$nam], $graphs);
         }
         else {
-            d_echo("MIB: no match for $module::$name");
+            d_echo("MIB: no match for $module::$name\n");
         }
     }
 }
