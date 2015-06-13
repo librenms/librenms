@@ -2,22 +2,17 @@
 namespace InfluxDB\Adapter;
 
 use InfluxDB\Options;
+use InfluxDB\Adapter\WritableInterface;
 
-abstract class AdapterAbstract implements AdapterInterface
+abstract class AdapterAbstract implements WritableInterface
 {
     private $options;
 
-    /**
-     * @param Options $options
-     */
     public function __construct(Options $options)
     {
         $this->options = $options;
     }
 
-    /**
-     * @return Options
-     */
     public function getOptions()
     {
         return $this->options;
