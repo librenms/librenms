@@ -1044,7 +1044,7 @@ function update_mib_graph_types($mibname, $oids, $mibdef, $graphs)
                 $graphdef = array();
                 $graphdef['graph_type'] = "device";
                 $graphdef['graph_subtype'] = $graphname;
-                $graphdef['graph_section'] = "MIB";
+                $graphdef['graph_section'] = "mib";
                 $graphdef['graph_descr'] = $mibdef[$oid]['description'];
                 $graphdef['graph_order'] = $i++;
                 // TODO: add colours, unit_text, and ds
