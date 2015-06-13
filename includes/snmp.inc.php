@@ -15,6 +15,12 @@ function string_to_oid($string)
   return $oid;
 }
 
+function mibdir($mibdir)
+{
+    global $config;
+    return " -M " . ($mibdir ? $mibdir : $config['mibdir']);
+}
+
 function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir = NULL)
 {
   global $debug,$config,$runtime_stats,$mibs_loaded;
@@ -43,7 +49,7 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
 
   if ($options) { $cmd .= " " . $options; }
   if ($mib) { $cmd .= " -m " . $mib; }
-  if ($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
+  $cmd .= mibdir($mibdir);
 
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
@@ -101,8 +107,7 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 
   if ($options) { $cmd .= " " . $options; }
   if ($mib) { $cmd .= " -m " . $mib; }
-  if ($mibdir) { $cmd .= " -M " . $mibdir; }
-    else { $cmd .= " -M ".$config['mibdir']; }
+  $cmd .= mibdir($mibdir);
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " " . $device['transport'].":".$device['hostname'].":".$device['port'];
@@ -162,7 +167,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 
   if ($options) { $cmd .= " $options "; }
   if ($mib) { $cmd .= " -m $mib"; }
-  if ($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
+  $cmd .= mibdir($mibdir);
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
 
@@ -224,7 +229,7 @@ function snmpwalk_cache_cip($device, $oid, $array = array(), $mib = 0)
 
   $cmd .= " -O snQ";
   if ($mib) { $cmd .= " -m $mib"; }
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
 
@@ -292,7 +297,7 @@ function snmp_cache_ifIndex($device)
   $cmd .= snmp_gen_auth ($device);
 
   $cmd .= " -O Qs";
-  $cmd .= " -M " . $config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   $cmd .= " -m IF-MIB ifIndex";
 
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -461,7 +466,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
   $cmd .= snmp_gen_auth ($device);
 
   $cmd .= " -O QUs";
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   if ($mib) { $cmd .= " -m $mib"; }
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
@@ -521,7 +526,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
   $cmd .= snmp_gen_auth ($device);
 
   $cmd .= " -O QUs";
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   if ($mib) { $cmd .= " -m $mib"; }
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
@@ -582,7 +587,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0)
 
   $cmd .= " -O QUs";
   if ($mib) { $cmd .= " -m $mib"; }
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
@@ -645,7 +650,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0)
   $cmd .= " -O vq";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   if ($mib) { $cmd .= " -m $mib"; }
   $cmd .= " -t " . $timeout . " -r " . $retries;
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$string;
@@ -692,7 +697,7 @@ function snmp_cache_portIfIndex($device, $array)
   $cmd .= snmp_gen_auth ($device);
 
   $cmd .= " -CI -m CISCO-STACK-MIB -O q";
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." portIfIndex";
@@ -739,7 +744,7 @@ function snmp_cache_portName($device, $array)
   $cmd .= snmp_gen_auth ($device);
 
   $cmd .= " -CI -m CISCO-STACK-MIB -O Qs";
-  $cmd .= " -M ".$config['install_dir']."/mibs";
+  $cmd .= mibdir(null);
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." portName";
