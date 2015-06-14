@@ -1,6 +1,20 @@
 <?php
-
-// Common Functions
+/*
+ * LibreNMS - Common Functions
+ *
+ * Original Observium version by: Adam Armstrong, Tom Laermans
+ * Copyright (c) 2009-2012 Adam Armstrong.
+ *
+ * Additions for LibreNMS by: Neil Lathwood, Paul Gear, Tim DuFrane
+ * Copyright (c) 2014-2015 Neil Lathwood <http://www.lathwood.co.uk>
+ * Copyright (c) 2014-2015 Gear Consulting Pty Ltd <http://libertysys.com.au/>
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
 
 function format_number_short($number, $sf)
 {
