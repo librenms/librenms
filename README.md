@@ -1,7 +1,5 @@
 # InfluxDB PHP SDK
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/699a9a78-39aa-41d0-bb60-41dbf0f1251d/big.png)](https://insight.sensiolabs.com/projects/699a9a78-39aa-41d0-bb60-41dbf0f1251d)
-
  * Master: [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
  * Develop: [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=develop)](https://travis-ci.org/corley/influxdb-php-sdk)
 
