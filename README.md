@@ -27,10 +27,12 @@ Just use composer
 }
 ```
 
+## Use it
+
 Add new points:
 
 ```php
-$client->mark("app.search", [
+$client->mark("app-search", [
     "key" => "this is my search"
 ]);
 ```
@@ -54,11 +56,10 @@ $client->mark([
 ]);
 ```
 
-
 Retrieve existing points:
 
 ```php
-$results = $client->query('select * from "app.search"');
+$results = $client->query('select * from "app-search"');
 ```
 
 ## InfluxDB client adapters
