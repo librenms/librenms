@@ -932,6 +932,9 @@ function snmp_mib_load($mib, $module, $mibdir = null)
 /*
  * Turn the given oid (name or numeric value) into a MODULE::mib name.
  * @return an array consisting of the module and mib names, or null if no matching MIB is found.
+ * Example:
+ * snmptranslate -m all -M mibs .1.3.6.1.4.1.8072.3.2.10 2>/dev/null
+ * NET-SNMP-TC::linux
  */
 function snmp_translate($oid, $module, $mibdir = null)
 {
