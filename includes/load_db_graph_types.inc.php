@@ -2,6 +2,7 @@
 /*
  * LibreNMS dynamic graph types
  *
+ * Author: Paul Gear
  * Copyright (c) 2015 Gear Consulting Pty Ltd <github@libertysys.com.au>
  *
  * This program is free software: you can redistribute it and/or modify it
