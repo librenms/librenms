@@ -48,8 +48,10 @@ The components involved in of MIB-based support are:
 
 ### Graphing ###
 
-  - For each graph type device directory, a graph will appear in the Device
-    -> Graphs -> MIB section.
+  - For each graph type defined in the database, a graph will appear in:
+	Device -> Graphs -> MIB
+  - MIB graphs are generated generically by
+    `html/includes/graphs/device/mib.inc.php`
   - At the moment, all units are placed in the same graph.  This is probably
     non-optimal for, e.g., wifi controllers with hundreds of APs attached.
 
