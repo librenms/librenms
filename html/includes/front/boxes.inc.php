@@ -2,6 +2,7 @@
 /*
  * LibreNMS front page graphs
  *
+ * Author: Paul Gear
  * Copyright (c) 2013 Gear Consulting Pty Ltd <http://libertysys.com.au/>
  *
  * This program is free software: you can redistribute it and/or modify it
