@@ -81,6 +81,11 @@ snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 hostname 
     valid name for the MIB.  See the comments for `snmp_translate()` in
     `includes/snmp.inc.php` for an example.  If this step fails, it means
     there is something wrong with the MIB and net-snmp cannot parse it.
+ 6. Add any additional MIBs you wish to poll for specific device types to
+    `includes/polling/os/OSNAME.inc.php` by calling `poll_mibs()` with the
+    MIB module and name.  See includes/polling/os/ruckuswireless.inc.php for
+    an example.
+ 7. That should be all you need to see MIB graphs!
 
 ## TODO ##
 
