@@ -20,12 +20,22 @@ if(!is_numeric($_POST['template_id'])) {
     echo('ERROR: No template selected');
     exit;
 } else {
-      if(dbUpdate(array('rule_id' => mres($_POST['rule_id'])), 'alert_templates', '`id`=?', array($_POST['template_id'])) >= 0) {
-      echo('Alert rules have been attached to this template.');
-      exit;
-    } else {
-      echo('ERROR: Alert rules have not been attached to this template.');
-      exit;
+    $rules = preg_split("/,/",mres($_POST['rule_id']));
+    $success = FALSE;
+    foreach ($rules as $rule_id) {
+        $db_id = dbInsert(array('alert_rule_id' => $rule_id, 'alert_templates_id' => mres($_POST['template_id'])), 'alert_template_map');
+        if ($db_id > 0) {
+            $success = TRUE;
+            $ids[] = $db_id;
+        } else {
+            echo('ERROR: Alert rules have not been attached to this template.');
+            exit;
+        }
+    }
+    if ($success === TRUE) {
+        dbDelete('alert_template_map',"id NOT IN (".implode(',',$ids).")");
+        echo "Alert rules have been attached to this template. $template_map_ids";
+        exit;
     }
 }
 
