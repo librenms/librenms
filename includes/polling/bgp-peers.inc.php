@@ -13,7 +13,8 @@ if ($config['enable_bgp'])
       $peer2 = FALSE;
     echo("Checking BGP peer ".$peer['bgpPeerIdentifier']." ");
 
-    if ((!strstr($peer['bgpPeerIdentifier'],':') || !empty($peer['bgpPeerIdentifier']) && $device['os'] != "junos"))
+    if( !empty($peer['bgpPeerIdentifier']) ) {
+    if( !strstr($peer['bgpPeerIdentifier'],':') || $device['os'] != "junos" )
     {
       # v4 BGP4 MIB
       // FIXME - needs moved to function
@@ -128,6 +129,7 @@ if ($config['enable_bgp'])
         }
         $bgpLocalAddr = Net_IPv6::compress(implode(':',$bgpLocalAddr6)); unset($bgpLocalAddr6);
       }
+    }
     }
 
     if ($bgpPeerFsmEstablishedTime)
