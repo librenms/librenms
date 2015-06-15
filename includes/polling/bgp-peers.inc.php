@@ -13,7 +13,7 @@ if ($config['enable_bgp'])
       $peer2 = FALSE;
     echo("Checking BGP peer ".$peer['bgpPeerIdentifier']." ");
 
-    if (!empty($peer['bgpPeerIdentifier']) && $device['os'] != "junos")
+    if ((!strstr($peer['bgpPeerIdentifier'],':') || !empty($peer['bgpPeerIdentifier']) && $device['os'] != "junos"))
     {
       # v4 BGP4 MIB
       // FIXME - needs moved to function
