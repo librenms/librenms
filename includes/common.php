@@ -652,11 +652,14 @@ function d_print_r($var, $no_debug_text = null)
  * Substitute for $subst if necessary.
  * @return the shortened name
  */
-function name_shorten($name, $common, $subst = "mibval", $len = 19)
+function name_shorten($name, $common = null, $subst = "mibval", $len = 19)
 {
-    if (strlen($name) > $len && strpos($name, $common) >= 0) {
-        $newname = str_replace($common, '', $name);
-        $name = $newname;
+    if ($common !== null) {
+        // remove common from the beginning of the string, if present
+        if (strlen($name) > $len && strpos($name, $common) >= 0) {
+            $newname = str_replace($common, '', $name);
+            $name = $newname;
+        }
     }
     if (strlen($name) > $len) {
         $name = $subst;
@@ -690,8 +693,8 @@ function is_mib_graph($type, $subtype)
  */
 function is_client_authorized($clientip)
 {
-
     global $config;
+
     if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs']) {
         d_echo("Unauthorized graphs allowed\n");
         return true;

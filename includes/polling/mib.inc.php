@@ -14,5 +14,3 @@
 
 $devicemib = array($device['sysObjectID'] => "all");
 poll_mibs($devicemib, $device, $graphs);
-
-?>
