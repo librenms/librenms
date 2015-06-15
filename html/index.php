@@ -276,17 +276,11 @@ if (isset($pagetitle) && is_array($pagetitle))
 <?php
 if($config['enable_footer'] == 1 && (isset($vars['bare']) && $vars['bare'] != "yes")) {
 ?>
-<nav class="navbar navbar-default <?php echo $navbar; ?> navbar-fixed-bottom">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-12 text-center">
-<?php
-echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" class="red">' . $config['project_name'].'</a>.</h5>');
-?>
-      </div>
-    </div>
-  </div>
-</nav>
+<center>
+  <?php
+  echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" class="red">' . $config['project_name'].' </a></h5>');
+  ?>
+</center>
 <?php
 }
 
