@@ -824,7 +824,8 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
 {
     global $debug;
 
-    $lastpart = end(explode(".", $oid));
+    $fulloid = explode(".", $oid);
+    $lastpart = end($fulloid);
 
     $cmd = "snmptranslate -Td -On";
     $cmd .= mibdir($mibdir);
