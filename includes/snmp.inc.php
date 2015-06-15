@@ -946,7 +946,7 @@ function snmp_translate($oid, $module, $mibdir = null)
     $cmd .= " 2>/dev/null";                     // ignore invalid MIBs
 
     $lines = preg_split('/\n+/', external_exec($cmd));
-    if (!$lines) {
+    if (empty($lines)) {
         d_echo("No results from snmptranslate\n");
         return null;
     }
@@ -1051,7 +1051,7 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
     foreach ($oids as $index => $array) {
         foreach ($array as $oid => $val) {
             $type = oid_rrd_type($oid, $mibdef);
-            if (!$type) {
+            if ($type === false) {
                 continue;
             }
             $usedoids[$index][$oid] = $val;

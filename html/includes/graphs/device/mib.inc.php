@@ -20,7 +20,8 @@ foreach (glob($prefix."*.rrd") as $filename) {
     $instance = substr($globpart, 0, -4);               // take off ".rrd"
 
     $ds = array();
-    $mibvar = end(explode("-", $subtype));
+    $mibparts = explode("-", $subtype);
+    $mibvar = end($mibparts);
     $ds['ds'] = name_shorten($mibvar);
     $ds['descr'] = "$mibvar-$instance";
     $ds['filename'] = $filename;
@@ -33,5 +34,3 @@ $nototal    = 0;
 $simple_rrd = true;
 
 include("includes/graphs/generic_multi_line.inc.php");
-
-?>
