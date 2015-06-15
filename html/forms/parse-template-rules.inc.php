@@ -19,8 +19,9 @@ if(is_admin() === false) {
 $template_id = ($_POST['template_id']);
 
 if(is_numeric($template_id) && $template_id > 0) {
-    $template = dbFetchCell("SELECT `rule_id` FROM `alert_templates` WHERE `id` = ? LIMIT 1",array($template_id));
-    $rule_id = split(",", $template);
-    $output = array('rule_id'=>$rule_id);
+    foreach (dbFetchRows("SELECT `alert_rule_id` FROM `alert_template_map` WHERE `alert_templates_id` = ?",array($template_id)) as $rule) {
+        $rules[] = $rule['alert_rule_id'];
+    }
+    $output = array('rule_id'=>$rules);
     echo _json_encode($output);
 }
