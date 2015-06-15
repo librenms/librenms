@@ -93,7 +93,7 @@ function IssueAlert($alert) {
 	}
 	$obj = DescribeAlert($alert);
 	if( is_array($obj) ) {
-		$tpl = dbFetchRow('SELECT template FROM alert_templates WHERE rule_id LIKE "%,'.$alert['rule_id'].',%"');
+                $tpl = dbFetchRow("SELECT `template` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?", array($alert['rule_id']));
 		if( isset($tpl['template']) ) {
 			$tpl = $tpl['template'];
 		} else {
