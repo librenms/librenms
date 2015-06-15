@@ -41,10 +41,10 @@ $subtype = $graphtype['subtype'];
 $auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
 include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
 
-if ($auth && is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
+if ($auth === true && is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
     include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
 }
-elseif ($auth && is_mib_graph($type, $subtype)) {
+elseif ($auth === true && is_mib_graph($type, $subtype)) {
     include($config['install_dir'] . "/html/includes/graphs/$type/mib.inc.php");
 }
 else {
