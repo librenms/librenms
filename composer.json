@@ -1,0 +1,28 @@
+{
+    "name": "leaseweb/php-influxdb",
+    "description": "InfluxDB client library for PHP",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Stephen Hoogendijk",
+            "email": "stephen@tca0.nl"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "scripts": {
+        "post-install-cmd": [
+
+        ],
+        "post-update-cmd": [
+
+        ]
+    },
+    "autoload": {
+        "psr-4" : {
+            "Leaseweb\\InfluxDB": "src/Leaseweb/InfluxDB"
+        }
+    }
+}
