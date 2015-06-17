@@ -436,6 +436,7 @@ function get_graphs() {
     $router = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
 
+    // FIXME: this has some overlap with html/pages/device/graphs.inc.php
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $graphs = array();

@@ -45,20 +45,6 @@ if (!$auth)
     $title .= " :: ".ucfirst($subtype);
   }
 
-  # Load our list of available graphtypes for this object
-  // FIXME not all of these are going to be valid
-  if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/".$type."/"))
-  {
-    while (false !== ($file = readdir($handle)))
-    {
-      if ($file != "." && $file != ".." && $file != "auth.inc.php" &&strstr($file, ".inc.php"))
-      {
-        $types[] = str_replace(".inc.php", "", $file);
-      }
-    }
-    closedir($handle);
-  }
-
   $graph_array = $vars;
   $graph_array['height'] = "60";
   $graph_array['width']  = $thumb_width;
@@ -75,11 +61,14 @@ if (!$auth)
     onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
           <?php
 
-  foreach ($types as $avail_type)
+  foreach (get_graph_subtypes($type) as $avail_type)
   {
     echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
-    if ($avail_type == $subtype) { echo(" selected"); }
-    echo(">".nicecase($avail_type)."</option>");
+    if ($avail_type == $subtype) {
+        echo(" selected");
+    }
+    $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+    echo(">$display_type</option>");
   }
           ?>
     </select>

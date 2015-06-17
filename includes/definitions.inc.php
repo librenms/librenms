@@ -1176,7 +1176,7 @@ foreach ($config['os'] as $this_os => $blah)
 
 // Graph Types
 
-$config['graph_sections'] = array('general', 'system', 'firewall', 'netstats', 'wireless', 'storage', 'vpdn', 'load balancer');
+include_once($config['install_dir'] . "/includes/load_db_graph_types.inc.php");
 
 
 // Device - Wireless - AirMAX
