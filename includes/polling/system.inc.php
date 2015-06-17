@@ -113,6 +113,12 @@
     log_event("Contact -> ".$poll_device['sysContact'], $device, 'system');
   }
 
+  if ($poll_device['sysObjectID'] && $poll_device['sysObjectID'] != $device['sysObjectID'])
+  {
+    $update_array['sysObjectID'] = $poll_device['sysObjectID'];
+    log_event("ObjectID -> ".$poll_device['sysObjectID'], $device, 'system');
+  }
+
   if ($poll_device['sysName'] && $poll_device['sysName'] != $device['sysName'])
   {
     $update_array['sysName'] = $poll_device['sysName'];

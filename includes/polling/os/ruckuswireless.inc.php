@@ -2,8 +2,12 @@
 /*
 * LibreNMS Ruckus Wireless OS information module
 *
+* Originally by:
 * Copyright (c) 2015 Søren Friis Rosiak <sorenrosiak@gmail.com>
+*
+* Updates by Paul Gear:
 * Copyright (c) 2015 Gear Consulting Pty Ltd <github@libertysys.com.au>
+*
 * This program is free software: you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
 * Free Software Foundation, either version 3 of the License, or (at your
@@ -39,4 +43,12 @@ $ruckuscountry = first_oid_match($device, $ruckuscountries);
 if (isset($ruckuscountry) && $ruckuscountry != "") {
     $version .= " ($ruckuscountry)";
 }
+
+$ruckus_mibs = array(
+    "ruckusZDSystemStats" => "RUCKUS-ZD-SYSTEM-MIB",
+    "ruckusZDWLANTable"   => "RUCKUS-ZD-WLAN-MIB",
+    "ruckusZDWLANAPTable" => "RUCKUS-ZD-WLAN-MIB",
+);
+poll_mibs($ruckus_mibs, $device, $graphs);
+
 ?>
