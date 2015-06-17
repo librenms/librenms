@@ -322,9 +322,9 @@ function snmp_cache_ifIndex($device)
   return $array;
 }
 
-function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
+function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL, $snmpflags = "-OQUs")
 {
-  $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
+  $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
   foreach (explode("\n", $data) as $entry)
   {
     list($oid,$value) = explode("=", $entry, 2);
@@ -345,20 +345,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 // to be the same.
 function snmpwalk_cache_oid_num($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 {
-  $data = snmp_walk($device, $oid, "-OQUn", $mib, $mibdir);
-
-  foreach (explode("\n", $data) as $entry)
-  {
-    list($oid,$value) = explode("=", $entry, 2);
-    $oid = trim($oid); $value = trim($value);
-    list($oid, $index) = explode(".", $oid, 2);
-    if (!strstr($value, "at this OID") && isset($oid) && isset($index))
-    {
-      $array[$index][$oid] = $value;
-    }
-  }
-
-  return $array;
+    return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = "-OQUn");
 }
 
 
@@ -816,6 +803,303 @@ function snmp_gen_auth (&$device)
   if ($debug) { print "DEBUG: SNMP Auth options = $cmd\n"; }
 
   return $cmd;
+}
+
+/*
+ * Translate the given MIB into a vaguely useful PHP array.  Each keyword becomes an array index.
+ *
+ * Example:
+ * snmptranslate -Td -On -M mibs -m RUCKUS-ZD-SYSTEM-MIB RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta
+ * .1.3.6.1.4.1.25053.1.2.1.1.1.15.30
+ * ruckusZDSystemStatsAllNumSta OBJECT-TYPE
+ *   -- FROM    RUCKUS-ZD-SYSTEM-MIB
+ *     SYNTAX   Unsigned32
+ *     MAX-ACCESS       read-only
+ *     STATUS   current
+ *     DESCRIPTION      "Number of All client devices"
+ *   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) ruckusRootMIB(25053) ruckusObjects(1) ruckusZD(2) ruckusZDSystemModule(1) ruckusZDSystemMIB(1) ruckusZDSystemObjects(1) 
+ *           ruckusZDSystemStats(15) 30 }
+ */
+function snmp_mib_parse($oid, $mib, $module, $mibdir = null)
+{
+    global $debug;
+
+    $fulloid = explode(".", $oid);
+    $lastpart = end($fulloid);
+
+    $cmd = "snmptranslate -Td -On";
+    $cmd .= mibdir($mibdir);
+    $cmd .= " -m ".$module." ".$module."::";
+    $cmd .= $lastpart;
+
+    $result = array();
+    $lines = preg_split('/\n+/', trim(shell_exec($cmd)));
+    foreach ($lines as $l) {
+        $f = preg_split('/\s+/', trim($l));
+        // first line is all numeric
+        if (preg_match('/^[\d.]+$/', $f[0])) {
+            $result['oid'] = $f[0];
+            continue;
+        }
+        // then the name of the object type
+        if ($f[1] && $f[1] == "OBJECT-TYPE") {
+            $result['object_type'] = $f[0];
+            $result['shortname'] = str_replace($mib, '', $f[0]);
+            $result['dsname'] = name_shorten($f[0], $mib);
+            continue;
+        }
+        // then the other data elements
+        if ($f[0] == "--" && $f[1] == "FROM") {
+            $result['module'] = $f[2];
+            continue;
+        }
+        if ($f[0] == "MAX-ACCESS") {
+            $result['max_access'] = $f[1];
+            continue;
+        }
+        if ($f[0] == "STATUS") {
+            $result[strtolower($f[0])] = $f[1];
+            continue;
+        }
+        if ($f[0] == "SYNTAX") {
+            $result[strtolower($f[0])] = $f[1];
+            continue;
+        }
+        if ($f[0] == "DESCRIPTION") {
+            $desc = explode('"', $l);
+            if ($desc[1]) {
+                $str = preg_replace('/^[\s.]*/', '', $desc[1]);
+                $str = preg_replace('/[\s.]*$/', '', $str);
+                $result[strtolower($f[0])] = $str;
+            }
+            continue;
+        }
+    }
+    // The main mib entry doesn't have any useful data in it - only return items that have the syntax specified.
+    if (isset($result['syntax']) && isset($result['object_type'])) {
+        $result['mib'] = $mib;
+        return $result;
+    }
+    else {
+        return null;
+    }
+}
+
+
+/*
+ * Walks through the given MIB module, looking for the given MIB.
+ * NOTE: different from snmp walk - this doesn't touch the device.
+ * NOTE: There's probably a better way to do this with snmptranslate.
+ *
+ * Example:
+ * snmptranslate -Ts -M mibs -m RUCKUS-ZD-SYSTEM-MIB | grep ruckusZDSystemStats
+ * .iso.org.dod.internet.private.enterprises.ruckusRootMIB.ruckusObjects.ruckusZD.ruckusZDSystemModule.ruckusZDSystemMIB.ruckusZDSystemObjects.ruckusZDSystemStats
+ * .iso.org.dod.internet.private.enterprises.ruckusRootMIB.ruckusObjects.ruckusZD.ruckusZDSystemModule.ruckusZDSystemMIB.ruckusZDSystemObjects.ruckusZDSystemStats.ruckusZDSystemStatsNumAP
+ * .iso.org.dod.internet.private.enterprises.ruckusRootMIB.ruckusObjects.ruckusZD.ruckusZDSystemModule.ruckusZDSystemMIB.ruckusZDSystemObjects.ruckusZDSystemStats.ruckusZDSystemStatsNumSta
+ * ...
+ */
+function snmp_mib_walk($mib, $module, $mibdir = null)
+{
+    $cmd = "snmptranslate -Ts";
+    $cmd .= mibdir($mibdir);
+    $cmd .= " -m ".$module;
+    $result = array();
+    $data = preg_split('/\n+/', shell_exec($cmd));
+    foreach ($data as $oid) {
+        // only include oids which are part of this mib
+        if (strstr($oid, $mib)) {
+            $obj = snmp_mib_parse($oid, $mib, $module, $mibdir);
+            if ($obj) {
+                $result[] = $obj;
+            }
+        }
+    }
+    return $result;
+}
+
+/*
+ * @return an array containing all of the mib objects, keyed by object-type;
+ * returns an empty array if something goes wrong.
+ */
+function snmp_mib_load($mib, $module, $mibdir = null)
+{
+    $mibs = array();
+    foreach (snmp_mib_walk($mib, $module, $mibdir) as $obj) {
+        $mibs[$obj['object_type']] = $obj;
+    }
+    return $mibs;
+}
+
+/*
+ * Turn the given oid (name or numeric value) into a MODULE::mib name.
+ * @return an array consisting of the module and mib names, or null if no matching MIB is found.
+ * Example:
+ * snmptranslate -m all -M mibs .1.3.6.1.4.1.8072.3.2.10 2>/dev/null
+ * NET-SNMP-TC::linux
+ */
+function snmp_translate($oid, $module, $mibdir = null)
+{
+    if ($module !== "all") {
+        $oid = "$module::$oid";
+    }
+    $cmd = "snmptranslate" . mibdir($mibdir);
+    $cmd .= " -m $module $oid";                 // load all the MIBs looking for our object
+    $cmd .= " 2>/dev/null";                     // ignore invalid MIBs
+
+    $lines = preg_split('/\n+/', external_exec($cmd));
+    if (empty($lines)) {
+        d_echo("No results from snmptranslate\n");
+        return null;
+    }
+
+    $matches = array();
+    if (!preg_match('/(.*)::(.*)/', $lines[0], $matches)) {
+        d_echo("This doesn't look like a MIB: $lines[0]\n");
+        return null;
+    }
+
+    d_echo("SNMP translated: $module::$oid -> $matches[1]::$matches[2]\n");
+    return array($matches[1], $matches[2]);
+}
+
+/*
+ * check if the type of the oid is a numeric type, and if so,
+ * @return the name of RRD type that is best suited to saving it
+ */
+function oid_rrd_type($oid, $mibdef) {
+    if (!isset($mibdef[$oid])) {
+        return false;
+    }
+    switch ($mibdef[$oid]['syntax']) {
+
+    case 'OCTET':
+    case 'IpAddress':
+        return false;
+
+    case 'TimeTicks':
+        // Need to find a way to flag that this should be parsed
+        //return 'COUNTER';
+        return false;
+
+    case 'Counter64':
+        return 'COUNTER:600:0:U';
+
+    case 'Unsigned32':
+        return 'GAUGE:600:U:U';
+
+    }
+    return false;
+}
+
+/*
+ * Construct a graph names for use in the database.
+ * Tag each as in use on this device in &$graphs.
+ * Update the database with graph definitions as needed.
+ * We don't include the index in the graph name - that is handled at display time.
+ */
+function tag_graphs($mibname, $oids, $mibdef, &$graphs)
+{
+    foreach ($oids as $index => $array) {
+        foreach ($array as $oid => $val) {
+            $graphname = $mibname."-".$mibdef[$oid]['shortname'];
+            $graphs[$graphname] = true;
+        }
+    }
+}
+
+/*
+ * Ensure a graph_type definition exists in the database for the entities in this MIB
+ */
+function update_mib_graph_types($mibname, $oids, $mibdef, $graphs)
+{
+    $seengraphs = array();
+
+    // Get the list of graphs currently in the database
+    // FIXME: there's probably a more efficient way to do this
+    foreach (dbFetch("SELECT DISTINCT `graph_subtype` FROM `graph_types` WHERE `graph_subtype` LIKE ?", array("$mibname-%")) as $graph) {
+        $seengraphs[$graph['graph_subtype']] = true;
+    }
+
+    foreach ($oids as $index => $array) {
+        $i = 1;
+        foreach ($array as $oid => $val) {
+            $graphname = "$mibname-".$mibdef[$oid]['shortname'];
+
+            // add the graph if it's not in the database already
+            if ($graphs[$graphname] && !$seengraphs[$graphname]) {
+                // construct a graph definition based on the MIB definition
+                $graphdef = array();
+                $graphdef['graph_type'] = "device";
+                $graphdef['graph_subtype'] = $graphname;
+                $graphdef['graph_section'] = "mib";
+                $graphdef['graph_descr'] = $mibdef[$oid]['description'];
+                $graphdef['graph_order'] = $i++;
+                // TODO: add colours, unit_text, and ds
+
+                // add graph to the database
+                dbInsert($graphdef, 'graph_types');
+            }
+        }
+    }
+}
+
+/*
+ * Save all of the measurable oids for the device in their own RRDs.
+ */
+function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
+{
+    $usedoids = array();
+    foreach ($oids as $index => $array) {
+        foreach ($array as $oid => $val) {
+            $type = oid_rrd_type($oid, $mibdef);
+            if ($type === false) {
+                continue;
+            }
+            $usedoids[$index][$oid] = $val;
+            rrd_create_update(
+                $device,
+                array($mibname, $mibdef[$oid]['shortname'], $index),
+                array("DS:".$mibdef[$oid]['dsname'].":$type"),
+                "N:$val"
+            );
+        }
+    }
+    tag_graphs($mibname, $usedoids, $mibdef, $graphs);
+    update_mib_graph_types($mibname, $usedoids, $mibdef, $graphs);
+}
+
+/*
+ * Take a list of MIB name => module pairs.
+ * Validate MIBs and poll based on the results.
+ */
+function poll_mibs($list, $device, &$graphs)
+{
+    if (!is_dev_attrib_enabled($device, "poll_mib")) {
+        d_echo("MIB module disabled for ".$device['hostname']."\n");
+        return;
+    }
+    $mibdefs = array();
+    echo("MIB-based polling:");
+    d_echo("\n");
+
+    foreach ($list as $name => $module) {
+        $translated = snmp_translate($name, $module);
+        if ($translated) {
+            echo(" $module::$name");
+            d_echo("\n");
+            $mod = $translated[0];
+            $nam = $translated[1];
+            $mibdefs[$nam] = snmp_mib_load($nam, $mod);
+            $oids = snmpwalk_cache_oid($device, $nam, array(), $mod, null, "-OQUsb");
+            d_print_r($oids);
+            save_mibs($device, $nam, $oids, $mibdefs[$nam], $graphs);
+        }
+        else {
+            d_echo("MIB: no match for $module::$name\n");
+        }
+    }
+    d_echo("Done MIB-based polling");
+    echo("\n");
 }
 
 ?>
