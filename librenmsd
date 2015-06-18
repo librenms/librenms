@@ -49,6 +49,8 @@ register_shutdown_function('catchFatal');
 chdir($BASEDIR);
 
 // Load config
+$cfiles = array("includes/defaults.inc.php","config.php","includes/definitions.inc.php");
+$chash  = "";
 $config = array(); //Make scrut happy as we global $config
 $config = loadcnf();
 
@@ -173,12 +175,18 @@ function clocksync() {
  * @return array
  */
 function loadcnf() {
-	global $config;
-	unset($config);
-	require("includes/defaults.inc.php");
-	require("config.php");
-	require("includes/definitions.inc.php");
-	logger("Config reloaded",LOG_DEBUG,'main');
+	global $config, $cfiles, $chash;
+	$data = "";
+	foreach( $cfiles as $file ) {
+		$data .= file_get_contents($file);
+	}
+	$hash = sha1($data);
+	if( $hash != $chash ) {
+		$chash = $hash;
+		unset($config);
+		eval(str_ireplace(array('<?php','?>'),'',$data));
+		logger("Config now at ".$chash,LOG_DEBUG,'main');
+	}
 	return $config;
 }
 
@@ -221,7 +229,7 @@ function logger($msgs,$lvl=LOG_INFO,$prefix='') {
 	if( $lvl === LOG_DEBUG && ($config['daemon']['debug'] === false || ($config['daemon']['debug'] !== true && stripos($config['daemon']['debug'],$prefix) === false) ) ) {
 		return;
 	}
-	openlog('librenms', (LOG_CONS | LOG_NDELAY | LOG_PID), $config['daemon']['facility']);
+	openlog('librenms', (LOG_CONS | LOG_NDELAY | LOG_PID), (isset($config['daemon']['facility']) ? $config['daemon']['facility'] : LOG_DAEMON));
 	if( !is_array($msgs) ) {
 		$msgs = explode("\n",$msgs);
 	}
@@ -273,7 +281,8 @@ function spawn($job) {
 }
 
 /**
-*/
+ * Log fatals to syslog
+ */
 function catchFatal() {
 	$last_error = error_get_last();
 	if ($last_error['type'] == 1) {

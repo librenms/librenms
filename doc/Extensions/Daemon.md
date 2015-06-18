@@ -15,7 +15,15 @@ These reasons, although not exclusively, made the need of an accurate daemon to 
 
 ## Running the Daemon
 
-We highly recommend to run the daemon as init-script.
+### Running it through cron
+
+We recommend running the daemon through cron to have watchdog capabilities. This way the cron will attempt to restart the daemon in case it exists unexpectedly.
+
+```crontab
+*    *    * * *   root    /opt/librenms/librenmsd start >> /dev/null 2>&1
+```
+
+### Running it as init-script
 
 On most systems, you can simply symlink `/etc/init.d/librenmd` to `/opt/librenms/librenmsd`.
 The daemon comes with LSB Compliant headers, on a debian system you would issue `insserv librenmsd` or similar to autogenerate the runlevel links.

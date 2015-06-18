@@ -10,3 +10,4 @@ nbproject
 .alerts.lock
 .ircbot.alert
 .metadata_never_index
+librenmsd.pid
