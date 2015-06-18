@@ -5,25 +5,29 @@
 
 namespace Leaseweb\InfluxDB\Database;
 
-
+/**
+ * Class RetentionPolicy
+ *
+ * @package Leaseweb\InfluxDB\Database
+ */
 class RetentionPolicy
 {
     /**
      * @var string
      */
-    private $name;
+    public $name;
     /**
      * @var string
      */
-    private $duration;
+    public $duration;
     /**
      * @var int
      */
-    private $replication;
+    public $replication;
     /**
      * @var bool
      */
-    private $default;
+    public $default;
 
 
     /**
@@ -31,14 +35,15 @@ class RetentionPolicy
      * @param string $duration
      * @param int    $replication
      * @param bool   $default
+     *
+     * @todo validate duration, replication
      */
     public function __construct($name, $duration = '1d', $replication = 1, $default = false)
     {
-
-
         $this->name = $name;
         $this->duration = $duration;
         $this->replication = $replication;
-        $this->default = $default;
+
+        $this->default = (bool) $default;
     }
 }

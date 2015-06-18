@@ -5,6 +5,8 @@
 
 namespace Leaseweb\InfluxDB;
 
+
+use GuzzleHttp\Client as httpClient;
 /**
  * Class Client
  *
@@ -33,11 +35,6 @@ class Client
     protected $password = '';
 
     /**
-     * @var string
-     */
-    protected $database = '';
-
-    /**
      * @var int
      */
     protected $timeout = 0;
@@ -62,18 +59,21 @@ class Client
      */
     protected $udpPort = 4444;
 
-
     /**
      * @var
      */
     protected $baseURI;
 
     /**
+     * @var \GuzzleHttp\Client
+     */
+    protected $httpClient;
+
+    /**
      * @param string $host
      * @param int    $port
      * @param string $username
      * @param string $password
-     * @param string $database
      * @param bool   $ssl
      * @param bool   $verifySSL
      * @param int    $timeout
@@ -86,7 +86,6 @@ class Client
         $port = 8086,
         $username = '',
         $password = '',
-        $database = '',
         $ssl = false,
         $verifySSL = false,
         $timeout = 0
@@ -99,7 +98,6 @@ class Client
         $this->port = (int) $port;
         $this->username = $username;
         $this->password = $password;
-        $this->database = $database;
         $this->timeout = $timeout;
         $this->verifySSL = (bool) $verifySSL;
 
@@ -110,15 +108,11 @@ class Client
         // the the base URI
         $this->setBaseURI(sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port));
 
-        $return = null;
-
-        // return a database instance if a database name has been given
-        if ($this->database) {
-            $return = $this->db($database);
-        }
-
-        return $return;
-
+        $this->httpClient = new httpClient(array(
+                'base_uri' => $this->getBaseURI(),
+                'timeout' => $this->getTimeout()
+            )
+        );
     }
 
     /**
@@ -132,10 +126,57 @@ class Client
     {
 
         if (empty($name)) {
-            throw new \InvalidArgumentException(sprintf('No database provided'));
+            throw new \InvalidArgumentException(sprintf('No name provided'));
         }
 
         return new Database($name, $this);
+    }
+
+    /**
+     * Query influxDB
+     *
+     * @param string $database
+     * @param string $query
+     * @param array  $params
+     *
+     * @return ResultSet
+     * @throws Exception
+     */
+    public function query($database = null, $query, $params = array())
+    {
+
+        if ($database) {
+            $params += array('db' => $database);
+        }
+
+        $params = array_merge(array('q' => $query), $params);
+
+        try {
+            $response = $this->httpClient->get('query', array('query' => $params, 'http_errors' => false));
+
+            $raw = (string) $response->getBody();
+
+            return new ResultSet($raw);
+
+        } catch (\Exception $e) {
+            throw new Exception(sprintf('Query has failed, exception: %s', $e->getMessage()));
+        }
+    }
+
+    /**
+     * List all the databases
+     */
+    public function listDatabases()
+    {
+        $result = $this->query(null, 'SHOW DATABASES')->getPoints();
+
+        $names = array();
+
+        foreach ($result as $item) {
+            $names[] = $item['name'];
+        }
+
+        return $names;
     }
 
     /**
@@ -150,9 +191,6 @@ class Client
     public static function fromDSN($dsn)
     {
         $args  = array();
-
-
-
     }
 
     /**
@@ -169,5 +207,21 @@ class Client
     public function setBaseURI($baseURI)
     {
         $this->baseURI = $baseURI;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
     }
 }
