@@ -73,11 +73,18 @@ class ResultSet
      * results is an array of objects, one for each query,
      * each containing the keys for a series
      *
+     * @throws InfluxDBClientError
+     *
      * @return array $series
      */
     public function getSeries()
     {
         $pickSeries = function ($object) {
+            
+            if (isset($object['error'])) {
+                throw new InfluxDBClientError($object['error']);
+            }
+
             return $object['series'];
         };
 

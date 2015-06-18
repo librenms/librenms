@@ -41,6 +41,27 @@ EOD;
     }
 
     /**
+     * Throws Exception if something went wrong with influxDB after processing the query
+     * @expectedException \Leaseweb\InfluxDB\InfluxDBClientError
+     */
+    public function testThrowsInfluxDBExceptionIfAnyErrorInSeries()
+    {
+
+        $errorResult = <<<EOD
+{
+    "results": [
+        {
+            "series": [],
+            "error": "There was an error after querying"
+        }
+    ]
+}
+EOD;
+        $rs = new ResultSet($errorResult);
+        $rs->getSeries();
+    }
+
+    /**
      * We can get points from measurement
      */
     public function testGetPoints()
