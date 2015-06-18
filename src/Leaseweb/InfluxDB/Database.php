@@ -110,6 +110,7 @@ class Database
         return $this->query(sprintf('SHOW RETENTION POLICIES %s', $this->name))->getPoints();
     }
 
+
     /**
      * Drop this database
      */
