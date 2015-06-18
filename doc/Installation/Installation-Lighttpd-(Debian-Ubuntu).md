@@ -145,7 +145,15 @@ Discover localhost and poll it for the first time:
 
 ### Run Daemon ###
 
-We highly recommend to run the daemon as init-script.
+#### Running it through cron
+
+We recommend running the daemon through cron to have watchdog capabilities. This way the cron will attempt to restart the daemon in case it exists unexpectedly.
+
+```crontab
+*    *    * * *   root    /opt/librenms/librenmsd start >> /dev/null 2>&1
+```
+
+#### Running it as init-script
 
 On most systems, you can simply symlink `/etc/init.d/librenmd` to `/opt/librenms/librenmsd`.
 The daemon comes with LSB Compliant headers, on a debian system you would issue `insserv librenmsd` or similar to autogenerate the runlevel links.
@@ -170,7 +178,7 @@ __In case you do not run librenms in /opt/librenms, you're `REQUIRED` to adjust 
 
 More details on the Daemon and it's config are at [Extensions/Daemon](http://docs.librenms.org/Extensions/Daemon/)
 
-#### ... or Create cronjob ####
+### ... or Create cronjob ####
 
 The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in the public domain by its author.  By default, the LibreNMS cronjob runs `poller-wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 threads per core.  The default if no thread count is `16 threads`.
 
