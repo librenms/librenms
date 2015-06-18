@@ -1,0 +1,2710 @@
+
+--
+-- Copyright (c) 2002-2003 by EqualLogic, Inc.
+-- 
+-- All rights reserved.  This software may not be copied, disclosed,
+-- transferred, or used except in accordance with a license granted
+-- by EqualLogic, Inc.  This software embodies proprietary information
+-- and trade secrets of EqualLogic, Inc.
+--
+
+ISCSI-MIB DEFINITIONS  ::= BEGIN
+
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+    Unsigned32, Counter32, Counter64, Gauge32,
+    experimental
+    FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, TruthValue, TimeStamp, RowStatus, RowPointer
+    FROM SNMPv2-TC
+
+    InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+
+    SnmpAdminString
+    FROM  SNMP-FRAMEWORK-MIB
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+
+     ;
+
+iscsiModule MODULE-IDENTITY
+    LAST-UPDATED  "200206260000Z" -- June 26, 2002
+    ORGANIZATION  "IETF IPS Working Group"
+    CONTACT-INFO
+    "
+    Mark Bakke
+    Postal: Cisco Systems, Inc
+    6450 Wedgwood Road, Suite 130
+    Maple Grove, MN
+    USA 55311
+
+    Tel: +1 763-398-1000
+    Fax: +1 763-398-1001
+
+    E-mail: mbakke@cisco.com
+
+    Marjorie Krueger
+    Postal: Hewlett-Packard
+    Networked Storage Architecture
+    Networked Storage Solutions Org.
+    8000 Foothills Blvd.
+    Roseville, CA 95747
+
+
+
+    Tel: +1 916-785-2656
+    Tel: +1 916-785-0391
+
+    Email: marjorie_krueger@hp.com
+
+    Tom McSweeney
+    Postal: IBM Corporation
+    600 Park Offices Drive
+    Research Triangle Park, NC
+    USA 27709
+
+    Tel: +1-919-254-5634
+    Fax: +1-919-254-0391
+
+    E-mail: rf42tpme@us.ibm.com
+
+    Jim Muchow
+    Postal: Cisco Systems, Inc
+    6450 Wedgwood Road, Suite 130
+    Maple Grove, MN
+    USA 55311
+
+    Tel: +1 763-398-1000
+    Fax: +1 763-398-1001
+
+    E-mail: jmuchow@cisco.com"
+
+    DESCRIPTION
+        "The iSCSI Protocol MIB module."
+
+    REVISION "200206260000Z" -- June 26, 2002
+    DESCRIPTION
+        "Initial revision published as RFC xxxx."
+
+-- ::= { mib-2 xx } to be assigned by IANA.
+-- in case you want to COMPILE
+::= { experimental 9999 }
+
+iscsiObjects OBJECT IDENTIFIER ::= { iscsiModule 1 }
+iscsiNotifications OBJECT IDENTIFIER ::= { iscsiModule 2 }
+iscsiConformance OBJECT IDENTIFIER ::= { iscsiModule 3 }
+
+-- Textual Conventions
+
+IscsiTransportProtocols ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS        current
+    DESCRIPTION
+        "This data type is used to define the transport
+        protocols that will carry iSCSI PDUs."
+    REFERENCE
+        "RFC791, RFC1700
+
+        The presently known, officially delegated numbers
+        can be found at:
+        http://www.iana.org/assignments/protocol-numbers"
+    SYNTAX        INTEGER (0..255)
+
+IscsiDigestMethod ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "This data type represents the methods possible
+        for digest negotiation.
+        none     - a placeholder for a secondary digest method
+                   that means only the primary method can be
+                   used.
+        other    - a digest method other than those defined below;
+        noDigest - does not support digests (will operate without
+                   a digest (NOTE: implementations MUST support
+                  digests to be compliant with the iSCSI RFC);
+     CRC32c   - require a CRC32C digest."
+    SYNTAX        INTEGER {
+                      none(1),
+                      other(2),
+                      noDigest(3),
+                      crc32c(4)
+                  }
+
+------------------------------------------------------------------------
+
+iscsiDescriptors OBJECT IDENTIFIER ::= { iscsiObjects 1 }
+
+iscsiHeaderIntegrityTypes OBJECT IDENTIFIER ::= { iscsiDescriptors 1 }
+
+iscsiHdrIntegrityNone OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+     "The authoritative identifier when no integrity
+     scheme (for either the header or data) is being
+     used."
+    REFERENCE "iSCSI Protocol Specification."
+::= { iscsiHeaderIntegrityTypes 1 }
+
+iscsiHdrIntegrityCrc32c OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+
+
+
+     "The authoritative identifier when the integrity
+     scheme (for either the header or data) is CRC-32c."
+    REFERENCE "iSCSI Protocol Specification."
+::= { iscsiHeaderIntegrityTypes 2 }
+
+iscsiDataIntegrityTypes OBJECT IDENTIFIER ::= { iscsiDescriptors 2 }
+
+iscsiDataIntegrityNone OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+     "The authoritative identifier when no integrity
+     scheme (for either the header or data) is being
+     used."
+    REFERENCE "iSCSI Protocol Specification."
+::= { iscsiDataIntegrityTypes 1 }
+
+iscsiDataIntegrityCrc32c OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+     "The authoritative identifier when the integrity
+     scheme (for either the header or data) is CRC-32c."
+    REFERENCE "iSCSI Protocol Specification."
+::= { iscsiDataIntegrityTypes 2 }
+
+----------------------------------------------------------------------
+
+iscsiInstance OBJECT IDENTIFIER ::= { iscsiObjects 2 }
+
+-- Instance Attributes Table
+
+iscsiInstanceAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiInstanceAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of iSCSI instances present on the system."
+::= { iscsiInstance 1 }
+
+iscsiInstanceAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiInstanceAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An Dynamic entry (row) containing management information applicable
+        to a particular iSCSI instance."
+    INDEX { iscsiInstIndex }
+::= { iscsiInstanceAttributesTable 1 }
+
+
+
+
+IscsiInstanceAttributesEntry ::= SEQUENCE {
+    iscsiInstIndex                 Unsigned32,
+    iscsiInstDescr                 SnmpAdminString,
+    iscsiInstVersionMin            INTEGER,
+    iscsiInstVersionMax            INTEGER,
+    iscsiInstVendorID                SnmpAdminString,
+    iscsiInstVendorVersion       SnmpAdminString,
+    iscsiInstPortalNumber          Unsigned32,
+    iscsiInstNodeNumber            Unsigned32,
+    iscsiInstSessionNumber         Unsigned32,
+    iscsiInstSsnFailures           Counter32,
+    iscsiInstLastSsnFailureType   INTEGER,   --was  AutonomousType, we need to support it,
+    iscsiInstLastSsnRmtNodeName   SnmpAdminString
+}
+
+iscsiInstIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An arbitrary integer used to uniquely identify a particular
+        ISCSI instance."
+::= { iscsiInstanceAttributesEntry 1 }
+
+iscsiInstDescr OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string, determined by the implementation to describe
+     the iSCSI instance.  When only a single instance is present,
+     this object may be set to the zero-length string; with multiple
+     iSCSI instances, it may be used in an implementation-dependent
+     manner to describe the purpose of the respective instance."
+::= { iscsiInstanceAttributesEntry 2 }
+
+iscsiInstVersionMin OBJECT-TYPE
+    SYNTAX        INTEGER (0..255)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Minimum version number of the iSCSI specification supported
+        by this instance."
+::= { iscsiInstanceAttributesEntry 3 }
+
+iscsiInstVersionMax OBJECT-TYPE
+    SYNTAX        INTEGER (0..255)
+    MAX-ACCESS    read-only
+
+
+
+    STATUS        current
+    DESCRIPTION
+        "Maximum version number of the iSCSI specification supported
+        by this instance."
+::= { iscsiInstanceAttributesEntry 4 }
+
+iscsiInstVendorID OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string describing the manufacturer of the
+     implementation of this instance."
+::= { iscsiInstanceAttributesEntry 5 }
+
+iscsiInstVendorVersion OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string set by the manufacturer describing the verison
+        of the implementation of this instance.  The format of this string
+     is determined solely by the manufacturer, and is for informational
+     purposes only.  It is unrelated to the iSCSI specification version
+        numbers."
+::= { iscsiInstanceAttributesEntry 6 }
+
+iscsiInstPortalNumber OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    UNITS         "transport endpoints"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of rows in the iscsiPortalAttributesTable
+     which are currently associated with this iSCSI instance."
+::= { iscsiInstanceAttributesEntry 7 }
+
+iscsiInstNodeNumber OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    UNITS         "Internet Network Addresses"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "The number of rows in the iscsiNodeAttributesTable
+     which are currently associated with this iSCSI instance."
+::= { iscsiInstanceAttributesEntry 8 }
+
+iscsiInstSessionNumber OBJECT-TYPE
+
+
+
+    SYNTAX        Unsigned32 (1..4294967295)
+    UNITS         "sessions"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of rows in the iscsiSessionAttributesTable
+     which are currently associated with this iSCSI instance."
+::= { iscsiInstanceAttributesEntry 9 }
+
+iscsiInstSsnFailures  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "sessions"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object counts the number of times a session belonging
+     to this instance has been failed."
+::= { iscsiInstanceAttributesEntry 10 }
+
+iscsiInstLastSsnFailureType  OBJECT-TYPE
+    SYNTAX        INTEGER    -- was AutonomousType , we need to support it
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "The counter object in the iscsiInstSsnErrorStatsTable
+        that was incremented when the last session failure occurred.
+
+     If the reason for failure is not found in the
+     iscsiInstSsnErrorStatsTable, the value { 0.0 } is
+     used instead."
+::= { iscsiInstanceAttributesEntry 11 }
+
+iscsiInstLastSsnRmtNodeName  OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string describing the name of the remote node
+     from the failed session."
+::= { iscsiInstanceAttributesEntry 12 }
+
+-- Instance Session Failure Stats Table
+
+iscsiInstanceSsnErrorStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiInstanceSsnErrorStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+
+
+
+        "A Dynamic list of error types that will cause a session failure."
+::= { iscsiInstance 2 }
+
+iscsiInstanceSsnErrorStatsEntry OBJECT-TYPE
+    SYNTAX        IscsiInstanceSsnErrorStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing management information applicable
+        to a particular iSCSI instance."
+    AUGMENTS { iscsiInstanceAttributesEntry }
+::= { iscsiInstanceSsnErrorStatsTable 1 }
+
+IscsiInstanceSsnErrorStatsEntry ::= SEQUENCE {
+    iscsiInstSsnDigestErrors       Counter32,
+    iscsiInstSsnCxnTimeoutErrors   Counter32,
+    iscsiInstSsnFormatErrors       Counter32
+}
+
+iscsiInstSsnDigestErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "sessions"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of sessions which were failed due to receipt of a PDU
+        containing header or data digest errors."
+::= { iscsiInstanceSsnErrorStatsEntry 1 }
+
+iscsiInstSsnCxnTimeoutErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "sessions"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of sessions which were failed due to a sequence
+        exceeding a time limit."
+::= { iscsiInstanceSsnErrorStatsEntry 2 }
+
+iscsiInstSsnFormatErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "sessions"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of sessions which were failed due to receipt of a PDU
+        which contained a format error."
+::= { iscsiInstanceSsnErrorStatsEntry 3 }
+
+
+
+----------------------------------------------------------------------
+
+iscsiPortal OBJECT IDENTIFIER ::= { iscsiObjects 3 }
+
+-- Portal Attributes Table
+
+iscsiPortalAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiPortalAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of transport endpoints (using TCP or another transport
+     protocol) used by this iSCSI instance. An iSCSI instance may
+     use a portal to listen for incoming connections to its targets,
+     to initiate connections to other targets, or both. Equallogic-Dynamic"
+::= { iscsiPortal 1 }
+
+iscsiPortalAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiPortalAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing management information applicable
+        to a particular portal instance."
+    INDEX { iscsiInstIndex, iscsiPortalIndex  }
+::= { iscsiPortalAttributesTable 1 }
+
+IscsiPortalAttributesEntry ::= SEQUENCE {
+    iscsiPortalIndex               Unsigned32,
+--    iscsiPortalRowStatus           RowStatus,
+    iscsiPortalRoles               BITS,
+    iscsiPortalAddrType       InetAddressType,
+    iscsiPortalAddr               InetAddress,
+    iscsiPortalProtocol            IscsiTransportProtocols,
+    iscsiPortalMaxRecvDataSegLength INTEGER,
+    iscsiPortalPrimaryHdrDigest    IscsiDigestMethod,
+    iscsiPortalPrimaryDataDigest   IscsiDigestMethod,
+    iscsiPortalSecondaryHdrDigest  IscsiDigestMethod,
+    iscsiPortalSecondaryDataDigest IscsiDigestMethod,
+    iscsiPortalRecvMarker          TruthValue
+}
+
+iscsiPortalIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An arbitrary integer used to uniquely identify a particular
+
+
+
+     transport endpoint within this iSCSI instance."
+::= { iscsiPortalAttributesEntry 1 }
+
+-- iscsiPortalRowStatus OBJECT-TYPE
+--    SYNTAX        RowStatus
+--    MAX-ACCESS    read-create
+--    STATUS        current
+--    DESCRIPTION
+--        "The status of the row."
+-- ::= { iscsiPortalAttributesEntry 2 }
+
+iscsiPortalRoles OBJECT-TYPE
+    SYNTAX        BITS {
+                      targetTypePortal(0),
+                      initiatorTypePortal(1)
+                  }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "A portal can operate in one or both of two roles:
+     as a target portal and/or an initiator portal.
+
+     When a new iscsiPortalAttributesEntry is to be created,
+     the agent should use this object as a hint for the
+     creation of a new iscsiTgtPortalAttributesEntry and/or
+     iscsiIntrPortalAttributesEntry."
+::= { iscsiPortalAttributesEntry 3 }
+
+iscsiPortalAddrType OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The type of Internet Network Address in the iscsiPortalAddr."
+::= { iscsiPortalAttributesEntry 4 }
+
+iscsiPortalAddr OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The portal's Internet Network Address."
+::= { iscsiPortalAttributesEntry 5 }
+
+iscsiPortalProtocol OBJECT-TYPE
+    SYNTAX        IscsiTransportProtocols
+    MAX-ACCESS    read-create
+    STATUS        current
+
+
+
+    DESCRIPTION
+        "The portal's transport protocol."
+    DEFVAL        { 6 } -- TCP
+::= { iscsiPortalAttributesEntry 6 }
+
+iscsiPortalMaxRecvDataSegLength OBJECT-TYPE
+    SYNTAX        INTEGER (512..16777215)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The maximum PDU length this portal can receive.
+        This may be constrained by hardware characteristics
+        and individual implementations may chose not to
+        allow this object to be changed."
+    DEFVAL { 8192 }
+::= { iscsiPortalAttributesEntry 7 }
+
+iscsiPortalPrimaryHdrDigest OBJECT-TYPE
+    SYNTAX        IscsiDigestMethod
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The preferred header digest for this portal."
+    DEFVAL        { noDigest }
+::= { iscsiPortalAttributesEntry 8 }
+
+iscsiPortalPrimaryDataDigest OBJECT-TYPE
+    SYNTAX        IscsiDigestMethod
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The preferred data digest method for this portal."
+    DEFVAL        { noDigest }
+::= { iscsiPortalAttributesEntry 9 }
+
+iscsiPortalSecondaryHdrDigest OBJECT-TYPE
+    SYNTAX        IscsiDigestMethod
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "An alternate header digest preference for this portal."
+    DEFVAL        { none }
+::= { iscsiPortalAttributesEntry 10 }
+
+iscsiPortalSecondaryDataDigest OBJECT-TYPE
+    SYNTAX        IscsiDigestMethod
+    MAX-ACCESS    read-create
+    STATUS        current
+
+
+
+    DESCRIPTION
+        "An alternate data digest preference for this portal."
+    DEFVAL        { none }
+::= { iscsiPortalAttributesEntry 11 }
+
+iscsiPortalRecvMarker OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This object indicates whether or not this portal will
+        request markers in it's incoming data stream."
+::= { iscsiPortalAttributesEntry 12 }
+
+----------------------------------------------------------------------
+iscsiTargetPortal OBJECT IDENTIFIER ::= { iscsiObjects 4 }
+
+-- Target Portal Attributes Table
+
+iscsiTgtPortalAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiTgtPortalAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of transport endpoints (using TCP or another transport
+     protocol) on which this iSCSI instance listens for incoming
+     connections to its targets."
+::= { iscsiTargetPortal 1 }
+
+iscsiTgtPortalAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiTgtPortalAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An Dynamic entry (row) containing management information applicable
+        to a particular portal instance that is used to listen for
+     incoming connections to local targets. This row is populated
+     for each iscsiPortalAttributesEntry row that may be used as
+     a target portal."
+    INDEX { iscsiInstIndex, iscsiPortalIndex  }
+::= { iscsiTgtPortalAttributesTable 1 }
+
+IscsiTgtPortalAttributesEntry ::= SEQUENCE {
+    iscsiTgtPortalPort             Unsigned32,
+    iscsiTgtPortalTag              INTEGER
+}
+
+iscsiTgtPortalPort OBJECT-TYPE
+
+
+
+    SYNTAX        Unsigned32 (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The portal's transport protocol port number on which the
+        portal listens for incoming iSCSI connections when the
+        portal is used as a target portal."
+::= { iscsiTgtPortalAttributesEntry 1 }
+
+iscsiTgtPortalTag OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+     "The portal's aggregation tag when portal is used as
+     a target portal.  Multiple-connection sessions may
+     be aggregated over portals sharing an identical
+     aggregation tag."
+::= { iscsiTgtPortalAttributesEntry 2 }
+
+----------------------------------------------------------------------
+
+iscsiInitiatorPortal OBJECT IDENTIFIER ::= { iscsiObjects 5 }
+
+-- Initiator Portal Attributes Table
+
+iscsiIntrPortalAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiIntrPortalAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of Internet Network Addresses (using TCP or another
+        transport protocol) from which this iSCSI instance may
+     initiate connections to other targets."
+::= { iscsiInitiatorPortal 1 }
+
+iscsiIntrPortalAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiIntrPortalAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An Dynamic entry (row) containing managment information applicable
+     to a particular portal instance that is used to initiate
+     connections to iSCSI targets.  This row is populated for
+     each iscsiPortalAttributesEntry row that may be used as an
+     initiator portal."
+    INDEX { iscsiInstIndex, iscsiPortalIndex  }
+::= { iscsiIntrPortalAttributesTable 1 }
+
+
+
+IscsiIntrPortalAttributesEntry ::= SEQUENCE {
+    iscsiIntrPortalTag             INTEGER
+}
+
+iscsiIntrPortalTag OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+     "The portal's aggregation tag when the portal is used as
+     an initiator portal.  Multiple-connection sessions may
+     be aggregated over portals sharing an identical
+     aggregation tag."
+::= { iscsiIntrPortalAttributesEntry 1 }
+
+----------------------------------------------------------------------
+
+iscsiNode OBJECT IDENTIFIER ::= { iscsiObjects 6 }
+
+-- Node Attributes Table
+
+iscsiNodeAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiNodeAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "A Dynamic list of iSCSI nodes belonging to each iSCSI instance
+     present on the local system.  An iSCSI node can act as
+     an initiator, a target, or both."
+::= { iscsiNode 1 }
+
+iscsiNodeAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiNodeAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An Dynamic entry (row) containing managment information applicable
+     to a particular iSCSI node."
+    INDEX { iscsiInstIndex, iscsiNodeIndex }
+::= { iscsiNodeAttributesTable 1 }
+
+IscsiNodeAttributesEntry ::= SEQUENCE {
+    iscsiNodeIndex                  Unsigned32,
+    iscsiNodeName                  SnmpAdminString,
+    iscsiNodeAlias                  SnmpAdminString,
+    iscsiNodeRoles                  BITS,
+    iscsiNodeTransportType          RowPointer,
+    iscsiNodeInitialR2T             TruthValue,
+
+
+
+    iscsiNodeBidiInitialR2T         TruthValue,
+    iscsiNodeImmediateData          TruthValue,
+    iscsiNodeMaxOutstandingR2T      INTEGER,
+    iscsiNodeFirstBurstSize         INTEGER,
+    iscsiNodeMaxBurstSize           INTEGER,
+    iscsiNodeMaxConnections         INTEGER,
+    iscsiNodeDataSequenceInOrder    TruthValue,
+    iscsiNodeDataPduInOrder         TruthValue,
+    iscsiNodeDefaultTime2Wait       INTEGER,
+    iscsiNodeDefaultTime2Retain     INTEGER,
+    iscsiNodeErrorRecoveryLevel     INTEGER
+}
+
+iscsiNodeIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An arbitrary integer used to uniquely identify a particular
+     node within an iSCSI instance present on the local system."
+::= { iscsiNodeAttributesEntry 1 }
+
+iscsiNodeName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "A character string that is a globally unique identifier for
+     this iSCSI node.  The node name is independent of the location
+     of the node, and can be resolved into a set of addresses
+     through various discovery services."
+::= { iscsiNodeAttributesEntry 2 }
+
+iscsiNodeAlias OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A character string that is a human-readable name or
+     description of the iSCSI node.  If configured, this alias
+     may be communicated to the initiator or target node at
+     the remote end of the connection during a Login Request
+     or Response message.  This string is not used as an
+     identifier, but can be displayed by the system's user
+     interface in a list of initiators and/or targets to
+     which it is connected.
+
+     If no alias is configured, this object is a zero-length
+
+
+
+     string."
+::= { iscsiNodeAttributesEntry 3 }
+
+iscsiNodeRoles OBJECT-TYPE
+    SYNTAX        BITS {
+                      targetTypeNode(0),
+                      initiatorTypeNode(1)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A node can operate as in one or both of two roles:
+     a target role and/or an initiator role."
+::= { iscsiNodeAttributesEntry 4 }
+
+iscsiNodeTransportType OBJECT-TYPE
+    SYNTAX        RowPointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "A pointer to the corresponding scsiTrnspt object in
+     the SCSI MIB (which in turn points to this iSCSI node)
+     allowing management stations to locate the SCSI-level
+     Device that is represented by this iscsiNode."
+    REFERENCE
+        "SCSI-MIB"
+::= { iscsiNodeAttributesEntry 5 }
+
+iscsiNodeInitialR2T OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates InitialR2T preference for this node -
+          True = YES,
+          False = will try to negotiate NO, will accept YES "
+    DEFVAL        { true }
+::= { iscsiNodeAttributesEntry 6 }
+
+iscsiNodeBidiInitialR2T OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates BidiInitialR2T preference for this node-
+          True = YES,
+          False = will try to negotiate NO, will accept YES "
+    DEFVAL        { true }
+
+
+
+::= { iscsiNodeAttributesEntry 7 }
+
+iscsiNodeImmediateData OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object indicates ImmediateData preference for this node
+        True = YES (but will accept NO),
+        False = NO "
+    DEFVAL        { true }
+::= { iscsiNodeAttributesEntry 8 }
+
+iscsiNodeMaxOutstandingR2T OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Maximum number of outstanding R2Ts allowed per task."
+    DEFVAL        { 1 }
+::= { iscsiNodeAttributesEntry 9 }
+
+iscsiNodeFirstBurstSize OBJECT-TYPE
+    SYNTAX        INTEGER (512..16777215)
+    UNITS         "bytes"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The maximum length (bytes) supported for unsolicited data
+        to/from this node."
+    DEFVAL        { 65536 }
+::= { iscsiNodeAttributesEntry 10 }
+
+iscsiNodeMaxBurstSize OBJECT-TYPE
+    SYNTAX        INTEGER (512..16777215)
+    UNITS         "bytes"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+     "The maximum number of bytes which can be sent within
+     a single sequence of Data-In or Data-Out PDUs."
+    DEFVAL        { 262144 }
+::= { iscsiNodeAttributesEntry 11 }
+
+iscsiNodeMaxConnections OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    UNITS         "connections"
+    MAX-ACCESS    read-write
+
+
+
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of connections allowed in each
+        session to and/or from this node."
+    DEFVAL        { 1 }
+::= { iscsiNodeAttributesEntry 12 }
+
+iscsiNodeDataSequenceInOrder OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The DataSequenceInOrder preference of this node.
+        False (=No) indicates that iSCSI data PDU sequences may
+        be transferred in any order.  True (=Yes) indicates that
+        data PDU sequences must be tranferred using
+        continuously increasing offsets, except during
+        error recovery."
+    DEFVAL        { true }
+::= { iscsiNodeAttributesEntry 13 }
+
+iscsiNodeDataPduInOrder OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The DataPDUInOrder preference of this node.
+        False (=No) indicates that iSCSI data PDUs within sequences
+        may be in any order.  True (=Yes) indicates that data PDUs
+        within sequences must be at continuously increasing
+        addresses, with no gaps or overlay between PDUs."
+    DEFVAL        { true }
+::= { iscsiNodeAttributesEntry 14 }
+
+iscsiNodeDefaultTime2Wait OBJECT-TYPE
+    SYNTAX        INTEGER (0..3600)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The DefaultTime2Wait preference of this node.
+        This is the minimum time, in seconds, to wait before attempting
+        an explicit/implicit logout or active task reassignment after
+        an unexpected connection termination or a connection reset."
+    DEFVAL        { 2 }
+::= { iscsiNodeAttributesEntry 15 }
+
+iscsiNodeDefaultTime2Retain OBJECT-TYPE
+    SYNTAX        INTEGER (0..3600)
+
+
+
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The DefaultTime2Retain preference of this node.
+        This is the maximum time, in seconds after an initial wait
+        (Time2Wait), before which an active task reassignment is still
+        possible after an unexpected connection termination or a
+        connection reset."
+    DEFVAL        { 20 }
+::= { iscsiNodeAttributesEntry 16 }
+
+iscsiNodeErrorRecoveryLevel OBJECT-TYPE
+    SYNTAX        INTEGER (0..255)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The ErrorRecoveryLevel preference of this node.
+        Currently, only 0-2 are valid.
+        This object is designed to accommodate future error recover
+        levels.
+        Higher error recovery levels imply support in addition to
+        support for the lower error level functions.  In otherwords,
+        error level 2 implies support for levels 0-1, since those
+        functions are subsets of error level 2."
+    DEFVAL        { 0 }
+::= { iscsiNodeAttributesEntry 17 }
+
+----------------------------------------------------------------------
+
+iscsiTarget OBJECT IDENTIFIER ::= { iscsiObjects 7 }
+
+-- Target Attributes Table
+
+iscsiTargetAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiTargetAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An Dynamic entry (row) containing managment information applicable
+     to a particular node that can take on a target role."
+::= { iscsiTarget 1 }
+
+iscsiTargetAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiTargetAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing management information applicable
+
+
+
+        to a particular target."
+    INDEX { iscsiInstIndex, iscsiNodeIndex }
+::= { iscsiTargetAttributesTable 1 }
+
+IscsiTargetAttributesEntry ::= SEQUENCE {
+    iscsiTgtLoginFailures          Counter32,
+    iscsiTgtLastFailureTime        TimeStamp,
+    iscsiTgtLastFailureType        INTEGER,    -- was AutonomousType , we need to support it
+    iscsiTgtLastIntrFailureName    SnmpAdminString,
+    iscsiTgtLastIntrFailureAddrType InetAddressType,
+    iscsiTgtLastIntrFailureAddr    InetAddress
+}
+
+iscsiTgtLoginFailures OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed login attempts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object counts the number of times a login attempt to this
+     local target has failed."
+::= { iscsiTargetAttributesEntry 1 }
+
+iscsiTgtLastFailureTime OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "The timestamp of the most recent failure of a login attempt
+     to this target.  A value of zero indicates that no such
+     failures have occurred."
+::= { iscsiTargetAttributesEntry 2 }
+
+iscsiTgtLastFailureType  OBJECT-TYPE
+    SYNTAX        INTEGER      -- was AutonomousType , we need to support it
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "The type of the most recent failure of a login attempt
+     to this target, represented as the OID of the counter
+     object in iscsiTargetLoginStatsTable for which the
+     relevant instance was incremented.  A value of 0.0
+     indicates a type which is not represented by any of
+     the counters in iscsiTargetLoginStatsTable."
+::= { iscsiTargetAttributesEntry 3 }
+
+iscsiTgtLastIntrFailureName  OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+
+
+
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string giving the name of the initiator
+        that failed the last login attempt."
+::= { iscsiTargetAttributesEntry 4 }
+
+iscsiTgtLastIntrFailureAddrType OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of Internet Network Address in
+     iscsiTgtLastIntrFailureAddr."
+::= { iscsiTargetAttributesEntry 5 }
+
+iscsiTgtLastIntrFailureAddr OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An Internet Network Address giving the host address
+     of the initiator that failed the last login attempt."
+::= { iscsiTargetAttributesEntry 6 }
+
+-- Target Login Stats Table
+
+iscsiTargetLoginStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiTargetLoginStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic table of counters which keep a record of the results
+     of initiators' login attempts to this target."
+::= { iscsiTarget 2 }
+
+iscsiTargetLoginStatsEntry OBJECT-TYPE
+    SYNTAX        IscsiTargetLoginStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing counters for each result of
+     a login attempt to this target."
+    AUGMENTS { iscsiTargetAttributesEntry }
+::= { iscsiTargetLoginStatsTable 1 }
+
+IscsiTargetLoginStatsEntry ::= SEQUENCE {
+    iscsiTgtLoginAccepts           Counter32,
+
+
+
+    iscsiTgtLoginOtherFails        Counter32,
+    iscsiTgtLoginRedirects         Counter32,
+    iscsiTgtLoginAuthorizeFails    Counter32,
+    iscsiTgtLoginAuthenticateFails Counter32,
+    iscsiTgtLoginNegotiateFails    Counter32
+}
+
+iscsiTgtLoginAccepts OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "successful logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs with status
+        0x0000, Accept Login, transmitted by this
+        target."
+::= { iscsiTargetLoginStatsEntry 1 }
+
+iscsiTgtLoginOtherFails OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of Login Response PDUs which were transmitted
+        by this target, and which were not counted by any other
+        object in the row."
+::= { iscsiTargetLoginStatsEntry 2 }
+
+iscsiTgtLoginRedirects OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs with status class 0x01,
+        Redirection, transmitted by this target."
+::= { iscsiTargetLoginStatsEntry 3 }
+
+iscsiTgtLoginAuthorizeFails OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs with status 0x0202,
+        Forbidden Target, transmitted by this target.
+
+
+
+
+        If this counter is incremented, an iscsiTgtLoginFailure
+        notification should be generated."
+::= { iscsiTargetLoginStatsEntry 4 }
+
+iscsiTgtLoginAuthenticateFails OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs with status 0x0201,
+        Authentication Failed, transmitted by this target
+
+        If this counter is incremented, an iscsiTgtLoginFailure
+        notification should be generated."
+::= { iscsiTargetLoginStatsEntry 5 }
+
+iscsiTgtLoginNegotiateFails OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times a target has effectively refused a
+        login because the parameter negotiation failed.
+        [Ed. While this situation can occur, the exact mechanism
+        is as yet undefined in the iSCSI Protocol Spec.]
+
+        If this counter is incremented, an iscsiTgtLoginFailure
+        notification should be generated."
+::= { iscsiTargetLoginStatsEntry 6 }
+
+-- Target Logout Stats Table
+
+iscsiTargetLogoutStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiTargetLogoutStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "When a target receives a Logout command, it responds
+        with a Logout Response that carries a status code.
+        This Dynamic table contains counters for both normal and
+        abnormal logout requests received by this target."
+::= { iscsiTarget 3 }
+
+iscsiTargetLogoutStatsEntry OBJECT-TYPE
+    SYNTAX        IscsiTargetLogoutStatsEntry
+    MAX-ACCESS    not-accessible
+
+
+
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing counters of Logout Response
+        PDUs that were received by this target."
+    AUGMENTS { iscsiTargetAttributesEntry }
+::= { iscsiTargetLogoutStatsTable 1 }
+
+IscsiTargetLogoutStatsEntry ::= SEQUENCE {
+    iscsiTgtLogoutNormals          Counter32,
+    iscsiTgtLogoutOthers           Counter32
+}
+
+iscsiTgtLogoutNormals OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "normal logouts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Logout Command PDUs received by this target,
+     with reason code 0 (closes the session)."
+::= { iscsiTargetLogoutStatsEntry 1 }
+
+iscsiTgtLogoutOthers OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "abnormal logouts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Logout Command PDUs received by this target,
+        with any status code other than 0."
+::= { iscsiTargetLogoutStatsEntry 2 }
+
+----------------------------------------------------------------------
+
+iscsiTgtAuthorization OBJECT IDENTIFIER ::= { iscsiObjects 8 }
+
+-- Target Authorization Attributes Table
+
+iscsiTgtAuthAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiTgtAuthAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "A list of initiator identities that are authorized to
+     access each target node within each iSCSI instance
+     present on the local system."
+::= { iscsiTgtAuthorization 1 }
+
+
+
+
+iscsiTgtAuthAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiTgtAuthAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An entry (row) containing management information
+     applicable to a particular target node's authorized
+     initiator identity."
+    INDEX { iscsiInstIndex, iscsiNodeIndex, iscsiTgtAuthIndex }
+::= { iscsiTgtAuthAttributesTable 1 }
+
+IscsiTgtAuthAttributesEntry ::= SEQUENCE {
+    iscsiTgtAuthIndex              Unsigned32,
+    iscsiTgtAuthRowStatus          RowStatus,
+    iscsiTgtAuthIdentity           RowPointer
+}
+
+iscsiTgtAuthIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An arbitrary integer used to uniquely identify a particular
+     target's authorized initiator identity within an iSCSI
+     instance present on the local system."
+::= { iscsiTgtAuthAttributesEntry 1 }
+
+iscsiTgtAuthRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The status of the row."
+::= { iscsiTgtAuthAttributesEntry 2 }
+
+iscsiTgtAuthIdentity OBJECT-TYPE
+    SYNTAX        RowPointer
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "A pointer to the corresponding IPS-AUTH MIB user entry
+     that will be allowed to access this iSCSI target."
+    REFERENCE
+        "IPS-AUTH MIB"
+::= { iscsiTgtAuthAttributesEntry 3 }
+
+----------------------------------------------------------------------
+
+
+
+
+iscsiInitiator OBJECT IDENTIFIER ::= { iscsiObjects 9 }
+
+-- Initiator Attributes Table
+
+iscsiInitiatorAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiInitiatorAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "A Dynamic list of iSCSI nodes that can take on an initiator
+     role, belonging to each iSCSI instance present on
+     the local system."
+::= { iscsiInitiator 1 }
+
+iscsiInitiatorAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiInitiatorAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An entry (row) containing managment information
+     applicable to a particular iSCSI node that has
+     initiator capabilities."
+    INDEX  { iscsiInstIndex, iscsiNodeIndex }
+::= { iscsiInitiatorAttributesTable 1 }
+
+IscsiInitiatorAttributesEntry ::= SEQUENCE {
+    iscsiIntrLoginFailures         Counter32,
+    iscsiIntrLastFailureTime       TimeStamp,
+    iscsiIntrLastFailureType       INTEGER,         -- was AutonomousType , we need to support it,
+    iscsiIntrLastTgtFailureName    SnmpAdminString,
+    iscsiIntrLastTgtFailureAddrType InetAddressType,
+    iscsiIntrLastTgtFailureAddr    InetAddress
+}
+
+iscsiIntrLoginFailures OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object counts the number of times a login attempt from this
+     local initiator has failed."
+::= { iscsiInitiatorAttributesEntry 1 }
+
+iscsiIntrLastFailureTime OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current
+
+
+
+    DESCRIPTION
+     "The timestamp of the most recent failure of a login attempt
+     from this initiator.  A value of zero indicates that no such
+     failures have occurred."
+::= { iscsiInitiatorAttributesEntry 2 }
+
+iscsiIntrLastFailureType  OBJECT-TYPE
+    SYNTAX        INTEGER          -- was AutonomousType , we need to support it
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "The type of the most recent failure of a login attempt
+     from this initiator, represented as the OID of the counter
+     object in iscsiInitiatorLoginStatsTable for which the
+     relevant instance was incremented.  A value of 0.0
+     indicates a type which is not represented by any of
+     the counters in iscsiInitiatorLoginStatsTable."
+::= { iscsiInitiatorAttributesEntry 3 }
+
+iscsiIntrLastTgtFailureName  OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string giving the name of the target that failed
+      the last login attempt."
+::= { iscsiInitiatorAttributesEntry 4 }
+
+iscsiIntrLastTgtFailureAddrType OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of Internet Network Address in iscsiIntrLastTgtFailureAddr."
+::= { iscsiInitiatorAttributesEntry 5 }
+
+iscsiIntrLastTgtFailureAddr OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An Internet Network Address giving the host address of the target
+        that failed the last login attempt."
+::= { iscsiInitiatorAttributesEntry 6 }
+
+-- Initiator Login Stats Table
+
+iscsiInitiatorLoginStatsTable OBJECT-TYPE
+
+
+
+    SYNTAX        SEQUENCE OF IscsiInitiatorLoginStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic table of counters which keep track of the results of
+        this initiator's login attempts."
+::= { iscsiInitiator 2 }
+
+iscsiInitiatorLoginStatsEntry OBJECT-TYPE
+    SYNTAX        IscsiInitiatorLoginStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing counters of each result
+        of this initiator's login attempts."
+    AUGMENTS { iscsiInitiatorAttributesEntry }
+::= { iscsiInitiatorLoginStatsTable 1 }
+
+IscsiInitiatorLoginStatsEntry ::= SEQUENCE {
+    iscsiIntrLoginAcceptRsps       Counter32,
+    iscsiIntrLoginOtherFailRsps    Counter32,
+    iscsiIntrLoginRedirectRsps     Counter32,
+    iscsiIntrLoginAuthFailRsps     Counter32,
+    iscsiIntrLoginAuthenticateFails Counter32,
+    iscsiIntrLoginNegotiateFails   Counter32
+}
+
+iscsiIntrLoginAcceptRsps OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "successful logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs with status
+        0x0000, Accept Login, received by this initiator."
+::= { iscsiInitiatorLoginStatsEntry 1 }
+
+iscsiIntrLoginOtherFailRsps OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs received by this
+        initiator with any status code not counted in the
+        objects below."
+::= { iscsiInitiatorLoginStatsEntry 2 }
+
+
+
+
+iscsiIntrLoginRedirectRsps OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs with status class 0x01,
+        Redirection, received by this initiator."
+::= { iscsiInitiatorLoginStatsEntry 3 }
+
+iscsiIntrLoginAuthFailRsps OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Login Response PDUs with status class 0x201,
+        Authentication Failed, received by this initiator."
+::= { iscsiInitiatorLoginStatsEntry 4 }
+
+iscsiIntrLoginAuthenticateFails OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times the initiator has aborted a
+        login because the target could not be authenticated.
+
+        No response is generated.
+
+        If this counter is incremented, an iscsiIntrLoginFailure
+        notification should be generated."
+::= { iscsiInitiatorLoginStatsEntry 5 }
+
+iscsiIntrLoginNegotiateFails OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "failed logins"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times the initiator has aborted a
+        login because parameter negotiation with the target
+        failed.
+
+        No response is generated.
+
+        If this counter is incremented, an iscsiIntrLoginFailure
+
+
+
+        notification should be generated."
+::= { iscsiInitiatorLoginStatsEntry 6 }
+
+-- Initiator Logout Stats Table
+
+iscsiInitiatorLogoutStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiInitiatorLogoutStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "When an initiator attempts send a Logout command, the target
+        responds with a Logout Response that carries a status code.
+        This Dynamic table contains a list of counters of Logout Response
+        PDUs of each status code, that were received by each
+        initiator belonging to this iSCSI instance present on this
+     system."
+::= { iscsiInitiator 3 }
+
+iscsiInitiatorLogoutStatsEntry OBJECT-TYPE
+    SYNTAX        IscsiInitiatorLogoutStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing counters of Logout Response
+        PDUs of each status code, that were generated by this
+        initiator."
+    AUGMENTS { iscsiInitiatorAttributesEntry }
+::= { iscsiInitiatorLogoutStatsTable 1 }
+
+IscsiInitiatorLogoutStatsEntry ::= SEQUENCE {
+    iscsiIntrLogoutNormals         Counter32,
+    iscsiIntrLogoutOthers          Counter32
+}
+
+iscsiIntrLogoutNormals OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "normal logouts"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Logout Command PDUs generated by this initiator
+     with reason code 0 (closes the session)."
+::= { iscsiInitiatorLogoutStatsEntry 1 }
+
+iscsiIntrLogoutOthers OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "abnormal logouts"
+    MAX-ACCESS    read-only
+
+
+
+    STATUS        current
+    DESCRIPTION
+        "The count of Logout Command PDUs generated by this initiator
+        with any status code other than 0."
+::= { iscsiInitiatorLogoutStatsEntry 2 }
+
+----------------------------------------------------------------------
+
+iscsiIntrAuthorization OBJECT IDENTIFIER ::= { iscsiObjects 10 }
+
+-- Initiator Authorization Attributes Table
+
+iscsiIntrAuthAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiIntrAuthAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A list of target identities which each initiator
+     on the local system may access."
+::= { iscsiIntrAuthorization 1 }
+
+iscsiIntrAuthAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiIntrAuthAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An entry (row) containing managment information applicable
+     to a particular initiator node's authorized target identity."
+    INDEX { iscsiInstIndex, iscsiNodeIndex, iscsiIntrAuthIndex }
+::= { iscsiIntrAuthAttributesTable 1 }
+
+IscsiIntrAuthAttributesEntry ::= SEQUENCE {
+    iscsiIntrAuthIndex              Unsigned32,
+    iscsiIntrAuthRowStatus          RowStatus,
+    iscsiIntrAuthIdentity           RowPointer
+}
+
+iscsiIntrAuthIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An arbitrary integer used to uniquely identify a
+     particular initiator node's authorized target
+     identity within an iSCSI instance present on the
+     local system."
+::= { iscsiIntrAuthAttributesEntry 1 }
+
+
+
+
+iscsiIntrAuthRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The status of the row."
+::= { iscsiIntrAuthAttributesEntry 2 }
+
+iscsiIntrAuthIdentity OBJECT-TYPE
+    SYNTAX        RowPointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "A pointer to the corresponding IPS-AUTH MIB user entry
+     to which this initiator node should attempt to establish
+     an iSCSI session."
+    REFERENCE
+        "IPS-AUTH MIB"
+::= { iscsiIntrAuthAttributesEntry 3 }
+
+----------------------------------------------------------------------
+
+iscsiSession OBJECT IDENTIFIER ::= { iscsiObjects 11 }
+
+-- Session Attributes Table
+
+iscsiSessionAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiSessionAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of sessions belonging to each iSCSI instance
+        present on the system."
+::= { iscsiSession 1 }
+
+iscsiSessionAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiSessionAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing management information applicable
+        to a particular session."
+    INDEX  { iscsiInstIndex, iscsiNodeIndex, iscsiSsnIndex }
+::= { iscsiSessionAttributesTable 1 }
+
+IscsiSessionAttributesEntry ::= SEQUENCE {
+    iscsiSsnIndex                  Unsigned32,
+    iscsiSsnDirection              INTEGER,
+
+
+
+    iscsiSsnInitiatorName         SnmpAdminString,
+    iscsiSsnTargetName             SnmpAdminString,
+    iscsiSsnTsih                   INTEGER,
+    iscsiSsnIsid                   OCTET STRING,
+    iscsiSsnInitiatorAlias         SnmpAdminString,
+    iscsiSsnTargetAlias            SnmpAdminString,
+    iscsiSsnInitialR2T             TruthValue,
+    iscsiSsnBidiInitialR2T         TruthValue,
+    iscsiSsnImmediateData          TruthValue,
+    iscsiSsnType                   INTEGER,
+    iscsiSsnMaxOutstandingR2T      INTEGER,
+    iscsiSsnFirstBurstSize         INTEGER,
+    iscsiSsnMaxBurstSize           INTEGER,
+    iscsiSsnConnectionNumber       Gauge32,
+    iscsiSsnAuthIdentity           RowPointer,
+    iscsiSsnDataSequenceInOrder    TruthValue,
+    iscsiSsnDataPduInOrder         TruthValue,
+    iscsiSsnErrorRecoveryLevel     INTEGER
+}
+
+iscsiSsnIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An arbitrary integer used to uniquely identify a
+     particular session within an iSCSI instance present
+     on the local system."
+::= { iscsiSessionAttributesEntry 1 }
+
+iscsiSsnDirection OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      inboundSession(1),
+                      outboundSession(2)
+                  }
+    MAX-ACCESS    read-only
+    STATUS                         current
+    DESCRIPTION
+        "Direction of iSCSI session:
+        InboundSession  - session is established from an external
+                          initiator to a target within this iSCSI
+                          instance.
+        OutboundSession - session is established from an initiator
+                          within this iSCSI instance to an external
+                          target."
+::= { iscsiSessionAttributesEntry 2 }
+
+iscsiSsnInitiatorName OBJECT-TYPE
+
+
+
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "If iscsiSsnDirection is Inbound, this object is an
+     octet string that will contain the name of the remote
+     initiator.
+
+     If iscsiSsnDirection is Outbound, this object will
+     contain a zero-length string."
+::= { iscsiSessionAttributesEntry 3 }
+
+iscsiSsnTargetName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "If iscsiSsnDirection is Outbound, this object is an
+     octet string that will contain the name of the remote
+     target.
+
+     If iscsiSsnDirection is Inbound, this object will
+     contain a zero-length string."
+::= { iscsiSessionAttributesEntry 4 }
+
+iscsiSsnTsih OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The target-defined identification handle for this session."
+::= { iscsiSessionAttributesEntry 5 }
+
+iscsiSsnIsid OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(6))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The initiator-defined portion of the iSCSI Session ID."
+::= { iscsiSessionAttributesEntry 6 }
+
+iscsiSsnInitiatorAlias OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string that gives the alias communicated by the
+        initiator end of the session during the login phase.
+
+
+
+        If no alias exists, the value is a zero-length string."
+::= { iscsiSessionAttributesEntry 7 }
+
+iscsiSsnTargetAlias OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An octet string that gives the alias communicated by the
+        target end of the session during the login phase.
+
+        If no alias exists, the value is a zero-length string."
+::= { iscsiSessionAttributesEntry 8 }
+
+iscsiSsnInitialR2T OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "If set to true, indicates that the initiator must wait
+        for an R2T before sending to the target.  If set to false,
+        the initiator may send data immediately, within limits set
+        by iscsiSsnFirstBurstSize and the expected data transfer
+        length of the request.
+
+        Default is true."
+::= { iscsiSessionAttributesEntry 9 }
+
+iscsiSsnBidiInitialR2T OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "If set to true, indicates that the initiator must wait
+        for an R2T before sending data to the target within a
+        bi-directional (both read and write) request.  If false,
+        the initiator may send unsolicited write data as part
+        of the request."
+::= { iscsiSessionAttributesEntry 10 }
+
+iscsiSsnImmediateData OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether the initiator and target have agreed to support
+        immediate data on this session."
+::= { iscsiSessionAttributesEntry 11 }
+
+
+
+iscsiSsnType OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      normalSession(1),
+                      discoverySession(2)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Type of iSCSI session:
+        normalSession    - session is a normal iSCSI session
+        discoverySession - session is being used only for discovery."
+    DEFVAL        { normalSession }
+::= { iscsiSessionAttributesEntry 12 }
+
+iscsiSsnMaxOutstandingR2T OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of outstanding request-to-transmit
+        (R2T)s per task within this session."
+::= { iscsiSessionAttributesEntry 13 }
+
+iscsiSsnFirstBurstSize OBJECT-TYPE
+    SYNTAX        INTEGER (512..16777215)
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum length supported for unsolicited data sent
+        within this session."
+    DEFVAL        { 65536 }
+::= { iscsiSessionAttributesEntry 14 }
+
+iscsiSsnMaxBurstSize OBJECT-TYPE
+    SYNTAX        INTEGER (512..16777215)
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "The maximum number of bytes which can be sent within
+     a single sequence of Data-In or Data-Out PDUs."
+    DEFVAL        { 262144 }
+::= { iscsiSessionAttributesEntry 15 }
+
+iscsiSsnConnectionNumber OBJECT-TYPE
+    SYNTAX        Gauge32 (1..65535)
+    UNITS         "connections"
+
+
+
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of transport protocol connections that currently
+     belong to this session."
+::= { iscsiSessionAttributesEntry 16 }
+
+iscsiSsnAuthIdentity OBJECT-TYPE
+    SYNTAX        RowPointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "This object contains a row in the IPS-AUTH MIB
+     which identifies the authentication method
+     being used on this session, as communicated
+     during the login phase."
+    REFERENCE
+        "IPS-AUTH MIB"
+::= { iscsiSessionAttributesEntry 17 }
+
+ iscsiSsnDataSequenceInOrder OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "False indicates that iSCSI data PDU sequences may
+        be transferred in any order.  True indicates that
+        data PDU sequences must be tranferred using
+        continuously increasing offsets, except during
+        error recovery."
+::= { iscsiSessionAttributesEntry 18 }
+
+iscsiSsnDataPduInOrder OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "False indicates that iSCSI data PDUs within sequences
+        may be in any order.  True indicates that data PDUs
+        within sequences must be at continuously increasing
+        addresses, with no gaps or overlay between PDUs.
+
+        Default is true."
+::= { iscsiSessionAttributesEntry 19 }
+
+iscsiSsnErrorRecoveryLevel OBJECT-TYPE
+    SYNTAX        INTEGER (0..255)
+    MAX-ACCESS    read-only
+
+
+
+    STATUS        current
+    DESCRIPTION
+        "The level of error recovery negotiated between
+     the initiator and the target.  Higher numbers
+     represent more detailed recovery schemes."
+::= { iscsiSessionAttributesEntry 20 }
+
+-- Session Stats Table
+
+iscsiSessionStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiSessionStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of general iSCSI traffic counters for each of the
+     sessions present on the system."
+::= { iscsiSession 2 }
+
+iscsiSessionStatsEntry OBJECT-TYPE
+    SYNTAX        IscsiSessionStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing general iSCSI traffic counters
+     for a particular session."
+    AUGMENTS { iscsiSessionAttributesEntry }
+::= { iscsiSessionStatsTable 1 }
+
+IscsiSessionStatsEntry ::= SEQUENCE {
+    iscsiSsnCmdPdus                Counter32,
+    iscsiSsnRspPdus                Counter32,
+    iscsiSsnTxDataOctets         Counter64,
+    iscsiSsnRxDataOctets           Counter64
+}
+
+iscsiSsnCmdPdus OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "PDUs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of Command PDUs transferred on this session."
+::= { iscsiSessionStatsEntry 1 }
+
+iscsiSsnRspPdus OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "PDUs"
+    MAX-ACCESS    read-only
+
+
+
+    STATUS        current
+    DESCRIPTION
+        "The count of Response PDUs transferred on this session."
+::= { iscsiSessionStatsEntry 2 }
+
+iscsiSsnTxDataOctets OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS         "octets"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of data octets that were transmitted by
+        the local iSCSI node on this session."
+::= { iscsiSessionStatsEntry 3 }
+
+iscsiSsnRxDataOctets OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS         "octets"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of data octets that were received by
+        the local iSCSI node on this session."
+::= { iscsiSessionStatsEntry 4 }
+
+-- Session Connection Error Stats Table
+
+iscsiSessionCxnErrorStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiSessionCxnErrorStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of error counters for each of the sessions
+     present on this system."
+::= { iscsiSession 3 }
+
+iscsiSessionCxnErrorStatsEntry OBJECT-TYPE
+    SYNTAX        IscsiSessionCxnErrorStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing error counters for
+     a particular session."
+    AUGMENTS { iscsiSessionAttributesEntry }
+::= { iscsiSessionCxnErrorStatsTable 1 }
+
+IscsiSessionCxnErrorStatsEntry ::= SEQUENCE {
+    iscsiSsnDigestErrors           Counter32,
+
+
+
+    iscsiSsnCxnTimeoutErrors       Counter32
+}
+
+iscsiSsnDigestErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "PDUs"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "The count of PDUs which were received on the session and
+     contained header or data digest errors."
+::= { iscsiSessionCxnErrorStatsEntry 1 }
+
+iscsiSsnCxnTimeoutErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "sequences"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of connections within this session
+        which have been terminated due to timeout."
+::= { iscsiSessionCxnErrorStatsEntry 2 }
+
+----------------------------------------------------------------------
+
+iscsiConnection OBJECT IDENTIFIER ::= { iscsiObjects 12 }
+
+-- Connection Attributes Table
+
+iscsiConnectionAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IscsiConnectionAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of connections belonging to each iSCSI instance
+        present on the system."
+::= { iscsiConnection 1 }
+
+iscsiConnectionAttributesEntry OBJECT-TYPE
+    SYNTAX        IscsiConnectionAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing management information applicable
+        to a particular connection."
+    INDEX  { iscsiInstIndex, iscsiNodeIndex, iscsiSsnIndex, iscsiCxnIndex }
+::= { iscsiConnectionAttributesTable 1 }
+
+
+
+
+IscsiConnectionAttributesEntry ::= SEQUENCE {
+    iscsiCxnIndex                  Unsigned32,
+    iscsiCxnCid                    INTEGER,
+    iscsiCxnState                  INTEGER,
+    iscsiCxnLocalAddrType          InetAddressType,
+    iscsiCxnLocalAddr              InetAddress,
+    iscsiCxnProtocol               IscsiTransportProtocols,
+    iscsiCxnLocalPort              Unsigned32,
+    iscsiCxnRemoteAddrType        InetAddressType,
+    iscsiCxnRemoteAddr             InetAddress,
+    iscsiCxnRemotePort             Unsigned32,
+    iscsiCxnMaxRecvDataSegLength   INTEGER,
+    iscsiCxnHeaderIntegrity        IscsiDigestMethod,
+    iscsiCxnDataIntegrity          IscsiDigestMethod,
+    iscsiCxnRecvMarker             TruthValue,
+    iscsiCxnSendMarker             TruthValue
+}
+
+iscsiCxnIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "An arbitrary integer used to uniquely identify a
+     particular connection of a particular session within
+     an iSCSI instance present on the local system."
+::= { iscsiConnectionAttributesEntry 1 }
+
+iscsiCxnCid OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The iSCSI Connection ID for this connection."
+::= { iscsiConnectionAttributesEntry 2 }
+
+iscsiCxnState OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      login(1),
+                      full(2),
+                      logout(3)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current state of this connection, from an iSCSI negotiation
+        point of view.  Here are the states:
+
+
+
+
+        login  - The transport protocol connection has been established,
+                 but a valid iSCSI login response with the final bit set
+                 has not been sent or received.
+        full   - A valid iSCSI login response with the final bit set
+                 has been sent or received.
+        logout - A valid iSCSI logout command has been sent or
+                 received, but the transport protocol connection has
+                 not yet been closed."
+::= { iscsiConnectionAttributesEntry 3 }
+
+iscsiCxnLocalAddrType OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The type of Internet Network Address in iscsiCxnLocalAddr."
+::= { iscsiConnectionAttributesEntry 4 }
+
+iscsiCxnLocalAddr OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The local Internet Network Address used by this connection."
+::= { iscsiConnectionAttributesEntry 5 }
+
+iscsiCxnProtocol OBJECT-TYPE
+    SYNTAX        IscsiTransportProtocols
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The transport protocol over which this connection is
+        running."
+    DEFVAL                         { 6 } -- TCP
+::= { iscsiConnectionAttributesEntry 6 }
+
+iscsiCxnLocalPort OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The local transport protocol port used by this connection."
+::= { iscsiConnectionAttributesEntry 7 }
+
+iscsiCxnRemoteAddrType OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    read-only
+    STATUS        current
+
+
+
+    DESCRIPTION
+        "The type of Internet Network Address in iscsiCxnRemoteAddr."
+::= { iscsiConnectionAttributesEntry 8 }
+
+iscsiCxnRemoteAddr OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remote Internet Network Address used by this connection."
+::= { iscsiConnectionAttributesEntry 9 }
+
+iscsiCxnRemotePort OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remote transport protocol port used by this connection."
+::= { iscsiConnectionAttributesEntry 10 }
+
+iscsiCxnMaxRecvDataSegLength OBJECT-TYPE
+    SYNTAX        INTEGER (512..16777215)
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum data payload size supported for command
+        or data PDUs in use within this connection.
+
+     Note that the size of reported in bytes even though
+     the negotiation is in 512k blocks."
+    DEFVAL { 8192 }
+::= { iscsiConnectionAttributesEntry 11 }
+
+iscsiCxnHeaderIntegrity OBJECT-TYPE
+    SYNTAX        IscsiDigestMethod
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "This object identifies the iSCSI header
+        digest scheme in use within this connection."
+::= { iscsiConnectionAttributesEntry 12 }
+
+iscsiCxnDataIntegrity OBJECT-TYPE
+    SYNTAX        IscsiDigestMethod
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+
+
+
+     "This object identifies the iSCSI data
+        digest scheme in use within this connection."
+::= { iscsiConnectionAttributesEntry 13 }
+
+iscsiCxnRecvMarker OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "This object indicates whether or not this connection
+        is receiving markers in in its incoming data stream."
+::= { iscsiConnectionAttributesEntry 14 }
+
+iscsiCxnSendMarker OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+     "This object indicates whether or not this connection
+        is inserting markers in in its outgoing data stream."
+::= { iscsiConnectionAttributesEntry 15 }
+
+------------------------------------------------------------------------
+-- Notifications
+
+iscsiNotificationsPrefix OBJECT IDENTIFIER ::= { iscsiNotifications 0 }
+
+iscsiTgtLoginFailure NOTIFICATION-TYPE
+    OBJECTS {
+        iscsiTgtLoginFailures,
+        iscsiTgtLastFailureType,
+        iscsiTgtLastIntrFailureName,
+        iscsiTgtLastIntrFailureAddrType,
+        iscsiTgtLastIntrFailureAddr
+    }
+    STATUS current
+    DESCRIPTION
+        "Sent when a login is failed by a target.
+
+     The implementation of this trap should not send more than
+     3 notifications of this type in any 10 second time span."
+::= { iscsiNotificationsPrefix 1 }
+
+iscsiIntrLoginFailure NOTIFICATION-TYPE
+    OBJECTS {
+        iscsiIntrLoginFailures,
+        iscsiIntrLastFailureType,
+        iscsiIntrLastTgtFailureName,
+
+
+
+        iscsiIntrLastTgtFailureAddrType,
+        iscsiIntrLastTgtFailureAddr
+    }
+    STATUS current
+    DESCRIPTION
+        "Sent when a login is failed by a initiator.
+
+     The implementation of this trap should not send more than
+     3 notifications of this type in any 10 second time span."
+::= { iscsiNotificationsPrefix 2 }
+
+iscsiInstSessionFailure NOTIFICATION-TYPE
+    OBJECTS {
+        iscsiInstSsnFailures,
+        iscsiInstLastSsnFailureType,
+        iscsiInstLastSsnRmtNodeName
+    }
+    STATUS current
+    DESCRIPTION
+        "Sent when an active session is failed by either the initiator
+        or the target.
+
+     The implementation of this trap should not send more than
+     3 notifications of this type in any 10 second time span."
+::= { iscsiNotificationsPrefix 3 }
+
+------------------------------------------------------------------------
+
+-- Conformance Statements
+
+iscsiGroups OBJECT IDENTIFIER ::= { iscsiConformance 1 }
+
+iscsiInstanceAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiInstDescr,
+        iscsiInstVersionMin,
+        iscsiInstVersionMax,
+        iscsiInstVendorID,
+        iscsiInstVendorVersion,
+        iscsiInstPortalNumber,
+        iscsiInstNodeNumber,
+        iscsiInstSessionNumber,
+        iscsiInstSsnFailures,
+        iscsiInstLastSsnFailureType,
+        iscsiInstLastSsnRmtNodeName
+    }
+    STATUS current
+    DESCRIPTION
+
+
+
+        "A collection of objects providing information about iSCSI
+     instances."
+::= { iscsiGroups 1 }
+
+iscsiInstanceSsnErrorStatsGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiInstSsnDigestErrors,
+        iscsiInstSsnCxnTimeoutErrors,
+        iscsiInstSsnFormatErrors
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about
+     errors that have caused a session failure for an
+     iSCSI instance."
+::= { iscsiGroups 2 }
+
+iscsiPortalAttributesGroup OBJECT-GROUP
+    OBJECTS {
+--        iscsiPortalRowStatus,
+        iscsiPortalRoles,
+        iscsiPortalAddrType,
+        iscsiPortalAddr,
+        iscsiPortalProtocol,
+        iscsiPortalMaxRecvDataSegLength,
+        iscsiPortalPrimaryHdrDigest,
+        iscsiPortalPrimaryDataDigest,
+        iscsiPortalSecondaryHdrDigest,
+        iscsiPortalSecondaryDataDigest,
+     iscsiPortalRecvMarker
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about
+     the transport protocol endpoints of the local targets."
+::= { iscsiGroups 3 }
+
+iscsiTgtPortalAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiTgtPortalPort,
+        iscsiTgtPortalTag
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about
+     the transport protocol endpoints of the local targets."
+::= { iscsiGroups 4 }
+
+
+
+
+iscsiIntrPortalAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiIntrPortalTag
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about
+     the Internet Network Addresses of the local initiators."
+::= { iscsiGroups 5 }
+
+iscsiNodeAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiNodeName,
+        iscsiNodeAlias,
+        iscsiNodeRoles,
+        iscsiNodeTransportType,
+     iscsiNodeInitialR2T,
+     iscsiNodeBidiInitialR2T,
+     iscsiNodeImmediateData,
+     iscsiNodeMaxOutstandingR2T,
+     iscsiNodeFirstBurstSize,
+     iscsiNodeMaxBurstSize,
+     iscsiNodeMaxConnections,
+     iscsiNodeDataSequenceInOrder,
+     iscsiNodeDataPduInOrder,
+     iscsiNodeDefaultTime2Wait,
+     iscsiNodeDefaultTime2Retain,
+     iscsiNodeErrorRecoveryLevel
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about all
+     local targets."
+::= { iscsiGroups 6 }
+
+iscsiTargetAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiTgtLoginFailures,
+        iscsiTgtLastFailureTime,
+        iscsiTgtLastFailureType,
+        iscsiTgtLastIntrFailureName,
+        iscsiTgtLastIntrFailureAddrType,
+        iscsiTgtLastIntrFailureAddr
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about all
+     local targets."
+
+
+
+::= { iscsiGroups 7 }
+
+iscsiTargetLoginStatsGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiTgtLoginAccepts,
+        iscsiTgtLoginOtherFails,
+        iscsiTgtLoginRedirects,
+        iscsiTgtLoginAuthorizeFails,
+        iscsiTgtLoginAuthenticateFails,
+        iscsiTgtLoginNegotiateFails
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about all
+     login attempts by remote initiators to local targets."
+::= { iscsiGroups 8 }
+
+iscsiTargetLogoutStatsGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiTgtLogoutNormals,
+        iscsiTgtLogoutOthers
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about all
+     logout events between remote initiators to local targets."
+::= { iscsiGroups 9 }
+
+iscsiTargetAuthGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiTgtAuthRowStatus,
+        iscsiTgtAuthIdentity
+    }
+    STATUS current
+    DESCRIPTION
+        "."
+::= { iscsiGroups 10 }
+
+iscsiInitiatorAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiIntrLoginFailures,
+        iscsiIntrLastFailureTime,
+        iscsiIntrLastFailureType,
+        iscsiIntrLastTgtFailureName,
+        iscsiIntrLastTgtFailureAddrType,
+        iscsiIntrLastTgtFailureAddr
+    }
+    STATUS current
+
+
+
+    DESCRIPTION
+        "A collection of objects providing information about
+     all local initiators."
+::= { iscsiGroups 11 }
+
+iscsiInitiatorLoginStatsGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiIntrLoginAcceptRsps,
+        iscsiIntrLoginOtherFailRsps,
+        iscsiIntrLoginRedirectRsps,
+        iscsiIntrLoginAuthFailRsps,
+        iscsiIntrLoginAuthenticateFails,
+        iscsiIntrLoginNegotiateFails
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about all
+     login attempts by local initiators to remote targets."
+::= { iscsiGroups 12 }
+
+iscsiInitiatorLogoutStatsGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiIntrLogoutNormals,
+        iscsiIntrLogoutOthers
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about all
+     logout events between local initiators to remote targets."
+::= { iscsiGroups 13 }
+
+iscsiInitiatorAuthGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiIntrAuthRowStatus,
+        iscsiIntrAuthIdentity
+    }
+    STATUS current
+    DESCRIPTION
+        "."
+::= { iscsiGroups 14 }
+
+iscsiSessionAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiSsnDirection,
+        iscsiSsnInitiatorName,
+        iscsiSsnTargetName,
+        iscsiSsnTsih,
+        iscsiSsnIsid,
+
+
+
+        iscsiSsnInitiatorAlias,
+        iscsiSsnTargetAlias,
+        iscsiSsnInitialR2T,
+        iscsiSsnBidiInitialR2T,
+        iscsiSsnImmediateData,
+        iscsiSsnType,
+        iscsiSsnMaxOutstandingR2T,
+        iscsiSsnFirstBurstSize,
+        iscsiSsnMaxBurstSize,
+        iscsiSsnConnectionNumber,
+        iscsiSsnAuthIdentity,
+        iscsiSsnDataSequenceInOrder,
+        iscsiSsnDataPduInOrder,
+        iscsiSsnErrorRecoveryLevel
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information applicable to
+     all sessions."
+::= { iscsiGroups 15 }
+
+iscsiSessionStatsGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiSsnCmdPdus,
+        iscsiSsnRspPdus,
+        iscsiSsnTxDataOctets,
+        iscsiSsnRxDataOctets
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about message
+     and data traffic for all sessions."
+::= { iscsiGroups 16 }
+
+iscsiSessionCxnErrorStatsGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiSsnDigestErrors,
+        iscsiSsnCxnTimeoutErrors
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about connection
+     errors for all sessions."
+::= { iscsiGroups 17 }
+
+iscsiConnectionAttributesGroup OBJECT-GROUP
+    OBJECTS {
+        iscsiCxnCid,
+
+
+
+        iscsiCxnState,
+        iscsiCxnProtocol,
+        iscsiCxnLocalAddrType,
+        iscsiCxnLocalAddr,
+        iscsiCxnLocalPort,
+        iscsiCxnRemoteAddrType,
+        iscsiCxnRemoteAddr,
+        iscsiCxnRemotePort,
+     iscsiCxnMaxRecvDataSegLength,
+     iscsiCxnHeaderIntegrity,
+        iscsiCxnDataIntegrity,
+        iscsiCxnRecvMarker,
+        iscsiCxnSendMarker
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing information about all
+     connections used by all sessions."
+::= { iscsiGroups 18 }
+
+iscsiTgtLgnNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        iscsiTgtLoginFailure
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of notifications which indicate a login
+     failure from a remote initiator to a local target."
+::= { iscsiGroups 19 }
+
+iscsiIntrLgnNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        iscsiIntrLoginFailure
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of notifications which indicate a login
+     failure from a local initiator to a remote target."
+::= { iscsiGroups 20 }
+
+iscsiSsnFlrNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        iscsiInstSessionFailure
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of notifications which indicate session
+     failures occurring after login."
+
+
+
+::= { iscsiGroups 21 }
+
+------------------------------------------------------------------------
+
+iscsiCompliances OBJECT IDENTIFIER ::= { iscsiConformance 2 }
+
+iscsiComplianceV1 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "Initial version of compliance statement based on
+        initial version of MIB.
+
+     If an implementation can be both a target and an
+     initiator, all groups are mandatory."
+    MODULE       -- this module
+    MANDATORY-GROUPS {
+        iscsiInstanceAttributesGroup,
+        iscsiPortalAttributesGroup,
+        iscsiNodeAttributesGroup,
+        iscsiSessionAttributesGroup,
+        iscsiSessionStatsGroup,
+        iscsiSessionCxnErrorStatsGroup,
+        iscsiConnectionAttributesGroup,
+        iscsiSsnFlrNotificationsGroup
+    }
+
+    -- Conditionally mandatory groups to be included with
+    -- the mandatory groups when the implementation has
+    -- iSCSI target facilities.
+
+    GROUP iscsiTgtPortalAttributesGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI target facilities."
+
+    GROUP iscsiTargetAttributesGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI target facilities."
+
+    GROUP iscsiTargetLoginStatsGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI target facilities."
+
+    GROUP iscsiTargetLogoutStatsGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+
+
+
+     that have iSCSI target facilities."
+
+    GROUP iscsiTgtLgnNotificationsGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI target facilities."
+
+    GROUP iscsiTargetAuthGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI target facilities."
+
+    -- Conditionally mandatory groups to be included with
+    -- the mandatory groups when the implementation has
+    -- iSCSI initiator facilities.
+
+    GROUP iscsiIntrPortalAttributesGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI initiator facilities."
+
+    GROUP iscsiInitiatorAttributesGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI initiator facilities."
+
+    GROUP iscsiInitiatorLoginStatsGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI initiator facilities."
+
+    GROUP iscsiInitiatorLogoutStatsGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI initiator facilities."
+
+    GROUP iscsiIntrLgnNotificationsGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI initiator facilities."
+
+    GROUP iscsiInitiatorAuthGroup
+    DESCRIPTION
+        "This group is mandatory for all iSCSI implementations
+     that have iSCSI initiator facilities."
+
+::= { iscsiCompliances 1 }
+
+
+
+
+END
+
+
+
