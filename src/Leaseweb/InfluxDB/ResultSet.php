@@ -17,12 +17,16 @@ class ResultSet
      */
     protected $raw = '';
 
+    /**
+     * @var array|mixed
+     */
     protected $parsedResults = array();
 
     /**
      * @param $raw
      *
      * @throws \InvalidArgumentException
+     * @throws InfluxDBClientError
      */
     public function __construct($raw)
     {
@@ -32,6 +36,11 @@ class ResultSet
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \InvalidArgumentException("Invalid JSON");
+        }
+
+        // There was an error in the query thrown by influxdb
+        if (isset($this->parsedResults['error'])) {
+            throw new InfluxDBClientError($this->parsedResults['error']);
         }
     }
 
@@ -45,18 +54,33 @@ class ResultSet
     {
         $points = array();
 
-        // todo: we are considering always have a metricName
-        foreach ($this->parsedResults['results'] as $result) {
-
-            foreach ($result['series'] as $serie) {
-                if ($serie['measurement'] == $metricName) {
-
-                    $points[] = $this->getPointsFromSerie($serie);
-                }
+        foreach ($this->getSeries() as $serie) {
+            if ($serie['measurement'] == $metricName || array_intersect($tags, $serie['tags'])) {
+                $points = array_merge($points, $this->getPointsFromSerie($serie));
             }
         }
 
         return $points;
+    }
+
+    /**
+     * @see: https://influxdb.com/docs/v0.9/concepts/reading_and_writing_data.html
+     *
+     * results is an array of objects, one for each query,
+     * each containing the keys for a series
+     * 
+     * @return array $series
+     */
+    private function getSeries()
+    {
+        $pickSeries = function ($object) {
+            return $object['series'];
+        };
+
+        // Foreach object, pick series key
+        return array_shift(
+            array_map($pickSeries, $this->parsedResults['results'])
+        );
     }
 
     /**
@@ -65,9 +89,16 @@ class ResultSet
      */
     private function getPointsFromSerie(array $serie)
     {
-        return array_combine(
-            $serie['columns'],
-            array_shift($serie['values'])
-        );
+        $points = array();
+
+        foreach ($serie['values'] as $point) {
+            $points[] = array_combine(
+                $serie['columns'],
+                $point
+            );
+        }
+
+        return $points;
     }
+
 }
