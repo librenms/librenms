@@ -48,9 +48,11 @@ WantedBy=multi-user.target
 
 ## Job configuration
 
-The Daemon reloads the `config.php` on each interval.
+The Daemon reloads the `config.php` on changes.
 
 Currently each interval is 10s. Although it is possible to go lower, it's discouraged to do so in order to avoid unecessarly loads.
+
+The config auto-detects when Distributed Polling is set up and will automatically exclude jobs for alerts, services and billing unless told not to in order to avoid redundant work across the pollers. See `Notes on Distributed Polling` for cofig options.
 
 
 ### Job Object
@@ -80,11 +82,22 @@ Although you can define each job by the base-unit of 1, we discourage this. It's
 
 Defaults:
 ```php
-$config['daemon']['intervals'][60][1][]    = array('type'=>'include', 'file'=>'alerts.php');                          // Alerts run every minute.
 $config['daemon']['intervals'][60][2][]    = array('type'=>'exec',    'file'=>'discovery.php',     'args'=>'-h new'); // Discover new devices every 2 minutes
 $config['daemon']['intervals'][60][5][]    = array('type'=>'exec',    'file'=>'poller-wrapper.py', 'args'=>'16');     // Poller runs every 5 minutes
 $config['daemon']['intervals'][3600][6][]  = array('type'=>'exec',    'file'=>'discovery.php',     'args'=>'-h all'); // Re-Discover every 6 Hours
 $config['daemon']['intervals'][86400][1][] = array('type'=>'exec',    'file'=>'daily.sh');                            // Daily at midnight. Interval overflows here, everything over [86400][1] remains daily.
+```
+
+## Notes on Distributed Polling
+
+When running in a distributed setup, the default behavior is to exclude the non-distributable jobs for _Dispatching Alerts_, _Calculating Bills_ and _Check Services_.
+
+It's recommended to only allow one poller to execute those 3 jobs, best would be to let the GUI-Machine do it.
+
+```php
+$config['daemon']['run']['alerts']   = true; // Run alerts    although in a distributed setup
+$config['daemon']['run']['billing']  = true; // ..  billing   ..
+$config['daemon']['run']['services'] = true; // ..  servvices ..
 ```
 
 ## Daemon Config
