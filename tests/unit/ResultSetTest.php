@@ -25,7 +25,7 @@ class ResultSetTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * We can get points for a measurement
+     * We can get points from measurement
      */
     public function testGetPointsFromMeasurementName()
     {
@@ -49,11 +49,22 @@ class ResultSetTest extends \PHPUnit_Framework_TestCase
     public function testGetPointsFromTags()
     {
         $tags = array("host" => "server01");
+        $expectedNumberOfPoints = 2;
 
         $points = $this->resultSet->getPoints('', $tags);
 
-        $this->assertTrue(
-            is_array($points)
-        );
+        $this->assertTrue(is_array($points));
+        $this->assertCount($expectedNumberOfPoints, $points);
+    }
+
+    public function testGetPointsFromNameAndTags()
+    {
+        $tags = array("host" => "server01");
+        $expectedNumberOfPoints = 2;
+
+        $points = $this->resultSet->getPoints('', $tags);
+
+        $this->assertTrue(is_array($points));
+        $this->assertCount($expectedNumberOfPoints, $points);
     }
 }
