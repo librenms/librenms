@@ -41,8 +41,33 @@ class ResultSet
      *
      * @return array $points
      */
-    public function getPoints($metricName = '', $tags = array())
+    public function getPoints($metricName = '', array $tags = array())
     {
-        return array();
+        $points = array();
+
+        // todo: we are considering always have a metricName
+        foreach ($this->parsedResults['results'] as $result) {
+
+            foreach ($result['series'] as $serie) {
+                if ($serie['measurement'] == $metricName) {
+
+                    $points[] = $this->getPointsFromSerie($serie);
+                }
+            }
+        }
+
+        return $points;
+    }
+
+    /**
+     * @param array $serie
+     * @return array
+     */
+    private function getPointsFromSerie(array $serie)
+    {
+        return array_combine(
+            $serie['columns'],
+            array_shift($serie['values'])
+        );
     }
 }

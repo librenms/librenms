@@ -14,11 +14,43 @@ class ResultSetTest extends \PHPUnit_Framework_TestCase
         $this->resultSet = new ResultSet($resultJsonExample);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testThrowsExceptionIfJSONisNotValid()
+    {
+        $invalidJSON = 'foo';
+
+        new ResultSet($invalidJSON);
+    }
+
+    /**
+     * We can get points for a measurement
+     */
     public function testGetPointsFromMeasurementName()
     {
         $measurementName = 'cpu_load_short';
+        $expectedNumberOfPoints = 2;
+        $expectedValueFromFirstPoint = 0.64;
 
         $points = $this->resultSet->getPoints($measurementName);
+
+        $this->assertTrue(
+            is_array($points)
+        );
+
+        $this->assertCount($expectedNumberOfPoints, $points);
+
+        $somePoint = array_shift($points);
+
+        $this->assertEquals($expectedValueFromFirstPoint, $somePoint['value']);
+    }
+
+    public function testGetPointsFromTags()
+    {
+        $tags = array("host" => "server01");
+
+        $points = $this->resultSet->getPoints('', $tags);
 
         $this->assertTrue(
             is_array($points)
