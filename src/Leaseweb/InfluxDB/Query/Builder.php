@@ -6,9 +6,10 @@
 namespace Leaseweb\InfluxDB\Query;
 
 use Leaseweb\InfluxDB\Database;
+use Leaseweb\InfluxDB\ResultSet;
 
 /**
- * Class QueryBuilder
+ * Class Builder
  *
  * Abstraction class for getting time series out of InfluxDB
  *
@@ -19,7 +20,7 @@ use Leaseweb\InfluxDB\Database;
  *
  * $series->select('*')->from('*')->getResult();
  *
- * @package Leaseweb\InfluxDB
+ * @package Leaseweb\InfluxDB\Query
  */
 class Builder
 {
@@ -191,9 +192,9 @@ class Builder
      *
      * @param bool $raw always return the ResultSeriesObjects, even when using an aggregation function
      *
-     * @return array|null
+     * @return ResultSet
      */
-    public function getResult($raw = false)
+    public function getResultSet($raw = false)
     {
         $query = sprintf("SELECT %s FROM %s", $this->selection, $this->metric);
         $aggregateKey = null;
@@ -217,12 +218,6 @@ class Builder
 
         }
 
-        $queryResult = $this->db->query($query);
-
-        if ($queryResult && $aggregateKey && !$raw) {
-            return (float) $queryResult[0]->$aggregateKey;
-        }
-
-        return $queryResult;
+        return  $this->db->query($query);
     }
 }
