@@ -43,6 +43,23 @@ EOD;
     /**
      * We can get points from measurement
      */
+    public function testGetPoints()
+    {
+        $expectedNumberOfPoints = 3;
+
+        $points = $this->resultSet->getPoints();
+
+        $this->assertTrue(
+            is_array($points)
+        );
+
+        $this->assertCount($expectedNumberOfPoints, $points);
+
+    }
+
+    /**
+     * We can get points from measurement
+     */
     public function testGetPointsFromMeasurementName()
     {
         $measurementName = 'cpu_load_short';
