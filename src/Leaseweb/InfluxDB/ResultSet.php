@@ -55,7 +55,7 @@ class ResultSet
         $points = array();
 
         foreach ($this->getSeries() as $serie) {
-            if ($serie['measurement'] == $metricName || array_intersect($tags, $serie['tags'])) {
+            if ($serie['name'] == $metricName || array_intersect($tags, $serie['tags'])) {
                 $points = array_merge($points, $this->getPointsFromSerie($serie));
             }
         }
