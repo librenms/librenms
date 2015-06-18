@@ -55,7 +55,11 @@ class ResultSet
         $points = array();
 
         foreach ($this->getSeries() as $serie) {
-            if ($serie['name'] == $metricName || array_intersect($tags, $serie['tags'])) {
+
+            if ((empty($metricName) && empty($tags))
+                || $serie['name'] == $metricName
+                || array_intersect($tags, $serie['tags'])
+            ) {
                 $points = array_merge($points, $this->getPointsFromSerie($serie));
             }
         }
@@ -68,10 +72,10 @@ class ResultSet
      *
      * results is an array of objects, one for each query,
      * each containing the keys for a series
-     * 
+     *
      * @return array $series
      */
-    private function getSeries()
+    public function getSeries()
     {
         $pickSeries = function ($object) {
             return $object['series'];
