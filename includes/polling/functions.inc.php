@@ -374,7 +374,6 @@ function get_main_serial($device) {
 
     if ($device['os_group'] == 'cisco') {
         $serial_output = snmp_get_multi($device, "entPhysicalSerialNum.1 entPhysicalSerialNum.1001", "-OQUs", "ENTITY-MIB:OLD-CISCO-CHASSIS-MIB");
-        $serial = "";
         if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
             return $serial_output[1]['entPhysicalSerialNum'];
         } elseif (!empty($serial_output[1001]['entPhysicalSerialNum'])) {
