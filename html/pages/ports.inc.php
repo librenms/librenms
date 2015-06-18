@@ -277,6 +277,8 @@ if(!isset($vars['disabled'])) { $vars['disabled'] = "0"; }
 if(!isset($vars['deleted']))  { $vars['deleted'] = "0"; }
 
 $where = '';
+$ignore_filter = 0;
+$disabled_filter = 0;
 
 foreach ($vars as $var => $value)
 {
@@ -297,13 +299,23 @@ foreach ($vars as $var => $value)
         $param[] = $value;
         break;
       case 'deleted':
+        if ($value == 1) {
+          $where .= " AND `I`.`deleted` = 1";
+          $ignore_filter = 1;
+        }
+        break;
       case 'ignore':
-        if ($value == 1)
-        {
+        if ($value == 1) {
           $where .= " AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0";
+          $ignore_filter = 1;
         }
         break;
       case 'disabled':
+        if ($value == 1) {
+            $where .= " AND `I`.`disabled` = 1 AND `I`.`deleted` = 0";
+            $disabled_filter = 1;
+        }
+        break;
       case 'ifSpeed':
         if (is_numeric($value))
         {
@@ -343,6 +355,10 @@ foreach ($vars as $var => $value)
       break;
     }
   }
+}
+
+if ($ignore_filter == 0 && $disabled_filter == 0) {
+    $where .= " AND `I`.`ignore` = 0 AND `I`.`disabled` = 0 AND `I`.`deleted` = 0";
 }
 
 $query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort;
