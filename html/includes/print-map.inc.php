@@ -53,6 +53,7 @@ if (is_array($tmp_devices[0])) {
     $tmp_links = array();
     foreach (dbFetchRows("SELECT local_device_id, remote_device_id, `remote_hostname`,`ports`.*, `remote_port` FROM `links` LEFT JOIN `ports` ON `local_port_id`=`ports`.`port_id` LEFT JOIN `devices` ON `ports`.`device_id`=`devices`.`device_id` WHERE (`local_device_id` IN ($tmp_ids) AND `remote_device_id` IN ($tmp_ids))") as $link_devices) {
         foreach ($tmp_devices as $k=>$v) {
+	    $port='';
             if ($v['id'] == $link_devices['local_device_id']) {
                 $from = $v['id'];
                 $port = shorten_interface_type($link_devices['ifName']);
@@ -60,7 +61,7 @@ if (is_array($tmp_devices[0])) {
             }
             if ($v['id'] == $link_devices['remote_device_id']) {
                 $to = $v['id'];
-                $port = ' > ' .shorten_interface_type($link_devices['remote_port']);
+                $port .= ' > ' .shorten_interface_type($link_devices['remote_port']);
             }
         }
         $speed = $link_devices['ifSpeed']/1000/1000;
