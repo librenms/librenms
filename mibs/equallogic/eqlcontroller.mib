@@ -1,0 +1,999 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+
+EQLCONTROLLER-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,Unsigned32, Counter32, Counter64, TimeTicks,  enterprises      
+            FROM SNMPv2-SMI        
+    DisplayString    
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId
+            FROM EQLGROUP-MIB
+    eqlMemberIndex
+            FROM EQLMEMBER-MIB;
+      
+      
+
+eqlcontrollerModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "
+        Copyright (c) 2004-2014 by Dell Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell Inc.  This software embodies proprietary information 
+        and trade secrets of Dell Inc. 
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION    "200209060000Z"         -- 02-Sep-06
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 4 }
+
+
+eqlcontrollerObjects        OBJECT IDENTIFIER ::= { eqlcontrollerModule 1 }
+eqlcontrollerNotifications  OBJECT IDENTIFIER ::= { eqlcontrollerModule 2 }
+eqlcontrollerConformance    OBJECT IDENTIFIER ::= { eqlcontrollerModule 3 }
+
+eqlbackplaneObjects         OBJECT IDENTIFIER ::= { eqlcontrollerModule 4 }
+eqlbackplaneNotifications   OBJECT IDENTIFIER ::= { eqlcontrollerModule 5 }
+eqlbackplaneConformance     OBJECT IDENTIFIER ::= { eqlcontrollerModule 6 }
+
+eqlemmObjects               OBJECT IDENTIFIER ::= { eqlcontrollerModule 7 }
+eqlemmNotifications         OBJECT IDENTIFIER ::= { eqlcontrollerModule 8 }
+eqlemmConformance           OBJECT IDENTIFIER ::= { eqlcontrollerModule 9 }
+
+eqldaughtercardObjects        OBJECT IDENTIFIER ::= { eqlcontrollerModule 10 }
+eqldaughtercardNotifications  OBJECT IDENTIFIER ::= { eqlcontrollerModule 11 }
+eqldaughtercardConformance    OBJECT IDENTIFIER ::= { eqlcontrollerModule 12 }
+
+eqlchannelcardObjects        OBJECT IDENTIFIER ::= { eqlcontrollerModule 13 }
+eqlsfpObjects                OBJECT IDENTIFIER ::= { eqlcontrollerModule 14 }
+
+--  ***************************************************************************************
+
+eqlControllerTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlControllerEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Controller Table. 
+                    This table contains controller status information. 
+                    One table entry per controller. It is indexed by controller slot number. 
+                    The number of entries is equal to the number of controllers that are present in the system"  
+    ::=  {  eqlcontrollerObjects 1 }    
+
+eqlControllerEntry OBJECT-TYPE      
+    SYNTAX          EqlControllerEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing controller status information."
+    INDEX           { eqlGroupId, eqlMemberIndex,eqlControllerIndex }    
+    ::=    { eqlControllerTable 1 }
+    
+
+EqlControllerEntry ::= 
+    SEQUENCE {     
+        eqlControllerIndex                      Integer32,
+        eqlControllerModel                      DisplayString, 
+        eqlControllerCMRevision                DisplayString,      
+        eqlControllerSwRevision                 DisplayString,  
+        eqlControllerBatteryStatus              INTEGER,
+        eqlControllerUpTime                     Counter32,
+        eqlControllerProcessorTemp              Integer32,
+        eqlControllerChipsetTemp                Integer32,
+        eqlControllerPrimaryOrSecondary         INTEGER,
+        eqlControllerPrimaryFlashImageRev       DisplayString,
+        eqlControllerSecondaryFlashImageRev     DisplayString,
+        eqlControllerSerialNumber               DisplayString,
+        eqlControllerDate                       DisplayString,
+        eqlControllerECO                        DisplayString,
+        eqlControllerEEprom                     OCTET STRING,
+        eqlControllerPLDrev                     Unsigned32,
+        eqlControllerPlatformType               Unsigned32,
+        eqlControllerPlatformVersion            Unsigned32,
+        eqlControllerCPUPass                    Unsigned32,
+        eqlControllerCPUrev                     Unsigned32,
+        eqlControllerCPUfreq                    Unsigned32,
+        eqlControllerPhysRam                    Unsigned32,
+        eqlControllerBootRomVersion             DisplayString,
+        eqlControllerBootRomBuildDate           DisplayString,
+        eqlControllerInfoMsg                    DisplayString,
+        eqlControllerAthenaSataVersion          DisplayString,
+        eqlControllerMajorVersion               Unsigned32,
+        eqlControllerMinorVersion               Unsigned32,
+        eqlControllerMaintenanceVersion         Unsigned32,
+        eqlControllerSWCompatibilityLevel       Unsigned32,
+        eqlControllerFullSwRevision             DisplayString,
+        eqlControllerNVRAMBattery               INTEGER,
+        eqlControllerSerialNumber2              DisplayString,
+        eqlControllerType                       DisplayString,
+        eqlControllerBootTime                   Counter32
+    }
+
+eqlControllerIndex  OBJECT-TYPE      
+    SYNTAX          Integer32 ( 1..2 )
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "The index value that uniquely identifies the controller.
+                     It is equal to the controller slot number. The minimum slot number is 1"  
+    DEFVAL          {1}
+    ::=  {  eqlControllerEntry 1 }
+
+eqlControllerModel  OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..32 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies controller model. Is value of Part="  
+    DEFVAL          {"unknown model"}
+    ::=  { eqlControllerEntry 2}
+
+eqlControllerCMRevision OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..9 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "CM version number; Is value of Rev="  
+    DEFVAL          {"unknown rev"}
+    ::=  { eqlControllerEntry 3}    
+
+eqlControllerSwRevision      OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..96 ) )    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the customer visible controller software revision."   -- From build.c
+    DEFVAL          {"unknown sw rev"}
+    ::=  { eqlControllerEntry 4}
+
+eqlControllerBatteryStatus  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        ok (1),     -- up means good
+                        failed (2),
+                        good-battery-is-charging(3),
+                        low-voltage-status(4),
+                        low-voltage-is-charging(5),
+                        missing-battery(6),
+                        high-temp(7),
+                        low-temp(8),
+                        end-of-life(9),
+                        end-of-life-warning(10)
+    }      
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies controller battery status."  
+    ::=  { eqlControllerEntry 5}
+
+eqlControllerUpTime  OBJECT-TYPE      
+    SYNTAX      	Counter32
+    UNITS       	"seconds"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies time interval since the controller was last booted
+                     in seconds. "  
+    ::=  { eqlControllerEntry 6}
+
+eqlControllerProcessorTemp  OBJECT-TYPE      
+    SYNTAX          Integer32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the temperature in Celsius."  
+    ::=  {  eqlControllerEntry 7 }
+
+eqlControllerChipsetTemp        OBJECT-TYPE      
+    SYNTAX          Integer32    
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the temperature in Celsius."  
+    ::=  {  eqlControllerEntry 8 }      
+
+eqlControllerPrimaryOrSecondary OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        primary (1),
+                        secondary (2)
+    }      
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies if the controller is a primary or secondary controller."  
+    ::=  { eqlControllerEntry 9}
+
+eqlControllerPrimaryFlashImageRev  OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..40 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The revision of the primary flash image."
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 10}
+
+eqlControllerSecondaryFlashImageRev  OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..40 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The revision of the secondary flash image."
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 11}
+
+eqlControllerSerialNumber  OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      --deprecated
+    DESCRIPTION     "This variable specifies controller serial number. Is value of SN="
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 12}
+
+eqlControllerDate  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies date of mfg of the CM. Is value of Date="
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 13}
+
+eqlControllerECO  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies eco level of the CM. Is value of ECO="
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 14}
+
+eqlControllerEEprom  OBJECT-TYPE      
+    SYNTAX          OCTET STRING ( SIZE(256 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The contents of the eeprom."
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 15}
+
+eqlControllerPLDrev  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies pld version number."
+    DEFVAL          {0}
+    ::=  { eqlControllerEntry 16}
+
+eqlControllerPlatformType  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the platform type.
+                     If the number is negative its a simulator.
+                     If zero its an eval platform.
+                     If >= 1 is the version of the pss board -- does this mean cm rev?"
+    DEFVAL          { 0 }
+    ::=  { eqlControllerEntry 17}
+
+eqlControllerPlatformVersion  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the version of the pss board (ie CM?)"
+    DEFVAL          { 0 }
+    ::=  { eqlControllerEntry 18}
+
+eqlControllerCPUPass  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies silicon rev."
+    DEFVAL          { 0 }
+    ::=  { eqlControllerEntry 19}
+
+eqlControllerCPUrev  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the revision of the cpu."
+    DEFVAL          { 0 }
+    ::=  { eqlControllerEntry 20}
+
+eqlControllerCPUfreq  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the cpu freq in MHz."
+    DEFVAL          { 0 }
+    ::=  { eqlControllerEntry 21}
+
+eqlControllerPhysRam  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the amount of physical memory in MB."
+    DEFVAL          { 0 }
+    ::=  { eqlControllerEntry 22}
+
+eqlControllerBootRomVersion  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE(0..16) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the bootrom version number."
+    DEFVAL          { "unknown" }
+    ::=  { eqlControllerEntry 23}
+
+eqlControllerBootRomBuildDate OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE(128) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the date and time bootrom image was built."
+    DEFVAL          { "unknown" }
+    ::=  { eqlControllerEntry 24}
+
+
+eqlControllerInfoMsg  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable is basic info on the cpu at bootup."
+    DEFVAL          { "unknown" }
+    ::=  { eqlControllerEntry 25}
+
+eqlControllerAthenaSataVersion        OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable is the Athena Sata revision for all Athena chips."
+    DEFVAL          { "unknown" }
+    ::=  { eqlControllerEntry 26}
+
+eqlControllerMajorVersion  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the major version number of the
+                     software present on the controller module."
+    DEFVAL          { 1 }
+    ::=  { eqlControllerEntry 27}
+
+eqlControllerMinorVersion  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the minor version number of the
+                     software present on the controller module."
+    DEFVAL          { 1 }
+    ::=  { eqlControllerEntry 28}
+
+eqlControllerMaintenanceVersion  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the maintenance version number of the
+                     software present on the controller module."
+    DEFVAL          { 0 }
+    ::=  { eqlControllerEntry 29}
+
+eqlControllerSWCompatibilityLevel  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the compatibility level of the
+                     software present on the controller module."
+    ::=  { eqlControllerEntry 30}
+
+eqlControllerFullSwRevision      OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..96 ) )    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies controller software revision. "   -- From build.c
+    DEFVAL          {"unknown sw rev"}
+    ::=  { eqlControllerEntry 31}
+        
+eqlControllerNVRAMBattery      OBJECT-TYPE      
+    SYNTAX          INTEGER 
+                    {
+                     not-present(0),
+                     good(1),
+                     bad(2),
+                     unknown(3)
+                    }
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable represents the NVRAM Battery on CM.
+                     Value would be zero if there is no NVRAM Battery( old CM).
+                     "
+    DEFVAL          {0}
+    ::=  { eqlControllerEntry 32}
+        
+eqlControllerSerialNumber2  OBJECT-TYPE      
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only      
+    STATUS          current    
+    DESCRIPTION     "This variable specifies controller serial number. Is value of SN=.The eqlControllerSerialNumber is deprecated
+                     because this value can be upto 15 characters for manhattan."
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 33}
+
+eqlControllerType  OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..32 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the type of the controller module. Ex: Type II"
+    DEFVAL          {"unknown"}
+    ::=  { eqlControllerEntry 34}
+
+eqlControllerBootTime  OBJECT-TYPE      
+    SYNTAX      	Counter32
+    UNITS       	"seconds"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies time at which the controller was booted expressed as seconds since epoch."  
+    ::=  { eqlControllerEntry 35}
+
+--  ***************************************************************************************
+eqlBackplaneTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlBackplaneEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Backplane Table. 
+                    This table contains backplane status information. 
+                    There is only one table entry for the one backplane per PSA."
+    ::=  {  eqlbackplaneObjects 1 }    
+
+eqlBackplaneEntry OBJECT-TYPE      
+    SYNTAX          EqlBackplaneEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing backplane status information."
+    INDEX           { eqlGroupId, eqlMemberIndex,eqlBackplaneIndex }    
+    ::=    { eqlBackplaneTable 1 }
+    
+
+EqlBackplaneEntry ::= 
+    SEQUENCE {     
+        eqlBackplaneIndex                      Integer32,
+        eqlBackplanePartNum                    DisplayString,
+        eqlBackplaneRev                        DisplayString,
+        eqlBackplaneDate                       DisplayString,
+        eqlBackplaneSN                         DisplayString,
+        eqlBackplaneECO                        DisplayString,
+        eqlBackplaneEEprom                     OCTET STRING,
+        eqlBackplaneSN2                        DisplayString,
+	    eqlBackplaneType                       DisplayString,
+	    eqlBackplaneTypeId                     Integer32
+}
+eqlBackplaneIndex  OBJECT-TYPE      
+    SYNTAX          Integer32 ( 1..2 )
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "The index value that uniquely identifies the backplane.
+                     A well chosen number for the index is 1. It is in fact the only valid index."
+    DEFVAL          {1}
+    ::=  {  eqlBackplaneEntry 1 }
+
+eqlBackplanePartNum  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies part number of the backplane."
+    DEFVAL          {"unknown"}
+    ::=  { eqlBackplaneEntry 2}
+
+eqlBackplaneRev  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies revision of the backplane. Is value of Rev="
+    DEFVAL          {"unknown"}
+    ::=  { eqlBackplaneEntry 3}
+
+eqlBackplaneDate  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies date of mfg of the backplane."
+    DEFVAL          {"unknown"}
+    ::=  { eqlBackplaneEntry 4}
+
+eqlBackplaneSN  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies serial number of the backplane."
+    DEFVAL          {"unknown"}
+    ::=  { eqlBackplaneEntry 5}
+
+eqlBackplaneECO  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies eco level of the backplane."
+    DEFVAL          {"unknown"}
+    ::=  { eqlBackplaneEntry 6}
+
+eqlBackplaneEEprom  OBJECT-TYPE      
+    SYNTAX          OCTET STRING ( SIZE(256 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The contents of the eeprom."
+    DEFVAL          {"unknown"}
+    ::=  { eqlBackplaneEntry 7}
+
+eqlBackplaneSN2     OBJECT-TYPE      
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only      
+    STATUS          current    
+    DESCRIPTION     "This variable specifies the backplane serial number. Is value of SN=.The eqlBackplaneSN is deprecated
+                     because this value can be up to 15 characters for manhattan."
+    DEFVAL          {"unknown"}
+    ::=  { eqlBackplaneEntry 8}
+
+eqlBackplaneType     OBJECT-TYPE      
+    SYNTAX          DisplayString ( SIZE( 0..32 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current    
+    DESCRIPTION     "This variable specifies the backplane type."
+    ::=  { eqlBackplaneEntry 9}
+
+eqlBackplaneTypeId     OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only      
+    STATUS          current    
+    DESCRIPTION     "This variable specifies the backplane type as an Id. Used for Globalization."
+    ::=  { eqlBackplaneEntry 10}
+
+--  ***************************************************************************************
+
+eqlEMMTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlEMMEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member EMM Table. 
+                    This table contains enclosure management status information. 
+                    One table entry per emm. It is indexed by emm index.
+                    The number of entries is equal to the number of emms that are present in the system"  
+    ::=  {  eqlemmObjects 1 }    
+
+eqlEMMEntry OBJECT-TYPE      
+    SYNTAX          EqlEMMEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing emm status information."
+    INDEX           { eqlGroupId, eqlMemberIndex,eqlEMMIndex }    
+    ::=    { eqlEMMTable 1 }
+    
+
+
+EqlEMMEntry ::= 
+    SEQUENCE {     
+        eqlEMMIndex                             Integer32,
+        eqlEMMModel                             DisplayString, 
+        eqlEMMPartNum                           DisplayString,
+        eqlEMMRev                               DisplayString,
+        eqlEMMDate                              DisplayString,
+        eqlEMMSN                                DisplayString,
+        eqlEMMECO                               DisplayString,
+        eqlEMMEEprom                            OCTET STRING,
+        eqlEMMSN2                               DisplayString
+    }
+
+eqlEMMIndex  OBJECT-TYPE      
+    SYNTAX          Integer32 ( 1..3 )
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "The index value that uniquely identifies the EMM subsystem. "  
+    DEFVAL          {1}
+    ::=  {  eqlEMMEntry 1 }
+
+eqlEMMModel  OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..32 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies controller model. Is value of Part="  
+    DEFVAL          {"unknown model"}
+    ::=  { eqlEMMEntry 2}
+
+eqlEMMPartNum  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies part number of the CM."
+    DEFVAL          {"unknown"}
+    ::=  { eqlEMMEntry 3}
+
+eqlEMMRev  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies revision of the CM."
+    DEFVAL          {"unknown"}
+    ::=  { eqlEMMEntry 4}
+
+eqlEMMDate  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies date of mfg of the CM."
+    DEFVAL          {"unknown"}
+    ::=  { eqlEMMEntry 5}
+
+eqlEMMSN  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies serial number of the CM."
+    DEFVAL          {"unknown"}
+    ::=  { eqlEMMEntry 6}
+
+eqlEMMECO  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies eco level of the CM."
+    DEFVAL          {"unknown"}
+    ::=  { eqlEMMEntry 7}
+
+eqlEMMEEprom  OBJECT-TYPE      
+    SYNTAX          OCTET STRING ( SIZE(256 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The contents of the eeprom."
+    DEFVAL          {"unknown"}
+    ::=  { eqlEMMEntry 8}
+
+eqlEMMSN2    OBJECT-TYPE      
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only      
+    STATUS          current    
+    DESCRIPTION     "This variable specifies the serial number. Is value of SN=.The eqlEMMSN is deprecated
+                     because this value can be up to 15 characters for manhattan."
+    DEFVAL          {"unknown"}
+    ::=  { eqlEMMEntry 9}
+
+--  ***************************************************************************************
+
+
+eqlDaughterCardTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlDaughterCardEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member DaughterCard Table. 
+                    This table contains daughter card information. 
+                    One table entry per daughter card. It is indexed by daughter card index.
+                    The number of entries is equal to the number of daughter cards that are present in the system"  
+    ::=  {  eqldaughtercardObjects 1 }    
+
+eqlDaughterCardEntry OBJECT-TYPE      
+    SYNTAX          EqlDaughterCardEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing daughter card information."
+    INDEX           { eqlGroupId, eqlMemberIndex,eqlDaughterCardIndex }    
+    ::=    { eqlDaughterCardTable 1 }
+    
+
+
+EqlDaughterCardEntry ::= 
+    SEQUENCE {     
+        eqlDaughterCardIndex                             Integer32,
+        eqlDaughterCardModel                             DisplayString, 
+        eqlDaughterCardPartNum                           DisplayString,
+        eqlDaughterCardRev                               DisplayString,
+        eqlDaughterCardDate                              DisplayString,
+        eqlDaughterCardSN                                DisplayString,
+        eqlDaughterCardECO                               DisplayString,
+        eqlDaughterCardEEprom                            OCTET STRING
+    }
+
+eqlDaughterCardIndex  OBJECT-TYPE      
+    SYNTAX          Integer32 ( 1..2 )
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "The index value that uniquely identifies the DaughterCard subsystem. 1 based"
+    DEFVAL          {1}
+    ::=  {  eqlDaughterCardEntry 1 }
+
+eqlDaughterCardModel  OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..32 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies controller model. Is value of Part="  
+    DEFVAL          {"unknown model"}
+    ::=  { eqlDaughterCardEntry 2}
+
+eqlDaughterCardPartNum  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies part number of the daughter card."
+    DEFVAL          {"unknown"}
+    ::=  { eqlDaughterCardEntry 3}
+
+eqlDaughterCardRev  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies revision of the daughter card."
+    DEFVAL          {"unknown"}
+    ::=  { eqlDaughterCardEntry 4}
+
+eqlDaughterCardDate  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies date of mfg of the daughter card."
+    DEFVAL          {"unknown"}
+    ::=  { eqlDaughterCardEntry 5}
+
+eqlDaughterCardSN  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies serial number of the daughter card."
+    DEFVAL          {"unknown"}
+    ::=  { eqlDaughterCardEntry 6}
+
+eqlDaughterCardECO  OBJECT-TYPE
+    SYNTAX          DisplayString( SIZE( 0..10 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies eco level of the daughter card."
+    DEFVAL          {"unknown"}
+    ::=  { eqlDaughterCardEntry 7}
+
+eqlDaughterCardEEprom  OBJECT-TYPE      
+    SYNTAX          OCTET STRING ( SIZE(256 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The contents of the eeprom."
+    DEFVAL          {"unknown"}
+    ::=  { eqlDaughterCardEntry 8}
+
+
+--  ***************************************************************************************
+
+eqlChannelCardTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlChannelCardEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member ChannelCard Table. 
+                    This table contains channel card information. 
+                    One table entry per channel card. It is indexed by channel card index.
+                    The number of entries is equal to the number of channel cards that are present in the system"  
+    ::=  {  eqlchannelcardObjects 1 }    
+
+eqlChannelCardEntry OBJECT-TYPE      
+    SYNTAX          EqlChannelCardEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing channel card information."
+    INDEX           { eqlGroupId, eqlMemberIndex,eqlChannelCardIndex }    
+    ::=    { eqlChannelCardTable 1 }
+    
+
+
+EqlChannelCardEntry ::= 
+    SEQUENCE {     
+        eqlChannelCardIndex                             Unsigned32,
+        eqlChannelCardSerialNumber                      DisplayString, 
+        eqlChannelCardFirmwareRev                       DisplayString, 
+        eqlChannelCardInitRev                           DisplayString, 
+        eqlChannelCardStatus                          INTEGER
+    }
+
+eqlChannelCardIndex  OBJECT-TYPE      
+    SYNTAX          Unsigned32 (1..100)
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "The index value that uniquely identifies the ChannelCard subsystem."
+    ::=  {  eqlChannelCardEntry 1 }
+
+eqlChannelCardSerialNumber  OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies serial number of the card."  
+    DEFVAL          {"unknown"}
+    ::=  { eqlChannelCardEntry 2}
+
+eqlChannelCardFirmwareRev  OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies firmware revision of the card."
+    DEFVAL          {"unknown"}
+    ::=  { eqlChannelCardEntry 3}
+
+eqlChannelCardInitRev  OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies revision of the initialization configuration file."
+    DEFVAL          {"unknown"}
+    ::=  { eqlChannelCardEntry 4}
+
+eqlChannelCardStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    not-present(1),
+                    failed(2),
+                    good(3)
+                    }
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the status of the channel card ."
+    DEFVAL          { unknown }
+    ::=  { eqlChannelCardEntry 5}
+
+
+-- ***************************************************************************************
+
+eqlSFPTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlSFPEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member SFP Table. 
+                    This table contains SFP information. 
+                    One table entry per SFP. It is indexed by SFP index.
+                    The number of entries is equal to the number of SFPs that are present in the system"  
+    ::=  {  eqlsfpObjects 1 }    
+
+eqlSFPEntry OBJECT-TYPE      
+    SYNTAX          EqlSFPEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing SFP information."
+    INDEX           { eqlGroupId, eqlMemberIndex,eqlSFPIndex }    
+    ::=    { eqlSFPTable 1 }
+    
+
+
+EqlSFPEntry ::= 
+    SEQUENCE {     
+        eqlSFPIndex                             Unsigned32,
+	eqlSFPMode				INTEGER,
+	eqlSFPIfIndex				INTEGER,
+	eqlSFPIdentifier			INTEGER,
+	eqlSFPConnector				INTEGER,
+	eqlSFPBitrate				INTEGER,
+	eqlSFPLength1				INTEGER,
+	eqlSFPLength2				INTEGER,
+        eqlSFPVendorName                      	DisplayString, 
+        eqlSFPPartNumber                      	DisplayString, 
+        eqlSFPFirmwareRev                       DisplayString, 
+        eqlSFPSerialNumber                      DisplayString, 
+        eqlSFPDateCode                          DisplayString, 
+        eqlSFPStatus                          	INTEGER
+    }
+
+eqlSFPIndex  OBJECT-TYPE      
+    SYNTAX          Unsigned32 (1..100)
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "The index value that uniquely identifies the SFP."
+    ::=  {  eqlSFPEntry 1 }
+
+
+eqlSFPMode  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    single-mode(1),
+                    multi-mode(2),
+                    copper(3),
+                    not-present(4)
+                    }
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the mode of the SFP."
+    DEFVAL          { unknown }
+    ::=  { eqlSFPEntry 2}
+
+eqlSFPIfIndex  OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION	     "Index of the interface attached to the SFP."
+    ::=  { eqlSFPEntry 3}
+
+eqlSFPIdentifier  OBJECT-TYPE
+    SYNTAX          INTEGER {
+		    	unknown(0),
+			sfp-transceiver(3)
+			}
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION	     "Identifies the SFP."
+    DEFVAL          { unknown }
+    ::=  { eqlSFPEntry 4}
+
+eqlSFPConnector  OBJECT-TYPE
+    SYNTAX          INTEGER {
+		    	unknown(0),
+			lc(7),
+			copper(33)
+			}
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION	     "type of the  SFP connector."
+    DEFVAL          { unknown }
+    ::=  { eqlSFPEntry 5}
+
+eqlSFPBitrate  OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION	     "Bit rate of the SFP in units of 100 Mbits/sec.
+			103 => 10300 => 10 Gbps"
+    ::=  { eqlSFPEntry 6}
+
+eqlSFPLength1  OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION	     "If Mode is single mode, length in kilometres,
+			 Mode is multi mode, length in units of 10metres of 50/125 um fiber."
+    ::=  { eqlSFPEntry 7}
+
+eqlSFPLength2  OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION	     "If Mode is single mode, length in units of 100metres,
+			 Mode is multi mode, length in units of 10metres of 62/125 um fiber."
+    ::=  { eqlSFPEntry 8}
+
+eqlSFPVendorName  OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..16))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies vendor name of the SFP."  
+    DEFVAL          {"unknown"}
+    ::=  { eqlSFPEntry 9}
+
+eqlSFPPartNumber  OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..16))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies part number of the SFP."  
+    DEFVAL          {"unknown"}
+    ::=  { eqlSFPEntry 10}
+
+eqlSFPFirmwareRev  OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..16))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies firmware revision of the SFP."
+    DEFVAL          {"unknown"}
+    ::=  { eqlSFPEntry 11}
+
+eqlSFPSerialNumber  OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..16))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies serial number of the SFP."  
+    DEFVAL          {"unknown"}
+    ::=  { eqlSFPEntry 12}
+
+eqlSFPDateCode  OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..16))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies date of manufacture of the SFP."
+    DEFVAL          {"unknown"}
+    ::=  { eqlSFPEntry 13}
+
+eqlSFPStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    not-present(1),
+                    failed(2),
+                    good(3)
+                    }
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the status of the SFP."
+    DEFVAL          { unknown }
+    ::=  { eqlSFPEntry 14}
+
+END
