@@ -57,8 +57,7 @@ EOD;
     ]
 }
 EOD;
-        $rs = new ResultSet($errorResult);
-        $rs->getSeries();
+        new ResultSet($errorResult);
     }
 
     /**

@@ -41,6 +41,10 @@ class ResultSet
         // There was an error in the query thrown by influxdb
         if (isset($this->parsedResults['error'])) {
             throw new InfluxDBClientError($this->parsedResults['error']);
+
+            // Check if there are errors in the first serie
+        } elseif (isset($this->parsedResults['results'][0]['error'])) {
+            throw new InfluxDBClientError($this->parsedResults['results'][0]['error']);
         }
     }
 
@@ -80,7 +84,7 @@ class ResultSet
     public function getSeries()
     {
         $pickSeries = function ($object) {
-            
+
             if (isset($object['error'])) {
                 throw new InfluxDBClientError($object['error']);
             }
