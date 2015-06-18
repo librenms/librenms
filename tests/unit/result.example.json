@@ -3,7 +3,7 @@
     {
       "series": [
         {
-          "measurement": "cpu_load_short",
+          "name": "cpu_load_short",
           "tags": {
             "host": "server01",
             "region": "us-west"
@@ -20,7 +20,7 @@
           ]
         },
         {
-          "measurement": "cpu_load_short",
+          "name": "cpu_load_short",
           "tags": {
             "host": "server02",
             "region": "us-west"
@@ -37,7 +37,7 @@
           ]
         },
         {
-          "measurement": "other_serie",
+          "name": "other_serie",
           "tags": {
             "host": "server01",
             "region": "us-west"

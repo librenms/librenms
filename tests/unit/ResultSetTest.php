@@ -25,6 +25,22 @@ class ResultSetTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Throws Exception if something went wrong with influxDB
+     * @expectedException \Leaseweb\InfluxDB\InfluxDBClientError
+     */
+    public function testThrowsInfluxDBException()
+    {
+
+        $errorResult = <<<EOD
+{
+    "series": [],
+    "error": "Big error, many problems."
+}
+EOD;
+        new ResultSet($errorResult);
+    }
+
+    /**
      * We can get points from measurement
      */
     public function testGetPointsFromMeasurementName()
