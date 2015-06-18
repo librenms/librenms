@@ -36,7 +36,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ?", array($devic
 
     $rrd_filenames[] = $rrd_filename;
     $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['descr'] = $port['label'];
+    $rrd_list[$i]['descr'] = shorten_interface_type($port['label']);
     $rrd_list[$i]['descr_in'] = $port['label'];
     $rrd_list[$i]['descr_out'] = $port['ifAlias'];
     $rrd_list[$i]['ds_in'] = $ds_in;
