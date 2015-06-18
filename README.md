@@ -1,11 +1,12 @@
-# php-influxdb - InfluxDB client library for PHP
+# influxdb-php
+## InfluxDB client library for PHP
 
-##Overview
+###Overview
 
 This library was created to have php port of the python influxdb client. 
 This way there will be a common abstraction library between different programming languages.
 
-##Usage
+###Usage
 
 Initialize a new client object:
 
