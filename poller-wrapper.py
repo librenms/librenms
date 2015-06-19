@@ -81,8 +81,19 @@ except:
 poller_path = config['install_dir'] + '/poller.php'
 db_username = config['db_user']
 db_password = config['db_pass']
-db_server = config['db_host']
+
+if config['db_host'][:5].lower() == 'unix:':
+	db_server = config['db_host']
+	db_port = 0
+elif ':' in config['db_host']:
+	db_server = config['db_host'].rsplit(':')[0]
+	db_port = int(config['db_host'].rsplit(':')[1])
+else:
+	db_server = config['db_host']
+	db_port =0
+
 db_dbname = config['db_name']
+
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
 if 'distributed_poller_group' in config:
@@ -167,7 +178,10 @@ except:
 devices_list = []
 
 try:
-    db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+    if db_port == 0:
+        db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+    else:
+        db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
     cursor = db.cursor()
 except:
     print "ERROR: Could not connect to MySQL database!"
