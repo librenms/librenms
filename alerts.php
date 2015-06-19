@@ -329,7 +329,7 @@ function DescribeAlert($alert) {
 	$obj['device_id'] = $alert['device_id'];
 	$extra = $alert['details'];
 	if( $alert['state'] >= 1 ) {
-		$obj['title'] = 'Alert for device '.$device['hostname'].' Alert-ID #'.$alert['id'];
+		$obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
 		if( $alert['state'] == 2 ) {
 			$obj['title'] .= " got acknowledged";
 		} elseif( $alert['state'] == 3 ) {
@@ -352,7 +352,7 @@ function DescribeAlert($alert) {
 			return false;
 		}
 		$extra = json_decode(gzuncompress($id['details']),true);
-		$obj['title'] = 'Device '.$device['hostname'].' recovered from Alert-ID #'.$id['id'];
+		$obj['title'] = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
 		$obj['elapsed'] = TimeFormat(strtotime($alert['time_logged'])-strtotime($id['time_logged']));
 		$obj['id'] = $id['id'];
 		$obj['faults'] = false;
