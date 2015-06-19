@@ -2,7 +2,11 @@
 
 namespace Leaseweb\InfluxDB;
 
-
+/**
+ * Class Point
+ *
+ * @package Leaseweb\InfluxDB
+ */
 class Point
 {
     private $measurement;
@@ -20,7 +24,8 @@ class Point
     private $timestamp;
 
     /**
-     * todo: Handle optional timestamp
+     * The timestamp is optional.
+     * If you do not specify a timestamp the server’s local timestamp will be used
      *
      * @param $measurement
      * @param array $tags
@@ -56,8 +61,8 @@ class Point
     {
         $strParts = array();
 
-        foreach ($arr as $key=> $value) {
-            $strParts[]="{$key}={$value}";
+        foreach ($arr as $key => $value) {
+            $strParts[] = "{$key}={$value}";
         }
 
         return implode(",", $strParts);

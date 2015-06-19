@@ -53,8 +53,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
         $this->mockClient->expects($this->once())
             ->method('query')
-            ->with($this->equalTo($this->db->getName()), $this->equalTo($payloadExpected))
-            ->will($this->returnValue($this->equalTo('http://localhost:8086')));
+            ->with($this->equalTo($this->db->getName()), $this->equalTo($payloadExpected));
 
         $this->db->writePoints(array($point1, $point2));
     }
