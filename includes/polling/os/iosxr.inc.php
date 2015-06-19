@@ -11,6 +11,7 @@ else
   # It is not an IOS-XR ... What should we do ?
 }
 
+$serial = get_main_serial($device);
+
 echo("\n".$poll_device['sysDescr']."\n");
 
-?>
