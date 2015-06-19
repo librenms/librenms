@@ -41,15 +41,24 @@ class Point
      */
     public function __toString()
     {
-        return "";
-        /*return sprintf(
+        return sprintf(
             '%s,%s %s %s',
             $this->measurement,
-            implode()
-        );*/
+            $this->arrayToString($this->tags),
+            $this->arrayToString($this->fields),
+            $this->timestamp
+        );
     }
 
-    public function a(){
+    private function arrayToString(array $arr)
+    {
+        $strParts = array();
 
+        foreach ($arr as $key=> $value) {
+            $strParts[]="{$key}={$value}";
+        }
+
+        return implode(",", $strParts);
     }
+
 }

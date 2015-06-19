@@ -104,7 +104,7 @@ class Database
     public function writePoints(array $points)
     {
         foreach ($points as $point) {
-            $point->a();
+            //$point->a();
         }
     }
 

@@ -26,7 +26,7 @@ class ResultSetTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Throws Exception if something went wrong with influxDB
-     * @expectedException \Leaseweb\InfluxDB\InfluxDBClientError
+     * @expectedException \Leaseweb\InfluxDB\Exception
      */
     public function testThrowsInfluxDBException()
     {
@@ -42,7 +42,7 @@ EOD;
 
     /**
      * Throws Exception if something went wrong with influxDB after processing the query
-     * @expectedException \Leaseweb\InfluxDB\InfluxDBClientError
+     * @expectedException \Leaseweb\InfluxDB\Exception
      */
     public function testThrowsInfluxDBExceptionIfAnyErrorInSeries()
     {
