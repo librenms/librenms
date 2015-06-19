@@ -52,7 +52,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             'myTime'
         );
 
-        $this->db->writePoints(array($point1, $point2));
+        //$this->db->writePoints(array($point1, $point2));
 
         $this->assertTrue(
             true

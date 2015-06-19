@@ -63,6 +63,24 @@ EOD;
     /**
      * We can get points from measurement
      */
+    public function testGetPointsFromNameWithoudTags()
+    {
+        $resultJsonExample = file_get_contents(dirname(__FILE__) . '/result-no-tags.example.json');
+        $this->resultSet = new ResultSet($resultJsonExample);
+
+        $measurementName = 'cpu_load_short';
+        $expectedNumberOfPoints = 2;
+
+        $points = $this->resultSet->getPoints($measurementName);
+
+        $this->assertTrue(is_array($points));
+
+        $this->assertCount($expectedNumberOfPoints, $points);
+    }
+
+    /**
+     * We can get points from measurement
+     */
     public function testGetPoints()
     {
         $expectedNumberOfPoints = 3;
