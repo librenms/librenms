@@ -88,11 +88,13 @@ class Builder
     }
 
     /**
+     * @param string $field
+     *
      * @return $this
      */
-    public function selectAll()
+    public function count($field = 'type')
     {
-        $this->selection = '*';
+        $this->selection = sprintf('count(%s)', $field);
 
         return $this;
     }
@@ -102,9 +104,9 @@ class Builder
      *
      * @return $this
      */
-    public function count($field = 'type')
+    public function median($field = 'type')
     {
-        $this->selection = sprintf('count(%s)', $field);
+        $this->selection = sprintf('median(%s)', $field);
 
         return $this;
     }
@@ -152,7 +154,7 @@ class Builder
      */
     public function last($field = 'type')
     {
-        $this->selection = sprintf('first(%s)', $field);
+        $this->selection = sprintf('last(%s)', $field);
 
         return $this;
     }
