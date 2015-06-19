@@ -1,0 +1,116 @@
+-- *****************************************************************
+-- $Id: ZXR10-SMI.mib 27 2005-04-13 08:47:59Z taowq $
+--
+-- ZXR10-SMI.mib: ZTE Corporation Enterprise Structure of Management Information
+--
+-- April 2005, Tao wenqiang
+--
+-- Copyright (c) 2005 by ZTE Corporation
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+ZXR10-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+zte MODULE-IDENTITY
+    LAST-UPDATED "200504120000Z"  -- April 12, 2005
+    ORGANIZATION "ZTE Corporation"
+    CONTACT-INFO
+        "ZTE Corporation 
+         Nanjing Institute of ZTE Corporation
+         
+         No.68 Zijinghua Rd. Yuhuatai District, Nanjing, China
+         
+         Tel: +86-25-52870000"
+
+    DESCRIPTION
+        "ZXROS SMI MIB"
+
+    REVISION "200504120000Z"  -- April 12, 2005
+    DESCRIPTION
+       ""
+	::= { enterprises 3902 }	-- assigned by IANA
+
+
+zxr10 OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"zxr10 is the root OBJECT IDENTIFIER for ZTE
+		 routers and switches pruducts"
+	::= { zte 3 }
+
+zxr10switch OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which switches MIBS were built."
+	::= { zxr10 102 }
+
+zxr10interfaces OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which switches MIBS were built."
+	::= { zxr10 103 }
+
+zxr10L2vpn OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which switches MIBS were built."
+	::= { zxr10 104 }	
+
+zxr10L3vpn OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which switches MIBS were built."
+	::= { zxr10 105 }	
+
+zxr10Modules OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"zxr10Modules provides a root object identifier
+		from which MODULE-IDENTITY values may be assigned."
+	::= { zxr10 500 }
+	
+zxr10Products 	 OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"zxr10 products Objetcs"
+	::= { zxr10 101 }
+
+voip OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Voip projiect Objetcs"
+	::= { zxr10 200 }	
+	
+isdn OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Voip projiect Objetcs"
+	::= { zxr10 201 }	 
+
+mgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"main subtree for configuration mibs"
+	::= { zxr10 202 }
+
+zxr10MplsTe OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Mpls Te Project Objects."
+	::= { zxr10 315 } 
+
+zxr10MplsTeFrr OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"MPLS-TE FRR Project Object."
+  ::= { zxr10 316 } 
+ 
+END
