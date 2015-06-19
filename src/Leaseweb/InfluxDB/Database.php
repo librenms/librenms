@@ -93,6 +93,17 @@ class Database
     }
 
     /**
+     * Writes points into INfluxdb
+     * @param Point[] $points
+     */
+    public function writePoints(array $points)
+    {
+        foreach ($points as $point) {
+            $point->a();
+        }
+    }
+
+    /**
      * @param RetentionPolicy $retentionPolicy
      */
     public function alterRetentionPolicy(RetentionPolicy $retentionPolicy)
