@@ -1,0 +1,579 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+
+EQLRAID-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,MODULE-IDENTITY, enterprises
+                FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+	 ifEntry 
+				FROM RFC1213-MIB
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId
+            FROM EQLGROUP-MIB
+    eqlStoragePoolIndex
+            FROM EQLSTORAGEPOOL-MIB
+    eqlMemberIndex, eqlDriveGroupIndex
+            FROM EQLMEMBER-MIB;
+    
+ 
+    eqlRAIDModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Equallogic Inc. Storage Array raid mib
+
+         Copyright (c) 2002-2009 by Dell, Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by Dell, Inc.  This software embodies proprietary information
+         and trade secrets of Dell, Inc.
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION     "200211110000Z"  -- 02-Nov-11
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 10 }
+
+
+	eqlRAIDObjects 			OBJECT IDENTIFIER ::= { eqlRAIDModule 1 }
+	eqlRAIDNotifications 	OBJECT IDENTIFIER ::= { eqlRAIDModule 2 }
+	eqlRAIDConformance		OBJECT IDENTIFIER ::= { eqlRAIDModule 3 }
+
+	-- EqualLogic RAID Device Table	
+	
+	eqlRAIDDeviceTable OBJECT-TYPE
+		SYNTAX 	SEQUENCE OF EqlRAIDDeviceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "EqualLogic-Dynamic Table representing a list of all of 
+                  the RAID devices in a group"
+		::= { eqlRAIDObjects 1 }
+
+	eqlRAIDDeviceEntry	OBJECT-TYPE
+		SYNTAX		EqlRAIDDeviceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "A sequence of attributes pertaining to a single RAID device in a group"
+		INDEX 	{eqlGroupId, eqlMemberIndex, eqlRAIDDeviceLUNIndex }
+		::={ eqlRAIDDeviceTable 1 }
+
+	EqlRAIDDeviceEntry ::= 
+		SEQUENCE { 
+			eqlRAIDDeviceLUNIndex  			Integer32,
+			eqlRAIDDeviceLUN					Integer32,
+			eqlRAIDDeviceOperStatus			INTEGER,
+			eqlRAIDDeviceUUID					OCTET STRING,
+			eqlRAIDDeviceDriveCount			Integer32,
+			eqlRAIDDeviceLayoutOperStatus	INTEGER,
+			eqlRAIDDeviceLayoutSectPerSU	Integer32,
+			eqlRAIDDeviceLUNCapacity		Counter64,
+			eqlRAIDDeviceLostBlocks			Integer32,
+			eqlRAIDDeviceOutIOOps			Integer32,
+			eqlRAIDDeviceCacheWrites		Integer32,
+			eqlRAIDDeviceCacheReads			Integer32,
+			eqlRAIDDeviceCompCacheWrites	Counter64,
+			eqlRAIDDeviceCompCacheReads	Counter64,
+			eqlRAIDDeviceSectWritten		Counter64,
+			eqlRAIDDeviceSectRead			Counter64,
+			eqlRAIDDeviceStoragePoolIndex	Unsigned32,
+			eqlRAIDDeviceDriveGroupIndex	Unsigned32
+			}
+			
+	eqlRAIDDeviceLUNIndex  	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The LUN number of the RAID device, incremented by one for SNMP compatibility.
+							Valid LUN numbers	begin at zero. "
+		::= { eqlRAIDDeviceEntry 1 }
+
+	eqlRAIDDeviceLUN  	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION 	"The LUN of the drive. In all cases the value of this variable will be equal to 
+							eqlRAIDDeviceLUNIndex-1."
+		::= { eqlRAIDDeviceEntry 2 }
+
+	eqlRAIDDeviceOperStatus		OBJECT-TYPE
+		SYNTAX	INTEGER {
+					noDevice(1),
+					dataLoss(2),
+					nominal(3),
+					degraded(4),
+					failed(5)
+					}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The operational status of the RAID device. Values are as follows:
+							1 - no device
+							2 - data loss
+							3 - nominal
+							4 - degraded
+							5 - failed "
+		::= { eqlRAIDDeviceEntry 3 }
+
+	eqlRAIDDeviceUUID	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(16))
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"a 16 byte identifier for the device that is guranteed to be universally
+							unique"
+		::= { eqlRAIDDeviceEntry 4 }
+			
+	eqlRAIDDeviceDriveCount		OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of drives used by the RAID device"
+		::= { eqlRAIDDeviceEntry 5 }
+	
+	eqlRAIDDeviceLayoutOperStatus	OBJECT-TYPE
+		SYNTAX INTEGER {
+					noOp(1),
+					expSuspended(2),
+					expInProgress(3),
+					swapSuspended(4),
+					swapInProgress(5)
+					}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The status of the currently executing layout operation on the 
+							device (if any)
+							1 - no operation in progress
+							2 - exp suspended
+							3 - exp in progress
+							4 - swap suspended
+							5 - swap in progress"
+		::= { eqlRAIDDeviceEntry 6 }
+
+	eqlRAIDDeviceLayoutSectPerSU	OBJECT-TYPE 
+		SYNTAX	Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of sectors per stripe unit in this layout"
+		::= { eqlRAIDDeviceEntry 7 }
+		
+	eqlRAIDDeviceLUNCapacity	OBJECT-TYPE
+		SYNTAX	Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The current LUN capacity of this layout in sectors, including 
+							internal layout operations"
+		::= { eqlRAIDDeviceEntry 8 }
+
+	eqlRAIDDeviceLostBlocks		OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The count of bad soft sectors"
+		::= { eqlRAIDDeviceEntry 9 }
+
+	eqlRAIDDeviceOutIOOps		OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Th number of I/O operations currently in progress on the device"
+		::= { eqlRAIDDeviceEntry 10 }
+
+	eqlRAIDDeviceCacheWrites	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The count of the number of cache write operations in progress on the device"
+		::= { eqlRAIDDeviceEntry 11 }
+
+	eqlRAIDDeviceCacheReads		OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The count of the number of cache read operations in progress on the device"
+		::= { eqlRAIDDeviceEntry 12 }
+
+	eqlRAIDDeviceCompCacheWrites	OBJECT-TYPE
+		SYNTAX	Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of completed cache write operations since the system was started"
+		::= { eqlRAIDDeviceEntry 13 }
+
+	eqlRAIDDeviceCompCacheReads	OBJECT-TYPE
+		SYNTAX 	Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION			"The number of completed cache read operations since the system was started"
+		::= { eqlRAIDDeviceEntry 14 }
+
+	eqlRAIDDeviceSectWritten	OBJECT-TYPE
+		SYNTAX	Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of sectors written since the system was started"
+		::= { eqlRAIDDeviceEntry 15 }
+
+	eqlRAIDDeviceSectRead OBJECT-TYPE
+		SYNTAX	Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of sectors read since the system was started"
+		::= { eqlRAIDDeviceEntry 16 }
+
+	eqlRAIDDeviceStoragePoolIndex OBJECT-TYPE      
+		SYNTAX          Unsigned32
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "This field specifies a unique index for identifying a storage pool."
+		::= { eqlRAIDDeviceEntry 17 }
+
+	eqlRAIDDeviceDriveGroupIndex OBJECT-TYPE      
+		SYNTAX          Unsigned32
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "This field specifies a unique index for identifying a drive group."
+		::= { eqlRAIDDeviceEntry 18 }
+
+	-- EqualLogic RAID Layout Table
+
+	eqlRAIDLayoutTable OBJECT-TYPE
+		SYNTAX 	SEQUENCE OF EqlRAIDLayoutEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "EqualLogic-Dynamic Table listing the layouts in existence in a RAID device. 
+                  Typically, there will only be a single entry for each device. When layout 
+						operations are in progress, there will be two layouts. The layout 
+						represents a set of drives and a parity configuration for the drives."
+		::= { eqlRAIDObjects 2 }
+
+	eqlRAIDLayoutEntry	OBJECT-TYPE
+		SYNTAX		EqlRAIDLayoutEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "a sequence of attributes belonging to a single layout group"
+		INDEX 	{ eqlGroupId, eqlMemberIndex, eqlRAIDDeviceLUNIndex, eqlRAIDLayoutIndex }
+		::={ eqlRAIDLayoutTable 1 }
+
+	EqlRAIDLayoutEntry ::= 
+		SEQUENCE {
+			eqlRAIDLayoutIndex 				INTEGER,
+			eqlRAIDLayoutOperStatus			INTEGER,
+			eqlRAIDLayoutNumParityGrp		Integer32,
+			eqlRAIDLayoutParityType			INTEGER,
+			eqlRAIDLayoutBeginLBA			Counter64,
+			eqlRAIDLayoutLength				Counter64
+			}
+
+	eqlRAIDLayoutIndex	OBJECT-TYPE
+		SYNTAX	INTEGER {
+						first(1),
+						second(2)
+						}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"An identifier for this instance of a layout. The layouts are 1-indexed
+							where the primary is index 1, and the secindary (if any) is index 2"
+		::={ eqlRAIDLayoutEntry 1 }
+
+	eqlRAIDLayoutOperStatus	OBJECT-TYPE
+		SYNTAX 	INTEGER {
+						noDevice(1),
+						noLayout(2),
+						failed(3),
+						nominal(4),
+						degraded(5)
+					}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Operational status of the layout as follows:
+							1 - no device
+							2 - no layout
+							3 - failed
+							4 - nominal
+							5 - degraded"
+		::={ eqlRAIDLayoutEntry 2 }
+
+	eqlRAIDLayoutNumParityGrp	OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of parity groups in this layout"
+		::={ eqlRAIDLayoutEntry 3 }
+		
+	eqlRAIDLayoutParityType	OBJECT-TYPE
+		SYNTAX	INTEGER {
+					stripe(0),
+					raid1(1),
+					raid10(10),
+					raid5(5),
+					raid50(50)
+					}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The parity type of this layout:
+							0 - stripe
+							1 - raid1 mirror
+							10- raid10 multi raid1 parity groups
+							5 - raid5
+							50- multi raid5 parity groups"
+		::={ eqlRAIDLayoutEntry 4 }
+
+	eqlRAIDLayoutBeginLBA	OBJECT-TYPE
+		SYNTAX	Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The beginning RAID LBA of this layout"
+		::={ eqlRAIDLayoutEntry 5 }
+
+	eqlRAIDLayoutLength	OBJECT-TYPE
+		SYNTAX	Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Length in sectors of this layout. This value can be used
+							 to determine the progress of layout operations."
+		::={ eqlRAIDLayoutEntry 6 }
+
+	-- EqualLogic RAID Parity Group Table
+
+	eqlRAIDParityGroupTable OBJECT-TYPE
+		SYNTAX 	SEQUENCE OF EqlRAIDParityGroupEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "EqualLogic-Dynamic Table. Each layout on a RAID device has one or more 
+                  parity groups. The groups are indexed starting at 1. 
+                  Each group represents a set of drives consisting of one stripe and one 
+                  parity drive with one or more data drives.
+	
+						Each groups is reconstructed and verified as a whole and can be done so
+						independently of other partity groups in the set.
+
+						RAID 0, 1, and 5 have only one parity grouping per layout.
+						RAID 10 and 50 have multiple parity groups per layout. "
+		::= { eqlRAIDObjects 3 }
+
+	eqlRAIDParityGroupEntry	OBJECT-TYPE
+		SYNTAX		EqlRAIDParityGroupEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "a sequence of attributes belonging to a single parity group"
+		INDEX 	{ eqlGroupId, eqlMemberIndex, eqlRAIDDeviceLUNIndex, eqlRAIDLayoutIndex, eqlParityGrpIndex }
+		::={ eqlRAIDParityGroupTable 1 }
+
+	EqlRAIDParityGroupEntry ::= 
+		SEQUENCE {
+			eqlParityGrpIndex 			Integer32,
+			eqlParityGrpOperStatus		INTEGER,
+			eqlParityGrpDriveCount		Integer32,
+			eqlParityGrpOperation		INTEGER,
+			eqlParityGrpReconstChkpt	Counter64,
+			eqlParityGrpVerifyChkpt		Counter64
+			}
+
+	eqlParityGrpIndex		OBJECT-TYPE
+		SYNTAX 		Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"A numeric index describing the instance of this parity group"
+		::={ eqlRAIDParityGroupEntry 1 }
+
+	eqlParityGrpOperStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+						noDevice(1),
+						noLayout(2),
+						noGroup(3),
+						degraded(4),				
+						failed(5),
+						nominal(6)
+						}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The operational status of the parity group:
+							1 - no device
+							2 - no layout
+							3 - no group
+							4 - degraded
+							5 - failed
+							6 - nominal
+							"
+		::={ eqlRAIDParityGroupEntry 2 }
+
+	eqlParityGrpDriveCount	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The number of drives in the parity group"
+		::={ eqlRAIDParityGroupEntry 3 }
+
+	eqlParityGrpOperation	OBJECT-TYPE
+		SYNTAX			INTEGER {
+								verify(1),
+								reconstruct(2),
+								noOp(3)
+							}
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The current parity group operation underway on this group (if any):
+							1 - verify
+							2 - reconstruct
+							3 - no operation"
+		::={ eqlRAIDParityGroupEntry 4 }
+
+	eqlParityGrpReconstChkpt	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Reconstruction checkpoint: The number of sectors that have been completed during 
+							the reconstruction operation. This can be compared to the corresonding value for
+							eqlRAIDLayoutLength and eqlRAIDLayoutBeginLBA to setermine the progress of the 
+							operation."
+		::={ eqlRAIDParityGroupEntry 5 }
+
+	eqlParityGrpVerifyChkpt	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Verify checkpoint: The number of sectors that have been completed during 
+							the verify operation. This can be compared to the corresonding value for
+							eqlRAIDLayoutLength and eqlRAIDLayoutBeginLBA to setermine the progress of the 
+							operation."
+		::={ eqlRAIDParityGroupEntry 6 }
+
+
+	-- EqualLogic RAID Drive Table
+
+	eqlRAIDDriveTable OBJECT-TYPE
+		SYNTAX 	SEQUENCE OF EqlRAIDDriveEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "EqualLogic-Dynamic Table. The RAID Drive Table contains an entry for each drive
+                  in the system. The mapping between the enties in this table and the entries 
+                  in the eqlDisk table	is one to one. This table is intended to store the RAID 
+                  attributes of each drive."
+		::= { eqlRAIDObjects 4 }
+           
+	eqlRAIDDriveEntry	OBJECT-TYPE
+		SYNTAX		EqlRAIDDriveEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION "a sequence of RAID attributes for a single drive in the group"
+		INDEX 	{ eqlGroupId, eqlMemberIndex, eqlRAIDDriveDriveLUNIndex }
+		::={ eqlRAIDDriveTable 1 }
+
+	EqlRAIDDriveEntry ::= 
+		SEQUENCE {
+			eqlRAIDDriveDriveLUNIndex	Integer32,
+			eqlRAIDDriveDriveLUN			Integer32,
+			eqlRAIDDriveOperStatus		INTEGER,
+			eqlRAIDDriveUUID				OCTET STRING,
+			eqlRAIDDiskIndex          	Integer32,
+			eqlRAIDDeviceIndex     	   Integer32
+			}
+
+	eqlRAIDDriveDriveLUNIndex	OBJECT-TYPE
+		SYNTAX	Integer32
+    	MAX-ACCESS      read-only
+		STATUS		current
+		DESCRIPTION "The LUN index of the drive. In all cases the value of the index will be 
+                  one greater than the value of the LUN ID of this drive. Thus, where LUNs 
+                  will start at the number 0 and increment, LUN index entries will start 
+                  at the number one and increment. "
+		::= { eqlRAIDDriveEntry 1 }
+
+	eqlRAIDDriveDriveLUN	OBJECT-TYPE
+		SYNTAX	Integer32
+    	MAX-ACCESS      read-only
+		STATUS		current
+		DESCRIPTION "The LUN of the drive. In all cases the value of this variable will be equal to 
+						eqlRAIDDriveLUNIndex-1."
+		::= { eqlRAIDDriveEntry 2 }
+
+	eqlRAIDDriveOperStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+							noDrive(1),
+							active(2),
+							failed(3),
+							tooSmall(4),
+							reconstruct(5),
+							swap(6),
+							spare(7)
+						}
+    	MAX-ACCESS      read-only
+		STATUS		current
+		DESCRIPTION "Operational status of the drive:
+						1 - no drive
+						2 - active
+						3 - failed
+						4 - too small
+						5 - reconstructing
+						6 - swapping
+						7 - spare"
+		::= { eqlRAIDDriveEntry 3 }
+
+	eqlRAIDDriveUUID	OBJECT-TYPE
+		SYNTAX	OCTET STRING (SIZE(16))
+    	MAX-ACCESS      read-only
+		STATUS		current
+		DESCRIPTION "A 16 byte univerally unique identifier for the drive. This should be unique 
+						throughout the universe of drives in EqualLogic arrays."
+		::= { eqlRAIDDriveEntry 4 }
+
+	eqlRAIDDiskIndex    OBJECT-TYPE      
+   	SYNTAX          Integer32 (1..14) 
+    	MAX-ACCESS      read-only
+    	STATUS          current      
+    	DESCRIPTION     "The index value that uniquely identifies the disk.
+                     It is equal to the disk slot number plus one. The value of this will correspond 
+							to a value of eqlDiskIndex in the eqlDiskTable." 
+		::= { eqlRAIDDriveEntry 5 }
+
+	eqlRAIDDeviceIndex     OBJECT-TYPE      
+   	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current      
+    	DESCRIPTION     "The index of the device this disk belongs to.
+                     It is equal to a value of eqlRAIDDeviceLUNIndex in the eqlRAIDDeviceTable." 
+		::= { eqlRAIDDriveEntry 6 }
+
+--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+eqlStoragePoolRAIDLUNTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStoragePoolRAIDLUNEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Storage Pool RAID LUN Table"
+    ::=  {  eqlRAIDObjects 5 }    
+
+eqlStoragePoolRAIDLUNEntry OBJECT-TYPE      
+    SYNTAX          EqlStoragePoolRAIDLUNEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a RAID LUN mapping to a storage pool."
+    INDEX           { eqlStoragePoolIndex, eqlMemberIndex, eqlDriveGroupIndex, eqlRAIDDeviceLUNIndex }    
+    ::=    { eqlStoragePoolRAIDLUNTable 1 }
+    
+EqlStoragePoolRAIDLUNEntry ::= 
+    SEQUENCE {     
+	eqlStoragePoolRAIDLUNfoo Integer32
+    }
+
+eqlStoragePoolRAIDLUNfoo OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Bogus"
+    ::= {   eqlStoragePoolRAIDLUNEntry 1 } 
+
+END
+
+
