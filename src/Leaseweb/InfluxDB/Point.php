@@ -20,6 +20,8 @@ class Point
     private $timestamp;
 
     /**
+     * todo: Handle optional timestamp
+     *
      * @param $measurement
      * @param array $tags
      * @param array $fields

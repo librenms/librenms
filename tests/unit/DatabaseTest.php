@@ -33,10 +33,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/input.example.json');
     }
 
-    /**
-     * todo:
-     */
-    public function testWrite()
+
+    public function testWritePointsInASingleCall()
     {
         $point1 = new Point(
             'cpu_load_short',
@@ -44,7 +42,6 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             array('value' => 0.64),
             'myTime'
         );
-
         $point2 = new Point(
             'cpu_load_short',
             array('host'  =>'server01', 'region'=>'us-west'),
@@ -52,10 +49,13 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             'myTime'
         );
 
-        //$this->db->writePoints(array($point1, $point2));
+        $payloadExpected ="$point1\n$point2";
 
-        $this->assertTrue(
-            true
-        );
+        $this->mockClient->expects($this->once())
+            ->method('query')
+            ->with($this->equalTo($this->db->getName()), $this->equalTo($payloadExpected))
+            ->will($this->returnValue($this->equalTo('http://localhost:8086')));
+
+        $this->db->writePoints(array($point1, $point2));
     }
 }

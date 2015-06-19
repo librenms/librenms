@@ -52,6 +52,14 @@ class Database
     }
 
     /**
+     * @return string db name
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * Query influxDB
      *
      * @param string $query
