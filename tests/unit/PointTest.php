@@ -13,10 +13,9 @@ use Leaseweb\InfluxDB\Point;
 
 class PointTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testPointStringRepresentation()
     {
-        $expected = 'cpu_load_short,host=server01,region=us-west value=0.64 mytime';
+        $expected = 'cpu_load_short,host=server01,region=us-west value=0.64 myTime';
 
         $point = new Point(
             'cpu_load_short',
@@ -25,8 +24,6 @@ class PointTest extends \PHPUnit_Framework_TestCase
             'myTime'
         );
 
-
         $this->assertEquals($expected, (string) $point);
     }
-
 }

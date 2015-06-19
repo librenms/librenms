@@ -5,6 +5,8 @@
 
 namespace Leaseweb\InfluxDB;
 
+use Leaseweb\InfluxDB\Client\Exception as ClientException;
+
 /**
  * Class ResultSet
  *
@@ -26,7 +28,7 @@ class ResultSet
      * @param $raw
      *
      * @throws \InvalidArgumentException
-     * @throws InfluxDBClientError
+     * @throws Exception
      */
     public function __construct($raw)
     {
@@ -40,11 +42,11 @@ class ResultSet
 
         // There was an error in the query thrown by influxdb
         if (isset($this->parsedResults['error'])) {
-            throw new InfluxDBClientError($this->parsedResults['error']);
+            throw new ClientException($this->parsedResults['error']);
 
             // Check if there are errors in the first serie
         } elseif (isset($this->parsedResults['results'][0]['error'])) {
-            throw new InfluxDBClientError($this->parsedResults['results'][0]['error']);
+            throw new ClientException($this->parsedResults['results'][0]['error']);
         }
     }
 
@@ -77,7 +79,7 @@ class ResultSet
      * results is an array of objects, one for each query,
      * each containing the keys for a series
      *
-     * @throws InfluxDBClientError
+     * @throws Exception
      *
      * @return array $series
      */
@@ -86,7 +88,7 @@ class ResultSet
         $pickSeries = function ($object) {
 
             if (isset($object['error'])) {
-                throw new InfluxDBClientError($object['error']);
+                throw new ClientException($object['error']);
             }
 
             return $object['series'];
