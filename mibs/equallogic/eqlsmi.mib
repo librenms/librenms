@@ -1,0 +1,41 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQUALLOGIC-SMI DEFINITIONS  ::= BEGIN
+IMPORTS
+    DisplayString , TruthValue, RowStatus, RowPointer, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, enterprises, IpAddress, TimeTicks, Counter32
+            FROM SNMPv2-SMI;
+
+equalLogic MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION
+        "Equallogic Inc. group information
+
+        Copyright (c) 2002-2009 by Dell, Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell, Inc.  This software embodies proprietary information 
+        and trade secrets of Dell, Inc. 
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION   "200805202109Z"      -- 20-May-08
+    DESCRIPTION "Initial revision"
+    ::= { enterprises 12740 }
+
+products	OBJECT IDENTIFIER ::= { equalLogic 12740 }
+eqlPSSeries	OBJECT IDENTIFIER ::= { products 1 }
+
+END
