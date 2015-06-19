@@ -173,6 +173,26 @@ class Client
     }
 
     /**
+     * @param $database
+     * @param $data
+     * @return bool
+     * @throws Exception
+     */
+    public function write($database, $data)
+    {
+        try {
+            $this->httpClient->post(
+                $this->getBaseURI() . '/write?db=' . $database,
+                array('body' => $data)
+            );
+        } catch (\Exception $e) {
+            throw new Exception(sprintf('Writing has failed, exception: %s', $e->getMessage()));
+        }
+
+        return true;
+    }
+
+    /**
      * List all the databases
      */
     public function listDatabases()

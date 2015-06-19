@@ -63,7 +63,7 @@ class Database
      * Query influxDB
      *
      * @param string $query
-     * @param array  $params
+     * @param array $params
      *
      * @return ResultSet
      *
@@ -71,7 +71,7 @@ class Database
      */
     public function query($query, $params = array())
     {
-       return $this->client->query($this->name, $query, $params);
+        return $this->client->query($this->name, $query, $params);
     }
 
     /**
@@ -108,7 +108,7 @@ class Database
     /**
      * Writes points into INfluxdb
      *
-     * @param array $points
+     * @param Point []
      * @return ResultSet
      */
     public function writePoints(array $points)
@@ -117,14 +117,14 @@ class Database
 
         foreach ($points as $point) {
 
-            if (! $point instanceof Point) {
+            if (!$point instanceof Point) {
                 throw new \InvalidArgumentException('Array of Point should be passed');
             }
 
             $payload[] = (string) $point;
         }
 
-        return $this->query(implode("\n", $payload));
+        return $this->client->write($this->name, implode(PHP_EOL, $payload));
     }
 
     /**
