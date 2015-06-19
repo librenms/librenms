@@ -82,7 +82,7 @@ class Database
             $this->query(sprintf('CREATE DATABASE %s', $this->name));
 
             if ($retentionPolicy) {
-                $this->query($this->getRetentionPolicyQuery('CREATE', $retentionPolicy));
+                $this->createRetentionPolicy($retentionPolicy);
             }
 
         } catch (\Exception $e) {
@@ -90,6 +90,11 @@ class Database
                 sprintf('Failed to created database %s, exception: %s', $this->name, $e->getMessage())
             );
         }
+    }
+
+    public function createRetentionPolicy(RetentionPolicy $retentionPolicy)
+    {
+        $this->query($this->getRetentionPolicyQuery('CREATE', $retentionPolicy));
     }
 
     /**

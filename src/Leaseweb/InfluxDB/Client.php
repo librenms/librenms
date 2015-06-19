@@ -70,6 +70,11 @@ class Client
     protected $httpClient;
 
     /**
+     * @var array
+     */
+    protected $options = array();
+
+    /**
      * @param string $host
      * @param int    $port
      * @param string $username
@@ -87,7 +92,7 @@ class Client
         $username = '',
         $password = '',
         $ssl = false,
-        $verifySSL = false,
+        $verifySSL = true,
         $timeout = 0
 //        $useUdp = false,
 //        $udpPort = 4444
@@ -103,6 +108,9 @@ class Client
 
         if ($ssl) {
             $this->scheme = 'https';
+            $this->options += array(
+                'verify' => $verifySSL
+            );
         }
 
         // the the base URI
@@ -150,9 +158,10 @@ class Client
         }
 
         $params = array_merge(array('q' => $query), $params);
+        $options = array_merge($this->options, array('query' => $params, 'http_errors' => false));
 
         try {
-            $response = $this->httpClient->get('query', array('query' => $params, 'http_errors' => false));
+            $response = $this->httpClient->get('query', $options);
 
             $raw = (string) $response->getBody();
 
@@ -170,14 +179,23 @@ class Client
     {
         $result = $this->query(null, 'SHOW DATABASES')->getPoints();
 
-        $names = array();
-
-        foreach ($result as $item) {
-            $names[] = $item['name'];
-        }
-
-        return $names;
+        return $this->pointsToArray($result);
     }
+
+    /**
+     * List all the users
+     *
+     * @return array
+     * @todo implement once issue #3048 is fixed
+     *
+     * @throws Exception
+     */
+//    public function listUsers()
+//    {
+//        $result = $this->query(null, 'SHOW USERS')->getPoints();
+//
+//        return $this->pointsToArray($result);
+//    }
 
     /**
      * Build the client from a dsn
@@ -186,12 +204,12 @@ class Client
      *
      * @param string $dsn
      *
-     * @todo finish this functionality
+     * @todo implement this functionality
      */
-    public static function fromDSN($dsn)
-    {
-        $args  = array();
-    }
+//    public static function fromDSN($dsn)
+//    {
+//        $args  = array();
+//    }
 
     /**
      * @return mixed
@@ -223,5 +241,21 @@ class Client
     public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
+    }
+
+    /**
+     * @param array $points
+     *
+     * @return array
+     */
+    protected function pointsToArray(array $points)
+    {
+        $names = array();
+
+        foreach ($points as $item) {
+            $names[] = $item['name'];
+        }
+
+        return $names;
     }
 }
