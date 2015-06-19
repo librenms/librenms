@@ -99,13 +99,24 @@ class Database
 
     /**
      * Writes points into INfluxdb
-     * @param Point[] $points
+     *
+     * @param array $points
+     * @return ResultSet
      */
     public function writePoints(array $points)
     {
+        $payload = array();
+
         foreach ($points as $point) {
-            //$point->a();
+
+            if (! $point instanceof Point) {
+                throw new \InvalidArgumentException('Array of Point should be passed');
+            }
+
+            $payload[] = (string) $point;
         }
+
+        return $this->query(implode("\n", $payload));
     }
 
     /**

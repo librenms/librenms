@@ -64,7 +64,7 @@ class ResultSet
 
             if ((empty($metricName) && empty($tags))
                 || $serie['name'] == $metricName
-                || array_intersect($tags, $serie['tags'])
+                || (isset($serie['tags']) && array_intersect($tags, $serie['tags']))
             ) {
                 $points = array_merge($points, $this->getPointsFromSerie($serie));
             }
