@@ -113,6 +113,38 @@ $no_refresh = TRUE;
 </div>
 <!-- End Hipchat Modal -->
 
+<!-- Pushover Modal -->
+<div class="modal fade" id="new-config-pushover" role="dialog" aria-hidden="true" title="Create new config item">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form role="form" class="new_config_form">
+                    <div class="form-group">
+                        <span class="message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="pushover_value">Pushover Apikey</label>
+                        <input type="text" class="form-control" name="pushover_value" id="pushover_value" placeholder="Enter the Pushover Apikey">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_userkey">Room ID</label>
+                        <input type="text" class="form-control" name="new_userkey" id="new_userkey" placeholder="Enter the Userkey">
+                    </div>
+                    <div class="form-group">
+                        <label for="pushover_extra">Pushover options (specify one per line key=value)</label>
+                        <textarea class="form-control" name="pushover_extra" id="pushover_extra" placeholder="Enter the config options"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="submit-pushover">Add config</button>
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Pushover Modal -->
+
 <?php
 if (isset($_GET['error'])) {
     print_error('We had issues connecting to your Pager Duty account, please try again');
@@ -580,6 +612,85 @@ echo '
                 </div>
             </div>
         </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pushover_transport_expand">Pushover transport</a>
+                </h4>
+            </div>
+            <div id="pushover_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-pushover">Add Pushover config</button>
+                        </div>
+                    </div>';
+$pushover_appkeys = get_config_like_name('alert.transports.pushover.%.appkey');
+foreach ($pushover_appkeys as $pushover_appkey) {
+    unset($upd_pushover_extra);
+    $new_pushover_extra = array();
+    $pushover_extras = get_config_like_name('alert.transports.pushover.'.$pushover_appkey['config_id'].'.%');
+    $pushover_userkey = get_config_by_name('alert.transports.pushover.'.$pushover_appkey['config_id'].'.userkey');
+    foreach ($pushover_extras as $extra) {
+        $split_extra = explode('.',$extra['config_name']);
+        if ($split_extra[4] != 'appkey' && $split_extra[4] != 'userkey') {
+            $new_pushover_extra[] = $split_extra[4] . '=' . $extra['config_value'];
+        }
+    }
+    $upd_pushover_extra = implode(PHP_EOL,$new_pushover_extra);
+    echo '<div id="'.$pushover_appkey['config_id'].'">
+                        <div class="form-group has-feedback">
+                            <label for="pushover_appkey" class="col-sm-4 control-label">Pushover Appkey </label>
+                            <div class="col-sm-4">
+                                <input id="pushover_appkey" class="form-control" type="text" name="global-config-input" value="'.$pushover_appkey['config_value'].'" data-config_id="'.$pushover_appkey['config_id'].'">
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-pushover-config" name="del-pushover-call" data-config_id="'.$pushover_appkey['config_id'].'"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label for="pushover_userkey" class="col-sm-4 control-label">Userkey</label>
+                            <div class="col-sm-4">
+                                <input id="pushover_userkey" class="form-control" type="text" name="global-config-input" value="'.$pushover_userkey['config_value'].'" data-config_id="'.$pushover_userkey['config_id'].'">
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <div class="col-sm-offset-4 col-sm-4">
+                                <textarea class="form-control" name="global-config-textarea" id="upd_pushover_extra" placeholder="Enter the config options" data-config_id="'.$pushover_appkey['config_id'].'" data-type="pushover">'.$upd_pushover_extra.'</textarea>
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    </div>';
+}
+echo '<div id="pushover_appkey_template" class="hide">
+                        <div class="form-group has-feedback">
+                            <label for="pushover_appkey" class="col-sm-4 control-label api-method">Pushover Appkey </label>
+                            <div class="col-sm-4">
+                                <input id="pushover_appkey" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-pushover-config" id="del-pushover-call" name="del-pushover-call" data-config_id=""><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label for="pushover_userkey" class="col-sm-4 control-label">Userkey</label>
+                            <div class="col-sm-4">
+                                <input id="global-config-userkey" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <div class="col-sm-offset-4 col-sm-4">
+                                <textarea class="form-control" name="global-config-textarea" id="upd_pushover_extra" placeholder="Enter the config options" data-config_id="" data-type="pushover"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 ';
@@ -710,6 +821,44 @@ echo '
         });
     });// End Add Hipchat config
 
+    // Add Pushover config
+    pushoverIndex = 0;
+    $("button#submit-pushover").click(function(){
+        var config_value = $('#pushover_value').val();
+        var config_extra = $('#pushover_extra').val();
+        var config_userkey = $('#new_userkey').val();
+        $.ajax({
+            type: "POST",
+            url: "/ajax_form.php",
+            data: {type: "config-item", action: 'add-pushover', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value, config_userkey: config_userkey},
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    pushoverIndex++;
+                    var $template = $('#pushover_appkey_template'),
+                        $clone    = $template
+                            .clone()
+                            .removeClass('hide')
+                            .attr('id',data.config_id)
+                            .attr('pushover-appkey-index', pushoverIndex)
+                            .insertBefore($template);
+                    $clone.find('[id="pushover_appkey"]').attr('data-config_id',data.config_id);
+                    $clone.find('[id="del-pushover-call"]').attr('data-config_id',data.config_id);
+                    $clone.find('[name="global-config-input"]').attr('value', config_value);
+                    $clone.find('[id="global-config-userkey"]').attr('value', config_userkey);
+                    $clone.find('[id="global-config-userkey"]').attr('data-config_id',data.additional_id['userkey']);
+                    $clone.find('[id="upd_pushover_extra"]').val(config_extra);
+                    $clone.find('[id="upd_pushover_extra"]').attr('data-config_id',data.config_id);
+                    $("#new-config-pushover").modal('hide');
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function(){
+                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+            }
+        });
+    });// End Add Pushover config
 
     // Delete api config
     $(document).on('click', 'button[name="del-api-call"]', function(event) {
@@ -774,6 +923,27 @@ echo '
         });
     });// End delete hipchat config
 
+    // Delete pushover config
+    $(document).on('click', 'button[name="del-pushover-call"]', function(event) {
+        var config_id = $(this).data('config_id');
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_form.php',
+            data: {type: "config-item", action: 'remove-pushover', config_id: config_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $("#"+config_id).remove();
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function () {
+                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+            }
+        });
+    });// End delete pushover config
+
     $("[name='global-config-check']").bootstrapSwitch('offColor','danger');
     $('input[name="global-config-check"]').on('switchChange.bootstrapSwitch',  function(event, state) {
         event.preventDefault();
@@ -799,6 +969,7 @@ echo '
         var $this = $(this);
         var config_id = $this.data("config_id");
         var config_value = $this.val();
+        alert(config_id + ' and ' + config_value)
         $.ajax({
             type: 'POST',
             url: '/ajax_form.php',
