@@ -359,6 +359,30 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(712423, $body["results"][0]["series"][0]["values"][0][2]);
     }
 
+    /**
+     * Test that we handle socket problems correctly in the UDP
+     * adapter, and that they don't inturrupt the user's application.
+     *
+     * @group udp
+     */
+    public function testReplicateIssue27()
+    {
+        $options = new \InfluxDB\Options();
+
+        // Configure options
+        $options->setHost('172.16.1.182');
+        $options->setPort(4444);
+        $options->setDatabase('...');
+        $options->setUsername('root');
+        $options->setPassword('root');
+
+        $httpAdapter = new \InfluxDB\Adapter\UdpAdapter($options);
+
+        $client = new \InfluxDB\Client();
+        $client->setAdapter($httpAdapter);
+        $client->mark("udp.test", ["mark" => "element"]);
+    }
+
     public function testListActiveDatabses()
     {
         $databases = $this->object->getDatabases();
