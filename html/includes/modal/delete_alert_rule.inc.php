@@ -40,9 +40,8 @@ if(is_admin() === false) {
 </div>
 
 <script>
-$('#confirm-delete').on('show.bs.modal', function(e) {
-    event.preventDefault();
-    alert_id = $(e.relatedTarget).data('alert_id');
+$('#confirm-delete').on('show.bs.modal', function(event) {
+    alert_id = $(event.relatedTarget).data('alert_id');
     $("#alert_id").val(alert_id);
 });
 
