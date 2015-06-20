@@ -969,7 +969,6 @@ echo '<div id="pushover_appkey_template" class="hide">
         var $this = $(this);
         var config_id = $this.data("config_id");
         var config_value = $this.val();
-        alert(config_id + ' and ' + config_value)
         $.ajax({
             type: 'POST',
             url: '/ajax_form.php',
