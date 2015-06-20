@@ -33,15 +33,22 @@ if (!is_numeric($config_id)) {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.slack.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default'=>$v, 'config_descr'=>'Slack Transport'), 'config');
             } elseif ($config_type == 'hipchat') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default'=>$v, 'config_descr'=>'Hipchat Transport'), 'config');
+            } elseif ($config_type == 'pushover') {
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.pushover.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default'=>$v, 'config_descr'=>'Pushover Transport'), 'config');
             }
         }
     }
     $db_inserts = implode(",",$db_id);
-    if (!empty($db_inserts)) {
+    if (!empty($db_inserts) || empty($_POST['config_value'])) {
+        if (empty($_POST['config_value'])) {
+            $db_inserts = 0;
+        }
         if ($config_type == 'slack') {
             dbDelete('config',"(`config_name` LIKE 'alert.transports.slack.$config_id.%' AND `config_name` != 'alert.transports.slack.$config_id.url' AND `config_id` NOT IN ($db_inserts))");
         } elseif ($config_type == 'hipchat') {
             dbDelete('config',"(`config_name` LIKE 'alert.transports.hipchat.$config_id.%' AND (`config_name` != 'alert.transports.hipchat.$config_id.url' AND `config_name` != 'alert.transports.hipchat.$config_id.room_id' AND `config_name` != 'alert.transports.hipchat.$config_id.from') AND `config_id` NOT IN ($db_inserts))");
+        } elseif ($config_type == 'pushover') {
+            dbDelete('config',"(`config_name` LIKE 'alert.transports.pushover.$config_id.%' AND (`config_name` != 'alert.transports.pushover.$config_id.appkey' AND `config_name` != 'alert.transports.pushover.$config_id.userkey') AND `config_id` NOT IN ($db_inserts))");
         }
     }
     $message = 'Config item has been updated:';
