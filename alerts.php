@@ -194,20 +194,45 @@ function RunAlerts() {
 		if( $chk['alerted'] == $alert['state'] ) {
 			$noiss = true;
 		}
-		if( !empty($rextra['delay']) ) {
-			if( (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']+$config['alert']['tolerance-window']) < $rextra['delay']) ) {
+		if( !empty($rextra['count']) && empty($rextra['interval']) ) {
+			// This check below is for compat-reasons
+			if( !empty($rextra['delay']) ) {
+				if( (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']+$config['alert']['tolerance-window']) < $rextra['delay']) ) {
 				continue;
-			} else {
-				$alert['details']['delay'] = time();
+				} else {
+					$alert['details']['delay'] = time();
+					$updet = true;
+				}
+			}
+			if( $alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count']) ) {
+				if( $alert['details']['count'] < $rextra['count'] ) {
+					$noacc = true;
+				}
 				$updet = true;
+				$noiss = false;
 			}
-		}
-		if( $alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count']) ) {
-			if( $alert['details']['count'] < $rextra['count'] ) {
-				$noacc = true;
+
+		} else {
+			// This is the new way
+			if( !empty($rextra['delay']) && (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] ) {
+				continue;
 			}
-			$updet = true;
-			$noiss = false;
+			if( !empty($rextra['interval']) ) {
+				if( !empty($alert['details']['interval']) && (time()-$alert['details']['interval']+$config['alert']['tolerance-window']) < $rextra['interval'] ) {
+					continue;
+				} else {
+					$alert['details']['interval'] = time();
+					$updet = true;
+				}
+			}
+			if( $alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count']) ) {
+				if( $alert['details']['count'] < $rextra['count'] ) {
+					$noacc = true;
+				}
+				$updet = true;
+				$noiss = false;
+			}
+
 		}
 		if( $chk['ignore'] == 1 || $chk['disabled'] == 1 ) {
 			$noiss = true;
