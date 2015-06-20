@@ -378,8 +378,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $httpAdapter = new \InfluxDB\Adapter\UdpAdapter($options);
 
-        $client = new \InfluxDB\Client();
-        $client->setAdapter($httpAdapter);
+        $client = new \InfluxDB\Client($httpAdapter);
         $client->mark("udp.test", ["mark" => "element"]);
     }
 
