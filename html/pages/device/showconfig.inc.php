@@ -92,6 +92,9 @@ if ($_SESSION['userlevel'] >= "7")
   } elseif ($config['oxidized']['enabled'] === TRUE && isset($config['oxidized']['url'])) {
       $node_info = json_decode(file_get_contents($config['oxidized']['url']."/node/show/".$device['hostname']."?format=json"),TRUE);
       $text = file_get_contents($config['oxidized']['url']."/node/fetch/".$device['hostname']);
+      if ($text == "node not found") {
+          $text = file_get_contents($config['oxidized']['url']."/node/fetch/".$device['os']."/".$device['hostname']);
+      }
 
       if (is_array($node_info)) {
           echo('<br />
