@@ -45,8 +45,9 @@ if (isset($ruckuscountry) && $ruckuscountry != '') {
 }
 
 $ruckus_mibs = array(
-    'ruckusZDSystemStats' => 'RUCKUS-ZD-SYSTEM-MIB',
-    'ruckusZDWLANTable'   => 'RUCKUS-ZD-WLAN-MIB',
-    'ruckusZDWLANAPTable' => 'RUCKUS-ZD-WLAN-MIB',
+    'ruckusZDSystemStats'           => 'RUCKUS-ZD-SYSTEM-MIB',
+    'ruckusZDWLANTable'             => 'RUCKUS-ZD-WLAN-MIB',
+    'ruckusZDWLANAPTable'           => 'RUCKUS-ZD-WLAN-MIB',
+    'ruckusZDWLANAPRadioStatsTable' => 'RUCKUS-ZD-WLAN-MIB',
 );
 poll_mibs($ruckus_mibs, $device, $graphs);
