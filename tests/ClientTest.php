@@ -66,6 +66,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group tcp
+     * @group proxy
+     */
+    public function testGuzzleHttpApiWorksCorrectlyWithProxies()
+    {
+        $this->options->setHost("localhost");
+        $this->options->setPort(9000);
+        $this->options->setPrefix("/influxdb");
+        $this->object->mark("tcp.test", ["mark" => "element"]);
+
+        sleep(2);
+
+        $body = $this->object->query("select * from \"tcp.test\"");
+        $this->assertCount(1, $body["results"][0]["series"][0]["values"]);
+        $this->assertEquals("mark", $body["results"][0]["series"][0]["columns"][1]);
+        $this->assertEquals("element", $body["results"][0]["series"][0]["values"][0][1]);
+    }
+
+    /**
+     * @group tcp
      */
     public function testGuzzleHttpQueryApiWorksCorrectly()
     {

@@ -13,6 +13,10 @@ before_install:
   - sudo cp ./scripts/influxdb_conf.toml /etc/opt/influxdb/influxdb.conf
   - travis_retry sudo service influxdb restart
   - sudo service influxdb status
+  - sudo apt-get update
+  - sudo apt-get install -y nginx
+  - sudo cp scripts/nginx_proxy.conf /etc/nginx/conf.d/proxy.conf
+  - travis_retry sudo service nginx restart
 
 before_script:
   - composer selfupdate
