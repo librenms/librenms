@@ -621,4 +621,9 @@ $config['ipmi']['type'][]                                = "open";
 // Options needed for dyn config - do NOT edit
 $dyn_config['email_backend'] = array('mail','sendmail','smtp');
 $dyn_config['email_smtp_secure'] = array('', 'tls', 'ssl');
+
+// Unix-agent poller module config settings
+$config['unix-agent-connection-time-out'] 		= 10; //seconds
+$config['unix-agent-read-time-out'] 			= 10; //seconds
+
 ?>
