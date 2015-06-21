@@ -54,20 +54,22 @@ class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
     protected function getHttpSeriesEndpoint()
     {
         return sprintf(
-            "%s://%s:%d/write",
+            "%s://%s:%d%s/write",
             $this->getOptions()->getProtocol(),
             $this->getOptions()->getHost(),
-            $this->getOptions()->getPort()
+            $this->getOptions()->getPort(),
+            $this->getOptions()->getPrefix()
         );
     }
 
     protected function getHttpQueryEndpoint($name = false)
     {
         $url = sprintf(
-            "%s://%s:%d/query",
+            "%s://%s:%d%s/query",
             $this->getOptions()->getProtocol(),
             $this->getOptions()->getHost(),
-            $this->getOptions()->getPort()
+            $this->getOptions()->getPort(),
+            $this->getOptions()->getPrefix()
         );
 
         return $url;
