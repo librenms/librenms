@@ -458,26 +458,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * @group udp
      */
-    public function testReplicateIssue27()
-    {
-        $options = new \InfluxDB\Options();
-
-        // Configure options
-        $options->setHost('172.16.1.182');
-        $options->setPort(4444);
-        $options->setDatabase('...');
-        $options->setUsername('root');
-        $options->setPassword('root');
-
-        $udpAdapter = new \InfluxDB\Adapter\UdpAdapter($options);
-        $client = new \InfluxDB\Client($udpAdapter);
-
-        $client->mark("udp.test", ["mark" => "element"]);
-    }
-
-    /**
-     * @group udp
-     */
     public function testWriteUDPPackagesToInvalidHostname()
     {
         $rawOptions = $this->rawOptions;
