@@ -23,6 +23,8 @@ class Options
 
     private $tags;
 
+    private $prefix;
+
     public function __construct()
     {
         $this->setHost("localhost");
@@ -30,9 +32,21 @@ class Options
         $this->setUsername("root");
         $this->setPassword("root");
         $this->setProtocol("http");
+        $this->setPrefix("");
 
         $this->setRetentionPolicy("default");
         $this->setTags([]);
+    }
+
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+        return $this;
     }
 
     public function getTags()
