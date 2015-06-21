@@ -239,6 +239,20 @@ $options->setRetentionPolicy("myPolicy");
 
 In that way the SDK use that policy instead of `default` policy.
 
+## Proxies and InfluxDB
+
+If you proxy your InfluxDB typically you have a prefix in your endpoints. 
+
+```
+$option->setHost("proxy.influxdb.tld");
+$option->setPort(80);
+$option->setPrefix("/influxdb"); // your prefix is: /influxdb
+
+// final url will be: http://proxy.influxdb.tld:80/influxdb/write
+
+$client->mark("serie", ["data" => "my-data"]);
+```
+
 ## Benchmarks
 
 Simple benchmarks executed on a Sony Vaio T13 (SVT1311C5E)
