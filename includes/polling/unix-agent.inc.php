@@ -10,15 +10,25 @@ if ($device['os_group'] == "unix")
   $agent_port='6556';
 
   $agent_start = utime();
-  $agent = fsockopen($device['hostname'], $agent_port, $errno, $errstr, 10);
+  $agent = fsockopen($device['hostname'], $agent_port, $errno, $errstr, $config['unix-agent-connection-time-out'] );
+
+  // Set stream timeout (for timeouts during agent  fetch
+  stream_set_timeout($agent,$config['unix-agent-read-time-out']);
+  $agentinfo = stream_get_meta_data($agent);
 
   if (!$agent)
   {
     echo "Connection to UNIX agent failed on port ".$port.".";
   } else {
-    while (!feof($agent))
+    // fetch data while not eof and not timed-out
+    while ((!feof($agent)) && (!$agentinfo['timed_out']))
     {
       $agent_raw .= fgets($agent, 128);
+      $agentinfo = stream_get_meta_data($agent);
+    }
+    if ($agentinfo['timed_out'])
+    {
+      echo "Connection to UNIX agent timed out during fetch on port ".$port.".";
     }
   }
   
