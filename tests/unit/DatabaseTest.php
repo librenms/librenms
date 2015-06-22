@@ -52,7 +52,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $payloadExpected ="$point1\n$point2";
 
         $this->mockClient->expects($this->once())
-            ->method('query')
+            ->method('write')
             ->with($this->equalTo($this->db->getName()), $this->equalTo($payloadExpected));
 
         $this->db->writePoints(array($point1, $point2));
