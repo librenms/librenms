@@ -165,6 +165,14 @@ class Database
     }
 
     /**
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
      * @param                 $method
      * @param RetentionPolicy $retentionPolicy
      *

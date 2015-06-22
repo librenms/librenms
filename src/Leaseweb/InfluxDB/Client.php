@@ -7,6 +7,8 @@ namespace Leaseweb\InfluxDB;
 
 
 use GuzzleHttp\Client as httpClient;
+use Leaseweb\InfluxDB\Client\Exception as ClientException;
+
 /**
  * Class Client
  *
@@ -84,7 +86,6 @@ class Client
      * @param int    $timeout
      *
      * @todo add UDP support
-     * @todo add SSL support
      */
     public function __construct(
         $host,
@@ -94,8 +95,6 @@ class Client
         $ssl = false,
         $verifySSL = true,
         $timeout = 0
-//        $useUdp = false,
-//        $udpPort = 4444
     )
     {
 
@@ -206,31 +205,71 @@ class Client
      * List all the users
      *
      * @return array
-     * @todo implement once issue #3048 is fixed
      *
      * @throws Exception
      */
-//    public function listUsers()
-//    {
-//        $result = $this->query(null, 'SHOW USERS')->getPoints();
-//
-//        return $this->pointsToArray($result);
-//    }
+    public function listUsers()
+    {
+        $result = $this->query(null, 'SHOW USERS')->getPoints();
+
+        return $this->pointsToArray($result);
+    }
 
     /**
      * Build the client from a dsn
      *
-     * Example: tcp+influxdb://username:pass@localhost:8086/databasename', timeout=5
+     * Example: https+influxdb://username:pass@localhost:8086/databasename', timeout=5
      *
      * @param string $dsn
      *
-     * @todo implement this functionality
+     * @param int    $timeout
+     * @param bool   $verifySSL
+     *
+     * @return Client|Database
+     *
+     * @throws ClientException
      */
-//    public static function fromDSN($dsn)
-//    {
-//        $args  = array();
-//    }
+    public static function fromDSN($dsn, $timeout = 0, $verifySSL = false)
+    {
+        $connParams = parse_url($dsn);
+        $schemeInfo = explode('+', $connParams['scheme']);
+        $dbName = null;
 
+        if (count($schemeInfo) == 1) {
+            $modifier = null;
+            $scheme = $schemeInfo[0];
+        } else {
+            $modifier = $schemeInfo[0];
+            $scheme = $schemeInfo[1];
+        }
+
+        if ($scheme != 'influxdb') {
+            throw new ClientException(sprintf('%s is not a valid scheme', $scheme));
+        }
+
+        $ssl = ($modifier && $modifier == 'https' ? true : false);
+
+        if ($connParams['path']) {
+            $dbName = substr($connParams['path'], 1);
+        }
+
+        $client = new self(
+            $connParams['host'],
+            $connParams['port'],
+            $connParams['user'],
+            $connParams['pass'],
+            $ssl,
+            $verifySSL,
+            $timeout
+        );
+
+        $return = $client;
+        if ($dbName) {
+            $return = $client->db($dbName);
+        }
+
+        return $return;
+    }
     /**
      * @return mixed
      */

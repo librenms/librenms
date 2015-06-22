@@ -62,9 +62,10 @@ class ResultSet
 
         foreach ($this->getSeries() as $serie) {
 
-            if ((empty($metricName) && empty($tags))
+            if ((empty($metricName) && empty($tags)
                 || $serie['name'] == $metricName
-                || (isset($serie['tags']) && array_intersect($tags, $serie['tags']))
+                || (isset($serie['tags']) && array_intersect($tags, $serie['tags'])))
+                && isset($serie['values'])
             ) {
                 $points = array_merge($points, $this->getPointsFromSerie($serie));
             }
