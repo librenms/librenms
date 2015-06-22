@@ -539,8 +539,8 @@ function getpollergroup($poller_group='0')
     //Check if it contains a comma
     if (strpos($poller_group,',')!== FALSE) {
       //If it has a comma use the first element as the poller group
-      $poller_group=explode(',',$poller_group)[0];
-      return getpollergroup($poller_group);
+      $poller_group_array=explode(',',$poller_group);
+      return getpollergroup($poller_group_array[0]);
     } else {
       if ($config['distributed_poller_group']) {
         //If not use the poller's group from the config
