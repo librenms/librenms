@@ -502,3 +502,19 @@ Entity: `%macros.sensor`
 Description: Only select sensors that aren't ignored.
 
 Source: `(%sensors.sensor_alert = 1)`
+
+## <a name="macros-packetloss">Packet Loss</a> (Boolean)
+
+Entity: `(%macros.packet_loss_5m)`
+
+Description: Packet loss % value for the device within the last 5 minutes.
+
+Example: `%macros.packet_loss_5m` > 50
+
+Entity: `(%macros.packet_loss_15m)`
+
+Description: Packet loss % value for the device within the last 15 minutes.
+
+Example: `%macros.packet_loss_15m` > 50
+
+
