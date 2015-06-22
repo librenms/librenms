@@ -195,7 +195,7 @@ except:
 """
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
 if poller_group is not False:
-    query = "select device_id from devices where poller_group = " + poller_group + " and disabled = 0 order by last_polled_timetaken desc"
+    query = "select device_id from devices where poller_group IN(" + poller_group + ") and disabled = 0 order by last_polled_timetaken desc"
 else:
     query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
 # EOC2

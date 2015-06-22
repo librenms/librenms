@@ -530,14 +530,36 @@ function utime()
   return $sec + $usec;
 }
 
+function getpollergroup($poller_group='0')
+{
+  //Is poller group an integer
+  if (is_int($poller_group) || ctype_digit($poller_group)) {
+    return $poller_group;
+  } else {
+    //Check if it contains a comma
+    if (strpos($poller_group,',')!== FALSE) {
+      //If it has a comma use the first element as the poller group
+      $poller_group=explode(',',$poller_group)[0];
+      return getpollergroup($poller_group);
+    } else {
+      if ($config['distributed_poller_group']) {
+        //If not use the poller's group from the config
+        return getpollergroup($config['distributed_poller_group']);
+      } else {
+        //If all else fails use default
+        return '0';
+      }
+    }
+  }
+}
+
 function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0')
 {
   global $config;
   $host = trim(strtolower($host));
 
-  if (is_numeric($poller_group) === FALSE) {
-      $poller_group = $config['distributed_poller_group'];
-  }
+  $poller_group=getpollergroup($poller_group);
+
   $device = array('hostname' => $host,
                   'sysName' => $host,
                   'community' => $community,
