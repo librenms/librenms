@@ -1285,7 +1285,6 @@ $process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1',
 
 if (is_resource($process)) {
 
-   fwrite($pipes[0], $in);
     /* fwrite writes to stdin, 'cat' will immediately write the data from stdin
     * to stdout and blocks, when the stdout buffer is full. Then it will not
     * continue reading from stdin and php will block here.
@@ -1293,16 +1292,15 @@ if (is_resource($process)) {
 
    fclose($pipes[0]);
 
+   $read = '';
    while (!feof($pipes[1])) {
        $read .= fgets($pipes[1], 1024);
    }
    fclose($pipes[1]);
 
-   $return_value = proc_close($process);
+   proc_close($process);
 }
 
-    system("echo 'YEAH $read END\n' >> /tmp/testing");
-    system("echo '". $config['fping'] ."  -e -q $params $host' >> /tmp/testing");
     preg_match('/[0-9]+\/[0-9]+\/[0-9]+%/', $read, $loss_tmp);
     preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
     $loss = preg_replace("/%/","",$loss_tmp[0]);
