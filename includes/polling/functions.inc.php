@@ -144,21 +144,23 @@ function poll_device($device, $options)
   $device['pingable'] = $ping_response['result'];
   $ping_time = $ping_response['last_ping_timetaken'];
   $response = array();
+  $status_reason = '';
   if ($device['pingable'])
   {
     $device['snmpable'] = isSNMPable($device);
     if ($device['snmpable'])
     {
       $status = "1";
+      $response['status_reason'] = '';
     } else {
       echo("SNMP Unreachable");
       $status = "0";
-      $response['status'] = 'snmp';
+      $response['status_reason'] = 'snmp';
     }
   } else {
     echo("Unpingable");
     $status = "0";
-    $response['status'] = 'icmp';
+    $response['status_reason'] = 'icmp';
   }
 
   if ($device['status'] != $status)
@@ -166,11 +168,11 @@ function poll_device($device, $options)
     $poll_update .= $poll_separator . "`status` = '$status'";
     $poll_separator = ", ";
 
-    dbUpdate(array('status' => $status), 'devices', 'device_id=?', array($device['device_id']));
+    dbUpdate(array('status' => $status,'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
     dbInsert(array('importance' => '0', 'device_id' => $device['device_id'], 'message' => "Device is " .($status == '1' ? 'up' : 'down')), 'alerts');
 
     log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
-    notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " " . $response['status']);
+    notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " " . $response['status_reason']);
   }
 
   if ($status == "1")

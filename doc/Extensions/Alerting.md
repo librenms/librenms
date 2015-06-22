@@ -321,6 +321,8 @@ __devices.location__ = The devices location.
 
 __devices.status__ = The status of the device, 1 = up, 0 = down.
 
+__devices.status_reason__ = The reason the device was detected as down (icmp or snmp).
+
 __devices.ignore__ = If the device is ignored this will be set to 1.
 
 __devices.disabled__ = If the device is disabled this will be set to 1.
