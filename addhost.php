@@ -28,7 +28,7 @@ if (isset($options['g']) && $options['g'] >= 0) {
     array_shift($argv);
     array_unshift($argv, $cmd);
     $poller_group = $options['g'];
-} elseif ($config['distributed_poller_group'] > 0 && $config['distributed_poller'] === TRUE) {
+} elseif ($config['distributed_poller'] === TRUE) {
     $poller_group = $config['distributed_poller_group'];
 }
 
