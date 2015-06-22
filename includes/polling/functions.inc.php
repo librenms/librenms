@@ -132,6 +132,15 @@ function poll_device($device, $options)
   if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
 
   $ping_response = isPingable($device['hostname'],$device['device_id']);
+
+    $device_perf = $ping_response['db'];
+    $device_perf['device_id'] = $device['device_id'];
+    $device_perf['timestamp'] = array('NOW()');
+    if (is_array($device_perf)) {
+        dbInsert($device_perf, 'device_perf');
+    }
+
+
   $device['pingable'] = $ping_response['result'];
   $ping_time = $ping_response['last_ping_timetaken'];
   $response = array();

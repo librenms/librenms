@@ -495,25 +495,21 @@ function isPingable($hostname,$device_id = FALSE)
    if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
        $fping_params .= ' -t ' . $config['fping_options']['timeout'];
    }
-   $status = shell_exec($config['fping'] . "$fping_params -e $hostname 2>/dev/null");
+    if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+        $fping_params .= ' -c ' . $config['fping_options']['count'];
+    }
+   //$status = shell_exec($config['fping'] . "$fping_params -e $hostname 2>/dev/null");
    $response = array();
-   if (strstr($status, "alive"))
-   {
-     $response['result'] = TRUE;
-   } else {
-     $status = shell_exec($config['fping6'] . "$fping_params -e $hostname 2>/dev/null");
-     if (strstr($status, "alive"))
-     {
-       $response['result'] = TRUE;
-     } else {
+   $status = fping($hostname,$fping_params);
+   if ($status['loss'] < 0 || $status['loss'] == 100) {
        $response['result'] = FALSE;
-     }
+   } else {
+       $response['result'] = TRUE;
    }
-   if(is_numeric($device_id) && !empty($device_id))
-   {
-     preg_match('/(\d+\.*\d*) (ms)/', $status, $time);
-     $response['last_ping_timetaken'] = $time[1];
+   if (is_numeric($status['avg'])) {
+       $response['last_ping_timetaken'] = $status['avg'];
    }
+   $response['db'] = $status;
    return($response);
 }
 
@@ -1269,3 +1265,55 @@ function ip_exists($ip) {
     }
     return true;
 }
+
+function fping($host,$params) {
+
+    global $config;
+
+//    $handle = popen($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', 'r');
+//    sleep(0.2);
+//    $read = fread($handle, 8192);
+//    pclose($handle);
+
+$descriptorspec = array(
+   0 => array("pipe", "r"),
+   1 => array("pipe", "w"),
+   2 => array("pipe", "w")
+);
+
+$process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
+
+if (is_resource($process)) {
+
+   fwrite($pipes[0], $in);
+    /* fwrite writes to stdin, 'cat' will immediately write the data from stdin
+    * to stdout and blocks, when the stdout buffer is full. Then it will not
+    * continue reading from stdin and php will block here.
+    */
+
+   fclose($pipes[0]);
+
+   while (!feof($pipes[1])) {
+       $read .= fgets($pipes[1], 1024);
+   }
+   fclose($pipes[1]);
+
+   $return_value = proc_close($process);
+}
+
+    system("echo 'YEAH $read END\n' >> /tmp/testing");
+    system("echo '". $config['fping'] ."  -e -q $params $host' >> /tmp/testing");
+    preg_match('/[0-9]+\/[0-9]+\/[0-9]+%/', $read, $loss_tmp);
+    preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
+    $loss = preg_replace("/%/","",$loss_tmp[0]);
+    list($xmt,$rcv,$loss) = preg_split("/\//", $loss);
+    list($min,$max,$avg) = preg_split("/\//", $latency[0]);
+    if ($loss < 0) {
+        $xmt = 1;
+        $rcv = 1;
+        $loss = 100;
+    }
+    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
+    return $response;
+}
+
