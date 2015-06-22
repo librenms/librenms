@@ -1270,36 +1270,25 @@ function fping($host,$params) {
 
     global $config;
 
-//    $handle = popen($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', 'r');
-//    sleep(0.2);
-//    $read = fread($handle, 8192);
-//    pclose($handle);
+    $descriptorspec = array(
+        0 => array("pipe", "r"),
+        1 => array("pipe", "w"),
+        2 => array("pipe", "w")
+    );
 
-$descriptorspec = array(
-   0 => array("pipe", "r"),
-   1 => array("pipe", "w"),
-   2 => array("pipe", "w")
-);
+    $process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
+    $read = '';
 
-$process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
+    if (is_resource($process)) {
 
-if (is_resource($process)) {
+       fclose($pipes[0]);
 
-    /* fwrite writes to stdin, 'cat' will immediately write the data from stdin
-    * to stdout and blocks, when the stdout buffer is full. Then it will not
-    * continue reading from stdin and php will block here.
-    */
-
-   fclose($pipes[0]);
-
-   $read = '';
-   while (!feof($pipes[1])) {
-       $read .= fgets($pipes[1], 1024);
-   }
-   fclose($pipes[1]);
-
-   proc_close($process);
-}
+       while (!feof($pipes[1])) {
+           $read .= fgets($pipes[1], 1024);
+       }
+       fclose($pipes[1]);
+       proc_close($process);
+    }
 
     preg_match('/[0-9]+\/[0-9]+\/[0-9]+%/', $read, $loss_tmp);
     preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
