@@ -498,7 +498,9 @@ function isPingable($hostname,$device_id = FALSE)
     if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
         $fping_params .= ' -c ' . $config['fping_options']['count'];
     }
-   //$status = shell_exec($config['fping'] . "$fping_params -e $hostname 2>/dev/null");
+    if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+        $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+    }
    $response = array();
    $status = fping($hostname,$fping_params);
    if ($status['loss'] < 0 || $status['loss'] == 100) {
