@@ -169,4 +169,43 @@ EOF
             ]
         ]);
     }
+
+    /**
+     * @group udp
+     */
+    public function testMergeGlobalTags()
+    {
+        $options = (new Options())
+            ->setDatabase("test")
+            ->setTags(["dc" => "eu-west"]);
+        $adapter = $this->getMockBuilder("InfluxDB\\Adapter\\UdpAdapter")
+            ->setConstructorArgs([$options])
+            ->setMethods(["write", "generateTimeInNanoSeconds"])
+            ->getMock();
+
+        $adapter->expects($this->any())
+            ->method("generateTimeInNanoSeconds")
+            ->will($this->returnValue(1245));
+
+        $adapter->expects($this->once())
+            ->method("write")
+            ->with(<<<EOF
+mem,dc=eu-west,region=eu-west-1 free=712423 1245
+EOF
+);
+
+        $adapter->send([
+            "tags" => [
+                "region" => "eu-west-1",
+            ],
+            "points" => [
+                [
+                    "measurement" => "mem",
+                    "fields" => [
+                        "free" => 712423,
+                    ],
+                ],
+            ]
+        ]);
+    }
 }
