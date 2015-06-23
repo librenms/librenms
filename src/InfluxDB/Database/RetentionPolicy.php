@@ -3,12 +3,12 @@
  * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 
-namespace Leaseweb\InfluxDB\Database;
+namespace InfluxDB\Database;
 
 /**
  * Class RetentionPolicy
  *
- * @package Leaseweb\InfluxDB\Database
+ * @package InfluxDB\Database
  */
 class RetentionPolicy
 {

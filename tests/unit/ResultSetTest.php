@@ -1,7 +1,7 @@
 <?php
-namespace Leaseweb\InfluxDB\Test;
+namespace InfluxDB\Test;
 
-use Leaseweb\InfluxDB\ResultSet;
+use InfluxDB\ResultSet;
 
 class ResultSetTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +26,7 @@ class ResultSetTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Throws Exception if something went wrong with influxDB
-     * @expectedException \Leaseweb\InfluxDB\Exception
+     * @expectedException \InfluxDB\Exception
      */
     public function testThrowsInfluxDBException()
     {
@@ -42,7 +42,7 @@ EOD;
 
     /**
      * Throws Exception if something went wrong with influxDB after processing the query
-     * @expectedException \Leaseweb\InfluxDB\Exception
+     * @expectedException \InfluxDB\Exception
      */
     public function testThrowsInfluxDBExceptionIfAnyErrorInSeries()
     {

@@ -22,12 +22,12 @@
     },
     "autoload": {
         "psr-4" : {
-            "Leaseweb\\InfluxDB\\": "src/Leaseweb/InfluxDB"
+            "InfluxDB\\": "src/InfluxDB"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Leaseweb\\InfluxDB\\Test\\": "tests"
+            "InfluxDB\\Test\\": "tests"
         }
     }
 }

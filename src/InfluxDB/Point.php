@@ -1,11 +1,11 @@
 <?php
 
-namespace Leaseweb\InfluxDB;
+namespace InfluxDB;
 
 /**
  * Class Point
  *
- * @package Leaseweb\InfluxDB
+ * @package InfluxDB
  */
 class Point
 {

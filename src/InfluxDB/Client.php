@@ -3,16 +3,16 @@
  * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 
-namespace Leaseweb\InfluxDB;
+namespace InfluxDB;
 
 
 use GuzzleHttp\Client as httpClient;
-use Leaseweb\InfluxDB\Client\Exception as ClientException;
+use InfluxDB\Client\Exception as ClientException;
 
 /**
  * Class Client
  *
- * @package Leaseweb\InfluxDB
+ * @package InfluxDB
  */
 class Client
 {

@@ -6,10 +6,10 @@
  * Time: 17:39
  */
 
-namespace Leaseweb\InfluxDB\Test;
+namespace InfluxDB\Test;
 
 
-use Leaseweb\InfluxDB\Point;
+use InfluxDB\Point;
 
 class PointTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Leaseweb\InfluxDB\Test;
+namespace InfluxDB\Test;
 
-use Leaseweb\InfluxDB\Client;
+use InfluxDB\Client;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
