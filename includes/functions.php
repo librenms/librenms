@@ -1296,7 +1296,7 @@ function fping($host,$params) {
     preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
     $loss = preg_replace("/%/","",$loss_tmp[0]);
     list($xmt,$rcv,$loss) = preg_split("/\//", $loss);
-    list($min,$max,$avg) = preg_split("/\//", $latency[0]);
+    list($min,$avg,$max) = preg_split("/\//", $latency[0]);
     if ($loss < 0) {
         $xmt = 1;
         $rcv = 1;
