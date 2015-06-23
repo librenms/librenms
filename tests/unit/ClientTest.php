@@ -62,4 +62,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
     }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testNeedWritableInterfaceDuringMark()
+    {
+        $client = new Client(new \stdClass());
+        $client->mark("OK", []);
+    }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testNeedQueryableInterfaceDuringQuery()
+    {
+        $client = new Client(new \stdClass());
+        $client->query("OK", []);
+    }
 }

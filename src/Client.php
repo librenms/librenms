@@ -52,25 +52,16 @@ class Client
 
     public function getDatabases()
     {
-        if (!($this->getAdapter() instanceOf QueryableInterface)) {
-            throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
-        }
         return $this->getAdapter()->query("show databases");
     }
 
     public function createDatabase($name)
     {
-        if (!($this->getAdapter() instanceOf QueryableInterface)) {
-            throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
-        }
         return $this->getAdapter()->query("create database \"{$name}\"");
     }
 
     public function deleteDatabase($name)
     {
-        if (!($this->getAdapter() instanceOf QueryableInterface)) {
-            throw new  \BadMethodCallException("You can query the database only if the adapter supports it!");
-        }
         return $this->getAdapter()->query("drop database \"{$name}\"");
     }
 }
