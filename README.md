@@ -1,7 +1,6 @@
 # InfluxDB PHP SDK
 
- * Master: [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
- * Develop: [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=develop)](https://travis-ci.org/corley/influxdb-php-sdk)
+[![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
 
 Send metrics to InfluxDB and query for any data.
 
