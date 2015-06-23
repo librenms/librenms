@@ -114,4 +114,16 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
             ["InfluxDB\\Adapter\\GuzzleAdapter"],
         ];
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidProviderThrowsException()
+    {
+        $client = ClientFactory::create([
+            "adapter" => [
+                "name" => "InvalidClass",
+            ],
+        ]);
+    }
 }
