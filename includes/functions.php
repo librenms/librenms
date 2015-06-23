@@ -503,7 +503,7 @@ function isPingable($hostname,$device_id = FALSE)
     }
    $response = array();
    $status = fping($hostname,$fping_params);
-   if ($status['loss'] < 0 || $status['loss'] == 100) {
+   if ($status['loss'] == 100) {
        $response['result'] = FALSE;
    } else {
        $response['result'] = TRUE;
