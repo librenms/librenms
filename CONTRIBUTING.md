@@ -10,6 +10,4 @@ We are always thrilled to receive pull requests. We do our best to process them
 quickly. If your pull request is not accepted on the first try, don't get
 discouraged!
 
-We follows the *vincent driessen's branching model*
-[http://nvie.com/posts/a-successful-git-branching-model/](http://nvie.com/posts/a-successful-git-branching-model/)
-
+Just branch on master and prepare your PR.

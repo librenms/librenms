@@ -3,7 +3,7 @@ namespace InfluxDB\Adapter;
 
 use DateTime;
 
-final class UdpAdapter extends AdapterAbstract
+class UdpAdapter extends AdapterAbstract
 {
     public function send(array $message)
     {
@@ -37,7 +37,7 @@ final class UdpAdapter extends AdapterAbstract
             $tags = array_replace_recursive($tags, $message["tags"]);
         }
 
-        $unixepoch = (int)(microtime(true) * 1e9);
+        $unixepoch = $this->generateTimeInNanoSeconds();
         if (array_key_exists("time", $message)) {
             $dt = new DateTime($message["time"]);
             $unixepoch = (int)($dt->format("U") * 1e9);
@@ -68,7 +68,12 @@ final class UdpAdapter extends AdapterAbstract
         return implode("\n", $lines);
     }
 
-    private function toKeyValue(array $elems, $escape=false)
+    protected function generateTimeInNanoSeconds()
+    {
+        return (int)(microtime(true) * 1e9);
+    }
+
+    protected function toKeyValue(array $elems, $escape=false)
     {
         $list = [];
         foreach ($elems as $key => $value) {
