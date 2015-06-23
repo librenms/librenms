@@ -1,7 +1,13 @@
 <?php
 namespace InfluxDB\Adapter;
 
+use DateTime;
+use DateTimeZone;
 use InfluxDB\Options;
+use GuzzleHttp\Client as GuzzleHttpClient;
+use InfluxDB\Adapter\GuzzleAdapter as InfluxHttpAdapter;
+use InfluxDB\Client;
+use Prophecy\Argument;
 
 class UdpAdapterTest extends \PHPUnit_Framework_TestCase
 {
@@ -90,5 +96,77 @@ mem,region=us-west,host=serverA,env=prod,target=servers,zone=1c free=712432 1257
 EOF
             ],
         ];
+    }
+
+    /**
+     * @group udp
+     */
+    public function testUdpIpWriteDataWillBeConvertedAsLineProtocol()
+    {
+        $options = (new Options())->setDatabase("test");
+        $adapter = $this->getMockBuilder("InfluxDB\\Adapter\\UdpAdapter")
+            ->setConstructorArgs([$options])
+            ->setMethods(["write", "generateTimeInNanoSeconds"])
+            ->getMock();
+
+        $adapter->expects($this->any())
+            ->method("generateTimeInNanoSeconds")
+            ->will($this->returnValue(1245));
+
+        $adapter->expects($this->once())
+            ->method("write")
+            ->with("udp.test mark=\"element\" 1245");
+
+        $adapter->send([
+            "points" => [
+                [
+                    "measurement" => "udp.test",
+                    "fields" => [
+                        "mark" => "element"
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * @group udp
+     */
+    public function testSendMultipleMeasurementWithUdpIp()
+    {
+        $options = (new Options())->setDatabase("test");
+        $adapter = $this->getMockBuilder("InfluxDB\\Adapter\\UdpAdapter")
+            ->setConstructorArgs([$options])
+            ->setMethods(["write", "generateTimeInNanoSeconds"])
+            ->getMock();
+
+        $adapter->expects($this->any())
+            ->method("generateTimeInNanoSeconds")
+            ->will($this->onConsecutiveCalls(1245, 1246));
+
+        $adapter->expects($this->once())
+            ->method("write")
+            ->with(<<<EOF
+mem free=712423 1245
+cpu cpu=18.12 1245
+EOF
+);
+
+        $adapter->send([
+            "points" => [
+                [
+                    "measurement" => "mem",
+                    "fields" => [
+                        "free" => 712423,
+                    ],
+                ],
+                [
+                    "measurement" => "cpu",
+                    "fields" => [
+                        "cpu" => 18.12,
+                    ],
+                ],
+            ]
+        ]);
     }
 }
