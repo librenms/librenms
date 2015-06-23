@@ -1,11 +1,11 @@
 <?php
 
-namespace Leaseweb\InfluxDB\Test;
+namespace InfluxDB\Test;
 
 
-use Leaseweb\InfluxDB\Client;
-use Leaseweb\InfluxDB\Database;
-use Leaseweb\InfluxDB\Point;
+use InfluxDB\Client;
+use InfluxDB\Database;
+use InfluxDB\Point;
 
 class DatabaseTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->mockClient = $this->getMockBuilder('\Leaseweb\InfluxDB\Client')
+        $this->mockClient = $this->getMockBuilder('\InfluxDB\Client')
             ->disableOriginalConstructor()
             ->getMock();
 

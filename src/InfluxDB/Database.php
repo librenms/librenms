@@ -3,18 +3,18 @@
  * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 
-namespace Leaseweb\InfluxDB;
+namespace InfluxDB;
 
-use Leaseweb\InfluxDB\Database\RetentionPolicy;
-use Leaseweb\InfluxDB\Query\Builder as QueryBuilder;
-use Leaseweb\InfluxDB\Database\Exception as DatabaseException;
+use InfluxDB\Database\RetentionPolicy;
+use InfluxDB\Query\Builder as QueryBuilder;
+use InfluxDB\Database\Exception as DatabaseException;
 
 /**
  * Class Database
  *
  * @todo admin functionality
  *
- * @package Leaseweb\InfluxDB
+ * @package InfluxDB
  */
 class Database
 {

@@ -3,7 +3,7 @@
  * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 
-namespace Leaseweb\InfluxDB;
+namespace InfluxDB;
 
 
 class Exception extends \Exception

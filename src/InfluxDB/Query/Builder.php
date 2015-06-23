@@ -3,10 +3,10 @@
  * @author Stephen "TheCodeAssassin" Hoogendijk <s.hoogendijk@tech.leaseweb.com>
  */
 
-namespace Leaseweb\InfluxDB\Query;
+namespace InfluxDB\Query;
 
-use Leaseweb\InfluxDB\Database;
-use Leaseweb\InfluxDB\ResultSet;
+use InfluxDB\Database;
+use InfluxDB\ResultSet;
 
 /**
  * Class Builder
@@ -20,7 +20,7 @@ use Leaseweb\InfluxDB\ResultSet;
  *
  * $series->select('*')->from('*')->getResult();
  *
- * @package Leaseweb\InfluxDB\Query
+ * @package InfluxDB\Query
  */
 class Builder
 {

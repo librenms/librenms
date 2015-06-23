@@ -12,7 +12,7 @@ Initialize a new client object:
 
 ```php
 
-$client = new Leaseweb\InfluxDB\Client($host, $port);
+$client = new InfluxDB\Client($host, $port);
 
 
 ```
