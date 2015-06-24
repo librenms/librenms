@@ -248,6 +248,10 @@ function delete_device($id)
     return "No such host.";
   }
 
+  // Remove IPv4/IPv6 addresses before removing ports as they depend on port_id
+  dbQuery("DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?",array($id));
+  dbQuery("DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?",array($id));
+
   foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
     $int_if = $int_data['ifDescr'];
