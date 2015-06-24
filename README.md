@@ -4,6 +4,8 @@
 [![Code Climate](https://codeclimate.com/github/corley/influxdb-php-sdk/badges/gpa.svg)](https://codeclimate.com/github/corley/influxdb-php-sdk)
 [![Test Coverage](https://codeclimate.com/github/corley/influxdb-php-sdk/badges/coverage.svg)](https://codeclimate.com/github/corley/influxdb-php-sdk/coverage)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/corley/influxdb-sdk/v/stable)](https://packagist.org/packages/corley/influxdb-sdk)
+[![License](https://poser.pugx.org/corley/influxdb-sdk/license)](https://packagist.org/packages/corley/influxdb-sdk)
 
 Send metrics to InfluxDB and query for any data.
 
