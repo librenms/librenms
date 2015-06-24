@@ -29,6 +29,10 @@ script:
 after_script:
   - CODECLIMATE_REPO_TOKEN=$CODECLIMATE_REPO_TOKEN vendor/bin/test-reporter
 
+matrix:
+  allow_failures:
+    - php: 7
+
 notifications:
   slack:
     secure: UN4V33CfLzEcb+5/LWcfcbwROZobbUawgFSiM3TzagBC+7w0DH2rK8DczxkUBs5rNAaYBj+DkxmmF9tiDb0BLB7Jezlq0vmrNBOhregLodOG44/bFwg58YOwTGxt/Iak38A+8VskGj0sSybNq4TB1/K0040wXS5bA+M/9NqyQeo=
