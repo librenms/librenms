@@ -73,7 +73,7 @@ class UdpAdapter extends AdapterAbstract
         return (int)(microtime(true) * 1e9);
     }
 
-    protected function toKeyValue(array $elems, $escape=false)
+    protected function toKeyValue(array $elems, $escape = false)
     {
         $list = [];
         foreach ($elems as $key => $value) {
