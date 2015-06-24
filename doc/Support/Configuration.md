@@ -33,6 +33,8 @@ $config['fping']            = "/usr/bin/fping";
 $config['fping6']           = "/usr/bin/fping6";
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
+$config['fping_options']['count'] = 3;
+$config['fping_options']['millisec'] = 5;
 ```
 fping configuration options, this includes setting the timeout and retry options.
 
@@ -404,6 +406,7 @@ $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
+$config['device_perf_purge']                              = 30;
 ```
 This option will ensure data within LibreNMS over 1 month old is automatically purged. You can alter these individually, 
 values are in days.
