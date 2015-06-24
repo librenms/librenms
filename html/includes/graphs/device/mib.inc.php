@@ -16,14 +16,12 @@ $rrd_list = array();
 $prefix   = rrd_name($device['hostname'], array($subtype, ''), '');
 foreach (glob($prefix.'*.rrd') as $filename) {
     // find out what * expanded to
-    $globpart = str_replace($prefix, '', $filename);
-    // take off the prefix
-    $instance = substr($globpart, 0, -4);
-    // take off ".rrd"
+    $globpart = str_replace($prefix, '', $filename);    // take off the prefix
+    $instance = substr($globpart, 0, -4);               // take off ".rrd"
     $ds             = array();
     $mibparts       = explode('-', $subtype);
     $mibvar         = end($mibparts);
-    $ds['ds']       = name_shorten($mibvar);
+    $ds['ds']       = 'mibval';
     $ds['descr']    = "$mibvar-$instance";
     $ds['filename'] = $filename;
     $rrd_list[]     = $ds;
