@@ -208,4 +208,46 @@ EOF
             ]
         ]);
     }
+
+    /**
+     * @group udp
+     */
+    public function testMergeFullTagsPositions()
+    {
+        $options = (new Options())
+            ->setDatabase("test")
+            ->setTags(["dc" => "eu-west"]);
+        $adapter = $this->getMockBuilder("InfluxDB\\Adapter\\UdpAdapter")
+            ->setConstructorArgs([$options])
+            ->setMethods(["write", "generateTimeInNanoSeconds"])
+            ->getMock();
+
+        $adapter->expects($this->any())
+            ->method("generateTimeInNanoSeconds")
+            ->will($this->returnValue(1245));
+
+        $adapter->expects($this->once())
+            ->method("write")
+            ->with(<<<EOF
+mem,dc=eu-west,region=eu-west-1,location=ireland free=712423 1245
+EOF
+);
+
+        $adapter->send([
+            "tags" => [
+                "region" => "eu-west-1",
+            ],
+            "points" => [
+                [
+                    "measurement" => "mem",
+                    "tags" => [
+                        "location" => "ireland",
+                    ],
+                    "fields" => [
+                        "free" => 712423,
+                    ],
+                ],
+            ]
+        ]);
+    }
 }
