@@ -747,4 +747,34 @@ function get_graph_subtypes($type)
     return $types;
 }
 
-?>
+function get_smokeping_files($device) {
+    global $config;
+    if (isset($config['smokeping']['dir'])) {
+        $smokeping_files = array();
+        if ($config['smokeping']['integration'] === true) {
+            $smokeping_dir = $config['smokeping']['dir'] . "/" . $device['type'];
+        } else {
+            $smokeping_dir = $config['smokeping']['dir'];
+        }
+        if ($handle = opendir($smokeping_dir)) {
+            while (false !== ($file = readdir($handle))) {
+                if ($file != "." && $file != "..") {
+                    if (eregi(".rrd", $file)) {
+                        if (eregi("~", $file)) {
+                            list($target,$slave) = explode("~", str_replace(".rrd", "", $file));
+                            $target = str_replace("_", ".", $target);
+                            $smokeping_files['in'][$target][$slave] = $file;
+                            $smokeping_files['out'][$slave][$target] = $file;
+                        } else {
+                            $target = str_replace(".rrd", "", $file);
+                            $target = str_replace("_", ".", $target);
+                            $smokeping_files['in'][$target][$config['own_hostname']] = $file;
+                            $smokeping_files['out'][$config['own_hostname']][$target] = $file;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return $smokeping_files;
+}
