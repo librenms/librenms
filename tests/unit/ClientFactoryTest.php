@@ -117,13 +117,19 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException InvalidArgumentException
+     * @dataProvider getInvalidClasses
      */
-    public function testInvalidProviderThrowsException()
+    public function testInvalidProviderThrowsException($class)
     {
         $client = ClientFactory::create([
             "adapter" => [
-                "name" => "InvalidClass",
+                "name" => $class,
             ],
         ]);
+    }
+
+    public function getInvalidClasses()
+    {
+        return [["InvalidClass"],["stdClass"]];
     }
 }
