@@ -321,6 +321,8 @@ __devices.location__ = The devices location.
 
 __devices.status__ = The status of the device, 1 = up, 0 = down.
 
+__devices.status_reason__ = The reason the device was detected as down (icmp or snmp).
+
 __devices.ignore__ = If the device is ignored this will be set to 1.
 
 __devices.disabled__ = If the device is disabled this will be set to 1.
@@ -502,3 +504,19 @@ Entity: `%macros.sensor`
 Description: Only select sensors that aren't ignored.
 
 Source: `(%sensors.sensor_alert = 1)`
+
+## <a name="macros-packetloss">Packet Loss</a> (Boolean)
+
+Entity: `(%macros.packet_loss_5m)`
+
+Description: Packet loss % value for the device within the last 5 minutes.
+
+Example: `%macros.packet_loss_5m` > 50
+
+Entity: `(%macros.packet_loss_15m)`
+
+Description: Packet loss % value for the device within the last 15 minutes.
+
+Example: `%macros.packet_loss_15m` > 50
+
+
