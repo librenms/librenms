@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
 [![Code Climate](https://codeclimate.com/github/corley/influxdb-php-sdk/badges/gpa.svg)](https://codeclimate.com/github/corley/influxdb-php-sdk)
 [![Test Coverage](https://codeclimate.com/github/corley/influxdb-php-sdk/badges/coverage.svg)](https://codeclimate.com/github/corley/influxdb-php-sdk/coverage)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/?branch=master)
 
 Send metrics to InfluxDB and query for any data.
 
@@ -242,7 +243,7 @@ In that way the SDK use that policy instead of `default` policy.
 
 ## Proxies and InfluxDB
 
-If you proxy your InfluxDB typically you have a prefix in your endpoints. 
+If you proxy your InfluxDB typically you have a prefix in your endpoints.
 
 ```
 $option->setHost("proxy.influxdb.tld");
