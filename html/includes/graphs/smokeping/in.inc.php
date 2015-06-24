@@ -33,18 +33,22 @@ if($width > "500")
 
 if($src['hostname'] == $config['own_hostname'])
 {
-  $filename = $config['smokeping']['dir'] . $device['hostname'].'.rrd';
-  if (!file_exists($filename))
+    if ($config['smokeping']['integration'] === true) {
+        $filename_dir = $config['smokeping']['dir'] .'/'. $device['type'] .'/';
+    } else {
+        $filename_dir = $config['smokeping']['dir'];
+    }
+  if (!file_exists($filename_dir.$device['hostname'].'.rrd'))
   {
     // Try with dots in hostname replaced by underscores
-    $filename = $config['smokeping']['dir'] . str_replace(".", "_", $device['hostname']).'.rrd';
+    $filename = $filename_dir . str_replace(".", "_", $device['hostname']).'.rrd';
   }
 } else {
-  $filename = $config['smokeping']['dir'] . $device['hostname'] .'~'.$src['hostname'].'.rrd';
+  $filename = $filename_dir . $device['hostname'] .'~'.$src['hostname'].'.rrd';
   if (!file_exists($filename))
   {
     // Try with dots in hostname replaced by underscores
-    $filename = $config['smokeping']['dir'] . str_replace(".", "-", $device['hostname']) .'~'.$src['hostname'].'.rrd';
+    $filename = $filename_dir . str_replace(".", "-", $device['hostname']) .'~'.$src['hostname'].'.rrd';
   }
 }
 
