@@ -10,6 +10,7 @@
          "zendframework/zend-servicemanager": "~2"
     },
     "require-dev": {
+        "codeclimate/php-test-reporter": "dev-master",
         "phpunit/phpunit": "4.*",
         "athletic/athletic": "~0.1",
         "ext-sockets": "*"
