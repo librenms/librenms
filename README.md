@@ -1,6 +1,8 @@
 # InfluxDB PHP SDK
 
 [![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
+[![Code Climate](https://codeclimate.com/github/corley/influxdb-php-sdk/badges/gpa.svg)](https://codeclimate.com/github/corley/influxdb-php-sdk)
+[![Test Coverage](https://codeclimate.com/github/corley/influxdb-php-sdk/badges/coverage.svg)](https://codeclimate.com/github/corley/influxdb-php-sdk/coverage)
 
 Send metrics to InfluxDB and query for any data.
 
