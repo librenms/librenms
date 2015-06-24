@@ -114,6 +114,9 @@ if (!empty($argv[1]))
         elseif (preg_match ('/^(sha|md5)$/i', $arg))
         {
           $v3['authalgo'] = $arg;
+        } else {
+          echo "Invalid argument: " . $arg . "\n" ;
+          return ;
         }
       }
 
@@ -147,6 +150,9 @@ if (!empty($argv[1]))
         elseif (preg_match ('/^(aes|des)$/i', $arg))
         {
           $v3['cryptoalgo'] = $arg;
+        } else {
+          echo "Invalid argument: " . $arg . "\n" ;
+          return ;
         }
       }
 
