@@ -828,7 +828,6 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
         if ($f[1] && $f[1] == 'OBJECT-TYPE') {
             $result['object_type'] = $f[0];
             $result['shortname']   = str_replace($mib, '', $f[0]);
-            $result['dsname']      = name_shorten($f[0], $mib);
             continue;
         }
 
@@ -1081,8 +1080,8 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs) {
                     $mibdef[$oid]['shortname'],
                     $index,
                 ),
-                array('DS:'.$mibdef[$oid]['dsname'].":$type"),
-                array($mibdef[$oid]['dsname'] => $val)
+                array("DS:mibval:$type"),
+                array("mibval" => $val)
             );
         }
     }
