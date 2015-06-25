@@ -25,11 +25,6 @@ include("includes/alerts.inc.php");
 $poller_start = utime();
 echo($config['project_name_version']." Poller\n\n");
 
-if (is_file($config['mib_dir'].'/.index') === true) {
-    echo ".index exists, removing\n";
-    unlink($config['mib_dir'].'/.index');
-}
-
 $options = getopt("h:m:i:n:r::d::a::");
 
 if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
