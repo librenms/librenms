@@ -50,6 +50,8 @@ include("overview/sensors/voltages.inc.php");
 include("overview/sensors/current.inc.php");
 include("overview/sensors/power.inc.php");
 include("overview/sensors/frequencies.inc.php");
+include("overview/sensors/load.inc.php");
+include("overview/sensors/state.inc.php");
 include("overview/eventlog.inc.php");
 include("overview/services.inc.php");
 include("overview/syslog.inc.php");
