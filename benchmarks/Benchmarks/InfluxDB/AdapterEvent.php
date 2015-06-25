@@ -23,6 +23,8 @@ class AdapterEvent extends AthleticEvent
         $options->setDatabase("tcp.test");
 
         $client = new Client(new GuzzleAdapter(new HttpClient(), $options));
+        $client->createDatabase("tcp.test");
+        $client->createDatabase("udp.test");
 
         $this->httpClient = $client;
 

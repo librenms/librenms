@@ -17,13 +17,15 @@ class UdpAdapterTest extends \PHPUnit_Framework_TestCase
     public function testRewriteMessages($input, $response)
     {
         $object = new UdpAdapter(new Options());
-        $reflection = new \ReflectionClass(get_class($object));
-        $method = $reflection->getMethod("serialize");
-        $method->setAccessible(true);
+        $object = $this->getMockBuilder("InfluxDB\Adapter\UdpAdapter")
+            ->setConstructorArgs([new Options()])
+            ->setMethods(["write"])
+            ->getMock();
+        $object->expects($this->once())
+            ->method("write")
+            ->with($response);
 
-        $message = $method->invokeArgs($object, [$input]);
-
-        $this->assertEquals($response, $message);
+        $object->send($input);
     }
 
     public function getMessages()
@@ -42,6 +44,21 @@ class UdpAdapterTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 "cpu value=1 1257894000000000000"
+            ],
+            [
+                [
+                    "time" => "2009-11-10T23:00:00Z",
+                    "points" => [
+                        [
+                            "measurement" => "cpu",
+                            "fields" => [
+                                "value" => 1,
+                                "string" => "escape",
+                            ],
+                        ],
+                    ],
+                ],
+                "cpu value=1,string=\"escape\" 1257894000000000000"
             ],
             [
                 [
@@ -115,7 +132,7 @@ EOF
 
         $adapter->expects($this->once())
             ->method("write")
-            ->with("udp.test mark=\"element\" 1245");
+            ->with($this->matchesRegularExpression("/udp.test mark=\"element\" \d+/i"));
 
         $adapter->send([
             "points" => [
@@ -146,11 +163,11 @@ EOF
 
         $adapter->expects($this->once())
             ->method("write")
-            ->with(<<<EOF
-mem free=712423 1245
-cpu cpu=18.12 1245
+            ->with($this->matchesRegularExpression(<<<EOF
+/mem free=712423 \d+
+cpu cpu=18.12 \d+/i
 EOF
-);
+        ));
 
         $adapter->send([
             "points" => [
@@ -189,10 +206,10 @@ EOF
 
         $adapter->expects($this->once())
             ->method("write")
-            ->with(<<<EOF
-mem,dc=eu-west,region=eu-west-1 free=712423 1245
+            ->with($this->matchesRegularExpression(<<<EOF
+/mem,dc=eu-west,region=eu-west-1 free=712423 \d+/i
 EOF
-);
+        ));
 
         $adapter->send([
             "tags" => [
@@ -228,10 +245,10 @@ EOF
 
         $adapter->expects($this->once())
             ->method("write")
-            ->with(<<<EOF
-mem,dc=eu-west,region=eu-west-1,location=ireland free=712423 1245
+            ->with($this->matchesRegularExpression(<<<EOF
+/mem,dc=eu-west,region=eu-west-1,location=ireland free=712423 \d+/i
 EOF
-);
+        ));
 
         $adapter->send([
             "tags" => [
