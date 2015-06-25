@@ -96,9 +96,11 @@ class ResultSet
             return (isset($object['series']) ? $object['series'] : array());
         };
 
+        // we use array_shift because of compatibility with php5.3
         // Foreach object, pick series key
+        $map = array_map($pickSeries, $this->parsedResults['results']);
         return array_shift(
-            array_map($pickSeries, $this->parsedResults['results'])
+            $map
         );
     }
 
