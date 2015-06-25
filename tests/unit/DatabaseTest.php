@@ -38,15 +38,15 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     {
         $point1 = new Point(
             'cpu_load_short',
-            array('host'  =>'server01', 'region'=>'us-west'),
-            array('value' => 0.64),
-            'myTime'
+            0.64,
+            array('host' => 'server01', 'region' => 'us-west'),
+            array('cpucount' => 10),
+            1435222310
         );
+
         $point2 = new Point(
             'cpu_load_short',
-            array('host'  =>'server01', 'region'=>'us-west'),
-            array('value' => 0.84),
-            'myTime'
+            0.84
         );
 
         $payloadExpected ="$point1\n$point2";
