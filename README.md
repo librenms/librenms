@@ -1,5 +1,6 @@
 # influxdb-php
 ## InfluxDB client library for PHP
+[![Build Status](https://travis-ci.org/LeaseWeb/influxdb-php.svg?branch=master)](https://travis-ci.org/LeaseWeb/influxdb-php)
 
 ### Overview
 
