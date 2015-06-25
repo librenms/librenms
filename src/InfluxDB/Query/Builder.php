@@ -207,7 +207,14 @@ class Builder
         return $this;
     }
 
-//    public function orderBy
+
+    /**
+     * @return string
+     */
+    public function getQuery()
+    {
+        return $this->parseQuery();
+    }
 
     /**
      * Gets the result from the database (builds the query)
@@ -215,6 +222,14 @@ class Builder
      * @return ResultSet
      */
     public function getResultSet()
+    {
+        return  $this->db->query($this->parseQuery());
+    }
+
+    /**
+     * @return string
+     */
+    protected function parseQuery()
     {
         $query = sprintf("SELECT %s FROM %s", $this->selection, $this->metric);
 
@@ -237,6 +252,6 @@ class Builder
             $query .= $this->limitClause;
         }
 
-        return  $this->db->query($query);
+        return $query;
     }
 }
