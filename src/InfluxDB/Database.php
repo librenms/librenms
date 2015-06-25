@@ -100,16 +100,21 @@ class Database
         }
     }
 
+    /**
+     * @param RetentionPolicy $retentionPolicy
+     */
     public function createRetentionPolicy(RetentionPolicy $retentionPolicy)
     {
         $this->query($this->getRetentionPolicyQuery('CREATE', $retentionPolicy));
     }
 
     /**
-     * Writes points into INfluxdb
+     * Writes points into InfluxDB
      *
-     * @param Point []
-     * @return ResultSet
+     * @param array $points
+     *
+     * @return bool
+     * @throws Exception
      */
     public function writePoints(array $points)
     {
@@ -118,7 +123,7 @@ class Database
         foreach ($points as $point) {
 
             if (!$point instanceof Point) {
-                throw new \InvalidArgumentException('Array of Point should be passed');
+                throw new \InvalidArgumentException('An array of Point[] should be passed');
             }
 
             $payload[] = (string) $point;

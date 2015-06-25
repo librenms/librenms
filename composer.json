@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.3",
-        "guzzlehttp/guzzle": "~6.0"
+        "guzzlehttp/guzzle": "~5.0"
     },
     "scripts": {
         "post-install-cmd": [

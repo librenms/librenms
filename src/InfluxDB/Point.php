@@ -2,6 +2,8 @@
 
 namespace InfluxDB;
 
+use InfluxDB\Database\Exception;
+
 /**
  * Class Point
  *
@@ -13,30 +15,45 @@ class Point
     /**
      * @var array
      */
-    private $tags;
+    private $tags = array();
     /**
      * @var array
      */
-    private $fields;
+    private $fields = array();
     /**
      * @var string
      */
-    private $timestamp;
+    private $timestamp = null;
 
     /**
      * The timestamp is optional.
      * If you do not specify a timestamp the server’s local timestamp will be used
      *
-     * @param $measurement
-     * @param array $tags
-     * @param array $fields
-     * @param string $timestamp
+     * @param string $measurement      Name of the measurement
+     * @param float  $value            Value of the measurement
+     * @param array  $tags             Array of tags
+     * @param array  $additionalFields Array of optional fields
+     * @param int    $timestamp        Optional timestamp
+     *
+     * @throws Exception
      */
-    public function __construct($measurement, array $tags, array $fields, $timestamp = '')
+    public function __construct($measurement, $value, array $tags = array(), array $additionalFields = array(), $timestamp = null)
     {
-        $this->measurement = $measurement;
+
+        if (empty($measurement)) {
+            throw new Exception('Invalid measurement name provided');
+        }
+
+        $this->measurement = (string) $measurement;
         $this->tags = $tags;
-        $this->fields = $fields;
+        $this->fields = $additionalFields;
+
+        $this->fields += array('value' => (float) $value);
+
+        if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
+            throw new Exception(sprintf('%s is not a valid timestamp', $timestamp));
+        }
+
         $this->timestamp = $timestamp;
     }
 
@@ -48,13 +65,20 @@ class Point
      */
     public function __toString()
     {
-        return sprintf(
-            '%s,%s %s %s',
-            $this->measurement,
-            $this->arrayToString($this->tags),
-            $this->arrayToString($this->fields),
-            $this->timestamp
-        );
+
+        $string = $this->measurement;
+
+        if (count($this->tags) > 0) {
+            $string .=  ',' . $this->arrayToString($this->tags);
+        }
+
+        $string .= ' ' .$this->arrayToString($this->fields);
+
+        if ($this->timestamp) {
+            $string .= ' '.$this->timestamp;
+        }
+
+        return $string;
     }
 
     private function arrayToString(array $arr)
@@ -68,4 +92,15 @@ class Point
         return implode(",", $strParts);
     }
 
+    /**
+     * @param $timestamp
+     *
+     * @return bool
+     */
+    private function isValidTimeStamp($timestamp)
+    {
+        return ((int) $timestamp === $timestamp)
+        && ($timestamp <= PHP_INT_MAX)
+        && ($timestamp >= ~PHP_INT_MAX);
+    }
 }

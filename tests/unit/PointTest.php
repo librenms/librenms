@@ -15,13 +15,14 @@ class PointTest extends \PHPUnit_Framework_TestCase
 {
     public function testPointStringRepresentation()
     {
-        $expected = 'cpu_load_short,host=server01,region=us-west value=0.64 myTime';
+        $expected = 'cpu_load_short,host=server01,region=us-west cpucount=10,value=0.64 1435222310';
 
-        $point = new Point(
+        $point =  new Point(
             'cpu_load_short',
-            array('host'  =>'server01', 'region'=>'us-west'),
-            array('value' => 0.64),
-            'myTime'
+            0.64,
+            array('host' => 'server01', 'region' => 'us-west'),
+            array('cpucount' => 10),
+            1435222310
         );
 
         $this->assertEquals($expected, (string) $point);

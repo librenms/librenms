@@ -116,10 +116,11 @@ class Client
         $this->setBaseURI(sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port));
 
         $this->httpClient = new httpClient(array(
-                'base_uri' => $this->getBaseURI(),
+                'base_url' => $this->getBaseURI(),
                 'timeout' => $this->getTimeout()
             )
         );
+
     }
 
     /**
@@ -156,11 +157,12 @@ class Client
             $params += array('db' => $database);
         }
 
-        $params = array_merge(array('q' => $query), $params);
-        $options = array_merge($this->options, array('query' => $params, 'http_errors' => false));
+        $params = '?'.http_build_query(array_merge(array('q' => $query), $params));
+
+        $options = array_merge($this->options, array('exceptions' => false));
 
         try {
-            $response = $this->httpClient->get('query', $options);
+            $response = $this->httpClient->get('query'.$params, $options);
 
             $raw = (string) $response->getBody();
 
@@ -180,6 +182,7 @@ class Client
     public function write($database, $data)
     {
         try {
+
             $this->httpClient->post(
                 $this->getBaseURI() . '/write?db=' . $database,
                 array('body' => $data)

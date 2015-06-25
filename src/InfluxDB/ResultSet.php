@@ -92,7 +92,7 @@ class ResultSet
                 throw new ClientException($object['error']);
             }
 
-            return $object['series'];
+            return (isset($object['series']) ? $object['series'] : array());
         };
 
         // Foreach object, pick series key

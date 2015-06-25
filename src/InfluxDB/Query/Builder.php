@@ -20,6 +20,9 @@ use InfluxDB\ResultSet;
  *
  * $series->select('*')->from('*')->getResult();
  *
+ * @todo add inner join
+ * @todo add merge
+ *
  * @package InfluxDB\Query
  */
 class Builder
@@ -31,6 +34,7 @@ class Builder
     protected $startTime = null;
     protected $endTime = null;
     protected $metric = null;
+    protected $limitClause = '';
 
     /**
      * @param Database $db
@@ -190,23 +194,32 @@ class Builder
     }
 
     /**
-     * Gets the result from the database (builds the query)
+     * Limit the ResultSet to n records
      *
-     * @param bool $raw always return the ResultSeriesObjects, even when using an aggregation function
+     * @param int $count
+     *
+     * @return $this
+     */
+    public function limit($count)
+    {
+        $this->limitClause = sprintf(' LIMIT %s', (int) $count);
+
+        return $this;
+    }
+
+//    public function orderBy
+
+    /**
+     * Gets the result from the database (builds the query)
      *
      * @return ResultSet
      */
-    public function getResultSet($raw = false)
+    public function getResultSet()
     {
         $query = sprintf("SELECT %s FROM %s", $this->selection, $this->metric);
-        $aggregateKey = null;
 
         if (!$this->metric) {
             throw new \InvalidArgumentException('No metric provided to from()');
-        }
-
-        if (preg_match("/([a-z]+)\(/i", $this->selection, $matches)) {
-            $aggregateKey = $matches[1];
         }
 
         for ($i=0; $i < count($this->where); $i++) {
@@ -218,6 +231,10 @@ class Builder
             $clause = $this->where[$i];
             $query .= ' ' . $selection . ' ' . $clause;
 
+        }
+
+        if ($this->limitClause) {
+            $query .= $this->limitClause;
         }
 
         return  $this->db->query($query);
