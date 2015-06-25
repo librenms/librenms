@@ -26,6 +26,8 @@ echo('
     <div class="col-md-6">
 ');
 include("includes/dev-overview-data.inc.php");
+Plugins::call('device_overview_container',array($device));
+
 include("overview/ports.inc.php");
 echo('
     </div>
