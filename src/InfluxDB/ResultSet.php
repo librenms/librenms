@@ -59,8 +59,9 @@ class ResultSet
     public function getPoints($metricName = '', array $tags = array())
     {
         $points = array();
+        $series = $this->getSeries();
 
-        foreach ($this->getSeries() as $serie) {
+        foreach ($series as $serie) {
 
             if ((empty($metricName) && empty($tags)
                 || $serie['name'] == $metricName
