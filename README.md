@@ -39,6 +39,8 @@ To fetch records from InfluxDB you can do a query directly on a database:
 
 ```php
     
+    // fetch the db
+    $database = $client->db('influx_test_db');
     
     // executing a query will yield a resultset object
     $result = $database->query('select * from test_metric LIMIT 5');
@@ -81,13 +83,15 @@ Writing data is done by providing an array of points to the writePoints method o
                 'test_metric',
                 0.64,
                 array('host' => 'server01', 'region' => 'us-west'),
-                array('cpucount' => 10)
+                array('cpucount' => 10),
+                1435255849
             ),
             new Point(
                 'test_metric',
                 0.84,
                 array('host' => 'server01', 'region' => 'us-west'),
-                array('cpucount' => 10)
+                array('cpucount' => 10),
+                1435255850
             )
         )
     );
@@ -111,6 +115,9 @@ This library makes it easy to provide a retention policy when creating a databas
     
     // create the client
     $client = new \InfluxDB\Client($host, $port, '', '');
+
+    // select the db
+    $database = $client->db('influx_test_db');
 
     // create the database with a retention policy
     $result = $database->create(new RetentionPolicy('test', '5d', 1, true));    
