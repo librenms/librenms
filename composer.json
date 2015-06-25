@@ -10,7 +10,8 @@
     ],
     "require": {
         "php": ">=5.3",
-        "guzzlehttp/guzzle": "~3.0"
+        "guzzlehttp/guzzle": "3.*",
+        "symfony/event-dispatcher": "2.*"
     },
     "scripts": {
         "post-install-cmd": [
