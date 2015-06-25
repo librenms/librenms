@@ -49,12 +49,22 @@ To fetch records from InfluxDB you can do a query directly on a database:
 It's also possible to use the QueryBuilder object. This is a class that simplifies the process of building queries.
 
 ```php
+
+    // retrieve points with the query builder
     $result = $database->getQueryBuilder()
         ->select('cpucount')
         ->from('test_metric')
         ->limit(2)
         ->getResultSet()
         ->getPoints();
+        
+        
+    // get the query from the QueryBuilder
+    $query = $database->getQueryBuilder()
+         ->select('cpucount')
+         ->from('test_metric')
+         ->getQuery();
+         
 ```
 
 ### Writing data

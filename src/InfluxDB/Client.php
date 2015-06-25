@@ -6,7 +6,6 @@
 namespace InfluxDB;
 
 
-use GuzzleHttp\Client as httpClient;
 use InfluxDB\Client\Exception as ClientException;
 
 /**
@@ -67,7 +66,7 @@ class Client
     protected $baseURI;
 
     /**
-     * @var \GuzzleHttp\Client
+     * @var \Guzzle\Http\Client
      */
     protected $httpClient;
 
@@ -114,12 +113,7 @@ class Client
 
         // the the base URI
         $this->setBaseURI(sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port));
-
-        $this->httpClient = new httpClient(array(
-                'base_url' => $this->getBaseURI(),
-                'timeout' => $this->getTimeout()
-            )
-        );
+        $this->httpClient = new \Guzzle\Http\Client($this->getBaseURI());
 
     }
 
@@ -159,12 +153,12 @@ class Client
 
         $params = '?'.http_build_query(array_merge(array('q' => $query), $params));
 
-        $options = array_merge($this->options, array('exceptions' => false));
+        $options = array_merge($this->options, array('exceptions' => false, 'timeout' => $this->getTimeout()));
 
         try {
-            $response = $this->httpClient->get('query'.$params, $options);
+            $response = $this->httpClient->get('query'.$params, null, $options);
 
-            $raw = (string) $response->getBody();
+            $raw = (string) $response->send()->getBody();
 
             return new ResultSet($raw);
 
@@ -174,24 +168,29 @@ class Client
     }
 
     /**
-     * @param $database
-     * @param $data
+     * Write points to the database
+     *
+     * @param string $database
+     * @param string $data
+     *
      * @return bool
+     *
+     * @internal Internal method, do not use directly
      * @throws Exception
      */
     public function write($database, $data)
     {
         try {
 
-            $this->httpClient->post(
-                $this->getBaseURI() . '/write?db=' . $database,
-                array('body' => $data)
-            );
+            $result = $this->httpClient->post($this->getBaseURI() . '/write?db=' . $database, null, $data,
+                array('timeout' => $this->getTimeout())
+            )->send();
+
+            return $result->getStatusCode() == 204;
+
         } catch (\Exception $e) {
             throw new Exception(sprintf('Writing has failed, exception: %s', $e->getMessage()));
         }
-
-        return true;
     }
 
     /**
