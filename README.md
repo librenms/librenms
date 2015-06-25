@@ -27,8 +27,9 @@ It's also possible to create a client from a DSN:
     $database = InfluxDB\Client::fromDSN(sprintf('influxdb://user:pass@%s:%s/%s', $host, $port, $dbname));
     
     // get the client to retrieve other databases
-    $client = $database->getClient();
-```php
+    $client = $database->getClient();   
+    
+```
 
 ### Reading
 
@@ -52,7 +53,8 @@ It's also possible to use the QueryBuilder object. This is a class that simplifi
         ->select('cpucount')
         ->from('test_metric')
         ->limit(2)
-        ->getResultSet()->getPoints();
+        ->getResultSet()
+        ->getPoints();
 ```
 
 ### Writing data
@@ -130,6 +132,6 @@ Some functions are too general for a database. So these are available in the cli
 
 ## Changelog
 
-0.1
+####0.1
 ------
-Initial release
+* Initial release
