@@ -397,9 +397,9 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:avg:LAST:%4.1lf\l');
 	$GraphDefs['entropy'] = array(
 		#'-v', 'Bits',
-		'DEF:avg={file}:entropy:AVERAGE',
-		'DEF:min={file}:entropy:MIN',
-		'DEF:max={file}:entropy:MAX',
+		'DEF:avg={file}:value:AVERAGE',
+		'DEF:min={file}:value:MIN',
+		'DEF:max={file}:value:MAX',
 		'COMMENT:         Min       Avg       Max       Cur\l',
 		"AREA:max#$HalfBlue",
 		"AREA:min#$Canvas",
