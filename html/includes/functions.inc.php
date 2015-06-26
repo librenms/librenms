@@ -69,7 +69,7 @@ function generate_url($vars, $new_vars = array())
   {
     if ($value == "0" || $value != "" && strstr($var, "opt") === FALSE && is_numeric($var) === FALSE)
     {
-      $url .= $var ."=".$value."/";
+      $url .= $var ."=".urlencode($value)."/";
     }
   }
 
@@ -339,7 +339,7 @@ function generate_graph_tag($args)
   $urlargs = array();
   foreach ($args as $key => $arg)
   {
-    $urlargs[] = $key."=".$arg;
+    $urlargs[] = $key."=".urlencode($arg);
   }
 
   return '<img src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
