@@ -34,6 +34,7 @@ Contributors to LibreNMS:
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
 - Louis Rossouw <lrossouw@gmail.com> (spinza)
+- Clint Armstrong <clint@clintarmstrong.net> (clinta)
 
 [1]: http://observium.org/ "Observium web site"
 
