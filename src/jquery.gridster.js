@@ -1048,6 +1048,10 @@
 	 */
 	fn.remove_widget = function (el, silent, callback) {
 		var $el = el instanceof $ ? el : $(el);
+		if ($el.length === 0) {
+			//there is nothing to remove, so we can't remove it
+			return this;
+		}
 		var wgd = $el.coords().grid;
 		if (wgd === undefined) {
 			//there is no grid, so we can't remove it
