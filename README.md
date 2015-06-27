@@ -284,9 +284,9 @@ The impact of message to inline protocol conversion is:
 Corley\Benchmarks\InfluxDB\MessageToInlineProtocolEvent
     Method Name                                            Iterations    Average Time      Ops/second
     ----------------------------------------------------  ------------  --------------    -------------
-    convertMessageToInlineProtocolWithNoTags            : [10,000    ] [0.0000237422466] [42,119.01324]
-    convertMessageToInlineProtocolWithGlobalTags        : [10,000    ] [0.0000306700468] [32,605.10185]
-    convertMessageToInlineProtocolWithDifferentTagLevels: [10,000    ] [0.0000343942404] [29,074.63543]
+    convertMessageToInlineProtocolWithNoTags            : [10,000    ] [0.0000343696594] [29,095.42942]
+    convertMessageToInlineProtocolWithGlobalTags        : [10,000    ] [0.0000437165260] [22,874.64469]
+    convertMessageToInlineProtocolWithDifferentTagLevels: [10,000    ] [0.0000493728638] [20,254.04086]
 ```
 
 ## FAQ
