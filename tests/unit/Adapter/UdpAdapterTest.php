@@ -190,6 +190,35 @@ EOF
     /**
      * @group udp
      */
+    public function testFillWithGlobalTags()
+    {
+        $options = (new Options())
+            ->setDatabase("test")
+            ->setTags(["dc" => "eu-west"]);
+        $adapter = $this->getMockBuilder("InfluxDB\\Adapter\\UdpAdapter")
+            ->setConstructorArgs([$options])
+            ->setMethods(["write"])
+            ->getMock();
+
+        $adapter->expects($this->once())
+            ->method("write")
+            ->with($this->matchesRegularExpression("/mem,dc=eu-west free=712423 \d+/i"));
+
+        $adapter->send([
+            "points" => [
+                [
+                    "measurement" => "mem",
+                    "fields" => [
+                        "free" => 712423,
+                    ],
+                ],
+            ]
+        ]);
+    }
+
+    /**
+     * @group udp
+     */
     public function testMergeGlobalTags()
     {
         $options = (new Options())
