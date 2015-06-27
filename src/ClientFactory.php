@@ -24,19 +24,15 @@ abstract class ClientFactory
             ],
             "options" => [],
         ];
-
         $options = array_replace_recursive($defaultOptions, $options);
 
-        $adapterName = $options["adapter"]["name"];
-        if (!class_exists($adapterName)) {
-            throw new \InvalidArgumentException("Missing class: {$adapterName}");
-        }
         $adapterOptions = new Options();
 
         $hydrator = new ClassMethods();
         $hydrator->hydrate($options["options"], $adapterOptions);
 
         $adapter = null;
+        $adapterName = $options["adapter"]["name"];
         switch ($adapterName) {
             case 'InfluxDB\\Adapter\\UdpAdapter':
                 $adapter = new $adapterName($adapterOptions);
