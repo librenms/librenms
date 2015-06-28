@@ -1,6 +1,6 @@
 # InfluxDB PHP SDK
 
-[![Build Status](https://travis-ci.org/corley/influxdb-php-sdk.svg?branch=master)](https://travis-ci.org/corley/influxdb-php-sdk)
+[![Circle CI](https://circleci.com/gh/corley/influxdb-php-sdk/tree/master.svg?style=svg)](https://circleci.com/gh/corley/influxdb-php-sdk/tree/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/corley/influxdb-php-sdk/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/corley/influxdb-sdk/v/stable)](https://packagist.org/packages/corley/influxdb-sdk)
