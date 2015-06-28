@@ -35,6 +35,7 @@ Contributors to LibreNMS:
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
 - Louis Rossouw <lrossouw@gmail.com> (spinza)
 - Clint Armstrong <clint@clintarmstrong.net> (clinta)
+- Tony Ditchfield <tony.ditchfield@gmail.com> (arnoldthebat)
 
 [1]: http://observium.org/ "Observium web site"
 
