@@ -342,7 +342,7 @@ function generate_graph_tag($args)
     $urlargs[] = $key."=".urlencode($arg);
   }
 
-  return '<img class="lazy" width="100" height="216" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+  return '<img class="lazy" width="216" height="100" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
 }
 
 function generate_graph_js_state($args) {
