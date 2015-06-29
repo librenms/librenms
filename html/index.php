@@ -321,11 +321,11 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
         $(document).ready(function() {
 
            $("img.lazy").lazyload({
-               effect: "fadeIn"
+               //effect: "fadeIn"
            }).removeClass("lazy");
            $(document).ajaxStop(function() {
                $("img.lazy").lazyload({
-                   effect: "fadeIn"
+                   //effect: "fadeIn"
                }).removeClass("lazy");
            });
 
