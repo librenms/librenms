@@ -191,7 +191,7 @@ function overlib_link($url, $text, $contents, $class)
   if ($config['web_mouseover'] === FALSE) {
       $output .= ">";
   } else {
-      $output .= " onmouseover=\"return overlib('".str_replace('data-original', 'src', $contents)."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
+      $output .= " onmouseover=\"return wrap_overlib('".str_replace('data-original', 'src', $contents)."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
   }
   $output .= $text."</a>";
 
