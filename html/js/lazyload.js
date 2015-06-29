@@ -16,7 +16,7 @@ $(document).ready(function(){
 });
 
 function wrap_overlib() {
-	var ret = overlib(arguments);
+	var ret = overlib.apply(null,arguments);
 	$('div#overDiv img').removeAttr('width').removeAttr('height');
 	return ret;
 }
