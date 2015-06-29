@@ -1,16 +1,16 @@
 $(document).ready(function(){
 	
-	/*
 		$("img.lazy").lazyload({
     		effect: "fadeIn",
-    		threshold: 200
+    		threshold: 300,
+		    placeholder: ""
     }).removeClass("lazy");
 
     $(document).ajaxStop(function() {
         $("img.lazy").lazyload({
             effect: "fadeIn",
-    		    threshold: 200
+    		    threshold: 300,
+    		    placeholder: ""
         }).removeClass("lazy");
     });
-*/
 });
