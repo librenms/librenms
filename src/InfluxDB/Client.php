@@ -112,7 +112,7 @@ class Client
         }
 
         // the the base URI
-        $this->setBaseURI(sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port));
+        $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
         $this->httpClient = new \Guzzle\Http\Client($this->getBaseURI());
 
     }
@@ -236,11 +236,10 @@ class Client
         $connParams = parse_url($dsn);
         $schemeInfo = explode('+', $connParams['scheme']);
         $dbName = null;
+        $modifier = null;
+        $scheme = $schemeInfo[0];
 
-        if (count($schemeInfo) == 1) {
-            $modifier = null;
-            $scheme = $schemeInfo[0];
-        } else {
+        if (isset($schemeInfo[1])) {
             $modifier = $schemeInfo[0];
             $scheme = $schemeInfo[1];
         }
@@ -250,10 +249,7 @@ class Client
         }
 
         $ssl = ($modifier && $modifier == 'https' ? true : false);
-
-        if ($connParams['path']) {
-            $dbName = substr($connParams['path'], 1);
-        }
+        $dbName = ($connParams['path'] ? substr($connParams['path'], 1) : null);
 
         $client = new self(
             $connParams['host'],
@@ -265,12 +261,7 @@ class Client
             $timeout
         );
 
-        $return = $client;
-        if ($dbName) {
-            $return = $client->db($dbName);
-        }
-
-        return $return;
+        return ($dbName ? $client->db($dbName) : $client);
     }
     /**
      * @return mixed
@@ -281,27 +272,11 @@ class Client
     }
 
     /**
-     * @param mixed $baseURI
-     */
-    public function setBaseURI($baseURI)
-    {
-        $this->baseURI = $baseURI;
-    }
-
-    /**
      * @return int
      */
     public function getTimeout()
     {
         return $this->timeout;
-    }
-
-    /**
-     * @param int $timeout
-     */
-    public function setTimeout($timeout)
-    {
-        $this->timeout = $timeout;
     }
 
     /**
@@ -318,5 +293,13 @@ class Client
         }
 
         return $names;
+    }
+
+    /**
+     * @return \Guzzle\Http\Client
+     */
+    public function getHttpClient()
+    {
+        return $this->httpClient;
     }
 }
