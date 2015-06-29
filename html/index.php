@@ -151,6 +151,7 @@ if (empty($config['favicon'])) {
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
   <script src="js/jquery.lazyload.min.js"></script>
+  <script src="js/lazyload.js"></script>
   <script type="text/javascript">
 
     <!-- Begin
@@ -319,15 +320,6 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
     $refresh = $config['page_refresh'] * 1000;
     echo('<script type="text/javascript">
         $(document).ready(function() {
-
-           $("img.lazy").lazyload({
-               //effect: "fadeIn"
-           }).removeClass("lazy");
-           $(document).ajaxStop(function() {
-               $("img.lazy").lazyload({
-                   //effect: "fadeIn"
-               }).removeClass("lazy");
-           });
 
            $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
            var Countdown = {
