@@ -16,6 +16,7 @@ function get_overlib(content) {
 	var ret = overlib(content, WRAP,HAUTO,VAUTO);
 	
 	jQuery.event.trigger("ajaxStop");
+	console.log('test');
 	
 	return ret;
 }
