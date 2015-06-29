@@ -320,6 +320,10 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
     echo('<script type="text/javascript">
         $(document).ready(function() {
 
+           $("img.lazy").lazyload({
+               effect: "fadeIn"
+           });
+
            $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
            var Countdown = {
                sec: '. $config['page_refresh'] .',
