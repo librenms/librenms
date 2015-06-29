@@ -15,6 +15,7 @@ if($_SESSION['widescreen'])
 
 $graph_array['to']     = $config['time']['now'];
 
+$graph_data = array();
 foreach ($periods as $period)
 {
   $graph_array['from']        = $config['time'][$period];
