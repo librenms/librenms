@@ -14,3 +14,9 @@ $(document).ready(function(){
         }).removeClass("lazy").removeAttr('width').removeAttr('height');
     });
 });
+
+function wrap_overlib() {
+	var ret = overlib(arguments);
+	$('div#overDiv img').removeAttr('width').removeAttr('height');
+	return ret;
+}
