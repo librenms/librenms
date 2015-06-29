@@ -1,24 +1,27 @@
 $(document).ready(function(){
 	
-		$("img.lazy").lazyload({
+		$("img.lazy").load(lazyload_done).lazyload({
     		effect: "fadeIn",
     		threshold: 300,
-		    placeholder: "",
-		    skip_invisible: false
-    }).removeClass("lazy").removeAttr('width').removeAttr('height');
+		    placeholder: ""
+    });
+
 
     $(document).ajaxStop(function() {
-        $("img.lazy").lazyload({
+        $("img.lazy").load(lazyload_done).lazyload({
             effect: "fadeIn",
     		    threshold: 300,
-    		    placeholder: "",
-    		    skip_invisible: false
-        }).removeClass("lazy").removeAttr('width').removeAttr('height');
+    		    placeholder: ""
+        });
     });
 });
 
 function wrap_overlib() {
 	var ret = overlib.apply(null,arguments);
-	$('div#overDiv img').removeAttr('width').removeAttr('height');
+	$('div#overDiv img').removeAttr('width').removeAttr('height').removeClass('lazy');
 	return ret;
+}
+
+function lazyload_done() {
+	$(this).removeAttr('width').removeAttr('height').removeClass('lazy');
 }
