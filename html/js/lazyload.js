@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	
+	/*
 		$("img.lazy").lazyload({
     		effect: "fadeIn",
     		threshold: 200
@@ -11,5 +12,5 @@ $(document).ready(function(){
     		    threshold: 200
         }).removeClass("lazy");
     });
-
+*/
 });
