@@ -324,7 +324,7 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
                effect: "fadeIn"
            }).removeClass("lazy");
            $(document).ajaxStop(function() {
-               $(img.lazy").lazyload({
+               $("img.lazy").lazyload({
                    effect: "fadeIn"
                }).removeClass("lazy");
            });
