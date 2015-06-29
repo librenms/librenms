@@ -322,6 +322,11 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
 
            $("img.lazy").lazyload({
                effect: "fadeIn"
+           }).removeClass("lazy");
+           $(document).ajaxStop(function() {
+               $(img.lazy").lazyload({
+                   effect: "fadeIn"
+               }).removeClass("lazy");
            });
 
            $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw\"></i> Pause");
