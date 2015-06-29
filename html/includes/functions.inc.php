@@ -191,7 +191,7 @@ function overlib_link($url, $text, $contents, $class)
   if ($config['web_mouseover'] === FALSE) {
       $output .= ">";
   } else {
-      $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].", WRAP,HAUTO,VAUTO);\" onmouseout=\"return nd();\">";
+      $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].", WRAP,HAUTO,VAUTO); jQuery.event.trigger(\"ajaxStop\"); \" onmouseout=\"return nd();\">";
   }
   $output .= $text."</a>";
 
