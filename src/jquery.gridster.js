@@ -41,7 +41,21 @@
 				scroll_container: window,
 				shift_larger_widgets_down: true,
 				shift_widgets_up: true,
-				serialize_params: function ($w, wgd) {
+				show_element: function($el, callback) {
+					if (callback) {
+						$el.fadeIn(callback);
+					} else {
+						$el.fadeIn();
+					}
+				},
+				hide_element: function($el, callback) {
+					if (callback) {
+						$el.fadeOut(callback);
+					} else {
+						$el.fadeOut();
+					}
+				},
+				serialize_params: function($w, wgd) {
 					return {
 						col: wgd.col,
 						row: wgd.row,
@@ -381,9 +395,9 @@
 	 * @param {Number} [row] The row the widget should start in.
 	 * @param {Array} [max_size] max_size Maximun size (in units) for width and height.
 	 * @param {Array} [min_size] min_size Minimum size (in units) for width and height.
+	 * @param {Function} [callback] 
 	 * @return {HTMLElement} Returns the jQuery wrapped HTMLElement representing.
 	 *  the widget that was just created.
-	 * @param callback
 	 */
 	fn.add_widget = function (html, size_x, size_y, col, row, max_size, min_size, callback) {
 		var pos;
@@ -440,14 +454,9 @@
 			}, this), 0);
 		}
 
-		return $w.fadeIn({
-			complete: function () {
-				if (callback) {
-					callback.call(this);
-				}
-			}
-		});
-
+		this.options.show_element.call(this, $w, callback);
+		
+		return $w;
 	};
 
 
@@ -975,11 +984,10 @@
 			size_y: size_y
 		});
 
-
-		 $nexts.not(exclude).each($.proxy(function(i, widget) {
-		 this.move_widget_up( $(widget), size_y );
-		 }, this));
-
+		$nexts.not(exclude).each($.proxy(function(i, widget) {
+			this.move_widget_up( $(widget), size_y );
+		}, this));
+		
 		this.set_dom_grid_height();
 
 		return this;
@@ -1071,7 +1079,7 @@
 
 		this.remove_from_gridmap(wgd);
 
-		$el.fadeOut($.proxy(function () {
+		this.options.hide_element.call(this, $el, $.proxy(function(){
 			$el.remove();
 
 			if (!silent) {
