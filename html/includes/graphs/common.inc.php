@@ -32,3 +32,4 @@ if ($width <= "300") { $rrd_options .= " --font LEGEND:7:" . $config['mono_font'
 else {                 $rrd_options .= " --font LEGEND:8:" . $config['mono_font'] . " --font AXIS:7:" . $config['mono_font']; }
 
 $rrd_options .= " --font-render-mode normal";
+$rrd_options .= " --full-size-mode";
