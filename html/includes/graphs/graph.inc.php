@@ -61,7 +61,6 @@ function graph_error($string)
 
   $rrd_options .= " HRULE:0#555555";
   $rrd_options .= " --title='".$string."'";
-  $rrd_options .= " --full-size-mode";
 
   rrdtool_graph($graphfile, $rrd_options);
 
