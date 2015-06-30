@@ -1,4 +1,4 @@
-/*! gridster.js - v0.6.10 - 2015-06-25
+/*! gridster.js - v0.6.10 - 2015-06-30
 * https://dsmorse.github.io/gridster.js/
 * Copyright (c) 2015 ducksboard; Licensed MIT */
 
@@ -939,7 +939,21 @@
 				scroll_container: window,
 				shift_larger_widgets_down: true,
 				shift_widgets_up: true,
-				serialize_params: function ($w, wgd) {
+				show_element: function($el, callback) {
+					if (callback) {
+						$el.fadeIn(callback);
+					} else {
+						$el.fadeIn();
+					}
+				},
+				hide_element: function($el, callback) {
+					if (callback) {
+						$el.fadeOut(callback);
+					} else {
+						$el.fadeOut();
+					}
+				},
+				serialize_params: function($w, wgd) {
 					return {
 						col: wgd.col,
 						row: wgd.row,
@@ -1004,20 +1018,27 @@
 	 *            for each widget in the serialization. Two arguments are passed:
 	 *            `$w`: the jQuery wrapped HTMLElement, and `wgd`: the grid
 	 *            coords object (`col`, `row`, `size_x`, `size_y`).
- *            @param {Boolean} [options.shift_larger_widgets_down] Determines if how widgets get pushes
+	 *        @param {Boolean} [options.shift_larger_widgets_down] Determines if how widgets get pushes
 	 *            out of the way of the player. If set to false smaller widgets will not move larger
 	 *            widgets out of their way . Defaults to true.
- *            @param {Boolean} [options.shift_widgets_up] Determines if the player will automatically
+	 *        @param {Boolean} [options.shift_widgets_up] Determines if the player will automatically
 	 *            condense the grid and not allow a widget to have space above it. Defaults to true.
+	 *        @param {Function} [options.show_element] Makes the given element visible. Two arguments are passed:
+	 *            `$el`: the jQuery wrapped HTMLElement, and `callback`: a function that should be executed
+	 *            after the element was made visible. The latter parameter is optional for the callee and might be
+	 *            null or undefined.
+	 *        @param {Function} [options.hide_element] Hides the given element. Two arguments are passed:
+	 *            `$el`: the jQuery wrapped HTMLElement, and `callback`: a function that should be executed
+	 *            after the element was hidden. The latter parameter is optional for the callee and might be
+	 *            null or undefined.
 	 *        @param {Object} [options.collision] An Object with all options for
 	 *            Collision class you want to overwrite. See Collision docs for
 	 *            more info.
-	 *       			@param {Boolean} [options.collision.wait_for_mouseup] Default is false.
-	 *				    If true then it will not move colliding widgets during drag, but only on
-	 *		       		mouseup.
+	 *                  @param {Boolean} [options.collision.wait_for_mouseup] Default is false.
+	 *                       If true then it will not move colliding widgets during drag, but only on
+	 *                       mouseup.
 	 *        @param {Object} [options.draggable] An Object with all options for
-	 *            Draggable class you want to overwrite. See Draggable docs for more
-	 *            info.
+	 *            Draggable class you want to overwrite. See Draggable docs for more info.
 	 *                @param {Object|Function} [options.draggable.ignore_dragging] Note that
 	 *                    if you use a Function, and resize is enabled, you should ignore the
 	 *                    resize handlers manually (options.resize.handle_class).
@@ -1279,9 +1300,9 @@
 	 * @param {Number} [row] The row the widget should start in.
 	 * @param {Array} [max_size] max_size Maximun size (in units) for width and height.
 	 * @param {Array} [min_size] min_size Minimum size (in units) for width and height.
+	 * @param {Function} [callback] Function executed after the widget is shown.
 	 * @return {HTMLElement} Returns the jQuery wrapped HTMLElement representing.
 	 *  the widget that was just created.
-	 * @param callback
 	 */
 	fn.add_widget = function (html, size_x, size_y, col, row, max_size, min_size, callback) {
 		var pos;
@@ -1338,14 +1359,9 @@
 			}, this), 0);
 		}
 
-		return $w.fadeIn({
-			complete: function () {
-				if (callback) {
-					callback.call(this);
-				}
-			}
-		});
-
+		this.options.show_element.call(this, $w, callback);
+		
+		return $w;
 	};
 
 
@@ -1873,11 +1889,10 @@
 			size_y: size_y
 		});
 
-
-		 $nexts.not(exclude).each($.proxy(function(i, widget) {
-		 this.move_widget_up( $(widget), size_y );
-		 }, this));
-
+		$nexts.not(exclude).each($.proxy(function(i, widget) {
+			this.move_widget_up( $(widget), size_y );
+		}, this));
+		
 		this.set_dom_grid_height();
 
 		return this;
@@ -1941,7 +1956,7 @@
 	 * @param {HTMLElement} el The jQuery wrapped HTMLElement you want to remove.
 	 * @param {Boolean|Function} [silent] If true, widgets below the removed one
 	 * will not move up. If a Function is passed it will be used as callback.
-	 * @param {Function} [callback] Function executed when the widget is removed.
+	 * @param {Function} [callback] Function executed after the widget is removed.
 	 * @return {Gridster} Returns the instance of the Gridster Class.
 	 */
 	fn.remove_widget = function (el, silent, callback) {
@@ -1969,7 +1984,7 @@
 
 		this.remove_from_gridmap(wgd);
 
-		$el.fadeOut($.proxy(function () {
+		this.options.hide_element.call(this, $el, $.proxy(function(){
 			$el.remove();
 
 			if (!silent) {
