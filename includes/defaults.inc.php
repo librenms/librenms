@@ -632,4 +632,5 @@ $config['unix-agent-connection-time-out'] 		= 10; //seconds
 $config['unix-agent-read-time-out'] 			= 10; //seconds
 
 // Lat / Lon support for maps
-$config['latlon']                                       = false; // True to enable translation of location to latlon co-ordinates
+$config['geoloc']['latlon']                             = false; // True to enable translation of location to latlon co-ordinates
+$config['geoloc']['engine']                             = "google";

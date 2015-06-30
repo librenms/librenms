@@ -138,13 +138,13 @@
       {
         $update_array['location'] = $poll_device['sysLocation'];
         log_event("Location -> ".$poll_device['sysLocation'], $device, 'system');
-          if ($config['latlon'] === true) {
+          if ($config['geoloc']['latlon'] === true) {
               $update_latlon = true;
           }
       }
   }
 
-    if ($config['latlon'] === true || $update_latlon === true) {
+    if ($config['geoloc']['latlon'] === true || $update_latlon === true) {
         if (strtotime($device['latlon_update']) < strtotime('-1 day')) {
             location_to_latlon($device);
         }

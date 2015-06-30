@@ -395,12 +395,28 @@ function get_main_serial($device) {
 }
 
 function location_to_latlon($device) {
-    if (get_dev_attrib($device,'override_sysLocation_bool') === true) {
+    if (get_dev_attrib($device,'override_sysLocation_bool')) {
         $device_location = get_dev_attrib($device,'override_sysLocation_string');
     } else {
         $device_location = $device['location'];
     }
     if (!empty($device_location)) {
-        
+        // We have a location string for the device.
+        $loc = dbFetchRow("SELECT `lat`,`lon` FROM `devices` LEFT JOIN `devices_attribs` ON `devices_attribs`.`device_id` = `devices`.`device_id` `WHERE ((`devices_attribs`.`attrib_type`='override_sysLocation_string' AND `devices_attribs`.`attrib_value` = ?) OR `location` = ?) AND `disabled`= 0 AND `ignored` = 0 AND `latlon_update` >= SUBDATE( NOW(), INTERVAL 24 HOUR) ORDER BY `latlon_update` DESC LIMIT 1", array($device_location,$device_location));
+        if (!is_array($loc)) {
+            // No other device has this location string which was updated in the last 24 hours
+            $device_location = preg_replace("/ /","+",$device_location);
+            switch ($config['geoloc']['engine']) {
+                case "google":
+                default:
+                    d_echo("Google geocode engine being used\n");
+                    $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$device_location";
+            }
+
+            $data = json_decode(file_get_contents($api_url),true);
+
+            print_r($data[0]['geometry']['bounds']['location']);
+
+        }
     }
 }
