@@ -36,6 +36,9 @@ foreach ($rrd_list as $rrd) {
     }
 
     $colour = $config['graph_colours'][$colours][$iter];
+    if (!empty($rrd['area']) && empty($rrd['areacolour'])) {
+        $rrd['areacolour'] = $colour."20";
+    }
 
     $ds       = $rrd['ds'];
     $filename = $rrd['filename'];
@@ -69,8 +72,8 @@ foreach ($rrd_list as $rrd) {
         }
     }
 
-    $rrd_optionsb .= ' GPRINT:'.$id.':LAST:%5.2lf%s GPRINT:'.$id.'min:MIN:%5.2lf%s';
-    $rrd_optionsb .= ' GPRINT:'.$id.'max:MAX:%5.2lf%s GPRINT:'.$id.":AVERAGE:'%5.2lf%s\\n'";
+    $rrd_optionsb .= ' GPRINT:'.$id.':LAST:%5.2lf%s'.$units.' GPRINT:'.$id.'min:MIN:%5.2lf%s'.$units;
+    $rrd_optionsb .= ' GPRINT:'.$id.'max:MAX:%5.2lf%s'.$units.' GPRINT:'.$id.":AVERAGE:'%5.2lf%s$units\\n'";
 
     $i++;
     $iter++;
