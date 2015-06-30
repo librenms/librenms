@@ -38,7 +38,9 @@ $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
 
-$auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
+if ($auth !== true && $auth != 1) {
+    $auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
+}
 include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
 
 if ($auth === true && is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
