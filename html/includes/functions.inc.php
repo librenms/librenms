@@ -341,8 +341,6 @@ function generate_graph_tag($args)
   $h = 0;
   foreach ($args as $key => $arg)
   {
-    if(strtolower($key) == 'width')
-      $w = $arg;
     switch (strtolower($key)) {
       case 'width':
         $w = $arg;
@@ -353,8 +351,7 @@ function generate_graph_tag($args)
     $urlargs[] = $key."=".urlencode($arg);
   }
 
-  //return '<img class="lazy" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
-  return '<img class="lazy" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+  return '<img class="lazy" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
 
 }
 
