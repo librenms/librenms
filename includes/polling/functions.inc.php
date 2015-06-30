@@ -393,3 +393,14 @@ function get_main_serial($device) {
     }
 
 }
+
+function location_to_latlon($device) {
+    if (get_dev_attrib($device,'override_sysLocation_bool') === true) {
+        $device_location = get_dev_attrib($device,'override_sysLocation_string');
+    } else {
+        $device_location = $device['location'];
+    }
+    if (!empty($device_location)) {
+        
+    }
+}
