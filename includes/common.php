@@ -739,6 +739,67 @@ function round_Nth($val = 0, $round_to) {
     }
 } // end round_Nth 
 
+function count_mib_mempools($device)
+{
+    if ($device['os'] == 'ruckuswireless') {
+        return 1;
+    }
+    return 0;
+}
+
+function count_mib_processors($device)
+{
+    if ($device['os'] == 'ruckuswireless') {
+        return 1;
+    }
+    return 0;
+}
+
+function count_mib_health($device)
+{
+    return count_mib_mempools($device) + count_mib_processors($device);
+}
+
+/*
+ * @return true if there is a custom graph defined for this type, subtype, and device
+ */
+function is_custom_graph($type, $subtype, $device)
+{
+    if ($device['os'] == 'ruckuswireless' && $type == 'device') {
+        switch ($subtype) {
+        case 'cpumem':
+        case 'mempool':
+        case 'processor':
+            return true;
+        }
+    }
+    return false;
+}
+
+/*
+ * Set section/graph entries in $graph_enable for graphs specific to $os.
+ */
+function enable_os_graphs($os, &$graph_enable)
+{
+    /*
+    foreach (dbFetchRows("SELECT * FROM graph_conditions WHERE graph_type = 'device' AND condition_name = 'os' AND condition_value = ?", array($os)) as $graph) {
+        $graph_enable[$graph['graph_section']][$graph['graph_subtype']] = "device_".$graph['graph_subtype'];
+    }
+    */
+}
+
+/*
+ * For each os-based or global graph relevant to $device, set its section/graph entry in $graph_enable.
+ */
+function enable_graphs($device, &$graph_enable)
+{
+    // These are standard graphs we should have for all systems
+    $graph_enable['poller']['poller_perf'] = 'device_poller_perf';
+    $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
+
+    enable_os_graphs($device['os'], $graph_enable);
+}
+
 /**
  * Checks if config allows us to ping this device
  * $attribs contains an array of all of this devices
