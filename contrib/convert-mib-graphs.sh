@@ -7,6 +7,9 @@ set -u
 
 for i; do
     base=${i%%.rrd}
+    if [ -e $i.old ]; then
+	continue
+    fi
     mv $i $i.old
     echo "Processing $i"
     rrdtool dump $i.old | sed -e 's|<name>.*</name>|<name>mibval</name>|' > $base.xml
