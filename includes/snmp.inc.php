@@ -922,7 +922,7 @@ function snmp_mib_load($mib, $module, $mibdir=null) {
     foreach (snmp_mib_walk($mib, $module, $mibdir) as $obj) {
         $mibs[$obj['object_type']] = $obj;
     }
-
+    d_print_r($mibs);
     return $mibs;
 
 }//end snmp_mib_load()
