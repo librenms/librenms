@@ -131,21 +131,21 @@
     log_event("sysDescr -> ".$poll_device['sysDescr'], $device, 'system');
   }
 
-  $update_latlon = false;
+  $update_latlng = false;
   if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'])
   {
       if (!get_dev_attrib($device,'override_sysLocation_bool'))
       {
         $update_array['location'] = $poll_device['sysLocation'];
         log_event("Location -> ".$poll_device['sysLocation'], $device, 'system');
-          if ($config['geoloc']['latlon'] === true) {
-              $update_latlon = true;
+          if ($config['geoloc']['latlng'] === true) {
+              $update_latlng = true;
           }
       }
   }
 
-    if ($config['geoloc']['latlon'] === true || $update_latlon === true) {
-        if (strtotime($device['latlon_update']) < strtotime('-1 day')) {
-            location_to_latlon($device);
+    if ($config['geoloc']['latlng'] === true || $update_latlng === true) {
+        if (strtotime($device['latlng_update']) < strtotime('-1 day')) {
+            location_to_latlng($device);
         }
     }
