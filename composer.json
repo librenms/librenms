@@ -45,6 +45,7 @@
         }
     },
     "suggest": {
+        "corley/dbal-influxdb": "This library help you to build query",
         "fabpot/pimple": "Allows to prepare the client dependencies in order to require an initialized instance",
         "zendframework/zend-servicemanager": "Use a service locator in order to prepare a valid instance",
         "symfony/dependency-injection": "Prepare a  valid instance via the symfony DiC"
