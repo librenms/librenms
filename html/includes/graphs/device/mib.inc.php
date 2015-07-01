@@ -13,8 +13,10 @@
  */
 
 $rrd_list = array();
-$prefix   = rrd_name($device['hostname'], array($subtype, ''), '');
-foreach (glob($prefix.'*.rrd') as $filename) {
+$prefix    = rrd_name($device['hostname'], array($subtype, ''), '');
+$filenames = glob($prefix."*.rrd");
+$count     = count($filenames);
+foreach ($filenames as $filename) {
     // find out what * expanded to
     $globpart = str_replace($prefix, '', $filename);    // take off the prefix
     $instance = substr($globpart, 0, -4);               // take off ".rrd"
@@ -27,9 +29,19 @@ foreach (glob($prefix.'*.rrd') as $filename) {
     $rrd_list[]     = $ds;
 }
 
-$colours    = 'mixed';
 $scale_min  = '0';
-$nototal    = 0;
 $simple_rrd = true;
 
-require 'includes/graphs/generic_multi_line.inc.php';
+// If there are multiple matching files, use a stacked graph instead of a line graph
+if ($count > 1) {
+    $nototal = 1;
+    $divider = $count;
+    $text_orig = 1;
+    $colours = 'manycolours';
+    include "includes/graphs/generic_multi_simplex_seperated.inc.php";
+}
+else {
+    $colours = 'mixed';
+    $nototal = 0;
+    include "includes/graphs/generic_multi_line.inc.php";
+}
