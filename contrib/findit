@@ -5,6 +5,7 @@ find . \
 	-path ./html/includes/geshi -prune -o \
 	-path ./html/includes/jpgraph -prune -o \
 	-path ./html/js/jqplot -prune -o \
+	-path ./lib -prune -o \
 	-path ./junk -prune -o \
 	-path ./logs -prune -o \
 	-path ./mibs -prune -o \
