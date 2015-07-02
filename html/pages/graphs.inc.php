@@ -145,6 +145,7 @@ if (!$auth)
     </form>
     <script type="text/javascript">
         $(function () {
+            alert("function");
             var strfrom = new Date($("#dtpickerfrom").value - (new Date().getTimezoneOffset()));
             $("#dtpickerfrom").value = strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes() 
             var strto = new Date($("#dtpickerto").value - (new Date().getTimezoneOffset()));
