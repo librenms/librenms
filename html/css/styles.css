@@ -1654,3 +1654,41 @@ tr.search:nth-child(odd) {
 	color: #FFFFFF;
 }
 
+		.mapTooltip {
+			position : fixed;
+			background-color : #fff;
+			moz-opacity:0.70;
+			opacity: 0.70;
+			filter:alpha(opacity=70);
+			border-radius:10px;
+			padding : 10px;
+			z-index: 1000;
+			max-width: 200px;
+			display:none;
+			color:#343434;
+		}
+.zoomIn, .zoomOut {
+			background-color:#fff;
+			border:1px solid #ccc;
+			color:#000;
+			width:15px;
+			height:15px;
+			line-height: 15px;
+			text-align:center;
+			border-radius:3px;
+			cursor:pointer;
+			position:absolute;
+			top : 10px;
+			font-weight:bold;
+			left : 10px;
+			
+			-webkit-user-select: none; // For Webkit
+			-khtml-user-select: none;
+			-moz-user-select: none; // For Mozilla
+			-o-user-select: none;
+			user-select: none; // Default
+		}
+		
+		.zoomOut {
+			top:30px;
+		}

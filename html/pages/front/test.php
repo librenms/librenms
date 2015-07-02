@@ -25,28 +25,70 @@
 ?>
 <script>
 </script>
-<script src='js/jquery-jvectormap.min.js'></script>
-<script src='js/jquery-jvectormap-world-mill-en.js'></script>
-<script src='js/jquery-jvectormap-de-merc-en.js'></script>
+<script src='js/raphael-min.js'></script>
+<script src='js/jquery.mapael.js'></script>
+<script src='js/world_countries.js'></script>
+<script src='js/jquery.mousewheel.min.js'></script>
 <?php
-foreach (dbFetchRows("SELECT `hostname`,`lat`,`lng`,COUNT(`status`) AS `status` FROM `devices` WHERE `lat` IS NOT NULL AND `lng` IS NOT NULL AND `disabled`=0 AND `ignore`=0 GROUP BY `status`,`lat`,`lng` ORDER BY `hostname`") as $loc) {
-    $data .= "{latLng: [". $loc['lat'] . ", " . $loc['lng'] . "], name: '".$loc['status'] ."'},\n";
+$x=0;
+foreach (dbFetchRows("SELECT `lat`,`lng`,`status`,COUNT(`status`) AS `total` FROM `devices` WHERE `lat` IS NOT NULL AND `lng` IS NOT NULL AND `disabled`=0 AND `ignore`=0 GROUP BY `status`,`lat`,`lng` ORDER BY `status` ASC, `hostname`") as $map_devices) {
+    $color = "#00a4c7";
+    $size = 15;
+    if ($map_devices['status'] == 0) {
+        $color = "#a71390";
+        $size = 30;
+    }
+    $data .= "\"$x\": {
+                        value: \"" . $map_devices['total'] . "\",
+                        latitude: ". $map_devices['lat'] . ",
+                        longitude: " . $map_devices['lng'] . ",
+                        size: " . $size . ",
+                        attrs: {
+                            fill: \"" . $color . "\",
+                            opacity: 0.8
+                        },
+                        tooltip: {
+                            content: \"Devices: " . $map_devices['total']  . "\"
+                        }
+                    },\n";
+    $x++;
 }
 ?>
-    <div id="map" style="width: 720px; height: 600px"></div>
-    <script>
-    $('#map').vectorMap({
-    map: 'world_mill_en',
-    markers: [ <?php echo $data; ?>],
-    series: {
-            markers: [{
-              attribute: 'r',
-              scale: [5, 15],
-              values: [10,100,200]
-            }]
-          }
+<script>
+$(function () {
+    $(".mapcontainer").mapael({
+        map: {
+            name: "world_countries",
+            zoom : {
+                enabled : true,
+                maxLevel : 10,
+            },
+            defaultArea: {
+                attrs: {
+                    fill : "#afeef4",
+                    stroke: "#00a1fe"
+                },
+                attrsHover: {
+                    fill: "#343434",
+                    stroke: "#5d5d5d",
+                        "stroke-width": 1,
+                        "stroke-linejoin": "round"
+                }
+            }
+        },
+        plots: {
+            <?php echo $data; ?>
+        }
     });
-    </script>
+});
+</script>
+<div class="container">
+		<div class="mapcontainer">
+			<div class="map">
+				<span>Alternative content for the map</span>
+			</div>
+		</div>
+</div>
 <?php
 include_once("includes/object-cache.inc.php");
 echo '<div class="container-fluid">
