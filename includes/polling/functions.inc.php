@@ -407,6 +407,7 @@ function location_to_latlng($device) {
         if (!is_array($loc)) {
             // No other device has this location string which was updated in the last 24 hours
             $device_location = preg_replace("/ /","+",$device_location);
+            // Grab data from which ever Geocode service we use.
             switch ($config['geoloc']['engine']) {
                 case "google":
                 default:
@@ -417,6 +418,7 @@ function location_to_latlng($device) {
 
             $data = json_decode(file_get_contents($api_url),true);
 
+            // Parse the data from the specific Geocode services.
             switch ($config['geoloc']['engine']) {
                 case "google":
                 default:
