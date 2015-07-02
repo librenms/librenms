@@ -146,11 +146,19 @@ if (!$auth)
     <script type="text/javascript">
         $(function () {
             var strfrom = new Date($("#dtpickerfrom").val()*1000);
-            $("#dtpickerfrom").val(strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes());
-            alert(strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes());
+            $("#dtpickerfrom").val(strfrom.getFullYear()+"-"+
+              ("0"+(strfrom.getMonth()+1)).slice(-2)+"-"+
+              ("0"+strfrom.getDate()).slice(-2)+" "+
+              ("0"+strfrom.getHours()).slice(-2)+":"+
+              ("0"+strfrom.getMinutes()).slice(-2)
+            );
             var strto = new Date($("#dtpickerto").val()*1000);
-            $("#dtpickerto").val(strto.getFullYear()+"-"+(strto.getMonth()+1)+"-"+strto.getDate()+" "+strto.getHours()+":"+strto.getMinutes());
-            alert(strto);
+            $("#dtpickerto").val(strto.getFullYear()+"-"+
+              ("0"+(strto.getMonth()+1)).slice(-2)+"-"+
+              ("0"+strto.getDate()).slice(-2)+" "+
+              ("0"+strto.getHours()).slice(-2)+":"+
+              ("0"+strto.getMinutes()).slice(-2)
+            );
             $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
             $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
         });
