@@ -119,6 +119,7 @@ if (!$auth)
             var reto = /to=([0-9])+/g;
             var refrom = /from=([0-9])+/g;
             var tsto = new Date(frmdata.dtpickerto.value+":00");
+            alert(frmdata.dtpickerto.value+":00")
             var tsfrom = new Date(frmdata.dtpickerfrom.value+":00");
             tsto = tsto.getTime() / 1000;
             tsfrom = tsfrom.getTime() / 1000;
