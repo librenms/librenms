@@ -145,11 +145,10 @@ if (!$auth)
     </form>
     <script type="text/javascript">
         $(function () {
-            alert("function");
-            var strfrom = new Date($("#dtpickerfrom").value - ((new Date().getTimezoneOffset())*60));
+            var strfrom = new Date($("#dtpickerfrom").val()*1000);
             $("#dtpickerfrom").value = strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes() 
             alert(strfrom);
-            var strto = new Date($("#dtpickerto").value - ((new Date().getTimezoneOffset())*60));
+            var strto = new Date($("#dtpickerto").val()*1000);
             $("#dtpickerto").value = strto.getFullYear()+"-"+(strto.getMonth()+1)+"-"+strto.getDate()+" "+strto.getHours()+":"+strto.getMinutes()
             alert(strto);
             $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
