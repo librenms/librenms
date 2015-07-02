@@ -146,10 +146,10 @@ if (!$auth)
     <script type="text/javascript">
         $(function () {
             alert("function");
-            var strfrom = new Date($("#dtpickerfrom").value - (new Date().getTimezoneOffset()));
+            var strfrom = new Date($("#dtpickerfrom").value - ((new Date().getTimezoneOffset())*60));
             $("#dtpickerfrom").value = strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes() 
             alert(strfrom);
-            var strto = new Date($("#dtpickerto").value - (new Date().getTimezoneOffset()));
+            var strto = new Date($("#dtpickerto").value - ((new Date().getTimezoneOffset())*60));
             $("#dtpickerto").value = strto.getFullYear()+"-"+(strto.getMonth()+1)+"-"+strto.getDate()+" "+strto.getHours()+":"+strto.getMinutes()
             alert(strto);
             $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
