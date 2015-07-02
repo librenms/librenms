@@ -147,7 +147,7 @@ if (!$auth)
         $(function () {
             var strfrom = new Date($("#dtpickerfrom").val()*1000);
             $("#dtpickerfrom").value = strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes() 
-            alert(strfrom);
+            alert(strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes());
             var strto = new Date($("#dtpickerto").val()*1000);
             $("#dtpickerto").value = strto.getFullYear()+"-"+(strto.getMonth()+1)+"-"+strto.getDate()+" "+strto.getHours()+":"+strto.getMinutes()
             alert(strto);
