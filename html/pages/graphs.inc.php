@@ -118,9 +118,8 @@ if (!$auth)
         function submitCustomRange(frmdata) {
             var reto = /to=([0-9])+/g;
             var refrom = /from=([0-9])+/g;
-            var tsto = new Date(frmdata.dtpickerto.value+":00");
-            alert(frmdata.dtpickerto.value+":00")
-            var tsfrom = new Date(frmdata.dtpickerfrom.value+":00");
+            var tsto = new Date(frmdata.dtpickerto.value.replace(' ', 'T')+":00.000Z");
+            var tsfrom = new Date(frmdata.dtpickerfrom.value.replace(' ', 'T')+":00.000Z");
             tsto = tsto.getTime() / 1000;
             tsfrom = tsfrom.getTime() / 1000;
             frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
