@@ -146,10 +146,10 @@ if (!$auth)
     <script type="text/javascript">
         $(function () {
             var strfrom = new Date($("#dtpickerfrom").val()*1000);
-            $("#dtpickerfrom").value = strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes() 
+            $("#dtpickerfrom").val(strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes());
             alert(strfrom.getFullYear()+"-"+(strfrom.getMonth()+1)+"-"+strfrom.getDate()+" "+strfrom.getHours()+":"+strfrom.getMinutes());
             var strto = new Date($("#dtpickerto").val()*1000);
-            $("#dtpickerto").value = strto.getFullYear()+"-"+(strto.getMonth()+1)+"-"+strto.getDate()+" "+strto.getHours()+":"+strto.getMinutes()
+            $("#dtpickerto").val(strto.getFullYear()+"-"+(strto.getMonth()+1)+"-"+strto.getDate()+" "+strto.getHours()+":"+strto.getMinutes());
             alert(strto);
             $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
             $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
