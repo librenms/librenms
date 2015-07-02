@@ -118,10 +118,8 @@ if (!$auth)
         function submitCustomRange(frmdata) {
             var reto = /to=([0-9])+/g;
             var refrom = /from=([0-9])+/g;
-            var strto = frmdata.dtpickerto.value.replace(' ', 'T')+':00Z0400';
-            var tsto = new Date(strto);
-            var strfrom = frmdata.dtpickerfrom.value.replace(' ', 'T')+':00Z0400';
-            var tsfrom = new Date(strfrom);
+            var tsto = new Date(frmdata.dtpickerto.value.replace(' ','T'));
+            var tsfrom = new Date(frmdata.dtpickerfrom.value.replace(' ','T'));
             tsto = tsto.getTime() / 1000;
             tsfrom = tsfrom.getTime() / 1000;
             frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
@@ -137,16 +135,18 @@ if (!$auth)
   echo('
         <div class="form-group">
             <label for="dtpickerfrom">From</label>
-            <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . date($config['dateformat']['byminute'], $graph_array['from']) . '" data-date-format="YYYY-MM-DD HH:mm">
+            <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . $graph_array['from'] . '" data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <div class="form-group">
             <label for="dtpickerto">To</label>
-            <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . date($config['dateformat']['byminute'], $graph_array['to']) . '" data-date-format="YYYY-MM-DD HH:mm">
+            <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . $graph_array['to'] . '" data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <input type="submit" class="btn btn-default" id="submit" value="Update" onclick="javascript:submitCustomRange(this.form);">
     </form>
     <script type="text/javascript">
         $(function () {
+            $("#dtpickerfrom").value = $("#dtpickerfrom").value - (new Date().getTimezoneOffset());
+            $("#dtpickerto").value = $("#dtpickerto").value - (new Date().getTimezoneOffset());
             $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
             $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
         });
