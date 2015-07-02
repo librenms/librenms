@@ -120,8 +120,6 @@ if (!$auth)
             var refrom = /from=([0-9])+/g;
             var tsto = moment(frmdata.dtpickerto.value).unix();
             var tsfrom = moment(frmdata.dtpickerfrom.value).unix();
-            //tsto = tsto.getTime() / 1000;
-            //tsfrom = tsfrom.getTime() / 1000;
             frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
             frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
             frmdata.action = frmdata.selfaction.value;
