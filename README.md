@@ -9,6 +9,12 @@
 This library was created to have php port of the python influxdb client. 
 This way there will be a common abstraction library between different programming languages.
 
+### Installation
+
+Installation can be done with composer:
+
+composer require influxdb/influxdb-php:dev-master
+
 ### Getting started
 
 Initialize a new client object:
@@ -156,8 +162,3 @@ Some functions are too general for a database. So these are available in the cli
 * Merged repository to influxdb/influxdb-php
 * Added unit test for createRetentionPolicy
 * -BREAKING CHANGE- changed $client->db to $client->selectDB
-
-
-####0.1.0
-------
-* Initial release
