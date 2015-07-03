@@ -18,4 +18,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $client->getBaseURI(), 'http://localhost:8086'
         );
     }
+
+    public function testSelectDbShouldReturnDatabaseInstance()
+    {
+        $client = new Client('localhost', 8086);
+
+        $dbName = 'test-database';
+        $db = $client->selectDB($dbName);
+
+        $this->assertInstanceOf('\InfluxDB\Database', $db);
+
+        $this->assertEquals($dbName, $db->getName());
+    }
 }
