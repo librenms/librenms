@@ -44,7 +44,7 @@ class Database
         $this->client = $client;
 
         if (!$name) {
-            throw new DatabaseException('No database name provided');
+            throw new \InvalidArgumentException('No database name provided');
         }
 
         $this->name = $name;
@@ -105,7 +105,7 @@ class Database
      */
     public function createRetentionPolicy(RetentionPolicy $retentionPolicy)
     {
-        $this->query($this->getRetentionPolicyQuery('CREATE', $retentionPolicy));
+        return $this->query($this->getRetentionPolicyQuery('CREATE', $retentionPolicy));
     }
 
     /**
