@@ -46,7 +46,7 @@ To fetch records from InfluxDB you can do a query directly on a database:
 
 ```php
     
-    // fetch the selectDB
+    // fetch the database
     $database = $client->selectDB('influx_test_db');
     
     // executing a query will yield a resultset object
@@ -84,24 +84,25 @@ Writing data is done by providing an array of points to the writePoints method o
 
 ```php
 
-    $newPoints = $database->writePoints(
-        array(
-            new Point(
-                'test_metric',
-                0.64,
-                array('host' => 'server01', 'region' => 'us-west'),
-                array('cpucount' => 10),
-                1435255849
-            ),
-            new Point(
-                'test_metric',
-                0.84,
-                array('host' => 'server01', 'region' => 'us-west'),
-                array('cpucount' => 10),
-                1435255850
-            )
+    // create an array of points
+    $points = array(
+        new Point(
+            'test_metric',
+            0.64,
+            array('host' => 'server01', 'region' => 'us-west'),
+            array('cpucount' => 10),
+            1435255849
+        ),
+        new Point(
+            'test_metric',
+            0.84,
+            array('host' => 'server01', 'region' => 'us-west'),
+            array('cpucount' => 10),
+            1435255850
         )
     );
+
+    $newPoints = $database->writePoints($points);
     
 ```
 
@@ -123,7 +124,7 @@ This library makes it easy to provide a retention policy when creating a databas
     // create the client
     $client = new \InfluxDB\Client($host, $port, '', '');
 
-    // select the selectDB
+    // select the database
     $database = $client->selectDB('influx_test_db');
 
     // create the database with a retention policy
@@ -141,6 +142,12 @@ and list them:
 
 ```php
     $result = $database->listRetentionPolicies();
+```
+
+You can add more retention policies to a database:
+
+```php
+    $result = $database->createRetentionPolicy(new RetentionPolicy('test2', '30d', 1, true));
 ```
 
 ### Client functions
