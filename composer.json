@@ -1,5 +1,5 @@
 {
-  "name": "leaseweb/influxdb-php",
+  "name": "influxdb/influxdb-php",
   "description": "InfluxDB client library for PHP",
   "keywords": [
     "influxdb",
