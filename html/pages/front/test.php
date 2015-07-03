@@ -22,12 +22,18 @@
  * @subpackage Frontpage
  */
 
+if (isset($config['default_map']) && is_file($config['html_dir'].'/js/'.$config['default_map'])) {
+    $default_map = $config['default_map'];
+} else {
+    $default_map = 'maps/world_countries.js';
+}
+
 ?>
 <script>
 </script>
 <script src='js/raphael-min.js'></script>
 <script src='js/jquery.mapael.js'></script>
-<script src='js/world_countries.js'></script>
+<script src='js/<?php echo $default_map; ?>'></script>
 <script src='js/jquery.mousewheel.min.js'></script>
 <?php
 $x=0;

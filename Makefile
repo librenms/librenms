@@ -49,3 +49,6 @@ typeahead:
 
 jquery-mapael:
 	$(GIT_SUBTREE) --prefix=lib/jQuery-Mapael https://github.com/neveldo/jQuery-Mapael.git master
+
+mapael-maps:
+	$(GIT_SUBTREE) --prefix=lib/mapael-maps https://github.com/neveldo/mapael-maps.git master
