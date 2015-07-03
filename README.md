@@ -156,6 +156,16 @@ Some functions are too general for a database. So these are available in the cli
     $result = $client->listDatabases();
 ```
 
+## Todo
+
+* Add UDP support
+* Add more admin features
+* More unit tests
+* Increase documentation (wiki?)
+* Add more features to the query builder
+* Add validation to RetentionPolicy
+
+
 ## Changelog
 
 ####0.1.1
