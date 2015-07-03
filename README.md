@@ -288,6 +288,43 @@ Corley\Benchmarks\InfluxDB\MessageToInlineProtocolEvent
     convertMessageToInlineProtocolWithDifferentTagLevels: [10,000    ] [0.0000493728638] [20,254.04086]
 ```
 
+### Query Builder
+
+Interested in a Query Builder?
+
+https://github.com/corley/dbal-influxdb
+
+Thanks to Doctrine DBAL (Abstract Layer) you can use the query builder
+
+```
+$qb = $conn->createQueryBuilder();
+
+$qb->select("*")
+    ->from("cpu_load_short")
+    ->where("time = ?")
+    ->setParameter(0, 1434055562000000000);
+
+$data = $qb->execute();
+foreach ($data->fetchAll() as $element) {
+    // Use your element
+}
+```
+
+```php
+$config = new \Doctrine\DBAL\Configuration();
+//..
+$connectionParams = array(
+    'dbname' => 'mydb',
+    'user' => 'root',
+    'password' => 'root',
+    'host' => 'localhost',
+    'port' => 8086,
+    "driverClass" => "Corley\\DBAL\\Driver\\InfluxDB",
+);
+$conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+```
+
+
 ## FAQ
 
 ### Add sockets support to your PHP
