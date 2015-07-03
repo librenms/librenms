@@ -1,0 +1,40 @@
+{
+	"name": "mapael",
+	"title": "jQuery Mapael",
+	"description": "jQuery Mapael is a jQuery plugin based on raphael.js that allows you to display dynamic vector maps.",
+	"keywords": [
+		"map",
+		"vector",
+		"svg",
+		"dataviz",
+		"dynamic"
+	],
+	"version": "1.0.1",
+	"author": {
+		"name": "Vincent Brouté",
+		"url": "http://www.vincentbroute.fr"
+	},
+	"maintainers": [
+		{
+			"name": "Vincent Brouté",
+			"email": "contact@vincentbroute.fr",
+			"url": "http://www.vincentbroute.fr"
+		}
+	],
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "http://www.opensource.org/licenses/mit-license.php"
+		}
+	],
+	"bugs": "https://github.com/neveldo/jQuery-Mapael/issues",
+	"homepage": "http://www.vincentbroute.fr/mapael/",
+	"docs": "http://www.vincentbroute.fr/mapael/",
+	"demo": "http://www.vincentbroute.fr/mapael/usecases/world/",
+	"download": "https://github.com/neveldo/jQuery-Mapael/tags",
+	"dependencies": {
+		"jquery": ">=1.7",
+		"raphael": ">=2.1.4",
+		"jquery-mousewheel": ">=3.1.6"
+	}
+}
