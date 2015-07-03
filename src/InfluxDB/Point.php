@@ -2,7 +2,7 @@
 
 namespace InfluxDB;
 
-use InfluxDB\Database\Exception;
+use InfluxDB\Database\Exception as DatabaseException;
 
 /**
  * Class Point
@@ -35,13 +35,13 @@ class Point
      * @param array  $additionalFields Array of optional fields
      * @param int    $timestamp        Optional timestamp
      *
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function __construct($measurement, $value, array $tags = array(), array $additionalFields = array(), $timestamp = null)
     {
 
         if (empty($measurement)) {
-            throw new Exception('Invalid measurement name provided');
+            throw new DatabaseException('Invalid measurement name provided');
         }
 
         $this->measurement = (string) $measurement;
@@ -51,7 +51,7 @@ class Point
         $this->fields += array('value' => (float) $value);
 
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
-            throw new Exception(sprintf('%s is not a valid timestamp', $timestamp));
+            throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
         }
 
         $this->timestamp = $timestamp;

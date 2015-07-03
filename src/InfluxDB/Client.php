@@ -124,7 +124,7 @@ class Client
      *
      * @return Database
      */
-    public function db($name)
+    public function selectDB($name)
     {
 
         if (empty($name)) {
@@ -261,7 +261,7 @@ class Client
             $timeout
         );
 
-        return ($dbName ? $client->db($dbName) : $client);
+        return ($dbName ? $client->selectDB($dbName) : $client);
     }
     /**
      * @return mixed
@@ -293,13 +293,5 @@ class Client
         }
 
         return $names;
-    }
-
-    /**
-     * @return \Guzzle\Http\Client
-     */
-    public function getHttpClient()
-    {
-        return $this->httpClient;
     }
 }

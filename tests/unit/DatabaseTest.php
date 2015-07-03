@@ -6,6 +6,8 @@ namespace InfluxDB\Test;
 use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Point;
+use InfluxDB\ResultSet;
+use PHPUnit_Framework_MockObject_MockObject;
 
 class DatabaseTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,10 +15,28 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     /** @var Database $db */
     protected $db = null;
 
-    /** @var  Client $client */
+    /** @var  Client|PHPUnit_Framework_MockObject_MockObject $client */
     protected $mockClient;
 
+    /**
+     * @var string
+     */
     protected $dataToInsert;
+
+    /**
+     * @var string
+     */
+    protected $resultData;
+
+    /**
+     * @var string
+     */
+    static $emptyResult = '{"results":[{}]}';
+
+    /**
+     * @var
+     */
+    protected $mockResultSet;
 
     public function setUp()
     {
@@ -24,13 +44,56 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->resultData = file_get_contents(dirname(__FILE__) . '/result.example.json');
+
         $this->mockClient->expects($this->any())
             ->method('getBaseURI')
             ->will($this->returnValue($this->equalTo('http://localhost:8086')));
 
+        $this->mockClient->expects($this->any())
+            ->method('query')
+            ->will($this->returnValue(new ResultSet($this->resultData)));
+
         $this->db = new Database('influx_test_db', $this->mockClient);
 
         $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/input.example.json');
+
+    }
+
+    /**
+     *
+     */
+    public function testQuery()
+    {
+        $testResultSet = new ResultSet($this->resultData);
+        $this->assertEquals($this->db->query('SELECT * FROM test_metric'), $testResultSet);
+    }
+
+    public function testCreateRetentionPolicy()
+    {
+        $retentionPolicy = new Database\RetentionPolicy('test', '1d', 1, true);
+
+        $mockClient = $this->getMockBuilder('\InfluxDB\Client')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockClient->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue(new ResultSet(self::$emptyResult)));
+
+
+
+        $database = new Database('test', $mockClient);
+
+        $this->assertEquals($database->createRetentionPolicy($retentionPolicy), new ResultSet(self::$emptyResult));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyDatabaseName()
+    {
+        new Database(null, $this->mockClient);
     }
 
 
@@ -53,7 +116,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
         $this->mockClient->expects($this->once())
             ->method('write')
-            ->with($this->equalTo($this->db->getName()), $this->equalTo($payloadExpected));
+            ->with($this->equalTo($this->db->getName()), $this->equalTo($payloadExpected))
+            ->will($this->returnValue(true));
 
         $this->db->writePoints(array($point1, $point2));
     }

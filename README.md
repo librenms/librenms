@@ -2,6 +2,7 @@
 ## InfluxDB client library for PHP
 [![Build Status](https://travis-ci.org/LeaseWeb/influxdb-php.svg?branch=master)](https://travis-ci.org/LeaseWeb/influxdb-php)
 [![Code Climate](https://codeclimate.com/github/LeaseWeb/influxdb-php/badges/gpa.svg)](https://codeclimate.com/github/LeaseWeb/influxdb-php)
+[![Test Coverage](https://codeclimate.com/github/LeaseWeb/influxdb-php/badges/coverage.svg)](https://codeclimate.com/github/LeaseWeb/influxdb-php/coverage)
 
 ### Overview
 
@@ -39,8 +40,8 @@ To fetch records from InfluxDB you can do a query directly on a database:
 
 ```php
     
-    // fetch the db
-    $database = $client->db('influx_test_db');
+    // fetch the selectDB
+    $database = $client->selectDB('influx_test_db');
     
     // executing a query will yield a resultset object
     $result = $database->query('select * from test_metric LIMIT 5');
@@ -116,8 +117,8 @@ This library makes it easy to provide a retention policy when creating a databas
     // create the client
     $client = new \InfluxDB\Client($host, $port, '', '');
 
-    // select the db
-    $database = $client->db('influx_test_db');
+    // select the selectDB
+    $database = $client->selectDB('influx_test_db');
 
     // create the database with a retention policy
     $result = $database->create(new RetentionPolicy('test', '5d', 1, true));    
@@ -151,6 +152,12 @@ Some functions are too general for a database. So these are available in the cli
 
 ## Changelog
 
-####0.1
+####0.1.1
+* Merged repository to influxdb/influxdb-php
+* Added unit test for createRetentionPolicy
+* -BREAKING CHANGE- changed $client->db to $client->selectDB
+
+
+####0.1.0
 ------
 * Initial release
