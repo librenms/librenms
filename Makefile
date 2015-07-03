@@ -52,3 +52,6 @@ jquery-mapael:
 
 mapael-maps:
 	$(GIT_SUBTREE) --prefix=lib/mapael-maps https://github.com/neveldo/mapael-maps.git master
+
+jquery-mousewheel:
+	$(GIT_SUBTREE) --prefix=lib/jquery-mousewheel https://github.com/jquery/jquery-mousewheel.git master
