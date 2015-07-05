@@ -3,7 +3,7 @@
 #### Bug fixes
   - Fixed API not functioning. (PR1367)
   - Fixed API not storing alert rule names (PR1372)
-  - Fixed datetimepicker use (PR
+  - Fixed datetimepicker use (PR1376)
   - Do not allow master to rejoin itself. (PR1377)
   - Fixed Nginx config file (PR1389)
 
