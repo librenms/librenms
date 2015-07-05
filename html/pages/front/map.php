@@ -22,11 +22,36 @@
  * @subpackage Frontpage
  */
 
-if (isset($config['default_map']) && is_file($config['html_dir'].'/js/'.$config['default_map'])) {
-    $default_map = $config['default_map'];
+if (isset($config['mapael']['default_map']) && is_file($config['html_dir'].'/js/'.$config['mapael']['default_map'])) {
+    $default_map = $config['mapael']['default_map'];
 } else {
     $default_map = 'maps/world_countries.js';
 }
+$map_tmp = preg_split("/\//",$default_map);
+$map_name = $map_tmp[count($map_tmp)-1];
+$map_name = str_replace('.js','',$map_name);
+
+if (isset($config['mapael']['map_width']) && is_numeric($config['mapael']['map_width'])) {
+    $map_width = $config['mapael']['map_width'];
+} else {
+    $map_width = '800';
+}
+
+if (isset($config['mapael']['default_zoom'])) {
+    $default_zoom = $config['mapael']['default_zoom'];
+} else {
+    $default_zoom = 10;
+}
+
+if (isset($config['mapael']['default_lat']) && isset($config['mapael']['default_lng'])) {
+    $init_zoom = "init: {
+                            latitude: " . $config['mapael']['default_lat'] . ",
+                            longitude: " . $config['mapael']['default_lng'] . ",
+                            level: $default_zoom
+                        }\n";
+}
+
+
 
 ?>
 <script>
@@ -66,10 +91,12 @@ foreach (dbFetchRows("SELECT `lat`,`lng`,`status`,COUNT(`status`) AS `total` FRO
 $(function () {
     $(".mapcontainer").mapael({
         map: {
-            name: "world_countries",
+            name: "<?php echo $map_name; ?>",
+            width: <?php echo $map_width; ?>,
             zoom : {
                 enabled : true,
-                maxLevel : 10,
+                maxLevel : <?php echo $default_zoom+10; ?>,
+                <?php echo $init_zoom; ?>
             },
             defaultArea: {
                 attrs: {
@@ -101,23 +128,14 @@ $(function () {
 include_once("includes/object-cache.inc.php");
 echo '<div class="container-fluid">
 	<div class="row">
-		<div class="col-md-8">
-			<div id="chart_div"></div>
-		</div>
-		<div class="col-md-4">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-md-4">';
-						include_once("includes/device-summary-vert.inc.php");
-echo '					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-4">';
-						include_once("includes/front/boxes.inc.php");
-echo '					</div>
-				</div>
-			</div>
-		</div>
+		<div class="col-md-4">';
+			include_once("includes/front/boxes.inc.php");
+echo '		</div>
+                <div class="col-md-2">
+                </div>
+		<div class="col-md-4">';
+			include_once("includes/device-summary-vert.inc.php");
+echo '		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">';
