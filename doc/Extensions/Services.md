@@ -49,3 +49,4 @@ no graphs will be generated. **
 - pop
 - simap
 - ntp
+- ircd
