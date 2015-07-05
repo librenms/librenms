@@ -15,6 +15,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
     $type       = "rfc1628";
     $divisor  = 10;
+    if ($device['os'] == "huaweiups") { $divisor = 100; };
     $index      = '3.2.0.'.$i;
     discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
@@ -24,6 +25,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
   $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
   $type       = "rfc1628";
   $divisor  = 10;
+  if ($device['os'] == "huaweiups") { $divisor = 100; };
   $index      = '4.2.0';
   discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 
@@ -32,6 +34,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
   $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
   $type       = "rfc1628";
   $divisor  = 10;
+  if ($device['os'] == "huaweiups") { $divisor = 100; };
   $index      = '5.1.0';
   discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 }
