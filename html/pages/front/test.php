@@ -38,11 +38,13 @@ if (isset($config['default_map']) && is_file($config['html_dir'].'/js/'.$config[
 <?php
 $x=0;
 foreach (dbFetchRows("SELECT `lat`,`lng`,`status`,COUNT(`status`) AS `total` FROM `devices` WHERE `lat` IS NOT NULL AND `lng` IS NOT NULL AND `disabled`=0 AND `ignore`=0 GROUP BY `status`,`lat`,`lng` ORDER BY `status` ASC, `hostname`") as $map_devices) {
-    $color = "#00a4c7";
+    $color = "#29FF3B";
     $size = 15;
+    $status = 'Up';
     if ($map_devices['status'] == 0) {
-        $color = "#a71390";
+        $color = "#FF0000";
         $size = 30;
+        $status = 'Down';
     }
     $data .= "\"$x\": {
                         value: \"" . $map_devices['total'] . "\",
@@ -54,7 +56,7 @@ foreach (dbFetchRows("SELECT `lat`,`lng`,`status`,COUNT(`status`) AS `total` FRO
                             opacity: 0.8
                         },
                         tooltip: {
-                            content: \"Devices: " . $map_devices['total']  . "\"
+                            content: \"Devices " . $status . ": " . $map_devices['total']  . "\"
                         }
                     },\n";
     $x++;
@@ -71,11 +73,11 @@ $(function () {
             },
             defaultArea: {
                 attrs: {
-                    fill : "#afeef4",
-                    stroke: "#00a1fe"
+                    fill : "#449603",
+                    stroke: "#295C00"
                 },
                 attrsHover: {
-                    fill: "#343434",
+                    fill: "#367504",
                     stroke: "#5d5d5d",
                         "stroke-width": 1,
                         "stroke-linejoin": "round"

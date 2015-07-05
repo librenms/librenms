@@ -1656,16 +1656,16 @@ tr.search:nth-child(odd) {
 
 .mapTooltip {
     position : fixed;
-    background-color : #fff;
-    moz-opacity:0.70;
-    opacity: 0.70;
-    filter:alpha(opacity=70);
+    background-color : #B2B3B1;
+    moz-opacity:0.90;
+    opacity: 0.90;
+    filter:alpha(opacity=90);
     border-radius:10px;
     padding : 10px;
     z-index: 1000;
     max-width: 200px;
     display:none;
-    color:#343434;
+    color:#000000;
 }
 
 .zoomIn, .zoomOut {
