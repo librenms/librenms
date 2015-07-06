@@ -29,7 +29,7 @@ if (!$os)
     else
     {
       // Check for Synology DSM
-      $hrSystemInitialLoadParameters = trim(snmp_get($device, "hrSystemInitialLoadParameters.0", "-Osqnv"));
+      $hrSystemInitialLoadParameters = trim(snmp_get($device, "HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0", "-Osqnv"));
 
       if (strpos($hrSystemInitialLoadParameters, "syno_hw_version") !== FALSE) { $os = "dsm"; }
       else

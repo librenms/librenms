@@ -397,9 +397,9 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:avg:LAST:%4.1lf\l');
 	$GraphDefs['entropy'] = array(
 		#'-v', 'Bits',
-		'DEF:avg={file}:entropy:AVERAGE',
-		'DEF:min={file}:entropy:MIN',
-		'DEF:max={file}:entropy:MAX',
+		'DEF:avg={file}:value:AVERAGE',
+		'DEF:min={file}:value:MIN',
+		'DEF:max={file}:value:MAX',
 		'COMMENT:         Min       Avg       Max       Cur\l',
 		"AREA:max#$HalfBlue",
 		"AREA:min#$Canvas",
@@ -422,9 +422,9 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:avg:LAST:%4.1lf\l');
 	$GraphDefs['frequency'] = array(
 		#'-v', 'Hertz',
-		'DEF:avg={file}:frequency:AVERAGE',
-		'DEF:min={file}:frequency:MIN',
-		'DEF:max={file}:frequency:MAX',
+		'DEF:avg={file}:value:AVERAGE',
+		'DEF:min={file}:value:MIN',
+		'DEF:max={file}:value:MAX',
 		"AREA:max#b5b5b5",
 		"AREA:min#$Canvas",
 		"LINE1:avg#$FullBlue:Frequency [Hz]",
