@@ -1,0 +1,15 @@
+node_modules
+.DS_Store
+tmp/**/*
+.idea
+.idea/**/*
+*.iml
+*.sublime-*
+_site
+dist/*.js
+coverage/
+*.js.html
+index.html
+.mailmap
+bower.json
+component.json
