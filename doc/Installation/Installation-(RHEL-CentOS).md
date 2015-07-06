@@ -7,8 +7,8 @@ NOTE: These instructions assume you are the root user.  If you are not, prepend 
     yum install net-snmp mysql-server
     service snmpd start
     service mysqld start
-    chkconfig --levels 235 mysqld on
-    chkconfig --levels 235 snmpd on
+    chkconfig mysqld on
+    chkconfig snmpd on
     mysql_secure_installation
     mysql -uroot -p
 
