@@ -21,6 +21,7 @@ import sys
 import threading
 import time
 import MySQLdb
+from datetime import datetime, timedelta
 
 install_dir = os.path.dirname(os.path.realpath(__file__))
 config_file = install_dir + '/config.php'
@@ -70,6 +71,11 @@ else:
     poller_group = False
 # EOC1
 
+s_time = time.time()
+real_duration = 0
+per_device_duration = {}
+polled_devices = 0
+
 # Take the amount of threads we want to run in parallel from the commandline
 # if None are given or the argument was garbage, fall back to default of 16
 try:
@@ -100,15 +106,6 @@ except:
     print "ERROR: Could not connect to MySQL database!"
     sys.exit(2)
 
-# Query ordering based on last polled date, so that the device with the oldest data is polled first.
-query = 'select device_id from devices {} disabled = 0 order by last_polled asc limit {}'.format(
-                    'where poller_group IN({}) and'.format(poller_group) if poller_group else '',
-                    amount_of_workers)
-
-cursor.execute(query)
-devices_list = cursor.fetchall()
-
-
 # A seperate queue and a single worker for printing information to the screen prevents
 # the good old joke:
 #
@@ -118,6 +115,7 @@ devices_list = cursor.fetchall()
 def printworker():
     nodeso = 0
     while True:
+        worker_id, device_id, elapsed_time = print_queue.get()
         global real_duration
         global per_device_duration
         global polled_devices
@@ -130,41 +128,67 @@ def printworker():
             print "WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time)
         print_queue.task_done()
 
-def poll_worker():
-    while True:
-        device_id = poll_queue.get()
-        try:
-            start_time = time.time()
-            command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (poller_path, device_id)
-            subprocess.check_call(command, shell=True)
-            elapsed_time = int(time.time() - start_time)
-            print_queue.put([threading.current_thread().name, device_id, elapsed_time])
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
-            pass
-        poll_queue.task_done()
+def poll_worker(device_id):
+    try:
+        start_time = time.time()
+        command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (poller_path, device_id)
+        subprocess.check_call(command, shell=True)
+        elapsed_time = int(time.time() - start_time)
+        print_queue.put([threading.current_thread().name, device_id, elapsed_time])
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except:
+        pass
 
-poll_queue = Queue.Queue()
 print_queue = Queue.Queue()
 
 print "INFO: starting the poller at %s with %s threads, slowest devices first" % (time.strftime("%Y-%m-%d %H:%M:%S"),
         amount_of_workers)
 
-for device_id in devices_list:
-    poll_queue.put(device_id)
 
-for i in range(amount_of_workers):
-    t = threading.Thread(target=poll_worker)
-    t.setDaemon(True)
-    t.start()
+def queue_feeder():
+    while True:
+        if threading.active_count() > amount_of_workers + 1:
+            time.sleep(1)
+            continue
+
+        query = 'select device_id,last_polled from devices {} disabled = 0 order by last_polled asc'.format(
+                            'where poller_group IN({}) and'.format(poller_group) if poller_group else '')
+        cursor.execute(query)
+        for device_id, last_polled in cursor.fetchall():
+            cursor.execute("SELECT IS_FREE_LOCK('polling.{}')".format(device_id))
+            if cursor.fetchone()[0] != 1:
+                continue
+            cursor.execute("SELECT IS_FREE_LOCK('queued.{}')".format(device_id))
+            if cursor.fetchone()[0] != 1:
+                continue
+            last_polled_date = strptime(last_polled, '%Y-%m-%d %H:%M:%S')
+            if last_polled_date < datetime.now() - timedelta(seconds=frequency):
+                t = threading.Thread(target=poll_worker(device_id))
+                t.setDaemon(True)
+                t.start()
+                break
+            else:
+                cursor.execute("SELECT GET_LOCK('queued.{}')".format(device_id))
+                if cursor.fetchone()[0] != 1:
+                    break
+                sleeptime = ((last_polled_date + timedelta(seconds=300)) - datetime.now()).seconds
+                datetime.sleep(sleeptime)
+                t = threading.Thread(target=poll_worker(device_id))
+                t.setDaemon(True)
+                t.start()
+                cursor.execute("SELECT RELEASE_LOCK('queued.{}')".format(device_id))
+                break
 
 p = threading.Thread(target=printworker)
 p.setDaemon(True)
 p.start()
 
+f = threading.Thread(target=queue_feeder)
+f.setDaemon(True)
+f.start()
+
 try:
-    poll_queue.join()
     print_queue.join()
 except (KeyboardInterrupt, SystemExit):
     raise
