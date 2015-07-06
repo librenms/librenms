@@ -90,17 +90,28 @@ except:
 # if None are given or the argument was garbage, fall back to default of 300
 try:
     frequency = int(sys.argv[2])
-    if amount_of_workers == 0:
+    if frequency == 0:
         print "ERROR: 0 seconds is not a valid value"
         sys.exit(2)
 except:
     frequency = 300
+
+# Take the down_retry value from the commandline
+# if None are given or the argument was garbage, fall back to default of 15
+try:
+    down_retry = int(sys.argv[3])
+    if down_retry == 0:
+        print "ERROR: 0 seconds is not a valid value"
+        sys.exit(2)
+except:
+    down_retry = 15
 
 try:
     if db_port == 0:
         db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
     else:
         db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
+    db.autocommit(True)
     cursor = db.cursor()
 except:
     print "ERROR: Could not connect to MySQL database!"
@@ -137,56 +148,101 @@ def poll_worker(device_id):
         print_queue.put([threading.current_thread().name, device_id, elapsed_time])
     except (KeyboardInterrupt, SystemExit):
         raise
-    except:
-        pass
+    #except:
+    #    pass
 
 print_queue = Queue.Queue()
 
-print "INFO: starting the poller at %s with %s threads, slowest devices first" % (time.strftime("%Y-%m-%d %H:%M:%S"),
+print "INFO: starting the poller at %s with %s threads" % (time.strftime("%Y-%m-%d %H:%M:%S"),
         amount_of_workers)
-
-
-def queue_feeder():
-    while True:
-        if threading.active_count() > amount_of_workers + 1:
-            time.sleep(1)
-            continue
-
-        query = 'select device_id,last_polled from devices {} disabled = 0 order by last_polled asc'.format(
-                            'where poller_group IN({}) and'.format(poller_group) if poller_group else '')
-        cursor.execute(query)
-        for device_id, last_polled in cursor.fetchall():
-            cursor.execute("SELECT IS_FREE_LOCK('polling.{}')".format(device_id))
-            if cursor.fetchone()[0] != 1:
-                continue
-            cursor.execute("SELECT IS_FREE_LOCK('queued.{}')".format(device_id))
-            if cursor.fetchone()[0] != 1:
-                continue
-            last_polled_date = strptime(last_polled, '%Y-%m-%d %H:%M:%S')
-            if last_polled_date < datetime.now() - timedelta(seconds=frequency):
-                t = threading.Thread(target=poll_worker(device_id))
-                t.setDaemon(True)
-                t.start()
-                break
-            else:
-                cursor.execute("SELECT GET_LOCK('queued.{}')".format(device_id))
-                if cursor.fetchone()[0] != 1:
-                    break
-                sleeptime = ((last_polled_date + timedelta(seconds=300)) - datetime.now()).seconds
-                datetime.sleep(sleeptime)
-                t = threading.Thread(target=poll_worker(device_id))
-                t.setDaemon(True)
-                t.start()
-                cursor.execute("SELECT RELEASE_LOCK('queued.{}')".format(device_id))
-                break
 
 p = threading.Thread(target=printworker)
 p.setDaemon(True)
 p.start()
 
-f = threading.Thread(target=queue_feeder)
-f.setDaemon(True)
-f.start()
+def lockFree(lock):
+    global cursor
+    query = "SELECT IS_FREE_LOCK('{}')".format(lock)
+    #print 'checking lock: {}'.format(query)
+    cursor.execute(query)
+    return cursor.fetchall()[0][0] == 1
+
+def getLock(lock):
+    global cursor
+    query = "SELECT GET_LOCK('{}', 0)".format(lock)
+    #print 'getting lock: {}'.format(query)
+    cursor.execute(query)
+    return cursor.fetchall()[0][0] == 1
+
+def releaseLock(lock):
+    global cursor
+    query = "SELECT RELEASE_LOCK('{}')".format(lock)
+    #print 'releasing lock: {}'.format(query)
+    cursor.execute(query)
+    return cursor.fetchall()[0][0] == 1
+
+recently_scanned = {}
+
+while True:
+    print '{} threads currently active'.format(threading.active_count())
+    while threading.active_count() >= amount_of_workers:
+        time.sleep(.5)
+
+    #print 'querying for devices'
+    query = 'select device_id,last_polled from devices {} disabled = 0 order by last_polled asc'.format(
+                        'where poller_group IN({}) and'.format(poller_group) if poller_group else '')
+    cursor.execute(query)
+    devices = cursor.fetchall()
+    dead_retry_in = frequency
+    #print "first 5 devices: {}".format(devices[:5])
+    for device_id, last_polled in devices:
+#        print 'trying device {}'.format(device_id)
+#        time.sleep(1)
+        if not lockFree('polling.{}'.format(device_id)):
+#            print 'polling lock is not free on {} continuing'.format(device_id)
+#            time.sleep(1)
+            continue
+        if not lockFree('queued.{}'.format(device_id)):
+#            print 'queued lock is not free on {} continuing'.format(device_id)
+#            time.sleep(1)
+            continue
+        try:
+            if ((recently_scanned[device_id] + timedelta(seconds=down_retry)) - datetime.now()).seconds > 1:
+                dead_retry_in = ((recently_scanned[device_id] + timedelta(seconds=down_retry)) - datetime.now()).seconds
+#                print 'device {} recently scanned already'.format(device_id)
+#                time.sleep(1)
+                continue
+        except KeyError:
+            pass
+
+        # add queue lock, so if we sleep, we lock the next device against any other pollers, break
+        # if aquiring lock fails
+        if not getLock('queued.{}'.format(device_id)):
+#            print 'getting queue lock on {} failed'.format(device_id)
+#            time.sleep(1)
+            break
+
+        if last_polled > datetime.now() - timedelta(seconds=frequency):
+            sleeptime = ((last_polled + timedelta(seconds=300)) - datetime.now()).seconds
+            if sleeptime > dead_retry_in:
+                print 'Sleeping {} seconds before retrying failed device'.format(dead_retry_in, device_id, last_polled)
+                time.sleep(dead_retry_in)
+                break
+
+            print 'Sleeping {} seconds before polling {}, last polled {}'.format(sleeptime, device_id, last_polled)
+            time.sleep(sleeptime)
+
+        print 'Starting poll of device {}, last polled {}'.format(device_id, last_polled)
+        recently_scanned[device_id] = datetime.now()
+        t = threading.Thread(target=poll_worker, args=[device_id])
+        #t.setDaemon(True)
+        t.start()
+        #print 'thread launched'
+
+        releaseLock('queued.{}'.format(device_id))
+
+        # If we made it this far, break out of the loop and query again.
+        break
 
 try:
     print_queue.join()
