@@ -133,6 +133,9 @@ if ('distributed_poller' in config and
         import uuid
         memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
             str(config['distributed_poller_memcached_port'])])
+        if str(memc.get("poller.master")) == config['distributed_poller_name']:
+            print "This sytem is already joined as the poller master."
+            sys.exit(2)
         if memc_alive():
             if memc.get("poller.master") is None:
                 print "Registered as Master"
@@ -148,7 +151,7 @@ if ('distributed_poller' in config and
             print "Could not connect to memcached, disabling distributed poller."
             distpoll = False
             IsNode = False
-    except:
+    except ImportError:
         print "ERROR: missing memcache python module:"
         print "On deb systems: apt-get install python-memcache"
         print "On other systems: easy_install python-memcached"

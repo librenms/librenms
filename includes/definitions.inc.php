@@ -1162,6 +1162,15 @@ $config['os'][$os]['text']              = "Multimatic UPS";
 $config['os'][$os]['type']              = "power";
 $config['os'][$os]['icon']              = "multimatic";
 
+// Huawei UPS
+$os = "huaweiups";
+$config['os'][$os]['text']              = "Huawei UPS";
+$config['os'][$os]['group']             = "ups";
+$config['os'][$os]['type']              = "power";
+$config['os'][$os]['icon']              = "huawei";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))

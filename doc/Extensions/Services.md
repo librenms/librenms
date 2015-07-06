@@ -48,3 +48,5 @@ no graphs will be generated. **
 - smtp
 - pop
 - simap
+- ntp
+- ircd
