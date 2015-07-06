@@ -25,11 +25,6 @@ include("includes/alerts.inc.php");
 $poller_start = utime();
 echo($config['project_name_version']." Poller\n\n");
 
-if (is_file($config['mib_dir'].'/.index') === true) {
-    echo ".index exists, removing\n";
-    unlink($config['mib_dir'].'/.index');
-}
-
 $options = getopt("h:m:i:n:r::d::a::");
 
 if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
@@ -113,9 +108,13 @@ if (!isset($query))
 foreach (dbFetch($query) as $device)
 {
   $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
-  poll_device($device, $options);
-  RunRules($device['device_id']);
-  echo "\r\n";
+  if (dbGetLock('polling.' . $device['device_id']))
+  {
+    poll_device($device, $options);
+    RunRules($device['device_id']);
+    dbReleaseLock('polling.' . $device['device_id']);
+    echo "\r\n";
+  }
   $polled_devices++;
 }
 
