@@ -23,10 +23,10 @@ import time
 import MySQLdb
 
 install_dir = os.path.dirname(os.path.realpath(__file__))
-config_file = ob_install_dir + '/config.php'
+config_file = install_dir + '/config.php'
 
 def get_config_data():
-    config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % ob_install_dir]
+    config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
     try:
         proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     except:
