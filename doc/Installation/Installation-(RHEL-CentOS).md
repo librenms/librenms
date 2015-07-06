@@ -87,8 +87,8 @@ If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove th
 Install necessary extra software and let it start on system boot.
 
     yum install nginx php-fpm
-    chkconfig --levels 235 nginx on
-    chkconfig --levels 235 php-fpm on
+    chkconfig nginx on
+    chkconfig php-fpm on
 
 Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
