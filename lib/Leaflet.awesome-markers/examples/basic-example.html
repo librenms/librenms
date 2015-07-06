@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet Quick Start Guide Example</title>
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="../dist/leaflet.awesome-markers.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.ie.css" />
+    <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
+<![endif]-->
+</head>
+<body>
+  <div id="map" style="width: 800px; height: 600px"></div>
+
+  <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
+  <script src="../dist/leaflet.awesome-markers.js"></script>
+  <script>
+    var map = L.map('map').setView([51.932994,4.509373], 14);
+
+    L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade. Font Awesome by Dave Gandy',
+      key: 'BC9A493B41014CAABB98F0471D759707',
+      detectRetina: true
+    }).addTo(map);
+
+    L.marker([51.941196,4.512291], {icon: L.AwesomeMarkers.icon({icon: 'spinner', color: 'red', spin:true}) }).addTo(map);
+    L.marker([51.927913,4.521303], {icon: L.AwesomeMarkers.icon({icon: 'icon-coffee', color: 'red', iconColor: 'black'}) }).addTo(map);
+    L.marker([51.936063,4.502077], {icon: L.AwesomeMarkers.icon({icon: 'food', color: 'purple'}) }).addTo(map);
+    L.marker([51.932835,4.506969], {icon: L.AwesomeMarkers.icon({icon: 'glass', color: 'green'}) }).addTo(map);
+    L.marker([51.930295,4.515209], {icon: L.AwesomeMarkers.icon({icon: 'shopping-cart', color: 'blue'}) }).addTo(map);
+    L.marker([51.930083,4.507742], {icon: L.AwesomeMarkers.icon({icon: 'comments', color: 'orange'}) }).addTo(map);
+
+    L.marker([51.930454,4.527054], {icon: L.AwesomeMarkers.icon({icon: 'group', color: 'darkred'}) }).addTo(map);
+    L.marker([51.929607,4.527054], {icon: L.AwesomeMarkers.icon({icon: 'arrow-right', color: 'darkblue'}) }).addTo(map);
+    L.marker([51.928919,4.528856], {icon: L.AwesomeMarkers.icon({icon: 'twitter', color: 'cadetblue'}) }).addTo(map);
+    L.marker([51.930295,4.530745], {icon: L.AwesomeMarkers.icon({icon: 'phone', color: 'darkpurple'}) }).addTo(map);
+    L.marker([51.925055,4.512806], {icon: L.AwesomeMarkers.icon({icon: 'ambulance', color: 'darkgreen'}) }).addTo(map);
+    L.marker([51.925902,4.505768], {icon: L.AwesomeMarkers.icon({icon: 'medkit', color: 'darkblue'}) }).addTo(map);
+  </script>
+</body>
+</html>

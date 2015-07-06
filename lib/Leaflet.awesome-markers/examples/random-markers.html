@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet Quick Start Guide Example</title>
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="../dist/leaflet.awesome-markers.css">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.ie.css" />
+    <link rel="stylesheet" href="css/font-awesome-ie7.min.css">
+<![endif]-->
+</head>
+<body>
+  <div id="map" style="width: 800px; height: 600px"></div>
+
+  <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
+  <script src="../dist/leaflet.awesome-markers.js"></script>
+  <script>
+    var map = L.map('map').setView([51.5, -0.09], 9);
+
+    L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade. Font Awesome by Dave Gandy',
+      key: 'BC9A493B41014CAABB98F0471D759707',
+      detectRetina: true
+    }).addTo(map);
+
+    var colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'darkblue', 'darkgreen', 'cadetblue', 'darkpurple'];
+
+    var awesomeIcons = ['font', 'cloud-download', 'medkit', 'github-alt', 'coffee', 'food', 'bell-alt', 'question-sign', 'star'];
+
+    var rndCoordinates = function(from, to, fixed) {
+        return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
+      };
+
+    for (var i = 0; i <= 100; i++) {
+      var color = colors[Math.floor(Math.random()*colors.length)];
+      var awesomeIcon = awesomeIcons[Math.floor(Math.random()*awesomeIcons.length)];
+      var geo = [rndCoordinates(51.3,51.8, 3), rndCoordinates(0.3,-0.4,3)];
+
+      L.marker(geo, {icon: L.AwesomeMarkers.icon({icon: awesomeIcon, color: color}) }).addTo(map);
+    }
+  </script>
+</body>
+</html>
