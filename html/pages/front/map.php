@@ -26,7 +26,7 @@ if ($config['map']['engine'] == 'leaflet') {
 ?>
 <script src="js/leaflet.js"></script>
 <script src="js/leaflet.markercluster-src.js"></script>
-<script src="js/leaflet.awesome-markers.js"></script>
+<script src="js/leaflet.awesome-markers.min.js"></script>
 <div id="leaflet-map"></div>
 <script>
 <?php
@@ -43,14 +43,23 @@ L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 var markers = L.markerClusterGroup();
 var redMarker = L.AwesomeMarkers.icon({
     icon: 'server',
-    markerColor: 'red', prefix: 'fa', iconColor: 'black'
+    markerColor: 'red', prefix: 'fa', iconColor: 'white'
+  });
+var greenMarker = L.AwesomeMarkers.icon({
+    icon: 'server',
+    markerColor: 'green', prefix: 'fa', iconColor: 'white'
   });
 
 <?php
 foreach (dbFetchRows("SELECT `hostname`,`lat`,`lng`,`status` FROM `devices` WHERE `lat` IS NOT NULL AND `lng` IS NOT NULL AND `disabled`=0 AND `ignore`=0 ORDER BY `status` ASC, `hostname`") as $map_devices) {
 
+    $icon = 'greenMarker';
+    if ($map_devices['status'] == 0) {
+        $icon = 'redMarker';
+    }
+
     echo "var title = '" . $map_devices['hostname'] . "';
-         var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: title});
+         var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: title, icon: $icon});
          marker.bindPopup(title);
          markers.addLayer(marker);\n";
 }
