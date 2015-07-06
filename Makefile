@@ -55,3 +55,9 @@ mapael-maps:
 
 jquery-mousewheel:
 	$(GIT_SUBTREE) --prefix=lib/jquery-mousewheel https://github.com/jquery/jquery-mousewheel.git master
+
+Leaflet.markercluster:
+	$(GIT_SUBTREE) --prefix=lib/Leaflet.markercluster https://github.com/Leaflet/Leaflet.markercluster.git master
+
+Leaflet.awesome-markers:
+	$(GIT_SUBTREE) --prefix=lib/Leaflet.awesome-markers https://github.com/lvoogdt/Leaflet.awesome-markers.git 2.0/develop
