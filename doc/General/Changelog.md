@@ -1,3 +1,16 @@
+### July 2015
+
+#### Bug fixes
+  - Fixed API not functioning. (PR1367)
+  - Fixed API not storing alert rule names (PR1372)
+  - Fixed datetimepicker use (PR1376)
+  - Do not allow master to rejoin itself. (PR1377)
+  - Fixed Nginx config file (PR1389)
+
+#### Improvements
+  - Added additional support for Rielo UPS (PR1381)
+  - Improved service check support (PR1385,PR1386,PR1387,PR1388)
+
 ### June 2015
 
 #### Bug fixes
@@ -15,6 +28,14 @@
   - Fixed legend ifLabels (PR1296)
   - Fixed bug causing map to not load when stale link data was present (PR1297)
   - Fixed javascript issue preventing removal of alert rules (PR1312)
+  - Fixed removal of IPs before ports are deleted (PR1329)
+  - Fixed JS issue when removing ports from bills (PR1330)
+  - Fixed adding --daemon a second time to collectd Graphs (PR1342)
+  - Fixed CollectD DS names (PR1347,PR1349,PR1368)
+  - Fixed graphing issues when rrd contains special chars (PR1350)
+  - Fixed regex for device groups (PR1359)
+  - Added HOST-RESOURCES-MIB into Synology detection (RP1360)
+  - Fix health page graphs showing the first graph for all (PR1363)
 
 #### Improvements
   - Updated Syslog docs to include syslog-ng 3.5.1 updates (PR1171)
@@ -48,6 +69,18 @@
   - Added WebUI support for Pushover (PR1313)
   - Updated path check for Oxidized config (PR1316)
   - Added Multimatic UPS to rfc1628 detection (PR1317)
+  - Added timeout for Unix agent (PR1319)
+  - Added support for a poller to use more than one poller group (PR1323)
+  - Added ability to use Plugins on device overview page (PR1325)
+  - Added latency loss/avg/max/min results to DB and Graph (PR1326)
+  - Added recording of device down (snmp/icmp) (PR1326)
+  - Added debugging output for when invalid SNMPv3 options used (PR1331)
+  - Added load and state output to device overview page (PR1333)
+  - Added load sensors to RFC1628 Devices (PR1336)
+  - Added support for WebPower Pro II UPS Cards (PR1338)
+  - No longer rewrite server-status in .htaccess (PR1339)
+  - Added docs for setting up Service extensions (PR1354)
+  - Added additional info from pfsense devices (PR1356)
 
 ### May 2015
 
