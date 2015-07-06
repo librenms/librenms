@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 """
  poller-service A service to wrap SNMP polling.  It will poll up to $threads devices at a time, and will not re-poll
                 devices that have been polled within the last $frequency seconds. It will prioritize devices based on
