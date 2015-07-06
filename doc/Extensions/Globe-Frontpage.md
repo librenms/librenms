@@ -12,10 +12,30 @@ $config['geoloc']['latlng'] = true;
 $config['geoloc']['engine'] = "google";//Only one available at present
 ```
 
+We have two current mapping engines available:
+
+- Leaflet (default)
+- Jquery-Mapael
+
+
+### Leaflet config
+
+This is a simple engine to use yet is quite powerful, here you can see how to enable this engine and zoom to a default place.
+
+```php
+$config['map']['engine']                                = "leaflet";
+$config['leaflet']['default_lat']                       = "50.898482";
+$config['leaflet']['default_lng']                       = "-3.401402";
+$config['leaflet']['default_zoom']                       = 8;
+```
+
+
+### Jquery-Mapael config
 Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of 
 this is:
 
 ```php
+$config['map']['engine']                                = "jquery-mapael";
 $config['mapael']['default_map'] = 'mapael-maps/united_kingdom/united_kingdom.js';
 $config['mapael']['map_width'] = 400;
 $config['mapael']['default_lat'] = '50.898482';

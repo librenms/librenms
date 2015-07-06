@@ -22,6 +22,40 @@
  * @subpackage Frontpage
  */
 
+if ($config['map']['engine'] == 'leaflet') {
+?>
+<script src="js/leaflet.js"></script>
+<script src="js/leaflet.markercluster-src.js"></script>
+<div id="leaflet-map"></div>
+<script>
+<?php
+
+$map_init = "[" . $config['leaflet']['default_lat'] . ", " . $config['leaflet']['default_lng'] . "], " . $config['leaflet']['default_zoom'];
+
+?>
+var map = L.map('leaflet-map').setView(<?php echo $map_init; ?>);
+
+L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var markers = L.markerClusterGroup();
+
+<?php
+foreach (dbFetchRows("SELECT `hostname`,`lat`,`lng`,`status` FROM `devices` WHERE `lat` IS NOT NULL AND `lng` IS NOT NULL AND `disabled`=0 AND `ignore`=0 ORDER BY `status` ASC, `hostname`") as $map_devices) {
+
+    echo "var title = '" . $map_devices['hostname'] . "'
+         var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: 'title'});
+         marker.bindPopup('title');
+         markers.addLayer(marker);\n";
+}
+?>
+
+map.addLayer(markers);
+</script>
+<?php
+} else {
+
 if (isset($config['mapael']['default_map']) && is_file($config['html_dir'].'/js/'.$config['mapael']['default_map'])) {
     $default_map = $config['mapael']['default_map'];
 } else {
@@ -125,6 +159,7 @@ $(function () {
 		</div>
 </div>
 <?php
+}
 include_once("includes/object-cache.inc.php");
 echo '<div class="container-fluid">
 	<div class="row">

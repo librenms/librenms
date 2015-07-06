@@ -1692,3 +1692,7 @@ tr.search:nth-child(odd) {
 .zoomOut {
     top:30px;
 }
+
+#leaflet-map {
+    height: 600px;
+}
