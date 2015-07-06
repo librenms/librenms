@@ -64,11 +64,7 @@ function dbQuery($sql, $parameters=array()) {
  * */
 function dbGetLock($data, $timeout = 0) {
 	$sql = 'SELECT GET_LOCK(\'' . $data . '\',' . $timeout . ')';
-	echo "printing sql: ";
-	echo "$sql\n";
 	$result = dbFetchCell($sql);
-	echo "printing result: ";
-	echo "$result\n";
 	return $result;
 }
 
@@ -78,15 +74,10 @@ function dbGetLock($data, $timeout = 0) {
  * */
 function dbReleaseLock($data, $timeout = 0) {
 	$sql = 'SELECT RELEASE_LOCK(\'' . $data . '\')';
-	echo "printing sql: ";
-	echo "$sql\n";
 	$result = dbFetchCell($sql);
-	echo "printing result: ";
-	echo "$result\n";
 	return $result;
-}
 
-
+ 
 /*
  * Passed an array and a table name, it attempts to insert the data into the table.
  * Check for boolean false to determine whether insert failed
