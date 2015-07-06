@@ -118,6 +118,18 @@ class Client
     }
 
     /**
+     * For testing
+     * @param \Guzzle\Http\Client $client
+     * @return $this
+     */
+    public function setHttpClient(\Guzzle\Http\Client $client)
+    {
+        $this->httpClient = $client;
+
+        return $this;
+    }
+
+    /**
      * Use the given database
      *
      * @param string $name
