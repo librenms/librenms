@@ -37,6 +37,7 @@ Contributors to LibreNMS:
 - Clint Armstrong <clint@clintarmstrong.net> (clinta)
 - Tony Ditchfield <tony.ditchfield@gmail.com> (arnoldthebat)
 - Travis Hegner <travis.hegner@gmail.com> (travishegner)
+- Will Jones <email@willjones.eu> (willjones)
 
 [1]: http://observium.org/ "Observium web site"
 
