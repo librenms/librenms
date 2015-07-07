@@ -197,7 +197,6 @@ if (isset($MetaGraphDefs[$type])) {
 
 if(isset($rrd_cmd))
 {
-  if ($config['rrdcached']) { $rrd_cmd .= " --daemon ".$config['rrdcached'] . " "; }
     if ($_GET['from'])  { $from   = mres($_GET['from']);   }
       if ($_GET['to'])    { $to   = mres($_GET['to']);   }
         $rrd_cmd .= " -s " . $from . " -e " . $to;

@@ -43,6 +43,8 @@ $config['rrdtool']          = "/usr/bin/rrdtool";
 $config['fping']            = "/usr/bin/fping";
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
+$config['fping_options']['count'] = 3;
+$config['fping_options']['millisec'] = 20;
 $config['fping6']           = "/usr/bin/fping6";
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
 $config['snmpget']          = "/usr/bin/snmpget";
@@ -572,6 +574,8 @@ $config['modules_compat']['rfc1628']['netmanplus']        = 1;
 $config['modules_compat']['rfc1628']['deltaups']          = 1;
 $config['modules_compat']['rfc1628']['poweralert']        = 1;
 $config['modules_compat']['rfc1628']['multimatic']        = 1;
+$config['modules_compat']['rfc1628']['webpower']          = 1;
+$config['modules_compat']['rfc1628']['huaweiups']         = 1;
 
 # Enable daily updates
 $config['update'] = 1;
@@ -581,6 +585,7 @@ $config['syslog_purge']                                   = 30; # Number in days
 $config['eventlog_purge']                                 = 30; # Number in days of how long to keep eventlog entries for.
 $config['authlog_purge']                                  = 30; # Number in days of how long to keep authlog entries for.
 $config['perf_times_purge']                               = 30; # Number in days of how long to keep performace pooling stats  entries for.
+$config['device_perf_purge']                              = 30; // Number in days of how long to keep device performance data for.
 
 # Date format for PHP date()s
 $config['dateformat']['long']                             = "r"; # RFC2822 style
