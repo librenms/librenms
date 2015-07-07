@@ -176,52 +176,78 @@ def releaseLock(lock):
     cursor.execute(query)
     return cursor.fetchall()[0][0] == 1
 
-recently_scanned = {}
+def sleep_until(timestamp):
+    now = datetime.now()
+    if timestamp > now:
+        sleeptime = (timestamp - now).seconds
+    else:
+        sleeptime = 0
+    time.sleep(sleeptime)
+
+poller_group = ('and poller_group IN({}) '
+    .format(str(config['distributed_poller_group'])) if 'distributed_poller_group' in config else '')
+
+# Add last_polled and last_polled_timetaken so we can sort by the time the last poll started, with the goal
+# of having each device complete a poll within the given time range.
+dev_query = (   'SELECT device_id,                                  '
+                'DATE_ADD(                                          '
+                '  DATE_SUB(                                        '
+                '    last_polled,                                   '
+                '    INTERVAL last_polled_timetaken SECOND          '
+                '  ),                                               '
+                '  INTERVAL {0} SECOND) AS next_poll                '
+                'FROM devices WHERE                                 '
+                'disabled = 0                                       '
+                'AND IS_FREE_LOCK(CONCAT("polling.", device_id))    '
+                'AND IS_FREE_LOCK(CONCAT("queued.", device_id))     '
+                '{1}                                                '
+                'ORDER BY next_poll asc                             ').format(frequency, poller_group)
+
+dont_retry = {}
+threads = 0
 
 while True:
-    print '{} threads currently active'.format(threading.active_count())
+    cur_threads = threading.active_count()
+    if cur_threads != threads:
+        threads = cur_threads
+        print 'INFO: {} threads currently active'.format(threads)
+
+    dont_retry = dict((dev, time) for dev, time in dont_retry.iteritems() if time > datetime.now())
+
     while threading.active_count() >= amount_of_workers:
         time.sleep(.5)
 
-    query = 'select device_id,last_polled from devices {} disabled = 0 order by last_polled asc'.format(
-                'where poller_group IN({}) and'.format(str(config['distributed_poller_group']))
-                if 'distributed_poller_group' in config else '')
-    cursor.execute(query)
+    cursor.execute(dev_query)
     devices = cursor.fetchall()
-    dead_retry_in = frequency
-    for device_id, last_polled in devices:
-        if not lockFree('polling.{}'.format(device_id)):
-            continue
-        if not lockFree('queued.{}'.format(device_id)):
-            continue
-        try:
-            if ((recently_scanned[device_id] + timedelta(seconds=down_retry)) - datetime.now()).seconds > 1:
-                dead_retry_in = ((recently_scanned[device_id] + timedelta(seconds=down_retry)) - datetime.now()).seconds
-                continue
-        except KeyError:
-            pass
-
-        # add queue lock, so if we sleep, we lock the next device against any other pollers, break
-        # if aquiring lock fails
+    for device_id, next_poll in devices:
+        # add queue lock, so we lock the next device against any other pollers
+        # if this fails, the device is locked by another poller already
         if not getLock('queued.{}'.format(device_id)):
-            break
+            continue
+        if not lockFree('polling.{}'.format(device_id)):
+            releaseLock('queued.{}'.format(device_id))
+            continue
+        if device_id in dont_retry:
+            releaseLock('queued.{}'.format(device_id))
+            continue
 
-        if last_polled > datetime.now() - timedelta(seconds=frequency):
-            sleeptime = ((last_polled + timedelta(seconds=300)) - datetime.now()).seconds
-            if sleeptime > dead_retry_in:
-                print 'Sleeping {} seconds before retrying failed device'.format(dead_retry_in, device_id, last_polled)
-                time.sleep(dead_retry_in)
-                break
+        if next_poll > datetime.now():
+            next_retry_device = min(dont_retry, key=dont_retry.get)
+            next_retry_time = dont_retry[next_retry_device]
+            if next_retry_time < next_poll:
+                device_id = next_retry_device
+                if not getLock('queued.{}'.format(device_id)):
+                    continue
+                print 'INFO: Sleeping until {} before retrying failed device {}'.format(next_retry_time, device_id)
+                sleep_until(next_retry_time)
+            else:
+                print 'INFO: Sleeping until {} before polling {}'.format(next_poll, device_id)
+                sleep_until(next_poll)
 
-            print 'Sleeping {} seconds before polling {}, last polled {}'.format(sleeptime, device_id, last_polled)
-            time.sleep(sleeptime)
-
-        print 'Starting poll of device {}, last polled {}'.format(device_id, last_polled)
-        recently_scanned[device_id] = datetime.now()
+        print 'INFO: Starting poll of device {}'.format(device_id)
+        dont_retry[device_id] = datetime.now() + timedelta(seconds=down_retry)
         t = threading.Thread(target=poll_worker, args=[device_id])
         t.start()
-
-        releaseLock('queued.{}'.format(device_id))
 
         # If we made it this far, break out of the loop and query again.
         break
