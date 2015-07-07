@@ -219,6 +219,7 @@ while True:
 
     cursor.execute(dev_query)
     devices = cursor.fetchall()
+    retry_devs_found = {}
     for device_id, next_poll in devices:
         # add queue lock, so we lock the next device against any other pollers
         # if this fails, the device is locked by another poller already
@@ -228,21 +229,27 @@ while True:
             releaseLock('queued.{}'.format(device_id))
             continue
         if device_id in dont_retry:
+            retry_devs_found[device_id] = dont_retry[device_id]
             releaseLock('queued.{}'.format(device_id))
             continue
 
         if next_poll > datetime.now():
-            next_retry_device = min(dont_retry, key=dont_retry.get)
-            next_retry_time = dont_retry[next_retry_device]
-            if next_retry_time < next_poll:
-                device_id = next_retry_device
-                if not getLock('queued.{}'.format(device_id)):
-                    continue
-                print 'INFO: Sleeping until {} before retrying failed device {}'.format(next_retry_time, device_id)
-                sleep_until(next_retry_time)
-            else:
-                print 'INFO: Sleeping until {} before polling {}'.format(next_poll, device_id)
-                sleep_until(next_poll)
+            poll_action = 'polling'
+            sleep_until_time = next_poll
+            try:
+                next_retry_device = min(retry_devs_found, key=retry_devs_found.get)
+                next_retry_time = retry_devs_found[next_retry_device]
+                if next_retry_time < next_poll:
+                    device_id = next_retry_device
+                    if not getLock('queued.{}'.format(device_id)):
+                        continue
+                    poll_action = 'retrying failed device'
+                    sleep_until_time = next_retry_time
+            except ValueError:
+                pass
+
+            print 'INFO: Sleeping until {0} before {1} {2}'.format(next_poll, poll_action, device_id)
+            sleep_until(sleep_until_time)
 
         print 'INFO: Starting poll of device {}'.format(device_id)
         dont_retry[device_id] = datetime.now() + timedelta(seconds=down_retry)
