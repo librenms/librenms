@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 """
  poller-service A service to wrap SNMP polling.  It will poll up to $threads devices at a time, and will not re-poll
-                devices that have been polled within the last $poll_frequency seconds. It will prioritize devices based on
-                the last time polled. If resources are sufficient, this service should poll every device every
+                devices that have been polled within the last $poll_frequency seconds. It will prioritize devices based
+                on the last time polled. If resources are sufficient, this service should poll every device every
                 $poll_frequency seconds, but should gracefully degrade if resources are inefficient, polling devices as
                 frequently as possible. This service is based on poller-wrapper.py.
 
@@ -14,7 +14,6 @@
 
 import json
 import os
-import Queue
 import subprocess
 import sys
 import threading
@@ -28,7 +27,7 @@ log = logging.getLogger('poller-service')
 log.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('poller-service: %(message)s')
-handler = logging.handlers.SysLogHandler(address= '/dev/log')
+handler = logging.handlers.SysLogHandler(address='/dev/log')
 handler.setFormatter(formatter)
 log.addHandler(handler)
 
@@ -36,6 +35,7 @@ install_dir = os.path.dirname(os.path.realpath(__file__))
 config_file = install_dir + '/config.php'
 
 log.info('INFO: Starting poller-service')
+
 
 def get_config_data():
     config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
@@ -169,6 +169,7 @@ def releaseLock(lock):
     cursor.execute(query)
     return cursor.fetchall()[0][0] == 1
 
+
 def sleep_until(timestamp):
     now = datetime.now()
     if timestamp > now:
@@ -178,31 +179,31 @@ def sleep_until(timestamp):
     time.sleep(sleeptime)
 
 poller_group = ('and poller_group IN({}) '
-    .format(str(config['distributed_poller_group'])) if 'distributed_poller_group' in config else '')
+                .format(str(config['distributed_poller_group'])) if 'distributed_poller_group' in config else '')
 
 # Add last_polled and last_polled_timetaken so we can sort by the time the last poll started, with the goal
 # of having each device complete a poll within the given time range.
-dev_query = (   'SELECT device_id,                                  '
-                'DATE_ADD(                                          '
-                '  DATE_SUB(                                        '
-                '    last_polled,                                   '
-                '    INTERVAL last_polled_timetaken SECOND          '
-                '  ),                                               '
-                '  INTERVAL {0} SECOND) AS next_poll,               '
-                'DATE_ADD(                                          '
-                '  DATE_SUB(                                        '
-                '    last_discovered,                               '
-                '    INTERVAL last_discovered_timetaken SECOND      '
-                '  ),                                               '
-                '  INTERVAL {1} SECOND) AS next_discovery           '
-                'FROM devices WHERE                                 '
-                'disabled = 0                                       '
-                'AND IS_FREE_LOCK(CONCAT("polling.", device_id))    '
-                'AND IS_FREE_LOCK(CONCAT("queued.", device_id))     '
-                '{2}                                                '
-                'ORDER BY next_poll asc                             ').format( poll_frequency,
-                                                                               discover_frequency,
-                                                                               poller_group        )
+dev_query = ('SELECT device_id,                                  '
+             'DATE_ADD(                                          '
+             '  DATE_SUB(                                        '
+             '    last_polled,                                   '
+             '    INTERVAL last_polled_timetaken SECOND          '
+             '  ),                                               '
+             '  INTERVAL {0} SECOND) AS next_poll,               '
+             'DATE_ADD(                                          '
+             '  DATE_SUB(                                        '
+             '    last_discovered,                               '
+             '    INTERVAL last_discovered_timetaken SECOND      '
+             '  ),                                               '
+             '  INTERVAL {1} SECOND) AS next_discovery           '
+             'FROM devices WHERE                                 '
+             'disabled = 0                                       '
+             'AND IS_FREE_LOCK(CONCAT("polling.", device_id))    '
+             'AND IS_FREE_LOCK(CONCAT("queued.", device_id))     '
+             '{2}                                                '
+             'ORDER BY next_poll asc                             ').format(poll_frequency,
+                                                                           discover_frequency,
+                                                                           poller_group)
 
 dont_retry = {}
 threads = 0
@@ -271,8 +272,3 @@ while True:
 
         # If we made it this far, break out of the loop and query again.
         break
-
-try:
-    print_queue.join()
-except (KeyboardInterrupt, SystemExit):
-    raise
