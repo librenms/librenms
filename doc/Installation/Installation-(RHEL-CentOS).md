@@ -96,7 +96,7 @@ Modify permissions and configuration for `php-fpm` to use nginx credentials.
     vi /etc/php-fpm.d/www.conf      # At line #12: Change `listen` to `/var/run/php5-fpm.sock`
                                     # At line #39-41: Change the `user` and `group` to `nginx`
 
-Add configuration for `nginx` at `/etc/nginx/conf.d/librenms` with the following content:
+Add configuration for `nginx` at `/etc/nginx/conf.d/librenms.conf` with the following content:
 
 ```nginx
 server {

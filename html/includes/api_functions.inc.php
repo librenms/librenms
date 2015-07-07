@@ -567,6 +567,10 @@ function add_edit_rule() {
     if(empty($rule)) {
         $message = 'Missing the alert rule';
     }
+    $name = mres($data['name']);
+    if (empty($name)) {
+        $message = 'Missing the alert rule name';
+    }
     $severity = mres($data['severity']);
     $sevs = array("ok","warning","critical");
     if(!in_array($severity, $sevs)) {
@@ -590,15 +594,19 @@ function add_edit_rule() {
     $extra = array('mute'=>$mute,'count'=>$count,'delay'=>$delay_sec);
     $extra_json = json_encode($extra);
 
+    if (dbFetchCell("SELECT `name` FROM `alert_rules` WHERE `name`=?",array($name)) == $name) {
+        $message = 'Name has already been used';
+    }
+
     if(empty($message)) {
         if(is_numeric($rule_id)) {
-            if( dbUpdate(array('rule' => $rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json), 'alert_rules', 'id=?',array($rule_id)) >= 0) {
+            if( dbUpdate(array('name' => $name, 'rule' => $rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json), 'alert_rules', 'id=?',array($rule_id)) >= 0) {
                 $status = 'ok';
                 $code = 200;
             } else {
                 $message = 'Failed to update existing alert rule';
             }
-        } elseif( dbInsert(array('device_id'=>$device_id,'rule'=>$rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json),'alert_rules') ) {
+        } elseif( dbInsert(array('name' => $name, 'device_id'=>$device_id,'rule'=>$rule,'severity'=>$severity,'disabled'=>$disabled,'extra'=>$extra_json),'alert_rules') ) {
             $status = 'ok';
             $code = 200;
         } else {
