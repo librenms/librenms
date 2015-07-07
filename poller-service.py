@@ -36,7 +36,7 @@ log.addHandler(handler)
 install_dir = os.path.dirname(os.path.realpath(__file__))
 config_file = install_dir + '/config.php'
 
-log.info('Starting poller-service')
+log.info('INFO: Starting poller-service')
 
 def get_config_data():
     config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
@@ -61,11 +61,13 @@ except:
     sys.exit(2)
 
 try:
-    loglevel = config['poller_service_loglevel']
+    loglevel = logging.getLevelName(config['poller_service_loglevel'].upper())
 except KeyError:
-    loglevel = 'INFO'
-numeric_level = getattr(logging, loglevel.upper(), None)
-log.basicConfig(level=numeric_level)
+    loglevel = logging.getLevelName('INFO')
+if not isinstance(loglevel, int):
+    log.warning('ERROR: {} is not a valid log level'.format(str(loglevel)))
+    loglevel = logging.getLevelName('INFO')
+log.setLevel(loglevel)
 
 poller_path = config['install_dir'] + '/poller.php'
 db_username = config['db_user']
@@ -84,34 +86,28 @@ else:
 db_dbname = config['db_name']
 
 
-# Take the amount of threads we want to run in parallel from the commandline
-# if None are given or the argument was garbage, fall back to default of 16
 try:
-    amount_of_workers = int(sys.argv[1])
+    amount_of_workers = int(config['poller_service_workers'])
     if amount_of_workers == 0:
         log.critical("ERROR: 0 threads is not a valid value")
         sys.exit(2)
-except:
+except KeyError:
     amount_of_workers = 16
 
-# Take the frequency of scans we want from the commandline
-# if None are given or the argument was garbage, fall back to default of 300
 try:
-    frequency = int(sys.argv[2])
+    frequency = int(config['poller_service_frequency'])
     if frequency == 0:
         log.critical("ERROR: 0 seconds is not a valid value")
         sys.exit(2)
-except:
+except KeyError:
     frequency = 300
 
-# Take the down_retry value from the commandline
-# if None are given or the argument was garbage, fall back to default of 15
 try:
-    down_retry = int(sys.argv[3])
+    down_retry = int(config['poller_service_down_retry'])
     if down_retry == 0:
         log.critical("ERROR: 0 seconds is not a valid value")
         sys.exit(2)
-except:
+except KeyError:
     down_retry = 15
 
 try:
