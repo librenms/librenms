@@ -105,11 +105,11 @@ except KeyError:
 
 try:
     discover_frequency = int(config['poller_service_discover_frequency'])
-    if poll_frequency == 0:
+    if discover_frequency == 0:
         log.critical("ERROR: 0 seconds is not a valid value")
         sys.exit(2)
 except KeyError:
-    poll_frequency = 21600
+    discover_frequency = 21600
 
 try:
     down_retry = int(config['poller_service_down_retry'])
@@ -135,8 +135,8 @@ def poll_worker(device_id, action):
     try:
         start_time = time.time()
         path = poller_path
-        if action = 'discovery'
-            path = discovery_path
+        if action == 'discovery':
+            path = discover_path
         command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (path, device_id)
         subprocess.check_call(command, shell=True)
         elapsed_time = int(time.time() - start_time)
@@ -189,7 +189,7 @@ dev_query = (   'SELECT device_id,                                  '
                 '    last_polled,                                   '
                 '    INTERVAL last_polled_timetaken SECOND          '
                 '  ),                                               '
-                '  INTERVAL {0} SECOND) AS next_poll                '
+                '  INTERVAL {0} SECOND) AS next_poll,               '
                 'DATE_ADD(                                          '
                 '  DATE_SUB(                                        '
                 '    last_discovered,                               '
@@ -242,7 +242,7 @@ while True:
             releaseLock('queued.{}'.format(device_id))
             continue
 
-        if next_poll > datetime.now():
+        if next_poll and next_poll > datetime.now():
             poll_action = 'polling'
             sleep_until_time = next_poll
             try:
