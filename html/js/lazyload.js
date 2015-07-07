@@ -29,15 +29,6 @@ $(document).ready(function(){
     });
 });
 
-//We have to wrap the original overlib library to remove the WxH attributes
-function wrap_overlib() {
-    var ret = overlib.apply(null,arguments);
-    //Since RRD takes the width and height params for only the canvas, we must unset them 
-    //from the final (larger) image to prevent the browser from resizing them.
-    $('div#overDiv img').removeAttr('width').removeAttr('height').removeClass('lazy');
-    return ret;
-}
-
 function lazyload_done() {
     //Since RRD takes the width and height params for only the canvas, we must unset them 
     //from the final (larger) image to prevent the browser from resizing them.

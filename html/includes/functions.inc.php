@@ -191,7 +191,7 @@ function overlib_link($url, $text, $contents, $class)
   if ($config['web_mouseover'] === FALSE) {
       $output .= ">";
   } else {
-      $output .= " onmouseover=\"return wrap_overlib('".str_replace('data-original', 'src', $contents)."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
+      $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
   }
   $output .= $text."</a>";
 
@@ -337,6 +337,17 @@ function print_graph_tag($args)
 function generate_graph_tag($args)
 {
   $urlargs = array();
+  foreach ($args as $key => $arg)
+  {
+    $urlargs[] = $key."=".urlencode($arg);
+  }
+
+  return '<img src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+
+}
+
+function generate_lazy_graph_tag($args) {
+  $urlargs = array();
   $w = 0;
   $h = 0;
   foreach ($args as $key => $arg)
@@ -347,12 +358,12 @@ function generate_graph_tag($args)
         break;
       case 'height':
         $h = $arg;
+        break;
     }
     $urlargs[] = $key."=".urlencode($arg);
   }
 
   return '<img class="lazy" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
-
 }
 
 function generate_graph_js_state($args) {
