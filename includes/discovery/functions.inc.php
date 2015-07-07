@@ -22,12 +22,14 @@ function discover_new_device($hostname)
     }
     if ($debug) { echo("discovering $dst_host\n"); }
     $ip = gethostbyname($dst_host);
-    if ($ip == $dst_host) {
-      if ($debug) { echo("name lookup of $dst_host failed\n"); }
-      return FALSE;
-    } else {
-      if ($debug) { echo("ip lookup result: $ip\n"); }
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === FALSE && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === FALSE) {
+        // $ip isn't a valid IP so it must be a name.
+        if ($ip == $dst_host) {
+            if ($debug) { echo("name lookup of $dst_host failed\n"); }
+            return FALSE;
+        }
     }
+    if ($debug) { echo("ip lookup result: $ip\n"); }
 
     $dst_host = rtrim($dst_host, '.');	// remove trailing dot
 
