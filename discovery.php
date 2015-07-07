@@ -106,7 +106,9 @@ if ($config['distributed_poller'] === true) {
 }
 
 foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC") as $device) {
+    if (dbGetLock('polling.' . $device['device_id'])) {
     discover_device($device, $options);
+    }
 }
 
 $end      = utime();
