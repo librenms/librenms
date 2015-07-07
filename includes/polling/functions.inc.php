@@ -395,6 +395,11 @@ function get_main_serial($device) {
 }
 
 function location_to_latlng($device) {
+    if (function_check('curl_version') !== true) {
+        d_echo("Curl support for PHP not enabled\n");
+        return false;
+        exit;
+    }
     $bad_loc = false;
     if (get_dev_attrib($device,'override_sysLocation_bool')) {
         $device_location = get_dev_attrib($device,'override_sysLocation_string');
@@ -416,7 +421,9 @@ function location_to_latlng($device) {
                 break;
             }
 
-            $data = json_decode(file_get_contents($api_url),true);
+            $curl_init = curl_init("https://maps.googleapis.com/maps/api/geocode/json?address=12+Sapling+road,Swinton+manchester+m27+0bz");
+            curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
+            $data = json_decode(curl_exec($curl_init),true);
 
             // Parse the data from the specific Geocode services.
             switch ($config['geoloc']['engine']) {

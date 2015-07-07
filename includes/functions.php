@@ -1310,3 +1310,6 @@ function fping($host,$params) {
     return $response;
 }
 
+function function_check($function) {
+    return function_exists($function);
+}
