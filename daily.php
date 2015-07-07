@@ -58,5 +58,13 @@ if ($options['f'] === 'perf_times') {
 if ($options['f'] === 'callback') {
     require_once "callback.php";
 }
+if ($options['f'] === 'device_perf') {
+    if (is_numeric($config['device_perf_purge'])) {
+        if (dbDelete('device_perf', "timestamp < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))", array($config['device_perf_purge'])) ) {
+            echo 'Device performance times cleared for entries over ' . $config['device_perf_purge'] . " days\n";
+        }
+    }
+}
+
 
 ?>

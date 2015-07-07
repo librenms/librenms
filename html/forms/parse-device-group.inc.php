@@ -20,7 +20,7 @@ $group_id = $_POST['group_id'];
 
 if(is_numeric($group_id) && $group_id > 0) {
     $group = dbFetchRow("SELECT * FROM `device_groups` WHERE `id` = ? LIMIT 1",array($group_id));
-    $group_split = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@]+[&&\|\|]+)/',$group['pattern'], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+    $group_split = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@\[\]]+[&&\|\|]+)/',$group['pattern'], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
     $count = count($group_split) - 1;
     $group_split[$count] = $group_split[$count].'  &&';
     $output = array('name'=>$group['name'],'desc'=>$group['desc'],'pattern'=>$group_split);

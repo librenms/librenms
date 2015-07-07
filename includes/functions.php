@@ -248,6 +248,10 @@ function delete_device($id)
     return "No such host.";
   }
 
+  // Remove IPv4/IPv6 addresses before removing ports as they depend on port_id
+  dbQuery("DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?",array($id));
+  dbQuery("DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?",array($id));
+
   foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
     $int_if = $int_data['ifDescr'];
@@ -495,25 +499,23 @@ function isPingable($hostname,$device_id = FALSE)
    if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
        $fping_params .= ' -t ' . $config['fping_options']['timeout'];
    }
-   $status = shell_exec($config['fping'] . "$fping_params -e $hostname 2>/dev/null");
+    if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+        $fping_params .= ' -c ' . $config['fping_options']['count'];
+    }
+    if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+        $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+    }
    $response = array();
-   if (strstr($status, "alive"))
-   {
-     $response['result'] = TRUE;
-   } else {
-     $status = shell_exec($config['fping6'] . "$fping_params -e $hostname 2>/dev/null");
-     if (strstr($status, "alive"))
-     {
-       $response['result'] = TRUE;
-     } else {
+   $status = fping($hostname,$fping_params);
+   if ($status['loss'] == 100) {
        $response['result'] = FALSE;
-     }
+   } else {
+       $response['result'] = TRUE;
    }
-   if(is_numeric($device_id) && !empty($device_id))
-   {
-     preg_match('/(\d+\.*\d*) (ms)/', $status, $time);
-     $response['last_ping_timetaken'] = $time[1];
+   if (is_numeric($status['avg'])) {
+       $response['last_ping_timetaken'] = $status['avg'];
    }
+   $response['db'] = $status;
    return($response);
 }
 
@@ -1269,3 +1271,42 @@ function ip_exists($ip) {
     }
     return true;
 }
+
+function fping($host,$params) {
+
+    global $config;
+
+    $descriptorspec = array(
+        0 => array("pipe", "r"),
+        1 => array("pipe", "w"),
+        2 => array("pipe", "w")
+    );
+
+    $process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
+    $read = '';
+
+    if (is_resource($process)) {
+
+       fclose($pipes[0]);
+
+       while (!feof($pipes[1])) {
+           $read .= fgets($pipes[1], 1024);
+       }
+       fclose($pipes[1]);
+       proc_close($process);
+    }
+
+    preg_match('/[0-9]+\/[0-9]+\/[0-9]+%/', $read, $loss_tmp);
+    preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
+    $loss = preg_replace("/%/","",$loss_tmp[0]);
+    list($xmt,$rcv,$loss) = preg_split("/\//", $loss);
+    list($min,$avg,$max) = preg_split("/\//", $latency[0]);
+    if ($loss < 0) {
+        $xmt = 1;
+        $rcv = 1;
+        $loss = 100;
+    }
+    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
+    return $response;
+}
+
