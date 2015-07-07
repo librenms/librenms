@@ -54,7 +54,7 @@ if (count($sensors))
 
     $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
     $graph_array['from'] = $config['time']['day'];
-    $sensor_minigraph =  generate_graph_tag($graph_array);
+    $sensor_minigraph =  generate_lazy_graph_tag($graph_array);
 
     $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
 

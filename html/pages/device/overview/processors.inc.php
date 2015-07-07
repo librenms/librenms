@@ -45,7 +45,7 @@ if (count($processors))
 
     $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00'; # the 00 at the end makes the area transparent.
 
-    $minigraph =  generate_graph_tag($graph_array);
+    $minigraph =  generate_lazy_graph_tag($graph_array);
 
     echo("<tr>
            <td>".overlib_link($link, $text_descr, $overlib_content)."</td>
