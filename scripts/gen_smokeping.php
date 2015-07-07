@@ -13,7 +13,6 @@
 include_once("../config.php");
 include_once("../includes/defaults.inc.php");
 include_once("../includes/definitions.inc.php");
-include_once("../includes/functions.inc.php");
 
 ?>
 
@@ -22,11 +21,11 @@ title = Network Latency Grapher
 
 <?php
 
-foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 AND `type` != '' GROUP BY `type`") as $devices) {
-    echo ("+ " . $devices['type'] . PHP_EOL);
-    echo ("menu = " . $devices['type'] . PHP_EOL);
-    echo ("title = " . $devices['type'] . PHP_EOL);
-    foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `ignore` = 0 AND `disabled` = 0", array($devices['type'])) as $devices) {
+foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 AND `type` != '' GROUP BY `type`") as $groups) {
+    echo ("+ " . $groups['type'] . PHP_EOL);
+    echo ("menu = " . $groups['type'] . PHP_EOL);
+    echo ("title = " . $groups['type'] . PHP_EOL);
+    foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `ignore` = 0 AND `disabled` = 0", array($groups['type'])) as $devices) {
         //Dot needs to be replaced, since smokeping doesn't accept it at this level
         echo("++ " . str_replace(".","_",$devices['hostname']) . PHP_EOL);
         echo("menu = " . $devices['hostname'] . PHP_EOL);
