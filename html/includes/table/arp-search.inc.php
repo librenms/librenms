@@ -2,14 +2,22 @@
 
 $param = array();
 
-$sql = " FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.port_id = P.port_id AND P.device_id = D.device_id ";
+$sql .= " FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ";
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`";
+    $where .= " AND `DP`.`user_id`=?";
+    $param[] = $_SESSION['user_id'];
+}
+
+$sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where ";
 
 if (isset($_POST['searchby']) && $_POST['searchby'] == "ip") {
     $sql .= " AND `ipv4_address` LIKE ?";
-    $param = array("%".trim($_POST['address'])."%");
+    $param[] = "%".trim($_POST['address'])."%";
 } elseif (isset($_POST['searchby']) && $_POST['searchby'] == "mac") {
     $sql .= " AND `mac_address` LIKE ?";
-    $param = array("%".str_replace(array(':', ' ', '-', '.', '0x'),'',mres($_POST['address']))."%");
+    $param[] = "%".str_replace(array(':', ' ', '-', '.', '0x'),'',mres($_POST['address']))."%";
 }
 
 if (is_numeric($_POST['device_id'])) {
@@ -41,6 +49,7 @@ if ($rowCount != -1) {
 
 $sql = "SELECT *,`P`.`ifDescr` AS `interface` $sql";
 
+system("echo '$sql' >> /tmp/test");
 foreach (dbFetchRows($sql, $param) as $entry) {
     if (!$ignore) {
 
@@ -70,7 +79,7 @@ foreach (dbFetchRows($sql, $param) as $entry) {
     $response[] = array('mac_address'=>formatMac($entry['mac_address']),
                         'ipv4_address'=>$entry['ipv4_address'],
                         'hostname'=>generate_device_link($entry),
-                        'interface'=>generate_port_link($entry, makeshortif(fixifname(ifLabel($entry)['label']))) . ' ' . $error_img,
+                        'interface'=>generate_port_link($entry, makeshortif(fixifname(ifLabel($entry['label'])))) . ' ' . $error_img,
                         'remote_device'=>$arp_name,
                         'remote_interface'=>$arp_if);
     }
