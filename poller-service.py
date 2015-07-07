@@ -1,15 +1,15 @@
 #! /usr/bin/env python
 """
  poller-service A service to wrap SNMP polling.  It will poll up to $threads devices at a time, and will not re-poll
-                devices that have been polled within the last $frequency seconds. It will prioritize devices based on
+                devices that have been polled within the last $poll_frequency seconds. It will prioritize devices based on
                 the last time polled. If resources are sufficient, this service should poll every device every
-                $frequency seconds, but should gracefully degrade if resources are inefficient, polling devices as
+                $poll_frequency seconds, but should gracefully degrade if resources are inefficient, polling devices as
                 frequently as possible. This service is based on poller-wrapper.py.
 
  Author:        Clint Armstrong <clint@clintarmstrong.net>
  Date:          July 2015
 
- Usage:         poller-service [threads] [frequency]
+ Usage:         poller-service [threads] [poll_frequency]
                 Default is 16 threads and 300 seconds.
 """
 
@@ -70,6 +70,7 @@ if not isinstance(loglevel, int):
 log.setLevel(loglevel)
 
 poller_path = config['install_dir'] + '/poller.php'
+discover_path = config['install_dir'] + '/discovery.php'
 db_username = config['db_user']
 db_password = config['db_pass']
 
@@ -95,12 +96,20 @@ except KeyError:
     amount_of_workers = 16
 
 try:
-    frequency = int(config['poller_service_frequency'])
-    if frequency == 0:
+    poll_frequency = int(config['poller_service_poll_frequency'])
+    if poll_frequency == 0:
         log.critical("ERROR: 0 seconds is not a valid value")
         sys.exit(2)
 except KeyError:
-    frequency = 300
+    poll_frequency = 300
+
+try:
+    discover_frequency = int(config['poller_service_discover_frequency'])
+    if poll_frequency == 0:
+        log.critical("ERROR: 0 seconds is not a valid value")
+        sys.exit(2)
+except KeyError:
+    poll_frequency = 21600
 
 try:
     down_retry = int(config['poller_service_down_retry'])
@@ -122,10 +131,13 @@ except:
     sys.exit(2)
 
 
-def poll_worker(device_id):
+def poll_worker(device_id, action):
     try:
         start_time = time.time()
-        command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (poller_path, device_id)
+        path = poller_path
+        if action = 'discovery'
+            path = discovery_path
+        command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (path, device_id)
         subprocess.check_call(command, shell=True)
         elapsed_time = int(time.time() - start_time)
         if elapsed_time < 300:
@@ -178,12 +190,20 @@ dev_query = (   'SELECT device_id,                                  '
                 '    INTERVAL last_polled_timetaken SECOND          '
                 '  ),                                               '
                 '  INTERVAL {0} SECOND) AS next_poll                '
+                'DATE_ADD(                                          '
+                '  DATE_SUB(                                        '
+                '    last_discovered,                               '
+                '    INTERVAL last_discovered_timetaken SECOND      '
+                '  ),                                               '
+                '  INTERVAL {1} SECOND) AS next_discovery           '
                 'FROM devices WHERE                                 '
                 'disabled = 0                                       '
                 'AND IS_FREE_LOCK(CONCAT("polling.", device_id))    '
                 'AND IS_FREE_LOCK(CONCAT("queued.", device_id))     '
-                '{1}                                                '
-                'ORDER BY next_poll asc                             ').format(frequency, poller_group)
+                '{2}                                                '
+                'ORDER BY next_poll asc                             ').format( poll_frequency,
+                                                                               discover_frequency,
+                                                                               poller_group        )
 
 dont_retry = {}
 threads = 0
@@ -209,7 +229,7 @@ while True:
     cursor.execute(dev_query)
     devices = cursor.fetchall()
     retry_devs_found = {}
-    for device_id, next_poll in devices:
+    for device_id, next_poll, next_discovery in devices:
         # add queue lock, so we lock the next device against any other pollers
         # if this fails, the device is locked by another poller already
         if not getLock('queued.{}'.format(device_id)):
@@ -240,10 +260,14 @@ while True:
             log.debug('DEBUG: Sleeping until {0} before {1} {2}'.format(next_poll, poll_action, device_id))
             sleep_until(sleep_until_time)
 
-        log.debug('DEBUG: Starting poll of device {}'.format(device_id))
+        action = 'poll'
+        if not next_discovery or next_discovery < datetime.now():
+            action = 'discovery'
+
+        log.debug('DEBUG: Starting {} of device {}'.format(action, device_id))
         devices_scanned += 1
         dont_retry[device_id] = datetime.now() + timedelta(seconds=down_retry)
-        t = threading.Thread(target=poll_worker, args=[device_id])
+        t = threading.Thread(target=poll_worker, args=[device_id, action])
         t.start()
 
         # If we made it this far, break out of the loop and query again.
