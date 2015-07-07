@@ -5,9 +5,12 @@ Configure the maximum number of threads for the service in `$config['poller_serv
 
 The poller service is designed to gracefully degrade. If not all devices can be polled within the configured frequency, the service will continuously poll devices refreshing as frequently as possible using the configured number of threads.
 
+The service logs to syslog. A loglevel of INFO will print status updates every 5 minutes. Loglevel of DEBUG will print updates on every device as it is scanned.
+
 ## Configuration
 ```php
 // Poller-Service settings
+$config['poller_service_loglevel']                       = "INFO";
 $config['poller_service_workers']                        = 16;
 $config['poller_service_poll_frequency']                 = 300;
 $config['poller_service_discover_frequency']             = 21600;
