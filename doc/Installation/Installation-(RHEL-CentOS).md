@@ -7,8 +7,8 @@ NOTE: These instructions assume you are the root user.  If you are not, prepend 
     yum install net-snmp mysql-server
     service snmpd start
     service mysqld start
-    chkconfig --levels 235 mysqld on
-    chkconfig --levels 235 snmpd on
+    chkconfig mysqld on
+    chkconfig snmpd on
     mysql_secure_installation
     mysql -uroot -p
 
@@ -46,7 +46,7 @@ Install necessary software.  The packages listed below are an all-inclusive list
 
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
-    rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+    yum install epel-release
     yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
     pear install Net_IPv4-1.3.4
     pear install Net_IPv6-1.2.2b2
@@ -87,8 +87,8 @@ If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove th
 Install necessary extra software and let it start on system boot.
 
     yum install nginx php-fpm
-    chkconfig --levels 235 nginx on
-    chkconfig --levels 235 php-fpm on
+    chkconfig nginx on
+    chkconfig php-fpm on
 
 Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
