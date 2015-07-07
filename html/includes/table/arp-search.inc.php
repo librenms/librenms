@@ -49,7 +49,6 @@ if ($rowCount != -1) {
 
 $sql = "SELECT *,`P`.`ifDescr` AS `interface` $sql";
 
-system("echo '$sql' >> /tmp/test");
 foreach (dbFetchRows($sql, $param) as $entry) {
     if (!$ignore) {
 
