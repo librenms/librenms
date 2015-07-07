@@ -1189,11 +1189,7 @@ foreach ($config['os'] as $this_os => $blah)
   }
 }
 
-<<<<<<< HEAD
-// Meraki
-=======
 // Meraki Devices
->>>>>>> 8b9323852cb4acdbedecca17c7a1a2fc8a53155f
 $os = "merakimx";
 $config['os'][$os]['text']              = "Meraki MX Appliance";
 $config['os'][$os]['type']              = "firewall";
