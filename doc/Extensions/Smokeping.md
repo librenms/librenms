@@ -16,14 +16,14 @@ to call it and where LibreNMS is:
 
 ```bash
 cd /opt/librenms/scripts/
-php ./gen_smokeping.php > /opt/smokepgin/etc/librenms.conf
+php ./gen_smokeping.php > /opt/smokeping/etc/librenms.conf
 /opt/smokeping/bin/smokeping --reload
 ```
 
 Sample cron:
 
 ```bash
-15   0    * * * root cd /opt/librenms/scripts && php ./gen_smokeping.php > /opt/smokepgin/etc/librenms.conf && /opt/smokeping/bin/smokeping --reload >> /dev/null 2>&1
+15   0    * * * root cd /opt/librenms/scripts && php ./gen_smokeping.php > /opt/smokeping/etc/librenms.conf && /opt/smokeping/bin/smokeping --reload >> /dev/null 2>&1
 ```
 
 Now configure LibreNMS (make sure you point dir to your smokeping data directory:
