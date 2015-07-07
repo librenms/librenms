@@ -9,8 +9,7 @@
  Author:        Clint Armstrong <clint@clintarmstrong.net>
  Date:          July 2015
 
- Usage:         poller-service [threads] [poll_frequency]
-                Default is 16 threads and 300 seconds.
+ License:       BSD
 """
 
 import json
