@@ -60,6 +60,13 @@ except:
     log.critical("ERROR: Could not load or parse configuration, are PATHs correct?")
     sys.exit(2)
 
+try:
+    loglevel = config['poller_service_loglevel']
+except KeyError:
+    loglevel = 'INFO'
+numeric_level = getattr(logging, loglevel.upper(), None)
+log.basicConfig(level=numeric_level)
+
 poller_path = config['install_dir'] + '/poller.php'
 db_username = config['db_user']
 db_password = config['db_pass']
@@ -185,6 +192,7 @@ dev_query = (   'SELECT device_id,                                  '
 dont_retry = {}
 threads = 0
 next_update = datetime.now() + timedelta(minutes=5)
+devices_scanned = 0
 
 while True:
     cur_threads = threading.active_count()
@@ -236,7 +244,7 @@ while True:
             log.debug('DEBUG: Sleeping until {0} before {1} {2}'.format(next_poll, poll_action, device_id))
             sleep_until(sleep_until_time)
 
-        log.debug('INFO: Starting poll of device {}'.format(device_id))
+        log.debug('DEBUG: Starting poll of device {}'.format(device_id))
         devices_scanned += 1
         dont_retry[device_id] = datetime.now() + timedelta(seconds=down_retry)
         t = threading.Thread(target=poll_worker, args=[device_id])
