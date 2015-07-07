@@ -117,7 +117,7 @@ try:
         log.critical("ERROR: 0 seconds is not a valid value")
         sys.exit(2)
 except KeyError:
-    down_retry = 15
+    down_retry = 60
 
 try:
     if db_port == 0:
