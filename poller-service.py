@@ -129,9 +129,9 @@ def printworker():
         per_device_duration[device_id] = elapsed_time
         polled_devices += 1
         if elapsed_time < 300:
-            print "INFO: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time)
+            print "INFO: worker finished device %s in %s seconds" % (device_id, elapsed_time)
         else:
-            print "WARNING: worker %s finished device %s in %s seconds" % (worker_id, device_id, elapsed_time)
+            print "WARNING: worker finished device %s in %s seconds" % (device_id, elapsed_time)
         print_queue.task_done()
 
 
