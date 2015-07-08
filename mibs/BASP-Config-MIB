@@ -1,0 +1,514 @@
+BASP-Config-MIB  DEFINITIONS ::= BEGIN
+
+          -- Broadcom(R) Advanced Server Configuration MIB
+          -- 
+          -- This MIB defines LoadBalance/VLAN configuration Management Information Base.
+          -- These objects are part of the enterprise MIB for Broadcom Advanced Server.
+          --
+
+          IMPORTS
+                  enterprises, IpAddress
+                          FROM RFC1155-SMI
+                  OBJECT-TYPE
+                          FROM RFC-1212
+                  DisplayString, PhysAddress
+                          FROM RFC1213-MIB;
+
+
+    broadcom        OBJECT IDENTIFIER ::= { enterprises 4413 }
+    enet            OBJECT IDENTIFIER ::= { broadcom 1 }
+    basp            OBJECT IDENTIFIER ::= { enet 2 }
+    baspConfig      OBJECT IDENTIFIER ::= { basp 1 }
+    baspTeam        OBJECT IDENTIFIER ::= { baspConfig 1 }
+    baspPhyAdapter  OBJECT IDENTIFIER ::= { baspConfig 2 }
+    baspVirAdapter  OBJECT IDENTIFIER ::= { baspConfig 3 }
+
+
+-- baspTeam Group --
+          btTeamNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of loadbalance teams
+                       present on this system."
+              ::= { baspTeam 1 }
+
+          btTeamTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF BtTeamEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of team entries.  The number of
+                      teams is given by the value of teamNumber."
+              ::= { baspTeam 2 }
+
+          btTeamEntry OBJECT-TYPE
+              SYNTAX  BtTeamEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An entry containing team objects at the
+                       target system."
+              INDEX   { btTeamIndex }
+              ::= { btTeamTable 1 }
+
+          BtTeamEntry ::=
+              SEQUENCE {
+                  btTeamIndex
+                      INTEGER(0..65535),
+                  btTeamName
+                      DisplayString,
+                  btTeamType
+                      INTEGER,
+                  btTeamMacAddress
+                      PhysAddress,
+                  btPhyNumber
+                      INTEGER,
+                  btVirNumber
+                      INTEGER,
+                  btMode
+                      INTEGER,
+                  btLiveLinkEnable
+                      INTEGER,
+                  btLinkPacketFrequency
+                      INTEGER,
+                  btLinkMaxRetry
+                      INTEGER,
+                  btLinkRetryFrequency
+                      INTEGER,
+                  btLinkTargetIpAddress1
+                      IpAddress,
+                  btLinkTargetIpAddress2
+                      IpAddress,
+                  btLinkTargetIpAddress3
+                      IpAddress,
+                  btLinkTargetIpAddress4
+                      IpAddress
+              }
+              
+          btTeamIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An unique value for each team.  The value for 
+                       each team must remain constant at
+                       least from one re-initialization of the entity's
+                       network management system to the next re-
+                       initialization."
+                      
+              ::= { btTeamEntry 1 }
+              
+          btTeamName  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A textual string containing name of the team"
+              ::= { btTeamEntry 2 }
+              
+          btTeamType  OBJECT-TYPE
+              SYNTAX INTEGER 
+              {
+                   team-SLB(100),
+                   team-FEC-GEC(101),
+                   team-802-3-AD(102),
+				   team-SLB-AFD(104)
+              }
+              
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The type of team, distinguished according to
+                       the attribute assigned. When team has only one
+                       physical member, the team type is ignored"
+              ::= { btTeamEntry 3 }
+              
+          btTeamMacAddress  OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Mac address of the team. Mac address is 
+                       assigned to a team when the team type is
+                       team-FEC-GEC(101) or team-802-3-AD(102)"
+              ::= { btTeamEntry 4 }
+              
+          btPhyNumber  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of physical adapters in the team"
+              ::= { btTeamEntry 5 }
+              
+          btVirNumber  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of virtual adapters in the team  "
+              ::= { btTeamEntry 6 }
+         
+          btMode  OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   primaryMode(1),
+                   standby(2)
+              }
+
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "mode of this team, PrimaryMode(0) or 
+                       Standby(1). For team type other than 
+                       team-SLB(100), this should always be 
+                       PrimaryMode(0)."
+              ::= { btTeamEntry 7 }
+         
+          btLiveLinkEnable  OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   disabled(1),
+                   enabled(2)
+              }
+
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "LiveLink is enabled or not. Probe packet can 
+                       be enabled only for team-SLB(100) and
+                       team-SLB-AFD(104)."
+              ::= { btTeamEntry 8 }
+         
+          btLinkPacketFrequency  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "For LiveLink feature: The frequency in 
+                       milliseconds that a link packet is to be sent."
+              ::= { btTeamEntry 9 }
+         
+          btLinkMaxRetry  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "For LiveLink feature: The maximum number of 
+                       retries before failing a team member."
+              ::= { btTeamEntry 10 }
+         
+          btLinkRetryFrequency  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "For LiveLink feature: The frequency (milliseconds) 
+                       a link packet is to be sent after a dropped link 
+                       packet is detected."
+              ::= { btTeamEntry 11 }
+         
+          btLinkTargetIpAddress1  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "For LiveLink feature: The target IP address that 
+                      a link packet is sent to.  A DNS name cannot be 
+                      specified since there is no reliable method to 
+                      resolve the DNS name without introducing 
+                      unacceptable risk. Only the first one is mandatory 
+                      for LiveLink. All 0 is not available."
+              ::= { btTeamEntry 12 }
+
+          btLinkTargetIpAddress2  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "For LiveLink feature: The target IP address that 
+                      a link packet is sent to.  A DNS name cannot be 
+                      specified since there is no reliable method to 
+                      resolve the DNS name without introducing 
+                      unacceptable risk. This one is optional for 
+                      LiveLink. All 0 is not available."
+              ::= { btTeamEntry 13 }
+
+          btLinkTargetIpAddress3  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "For LiveLink feature: The target IP address that 
+                      a link packet is sent to.  A DNS name cannot be 
+                      specified since there is no reliable method to 
+                      resolve the DNS name without introducing 
+                      unacceptable risk. This one is optional for 
+                      LiveLink. All 0 is not available."
+              ::= { btTeamEntry 14 }
+
+          btLinkTargetIpAddress4  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "For LiveLink feature: The target IP address that 
+                      a link packet is sent to.  A DNS name cannot be 
+                      specified since there is no reliable method to 
+                      resolve the DNS name without introducing 
+                      unacceptable risk. This one is optional for 
+                      LiveLink. All 0 is not available."
+              ::= { btTeamEntry 15 }
+
+-- baspPhyAdapter Group --
+
+          btPhyAdapterNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of physical adapters presented
+                       in the physical adapter table."
+              ::= { baspPhyAdapter 1 }
+
+          btPhyAdapterTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF BtPhyAdapterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The phyMember tables contain the physical 
+                       adapter members of loadbalance teams."
+              ::= { baspPhyAdapter 2 }
+
+          btPhyAdapterEntry OBJECT-TYPE
+              SYNTAX  BtPhyAdapterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A team entry containing objects at the
+                       target system."
+              INDEX   { btpTeamIndex,
+                        btpAdapterIndex }
+              ::= { btPhyAdapterTable 1 }
+
+          BtPhyAdapterEntry ::=
+              SEQUENCE {
+                  btpTeamIndex
+                      INTEGER(0..65535),
+                  btpAdapterIndex
+                      INTEGER(0..65535),
+                  btpAdapterDesc
+                      DisplayString,
+                  btpMemberType
+                      INTEGER,
+                  btpMacAddress
+                      PhysAddress,
+                  btpMemberState
+                      INTEGER,
+                  btpLiveLinkIp
+                      IpAddress
+              }
+              
+          btpTeamIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An unique value for each team."
+              ::= { btPhyAdapterEntry 1 }
+              
+          btpAdapterIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A value for each adapter within a team."
+              ::= { btPhyAdapterEntry 2 }
+              
+
+          btpAdapterDesc  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing name of the adapter"
+              ::= { btPhyAdapterEntry 3 }
+
+          btpMemberType  OBJECT-TYPE
+              SYNTAX INTEGER 
+              {
+                   load-balance(100),
+                   standby(101)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The type of adapter member."
+              ::= { btPhyAdapterEntry 4 }
+
+
+          btpMacAddress  OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Mac address of the adapter."
+              ::= { btPhyAdapterEntry 5 }
+
+          btpMemberState  OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   unknown(1),
+                   link-up-not-join-traffic(2),
+                   disable-not-join-traffic(3),
+                   join-traffic(4)
+              }
+
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "State of the interface in the team."
+              ::= { btPhyAdapterEntry 6 }
+
+          btpLiveLinkIp  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "IP address for LiveLink."
+              ::= { btPhyAdapterEntry 7 }
+
+
+-- baspVirmember Group --
+
+          btVirAdapterNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of virtual adapters presented
+                       in the virtual adapter table."
+              ::= { baspVirAdapter 1 }
+
+          btVirAdapterTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF BtVirAdapterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The virMember tables contain the VLAN 
+                       members of loadbalance teams."
+              ::= { baspVirAdapter 2 }
+
+          btVirAdapterEntry OBJECT-TYPE
+              SYNTAX  BtVirAdapterEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A team entry containing objects at the
+                       target system."
+              INDEX   { btvTeamIndex,
+                        btvAdapterIndex }
+              ::= { btVirAdapterTable 1 }
+
+          BtVirAdapterEntry ::=
+              SEQUENCE {
+                  btvTeamIndex
+                      INTEGER(0..65535),
+                  btvAdapterIndex
+                      INTEGER(0..65535),
+                  btvAdapterDesc
+                      DisplayString,
+                  btvVlanId
+                      INTEGER,
+				  btvLinkStatus
+					  INTEGER,
+                  btvIPAddress
+                      IpAddress,
+				  btvSubnetMask
+				      IpAddress,
+				  btvPhysAddress
+                      PhysAddress,
+                  btvLineSpeed
+                      DisplayString
+              }
+              
+          btvTeamIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An unique value for each team."
+              ::= { btVirAdapterEntry 1 }
+              
+          btvAdapterIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each virtual adapter in a team."
+              ::= { btVirAdapterEntry 2 }
+              
+          btvAdapterDesc  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing name of the VLAN"
+              ::= { btVirAdapterEntry 3 }
+              
+          btvVlanId  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "802.1Q VLAN ID of the virtual adapter."
+              ::= { btVirAdapterEntry 4 }
+
+          btvLinkStatus OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   link-up(1),
+                   link-fail(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Virtual adapter link status"
+          	  ::= { btVirAdapterEntry 5 }
+
+          btvIPAddress  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IP address of the virtual adapter."
+              ::= { btVirAdapterEntry 6 }
+
+          btvSubnetMask  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IP subnet Mask of the virtual adapter."
+              ::= { btVirAdapterEntry 7 }
+
+          btvPhysAddress  OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "MAC address of the virtual adapter."
+              ::= { btVirAdapterEntry 8 }
+
+          btvLineSpeed  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A textual string displays the operating speed 
+                       of the virtual adapter."
+              ::= { btVirAdapterEntry 9 }
+              
+END
