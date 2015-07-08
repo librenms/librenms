@@ -199,17 +199,7 @@ $query .= " ORDER BY hostname";
 </div>
 <script>
 
-var grid = $("#devices").bootgrid({
-    ajax: true,
-    rowCount: [50,100,250,-1],
-    columnSelection: false,
-    formatters: {
-        "status": function(column,row) {
-            return "<h4><span class='label label-"+row.extra+" threeqtr-width'>" + row.msg + "</span></h4>";
-        }
-    },
-    templates: {
-        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
+    searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
                 "<span class=\"pull-left\"><div class=\"form-group\">"+
                 "<input type=\"text\" name=\"hostname\" id=\"hostname\" value=\"<?php echo($vars['hostname']); ?>\" class=\"form-control input-sm\" placeholder=\"Hostname\"/>"+
@@ -365,6 +355,24 @@ foreach (dbFetch($sql,$param) as $data) {
                       "</div>"+
                       "</form></span></div>"+
                       "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+
+<?php
+if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {
+    echo "searchbar = ''";
+}
+?>
+
+var grid = $("#devices").bootgrid({
+    ajax: true,
+    rowCount: [50,100,250,-1],
+    columnSelection: false,
+    formatters: {
+        "status": function(column,row) {
+            return "<h4><span class='label label-"+row.extra+" threeqtr-width'>" + row.msg + "</span></h4>";
+        }
+    },
+    templates: {
+        header: searchbar
     },
     post: function ()
     {
