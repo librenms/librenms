@@ -1,8 +1,8 @@
 # influxdb-php
 ## InfluxDB client library for PHP
-[![Build Status](https://travis-ci.org/influxdb/influxdb-php.svg?branch=master)](https://travis-ci.org/LeaseWeb/influxdb-php)
-[![Code Climate](https://codeclimate.com/github/influxdb/influxdb-php/badges/gpa.svg)](https://codeclimate.com/github/LeaseWeb/influxdb-php)
-[![Test Coverage](https://codeclimate.com/github/influxdb/influxdb-php/badges/coverage.svg)](https://codeclimate.com/github/LeaseWeb/influxdb-php/coverage)
+[![Build Status](https://travis-ci.org/influxdb/influxdb-php.svg?branch=master)](https://travis-ci.org/influxdb/influxdb-php)
+[![Code Climate](https://codeclimate.com/github/influxdb/influxdb-php/badges/gpa.svg)](https://codeclimate.com/github/influxdb/influxdb-php)
+[![Test Coverage](https://codeclimate.com/github/influxdb/influxdb-php/badges/coverage.svg)](https://codeclimate.com/github/influxdb/influxdb-php/coverage)
 
 ### Overview
 
