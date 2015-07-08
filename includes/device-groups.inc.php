@@ -63,6 +63,8 @@ function GenGroupSQL($pattern,$search='') {
  */
 function GetDevicesFromGroup($group_id) {
 	$pattern = dbFetchCell("SELECT pattern FROM device_groups WHERE id = ?",array($group_id));
+        $pattern = rtrim($pattern,'&&');
+        $pattern = rtrim($pattern,'||');
 	if( !empty($pattern) ) {
 		return dbFetchRows(GenGroupSQL($pattern));
 	}
