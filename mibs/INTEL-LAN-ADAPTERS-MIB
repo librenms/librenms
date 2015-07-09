@@ -1,0 +1,1529 @@
+-- /*****************************************************************************
+-- **                            INTEL CONFIDENTIAL                            **
+-- **                                                                          **
+-- **        Copyright 1998 2011 Intel Corporation All Rights Reserved.        **
+-- **                                                                          **
+-- **  The source code contained or described herein and all documents related **
+-- **  to the source code ("Material") are owned by Intel Corporation or its   **
+-- **  suppliers or licensors. Title to the Material remains with Intel        **
+-- **  Corporation or its suppliers and licensors. The Material contains trade **
+-- **  secrets and proprietary and confidential information of Intel or its    **
+-- **  suppliers and licensors. The Material is protected by worldwide         **
+-- **  copyright and trade secret laws and treaty provisions. No part of the   **
+-- **  Material may be used, copied, reproduced, modified, published,          **
+-- **  uploaded, posted, transmitted, distributed, or disclosed in any way     **
+-- **  without Intel’s prior express written permission.                       **
+-- **                                                                          **
+-- **  No license under any patent, copyright, trade secret or other           **
+-- **  intellectual property right is granted to or conferred upon you by      **
+-- **  disclosure or delivery of the Materials, either expressly, by           **
+-- **  implication, inducement, estoppel or otherwise. Any license under such  **
+-- **  intellectual property rights must be express and approved by Intel in   **
+-- **  writing.                                                                **
+-- *****************************************************************************/
+
+INTEL-LAN-ADAPTERS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Counter32,
+	Integer32,
+	Gauge32,
+	enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION,
+	PhysAddress,
+	DisplayString
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP	
+        FROM SNMPv2-CONF
+    ;
+		
+intellan   MODULE-IDENTITY
+  LAST-UPDATED "201210310000Z"   -- Oct, 31, 2012
+  ORGANIZATION "Intel Corp"
+  CONTACT-INFO
+         "Intel Corp
+          http://www.intel.com/"
+  DESCRIPTION
+          "The MIB module for Intel LAN SNMP agent."
+
+  REVISION    "201210310000Z"     -- Oct 31, 2012
+  DESCRIPTION
+          "Version 1.4.10
+		   Removed the extra 1 after enterprises ID"
+  
+  ::= { enterprises 3183 }
+
+    
+--iso          		OBJECT IDENTIFIER ::= { 1 }
+--org          		OBJECT IDENTIFIER ::= { iso 3 }
+--dod          		OBJECT IDENTIFIER ::= { org 6 }
+--internet     		OBJECT IDENTIFIER ::= { dod 1 }
+--directory    		OBJECT IDENTIFIER ::= { internet 1 }
+--mgmt         		OBJECT IDENTIFIER ::= { internet 2 }
+--experimental 		OBJECT IDENTIFIER ::= { internet 3 }
+--private      		OBJECT IDENTIFIER ::= { internet 4 }
+--enterprises  		OBJECT IDENTIFIER ::= { private 1 }
+intel        		OBJECT IDENTIFIER ::= { enterprises 343 }
+products     		OBJECT IDENTIFIER ::= { intel 2 }
+nic-products 		OBJECT IDENTIFIER ::= { products 7 }
+intel-lan-adapters  OBJECT IDENTIFIER ::= { nic-products 2 }
+
+component-description OBJECT IDENTIFIER ::= { intel-lan-adapters 1 }
+     
+InterfaceIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface or
+            interface sub-layer in the managed system.  It is
+            recommended that values are assigned contiguously starting
+            from 1.  The value for each interface sub-layer must remain
+            constant at least from one re-initialization of the entity's
+            network management system to the next re-initialization."
+    SYNTAX       Integer32 (1..2147483647)
+
+company		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+	    "Company that provided this MIB - Intel(R) Corporation." 
+	::= { component-description 1 }
+
+description	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+	    "Description of this component - 
+	    Intel(R) Network Adapter(s), Advanced Management."
+	::= { component-description 2 }
+	
+operatingSystem	       	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+	    "Operating System of the server on which the SNMP agent is executed."
+	::= { component-description 3 }
+	
+mibVersion1-4-3		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Version of this MIB - the empty string is always returned." 
+	::= { component-description 4 }
+
+mibVersionSupported	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Version of the MIB supported by the agent.
+		1.x.y indicates that every MIB version of that template is supported by the agent."
+	::= { component-description 5 }
+
+agentExtensionVersion	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Version of the SNMP extension agent." 	
+	::= { component-description 6 }
+
+status		OBJECT-TYPE
+	SYNTAX		INTEGER {
+				baseDriverNotLoadedAnsNotLoaded(0), 
+				baseDriverLoadedAnsNotLoaded(1),
+				baseDriverNotLoadedAnsLoaded(2),
+				baseDriverLoadedAnsLoaded(3)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Indicates status and functionality of the adapter(s) -
+	    whether the base driver and ANS are loaded."
+	::= { component-description 7 }
+	
+
+adaptersTables OBJECT IDENTIFIER ::= { intel-lan-adapters 2 }
+
+-- ******************************
+--   Generic Adapter Attr Table
+-- ******************************
+genericAdaptersAttrTables OBJECT IDENTIFIER ::= { adaptersTables 1 }
+
+genericAdaptersAttrTable 	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GenericAdapterAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all kinds of adapters."
+	::= { genericAdaptersAttrTables 1 }
+
+genericAdapterAttrEntry	OBJECT-TYPE
+	SYNTAX		GenericAdapterAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all kinds of adapters. 
+		There is one 'entry' for each physical or virtual adapter."
+	INDEX		{ adapterIndex }		
+	::= { genericAdaptersAttrTable 1 }
+
+GenericAdapterAttrEntry ::= SEQUENCE {
+	adapterIndex		 	InterfaceIndex,
+	adapterName		     	DisplayString,
+	adapterType		     	INTEGER,
+	adapterDriverLoadStatus INTEGER
+}
+
+adapterIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"A unique value, greater than or equal to zero, for each interface."
+	::= { genericAdapterAttrEntry 1 }
+
+adapterName	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Name of the adapter interface.
+		There is a unique name for each instance."
+	::= { genericAdapterAttrEntry 2 }	
+
+adapterType   OBJECT-TYPE
+	SYNTAX		INTEGER {
+				standAlone(0),
+				teamMember(1),
+				virtual(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Type of adapter (member, stand-alone, or virtual)."
+	::= { genericAdapterAttrEntry 3 }
+          
+adapterDriverLoadStatus   OBJECT-TYPE
+	SYNTAX		INTEGER {
+				loaded(0),
+				notLoaded(1)
+				}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Load status of the driver:
+			-'loaded' if the driver is loaded on the NIC; 'notLoaded' otherwise.
+		A status of 'notLoaded' means that the NIC is missing (via 'hotRemove')
+		or the driver is not fully loaded for some reason."
+	::= { genericAdapterAttrEntry 4 }
+	
+genericAdaptersDriversAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GenericAdapterDriverAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all kinds of adapter drivers."
+	::= { genericAdaptersAttrTables 2 }
+
+genericAdapterDriverAttrEntry	OBJECT-TYPE
+	SYNTAX		GenericAdapterDriverAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all kinds of adapter drivers.
+		There is one 'entry' for each adapter driver"
+	INDEX		{ adapterIndex }		
+	::= { genericAdaptersDriversAttrTable 1 }
+
+GenericAdapterDriverAttrEntry ::= SEQUENCE {
+	adapterDriverName	    DisplayString,
+	adapterDriverInfo	    DisplayString,
+	adapterDriverVersion	DisplayString,
+	adapterDriverPath	    DisplayString,
+	adapterDriverDate	    DisplayString,
+	adapterDriverSize	    DisplayString,
+	adapterIpAddress		DisplayString   
+}
+
+adapterDriverName	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS	read-only
+	STATUS	    current
+	DESCRIPTION 
+		"Name of the adapter driver."
+	::= { genericAdapterDriverAttrEntry 1 }
+
+adapterDriverInfo	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS	read-only
+	STATUS	    current
+	DESCRIPTION 
+		"Additional information about the adapter. Includes name of the NIC."
+	::= { genericAdapterDriverAttrEntry 2 }
+	
+adapterDriverVersion	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS	read-only
+	STATUS	    current
+	DESCRIPTION 
+		"Adapter driver version number."
+	::= { genericAdapterDriverAttrEntry 3 }
+
+adapterDriverPath	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS	read-only
+	STATUS	    current
+	DESCRIPTION 
+		"Adapter driver path name."
+	::= { genericAdapterDriverAttrEntry 4 }
+
+adapterDriverDate	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS	read-only
+	STATUS	    current
+	DESCRIPTION 
+		"Adapter driver creation date (in mm/dd/yy format)."
+	::= { genericAdapterDriverAttrEntry 5 }
+
+adapterDriverSize	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS	read-only
+	STATUS	    current
+	DESCRIPTION 
+		"Adapter driver file size."
+	::= { genericAdapterDriverAttrEntry 6 }
+
+-- *****************************************************************
+--  Generic Adapter IP address
+-- *****************************************************************
+
+adapterIpAddress	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS	read-only
+	STATUS	    current
+	DESCRIPTION 
+		"Adapter IP address"
+	::= { genericAdapterDriverAttrEntry 7 }
+
+genericAdaptersTrafficStatsAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GenericAdapterTrafficStatsAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Traffic stats common to all kinds of adapters."
+	::= { genericAdaptersAttrTables 3 }
+
+genericAdapterTrafficStatsAttrEntry	OBJECT-TYPE
+	SYNTAX		GenericAdapterTrafficStatsAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Traffic stats common to all kinds of adapters.
+		There is one 'entry' for each adapter instance."
+	INDEX		{ adapterIndex }		
+	::= { genericAdaptersTrafficStatsAttrTable 1 }
+
+GenericAdapterTrafficStatsAttrEntry ::= SEQUENCE {
+	adapterRxPackets	    Counter32,
+	adapterTxPackets	    Counter32,
+	adapterRxBytes		    Counter32,
+	adapterTxBytes		    Counter32,
+	adapterRxErrors		    Counter32,
+	adapterTxErrors		    Counter32,
+	adapterRxDropped	    Counter32,
+	adapterTxDropped	    Counter32,
+	adapterRxMulticast	    Counter32,
+	adapterCollisions	    Counter32
+}
+
+adapterRxPackets   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of packets received."
+	::= { genericAdapterTrafficStatsAttrEntry 1 }
+
+adapterTxPackets   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of packets transmitted."
+	::= { genericAdapterTrafficStatsAttrEntry 2 }
+ 
+adapterRxBytes   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of bytes received."
+	::= { genericAdapterTrafficStatsAttrEntry 3 }
+ 
+adapterTxBytes   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of bytes transmitted."
+	::= { genericAdapterTrafficStatsAttrEntry 4 }
+
+adapterRxErrors   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of packets received with errors
+		(packets that failed to reach the protocol)."
+	::= { genericAdapterTrafficStatsAttrEntry 5 }
+
+adapterTxErrors   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of packets that failed to transmit."
+	::= { genericAdapterTrafficStatsAttrEntry 6 }
+
+adapterRxDropped   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of receive packets dropped due to overrun."
+	::= { genericAdapterTrafficStatsAttrEntry 7 }
+
+adapterTxDropped   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of transmit packets dropped due to successive collisions."
+	::= { genericAdapterTrafficStatsAttrEntry 8 }
+
+adapterRxMulticast   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of Multicast packets received."
+	::= { genericAdapterTrafficStatsAttrEntry 9 }
+
+adapterCollisions   OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Total number of single collisions."
+	::= { genericAdapterTrafficStatsAttrEntry 10 }
+
+-- *******************************
+-- Physical Adapter Attr Table
+-- *******************************
+physicalAdaptersAttrTables OBJECT IDENTIFIER ::= { adaptersTables 2 }
+
+physicalAdaptersAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF PhysicalAdapterAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all Physical Adapters."
+	::= { physicalAdaptersAttrTables 1 }
+
+physicalAdapterAttrEntry	OBJECT-TYPE
+	SYNTAX		PhysicalAdapterAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all Physical Adapters.
+		There is one 'entry' for each standalone or member adapter."
+	INDEX		{ physicalAdapterIndex }		
+	::= { physicalAdaptersAttrTable 1 }
+
+PhysicalAdapterAttrEntry ::= SEQUENCE {
+	physicalAdapterIndex	    			InterfaceIndex,
+	physicalAdapterLinkStatus   			INTEGER,
+	physicalAdapterLinkStatusChangesCounter	Counter32,
+	physicalAdapterSpeed					Gauge32,
+	physicalAdapterDplxMode					INTEGER,
+	physicalAdapterAutoNegotiation			INTEGER,
+	physicalAdapterPciBus					Integer32,
+	physicalAdapterPciSlot					Integer32,
+	physicalAdapterIrq						Integer32,
+	physicalAdapterCurrentNA				PhysAddress,
+	physicalAdapterPermanentNA				PhysAddress,   
+	physicalAdapterOnlineDiagStatus         INTEGER,
+	physicalAdapterExpressTeamed			INTEGER,
+	physicalAdapterExpressTeamBundleId		Integer32
+}
+
+physicalAdapterIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A unique value, greater than or equal to zero, for each interface."
+	::= { physicalAdapterAttrEntry 1 }
+
+physicalAdapterLinkStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(-1),
+				link-up(0),
+				link-down(1)
+			}				
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical adapter link status. Appears only if available -
+		that is, only if the driver is compliant with SNMP;
+		otherwise, NO_SUCH_NAME is returned."
+	::= { physicalAdapterAttrEntry 2 }	
+
+physicalAdapterLinkStatusChangesCounter	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Number of changes in physical adapter link status. 
+		Any change ('up-to-down' or 'down- to-up') is counted.
+		This value can be reset (to zero) by the user; no other value is permitted.
+		This value appears only if it is available - 
+		that is, only if the driver is compliant with SNMP; 
+		otherwise, NO_SUCH_NAME is returned."
+	::= { physicalAdapterAttrEntry 3 }	
+
+physicalAdapterSpeed	OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical adapter speed (in Mbps).
+		Appears only for an SNMP-compliant adapter with link up."
+	::= { physicalAdapterAttrEntry 4 }	
+
+physicalAdapterDplxMode	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(0),
+				half(1),
+				full(2)
+			}				
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical Adapter Duplex Mode.
+		Appears only for an SNMP-compliant adapter with link up."
+	::= { physicalAdapterAttrEntry 5 }	
+
+physicalAdapterAutoNegotiation	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				on(0),
+				off(1)
+			}				
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical adapter autonegotiation mode.
+		This value appears only if it is available -
+		that is, only if the driver is compliant with SNMP;
+		otherwise, NO_SUCH_NAME is returned."
+	::= { physicalAdapterAttrEntry 6 }	
+
+physicalAdapterPciBus	OBJECT-TYPE
+	SYNTAX	    Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical adapter PCI bus number."
+	::= { physicalAdapterAttrEntry 7 }	
+
+physicalAdapterPciSlot	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical adapter PCI slot number."
+	::= { physicalAdapterAttrEntry 8 }	
+
+physicalAdapterIrq	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical adapter Interrupt Request number."
+	::= { physicalAdapterAttrEntry 9 }	
+
+physicalAdapterCurrentNA	OBJECT-TYPE
+	SYNTAX		PhysAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Current MAC address of the physical adapter(in hex notation)."
+	::= { physicalAdapterAttrEntry 10 }	
+
+physicalAdapterPermanentNA	OBJECT-TYPE
+	SYNTAX		PhysAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Permanent MAC address of the physical adapter(in hex notation)."
+	::= { physicalAdapterAttrEntry 11 }	
+           
+physicalAdapterOnlineDiagStatus	OBJECT-TYPE
+	SYNTAX		INTEGER { 
+				not-available(-1),
+				failed(0),
+				passed(1) 
+			}	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"The Online Diagnostics Status of the Physical Adapter. 
+		Online Diagnostics consist of Link Test and other Hardware Tests."
+	::= { physicalAdapterAttrEntry 12 }	
+                     
+physicalAdapterExpressTeamed OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(0),
+				primary(1),
+				secondary(2)
+			}				
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Physical Adapter Express team status.
+		Appears only for an adapter with express teaming capability."
+	::= { physicalAdapterAttrEntry 13 }	                            
+	
+physicalAdapterExpressTeamBundleId 	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Unique value to identify the express team in the system."
+	::= { physicalAdapterAttrEntry 14 }
+
+physicalAdaptersAttrOffloadTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF PhysicalAdapterAttrOffloadEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes of offloading-enabled physical adapters.
+		There is one 'entry' for each SNMP-compliant physical adapter."
+	::= { physicalAdaptersAttrTables 2 }
+
+physicalAdapterAttrOffloadEntry	OBJECT-TYPE
+	SYNTAX		PhysicalAdapterAttrOffloadEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes of offloading-enabled physical adapters.
+		There is one 'entry' for each SNMP-compliant physical adapter."
+	INDEX		{ physicalAdapterIndex }		
+	::= { physicalAdaptersAttrOffloadTable 1 }
+
+PhysicalAdapterAttrOffloadEntry ::= SEQUENCE {
+	physicalAdapterTcpRxChecksumOffLoadEnable INTEGER,
+	physicalAdapterTcpRxChecksumBad Counter32,
+	physicalAdapterTcpTxChecksumOffLoadEnable INTEGER,
+	physicalAdapterIpv4RxChecksumOffLoadEnable INTEGER,
+	physicalAdapterIpv4TxChecksumOffLoadEnable INTEGER,
+	physicalAdapterIpv4TCPSegmentationOffLoadEnable INTEGER
+}
+
+physicalAdapterTcpRxChecksumOffLoadEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				enabled(0),
+				disabled(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"When enabled, TCP for 'receive' checksums are performed in hardware."
+	::= { physicalAdapterAttrOffloadEntry 1 }	
+
+physicalAdapterTcpRxChecksumBad OBJECT-TYPE
+	SYNTAX		 Counter32
+	MAX-ACCESS	 read-only
+	STATUS		 current
+	DESCRIPTION	 
+		"Number of bad 'receive' checksums."
+	::= { physicalAdapterAttrOffloadEntry 2 }	
+
+physicalAdapterTcpTxChecksumOffLoadEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				enabled(0),
+				disabled(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"When enabled, TCP for 'transmit' checksums are performed in hardware."
+	::= { physicalAdapterAttrOffloadEntry 3 }	
+
+physicalAdapterIpv4RxChecksumOffLoadEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				enabled(0),
+				disabled(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"When enabled, IPv4 for 'receive' checksums are performed in hardware."
+	::= { physicalAdapterAttrOffloadEntry 4 }	
+
+physicalAdapterIpv4TxChecksumOffLoadEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				enabled(0),
+				disabled(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"When enabled, IPv4 for 'receive' checksums are performed in hardware."
+	::= { physicalAdapterAttrOffloadEntry 5 }	
+
+physicalAdapterIpv4TCPSegmentationOffLoadEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disabled(0),
+				enabled(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"When enabled, TCP Segmentation is performed in hardware."
+	::= { physicalAdapterAttrOffloadEntry 6 }
+	
+-- ************************************
+-- Virtual Adapter Attr Tables
+-- ************************************
+virtualAdaptersAttrTables OBJECT IDENTIFIER ::= { adaptersTables 3 }
+
+virtualAdaptersAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VirtualAdapterAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all iANS-virtual adapters."
+	::= { virtualAdaptersAttrTables 1 }
+
+virtualAdapterAttrEntry	OBJECT-TYPE
+	SYNTAX		VirtualAdapterAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all iANS-virtual adapters.
+		There is one 'entry' for each virtual adapter"
+	INDEX		{ virtualAdapterIndex }		
+	::= { virtualAdaptersAttrTable 1 }
+
+VirtualAdapterAttrEntry ::= SEQUENCE {
+	virtualAdapterIndex		InterfaceIndex,
+	virtualAdapterAnsId     Integer32
+}
+
+virtualAdapterIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A unique value, greater than or equal to zero, for each interface."
+	::= { virtualAdapterAttrEntry 1 }
+
+virtualAdapterAnsId OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"ID of the team to which the adapter belongs."
+	::= { virtualAdapterAttrEntry 2 }
+
+virtualAdaptersVlanAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VirtualAdapterVlanAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all iANS-virtual adapters VLANs."
+	::= { virtualAdaptersAttrTables 2 }
+
+virtualAdapterVlanAttrEntry	OBJECT-TYPE
+	SYNTAX		VirtualAdapterVlanAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"VLAN attributes.Appears for virtual adapters that support VLANs only.
+		There is one 'entry' for each VLAN."
+	INDEX		{ virtualAdapterIndex }		
+	::= { virtualAdaptersVlanAttrTable 1 }
+
+VirtualAdapterVlanAttrEntry ::= SEQUENCE {
+	virtualAdapterVlanId	    INTEGER
+}
+
+virtualAdapterVlanId	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"ID for this virtual adapter VLAN."
+	::= { virtualAdapterVlanAttrEntry 1 }	
+
+-- ********************
+-- Ans Attr Tables
+-- ********************
+ansAttrTables OBJECT IDENTIFIER ::= { adaptersTables 4 }
+
+ansAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AnsAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"ANS attributes."
+	::= { ansAttrTables 1 }
+
+ansAttrEntry	OBJECT-TYPE
+	SYNTAX		AnsAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"ANS attributes. There is one 'entry'  for each team"
+	INDEX		{ ansId }		
+	::= { ansAttrTable 1 }
+
+AnsAttrEntry ::= SEQUENCE {
+	ansId	  				   Integer32,
+	ansNumberOfMembers		   Integer32,
+	ansNumberOfVirtualAdapters Integer32
+}
+
+ansId	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"ANS ID. A unique value."
+	::= { ansAttrEntry 1 }
+
+ansNumberOfMembers	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Number of member adapters in the team."
+	::= { ansAttrEntry 2 }
+
+ansNumberOfVirtualAdapters	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Number of virtual adapters in the team."
+	::= { ansAttrEntry 3 }
+	
+ansVlansAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AnsVlanAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"ANS attributes."
+	::= { ansAttrTables 2 }
+
+ansVlanAttrEntry	OBJECT-TYPE
+	SYNTAX		AnsVlanAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"ANS VLAN attributes.
+		Appears only if VLAN is active. There is one 'entry'  for each Vlan."
+	INDEX		{ ansId }		
+	::= { ansVlansAttrTable 1 }
+
+AnsVlanAttrEntry ::= SEQUENCE {
+	ansVlanTaggingType	    INTEGER
+}
+
+ansVlanTaggingType	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				tag-802-1Q(1),
+				tag-802-1P(2),
+				tag-802-3AC(3),
+				tag-iSL(4)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Tagging type of the VLAN adapter."
+	::= { ansVlanAttrEntry 1 }
+
+ansTeamsAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AnsTeamAttrEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"ANS team attributes."
+	::= { ansAttrTables 3 }
+
+ansTeamAttrEntry	OBJECT-TYPE
+	SYNTAX		AnsTeamAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"ANS team attributes. Appears only when adapter teaming exist.
+		There is one 'entry' for each team."
+	INDEX		{ ansId }		
+	::= { ansTeamsAttrTable 1 }
+
+AnsTeamAttrEntry ::= SEQUENCE {
+	ansTeamName		    		 DisplayString,
+	ansTeamMode			    	 INTEGER,
+	ansTeamLinkState		     INTEGER,
+	ansTeamSpeed			     Gauge32,
+	ansTeamProbesState		     INTEGER,
+	ansTeamProbesMode		     INTEGER,
+	ansTeamLoadBalanceRefresh	 INTEGER,
+	ansTeamProbesSendTime	     INTEGER,
+	ansTeamPreferredPrimaryIndex INTEGER,
+	ansTeamCurrentPrimaryIndex	 INTEGER,
+	ansTeamPreviousPrimaryIndex	 INTEGER,
+	ansTeamFailoverCounter	     Counter32,
+	ansTeamSlaCompatible         INTEGER,
+	ansTeamAggrSelectionMode     INTEGER,    
+	ansTeamRlbSupport		     INTEGER
+}
+
+ansTeamName    OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Unique ANS team name"
+	::= { ansTeamAttrEntry 1 }
+
+ansTeamMode    OBJECT-TYPE
+	SYNTAX		INTEGER {
+				adapter-fault-tolerance(0),
+				adaptive-load-balancing(1),
+				static-link-aggregation(2),
+				iEEE-802-3ad(4),
+				switch-fault-tolerance(5),
+				none(6)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Team mode."
+	::= { ansTeamAttrEntry 2 }
+
+ansTeamLinkState    OBJECT-TYPE
+	SYNTAX		INTEGER {
+				up(0),
+				down(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Team link state.
+		Aggregation of the link state of all team members ( 0 = some up)."
+	::= { ansTeamAttrEntry 3 }
+
+ansTeamSpeed    OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Team speed.Speed of the current primary member (in Mbps)."
+	::= { ansTeamAttrEntry 4 }
+
+ansTeamProbesState    OBJECT-TYPE
+	SYNTAX		INTEGER {
+				probes-enabled(0),
+				probes-disabled(1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"If enabled, the ANS uses probes to check on its members."
+	::= { ansTeamAttrEntry 5 }
+
+ansTeamProbesMode    OBJECT-TYPE
+	SYNTAX		INTEGER {
+				broadcast(0),
+				multicast(1),
+				not-available(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Mode of probe usage."
+	::= { ansTeamAttrEntry 6 }
+
+ansTeamLoadBalanceRefresh	    OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(0)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"In seconds. If available, the number of seconds that passes before 
+		the software resets or refreshes the current load across team members."
+	::= { ansTeamAttrEntry 7 }
+
+ansTeamProbesSendTime	    OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(0)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"In seconds. If available,
+		the interval in seconds during which probe packets are sent."
+	::= { ansTeamAttrEntry 8 }
+
+ansTeamPreferredPrimaryIndex	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(-1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Index of the preferred primary member adapter. "
+	::= { ansTeamAttrEntry 9 }
+
+ansTeamCurrentPrimaryIndex	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(-1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Index of the current primary member adapter."
+	::= { ansTeamAttrEntry 10 }
+
+ansTeamPreviousPrimaryIndex	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(-1)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Index of the previous primary member adapter."
+	::= { ansTeamAttrEntry 11 }
+
+ansTeamFailoverCounter	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Failover counter - 
+			that is, the number of failovers the team suffered.
+			This value can be reset by the user - 
+			that is, it can be set to zero only; no other value is permitted."
+	::= { ansTeamAttrEntry 12 } 
+	
+ansTeamSlaCompatible  OBJECT-TYPE
+	SYNTAX		INTEGER { 
+				not-available(-1),
+				yes(0),
+				no(1)
+				}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Indicates compatibility with Static Link Aggregation mode 
+			when in IEEE 802.3AD mode."
+	::= { ansTeamAttrEntry 13 } 
+	
+ansTeamAggrSelectionMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+				not-available(-1),
+				bandwidth(0),
+				count(1)
+				}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Indicates aggregation selection mode when in IEEE 802.3AD mode."
+	::= { ansTeamAttrEntry 14 }  
+	
+ansTeamRlbSupport  OBJECT-TYPE
+	SYNTAX		INTEGER { 
+				not-available(-1),
+				enabled(0),
+				disabled(1)
+				}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Indicates whether 'receive load balancing support' is enabled 
+			when in AdaptiveLoadBalancing teaming mode.
+			(If disabled, only the transmission is balanced.)"
+	::= { ansTeamAttrEntry 15 } 	
+
+-- ***********************************
+-- Ans Member Attr Tables
+-- ***********************************
+ansMembersAttrTables OBJECT IDENTIFIER ::= { adaptersTables 5 }
+
+ansMembersAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AnsMemberAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all iANS-TeamMember Adapters."
+	::= { ansMembersAttrTables 1 }
+
+ansMemberAttrEntry	OBJECT-TYPE
+	SYNTAX		AnsMemberAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all iANS-TeamMember Adapters. 
+		There is one 'entry' for each team member adapter."
+	INDEX		{ ansMemberIndex }		
+	::= { ansMembersAttrTable 1 }
+
+AnsMemberAttrEntry ::= SEQUENCE {
+	ansMemberIndex		InterfaceIndex,
+	ansMemberAnsId		Integer32
+}
+
+ansMemberIndex	OBJECT-TYPE
+	SYNTAX		InterfaceIndex
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A unique value for each member. The value is non-negative and identical
+		to the value of the physical adapter associated with this member."
+	::= { ansMemberAttrEntry 1 }
+
+ansMemberAnsId OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"ID of the ANS to which the Adapter belongs."
+	::= { ansMemberAttrEntry 2 }
+
+ansTeamMembersAttrTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AnsTeamMemberAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes common to all iANS-TeamMember Adapters."
+	::= { ansMembersAttrTables 2 }
+
+ansTeamMemberAttrEntry	OBJECT-TYPE
+	SYNTAX		AnsTeamMemberAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	
+		"Attributes of iANS-TeamMember Adapters related to adapter teaming.
+		Appears only if adapter teaming exists."
+	INDEX		{ ansMemberIndex }		
+	::= { ansTeamMembersAttrTable 1 }
+
+AnsTeamMemberAttrEntry ::= SEQUENCE {
+	ansTeamMemberState			INTEGER,
+	ansTeamMemberFailureCounter	Counter32,
+	ansTeamMemberPriority		INTEGER
+}
+
+ansTeamMemberState	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				active(0),
+				disabled(1),
+				standby(2),
+				active-secondary(3)
+			}				
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"iANS-TeamMember adapter state."
+	::= { ansTeamMemberAttrEntry 1 }	
+
+ansTeamMemberFailureCounter	OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	                                  
+		"Failure counter - that is, the number of failovers from this member.
+		This value can be reset by the user - 
+		that is, it can be set to zero only; no other value is permitted."
+	::= { ansTeamMemberAttrEntry 2 }	
+
+ansTeamMemberPriority   OBJECT-TYPE
+	SYNTAX		INTEGER {
+				none(0),
+				primary(1),
+				secondary(2)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+		"Priority of the team member."
+	::= {ansTeamMemberAttrEntry 3 }
+
+-- ******
+-- events
+-- ******
+
+events OBJECT IDENTIFIER ::= { intel-lan-adapters 3 }
+
+-- **********************
+-- physicalAdapter Events
+-- **********************
+physicalAdaptersEvents OBJECT IDENTIFIER ::= { events 1 }
+
+physicalAdaptersTraps OBJECT IDENTIFIER ::= { physicalAdaptersEvents 1 }
+
+physicalAdapterLinkUpTrap 	NOTIFICATION-TYPE
+	OBJECTS		{ physicalAdapterIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Adapter has reached a linkup state."
+	::= { physicalAdaptersTraps 1 }
+
+physicalAdapterLinkDownTrap NOTIFICATION-TYPE
+	OBJECTS	 	{ physicalAdapterIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Adapter has reached a link down state."
+	::= { physicalAdaptersTraps 2 }
+
+physicalAdapterAddedTrap NOTIFICATION-TYPE
+	OBJECTS	 	{ physicalAdapterIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Adapter has been installed."
+	::= { physicalAdaptersTraps 3 }
+
+physicalAdapterRemovedTrap NOTIFICATION-TYPE
+	OBJECTS	 	{ physicalAdapterIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Adapter has been uninstalled."
+	::= { physicalAdaptersTraps 4 }
+     
+physicalAdapterOnlineDiagPassedTrap NOTIFICATION-TYPE
+	OBJECTS	 	{ physicalAdapterIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Adapter's online diagnostics passed."
+	::= { physicalAdaptersTraps 5 } 
+	
+physicalAdapterOnlineDiagFailedTrap NOTIFICATION-TYPE
+	OBJECTS	 	{ physicalAdapterIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Adapter's online diagnostics failed. 
+		Online diagnostics might fail because of link loss or other hardware issues."
+	::= { physicalAdaptersTraps 6 }
+
+physicalAdapterLinkUpDownTrapEnable	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disabled(0),
+				enabled(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+		"Indicates whether a physical adapter's link up and link down traps are enabled.
+		The user can set this value."
+	::= { physicalAdaptersEvents 2 }
+
+physicalAdapterAddedRemovedTrapEnable	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disabled(0),
+				enabled(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+		"Indicates whether a physical adapter's 'added' and 'removed' traps are enabled. 
+		The user can set this value."
+	::= { physicalAdaptersEvents 3 }
+
+physicalAdapterOnlineDiagPassedFailedTrapEnable	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disabled(0),
+				enabled(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+		"Indicates whether physicalAdapterOnlineDiag 'passed' and 'failed' are enabled."
+	::= { physicalAdaptersEvents 4 }
+
+-- *******************
+-- Virtual Adapter Events
+-- *******************
+virtualAdaptersEvents OBJECT IDENTIFIER ::= { events 2 }
+
+virtualAdaptersTraps OBJECT IDENTIFIER ::= { virtualAdaptersEvents 1 }
+
+virtualAdapterAddedTrap NOTIFICATION-TYPE
+	OBJECTS		{ virtualAdapterIndex, ansId }
+	STATUS		current
+	DESCRIPTION	
+		"Virtual adapter has been added to a team."
+	::= { virtualAdaptersTraps 1 }
+
+virtualAdapterRemovedTrap NOTIFICATION-TYPE
+	OBJECTS		{ virtualAdapterIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Virtual adapter has been removed from a team."
+	::= { virtualAdaptersTraps 2 }
+
+virtualAdaptersTrapEnable	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disabled(0),
+				enabled(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+		"Indicates whether virtual adapter traps are enabled.
+		The user can set this value."
+	::= { virtualAdaptersEvents 2 }
+
+-- *******************
+-- team Events
+-- *******************
+ansEvents OBJECT IDENTIFIER ::= { events 3 }
+
+ansTraps OBJECT IDENTIFIER ::= { ansEvents 1 }
+
+ansTeamFailoverTrap NOTIFICATION-TYPE
+	OBJECTS		{ 
+			  ansId, 
+			  ansTeamCurrentPrimaryIndex, 
+			  ansTeamPreviousPrimaryIndex 
+			}
+	STATUS		current
+	DESCRIPTION	
+		"The primary team member has been changed."
+	::= { ansTraps 1 }
+
+ansAddedTrap NOTIFICATION-TYPE
+	OBJECTS		{ ansId }
+	STATUS		current
+	DESCRIPTION	
+		"Team has been added."
+	::= { ansTraps 2 }
+
+ansRemovedTrap NOTIFICATION-TYPE
+	OBJECTS		{ ansId }
+	STATUS		current
+	DESCRIPTION	
+		"Team has been removed."
+	::= { ansTraps 3 }
+
+ansTrapEnable	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disabled(0),
+				enabled(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+		"Indicates whether team traps are enabled.
+		The user can set this value."
+	::= { ansEvents 2 }
+
+-- *******************
+-- Team Member Events
+-- *******************
+teamMembersEvents OBJECT IDENTIFIER ::= { events 4 }
+
+teamMembersTraps OBJECT IDENTIFIER ::= { teamMembersEvents 1 }
+
+teamMemberAddedTrap NOTIFICATION-TYPE
+	OBJECTS		{ ansMemberIndex, ansId }
+	STATUS		current
+	DESCRIPTION	
+		"Member has been added to a team."
+	::= { teamMembersTraps 1 }
+
+teamMemberRemovedTrap NOTIFICATION-TYPE
+	OBJECTS		{ ansMemberIndex }
+	STATUS		current
+	DESCRIPTION	
+		"Member has been removed from a team."
+	::= { teamMembersTraps 2 }
+
+teamMemberTrapEnable	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disabled(0),
+				enabled(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+		"Indicates whether traps for members are enabled.
+		The user can set this value."
+	::= { teamMembersEvents 2 }
+	
+	
+--
+-- Compliance Statements
+--
+
+intellan-conformance    OBJECT IDENTIFIER ::= { intellan 1 }
+phyAdapterGroups     OBJECT IDENTIFIER ::= { intellan-conformance 1 }
+phyAdapterNotificationGroups     OBJECT IDENTIFIER ::= { intellan-conformance 2 }
+miscGroups     OBJECT IDENTIFIER ::= { intellan-conformance 3 }
+vtAdapterGroups     OBJECT IDENTIFIER ::= { intellan-conformance 4 }
+vtAdapterNotificationGroups     OBJECT IDENTIFIER ::= { intellan-conformance 5 }
+ansGroups     OBJECT IDENTIFIER ::= { intellan-conformance 6 }
+ansNotificationGroups     OBJECT IDENTIFIER ::= { intellan-conformance 7 }
+teamGroups     OBJECT IDENTIFIER ::= { intellan-conformance 8 }
+teamNotificationGroups     OBJECT IDENTIFIER ::= { intellan-conformance 9 }
+
+
+intellanCompliances   OBJECT IDENTIFIER ::= { intellan-conformance 10 }
+
+intellan-compliance  MODULE-COMPLIANCE
+     STATUS      current
+
+     DESCRIPTION
+       "Compliance statements for the Intel Lan Agent."
+
+     MODULE -- this module
+     MANDATORY-GROUPS { phyAdapterGroup, phyAdapterNotificationGroup, 
+     	miscGroup, vtAdapterGroup, vtAdapterNotificationGroup }
+						
+
+ 
+     ::= { intellanCompliances 1 }
+
+	
+
+phyAdapterGroup OBJECT-GROUP
+     OBJECTS { physicalAdapterOnlineDiagPassedFailedTrapEnable, physicalAdapterAddedRemovedTrapEnable, physicalAdapterLinkUpDownTrapEnable,
+     			physicalAdapterIpv4TCPSegmentationOffLoadEnable, physicalAdapterIpv4TxChecksumOffLoadEnable,
+     			physicalAdapterIpv4RxChecksumOffLoadEnable, physicalAdapterTcpTxChecksumOffLoadEnable,
+     			physicalAdapterTcpRxChecksumBad, physicalAdapterTcpRxChecksumOffLoadEnable, 
+     			physicalAdapterExpressTeamBundleId, physicalAdapterExpressTeamed,
+     			physicalAdapterOnlineDiagStatus, physicalAdapterPermanentNA,
+     			physicalAdapterCurrentNA, physicalAdapterIrq,
+     			physicalAdapterPciSlot, physicalAdapterPciBus,
+     			physicalAdapterAutoNegotiation, physicalAdapterDplxMode,
+     			physicalAdapterSpeed, physicalAdapterLinkStatusChangesCounter,
+     			physicalAdapterLinkStatus, physicalAdapterIndex,
+     			adapterCollisions, adapterRxMulticast,
+     			adapterTxDropped, adapterRxDropped,
+     			adapterTxErrors, adapterRxErrors,
+     			adapterTxBytes, adapterRxBytes,
+     			adapterTxPackets, adapterRxPackets,
+     			adapterIpAddress, adapterDriverSize,
+     			adapterDriverDate, adapterDriverPath,
+     			adapterDriverVersion, adapterDriverInfo,
+     			adapterDriverName, adapterDriverLoadStatus,
+     			adapterType, adapterName, adapterIndex
+				}
+      STATUS current
+      DESCRIPTION
+        "A collection of objects for phyiscal adapter group"
+       ::= { phyAdapterGroups 1 }
+
+phyAdapterNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS  {
+		physicalAdapterOnlineDiagFailedTrap, physicalAdapterOnlineDiagPassedTrap,
+		physicalAdapterRemovedTrap, physicalAdapterAddedTrap,
+		physicalAdapterLinkDownTrap, physicalAdapterLinkUpTrap
+		
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of notification for physical adapter notification"
+	::= { phyAdapterNotificationGroups 1 }
+
+vtAdapterGroup OBJECT-GROUP
+     OBJECTS { virtualAdaptersTrapEnable, virtualAdapterVlanId, virtualAdapterAnsId,  virtualAdapterIndex
+			}
+      STATUS current
+      DESCRIPTION
+        "A collection of objects for virtual adapter group"
+       ::= { vtAdapterGroups 1 }
+
+
+vtAdapterNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS  {
+		virtualAdapterRemovedTrap, virtualAdapterAddedTrap
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of notification for virtual adapter notification"
+	::= { vtAdapterNotificationGroups 1 }
+
+
+ansGroup OBJECT-GROUP
+     OBJECTS { ansId, ansNumberOfMembers, ansNumberOfVirtualAdapters,
+		ansVlanTaggingType, ansTeamName,  ansTeamMode, 	ansTeamLinkState,
+		ansTeamSpeed, ansTeamProbesState, ansTeamProbesMode, 
+		ansTeamLoadBalanceRefresh, ansTeamProbesSendTime, 
+		ansTeamPreferredPrimaryIndex,  ansTeamCurrentPrimaryIndex,
+		ansTeamPreviousPrimaryIndex, ansTeamFailoverCounter, 
+		ansTeamSlaCompatible, ansTeamAggrSelectionMode,  ansTeamRlbSupport,
+		ansMemberIndex, ansMemberAnsId, ansTeamMemberState,
+		ansTeamMemberFailureCounter, ansTeamMemberPriority, ansTrapEnable
+		}
+      STATUS current
+      DESCRIPTION
+        "A collection of objects for ans group"
+       ::= { ansGroups 1 }
+
+
+ansNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS  {
+		ansTeamFailoverTrap, ansAddedTrap, ansRemovedTrap 
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of notification for ans notification"
+	::= { ansNotificationGroups 1 }
+
+teamGroup OBJECT-GROUP
+     OBJECTS { teamMemberTrapEnable
+			}
+      STATUS current
+      DESCRIPTION
+        "A collection of objects for team group"
+       ::= { teamGroups 1 }
+
+
+teamNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS  {
+		teamMemberAddedTrap,  teamMemberRemovedTrap
+	}
+	STATUS current
+	DESCRIPTION
+		"A collection of notification for team notification"
+	::= { teamNotificationGroups 1 }
+	
+miscGroup OBJECT-GROUP
+     OBJECTS { status,  agentExtensionVersion,
+     	mibVersionSupported, mibVersion1-4-3,
+     	operatingSystem, description, company
+		}
+      STATUS current
+      DESCRIPTION
+        "A collection of objects for misc.  group"
+       ::= { miscGroups 1 }
+	   
+-- Compliance statement end
+	
+
+END
