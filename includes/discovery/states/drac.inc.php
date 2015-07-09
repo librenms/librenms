@@ -28,4 +28,4 @@ if ($device['os'] == "drac") {
             discover_sensor($valid['sensor'], 'state', $device, $main_oid.$state_oid, "virtualDiskState.$state_oid", 'drac', 'Raid State', '1', '1', NULL, NULL, NULL, NULL, $state_current);
         }
     }
-
+}
