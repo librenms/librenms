@@ -46,6 +46,8 @@ $descr  = $device['purpose'];
 
 $override_sysLocation_bool = get_dev_attrib($device,'override_sysLocation_bool');
 $override_sysLocation_string = get_dev_attrib($device,'override_sysLocation_string');
+$override_latlng_bool = get_dev_attrib($device,'override_latlng_bool');
+$override_latlng_string = get_dev_attrib($device,'override_latlng_string');
 
 if ($updated && $update_message)
 {
@@ -122,6 +124,21 @@ foreach ($config['device_types'] as $type)
     </div>
     <div class="col-sm-6">
       <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysLocation_string); ?>" />
+    </div>
+  </div>
+ <div class="form-group">
+    <label for="override_latlng" class="col-sm-2 control-label">Override Lat / Lng:</label>
+    <div class="col-sm-6">
+     <div class="checkbox">
+       <input type="checkbox" name="override_latlng"<?php if ($override_latlng_bool) { echo(' checked="1"'); } ?> />
+     </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-2">
+    </div>
+    <div class="col-sm-6">
+      <input id="latlng" name="latlng" class="form-control" <?php if (!$override_latlng_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_latlng_string); ?>" />
     </div>
   </div>
   <div class="form-group">
