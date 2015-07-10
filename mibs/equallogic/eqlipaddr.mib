@@ -1,0 +1,527 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+
+
+EQLIPADDR-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        IpAddress, Integer32, Unsigned32, OBJECT-TYPE,MODULE-IDENTITY, enterprises
+                FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+    ifIndex
+        FROM RFC1213-MIB
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB       -- RFC2851
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId, UTFString
+            FROM EQLGROUP-MIB
+    eqlMemberIndex
+            FROM EQLMEMBER-MIB;   
+    
+ 
+    eqlipaddrModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Equallogic Inc. Storage Array IP address table mib
+
+         Copyright (c) 2002-2010 by Dell, Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by Dell, Inc.  This software embodies proprietary information
+         and trade secrets of Dell, Inc.
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION    "200209060000Z"         -- 02-Sep-06
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 9 }
+           
+
+          -- the IP address table
+
+          -- The IP address table contains this entity's IP addressing
+          -- information.
+
+          eqlipAddrTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF EqlipAddrEntry
+              MAX-ACCESS    not-accessible
+              STATUS        deprecated
+              DESCRIPTION
+                            "EqualLogic-Dynamic Storage Volume Table. 
+                             The table of addressing information relevant to
+                             this entity's IP addresses."
+              ::= { eqlipaddrModule 1 }
+
+          eqlipAddrEntry OBJECT-TYPE
+              SYNTAX        EqlipAddrEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            "The addressing information for one of this
+                            entity's IP addresses."
+              INDEX     {eqlGroupId, eqlMemberIndex, eqlIpAdEntAddr}
+              ::= { eqlipAddrTable 1 }
+
+          EqlipAddrEntry ::=
+              SEQUENCE {
+                  eqlIpAdEntAddr        IpAddress,
+                  eqlIpAdEntIfName      DisplayString,
+                  eqlIpAdEntNetMask     IpAddress,
+                  eqlIpAdEntIfIndex     Integer32,
+                  eqlIpAdEntRowStatus   RowStatus
+     }
+
+          eqlIpAdEntAddr OBJECT-TYPE
+              SYNTAX        IpAddress
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            "The IP address to which this entry's addressing
+                            information pertains."
+              ::= { eqlipAddrEntry 1 }
+
+      
+          eqlIpAdEntIfName OBJECT-TYPE
+              SYNTAX        DisplayString (SIZE (1..16))
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "The interface name for which this entry's addressing
+                            information pertains."
+              ::= { eqlipAddrEntry 2 }
+
+          eqlIpAdEntNetMask OBJECT-TYPE
+              SYNTAX        IpAddress
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "The subnet mask associated with the IP address of
+                             this entry.  The value of the mask is an IP
+                             address with all the network bits set to 1 and all
+                             the hosts bits set to 0."
+              ::= { eqlipAddrEntry 3 }
+
+          eqlIpAdEntIfIndex OBJECT-TYPE
+              SYNTAX        Integer32
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "The interface index for which this entry's addressing
+                            information pertains."
+              ::= { eqlipAddrEntry 4 }
+
+      eqlIpAdEntRowStatus  OBJECT-TYPE
+              SYNTAX         RowStatus
+              MAX-ACCESS     read-create
+              STATUS         current
+              DESCRIPTION   "The status of this conceptual row.
+
+                 Until instances of all read-create columns are
+                 appropriately configured, the value of the
+                 corresponding instance of the eqlIpRowStatus column
+                 is 'notReady'.
+
+                 The  RowStatus TC [RFC1903] requires that this
+                 DESCRIPTION clause states under which circumstances
+                 other objects in this row can be modified:
+
+                 The value of this object has no effect on whether
+                 other objects in this conceptual row can be modified.
+                "
+         ::= { eqlipAddrEntry 5 }
+
+--****************************************************
+
+-- 		Equallogic Interfaces Table
+
+-- ****************************************************
+
+          eqlifTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF EqlifEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            "EqualLogic-Persistent Interfaces Table. 
+                             The table of information relevant to
+                             this entity's physical interfaces."
+              ::= { eqlipaddrModule 2 }
+
+          eqlifEntry OBJECT-TYPE
+              SYNTAX        EqlifEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            " "
+              INDEX         { eqlGroupId, eqlMemberIndex, ifIndex }
+              ::= { eqlifTable 1 }
+
+           EqlifEntry ::=
+              SEQUENCE {
+                eqlifDescr     DisplayString,
+                eqlifPortAttr  INTEGER,
+                eqlifAdminStatus INTEGER,
+                eqlifRole INTEGER
+              }
+
+            eqlifDescr OBJECT-TYPE            
+               SYNTAX          DisplayString (SIZE (0..128))    
+               MAX-ACCESS      read-write      
+               STATUS          current      
+               DESCRIPTION     "This field provides a writable area for a manager to 
+                                enter user specific data pertaining to the interface 
+                                referred by this instance of ifIndex "
+	            ::=  {  eqlifEntry 1 } 
+
+
+            eqlifPortAttr OBJECT-TYPE      
+               SYNTAX          INTEGER     {
+                    attr-pss-only(1),
+                    attr-initiator-only(2),
+                    attr-any(3)
+                }     
+                MAX-ACCESS      read-write
+                STATUS          current      
+                DESCRIPTION     "This field specifies the mode of the specified port as follows:"
+                DEFVAL          { attr-any }
+	            ::=  {  eqlifEntry 2 } 
+
+          eqlifAdminStatus OBJECT-TYPE
+              SYNTAX  INTEGER {            
+                          up(1),       -- ready to pass packets
+                          down(2),
+                          testing(3)   -- in some test mode
+                      }
+              MAX-ACCESS  read-write 
+              STATUS  current  
+              DESCRIPTION
+                      "
+                      The desired state of the interface.  The
+                      testing(3) state indicates that no operational
+                      packets can be passed. 
+                      This column is used to maintain the desired state of the 
+                      interface accross reboots. The value of this object MUST 
+                      always be equal to ifAdminStatus defined in rfc1213 mib."
+              ::= { eqlifEntry 3 }
+
+          eqlifRole OBJECT-TYPE
+              SYNTAX  INTEGER {            
+                          iscsi-only(0), -- iscsi traffic
+                          mgmt-only(1) -- only mgmt traffic
+                      }
+              MAX-ACCESS  read-write 
+              STATUS  current  
+              DESCRIPTION
+                      "
+                      The desired role of the interface. By default the interface will allow
+                      iscsi only traffic. when set to mgmt-only, only management traffic
+                      will be allowed. (There is not a both at this time)"
+              DEFVAL { iscsi-only }
+              ::= { eqlifEntry 4 }
+
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+eqlWKATable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlWKAEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent WKA Table. This table maintains the list of
+                     well known ipaddresses (WKA) in the group."
+    ::=  {  eqlipaddrModule  3}
+
+eqlWKAEntry OBJECT-TYPE
+    SYNTAX          EqlWKAEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing storage group WKA information."
+    INDEX     {eqlGroupId, eqlInetAddrEntAddrType, eqlInetAddrEntAddr}
+    ::=    { eqlWKATable 1 }
+
+EqlWKAEntry ::=
+    SEQUENCE {
+    eqlWKARowStatus             RowStatus,
+    eqlWKARole                  INTEGER
+    }
+
+    eqlWKARowStatus  OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION   "The status of this conceptual row."
+    ::= {eqlWKAEntry 1}
+
+    eqlWKARole  OBJECT-TYPE
+    SYNTAX         INTEGER {
+         management(1),
+         secondary(2)
+    }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION   " The role of this WKA. Management WKA is used for only management traffic. secondary WKA can be used incase the 
+                    of failover to secondary site and secondary site wants to use primary site's WKA. Secondary WKAs can exist
+                    independent of partner records and their ipaddresses."
+    DEFVAL {secondary}
+    ::= {eqlWKAEntry 2}
+
+    
+-----------------------------------------------------------
+-----------------------------------------------------------
+eqlifStatusTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlifStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Interface Table.
+                     This table contains WKA information about the interfaces." 
+    ::=    { eqlipaddrModule 4 }     
+
+
+eqlifStatusEntry OBJECT-TYPE      
+    SYNTAX          EqlifStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Interface WKA information."
+    AUGMENTS        { eqlifEntry }
+
+    ::=   { eqlifStatusTable 1}     
+
+EqlifStatusEntry ::= 
+    SEQUENCE { 
+        eqlifStatusMgmtRolePolicy               INTEGER,
+        eqlifStatusConfigurationFlags           BITS,
+        eqlifOperStatus                         INTEGER
+    }
+
+	eqlifStatusMgmtRolePolicy  OBJECT-TYPE      
+    SYNTAX         INTEGER {
+         non-configurable(0),
+         configurable(1),
+         fixed(2)
+    }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION     "
+                     This field is for specifying the policy of this interface, i.e whether this interface can be used for mgmt-only role."  
+    DEFVAL {non-configurable}
+    ::=  { eqlifStatusEntry 1 }
+
+eqlifStatusConfigurationFlags OBJECT-TYPE
+    SYNTAX          BITS {
+                    isDcbCapable(0), -- is Interface DCB Capable
+                    flag1(1),
+                    flag2(2),
+                    flag3(3),
+                    flag4(4),
+                    flag5(5),
+                    flag6(6),
+                    flag7(7),
+                    flag8(8),
+                    flag9(9),
+                    flag10(10),
+                    flag11(11),
+                    flag12(12),
+                    flag13(13),
+                    flag14(14),
+                    flag15(15),
+                    flag16(16),
+                    flag17(17),
+                    flag18(18),
+                    flag19(19),
+                    flag20(20),
+                    flag21(21),
+                    flag22(22),
+                    flag23(23),
+                    flag24(24),
+                    flag25(25),
+                    flag26(26),
+                    flag27(27),
+                    flag28(28),
+                    flag29(29),
+                    flag30(30),
+                    flag31(31)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This fields defines the common place holder for ethernet interface
+                     configuration flags.  The flags must be of type
+                     enable(1) or disable(0), and the default will always be disable(0)."
+    DEFVAL          { {} }
+    ::= { eqlifStatusEntry 2 }
+
+eqlifOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                   up(1),       -- ready to pass packets
+                   down(2),
+                   testing(3),  -- in some test mode
+                   unknown(4),  -- status can not be determined
+                                -- for some reason.
+                   dormant(5)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+               "The current operational state of the interface.  The
+               testing(3) state indicates that no operational packets
+               can be passed.  If eqlifAdminStatus is down(2) then
+               eqlifOperStatus should be down(2).  If eqlifAdminStatus is
+               changed to up(1) then eqlifOperStatus should change to
+               up(1) if the interface is ready to transmit and
+               receive network traffic; it should change to
+               dormant(5) if the interface is waiting for external
+               actions (such as a serial line waiting for an
+               incomming connection); it should remain in the down(2)
+               state if and only if there is a fault that prevents if
+               from going to the up(1) state."
+    ::= { eqlifStatusEntry 3 }
+
+
+
+--****************************************************
+
+          -- R E P L A C E M E N T   F O R   I P v 4   I P   A D D R E S S   T A B L E
+
+          -- IP address table
+
+          -- The IP address table contains this entity's IP addressing
+          -- information.
+
+-- ****************************************************
+
+          eqlinetAddrTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF EqlinetAddrEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            "EqualLogic-Persistent Storage Volume Table. 
+                             The table of addressing information relevant to
+                             this entity's IP addresses."
+              ::= { eqlipaddrModule 5 }
+
+          eqlinetAddrEntry OBJECT-TYPE
+              SYNTAX        EqlinetAddrEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            "The addressing information for one of this
+                            entity's IP addresses."
+              INDEX     {eqlGroupId, eqlMemberIndex, eqlInetAddrEntAddrType, eqlInetAddrEntAddr}
+              ::= { eqlinetAddrTable 1 }
+
+          EqlinetAddrEntry ::=
+              SEQUENCE {
+                  eqlInetAddrEntAddrType    InetAddressType,
+                  eqlInetAddrEntAddr        InetAddress,
+                  eqlInetAddrEntIfName      DisplayString,
+                  eqlInetAddrEntNetMaskType InetAddressType,
+                  eqlInetAddrEntNetMask     InetAddress,
+                  eqlInetAddrEntIfIndex     Integer32,
+                  eqlInetAddrEntFlags       INTEGER,
+                  eqlInetAddrEntRowStatus   RowStatus
+              }
+
+          eqlInetAddrEntAddrType OBJECT-TYPE
+              SYNTAX        InetAddressType
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            "The IP address to which this entry's addressing
+                            information pertains."
+              ::= { eqlinetAddrEntry 1 }
+
+      
+          eqlInetAddrEntAddr OBJECT-TYPE
+              SYNTAX        InetAddress
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                            "The IP address to which this entry's addressing
+                            information pertains."
+              ::= { eqlinetAddrEntry 2 }
+
+      
+          eqlInetAddrEntIfName OBJECT-TYPE
+              SYNTAX        DisplayString (SIZE (1..16))
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "The interface name for which this entry's addressing
+                            information pertains."
+              ::= { eqlinetAddrEntry 3 }
+
+          eqlInetAddrEntNetMaskType OBJECT-TYPE
+              SYNTAX        InetAddressType
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "The subnet mask associated with the IP address of
+                             this entry.  The value of the mask is an IP
+                             address with all the network bits set to 1 and all
+                             the hosts bits set to 0."
+              ::= { eqlinetAddrEntry 4 }
+
+          eqlInetAddrEntNetMask OBJECT-TYPE
+              SYNTAX        InetAddress
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "The subnet mask associated with the IP address of
+                             this entry.  The value of the mask is an IP
+                             address with all the network bits set to 1 and all
+                             the hosts bits set to 0."
+              ::= { eqlinetAddrEntry 5 }
+
+          eqlInetAddrEntIfIndex OBJECT-TYPE
+              SYNTAX        Integer32
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "The interface index for which this entry's addressing
+                            information pertains."
+              ::= { eqlinetAddrEntry 6 }
+
+          eqlInetAddrEntFlags OBJECT-TYPE
+              SYNTAX        INTEGER {
+                 no-options(0),
+                 static(1)
+              }
+              MAX-ACCESS    read-create
+              STATUS        current
+              DESCRIPTION
+                            "This specifies specific flags for the address.  
+                            Currently the only flag that can be set is static (1),
+                            which means the address has been statically
+                            configured by the administrator"
+              ::= { eqlinetAddrEntry 7 }
+
+          eqlInetAddrEntRowStatus  OBJECT-TYPE
+              SYNTAX         RowStatus
+              MAX-ACCESS     read-create
+              STATUS         current
+              DESCRIPTION   "The status of this conceptual row.
+
+                 Until instances of all read-create columns are
+                 appropriately configured, the value of the
+                 corresponding instance of the eqlIpRowStatus column
+                 is 'notReady'.
+
+                 The  RowStatus TC [RFC1903] requires that this
+                 DESCRIPTION clause states under which circumstances
+                 other objects in this row can be modified:
+
+                 The value of this object has no effect on whether
+                 other objects in this conceptual row can be modified.
+                "
+              ::= { eqlinetAddrEntry 8 }
+
+END

@@ -1,0 +1,2471 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+--FROM SNMP-FRAMEWORK-MIB; 
+-- RFC 2571  
+  
+--  These are from draft-ietf-ops-rfc2851-update-00.txt  
+--  You will have to work out the details with your own  
+--  compiler being because they are so new. 
+
+     
+--equalLogic   OBJECT IDENTIFIER ::= { enterprises 12740 } 
+-- assigned by IANA to EqualLogic.  
+EQLVOLBALANCER-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32,TimeTicks,  enterprises, IpAddress, Opaque, Counter64, Counter32
+            FROM SNMPv2-SMI  
+	 DateAndTime, RowPointer       
+				FROM SNMPv2-TC
+    TruthValue, RowStatus, DisplayString    
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId, UTFString
+            FROM EQLGROUP-MIB     
+    eqlMemberIndex
+            FROM EQLMEMBER-MIB
+    eqlRAIDDeviceUUID, eqlRAIDDeviceLUNIndex
+            FROM EQLRAID-MIB
+    eqlStoragePoolIndex
+            FROM EQLSTORAGEPOOL-MIB
+    eqliscsiLocalMemberId, eqliscsiVolumeIndex
+            FROM EQLVOLUME-MIB
+    ifIndex
+        FROM RFC1213-MIB;
+
+eqlvolbalancerModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Equallogic Inc. Storage Array volume information 
+
+
+         Copyright (c) 2004-2011 by Dell, Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by EqualLogic, Inc.  This software embodies proprietary information
+         and trade secrets of Dell, Inc.
+        "
+
+    -- Revision history, in reverse chronological order
+    REVISION     "200401120000Z"      -- 04-January-12
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 14 }     
+
+
+eqlvolbalancerObjects OBJECT IDENTIFIER ::=  { eqlvolbalancerModule 1 }   
+eqlvolbalancerNotifications OBJECT IDENTIFIER ::= { eqlvolbalancerModule 2 }   
+eqlvolbalancerConformance OBJECT IDENTIFIER ::=  { eqlvolbalancerModule 3 } 
+     
+
+--***********************************************************************************
+
+-- The VolBalancer Config Group
+
+eqlvolbalancerConfigGroup OBJECT IDENTIFIER ::= { eqlvolbalancerObjects 1 }
+
+eqlvolbalancerConfigVolSliceCostFreq OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION "EqualLogic-Dynamic
+                 The frequency which volume-slice statistics are
+                 harvested and stored in the VolumeSliceCost table."
+    DEFVAL      {15}
+    ::=     { eqlvolbalancerConfigGroup 1 }
+
+
+eqlvolbalancerConfigVolSliceRollupTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION "EqualLogic-Dynamic
+                 The time of day at which VolumeSliceCost entries for
+                 the previous day are rolled up and stored in the
+                 DailyVolumeCost table."
+    DEFVAL      {60}							-- 01:00 AM
+    ::=     { eqlvolbalancerConfigGroup 2 }
+
+
+--***********************************************************************************
+
+eqlvolbalancerVolumeSliceCostTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlvolbalancerVolumeSliceCostEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated
+    DESCRIPTION     "EqualLogic-Persistent Volume Slice Statistic
+                     This table contains incremental cost statistic 
+                     values for a volume slice."
+    ::=    { eqlvolbalancerObjects 2 }     
+
+
+eqlvolbalancerVolumeSliceCostEntry OBJECT-TYPE
+    SYNTAX          EqlvolbalancerVolumeSliceCostEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated
+    DESCRIPTION     "An entry (row) containing volume slice statistics."
+    INDEX           { eqlvolbalancerVolumeSliceCostPsaId, eqlvolbalancerVolumeSliceCostTime, eqlvolbalancerVolumeSliceCostVolumeId }
+
+    ::=   { eqlvolbalancerVolumeSliceCostTable 1}
+
+EqlvolbalancerVolumeSliceCostEntry ::= 
+    SEQUENCE { 
+        eqlvolbalancerVolumeSliceCostPsaId                    OCTET STRING,	-- uuid_t
+        eqlvolbalancerVolumeSliceCostTime                     Unsigned32,
+        eqlvolbalancerVolumeSliceCostVolumeId                 OCTET STRING,	-- CPsvId_t
+        eqlvolbalancerVolumeSliceCostCost                     Unsigned32,
+        eqlvolbalancerVolumeSliceCostStatus                   RowStatus
+    }
+
+
+eqlvolbalancerVolumeSliceCostPsaId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "uuid_t of the PSA on which the volume slice is located"
+    ::= { eqlvolbalancerVolumeSliceCostEntry 1 }
+
+eqlvolbalancerVolumeSliceCostTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "the time at which the sample is taken from kernel"
+    ::= { eqlvolbalancerVolumeSliceCostEntry 2 }
+
+eqlvolbalancerVolumeSliceCostVolumeId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "CPsvId_t of the volume owning the volume slice"
+    ::= { eqlvolbalancerVolumeSliceCostEntry 3 }
+
+eqlvolbalancerVolumeSliceCostCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "cost associated with the sample"
+    ::= { eqlvolbalancerVolumeSliceCostEntry 4 }
+
+eqlvolbalancerVolumeSliceCostStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          deprecated
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlvolbalancerVolumeSliceCostEntry 5 }  
+
+
+
+
+
+--***********************************************************************************
+
+eqlvolbalancerDailyVolumeCostTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlvolbalancerDailyVolumeCostEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated
+    DESCRIPTION     "EqualLogic-Persistent Volume Slice Statistic
+                     This table contains rolled up cost statistic 
+                     values for a volume on a particular day."
+    ::=    { eqlvolbalancerObjects 3 }     
+
+
+eqlvolbalancerDailyVolumeCostEntry OBJECT-TYPE
+    SYNTAX          EqlvolbalancerDailyVolumeCostEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated
+    DESCRIPTION     "An entry (row) containing volume slice statistics."
+    INDEX           { eqlvolbalancerDailyVolumeCostDay, eqlvolbalancerDailyVolumeCostVolumeId }
+
+    ::=   { eqlvolbalancerDailyVolumeCostTable 1}
+
+EqlvolbalancerDailyVolumeCostEntry ::= 
+    SEQUENCE { 
+        eqlvolbalancerDailyVolumeCostDay                      Unsigned32,
+        eqlvolbalancerDailyVolumeCostVolumeId                 OCTET STRING,	-- CPsvId_t
+        eqlvolbalancerDailyVolumeCostCost                     Unsigned32,
+        eqlvolbalancerDailyVolumeCostStatus                   RowStatus
+    }
+
+
+eqlvolbalancerDailyVolumeCostDay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "the day when the sample was taken"
+    ::= { eqlvolbalancerDailyVolumeCostEntry 1 }
+
+eqlvolbalancerDailyVolumeCostVolumeId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "CPsvId_t of the volume owning the volume slice"
+    ::= { eqlvolbalancerDailyVolumeCostEntry 2 }
+
+eqlvolbalancerDailyVolumeCostCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "cost associated with the sample"
+    ::= { eqlvolbalancerDailyVolumeCostEntry 3 }
+
+eqlvolbalancerDailyVolumeCostStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          deprecated
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlvolbalancerDailyVolumeCostEntry 4 }
+
+
+
+
+
+--***********************************************************************************
+
+eqlvolbalancerRecommendationTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlvolbalancerRecommendationEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated
+    DESCRIPTION     "EqualLogic-Persistent Volume Slice Statistic
+                     This table contains rolled up cost statistic 
+                     values for a volume on a particular day."
+    ::=    { eqlvolbalancerObjects 4 }     
+
+
+eqlvolbalancerRecommendationEntry OBJECT-TYPE
+    SYNTAX          EqlvolbalancerRecommendationEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated
+    DESCRIPTION     "An entry (row) containing a volume slice move recommendation."
+    INDEX           { eqlvolbalancerRecommendationTime, eqlvolbalancerRecommendationVolumeId, eqlvolbalancerRecommendationSrcPsaId }
+
+    ::=   { eqlvolbalancerRecommendationTable 1}
+
+EqlvolbalancerRecommendationEntry ::= 
+    SEQUENCE { 
+        eqlvolbalancerRecommendationTime                     Unsigned32,
+        eqlvolbalancerRecommendationVolumeId                 OCTET STRING,	-- CPsvId_t
+        eqlvolbalancerRecommendationSrcPsaId                 OCTET STRING,	-- uuid_t
+        eqlvolbalancerRecommendationDstPsaId                 OCTET STRING,	-- uuid_t
+        eqlvolbalancerRecommendationComplete                 TruthValue,
+        eqlvolbalancerRecommendationStatus                   RowStatus
+    }
+
+
+eqlvolbalancerRecommendationTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "time at which the recommendation was made"
+    ::= { eqlvolbalancerRecommendationEntry 1 }
+
+eqlvolbalancerRecommendationVolumeId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "CPsvId_t of the volume owning the volume slice"
+    ::= { eqlvolbalancerRecommendationEntry 2 }
+
+eqlvolbalancerRecommendationSrcPsaId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "uuid_t of the Psa where the volume slice is originally located"
+    ::= { eqlvolbalancerRecommendationEntry 3 }
+
+eqlvolbalancerRecommendationDstPsaId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "uuid_t of the Psa to which the volume slice should be moved"
+    ::= { eqlvolbalancerRecommendationEntry 4 }
+
+eqlvolbalancerRecommendationComplete OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION "flag to indicate whether the recommendation has been carried out"
+    ::= { eqlvolbalancerRecommendationEntry 5 }
+
+eqlvolbalancerRecommendationStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          deprecated
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlvolbalancerRecommendationEntry 6 }
+
+
+--***********************************************************************************
+
+eqlVolBalConfigTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalConfigEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Volume balancer plan table."
+    ::=    { eqlvolbalancerObjects 5 }     
+
+
+eqlVolBalConfigEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing volume balancer configuration."
+    INDEX           { eqlStoragePoolIndex }
+
+    ::=   { eqlVolBalConfigTable 1 }
+
+EqlVolBalConfigEntry ::= 
+    SEQUENCE { 
+        eqlVolBalConfigLastPlanIndex                Counter32,
+        eqlVolBalConfigEnabled                      INTEGER,
+        eqlVolBalConfigSenseFrequency               Unsigned32,
+        eqlVolBalConfigImbalDetectFrequency         Unsigned32,
+        eqlVolBalConfigVolumeDelFrequency           Unsigned32,
+        eqlVolBalConfigVolumeBindFrequency          Unsigned32,
+        eqlVolBalConfigRAIDSetFreeSpaceTroubleDelay Unsigned32,
+        eqlVolBalConfigRAIDSetDeleteDelay           Unsigned32,
+        eqlVolBalConfigRAIDSetJoinDelay             Unsigned32,
+        eqlVolBalConfigReamSize                     Unsigned32,
+        eqlVolBalConfigHistoryRowMax                Unsigned32,
+        eqlVolBalConfigRAIDStatsRowMax              Unsigned32,
+        eqlVolBalConfigPoolThroughputRateMax        Unsigned32,
+        eqlVolBalConfigMinSpreadSize                Unsigned32,
+        eqlVolBalConfigPlacementThreshold           Unsigned32,
+        eqlVolBalConfigPreviousLeadUUID             OCTET STRING, -- uuid_t
+        eqlVolBalConfigFlags                        BITS,
+        eqlVolBalConfigArchivalPlacementThreshold   Unsigned32,
+        eqlVolBalConfigFreeSpaceTroubleEnabled      INTEGER,
+        eqlVolBalConfigPreferAutoRAIDPlacement      INTEGER,
+        eqlVolBalConfigHotColdPageSwapEnabled       INTEGER,        
+        eqlVolBalConfigArchiveEnabled               INTEGER        
+    }
+
+
+
+eqlVolBalConfigLastPlanIndex OBJECT-TYPE
+	SYNTAX		Counter32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The last PlanIndex used.  Stored so that we can ensure we're alway
+                 increasing our PlanIndex."
+    ::=     { eqlVolBalConfigEntry 1 }
+
+
+eqlVolBalConfigEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enabled(1),
+                capacity-only(2),
+                disabled(3),
+                performance(4)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current 
+    DESCRIPTION     "This field enables/disables the volume capacity and performance balancing subsystem within a group."
+    DEFVAL          { enabled }
+    ::=  {  eqlVolBalConfigEntry 2 }
+
+eqlVolBalConfigSenseFrequency OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the sense frequency."
+    ::=  {  eqlVolBalConfigEntry 3 }
+
+eqlVolBalConfigImbalDetectFrequency OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the imbalance detection frequency."
+    ::=  {  eqlVolBalConfigEntry 4 }
+
+eqlVolBalConfigVolumeDelFrequency OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the volume deletion frequency."
+    ::=  {  eqlVolBalConfigEntry 5 }
+
+eqlVolBalConfigVolumeBindFrequency OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the volume bind frequency."
+    ::=  {  eqlVolBalConfigEntry 6 }
+
+eqlVolBalConfigRAIDSetFreeSpaceTroubleDelay OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the minimum delay after resolving a raid-set
+                     being in free space trouble before re-evaluating.."
+    ::=  {  eqlVolBalConfigEntry 7 }
+
+eqlVolBalConfigRAIDSetDeleteDelay OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the minimum delay after vacating a raid-set before re-evaluating."
+    ::=  {  eqlVolBalConfigEntry 8 }
+
+eqlVolBalConfigRAIDSetJoinDelay OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the minimum delay after a raid-set joins a pool before re-evaluating."
+    ::=  {  eqlVolBalConfigEntry 9 }
+
+eqlVolBalConfigReamSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the number of pages in a ream."
+    ::=  {  eqlVolBalConfigEntry 10 }
+
+eqlVolBalConfigHistoryRowMax OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the maximum number of volume balance history entries."
+    ::=  {  eqlVolBalConfigEntry 11 }
+
+eqlVolBalConfigRAIDStatsRowMax OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the maximum number of volume balance raid-set stats entries."
+    ::=  {  eqlVolBalConfigEntry 12 }
+    
+eqlVolBalConfigPoolThroughputRateMax OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the maximum throughput we can impose on a pool during load balancing."
+    ::=  {  eqlVolBalConfigEntry 13 }
+
+eqlVolBalConfigMinSpreadSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field determines how big a volume is, in megabytes, before it is spread among other members."
+    DEFVAL          {1024}
+    ::=  {  eqlVolBalConfigEntry 14 }
+
+eqlVolBalConfigPlacementThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "Declares the minimum placement score for a volume before it will be considered for performance balancing."
+    DEFVAL          {200}
+    ::=  {  eqlVolBalConfigEntry 15 }
+
+eqlVolBalConfigPreviousLeadUUID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))    
+    MAX-ACCESS  read-only    
+    STATUS      current    
+    DESCRIPTION "uuid_t of the last lead."    
+    ::=  {  eqlVolBalConfigEntry 16 }
+
+eqlVolBalConfigFlags OBJECT-TYPE
+    SYNTAX          BITS { 
+                    enableRoutingTableChecker(0), -- enable the routing table checker 
+                    routingTableCheckerCheckAllPages(1), -- verify all pages present
+                    routingTableCheckerHaltGroup(2), -- halt the group if problem found 
+                    flag3(3),
+                    flag4(4),
+                    flag5(5),
+                    flag6(6),
+                    flag7(7),
+                    flag8(8),
+                    flag9(9),
+                    flag10(10),
+                    flag11(11),
+                    flag12(12),
+                    flag13(13),
+                    flag14(14),
+                    flag15(15),
+                    flag16(16),
+                    flag17(17),
+                    flag18(18),
+                    flag19(19),
+                    flag20(20),
+                    flag21(21),
+                    flag22(22),
+                    flag23(23),
+                    flag24(24),
+                    flag25(25),
+                    flag26(26),
+                    flag27(27),
+                    flag28(28),
+                    flag29(29),
+                    flag30(30),
+                    flag31(31)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field defines the common place holder for group wide config/debug flags. The flags must be of type
+                    enable(1) or disable(0). and the default value will always be disable(0)."
+    ::=  {  eqlVolBalConfigEntry 17 }
+    
+eqlVolBalConfigArchivalPlacementThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "Declares the minimum placement score for a volume before it will be considered for performance balancing when a pool has archival storage present."
+    DEFVAL          {50}
+    ::=  {  eqlVolBalConfigEntry 18 }
+
+eqlVolBalConfigFreeSpaceTroubleEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enabled(1),
+                disabled(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current 
+    DESCRIPTION     "This field enables/disables the free space trouble operation within a group."
+    DEFVAL          { enabled }
+    ::=  {  eqlVolBalConfigEntry 19 }   
+
+eqlVolBalConfigPreferAutoRAIDPlacement OBJECT-TYPE
+    SYNTAX      INTEGER {
+                disabled(0),
+                enabled(1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current 
+    DESCRIPTION     "This field changes the preference of the balancing from a capacity spread to Auto RAID Placement."
+    DEFVAL          { disabled }
+    ::=  {  eqlVolBalConfigEntry 20 }   
+
+eqlVolBalConfigHotColdPageSwapEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enabled(1),
+                disabled(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current 
+    DESCRIPTION     "This field enables/disables the hot/cold page swapping operation within a group."
+    DEFVAL          { enabled }
+    ::=  {  eqlVolBalConfigEntry 21 }    
+
+eqlVolBalConfigArchiveEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enabled(1),
+                disabled(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current 
+    DESCRIPTION     "This field enables/disables the archiving operation within a group."
+    DEFVAL          { enabled }
+    ::=  {  eqlVolBalConfigEntry 22 }    
+
+--***********************************************************************************
+
+eqlVolBalPlanTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalPlanEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Volume balancer plan table."
+    ::=    { eqlvolbalancerObjects 6 }     
+
+
+eqlVolBalPlanEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalPlanEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a volume balancer plan."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalPlanIndex, eqliscsiLocalMemberId }
+
+    ::=   { eqlVolBalPlanTable 1}
+
+EqlVolBalPlanEntry ::= 
+    SEQUENCE { 
+        eqlVolBalPlanIndex                    Unsigned32,
+        eqlVolBalPlanReason                   INTEGER,
+        eqlVolBalPlanComplete                 TruthValue,
+        eqlVolBalPlanStartTime                Counter32,
+        eqlVolBalPlanEndTime                  Counter32,
+        eqlVolBalPlanState                    INTEGER,
+        eqlVolBalPlanVacatingMemberUUID       OCTET STRING, -- uuid_t
+        eqlVolBalPlanTotalPages               Counter64,
+        eqlVolBalPlanEntryStatus              RowStatus,
+        eqlVolBalPlanFlags                    INTEGER,
+        eqlVolBalPlanTotalAllocatedPages      Counter64,       
+        eqlVolBalPlanAllocatedPagesMoved      Counter64,
+        eqlVolBalPlanAssignedPagesMoved       Counter64,
+        eqlVolBalPlanHistoryTableIndex        Unsigned32,
+        eqlVolBalPlanHistoryTableMemberIndex  Unsigned32,
+        eqlVolBalPlanHistoryTableMemberCount  Unsigned32,
+        eqlVolBalPlanFirstAlternateDst        OCTET STRING, -- uuid_t 
+        eqlVolBalPlanSecondAlternateDst       OCTET STRING,  -- uuid_t
+        eqlVolBalPlanTotalSnapPages           Counter64,
+        eqlVolBalPlanSnapPagesMoved			  Counter64
+    }
+
+eqlVolBalPlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this volume balance plan entry."
+    ::= { eqlVolBalPlanEntry 1 }
+
+eqlVolBalPlanReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                free-space-trouble(1),
+                vacate(2),
+                bind(3),
+                balance(4),
+                vacate-pool(5),
+                move-volume(6),
+                move-site(7),
+                performance-trouble(8),
+                archive(9)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Explains why this plan was created"
+    ::= { eqlVolBalPlanEntry 2 }
+
+eqlVolBalPlanComplete OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "True if the entire plan has been written to the database"
+    ::= { eqlVolBalPlanEntry 3 }
+
+eqlVolBalPlanStartTime OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Start time of the plan execution"
+    ::= { eqlVolBalPlanEntry 4 }
+
+eqlVolBalPlanEndTime OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Completion time of the plan"
+    ::= { eqlVolBalPlanEntry 5 }
+
+eqlVolBalPlanState OBJECT-TYPE
+    SYNTAX      INTEGER {
+				writing(1),
+				written(2),
+				invalid(3),
+				ready(4),
+				started(5),
+				cancelled(6),
+				finished(7)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Flags..."
+    ::= { eqlVolBalPlanEntry 6 } 
+
+eqlVolBalPlanVacatingMemberUUID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid_t of the member being vacated.  Only valid during a vacate plan"
+    ::= { eqlVolBalPlanEntry 7 }
+
+eqlVolBalPlanTotalPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of pages expected to be moved during this plan."
+    ::= { eqlVolBalPlanEntry 8 }
+
+eqlVolBalPlanEntryStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlVolBalPlanEntry 9 }
+
+eqlVolBalPlanFlags OBJECT-TYPE
+    SYNTAX      INTEGER {
+				mixedModeBit(1)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field defines special attributes of the plan."
+    ::= { eqlVolBalPlanEntry 10 }
+
+eqlVolBalPlanTotalAllocatedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocated pages expected to be moved during this plan."
+    ::= { eqlVolBalPlanEntry 11 }    
+
+ eqlVolBalPlanAllocatedPagesMoved OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocated pages moved by completed tasks."
+    ::= { eqlVolBalPlanEntry 12 }
+
+eqlVolBalPlanAssignedPagesMoved OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of assigned pages moved by completed tasks."
+    ::= { eqlVolBalPlanEntry 13 }     
+
+eqlVolBalPlanHistoryTableIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the minimum delay after resolving a raid-set
+                     being in free space trouble before re-evaluating.."
+    ::=  {  eqlVolBalPlanEntry 14 }
+
+eqlVolBalPlanHistoryTableMemberIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the minimum delay after resolving a raid-set
+                     being in free space trouble before re-evaluating.."
+    ::=  {  eqlVolBalPlanEntry 15 }
+
+eqlVolBalPlanHistoryTableMemberCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current 
+    DESCRIPTION     "This field indicates the minimum delay after resolving a raid-set
+                     being in free space trouble before re-evaluating.."
+    ::=  {  eqlVolBalPlanEntry 16 } 
+
+ eqlVolBalPlanFirstAlternateDst OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid_t of an alternate destination"
+    ::= { eqlVolBalPlanEntry 17 }
+
+ eqlVolBalPlanSecondAlternateDst OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid_t of an alternate destination"
+    ::= { eqlVolBalPlanEntry 18 }
+
+eqlVolBalPlanTotalSnapPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of snap pages expected to be moved during this plan."
+    ::= { eqlVolBalPlanEntry 19 }    
+
+ eqlVolBalPlanSnapPagesMoved OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of snap pages moved by completed tasks."
+    ::= { eqlVolBalPlanEntry 20 }    
+
+
+--***********************************************************************************
+
+eqlVolBalTaskTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalTaskEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Volume balancer task table."
+    ::=    { eqlvolbalancerObjects 7 }     
+
+
+eqlVolBalTaskEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalTaskEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a volume balancer task."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalPlanIndex, eqlVolBalTaskIndex, eqliscsiLocalMemberId }
+
+    ::=   { eqlVolBalTaskTable 1}
+
+EqlVolBalTaskEntry ::= 
+    SEQUENCE {
+        eqlVolBalTaskIndex                    Unsigned32,
+        eqlVolBalTaskVolumePsvId              OCTET STRING,	-- CPsvId_t
+        eqlVolBalTaskSrcDriveGroup            OCTET STRING,	-- uuid_t,
+        eqlVolBalTaskSrcName                  DisplayString,
+        eqlVolBalTaskDstDriveGroup            OCTET STRING,	-- uuid_t,
+        eqlVolBalTaskDstName                  DisplayString,
+        eqlVolBalTaskSrcInitialPageCount      Counter64,
+        eqlVolBalTaskNumPages                 Counter64,
+        eqlVolBalTaskCoordinateWith           Unsigned32,
+        eqlVolBalTaskType            		  INTEGER,
+        eqlVolBalTaskState                    INTEGER,
+        eqlVolBalTaskEntryStatus              RowStatus,
+        eqlVolBalTaskVolLeader                OCTET STRING,	-- uuid_t
+        eqlVolBalTaskNumAllocatedPages        Counter64,
+        eqlVolBalTaskNumSnapPages			  Counter64
+    }
+
+
+eqlVolBalTaskIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this volume balance task entry."
+    ::= { eqlVolBalTaskEntry 1 }
+
+eqlVolBalTaskVolumePsvId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "CPsvId_t of the volume owning the volume slice"
+    ::= { eqlVolBalTaskEntry 2 }
+
+eqlVolBalTaskSrcDriveGroup OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "EQL-SECONDARY-KEY id of the drive group where the volume slice is originally located"
+    ::= { eqlVolBalTaskEntry 3 }
+
+eqlVolBalTaskSrcName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "This field contains the last 16 characters of the src PSA's name"
+    ::= { eqlVolBalTaskEntry 4 }
+
+eqlVolBalTaskDstDriveGroup OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "EQL-SECONDARY-KEY id of the drive group to which the volume slice should be moved"
+    ::= { eqlVolBalTaskEntry 5 }
+
+eqlVolBalTaskDstName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "This field contains the last 16 characters of the destination PSA's name"
+    ::= { eqlVolBalTaskEntry 6 }
+
+eqlVolBalTaskSrcInitialPageCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Number of pages on the source drive group at the beginning of the move."
+    ::= { eqlVolBalTaskEntry 7 }
+
+eqlVolBalTaskNumPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Number of pages to move."
+    ::= { eqlVolBalTaskEntry 8 }
+
+eqlVolBalTaskCoordinateWith OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Unique Index of a different volume balance task entry 
+                 for this volume balance task entry to coordinate with"
+    ::= { eqlVolBalTaskEntry 9 }
+
+eqlVolBalTaskType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                         balance(1),
+                         moveslice(2),
+                         explicit(3),
+                         movehot(4),
+                         movecold(5),
+                         movesingle(6),
+                         besteffort(7),
+                         movesliceuncompressed(8)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Task type"
+    ::= { eqlVolBalTaskEntry 10 } 
+
+eqlVolBalTaskState OBJECT-TYPE
+    SYNTAX      INTEGER {
+		ready(1),
+		active(2),
+		cancel(3),
+		done(4),
+		failed(5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Flags..."
+    ::= { eqlVolBalTaskEntry 11 }
+   
+eqlVolBalTaskEntryStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlVolBalTaskEntry 12 }
+
+eqlVolBalTaskVolLeader OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "This field contains drive group that will lead the volume being moved."
+    ::= { eqlVolBalTaskEntry 13 } 
+
+eqlVolBalTaskNumAllocatedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Number of allocated pages to move."
+    ::= { eqlVolBalTaskEntry 14 }   
+   
+eqlVolBalTaskNumSnapPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Number of snap pages to move."
+    ::= { eqlVolBalTaskEntry 15 } 
+
+--***********************************************************************************
+
+eqlVolBalTaskPickedPagesTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalTaskPickedPagesEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Volume balancer task picked pages table."
+    ::=    { eqlvolbalancerObjects 8 }     
+
+
+eqlVolBalTaskPickedPagesEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalTaskPickedPagesEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a volume balancer task."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalPlanIndex, eqlVolBalTaskIndex, eqliscsiLocalMemberId }
+
+    ::=   { eqlVolBalTaskPickedPagesTable 1}
+
+EqlVolBalTaskPickedPagesEntry ::= 
+    SEQUENCE {
+        eqlVolBalTaskPickedProgress               	     Counter64,
+        eqlVolBalTaskPickedPagesCount                    Unsigned32,
+        eqlVolBalTaskPickedPagesContext                  OCTET STRING,
+        eqlVolBalTaskPickedPagesRev             	     Unsigned32,
+        eqlVolBalTaskPickedPagesFlags                    Unsigned32,
+        eqlVolBalTaskPickedPagesEntryStatus              RowStatus,
+        eqlVolBalTaskPickedPagesArray                    OCTET STRING,
+        eqlVolBalTaskPickedPagesAllocatedProgress 	     Counter64
+    }
+
+eqlVolBalTaskPickedProgress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Total progress count"
+    ::= { eqlVolBalTaskPickedPagesEntry 1 }
+
+eqlVolBalTaskPickedPagesCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Page count"
+    ::= { eqlVolBalTaskPickedPagesEntry 2 }
+
+eqlVolBalTaskPickedPagesContext OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "saved context for the page move"
+    ::= { eqlVolBalTaskPickedPagesEntry 3 }
+
+eqlVolBalTaskPickedPagesRev OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "revision"
+    ::= { eqlVolBalTaskPickedPagesEntry 4 }
+
+eqlVolBalTaskPickedPagesFlags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Flags..."
+    ::= { eqlVolBalTaskPickedPagesEntry 5 }
+   
+eqlVolBalTaskPickedPagesEntryStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlVolBalTaskPickedPagesEntry 6 }
+
+eqlVolBalTaskPickedPagesArray OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1200))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "A list of pages picked to move for this task"
+    ::= { eqlVolBalTaskPickedPagesEntry 7 }
+
+eqlVolBalTaskPickedPagesAllocatedProgress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Total allocated progress count"
+    ::= { eqlVolBalTaskPickedPagesEntry 8 }
+
+
+--***********************************************************************************
+
+eqlVolBalSliceStatsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalSliceStatsEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Volume balancer volume slice statistics table."
+    ::=    { eqlvolbalancerObjects 9 }     
+
+
+eqlVolBalSliceStatsEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalSliceStatsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing the volume slice balancer statistics."
+    INDEX           { eqliscsiLocalMemberId, eqliscsiVolumeIndex, eqlMemberIndex }
+
+    ::=   { eqlVolBalSliceStatsTable 1}
+
+EqlVolBalSliceStatsEntry ::= 
+    SEQUENCE {
+        eqlVolBalSliceMemberUUID                    OCTET STRING,
+        eqlVolBalSliceVolumeUUID                    OCTET STRING,
+        eqlVolBalSliceTimeStamp                     Counter32,
+        eqlVolBalSliceStatsRndRdRate                Unsigned32,
+        eqlVolBalSliceStatsRndWrRate                Unsigned32,
+        eqlVolBalSliceStatsSeqRdRate                Unsigned32,
+        eqlVolBalSliceStatsSeqWrRate                Unsigned32,
+        eqlVolBalSliceStatsPlacementScore           Unsigned32
+    }
+
+
+eqlVolBalSliceMemberUUID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "EQL-SECONDARY-KEY Unique identifier of the member."
+    ::= { eqlVolBalSliceStatsEntry 1 }
+
+eqlVolBalSliceVolumeUUID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "EQL-SECONDARY-KEY Unique identifier of the volume."
+    ::= { eqlVolBalSliceStatsEntry 2 }
+
+eqlVolBalSliceTimeStamp OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The time which the last gathering of stats took place."
+    ::= { eqlVolBalSliceStatsEntry 3 }
+    
+eqlVolBalSliceStatsRndRdRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "random read per second."
+    ::= { eqlVolBalSliceStatsEntry 7 }
+
+eqlVolBalSliceStatsRndWrRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "random write per second."
+    ::= { eqlVolBalSliceStatsEntry 8 }
+
+eqlVolBalSliceStatsSeqRdRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "sequential read per second."
+    ::= { eqlVolBalSliceStatsEntry 9 }
+
+eqlVolBalSliceStatsSeqWrRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "sequential read per second."
+    ::= { eqlVolBalSliceStatsEntry 10 }
+
+
+eqlVolBalSliceStatsPlacementScore OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EQL-SECONDARY-KEY Only valid for the whole volume row. Represents a score for the priority in which we should try to put this volume on RAID 10 storage."
+    ::= { eqlVolBalSliceStatsEntry 11 }
+
+
+
+--***********************************************************************************
+
+eqlVolBalMemberStatsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalMemberStatsEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Volume balanacer member statistics table."
+    ::=    { eqlvolbalancerObjects 10 }     
+
+
+eqlVolBalMemberStatsEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalMemberStatsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing the member's volume balancing statistics."
+    INDEX           { eqlMemberIndex }
+
+    ::=   { eqlVolBalMemberStatsTable 1}
+
+EqlVolBalMemberStatsEntry ::= 
+    SEQUENCE { 
+        eqlVolBalMemberUUID                           OCTET STRING,
+        eqlVolBalMemberTimeStamp                      Counter32,
+        eqlVolBalMemberStatsAvgRespTime               Unsigned32,
+        eqlVolBalMemberStatsCPUUsage                  Unsigned32,
+        eqlVolBalMemberStatsFreeSpace                 Unsigned32,
+        eqlVolBalMemberStatsRndRdRate                 Unsigned32,
+        eqlVolBalMemberStatsRndWrRate                 Unsigned32,
+        eqlVolBalMemberStatsSeqRdRate                 Unsigned32,
+        eqlVolBalMemberStatsSeqWrRate                 Unsigned32
+    }
+
+
+eqlVolBalMemberUUID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EQL-SECONDARY-KEY Unique Identifier of the member."
+    ::= { eqlVolBalMemberStatsEntry 1 }
+
+eqlVolBalMemberTimeStamp OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The time which the last gathering of stats took place."
+    ::= { eqlVolBalMemberStatsEntry 2 }
+
+eqlVolBalMemberStatsAvgRespTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "average response time for all I/O on this member."
+    ::= { eqlVolBalMemberStatsEntry 4 }
+
+eqlVolBalMemberStatsCPUUsage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "CPU utilization as the calculated weighted CPU cost"
+    ::= { eqlVolBalMemberStatsEntry 5 }
+
+eqlVolBalMemberStatsFreeSpace OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "available free space at the sample time"
+    ::= { eqlVolBalMemberStatsEntry 6 }
+
+eqlVolBalMemberStatsRndRdRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "random read per second."
+    ::= { eqlVolBalMemberStatsEntry 7 }
+
+eqlVolBalMemberStatsRndWrRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "random write per second."
+    ::= { eqlVolBalMemberStatsEntry 8 }
+
+eqlVolBalMemberStatsSeqRdRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "sequential read per second."
+    ::= { eqlVolBalMemberStatsEntry 9 }
+
+eqlVolBalMemberStatsSeqWrRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "sequential read per second."
+    ::= { eqlVolBalMemberStatsEntry 10 }
+
+--***********************************************************************************
+
+eqlVolBalHistoryTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalHistoryEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Volume balanacer RAID statistics table."
+    ::=    { eqlvolbalancerObjects 11 }     
+
+
+eqlVolBalHistoryEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalHistoryEntry      
+    MAX-ACCESS      not-accessible
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing the results of a volume balancing operation."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalHistoryStop }
+
+    ::=   { eqlVolBalHistoryTable 1 }
+
+EqlVolBalHistoryEntry ::=
+    SEQUENCE { 
+        eqlVolBalHistoryStop                      Unsigned32,
+        eqlVolBalHistoryStart                     Unsigned32,
+        eqlVolBalHistoryPagesMoved                Unsigned32,
+        eqlVolBalHistoryMembersInvolved           Unsigned32,
+        eqlVolBalHistorySlicesInvolved            Unsigned32,
+        eqlVolBalHistoryBalanceReason             Unsigned32
+    }
+
+
+eqlVolBalHistoryStop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "timestamp of the completion of the volume balancing event."
+    ::= { eqlVolBalHistoryEntry 1 }
+
+eqlVolBalHistoryStart OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "timestamp of the start of the volume balancing event."
+    ::= { eqlVolBalHistoryEntry 2 }
+
+eqlVolBalHistoryPagesMoved OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Number of pages moved in this volume balancing event."
+    ::= { eqlVolBalHistoryEntry 3 }
+
+eqlVolBalHistoryMembersInvolved OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Number of members involved in this volume balancing event."
+    ::= { eqlVolBalHistoryEntry 4 }
+
+eqlVolBalHistorySlicesInvolved OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "number of volume slices involved in this volume balancing event"
+    ::= { eqlVolBalHistoryEntry 5 }
+
+eqlVolBalHistoryBalanceReason OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "mask of the reasons this volume balancing event occurred"
+    ::= { eqlVolBalHistoryEntry 6 }
+
+
+--***********************************************************************************
+
+eqlVolBalCommandTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolBalCommandEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Volume balancer command table."
+    ::=    { eqlvolbalancerObjects 13 }     
+
+
+eqlVolBalCommandEntry OBJECT-TYPE
+    SYNTAX          EqlVolBalCommandEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a volume balancer command."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalCommandIndex, eqliscsiLocalMemberId }
+
+    ::=   { eqlVolBalCommandTable 1}
+
+EqlVolBalCommandEntry ::= 
+    SEQUENCE { 
+        eqlVolBalCommandIndex                    Unsigned32,
+        eqlVolBalCommandPlanIndex                Unsigned32,
+        eqlVolBalCommandReason                   INTEGER,
+        eqlVolBalCommandRunning                  TruthValue,
+        eqlVolBalCommandCreateTime               Counter32,
+        eqlVolBalCommandState                    INTEGER,
+        eqlVolBalCommandMemberUUID               OCTET STRING, -- uuid_t
+        eqlVolBalCommandVolumeId                 OCTET STRING,	-- CPsvId_t
+        eqlVolBalCommandFromPoolId               Unsigned32,
+        eqlVolBalCommandToPoolId                 Unsigned32,
+        eqlVolBalCommandEntryStatus              RowStatus,
+        eqlVolBalCommandFlags                    INTEGER,
+        eqlVolBalCommandSiteId                   Unsigned32
+    }
+
+eqlVolBalCommandIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this volume balance command entry."
+    ::= { eqlVolBalCommandEntry 1 }
+
+eqlVolBalCommandPlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "If this was written to disk, the plan ID is in here, 0 otherwise."
+    ::= { eqlVolBalCommandEntry 2 }
+
+eqlVolBalCommandReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                free-space-trouble(1),
+                vacate(2),
+                vacate-pool(3),
+                move-volume-to-pool(4),
+                bind(5),
+                balance(6),
+                delete-marshal(7),
+                move-site-to-pool(8),
+                performance-trouble(9),
+                archive(10)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Explains what this command is supposed to do"
+    ::= { eqlVolBalCommandEntry 3 }
+
+eqlVolBalCommandRunning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "True if the command has been planned and started"
+    ::= { eqlVolBalCommandEntry 4 }
+
+eqlVolBalCommandCreateTime OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Create time of the command"
+    ::= { eqlVolBalCommandEntry 5 }
+
+eqlVolBalCommandState OBJECT-TYPE
+    SYNTAX      INTEGER {
+				writing(1),
+				invalid(2),
+				ready(3),
+				started(4),
+				cancelled(5),
+				finished(6)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "EQL-SECONDARY-KEY Current state of the command"
+    ::= { eqlVolBalCommandEntry 6 } 
+
+eqlVolBalCommandMemberUUID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid_t of the member being worked on."
+    ::= { eqlVolBalCommandEntry 7 }
+
+
+eqlVolBalCommandVolumeId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "CPsvId_t of the member being worked on."
+    ::= { eqlVolBalCommandEntry 8 }
+
+
+eqlVolBalCommandFromPoolId OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Which pool are we moving from, not always valid."
+    ::= { eqlVolBalCommandEntry 9 }
+
+
+eqlVolBalCommandToPoolId OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Which pool are we moving to, not always valid."
+    ::= { eqlVolBalCommandEntry 10 }
+
+
+eqlVolBalCommandEntryStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlVolBalCommandEntry 11 }
+
+eqlVolBalCommandFlags OBJECT-TYPE
+    SYNTAX      INTEGER {
+				mixedModeBit(1)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field defines special attributes of the command."
+    ::= { eqlVolBalCommandEntry 12 }
+
+eqlVolBalCommandSiteId    OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY Which site are we moving, not always valid."
+    ::= { eqlVolBalCommandEntry 13 }
+
+
+--***********************************************************************************
+
+eqlPropertiesTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlPropertiesEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent properties table."
+    ::=    { eqlvolbalancerObjects 14 }
+
+eqlPropertiesEntry OBJECT-TYPE
+    SYNTAX          EqlPropertiesEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a property."
+    INDEX           { eqlPropertiesIndex }
+    ::=   { eqlPropertiesTable 1}
+
+EqlPropertiesEntry ::= 
+    SEQUENCE {
+        eqlPropertiesIndex         						 Unsigned32,
+        eqlPropertiesName         						 DisplayString,
+        eqlPropertiesValue         						 DisplayString
+    }
+
+eqlPropertiesIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this property entry."
+    ::= { eqlPropertiesEntry 1 }
+
+eqlPropertiesName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Name of the property"
+    ::= { eqlPropertiesEntry 2 }
+
+eqlPropertiesValue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Value of the property"
+    ::= { eqlPropertiesEntry 3 }
+
+--***********************************************************************************
+
+-- The eqlPageMoveHistoryTable Free Slot		
+
+eqlPageMoveHistoryTableFreeSlot OBJECT IDENTIFIER ::= { eqlvolbalancerObjects 15 }
+
+eqlPageMoveHistoryTableNextFreeSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "none"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "EqualLogic-Persistent
+                 The next empty slot to use in eqlPageMoveHistoryTable"
+    DEFVAL      {1}
+    ::=     { eqlPageMoveHistoryTableFreeSlot 1 }
+
+eqlPageMoveHistoryTableMemberNextFreeSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "none"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "EqualLogic-Persistent
+                 The next empty slot to use in eqlPageMoveHistoryMemberTable"
+    DEFVAL      {1}
+    ::=     { eqlPageMoveHistoryTableFreeSlot 2 }
+
+
+--***********************************************************************************
+
+eqlPageMoveHistoryTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlPageMoveHistoryEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent page move history table."
+    ::=    { eqlvolbalancerObjects 16 }
+
+eqlPageMoveHistoryEntry OBJECT-TYPE
+    SYNTAX          EqlPageMoveHistoryEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a page movement record."
+    INDEX           { eqlPageMoveHistoryIndex }
+
+    ::=   { eqlPageMoveHistoryTable 1}
+
+
+EqlPageMoveHistoryEntry ::= 
+    SEQUENCE {
+        eqlPageMoveHistoryIndex    						 	Unsigned32,
+        eqlPageMoveHistoryPoolId							Unsigned32,
+        eqlPageMoveHistoryPlanId							Unsigned32,
+        eqlPageMoveHistoryMemberId							Unsigned32,
+        eqlPageMoveHistoryType								INTEGER,
+        eqlPageMoveHistoryStartTime   		     					Counter32,
+        eqlPageMoveHistoryEndTime		         				Counter32,
+        eqlPageMoveHistoryTotalPages         						 Counter64,
+        eqlPageMoveHistoryAllocatedPages        					 Counter64,
+        eqlPageMoveHistoryTotalPagesMoved         					 Counter64,
+        eqlPageMoveHistoryAllocatedPagesMoved        					 Counter64,
+        eqlPageMoveHistoryResult		         				 INTEGER,
+        eqlPageMoveHistoryMemberStartIndex						 Unsigned32,
+        eqlPageMoveHistoryMemberCount							 Unsigned32
+    }
+
+eqlPageMoveHistoryIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this plan entry."
+    ::= { eqlPageMoveHistoryEntry 1 }
+
+eqlPageMoveHistoryPoolId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Pool id component of unique id."
+    ::= { eqlPageMoveHistoryEntry 2 }
+
+eqlPageMoveHistoryPlanId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Plan id component of unique id."
+    ::= { eqlPageMoveHistoryEntry 3 }
+
+eqlPageMoveHistoryMemberId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Member id component of unique id."
+    ::= { eqlPageMoveHistoryEntry 4 }
+
+eqlPageMoveHistoryType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                free-space-trouble(1),
+                vacate(2),
+                bind(3),
+                balance(4),
+                vacate-pool(5),
+                move-volume(6),
+                move-site(7),
+                performance-trouble(8)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Explains what type this plan is"
+    ::= { eqlPageMoveHistoryEntry 5 }
+
+eqlPageMoveHistoryStartTime OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Start time of the plan execution"
+    ::= { eqlPageMoveHistoryEntry 6 }
+
+eqlPageMoveHistoryEndTime OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Completion time of the plan"
+    ::= { eqlPageMoveHistoryEntry 7 }
+
+eqlPageMoveHistoryTotalPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of pages expected to be moved during this plan."
+    ::= { eqlPageMoveHistoryEntry 8 }
+
+eqlPageMoveHistoryAllocatedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocated pages expected to be moved during this plan."
+    ::= { eqlPageMoveHistoryEntry 9 }
+
+eqlPageMoveHistoryTotalPagesMoved OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of pages moved during this plan."
+    ::= { eqlPageMoveHistoryEntry 10 }
+
+eqlPageMoveHistoryAllocatedPagesMoved OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocated pages moved during this plan."
+    ::= { eqlPageMoveHistoryEntry 11 }
+
+eqlPageMoveHistoryResult OBJECT-TYPE
+    SYNTAX      INTEGER {
+                ready(1),
+                completed(2),
+                cancelled(3),
+                inprogress(4),
+                aborted(5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Explains how this plan ended"
+    ::= { eqlPageMoveHistoryEntry 12 }
+
+eqlPageMoveHistoryMemberStartIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Index of the first member entry in the eqlPageMoveHistoryMemberTable."
+    ::= { eqlPageMoveHistoryEntry 13 }
+
+eqlPageMoveHistoryMemberCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Count of the member entries reserved in the eqlPageMoveHistoryMemberTable."
+    ::= { eqlPageMoveHistoryEntry 14 }
+
+--***********************************************************************************
+
+eqlPageMoveHistoryMemberTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlPageMoveHistoryMemberEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent page move history member-specific info table."
+    ::=    { eqlvolbalancerObjects 18 }
+
+eqlPageMoveHistoryMemberEntry OBJECT-TYPE
+    SYNTAX          EqlPageMoveHistoryMemberEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a page movement record."
+    INDEX           { eqlPageMoveHistoryMemberIndex }
+    ::=   { eqlPageMoveHistoryMemberTable 1}
+
+EqlPageMoveHistoryMemberEntry ::= 
+    SEQUENCE {
+        eqlPageMoveHistoryMemberIndex    									 Unsigned32,
+        eqlPageMoveHistoryMemberParentIndex								 	 Unsigned32,
+        eqlPageMoveHistoryMemberPlanId									 	 Unsigned32,
+        eqlPageMoveHistoryMemberUuid										 OCTET STRING, -- CPsvId_t
+        eqlPageMoveHistoryMemberAddedPages         							 Counter64,
+        eqlPageMoveHistoryMemberAddedAllocatedPages        					 Counter64,
+        eqlPageMoveHistoryMemberRemovedPages         						 Counter64,
+        eqlPageMoveHistoryMemberRemovedAllocatedPages      					 Counter64,
+        eqlPageMoveHistoryMemberStartAUS		         					 Unsigned32,
+        eqlPageMoveHistoryMemberExpectedEndAUS           					 Unsigned32
+    }
+
+eqlPageMoveHistoryMemberIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this plan entry."
+    ::= { eqlPageMoveHistoryMemberEntry 1 }
+
+eqlPageMoveHistoryMemberParentIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Index of the parent entry in the eqlPageMoveHistoryTable."
+    ::= { eqlPageMoveHistoryMemberEntry 2 }
+
+eqlPageMoveHistoryMemberPlanId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Plan id."
+    ::= { eqlPageMoveHistoryMemberEntry 3 }
+
+eqlPageMoveHistoryMemberUuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uuid of the member"
+    ::= { eqlPageMoveHistoryMemberEntry 4 }
+
+eqlPageMoveHistoryMemberAddedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of pages added to this member in this plan."
+    ::= { eqlPageMoveHistoryMemberEntry 5 }
+
+eqlPageMoveHistoryMemberAddedAllocatedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocated pages added to this member in this plan."
+    ::= { eqlPageMoveHistoryMemberEntry 6 }
+
+eqlPageMoveHistoryMemberRemovedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of pages removed to this member in this plan."
+    ::= { eqlPageMoveHistoryMemberEntry 7 }
+
+eqlPageMoveHistoryMemberRemovedAllocatedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocated pages removed to this member in this plan."
+    ::= { eqlPageMoveHistoryMemberEntry 8 }
+
+eqlPageMoveHistoryMemberStartAUS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Member's AUS at start of the plan."
+    ::= { eqlPageMoveHistoryMemberEntry 9 }
+
+eqlPageMoveHistoryMemberExpectedEndAUS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Member's expected AUS at end of the plan."
+    ::= { eqlPageMoveHistoryMemberEntry 10 }
+
+--***********************************************************************************
+
+-- The eqlLocalIOCountsTable Free Slot
+
+eqlLocalIOCountsTableFreeSlot OBJECT IDENTIFIER ::= { eqlvolbalancerObjects 19 }
+
+eqlLocalIOCountsTableNextFreeSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "none"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "EqualLogic-Persistent
+                 The next empty slot to use in eqlLocalIOCountsTable"
+    DEFVAL      {1}
+    ::=     { eqlLocalIOCountsTableFreeSlot 1 }
+
+
+--***********************************************************************************
+
+eqlLocalIOCountsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlLocalIOCountsEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent iscsi I/O counts."
+    ::=    { eqlvolbalancerObjects 20 }
+
+eqlLocalIOCountsEntry OBJECT-TYPE
+    SYNTAX          EqlLocalIOCountsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing I/O counts"
+    INDEX           { eqlLocalIOCountsIndex }
+    ::=   { eqlLocalIOCountsTable 1}
+
+EqlLocalIOCountsEntry ::= 
+    SEQUENCE {
+    	eqlLocalIOCountsIndex					Unsigned32,
+        eqlLocalIOCountsTimestamp  				Counter32,
+        eqlLocalIOCountsReads        				Counter64,
+        eqlLocalIOCountsReadBytes     				Counter64,
+        eqlLocalIOCountsReadLatencyMs	  			Counter64,
+        eqlLocalIOCountsWrites        				Counter64,
+        eqlLocalIOCountsWriteBytes    				Counter64,
+        eqlLocalIOCountsWriteLatencyMs  			Counter64,
+        eqlLocalIOCountsHeadroomPercent    			Unsigned32,
+        eqlLocalIOCountsWorstQueuingLatencyMs			 Counter64
+    }
+
+eqlLocalIOCountsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this io counts entry."
+    ::= { eqlLocalIOCountsEntry 1 }
+
+eqlLocalIOCountsTimestamp OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Timestamp for this sample"
+    ::= { eqlLocalIOCountsEntry 2 }
+
+eqlLocalIOCountsReads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of reads."
+    ::= { eqlLocalIOCountsEntry 3 }
+
+eqlLocalIOCountsReadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of bytes associated with the above reads."
+    ::= { eqlLocalIOCountsEntry 4 }
+
+eqlLocalIOCountsReadLatencyMs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "cumulative latency associated with the above reads."
+    ::= { eqlLocalIOCountsEntry 5 }
+
+eqlLocalIOCountsWrites OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of writes."
+    ::= { eqlLocalIOCountsEntry 6 }
+
+eqlLocalIOCountsWriteBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of bytes associated with the above writes."
+    ::= { eqlLocalIOCountsEntry 7 }
+
+eqlLocalIOCountsWriteLatencyMs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "cumulative latency associated with the above writes."
+    ::= { eqlLocalIOCountsEntry 8 }
+
+eqlLocalIOCountsHeadroomPercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "how much free perf capacity is left"
+    ::= { eqlLocalIOCountsEntry 9 }
+
+eqlLocalIOCountsWorstQueuingLatencyMs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { eqlLocalIOCountsEntry 10 }
+
+--***********************************************************************************
+
+eqlPlanAUSTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlPlanAUSEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Start and end AUS entries for plans."
+    ::=    { eqlvolbalancerObjects 21 }     
+
+
+eqlPlanAUSEntry OBJECT-TYPE
+    SYNTAX          EqlPlanAUSEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing member start and end AUS. This is an
+    				 array of 32 byte blocks (currently only 18 in use: lengths in bytes in parens
+    				 {memberUuid(16), startAUS(1), endAUS(1)}."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalPlanIndex, eqliscsiLocalMemberId }
+
+    ::=   { eqlPlanAUSTable 1}
+
+EqlPlanAUSEntry ::= 
+    SEQUENCE {
+        eqlPlanAUSCount        Unsigned32,
+    	eqlPlanAUSArray  			OCTET STRING
+    }
+    
+eqlPlanAUSCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "entry count"
+    ::= { eqlPlanAUSEntry 1 }
+
+eqlPlanAUSArray OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1024))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "A list of start and end AUS values for all members involved in a page move plan"
+    ::= { eqlPlanAUSEntry 2 }
+
+
+--***********************************************************************************
+
+
+eqlTaskLocalPickedPagesTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlTaskLocalPickedPagesEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Volume balancer task picked pages table."
+    ::=    { eqlvolbalancerObjects 22 }     
+
+
+eqlTaskLocalPickedPagesEntry OBJECT-TYPE
+    SYNTAX          EqlTaskLocalPickedPagesEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a volume balancer task."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalPlanIndex, eqlVolBalTaskIndex, eqliscsiLocalMemberId }
+
+    ::=   { eqlTaskLocalPickedPagesTable 1}
+
+EqlTaskLocalPickedPagesEntry ::= 
+    SEQUENCE {
+        eqlTaskLocalPickedProgress                 Counter64,
+        eqlTaskLocalPickedPagesCount               Unsigned32,
+        eqlTaskLocalPickedPagesContext             OCTET STRING,
+        eqlTaskLocalPickedPagesRev             	   Unsigned32,
+        eqlTaskLocalPickedPagesFlags               Unsigned32,
+        eqlTaskLocalPickedPagesEntryStatus         RowStatus,
+        eqlTaskLocalPickedPagesArray               OCTET STRING,
+        eqlTaskLocalPickedPagesAllocatedProgress   Counter64,
+        eqlTaskLocalPickedPagesStatus              INTEGER
+    }
+
+eqlTaskLocalPickedProgress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Total progress count"
+    ::= { eqlTaskLocalPickedPagesEntry 1 }
+
+eqlTaskLocalPickedPagesCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Page count"
+    ::= { eqlTaskLocalPickedPagesEntry 2 }
+
+eqlTaskLocalPickedPagesContext OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "saved context for the page move"
+    ::= { eqlTaskLocalPickedPagesEntry 3 }
+
+eqlTaskLocalPickedPagesRev OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "revision"
+    ::= { eqlTaskLocalPickedPagesEntry 4 }
+
+eqlTaskLocalPickedPagesFlags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Flags..."
+    ::= { eqlTaskLocalPickedPagesEntry 5 }
+   
+eqlTaskLocalPickedPagesEntryStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlTaskLocalPickedPagesEntry 6 }
+
+eqlTaskLocalPickedPagesArray OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1200))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "A list of pages picked to move for this task"
+    ::= { eqlTaskLocalPickedPagesEntry 7 }
+
+eqlTaskLocalPickedPagesAllocatedProgress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Total allocated progress count"
+    ::= { eqlTaskLocalPickedPagesEntry 8 }
+
+eqlTaskLocalPickedPagesStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+				started(1),
+				finished(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "picked pages entry status"
+    ::= { eqlTaskLocalPickedPagesEntry 9 } 
+
+
+
+--***********************************************************************************
+
+eqlMemberCountersTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlMemberCountersEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent page move member-specific counters table."
+    ::=    { eqlvolbalancerObjects 23 }
+
+eqlMemberCountersEntry OBJECT-TYPE
+    SYNTAX          EqlMemberCountersEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a page movement member counters."
+    INDEX           { eqlMemberCountersIndex }
+    ::=   { eqlMemberCountersTable 1}
+
+EqlMemberCountersEntry ::= 
+    SEQUENCE {
+        eqlMemberCountersIndex    									 Unsigned32,
+        eqlMemberCountersUuid										 OCTET STRING, -- CPsvId_t
+        eqlMemberCountersTimeStamp         				             Counter32,
+        eqlMemberCountersAddedPages         						 Counter64,
+        eqlMemberCountersRemovedPages         						 Counter64,
+        eqlMemberCountersAddedAllocatedPages        				 Counter64,
+        eqlMemberCountersRemovedAllocatedPages  					 Counter64,
+        eqlMemberCountersAddedHotPages		        				 Counter64,
+        eqlMemberCountersRemovedHotPages  					 		 Counter64,
+        eqlMemberCountersAddedColdPages		        				 Counter64,
+        eqlMemberCountersRemovedColdPages  					 		 Counter64
+    }
+
+eqlMemberCountersIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this plan entry."
+    ::= { eqlMemberCountersEntry 1 }
+
+eqlMemberCountersUuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uuid of the member"
+    ::= { eqlMemberCountersEntry 2 }
+
+eqlMemberCountersTimeStamp OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Timestamp for this sample"
+    ::= { eqlMemberCountersEntry 3 }
+
+eqlMemberCountersAddedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of pages added to this member."
+    ::= { eqlMemberCountersEntry 4 }
+
+eqlMemberCountersRemovedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of pages removed from this member."
+    ::= { eqlMemberCountersEntry 5 }
+
+eqlMemberCountersAddedAllocatedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocated pages added to this member."
+    ::= { eqlMemberCountersEntry 6 }
+
+eqlMemberCountersRemovedAllocatedPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of allocate pages removed from this member."
+    ::= { eqlMemberCountersEntry 7 }
+
+eqlMemberCountersAddedHotPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of hot pages added to this member."
+    ::= { eqlMemberCountersEntry 8 }
+
+eqlMemberCountersRemovedHotPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of hot pages removed from this member."
+    ::= { eqlMemberCountersEntry 9 }
+
+eqlMemberCountersAddedColdPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of cold pages added to this member."
+    ::= { eqlMemberCountersEntry 10 }
+
+eqlMemberCountersRemovedColdPages OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "count of the number of cold pages removed from this member."
+    ::= { eqlMemberCountersEntry 11 }
+
+
+--***********************************************************************************
+
+
+
+eqlArchiveTaskTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlArchiveTaskEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Volume balancer task table."
+    ::=    { eqlvolbalancerObjects 24 }     
+
+
+eqlArchiveTaskEntry OBJECT-TYPE
+    SYNTAX          EqlArchiveTaskEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a volume balancer task."
+    INDEX           { eqlStoragePoolIndex, eqlVolBalPlanIndex, eqlArchiveTaskIndex, eqliscsiLocalMemberId }
+
+    ::=   { eqlArchiveTaskTable 1}
+
+EqlArchiveTaskEntry ::= 
+    SEQUENCE {
+        eqlArchiveTaskIndex                   Unsigned32,
+        eqlArchiveTaskMemberCount             Unsigned32,
+        eqlArchiveTaskState                   INTEGER,
+        eqlArchiveTaskType            		  INTEGER,
+        eqlArchiveTaskEntryStatus             RowStatus,
+        
+        eqlArchiveTaskMember1Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember1Flags            Unsigned32,
+        eqlArchiveTaskMember2Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember2Flags            Unsigned32,
+        eqlArchiveTaskMember3Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember3Flags            Unsigned32,
+        eqlArchiveTaskMember4Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember4Flags            Unsigned32,
+        eqlArchiveTaskMember5Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember5Flags            Unsigned32,
+        eqlArchiveTaskMember6Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember6Flags            Unsigned32,
+        eqlArchiveTaskMember7Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember7Flags            Unsigned32,
+        eqlArchiveTaskMember8Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember8Flags            Unsigned32,
+        eqlArchiveTaskMember9Uuid             OCTET STRING,	-- uuid
+        eqlArchiveTaskMember9Flags            Unsigned32,
+        eqlArchiveTaskMember10Uuid            OCTET STRING,	-- uuid
+        eqlArchiveTaskMember10Flags           Unsigned32,
+        eqlArchiveTaskMember11Uuid            OCTET STRING,	-- uuid
+        eqlArchiveTaskMember11Flags           Unsigned32,
+        eqlArchiveTaskMember12Uuid            OCTET STRING,	-- uuid
+        eqlArchiveTaskMember12Flags           Unsigned32,
+        eqlArchiveTaskMember13Uuid            OCTET STRING,	-- uuid
+        eqlArchiveTaskMember13Flags           Unsigned32,
+        eqlArchiveTaskMember14Uuid            OCTET STRING,	-- uuid
+        eqlArchiveTaskMember14Flags           Unsigned32,
+        eqlArchiveTaskMember15Uuid            OCTET STRING,	-- uuid
+        eqlArchiveTaskMember15Flags           Unsigned32,
+        eqlArchiveTaskMember16Uuid            OCTET STRING,	-- uuid
+        eqlArchiveTaskMember16Flags           Unsigned32
+    }
+
+
+eqlArchiveTaskIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this  task entry."
+    ::= { eqlArchiveTaskEntry 1 }
+
+
+eqlArchiveTaskMemberCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Unique Index for this  task entry."
+    ::= { eqlArchiveTaskEntry 2 }
+
+eqlArchiveTaskType OBJECT-TYPE
+    SYNTAX      INTEGER {
+				compression(1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Task type"
+    ::= { eqlArchiveTaskEntry 3 } 
+
+eqlArchiveTaskState OBJECT-TYPE
+    SYNTAX      INTEGER {
+		ready(1),
+		active(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "task state"
+    ::= { eqlArchiveTaskEntry 4 }
+
+eqlArchiveTaskEntryStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlArchiveTaskEntry 5 }
+
+
+
+eqlArchiveTaskMember1Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 6 }
+
+eqlArchiveTaskMember1Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 7 }
+
+
+eqlArchiveTaskMember2Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 8 }
+
+eqlArchiveTaskMember2Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 9 }
+
+eqlArchiveTaskMember3Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 10 }
+
+eqlArchiveTaskMember3Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 11 }
+
+eqlArchiveTaskMember4Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 12 }
+
+eqlArchiveTaskMember4Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 13 }
+
+eqlArchiveTaskMember5Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 14 }
+
+eqlArchiveTaskMember5Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 15 }
+
+eqlArchiveTaskMember6Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 16 }
+
+eqlArchiveTaskMember6Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 17 }
+
+eqlArchiveTaskMember7Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 18 }
+
+eqlArchiveTaskMember7Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 19 }
+
+eqlArchiveTaskMember8Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 20 }
+
+eqlArchiveTaskMember8Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 21 }
+
+eqlArchiveTaskMember9Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 22 }
+
+eqlArchiveTaskMember9Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 23 }
+
+
+eqlArchiveTaskMember10Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 24 }
+
+eqlArchiveTaskMember10Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 25 }
+
+eqlArchiveTaskMember11Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 26 }
+
+eqlArchiveTaskMember11Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 27 }
+
+eqlArchiveTaskMember12Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 28 }
+
+eqlArchiveTaskMember12Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 29 }
+
+eqlArchiveTaskMember13Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 30 }
+
+eqlArchiveTaskMember13Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 31 }
+
+eqlArchiveTaskMember14Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 32 }
+
+eqlArchiveTaskMember14Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 33 }
+
+eqlArchiveTaskMember15Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 34 }
+
+eqlArchiveTaskMember15Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 35 }
+
+eqlArchiveTaskMember16Uuid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "uuid for member"
+    ::= { eqlArchiveTaskEntry 36 }
+
+eqlArchiveTaskMember16Flags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "flags for member."
+    ::= { eqlArchiveTaskEntry 37 }
+
+
+
+
+--***********************************************************************************
+
+
+END

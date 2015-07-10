@@ -107,6 +107,10 @@ elseif ($device['os'] == "dsm")
       $hardware = $value;
     }
   }
+} elseif ($device['os'] == "pfsense") {
+    $output = preg_split("/ /", $poll_device['sysDescr']);
+    $version = $output[2];
+    $hardware = $output[6];
 }
 
 ?>

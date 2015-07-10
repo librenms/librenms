@@ -1,4 +1,4 @@
-	<?php
+<?php
 
 function poll_sensor($device, $class, $unit)
 {
@@ -132,24 +132,35 @@ function poll_device($device, $options)
   if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
 
   $ping_response = isPingable($device['hostname'],$device['device_id']);
+
+    $device_perf = $ping_response['db'];
+    $device_perf['device_id'] = $device['device_id'];
+    $device_perf['timestamp'] = array('NOW()');
+    if (is_array($device_perf)) {
+        dbInsert($device_perf, 'device_perf');
+    }
+
+
   $device['pingable'] = $ping_response['result'];
   $ping_time = $ping_response['last_ping_timetaken'];
   $response = array();
+  $status_reason = '';
   if ($device['pingable'])
   {
     $device['snmpable'] = isSNMPable($device);
     if ($device['snmpable'])
     {
       $status = "1";
+      $response['status_reason'] = '';
     } else {
       echo("SNMP Unreachable");
       $status = "0";
-      $response['status'] = 'snmp';
+      $response['status_reason'] = 'snmp';
     }
   } else {
     echo("Unpingable");
     $status = "0";
-    $response['status'] = 'icmp';
+    $response['status_reason'] = 'icmp';
   }
 
   if ($device['status'] != $status)
@@ -157,11 +168,11 @@ function poll_device($device, $options)
     $poll_update .= $poll_separator . "`status` = '$status'";
     $poll_separator = ", ";
 
-    dbUpdate(array('status' => $status), 'devices', 'device_id=?', array($device['device_id']));
+    dbUpdate(array('status' => $status,'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
     dbInsert(array('importance' => '0', 'device_id' => $device['device_id'], 'message' => "Device is " .($status == '1' ? 'up' : 'down')), 'alerts');
 
     log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
-    notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " " . $response['status']);
+    notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " " . $response['status_reason']);
   }
 
   if ($status == "1")
@@ -370,4 +381,15 @@ function rrd_create_update($device, $name, $def, $val, $step = 300)
     rrdtool_update($rrd, $val);
 }
 
-?>
+function get_main_serial($device) {
+
+    if ($device['os_group'] == 'cisco') {
+        $serial_output = snmp_get_multi($device, "entPhysicalSerialNum.1 entPhysicalSerialNum.1001", "-OQUs", "ENTITY-MIB:OLD-CISCO-CHASSIS-MIB");
+        if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
+            return $serial_output[1]['entPhysicalSerialNum'];
+        } elseif (!empty($serial_output[1001]['entPhysicalSerialNum'])) {
+            return $serial_output[1001]['entPhysicalSerialNum'];
+        }
+    }
+
+}

@@ -49,6 +49,7 @@ Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a 
 Rules can contain braces and __Glues__.  
 __Entities__ are provided as `%`-Noted pair of Table and Field. For Example: `%ports.ifOperStatus`.  
 __Conditions__ can be any of:
+
 - Equals `=`
 - Not Equals `!=`
 - Matches `~`
@@ -67,6 +68,7 @@ Arithmetics are allowed as well.
 ## <a name="rules-examples">Examples</a>
 
 Alert when:
+
 - Device goes down: `%devices.status != '1'`
 - Any port changes: `%ports.ifOperStatus != 'up'`
 - Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
@@ -81,12 +83,14 @@ The template-parser understands `if` and `foreach` controls and replaces certain
 ## <a name="templates-syntax">Syntax</a>
 
 Controls:
+
 - if-else (Else can be omitted):  
 `{if %placeholder == 'value'}Some Text{else}Other Text{/if}`
 - foreach-loop:  
 `{foreach %placeholder}Key: %key<br/>Value: %value{/foreach}`
 
 Placeholders:
+
 - Hostname of the Device: `%hostname`
 - Title for the Alert: `%title`
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
@@ -317,6 +321,8 @@ __devices.location__ = The devices location.
 
 __devices.status__ = The status of the device, 1 = up, 0 = down.
 
+__devices.status_reason__ = The reason the device was detected as down (icmp or snmp).
+
 __devices.ignore__ = If the device is ignored this will be set to 1.
 
 __devices.disabled__ = If the device is disabled this will be set to 1.
@@ -490,3 +496,27 @@ Example: `%macros.past_5m` is Last 5 Minutes.
 Resolution: 5,10,15,30,60
 
 Source: `DATE_SUB(NOW(),INTERVAL $ MINUTE)`
+
+## <a name="macros-sensors">Sensors</a> (Boolean)
+
+Entity: `%macros.sensor`
+
+Description: Only select sensors that aren't ignored.
+
+Source: `(%sensors.sensor_alert = 1)`
+
+## <a name="macros-packetloss">Packet Loss</a> (Boolean)
+
+Entity: `(%macros.packet_loss_5m)`
+
+Description: Packet loss % value for the device within the last 5 minutes.
+
+Example: `%macros.packet_loss_5m` > 50
+
+Entity: `(%macros.packet_loss_15m)`
+
+Description: Packet loss % value for the device within the last 15 minutes.
+
+Example: `%macros.packet_loss_15m` > 50
+
+

@@ -1,0 +1,288 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLTAG-MIB DEFINITIONS  ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, enterprises, TimeTicks, Unsigned32, Counter32, Counter64, Gauge32,
+    NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+    DisplayString, RowStatus, RowPointer, TruthValue 
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId, UTFString, eqlStorageGroupAdminAccountIndex
+            FROM EQLGROUP-MIB
+    eqliscsiLocalMemberId, eqliscsiVolumeIndex
+            FROM EQLVOLUME-MIB;
+
+eqltagModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION
+        "Equallogic Inc. tag information
+
+        Copyright (c) 2002-2011 by Dell, Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell, Inc.  This software embodies proprietary information 
+        and trade secrets of Dell, Inc. 
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION    "201110020000Z"         -- 02-Oct-11
+    DESCRIPTION "Initial revision"
+    ::= { enterprises equalLogic(12740) 23 }
+
+
+eqltagObjects OBJECT IDENTIFIER       ::= { eqltagModule 1 }
+eqltagNotifications OBJECT IDENTIFIER ::= { eqltagModule 2 }
+eqltagConformance OBJECT IDENTIFIER   ::= { eqltagModule 3 }
+
+
+----------------------------------------------------------------------
+
+-- Tag table
+--
+
+eqlTagTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlTagEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table maintains the list of tags.  For every tag, 
+      there is a row in this table.  This table supports multiple types of tags.
+      Initially the only supported tag type is 'folder'.  Subsequently clients 
+      can add other types of tags, and clients can add tags of the new tag
+      types to this table.
+
+      Clients can walk this table to get all tags, or can maintain the 
+      first index constant (tag type) to get all tags type.  For
+      example, the client can walk this table to get all folder tags."
+::= { eqltagObjects 1 }
+
+eqlTagEntry OBJECT-TYPE
+    SYNTAX        EqlTagEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the tag table."
+    INDEX           {eqlTagType, eqlTagIndex}
+::= { eqlTagTable 1 }
+
+EqlTagEntry ::= SEQUENCE {
+   eqlTagType               INTEGER,
+   eqlTagIndex              Unsigned32,
+   eqlTagRowStatus          RowStatus,
+   eqlTagValue              UTFString,
+   eqlTagAdminAccountKey    Unsigned32,
+   eqlTagValueDescription   UTFString
+}
+
+eqlTagType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    folder(1)
+                    }
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of this tag.  A typical
+                     tag type is folder.  Tag type enumeration values from 0 to 
+                     9,999 are reserved for internal use.  When user defined tag 
+                     types are supported, the user defined tag enumerated values 
+                     start at 10,000."
+    DEFVAL          { 1 }
+    ::=  { eqlTagEntry 1 } 
+
+eqlTagIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible  
+    STATUS          current
+    DESCRIPTION     "The index of the tag, included only because the MIB
+                     compiler fails without it, so this is a workaround."
+    ::=  { eqlTagEntry 2 }
+    
+eqlTagRowStatus           OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "Row status used to manage this row."
+::= { eqlTagEntry  3 }
+
+eqlTagValue OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..64))    
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the value of the tag.  For folders, 
+                     this value is the name of the folder.  
+                     The tag value can be up to 63 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlTagEntry 4 } 
+          
+eqlTagAdminAccountKey OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the unique key for identifying a volume administrator
+                     that owns this tag.  If no account has this value as its 
+                     eqlStorageGroupAdminAccountKey, then the tag is unassigned."
+    DEFVAL          {0}
+    ::=   { eqlTagEntry 5 }
+
+eqlTagValueDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides details about this tag.
+                     The description can be up to 127 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlTagEntry 6 } 
+          
+----------------------------------------------------------------------
+
+-- Tag Object table
+--
+
+eqlTagObjectTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlTagObjectEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table maintains an association between tags and objects.  Clients 
+      can use this table to determine for a given tag, which objects are 
+      associated with the tag.  When the tag is a folder, it lists the objects
+      that are in the folder."
+    ::= { eqltagObjects 2 }
+
+eqlTagObjectEntry OBJECT-TYPE
+    SYNTAX        EqlTagObjectEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the tag object table."
+    INDEX           {eqlTagType, eqlTagIndex, eqlTagObjectIndex}
+    ::= { eqlTagObjectTable 1 }
+
+EqlTagObjectEntry ::= SEQUENCE {
+   eqlTagObjectIndex                  Unsigned32,
+   eqlTagObjectTaggedObjectPointer    RowPointer,
+   eqlTagObjectRowStatus              RowStatus
+}
+
+eqlTagObjectIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible  
+    STATUS          current
+    DESCRIPTION     "The index of the tag to object, included only because the MIB
+                     compiler fails without it, so this is a workaround."
+    ::=  { eqlTagObjectEntry 1 }
+    
+eqlTagObjectTaggedObjectPointer   OBJECT-TYPE
+      SYNTAX          RowPointer
+      MAX-ACCESS      read-write
+      STATUS          current
+      DESCRIPTION     "The authoritative identification for the MIB object to tag."
+      ::= { eqlTagObjectEntry  2 }
+
+eqlTagObjectRowStatus           OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "Row status used to manage this row."
+    ::= { eqlTagObjectEntry  3 }
+
+-- Admin Account Tag table
+--
+
+eqlAdminAccountTagTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAdminAccountTagEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table has a row for every admin that has read or read-write access 
+      to a tag. If an admin does not have access to tag X, there is 
+      no row in the table with index 1.admin.X.
+
+      Clients can walk this table to get all tags that an admin can access."
+    ::= { eqltagObjects 3 }
+
+eqlAdminAccountTagEntry OBJECT-TYPE
+    SYNTAX        EqlAdminAccountTagEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the tag table."
+    INDEX           { eqlGroupId, eqlStorageGroupAdminAccountIndex, eqlTagType, eqlTagIndex }
+    ::= { eqlAdminAccountTagTable 1 }
+
+EqlAdminAccountTagEntry ::= 
+   SEQUENCE {
+      eqlAdminAccountTagAccess    INTEGER
+}
+
+eqlAdminAccountTagAccess OBJECT-TYPE
+    SYNTAX          INTEGER {
+                         read-only (1),
+                         read-write (2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The administrative permission to a tag."
+    ::=   { eqlAdminAccountTagEntry 1 }
+
+--******************************************************************
+          
+-- Volume Tag table
+--
+
+eqlVolumeTagTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlVolumeTagEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      Stores which tags reference a particular volume. 
+
+      Clients can walk this table, and for each volume, get the tags that reference this volume."
+    ::= { eqltagObjects 4 }
+
+eqlVolumeTagEntry OBJECT-TYPE
+    SYNTAX        EqlVolumeTagEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the volume tag table."
+    INDEX        { eqliscsiLocalMemberId, eqliscsiVolumeIndex, eqlTagType, eqlTagIndex }
+    ::= { eqlVolumeTagTable 1 }
+
+EqlVolumeTagEntry ::= 
+   SEQUENCE {
+      eqlVolumeTagValue   UTFString
+}
+
+eqlVolumeTagValue OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..64))    
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the value of the tag.  For folders, 
+                     this value is the name of the folder.  
+                     The tag value can be up to 63 characters plus NULL."  
+    ::=   { eqlVolumeTagEntry 1 }
+
+--******************************************************************
+          
+
+END
+
