@@ -1,0 +1,1608 @@
+-------------------------------------------------------------------------------
+--
+-- Server Administrator Remote Access MIB for Server3 MIB Branch
+--
+-- Copyright (c) 2000-2003 Dell Inc.
+-- All Rights Reserved.
+--
+-- The information and functionality described by this MIB file,
+-- like many MIB files, is subject to change without notice.
+-- Please examine the version number of this MIB and compare it
+-- to the version number you are expecting.
+--
+-- MIB Version 1.90                     21 January 2003
+--
+-- OID Format Legend:
+--   <a> = attribute ID
+--   <i> = index ID
+--
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-- Begin MIB
+-------------------------------------------------------------------------------
+
+DCS3RMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, IpAddress
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB;
+
+
+-------------------------------------------------------------------------------
+-- Object Identifiers
+-------------------------------------------------------------------------------
+
+-- Enterprise ID
+dell                            OBJECT IDENTIFIER ::= { enterprises    674   }
+
+-- Server3 Branch
+server3                         OBJECT IDENTIFIER ::= { dell           10892 }
+
+-- Server3 Groups
+baseboardGroup                  OBJECT IDENTIFIER ::= { server3        1     }
+drsOutOfBandGroup               OBJECT IDENTIFIER ::= { server3        2     }
+
+-- Server3 Baseboard Groups for Remote Access
+-- (All other Server3 Baseboard groups are defined in another MIB file.)
+remoteAccessGroup               OBJECT IDENTIFIER ::= { baseboardGroup 1700  }
+
+
+-------------------------------------------------------------------------------
+-- Textual Conventions
+-------------------------------------------------------------------------------
+
+DellObjectRange                 ::= INTEGER (1..128)
+DellUnsigned8BitRange           ::= INTEGER (0..255)
+DellUnsigned16BitRange          ::= INTEGER (0..65535)
+DellUnsigned32BitRange          ::= INTEGER (0..4294967295)
+DellBoolean                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
+
+-- Note About Bit Fields:
+-- Attributes with definitions of xxxCapabilities or xxxSettings are integers
+-- representing a series of bit definitions.  They are NOT enumerations and
+-- should be treated as bit fields.  The value is passed as a decimal value;
+-- it should be converted to hex, and the appropriate bits should be parsed
+-- from that.  Some of the more common bit combinations are defined in some
+-- variables, but not all combinations are or will be defined.
+
+--
+-- Generic State Capabilities
+--
+DellStateCapabilities           ::= INTEGER {
+    -- If set to 0 (zero), object has no state capabilities
+    unknownCapabilities(1),     -- object's state capabilities are unknown
+    -- The object's state capabilities allow it to be set to:
+    enableCapable(2),           -- be disabled (offline) or be enabled (online)
+    notReadyCapable(4),         -- not ready
+    enableAndNotReadyCapable(6)
+}
+
+--
+-- Generic State Settings
+--
+DellStateSettings           ::= INTEGER {
+    -- If set to 0 (zero), object has no state settings enabled and is disabled
+    unknown(1),             -- object's state is unknown
+    enabled(2),             -- object's state is disabled (offline) if bit is off
+                            -- or enabled (online) if bit is on
+    notReady(4),            -- object's state is not ready
+    enabledAndNotReady(6)
+}
+
+--
+-- Status
+--
+DellStatus                  ::= INTEGER {
+    other(1),               -- status is not one of the following:
+    unknown(2),             -- status of object is unknown (not known or monitored)
+    ok(3),                  -- status of object is OK (normal)
+    nonCritical(4),         -- status of object is noncritical (warning)
+    critical(5),            -- status of object is critical (failure)
+    nonRecoverable(6)       -- status of object is non-recoverable (dead)
+}
+
+
+-------------------------------------------------------------------------------
+--
+-- MIB Groups
+--
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-- Remote Access Group
+--
+-- OID: 1.3.6.1.4.1.674.10892.1.1700
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-- Remote Access Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10892.1.1700.10.1.<a>.<i1>.<i2>
+-------------------------------------------------------------------------------
+
+DellRemoteAccessType                    ::= INTEGER {
+    remoteAccessTypeIsOther(1),         -- the type is not one of the following:
+    remoteAccessTypeIsUnknown(2),       -- remote access type is unknown
+    remoteAccessTypeIsDRACIII(3),       -- remote access type is DRAC III
+    remoteAccessTypeIsERA(4),            -- remote access type is ERA
+    remoteAccessTypeIsDRAC4(5),          -- remote access type is DRAC4
+    remoteAccessTypeIsDRAC5(6)          -- remote access type is DRAC5
+}
+DellRemoteAccessControlCapabilities     ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    logResetCapable(2),                 -- reset its onboard logs
+    hardResetCapable(4),                -- be hard reset
+    softResetCapable(8),                -- be soft reset
+    gracefulResetCapable(16),           -- be gracefully shutdown and soft reset
+    defaultConfigResetCapable(32),      -- reset to its default settings for the release version
+    allResetCapable(62),
+    shutdownCapable(64),                -- shutdown and disable battery if PCI power is off
+    allResetAndShutdownCapable(126)
+}
+DellRemoteAccessControlSettings         ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings enabled
+    unknown(1),                         -- The object's state is unknown
+    -- Only one of the following settings may be enabled in one set request:
+    logReset(2),                        -- Reset the onboard logs
+    hardReset(4),                       -- Issue a hard reset to the object
+    softReset(8),                       -- Issue a soft reset to the object
+    gracefulReset(16),                  -- Issue a graceful shutdown and soft reset to the object
+    defaultConfigReset(32),             -- Reset the object to its default settings
+    shutdown(64)                        -- Shutdown (power off) the object
+}
+DellRemoteAccessMonitorCapabilities     ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    extPwrSupplyMonitorIfConnectedCapable(2),-- monitor external power supply if connected
+    extPwrSupplyMonitorAlwaysEnabledCapable(4),-- monitor external power supply always
+    extPwrSupplyMonitorIfConnectedAndAlwaysEnabledCapable(6)
+}
+DellRemoteAccessMonitorSettings         ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings enabled
+    -- Only one extPwrSupplyMonitor setting may be enabled:
+    unknown(1),                         -- The object's state is unknown
+    extPwrSupplyMonitorIfConnectedEnabled(2), -- Monitor ext pwr supply volt probe
+                                              -- if the cable is connected to the DRS
+    extPwrSupplyMonitorAlwaysEnabledEnabled(4)-- Monitor ext pwr supply volt probe
+                                              -- regardless of the plug state
+}
+DellRemoteAccessLANCapabilities         ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    nicCapable(2),                      -- supports a NIC
+    nicDHCPCapable(4),                  -- can use DHCP to obtain IP address for NIC
+    nicAndNicDHCPCapable(6)
+}
+DellRemoteAccessLANSettings             ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings enabled
+    unknown(1),                         -- The object's state is unknown
+    nicEnabled(2),                      -- NIC is enabled
+    nicDHCPEnabled(4),                  -- NIC should use DHCP to obtain IP address
+    nicAndNicDHCPEnabled(6)
+}
+DellRemoteAccessHostCapabilities        ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    smtpEmailCapable(2),                -- support email using SMTP
+    tftpRemoteFloppyCapable(4),         -- support remote floppy boot from TFTP server
+    smtpEmailAndTftpRemoteFloppyCapable(6),
+    tftpRemoteFwUpdateCapable(8),       -- support remote FW update from TFTP server
+    smtpEmailAndTftpRemoteFwUpdateCapable(10),
+    tftpRemoteFloppyAndFwUpdateCapable(12),
+    smtpEmailAndTftpRemoteFloppyAndFwUpdateCapable(14)
+}
+DellRemoteAccessHostSettings            ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings enabled
+    unknown(1),                         -- The object's state is unknown
+    smtpEmailEnabled(2),                -- SMTP client for email is enabled (R)
+    tftpRemoteFloppyEnabled(4),         -- TFTP client for remote floppy boot is enabled (R)
+    smtpEmailAndTftpRemoteFloppyEnabled(6),
+    tftpRemoteFwUpdateEnabled(8),       -- TFTP client for FW update is enabled (R)
+    smtpEmailAndTftpRemoteFwUpdateEnabled(10),
+    tftpRemoteFloppyAndFwUpdateEnabled(12),
+    smtpEmailAndTftpRemoteFloppyAndFwUpdateEnabled(14)
+}
+DellRemoteAccessOutOfBandSNMPCapabilities ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    oobSNMPAgentCapable(2),             -- object has an out-of-band SNMP agent
+    oobSNMPTrapsCapable(4),             -- object can send out-of-band SNMP traps
+    oobSNMPAgentAndTrapsCapable(6)
+}
+DellRemoteAccessOutOfBandSNMPSettings   ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings enabled
+    unknown(1),                         -- The object's state is unknown
+    oobSNMPAgentEnabled(2),             -- out-of-band SNMP agent is enabled
+    oobSNMPTrapsEnabled(4),             -- out-of-band SNMP traps are enabled
+    oobSNMPAgentAndTrapsEnabled(6)
+}
+
+RemoteAccessTableEntry                  ::= SEQUENCE {
+    remoteAccessChassisIndex            DellObjectRange,
+    remoteAccessAdapterIndex            DellObjectRange,
+    remoteAccessType                    DellRemoteAccessType,
+    remoteAccessStateCapabilities       DellStateCapabilities,
+    remoteAccessStateSettings           DellStateSettings,
+    remoteAccessStatus                  DellStatus,
+    remoteAccessProductInfoName         DisplayString (SIZE (0..63)),
+    remoteAccessDescriptionInfoName     DisplayString (SIZE (0..255)),
+    remoteAccessVersionInfoName         DisplayString (SIZE (0..63)),
+    remoteAccessControlCapabilities     DellRemoteAccessControlCapabilities,
+    remoteAccessControlSettings         DellRemoteAccessControlSettings,
+    remoteAccessMonitorCapabilities     DellRemoteAccessMonitorCapabilities,
+    remoteAccessMonitorSettings         DellRemoteAccessMonitorSettings,
+    remoteAccessLANCapabilities         DellRemoteAccessLANCapabilities,
+    remoteAccessLANSettings             DellRemoteAccessLANSettings,
+    remoteAccessHostCapabilities        DellRemoteAccessHostCapabilities,
+    remoteAccessHostSettings            DellRemoteAccessHostSettings,
+    remoteAccessOutOfBandSNMPCapabilities DellRemoteAccessOutOfBandSNMPCapabilities,
+    remoteAccessOutOfBandSNMPSettings   DellRemoteAccessOutOfBandSNMPSettings,
+    remoteAccessSMTPServerIPAddress     IpAddress,
+    remoteAccessFloppyTFTPIPAddress     IpAddress,
+    remoteAccessFloppyTFTPPathName      DisplayString (SIZE (0..255)),
+    remoteAccessFirmwareUpdateIPAddress IpAddress,
+    remoteAccessFirmwareUpdatePathName  DisplayString (SIZE (0..255)),
+    remoteAccessNICStaticIPAddress      IpAddress,
+    remoteAccessNICStaticNetmaskAddress IpAddress,
+    remoteAccessNICStaticGatewayAddress IpAddress,
+    remoteAccessPCMCIAInfoName          DisplayString (SIZE (0..63)),
+    remoteAccessMiscInfoName            DisplayString (SIZE (0..63)),
+    remoteAccessNICCurrentIPAddress     IpAddress,
+    remoteAccessNICCurrentNetmaskAddress IpAddress,
+    remoteAccessNICCurrentGatewayAddress IpAddress,
+    remoteAccessNICCurrentInfoFromDHCP  DellBoolean,
+    remoteAccessRemoteConnectURL	    DisplayString (SIZE (0..63))
+}
+
+remoteAccessTable                       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RemoteAccessTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010 This object defines the Remote Access table."
+    ::= { remoteAccessGroup 10 }
+remoteAccessTableEntry                  OBJECT-TYPE
+    SYNTAX      RemoteAccessTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001 This object defines the Remote Access table entry."
+    INDEX       { remoteAccessChassisIndex,
+                  remoteAccessAdapterIndex }
+    ::= { remoteAccessTable 1 }
+
+remoteAccessChassisIndex                OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0001 This attribute defines the index (one based) of the
+chassis containing the Remote Access hardware."
+    ::= { remoteAccessTableEntry 1 }
+remoteAccessAdapterIndex                OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0002 This attribute defines the index (one based) of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 2 }
+remoteAccessType                        OBJECT-TYPE
+    SYNTAX      DellRemoteAccessType
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0003 This attribute defines the type of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 3 }
+remoteAccessStateCapabilities           OBJECT-TYPE
+    SYNTAX      DellStateCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0004 This attribute defines the state capabilities of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 4 }
+remoteAccessStateSettings               OBJECT-TYPE
+    SYNTAX      DellStateSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0005 This attribute defines the state setting of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 5 }
+remoteAccessStatus                      OBJECT-TYPE
+    SYNTAX      DellStatus
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0006 This attribute defines the status of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 6 }
+remoteAccessProductInfoName             OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0007 This attribute defines the name of the
+product providing the Remote Access functionality."
+    ::= { remoteAccessTableEntry 7 }
+remoteAccessDescriptionInfoName         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0008 This attribute defines the description of the
+product providing the Remote Access functionality."
+    ::= { remoteAccessTableEntry 8 }
+remoteAccessVersionInfoName             OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0009 This attribute defines the version of the
+product providing the Remote Access functionality."
+    ::= { remoteAccessTableEntry 9 }
+remoteAccessControlCapabilities         OBJECT-TYPE
+    SYNTAX      DellRemoteAccessControlCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0010 This attribute defines the control capabilities of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 10 }
+remoteAccessControlSettings             OBJECT-TYPE
+    SYNTAX      DellRemoteAccessControlSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0011 This attribute defines the control settings of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 11 }
+remoteAccessMonitorCapabilities         OBJECT-TYPE
+    SYNTAX      DellRemoteAccessMonitorCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0012 This attribute defines the monitor capabilities of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 12 }
+remoteAccessMonitorSettings             OBJECT-TYPE
+    SYNTAX      DellRemoteAccessMonitorSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0013 This attribute defines the monitor settings of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 13 }
+remoteAccessLANCapabilities             OBJECT-TYPE
+    SYNTAX      DellRemoteAccessLANCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0014 This attribute defines the LAN capabilities of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 14 }
+remoteAccessLANSettings                 OBJECT-TYPE
+    SYNTAX      DellRemoteAccessLANSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0015 This attribute defines the LAN settings of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 15 }
+remoteAccessHostCapabilities            OBJECT-TYPE
+    SYNTAX      DellRemoteAccessHostCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0016 This attribute defines the host capabilities of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 16 }
+remoteAccessHostSettings                OBJECT-TYPE
+    SYNTAX      DellRemoteAccessHostSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0017 This attribute defines the host settings of the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 17 }
+remoteAccessOutOfBandSNMPCapabilities   OBJECT-TYPE
+    SYNTAX      DellRemoteAccessOutOfBandSNMPCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0018 This attribute defines the out-of-band SNMP capabilities
+of the Remote Access hardware."
+    ::= { remoteAccessTableEntry 18 }
+remoteAccessOutOfBandSNMPSettings       OBJECT-TYPE
+    SYNTAX      DellRemoteAccessOutOfBandSNMPSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0019 This attribute defines the out-of-band SNMP settings
+of the Remote Access hardware."
+    ::= { remoteAccessTableEntry 19 }
+remoteAccessSMTPServerIPAddress         OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0020 This attribute defines the IP address of the
+SMTP server provided by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 20 }
+remoteAccessFloppyTFTPIPAddress         OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0021 This attribute defines the IP address of the
+TFTP server providing the operating system image used by the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 21 }
+remoteAccessFloppyTFTPPathName          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0022 This attribute defines the file name of the
+the operating system image obtained from the TFTP server used by the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 22 }
+remoteAccessFirmwareUpdateIPAddress     OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0023 This attribute defines the IP address of the
+update server providing the firmware image used by the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 23 }
+remoteAccessFirmwareUpdatePathName      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0024 This attribute defines the file name of the
+the firmware image obtained from the update server used by the
+Remote Access hardware."
+    ::= { remoteAccessTableEntry 24 }
+remoteAccessNICStaticIPAddress          OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0025 This attribute defines the static IP address to be used
+by the onboard NIC provided by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 25 }
+remoteAccessNICStaticNetmaskAddress     OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0026 This attribute defines the netmask for the static
+IP address to be used by the onboard NIC provided by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 26 }
+remoteAccessNICStaticGatewayAddress     OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0027 This attribute defines the IP address for the gateway
+associated with the static IP address to be used by the onboard NIC provided
+by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 27 }
+remoteAccessPCMCIAInfoName              OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0028 This attribute defines the information for the
+PCMCIA device used by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 28 }
+remoteAccessMiscInfoName                OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0029 This attribute defines miscellaneous information
+for the Remote Access hardware."
+    ::= { remoteAccessTableEntry 29 }
+remoteAccessNICCurrentIPAddress         OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0030 This attribute defines the IP address currently being used
+by the onboard NIC provided by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 30 }
+remoteAccessNICCurrentNetmaskAddress    OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0031 This attribute defines the netmask currently being used
+by the onboard NIC provided by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 31 }
+remoteAccessNICCurrentGatewayAddress    OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0032 This attribute defines the IP address for the gateway
+currently being used by the onboard NIC provided by the Remote Access hardware."
+    ::= { remoteAccessTableEntry 32 }
+remoteAccessNICCurrentInfoFromDHCP      OBJECT-TYPE
+    SYNTAX      DellBoolean
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0033 This attribute defines if DHCP was used to obtain
+the NIC information currently being used by the onboard NIC provided by
+the Remote Access hardware."
+    ::= { remoteAccessTableEntry 33 }
+remoteAccessRemoteConnectURL            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0010.0001.0034 This attribute defines the URL for launching the
+Remote Access Remote Connect Interface."
+    ::= { remoteAccessTableEntry 34 }
+
+-------------------------------------------------------------------------------
+-- Remote User Administration Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10892.1.1700.20.1.<a>.<i1>.<i2>.<i3>
+-------------------------------------------------------------------------------
+
+DellRemoteUserAdminStateCapabilities    ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    enableCapable(2),                   -- be disabled (offline) or be enabled (online)
+    notReadyCapable(4),                 -- not ready
+    numericPagerCapable(8),             -- support numeric paging
+    alphaPagerCapable(16),              -- support alphanumeric paging
+    numericPagerAndAlphaPagerCapable(24),
+    emailCapable(32),                   -- support electronic mailing
+    numericPagerAlphaPagerAndEmailCapable(56),
+    privilegeCapable(64),               -- support user privileges
+    numericPagerAlphaPagerEmailAndPrivilegeCapable(120)
+}
+DellRemoteUserAdminStateSettings        ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings capabilities, and its state is disabled
+    unknown(1),                         -- The object's state is unknown
+    enabled(2),                         -- The object's state is disabled (offline) 0, or enabled (online) 1
+    notReady(4),                        -- The object's state is not ready
+    numericPagerEnabled(8),             -- Numeric paging support is enabled
+    enabledAndNumericPagerEnabled(10),
+    alphaPagerEnabled(16),              -- Alphanumeric paging support is enabled
+    enabledAndAlphaPagerEnabled(18),
+    enabledAndNumericPagerAndAlphaPagerEnabled(26),
+    emailEnabled(32),                   -- Electronic mailing is enabled
+    enabledAndEmailEnabled(34),
+    enabledAndNumericPagerAndEmailEnabled(42),
+    enabledAndAlphaPagerAndEmailEnabled(50),
+    enabledAndNumericPagerAlphaPagerAndEmailEnabled(58)
+}
+DellRemoteUserAdminControlCapabilities  ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    numericPagerTestCapable(2),         -- support testing of the numeric paging function
+    alphaPagerTestCapable(4),           -- support testing of the alphanumeric pager function
+    numericPagerTestAndAlphaPagerTestCapable(6),
+    emailTestCapable(8),                -- support sending a test electronic mail message
+    numericPagerTestAlphaPagerTestAndEmailTestCapable(14)
+}
+DellRemoteUserAdminControlSettings      ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings capabilities, and its state is disabled
+    unknown(1),                         -- The object's state is unknown
+    -- Only one of the following settings may be enabled in one set request:
+    numericPagerTest(2),                -- Perform a numeric pager test
+    alphaPagerTest(4),                  -- Perform an alphanumeric pager test
+    emailTest(8)                        -- Send a test email
+}
+DellRemoteUserAdminAlphaProtocolType    ::= INTEGER {
+    other(1),                           -- the alphanumeric protocol is not one of the following:
+    unknown(2),                         -- alphanumeric protocol is unknown
+    alpha7E0(3),                        -- alphanumeric protocol is 7E0
+    alpha8N1(4)                         -- alphanumeric protocol is 8N1
+}
+DellRemoteUserAdminAlphaBaudType        ::= INTEGER {
+    other(1),                           -- the alphanumeric baud rate is not one of the following:
+    unknown(2),                         -- alphanumeric baud rate is unknown
+    alphaBaud300(3),                    -- alphanumeric baud rate is 300
+    alphaBaud1200(4)                    -- alphanumeric baud rate is 1200
+}
+
+RemoteUserAdminTableEntry                        ::= SEQUENCE {
+    remoteUserAdminChassisIndex                  DellObjectRange,
+    remoteUserAdminAdapterIndex                  DellObjectRange,
+    remoteUserAdminUserIndex                     DellObjectRange,
+    remoteUserAdminStateCapabilities             DellRemoteUserAdminStateCapabilities,
+    remoteUserAdminStateSettings                 DellRemoteUserAdminStateSettings,
+    remoteUserAdminStatus                        DellStatus,
+    remoteUserAdminUserName                      DisplayString (SIZE (0..19)),
+    remoteUserAdminUserPasswordName              DisplayString (SIZE (0..255)),
+    remoteUserAdminUserPrivilege                 DisplayString (SIZE (0..31)),
+    remoteUserAdminUserPrivilegeCapabilities     DisplayString (SIZE (0..31)),
+    remoteUserAdminAlertFilterDrsEventsMask      DellUnsigned32BitRange,
+    remoteUserAdminAlertFilterSysEventsMask      DellUnsigned32BitRange,
+    remoteUserAdminAlertFilterDrsCapabilities    DellUnsigned32BitRange,
+    remoteUserAdminAlertFilterSysCapabilities    DellUnsigned32BitRange,
+    remoteUserAdminPagerNumericNumberName        DisplayString (SIZE (0..95)),
+    remoteUserAdminPagerNumericMessageName       DisplayString (SIZE (0..31)),
+    remoteUserAdminPagerNumericHangupDelay       DellUnsigned32BitRange,
+    remoteUserAdminPagerAlphaPhoneNumberName     DisplayString (SIZE (0..95)),
+    remoteUserAdminPagerAlphaProtocol            DellRemoteUserAdminAlphaProtocolType,
+    remoteUserAdminPagerAlphaBaudRate            DellRemoteUserAdminAlphaBaudType,
+    remoteUserAdminPagerAlphaCustomMessageName   DisplayString (SIZE (0..31)),
+    remoteUserAdminPagerAlphaModemConnectTimeout DellUnsigned32BitRange,
+    remoteUserAdminPagerAlphaPagerIdName         DisplayString (SIZE (0..31)),
+    remoteUserAdminPagerAlphaPasswordName        DisplayString (SIZE (0..31)),
+    remoteUserAdminPagerModemInitStringName      DisplayString (SIZE (0..31)),
+    remoteUserAdminPagerModemPort                DellUnsigned32BitRange,
+    remoteUserAdminEmailAddressName              DisplayString (SIZE (0..63)),
+    remoteUserAdminEmailCustomMessageName        DisplayString (SIZE (0..31)),
+    remoteUserAdminControlCapabilities           DellRemoteUserAdminControlCapabilities,
+    remoteUserAdminControlSettings               DellRemoteUserAdminControlSettings,
+    remoteUserAdminUserType                      DellUnsigned8BitRange
+}
+
+remoteUserAdminTable                    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RemoteUserAdminTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020 This object defines the Remote Access User Administration table."
+    ::= { remoteAccessGroup 20 }
+remoteUserAdminTableEntry               OBJECT-TYPE
+    SYNTAX      RemoteUserAdminTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001 This object defines the Remote Access User Administration
+table entry."
+    INDEX       { remoteUserAdminChassisIndex,
+                  remoteUserAdminAdapterIndex,
+                  remoteUserAdminUserIndex }
+    ::= { remoteUserAdminTable 1 }
+
+remoteUserAdminChassisIndex             OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0001 This attribute defines the index (one based) of the
+chassis containing the Remote Access hardware."
+    ::= { remoteUserAdminTableEntry 1 }
+remoteUserAdminAdapterIndex             OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0002 This attribute defines the index (one based) of the
+Remote Access hardware used by this Remote Access user."
+    ::= { remoteUserAdminTableEntry 2 }
+remoteUserAdminUserIndex                OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0003 This attribute defines the index (one based) of this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 3 }
+remoteUserAdminStateCapabilities        OBJECT-TYPE
+    SYNTAX      DellRemoteUserAdminStateCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0004 This attribute defines the state capabilities for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 4 }
+remoteUserAdminStateSettings            OBJECT-TYPE
+    SYNTAX      DellRemoteUserAdminStateSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0005 This attribute defines the state settings for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 5 }
+remoteUserAdminStatus                   OBJECT-TYPE
+    SYNTAX      DellStatus
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0006 This attribute defines the status for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 6 }
+remoteUserAdminUserName                 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..19))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0007 This attribute defines the name for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 7 }
+remoteUserAdminUserPasswordName         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0008 This attribute defines the password for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 8 }
+remoteUserAdminUserPrivilege            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0009 This attribute defines the privileges for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 9 }
+remoteUserAdminUserPrivilegeCapabilities OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0010 This attribute defines the privilege capabilities for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 10 }
+remoteUserAdminAlertFilterDrsEventsMask OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0011 This attribute defines the DRS events filter mask for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 11 }
+remoteUserAdminAlertFilterSysEventsMask OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0012 This attribute defines the system events filter mask
+for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 12 }
+remoteUserAdminAlertFilterDrsCapabilities OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0013 This attribute defines the DRS events filter capabilities
+for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 13 }
+remoteUserAdminAlertFilterSysCapabilities OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0014 This attribute defines the system events filter capabilities
+for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 14 }
+remoteUserAdminPagerNumericNumberName   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..95))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0015 This attribute defines the numeric pager number for this
+for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 15 }
+remoteUserAdminPagerNumericMessageName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0016 This attribute defines the message to send to the numeric
+pager for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 16 }
+remoteUserAdminPagerNumericHangupDelay  OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0017 This attribute defines the numeric pager hangup delay
+for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 17 }
+remoteUserAdminPagerAlphaPhoneNumberName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..95))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0018 This attribute defines the alphanumeric pager phone number
+for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 18 }
+remoteUserAdminPagerAlphaProtocol       OBJECT-TYPE
+    SYNTAX      DellRemoteUserAdminAlphaProtocolType
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0019 This attribute defines the protocol used by the
+alphanumeric pager provider for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 19 }
+remoteUserAdminPagerAlphaBaudRate       OBJECT-TYPE
+    SYNTAX      DellRemoteUserAdminAlphaBaudType
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0020 This attribute defines the baud rate used by the
+alphanumeric pager provider for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 20 }
+remoteUserAdminPagerAlphaCustomMessageName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0021 This attribute defines the message to be sent to the
+alphanumeric pager to inform the user of a call by this Remote Access user."
+    ::= { remoteUserAdminTableEntry 21 }
+remoteUserAdminPagerAlphaModemConnectTimeout OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0022 This attribute defines the modem connection timeout
+for the alhpanumeric pager for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 22 }
+remoteUserAdminPagerAlphaPagerIdName    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0023 This attribute defines the ID to be sent to the
+alphanumeric pager to inform the user of a call by this Remote Access user."
+    ::= { remoteUserAdminTableEntry 23 }
+remoteUserAdminPagerAlphaPasswordName   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0024 This attribute defines the password for the
+alphanumeric pager for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 24 }
+remoteUserAdminPagerModemInitStringName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0025 This attribute defines the initialization string
+to be sent to the pager modem for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 25 }
+remoteUserAdminPagerModemPort           OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0026 This attribute defines the port for the pager modem
+for this Remote Access user."
+    ::= { remoteUserAdminTableEntry 26 }
+remoteUserAdminEmailAddressName         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0027 This attribute defines the email address for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 27 }
+remoteUserAdminEmailCustomMessageName   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0028 This attribute defines the email message to send to this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 28 }
+remoteUserAdminControlCapabilities      OBJECT-TYPE
+    SYNTAX      DellRemoteUserAdminControlCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0029 This attribute defines the control capabilities for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 29 }
+remoteUserAdminControlSettings          OBJECT-TYPE
+    SYNTAX      DellRemoteUserAdminControlSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0030 This attribute defines the control settings for this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 30 }
+remoteUserAdminUserType                 OBJECT-TYPE
+    SYNTAX      DellUnsigned8BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0020.0001.0031 This attribute defines the type of this
+Remote Access user."
+    ::= { remoteUserAdminTableEntry 31 }
+
+
+-------------------------------------------------------------------------------
+-- Remote SNMP Trap Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10892.1.1700.30.1.<a>.<i1>.<i2>.<i3>
+-------------------------------------------------------------------------------
+
+DellRemoteSNMPTrapStateCapabilities     ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    enableCapable(2),                   -- be disabled (offline) or be enabled (online)
+    notReadyCapable(4),                 -- not ready
+    enableAndNotReadyCapable(6)
+}
+DellRemoteSNMPTrapStateSettings         ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings capabilities, and its state is disabled
+    unknown(1),                         -- The object's state is unknown
+    enabled(2),                         -- The object's state is disabled (offline) 0, or enabled (online) 1
+    notReady(4),                        -- The object's state is not ready
+    enabledAndNotReady(6)
+}
+DellRemoteSNMPTrapControlCapabilities   ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    trapTestCapable(2)                  -- support generating a test SNMP trap
+}
+DellRemoteSNMPTrapControlSettings       ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings capabilities, and its state is disabled
+    unknown(1),                         -- The object's state is unknown
+    -- Only one of the following settings may be enabled in one set request:
+    trapTest(2)                         -- Generate a test SNMP trap
+}
+
+RemoteSNMPTrapTableEntry                ::= SEQUENCE {
+    remoteSNMPTrapChassisIndex          DellObjectRange,
+    remoteSNMPTrapAdapterIndex          DellObjectRange,
+    remoteSNMPTrapIndex                 DellObjectRange,
+    remoteSNMPTrapStateCapabilities     DellRemoteSNMPTrapStateCapabilities,
+    remoteSNMPTrapStateSettings         DellRemoteSNMPTrapStateSettings,
+    remoteSNMPTrapStatus                DellStatus,
+    remoteSNMPTrapDestinationIPAddress  IpAddress,
+    remoteSNMPTrapSNMPCommunityName     DisplayString (SIZE (0..31)),
+    remoteSNMPTrapFilterDrsEventsMask   DellUnsigned32BitRange,
+    remoteSNMPTrapFilterSysEventsMask   DellUnsigned32BitRange,
+    remoteSNMPTrapFilterDrsCapabilities DellUnsigned32BitRange,
+    remoteSNMPTrapFilterSysCapabilities DellUnsigned32BitRange,
+    remoteSNMPTrapControlCapabilities   DellRemoteSNMPTrapControlCapabilities,
+    remoteSNMPTrapControlSettings       DellRemoteSNMPTrapControlSettings
+}
+
+remoteSNMPTrapTable                     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RemoteSNMPTrapTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030 This object defines the Remote Access SNMP Trap Destination table."
+    ::= { remoteAccessGroup 30 }
+remoteSNMPTrapTableEntry                OBJECT-TYPE
+    SYNTAX      RemoteSNMPTrapTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001 This object defines the Remote Access SNMP Trap Destination
+table entry."
+    INDEX       { remoteSNMPTrapChassisIndex,
+                  remoteSNMPTrapAdapterIndex,
+                  remoteSNMPTrapIndex }
+    ::= { remoteSNMPTrapTable 1 }
+
+remoteSNMPTrapChassisIndex              OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0001 This attribute defines the index (one based) of the
+chassis containing the Remote Access hardware."
+    ::= { remoteSNMPTrapTableEntry 1 }
+remoteSNMPTrapAdapterIndex              OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0002 This attribute defines the index (one based) of the
+Remote Access hardware that uses this SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 2 }
+remoteSNMPTrapIndex                     OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0003 This attribute defines the index (one based) of this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 3 }
+remoteSNMPTrapStateCapabilities         OBJECT-TYPE
+    SYNTAX      DellRemoteSNMPTrapStateCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0004 This attribute defines the state capabilities of this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 4 }
+remoteSNMPTrapStateSettings             OBJECT-TYPE
+    SYNTAX      DellRemoteSNMPTrapStateSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0005 This attribute defines the state settings of this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 5 }
+remoteSNMPTrapStatus                    OBJECT-TYPE
+    SYNTAX      DellStatus
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0006 This attribute defines the status of this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 6 }
+remoteSNMPTrapDestinationIPAddress      OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0007 This attribute defines the IP address of this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 7 }
+remoteSNMPTrapSNMPCommunityName         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0008 This attribute defines the community for traps sent to this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 8 }
+remoteSNMPTrapFilterDrsEventsMask       OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0009 This attribute defines the DRS events filter mask for this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 9 }
+remoteSNMPTrapFilterSysEventsMask       OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0010 This attribute defines the system events filter mask for
+this Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 10 }
+remoteSNMPTrapFilterDrsCapabilities     OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0011 This attribute defines the DRS events filter capabilities
+for this Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 11 }
+remoteSNMPTrapFilterSysCapabilities     OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0012 This attribute defines the system events filter
+capabilities for this Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 12 }
+remoteSNMPTrapControlCapabilities       OBJECT-TYPE
+    SYNTAX      DellRemoteSNMPTrapControlCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0013 This attribute defines the control capabilities of this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 13 }
+remoteSNMPTrapControlSettings           OBJECT-TYPE
+    SYNTAX      DellRemoteSNMPTrapControlSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0030.0001.0014 This attribute defines the control settings of this
+Remote Access SNMP trap destination."
+    ::= { remoteSNMPTrapTableEntry 14 }
+
+
+-------------------------------------------------------------------------------
+-- Remote Dial Up Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10892.1.1700.40.1.<a>.<i1>.<i2>.<i3>
+-------------------------------------------------------------------------------
+
+DellRemoteDialUpStateCapabilities       ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    enableCapable(2),                   -- be disabled (offline) or be enabled (online)
+    notReadyCapable(4),                 -- not ready
+    dialInCapable(8),                   -- support dial-in
+    dialOutCapable(16),                 -- support dial-out
+    dialInDHCPCapable(32),              -- support use of DHCP to obtain IP addresses
+    dialInAuthAnyCapable(64),           -- support any auth type including clear text
+    dialInAndOutAndDialInDHCPAndAuthAnyCapable(120),
+    dialInAuthEncryptedCapable(128),    -- support only encrypted passwords (CHAP)
+    dialInAndOutAndDialInDHCPAndAuthAnyAndEncryptedCapable(248),
+    dialInAuthMschapCapable(256),       -- support only MSCHAP
+    dialInAndOutAndDialInDHCPAndAllAuthCapable(504)
+}
+DellRemoteDialUpStateSettings           ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings capabilities, and its state is disabled
+    -- One and only one dialInAuth setting must be enabled:
+    unknown(1),                         -- The object's state is unknown
+    enabled(2),                         -- The object's state is disabled (offline) 0, or enabled (online) 1
+    notReady(4),                        -- The object's state is not ready
+    dialInEnabled(8),                   -- Dial-in is enabled
+    dialOutEnabled(16),                 -- Dial-out is enabled
+    dialInDHCPEnabled(32),              -- Object uses DHCP to obtain IP addresses
+    dialInAuthAnyEnabled(64),           -- Object accepts any auth type including clear text
+    enabledDialInAndOutAndDialInAuthAnyEnabled(90),
+    enabledDialInAndOutAndDialInDHCPAndAuthAnyEnabled(122),
+    dialInAuthEncryptedEnabled(128),    -- Object accepts only encrypted passwords (CHAP)
+    enabledDialInAndOutAndDialInAuthEncryptedEnabled(154),
+    enabledDialInAndOutAndDialInDHCPAndAuthEncryptedEnabled(186),
+    dialInAuthMschapEnabled(256),       -- Object accepts only MSCHAP
+    enabledDialInAndOutAndDialInAuthMschapEnabled(282),
+    enabledDialInAndOutAndDialInDHCPAndAuthMschapEnabled(314)
+}
+DellRemoteDialUpModemDialType           ::= INTEGER {
+    remoteDialUpIsOther(1),             -- the type is not one of the following:
+    remoteDialUpIsUnknown(2),           -- dial type is unknown
+    remoteDialUpIsTone(3),              -- dial type is tone
+    remoteDialUpIsPulse(4)              -- dial type is pulse
+}
+
+RemoteDialUpTableEntry                     ::= SEQUENCE {
+    remoteDialUpChassisIndex               DellObjectRange,
+    remoteDialUpAdapterIndex               DellObjectRange,
+    remoteDialUpIndex                      DellObjectRange,
+    remoteDialUpStateCapabilities          DellRemoteDialUpStateCapabilities,
+    remoteDialUpStateSettings              DellRemoteDialUpStateSettings,
+    remoteDialUpStatus                     DellStatus,
+    remoteDialUpPPPDialInBaseIPAddress     IpAddress,
+    remoteDialUpPPPDialInIdleTimeout       DellUnsigned32BitRange,
+    remoteDialUpPPPDialInMaxConnectTimeout DellUnsigned32BitRange,
+    remoteDialUpDialOutModemConnectTimeout DellUnsigned32BitRange,
+    remoteDialUpModemDialType              DellRemoteDialUpModemDialType,
+    remoteDialUpModemInitStringName        DisplayString (SIZE (0..63)),
+    remoteDialUpModemBaudRate              DellUnsigned32BitRange,
+    remoteDialUpModemPort                  DellUnsigned32BitRange
+}
+
+remoteDialUpTable                       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RemoteDialUpTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040 This object defines the Remote Access Dial Up table."
+    ::= { remoteAccessGroup 40 }
+remoteDialUpTableEntry                  OBJECT-TYPE
+    SYNTAX      RemoteDialUpTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001 This object defines the Remote Access Dial Up table entry."
+    INDEX       { remoteDialUpChassisIndex,
+                  remoteDialUpAdapterIndex,
+                  remoteDialUpIndex }
+    ::= { remoteDialUpTable 1 }
+
+remoteDialUpChassisIndex                OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0001 This attribute defines the index (one based) of the
+chassis containing the Remote Access hardware."
+    ::= { remoteDialUpTableEntry 1 }
+remoteDialUpAdapterIndex                OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0002 This attribute defines the index (one based) of the
+Remote Access hardware that supports this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 2 }
+remoteDialUpIndex                       OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0003 This attribute defines the index (one based) of this
+Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 3 }
+remoteDialUpStateCapabilities           OBJECT-TYPE
+    SYNTAX      DellRemoteDialUpStateCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0004 This attribute defines the state capabilities of this
+Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 4 }
+remoteDialUpStateSettings               OBJECT-TYPE
+    SYNTAX      DellRemoteDialUpStateSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0005 This attribute defines the state settings of this
+Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 5 }
+remoteDialUpStatus                      OBJECT-TYPE
+    SYNTAX      DellStatus
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0006 This attribute defines the status of this
+Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 6 }
+remoteDialUpPPPDialInBaseIPAddress      OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0007 This attribute defines the base IP address of the
+PPP server for this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 7 }
+remoteDialUpPPPDialInIdleTimeout        OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0008 This attribute defines the PPP idle timeout value
+in seconds for this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 8 }
+remoteDialUpPPPDialInMaxConnectTimeout  OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0009 This attribute defines the PPP connect timeout value
+in seconds for this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 9 }
+remoteDialUpDialOutModemConnectTimeout  OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0010 This attribute defines the modem dial out connect timeout
+value in seconds for this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 10 }
+remoteDialUpModemDialType               OBJECT-TYPE
+    SYNTAX      DellRemoteDialUpModemDialType
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0011 This attribute defines the dial type for the modem
+used by this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 11 }
+remoteDialUpModemInitStringName         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..63))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0012 This attribute defines the initialization string to be sent
+to the modem for this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 12 }
+remoteDialUpModemBaudRate               OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0013 This attribute defines the baud rate for the modem
+used by this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 13 }
+remoteDialUpModemPort                   OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0040.0001.0014 This attribute defines the port for the modem
+used by this Remote Access Dial Up functionality."
+    ::= { remoteDialUpTableEntry 14 }
+
+
+-------------------------------------------------------------------------------
+-- Remote User Dial In Configuration Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10892.1.1700.50.1.<a>.<i1>.<i2>.<i3>
+-------------------------------------------------------------------------------
+
+DellRemoteUserDialInStateCapabilities   ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    enableCapable(2),                   -- be disabled (offline) or be enabled (online)
+    notReadyCapable(4),                 -- not ready
+    dialInCallbackPresetNumberCapable(8), -- support callback with preset number
+    enableAndDialInCallbackPresetNumberCapable(10),
+    dialInCallbackUserSpecifiedCapable(16),-- support callback with user-specified number
+    enableAndDialInCallbackUserSpecifiedCapable(18),
+    dialInCallbackPresetNumberAndUserSpecifiedCapable(24),
+    enableAndDialInCallbackPresetNumberAndUserSpecifiedCapable(26)
+}
+DellRemoteUserDialInStateSettings       ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings capabilities, and its state is disabled
+    -- Only one dialInCallback setting may be enabled:
+    unknown(1),                         -- The object's state is unknown
+    enabled(2),                         -- The object's state is disabled (offline) 0, or enabled (online) 1
+    notReady(4),                        -- The object's state is not ready
+    dialInCallbackPresetNumberEnabled(8), -- Callback with preset number enabled
+    enabledAndDialInCallbackPresetNumberEnabled(10),
+    dialInCallbackUserSpecifiedEnabled(16),-- Callback with user-specified number enabled
+    enabledAndDialInCallbackUserSpecifiedEnabled(18)
+}
+
+RemoteUserDialInCfgTableEntry                  ::= SEQUENCE {
+    remoteUserDialInCfgChassisIndex            DellObjectRange,
+    remoteUserDialInCfgAdapterIndex            DellObjectRange,
+    remoteUserDialInCfgUserIndex               DellObjectRange,
+    remoteUserDialInCfgStateCapabilities       DellRemoteUserDialInStateCapabilities,
+    remoteUserDialInCfgStateSettings           DellRemoteUserDialInStateSettings,
+    remoteUserDialInCfgStatus                  DellStatus,
+    remoteUserDialInCfgPPPUserName             DisplayString (SIZE (0..15)),
+    remoteUserDialInCfgPPPUserPasswordName     DisplayString (SIZE (0..15)),
+    remoteUserDialInCfgCallbackPhoneNumberName DisplayString (SIZE (0..95))
+}
+
+remoteUserDialInCfgTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RemoteUserDialInCfgTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050 This object defines the Remote Access User Dial In Configuration
+table."
+    ::= { remoteAccessGroup 50 }
+remoteUserDialInCfgTableEntry           OBJECT-TYPE
+    SYNTAX      RemoteUserDialInCfgTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001 This object defines the Remote Access User Dial In Configuration
+table entry."
+    INDEX       { remoteUserDialInCfgChassisIndex,
+                  remoteUserDialInCfgAdapterIndex,
+                  remoteUserDialInCfgUserIndex }
+    ::= { remoteUserDialInCfgTable 1 }
+
+remoteUserDialInCfgChassisIndex         OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0001 This attribute defines the index (one based) of the
+chassis containing the Remote Access hardware."
+    ::= { remoteUserDialInCfgTableEntry 1 }
+remoteUserDialInCfgAdapterIndex         OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0002 This attribute defines the index (one based) of
+Remote Access hardware that supports this Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 2 }
+remoteUserDialInCfgUserIndex            OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0003 This attribute defines the index (one based) of this
+Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 3 }
+remoteUserDialInCfgStateCapabilities    OBJECT-TYPE
+    SYNTAX      DellRemoteUserDialInStateCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0004 This attribute defines the state capabilities of this
+Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 4 }
+remoteUserDialInCfgStateSettings        OBJECT-TYPE
+    SYNTAX      DellRemoteUserDialInStateSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0005 This attribute defines the state settings of this
+Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 5 }
+remoteUserDialInCfgStatus               OBJECT-TYPE
+    SYNTAX      DellStatus
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0006 This attribute defines the status of this
+Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 6 }
+remoteUserDialInCfgPPPUserName          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0007 This attribute defines the PPP user name of this
+Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 7 }
+remoteUserDialInCfgPPPUserPasswordName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0008 This attribute defines the PPP password for this
+Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 8 }
+remoteUserDialInCfgCallbackPhoneNumberName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..95))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0050.0001.0009 This attribute defines the callback phone number for this
+Remote Access Dial In user."
+    ::= { remoteUserDialInCfgTableEntry 9 }
+
+
+-------------------------------------------------------------------------------
+-- Remote Dial Out Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10892.1.1700.60.1.<a>.<i1>.<i2>.<i3>
+-------------------------------------------------------------------------------
+
+DellRemoteDialOutStateCapabilities      ::= INTEGER {
+    -- If set to 0 (zero) the object has no capabilities
+    unknownCapabilities(1),             -- The object's capabilities are unknown
+    -- The object's capabilities allow it to be set to:
+    enableCapable(2),                   -- be disabled (offline) or be enabled (online)
+    notReadyCapable(4),                 -- not ready
+    dialOutPPPAuthAnyCapable(8),        -- support "any PPP auth including clear text"
+    dialOutPPPAuthEncryptedCapable(16), -- support "require encrypted PPP Password"
+    dialOutPPPAuthAnyAndEncryptedCapable(24),
+    dialOutPPPAuthMschapCapable(32),    -- support "require MSCHAP"
+    dialOutPPPAuthAnyAndMschapCapable(40),
+    dialOutPPPAuthEncryptedAndMschapCapable(48),
+    dialOutPPPAuthAnyEncryptedAndMschapCapable(56)
+}
+DellRemoteDialOutStateSettings          ::= INTEGER {
+    -- If set to 0 (zero) the object has no settings capabilities, and its state is disabled
+    -- One and only one dialOutPPPAuth setting must be enabled:
+    unknown(1),                         -- The object's state is unknown
+    enabled(2),                         -- The object's state is disabled (offline) 0, or enabled (online) 1
+    notReady(4),                        -- The object's state is not ready
+    dialOutPPPAuthAnyEnabled(8),        -- Ojbect supports "use any PPP authentication including clear text"
+    enabledAnddialOutPPPAuthAnyEnabled(10),
+    dialOutPPPAuthEncryptedEnabled(16), -- Object supports "require encrypted PPP Authentication"
+    enabledAnddialOutPPPAuthEncryptedEnabled(18),
+    dialOutPPPAuthMschapEnabled(32),    -- Object supports "require MSCHAP PPP Authentication"
+    enabledAnddialOutPPPAuthMschapEnabled(34)
+}
+
+RemoteDialOutTableEntry                 ::= SEQUENCE {
+    remoteDialOutChassisIndex           DellObjectRange,
+    remoteDialOutAdapterIndex           DellObjectRange,
+    remoteDialOutDialOutIndex           DellObjectRange,
+    remoteDialOutStateCapabilities      DellRemoteDialOutStateCapabilities,
+    remoteDialOutStateSettings          DellRemoteDialOutStateSettings,
+    remoteDialOutStatus                 DellStatus,
+    remoteDialOutIPAddress              IpAddress,
+    remoteDialOutPhoneNumberName        DisplayString (SIZE (0..95)),
+    remoteDialOutPPPUserName            DisplayString (SIZE (0..31)),
+    remoteDialOutPPPPasswordName        DisplayString (SIZE (0..31))
+}
+
+remoteDialOutTable                      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RemoteDialOutTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060 This object defines the Remote Access Dial Out table."
+    ::= { remoteAccessGroup 60 }
+remoteDialOutTableEntry                 OBJECT-TYPE
+    SYNTAX      RemoteDialOutTableEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001 This object defines the Remote Access Dial Out table entry."
+    INDEX       { remoteDialOutChassisIndex,
+                  remoteDialOutAdapterIndex,
+                  remoteDialOutDialOutIndex }
+    ::= { remoteDialOutTable 1 }
+
+remoteDialOutChassisIndex               OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0001 This attribute defines the index (one based) of the
+chassis containing the Remote Access hardware."
+    ::= { remoteDialOutTableEntry 1 }
+remoteDialOutAdapterIndex               OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0002 This attribute defines the index (one based) of the
+Remote Access hardware that supports this Remote Access Dial Out functionality."
+    ::= { remoteDialOutTableEntry 2 }
+remoteDialOutDialOutIndex               OBJECT-TYPE
+    SYNTAX      DellObjectRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0003 This attribute defines the index (one based) of this
+Remote Access Dial Out functionality."
+    ::= { remoteDialOutTableEntry 3 }
+remoteDialOutStateCapabilities          OBJECT-TYPE
+    SYNTAX      DellRemoteDialOutStateCapabilities
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0004 This attribute defines the state capabilities of this
+Remote Access Dial Out functionality."
+    ::= { remoteDialOutTableEntry 4 }
+remoteDialOutStateSettings              OBJECT-TYPE
+    SYNTAX      DellRemoteDialOutStateSettings
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0005 This attribute defines the state settings of this
+Remote Access Dial Out functionality."
+    ::= { remoteDialOutTableEntry 5 }
+remoteDialOutStatus                     OBJECT-TYPE
+    SYNTAX      DellStatus
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0006 This attribute defines the status of this
+Remote Dial Out functionality."
+    ::= { remoteDialOutTableEntry 6 }
+remoteDialOutIPAddress                  OBJECT-TYPE
+    SYNTAX      IpAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0007 This attribute defines the IP address for this
+Remote Access Dial Out destination."
+    ::= { remoteDialOutTableEntry 7 }
+remoteDialOutPhoneNumberName            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..95))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0008 This attribute defines the phone number for this
+Remote Access Dial Out destination."
+    ::= { remoteDialOutTableEntry 8 }
+remoteDialOutPPPUserName                OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0009 This attribute defines the PPP user name for this
+Remote Access Dial Out destination."
+    ::= { remoteDialOutTableEntry 9 }
+remoteDialOutPPPPasswordName            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+"1700.0060.0001.0010 This attribute defines the PPP password for this
+Remote Access Dial Out destination."
+    ::= { remoteDialOutTableEntry 10 }
+
+
+END
+
+
+-------------------------------------------------------------------------------
+-- End MIB
+-------------------------------------------------------------------------------
+

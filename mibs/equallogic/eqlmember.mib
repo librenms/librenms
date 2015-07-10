@@ -1,0 +1,3341 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLMEMBER-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, enterprises,TimeTicks,Unsigned32, Counter32, Counter64, Gauge32,
+    NOTIFICATION-TYPE
+            FROM SNMPv2-SMI        
+    DisplayString, RowStatus, TruthValue 
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB       -- RFC2851
+    eqlGroupId, UTFString, eqlStorageGroupAdminAccountIndex
+            FROM EQLGROUP-MIB;
+
+eqlmemberModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Dell Inc. Storage Array member information 
+
+         Copyright (c) 2002-2012 by Dell Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by Dell Inc.  This software embodies proprietary information
+         and trade secrets of Dell Inc.
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION    "201209220000Z"         -- 2012-09-22T00:00:00
+    DESCRIPTION "Add eqlTaggedHeatProfileInfoTable, eqlTaggedHeatProfileBinTable."
+    REVISION    "201208150000Z"         -- 2012-08-15T00:00:00
+    DESCRIPTION "Add eqlDriveGroupHeatProfileInfoTable, eqlDriveGroupHeatProfileBinTable."
+    REVISION    "201108090000Z"         -- 2011-08-09T00:00:00
+    DESCRIPTION "Add eqlDriveGroupStatisticsTable."
+    REVISION    "200209060000Z"         -- 2002-09-06T00:00:00
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 2 }     
+
+
+eqlmemberObjects        OBJECT IDENTIFIER       ::= { eqlmemberModule 1 }   
+eqlmemberNotifications  OBJECT IDENTIFIER       ::= { eqlmemberModule 2 }   
+eqlmemberConformance    OBJECT IDENTIFIER       ::= { eqlmemberModule 3 } 
+     
+EqlMemberSEDShareType ::= TEXTUAL-CONVENTION
+    STATUS    current   
+    DESCRIPTION
+        "A share of an SED encryption key."
+    SYNTAX OCTET STRING (SIZE (0..163))
+    
+
+
+eqlMemberTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION          "EqualLogic-Persistent Storage Group Member Table"  
+    ::=  {  eqlmemberObjects 1 }    
+
+eqlMemberEntry OBJECT-TYPE      
+    SYNTAX        EqlMemberEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION          "An entry (row) containing member info"
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+::=    { eqlMemberTable 1 }
+    
+EqlMemberEntry ::= 
+    SEQUENCE {     
+        eqlMemberIndex                  Unsigned32,
+        eqlMemberDateAndTime            Counter32,          
+        eqlMemberTimeZone               INTEGER,
+        eqlMemberAdjustDaylightSavTime  INTEGER,
+        eqlMemberDefaultRoute       IpAddress,
+        eqlMemberUUID                   OCTET STRING,
+        eqlMemberName                   DisplayString,
+        eqlMemberSite                   DisplayString,
+        eqlMemberDescription            UTFString,
+        eqlMemberRowStatus              RowStatus,
+        eqlMemberState                  INTEGER,
+        eqlMemberPolicySingleControllerSafe INTEGER,
+        eqlMemberPolicyLowBatterySafe   INTEGER,
+        eqlMemberVersion                Unsigned32,
+        eqlMemberDelayDataMove          INTEGER,
+        eqlMemberDefaultInetRouteType       InetAddressType,
+        eqlMemberDefaultInetRoute           InetAddress,
+        eqlMemberDriveMirroring             INTEGER,
+        eqlMemberProfileIndex               Unsigned32,
+        eqlMemberControllerType             DisplayString,
+        eqlMemberControllerMajorVersion     Unsigned32,
+        eqlMemberControllerMinorVersion     Unsigned32,
+        eqlMemberControllerMaintenanceVersion  Unsigned32,
+        eqlMemberCompressionCapable         TruthValue
+        } 
+
+eqlMemberIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field unique identifies an array within a group."  
+    ::=  {  eqlMemberEntry 1 }  
+    
+eqlMemberDateAndTime    OBJECT-TYPE      
+    SYNTAX          Counter32    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is dynamic, it contains the date and time for the array.
+                     There is no default value."
+    ::=   { eqlMemberEntry 2}       
+ 
+eqlMemberTimeZone   OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                hst(1),
+                ast(2),
+                pst(3),
+                pnt(4),
+                mst(5),
+                cst(6),
+                est(7),
+                iet(8),
+                prt(9),
+                gmt(10),
+                ect(11),
+                eet(12),
+                eat(13),
+                met(14),
+                net(15),
+                plt(16),
+                ist(17),
+                bst(18),
+                vst(19),
+                ctt(20),
+                jst(21),
+                act(22),
+                aet(23),
+                sst(24),
+                nst(25),
+                mit(26),
+                cnt(27),
+                agt(28),
+                bet(29),
+                cat(30)
+    }     
+    MAX-ACCESS      read-create   
+    STATUS          current      
+    DESCRIPTION     "The field specifies the default timezone for the group.
+                     This can be overwritten on a per Array basis. The default is EST.
+                     We need to file in all the supported TZ. For now we punt and do GMT as the catch all."
+    DEFVAL          { est }
+    ::=   { eqlMemberEntry 3}       
+
+eqlMemberAdjustDaylightSavTime OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        enabled(1),
+                        disabled(2)
+    }     
+    MAX-ACCESS      read-create       
+    STATUS          current      
+    DESCRIPTION     "This field specifies whether or not dayLight savings time should be applied to the time. 
+                     The default value is enabled." 
+    DEFVAL          { enabled } 
+    ::=   { eqlMemberEntry 4}   
+
+eqlMemberDefaultRoute   OBJECT-TYPE      
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+     
+    ::=   { eqlMemberEntry 5}
+
+eqlMemberSite       OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..64))     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the site where the volume res ides.
+                     Sites are defined on a per array basis.
+                     Sites are used to define where primary and secondary copies of volume mirror reside.
+                     The default is the default site." 
+    DEFVAL          { "default" }
+    ::=   { eqlMemberEntry 6}
+
+eqlMemberDescription    OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field contains a description of the array.
+                     For example the location of the array. There is no default."
+    ::=   { eqlMemberEntry 7}   
+
+eqlMemberUUID       OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                                        This field is for internal use only."  
+    ::=   { eqlMemberEntry 8}
+
+eqlMemberName       OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (1..64))     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name of the array.
+                     This name must be unique within the group.
+                     It can be a DNS name, though it is not required to be one. There is no default."  
+    ::=   { eqlMemberEntry 9}   
+
+eqlMemberRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This RowStatus is used only to delete a member.
+                     The row in this table could be created only by the subsystem."  
+    ::= { eqlMemberEntry 10 }       
+
+eqlMemberState      OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        on-line(1),
+                        off-line(2),
+                        vacate(3),
+                        vacated(4)
+    }
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     
+     "The field specifies the desired state of the array.
+      Currently setting this value to vacate is the only operation that is
+      supported." 
+    DEFVAL          { on-line } 
+    ::=   { eqlMemberEntry 11}
+
+eqlMemberPolicySingleControllerSafe    OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        safe-enabled(1),
+                        safe-disabled(2)
+    }     
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field specifies the cache policy if we boot with only one CM."
+    DEFVAL          { safe-enabled }
+    ::=   { eqlMemberEntry 12}
+
+eqlMemberPolicyLowBatterySafe    OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        safe-enabled(1),
+                        safe-disabled(2)
+    }     
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field specifies the cache policy if the battery charge is below tolerance."
+    DEFVAL          { safe-enabled }
+    ::=   { eqlMemberEntry 13}
+
+eqlMemberVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field specifies the compatibility level of a member."
+    ::=  {  eqlMemberEntry 14 }  
+
+eqlMemberDelayDataMove OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unconfigured(0),
+                    wait(1),
+                    use-member-space(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "When a new member is added to the group the value of this column will be zero(unconfigured).
+                     Before configuring raid-policy , this value must be set to wait(1) or use-member-space(2).
+                     The value can be changed from wait(1) to use-member-space(2) 
+                     But once set to use-member-space, it cannot be changed back. 
+                     "
+    DEFVAL          { unconfigured }
+    ::=  {  eqlMemberEntry 15 }  
+
+eqlMemberDefaultInetRouteType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field is used to indicate the default gateway for the group.
+                     This value can be overriden on a per array basis.
+                     This field contains the address of the local router used to forward network traffic
+                     beyond the local subnet. Gateways are used to connect multiple subnets.
+                     There is no default value for this entry."
+     
+    ::=  {  eqlMemberEntry 16 }  
+
+eqlMemberDefaultInetRoute OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field is used to indicate the default gateway for the group.
+                     This value can be overriden on a per array basis.
+                     This field contains the address of the local router used to forward network traffic
+                     beyond the local subnet. Gateways are used to connect multiple subnets.
+                     There is no default value for this entry."
+     
+    ::=  {  eqlMemberEntry 17 }  
+
+eqlMemberDriveMirroring OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    enabled(0),
+                    disabled(1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "On disk drive failures, this value is checked for mirroring the data onto the spare drive.
+                     The value can be changed from enabled(0) to disabled(1) and vice-versa
+                     "
+    DEFVAL          { enabled }
+    ::=  {  eqlMemberEntry 18 }  
+ 
+eqlMemberProfileIndex  OBJECT-TYPE
+    SYNTAX          Unsigned32(1..4294967295)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field represents the profile identifier supported by this member."
+    DEFVAL          { 1 }
+    ::=  {  eqlMemberEntry 19 }  
+
+eqlMemberControllerType OBJECT-TYPE      
+    SYNTAX          DisplayString( SIZE( 0..32 ) )
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the type of the active controller module on this member. Ex: Type II"
+    DEFVAL          {"unknown"}
+    ::=  {  eqlMemberEntry 20 }  
+ 
+eqlMemberControllerMajorVersion  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the major version number of the
+                     software present on the active controller module."
+    DEFVAL          { 1 }
+    ::=  {  eqlMemberEntry 21 }  
+
+eqlMemberControllerMinorVersion  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the minor version number of the
+                     software present on the active controller module."
+    DEFVAL          { 1 }
+    ::=  {  eqlMemberEntry 22 }  
+
+eqlMemberControllerMaintenanceVersion  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the maintenance version number of the
+                     software present on the active controller module."
+    DEFVAL          { 0 }
+    ::=  {  eqlMemberEntry 23 }  
+
+eqlMemberCompressionCapable  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This variable specifies if the member is capable of supporting compression."
+    DEFVAL          { false }
+    ::=  {  eqlMemberEntry 24 }  
+
+--**************************************************************************   
+
+eqlMemberStatusTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Status Table"  
+    ::=  {  eqlmemberObjects 3 }    
+
+eqlMemberStatusEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing member status info"
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+    ::=    { eqlMemberStatusTable 1 }
+    
+EqlMemberStatusEntry ::= 
+    SEQUENCE {     
+        eqlMemberStatusTotalSpace           Integer32,
+        eqlMemberStatusTotalSpaceUsed       Integer32,
+        eqlMemberStatusModel                DisplayString, 
+        eqlMemberStatusSerialNumber         DisplayString,
+        eqlMemberStatusNumberOfControllers  INTEGER, 
+        eqlMemberStatusNumberOfDisks        Integer32, 
+        eqlMemberStatusNumberOfSpares       Integer32, 
+        eqlMemberStatusCacheSize            Integer32, 
+        eqlMemberStatusCacheMode            INTEGER, 
+        eqlMemberStatusNumberOfConnections  Integer32,
+        eqlMemberStatusAverageTemp          Integer32,
+        eqlMemberStatusTempStatus           INTEGER,
+        eqlMemberStatusBackplaneTempSensor1 Integer32,
+        eqlMemberStatusBackplaneTempSensor2 Integer32,
+        eqlMemberStatusPowerSupply1Status   INTEGER,
+        eqlMemberStatusPowerSupply2Status   INTEGER,
+        eqlMemberStatusTrayOneFanOneSpeed   Integer32,
+        eqlMemberStatusTrayOneFanTwoSpeed   Integer32,
+        eqlMemberStatusTrayTwoFanOneSpeed   Integer32,
+        eqlMemberStatusTrayTwoFanTwoSpeed   Integer32,              
+        eqlMemberStatusPowerSupplyOneFanStatus  INTEGER,
+        eqlMemberStatusPowerSupplyTwoFanStatus  INTEGER,
+        eqlMemberStatusRaidStatus           INTEGER,
+        eqlMemberStatusRaidPercentage       Integer32,
+        eqlMemberStatusLostRaidBlocks       INTEGER,
+        eqlMemberStatusHealth               Integer32,  -- deprecated  by new health tables in v1.1
+        eqlMemberStatusShortId              Integer32
+
+        -- This table is deprecated and new tables for Storage, Chassis, RAID etc... are added!!! 
+        -- Don't add any more columns here
+
+        }
+
+eqlMemberStatusTotalSpace    OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total disk space in MBs on the this array."  
+    ::=   { eqlMemberStatusEntry 1}     
+
+eqlMemberStatusTotalSpaceUsed OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total disk space in MBs allocated to volume data 
+                     for this array."  
+    ::=   { eqlMemberStatusEntry 2}
+
+eqlMemberStatusModel    OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..32))
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the model number for the array."
+        -- .jpmfix - acutally model of active CM
+    ::=   { eqlMemberStatusEntry 3}
+
+eqlMemberStatusSerialNumber OBJECT-TYPE      
+   SYNTAX          DisplayString (SIZE (0..32))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the serial number for the array."
+        -- -jpmfix looks like SN of active CM
+    ::=   { eqlMemberStatusEntry 4}     
+
+eqlMemberStatusNumberOfControllers  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        single(1),
+                        dual(2)
+    }     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of Controller modules in the array."  
+    ::=   { eqlMemberStatusEntry 5}      
+
+eqlMemberStatusNumberOfDisks    OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of disks installed in the array."  
+    ::=   { eqlMemberStatusEntry 6}       
+
+eqlMemberStatusNumberOfSpares   OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number disks allocated as spares in an array."  
+    ::=   { eqlMemberStatusEntry 7}         
+    
+eqlMemberStatusCacheSize    OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current
+    DESCRIPTION     "The field specifies the size in MB of the read/write cache within the array."  
+    ::=   { eqlMemberStatusEntry 8}             
+
+eqlMemberStatusCacheMode    OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        write-thru(1),
+                        write-back(2)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the mode the cache is in within the array.
+                     The default is write-back. The array will be set to write-thru on battery failure."  
+    DEFVAL          { write-back }
+    ::=   { eqlMemberStatusEntry 9}   
+
+eqlMemberStatusNumberOfConnections  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of iSCSI initiators which are connected to this array."  
+    ::=   { eqlMemberStatusEntry 11}  
+
+eqlMemberStatusAverageTemp  OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the average tempature of the array in degrees C."  
+    ::=   { eqlMemberStatusEntry 12}        
+
+eqlMemberStatusTempStatus   OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        good(1),
+                        bad(2)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies whether the tempatures for the array
+                     are within acceptable tolerances.
+                     ** What are acceptable tolerances?"  
+    ::=   { eqlMemberStatusEntry 13}    
+
+eqlMemberStatusBackplaneTempSensor1 OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the tempature of backplane sensor 1 in degrees C."  
+    ::=   { eqlMemberStatusEntry 14}        
+
+eqlMemberStatusBackplaneTempSensor2 OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the tempature of backplane sensor 2 in degrees C."  
+    ::=   { eqlMemberStatusEntry 15}            
+
+eqlMemberStatusPowerSupply1Status   OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        on(1),
+                        no-power(2),
+                        failed (3),
+                        fan-failed (4),
+                        not-present (5)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the state of the first power supply."
+    ::=   { eqlMemberStatusEntry 16}  
+    
+eqlMemberStatusPowerSupply2Status   OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        on (1),
+                        no-power (2),
+                        failed (3),
+                        fan-failed (4),
+                        not-present (5)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the state of the second power supply."  
+    ::=   { eqlMemberStatusEntry 17}  
+    
+eqlMemberStatusTrayOneFanOneSpeed   OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The field specifies the rpm fan speed for fan tray 1, fan 1."  
+    ::=   { eqlMemberStatusEntry 18}  
+
+eqlMemberStatusTrayOneFanTwoSpeed   OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The field specifies the rpm fan speed for fan tray 1, fan 2."  
+    ::=   { eqlMemberStatusEntry 19}  
+
+eqlMemberStatusTrayTwoFanOneSpeed   OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The field specifies the rpm fan speed for fan tray 2, fan 1."  
+    ::=   { eqlMemberStatusEntry 20}  
+
+eqlMemberStatusTrayTwoFanTwoSpeed   OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The field specifies the rpm fan speed for fan tray 2, fan 2."  
+    ::=   { eqlMemberStatusEntry 21}
+           
+eqlMemberStatusPowerSupplyOneFanStatus  OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        on-line(1),
+                        off-line (2)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies whether the fan in power supply one is on-line or not."  
+    ::=   {eqlMemberStatusEntry 22}
+    
+eqlMemberStatusPowerSupplyTwoFanStatus  OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        on-line(1),
+                        off-line (2)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies whether the fan in power supply two is on-line or not."  
+    ::=   {eqlMemberStatusEntry 23 }
+
+eqlMemberStatusRaidStatus  OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        ok              (1),
+                        degraded        (2),
+                        verifying       (3),
+                        reconstructing  (4),
+                        failed          (5),
+                        catastrophicLoss(6),
+                        expanding       (7)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the status of the raid subsystem. 
+                     This is a composite of the view of the underlying subsystems.
+                     Status ok means things are ok.
+                     Status degraded means we are in a degraded state, possible because no spare is available.
+                     Status verifying means a verify pass is run, and a percent complete is available.
+                     Status reconstructing means we are reconstructing a drive and a percent complete is available.
+                     Status failed means we had a failure while we were up, possibly a drive failed and we have
+                        no spare.
+                     Status catastrophicLoss may not be visible to the user since the member may not be able to 
+                        bootup. It means we need administrator intervention to correct the problem.
+                     "
+    ::=   {eqlMemberStatusEntry 24 }
+
+eqlMemberStatusRaidPercentage  OBJECT-TYPE      
+    SYNTAX          Integer32 (0..100)
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the percentage complete when the eqlMemberStatusRaidStatus is verifying
+                        or reconstructing."
+    ::=   {eqlMemberStatusEntry 25 }
+
+eqlMemberStatusLostRaidBlocks  OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        true  (1),
+                        false (2)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies whether we have lost blocks in the raid array which
+                        the user may want to clear."
+    ::=   {eqlMemberStatusEntry 26 }
+
+eqlMemberStatusHealth  OBJECT-TYPE      
+    SYNTAX          Integer32 (0..100)
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies what the overall health of the member
+                        is on a scale of 0(dead) to 100(healthy)
+                        -- deprecated  by new health tables in v1.1"
+    ::=   {eqlMemberStatusEntry 27 }
+
+eqlMemberStatusShortId  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies short member address" 
+    ::=   {eqlMemberStatusEntry 28 }
+
+--**************************************************************************   
+
+eqlMemberInfoTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberInfoEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Info Table"  
+    ::=  {  eqlmemberObjects 4 }    
+
+eqlMemberInfoEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberInfoEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing member info"
+    INDEX  { eqlGroupId, eqlTargetMemberIndex }    
+    ::=    { eqlMemberInfoTable 1 }
+    
+EqlMemberInfoEntry ::= 
+    SEQUENCE {     
+        eqlTargetMemberIndex        Integer32,
+        eqlMemberInfoStatus         INTEGER
+        }
+
+eqlTargetMemberIndex    OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      not-accessible
+    STATUS          current      
+    DESCRIPTION     " This is a duplication of eqlMemberIndex just to make our code generation happy."
+
+    ::=   { eqlMemberInfoEntry 1}     
+
+eqlMemberInfoStatus      OBJECT-TYPE      
+    SYNTAX               INTEGER     {
+                           on-line(1),
+                           off-line(2),
+                           vacating-in-progress(3),
+                           vacated(4)
+                         }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     " The current state of the member."
+    DEFVAL          { on-line } 
+    ::=   { eqlMemberInfoEntry 2}             
+
+--**************************************************************************   
+
+eqlMemberHealthTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberHealthEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Health Table"  
+    ::=  {  eqlmemberObjects 5 }
+
+eqlMemberHealthEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberHealthEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing overall member health info"
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+    ::=    { eqlMemberHealthTable 1 }
+
+
+EqlMemberHealthEntry ::= 
+    SEQUENCE {     
+        eqlMemberHealthStatus               INTEGER,
+        eqlMemberHealthWarningConditions    BITS,
+        eqlMemberHealthCriticalConditions   BITS
+        }
+
+
+eqlMemberHealthStatus      OBJECT-TYPE      
+    SYNTAX               INTEGER     {
+                            unknown  (0),
+                            normal   (1),
+                            warning  (2),
+                            critical (3)
+    }     
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "The value of this object is determinted by the severity of the
+                        health condition state variables. The most severe state will
+                        be reflected."
+    DEFVAL          { unknown } 
+    ::=   { eqlMemberHealthEntry 1}
+
+-- these are the encodings based on the definitions in NetBSD/src/sys/EQL/include/emd_info.h
+-- Note that snmp bits have bit 0 as the left most (or high order) bit in the octet..
+-- so this struct has to be twiddled
+eqlMemberHealthWarningConditions      OBJECT-TYPE      
+    SYNTAX               BITS {
+                            hwComponentFailedWarn   (0), -- A non-critical hardware component has failed
+                            powerSupplyRemoved      (1), -- One of the power supplys has been removed;
+                            controlModuleRemoved    (2), -- a cm is missing....
+                            psfanOffline            (3), -- a power supply fan has failed; 
+                            fanSpeed                (4), -- a fan is not operating in its normal ranges;
+                                                         -- check the eqllog msgs to see the exact fan and issue
+                            cacheSyncing            (5), -- the cache is syncing, it would be unwise to power down while this is occuring 
+                            raidSetFaulted          (6), --
+                            highTemp                (7), -- one or more sensors has exceeded the sensor's warning temp 
+                            raidSetLostblkEntry     (8), -- the raid set has lost blocks; see the Group Admin manual
+                            secondaryEjectSWOpen    (9), -- the eject switch on the secondary controller has been opened; Please close it..
+                            b2bFailure              (10), -- board to board communication between the active and secondary CMs has failed.. Call support?
+                            replicationNoProg       (11), -- no progress in replicating a volume. Check network connectivity between partners.
+                            raidSpareTooSmall       (12), -- a drive considered a spare is too small to use
+                            lowTemp                 (13), -- one or more sensors is below the sensor's warning temp range 
+                            powerSupplyFailed       (14), -- one of the power supplies failed
+                            timeOfDayClkBatteryLow  (15), -- time of day clock battery is low
+                            incorrectPhysRamSize    (16), -- incorrect physical ram size
+                            mixedMedia              (17), -- drive incompatibilities present
+                            sumoChannelCardMissing  (18), -- sumo channel card missing
+                            sumoChannelCardFailed   (19), -- sumo channel card failed
+                            batteryLessthan72hours  (20), -- The battery has insufficient charge to survive a 72 hour power outage. 
+                            cpuFanNotSpinning       (21), -- The CPU fan is not functioning properly
+                            raidMoreSparesExpected  (22), -- more spares are expected
+                            raidSpareWrongType      (23), -- a spare if the wrong type of spare
+                            raidSsdRaidsetHasHdd    (24), -- SSD RAIDset has a HDD
+                            driveNotApproved        (25), -- one or more drives is not approved
+                            noEthernetFlowControl   (26), -- Ethernet flow control disabled
+                            fanRemovedCondition     (27),
+                            smartBatteryLowCharge   (28),
+                            nandHighBadBlockCount   (29), -- NAND chip on control module is reporting a large number of bad blocks. 
+                            networkStorm            (30), -- Array is experiencing a network storm
+                            batteryEndOfLifeWarning (31)
+    }     
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field defines possible warning health conditions and which
+                        ones are present."
+    ::=   { eqlMemberHealthEntry 2}
+
+eqlMemberHealthCriticalConditions      OBJECT-TYPE      
+    SYNTAX               BITS {
+                            raidSetDoubleFaulted    (0), -- the raid set is double faulted; the psg wont come up without user intervention; See the admin guide
+                            bothFanTraysRemoved     (1), -- both fan trays are removed; How are you even seeing this message? 
+                            highAmbientTemp         (2), -- one or more sensors has exceeded its critical temperature tthreshold
+                            raidLostCache           (3), -- The RAID driver is unable to recover the battery-backed cache.  The disk array will not initialize without user intervention.  See the Handling Lost Data section in the Group Administration manual for more information.
+                            moreThanOneFanSpeedCondition(4), -- more than one fan is operating outside its normal parameters
+                            fanTrayRemoved          (5), -- a fan tray has been removed. Loss of the other fan tray will result in the PSA overheating
+                            raidSetLostblkTableFull (6), -- the raid lost block table is full; what is the user supposed to do about this? see the admin guide?
+                            raidDeviceIncompatible  (7), -- RAID Device is incompatible with platform.
+                            raidOrphanCache         (8), -- The RAID driver has found data in the battery-backed cache with no matching disk array.  Initialization will not proceed without user intervention. Call EqualLogic Support for assistance.
+                            raidMultipleRaidSets    (9), -- Multiple valid RAIDsets were found.  The array cannot choose which one to initialize.  Remove all but one valid RAIDset and power-cycle the array.
+                            nVRAMBatteryFailed      (10), -- The NVRAM battery has failed. The NVRAM can no longer be used.
+                            hwComponentFailedCrit   (11), -- A critical hardware component has failed
+                            incompatControlModule   (12), -- An incorrect control module has been inserted into the chassis
+                            lowAmbientTemp          (13), -- one or more sensors is below its critical temperature range
+                            opsPanelFailure         (14), -- Ops Panel is missing or broken
+                            emmLinkFailure          (15), -- Enclosure management services are unavailable
+                            highBatteryTemperature  (16), -- Cache battery temperature exceeds upper limit; battery charger is disabled.
+                            enclosureOpenPerm       (17), -- Enclosure open for a long time
+                            sumoChannelBothMissing  (18), -- Both Sumo Channel cards missing
+                            sumoEIPFailureCOndition (19), -- EIP failed in Sumo.
+                            sumoChannelBothFailed   (20), -- Both Sumo Channel cards failed
+                            staleMirrorDiskFailure  (21), -- Stale mirror disk failure
+                            c2fPowerModuleFailureCondition(22), -- Cache to flash power module failed
+                            raidsedUnresolved       (23), -- Raid sed is unresolved.
+                            colossusDeniedFullPower (24), -- Colossus was denied full power. Drive I/O is unavailable.
+                            cemiUpdateInProgress    (25), -- CEMI update is in progress.
+                            colossusCannotStart     (26), -- Colossus cannot start normal operation.
+                            multipleFansRemoved     (27), -- Multiple fans removed
+                            smartBatteryFailure     (28), -- Smart Battery failure
+                            critbit29               (29), -- available
+                            nandFailure             (30), -- NAND chip on control module failed to restore persistent data.
+                            batteryEndOfLife        (31)
+    }     
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field defines possible critical health conditions and which
+                        ones are present."
+    ::=   { eqlMemberHealthEntry 3}
+
+
+--**************************************************************************   
+
+eqlMemberHealthDetailsTemperatureTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberHealthDetailsTemperatureEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Health Details Temperature Table.
+                    "  
+    ::=  {  eqlmemberObjects 6 }
+
+eqlMemberHealthDetailsTemperatureEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberHealthDetailsTemperatureEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing member health detailed temperature info"
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlMemberHealthDetailsTempSensorIndex }    
+    ::=    { eqlMemberHealthDetailsTemperatureTable 1 }
+    
+EqlMemberHealthDetailsTemperatureEntry ::= 
+    SEQUENCE {     
+        eqlMemberHealthDetailsTempSensorIndex                   INTEGER,
+        eqlMemberHealthDetailsTemperatureName                   DisplayString,
+        eqlMemberHealthDetailsTemperatureValue                  Integer32,
+        eqlMemberHealthDetailsTemperatureCurrentState           INTEGER,
+        eqlMemberHealthDetailsTemperatureHighCriticalThreshold  Integer32,
+        eqlMemberHealthDetailsTemperatureHighWarningThreshold   Integer32,
+        eqlMemberHealthDetailsTemperatureLowCriticalThreshold   Integer32,
+        eqlMemberHealthDetailsTemperatureLowWarningThreshold    Integer32,
+        eqlMemberHealthDetailsTemperatureNameID                 Unsigned32
+        }
+
+eqlMemberHealthDetailsTempSensorIndex      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        integratedSystemTemperature(1),
+                        backplaneSensor0(2),
+                        backplaneSensor1(3),
+                        controlModule0processor(4),
+                        controlModule0chipset(5),
+                        controlModule1processor(6),
+                        controlModule1chipset(7),
+                        controlModule0sasController(8),
+                        controlModule0sasExpander(9),
+                        controlModule0sesEnclosure(10),
+                        controlModule1sasController(11),
+                        controlModule1sasExpander(12),
+                        controlModule1sesEnclosure(13),
+                        sesOpsPanel(14),
+                        cemi0(15),
+                        cemi1(16),
+                        controlModule0batteryThermistor(17),
+                        controlModule1batteryThermistor(18),
+                        subExpanderModule0(19),
+                        subExpanderModule1(20),
+                        subExpanderModule2(21),
+                        subExpanderModule3(22),
+                        bottomplane0d0(23),
+                        bottomplane0d1(24),
+                        bottomplane0d2(25),
+                        bottomplane0d3(26),
+                        bottomplane0d4(27),
+                        bottomplane1d0(28),
+                        bottomplane1d1(29),
+                        bottomplane1d2(30),
+                        bottomplane1d3(31),
+                        bottomplane1d4(32),
+                        subExpanderModule0expander0(33),
+                        subExpanderModule0expander1(34),
+                        subExpanderModule1expander0(35),
+                        subExpanderModule1expander1(36),
+                        subExpanderModule2expander0(37),
+                        subExpanderModule2expander1(38),
+                        subExpanderModule3expander0(39),
+                        subExpanderModule3expander1(40)
+                     }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A unique integer that denotes which temperature sensor
+                    this entry refers to"
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 1 }
+
+eqlMemberHealthDetailsTemperatureName   OBJECT-TYPE
+   SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name of the sensor that we display to the user."
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 2 }
+
+eqlMemberHealthDetailsTemperatureValue      OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of this object is temperature in degrees C"
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 3 }
+
+eqlMemberHealthDetailsTemperatureCurrentState      OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                            unknown  (0),
+                            normal   (1), -- green 
+                            warning  (2), -- yellow
+                            critical (3)  -- red
+    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field tells us the state of the temperature sensor.
+                        Either normal, warning or critical."
+    DEFVAL          { unknown }
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 4 }
+
+
+eqlMemberHealthDetailsTemperatureHighCriticalThreshold      OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the TemperatureValue is greater than or equal to this 
+                        variable's value the current state is set to critical."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 5 }
+
+eqlMemberHealthDetailsTemperatureHighWarningThreshold      OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the TemperatureValue is greater than or equal to this 
+                        variable's value and not greater than or equal to the 
+                        HighCriticalThreshold, the current state is set to warning."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 6 }
+
+eqlMemberHealthDetailsTemperatureLowCriticalThreshold      OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the TemperatureValue is less than or equal to this 
+                        variable's value the current state is set to critical."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 7 }
+
+eqlMemberHealthDetailsTemperatureLowWarningThreshold      OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the TemperatureValue is less than or equal to this 
+                        variable's value and not less than or equal to the 
+                        LowCriticalThreshold, the current state is set to warning."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 8 }
+
+eqlMemberHealthDetailsTemperatureNameID   OBJECT-TYPE
+   SYNTAX           Unsigned32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the XML based name ID of the sensor that we display to the user."
+    ::=   { eqlMemberHealthDetailsTemperatureEntry 9 }
+
+--**************************************************************************   
+
+eqlMemberHealthDetailsFanTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberHealthDetailsFanEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Health Details Fan Table."                      
+    ::=  {  eqlmemberObjects 7 }
+
+eqlMemberHealthDetailsFanEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberHealthDetailsFanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing member health detailed fan info"
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlMemberHealthDetailsFanIndex }    
+    ::=    { eqlMemberHealthDetailsFanTable 1 }
+    
+EqlMemberHealthDetailsFanEntry ::= 
+    SEQUENCE {     
+        eqlMemberHealthDetailsFanIndex                  INTEGER,
+        eqlMemberHealthDetailsFanName                   DisplayString,
+        eqlMemberHealthDetailsFanValue                  Unsigned32,
+        eqlMemberHealthDetailsFanCurrentState           INTEGER,
+        eqlMemberHealthDetailsFanHighCriticalThreshold  Unsigned32,
+        eqlMemberHealthDetailsFanHighWarningThreshold   Unsigned32,
+        eqlMemberHealthDetailsFanLowCriticalThreshold   Unsigned32,
+        eqlMemberHealthDetailsFanLowWarningThreshold    Unsigned32,
+        eqlMemberHealthDetailsFanNameID                 Unsigned32
+        }
+
+eqlMemberHealthDetailsFanIndex  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        emm0fan0(1),
+                        emm0fan1(2),
+                        emm1fan0(3),
+                        emm1fan1(4),
+                        emm2fan0(5),
+                        emm2fan1(6),
+                        emm3fan0(7),
+                        emm3fan1(8)
+                     }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A unique integer that identifies the fan that the
+                     corresponding entry refers to
+                     "
+    ::=   { eqlMemberHealthDetailsFanEntry 1 }
+
+eqlMemberHealthDetailsFanName   OBJECT-TYPE
+   SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name of the fan that we display to the user."
+    ::=   { eqlMemberHealthDetailsFanEntry 2 }
+
+eqlMemberHealthDetailsFanValue      OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of this object is fan speed in rpm."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsFanEntry 3 }
+
+eqlMemberHealthDetailsFanCurrentState      OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                            unknown  (0),
+                            normal   (1), -- green 
+                            warning  (2), -- yellow
+                            critical (3)  -- red
+    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field tells us the state of the fan.
+                        Either normal, warning or critical."
+    DEFVAL          { unknown }
+    ::=   { eqlMemberHealthDetailsFanEntry 4 }
+
+
+eqlMemberHealthDetailsFanHighCriticalThreshold      OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the FanValue is greater than or equal to this 
+                        variable's value the current state is set to critical."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsFanEntry 5 }
+
+eqlMemberHealthDetailsFanHighWarningThreshold      OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the FanValue is greater than or equal to this 
+                        variable's value and not greater than or equal to the 
+                        HighCriticalThreshold, the current state is set to warning."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsFanEntry 6 }
+
+eqlMemberHealthDetailsFanLowCriticalThreshold      OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the FanValue is less than or equal to this 
+                        variable's value the current state is set to critical."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsFanEntry 7 }
+
+eqlMemberHealthDetailsFanLowWarningThreshold      OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "when the FanValue is less than or equal to this 
+                        variable's value and not less than or equal to the 
+                        LowCriticalThreshold, the current state is set to warning."
+    DEFVAL          { 0 } 
+    ::=   { eqlMemberHealthDetailsFanEntry 8 }
+
+eqlMemberHealthDetailsFanNameID   OBJECT-TYPE
+   SYNTAX           Unsigned32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the XML based name ID of the fan that we display to the user."
+    ::=   { eqlMemberHealthDetailsFanEntry 9 }
+
+--**************************************************************************   
+
+eqlMemberHealthDetailsPowerSupplyTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberHealthDetailsPowerSupplyEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Health Details Power Supply Table.
+                        The mappng of index to power supply:
+                        .1 = power supply 0
+                        .2 = power supply 1
+                        .3 = power supply 2
+                    "  
+    ::=  {  eqlmemberObjects 8 }
+
+eqlMemberHealthDetailsPowerSupplyEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberHealthDetailsPowerSupplyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing power supply status information."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlMemberHealthDetailsPowerSupplyIndex }    
+    ::=    { eqlMemberHealthDetailsPowerSupplyTable 1 }
+    
+EqlMemberHealthDetailsPowerSupplyEntry ::= 
+    SEQUENCE {     
+        eqlMemberHealthDetailsPowerSupplyIndex                  INTEGER,
+        eqlMemberHealthDetailsPowerSupplyName                   DisplayString,
+        eqlMemberHealthDetailsPowerSupplyCurrentState           INTEGER,
+        eqlMemberHealthDetailsPowerSupplyFanStatus              INTEGER,
+        eqlMemberHealthDetailsPowerSupplyFirmwareVersion        DisplayString,
+        eqlMemberHealthDetailsPowerSupplyNameID                 Unsigned32
+        }
+
+eqlMemberHealthDetailsPowerSupplyIndex      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            powerSupply0(1),
+                            powerSupply1(2),
+                            powerSupply2(3)
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Iff the power supply current state is on-and-operating,
+                      then this field tells if the fan is operational."
+    ::=   { eqlMemberHealthDetailsPowerSupplyEntry 1 }
+
+
+eqlMemberHealthDetailsPowerSupplyName   OBJECT-TYPE
+   SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name of the power supply that we display to the user."
+    ::=   { eqlMemberHealthDetailsPowerSupplyEntry 2 }
+
+eqlMemberHealthDetailsPowerSupplyCurrentState      OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                            on-and-operating    (1),
+                            no-ac-power         (2),
+                            failed-or-no-data   (3) -- has ac but no dc out
+                                                     -- or we have no data
+    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field tells us the state of the power supply."
+    DEFVAL          { failed-or-no-data }
+    ::=   { eqlMemberHealthDetailsPowerSupplyEntry 3 }
+
+
+eqlMemberHealthDetailsPowerSupplyFanStatus      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            not-applicable (0),
+                            fan-is-operational  (1),
+                            fan-not-operational (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Iff the power supply current state is on-and-operating,
+                      then this field tells if the fan is operational."
+    DEFVAL          { fan-not-operational } 
+    ::=   { eqlMemberHealthDetailsPowerSupplyEntry 4 }
+
+eqlMemberHealthDetailsPowerSupplyFirmwareVersion   OBJECT-TYPE
+   SYNTAX           DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies power supply firmware version.
+                    Only available starting from Porfidio Platforms."
+    ::=   { eqlMemberHealthDetailsPowerSupplyEntry 5 }
+
+eqlMemberHealthDetailsPowerSupplyNameID   OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the XML based nameID of the power supply that we display to the user."
+    ::=   { eqlMemberHealthDetailsPowerSupplyEntry 6 }
+
+--**************************************************************************   
+
+eqlMemberIdentificationTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberIdentificationEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     " EqualLogic-Dynamic Member Identification Table."  
+    ::=  {  eqlmemberObjects 9 }    
+
+eqlMemberIdentificationEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberIdentificationEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "List of attributes of the array used to identity the location of that array.
+                    "
+    AUGMENTS        { eqlMemberStatusEntry }
+    ::=    { eqlMemberIdentificationTable 1 }
+    
+EqlMemberIdentificationEntry ::= 
+    SEQUENCE {     
+         eqlMemberIdentificationLEDsBlinking       TruthValue
+    }
+
+eqlMemberIdentificationLEDsBlinking  OBJECT-TYPE      
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "
+                      Setting this variable to true enables blinking of the ALRM and WARN 
+                      LEDs on the front panel and the ERR LED on the CM, as seen 
+                      from the back. 
+                      The blinking stops after 2 hours or when the variable is 
+                      set to false. 
+                    "  
+    DEFVAL          { false }
+    ::=   { eqlMemberIdentificationEntry 1}
+
+--**************************************************************************   
+
+eqlMemberStorageTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberStorageEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     " EqualLogic-Dynamic Member Storage Information Table."  
+    ::=  {  eqlmemberObjects 10 }    
+
+eqlMemberStorageEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberStorageEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "List of attributes used to convey the details of storage space utilization on the array.
+                    "
+    AUGMENTS        { eqlMemberIdentificationEntry }
+    ::=    { eqlMemberStorageTable 1 }
+    
+EqlMemberStorageEntry ::= 
+    SEQUENCE {     
+        eqlMemberTotalStorage           Integer32,
+        eqlMemberUsedStorage            Integer32,
+        eqlMemberSnapStorage            Integer32,
+        eqlMemberReplStorage            Integer32,
+        eqlMemberVirtualStorage          Counter64,
+        eqlMemberCompressionStackStorage Counter64
+    }
+
+eqlMemberTotalStorage OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total disk storage in MBs on the array."  
+    ::=   { eqlMemberStorageEntry 1}     
+
+eqlMemberUsedStorage OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies sum of reserved delegated space, reserved volume space, used snapshot space, used replication space."  
+    ::=   { eqlMemberStorageEntry 2}
+
+eqlMemberSnapStorage OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies used snapshot space.  Space on this array used by snapshots.  Note that this value is not the same as space reserved for snapshots."  
+    ::=   { eqlMemberStorageEntry 3}
+
+eqlMemberReplStorage OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies used replication space.  Space on this array used by in progress replicas or failback replicas.  Note that this value is not the same as space reserved for replication."  
+    ::=   { eqlMemberStorageEntry 4}
+
+eqlMemberVirtualStorage OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the amount of space (MB) used by compressed pages if all pages were not compressed on the member."
+    ::=   { eqlMemberStorageEntry 5}
+
+eqlMemberCompressionStackStorage OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The amount of space (MB) used to store compressed data on this member."
+    ::=   { eqlMemberStorageEntry 6}
+
+--**************************************************************************   
+
+eqlMemberChassisTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberChassisEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     " EqualLogic-Dynamic Member Chassis Information Table."  
+    ::=  {  eqlmemberObjects 11 }    
+
+eqlMemberChassisEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberChassisEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "List of attributes used to convey the details and type of Chassis present on the array.
+                    "
+    AUGMENTS        { eqlMemberIdentificationEntry }
+    ::=    { eqlMemberChassisTable 1 }
+    
+EqlMemberChassisEntry ::= 
+    SEQUENCE {     
+        eqlMemberModel                  DisplayString, 
+        eqlMemberSerialNumber           DisplayString,
+        eqlMemberNumberOfControllers    INTEGER, 
+        eqlMemberNumberOfDisks          Integer32, 
+        eqlMemberCacheSize              Integer32, 
+        eqlMemberCacheMode              INTEGER,
+        eqlMemberChassisType            INTEGER,
+        eqlMemberServiceTag             DisplayString,
+        eqlMemberProductFamily          DisplayString,
+        eqlMemberChassisFlags           BITS,
+        eqlMemberChassisDiskSectorSize INTEGER
+    }
+
+eqlMemberModel      OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..32))
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the model number for the array."
+        -- .jpmfix - acutally model of active CM
+    ::=   { eqlMemberChassisEntry 1}
+
+eqlMemberSerialNumber OBJECT-TYPE      
+   SYNTAX          DisplayString (SIZE (0..32))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the serial number for the array."
+        -- -jpmfix looks like SN of active CM"  
+    ::=   { eqlMemberChassisEntry 2}     
+
+eqlMemberNumberOfControllers  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        single(1),
+                        dual(2)
+    }     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of Controller modules in the array."  
+    ::=   { eqlMemberChassisEntry 3}      
+
+eqlMemberNumberOfDisks    OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of disk installed in the array."  
+    ::=   {eqlMemberChassisEntry  4}       
+
+eqlMemberCacheSize    OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current
+    DESCRIPTION     "The field specifies the size in MB of the read/write cache within the array."  
+    ::=   { eqlMemberChassisEntry 5}             
+
+eqlMemberCacheMode    OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        unknown(0),
+                        write-thru(1),
+                        write-back(2)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the mode the cache is in within the array.
+                     The default is write-back. The array will be set to write-thru on battery failure."  
+    DEFVAL          { write-back }
+    ::=   { eqlMemberChassisEntry 6}   
+
+eqlMemberChassisType  OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        unknown(0),
+                        t1403(1),
+                        t1603(2),
+                        t4835(3),
+                        tDELLSBB2u1235(4),
+                        tDELLSBB2u2425(5),
+                        tDELLSBB4u2435(6),
+                        tDELL2WB1425V1(7),
+                        tDELLSBB5u6035(8)
+
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the chassis type of the array.  The default is unknown."  
+    DEFVAL          { unknown }
+    ::=   { eqlMemberChassisEntry 7}   
+
+eqlMemberServiceTag OBJECT-TYPE      
+   SYNTAX          DisplayString (SIZE (0..32))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the service tag number for the array."
+    ::=   { eqlMemberChassisEntry 8}     
+
+eqlMemberProductFamily OBJECT-TYPE      
+   SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the product family of the peer storage array. Ex: PS5000 E Series."
+    ::=   { eqlMemberChassisEntry 9}     
+
+eqlMemberChassisFlags OBJECT-TYPE
+    SYNTAX          BITS {
+                    isAccelerated(0), -- is the chassis raid6-accelerated?
+                    isAllSedDisks(1), -- are all disks in the chassis SED?
+                    flag2(2),
+                    flag3(3),
+                    flag4(4),
+                    flag5(5),
+                    flag6(6),
+                    flag7(7),
+                    flag8(8),
+                    flag9(9),
+                    flag10(10),
+                    flag11(11),
+                    flag12(12),
+                    flag13(13),
+                    flag14(14),
+                    flag15(15),
+                    flag16(16),
+                    flag17(17),
+                    flag18(18),
+                    flag19(19),
+                    flag20(20),
+                    flag21(21),
+                    flag22(22),
+                    flag23(23),
+                    flag24(24),
+                    flag25(25),
+                    flag26(26),
+                    flag27(27),
+                    flag28(28),
+                    flag29(29),
+                    flag30(30),
+                    flag31(31)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field defines the common place holder for Chassis operational flags.  The flags must be of type
+                    enable(1) or disable(0), and the default will always be disable(0)."
+    DEFVAL          { {} }
+    ::= { eqlMemberChassisEntry 10 }
+
+eqlMemberChassisDiskSectorSize  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                        sector-size-512-bytes(0),
+                        sector-size-4096-bytes(1),
+                        sector-size-unknown(2),
+                        sector-size-mixed(3)    -- not currently supported
+    }     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the disk sector size of disks in this array."  
+    ::= { eqlMemberChassisEntry 11}
+
+--**************************************************************************   
+
+eqlMemberConnTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberConnEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     " EqualLogic-Dynamic Member Conn Information Table."  
+    ::=  {  eqlmemberObjects 12 }    
+
+eqlMemberConnEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberConnEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "List of attributes used to convey the connections information on the array.
+                    "
+    AUGMENTS        { eqlMemberIdentificationEntry }
+    ::=    { eqlMemberConnTable 1 }
+    
+EqlMemberConnEntry ::= 
+    SEQUENCE {     
+        eqlMemberNumberOfConnections  Integer32,
+        eqlMemberReadLatency          Counter64,
+        eqlMemberWriteLatency         Counter64,
+        eqlMemberReadAvgLatency       Gauge32,
+        eqlMemberWriteAvgLatency      Gauge32,
+        eqlMemberReadOpCount          Counter64,
+        eqlMemberWriteOpCount         Counter64,
+        eqlMemberTxData               Counter64,
+        eqlMemberRxData               Counter64,
+        eqlMemberNumberOfExtConnections  Integer32
+    }
+
+eqlMemberNumberOfConnections  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of iSCSI connections made from initiators to this array."  
+    ::=   {eqlMemberConnEntry 1}  
+
+eqlMemberReadLatency  OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The accumulative latency in milli seconds for read operations on this member. The value will be zero until all members are atleast 3.0. The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 2}  
+
+eqlMemberWriteLatency  OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The accumulative latency in milli seconds for write operations on this member. The value will be zero until all members are atleast 3.0. The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 3}  
+
+eqlMemberReadAvgLatency  OBJECT-TYPE      
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The average latency for read operations on this member in milli seconds. The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 4}  
+
+eqlMemberWriteAvgLatency  OBJECT-TYPE      
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The average latency for write operations on this member in milli seconds. The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 5}  
+
+eqlMemberReadOpCount  OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The number of read operations on this member. The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 6}  
+
+eqlMemberWriteOpCount  OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The number of write operations on this member. The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 7}  
+
+eqlMemberTxData  OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The count of data octets trasmitted by this member.The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 8}  
+
+eqlMemberRxData  OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The count of data octets received by this member.The value is reset to zero upon reboot."  
+    ::=   {eqlMemberConnEntry 9}  
+eqlMemberNumberOfExtConnections  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of iSCSI connections made from external initiators to this array."  
+    ::=   {eqlMemberConnEntry 10}  
+
+--**************************************************************************   
+
+eqlMemberRAIDTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberRAIDEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     " EqualLogic-Dynamic Member RAID Information Table."  
+    ::=  {  eqlmemberObjects 13 }    
+
+eqlMemberRAIDEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberRAIDEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "List of attributes used to convey the RAID status information on the array.
+                    "
+    AUGMENTS        { eqlMemberIdentificationEntry }
+    ::=    { eqlMemberRAIDTable 1 }
+    
+EqlMemberRAIDEntry ::= 
+    SEQUENCE {     
+        eqlMemberRaidStatus           INTEGER,
+        eqlMemberRaidPercentage       Integer32,
+        eqlMemberLostRaidBlocks       INTEGER,
+        eqlMemberNumberOfSpares       Integer32,
+        eqlMemberRaidProgress         Unsigned32
+    }
+
+eqlMemberRaidStatus OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        ok              (1),
+                        degraded        (2),
+                        verifying       (3),
+                        reconstructing  (4),
+                        failed          (5),
+                        catastrophicLoss(6),
+                        expanding       (7),
+                        mirroring       (8)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the status of the raid subsystem. 
+                     This is a composite of the view of the underlying subsystems.
+                     Status ok means things are ok.
+                     Status degraded means we are in a degraded state, possible because no spare is available.
+                     Status verifying means a verify pass is run, and a percent complete is available.
+                     Status reconstructing means we are reconstructing a drive and a percent complete is available.
+                     Status failed means we had a failure while we were up, possibly a drive failed and we have
+                        no spare.
+                     Status catastrophicLoss may not be visible to the user since the member may not be able to 
+                        bootup. It means we need administrator intervention to correct the problem.
+                     Status mirroring means we are mirroring a bad drive onto a spare drive.
+                     "
+    ::=   {eqlMemberRAIDEntry 1 }
+
+eqlMemberRaidPercentage  OBJECT-TYPE      
+    SYNTAX          Integer32 (0..100)
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the percentage complete when the eqlMemberStatusRaidStatus is verifying
+                        or reconstructing."
+    ::=   {eqlMemberRAIDEntry 2 }
+
+eqlMemberLostRaidBlocks  OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        true  (1),
+                        false (2)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies whether we have lost blocks in the raid array which
+                        the user may want to clear."
+    ::=   {eqlMemberRAIDEntry 3 }
+
+eqlMemberNumberOfSpares   OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number disks allocated as spares in an array."  
+    ::=   { eqlMemberRAIDEntry 4}         
+    
+eqlMemberRaidProgress  OBJECT-TYPE      
+    SYNTAX          Unsigned32 (0..100000)
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies 1000 times the percentage complete when the eqlMemberStatusRaidStatus is verifying
+                        or reconstructing."
+    ::=   {eqlMemberRAIDEntry 5 }
+
+--**************************************************************************   
+
+eqlMemberPSGMapTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberPSGMapEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     " EqualLogic-Dynamic Member PSG Map Table."  
+    ::=  {  eqlmemberObjects 14 }    
+
+eqlMemberPSGMapEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberPSGMapEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "List of attributes used to convey the PSS ID information of this array in the group map.
+                    "
+    AUGMENTS        { eqlMemberIdentificationEntry }
+    ::=    { eqlMemberPSGMapTable 1 }
+    
+EqlMemberPSGMapEntry ::= 
+    SEQUENCE {     
+        eqlMemberShortId              Integer32
+    }
+
+eqlMemberShortId  OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies PSS ID of the member in the context of the leader of the PSG." 
+    ::=   {eqlMemberPSGMapEntry 1 }
+
+--  SNMP TRAPS
+--
+-- 
+--
+--
+
+eqlMemberEnclosureMgmtNotifications OBJECT IDENTIFIER ::= {eqlmemberNotifications 1}
+
+-- traps related to enclosure sensors
+
+eqlMemberHealthTempSensorHighThreshold NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthDetailsTemperatureName,
+        eqlMemberHealthDetailsTemperatureValue,                 
+        eqlMemberHealthDetailsTemperatureCurrentState, 
+        eqlMemberHealthDetailsTemperatureHighCriticalThreshold,
+        eqlMemberHealthDetailsTemperatureHighWarningThreshold,
+        eqlMemberHealthDetailsTemperatureNameID
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when a high threshold has been exceeded for any of the 
+      enclosure temp sensors. The implementation of this trap should 
+      not send more than one notification of this type for a sensor 
+      in any 10 minute time span"
+::= { eqlMemberEnclosureMgmtNotifications 1 }
+
+eqlMemberHealthTempSensorLowThreshold NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthDetailsTemperatureName,
+        eqlMemberHealthDetailsTemperatureValue,                 
+        eqlMemberHealthDetailsTemperatureCurrentState, 
+        eqlMemberHealthDetailsTemperatureLowCriticalThreshold,
+        eqlMemberHealthDetailsTemperatureLowWarningThreshold,
+        eqlMemberHealthDetailsTemperatureNameID
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when a low threshold has been exceeded for any of the 
+      enclosure temp sensors. The implementation of this trap should 
+      not send more than one notification of this type for a sensor 
+      in any 10 minute time span"
+::= { eqlMemberEnclosureMgmtNotifications 2 }
+
+eqlMemberHealthFanSpeedHighThreshold NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthDetailsFanName,                  
+        eqlMemberHealthDetailsFanValue,                 
+        eqlMemberHealthDetailsFanCurrentState,          
+        eqlMemberHealthDetailsFanHighCriticalThreshold,
+        eqlMemberHealthDetailsFanHighWarningThreshold,
+        eqlMemberHealthDetailsFanNameID
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when a high threshold has been exceeded for any of the 
+      enclosure fan speed sensors. The implementation of this trap should 
+      not send more than one notification of this type for a sensor 
+      in any 10 minute time span"
+::= { eqlMemberEnclosureMgmtNotifications 3 }
+
+eqlMemberHealthFanSpeedLowThreshold NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthDetailsFanName,                  
+        eqlMemberHealthDetailsFanValue,                 
+        eqlMemberHealthDetailsFanCurrentState,          
+        eqlMemberHealthDetailsFanLowCriticalThreshold,
+        eqlMemberHealthDetailsFanLowWarningThreshold,
+        eqlMemberHealthDetailsFanNameID
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when a low threshold has been exceeded for any of the 
+      enclosure fan speed sensors. The implementation of this trap should 
+      not send more than one notification of this type for a sensor 
+      in any 10 minute time span"
+::= { eqlMemberEnclosureMgmtNotifications 4 }
+
+eqlMemberHealthPowerSupplyFanFailure NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthDetailsPowerSupplyName,
+        eqlMemberHealthDetailsPowerSupplyFanStatus,
+        eqlMemberHealthDetailsPowerSupplyNameID
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when a failure has been detected on any of the power   
+      supply fan speed sensors. The implementation of this trap should 
+      not send more than one notification of this type for a sensor 
+      in any 10 minute time span"
+::= { eqlMemberEnclosureMgmtNotifications 5 }
+
+
+eqlMemberHealthPowerSupplyFailure NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthDetailsPowerSupplyName,
+        eqlMemberHealthDetailsPowerSupplyCurrentState,
+        eqlMemberHealthDetailsPowerSupplyNameID
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when a failure has been detected on any of the power   
+      supplys in the PSA. The implementation of this trap should 
+      not send more than one notification of this type for a sensor 
+      in any 10 minute time span"
+::= { eqlMemberEnclosureMgmtNotifications 6 }
+
+eqlMemberHealthRAIDSetDoubleFaulted NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when the raid set has been detected to have double faulted. When
+       this occurs, the array will not come up. 
+       User intervention is required to correct the issue"
+::= { eqlMemberEnclosureMgmtNotifications 7 }
+
+eqlMemberHealthBothFanTraysRemoved NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when both of the fan trays have been removed from the 
+      chassis. This results in overheating" 
+::= { eqlMemberEnclosureMgmtNotifications 8 }
+
+eqlMemberHealthRAIDlostCache NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent because the RAID driver is unable to recover the 
+       battery-backed cache.  The disk array will not initialize 
+      without user intervention.  See the Handling Lost Data section 
+      in the Group Administration manual for more information."
+::= { eqlMemberEnclosureMgmtNotifications 9 }
+
+eqlMemberHealthFanTrayRemoved NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when one of the fan trays have been removed from the 
+      chassis. This results in overheating" 
+::= { eqlMemberEnclosureMgmtNotifications 10 }
+
+eqlMemberHealthRAIDSetLostBlkTableFull NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when the RAID lost block table is full. 
+       This usually is an indication of lost data."
+::= { eqlMemberEnclosureMgmtNotifications 11 }
+
+eqlMemberHealthBatteryLessThan72Hours NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+      "Sent when the battery has insufficient charge to survive
+       a 72 hour power outage."
+::= { eqlMemberEnclosureMgmtNotifications 12 }
+
+eqlMemberHealthRaidOrphanCache NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when the RAID driver finds data in the battery-backed cache with no matching disk array.  Initialization will not proceed without user intervention. Call EqualLogic Support for assistance."
+::= { eqlMemberEnclosureMgmtNotifications 13 }
+
+eqlMemberHealthRaidMultipleRaidSets NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when multiple valid RAIDsets were found.  The array cannot choose which one to initialize.  Remove all but one valid RAIDset and power-cycle the array."
+::= { eqlMemberEnclosureMgmtNotifications 14 }
+
+eqlMemberHealthNVRAMBatteryFailed NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when the NVRAM battery fails . The NVRAM can no longer be used."
+::= { eqlMemberEnclosureMgmtNotifications 15 }
+
+
+eqlMemberHealthhwComponentFailedCrit NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when a critical hardware component has failed."
+::= { eqlMemberEnclosureMgmtNotifications 16 }
+
+
+eqlMemberHealthincompatControlModule NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when An incorrect control module has been inserted into the chassis."
+::= { eqlMemberEnclosureMgmtNotifications 17 }
+
+
+eqlMemberHealthlowAmbientTemp NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when one or more sensors is below its critical temperature range."
+::= { eqlMemberEnclosureMgmtNotifications 18 }
+
+
+eqlMemberHealthopsPanelFailure NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when Ops Panel is missing or broken."
+::= { eqlMemberEnclosureMgmtNotifications 19 }
+
+
+eqlMemberHealthemmLinkFailure NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when enclosure management services are unavailable."
+::= { eqlMemberEnclosureMgmtNotifications 20 }
+
+
+eqlMemberHealthhighBatteryTemperature NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when the cache battery temperature exceeds upper limit; battery charger is disabled."
+::= { eqlMemberEnclosureMgmtNotifications 21 }
+
+eqlMemberHealthenclosureOpenPerm NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when the enclosure is open for a long time."
+::= { eqlMemberEnclosureMgmtNotifications 22 }
+
+eqlMemberHealthsumoChannelBothMissing NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when both the Sumo Channel cards go missing."
+::= { eqlMemberEnclosureMgmtNotifications 23 }
+
+eqlMemberHealthsumoEIPFailureCOndition NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when EIP failed in Sumo."
+::= { eqlMemberEnclosureMgmtNotifications 24 }
+
+eqlMemberHealthsumoChannelBothFailed NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberHealthStatus
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when both the Sumo Channel cards go into failed state."
+::= { eqlMemberEnclosureMgmtNotifications 25 }
+
+
+--**************************************************************************   
+
+eqlDriveGroupTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlDriveGroupEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION   "EqualLogic-Persistent Storage Drive Group Table."  
+    ::=  {  eqlmemberObjects 15 }    
+
+eqlDriveGroupEntry OBJECT-TYPE      
+    SYNTAX        EqlDriveGroupEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION   "An entry (row) containing drive group configuration"
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlDriveGroupIndex }    
+    ::=    { eqlDriveGroupTable 1 }
+    
+EqlDriveGroupEntry ::= 
+    SEQUENCE {     
+        eqlDriveGroupIndex                  Unsigned32,
+                eqlDriveGroupStoragePoolIndex       Unsigned32,
+                eqlDriveGroupRAIDPolicy             INTEGER
+    }
+
+eqlDriveGroupIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field uniquely identifies a RAID Group within a member."  
+    ::=  {  eqlDriveGroupEntry 1 }  
+    
+eqlDriveGroupStoragePoolIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field uniquely identifies a Storage Pool."
+    DEFVAL          { 1 }
+    ::=  {  eqlDriveGroupEntry 2 }  
+    
+eqlDriveGroupRAIDPolicy OBJECT-TYPE
+    SYNTAX INTEGER {
+        unconfigured(0),
+        raid50(1),
+        raid10(2),
+        raid5(3),
+        raid50-nospares(4),
+        raid10-nospares(5),
+        raid5-nospares(6),
+        raid6(7),
+        raid6-nospares(8),
+        raid6-accelerated(9),
+        hvs-storage(10)
+    }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "The RAID policy of this drive group:
+                        0 - unconfigured
+                        1 - raid50
+                        2 - raid10
+                        3 - raid5
+                        4 - raid50 with minimal spares
+                        5 - raid10 with minimal spares
+                        6 - raid5 with minimal spares
+                        7 - raid6
+                        8 - raid6 with minimal spares
+                        9 - raid6 with ssd acceleration
+                        10 - hvs storage"
+    DEFVAL         { unconfigured }
+    ::=  {  eqlDriveGroupEntry 3 }
+
+--**************************************************************************   
+
+eqlDriveGroupOpsTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlDriveGroupOpsEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION   "EqualLogic-Persistent Storage Drive Group Operations Table."  
+    ::=  {  eqlmemberObjects 16 }    
+
+eqlDriveGroupOpsEntry OBJECT-TYPE      
+    SYNTAX        EqlDriveGroupOpsEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION   "An entry (row) containing drive group configuration"
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlDriveGroupIndex, eqlDriveGroupOpsIndex }    
+    ::=    { eqlDriveGroupOpsTable 1 }
+    
+EqlDriveGroupOpsEntry ::= 
+    SEQUENCE {     
+        eqlDriveGroupOpsIndex                       Unsigned32,
+        eqlDriveGroupOpsRowStatus                   RowStatus,
+        eqlDriveGroupOpsOperation                   INTEGER,
+        eqlDriveGroupOpsExec                        INTEGER,
+        eqlDriveGroupOpsStartTime                   Counter32,
+        eqlDriveGroupOpsStoragePoolSourceIndex      Unsigned32,
+        eqlDriveGroupOpsStoragePoolDestinationIndex Unsigned32,
+        eqlDriveGroupOpsVolBalCommandIndex          Unsigned32,
+        eqlDriveGroupOpsVolBalCommandiscsiLocalMemberId Unsigned32
+    }
+
+eqlDriveGroupOpsIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field unique identifies an operation withing a Drive Group."
+    ::=  {  eqlDriveGroupOpsEntry 1 }  
+    
+eqlDriveGroupOpsRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlDriveGroupOpsEntry 2 }  
+
+eqlDriveGroupOpsOperation OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        movePool(1),
+        vacate(2)
+    }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "The current operation for this drive group
+                        0 - no operation
+                        1 - move Pool
+                        2 - vacate"
+    ::=  {  eqlDriveGroupOpsEntry 3 }
+
+eqlDriveGroupOpsExec OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        cancel(1),
+        failed(2)
+    }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "The action to perform on this operation
+                        0 - no operation
+                        1 - cancel
+                        2 - the operation failed"
+    ::=  {  eqlDriveGroupOpsEntry 4 }
+
+eqlDriveGroupOpsStartTime OBJECT-TYPE      
+    SYNTAX          Counter32    
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field contains the time of the start of the operation."
+    ::=  {  eqlDriveGroupOpsEntry 5 }
+ 
+eqlDriveGroupOpsStoragePoolSourceIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field unique identifies the source Storage Pool."
+    DEFVAL          { 1 }
+    ::=  {  eqlDriveGroupOpsEntry 6 }
+    
+eqlDriveGroupOpsStoragePoolDestinationIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field unique identifies the destination Storage Pool."
+    DEFVAL          { 1 }
+    ::=  {  eqlDriveGroupOpsEntry 7 }  
+
+eqlDriveGroupOpsVolBalCommandIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "2nd Part of Index for row in eqliscsiVolBalCommandTable"
+    ::=  {  eqlDriveGroupOpsEntry 8 }
+
+eqlDriveGroupOpsVolBalCommandiscsiLocalMemberId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "3rd Part of Index for row in eqliscsiVolBalCommandTable"
+    ::=  {  eqlDriveGroupOpsEntry 9 }
+
+--******************************************************************
+
+eqlAdminAccountMemberTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlAdminAccountMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic table indicating the access an administrator
+                     has to a member."
+    ::= { eqlmemberObjects 17 }
+
+eqlAdminAccountMemberEntry OBJECT-TYPE
+    SYNTAX          EqlAdminAccountMemberEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the access privilege."
+    INDEX           {  eqlGroupId, eqlStorageGroupAdminAccountIndex, eqlMemberIndex }
+    ::=   { eqlAdminAccountMemberTable 1 }
+
+EqlAdminAccountMemberEntry ::=
+    SEQUENCE {
+        eqlAdminAccountMemberAccess         INTEGER
+    }
+
+eqlAdminAccountMemberAccess OBJECT-TYPE
+    SYNTAX          INTEGER {
+                         read-only (1),
+                         read-write (2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The administrative permission to a member."
+    ::=   { eqlAdminAccountMemberEntry 1 }
+
+--******************************************************************
+
+eqlDriveGroupOpsStatusTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlDriveGroupOpsStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Storage Volume Operations Status Table."
+    ::= { eqlmemberObjects 18 }
+
+eqlDriveGroupOpsStatusEntry OBJECT-TYPE      
+    SYNTAX          EqlDriveGroupOpsStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing status for volume operations."
+    AUGMENTS        { eqlDriveGroupOpsEntry }
+
+    ::=   { eqlDriveGroupOpsStatusTable 1}     
+
+EqlDriveGroupOpsStatusEntry ::= 
+    SEQUENCE { 
+        eqlDriveGroupOpsStatusCompletePct            Unsigned32
+    }
+
+eqlDriveGroupOpsStatusCompletePct  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The percentage complete an ongoing move or bind operation is"
+    ::=   {eqlDriveGroupOpsStatusEntry 1 }
+
+--******************************************************************
+
+eqlMemberOpsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlMemberOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION   "EqualLogic-Persistent Member Operations Table."  
+    ::= { eqlmemberObjects 19 }
+
+eqlMemberOpsEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Member operations configuration."
+    INDEX        { eqlGroupId, eqlMemberIndex, eqlMemberOpsIndex }
+    ::=   { eqlMemberOpsTable 1}     
+
+EqlMemberOpsEntry ::= 
+    SEQUENCE { 
+        eqlMemberOpsIndex                        Unsigned32,
+        eqlMemberOpsRowStatus                    RowStatus,
+        eqlMemberOpsOperation                    INTEGER,
+        eqlMemberOpsExec                         INTEGER,
+        eqlMemberOpsCompletePct                  Integer32,
+        eqlMemberOpsOperationArg                 DisplayString,
+        eqlMemberOpsOperationStatus              INTEGER,
+        eqlMemberOpsStartTime                    Unsigned32,
+        eqlMemberOpsOperationArg1                DisplayString        
+    }
+
+eqlMemberOpsIndex  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "The field uniquely identifies an operation within a Member."
+    ::=   {eqlMemberOpsEntry 1 }
+
+eqlMemberOpsRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlMemberOpsEntry 2 }  
+
+eqlMemberOpsOperation OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        diagnose(3),
+        update(4),
+        restart(5),
+        shutdown(6),
+        delete-pending(7),
+        install-software-component(8),
+        cli-update(9)
+    }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The current operation for this Member
+                        0 - no operation
+                        3 - get diagnostics
+                        4 - firmware update
+                        5 - restart array
+                        6 - shutdown array
+                        7 - delete old update kit (deprecated, use eqlMemberDynamicOps instead)
+                        8 - install software component
+                        9 - update from the cli
+                        "
+    DEFVAL          { none } 
+    ::=  {  eqlMemberOpsEntry 3 }
+
+eqlMemberOpsExec OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        cancel(1),
+        failed(2)
+    }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The action to perform on this operation
+                        0 - no operation
+                        1 - cancel"
+    DEFVAL          { none } 
+    ::=  {  eqlMemberOpsEntry 4 }
+
+eqlMemberOpsCompletePct  OBJECT-TYPE
+    SYNTAX          Integer32 (0..100)
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The percentage complete an ongoing diag operation is"
+    ::=  {  eqlMemberOpsEntry 5 }
+
+eqlMemberOpsOperationArg       OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..255))     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the argument for the operation.
+                                         There is no default."  
+    ::=  {  eqlMemberOpsEntry 6 }
+
+eqlMemberOpsOperationStatus      OBJECT-TYPE      
+    SYNTAX               INTEGER     {
+                           success(0),
+                           failure(1)
+                         }     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     " The status of the operation."
+    DEFVAL          { success } 
+    ::=  {  eqlMemberOpsEntry 7 }
+
+eqlMemberOpsStartTime OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field contains the time of the start of the operation."
+    ::=  {  eqlMemberOpsEntry 8 }
+    
+eqlMemberOpsOperationArg1       OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..255))     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the additional argument(s) for the operation.
+                                         There is no default."  
+    ::=  {  eqlMemberOpsEntry 9 }
+
+
+--**************************************************************************   
+
+eqlMemberHWComponentTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberHWComponentEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Hardware component table. This is the general place holder for all single hardware components on the member. If there is more than one such hardware component(controllers, channel cards), they go into their own table. Otherwise they end up in this table."                      
+    ::=  {  eqlmemberObjects 20 }
+
+eqlMemberHWComponentEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberHWComponentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing member health detailed fan info"
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlMemberHWComponentIndex }    
+    ::=    { eqlMemberHWComponentTable 1 }
+    
+EqlMemberHWComponentEntry ::= 
+    SEQUENCE {     
+        eqlMemberHWComponentIndex                  INTEGER,
+        eqlMemberHWComponentName                   DisplayString,
+        eqlMemberHWComponentSerialNumber           DisplayString,
+        eqlMemberHWComponentFirmwareRev            DisplayString,
+        eqlMemberHWComponentStatus                 INTEGER
+        }
+
+eqlMemberHWComponentIndex  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                     eip(1)
+                     }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A unique integer that identifies the fan that the
+                     corresponding entry refers to
+                     "
+    ::=   { eqlMemberHWComponentEntry 1 }
+
+eqlMemberHWComponentName   OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name of the component."
+    ::=   { eqlMemberHWComponentEntry 2 }
+
+eqlMemberHWComponentSerialNumber   OBJECT-TYPE
+   SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the serial number of the component."
+    ::=   { eqlMemberHWComponentEntry 3 }
+
+eqlMemberHWComponentFirmwareRev   OBJECT-TYPE
+   SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the firmware revision of the component."
+    ::=   { eqlMemberHWComponentEntry 4 }
+
+eqlMemberHWComponentStatus   OBJECT-TYPE
+   SYNTAX           INTEGER {
+                    unknown(0),
+                    not-present(1),
+                    failed(2),
+                    good(3)
+                    }
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the status of the component."
+    DEFVAL          {unknown}
+    ::=   { eqlMemberHWComponentEntry 5 }
+
+--**************************************************************************   
+
+eqlMemberDynamicInfoTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberDynamicInfoEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Info Table"  
+    ::=  {  eqlmemberObjects 21 }    
+
+eqlMemberDynamicInfoEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberDynamicInfoEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing dynamic member info "
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+    ::=    { eqlMemberDynamicInfoTable 1 }
+    
+EqlMemberDynamicInfoEntry ::= 
+    SEQUENCE {     
+                 eqlMemberDynamicInfoPendingUpdateVersion                        DisplayString,
+                 eqlMemberDynamicInfoIsRestartRunning                            INTEGER,
+                 eqlMemberDynamicInfoIsUpdateRunning                             INTEGER
+        }
+
+eqlMemberDynamicInfoPendingUpdateVersion       OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..255))     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the string to be read.
+                                     To be used to send the member's pending update version.
+                                         "  
+    DEFVAL          {""}
+    ::=  {  eqlMemberDynamicInfoEntry 1 }
+
+eqlMemberDynamicInfoIsRestartRunning   OBJECT-TYPE
+   SYNTAX           INTEGER {
+                    not-running(0),
+                    running(1)
+                    }
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the status of the reboot shell script."
+    DEFVAL          {not-running}
+    ::=   { eqlMemberDynamicInfoEntry 2 }
+
+eqlMemberDynamicInfoIsUpdateRunning   OBJECT-TYPE
+   SYNTAX           INTEGER {
+                    not-running(0),
+                    running(1)
+                    }
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the status of the update shell script."
+    DEFVAL          {not-running}
+    ::=   { eqlMemberDynamicInfoEntry 3 }
+
+--**************************************************************************   
+
+eqlMemberCacheStatisticsTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberCacheStatisticsEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic member cache statistics table"  
+    ::=  {  eqlmemberObjects 22 }    
+
+eqlMemberCacheStatisticsEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberCacheStatisticsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing member cache statistics info "
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+    ::=    { eqlMemberCacheStatisticsTable 1 }
+
+EqlMemberCacheStatisticsEntry ::= 
+    SEQUENCE {     
+                eqlMemberTotalPageCount                                         Counter64,
+                eqlMemberHotPageCount                                           Counter64,
+                eqlMemberWarmPageCount                                          Counter64,
+                eqlMemberColdPageCount                                          Counter64,
+                eqlMemberPageSize                                               Unsigned32,
+                eqlMemberSSDAcceleratorSize                                     Unsigned32,
+                eqlMemberSSDCacheSize                                           Unsigned32,
+                eqlMemberSSDAcceleratorEntriesTotal                             Unsigned32,
+                eqlMemberSSDAcceleratorEntriesUsed                              Unsigned32 
+        }
+
+eqlMemberTotalPageCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total count of pages on the storage array"
+    ::=    { eqlMemberCacheStatisticsEntry 1 }
+
+eqlMemberHotPageCount OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies count of most frequently accessed pages on the storage array"
+    ::=    { eqlMemberCacheStatisticsEntry 2 }
+
+eqlMemberWarmPageCount OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies count of moderately accessed pages on the storage array"
+    ::=    { eqlMemberCacheStatisticsEntry 3 }
+
+eqlMemberColdPageCount OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies count of pages not currently being accessed on the storage array"
+    ::=    { eqlMemberCacheStatisticsEntry 4 }
+
+eqlMemberPageSize OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    UNITS           "KB"
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies size of an IOM page"
+    ::=    { eqlMemberCacheStatisticsEntry 5 }
+
+eqlMemberSSDAcceleratorSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "GB"
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies amount of space reserved for mapping writes to SSD"
+    ::=    { eqlMemberCacheStatisticsEntry 6 }
+
+eqlMemberSSDCacheSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "GB"
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies SSD RAID LUN"
+    ::=    { eqlMemberCacheStatisticsEntry 7 }
+
+eqlMemberSSDAcceleratorEntriesTotal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total number of i/o's that can be mapped to SSD space"
+    ::=    { eqlMemberCacheStatisticsEntry 8 }
+
+eqlMemberSSDAcceleratorEntriesUsed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies number of i/o's that are currently mapped to SSD space"
+    ::=    { eqlMemberCacheStatisticsEntry 9 }
+  
+--**************************************************************************   
+
+eqlMemberSEDEncryptionTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberSEDEncryptionEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic member encryption shares for SED disks"  
+    ::=  {  eqlmemberObjects 23 }    
+
+eqlMemberSEDEncryptionEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberSEDEncryptionEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing SED Encryption Key info "
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+    ::=    { eqlMemberSEDEncryptionTable 1 }
+
+EqlMemberSEDEncryptionEntry ::= 
+    SEQUENCE {
+        eqlMemberSEDEncryptionRowStatus                 RowStatus,
+        eqlMemberSEDEncryptionShare1                EqlMemberSEDShareType,     
+        eqlMemberSEDEncryptionShare2                EqlMemberSEDShareType,     
+        eqlMemberSEDEncryptionShare3                EqlMemberSEDShareType     
+    }
+
+eqlMemberSEDEncryptionRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlMemberSEDEncryptionEntry 1 }  
+
+eqlMemberSEDEncryptionShare1       OBJECT-TYPE      
+    SYNTAX          EqlMemberSEDShareType     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field is for the first retrieved SED backup key."  
+    ::=   { eqlMemberSEDEncryptionEntry 2 }
+
+eqlMemberSEDEncryptionShare2       OBJECT-TYPE      
+    SYNTAX          EqlMemberSEDShareType     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field is for the second retrieved SED backup key."  
+    ::=   { eqlMemberSEDEncryptionEntry 3 }
+
+eqlMemberSEDEncryptionShare3       OBJECT-TYPE      
+    SYNTAX          EqlMemberSEDShareType     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field is for the third retrieved SED backup key."  
+    ::=   { eqlMemberSEDEncryptionEntry 4 }
+
+--******************************************************************
+
+eqlMemberDynamicOpsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlMemberDynamicOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION   "EqualLogic-Dynamic Member Operations Table.
+                   This table is for member operations that do not require persistent storage.
+                   Rows in this table should be used instead of eqlMemberOps."  
+    ::= { eqlmemberObjects 24 }
+
+eqlMemberDynamicOpsEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberDynamicOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Member operations configuration."
+    INDEX       { eqlGroupId, eqlMemberIndex, eqlMemberDynamicOpsOperation }
+    ::=   { eqlMemberDynamicOpsTable 1}     
+
+EqlMemberDynamicOpsEntry ::= 
+    SEQUENCE { 
+        eqlMemberDynamicOpsOperation            INTEGER,
+        eqlMemberDynamicOpsOperationArg         OCTET STRING
+    }
+
+eqlMemberDynamicOpsOperation OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        delete-pending(7)
+    }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The current operation for this Member
+                        0 - no operation
+                        1 - delete old update kit
+                        "
+    DEFVAL          { none } 
+    ::=  {  eqlMemberDynamicOpsEntry 1 }
+
+
+eqlMemberDynamicOpsOperationArg       OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (0..255))     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the argument for the operation.
+                                         There is no default."  
+    ::=  {  eqlMemberDynamicOpsEntry 2 }
+
+
+--************************************************************************** 
+
+eqlMemberGroupInfoAtMemberTable OBJECT-TYPE      
+    SYNTAX      SEQUENCE OF EqlMemberGroupInfoAtMemberEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION   "EqualLogic-Persistent Member Group Info Known At Member Table"  
+    ::=  { eqlmemberObjects 25 }    
+
+eqlMemberGroupInfoAtMemberEntry OBJECT-TYPE      
+    SYNTAX        EqlMemberGroupInfoAtMemberEntry      
+    MAX-ACCESS    not-accessible      
+    STATUS        current      
+    DESCRIPTION   "An entry (row) containing Group info that in-use at this Member."
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+::=    { eqlMemberGroupInfoAtMemberTable 1 }
+    
+EqlMemberGroupInfoAtMemberEntry ::= 
+    SEQUENCE {  
+        eqlMemberGroupInfoAtMemberPasswd1         OCTET STRING, -- NOT null-terminated
+        eqlMemberGroupInfoAtMemberPasswd1Len      Unsigned32
+    } 
+
+eqlMemberGroupInfoAtMemberPasswd1     OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1..128))  -- GROUP_MAX_CREDENTIALS_SIZE = 128
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The eqlGroupPasswd1 value that is currently in-use at this Member.
+        Used by PSGD to insure that all Members are using the same eqlGroupPasswd1 value
+        before deleting the backup password.  Not null-terminated.  Not printable characters."
+    --DEFAULT       cookie "secure"
+    ::=  { eqlMemberGroupInfoAtMemberEntry 1 }
+
+eqlMemberGroupInfoAtMemberPasswd1Len  OBJECT-TYPE
+    SYNTAX          Unsigned32         
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of octets in eqlMemberGroupInfoAtMemberPasswd1."
+    ::=  { eqlMemberGroupInfoAtMemberEntry 2 }
+
+
+--**************************************************************************
+
+eqlDriveGroupStatisticsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlDriveGroupStatisticsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Storage Drive Group Statistics Table."
+    ::=  {  eqlmemberObjects 26 }
+
+eqlDriveGroupStatisticsEntry OBJECT-TYPE
+    SYNTAX        EqlDriveGroupStatisticsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry (row) containing drive group statistics."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlDriveGroupStatisticsIndex }
+    ::=    { eqlDriveGroupStatisticsTable 1 }
+
+EqlDriveGroupStatisticsEntry ::=
+    SEQUENCE {
+        eqlDriveGroupStatisticsIndex                INTEGER,
+        eqlDriveGroupStatisticsHeadroom             Unsigned32
+    }
+
+eqlDriveGroupStatisticsIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field uniquely identifies a RAID Group within a member."
+    ::=  {  eqlDriveGroupStatisticsEntry 1 }
+
+eqlDriveGroupStatisticsHeadroom OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field is the recent, estimated, and smoothed percentage by which the RAID Group is not utilized."
+    ::=  {  eqlDriveGroupStatisticsEntry 2 }
+
+--**************************************************************************
+-- This table is for the dynamic information that we need from the member
+-- that doesn't fit in eqlMemberInfoTable (handled by psgd, not netmgtd)
+-- and  eqlMemberDynamicInfoTable (used by netmgtd but polled all the time -
+-- every 30 seconds or so - by the GUI) and eqlMemberStatusTable is serviced
+-- by emd.
+-- This table was added initially for the Language Version
+-- ************************************************************************
+
+eqlMemberFirmwareInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlMemberFirmwareInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Member Info Table "
+    ::=  {  eqlmemberObjects 27 }
+
+eqlMemberFirmwareInfoEntry OBJECT-TYPE
+    SYNTAX          EqlMemberFirmwareInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing member info"
+    INDEX  { eqlGroupId, eqlMemberIndex }
+    ::=    { eqlMemberFirmwareInfoTable 1 }
+
+EqlMemberFirmwareInfoEntry ::=
+    SEQUENCE {
+        eqlMemberLanguageVersion                    DisplayString,
+        eqlMemberFirmwareInfoDataReduction          INTEGER
+        }
+
+eqlMemberLanguageVersion        OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the installed language kit version"
+    DEFVAL          {""}
+    ::=  {  eqlMemberFirmwareInfoEntry 1 }
+
+eqlMemberFirmwareInfoDataReduction  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                                unknown(0),              -- Current state of data reduction support is unknown.
+                                disabled(1),             -- Member is capable of some form of data-reduction, but it has never been enabled.
+                                no-capable-hardware(2),  -- Current member does not support data-reduction.
+                                no-capable-raid(3),      -- Data reduction is supported, but the RAID type is not correct.
+                                compression-running(4),  -- Member is actively compressing data.
+                                compression-paused(5)    -- Compression of new data has been paused.
+    }
+    MAX-ACCESS        read-write
+    STATUS            current      
+    DESCRIPTION       "Current form of data reduction to be used on the member.  
+                       The member must support the requested value in order for it to be set."
+    DEFVAL            { unknown }
+    ::=   { eqlMemberFirmwareInfoEntry 2 }
+
+--**************************************************************************
+
+eqlDriveGroupHeatProfileInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlDriveGroupHeatProfileInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Storage Drive Group Heat-Profile Information Table."
+    ::=  {  eqlmemberObjects 28 }
+
+eqlDriveGroupHeatProfileInfoEntry OBJECT-TYPE
+    SYNTAX        EqlDriveGroupHeatProfileInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry (row) identifying a per-drive-group heat profile."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlDriveGroupStatisticsIndex, eqlDriveGroupHeatProfilePart }
+    ::=    { eqlDriveGroupHeatProfileInfoTable 1 }
+
+EqlDriveGroupHeatProfileInfoEntry ::=
+    SEQUENCE {
+        eqlDriveGroupHeatProfilePart                Unsigned32,
+        eqlDriveGroupHeatProfileColdCount           Counter64,
+        -- NOTE: SNMPv2 does not support floating point.
+        eqlDriveGroupHeatProfileMinMagnitude        Integer32,
+        eqlDriveGroupHeatProfileMinMultiplier       Unsigned32,
+        eqlDriveGroupHeatProfileMaxMagnitude        Integer32,
+        eqlDriveGroupHeatProfileMaxMultiplier       Unsigned32
+        -- Want to put LBA/page range or something in here eventually.
+    }
+
+eqlDriveGroupHeatProfilePart OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "If 1, the entire drive group, otherwise a part (possibly the only part)."
+    ::=  {  eqlDriveGroupHeatProfileInfoEntry 1 }
+
+eqlDriveGroupHeatProfileColdCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of cold pages."
+    ::=  {  eqlDriveGroupHeatProfileInfoEntry 2 }
+
+eqlDriveGroupHeatProfileMinMagnitude OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The minimum access-rate magnitude.  An access-rate magnitude is the rounded-down-to-integer logarithm base 2 of the access rate in accesses per second."
+    ::=  {  eqlDriveGroupHeatProfileInfoEntry 3 }
+
+eqlDriveGroupHeatProfileMinMultiplier OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The minimum access-rate multiplier for the minimum access-rate magnitude.  An access-rate multiplier is the fractional 32 bits added to 1.0 to constitute a multiplier, which when multiplied by 2 to the access-rate magnitude yields the access-rate floor of a bin of the histogram that is the heat profile."
+    ::=  {  eqlDriveGroupHeatProfileInfoEntry 4 }
+
+eqlDriveGroupHeatProfileMaxMagnitude OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The maximum access-rate magnitude."
+    ::=  {  eqlDriveGroupHeatProfileInfoEntry 5 }
+
+eqlDriveGroupHeatProfileMaxMultiplier OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The maximum access-rate multiplier for the maximum access-rate magnitude."
+    ::=  {  eqlDriveGroupHeatProfileInfoEntry 6 }
+
+--**************************************************************************
+
+eqlDriveGroupHeatProfileBinTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlDriveGroupHeatProfileBinEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Storage Drive Group Heat-Profile-Histogram Bins Table."
+    ::=  {  eqlmemberObjects 29 }
+
+eqlDriveGroupHeatProfileBinEntry OBJECT-TYPE
+    SYNTAX        EqlDriveGroupHeatProfileBinEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry (row) representing one bin in the heat-profile histogram, telling how many pages covered by the heat profile have at least a certain access rate."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlDriveGroupStatisticsIndex, eqlDriveGroupHeatProfilePart, eqlDriveGroupHeatProfileBinId }
+    ::=    { eqlDriveGroupHeatProfileBinTable 1 }
+
+EqlDriveGroupHeatProfileBinEntry ::=
+    SEQUENCE {
+        eqlDriveGroupHeatProfileBinId                Unsigned32,
+        -- NOTE: SNMPv2 does not support floating point.
+        eqlDriveGroupHeatProfileAccessRateMagnitude  Integer32,
+        eqlDriveGroupHeatProfileAccessRateMultiplier Unsigned32,
+        eqlDriveGroupHeatProfileCount                Counter64
+    }
+
+eqlDriveGroupHeatProfileBinId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The identifier of the bin."
+    ::=  {  eqlDriveGroupHeatProfileBinEntry 1 }
+
+eqlDriveGroupHeatProfileAccessRateMagnitude OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The access-rate magnitude (cf. eqlDriveGroupHeatProfileMinMagnitude) for the bin."
+    ::=  {  eqlDriveGroupHeatProfileBinEntry 2 }
+
+eqlDriveGroupHeatProfileAccessRateMultiplier OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The access-rate multiplier (cf. eqlDriveGroupHeatProfileMinMultiplier) for the bin."
+    ::=  {  eqlDriveGroupHeatProfileBinEntry 3 }
+
+eqlDriveGroupHeatProfileCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of pages having the access-rate floor of the bin."
+    ::=  {  eqlDriveGroupHeatProfileBinEntry 4 }
+
+--**************************************************************************
+
+eqlTaggedHeatProfileInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlTaggedHeatProfileInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Storage Tagged Heat-Profile Information Table."
+    ::=  {  eqlmemberObjects 30 }
+
+eqlTaggedHeatProfileInfoEntry OBJECT-TYPE
+    SYNTAX        EqlTaggedHeatProfileInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry (row) identifying a quasi-per-volume heat profile."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlTaggedHeatTag }
+    ::=    { eqlTaggedHeatProfileInfoTable 1 }
+
+EqlTaggedHeatProfileInfoEntry ::=
+    SEQUENCE {
+        eqlTaggedHeatTag                      Unsigned32,
+        eqlTaggedHeatProfileColdCount           Counter64,
+        -- NOTE: SNMPv2 does not support floating point.
+        eqlTaggedHeatProfileMinMagnitude        Integer32,
+        eqlTaggedHeatProfileMinMultiplier       Unsigned32,
+        eqlTaggedHeatProfileMaxMagnitude        Integer32,
+        eqlTaggedHeatProfileMaxMultiplier       Unsigned32
+    }
+
+eqlTaggedHeatTag OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A tag identifying a heat profile that could apply to internal non-volume page usage, internal-volume usage, or external-volume usage.  User volumes have tags of 128 or higher."
+    ::=  {  eqlTaggedHeatProfileInfoEntry 1 }
+
+eqlTaggedHeatProfileColdCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of cold pages."
+    ::=  {  eqlTaggedHeatProfileInfoEntry 2 }
+
+eqlTaggedHeatProfileMinMagnitude OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The minimum access-rate magnitude.  An access-rate magnitude is the rounded-down-to-integer logarithm base 2 of the access rate in accesses per second."
+    ::=  {  eqlTaggedHeatProfileInfoEntry 3 }
+
+eqlTaggedHeatProfileMinMultiplier OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The minimum access-rate multiplier for the minimum access-rate magnitude.  An access-rate multiplier is the fractional 32 bits added to 1.0 to constitute a multiplier, which when multiplied by 2 to the access-rate magnitude yields the access-rate floor of a bin of the histogram that is the heat profile."
+    ::=  {  eqlTaggedHeatProfileInfoEntry 4 }
+
+eqlTaggedHeatProfileMaxMagnitude OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The maximum access-rate magnitude."
+    ::=  {  eqlTaggedHeatProfileInfoEntry 5 }
+
+eqlTaggedHeatProfileMaxMultiplier OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The maximum access-rate multiplier for the maximum access-rate magnitude."
+    ::=  {  eqlTaggedHeatProfileInfoEntry 6 }
+
+--**************************************************************************
+
+eqlTaggedHeatProfileBinTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlTaggedHeatProfileBinEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Storage Tagged Heat-Profile-Histogram Bins Table."
+    ::=  {  eqlmemberObjects 31 }
+
+eqlTaggedHeatProfileBinEntry OBJECT-TYPE
+    SYNTAX        EqlTaggedHeatProfileBinEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry (row) representing one bin in the quasi-per-volume heat-profile histogram, telling how many pages covered by the heat profile have at least a certain access rate."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlTaggedHeatTag, eqlTaggedHeatProfileBinId }
+    ::=    { eqlTaggedHeatProfileBinTable 1 }
+
+EqlTaggedHeatProfileBinEntry ::=
+    SEQUENCE {
+        eqlTaggedHeatProfileBinId                Unsigned32,
+        -- NOTE: SNMPv2 does not support floating point.
+        eqlTaggedHeatProfileAccessRateMagnitude  Integer32,
+        eqlTaggedHeatProfileAccessRateMultiplier Unsigned32,
+        eqlTaggedHeatProfileCount                Counter64
+    }
+
+eqlTaggedHeatProfileBinId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The identifier of the bin."
+    ::=  {  eqlTaggedHeatProfileBinEntry 1 }
+
+eqlTaggedHeatProfileAccessRateMagnitude OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The access-rate magnitude (cf. eqlTaggedHeatProfileMinMagnitude) for the bin."
+    ::=  {  eqlTaggedHeatProfileBinEntry 2 }
+
+eqlTaggedHeatProfileAccessRateMultiplier OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The access-rate multiplier (cf. eqlTaggedHeatProfileMinMultiplier) for the bin."
+    ::=  {  eqlTaggedHeatProfileBinEntry 3 }
+
+eqlTaggedHeatProfileCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of pages having the access-rate floor of the bin."
+    ::=  {  eqlTaggedHeatProfileBinEntry 4 }
+
+--**************************************************************************
+
+eqlMemberRaidPoliciesTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlMemberRaidPoliciesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Member Raid Policies Table."
+    ::=  {  eqlmemberObjects 32 }
+
+eqlMemberRaidPoliciesEntry OBJECT-TYPE
+    SYNTAX        EqlMemberRaidPoliciesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry (row) represents a RAID policy."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlDriveGroupRAIDPolicy }
+    ::=    { eqlMemberRaidPoliciesTable 1 }
+
+EqlMemberRaidPoliciesEntry ::=
+    SEQUENCE {
+        eqlMemberRaidPoliciesBehavior              INTEGER,
+        eqlMemberRaidPoliciesRAIDCapacity          Counter64
+    }
+
+eqlMemberRaidPoliciesBehavior OBJECT-TYPE
+    SYNTAX          INTEGER  {
+    	   		always   (1),
+	       		never    (2),
+	       		cli      (3),
+	       		cliSanHQ (4)
+    }			
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The behavior to be followed for this RAID policy based on the current
+		     RAID policy, the effective drive capacity and the platform.
+		     Behavior always means the RAID policy is always configurable.
+		     Behavior never means the RAID policy is never configurable.
+		     Behavior cli means the RAID policy is configurable via CLI only.
+		     Behavior cliSanHQ means the RAID policy is configurable via CLI only and
+		          SanHQ will monitor and report on its usage."
+    ::=  {  eqlMemberRaidPoliciesEntry 1 }
+
+eqlMemberRaidPoliciesRAIDCapacity OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The estimated RAID capacity in mega-bytes of the RAID set if using this RAID policy."
+    ::=  {  eqlMemberRaidPoliciesEntry 2 }
+
+--**************************************************************************
+
+
+-- This table describes the per TCP connection statistics for a member.
+-- Each connection is uniquely identified by the four tuple laddr:lport:faddr:fport.
+-- ************************************************************************ 
+
+eqlMemberPerTCPConnectionStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlMemberPerTCPConnectionStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Storage Member Per TCP Connection Statistics Table."
+    ::=  {  eqlmemberObjects 33 }
+
+
+eqlMemberPerTCPConnectionStatsEntry OBJECT-TYPE
+    SYNTAX        EqlMemberPerTCPConnectionStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry (row) of a member's per TCP connection statistics."
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlMemberPerTCPConnectionStatsIndex }
+    ::=    { eqlMemberPerTCPConnectionStatsTable 1 }
+
+EqlMemberPerTCPConnectionStatsEntry ::=
+    SEQUENCE {
+
+        eqlMemberPerTCPConnectionStatsIndex                Unsigned32,
+        eqlMemberPerTCPConnectionStatsLocalAddrType        InetAddressType,
+        eqlMemberPerTCPConnectionStatsLocalAddr            InetAddress,
+        eqlMemberPerTCPConnectionStatsLocalPort            Unsigned32,
+        eqlMemberPerTCPConnectionStatsForeignAddrType      InetAddressType,
+        eqlMemberPerTCPConnectionStatsForeignAddr          InetAddress,
+        eqlMemberPerTCPConnectionStatsForeignPort          Unsigned32,
+        eqlMemberPerTCPConnectionStatsMss                  Unsigned32,
+        eqlMemberPerTCPConnectionStatsState                INTEGER,
+        eqlMemberPerTCPConnectionStatsSndpack              Counter64,
+        eqlMemberPerTCPConnectionStatsSndbyte              Counter64,
+        eqlMemberPerTCPConnectionStatsSndrexmitpack        Counter64,
+        eqlMemberPerTCPConnectionStatsSndrexmitbyte        Counter64,
+        eqlMemberPerTCPConnectionStatsRexmttimeout         Counter64, 
+        eqlMemberPerTCPConnectionStatsFastrexmt            Counter64,
+        eqlMemberPerTCPConnectionStatsSndprobe             Counter64,
+        eqlMemberPerTCPConnectionStatsRcvpack              Counter64, 
+        eqlMemberPerTCPConnectionStatsRcvbyte              Counter64,
+        eqlMemberPerTCPConnectionStatsRcvwinprobe          Counter64,
+        eqlMemberPerTCPConnectionStatsRcvbadsum            Counter64
+    }
+
+    eqlMemberPerTCPConnectionStatsIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "An arbitrary integer used to uniquely identify a
+     particular connection. The index may change between requests."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 1 }
+
+    eqlMemberPerTCPConnectionStatsLocalAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The local IP address type (ipv4 or ipv6) of the connection."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 2 }
+
+    eqlMemberPerTCPConnectionStatsLocalAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The local IP address of the connection."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 3 }
+
+    eqlMemberPerTCPConnectionStatsLocalPort OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The local port of the connection."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 4 }
+
+    eqlMemberPerTCPConnectionStatsForeignAddrType OBJECT-TYPE 
+    SYNTAX          InetAddressType        
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The foreign IP address type(ipv4 or ipv6) of the connection."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 5 } 
+
+    eqlMemberPerTCPConnectionStatsForeignAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The foreign IP address of the connection."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 6 }
+
+    eqlMemberPerTCPConnectionStatsForeignPort OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The foreign port of the connection."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 7 } 
+
+     eqlMemberPerTCPConnectionStatsMss OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The TCP maximum segment size."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 8 }
+
+    eqlMemberPerTCPConnectionStatsState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+        tcps-closed(0),
+        tcps-listen(1),
+        tcps-syn-sent(2),
+        tcps-syn-received(3),
+        tcps-established(4),
+        tcps-close-wait(5),
+        tcps-fin-wait1(6),
+        tcps-closing(7),
+        tcps-last-ack(8),
+        tcps-fin-wait2(9),
+        tcps-time-wait(10)
+    }			
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The TCP state of the connection."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 9 }                 
+
+
+    eqlMemberPerTCPConnectionStatsSndpack OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of data packets sent."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 10 }
+
+    eqlMemberPerTCPConnectionStatsSndbyte OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of data bytes sent."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 11 } 
+
+    eqlMemberPerTCPConnectionStatsSndrexmitpack OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of data packets retransmitted."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 12 }
+
+    eqlMemberPerTCPConnectionStatsSndrexmitbyte OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of data bytes retransmitted."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 13 }
+
+    eqlMemberPerTCPConnectionStatsRexmttimeout OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of retransmit timeouts(slow start counter)."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 14 }
+
+    eqlMemberPerTCPConnectionStatsFastrexmt OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of fast retransmits."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 15 }
+
+    eqlMemberPerTCPConnectionStatsSndprobe OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of window probes sent."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 16 }
+
+    eqlMemberPerTCPConnectionStatsRcvpack OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of packets received in sequence."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 17 }
+
+    eqlMemberPerTCPConnectionStatsRcvbyte OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of bytes received in sequence."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 18 }
+
+    eqlMemberPerTCPConnectionStatsRcvwinprobe OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of received window probe packets."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 19 }
+
+    eqlMemberPerTCPConnectionStatsRcvbadsum OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of packets received with checksum errors."
+    ::=  {  eqlMemberPerTCPConnectionStatsEntry 20 } 
+
+
+--************************************************************************** 
+
+-- NOTE: DESCRIPTION strings for *Table entries are parsed.
+END

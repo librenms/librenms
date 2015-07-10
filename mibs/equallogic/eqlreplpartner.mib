@@ -1,0 +1,198 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+--FROM SNMP-FRAMEWORK-MIB; 
+-- RFC 2571  
+  
+--  These are from draft-ietf-ops-rfc2851-update-00.txt  
+--  You will have to work out the details with your own  
+--  compiler being because they are so new. 
+     
+--equalLogic   OBJECT IDENTIFIER ::= { enterprises 12740 } 
+-- assigned by IANA to EqualLogic.  
+EQLREPLPARTNER-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64, enterprises
+            FROM SNMPv2-SMI  
+    RowStatus
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    SiteIndex, eqliscsiVolumeReplSiteIndex
+       FROM EQLVOLUME-MIB;
+
+eqlReplPartnerModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Replication Partner information 
+
+        Copyright (c) 2013 by Dell Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell Inc.  This software embodies proprietary information 
+        and trade secrets of Dell Inc. 
+        "
+
+    -- Revision history, in reverse chronological order
+    REVISION   "201303280000Z"      -- 28-Mar-2013
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 26 }     
+
+eqlReplPartnerObjects OBJECT IDENTIFIER ::=  { eqlReplPartnerModule 1 }        
+
+--***********************************************************************************
+
+eqlReplPartnerTestTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlReplPartnerTestEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent ReplPartnerTestTable.
+                     This table contains replication partner test information.
+                     TimeoutCreate:60 TimeoutDelete:60"  
+    ::=    { eqlReplPartnerObjects 1 } 
+
+eqlReplPartnerTestEntry OBJECT-TYPE      
+    SYNTAX          EqlReplPartnerTestEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing replication partner test info."
+    INDEX           { eqliscsiVolumeReplSiteIndex }
+    ::=   { eqlReplPartnerTestTable 1}     
+
+EqlReplPartnerTestStatus ::= INTEGER {
+                       unknown(0),
+                       valid(1),
+                       invalid(2),
+                       remote-partner-not-configured(3)
+    }
+
+EqlReplPartnerTestEntry ::= 
+    SEQUENCE {  
+        eqlReplPartnerTestRowStatus             RowStatus,
+        eqlReplPartnerTestIPAddrStatus          EqlReplPartnerTestStatus,
+        eqlReplPartnerTestAuthStatus            EqlReplPartnerTestStatus,
+        eqlReplPartnerTestAction                INTEGER,
+        eqlReplPartnerTestState                 INTEGER,
+        eqlReplPartnerTestMajorVersion          INTEGER,
+        eqlReplPartnerTestMinorVersion          INTEGER,
+	eqlReplPartnerTestMaintVersion          INTEGER,
+        eqlReplPartnerTestDelegatedSpace        Counter64,
+        eqlReplPartnerTestDelegatedSpaceUsed    Counter64,
+        eqlReplPartnerTestTimestamp             Counter32
+
+    }
+
+eqlReplPartnerTestRowStatus          OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The row status."  
+    ::= { eqlReplPartnerTestEntry 1 }  
+
+eqlReplPartnerTestIPAddrStatus   OBJECT-TYPE      
+    SYNTAX          EqlReplPartnerTestStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The replication partner IP address test status."  
+    ::= { eqlReplPartnerTestEntry 2 }  
+
+eqlReplPartnerTestAuthStatus        OBJECT-TYPE      
+    SYNTAX          EqlReplPartnerTestStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The replication partner authentication test status."  
+    ::= { eqlReplPartnerTestEntry 3 }  
+
+eqlReplPartnerTestAction             OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                       none(0),
+                       start(1)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The replication partner test action."
+    ::= { eqlReplPartnerTestEntry 4 }
+
+eqlReplPartnerTestState              OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                       unknown(0),
+                       in-progress(1),
+                       complete(2),
+       		       error(3),
+		       restarted(4)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The replication partner test state."
+    ::= { eqlReplPartnerTestEntry 5 }
+
+
+
+eqlReplPartnerTestMajorVersion      OBJECT-TYPE      
+    SYNTAX          INTEGER  
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the Major part of 
+                     the lowest member software version of the 
+                     remote replication site group." 
+    DEFVAL          { 0 }
+    ::= { eqlReplPartnerTestEntry 6 }
+
+    
+eqlReplPartnerTestMinorVersion      OBJECT-TYPE      
+    SYNTAX          INTEGER  
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the Minor part of 
+                     the lowest member software version of the 
+                     remote replication site group." 
+    DEFVAL          { 0 }
+    ::= { eqlReplPartnerTestEntry 7 }
+
+
+eqlReplPartnerTestMaintVersion      OBJECT-TYPE      
+    SYNTAX          INTEGER  
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the Maintenance part of 
+                     the lowest member software version of the 
+                     remote replication site group." 
+    DEFVAL          { 0 }
+    ::= { eqlReplPartnerTestEntry 8 }
+
+
+eqlReplPartnerTestDelegatedSpace     OBJECT-TYPE      
+    SYNTAX          Counter64  
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total delegated space for the partners.
+                     This is a dynamic value, it is not Administrator setable." 
+    ::= { eqlReplPartnerTestEntry 9 }
+
+
+eqlReplPartnerTestDelegatedSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64  
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total delegated space used by partners.
+                     This is a dynamic value, it is not Administrator setable." 
+    ::= { eqlReplPartnerTestEntry 10 }
+
+eqlReplPartnerTestTimestamp         OBJECT-TYPE      
+    SYNTAX          Counter32  
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the date/time when replication partner test was started.
+                     Time is represented as the time in seconds since 00:00:00 UTC, 1970-01-01." 
+    ::= { eqlReplPartnerTestEntry 11 }
+
+END

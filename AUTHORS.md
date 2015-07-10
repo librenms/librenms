@@ -33,6 +33,12 @@ Contributors to LibreNMS:
 - James Campbell <neokjames@gmail.com> (neokjames)
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
+- Louis Rossouw <lrossouw@gmail.com> (spinza)
+- Clint Armstrong <clint@clintarmstrong.net> (clinta)
+- Tony Ditchfield <tony.ditchfield@gmail.com> (arnoldthebat)
+- Travis Hegner <travis.hegner@gmail.com> (travishegner)
+- Will Jones <email@willjones.eu> (willjones)
+- Job Snijders <job@instituut.net> (job)
 
 [1]: http://observium.org/ "Observium web site"
 

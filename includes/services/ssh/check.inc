@@ -1,6 +1,6 @@
 <?php
 
-$check = shell_exec($config['nagios_plugins'] . "/check_ssh -H ".$service['hostname']);
+$check = shell_exec($config['nagios_plugins'] . "/check_ssh -H ".$service['hostname']." ".$service['service_param']);
 
 list($check, $time) = split("\|", $check);
 

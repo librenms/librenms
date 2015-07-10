@@ -26,6 +26,8 @@ echo('
     <div class="col-md-6">
 ');
 include("includes/dev-overview-data.inc.php");
+Plugins::call('device_overview_container',array($device));
+
 include("overview/ports.inc.php");
 echo('
     </div>
@@ -48,6 +50,8 @@ include("overview/sensors/voltages.inc.php");
 include("overview/sensors/current.inc.php");
 include("overview/sensors/power.inc.php");
 include("overview/sensors/frequencies.inc.php");
+include("overview/sensors/load.inc.php");
+include("overview/sensors/state.inc.php");
 include("overview/eventlog.inc.php");
 include("overview/services.inc.php");
 include("overview/syslog.inc.php");

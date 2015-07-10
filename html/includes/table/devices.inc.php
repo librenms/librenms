@@ -94,7 +94,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
 
             if ($device['status'] == '0') {
                 $extra = "danger";
-                $msg = "down";
+                $msg = $device['status_reason'];
             } else {
                 $extra = "success";
                 $msg = "up";

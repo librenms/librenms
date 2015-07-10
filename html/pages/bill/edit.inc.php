@@ -138,7 +138,6 @@ for ($x=1;$x<32;$x++) {
   <button type="submit" class="btn btn-success" name="Submit" value="Save" /><i class="icon-ok icon-white"></i> <strong>Save Properties</strong></button>
 </form>
 
-<form class="form-horizontal" role="form">
   <h3>Billed Ports</h3>
   <div class="form-group">
 <?php
@@ -164,7 +163,7 @@ if (is_array($ports))
     $portalias = (empty($port['ifAlias']) ? "" : " - ".$port['ifAlias']."");
     $devicebtn = str_replace("\">".$port['hostname'], "\" style=\"color: #000;\"><i class=\"glyphicon glyphicon-asterisk\"></i> ".$port['hostname'], $devicebtn);
     $portbtn = str_replace("\">".strtolower($port['ifName']), "\" style=\"color: #000;\"><i class=\"glyphicon glyphicon-random\"></i> ".$port['ifName']."".$portalias, $portbtn);
-    echo("      <form action=\"\" method=\"post\" name=\"delete".$port['port_id']."\" style=\"display: none;\">\n");
+    echo("      <form action=\"\" class=\"form-inline\" method=\"post\" name=\"delete".$port['port_id']."\" style=\"display: none;\">\n");
     echo("        <input type=\"hidden\" name=\"action\" value=\"delete_bill_port\" />\n");
     echo("        <input type=\"hidden\" name=\"port_id\" value=\"".$port['port_id']."\" />\n");
     echo("      </form>\n");
@@ -189,7 +188,6 @@ if (is_array($ports))
 ?>
     </div>
   </fieldset>
-</form>
 <form action="" method="post" class="form-horizontal" role="form">
   <input type="hidden" name="action" value="add_bill_port" />
   <input type="hidden" name="bill_id" value="<?php echo $bill_id; ?>" />
