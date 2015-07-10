@@ -38,11 +38,8 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
 
   $descr = rrdtool_escape($source, $descr_len);
 
-    if ($config['smokeping']['integration'] === true) {
-        $filename = $config['smokeping']['dir'] .'/'. $device['type'] .'/'. $filename;
-    } else {
-        $filename = $config['smokeping']['dir'] . $filename;
-    }
+    $filename = generate_smokeping_file($device,$filename);
+
   $rrd_options .= " DEF:median$i=".$filename.":median:AVERAGE ";
   $rrd_options .= " DEF:loss$i=".$filename.":loss:AVERAGE";
   $rrd_options .= " CDEF:ploss$i=loss$i,$pings,/,100,*";

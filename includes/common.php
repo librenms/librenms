@@ -751,11 +751,7 @@ function get_smokeping_files($device) {
     global $config;
     if (isset($config['smokeping']['dir'])) {
         $smokeping_files = array();
-        if ($config['smokeping']['integration'] === true) {
-            $smokeping_dir = $config['smokeping']['dir'] . "/" . $device['type'];
-        } else {
-            $smokeping_dir = $config['smokeping']['dir'];
-        }
+        $filename_dir = generate_smokeping_dir($device);
         if ($handle = opendir($smokeping_dir)) {
             while (false !== ($file = readdir($handle))) {
                 if ($file != "." && $file != "..") {
@@ -778,3 +774,22 @@ function get_smokeping_files($device) {
     }
     return $smokeping_files;
 }
+
+function generate_smokeping_file($device,$file) {
+    global $config;
+    if ($config['smokeping']['integration'] === true) {
+        return $config['smokeping']['dir'] .'/'. $device['type'] .'/'. $file;
+    } else {
+        return $config['smokeping']['dir'] . $file;
+    }
+}
+
+function generate_smokeping_dir($device) {
+    global $config;
+    if ($config['smokeping']['integration'] === true) {
+        return $config['smokeping']['dir'] .'/'. $device['type'] .'/';
+    } else {
+        return $config['smokeping']['dir'];
+    }
+}
+
