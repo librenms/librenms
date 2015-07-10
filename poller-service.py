@@ -218,13 +218,18 @@ while True:
 
     if next_update < datetime.now():
         seconds_taken = (datetime.now() - (next_update - timedelta(minutes=5))).seconds
-        update_query = ("insert into pollers set  "
-                        "poller_name='%s',        "
-                        "last_polled=NOW(),       "
-                        "devices='%d',            "
-                        "time_taken='%d'          ").format(config['distributed_poller_name'],
-                                                            devices_scanned,
-                                                            seconds_taken)
+        update_query = ("INSERT INTO pollers(poller_name,   "
+                        "                    last_polled,   "
+                        "                    devices,       " 
+                        "                    time_taken)    "
+                        "  values({0}, NOW(), {1}, {2})     "
+                        "ON DUPLICATE KEY UPDATE            "
+                        "  poller_name=values(poller_name), "
+                        "  last_polled=values(last_polled), "
+                        "  devices=values(devices)          "
+                        "  time_taken=values(time_taken)    ").format(config['distributed_poller_name'],
+                                                                      devices_scanned,
+                                                                      seconds_taken)
         cursor.execute(update_query)
         log.info('INFO: {} devices scanned in the last 5 minutes'.format(devices_scanned))
         devices_scanned = 0
