@@ -669,6 +669,7 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $os = "drac";
 $config['os'][$os]['text']              = "Dell DRAC";
 $config['os'][$os]['icon']              = "dell";
+$config['os'][$os]['type']              = "server";
 
 $os = "bcm963";
 $config['os'][$os]['text']              = "Broadcom BCM963xx";
