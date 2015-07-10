@@ -81,8 +81,19 @@ except:
 poller_path = config['install_dir'] + '/poller.php'
 db_username = config['db_user']
 db_password = config['db_pass']
-db_server = config['db_host']
+
+if config['db_host'][:5].lower() == 'unix:':
+	db_server = config['db_host']
+	db_port = 0
+elif ':' in config['db_host']:
+	db_server = config['db_host'].rsplit(':')[0]
+	db_port = int(config['db_host'].rsplit(':')[1])
+else:
+	db_server = config['db_host']
+	db_port =0
+
 db_dbname = config['db_name']
+
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
 if 'distributed_poller_group' in config:
@@ -122,6 +133,9 @@ if ('distributed_poller' in config and
         import uuid
         memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
             str(config['distributed_poller_memcached_port'])])
+        if str(memc.get("poller.master")) == config['distributed_poller_name']:
+            print "This sytem is already joined as the poller master."
+            sys.exit(2)
         if memc_alive():
             if memc.get("poller.master") is None:
                 print "Registered as Master"
@@ -137,7 +151,7 @@ if ('distributed_poller' in config and
             print "Could not connect to memcached, disabling distributed poller."
             distpoll = False
             IsNode = False
-    except:
+    except ImportError:
         print "ERROR: missing memcache python module:"
         print "On deb systems: apt-get install python-memcache"
         print "On other systems: easy_install python-memcached"
@@ -167,7 +181,10 @@ except:
 devices_list = []
 
 try:
-    db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+    if db_port == 0:
+        db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+    else:
+        db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
     cursor = db.cursor()
 except:
     print "ERROR: Could not connect to MySQL database!"
@@ -181,7 +198,7 @@ except:
 """
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
 if poller_group is not False:
-    query = "select device_id from devices where poller_group = " + poller_group + " and disabled = 0 order by last_polled_timetaken desc"
+    query = "select device_id from devices where poller_group IN(" + poller_group + ") and disabled = 0 order by last_polled_timetaken desc"
 else:
     query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
 # EOC2

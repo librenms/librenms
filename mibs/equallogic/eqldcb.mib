@@ -1,0 +1,2946 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQL-DCB-MIB DEFINITIONS ::= BEGIN
+
+-- ******************************************************************
+-- DCB (IEEE 802.1Qaz, 802.1Qbb, 802.1Qau) MIB
+-- ******************************************************************
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    enterprises,
+    Counter32,
+    Counter64,
+    Integer32,
+    Unsigned32               FROM SNMPv2-SMI    -- [RFC2578]   
+    TimeInterval,
+    TruthValue               FROM SNMPv2-TC     -- [RFC2579]
+    ifIndex                  FROM RFC1213-MIB
+    equalLogic               FROM EQUALLOGIC-SMI
+    eqlGroupId               FROM EQLGROUP-MIB
+    eqlMemberIndex           FROM EQLMEMBER-MIB
+   ;
+
+eqlDcbMib MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION "EqualLogic Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+   DESCRIPTION 
+        "Data Center Bridging MIB module.
+        Copyright (c) 2010-2011 by Dell, Inc.
+
+        All rights reserved.  This software may not be copied, disclosed,
+        transferred, or used except in accordance with a license granted
+        by Dell, Inc.  This software embodies proprietary information
+        and trade secrets of Dell, Inc.
+
+        Copyright (C) IEEE (2009).  This version of this MIB module
+        is published as clause 17.7 of IEEE Std 802.1Qaz;
+        see the standard itself for full legal notices.
+        "
+   REVISION       "201101270000Z"    -- 27 Jan 2011 00:00GMT
+   DESCRIPTION 
+      "Initial revision - based on IEEE P802.1Qbb Draft 1.2
+        Copyright (C) IEEE."
+    ::= { enterprises equalLogic(12740) 19 }
+
+eqlDcbMIBObjects      OBJECT IDENTIFIER ::= { eqlDcbMib 1 }
+
+-------------------------------------------------------------------
+-- IEEE 802.1 - DCBX Textual Conventions
+-------------------------------------------------------------------
+
+EqlDcbxTrafficClassGroupValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS    current
+    DESCRIPTION
+        "Indicates a traffic class group.  Values 0-7 correspond to
+        traffic class groups."
+    SYNTAX    Integer32 (0..7)
+
+EqlDcbxAppSelector ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the contents of a protocol object
+        0: Ethertype
+        1: TCP Port number
+        2: UDP Port number
+        3: Port number over both TCP and UDP
+        4: Port number over neither TCP nor UDP"
+    SYNTAX INTEGER {
+        asEthertype(0),
+        asTCPPortNumber(1),
+        asUDPPortNumber(2),
+        asTCPUDPPortNumber(3),
+        asNotTCPUDPPortNumber(4)
+    }
+ 
+EqlDcbxAppProtocol ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d"
+     STATUS        current
+     DESCRIPTION
+         "Contains the application protocol indicator the
+         type of which is specified by an object with 
+         the syntax of EqlDcbxAppSelector"
+     SYNTAX Integer32 (0..65535)
+
+EqlDcbxSupportedCapacity ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS    current
+    DESCRIPTION
+        "Indicates the supported capacity of a given feature,
+        for example, the number of traffic classes supported.
+        This TC is used for features that have a maximum
+        capacity of eight but may have fewer supported."
+    SYNTAX Integer32 (0..8)
+
+EqlVlanIdentifier ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "A value used to identify a VLAN for VLAN tagged frames."
+    SYNTAX Unsigned32 (0|1..4094|4095)
+
+EqlIEEE8021PriorityValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "An 802.1Q user priority value."
+    REFERENCE   "12.13.3.3"
+    SYNTAX      Unsigned32 (0..7)
+
+EqlIEEEDraftSubtypeValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The sub-type to use within an 802.1Q draft TLV."
+    SYNTAX      Unsigned32 (0..255)
+
+EqlDcbxState ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the current state of a DCB feature."
+    SYNTAX INTEGER {
+        off(0),
+        on(1),
+        disabled(2)
+    }
+
+EqlDcbxVlanState ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the current state of VLAN tagging."
+    SYNTAX INTEGER {
+        off(0),
+        static(1),
+        dynamic(2)
+    }
+
+EqlDcbxTransmissionSelectionAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the Transmission Selection Algorithm
+        0: Strict priority
+        1: Credit-based shaper
+        2: Enhanced transmission selection
+        3-254: Reserved
+        255: Vendor-specific."
+    SYNTAX INTEGER {
+        tsaStrictPriority(0),
+        tsaCreditBasedShaper(1),
+        tsaEnhancedTransmission(2),
+        tsaVendorSpecific(255)
+    }
+
+EqlDcbxMode ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Indicates the current operating mode of DCB."
+    SYNTAX INTEGER {
+        off(0),
+        dcbx101Baseline(1),
+        dcbxIeeeStandard(2)
+    }
+
+--
+-- Static DCB interface table contains configuration information
+-- for DCB features (PFC, ETS, QCN).
+--
+eqlDcbStaticIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EqlDcbStaticIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "EqualLogic-Persistent
+        A table of DCB information per each interface of a system.
+        Each row in this table supplies values for one port's
+        DCB parameters."
+    ::= { eqlDcbMIBObjects 1 }
+
+eqlDcbStaticIfEntry OBJECT-TYPE
+    SYNTAX      EqlDcbStaticIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry in the DCB table, containing information
+        about DCB on a single interface."
+    INDEX { eqlGroupId, eqlMemberIndex, ifIndex }
+    ::= { eqlDcbStaticIfTable 1 }
+
+EqlDcbStaticIfEntry ::= SEQUENCE {
+        eqlDcbxConfigTCSupportedTxEnable            TruthValue,
+        eqlDcbxConfigETSConfigurationTxEnable       TruthValue,
+        eqlDcbxConfigETSRecommendationTxEnable      TruthValue,
+        eqlDcbxConfigPFCTxEnable                    TruthValue,
+        eqlDcbxConfigAppPriorityTxEnable            TruthValue,
+        eqlDcbxConfigQcnTxEnable                    TruthValue,
+        eqlDcbxAdminTCSupported                     EqlDcbxSupportedCapacity,
+        eqlDcbxAdminETSConMaxTCG                    EqlDcbxSupportedCapacity,
+        eqlDcbxAdminETSConWilling                   TruthValue,
+        eqlDcbxAdminETSConTrafficClassGroupBandwidthTable OCTET STRING,
+        eqlDcbxAdminETSRecoTrafficClassGroupBandwidthTable OCTET STRING,
+        eqlDcbxAdminPFCWilling                      TruthValue,
+        eqlDcbxAdminPFCMBC                          TruthValue,
+        eqlDcbxAdminPFCCap                          EqlDcbxSupportedCapacity,
+        eqlDcbxAdminAppPriorityWilling              TruthValue,
+        eqlDcbxConfigAutoDetectVLANEnable           TruthValue,
+        eqlDcbxConfigVLANId                         EqlVlanIdentifier,
+        eqlDcbxAdminETSConTrafficClassGroupPri0     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSConTrafficClassGroupPri1     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSConTrafficClassGroupPri2     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSConTrafficClassGroupPri3     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSConTrafficClassGroupPri4     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSConTrafficClassGroupPri5     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSConTrafficClassGroupPri6     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSConTrafficClassGroupPri7     EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminPFCEnableEnabledPri0            TruthValue,
+        eqlDcbxAdminPFCEnableEnabledPri1            TruthValue,
+        eqlDcbxAdminPFCEnableEnabledPri2            TruthValue,
+        eqlDcbxAdminPFCEnableEnabledPri3            TruthValue,
+        eqlDcbxAdminPFCEnableEnabledPri4            TruthValue,
+        eqlDcbxAdminPFCEnableEnabledPri5            TruthValue,
+        eqlDcbxAdminPFCEnableEnabledPri6            TruthValue,
+        eqlDcbxAdminPFCEnableEnabledPri7            TruthValue,
+        eqlDcbxAdminAppPriorityiSCSITxEnable        TruthValue,
+        eqlDcbxAdminAppPriorityiSCSIProtocol        EqlDcbxAppProtocol,
+        eqlDcbxAdminAppPriorityiSCSIPriority        EqlIEEE8021PriorityValue,
+        eqlDcbxAdminAppPriorityFCoETxEnable         TruthValue,
+        eqlDcbxAdminAppPriorityFCoEProtocol         EqlDcbxAppProtocol,
+        eqlDcbxAdminAppPriorityFCoEPriority         EqlIEEE8021PriorityValue,
+        eqlDcbxConfigDCBEnable                      TruthValue,
+        eqlDcbxConfigDCBX101Enable                  TruthValue,
+        eqlDcbxConfigDCBXIEEEDraftEnable            TruthValue,
+        eqlDcbxConfigQcnSubtype                     EqlIEEEDraftSubtypeValue,
+        eqlDcbxConfigETSConSubtype                  EqlIEEEDraftSubtypeValue,
+        eqlDcbxConfigETSRecoSubtype                 EqlIEEEDraftSubtypeValue,
+        eqlDcbxConfigPFCSubtype                     EqlIEEEDraftSubtypeValue,
+        eqlDcbxConfigAppPrioritySubtype             EqlIEEEDraftSubtypeValue,
+        eqlDcbxConfigTCSupportedSubtype             EqlIEEEDraftSubtypeValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri0    EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri1    EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri2    EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri3    EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri4    EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri5    EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri6    EqlDcbxTrafficClassGroupValue,
+        eqlDcbxAdminETSRecoTrafficClassGroupPri7    EqlDcbxTrafficClassGroupValue,
+        eqlDcbCnGlobalMasterEnable                  TruthValue,
+        eqlDcbCnRpPortPriMaxRps                     Unsigned32,
+        eqlDcbCnRpgEnablePri0                       TruthValue,
+        eqlDcbCnRpgEnablePri1                       TruthValue,
+        eqlDcbCnRpgEnablePri2                       TruthValue,
+        eqlDcbCnRpgEnablePri3                       TruthValue,
+        eqlDcbCnRpgEnablePri4                       TruthValue,
+        eqlDcbCnRpgEnablePri5                       TruthValue,
+        eqlDcbCnRpgEnablePri6                       TruthValue,
+        eqlDcbCnRpgEnablePri7                       TruthValue,
+        eqlDcbCnRpgTimeReset                        TimeInterval,
+        eqlDcbCnRpgByteReset                        Unsigned32,
+        eqlDcbCnRpgThreshold                        Unsigned32,
+        eqlDcbCnRpgMaxRate                          Unsigned32,
+        eqlDcbCnRpgAiRate                           Unsigned32,
+        eqlDcbCnRpgHaiRate                          Unsigned32,
+        eqlDcbCnRpgGd                               Integer32,
+        eqlDcbCnRpgMinDecFac                        Unsigned32,
+        eqlDcbCnRpgMinRate                          Unsigned32,
+        eqlDcbDefaultiSCSIPriority                  EqlIEEE8021PriorityValue,
+        eqlDcbDefaultFCoEPriority                   EqlIEEE8021PriorityValue,
+        eqlDcbxAdminETSConTsaTc0                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSConTsaTc1                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSConTsaTc2                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSConTsaTc3                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSConTsaTc4                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSConTsaTc5                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSConTsaTc6                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSConTsaTc7                    EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc0                   EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc1                   EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc2                   EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc3                   EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc4                   EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc5                   EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc6                   EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxAdminETSRecoTsaTc7                   EqlDcbxTransmissionSelectionAlgorithm
+}
+
+
+eqlDcbxConfigTCSupportedTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION 
+        "This field is deprecated."
+    ::= { eqlDcbStaticIfEntry 1 }
+
+eqlDcbxConfigETSConfigurationTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION 
+        "The eqlDcbxConfigETSConfigurationTxEnable, which is
+        defined as a truth value and configured by the network 
+        management, determines whether the IEEE 802.1 organizationally
+        defined ETS Configuration TLV transmission is allowed on a 
+        given LLDP transmission capable port.
+
+        The value of this object is restored from non-volatile
+        storage after a re-initialization of the management system."
+    REFERENCE
+        "35.5.2"
+    DEFVAL         { true }
+    ::= { eqlDcbStaticIfEntry 2 }
+
+eqlDcbxConfigETSRecommendationTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION 
+        "The eqlDcbxConfigETSRecommendationTxEnable, which is
+        defined as a truth value and configured by the network 
+        management, determines whether the IEEE 802.1 organizationally 
+        defined ETS Recommendation TLV transmission is allowed on a 
+        given LLDP transmission capable port.
+
+        The value of this object is restored from non-volatile
+        storage after a re-initialization of the management system."
+    REFERENCE
+        "35.5.3"
+    DEFVAL         { false }
+    ::= { eqlDcbStaticIfEntry 3 }
+
+eqlDcbxConfigPFCTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION 
+        "The eqlDcbxConfigPFCTxEnable, which is defined
+        as a truth value and configured by the network management,
+        determines whether the IEEE 802.1 organizationally defined
+        Priority-based Flow Fontrol TLV transmission is allowed on
+        a given LLDP transmission capable port.
+
+        The value of this object is restored from non-volatile
+        storage after a re-initialization of the management system."
+    REFERENCE
+        "35.5.4"
+    DEFVAL         { true }
+    ::= { eqlDcbStaticIfEntry 4 }
+
+eqlDcbxConfigAppPriorityTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION 
+        "The eqlDcbxConfigAppPriorityTxEnable, which
+        is defined as a truth value and configured by the network 
+        management, determines whether the IEEE 802.1 organizationally
+        defined Application Priority TLV transmission is allowed on
+        a given LLDP transmission capable port.
+
+        The value of this object is restored from non-volatile
+        storage after a re-initialization of the management system."
+    REFERENCE
+        "35.5.5"
+    DEFVAL         { true }
+    ::= { eqlDcbStaticIfEntry 5 }
+
+eqlDcbxConfigQcnTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION 
+        "The eqlDcbxConfigQcnTxEnable, which is defined
+        as a truth value and configured by the network management,
+        determines whether the IEEE 802.1 organizationally defined
+        Quantitized Congestion Notification TLV transmission is allowed on
+        a given LLDP transmission capable port.
+
+        The value of this object is restored from non-volatile
+        storage after a re-initialization of the management system."
+    REFERENCE
+        "35.5.4"
+    DEFVAL         { false }
+    ::= { eqlDcbStaticIfEntry 6 }
+
+eqlDcbxAdminTCSupported OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    ::= { eqlDcbStaticIfEntry 7 }
+
+eqlDcbxAdminETSConMaxTCG OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of Traffic Class Groups supported on the
+        remote system. A value of 0 indicates that 8 Traffic Class
+        Groups are supported."
+    REFERENCE
+        "35.5.2"
+    DEFVAL         { 0 }
+    ::= { eqlDcbStaticIfEntry 8 }
+
+eqlDcbxAdminETSConWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is willing to accept the
+        ETS configuration recommended by the remote system."
+    REFERENCE
+        "35.5.2"
+    DEFVAL         { true }
+    ::= { eqlDcbStaticIfEntry 9 }
+
+eqlDcbxAdminETSConTrafficClassGroupBandwidthTable OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(8))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Each octet corresponds to one traffic class group.  The first
+        octet corresponds to traffic class group 0, the second to
+        traffic class group 1, and so on.  Each octet contains the
+        bandwidth in percent to be allocated to the traffic class
+        group.  Valid values are between 0 and 100 inclusive.  The 
+        total of all eight octets must equal 100.
+
+        Note that an octet string is used instead of a table to enable
+        atomic programming of these values which is required to fulfill
+        the requirement that they always total to 100."
+    REFERENCE
+        "35.5.2"
+    DEFVAL      { '6400000000000000'H }
+    ::= { eqlDcbStaticIfEntry 10 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupBandwidthTable OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(8))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Each octet corresponds to one traffic class group.  The first
+        octet corresponds to traffic class group 0, the second to
+        traffic class group 1, and so on.  Each octet contains the
+        bandwidth in percent that the remote station is recommending to
+        be allocated to the traffic class group.  Valid values are
+        between 0 and 100 inclusive. The total of all eight octets must
+        equal 100.
+
+        Note that an octet string is used instead of a table to enable
+        atomic programming of these values which is required to fulfill
+        the requirement that they always total to 100."
+    REFERENCE
+        ".5.5.3"
+    DEFVAL      { '6400000000000000'H }
+    ::= { eqlDcbStaticIfEntry 11 }
+
+eqlDcbxAdminPFCWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is willing to accept the 
+        PFC configuration of the remote system."
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 12 }
+
+eqlDcbxAdminPFCMBC OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is capable of bypassing
+        MACSEC processing when MACSEC is disabled."
+    REFERENCE
+        "35.5.4"
+    DEFVAL         { false }
+    ::= { eqlDcbStaticIfEntry 13 }
+
+eqlDcbxAdminPFCCap OBJECT-TYPE
+    SYNTAX         EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "Indicates the number of traffic classes on the local device
+        that may simultaneously have PFC enabled."
+    REFERENCE
+        "35.5.4"
+    DEFVAL         { 8 }
+    ::= { eqlDcbStaticIfEntry 14 }
+
+eqlDcbxAdminAppPriorityWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is willing to accept the
+        Application Priority configuration of the remote system."
+    REFERENCE
+        "35.5.5"
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 15 }
+
+eqlDcbxConfigAutoDetectVLANEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Enable automatic detection of VLAN ID."
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 16 }
+
+eqlDcbxConfigVLANId OBJECT-TYPE
+    SYNTAX        EqlVlanIdentifier
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "VLAN ID to use for DCB."
+    DEFVAL      { 4095 }
+    ::= { eqlDcbStaticIfEntry 17 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 0 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 18 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 1 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 19 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 2 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 20 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 3 is
+        to be assigned."
+    REFERENCE
+        "35.5.2"
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 21 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 4 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 22 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 5 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 23 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 6 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 24 }
+
+eqlDcbxAdminETSConTrafficClassGroupPri7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 7 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 25 }
+
+eqlDcbxAdminPFCEnableEnabledPri0 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 0"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 26 }
+
+eqlDcbxAdminPFCEnableEnabledPri1 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 1"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 27 }
+
+eqlDcbxAdminPFCEnableEnabledPri2 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 2"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 28 }
+
+eqlDcbxAdminPFCEnableEnabledPri3 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 3"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 29 }
+
+eqlDcbxAdminPFCEnableEnabledPri4 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 4"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 30 }
+
+eqlDcbxAdminPFCEnableEnabledPri5 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 5"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 31 }
+
+eqlDcbxAdminPFCEnableEnabledPri6 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 6"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 32 }
+
+eqlDcbxAdminPFCEnableEnabledPri7 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 7"
+    REFERENCE
+        "35.5.4"
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 33 }
+
+eqlDcbxAdminAppPriorityiSCSITxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not the iSCSI application priority
+        entry is transmitted as part ot the Application Priority
+        TLV."
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 34 }
+
+eqlDcbxAdminAppPriorityiSCSIProtocol OBJECT-TYPE
+    SYNTAX        EqlDcbxAppProtocol
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The protocol indicator used for iSCSI in the Application
+        Priority TLV."
+    REFERENCE
+        "35.5.5"
+    DEFVAL      { 3260 }
+    ::= { eqlDcbStaticIfEntry 35 }
+
+eqlDcbxAdminAppPriorityiSCSIPriority OBJECT-TYPE
+    SYNTAX        EqlIEEE8021PriorityValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The priority value used for iSCSI in the Application
+        Priority TLV."
+    REFERENCE
+        "35.5.5"
+    DEFVAL      { 4 }
+    ::= { eqlDcbStaticIfEntry 36 }
+
+eqlDcbxAdminAppPriorityFCoETxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not the FCoE application priority
+        entry is transmitted as part ot the Application Priority
+        TLV."
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 37 }
+
+eqlDcbxAdminAppPriorityFCoEProtocol OBJECT-TYPE
+    SYNTAX        EqlDcbxAppProtocol
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The protocol indicator used for FCoE in the Application
+        Priority TLV."
+    REFERENCE
+        "35.5.5"
+    DEFVAL      { 35078 }
+    ::= { eqlDcbStaticIfEntry 38 }
+
+eqlDcbxAdminAppPriorityFCoEPriority OBJECT-TYPE
+    SYNTAX        EqlIEEE8021PriorityValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The priority value used for FCoE in the Application
+        Priority TLV."
+    REFERENCE
+        "35.5.5"
+    DEFVAL      { 3 }
+    ::= { eqlDcbStaticIfEntry 39 }
+
+eqlDcbxConfigDCBEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not DCB is enabled for this interface"
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 40 }
+
+eqlDcbxConfigDCBX101Enable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not the transmit of DCBX 1.01 TLVs
+        is enabled."
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 41 }
+
+eqlDcbxConfigDCBXIEEEDraftEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not the transmit of DCBX IEEE 802.1Qaz draft
+        TLVs is enabled."
+    DEFVAL      { true }
+    ::= { eqlDcbStaticIfEntry 42 }
+
+eqlDcbxConfigQcnSubtype OBJECT-TYPE
+    SYNTAX        EqlIEEEDraftSubtypeValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    DEFVAL      { 8 }
+    ::= { eqlDcbStaticIfEntry 43 }
+
+eqlDcbxConfigETSConSubtype OBJECT-TYPE
+    SYNTAX        EqlIEEEDraftSubtypeValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    DEFVAL      { 9 }
+    ::= { eqlDcbStaticIfEntry 44 }
+
+eqlDcbxConfigETSRecoSubtype OBJECT-TYPE
+    SYNTAX        EqlIEEEDraftSubtypeValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    DEFVAL      { 10 }
+    ::= { eqlDcbStaticIfEntry 45 }
+
+eqlDcbxConfigPFCSubtype OBJECT-TYPE
+    SYNTAX        EqlIEEEDraftSubtypeValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    DEFVAL      { 11 }
+    ::= { eqlDcbStaticIfEntry 46 }
+
+eqlDcbxConfigAppPrioritySubtype OBJECT-TYPE
+    SYNTAX        EqlIEEEDraftSubtypeValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    DEFVAL      { 12 }
+    ::= { eqlDcbStaticIfEntry 47 }
+
+eqlDcbxConfigTCSupportedSubtype OBJECT-TYPE
+    SYNTAX        EqlIEEEDraftSubtypeValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    ::= { eqlDcbStaticIfEntry 48 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 0 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 49 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 1 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 50 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 2 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 51 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 3 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 52 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 4 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 53 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 5 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 54 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 6 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 55 }
+
+eqlDcbxAdminETSRecoTrafficClassGroupPri7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 7 is
+        to be assigned."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 56 }
+
+eqlDcbCnGlobalMasterEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The state of the congestion notification feature on this bridge
+        component or system.  If true, Congestion notification is
+        enabled, and if false, congestion notification is disabled."
+    REFERENCE
+       "802.1Qau clause 32.2.1"
+    DEFVAL      { false }
+    ::= { eqlDcbStaticIfEntry 57 }
+
+eqlDcbCnRpPortPriMaxRps OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "An integer controlling the maximum number of Reaction Points
+        allowed for this CNPV on this Port. An end station SHALL
+        not create more than this many Reaction Point on this Port,
+        but it MAY create fewer."
+    REFERENCE
+       "802.1Qau clause 32.10.1"
+    DEFVAL { 65536 }
+    ::= { eqlDcbStaticIfEntry 58 }
+
+eqlDcbCnRpgEnablePri0 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 59 }
+
+eqlDcbCnRpgEnablePri1 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 60 }
+
+eqlDcbCnRpgEnablePri2 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 61 }
+
+eqlDcbCnRpgEnablePri3 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 62 }
+
+eqlDcbCnRpgEnablePri4 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 63 }
+
+eqlDcbCnRpgEnablePri5 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 64 }
+
+eqlDcbCnRpgEnablePri6 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 65 }
+
+eqlDcbCnRpgEnablePri7 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Controls the rpEnabled variable of the Reaction Point state
+        machines of the Reaction Points (RPs) controlled by this
+        entry as follows:
+            true(1)     The rpEnabled variable for the RPs controlled by
+                        this object are not held in the FALSE state,
+                        thus enabling them to pay attention to received
+                        CNMs.
+            false(2)    The rpEnabled variable for the RPs controlled by
+                        this object are held in the FALSE state, thus
+                        disabling them from paying attention to received
+                        CNMs.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.1, 32.13.1"
+    DEFVAL { false }
+    ::= { eqlDcbStaticIfEntry 66 }
+
+eqlDcbCnRpgTimeReset OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the value for all of the state machine
+        variables, rpgTimeReset, used to reset the timers RpWhile.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.2"
+    DEFVAL { 15 }
+    ::= { eqlDcbStaticIfEntry 67 }
+
+eqlDcbCnRpgByteReset OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the value for all of the state machine
+        variables, rpgByteReset, used to reset the counters
+        rpByteCount.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.3"
+    DEFVAL { 150000 }
+    ::= { eqlDcbStaticIfEntry 68 }
+
+eqlDcbCnRpgThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the number of times rpByteStage or
+        rpTimeStage can count before the
+        RP rate control state machine advances states.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.4"
+    DEFVAL { 5 }
+    ::= { eqlDcbStaticIfEntry 69 }
+
+eqlDcbCnRpgMaxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the maximum rate, in multiples of 1 Mbit/s,
+        at which an RP can transmit. Default value is the speed of the
+        port. A system SHALL support a minimim  value for this object
+        that is no larger than 5 Mbits/s (object value 5). This rate
+        includes all bits consequent to transmitting the frame on the
+        LAN, including preamble, inter-frame gap, etc.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.5"
+    DEFVAL { 10000 }
+    ::= { eqlDcbStaticIfEntry 70 }
+
+eqlDcbCnRpgAiRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the transmission rate increment in the
+        RPR_ACTIVE_INCREASE state (rpgAiRate) in multiples of 1 Mbit/s.
+        This rate includes all bits consequent to transmitting the
+        frame on the LAN, including preamble, inter-frame gap, etc.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.6"
+    DEFVAL { 5 }
+    ::= { eqlDcbStaticIfEntry 71 }
+
+eqlDcbCnRpgHaiRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the transmission rate increment in the
+        RPR_HYPER_INCREASE state (rpgHaiRate) in multiples of 1 Mbit/s.
+        This rate includes all bits consequent to transmitting the
+        frame on the LAN, including preamble, inter-frame gap, etc.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.7"
+    DEFVAL { 50 }
+    ::= { eqlDcbStaticIfEntry 72 }
+
+eqlDcbCnRpgGd OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the number of bits that the value of the
+        Quantized Feedback field received in a CNM PDU is shifted to
+        the right to decrease rpTargetRate. rpgGd is thus 2 to the
+        negative power of this object, e.g., 7 means rpgGd = 1/128.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.8"
+    DEFVAL { 7 }
+    ::= { eqlDcbStaticIfEntry 73 }
+
+eqlDcbCnRpgMinDecFac OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the minimum factor by which the current
+        RP transmit rate rpCurrentRate can be changed by reception
+        of a Congestion Notification Message.  Its integer value
+        represents a percentage, from 1% to 100%.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.9"
+    DEFVAL { 50 }
+    ::= { eqlDcbStaticIfEntry 74 }
+
+eqlDcbCnRpgMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbit/s"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the minimum transmission rate (rpgMinRate)
+        in multiples of 1 Mbit/s.  A system SHALL support a value for
+        this object that is no larger than 5 Mbit/s per second.
+        This rate includes all bits consequent to transmitting the
+        frame on the LAN, including preamble, inter-frame gap, etc.
+       "
+    REFERENCE
+       "802.1Qau clause 32.11.10"
+    DEFVAL { 5 }
+    ::= { eqlDcbStaticIfEntry 75 }
+
+eqlDcbDefaultiSCSIPriority OBJECT-TYPE
+    SYNTAX        EqlIEEE8021PriorityValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The default priority value used for iSCSI when no priority
+        value is negotiated through DCBX."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 76 }
+
+eqlDcbDefaultFCoEPriority OBJECT-TYPE
+    SYNTAX        EqlIEEE8021PriorityValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The default priority value used for FCoE when no priority
+        value is negotiated through DCBX."
+    DEFVAL      { 0 }
+    ::= { eqlDcbStaticIfEntry 77 }
+
+eqlDcbxAdminETSConTsaTc0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 78 }
+
+eqlDcbxAdminETSConTsaTc1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 79 }
+
+eqlDcbxAdminETSConTsaTc2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 80 }
+
+eqlDcbxAdminETSConTsaTc3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 81 }
+
+eqlDcbxAdminETSConTsaTc4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 82 }
+
+eqlDcbxAdminETSConTsaTc5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 83 }
+
+eqlDcbxAdminETSConTsaTc6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 84 }
+
+eqlDcbxAdminETSConTsaTc7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 85 }
+
+eqlDcbxAdminETSRecoTsaTc0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 86 }
+
+eqlDcbxAdminETSRecoTsaTc1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 87 }
+
+eqlDcbxAdminETSRecoTsaTc2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 88 }
+
+eqlDcbxAdminETSRecoTsaTc3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 89 }
+
+eqlDcbxAdminETSRecoTsaTc4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 90 }
+
+eqlDcbxAdminETSRecoTsaTc5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 91 }
+
+eqlDcbxAdminETSRecoTsaTc6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 92 }
+
+eqlDcbxAdminETSRecoTsaTc7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    DEFVAL      { tsaVendorSpecific }
+    ::= { eqlDcbStaticIfEntry 93 }
+
+
+--
+-- Dynamic DCB interface table contains status information and
+-- counters for DCB features (PFC, ETS, QCN).
+--
+eqlDcbDynamicIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EqlDcbDynamicIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "EqualLogic-Dynamic
+        A table of DCB information per each interface of a system.
+        Each row in this table supplies values for one port's
+        DCB parameters."
+    ::= { eqlDcbMIBObjects 2 }
+
+eqlDcbDynamicIfEntry OBJECT-TYPE
+    SYNTAX      EqlDcbDynamicIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry in the DCB table, containing information
+        about DCB on a single interface."
+    INDEX { eqlGroupId, eqlMemberIndex, ifIndex }
+    ::= { eqlDcbDynamicIfTable 1 }
+
+EqlDcbDynamicIfEntry ::= SEQUENCE {
+        eqlDcbPfcRequestsSent                   Counter32,
+        eqlDcbPfcIndicationsReceived            Counter32,
+        eqlDcbxLocTCSupported                   EqlDcbxSupportedCapacity,
+        eqlDcbxLocETSConMaxTCG                  EqlDcbxSupportedCapacity,
+        eqlDcbxLocETSConWilling                 TruthValue,
+        eqlDcbxLocETSConTrafficClassGroupBandwidthTable OCTET STRING,
+        eqlDcbxLocETSRecoTrafficClassGroupBandwidthTable OCTET STRING,
+        eqlDcbxLocPFCWilling                    TruthValue,
+        eqlDcbxLocPFCMBC                        TruthValue,
+        eqlDcbxLocPFCCap                        EqlDcbxSupportedCapacity,
+        eqlDcbxLocAppPriorityWilling            TruthValue,
+        eqlDcbxRemTCSupported                   EqlDcbxSupportedCapacity,
+        eqlDcbxRemETSConMaxTCG                  EqlDcbxSupportedCapacity,
+        eqlDcbxRemETSConWilling                 TruthValue,
+        eqlDcbxRemETSConTrafficClassGroupBandwidthTable OCTET STRING,
+        eqlDcbxRemETSRecoTrafficClassGroupBandwidthTable OCTET STRING,
+        eqlDcbxRemPFCWilling                    TruthValue,
+        eqlDcbxRemPFCMBC                        TruthValue,
+        eqlDcbxRemPFCCap                        EqlDcbxSupportedCapacity,
+        eqlDcbxRemAppPriorityWilling            TruthValue,
+        eqlDcbxLocETSConTrafficClassGroupPri0   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocETSConTrafficClassGroupPri1   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocETSConTrafficClassGroupPri2   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocETSConTrafficClassGroupPri3   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocETSConTrafficClassGroupPri4   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocETSConTrafficClassGroupPri5   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocETSConTrafficClassGroupPri6   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocETSConTrafficClassGroupPri7   EqlDcbxTrafficClassGroupValue,
+        eqlDcbxLocPFCEnableEnabledPri0          TruthValue,
+        eqlDcbxLocPFCEnableEnabledPri1          TruthValue,
+        eqlDcbxLocPFCEnableEnabledPri2          TruthValue,
+        eqlDcbxLocPFCEnableEnabledPri3          TruthValue,
+        eqlDcbxLocPFCEnableEnabledPri4          TruthValue,
+        eqlDcbxLocPFCEnableEnabledPri5          TruthValue,
+        eqlDcbxLocPFCEnableEnabledPri6          TruthValue,
+        eqlDcbxLocPFCEnableEnabledPri7          TruthValue,
+        eqlDcbxLocVLANId                        EqlVlanIdentifier,
+        eqlDcbxLocVLANState                     EqlDcbxVlanState,
+        eqlDcbxLocDCBState                      EqlDcbxState,
+        eqlDcbxLocPFCState                      EqlDcbxState,
+        eqlDcbxLocETSState                      EqlDcbxState,
+        eqlDcbxLocQCNState                      EqlDcbxState,
+        eqlDcbxLociSCSIPriority                 EqlIEEE8021PriorityValue,
+        eqlDcbxLocFCoEPriority                  EqlIEEE8021PriorityValue,
+        eqlDcbxLocBytesRxPri0                   Counter64,
+        eqlDcbxLocBytesRxPri1                   Counter64,
+        eqlDcbxLocBytesRxPri2                   Counter64,
+        eqlDcbxLocBytesRxPri3                   Counter64,
+        eqlDcbxLocBytesRxPri4                   Counter64,
+        eqlDcbxLocBytesRxPri5                   Counter64,
+        eqlDcbxLocBytesRxPri6                   Counter64,
+        eqlDcbxLocBytesRxPri7                   Counter64,
+        eqlDcbxLocBytesTxPri0                   Counter64,
+        eqlDcbxLocBytesTxPri1                   Counter64,
+        eqlDcbxLocBytesTxPri2                   Counter64,
+        eqlDcbxLocBytesTxPri3                   Counter64,
+        eqlDcbxLocBytesTxPri4                   Counter64,
+        eqlDcbxLocBytesTxPri5                   Counter64,
+        eqlDcbxLocBytesTxPri6                   Counter64,
+        eqlDcbxLocBytesTxPri7                   Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri0         Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri1         Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri2         Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri3         Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri4         Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri5         Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri6         Counter64,
+        eqlDcbCnRpPortPriCreatedRpsPri7         Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri0       Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri1       Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri2       Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri3       Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri4       Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri5       Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri6       Counter64,
+        eqlDcbCnRpPortPriCentisecondsPri7       Counter64,
+        eqlDcbxLocPfcPausePri0                  Counter64,
+        eqlDcbxLocPfcPausePri1                  Counter64,
+        eqlDcbxLocPfcPausePri2                  Counter64,
+        eqlDcbxLocPfcPausePri3                  Counter64,
+        eqlDcbxLocPfcPausePri4                  Counter64,
+        eqlDcbxLocPfcPausePri5                  Counter64,
+        eqlDcbxLocPfcPausePri6                  Counter64,
+        eqlDcbxLocPfcPausePri7                  Counter64,
+        eqlDcbxLocPfcUnpausePri0                Counter64,
+        eqlDcbxLocPfcUnpausePri1                Counter64,
+        eqlDcbxLocPfcUnpausePri2                Counter64,
+        eqlDcbxLocPfcUnpausePri3                Counter64,
+        eqlDcbxLocPfcUnpausePri4                Counter64,
+        eqlDcbxLocPfcUnpausePri5                Counter64,
+        eqlDcbxLocPfcUnpausePri6                Counter64,
+        eqlDcbxLocPfcUnpausePri7                Counter64,
+        eqlDcbxLocETSConTsaTc0                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSConTsaTc1                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSConTsaTc2                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSConTsaTc3                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSConTsaTc4                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSConTsaTc5                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSConTsaTc6                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSConTsaTc7                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc0                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc1                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc2                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc3                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc4                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc5                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc6                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocETSRecoTsaTc7                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc0                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc1                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc2                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc3                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc4                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc5                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc6                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSConTsaTc7                  EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc0                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc1                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc2                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc3                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc4                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc5                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc6                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxRemETSRecoTsaTc7                 EqlDcbxTransmissionSelectionAlgorithm,
+        eqlDcbxLocDCBMode                       EqlDcbxMode
+    }
+
+eqlDcbPfcRequestsSent    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the invoked PFC M_CONTROL.request primitives."
+    ::= { eqlDcbDynamicIfEntry 1 }
+
+eqlDcbPfcIndicationsReceived    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the received PFC M_CONTROL.indication primitives."
+    ::= { eqlDcbDynamicIfEntry 2 }
+
+eqlDcbxLocTCSupported OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    ::= { eqlDcbDynamicIfEntry 3 }
+
+eqlDcbxLocETSConMaxTCG OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of Traffic Class Groups supported on the
+        local system. A value of 0 indicates that 8 Traffic Class Groups
+        are supported."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 4 }
+
+eqlDcbxLocETSConWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is willing to accept the
+        ETS configuration recommended by the remote system."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 5 }
+
+eqlDcbxLocETSConTrafficClassGroupBandwidthTable OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Each octet corresponds to one traffic class group.  The first
+        octet corresponds to traffic class group 0, the second to
+        traffic class group 1, and so on.  Each octet contains the
+        bandwidth in percent to be allocated to the traffic class 
+        group. Valid values are between 0 and 100 inclusive.  The 
+        total of all eight octets must equal 100.
+
+        Note that an octet string is used instead of a table to enable
+        atomic programming of these values which is required to fulfill
+        the requirement that they always total to 100."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 6 }
+
+eqlDcbxLocETSRecoTrafficClassGroupBandwidthTable OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Each octet corresponds to one traffic class group.  The first
+        octet corresponds to traffic class group 0, the second to
+        traffic class group 1, and so on.  Each octet contains the
+        bandwidth in percent that the remote station is recommending
+        to be allocated to the traffic class group.  Valid values are
+        between 0 and 100 inclusive. The total of all eight octets must
+        equal 100.
+
+        Note that an octet string is used instead of a table to enable
+        atomic programming of these values which is required to fulfill
+        the requirement that they always total to 100."
+    REFERENCE
+        "35.5.3"
+    ::= { eqlDcbDynamicIfEntry 7 }
+
+eqlDcbxLocPFCWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is willing to accept the 
+        PFC configuration of the remote system."
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 8 }
+
+eqlDcbxLocPFCMBC OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is capable of bypassing
+        MACSEC processing when MACSEC is disabled."
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 9 }
+    
+eqlDcbxLocPFCCap OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of traffic classes on the local device
+        that may simultaneously have PFC enabled.  Zero indicates no
+        limitation, i.e. all available traffic classes may have PFC
+        enabled."
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 10 }
+
+eqlDcbxLocAppPriorityWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the local system is willing to accept
+        the Application Priority configuration of the remote system."
+    ::= { eqlDcbDynamicIfEntry 11 }
+
+eqlDcbxRemTCSupported OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+        "This field is deprecated."
+    ::= { eqlDcbDynamicIfEntry 12 }
+
+eqlDcbxRemETSConMaxTCG OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of Traffic Class Groups supported on the
+        remote system. A value of 0 indicates that 8 Traffic Class Groups
+        are supported."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 13 }
+
+eqlDcbxRemETSConWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the remote system is willing to accept the
+        ETS configuration recommended by the remote system."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 14 }
+
+eqlDcbxRemETSConTrafficClassGroupBandwidthTable OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Each octet corresponds to one traffic class group.  The first
+        octet corresponds to traffic class group 0, the second to
+        traffic class group 1, and so on.  Each octet contains the
+        bandwidth in percent to be allocated to the traffic class 
+        group. Valid values are between 0 and 100 inclusive.  The 
+        total of all eight octets must equal 100.
+
+        Note that an octet string is used instead of a table to enable
+        atomic programming of these values which is required to fulfill
+        the requirement that they always total to 100."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 15 }
+
+eqlDcbxRemETSRecoTrafficClassGroupBandwidthTable OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(8))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Each octet corresponds to one traffic class group.  The first
+        octet corresponds to traffic class group 0, the second to
+        traffic class group 1, and so on.  Each octet contains the
+        bandwidth in percent that the remote station is recommending
+        to be allocated to the traffic class group.  Valid values are
+        between 0 and 100 inclusive. The total of all eight octets must
+        equal 100.
+
+        Note that an octet string is used instead of a table to enable
+        atomic programming of these values which is required to fulfill
+        the requirement that they always total to 100."
+    REFERENCE
+        "35.5.3"
+    ::= { eqlDcbDynamicIfEntry 16 }
+
+eqlDcbxRemPFCWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the remote system is willing to accept the 
+        PFC configuration of the local system."
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 17 }
+
+eqlDcbxRemPFCMBC OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the remote system is capable of bypassing
+        MACSEC processing when MACSEC is disabled."
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 18 }
+    
+eqlDcbxRemPFCCap OBJECT-TYPE
+    SYNTAX        EqlDcbxSupportedCapacity
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of traffic classes on the remote device
+        that may simultaneously have PFC enabled.  Zero indicates no
+        limitation, i.e. all available traffic classes may have PFC
+        enabled."
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 19 }
+
+eqlDcbxRemAppPriorityWilling OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if the remote system is willing to accept
+        the Application Priority configuration of the local system."
+    ::= { eqlDcbDynamicIfEntry 20 }
+
+eqlDcbxLocETSConTrafficClassGroupPri0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 0 is
+        assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 21 }
+
+eqlDcbxLocETSConTrafficClassGroupPri1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 1 is
+        assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 22 }
+
+eqlDcbxLocETSConTrafficClassGroupPri2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 2 is
+        assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 23 }
+
+eqlDcbxLocETSConTrafficClassGroupPri3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 3 is
+        assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 24 }
+
+eqlDcbxLocETSConTrafficClassGroupPri4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 4 is
+        assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 25 }
+
+eqlDcbxLocETSConTrafficClassGroupPri5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 5 is
+        to be assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 26 }
+
+eqlDcbxLocETSConTrafficClassGroupPri6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 6 is
+        assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 27 }
+
+eqlDcbxLocETSConTrafficClassGroupPri7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTrafficClassGroupValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the traffic class group to which priority 7 is
+        assigned."
+    REFERENCE
+        "35.5.2"
+    ::= { eqlDcbDynamicIfEntry 28 }
+
+eqlDcbxLocPFCEnableEnabledPri0 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 0"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 29 }
+
+eqlDcbxLocPFCEnableEnabledPri1 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 1"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 30 }
+
+eqlDcbxLocPFCEnableEnabledPri2 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 2"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 31 }
+
+eqlDcbxLocPFCEnableEnabledPri3 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 3"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 32 }
+
+eqlDcbxLocPFCEnableEnabledPri4 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 4"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 33 }
+
+eqlDcbxLocPFCEnableEnabledPri5 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 5"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 34 }
+
+eqlDcbxLocPFCEnableEnabledPri6 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 6"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 35 }
+
+eqlDcbxLocPFCEnableEnabledPri7 OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates if PFC is enabled on priority 7"
+    REFERENCE
+        "35.5.4"
+    ::= { eqlDcbDynamicIfEntry 36 }
+
+eqlDcbxLocVLANId OBJECT-TYPE
+    SYNTAX        EqlVlanIdentifier
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VLAN ID to use for DCB."
+    ::= { eqlDcbDynamicIfEntry 37 }
+
+eqlDcbxLocVLANState OBJECT-TYPE
+    SYNTAX        EqlDcbxVlanState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "State of VLAN tagging."
+    ::= { eqlDcbDynamicIfEntry 38 }
+
+eqlDcbxLocDCBState OBJECT-TYPE
+    SYNTAX        EqlDcbxState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current state of DCB."
+    ::= { eqlDcbDynamicIfEntry 39 }
+
+eqlDcbxLocPFCState OBJECT-TYPE
+    SYNTAX        EqlDcbxState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current state of DCB feature PFC."
+    ::= { eqlDcbDynamicIfEntry 40 }
+
+eqlDcbxLocETSState OBJECT-TYPE
+    SYNTAX        EqlDcbxState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current state of DCB feature ETS."
+    ::= { eqlDcbDynamicIfEntry 41 }
+
+eqlDcbxLocQCNState OBJECT-TYPE
+    SYNTAX        EqlDcbxState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current state of DCB feature QCN."
+    ::= { eqlDcbDynamicIfEntry 42 }
+
+eqlDcbxLociSCSIPriority OBJECT-TYPE
+    SYNTAX        EqlIEEE8021PriorityValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current iSCSI priority."
+    ::= { eqlDcbDynamicIfEntry 43 }
+
+eqlDcbxLocFCoEPriority OBJECT-TYPE
+    SYNTAX        EqlIEEE8021PriorityValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current state of DCB feature QCN."
+    ::= { eqlDcbDynamicIfEntry 44 }
+
+eqlDcbxLocBytesRxPri0 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 0."
+    ::= { eqlDcbDynamicIfEntry 45 }
+
+eqlDcbxLocBytesRxPri1 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 1."
+    ::= { eqlDcbDynamicIfEntry 46 }
+
+eqlDcbxLocBytesRxPri2 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 2."
+    ::= { eqlDcbDynamicIfEntry 47 }
+
+eqlDcbxLocBytesRxPri3 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 3."
+    ::= { eqlDcbDynamicIfEntry 48 }
+
+eqlDcbxLocBytesRxPri4 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 4."
+    ::= { eqlDcbDynamicIfEntry 49 }
+
+eqlDcbxLocBytesRxPri5 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 5."
+    ::= { eqlDcbDynamicIfEntry 50 }
+
+eqlDcbxLocBytesRxPri6 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 6."
+    ::= { eqlDcbDynamicIfEntry 51 }
+
+eqlDcbxLocBytesRxPri7 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes recevied on priority 7."
+    ::= { eqlDcbDynamicIfEntry 52 }
+
+eqlDcbxLocBytesTxPri0 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 0."
+    ::= { eqlDcbDynamicIfEntry 53 }
+
+eqlDcbxLocBytesTxPri1 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 1."
+    ::= { eqlDcbDynamicIfEntry 54 }
+
+eqlDcbxLocBytesTxPri2 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 2."
+    ::= { eqlDcbDynamicIfEntry 55 }
+
+eqlDcbxLocBytesTxPri3 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 3."
+    ::= { eqlDcbDynamicIfEntry 56 }
+
+eqlDcbxLocBytesTxPri4 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 4."
+    ::= { eqlDcbDynamicIfEntry 57 }
+
+eqlDcbxLocBytesTxPri5 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 5."
+    ::= { eqlDcbDynamicIfEntry 58 }
+
+eqlDcbxLocBytesTxPri6 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 6."
+    ::= { eqlDcbDynamicIfEntry 59 }
+
+eqlDcbxLocBytesTxPri7 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Count of bytes transmitted on priority 7."
+    ::= { eqlDcbDynamicIfEntry 60 }
+
+eqlDcbCnRpPortPriCreatedRpsPri0 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 61 }
+
+eqlDcbCnRpPortPriCreatedRpsPri1 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 62 }
+
+eqlDcbCnRpPortPriCreatedRpsPri2 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 63 }
+
+eqlDcbCnRpPortPriCreatedRpsPri3 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 64 }
+
+eqlDcbCnRpPortPriCreatedRpsPri4 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 65 }
+
+eqlDcbCnRpPortPriCreatedRpsPri5 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 66 }
+
+eqlDcbCnRpPortPriCreatedRpsPri6 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 67 }
+
+eqlDcbCnRpPortPriCreatedRpsPri7 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the number of times any of the
+        Reaction Points (RPs) controlled by this entry has had
+        its rpEnabled variable set TRUE by the reception of a
+        Congestion Notification Message.
+
+        Dividing the change in eqlDcbCnRpPortPriCentiseconds by the
+        change in this object over a time interval yields the average
+        lifetime of an active RP during that interval."
+    ::= { eqlDcbDynamicIfEntry 68 }
+
+eqlDcbCnRpPortPriCentisecondsPri0   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 69 }
+
+eqlDcbCnRpPortPriCentisecondsPri1   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 70 }
+
+eqlDcbCnRpPortPriCentisecondsPri2   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 71 }
+
+eqlDcbCnRpPortPriCentisecondsPri3   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 72 }
+
+eqlDcbCnRpPortPriCentisecondsPri4   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 73 }
+
+eqlDcbCnRpPortPriCentisecondsPri5   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 74 }
+
+eqlDcbCnRpPortPriCentisecondsPri6   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 75 }
+
+eqlDcbCnRpPortPriCentisecondsPri7   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object returns the total number of centi-seconds that
+        any of the Reaction Points (RPs) controlled by this entry
+        has had its rpEnabled variable in the TRUE state. That is,
+        once each centi-second, this counter is incremented by the
+        number of RPs this entry controls that are actively rate
+        limiting output frames.
+
+        Dividing the change in this object over a time interval by the
+        length of the interval yields the average number of RPs active
+        over that interval. Dividing the change in this object by the
+        change in eqlDcbCnRpPortPriCreatedRps over that same time
+        interval yields the average lifetime of an active RP during that
+        interval.
+        "
+    REFERENCE
+        "802.1Qau clause 32.10.3, 32.13.1"
+    ::= { eqlDcbDynamicIfEntry 76 }
+
+eqlDcbxLocPfcPausePri0 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 0."
+    ::= { eqlDcbDynamicIfEntry 77 }
+
+eqlDcbxLocPfcPausePri1 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 1."
+    ::= { eqlDcbDynamicIfEntry 78 }
+
+eqlDcbxLocPfcPausePri2 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 2."
+    ::= { eqlDcbDynamicIfEntry 79 }
+
+eqlDcbxLocPfcPausePri3 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 3."
+    ::= { eqlDcbDynamicIfEntry 80 }
+
+eqlDcbxLocPfcPausePri4 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 4."
+    ::= { eqlDcbDynamicIfEntry 81 }
+
+eqlDcbxLocPfcPausePri5 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 5."
+    ::= { eqlDcbDynamicIfEntry 82 }
+
+eqlDcbxLocPfcPausePri6 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 6."
+    ::= { eqlDcbDynamicIfEntry 83 }
+
+eqlDcbxLocPfcPausePri7 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC pause frames received for priority 7."
+    ::= { eqlDcbDynamicIfEntry 84 }
+
+
+eqlDcbxLocPfcUnpausePri0 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 0."
+    ::= { eqlDcbDynamicIfEntry 85 }
+
+eqlDcbxLocPfcUnpausePri1 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 1."
+    ::= { eqlDcbDynamicIfEntry 86 }
+
+eqlDcbxLocPfcUnpausePri2 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 2."
+    ::= { eqlDcbDynamicIfEntry 87 }
+
+eqlDcbxLocPfcUnpausePri3 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 3."
+    ::= { eqlDcbDynamicIfEntry 88 }
+
+eqlDcbxLocPfcUnpausePri4 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 4."
+    ::= { eqlDcbDynamicIfEntry 89 }
+
+eqlDcbxLocPfcUnpausePri5 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 5."
+    ::= { eqlDcbDynamicIfEntry 90 }
+
+eqlDcbxLocPfcUnpausePri6 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 6."
+    ::= { eqlDcbDynamicIfEntry 91 }
+
+eqlDcbxLocPfcUnpausePri7 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of time PFC unpause frames received for priority 7."
+    ::= { eqlDcbDynamicIfEntry 92 }
+
+eqlDcbxLocETSConTsaTc0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 93 }
+
+eqlDcbxLocETSConTsaTc1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 94 }
+
+eqlDcbxLocETSConTsaTc2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 95 }
+
+eqlDcbxLocETSConTsaTc3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 96 }
+
+eqlDcbxLocETSConTsaTc4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 97 }
+
+eqlDcbxLocETSConTsaTc5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 98 }
+
+eqlDcbxLocETSConTsaTc6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 99 }
+
+eqlDcbxLocETSConTsaTc7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 100 }
+
+eqlDcbxLocETSRecoTsaTc0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 101 }
+
+eqlDcbxLocETSRecoTsaTc1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 102 }
+
+eqlDcbxLocETSRecoTsaTc2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 103 }
+
+eqlDcbxLocETSRecoTsaTc3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 104 }
+
+eqlDcbxLocETSRecoTsaTc4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 105 }
+
+eqlDcbxLocETSRecoTsaTc5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 106 }
+
+eqlDcbxLocETSRecoTsaTc6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 107 }
+
+eqlDcbxLocETSRecoTsaTc7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 108 }
+
+eqlDcbxRemETSConTsaTc0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 109 }
+
+eqlDcbxRemETSConTsaTc1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 110 }
+
+eqlDcbxRemETSConTsaTc2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 111 }
+
+eqlDcbxRemETSConTsaTc3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 112 }
+
+eqlDcbxRemETSConTsaTc4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 113 }
+
+eqlDcbxRemETSConTsaTc5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 114 }
+
+eqlDcbxRemETSConTsaTc6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 115 }
+
+eqlDcbxRemETSConTsaTc7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 116 }
+
+eqlDcbxRemETSRecoTsaTc0 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 117 }
+
+eqlDcbxRemETSRecoTsaTc1 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 118 }
+
+eqlDcbxRemETSRecoTsaTc2 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 119 }
+
+eqlDcbxRemETSRecoTsaTc3 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 120 }
+
+eqlDcbxRemETSRecoTsaTc4 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 121 }
+
+eqlDcbxRemETSRecoTsaTc5 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 122 }
+
+eqlDcbxRemETSRecoTsaTc6 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 123 }
+
+eqlDcbxRemETSRecoTsaTc7 OBJECT-TYPE
+    SYNTAX        EqlDcbxTransmissionSelectionAlgorithm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the transmission selection algorithm which is assigned
+        to this traffic class."
+    ::= { eqlDcbDynamicIfEntry 124 }
+
+eqlDcbxLocDCBMode OBJECT-TYPE
+    SYNTAX        EqlDcbxMode
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current operating mode of DCB."
+    ::= { eqlDcbDynamicIfEntry 125 }
+
+END

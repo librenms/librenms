@@ -26,10 +26,11 @@ $config_value = mres($_POST['config_value']);
 $config_extra = mres($_POST['config_extra']);
 $config_room_id = mres($_POST['config_room_id']);
 $config_from = mres($_POST['config_from']);
+$config_userkey = mres($_POST['config_userkey']);
 $status = 'error';
 $message = 'Error with config';
 
-if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat') {
+if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover') {
     $config_id = mres($_POST['config_id']);
     if (empty($config_id)) {
         $message = 'No config id passed';
@@ -39,6 +40,8 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
                 dbDelete('config', "`config_name` LIKE 'alert.transports.slack.$config_id.%'");
             } elseif ($action == 'remove-hipchat') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.hipchat.$config_id.%'");
+            } elseif ($action == 'remove-pushover') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.pushover.$config_id.%'");
             }
             $status = 'ok';
             $message = 'Config item removed';
@@ -73,8 +76,8 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
         $config_id = dbInsert(array('config_name' => 'alert.transports.hipchat.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$config_value, 'config_descr'=>'Hipchat Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
-            dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.room_id', 'config_value' => $config_room_id, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$config_room_id, 'config_descr'=>'Hipchat URL'), 'config');
-            dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.from', 'config_value' => $config_from, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$config_from, 'config_descr'=>'Hipchat From'), 'config');
+            $additional_id['room_id'] = dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.room_id', 'config_value' => $config_room_id, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$config_room_id, 'config_descr'=>'Hipchat URL'), 'config');
+            $additional_id['from'] = dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.from', 'config_value' => $config_from, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$config_from, 'config_descr'=>'Hipchat From'), 'config');
             $status = 'ok';
             $message = 'Config item created';
             $extras = explode('\n',$config_extra);
@@ -82,6 +85,27 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
                 list($k,$v) = explode("=", $option,2);
                 if (!empty($k) || !empty($v)) {
                     dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$v, 'config_descr'=>'Hipchat '.$v), 'config');
+                }
+            }
+        } else {
+            $message = 'Could not create config item';
+        }
+    }
+} elseif ($action == 'add-pushover') {
+    if (empty($config_value) || empty($config_userkey)) {
+        $message = 'No pushover appkey or userkey provided';
+    } else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.pushover.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$config_value, 'config_descr'=>'Pushover Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.pushover.'.$config_id.'.appkey'), 'config', 'config_id=?', array($config_id));
+            $additional_id['userkey'] = dbInsert(array('config_name' => 'alert.transports.pushover.'.$config_id.'.userkey', 'config_value' => $config_userkey, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$config_userkey, 'config_descr'=>'Pushver Userkey'), 'config');
+            $status = 'ok';
+            $message = 'Config item created';
+            $extras = explode('\n',$config_extra);
+            foreach ($extras as $option) {
+                list($k,$v) = explode("=", $option,2);
+                if (!empty($k) || !empty($v)) {
+                    dbInsert(array('config_name' => 'alert.transports.pushover.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default'=>$v, 'config_descr'=>'Pushover '.$v), 'config');
                 }
             }
         } else {
@@ -104,5 +128,5 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
     }
 }
 
-$response = array('status'=>$status,'message'=>$message, 'config_id'=>$config_id);
+$response = array('status'=>$status,'message'=>$message, 'config_id'=>$config_id, 'additional_id'=>$additional_id);
 echo _json_encode($response);

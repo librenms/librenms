@@ -30,7 +30,16 @@ var grid = $("#arp-search").bootgrid({
 <?php
 
 // Select the devices only with ARP tables
-foreach (dbFetchRows("SELECT D.device_id AS device_id, `hostname` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D WHERE M.port_id = P.port_id AND P.device_id = D.device_id GROUP BY `device_id` ORDER BY `hostname`") as $data) {
+$sql = "SELECT D.device_id AS device_id, `hostname` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D";
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`";
+    $where .= " AND `DP`.`user_id`=?";
+    $param[] = $_SESSION['user_id'];
+}
+
+$sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `device_id` ORDER BY `hostname`";
+foreach (dbFetchRows($sql,$param) as $data) {
     echo('"<option value=\"'.$data['device_id'].'\""+');
     if ($data['device_id'] == $_POST['device_id']) {
         echo('" selected "+');
