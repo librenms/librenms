@@ -7,10 +7,18 @@ if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%')";
+    $sql_search .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%')";
 }
 
-$sql = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id` RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE $where AND `state` IN (1,2,3,4) $sql";
+$sql = " FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`";
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
+    $where .= " AND `DP`.`user_id`=?";
+    $param[] = $_SESSION['user_id'];
+}
+
+$sql .= "  RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE $where AND `state` IN (1,2,3,4) $sql_search";
 
 $count_sql = "SELECT COUNT(`alerts`.`id`) $sql";
 $total = dbFetchCell($count_sql,$param);
@@ -78,14 +86,12 @@ foreach (dbFetchRows($sql,$param) as $alert) {
         $severity .= " <strong>-</strong>";
     }
 
-    if ($_SESSION['userlevel'] >= '10') {
-        $ack_ico = 'volume-up';
-        $ack_col = 'success';
-        if($alert['state'] == 2) {
-            $ack_ico = 'volume-off';
-            $ack_col = 'danger';
-        }
-    }
+    $ack_ico = 'volume-up';
+    $ack_col = 'success';
+    if($alert['state'] == 2) {
+        $ack_ico = 'volume-off';
+        $ack_col = 'danger';
+     }
 
     $hostname = '
      <div class="incident">
