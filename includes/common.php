@@ -751,7 +751,7 @@ function get_smokeping_files($device) {
     global $config;
     if (isset($config['smokeping']['dir'])) {
         $smokeping_files = array();
-        $filename_dir = generate_smokeping_dir($device);
+        $smokeping_dir = generate_smokeping_dir($device);
         if ($handle = opendir($smokeping_dir)) {
             while (false !== ($file = readdir($handle))) {
                 if ($file != "." && $file != "..") {

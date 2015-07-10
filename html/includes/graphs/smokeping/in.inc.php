@@ -31,9 +31,10 @@ if($width > "500")
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev                              \l'";
 }
 
+$filename_dir = generate_smokeping_dir($device);
 if($src['hostname'] == $config['own_hostname'])
 {
-    $filename_dir = generate_smokeping_dir($device);
+    $filename = $filename_dir . $device['hostname'].'.rrd';
   if (!file_exists($filename_dir.$device['hostname'].'.rrd'))
   {
     // Try with dots in hostname replaced by underscores
