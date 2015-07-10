@@ -669,6 +669,7 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $os = "drac";
 $config['os'][$os]['text']              = "Dell DRAC";
 $config['os'][$os]['icon']              = "dell";
+$config['os'][$os]['type']              = "server";
 
 $os = "bcm963";
 $config['os'][$os]['text']              = "Broadcom BCM963xx";
@@ -1188,6 +1189,31 @@ foreach ($config['os'] as $this_os => $blah)
     }
   }
 }
+
+// Meraki Devices
+$os = "merakimx";
+$config['os'][$os]['text']              = "Meraki MX Appliance";
+$config['os'][$os]['type']              = "firewall";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
+$os = "merakimr";
+$config['os'][$os]['text']              = "Meraki AP";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
+$os = "merakims";
+$config['os'][$os]['text']              = "Meraki Switch";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 // Graph Types
 

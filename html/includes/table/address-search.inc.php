@@ -1,11 +1,18 @@
 <?php
 
-$where = 1;
 $param = array();
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $perms_sql .= " LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`";
+    $where .= " AND `DP`.`user_id`=?";
+    $param[] = array($_SESSION['user_id']);
+}
 
 list($address,$prefix) = explode("/", $_POST['address']);
 if ($_POST['search_type'] == 'ipv4') {
-    $sql = " FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D, `ipv4_networks` AS N WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id ";
+    $sql = " FROM `ipv4_addresses` AS A, `ports` AS I, `ipv4_networks` AS N, `devices` AS D";
+    $sql .= $perms_sql;
+    $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id $where ";
     if (!empty($address)) {
         $sql .= " AND ipv4_address LIKE '%".$address."%'";
     }
@@ -14,7 +21,9 @@ if ($_POST['search_type'] == 'ipv4') {
         $param[] = array($prefix);
     }
 } elseif ($_POST['search_type'] == 'ipv6') {
-    $sql = " FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D, `ipv6_networks` AS N WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id ";
+    $sql = " FROM `ipv6_addresses` AS A, `ports` AS I, `ipv6_networks` AS N, `devices` AS D";
+    $sql .= $perms_sql;
+    $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id $where ";
     if (!empty($address)) {
         $sql .= " AND (ipv6_address LIKE '%".$address."%' OR ipv6_compressed LIKE '%".$address."%')";
     }
@@ -22,8 +31,9 @@ if ($_POST['search_type'] == 'ipv4') {
         $sql .= " AND ipv6_prefixlen = '$prefix'";
     }
 } elseif ($_POST['search_type'] == 'mac') {
-    $sql = " FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%?%' ";
-    $param[] = array("%".str_replace(array(':', ' ', '-', '.', '0x'),'',mres($_POST['address']))."%");
+    $sql = " FROM `ports` AS I, `devices` AS D";
+    $sql .= $perms_sql;
+    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%".str_replace(array(':', ' ', '-', '.', '0x'),'',mres($_POST['address']))."%' $where ";
 }
 if (is_numeric($_POST['device_id'])) {
     $sql  .= " AND I.device_id = ?";

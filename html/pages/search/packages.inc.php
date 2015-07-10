@@ -70,9 +70,18 @@ if(isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 
 $count_query = "SELECT COUNT(*) FROM ( ";
 $full_query = "";
-$query = 'SELECT packages.name FROM packages,devices WHERE packages.device_id = devices.device_id AND packages.name LIKE "%'.mres($_POST['package']).'%" GROUP BY packages.name';
-$where = '';
+$query = 'SELECT packages.name FROM packages,devices ';
 $param = array();
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $query .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
+    $sql_where .= " AND `DP`.`user_id`=?";
+    $param[] = $_SESSION['user_id'];
+}
+
+$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";
+
+$where = '';
 $ver = "";
 $opt = "";
 

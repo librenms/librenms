@@ -1,0 +1,410 @@
+BASP-Statistics-MIB DEFINITIONS ::= BEGIN
+
+          -- Broadcom(R) Advanced Server Statistics MIB
+          -- 
+          -- This MIB defines Load Balance/VLAN Statistics Management Information Base.
+          -- These objects are part of the enterprise MIB for Broadcom Advanced Server.
+          --
+
+          IMPORTS
+                  enterprises, Counter
+                          FROM RFC1155-SMI
+                  OBJECT-TYPE
+                          FROM RFC-1212
+                  DisplayString
+                          FROM RFC1213-MIB;
+
+
+    broadcom            OBJECT IDENTIFIER ::= { enterprises 4413 }
+    enet                OBJECT IDENTIFIER ::= { broadcom 1 }
+    basp                OBJECT IDENTIFIER ::= { enet 2 }
+    baspStat            OBJECT IDENTIFIER ::= { basp 2 }
+    baspTeamStat        OBJECT IDENTIFIER ::= { baspStat 1 }
+    baspPhyAdapterStat  OBJECT IDENTIFIER ::= { baspStat 2 }
+    baspVirAdapterStat  OBJECT IDENTIFIER ::= { baspStat 3 }
+
+------------------------
+-- baspTeamStat Group --
+------------------------
+          btsTeamNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of loadbalance teams
+                       present on this system."
+              ::= { baspTeamStat 1 }
+
+          btsTeamTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF BtsTeamEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of team entries.  The number of
+                      teams is given by the value of teamNumber."
+              ::= { baspTeamStat 2 }
+
+          btsTeamEntry OBJECT-TYPE
+              SYNTAX  BtsTeamEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An entry containing team statistics objects 
+                       at the target system."
+              INDEX   { btsTeamIndex }
+              ::= { btsTeamTable 1 }
+
+          BtsTeamEntry ::=
+              SEQUENCE {
+                  btsTeamIndex
+                      INTEGER,
+                  btsTeamName
+                      DisplayString,
+                  btsPhyNumber
+                      INTEGER,
+                  btsVirNumber
+                      INTEGER,
+                  btsPacketSends
+                      Counter,
+                  btsPacketSendDiscardeds
+                      Counter,
+                  btsPacketSendQueueds
+                      Counter,
+                  btsPacketRecvs
+                      Counter,
+                  btsPacketRecvDiscardeds
+                      Counter,
+                  btsLinkPacketsSents
+                      Counter,
+                  btsLinkPacketsRetrieds
+                      Counter
+              }
+              
+          btsTeamIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An unique value for each team.    
+                       The value for each team must remain constant at
+                       least from one re-initialization of the entity's
+                       network management system to the next re-
+                       initialization."
+                      
+              ::= { btsTeamEntry 1 }
+              
+          btsTeamName  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing name of the team"
+              ::= { btsTeamEntry 2 }
+
+          btsPhyNumber  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of physical adapters in the team"
+              ::= { btsTeamEntry 3 }
+              
+          btsVirNumber  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of virtual adapters in the team "
+              ::= { btsTeamEntry 4 }
+         
+          btsPacketSends OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of send packets that are forwarded to the team members,
+                         derived from physical adapter statistics."
+                ::= { btsTeamEntry 5 }
+                
+          btsPacketSendDiscardeds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of send packets that are discarded,
+                         derived from physical adapter statistics."
+                ::= { btsTeamEntry 6 }
+                
+          btsPacketSendQueueds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of send packets queued by driver waiting for resource"
+                ::= { btsTeamEntry 7 }
+      
+           btsPacketRecvs OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of receive packets that are indicated to upper layer,
+                         derived from physical adapter statistics."
+                ::= { btsTeamEntry 8 }
+
+           btsPacketRecvDiscardeds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of receive packets discarded,
+                         derived from physical adapter statistics."
+                ::= { btsTeamEntry 9 }
+
+           btsLinkPacketsSents OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "For LiveLink feature: Number of link packets sent 
+                         across all adapters for the team - Expressed as a 
+                         quantity."
+                ::= { btsTeamEntry 10 }
+
+           btsLinkPacketsRetrieds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "For LiveLink feature: The number of retry packets 
+                         sent across all adapters for the team - Expressed 
+                         as a quantity."
+                ::= { btsTeamEntry 11 }
+
+------------------------------
+-- baspPhyAdapterStat Group --
+------------------------------
+          btsPhyAdapterNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of physical adapters presented
+                       in the physical adapter table."
+              ::= { baspPhyAdapterStat 1 }
+
+          btsPhyAdapterStatTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF BtsPhyAdapterStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The phyMember tables contain the physical 
+                       adapter members of loadbalance teams."
+              ::= { baspPhyAdapterStat 2 }
+
+          btsPhyAdapterStatEntry OBJECT-TYPE
+              SYNTAX  BtsPhyAdapterStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A team entry containing objects at the
+                       target system."
+              INDEX   { btspTeamIndex,
+                        btspAdapterIndex }
+              ::= { btsPhyAdapterStatTable 1 }
+
+          BtsPhyAdapterStatEntry ::=
+              SEQUENCE {
+                  btspTeamIndex
+                      INTEGER(0..65535),
+                  btspAdapterIndex
+                      INTEGER(0..65535),
+                  btspAdapterDesc
+                      DisplayString,
+                  btspPacketSends
+                      Counter,
+                  btspPacketSendDiscardeds
+                      Counter,
+                  btspPacketRecvs
+                      Counter,
+                  btspPacketRecvDiscardeds
+                      Counter,
+                  btspLinkPacketsSents
+                      Counter,
+                  btspLinkPacketsRetrieds
+                      Counter
+              }
+              
+          btspTeamIndex  OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An unique value for each team."
+              ::= { btsPhyAdapterStatEntry 1 }
+              
+          btspAdapterIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A value for each adapter within a team."
+              ::= { btsPhyAdapterStatEntry 2 }
+              
+          btspAdapterDesc  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing name of the physical member"
+              ::= { btsPhyAdapterStatEntry 3 }
+
+          btspPacketSends OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of send request completed by miniport ."
+                ::= { btsPhyAdapterStatEntry 4 }
+                
+          btspPacketSendDiscardeds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of send request discarded."
+                ::= { btsPhyAdapterStatEntry 5 }
+
+           btspPacketRecvs OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of receive packets that are indicated to upper layer."
+                ::= { btsPhyAdapterStatEntry 6 }
+
+           btspPacketRecvDiscardeds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        " number of receive packets discarded."
+                ::= { btsPhyAdapterStatEntry 7 }
+
+           btspLinkPacketsSents OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "For LiveLink feature: Number of link packets 
+                         sent vis the adapters for the team - 
+                         Expressed as a quantity."
+                ::= { btsPhyAdapterStatEntry 8 }
+
+           btspLinkPacketsRetrieds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "For LiveLink feature: The number of retry packets 
+                         sent via the adapters for the team - Expressed 
+                         as a quantity."
+                ::= { btsPhyAdapterStatEntry 9 }
+
+------------------------------
+-- baspVirAdapterStat Group --
+------------------------------
+          btsVirAdapterNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Number of virtual adapters presented
+                       in the virtual adapter table."
+              ::= { baspVirAdapterStat 1 }
+
+          btsVirAdapterStatTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF BtsVirAdapterStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The phyMember tables contain the physical 
+                       adapter members of loadbalance teams."
+              ::= { baspVirAdapterStat 2 }
+
+          btsVirAdapterStatEntry OBJECT-TYPE
+              SYNTAX  BtsVirAdapterStatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A team entry containing objects at the
+                       target system."
+              INDEX   { btsvTeamIndex,
+                        btsvAdapterIndex }
+              ::= { btsVirAdapterStatTable 1 }
+
+          BtsVirAdapterStatEntry ::=
+              SEQUENCE {
+                  btsvTeamIndex
+                      INTEGER(0..65535),
+                  btsvAdapterIndex
+                      INTEGER(0..65535),
+                  btsvAdapterDesc
+                      DisplayString,
+                  btsvPacketSends
+                      Counter,
+                  btsvPacketSendQueueds
+                      Counter,
+                  btsvPacketRecvs
+                      Counter
+              }
+              
+          btsvTeamIndex  OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An unique value for each team."
+              ::= { btsVirAdapterStatEntry 1 }
+              
+          btsvAdapterIndex   OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A value for each adapter within a team."
+              ::= { btsVirAdapterStatEntry 2 }
+              
+          btsvAdapterDesc  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A textual string containing name of the virtual member"
+              ::= { btsVirAdapterStatEntry 3 }
+              
+         btsvPacketSends OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of send request completed ."
+                ::= { btsVirAdapterStatEntry 4 }
+                
+          btsvPacketSendQueueds OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "number of send request being queued by driver waiting for resource" 
+                ::= { btsVirAdapterStatEntry 5 }
+
+         btsvPacketRecvs OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        " number of receive indicated to upper layer successfully."
+                ::= { btsVirAdapterStatEntry 6 }
+                
+END
