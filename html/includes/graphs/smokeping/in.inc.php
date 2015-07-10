@@ -33,11 +33,7 @@ if($width > "500")
 
 if($src['hostname'] == $config['own_hostname'])
 {
-    if ($config['smokeping']['integration'] === true) {
-        $filename_dir = $config['smokeping']['dir'] .'/'. $device['type'] .'/';
-    } else {
-        $filename_dir = $config['smokeping']['dir'];
-    }
+    $filename_dir = generate_smokeping_dir($device);
   if (!file_exists($filename_dir.$device['hostname'].'.rrd'))
   {
     // Try with dots in hostname replaced by underscores
