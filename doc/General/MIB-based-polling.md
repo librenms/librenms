@@ -3,7 +3,7 @@
 MIB-based polling is experimental.  It might overload your LibreNMS server,
 destroy your data, set your routers on fire, and kick your cat.  It has been
 tested against a very limited set of devices (namely Ruckus ZD1000 wireless
-controllers, and Net-SNMP on Linux).  It may fail badly on other hardware.
+controllers, and `net-snmp` on Linux).  It may fail badly on other hardware.
 
 The approach taken is fairly basic and I claim no special expertise in
 understanding MIBs.  Most of my understanding of SNMP comes from reading
@@ -18,7 +18,7 @@ Paul Gear <paul@librenms.org>
 
 MIB-based polling is disabled by default; you must set
     `$config['poller_modules']['mib'] = 1;`
-in config.php to enable it.
+in `config.php` to enable it.
 
 The components involved in of MIB-based support are:
 
@@ -41,7 +41,7 @@ The components involved in of MIB-based support are:
     - updates/adds graph definitions in the previously-unused graph_types
       database table
   - Individual OSes (`includes/polling/os/*.inc.php`) can poll extra MIBs
-    for a given OS by calling poll_mib().  At the moment, this actually
+    for a given OS by calling `poll_mib()`.  At the moment, this actually
     happens before the general MIB polling.
   - Devices may be excluded from MIB polling by changing the setting in the
     device edit screen (`/device/device=ID/tab=edit/section=modules/`)
@@ -73,17 +73,16 @@ gather the data you want.
  3. Check that `snmptranslate -Td -On -M mibs -m MODULE MODULE::mibName`
     produces a parsed description of the OID values.  An example can be
     found in the comments for `snmp_mib_parse()` in `includes/snmp.inc.php`.
- 4. Get the `sysObjectID` from a device, for example:```
-snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 hostname sysObjectID.0
-```
+ 4. Get the `sysObjectID` from a device, for example:
+ ```snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 hostname sysObjectID.0```
  5. Ensure `snmptranslate -m all -M /opt/librenms/mibs OID 2>/dev/null`
     (where OID is the value returned for sysObjectID above) results in a
     valid name for the MIB.  See the comments for `snmp_translate()` in
     `includes/snmp.inc.php` for an example.  If this step fails, it means
-    there is something wrong with the MIB and net-snmp cannot parse it.
+    there is something wrong with the MIB and `net-snmp` cannot parse it.
  6. Add any additional MIBs you wish to poll for specific device types to
     `includes/polling/os/OSNAME.inc.php` by calling `poll_mibs()` with the
-    MIB module and name.  See includes/polling/os/ruckuswireless.inc.php for
+    MIB module and name.  See `includes/polling/os/ruckuswireless.inc.php` for
     an example.
  7. That should be all you need to see MIB graphs!
 
@@ -99,4 +98,3 @@ snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 hostname 
   - Combine multiple MIB values into graphs automatically on a predefined or
     user-defined basis.
   - Include MIB types in stats submissions.
-
