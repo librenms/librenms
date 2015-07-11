@@ -1,0 +1,426 @@
+-- *******************************************************************
+-- CISCO-LWAPP-DOT11-CLIENT-MIB.my: Dot11 Wireless Clients MIB
+--   
+-- June 2006, Devesh Pujari, Srinath Candadai
+--   
+-- Copyright (c) 2006 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *******************************************************************
+
+CISCO-LWAPP-DOT11-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TruthValue,
+    MacAddress
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    CLApIfType,
+    CLDot11ClientStatus
+        FROM CISCO-LWAPP-TC-MIB;
+
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+
+ciscoLwappDot11ClientMIB MODULE-IDENTITY
+    LAST-UPDATED    "200611210000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+            "Cisco Systems,
+            Customer Service
+            Postal: 170 West Tasman Drive
+            San Jose, CA  95134
+            USA
+            Tel: +1 800 553-NETS
+
+            Email: cs-wnbu-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB is intended to be implemented on all those
+        devices operating as Central controllers, that
+        terminate the Light Weight Access Point Protocol
+        tunnel from Cisco Light-weight LWAPP Access Points.
+
+        Information provided by this MIB is about the
+        configuration and monitoring of 802.11 wireless
+        clients in the network.
+
+        The relationship between CC and the LWAPP APs
+        can be depicted as follows:
+
+        +......+     +......+     +......+           +......+
+        +      +     +      +     +      +           +      +
+        +  CC  +     +  CC  +     +  CC  +           +  CC  +
+        +      +     +      +     +      +           +      +
+        +......+     +......+     +......+           +......+
+        ..            .             .                 .
+        ..            .             .                 .
+        .  .            .             .                 .
+        .    .            .             .                 .
+        .      .            .             .                 .
+        .        .            .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  AP  + +  AP  +     +  AP  +      +  AP  +          +  AP  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
+        .              .             .                 .
+        .  .              .             .                 .
+        .    .              .             .                 .
+        .      .              .             .                 .
+        .        .              .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  MN  + +  MN  +     +  MN  +      +  MN  +          +  MN  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
+
+        The LWAPP tunnel exists between the controller and
+        the APs.  The MNs communicate with the APs through
+        the protocol defined by the 802.11 standard.
+
+        LWAPP APs, upon bootup, discover and join one of the
+        controllers and the controller pushes the configuration,
+        that includes the WLAN parameters, to the LWAPP APs.
+        The APs then encapsulate all the 802.11 frames from
+        wireless clients inside LWAPP frames and forward
+        the LWAPP frames to the controller.
+
+                           GLOSSARY
+
+        Access Point ( AP )
+
+        An entity that contains an 802.11 medium access
+        control ( MAC ) and physical layer ( PHY ) interface
+        and provides access to the distribution services via
+        the wireless medium for associated clients.  
+
+        LWAPP APs encapsulate all the 802.11 frames in
+        LWAPP frames and sends them to the controller to which
+        it is logically connected.
+
+        Light Weight Access Point Protocol ( LWAPP ) 
+
+        This is a generic protocol that defines the 
+        communication between the Access Points and the
+        Central Controller.
+
+        Mobile Node ( MN )
+
+        A roaming 802.11 wireless device in a wireless
+        network associated with an access point. Mobile Node,
+        Mobile Station(Ms) and client are used 
+        interchangeably. 
+
+        Wireless local-area network ( WLAN )
+        A local-area network that uses high-frequency radio 
+        waves rather than wires to communicate between nodes.
+
+        Workgroup Bridge ( WGB )
+        A WGB can provide a wireless infrastructure connection
+        for a Ethernet-enabled devices. Devices that do not have
+        a wireless client adapter in order to connect to the
+        wireless network can be connected to a WGB through 
+        Ethernet port.
+
+        REFERENCE
+
+        [1] Wireless LAN Medium Access Control ( MAC ) and
+        Physical Layer ( PHY ) Specifications 
+
+        [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
+        Weight Access Point Protocol "
+    REVISION        "200611210000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+          ::= { ciscoMgmt 599 }
+
+
+ciscoLwappDot11ClientMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIB 0 }
+
+ciscoLwappDot11ClientMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIB 1 }
+
+ciscoLwappDot11ClientMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIB 2 }
+
+cldcConfigObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBObjects 1 }
+
+cldcNotifObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBObjects 2 }
+
+cldcStatusObjects  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBObjects 3 }
+
+-- ********************************************************************
+-- Wireless Clients
+-- ********************************************************************
+
+cldcClientTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CldcClientEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the 802.11 wireless clients
+        that are associated with the APs that have joined 
+        this controller.
+        An entry is created automatically by the controller 
+        when the client gets associated to the AP. An existing
+        entry gets deleted when the association gets dropped.
+        Each client added to this table is uniquely identified
+        by the client's MAC address."
+    ::= { cldcStatusObjects 1 }
+
+cldcClientEntry OBJECT-TYPE
+    SYNTAX          CldcClientEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry represents a conceptual row in this
+        table and provides the information about the
+        clients associated to the APs that have joined 
+        the controller. An entry is identified the client's
+        MAC address."
+    INDEX           { cldcClientMacAddress } 
+    ::= { cldcClientTable 1 }
+
+CldcClientEntry ::= SEQUENCE {
+        cldcClientMacAddress      MacAddress,
+        cldcClientStatus          CLDot11ClientStatus,
+        cldcClientWlanProfileName SnmpAdminString,
+        cldcClientWgbStatus       INTEGER ,
+        cldcClientWgbMacAddress   MacAddress,
+        cldcClientProtocol        INTEGER ,
+        cldcAssociationMode       INTEGER ,
+        cldcApMacAddress          MacAddress,
+        cldcIfType                CLApIfType
+}
+
+cldcClientMacAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the MAC address of the
+        client for this entry  and uniquely identifies 
+        this entry. " 
+    ::= { cldcClientEntry 1 }
+
+cldcClientStatus OBJECT-TYPE
+    SYNTAX          CLDot11ClientStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object that represents the current status of
+        the client." 
+    ::= { cldcClientEntry 2 }
+
+cldcClientWlanProfileName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the WLAN Profile name
+        this 802.11 wireless client is connected to." 
+    ::= { cldcClientEntry 3 }
+
+cldcClientWgbStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        regClient(1),
+                        wgbClient(2),
+                        wgb(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object that represents the work group bridging
+        status of a DOT11 client.
+        'regClient' - The client is a wireless client
+        'wgbClient' - The client is connected via a WGB
+        'wgb'       - The client is the WGB itself." 
+    ::= { cldcClientEntry 4 }
+
+cldcClientWgbMacAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the MAC address of the
+        WGB this 802.11 wireless client to which it is 
+        connected.  This returns a non-zero value when 
+        the cldcClientWgbStatus is wgbClient." 
+    ::= { cldcClientEntry 5 }
+
+cldcClientProtocol OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        dot11a(1),
+                        dot11b(2),
+                        dot11g(3),
+                        unknown(4),
+                        mobile(5),
+                        dot11n24(6),
+                        dot11n5(7)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The 802.11 protocol type of the client.
+        'dot11a'   - The client is using 802.11a standard 
+                     to connect to the access point (AP)
+        'dot11b'   - The client is using 802.11b standard 
+                     to connect to the access point (AP)
+        'dot11g'   - The client is using 802.11g standard 
+                     to connect to the access point (AP)
+        'unknown'  - The client protocol is unknown
+        'mobile'   - The client using mobile wireless to 
+                     connect to the access point (AP).
+        'dot11n24' - The client is using 802.11n standard 
+                     with 2.4 GHz frequency to connect to 
+                     the access point (AP)
+        'dot11n5'  - The client is using 802.11n standard 
+                     with 5 GHz frequency to connect to 
+                     the access point (AP)." 
+    ::= { cldcClientEntry 6 }
+
+cldcAssociationMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        wep(2),
+                        wpa(3),
+                        wpa2(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The association mode for which the key decrypt
+        error occurred." 
+    ::= { cldcClientEntry 7 }
+
+cldcApMacAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the radio MAC address
+        of a LWAPP AP." 
+    ::= { cldcClientEntry 8 }
+
+cldcIfType OBJECT-TYPE
+    SYNTAX          CLApIfType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object specifies the wireless interace type." 
+    ::= { cldcClientEntry 9 }
+ 
+
+
+-- ********************************************************************
+-- *    NOTIFICATION  Control objects
+-- ********************************************************************
+cldcKeyDecryptErrorEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The object to control the generation of
+        ciscoLwappDot11ClientKeyDecryptError notification.
+
+        A value of 'true' indicates that the agent generates
+        ciscoLwappDot11ClientKeyDecryptError notification.
+
+        A value of 'false' indicates that the agent doesn't
+        generate ciscoLwappDot11ClientKeyDecryptError notification."
+    DEFVAL          { true } 
+    ::= { cldcConfigObjects 1 }
+-- ********************************************************************
+-- *    NOTIFICATIONS
+-- ********************************************************************
+
+
+ciscoLwappDot11ClientKeyDecryptError NOTIFICATION-TYPE
+    OBJECTS         {
+                        cldcAssociationMode,
+                        cldcApMacAddress,
+                        cldcIfType
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Issued when a decrypt error occurs. The WEP WPA or WPA2 Key
+        configured at the station may be wrong."
+   ::= { ciscoLwappDot11ClientMIBNotifs 1 }
+-- *******************************************************************
+-- *    Compliance statements
+-- ********************************************************************
+ciscoLwappDot11ClientMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBConform 1 }
+
+ciscoLwappDot11ClientMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoLwappDot11ClientMIBConform 2 }
+
+
+ciscoLwappDot11ClientMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement this MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappDot11ClientMIBConfigGroup,
+                        ciscoLwappDot11ClientMIBNotifsGroup,
+                        ciscoLwappDot11ClientMIBStatusGroup
+                    }
+    ::= { ciscoLwappDot11ClientMIBCompliances 1 }
+
+-- ********************************************************************
+-- *    Units of conformance
+-- ********************************************************************
+ciscoLwappDot11ClientMIBConfigGroup OBJECT-GROUP
+    OBJECTS         { cldcKeyDecryptErrorEnabled }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the required
+        configuration parameters for the 802.11 wireless 
+        clients."
+    ::= { ciscoLwappDot11ClientMIBGroups 1 }
+
+ciscoLwappDot11ClientMIBNotifsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { ciscoLwappDot11ClientKeyDecryptError }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the
+        notifications for the 802.11 wireless clients."
+    ::= { ciscoLwappDot11ClientMIBGroups 2 }
+
+ciscoLwappDot11ClientMIBStatusGroup OBJECT-GROUP
+    OBJECTS         {
+                        cldcClientStatus,
+                        cldcClientWlanProfileName,
+                        cldcClientWgbStatus,
+                        cldcClientWgbMacAddress,
+                        cldcClientProtocol,
+                        cldcAssociationMode,
+                        cldcApMacAddress,
+                        cldcIfType
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the required
+        status parameters for the 802.11 wireless clients."
+    ::= { ciscoLwappDot11ClientMIBGroups 3 }
+
+END
+
+
+
