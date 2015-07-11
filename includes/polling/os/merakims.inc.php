@@ -10,9 +10,6 @@
  * the source code distribution for details.
  */    
 
-if(empty($hardware)) {
-  $hardware = snmp_get($device, "sysDescr.0", "-Osqv", "SNMPv2-MIB");
+if (empty($hardware)) {
+    $hardware = snmp_get($device, "sysDescr.0", "-Osqv", "SNMPv2-MIB");
 }
-
-
-?>
