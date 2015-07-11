@@ -11,7 +11,7 @@
  */    
 
 if (!$os) {
-    if (preg_match("/^Meraki MS/", $sysDescr)) { $os = "merakims"; }
+    if (preg_match("/^Meraki MS/", $sysDescr)) {
+        $os = "merakims";
+    }
 }
-
-?>
