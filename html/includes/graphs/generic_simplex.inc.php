@@ -19,7 +19,7 @@ if ($multiplier)
   $rrd_options .= " DEF:".$ds."_max_o=".$rrd_filename.":".$ds.":MAX";
   $rrd_options .= " DEF:".$ds."_min_o=".$rrd_filename.":".$ds.":MIN";
 
-  if (!isset($multiplier_action)) {
+  if (empty($multiplier_action)) {
       $multiplier_action = "*";
   }
   $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,$multiplier_action";
@@ -48,7 +48,7 @@ if($_GET['previous'] == "yes")
     $rrd_options .= " DEF:".$ds."_max_oX=".$rrd_filename.":".$ds.":MAX:start=".$prev_from.":end=".$from;
     $rrd_options .= " SHIFT:".$ds."_oX:$period";
     $rrd_options .= " SHIFT:".$ds."_max_oX:$period";
-    if (!isset($multiplier_action)) {
+    if (empty($multiplier_action)) {
         $multiplier_action = "*";
     }
     $rrd_options .= " CDEF:".$ds."X=".$ds."_oX,$multiplier,$multiplier_action";
