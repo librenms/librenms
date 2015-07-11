@@ -1590,7 +1590,7 @@ $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order'] = '0';
 $config['graph_types']['device']['wifi_clients']['descr'] = 'Wireless Clients';
 
-$config['graph_types']['device']['agent']['section'] = 'system';
+$config['graph_types']['device']['agent']['section'] = 'poller';
 $config['graph_types']['device']['agent']['order'] = '0';
 $config['graph_types']['device']['agent']['descr'] = 'Agent Execution Time';
 
