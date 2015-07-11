@@ -297,10 +297,10 @@ if(dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= 
 // Daemon-Check
 $librenmsd_err = false;
 if( file_exists($config['install_dir'].'/librenmsd.pid') ) {
-	$pid = file_get_contents($config['install_dir'].'/librenmsd.pid');
+	$pid = trim(file_get_contents($config['install_dir'].'/librenmsd.pid'));
 	if( file_exists('/proc/'.$pid.'/status') ) {
-		$status = file('/proc/'.$pid.'/status');
-		if( !stristr($status[0],'php') ) {
+		$status = explode("\x00",file_get_contents('/proc/'.$pid.'/cmdline'));
+		if( !stristr($status[1],'librenmsd') ) {
 			$librenmsd_err = true;
 		}
 	} else {
