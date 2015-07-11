@@ -19,9 +19,12 @@ if ($multiplier)
   $rrd_options .= " DEF:".$ds."_max_o=".$rrd_filename.":".$ds.":MAX";
   $rrd_options .= " DEF:".$ds."_min_o=".$rrd_filename.":".$ds.":MIN";
 
-  $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,*";
-  $rrd_options .= " CDEF:".$ds."_max=".$ds."_max_o,$multiplier,*";
-  $rrd_options .= " CDEF:".$ds."_min=".$ds."_min_o,$multiplier,*";
+  if (!isset($multiplier_action)) {
+      $multiplier_action = "*";
+  }
+  $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,$multiplier_action";
+  $rrd_options .= " CDEF:".$ds."_max=".$ds."_max_o,$multiplier,$multiplier_action";
+  $rrd_options .= " CDEF:".$ds."_min=".$ds."_min_o,$multiplier,$multiplier_action";
 } else {
   $rrd_options .= " DEF:".$ds."=".$rrd_filename.":".$ds.":AVERAGE";
   $rrd_options .= " DEF:".$ds."_max=".$rrd_filename.":".$ds.":MAX";
@@ -45,8 +48,11 @@ if($_GET['previous'] == "yes")
     $rrd_options .= " DEF:".$ds."_max_oX=".$rrd_filename.":".$ds.":MAX:start=".$prev_from.":end=".$from;
     $rrd_options .= " SHIFT:".$ds."_oX:$period";
     $rrd_options .= " SHIFT:".$ds."_max_oX:$period";
-    $rrd_options .= " CDEF:".$ds."X=".$ds."_oX,$multiplier,*";
-    $rrd_options .= " CDEF:".$ds."_maxX=".$ds."_max_oX,$multiplier,*";
+    if (!isset($multiplier_action)) {
+        $multiplier_action = "*";
+    }
+    $rrd_options .= " CDEF:".$ds."X=".$ds."_oX,$multiplier,$multiplier_action";
+    $rrd_options .= " CDEF:".$ds."_maxX=".$ds."_max_oX,$multiplier,$multiplier_action";
   } else {
     $rrd_options .= " DEF:".$ds."X=".$rrd_filename.":".$ds.":AVERAGE:start=".$prev_from.":end=".$from;
     $rrd_options .= " DEF:".$ds."_maxX=".$rrd_filename.":".$ds.":MAX:start=".$prev_from.":end=".$from;
