@@ -2,13 +2,12 @@
 
 $scale_min = 0;
 
-include("includes/graphs/common.inc.php");
+require "includes/graphs/common.inc.php";
 
 $agent_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/agent.rrd";
 
-if (is_file($agent_rrd))
-{
-  $rrd_filename = $agent_rrd;
+if (is_file($agent_rrd)) {
+    $rrd_filename = $agent_rrd;
 }
 
 $ds = "time";
@@ -22,6 +21,6 @@ $graph_max = 1;
 
 $unit_text = "msec";
 
-include("includes/graphs/generic_simplex.inc.php");
+require "includes/graphs/generic_simplex.inc.php";
 
 ?>
