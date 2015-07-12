@@ -95,12 +95,7 @@ if ($config['enable_bgp'])
         $add = dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'bgpPeerRemoteAs' => $peer['as']), 'bgpPeers');
         if ($config['autodiscovery']['bgp'] === true) {
             $name = gethostbyaddr($peer['ip']);
-            $remote_device_id = discover_new_device($name);
-            if ($remote_device_id) {
-                log_event("Device $name (" . $peer['ip'] .") autodiscovered through BGP on ".$device['hostname'], $remote_device_id, 'system');
-            }  else {
-                log_event("BGP discovery of $name (" . $peer['ip'] . ") failed - check ping and SNMP access", $device['device_id'], 'system');
-            }
+            $remote_device_id = discover_new_device($name,$device,'BGP');
         }
         echo("+");
       } else {
