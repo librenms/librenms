@@ -408,7 +408,18 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $config['os'][$os]['icon']              = "cisco";
 
-
+// Brocade NOS
+$os = "nos";
+$config['os'][$os]['text']              = "Brocade NOS";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processor";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_mempool";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+$config['os'][$os]['icon']              = "brocade";
 
 // Cisco Small Business
 
@@ -669,6 +680,7 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $os = "drac";
 $config['os'][$os]['text']              = "Dell DRAC";
 $config['os'][$os]['icon']              = "dell";
+$config['os'][$os]['type']              = "server";
 
 $os = "bcm963";
 $config['os'][$os]['text']              = "Broadcom BCM963xx";
@@ -1189,6 +1201,31 @@ foreach ($config['os'] as $this_os => $blah)
   }
 }
 
+// Meraki Devices
+$os = "merakimx";
+$config['os'][$os]['text']              = "Meraki MX Appliance";
+$config['os'][$os]['type']              = "firewall";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
+$os = "merakimr";
+$config['os'][$os]['text']              = "Meraki AP";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
+$os = "merakims";
+$config['os'][$os]['text']              = "Meraki Switch";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 // Graph Types
 
 include_once($config['install_dir'] . "/includes/load_db_graph_types.inc.php");
@@ -1553,7 +1590,7 @@ $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order'] = '0';
 $config['graph_types']['device']['wifi_clients']['descr'] = 'Wireless Clients';
 
-$config['graph_types']['device']['agent']['section'] = 'system';
+$config['graph_types']['device']['agent']['section'] = 'poller';
 $config['graph_types']['device']['agent']['order'] = '0';
 $config['graph_types']['device']['agent']['descr'] = 'Agent Execution Time';
 
