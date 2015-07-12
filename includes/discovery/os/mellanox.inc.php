@@ -1,7 +1,7 @@
 <?php
 
 if (!$os) {
-    if (stristr($sysDescr, "mellanox")) {
+    if (strstr($sysObjectId, ".33049.1.1.1.1012")) {
         $os = "mellanox";
     }
 }
