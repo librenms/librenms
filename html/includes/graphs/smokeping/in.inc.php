@@ -31,7 +31,7 @@ if($width > "500")
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev                              \l'";
 }
 
-$filename_dir = generate_smokeping_dir($device);
+$filename_dir = generate_smokeping_file($device);
 if($src['hostname'] == $config['own_hostname'])
 {
     $filename = $filename_dir . $device['hostname'].'.rrd';
