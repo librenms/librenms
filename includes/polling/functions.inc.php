@@ -421,7 +421,8 @@ function location_to_latlng($device) {
                 break;
             }
 
-            $curl_init = curl_init("https://maps.googleapis.com/maps/api/geocode/json?address=12+Sapling+road,Swinton+manchester+m27+0bz");
+            $curl_init = curl_init($api_url);
+            set_curl_proxy($curl_init);
             curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
             $data = json_decode(curl_exec($curl_init),true);
 
