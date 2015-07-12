@@ -825,8 +825,8 @@
 						height += legendOptions.marginBottom + elemBBox.height;
 					}
 					
-					$(elem.node).attr({"data-type": "elem", "data-index": i});
-					$(label.node).attr({"data-type": "label", "data-index": i});
+					$(elem.node).attr({"data-type": "elem", "data-index": i, "data-hidden": 0});
+					$(label.node).attr({"data-type": "label", "data-index": i, "data-hidden": 0});
 					
 					// Hide map elements when the user clicks on a legend item
 					if (legendOptions.hideElemsOnClick.enabled) {
@@ -837,9 +837,7 @@
 						$.fn.mapael.setHoverOptions(elem, sliceAttrs[i], sliceAttrs[i]);
 						$.fn.mapael.setHoverOptions(label, legendOptions.labelAttrs, legendOptions.labelAttrsHover);
 						$.fn.mapael.setHover(paper, elem, label);
-						
-						label.hidden = false;
-						$.fn.mapael.handleClickOnLegendElem(legendOptions, legendOptions.slices[i], label, elem, elems, legendIndex);
+						$.fn.mapael.handleClickOnLegendElem($container, legendOptions, legendOptions.slices[i], label, elem, elems, legendIndex);
 					}
 				}
 			}
@@ -855,6 +853,7 @@
 	
 	/**
 	* Allow to hide elements of the map when the user clicks on a related legend item
+	* @param $container the map container
 	* @param legendOptions options for the legend to draw
 	* @param sliceOptions options of the slice
 	* @param label label of the legend item
@@ -862,11 +861,13 @@
 	* @param elems collection of plots or areas displayed on the map
 	* @param legendIndex index of the legend in the conf array
 	*/
-	$.fn.mapael.handleClickOnLegendElem = function(legendOptions, sliceOptions, label, elem, elems, legendIndex) {
-		var hideMapElems = function() {
-			var elemValue = 0;
-			
-			if (!label.hidden) {
+	$.fn.mapael.handleClickOnLegendElem = function($container, legendOptions, sliceOptions, label, elem, elems, legendIndex) {
+		var hideMapElems = function(e, hideOtherElems) {
+			var elemValue = 0
+				, hidden = $(label.node).attr('data-hidden')
+				, hiddenNewAttr = (hidden == 0) ? {"data-hidden": 1} : {"data-hidden": 0};
+
+			if (hidden == 0) {
 				label.animate({"opacity":0.5}, 300);
 			} else {
 				label.animate({"opacity":1}, 300);
@@ -885,7 +886,7 @@
 						&& (typeof sliceOptions.max == "undefined" || elemValue < sliceOptions.max))
 				) {
 					(function(id) {
-						if (!label.hidden) {
+						if (hidden == 0) {
 							elems[id].mapElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].mapElem.hide();});
 							elems[id].textElem && elems[id].textElem.animate({"opacity":legendOptions.hideElemsOnClick.opacity}, 300, "linear", function() {(legendOptions.hideElemsOnClick.opacity == 0) && elems[id].textElem.hide();});
 						} else {
@@ -899,10 +900,26 @@
 					})(id);
 				}
 			}
-			label.hidden = !label.hidden;
+
+			$(elem.node).attr(hiddenNewAttr);
+			$(label.node).attr(hiddenNewAttr);
+
+			if ((typeof hideOtherElems === "undefined" || hideOtherElems === true) 
+				&& typeof legendOptions.exclusive !== "undefined" && legendOptions.exclusive === true
+			) {
+				$("[data-type='elem'][data-hidden=0]", $container).each(function() {
+					if ($(this).attr('data-index') !== $(elem.node).attr('data-index')) {
+						$(this).trigger('click', false);
+					}
+				});
+			}
 		};
 		$(label.node).on("click", hideMapElems);
 		$(elem.node).on("click", hideMapElems);
+
+		if (typeof sliceOptions.hidden !== "undefined" && sliceOptions.hidden === true) {
+			$(elem.node).trigger('click', false);
+		}
 	};
 	
 	/**
