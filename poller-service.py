@@ -250,10 +250,6 @@ while True:
         if not lockFree('polling.{}'.format(device_id)):
             releaseLock('queued.{}'.format(device_id))
             continue
-        if device_id in dont_retry:
-            retry_devs_found[device_id] = dont_retry[device_id]
-            releaseLock('queued.{}'.format(device_id))
-            continue
 
         if next_poll and next_poll > datetime.now():
             log.debug('DEBUG: Sleeping until {0} before polling {2}'.format(next_poll, device_id))
