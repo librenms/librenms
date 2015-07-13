@@ -7,15 +7,15 @@ $nototal      = (($width < 224) ? 1 : 0);
 $unit_text    = 'Packets';
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-ntpdserver-'.$app['app_id'].'.rrd';
 $array        = array(
-                 'packets_drop'   => array(
-                                      'descr'  => 'Dropped',
-                                      'colour' => '880000FF',
-                                     ),
-                 'packets_ignore' => array(
-                                      'descr'  => 'Ignored',
-                                      'colour' => 'FF8800FF',
-                                     ),
-                );
+    'packets_drop'   => array(
+        'descr'  => 'Dropped',
+        'colour' => '880000FF',
+    ),
+    'packets_ignore' => array(
+        'descr'  => 'Ignored',
+        'colour' => 'FF8800FF',
+    ),
+);
 
 $i = 0;
 

@@ -6,8 +6,7 @@ if ($config['enable_sla'] && $device['os_group'] == 'cisco') {
     $slas = snmp_walk($device, 'ciscoRttMonMIB.ciscoRttMonObjects.rttMonCtrl', '-Osq', '+CISCO-RTTMON-MIB');
 
     $sla_table = array();
-    foreach (explode("\n", $slas) as $sla)
-    {
+    foreach (explode("\n", $slas) as $sla) {
         $key_val = explode(' ', $sla, 2);
         if (count($key_val) != 2) {
             $key_val[] = '';
@@ -50,8 +49,7 @@ if ($config['enable_sla'] && $device['os_group'] == 'cisco') {
 
         // Some fallbacks for when the tag is empty
         if (!$data['tag']) {
-            switch ($data['rtt_type'])
-            {
+            switch ($data['rtt_type']) {
                 case 'http':
                     $data['tag'] = $sla_config['rttMonEchoAdminURL'];
                 break;

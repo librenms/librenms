@@ -88,8 +88,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
         // # Loop Ports
         $i_p   = ($i_a + 1);
         $p_sql = "SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND O.`ospfIfAreaId` = ? AND P.port_id = O.port_id";
-        foreach (dbFetchRows($p_sql, array($device['device_id'], $area['ospfAreaId'])) as $ospfport)
-        {
+        foreach (dbFetchRows($p_sql, array($device['device_id'], $area['ospfAreaId'])) as $ospfport) {
             if (!is_integer($i_a / 2)) {
                 if (!is_integer($i_p / 2)) {
                     $port_bg = $list_colour_b_b;

@@ -1,16 +1,15 @@
 <?php
 
-$no_refresh = TRUE;
+$no_refresh = true;
 
 $param = array();
 
-if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
-{
-  dbQuery("TRUNCATE TABLE `syslog`");
-  print_message("syslog truncated");
+if ($vars['action'] == 'expunge' && $_SESSION['userlevel'] >= '10') {
+    dbQuery('TRUNCATE TABLE `syslog`');
+    print_message('syslog truncated');
 }
 
-$pagetitle[] = "Syslog";
+$pagetitle[] = 'Syslog';
 ?>
 
 <div class="table-responsive">
@@ -38,14 +37,17 @@ var grid = $("#syslog").bootgrid({
                 "<select name=\"device\" id=\"device\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
                 <?php
-                 foreach( get_all_devices() as $hostname ) {
-                  $device_id = getidbyname($hostname);
-                  if (device_permitted($device_id)) {
-                   echo('"<option value=\"'.$device_id.'\"');
-                   if ($device_id == $vars['device']) { echo(' selected'); }
-                   echo('>'.$hostname.'</option>"+');
-                  }
-                 }
+                foreach (get_all_devices() as $hostname) {
+                    $device_id = getidbyname($hostname);
+                    if (device_permitted($device_id)) {
+                        echo '"<option value=\"'.$device_id.'\"';
+                        if ($device_id == $vars['device']) {
+                            echo ' selected';
+                        }
+
+                        echo '>'.$hostname.'</option>"+';
+                    }
+                }
                 ?>
                 "</select>"+
                 "</div>"+
@@ -53,11 +55,14 @@ var grid = $("#syslog").bootgrid({
                 "<select name=\"program\" id=\"program\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Programs</option>"+
                 <?php
-                 foreach( dbFetchRows("SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`") as $data ) {
-                  echo('"<option value=\"'.$data['program'].'\"');
-                  if ($data['program'] == $vars['program']) { echo(' selected'); }
-                  echo('>'.$data['program'].'</option>"+');
-                 }
+                foreach (dbFetchRows('SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`') as $data) {
+                    echo '"<option value=\"'.$data['program'].'\"';
+                    if ($data['program'] == $vars['program']) {
+                        echo ' selected';
+                    }
+
+                    echo '>'.$data['program'].'</option>"+';
+                }
                 ?>
                 "</select>"+
                 "</div>"+

@@ -12,39 +12,32 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-if(!is_numeric($_POST['alert_id']))
-{
-  echo('ERROR: No alert selected');
-  exit;
-}
-else
-{
-  if($_POST['state'] == 'true')
-  {
-    $state = 0;
-  }
-  elseif($_POST['state'] == 'false')
-  {
-    $state = 1;
-  }
-  else
-  {
-    $state = 1;
-  }
-  $update = dbUpdate(array('disabled' => $state), 'alert_rules', '`id`=?', array($_POST['alert_id']));
-  if(!empty($update) || $update == '0')
-  {
-    echo('Alert rule has been updated.');
+if (!is_numeric($_POST['alert_id'])) {
+    echo 'ERROR: No alert selected';
     exit;
-  }
-  else
-  {
-    echo('ERROR: Alert rule has not been updated.');
-    exit;
-  }
 }
+else {
+    if ($_POST['state'] == 'true') {
+        $state = 0;
+    }
+    else if ($_POST['state'] == 'false') {
+        $state = 1;
+    }
+    else {
+        $state = 1;
+    }
 
+    $update = dbUpdate(array('disabled' => $state), 'alert_rules', '`id`=?', array($_POST['alert_id']));
+    if (!empty($update) || $update == '0') {
+        echo 'Alert rule has been updated.';
+        exit;
+    }
+    else {
+        echo 'ERROR: Alert rule has not been updated.';
+        exit;
+    }
+}
