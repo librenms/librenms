@@ -270,3 +270,7 @@ while True:
 
         # If we made it this far, break out of the loop and query again.
         break
+
+    # Looping with no break causes the service to be killed by init.
+    # This point is only reached if the query is empty, so sleep half a second before querying again.
+    time.sleep(.5)
