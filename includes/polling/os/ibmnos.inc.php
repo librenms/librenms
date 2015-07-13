@@ -39,4 +39,3 @@ if (strpos($sysdescr_value, 'IBM Networking Operating System') !== false) {
     $version = trim(snmp_get($device, ".1.3.6.1.2.1.47.1.1.1.1.10.1", "-Ovq") , '" ');
     $serial = trim(snmp_get($device, ".1.3.6.1.2.1.47.1.1.1.1.11.1", "-Ovq") , '" ');
 }
-?>
