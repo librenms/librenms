@@ -235,6 +235,7 @@ while True:
             cursor.execute(update_query)
         except:
             log.critical('ERROR: MySQL query error. Is your schema up to date?')
+            sys.exit(2)
         cursor.fetchall()
         log.info('INFO: {} devices scanned in the last 5 minutes'.format(devices_scanned))
         devices_scanned = 0
@@ -247,6 +248,7 @@ while True:
         cursor.execute(dev_query)
     except:
         log.critical('ERROR: MySQL query error. Is your schema up to date?')
+        sys.exit(2)
 
     devices = cursor.fetchall()
     for device_id, next_poll, next_discovery in devices:
