@@ -183,30 +183,30 @@ poller_group = ('and poller_group IN({}) '
 
 # Add last_polled and last_polled_timetaken so we can sort by the time the last poll started, with the goal
 # of having each device complete a poll within the given time range.
-dev_query = ('SELECT device_id,                                  '
-             'DATE_ADD(                                          '
-             '  DATE_SUB(                                        '
-             '    last_polled,                                   '
-             '    INTERVAL last_polled_timetaken SECOND          '
-             '  ),                                               '
-             '  INTERVAL {0} SECOND) AS next_poll,               '
-             'DATE_ADD(                                          '
-             '  DATE_SUB(                                        '
-             '    last_discovered,                               '
-             '    INTERVAL last_discovered_timetaken SECOND      '
-             '  ),                                               '
-             '  INTERVAL {1} SECOND) AS next_discovery           '
-             'FROM devices WHERE                                 '
-             'disabled = 0                                       '
-             'AND IS_FREE_LOCK(CONCAT("polling.", device_id))    '
-             'AND IS_FREE_LOCK(CONCAT("queued.", device_id))     '
-             'AND last_poll_attempted < DATE_SUB(                '
-             '  NOW(), INTERVAL {2} SECOND )                     '
-             '{3}                                                '
-             'ORDER BY next_poll asc                             ').format(poll_frequency,
-                                                                           discover_frequency,
-                                                                           down_retry,
-                                                                           poller_group)
+dev_query = ('SELECT device_id,                                                  '
+             'DATE_ADD(                                                          '
+             '  DATE_SUB(                                                        '
+             '    last_polled,                                                   '
+             '    INTERVAL last_polled_timetaken SECOND                          '
+             '  ),                                                               '
+             '  INTERVAL {0} SECOND) AS next_poll,                               '
+             'DATE_ADD(                                                          '
+             '  DATE_SUB(                                                        '
+             '    last_discovered,                                               '
+             '    INTERVAL last_discovered_timetaken SECOND                      '
+             '  ),                                                               '
+             '  INTERVAL {1} SECOND) AS next_discovery                           '
+             'FROM devices WHERE                                                 '
+             'disabled = 0                                                       '
+             'AND IS_FREE_LOCK(CONCAT("polling.", device_id))                    '
+             'AND IS_FREE_LOCK(CONCAT("queued.", device_id))                     '
+             'AND ( last_poll_attempted < DATE_SUB(NOW(), INTERVAL {2} SECOND )  '
+             '  OR last_poll_attempted IS NULL )                                 '
+             '{3}                                                                '
+             'ORDER BY next_poll asc                                             ').format(poll_frequency,
+                                                                                           discover_frequency,
+                                                                                           down_retry,
+                                                                                           poller_group)
 
 threads = 0
 next_update = datetime.now() + timedelta(minutes=5)
