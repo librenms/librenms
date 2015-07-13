@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-function discover_new_device($hostname)
+function discover_new_device($hostname,$device='',$method='', $interface='')
 {
     global $config, $debug;
 
@@ -22,12 +22,14 @@ function discover_new_device($hostname)
     }
     if ($debug) { echo("discovering $dst_host\n"); }
     $ip = gethostbyname($dst_host);
-    if ($ip == $dst_host) {
-      if ($debug) { echo("name lookup of $dst_host failed\n"); }
-      return FALSE;
-    } else {
-      if ($debug) { echo("ip lookup result: $ip\n"); }
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === FALSE && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === FALSE) {
+        // $ip isn't a valid IP so it must be a name.
+        if ($ip == $dst_host) {
+            if ($debug) { echo("name lookup of $dst_host failed\n"); }
+            return FALSE;
+        }
     }
+    if ($debug) { echo("ip lookup result: $ip\n"); }
 
     $dst_host = rtrim($dst_host, '.');	// remove trailing dot
 
@@ -44,6 +46,16 @@ function discover_new_device($hostname)
         echo("+[".$remote_device['hostname']."(".$remote_device['device_id'].")]");
         discover_device($remote_device);
         device_by_id_cache($remote_device_id, 1);
+        if ($remote_device_id && is_array($device) && !empty($method)) {
+            $extra_log = '';
+            $int = ifNameDescr($interface);
+            if (is_array($int)) {
+                $extra_log = " (port " . $int['label'] . ") ";
+            }
+            log_event("Device $". $remote_device['hostname'] ." ($ip) $extra_log autodiscovered through $method on ".$device['hostname'], $remote_device_id, 'system');
+        }  else {
+            log_event("$method discovery of ". $remote_device['hostname'] ." ($ip) failed - check ping and SNMP access", $device['device_id'], 'system');
+        }
         return $remote_device_id;
       }
     } else {

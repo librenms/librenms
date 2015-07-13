@@ -69,29 +69,16 @@ foreach (dbFetchRows($sql, array($deviceid)) as $entry)
 	}
 	arp_discovery_add_cache($ip);
 
-	// Log reverse DNS failures so the administrator can take action.
 	$name = gethostbyaddr($ip);
-	if ($name != $ip) {		// gethostbyaddr returns the original argument on failure
-		echo("+");
-		$names[] = $name;
-		$ips[$name] = $ip;
-	}
-	else {
-		echo("-");
-		log_event("ARP discovery of $ip failed due to absent reverse DNS", $deviceid, 'interface', $if);
-	}
+	echo("+");
+	$names[] = $name;
+	$ips[$name] = $ip;
 }
 echo("\n");
 
 // Run device discovery on each of the devices we've detected so far.
 foreach ($names as $name) {
-	$remote_device_id = discover_new_device($name);
-	if ($remote_device_id) {
-		log_event("Device $name (" . $ips[$name] .") autodiscovered through ARP on $hostname", $remote_device_id, 'interface', $if);
-	}
-	else {
-		log_event("ARP discovery of $name (" . $ips[$name] . ") failed - check ping and SNMP access", $deviceid, 'interface', $if);
-	}
+	$remote_device_id = discover_new_device($name,$device,'ARP');
 }
 
 unset($names);

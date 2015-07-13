@@ -10,8 +10,11 @@ $line_text = str_pad(truncate($line_text,12,''),12);
 
 if ($multiplier)
 {
+  if (empty($multiplier_action)) {
+      $multiplier_action = "*";
+  }
   $rrd_options .= " DEF:".$ds."_o=".$rrd_filename.":".$ds.":AVERAGE";
-  $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,*";
+  $rrd_options .= " CDEF:".$ds."=".$ds."_o,$multiplier,$multiplier_action";
 } else {
   $rrd_options .= " DEF:".$ds."=".$rrd_filename.":".$ds.":AVERAGE";
 }
@@ -29,6 +32,9 @@ if($_GET['previous'] == "yes")
 {
   if ($multiplier)
   {
+    if (empty($multiplier_action)) {
+        $multiplier_action = "*";
+    }
     $rrd_options .= " DEF:".$ds."_oX=".$rrd_filename.":".$ds.":AVERAGE:start=".$prev_from.":end=".$from;
     $rrd_options .= " SHIFT:".$ds."_oX:$period";
     $rrd_options .= " CDEF:".$ds."X=".$ds."_oX,$multiplier,*";
