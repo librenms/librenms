@@ -16,7 +16,7 @@ else {
 $text       = $ap['name'].' '.$ap['type'];
 $ap['text'] = $text;
 
-echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='".generate_ap_url($ap)."/'\" style='cursor: pointer;'> 
+echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='".generate_ap_url($ap)."/'\" style='cursor: pointer;'>
          <td valign=top width=350>";
 echo '        <span class=list-large> '.generate_ap_link($ap, " $text </span><br />");
 echo '<span class=interface-desc>';

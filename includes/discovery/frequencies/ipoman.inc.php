@@ -23,8 +23,7 @@ if ($device['os'] == 'ipoman') {
     $oids = snmpwalk_cache_multi_oid($device, 'inletStatusFrequency', $oids, 'IPOMANII-MIB');
 
     if (is_array($oids)) {
-        foreach ($oids as $index => $entry)
-        {
+        foreach ($oids as $index => $entry) {
             $freq_oid   = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.4.'.$index;
             $divisor    = 10;
             $descr      = (trim($cache['ipoman']['in'][$index]['inletConfigDesc'], '"') != '' ? trim($cache['ipoman']['in'][$index]['inletConfigDesc'], '"') : "Inlet $index");
