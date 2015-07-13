@@ -1,9 +1,7 @@
 <?php
 
-$class     = "humidity";
-$unit      = "%%";
-$unit_long = "Percent";
+$class     = 'humidity';
+$unit      = '%%';
+$unit_long = 'Percent';
 
-include("includes/graphs/device/sensor.inc.php");
-
-?>
+require 'includes/graphs/device/sensor.inc.php';

@@ -1,15 +1,14 @@
 <?php
-echo("Current: ");
+echo 'Current: ';
 
 // Include all discovery modules
+$include_dir = 'includes/discovery/current';
+require 'includes/include-dir.inc.php';
 
-$include_dir = "includes/discovery/current";
-include("includes/include-dir.inc.php");
-
-if ($debug) { print_r($valid['sensor']['current']); }
+if ($debug) {
+    print_r($valid['sensor']['current']);
+}
 
 check_valid_sensors($device, 'current', $valid['sensor']);
 
-echo("\n");
-
-?>
+echo "\n";
