@@ -1,6 +1,0 @@
-Need to set poller_name as primary key for this to work:
-
-ALTER TABLE pollers
-  ADD PRIMARY KEY (poller_name)   
-
-Check in beginning?
