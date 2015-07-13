@@ -1,8 +1,7 @@
 <?php
 
 if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
-    foreach (dbFetchRows('SELECT * FROM `bill_ports` WHERE `bill_id` = ?', array($bill_id)) as $port_data)
-    {
+    foreach (dbFetchRows('SELECT * FROM `bill_ports` WHERE `bill_id` = ?', array($bill_id)) as $port_data) {
         dbDelete('port_in_measurements', '`port_id` = ?', array($port_data['bill_id']));
         dbDelete('port_out_measurements', '`port_id` = ?', array($port_data['bill_id']));
     }

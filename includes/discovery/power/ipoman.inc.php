@@ -36,8 +36,7 @@ if ($device['os'] == 'ipoman') {
     // }
     // }
     if (is_array($oids_out)) {
-        foreach ($oids_out as $index => $entry)
-        {
+        foreach ($oids_out as $index => $entry) {
             $cur_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.5.'.$index;
             $divisor = 10;
             $descr   = (trim($cache['ipoman']['out'][$index]['outletConfigDesc'], '"') != '' ? trim($cache['ipoman']['out'][$index]['outletConfigDesc'], '"') : "Output $index");

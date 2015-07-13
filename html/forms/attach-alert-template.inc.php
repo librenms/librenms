@@ -12,30 +12,32 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-if(!is_numeric($_POST['template_id'])) {
-    echo('ERROR: No template selected');
+if (!is_numeric($_POST['template_id'])) {
+    echo 'ERROR: No template selected';
     exit;
-} else {
-    $rules = preg_split("/,/",mres($_POST['rule_id']));
-    $success = FALSE;
+}
+else {
+    $rules   = preg_split('/,/', mres($_POST['rule_id']));
+    $success = false;
     foreach ($rules as $rule_id) {
         $db_id = dbInsert(array('alert_rule_id' => $rule_id, 'alert_templates_id' => mres($_POST['template_id'])), 'alert_template_map');
         if ($db_id > 0) {
-            $success = TRUE;
-            $ids[] = $db_id;
-        } else {
-            echo('ERROR: Alert rules have not been attached to this template.');
+            $success = true;
+            $ids[]   = $db_id;
+        }
+        else {
+            echo 'ERROR: Alert rules have not been attached to this template.';
             exit;
         }
     }
-    if ($success === TRUE) {
-        dbDelete('alert_template_map',"id NOT IN (".implode(',',$ids).")");
+
+    if ($success === true) {
+        dbDelete('alert_template_map', 'id NOT IN ('.implode(',', $ids).')');
         echo "Alert rules have been attached to this template. $template_map_ids";
         exit;
     }
-}
-
+}//end if

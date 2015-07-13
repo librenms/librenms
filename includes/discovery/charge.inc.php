@@ -1,16 +1,15 @@
 <?php
 
-echo("Battery Charge: ");
+echo 'Battery Charge: ';
 
 // Include all discovery modules
+$include_dir = 'includes/discovery/charge';
+require 'includes/include-dir.inc.php';
 
-$include_dir = "includes/discovery/charge";
-include("includes/include-dir.inc.php");
-
-if ($debug) { print_r($valid['sensor']['charge']); }
+if ($debug) {
+    print_r($valid['sensor']['charge']);
+}
 
 check_valid_sensors($device, 'charge', $valid['sensor']);
 
-echo("\n");
-
-?>
+echo "\n";
