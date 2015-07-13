@@ -246,13 +246,15 @@ while True:
         # add queue lock, so we lock the next device against any other pollers
         # if this fails, the device is locked by another poller already
         if not getLock('queued.{}'.format(device_id)):
+            time.sleep(.5)
             continue
         if not lockFree('polling.{}'.format(device_id)):
             releaseLock('queued.{}'.format(device_id))
+            time.sleep(.5)
             continue
 
         if next_poll and next_poll > datetime.now():
-            log.debug('DEBUG: Sleeping until {0} before polling {2}'.format(next_poll, device_id))
+            log.debug('DEBUG: Sleeping until {0} before polling {1}'.format(next_poll, device_id))
             sleep_until(next_poll)
 
         action = 'poll'
