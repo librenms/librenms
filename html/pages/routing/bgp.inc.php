@@ -140,7 +140,7 @@ else
     $where .= " AND (B.bgpPeerAdminStatus = 'stop')";
   } elseif ($vars['adminstatus'] == "start")
   {
-    $where .= " AND (B.bgpPeerAdminStatus = 'start')";
+    $where .= " AND (B.bgpPeerAdminStatus = 'start' || B.bgpPeerAdminStatus = 'running')";
   }
 
   if ($vars['state'] == "down")

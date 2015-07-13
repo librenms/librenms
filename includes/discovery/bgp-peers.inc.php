@@ -93,6 +93,10 @@ if ($config['enable_bgp'])
       if (dbFetchCell("SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ?",array($device['device_id'], $peer['ip'])) < '1')
       {
         $add = dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'bgpPeerRemoteAs' => $peer['as']), 'bgpPeers');
+        if ($config['autodiscovery']['bgp'] === true) {
+            $name = gethostbyaddr($peer['ip']);
+            $remote_device_id = discover_new_device($name,$device,'BGP');
+        }
         echo("+");
       } else {
         $update = dbUpdate(array('bgpPeerRemoteAs' => $peer['as'], 'astext' => mres($astext)), 'bgpPeers', 'device_id=? AND bgpPeerIdentifier=?',array($device['device_id'],$peer['ip']));
