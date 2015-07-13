@@ -227,8 +227,8 @@ while True:
                         '  values("{0}", NOW(), "{1}", "{2}") '
                         'ON DUPLICATE KEY UPDATE              '
                         '  last_polled=values(last_polled),   '
-                        '  devices=values(devices)            '
-                        '  time_taken=values(time_taken)      ').format(config['distributed_poller_name'],
+                        '  devices=values(devices),           '
+                        '  time_taken=values(time_taken)      ').format(config['distributed_poller_name'].strip(),
                                                                         devices_scanned,
                                                                         seconds_taken)
         cursor.execute(update_query)
