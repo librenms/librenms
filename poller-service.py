@@ -183,7 +183,7 @@ poller_group = ('and poller_group IN({}) '
 
 # Add last_polled and last_polled_timetaken so we can sort by the time the last poll started, with the goal
 # of having each device complete a poll within the given time range.
-dev_query = ('SELECT device_id,                                                  '
+dev_query = ('SELECT device_id, status,                                          '
              'DATE_ADD(                                                          '
              '  DATE_SUB(                                                        '
              '    last_polled,                                                   '
@@ -251,7 +251,7 @@ while True:
         sys.exit(2)
 
     devices = cursor.fetchall()
-    for device_id, next_poll, next_discovery in devices:
+    for device_id, status, next_poll, next_discovery in devices:
         # add queue lock, so we lock the next device against any other pollers
         # if this fails, the device is locked by another poller already
         if not getLock('queued.{}'.format(device_id)):
@@ -267,7 +267,7 @@ while True:
             sleep_until(next_poll)
 
         action = 'poll'
-        if not next_discovery or next_discovery < datetime.now():
+        if (not next_discovery or next_discovery < datetime.now()) and status == 1:
             action = 'discovery'
 
         log.debug('DEBUG: Starting {} of device {}'.format(action, device_id))
