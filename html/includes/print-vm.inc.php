@@ -1,43 +1,37 @@
 <?php
 
-echo('<tr class="list">');
+echo '<tr class="list">';
 
-echo('<td class="list">');
+echo '<td class="list">';
 
-if (getidbyname($vm['vmwVmDisplayName']))
-{
-  echo(generate_device_link(device_by_name($vm['vmwVmDisplayName'])));
-} else {
-  echo $vm['vmwVmDisplayName'];
+if (getidbyname($vm['vmwVmDisplayName'])) {
+    echo generate_device_link(device_by_name($vm['vmwVmDisplayName']));
+}
+else {
+    echo $vm['vmwVmDisplayName'];
 }
 
-echo("</td>");
-echo('<td class="list">' . $vm['vmwVmState'] . "</td>");
+echo '</td>';
+echo '<td class="list">'.$vm['vmwVmState'].'</td>';
 
-if ($vm['vmwVmGuestOS'] == "E: tools not installed")
-{
-  echo('<td class="box-desc">Unknown (VMware Tools not installed)</td>');
+if ($vm['vmwVmGuestOS'] == 'E: tools not installed') {
+    echo '<td class="box-desc">Unknown (VMware Tools not installed)</td>';
 }
-else if ($vm['vmwVmGuestOS'] == "")
-{
-  echo('<td class="box-desc"><i>(Unknown)</i></td>');
+else if ($vm['vmwVmGuestOS'] == '') {
+    echo '<td class="box-desc"><i>(Unknown)</i></td>';
 }
-elseif (isset($config['vmware_guestid'][$vm['vmwVmGuestOS']]))
-{
-  echo('<td class="list">' . $config['vmware_guestid'][$vm['vmwVmGuestOS']] . "</td>");
+else if (isset($config['vmware_guestid'][$vm['vmwVmGuestOS']])) {
+    echo '<td class="list">'.$config['vmware_guestid'][$vm['vmwVmGuestOS']].'</td>';
 }
-else
-{
-  echo('<td class="list">' . $vm['vmwVmGuestOS'] . "</td>");
+else {
+    echo '<td class="list">'.$vm['vmwVmGuestOS'].'</td>';
 }
 
-if ($vm['vmwVmMemSize'] >= 1024)
-{
-  echo("<td class=list>" . sprintf("%.2f",$vm['vmwVmMemSize']/1024) . " GB</td>");
-} else {
-  echo("<td class=list>" . sprintf("%.2f",$vm['vmwVmMemSize']) . " MB</td>");
+if ($vm['vmwVmMemSize'] >= 1024) {
+    echo ('<td class=list>'.sprintf('%.2f', ($vm['vmwVmMemSize'] / 1024)).' GB</td>');
+}
+else {
+    echo '<td class=list>'.sprintf('%.2f', $vm['vmwVmMemSize']).' MB</td>';
 }
 
-echo('<td class="list">' . $vm['vmwVmCpus'] . " CPU</td>");
-
-?>
+echo '<td class="list">'.$vm['vmwVmCpus'].' CPU</td>';

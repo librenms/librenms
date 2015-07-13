@@ -75,5 +75,3 @@ $css = <<<EOF
 </style>
 
 EOF;
-
-?>

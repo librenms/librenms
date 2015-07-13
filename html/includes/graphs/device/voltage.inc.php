@@ -1,9 +1,7 @@
 <?php
 
-$class     = "voltage";
-$unit      = "V";
-$unit_long = "Volts";
+$class     = 'voltage';
+$unit      = 'V';
+$unit_long = 'Volts';
 
-include("includes/graphs/device/sensor.inc.php");
-
-?>
+require 'includes/graphs/device/sensor.inc.php';
