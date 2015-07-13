@@ -1,6 +1,6 @@
 <?php
 
-if (is_numeric($vars['vsvr'])) {     
+if (is_numeric($vars['vsvr'])) {
     // print_optionbar_start();
     // echo("<span style='font-weight: bold;'>VServer</span> &#187; ");
     // echo('<a href="'.generate_url($vars, array('vsvr' => NULL)).'">All</a>');

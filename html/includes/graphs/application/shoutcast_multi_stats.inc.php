@@ -13,8 +13,7 @@ $i      = 0;
 $x      = 0;
 
 if ($handle = opendir($rrddir)) {
-    while (false !== ($file = readdir($handle)))
-    {
+    while (false !== ($file = readdir($handle))) {
         if ($file != '.' && $file != '..') {
             if (eregi('app-shoutcast-'.$app['app_id'], $file)) {
                 array_push($files, $file);
