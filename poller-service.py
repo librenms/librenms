@@ -209,7 +209,7 @@ dev_query = ('SELECT device_id,                                                 
                                                                                            poller_group)
 
 threads = 0
-next_update = datetime.now() + timedelta(minutes=5)
+next_update = datetime.now() + timedelta(minutes=2)
 devices_scanned = 0
 
 while True:
@@ -219,7 +219,7 @@ while True:
         log.debug('DEBUG: {} threads currently active'.format(threads))
 
     if next_update < datetime.now():
-        seconds_taken = (datetime.now() - (next_update - timedelta(minutes=5))).seconds
+        seconds_taken = (datetime.now() - (next_update - timedelta(minutes=2))).seconds
         update_query = ('INSERT INTO pollers(poller_name,     '
                         '                    last_polled,     '
                         '                    devices,         '
@@ -235,7 +235,7 @@ while True:
         cursor.fetchall()
         log.info('INFO: {} devices scanned in the last 5 minutes'.format(devices_scanned))
         devices_scanned = 0
-        next_update = datetime.now() + timedelta(minutes=5)
+        next_update = datetime.now() + timedelta(minutes=2)
 
     while threading.active_count() >= amount_of_workers:
         time.sleep(.5)
