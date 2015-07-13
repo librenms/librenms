@@ -407,11 +407,10 @@ function location_to_latlng($device) {
         $device_location = $device['location'];
     }
     if (!empty($device_location)) {
+        $device_location = preg_replace("/ /","+",$device_location);
         // We have a location string for the device.
-        $loc = dbFetchRow("SELECT `lat`,`lng` FROM `devices` LEFT JOIN `devices_attribs` ON `devices_attribs`.`device_id` = `devices`.`device_id` WHERE ((`devices_attribs`.`attrib_type`='override_sysLocation_string' AND `devices_attribs`.`attrib_value` = ?) OR `location` = ?) AND `disabled`= 0 AND `ignore` = 0 AND `latlng_update` >= SUBDATE( NOW(), INTERVAL 24 HOUR) ORDER BY `latlng_update` DESC LIMIT 1", array($device_location,$device_location));
-        if (!is_array($loc)) {
-            // No other device has this location string which was updated in the last 24 hours
-            $device_location = preg_replace("/ /","+",$device_location);
+        $loc = dbFetchRow("SELECT `lat`,`lng` FROM `coordinates` WHERE `location`=? LIMIT 1", array($device_location));
+        if (is_array($loc) === false) {
             // Grab data from which ever Geocode service we use.
             switch ($config['geoloc']['engine']) {
                 case "google":
@@ -437,18 +436,19 @@ function location_to_latlng($device) {
                     }
                 break;
             }
+            if ($bad_loc === true) {
+                d_echo("Bad lat / lng received\n");
+            } else {
+                $loc['timestamp'] = array('NOW()');
+                $loc['location'] = $device_location;
+                if (dbInsert($loc, 'coordinates')) {
+                    d_echo("Device lat/lng created\n");
+                } else {
+                    d_echo("Device lat/lng could not be created\n");
+                }
+            }
         } else {
             d_echo("Using cached lat/lng from other device\n");
-        }
-    }
-    if ($bad_loc === true) {
-        d_echo("Bad lat / lng received\n");
-    } else {
-        $loc['latlng_update'] = array('NOW()');
-        if (dbUpdate($loc, 'devices', '`device_id`=?',array($device['device_id']))) {
-            d_echo("Device lat/lng updated\n");
-        } else {
-            d_echo("Device lat/lng could not be updated\n");
         }
     }
 }

@@ -51,8 +51,13 @@ var greenMarker = L.AwesomeMarkers.icon({
   });
 
 <?php
-foreach (dbFetchRows("SELECT `hostname`,`lat`,`lng`,`status` FROM `devices` WHERE `lat` IS NOT NULL AND `lng` IS NOT NULL AND `disabled`=0 AND `ignore`=0 ORDER BY `status` ASC, `hostname`") as $map_devices) {
-
+foreach (dbFetchRows("SELECT `hostname`,`location`,`status`,`DA`.`attrib_value` AS `overwrote_location` FROM `devices` LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id` WHERE `disabled`=0 AND `ignore`=0 ORDER BY `status` ASC, `hostname`") as $map_devices) {
+    if (empty($map_devices['overwrote_location'])) {
+        $location = $map_devices['overwrote_location'];
+    } else {
+        $location = $map_devices['location'];
+    }
+    //$loc = dbFetcRow("SELECT `// Finish me
     $icon = 'greenMarker';
     if ($map_devices['status'] == 0) {
         $icon = 'redMarker';
@@ -110,7 +115,7 @@ if (isset($config['mapael']['default_lat']) && isset($config['mapael']['default_
 <script src='js/jquery.mousewheel.min.js'></script>
 <?php
 $x=0;
-foreach (dbFetchRows("SELECT `lat`,`lng`,`status`,COUNT(`status`) AS `total` FROM `devices` WHERE `lat` IS NOT NULL AND `lng` IS NOT NULL AND `disabled`=0 AND `ignore`=0 GROUP BY `status`,`lat`,`lng` ORDER BY `status` ASC, `hostname`") as $map_devices) {
+foreach (dbFetchRows("SELECT `hostname`,`location`,`status`, COUNT(`status`) AS `total`,`DA`.`attrib_value` FROM `devices` LEFT JOIN `devices_attribs` AS `DB` ON `DB`.`device_id`=`devices`.`device_id` AND `DB`.`attrib_type`='override_sysLocation_bool' AND `DB`.`attrib_value`='1' LEFT JOIN `devices_attribs` AS `DA` ON `devices`.`device_id`=`DA`.`device_id` WHERE `disabled`=0 AND `ignore`=0 GROUP BY `status`,`lat`,`lng` ORDER BY `status` ASC, `hostname`") as $map_devices) {
     $color = "#29FF3B";
     $size = 15;
     $status = 'Up';

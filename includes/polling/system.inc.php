@@ -178,7 +178,5 @@ if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocat
 }
 
     if ($config['geoloc']['latlng'] === true || $update_latlng === true) {
-        if (strtotime($device['latlng_update']) < strtotime('-1 day')) {
-            location_to_latlng($device);
-        }
+        location_to_latlng($device);
     }

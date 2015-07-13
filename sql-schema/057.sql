@@ -1,3 +1,1 @@
-LOCK TABLES `devices` WRITE;
-ALTER TABLE  `devices` ADD  `lat` FLOAT( 10, 6 ) NULL , ADD  `lng` FLOAT( 10, 6 ) NULL, ADD  `latlng_update` DATETIME NULL ;
-UNLOCK TABLES;
+CREATE TABLE  `librenms`.`coordinates` ( `id` INT NOT NULL AUTO_INCREMENT ,`location` TEXT NOT NULL ,`lat` FLOAT( 10, 6 ) NOT NULL ,`lng` FLOAT( 10, 6 ) NOT NULL ,`timestamp` DATETIME NOT NULL ,INDEX (  `id` )) ENGINE = INNODB
