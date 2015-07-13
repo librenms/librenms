@@ -201,7 +201,7 @@ dev_query = ('SELECT device_id,                                  '
              'AND IS_FREE_LOCK(CONCAT("polling.", device_id))    '
              'AND IS_FREE_LOCK(CONCAT("queued.", device_id))     '
              'AND last_poll_attempted < DATE_SUB(                '
-             '  NOW(), INTERVAL {2} SECOND )                      '
+             '  NOW(), INTERVAL {2} SECOND )                     '
              '{3}                                                '
              'ORDER BY next_poll asc                             ').format(poll_frequency,
                                                                            discover_frequency,
@@ -267,6 +267,10 @@ while True:
 
         t = threading.Thread(target=poll_worker, args=[device_id, action])
         t.start()
+
+        # If there is only one device, release the queue lock, because it won't release automatically.
+        if len(devices) == 1:
+            releaseLock('queued.{}'.format(device_id))
 
         # If we made it this far, break out of the loop and query again.
         break
