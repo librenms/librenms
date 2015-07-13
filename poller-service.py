@@ -231,7 +231,10 @@ while True:
                         '  time_taken=values(time_taken)      ').format(config['distributed_poller_name'].strip(),
                                                                         devices_scanned,
                                                                         seconds_taken)
-        cursor.execute(update_query)
+        try:
+            cursor.execute(update_query)
+        except:
+            log.critical('ERROR: MySQL query error. Is your schema up to date?')
         cursor.fetchall()
         log.info('INFO: {} devices scanned in the last 5 minutes'.format(devices_scanned))
         devices_scanned = 0
@@ -240,7 +243,11 @@ while True:
     while threading.active_count() >= amount_of_workers:
         time.sleep(.5)
 
-    cursor.execute(dev_query)
+    try:
+        cursor.execute(dev_query)
+    except:
+        log.critical('ERROR: MySQL query error. Is your schema up to date?')
+
     devices = cursor.fetchall()
     for device_id, next_poll, next_discovery in devices:
         # add queue lock, so we lock the next device against any other pollers
