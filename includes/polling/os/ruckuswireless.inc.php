@@ -50,5 +50,3 @@ $ruckus_mibs = array(
     "ruckusZDWLANAPTable" => "RUCKUS-ZD-WLAN-MIB",
 );
 poll_mibs($ruckus_mibs, $device, $graphs);
-
-?>

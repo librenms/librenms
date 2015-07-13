@@ -42,5 +42,3 @@ if (is_numeric($cpu_usage))
   rrdtool_update($cpurrd, " N:$cpu_usage");
   $graphs['fortigate_cpu'] = TRUE;
 }
-
-?>

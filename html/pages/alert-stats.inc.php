@@ -10,4 +10,3 @@
 * the source code distribution for details.
 */
 require_once('includes/print-graph-alerts.inc.php');
-?>
