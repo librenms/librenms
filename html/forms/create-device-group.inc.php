@@ -23,8 +23,6 @@ $desc = mres($_POST['desc']);
 
 if( is_array($pattern) ) {
 	$pattern = implode(" ", $pattern);
-	$pattern = rtrim($pattern,'&&');
-	$pattern = rtrim($pattern,'||');
 } elseif( !empty($_POST['pattern']) && !empty($_POST['condition']) && !empty($_POST['value']) ) {
 	$pattern = '%'.$_POST['pattern'].' '.$_POST['condition'].' ';
 	if( is_numeric($_POST['value']) ) {

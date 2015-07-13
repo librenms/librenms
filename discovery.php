@@ -99,10 +99,9 @@ include("includes/sql-schema/update.php");
 $discovered_devices = 0;
 
 if ($config['distributed_poller'] === TRUE) {
-    $where .= " AND poller_group IN(?)";
-    $params = array($config['distributed_poller_group']);
+    $where .= " AND poller_group IN(".$config['distributed_poller_group'].")";
 }
-foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC",$params) as $device)
+foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC") as $device)
 {
   discover_device($device, $options);
 }
