@@ -268,13 +268,12 @@ while True:
         t = threading.Thread(target=poll_worker, args=[device_id, action])
         t.start()
 
-        # If there is only one device, release the queue lock, because it won't release automatically.
-        if len(devices) == 1:
-            releaseLock('queued.{}'.format(device_id))
-
         # If we made it this far, break out of the loop and query again.
         break
 
     # Looping with no break causes the service to be killed by init.
     # This point is only reached if the query is empty, so sleep half a second before querying again.
     time.sleep(.5)
+
+    # Make sure we're not holding any device queue locks in this connection before querying again.
+    getLock('unlock.{}'.format(config['distributed_poller_name']))
