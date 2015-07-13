@@ -1,9 +1,9 @@
 <?php
 $param = array();
 
-$pagetitle[] = "Alert Log";
+$pagetitle[] = 'Alert Log';
 
-            echo('<div class="panel panel-default panel-condensed">
+            echo '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-md-2">
@@ -14,7 +14,7 @@ $pagetitle[] = "Alert Log";
                         </div>
                     </div>
                 </div>
-            ');
+            ';
 ?>
 
 <div class="table-responsive">
@@ -47,16 +47,17 @@ var grid = $("#alertlog").bootgrid({
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
 <?php
-    foreach (get_all_devices() as $hostname) {
-        $device_id = getidbyname($hostname);
-        if (device_permitted($device_id)) {
-            echo('"<option value=\"'.$device_id.'\""+');
-            if (getidbyname($hostname) == $_POST['device_id']) {
-                echo('" selected "+');
-            }
-           echo('">'.$hostname.'</option>"+');
+foreach (get_all_devices() as $hostname) {
+    $device_id = getidbyname($hostname);
+    if (device_permitted($device_id)) {
+        echo '"<option value=\"'.$device_id.'\""+';
+        if (getidbyname($hostname) == $_POST['device_id']) {
+            echo '" selected "+';
         }
+
+        echo '">'.$hostname.'</option>"+';
     }
+}
 ?>
                "</select>"+
                "</div>"+
@@ -80,7 +81,7 @@ var grid = $("#alertlog").bootgrid({
     max = high - low;
     search = $('.search-field').val();
 
-    $(".pdf-export").html("<a href='pdf.php?report=alert-log&device_id=<?php echo $_POST['device_id'];?>&string="+search+"&results="+max+"&start="+low+"'><img src='images/16/pdf.png' width='16' height='16' alt='Export to pdf'> Export to pdf</a>");
+    $(".pdf-export").html("<a href='pdf.php?report=alert-log&device_id=<?php echo $_POST['device_id']; ?>&string="+search+"&results="+max+"&start="+low+"'><img src='images/16/pdf.png' width='16' height='16' alt='Export to pdf'> Export to pdf</a>");
 
     grid.find(".incident-toggle").each( function() {
       $(this).parent().addClass('incident-toggle-td');

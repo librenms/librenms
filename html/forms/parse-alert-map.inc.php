@@ -12,19 +12,24 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 $map_id = $_POST['map_id'];
 
-if(is_numeric($map_id) && $map_id > 0) {
-    $map = dbFetchRow("SELECT alert_rules.name,alert_map.target FROM alert_map,alert_rules WHERE alert_map.rule=alert_rules.id && alert_map.id = ?",array($map_id));
-    if( $map['target'][0] == "g" ) {
-        $map['target'] = 'g:'.dbFetchCell("SELECT name FROM device_groups WHERE id = ?",array(substr($map['target'],1)));
-    } else {
-        $map['target'] = dbFetchCell("SELECT hostname FROM devices WHERE device_id = ?",array($map['target']));
+if (is_numeric($map_id) && $map_id > 0) {
+    $map = dbFetchRow('SELECT alert_rules.name,alert_map.target FROM alert_map,alert_rules WHERE alert_map.rule=alert_rules.id && alert_map.id = ?', array($map_id));
+    if ($map['target'][0] == 'g') {
+        $map['target'] = 'g:'.dbFetchCell('SELECT name FROM device_groups WHERE id = ?', array(substr($map['target'], 1)));
     }
-    $output = array('rule'=>$map['name'],'target'=>$map['target']);
+    else {
+        $map['target'] = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', array($map['target']));
+    }
+
+    $output = array(
+               'rule'   => $map['name'],
+               'target' => $map['target'],
+              );
     echo _json_encode($output);
 }

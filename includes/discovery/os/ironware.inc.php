@@ -1,8 +1,7 @@
 <?php
 
-if (!$os)
-{
-  if (preg_match("/IronWare/", $sysDescr)) { $os = "ironware"; }
+if (!$os) {
+    if (preg_match('/IronWare/', $sysDescr)) {
+        $os = 'ironware';
+    }
 }
-
-?>

@@ -1,18 +1,15 @@
 <?php
 
-include("includes/graphs/common.inc.php");
+require 'includes/graphs/common.inc.php';
 
-//$rrd_options .= " -l 0 -E ";
+// $rrd_options .= " -l 0 -E ";
+$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/ubnt-airmax-mib.rrd';
 
-$rrdfilename  = $config['rrd_dir'] . "/".$device['hostname']."/ubnt-airmax-mib.rrd";
-
-if (file_exists($rrdfilename))
-{
-  $rrd_options .= " COMMENT:'dbm                        Now    Min     Max\\n'";
-  $rrd_options .= " DEF:WlStatRssi=".$rrdfilename.":WlStatRssi:AVERAGE ";
-  $rrd_options .= " LINE1:WlStatRssi#CC0000:'RSSI                 ' ";
-  $rrd_options .= " GPRINT:WlStatRssi:LAST:%3.2lf ";
-  $rrd_options .= " GPRINT:WlStatRssi:MIN:%3.2lf ";
-  $rrd_options .= " GPRINT:WlStatRssi:MAX:%3.2lf\\\l ";
+if (file_exists($rrdfilename)) {
+    $rrd_options .= " COMMENT:'dbm                        Now    Min     Max\\n'";
+    $rrd_options .= ' DEF:WlStatRssi='.$rrdfilename.':WlStatRssi:AVERAGE ';
+    $rrd_options .= " LINE1:WlStatRssi#CC0000:'RSSI                 ' ";
+    $rrd_options .= ' GPRINT:WlStatRssi:LAST:%3.2lf ';
+    $rrd_options .= ' GPRINT:WlStatRssi:MIN:%3.2lf ';
+    $rrd_options .= ' GPRINT:WlStatRssi:MAX:%3.2lf\\\l ';
 }
-
