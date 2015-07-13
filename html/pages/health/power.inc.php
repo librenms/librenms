@@ -1,9 +1,7 @@
 <?php
 
-$graph_type = "sensor_power";
-$unit = "W";
-$class = "power";
+$graph_type = 'sensor_power';
+$unit       = 'W';
+$class      = 'power';
 
-include("pages/health/sensors.inc.php");
-
-?>
+require 'pages/health/sensors.inc.php';

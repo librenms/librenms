@@ -1,5 +1,3 @@
 <?php
 
-include("diskio_ops.inc.php");
-
-?>
+require 'diskio_ops.inc.php';

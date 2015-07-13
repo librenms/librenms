@@ -1,8 +1,5 @@
 <?php
 
-if ($_SESSION['userlevel'] >= "5")
-{
-  $auth = 1;
+if ($_SESSION['userlevel'] >= '5') {
+    $auth = 1;
 }
-
-?>
