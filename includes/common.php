@@ -775,16 +775,12 @@ function get_smokeping_files($device) {
     return $smokeping_files;
 }
 
-function generate_smokeping_file($device,$file) {
+function generate_smokeping_file($device,$file='') {
     global $config;
     if ($config['smokeping']['integration'] === true) {
-        $response = $config['smokeping']['dir'] .'/'. $device['type'] .'/';
+        return $config['smokeping']['dir'] .'/'. $device['type'] .'/' . $file;
     } else {
-        $response = $config['smokeping']['dir'] . '/';
+        return $config['smokeping']['dir'] . '/' . $file;
     }
-    if (!empty($file)) {
-        $response = $response . $file;
-    }
-    return $response;
 }
 
