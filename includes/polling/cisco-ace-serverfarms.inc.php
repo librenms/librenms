@@ -7,8 +7,7 @@ foreach ($serverfarm_db as $vserver) {
     $classmaps[$vserver['classmap']] = $vserver;
 }
 
-foreach ($serverfarm_array as $index => $vserver)
-{
+foreach ($serverfarm_array as $index => $vserver) {
     $classmap    = str_replace('class-map-', '', $vserver['slbVServerClassMap']);
     $classmap_id = str_replace('9.', '', $index);
 

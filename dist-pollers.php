@@ -15,49 +15,55 @@
 
 chdir(dirname($argv[0]));
 
-include("includes/defaults.inc.php");
-include("config.php");
-include("includes/definitions.inc.php");
-include("includes/functions.php");
-include("includes/polling/functions.inc.php");
-include("includes/alerts.inc.php");
-include('includes/console_table.php');
+require 'includes/defaults.inc.php';
+require 'config.php';
+require 'includes/definitions.inc.php';
+require 'includes/functions.php';
+require 'includes/polling/functions.inc.php';
+require 'includes/alerts.inc.php';
+require 'includes/console_table.php';
 
-$options = getopt("l:u:r::");
+$options = getopt('l:u:r::');
 
 if (isset($options['l'])) {
     if ($options['l'] == 'pollers') {
         $tbl = new Console_Table();
-        $tbl->setHeaders(array('ID','Poller Name','Last Polled','# Devices','Poll Time'));
-        foreach (dbFetchRows("SELECT * FROM `pollers`") as $poller) {
-            $tbl->addRow(array($poller['id'],$poller['poller_name'],$poller['last_polled'],$poller['devices'],$poller['time_taken']));
+        $tbl->setHeaders(array('ID', 'Poller Name', 'Last Polled', '# Devices', 'Poll Time'));
+        foreach (dbFetchRows('SELECT * FROM `pollers`') as $poller) {
+            $tbl->addRow(array($poller['id'], $poller['poller_name'], $poller['last_polled'], $poller['devices'], $poller['time_taken']));
         }
-        echo $tbl->getTable();
-    } elseif ($options['l'] == 'groups') {
-        $tbl = new Console_Table();
-        $tbl->setHeaders(array('ID','Group Name','Description'));
-        foreach (dbFetchRows("SELECT * FROM `poller_groups`") as $groups) {
-            $tbl->addRow(array($groups['id'],$groups['group_name'],$groups['descr']));
-        }
+
         echo $tbl->getTable();
     }
-} elseif (isset($options['u']) && !empty($options['u'])) {
+    else if ($options['l'] == 'groups') {
+        $tbl = new Console_Table();
+        $tbl->setHeaders(array('ID', 'Group Name', 'Description'));
+        foreach (dbFetchRows('SELECT * FROM `poller_groups`') as $groups) {
+            $tbl->addRow(array($groups['id'], $groups['group_name'], $groups['descr']));
+        }
+
+        echo $tbl->getTable();
+    }
+}
+else if (isset($options['u']) && !empty($options['u'])) {
     if (is_numeric($options['u'])) {
-       $db_column = 'id';
-    } else {
+        $db_column = 'id';
+    }
+    else {
         $db_column = 'poller_name';
     }
-    if (dbDelete('pollers',"`$db_column` = ?", array($options['u'])) >= 0) {
-        echo "Poller " . $options['u'] . " has been removed\n";
+
+    if (dbDelete('pollers', "`$db_column` = ?", array($options['u'])) >= 0) {
+        echo 'Poller '.$options['u']." has been removed\n";
     }
-} elseif (isset($options['r'])) {
-    if(dbInsert(array('poller_name' => $config['distributed_poller_name'], 'last_polled' => '0000-00-00 00:00:00', 'devices' => 0, 'time_taken' => 0), 'pollers') >= 0) {
-        echo "Poller " . $config['distributed_poller_name'] . " has been registered\n";
+}
+else if (isset($options['r'])) {
+    if (dbInsert(array('poller_name' => $config['distributed_poller_name'], 'last_polled' => '0000-00-00 00:00:00', 'devices' => 0, 'time_taken' => 0), 'pollers') >= 0) {
+        echo 'Poller '.$config['distributed_poller_name']." has been registered\n";
     }
-} else {
+}
+else {
     echo "-l pollers | groups List registered pollers or poller groups\n";
     echo "-u <id> | <poller name> Unregister a poller\n";
     echo "-r Register this install as a poller\n";
-}
-
-?>
+}//end if

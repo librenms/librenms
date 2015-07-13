@@ -1,13 +1,11 @@
 <?php
 
-include("memcached.inc.php");
-include("includes/graphs/common.inc.php");
+require 'memcached.inc.php';
+require 'includes/graphs/common.inc.php';
 
 $multiplier = 8;
 
-$ds_in = "bytes_read";
-$ds_out = "bytes_written";
+$ds_in  = 'bytes_read';
+$ds_out = 'bytes_written';
 
-include("includes/graphs/generic_data.inc.php");
-
-?>
+require 'includes/graphs/generic_data.inc.php';

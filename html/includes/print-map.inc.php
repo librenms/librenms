@@ -21,7 +21,8 @@ if (!empty($device['hostname'])) {
     $sql_array = array($device['hostname'], $device['hostname']);
     $mac_sql = ' AND `D`.`hostname` = ?';
     $mac_array = array($device['hostname']);
-} else {
+}
+else {
     $sql = ' ';
 }
 
@@ -130,22 +131,28 @@ foreach ($list as $items) {
     $speed = $items['local_ifspeed']/1000/1000;
     if ($speed == 100) {
         $width = 3;
-    } elseif ($speed == 1000) {
+    } 
+    elseif ($speed == 1000) {
         $width = 5;
-    } elseif ($speed == 10000) {
+    } 
+    elseif ($speed == 10000) {
         $width = 10;
-    } elseif ($speed == 40000) {
+    } 
+    elseif ($speed == 40000) {
         $width = 15;
-    } elseif ($speed == 100000) {
+    } 
+    elseif ($speed == 100000) {
         $width = 20;
-    } else {
+    } 
+    else {
         $width = 1;
     }
     $link_in_used = ($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
     $link_out_used = ($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
     if ($link_in_used > $link_out_used) {
         $link_used = $link_in_used;
-    } else {
+    } 
+    else {
         $link_used = $link_out_used;
     }
     $link_used = round($link_used, -1);
@@ -221,12 +228,11 @@ echo $edges;
 
 <?php
 
-} else {
+} 
+else {
 
     print_message("No map to display, this may be because you aren't running autodiscovery or no devices are linked by mac address.");
 
 }
 
 $pagetitle[] = "Map";
-
-?>

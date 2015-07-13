@@ -12,14 +12,17 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 $group_id = ($_POST['group_id']);
 
-if(is_numeric($group_id) && $group_id > 0) {
-    $group = dbFetchRow("SELECT * FROM `poller_groups` WHERE `id` = ? LIMIT 1",array($group_id));
-    $output = array('group_name'=>$group['group_name'],'descr'=>$group['descr']);
+if (is_numeric($group_id) && $group_id > 0) {
+    $group  = dbFetchRow('SELECT * FROM `poller_groups` WHERE `id` = ? LIMIT 1', array($group_id));
+    $output = array(
+        'group_name' => $group['group_name'],
+        'descr'      => $group['descr'],
+    );
     echo _json_encode($output);
 }

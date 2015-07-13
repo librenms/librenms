@@ -12,5 +12,5 @@
  * the source code distribution for details.
  */
 
-$version = "Powercode";
-$hardware = "BMU";
+$version  = 'Powercode';
+$hardware = 'BMU';

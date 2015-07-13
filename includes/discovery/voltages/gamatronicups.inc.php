@@ -1,8 +1,7 @@
 <?php
 
 if ($device['os'] == 'gamatronicups') {
-    for ($i = 1; $i <= 3; $i++)
-    {
+    for ($i = 1; $i <= 3; $i++) {
         $volt_oid = "GAMATRONIC-MIB::gamatronicLTD.5.4.1.1.2.$i";
         $descr    = "Input Phase $i";
         $volt     = snmp_get($device, $volt_oid, '-Oqv');
