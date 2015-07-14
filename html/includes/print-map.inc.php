@@ -17,12 +17,12 @@ $row_colour="#ffffff";
 
 $sql_array= array();
 if (!empty($device['hostname'])) {
-    $sql = ' WHERE `devices`.`hostname`=?';
+    $sql = ' `devices`.`hostname`=?';
     $sql_array = array($device['hostname']);
     $mac_sql = ' AND `D`.`hostname` = ?';
     $mac_array = array($device['hostname']);
 } else {
-    $sql = ' WHERE 1';
+    $sql = ' ';
 }
 
 $sql .= ' AND `local_device_id` != 0 AND `remote_device_id` != 0 ';
