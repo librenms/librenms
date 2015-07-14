@@ -147,17 +147,9 @@ if ($config['show_locations'])
             <li><a href="delhost/"><i class="fa fa-trash fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>');
 }
 
-if ($links['count'] > 0) {
-
 ?>
               <li role="presentation" class="divider"></li>
               <li><a href="map/"><img src="images/16/chart_organisation.png" border="0" alt="Network Map" width="16" height="16" /> Network Map</a></li>
-<?php
-
-}
-
-?>
-
           </ul>
         </li>
 
