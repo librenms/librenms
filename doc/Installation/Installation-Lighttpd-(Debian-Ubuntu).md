@@ -143,7 +143,42 @@ Discover localhost and poll it for the first time:
 
     php discovery.php -h all && php poller.php -h all
 
-### Create cronjob ###
+### Run Daemon ###
+
+#### Running it through cron
+
+We recommend running the daemon through cron to have watchdog capabilities. This way the cron will attempt to restart the daemon in case it exists unexpectedly.
+
+```crontab
+*    *    * * *   root    /opt/librenms/librenmsd start >> /dev/null 2>&1
+```
+
+#### Running it as init-script
+
+On most systems, you can simply symlink `/etc/init.d/librenmd` to `/opt/librenms/librenmsd`.
+The daemon comes with LSB Compliant headers, on a debian system you would issue `insserv librenmsd` or similar to autogenerate the runlevel links.
+
+On a RHEL/Centos system prior to 7, you need to issue `chkconfig --add librenmsd`.
+
+On a distribution using systemd (RHEL/Centos 7 or later) you'll need to create a `librenmsd.service` file yourself and put it in the correct directory.
+Here is a skelleton:
+```systemd
+[Unit]
+Description=LibreNMS Daemon
+After=syslog.target
+
+[Service]
+ExecStart=/opt/librenmsd foreground
+
+[Install]
+WantedBy=multi-user.target
+```
+
+__In case you do not run librenms in /opt/librenms, you're `REQUIRED` to adjust the `$BASEDIR` varible in the top of the `librenmsd` file.__
+
+More details on the Daemon and it's config are at [Extensions/Daemon](http://docs.librenms.org/Extensions/Daemon/)
+
+### ... or Create cronjob ####
 
 The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in the public domain by its author.  By default, the LibreNMS cronjob runs `poller-wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 threads per core.  The default if no thread count is `16 threads`.
 
