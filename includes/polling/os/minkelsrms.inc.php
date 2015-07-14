@@ -1,7 +1,4 @@
 <?php
 
-# AKCP clone
-
-include('includes/polling/os/akcp.inc.php');
-
-?>
+// AKCP clone
+require 'includes/polling/os/akcp.inc.php';

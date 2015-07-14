@@ -47,5 +47,3 @@ if ($alert_state!='') {
 }
 
 echo("</tr>");
-
-?>

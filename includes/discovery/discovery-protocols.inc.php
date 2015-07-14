@@ -24,12 +24,7 @@ if ($device['os'] == "ironware" && $config['autodiscovery']['xdp'] === TRUE)
 
         if (!$remote_device_id)
         {
-          $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId']);
-          if ($remote_device_id)
-          {
-            $int = ifNameDescr($interface);
-            log_event("Device autodiscovered through FDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['port_id']);
-          }
+          $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId'], $device,'FDP', $interface);
         }
 
         if ($remote_device_id)
@@ -63,12 +58,7 @@ if ($cdp_array && $config['autodiscovery']['xdp'] === TRUE)
 
         if (!$remote_device_id)
         {
-          $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId']);
-          if ($remote_device_id)
-          {
-            $int = ifNameDescr($interface);
-            log_event("Device autodiscovered through CDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['port_id']);
-          }
+          $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
         }
 
         if ($remote_device_id)
@@ -119,12 +109,7 @@ if ($lldp_array && $config['autodiscovery']['xdp'] === TRUE)
 
         if (!$remote_device_id && is_valid_hostname($lldp['lldpRemSysName']))
         {
-          $remote_device_id = discover_new_device($lldp['lldpRemSysName']);
-          if ($remote_device_id)
-          {
-            $int = ifNameDescr($interface);
-            log_event("Device autodiscovered through LLDP on " . $device['hostname'] . " (port " . $int['label'] . ")", $remote_device_id, 'interface', $int['port_id']);
-          }
+          $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP',$interface);
         }
 
         if ($remote_device_id)
@@ -159,12 +144,7 @@ if ($config['autodiscovery']['ospf'] === TRUE) {
             continue;
         }
         $name = gethostbyaddr($ip);
-        $remote_device_id = discover_new_device($name);
-        if (isset($remote_device_id) && $remote_device_id > 0) {
-            log_event("Device $name ($ip) autodiscovered through OSPF", $remote_device_id, 'system');
-        } else {
-            log_event("OSPF discovery of $name ($ip) failed - check ping and SNMP access", $device['device_id'], 'system');
-        }
+        $remote_device_id = discover_new_device($name, $device, 'OSPF');
     }
 } else {
    echo "disabled\n";
