@@ -17,21 +17,62 @@ $row_colour="#ffffff";
 
 $sql_array= array();
 if (!empty($device['hostname'])) {
-    $sql = ' `devices`.`hostname`=?';
-    $sql_array = array($device['hostname']);
+    $sql = ' AND (`D1`.`hostname`=? OR `D2`.`hostname`=?)';
+    $sql_array = array($device['hostname'], $device['hostname']);
     $mac_sql = ' AND `D`.`hostname` = ?';
     $mac_array = array($device['hostname']);
 } else {
     $sql = ' ';
 }
 
-$sql .= ' AND `local_device_id` != 0 AND `remote_device_id` != 0 ';
-$sql .= ' AND `local_device_id` IS NOT NULL AND `remote_device_id` IS NOT NULL ';
+if (is_admin() === false && is_read() === false) {
+    $join_sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D1`.`device_id` = `DP`.`device_id`';
+    $sql  .= ' AND `DP`.`user_id`=?';
+    $sql_array[] = $_SESSION['user_id'];
+}
 
 $tmp_devices = array();
 $tmp_ids = array();
 $tmp_links = array();
-foreach (dbFetchRows("SELECT
+
+
+$ports = dbFetchRows("SELECT
+                             `D1`.`device_id` AS `local_device_id`,
+                             `D1`.`os` AS `local_os`,
+                             `D1`.`hostname` AS `local_hostname`,
+                             `D2`.`device_id` AS `remote_device_id`,
+                             `D2`.`os` AS `remote_os`,
+                             `D2`.`hostname` AS `remote_hostname`,
+                             `P1`.`port_id` AS `local_port_id`,
+                             `P1`.`device_id` AS `local_port_device_id`,
+                             `P1`.`ifName` AS `local_ifname`,
+                             `P1`.`ifSpeed` AS `local_ifspeed`,
+                             `P1`.`ifOperStatus` AS `local_ifoperstatus`,
+                             `P1`.`ifAdminStatus` AS `local_ifadminstatus`,
+                             `P1`.`ifInOctets_rate` AS `local_ifinoctets_rate`,
+                             `P1`.`ifOutOctets_rate` AS `local_ifoutoctets_rate`,
+                             `P2`.`port_id` AS `remote_port_id`,
+                             `P2`.`device_id` AS `remote_port_device_id`,
+                             `P2`.`ifName` AS `remote_ifname`,
+                             `P2`.`ifSpeed` AS `remote_ifspeed`,
+                             `P2`.`ifOperStatus` AS `remote_ifoperstatus`,
+                             `P2`.`ifAdminStatus` AS `remote_ifadminstatus`,
+                             `P2`.`ifInOctets_rate` AS `remote_ifinoctets_rate`,
+                             `P2`.`ifOutOctets_rate` AS `remote_ifoutoctets_rate`
+                      FROM `ipv4_mac` AS `M`
+                             LEFT JOIN `ports` AS `P1` ON `P1`.`port_id`=`M`.`port_id`
+                             LEFT JOIN `ports` AS `P2` ON `P2`.`ifPhysAddress`=`M`.`mac_address`
+                             LEFT JOIN `devices` AS `D1` ON `P1`.`device_id`=`D1`.`device_id`
+                             LEFT JOIN `devices` AS `D2` ON `P2`.`device_id`=`D2`.`device_id`
+                             $join_sql
+                      WHERE
+                             `P1`.`port_id` IS NOT NULL AND
+                             `P2`.`port_id` IS NOT NULL AND
+                             `D1`.`device_id` != `D2`.`device_id`
+                             $sql
+                     ", $sql_array);
+
+$devices = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
                              `D1`.`hostname` AS `local_hostname`,
@@ -59,10 +100,19 @@ foreach (dbFetchRows("SELECT
                              LEFT JOIN `devices` AS `D2` ON `D2`.`device_id`=`links`.`remote_device_id`
                              LEFT JOIN `ports` AS `P1` ON `P1`.`port_id`=`links`.`local_port_id`
                              LEFT JOIN `ports` AS `P2` ON `P2`.`port_id`=`links`.`remote_port_id`
+                             $join_sql
                       WHERE
-                             `active`=1
+                             `active`=1 AND
+                             `local_device_id` != 0 AND
+                             `remote_device_id` != 0 AND
+                             `local_device_id` IS NOT NULL AND
+                             `remote_device_id` IS NOT NULL
                              $sql
-                      ",$sql_array) as $items) {
+                      ", $sql_array);
+
+$list = array_merge($ports,$devices);
+
+foreach ($list as $items) {
     $local_device = array('device_id'=>$items['local_device_id'], 'os'=>$items['local_os'], 'hostname'=>$items['local_hostname']);
     $remote_device = array('device_id'=>$items['remote_device_id'], 'os'=>$items['remote_os'], 'hostname'=>$items['remote_hostname']);
 
@@ -77,7 +127,7 @@ foreach (dbFetchRows("SELECT
     }
     array_push($tmp_ids,$items['local_device_id']);
     array_push($tmp_ids,$items['remote_device_id']);
-    $speed = $items['ifSpeed']/1000/1000;
+    $speed = $items['local_ifspeed']/1000/1000;
     if ($speed == 100) {
         $width = 3;
     } elseif ($speed == 1000) {
@@ -117,7 +167,8 @@ if (count($node_devices) > 1 && count($tmp_links) > 0) {
 <div id="visualization"></div>
 <script src="js/vis.min.js"></script>
 <script type="text/javascript">
-
+var height = $(window).height() - 100;
+$('#visualization').height(height + 'px');
     // create an array with nodes
     var nodes =
 <?php
@@ -135,14 +186,17 @@ echo $edges;
     // create a network
     var container = document.getElementById('visualization');
     var data = {
-            nodes: nodes,
+        nodes: nodes,
         edges: edges,
-        stabilize: false
+        stabilize: true
     };
     var options = {
+       autoResize: true,
+       height: '100%',
+       width: '100%',
        physics: {
            barnesHut: {
-               gravitationalConstant: -80000, springConstant: 0.001, springLength: 200
+               gravitationalConstant: -10000, springConstant: 0.001, springLength: 50
            }
        },
        tooltip: {
@@ -158,17 +212,11 @@ echo $edges;
        }
     };
     var network = new vis.Network(container, data, options);
-    network.on("resize", function(params) {console.log(params.width,params.height)});
     network.on('click', function (properties) {
         if (properties.nodes > 0) {
             window.location.href = "/device/device="+properties.nodes+"/tab=map/"
         }
     });
-</script>
-<script>
-var height = $(window).height() - 100;
-$('#visualization').height(height + 'px');
-network.redraw();
 </script>
 
 <?php
