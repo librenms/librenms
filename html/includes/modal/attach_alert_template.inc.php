@@ -79,7 +79,7 @@ $('#alert-template-attach').click('', function(event) {
     $('#rules_list :selected').each(function(i, selectedElement) {
         items.push($(selectedElement).val());
     });
-    var rules = items.join(', ');
+    var rules = items.join(',');
     $.ajax({
         type: 'POST',
         url: '/ajax_form.php',

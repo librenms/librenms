@@ -226,8 +226,8 @@ foreach ($ports as $data)
       <div class="form-group">
         <label for="ignore">Ignored</label>
         <input type=checkbox id="ignore" name="ignore" value="1" class="" <?php if ($vars['ignore']) { echo("checked"); } ?> ></input>
-        <label for="disable">Disabled</label>
-        <input type=checkbox id="disable" name="disable" value=1 class="" <?php if ($vars['disable']) { echo("checked"); } ?> ></input>
+        <label for="disabled">Disabled</label>
+        <input type=checkbox id="disabled" name="disabled" value=1 class="" <?php if ($vars['disabled']) { echo("checked"); } ?> ></input>
         </label>
         <label for="deleted">Deleted</label>
         <input type=checkbox id="deleted" name="deleted" value=1 class="" <?php if ($vars['deleted']) { echo("checked"); } ?> ></input>
@@ -277,6 +277,8 @@ if(!isset($vars['disabled'])) { $vars['disabled'] = "0"; }
 if(!isset($vars['deleted']))  { $vars['deleted'] = "0"; }
 
 $where = '';
+$ignore_filter = 0;
+$disabled_filter = 0;
 
 foreach ($vars as $var => $value)
 {
@@ -297,13 +299,23 @@ foreach ($vars as $var => $value)
         $param[] = $value;
         break;
       case 'deleted':
-      case 'ignore':
-        if ($value == 1)
-        {
-          $where .= " AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0";
+        if ($value == 1) {
+          $where .= " AND `I`.`deleted` = 1";
+          $ignore_filter = 1;
         }
         break;
-      case 'disable':
+      case 'ignore':
+        if ($value == 1) {
+          $where .= " AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0";
+          $ignore_filter = 1;
+        }
+        break;
+      case 'disabled':
+        if ($value == 1) {
+            $where .= " AND `I`.`disabled` = 1 AND `I`.`deleted` = 0";
+            $disabled_filter = 1;
+        }
+        break;
       case 'ifSpeed':
         if (is_numeric($value))
         {
@@ -343,6 +355,10 @@ foreach ($vars as $var => $value)
       break;
     }
   }
+}
+
+if ($ignore_filter == 0 && $disabled_filter == 0) {
+    $where .= " AND `I`.`ignore` = 0 AND `I`.`disabled` = 0 AND `I`.`deleted` = 0";
 }
 
 $query = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ".$where." ".$query_sort;

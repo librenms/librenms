@@ -38,37 +38,18 @@ $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
 
-if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php"))
-{
-
-  if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
-  {
-    $auth = "1"; // hardcode auth for all with config function
-  }
-
-  if (isset($config['allow_unauth_graphs_cidr']) && count($config['allow_unauth_graphs_cidr']) > 0)
-  {
-    foreach ($config['allow_unauth_graphs_cidr'] as $range)
-    {
-      if (Net_IPv4::ipInNetwork($_SERVER['REMOTE_ADDR'], $range))
-      {
-        $auth = "1";
-        if ($debug) { echo("matched $range"); }
-        break;
-      }
-    }
-  }
-
-  include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
-
-  if (isset($auth) && $auth)
-  {
-    include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
-  }
-
+if ($auth !== true && $auth != 1) {
+    $auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
 }
-else
-{
+include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
+
+if ($auth === true && is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
+    include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
+}
+elseif ($auth === true && is_mib_graph($type, $subtype)) {
+    include($config['install_dir'] . "/html/includes/graphs/$type/mib.inc.php");
+}
+else {
   graph_error("$type*$subtype ");//Graph Template Missing");
 }
 

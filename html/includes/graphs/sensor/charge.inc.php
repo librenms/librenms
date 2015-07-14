@@ -10,7 +10,10 @@ $rrd_options .= " COMMENT:'                                 Last   Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 $rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";
 $rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";
-$rrd_options .= " CDEF:sensorwarm=sensor_max,".$sensor['sensor_limit'].",GT,sensor,UNKN,IF";
+if (isset($sensor['sensor_limit'])) {
+    $rrd_options .= " CDEF:sensorwarm=sensor_max,".$sensor['sensor_limit'].",GT,sensor,UNKN,IF";
+    $rrd_options .= " LINE1:sensorwarm#660000";
+}
 $rrd_options .= " CDEF:sensorcold=sensor_min,20,LT,sensor,UNKN,IF";
 $rrd_options .= " AREA:sensor_max#c5c5c5";
 $rrd_options .= " AREA:sensor_min#ffffffff";
@@ -19,7 +22,6 @@ $rrd_options .= " AREA:sensor_min#ffffffff";
 #  $rrd_options .= " AREA:sensorwarm#FFCCCC";
 #  $rrd_options .= " AREA:sensorcold#CCCCFF";
 $rrd_options .= " LINE1:sensor#cc0000:'" . rrdtool_escape($sensor['sensor_descr'],28)."'";
-$rrd_options .= " LINE1:sensorwarm#660000";
 $rrd_options .= " GPRINT:sensor:LAST:%3.0lf%%";
 $rrd_options .= " GPRINT:sensor:MAX:%3.0lf%%\\\\l";
 

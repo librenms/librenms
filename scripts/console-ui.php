@@ -52,7 +52,7 @@ while($end == 0)
     {
       $sql = "WHERE host='".$options['d']."'";
     }
-    $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate  FROM `eventlog` AS E $sql ORDER BY `datetime` DESC LIMIT 20";
+    $query = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` AS E $sql ORDER BY `datetime` DESC LIMIT 20";
     foreach (dbFetchRows($query, $param) as $entry)
     {
       $tbl->addRow(array($entry['datetime'],gethostbyid($entry['host']),$entry['message'],$entry['type'],$entry['reference']));
@@ -67,7 +67,7 @@ while($end == 0)
     {
       $sql = "WHERE device_id='".$options['d']."'";
     }
-    $query = "SELECT *, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date from syslog AS S $sql_query ORDER BY `timestamp` DESC LIMIT 20";
+    $query = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog AS S $sql_query ORDER BY `timestamp` DESC LIMIT 20";
     foreach (dbFetchRows($query, $param) as $entry)
     {
       $tbl->addRow(array($entry['timestamp'],gethostbyid($entry['device_id']),$entry['program'],$entry['msg'],$entry['level'],$entry['facility']));

@@ -93,9 +93,13 @@ if(is_admin() !== false) {
             <div class='col-sm-2'>
                 <input type='text' id='count' name='count' class='form-control'>
             </div>
-            <label for='delay' class='col-sm-3 control-label'>Alert delay: </label>
+            <label for='delay' class='col-sm-1 control-label'>Delay: </label>
             <div class='col-sm-2'>
                 <input type='text' id='delay' name='delay' class='form-control'>
+            </div>
+            <label for='interval' class='col-sm-2 control-label'>Interval: </label>
+            <div class='col-sm-2'>
+                <input type='text' id='interval' name='interval' class='form-control'>
             </div>
         </div>
         <div class='form-group'>
@@ -202,6 +206,16 @@ $('#create-alert').on('show.bs.modal', function (event) {
                 var delay = extra['delay'];
             }
             $('#delay').val(delay);
+            if((extra['interval'] / 86400) >= 1) {
+                var interval = extra['interval'] / 86400 + ' d';
+            } else if((extra['interval'] / 3600) >= 1) {
+                var interval = extra['interval'] / 3600 + ' h';
+            } else if((extra['interval'] / 60) >= 1) {
+                var interval = extra['interval'] / 60 + ' m';
+            } else {
+                var interval = extra['interval'];
+            }
+            $('#interval').val(interval);
             $("[name='mute']").bootstrapSwitch('state',extra['mute']);
             $("[name='invert']").bootstrapSwitch('state',extra['invert']);
             $('#name').val(output['name']);

@@ -31,7 +31,7 @@ if( !empty($_POST['string']) ) {
 	$sql .= " AND message LIKE '%".mres($_POST['string'])."%'";
 }
 
-$entries = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate  FROM `eventlog` WHERE `host` = ? $sql ORDER BY `datetime` DESC LIMIT 0,250", array($device['device_id']));
+$entries = dbFetchRows("SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` WHERE `host` = ? $sql ORDER BY `datetime` DESC LIMIT 0,250", array($device['device_id']));
 
 echo('      <div class="panel panel-default panel-condensed">
               <div class="panel-heading">

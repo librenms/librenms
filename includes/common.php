@@ -1,6 +1,20 @@
 <?php
-
-// Common Functions
+/*
+ * LibreNMS - Common Functions
+ *
+ * Original Observium version by: Adam Armstrong, Tom Laermans
+ * Copyright (c) 2009-2012 Adam Armstrong.
+ *
+ * Additions for LibreNMS by: Neil Lathwood, Paul Gear, Tim DuFrane
+ * Copyright (c) 2014-2015 Neil Lathwood <http://www.lathwood.co.uk>
+ * Copyright (c) 2014-2015 Gear Consulting Pty Ltd <http://libertysys.com.au/>
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
 
 function format_number_short($number, $sf)
 {
@@ -476,6 +490,19 @@ function get_dev_attrib($device, $attrib_type)
   }
 }
 
+function is_dev_attrib_enabled($device, $attrib, $default = true)
+{
+    $val = get_dev_attrib($device, $attrib);
+    if ($val != NULL) {
+        // attribute is set
+        return ($val != 0);
+    }
+    else {
+        // attribute not set
+        return $default;
+    }
+}
+
 function del_dev_attrib($device, $attrib_type)
 {
   return dbDelete('devices_attribs', "`device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type));
@@ -590,6 +617,134 @@ function edit_service($service, $descr, $service_ip, $service_param = "", $servi
                     'service_ignore' => $service_ignore);
     return dbUpdate($update, 'services', '`service_id`=?', array($service));
 
+}
+
+/*
+ * convenience function - please use this instead of 'if ($debug) { echo ...; }'
+ */
+function d_echo($text, $no_debug_text = null)
+{
+    global $debug;
+    if ($debug) {
+        echo "$text";
+    }
+    elseif ($no_debug_text) {
+        echo "$no_debug_text";
+    }
+}
+
+/*
+ * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
+ */
+function d_print_r($var, $no_debug_text = null)
+{
+    global $debug;
+    if ($debug) {
+        print_r($var);
+    }
+    elseif ($no_debug_text) {
+        echo "$no_debug_text";
+    }
+}
+
+/*
+ * Shorten the name so it works as an RRD data source name (limited to 19 chars by default).
+ * Substitute for $subst if necessary.
+ * @return the shortened name
+ */
+function name_shorten($name, $common = null, $subst = "mibval", $len = 19)
+{
+    if ($common !== null) {
+        // remove common from the beginning of the string, if present
+        if (strlen($name) > $len && strpos($name, $common) >= 0) {
+            $newname = str_replace($common, '', $name);
+            $name = $newname;
+        }
+    }
+    if (strlen($name) > $len) {
+        $name = $subst;
+    }
+    return $name;
+}
+
+/*
+ * @return the name of the rrd file for $host's $extra component
+ * @param host Host name
+ * @param extra Components of RRD filename - will be separated with "-"
+ */
+function rrd_name($host, $extra, $exten = ".rrd")
+{
+    global $config;
+    $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
+    return implode("/", array($config['rrd_dir'], $host, $filename.$exten));
+}
+
+/*
+ * @return true if the given graph type is a dynamic MIB graph
+ */
+function is_mib_graph($type, $subtype)
+{
+    global $config;
+    return $config['graph_types'][$type][$subtype]['section'] == 'mib';
+}
+
+/*
+ * @return true if client IP address is authorized to access graphs
+ */
+function is_client_authorized($clientip)
+{
+    global $config;
+
+    if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs']) {
+        d_echo("Unauthorized graphs allowed\n");
+        return true;
+    }
+
+    if (isset($config['allow_unauth_graphs_cidr'])) {
+        foreach ($config['allow_unauth_graphs_cidr'] as $range) {
+            if (Net_IPv4::ipInNetwork($clientip, $range)) {
+                d_echo("Unauthorized graphs allowed from $range\n");
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/*
+ * @return an array of all graph subtypes for the given type
+ * FIXME not all of these are going to be valid
+ */
+function get_graph_subtypes($type)
+{
+    global $config;
+
+    $types = array();
+
+    // find the subtypes defined in files
+    if ($handle = opendir($config['install_dir'] . "/html/includes/graphs/$type/")) {
+        while (false !== ($file = readdir($handle))) {
+            if ($file != "." && $file != ".." && $file != "auth.inc.php" && strstr($file, ".inc.php")) {
+                $types[] = str_replace(".inc.php", "", $file);
+            }
+        }
+        closedir($handle);
+    }
+
+    // find the MIB subtypes
+    foreach ($config['graph_types'] as $type => $unused1) {
+        print_r($type);
+        foreach ($config['graph_types'][$type] as $subtype => $unused2) {
+            print_r($subtype);
+            if (is_mib_graph($type, $subtype)) {
+                $types[] = $subtype;
+            }
+        }
+    }
+
+    sort($types);
+    return $types;
 }
 
 ?>

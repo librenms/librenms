@@ -5,8 +5,9 @@ find . \
 	-path ./html/includes/geshi -prune -o \
 	-path ./html/includes/jpgraph -prune -o \
 	-path ./html/js/jqplot -prune -o \
+	-path ./junk -prune -o \
 	-path ./logs -prune -o \
 	-path ./mibs -prune -o \
 	-path ./rrd -prune -o \
 	-name .git -prune -o \
-		-type f -print|xargs grep "$@"
+		-type f -print0|xargs -0 grep "$@"

@@ -1,3 +1,87 @@
+### July 2015
+
+#### Bug fixes
+  - Fixed API not functioning. (PR1367)
+  - Fixed API not storing alert rule names (PR1372)
+  - Fixed datetimepicker use (PR1376)
+  - Do not allow master to rejoin itself. (PR1377)
+  - Fixed Nginx config file (PR1389)
+
+#### Improvements
+  - Added additional support for Rielo UPS (PR1381)
+  - Improved service check support (PR1385,PR1386,PR1387,PR1388)
+
+### June 2015
+
+#### Bug fixes
+  - Fixed services list SQL issue (PR1181)
+  - Fixed negative values for storage when volume is > 2TB (PR1185)
+  - Fixed visual display for input fields on /syslog/ (PR1193)
+  - Fixed fatal php issue in shoutcast.php (PR1203)
+  - Fixed percent bars in /bills/ (PR1208)
+  - Fixed item count in memory and storage pages (PR1210)
+  - Fixed syslog not loading (PR1219)
+  - Fixed fatal on reload in IRC bot (PR1218)
+  - Alter Windows CPU description when unknown (PR1226)
+  - Fixed rfc1628 current calculation (PR1256)
+  - Fixed alert mapping not working (PR1280)
+  - Fixed legend ifLabels (PR1296)
+  - Fixed bug causing map to not load when stale link data was present (PR1297)
+  - Fixed javascript issue preventing removal of alert rules (PR1312)
+  - Fixed removal of IPs before ports are deleted (PR1329)
+  - Fixed JS issue when removing ports from bills (PR1330)
+  - Fixed adding --daemon a second time to collectd Graphs (PR1342)
+  - Fixed CollectD DS names (PR1347,PR1349,PR1368)
+  - Fixed graphing issues when rrd contains special chars (PR1350)
+  - Fixed regex for device groups (PR1359)
+  - Added HOST-RESOURCES-MIB into Synology detection (RP1360)
+  - Fix health page graphs showing the first graph for all (PR1363)
+
+#### Improvements
+  - Updated Syslog docs to include syslog-ng 3.5.1 updates (PR1171)
+  - Added Pushover Transport (PR1180, PR1191)
+  - Converted processors and memory table to bootgrid (PR1188, PR1192)
+  - Issued alerts and transport now logged to eventlog (PR1194)
+  - Added basic support for Enterasys devices (PR1211)
+  - Added dynamic config to configure alerting (PR1153)
+  - Added basic support for Multimatic USV (PR1215)
+  - Disabled and ignored ports no longer show by default on /ports/ (PR1228,PR1301)
+  - Added additional graphs to menu on devices page (PR1229)
+  - Added Docs on configuring Globe front page (PR1231)
+  - Added robots.txt to html folder to disallow indexing (PR1234)
+  - Added additional support for Synology units (PR1235,PR1244,PR1269)
+  - Added IP check to autodiscovery code (PR1248)
+  - Updated HP ProCurve detection (PR1249)
+  - Added basic detection for Alcatel-Lucent OmniSwitch (PR1253, PR1282)
+  - Added additional metrics for rfc1628 UPS (PR1258, PR1268)
+  - Allow multiple discovery modules to be specified on command line (PR1263)
+  - Updated docs on using libvirt (PR1264)
+  - Updated Ruckus detection (PR1267)
+  - Initial release of MIB based polling (PR1273)
+  - Added support for CISCO-BGP4-MIB (PR1184)
+  - Added support for Dell EqualLogic units (PR1283,PR1309)
+  - Added logging of success/ failure for alert transports (PR1286)
+  - Updated VyOS detection (PR1299)
+  - Added primary serial number detection for Cisco units (PR1300)
+  - Added support for specifying MySQL port number in config.php (PR1302)
+  - Updated alert subject to use rule name not ID (PR1310)
+  - Added macro %macros.sensor (PR1311)
+  - Added WebUI support for Pushover (PR1313)
+  - Updated path check for Oxidized config (PR1316)
+  - Added Multimatic UPS to rfc1628 detection (PR1317)
+  - Added timeout for Unix agent (PR1319)
+  - Added support for a poller to use more than one poller group (PR1323)
+  - Added ability to use Plugins on device overview page (PR1325)
+  - Added latency loss/avg/max/min results to DB and Graph (PR1326)
+  - Added recording of device down (snmp/icmp) (PR1326)
+  - Added debugging output for when invalid SNMPv3 options used (PR1331)
+  - Added load and state output to device overview page (PR1333)
+  - Added load sensors to RFC1628 Devices (PR1336)
+  - Added support for WebPower Pro II UPS Cards (PR1338)
+  - No longer rewrite server-status in .htaccess (PR1339)
+  - Added docs for setting up Service extensions (PR1354)
+  - Added additional info from pfsense devices (PR1356)
+
 ### May 2015
 
 #### Bug fixes
@@ -31,6 +115,9 @@
   - Fixed ARP search graph type reference (PR1131)
   - Fixed showing state=X in device list (PR1144)
   - Removed ability for demo user to delete users (PR1151)
+  - Fixed user / port perms for top X front page boxes (PR1156)
+  - Fixed truncating UTF-8 strings (PR1166)
+  - Fixed attaching templates due to JS issue (PR1167)
 
 #### Improvements
   - Added loading bar to top nav (PR893)
@@ -69,7 +156,7 @@
   - Added disk temperature for Synology DSM (PR986)
   - Added ICMP, TLS/SSL and Domain expiry service checks (PR987, PR1040, PR1041)
   - Added IPMI detection (PR988)
-  - Miktrotik MIB update (PR991)
+  - Mikrotik MIB update (PR991)
   - Set better timeperiod for caching graphs (PR992)
   - Added config option to disable port relationship in ports list (PR996)
   - Added support for custom customer description parse (PR998)
@@ -105,6 +192,8 @@
   - Added config options for region and resolution on globe map (PR1137)
   - Addded RRDCached example docs (PR1148)
   - Updated support for additional NetBotz models (PR1152)
+  - Updated /iftype/ page to include speed/circuit/notes (PR1155)
+  - Added detection for PowerConnect 55XX devices (PR1165)
 
 ### Apr 2015
 

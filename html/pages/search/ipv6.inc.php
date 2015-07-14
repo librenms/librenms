@@ -25,7 +25,18 @@ var grid = $("#ipv6-search").bootgrid({
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
 <?php
-foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`") as $data) {
+
+$sql = "SELECT `devices`.`device_id`,`hostname` FROM `devices`";
+
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
+    $where .= " WHERE `DP`.`user_id`=?";
+    $param[] = $_SESSION['user_id'];
+}
+
+$sql .= " $where GROUP BY `hostname` ORDER BY `hostname`";
+
+foreach (dbFetchRows($sql,$param) as $data) {
     echo('"<option value=\"'.$data['device_id'].'\""+');
     if ($data['device_id'] == $_POST['device_id']) {
         echo('" selected"+');

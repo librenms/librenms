@@ -93,7 +93,7 @@ function IssueAlert($alert) {
 	}
 	$obj = DescribeAlert($alert);
 	if( is_array($obj) ) {
-		$tpl = dbFetchRow('SELECT template FROM alert_templates WHERE rule_id LIKE "%,'.$alert['rule_id'].',%"');
+                $tpl = dbFetchRow("SELECT `template` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?", array($alert['rule_id']));
 		if( isset($tpl['template']) ) {
 			$tpl = $tpl['template'];
 		} else {
@@ -197,20 +197,45 @@ function RunAlerts() {
 		if( $chk['alerted'] == $alert['state'] ) {
 			$noiss = true;
 		}
-		if( !empty($rextra['delay']) ) {
-			if( (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']+$config['alert']['tolerance-window']) < $rextra['delay']) ) {
+		if( !empty($rextra['count']) && empty($rextra['interval']) ) {
+			// This check below is for compat-reasons
+			if( !empty($rextra['delay']) ) {
+				if( (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time()-$alert['details']['delay']+$config['alert']['tolerance-window']) < $rextra['delay']) ) {
 				continue;
-			} else {
-				$alert['details']['delay'] = time();
+				} else {
+					$alert['details']['delay'] = time();
+					$updet = true;
+				}
+			}
+			if( $alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count']) ) {
+				if( $alert['details']['count'] < $rextra['count'] ) {
+					$noacc = true;
+				}
 				$updet = true;
+				$noiss = false;
 			}
-		}
-		if( $alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count']) ) {
-			if( $alert['details']['count'] < $rextra['count'] ) {
-				$noacc = true;
+
+		} else {
+			// This is the new way
+			if( !empty($rextra['delay']) && (time()-strtotime($alert['time_logged'])+$config['alert']['tolerance-window']) < $rextra['delay'] ) {
+				continue;
 			}
-			$updet = true;
-			$noiss = false;
+			if( !empty($rextra['interval']) ) {
+				if( !empty($alert['details']['interval']) && (time()-$alert['details']['interval']+$config['alert']['tolerance-window']) < $rextra['interval'] ) {
+					continue;
+				} else {
+					$alert['details']['interval'] = time();
+					$updet = true;
+				}
+			}
+			if( $alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count']) ) {
+				if( $alert['details']['count'] < $rextra['count'] ) {
+					$noacc = true;
+				}
+				$updet = true;
+				$noiss = false;
+			}
+
 		}
 		if( $chk['ignore'] == 1 || $chk['disabled'] == 1 ) {
 			$noiss = true;
@@ -247,12 +272,19 @@ function ExtTransports($obj) {
 	global $config;
 	$tmp = false; //To keep scrutinizer from naging because it doesnt understand eval
 	foreach( $config['alert']['transports'] as $transport=>$opts ) {
-		if( ($opts === true || !empty($opts)) && file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php") ) {
+		if( ($opts === true || !empty($opts)) && $opts != false && file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php") ) {
 			echo $transport." => ";
 			eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir']."/includes/alerts/transport.".$transport.".php").' };');
 			$tmp = $tmp($obj,$opts);
-			echo ($tmp ? "OK" : "ERROR")."; ";
+			if( $tmp ) {
+				echo "OK";
+				log_event("Issued ".$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'",$obj['device_id']);
+			} else {
+				echo "ERROR";
+				log_event("Could not issue ".$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'",$obj['device_id']);
+			}
 		}
+		echo "; ";
 	}
 }
 
@@ -322,7 +354,7 @@ function DescribeAlert($alert) {
 	$obj['device_id'] = $alert['device_id'];
 	$extra = $alert['details'];
 	if( $alert['state'] >= 1 ) {
-		$obj['title'] = 'Alert for device '.$device['hostname'].' Alert-ID #'.$alert['id'];
+		$obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
 		if( $alert['state'] == 2 ) {
 			$obj['title'] .= " got acknowledged";
 		} elseif( $alert['state'] == 3 ) {
@@ -345,7 +377,7 @@ function DescribeAlert($alert) {
 			return false;
 		}
 		$extra = json_decode(gzuncompress($id['details']),true);
-		$obj['title'] = 'Device '.$device['hostname'].' recovered from Alert-ID #'.$id['id'];
+		$obj['title'] = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
 		$obj['elapsed'] = TimeFormat(strtotime($alert['time_logged'])-strtotime($id['time_logged']));
 		$obj['id'] = $id['id'];
 		$obj['faults'] = false;
