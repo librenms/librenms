@@ -48,4 +48,4 @@ foreach ($ds_list as $ds) {
 
 rrdtool_update($rrd_filename, 'N:'.$drbd['ns'].':'.$drbd['nr'].':'.$drbd['dw'].':'.$drbd['dr'].':'.$drbd['al'].':'.$drbd['bm'].':'.$drbd['lo'].':'.$drbd['pe'].':'.$drbd['ua'].':'.$drbd['ap'].':'.$drbd['oop']);
 
-unset($drbd)
+unset($drbd);

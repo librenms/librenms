@@ -256,15 +256,11 @@ if (device_permitted($vars['device']) || $check_device == $vars['device'])
   </li>');
     }
 
-    if ($_SESSION['userlevel'] >= "5" && dbFetchCell("SELECT COUNT(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.port_id = L.local_port_id"))
-    {
-      $discovery_links = TRUE;
       echo('<li class="' . $select['map'] . '">
     <a href="'.generate_device_url($device, array('tab' => 'map')).'">
       <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map
     </a>
   </li>');
-    }
 
     if (@dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0')
     {
