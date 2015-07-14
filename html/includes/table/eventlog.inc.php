@@ -46,7 +46,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate $sql";
+$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate $sql";
 
 foreach (dbFetchRows($sql,$param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['host']);

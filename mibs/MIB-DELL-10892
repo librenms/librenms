@@ -31,7 +31,7 @@
 MIB-Dell-10892 DEFINITIONS ::= BEGIN
 
 IMPORTS
-    enterprises, IpAddress
+    enterprises, IpAddress, Gauge
         FROM RFC1155-SMI
     OBJECT-TYPE
         FROM RFC-1212
@@ -94,7 +94,7 @@ DellMACAddress                  ::= OCTET STRING (SIZE(6))
 DellObjectRange                 ::= INTEGER (1..128)
 DellUnsigned8BitRange           ::= INTEGER (0..255)
 DellUnsigned16BitRange          ::= INTEGER (0..65535)
-DellUnsigned32BitRange          ::= INTEGER (0..4294967295)
+DellUnsigned32BitRange          ::= Gauge (0..4294967295)
 DellSigned32BitRange            ::= INTEGER (-2147483647..2147483647)
 DellBoolean                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
 
@@ -8248,7 +8248,8 @@ DellMemoryDeviceType                            ::= INTEGER {
     deviceTypeIsDDR2(19),                       -- type is DDR2
     deviceTypeIsDDR2FBDIMM(20),                 -- type is DDR2 FB-DIMM
     deviceTypeIsDDR3(24),                       -- type is DDR3
-    deviceTypeIsFBD2(25)                        -- type is FBD2
+    deviceTypeIsFBD2(25),                       -- type is FBD2
+    deviceTypeIsDDR4(26)                        -- type is DDR4
 }
 
 DellMemoryDeviceRank                            ::= INTEGER {  
@@ -13784,18 +13785,22 @@ DellManagementControllerType                            ::= INTEGER {
     iDRAC6Modular(11),                                   -- type is Integrated Dell Remote Access Controller 6 (Modular)
     iDRAC6BMC(13),                                       -- type is Integrated Dell Remote Access Controller 6 (BMC mode)
     iDRAC7(16),                                          -- type is Integrated Dell Remote Access Controller 7
-    iDRAC7Modular(17)                                    -- type is Integrated Dell Remote Access Controller 7 (Modular)
+    iDRAC7Modular(17),                                   -- type is Integrated Dell Remote Access Controller 7 (Modular)
+	vrtxCMC(18),                                         -- type is VRTX CMC
+	fx2CMC(19),                                          -- type is FX2 Family CMC
+	iDRAC8(32),                                          -- type is iDRAC8 Monolithic
+	iDRAC8Modular(33)                                    -- type is iDRAC8 Modular
 }
 
 DellBladeFormFactorType                                 ::= INTEGER {  
     formFactorTypeIsSingleWidthHalfHeight(1),            -- Form Factor Type is singleWidthHalfHeight 
     formFactorTypeIsDualWidthHalfHeight(2),              -- Form Factor Type is DualWidthHalfHeight
     formFactorTypeIsSingleWidthFullHeight(3),	         -- Form Factor Type is SingleWidthFullHeight
-    formFactorTypeIsDualWidthFullHeight(4),	         -- Form Factor Type is DualWidthFullHeight
-    formFactorTypeIsSingleWidthQuarterHeight(5),	 -- Form Factor Type is SingleWidthQuarterHeight 
-    formFactorTypeIs1UHalfWidth(6),	                 -- Form Factor Type is 1UHalfWidth
+    formFactorTypeIsDualWidthFullHeight(4),	             -- Form Factor Type is DualWidthFullHeight
+    formFactorTypeIsSingleWidthQuarterHeight(5),	     -- Form Factor Type is SingleWidthQuarterHeight 
+    formFactorTypeIs1UHalfWidth(6),	                     -- Form Factor Type is 1UHalfWidth
     formFactorTypeIs1UQuarterWidth(7),	                 -- Form Factor Type is 1UQuarterWidth
-    formFactorTypeIs1UFullWidth(8),	                 -- Form Factor Type is 1UFullWidth
+    formFactorTypeIs1UFullWidth(8),	                     -- Form Factor Type is 1UFullWidth
     notApplicable(256)	                                 -- Form Factor Type is Not Applicable for the system
 	
 }
@@ -16987,3 +16992,4 @@ END
 -------------------------------------------------------------------------------
 -- End MIB
 -------------------------------------------------------------------------------
+

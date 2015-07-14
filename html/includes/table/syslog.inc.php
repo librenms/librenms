@@ -60,7 +60,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT S.*, DATE_FORMAT(timestamp, '%Y-%m-%d %T') AS date $sql";
+$sql = "SELECT S.*, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date $sql";
 
 foreach (dbFetchRows($sql,$param) as $syslog) {
     $dev = device_by_id_cache($syslog['device_id']);

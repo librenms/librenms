@@ -1,16 +1,15 @@
 <?php
 
-echo("Power: ");
+echo 'Power: ';
 
 // Include all discovery modules
+$include_dir = 'includes/discovery/power';
+require 'includes/include-dir.inc.php';
 
-$include_dir = "includes/discovery/power";
-include("includes/include-dir.inc.php");
-
-if ($debug) { print_r($valid['sensor']['power']); }
+if ($debug) {
+    print_r($valid['sensor']['power']);
+}
 
 check_valid_sensors($device, 'power', $valid['sensor']);
 
-echo("\n");
-
-?>
+echo "\n";

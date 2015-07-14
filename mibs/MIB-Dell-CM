@@ -1,0 +1,353 @@
+--
+--
+-- Title: Change Management MIB
+--
+-- Version: 1.0.7
+--
+-- Release Date: Jul 2004
+--
+-- Description: This file defines the change management MIB that is
+-- implemented by the Server Administrator Update Service.
+-- The MIB defines objects that make change management data available to SNMP
+-- management applications.  The MIB models inventory data described by the
+-- inventory XML schema contained in the CM SDK Specification.  Refer to this
+-- for details on the inventory data obtained by the inventory collector.
+--
+-- Copyright (c) 2000-2004 Dell Inc.
+-- All Rights Reserved.
+--
+-- Note: The information and functionality described by this MIB file,
+-- like many MIB files, is subject to change without notice.
+-- Please examine the version number of this MIB and compare it
+-- to the version number you are expecting.
+--
+-- OID Format Legend:
+--   <a> = attribute ID
+--   <i> = index ID
+--
+--
+
+--
+-- Begin MIB
+--
+
+MIB-Dell-CM DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB;
+
+--
+-- Object Identifiers
+--
+
+-- Enterprise ID
+dell                          OBJECT IDENTIFIER ::= { enterprises    674   }
+
+-- Dell Groups
+-- The cm group holds Change Management information.  See the CM SDK
+-- Specification for details.
+cm                            OBJECT IDENTIFIER ::= { dell           10899 }
+
+-- Change Management Groups
+inventoryGroup                OBJECT IDENTIFIER ::= { cm             1     }
+operatingSystemGroup          OBJECT IDENTIFIER ::= { cm             2     }
+
+-- Product Groups
+productID                     OBJECT IDENTIFIER ::= { cm             100   }
+
+--
+-- Textual Conventions
+--
+
+SystemID                        ::= OCTET STRING (SIZE (16))
+Unsigned16BitRange              ::= INTEGER (0..65535)
+
+
+--
+-- System Management Inventory
+--
+-- OID Format: 1.3.6.1.4.1.674.10899.1.1
+--
+
+inventoryLocale OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the locale for the system."
+    ::= { inventoryGroup 1 }
+
+inventorySchemaVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the version of the inventory schema
+                 implemented by this system."
+    ::= { inventoryGroup 2 }
+
+inventorySystemID OBJECT-TYPE
+    SYNTAX      SystemID
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the System ID for the system."
+    ::= { inventoryGroup 3 }
+
+--
+-- Device Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10899.1.5
+--
+
+deviceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DeviceEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION "This defines a table of versioned devices as inventoried by the
+                 product."
+    ::= { inventoryGroup 5 }
+
+deviceEntry OBJECT-TYPE
+    SYNTAX      DeviceEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION "This defines a row of versioned devices as inventoried by the
+                 product."
+    INDEX       { deviceIndex }
+    ::= { deviceTable 1 }
+
+DeviceEntry                                   ::= SEQUENCE {
+    deviceIndex                                  Unsigned16BitRange,  -- INDEX Item
+    deviceComponentID                            INTEGER,
+    deviceDisplayString                          DisplayString,
+    deviceVendorID                               OCTET STRING,
+    deviceDeviceID                               OCTET STRING,
+    deviceSubID                                  OCTET STRING,
+    deviceSubVendorID                            OCTET STRING
+}
+
+deviceIndex OBJECT-TYPE
+    SYNTAX      Unsigned16BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the unique index for this device."
+    ::= { deviceEntry 1 }
+
+deviceComponentID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines an optional component id field for the
+                 device."
+    ::= { deviceEntry 2 }
+
+deviceDisplayString OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute provides a displayable string that describes the
+                 device."
+    ::= { deviceEntry 3 }
+
+deviceVendorID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute represents the ID for the vendor supplying
+                 the device."
+    ::= { deviceEntry 4 }
+
+deviceDeviceID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute represents the ID for the device."
+    ::= { deviceEntry 5 }
+
+deviceSubID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute provides additional device identification
+                 information."
+    ::= { deviceEntry 6 }
+
+deviceSubVendorID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute provides additional vendor identification
+                 information."
+    ::= { deviceEntry 7 }
+
+--
+-- Application Table
+--
+-- OID Format: 1.3.6.1.4.1.674.10899.1.6
+--
+
+applicationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ApplicationEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION "This defines a table of application information for the system."
+    ::= { inventoryGroup 6 }
+
+applicationEntry OBJECT-TYPE
+    SYNTAX      ApplicationEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION "This defines a row of application information for the system."
+    INDEX       { applicationIndex }
+    ::= { applicationTable 1 }
+
+ApplicationEntry                              ::= SEQUENCE {
+    applicationIndex                             Unsigned16BitRange,   -- INDEX Item
+    -- Device index for cross-indexing
+    applicationDeviceIndex                       Unsigned16BitRange,
+    applicationComponentType                     DisplayString,
+    applicationVersion                           DisplayString,
+    applicationDisplayString                     DisplayString,
+    applicationSubComponentID                    DisplayString
+}
+
+applicationIndex OBJECT-TYPE
+    SYNTAX      Unsigned16BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the unique index for this application."
+    ::= { applicationEntry 1 }
+
+
+applicationDeviceIndex OBJECT-TYPE
+    SYNTAX      Unsigned16BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines a cross-index to the device table for the
+                 application."
+    ::= { applicationEntry 2 }
+
+applicationComponentType OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute identifies the type of application reported."
+    ::= { applicationEntry 3 }
+
+applicationVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute identifies the version of the application."
+    ::= { applicationEntry 4 }
+
+applicationDisplayString OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute provides a user visible display string that
+                 describes the application."
+    ::= { applicationEntry 5 }
+
+applicationSubComponentID OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute provides the sub component id for the
+                 application.  This is usually valid on ESM device
+                 reporting."
+    ::= { applicationEntry 6 }
+
+--
+-- Operating System Group
+--
+-- OID Format: 1.3.6.1.4.1.674.10899.2
+--
+
+operatingSystemVendor OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the vendor of the Operating System."
+    ::= { operatingSystemGroup 1 }
+
+operatingSystemMajorVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the major version of the Operating System."
+    ::= { operatingSystemGroup 2 }
+
+operatingSystemMinorVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the minor version of the Operating System."
+    ::= { operatingSystemGroup 3 }
+
+operatingSystemSPMajorVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the Operating System's Service Pack major version."
+    ::= { operatingSystemGroup 5 }
+
+operatingSystemSPMinorVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the Operating System's Service Pack minor version."
+    ::= { operatingSystemGroup 6 }
+
+operatingSystemArchitecture OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the Operating System's architecture."
+    ::= { operatingSystemGroup 7 }
+
+--
+-- Product ID group
+--
+-- OID Format: 1.3.6.1.4.1.674.10899.100.x
+--
+
+productIDDisplayName OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the display name of the product."
+    ::= { productID 1 }
+
+productIDDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines a short description of the product."
+    ::= { productID 2 }
+
+productIDVendor OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the name of the manufacturer of the product."
+    ::= { productID 3 }
+
+productIDVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION "This attribute defines the version of the product."
+    ::= { productID 4 }
+
+productIDBuildNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      obsolete
+    DESCRIPTION "This attribute defines the software build number of the product."
+    ::= { productID 5 }
+
+END

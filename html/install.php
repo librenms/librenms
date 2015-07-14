@@ -32,7 +32,11 @@ $config['db_name']=$dbname;
 include("../includes/defaults.inc.php");
 // Work out the install directory
 $cur_dir = explode('/',$_SERVER['DOCUMENT_ROOT']);
-$install_dir = array_pop($cur_dir);
+$check = end($cur_dir);
+if( empty($check) ) {
+  $install_dir = array_pop($cur_dir);
+}
+unset($check);
 $install_dir = array_pop($cur_dir);
 $install_dir = implode('/',$cur_dir);
 $config['install_dir'] = $install_dir;
@@ -221,7 +225,7 @@ foreach ($modules as $extension)
 }
 
 // Check for pear install
-require_once 'System.php';
+include_once 'System.php';
 if(class_exists('System')===true)
 {
   $ext_loaded = 'yes';
@@ -229,7 +233,7 @@ if(class_exists('System')===true)
 }
 else
 {
-  $ext_loaded = 'yes';
+  $ext_loaded = 'no';
   $row_class = 'danger';
 }
 

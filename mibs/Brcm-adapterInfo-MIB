@@ -1,0 +1,281 @@
+Brcm-adapterInfo-MIB DEFINITIONS ::= BEGIN
+
+          -- Broadcom(R) NetXtreme Network Adapter Extended Information MIB
+          -- 
+          -- This MIB defines the Broadcom NetXtreme Adapter Extended Information Set.
+          -- These objects are part of the enterprise MIB for Broadcom server and 
+          -- work station network adapters.
+          --
+
+          IMPORTS
+                  OBJECT-TYPE
+                          FROM RFC-1212
+                  enterprises, IpAddress
+                          FROM RFC1155-SMI
+                  DisplayString, PhysAddress
+                          FROM RFC1213-MIB
+                  InetAddressIPv6
+                          FROM INET-ADDRESS-MIB;
+
+
+    broadcom         	OBJECT IDENTIFIER ::= { enterprises 4413 }
+    enet             	OBJECT IDENTIFIER ::= { broadcom 1 }
+    basp             	OBJECT IDENTIFIER ::= { enet 2 }
+    ifControllers       OBJECT IDENTIFIER ::= { enet 3 }
+    baspConfig       	OBJECT IDENTIFIER ::= { basp 1 }
+    baspStat         	OBJECT IDENTIFIER ::= { basp 2 }
+    baspTrap         	OBJECT IDENTIFIER ::= { basp 3 }
+    
+--
+-- adaptergroup Group
+--
+          ifiNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of Broadcom network interfaces (regardless
+                      of their current state) present on this system."
+              ::= { ifControllers 1 }
+              
+          ifiTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfiEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of Broadcom network interface entries.  
+                      The number of entries is given by the ifiNumber."
+              ::= { ifControllers 2 }
+
+          ifiEntry OBJECT-TYPE
+              SYNTAX  IfiEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An entry containing statistics objects of a Broadcom
+                       network interface in this system."
+              INDEX   { ifiIndex }
+              ::= { ifiTable 1 }
+              
+		  IfiEntry ::=
+              SEQUENCE {
+			      ifiIndex
+					  INTEGER(0..65535),
+                  ifName
+                      DisplayString,
+				  ifiDescr
+				      DisplayString,
+                  ifNetworkAddress
+                      IpAddress,
+				  ifSubnetMask
+				      IpAddress,
+				  ifiPhysAddress
+                      PhysAddress,
+				  ifPermPhysAddress
+                      PhysAddress,
+				  ifLinkStatus
+					  INTEGER,
+                  ifState
+                      INTEGER,
+                  ifLineSpeed
+                      INTEGER,
+                  ifDuplexMode
+                      INTEGER,
+				  ifMemBaseLow
+					  DisplayString,
+				  ifMemBaseHigh
+				  	  DisplayString,	
+				  ifInterrupt
+                      INTEGER,
+				  ifBusNumber
+					  INTEGER,
+				  ifDeviceNumber
+				      INTEGER,
+				  ifFunctionNumber
+				      INTEGER,
+				  ifIpv6NetworkAddress
+				      InetAddressIPv6
+			  }
+              
+          ifiIndex  OBJECT-TYPE
+              SYNTAX  INTEGER(0..65535)
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                     "An unique value for each Broadcom interface.
+                      The value for each interface must remain constant at
+                      least from one re-initialization of the entity's
+                      network management system to the next re-
+                      initialization."
+              ::= { ifiEntry 1 }
+
+          ifName  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing name of the adapter or team"
+              ::= { ifiEntry 2 }
+              
+          ifiDescr  OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      " A textual string containing the adapter or team description"
+              ::= { ifiEntry 3 }
+              
+          ifNetworkAddress  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IP address of the adapter."
+              ::= { ifiEntry 4 }
+
+          ifSubnetMask  OBJECT-TYPE
+              SYNTAX  IpAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IP subnet Mask of the adapter."
+              ::= { ifiEntry 5 }
+
+          ifiPhysAddress  OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "MAC address of the adapter."
+              ::= { ifiEntry 6 }
+
+          ifPermPhysAddress  OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Permanent MAC address of the adapter."
+              ::= { ifiEntry 7 }
+
+          ifLinkStatus OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   link-up(1),
+                   link-fail(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	Adapter link status, this information only
+                      applicable to the Broadcom adapter"
+          	  ::= { ifiEntry 8 }
+
+          ifState  OBJECT-TYPE
+              SYNTAX INTEGER 
+              {
+                   normal-mode(1),
+                   diagnotic-mode(2),
+                   adapter-removed(3),
+                   lowpower-mode(4)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The operating mode of the driver, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry  9 }
+
+    	   ifLineSpeed  OBJECT-TYPE
+              SYNTAX  INTEGER
+			  {
+					unknown(1),
+					speed-10-Mbps (2),
+					speed-100-Mbps (3),
+					speed-1000-Mbps (4),
+					speed-2500-Mbps (5),
+					speed-10-Gbps (6)
+			  } 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	The operating speed of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry  10 }
+
+           ifDuplexMode OBJECT-TYPE
+              SYNTAX  INTEGER
+              {
+                   unknown(1),
+                   half-duplex(2),
+                   full-duplex(3)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	Adapter duplex mode, this information only
+                      applicable to the Broadcom adapter"
+           	  ::= { ifiEntry 11 }
+
+           ifMemBaseLow OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	memory low range of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry 12 }
+
+           ifMemBaseHigh OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	memory high range of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry 13 }
+
+    	   ifInterrupt  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	IRQ value for the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry 14 }
+
+           ifBusNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	PCI Bus Number where the Adapter is situated, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry 15 }
+
+           ifDeviceNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	PCI Device Number of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry 16 }
+
+           ifFunctionNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "	PCI Function Number of the adapter, this information only
+                      applicable to the Broadcom adapter"
+              ::= { ifiEntry 17 }
+
+          ifIpv6NetworkAddress  OBJECT-TYPE
+              SYNTAX  InetAddressIPv6
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                     "IPv6 address of the adapter."
+              ::= { ifiEntry 18 }
+
+END	

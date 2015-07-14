@@ -1,0 +1,211 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLINTERNAL-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, Counter32, enterprises
+                FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB       -- RFC2851
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    UTFString
+            FROM EQLGROUP-MIB;
+    
+ 
+eqlInternalModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "Dell Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762             
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Dell Inc Storage Array internal information to track monitoring and
+         licensing of group.
+
+         Copyright (c) 2003-2013 by Dell Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by Dell Inc.  This software embodies proprietary information
+         and trade secrets of Dell Inc.
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION     "201301280000Z"     -- 28-Jan-13
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 27 }
+
+
+eqlInternalObjects	OBJECT IDENTIFIER ::= { eqlInternalModule 1 }
+
+
+eqlMonitorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlMonitorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Monitor Table"
+    ::=  {  eqlInternalObjects  1}
+
+eqlMonitorEntry OBJECT-TYPE
+    SYNTAX          EqlMonitorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing information about hosts monitoring the group."
+    INDEX           { eqlMonitorIndex}
+::=    { eqlMonitorTable 1 }
+
+EqlMonitorEntry ::=
+    SEQUENCE {
+        eqlMonitorIndex                           Unsigned32,
+        eqlMonitorRowStatus                       RowStatus,
+        eqlMonitorUUID                            OCTET STRING,
+        eqlMonitorServerName                      UTFString,
+        eqlMonitorDomainName                      UTFString,
+        eqlMonitorInetAddressType                 InetAddressType,
+        eqlMonitorInetAddress                     InetAddress,
+        eqlMonitorSupportAssist                   INTEGER,
+        eqlMonitorTimestamp                       Counter32,
+        eqlMonitorSupportAssistTimestamp          Counter32,
+        eqlMonitorLicensingTimestamp              Counter32,
+        eqlMonitorDescription                     UTFString
+        }
+
+    eqlMonitorIndex  OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index which identifies an monitoring instance.
+                     This field is a hash of the GUID."  
+    ::= { eqlMonitorEntry 1 }
+
+    eqlMonitorRowStatus OBJECT-TYPE           
+    SYNTAX RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The status of the row"
+    ::= { eqlMonitorEntry 2 }
+
+    eqlMonitorUUID OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (16))
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is for internal use only."
+    ::= { eqlMonitorEntry 3 }
+
+    eqlMonitorServerName OBJECT-TYPE
+    SYNTAX          UTFString(SIZE(0..128))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the DNS server name of the host running SANHQ monitoring the group.
+                     Together with eqlSANHQDomainName it must be a name which is resolvable by DNS. There is no default for SANHQDNSName."
+    ::=  {  eqlMonitorEntry 4 }
+
+    eqlMonitorDomainName OBJECT-TYPE
+    SYNTAX          UTFString(SIZE(0..128))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the DNS domain name of the host running SANHQ monitoring the group."
+    ::=  {  eqlMonitorEntry 5 }
+
+    eqlMonitorInetAddressType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "The ip address type of the host monitoring this group."
+    ::=  {  eqlMonitorEntry 6 }
+
+    eqlMonitorInetAddress OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "The ip address, in network byte order, of the host monitoring this group."
+    ::=  {  eqlMonitorEntry 7 }
+                       
+    eqlMonitorSupportAssist OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    supportAssistNone(0),
+                    supportAssistInstalledNotEnabled(1),
+                    supportAssistEnabled(2),
+                    supportAssistCommunicatingWithDell(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies how SupportAssist is currently monitoring this group."
+    ::=  {  eqlMonitorEntry 8 }
+
+    eqlMonitorTimestamp OBJECT-TYPE      
+    SYNTAX          Counter32  
+    MAX-ACCESS      read-create  
+    STATUS          current      
+    DESCRIPTION     "This field specifies the last access time for SANHQ Monitoring.
+                     Time is represented as the time in seconds since 00:00:00 UTC, 1970-01-01." 
+    ::=  {  eqlMonitorEntry 9 }
+
+    eqlMonitorSupportAssistTimestamp OBJECT-TYPE      
+    SYNTAX          Counter32  
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the last access time for SupportAssist.
+                     Time is represented as the time in seconds since 00:00:00 UTC, 1970-01-01." 
+    ::=  {  eqlMonitorEntry 10 }
+
+    eqlMonitorLicensingTimestamp OBJECT-TYPE      
+    SYNTAX          Counter32  
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the last time SupportAssist sent licensing records to Dell.
+                     Time is represented as the time in seconds since 00:00:00 UTC, 1970-01-01." 
+    ::=  {  eqlMonitorEntry 11 }
+
+    eqlMonitorDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides details about group monitoring.
+                     The description can be 128 octets. There is no default value."  
+    ::=  {  eqlMonitorEntry 12 }
+
+--***********************************************************************************
+eqlMonitorStatusTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlMonitorStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Monitor Status Table"  
+    ::=  {  eqlInternalObjects  2}
+
+eqlMonitorStatusEntry OBJECT-TYPE
+    SYNTAX          EqlMonitorStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing status information about hosts monitoring the group."
+    INDEX           { eqlMonitorIndex}
+::=    { eqlMonitorStatusTable 1 }
+
+EqlMonitorStatusEntry ::= 
+    SEQUENCE { 
+        eqlMonitorStatusReminder       INTEGER
+    }    
+
+eqlMonitorStatusReminder OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    monitoringExpired(0),
+                    monitoringCurrent(1)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field indicates if the SANHQ currently monitoring this group
+                     has recently contacted the group."
+    ::=  {  eqlMonitorStatusEntry 1 }
+
+--
+
+END

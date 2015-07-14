@@ -18,6 +18,7 @@ include_once("Net/IPv4.php");
 include_once("Net/IPv6.php");
 
 // Observium Includes
+include_once($config['install_dir'] . "/includes/dbFacile.php");
 
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
@@ -27,7 +28,6 @@ include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
-include_once($config['install_dir'] . "/includes/dbFacile.php");
 include_once($config['install_dir'] . "/includes/console_colour.php");
 
 $console_color = new Console_Color2();
@@ -248,6 +248,10 @@ function delete_device($id)
     return "No such host.";
   }
 
+  // Remove IPv4/IPv6 addresses before removing ports as they depend on port_id
+  dbQuery("DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?",array($id));
+  dbQuery("DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?",array($id));
+
   foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data)
   {
     $int_if = $int_data['ifDescr'];
@@ -285,6 +289,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
   // Test Database Exists
   if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0')
   {
+    if (ip_exists($host) === false) {
       // Test reachability
       if ($force_add == 1 || isPingable($host))
       {
@@ -369,6 +374,11 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         // failed Reachability
         if($quiet == '0') { print_error("Could not ping $host"); }
       }
+    } else {
+        if ($quiet == 0) {
+            print_error("Already have host with this IP $host");
+        }
+    }
   } else {
     // found in database
     if($quiet == '0') { print_error("Already got host $host"); }
@@ -489,25 +499,23 @@ function isPingable($hostname,$device_id = FALSE)
    if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
        $fping_params .= ' -t ' . $config['fping_options']['timeout'];
    }
-   $status = shell_exec($config['fping'] . "$fping_params -e $hostname 2>/dev/null");
+    if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+        $fping_params .= ' -c ' . $config['fping_options']['count'];
+    }
+    if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+        $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+    }
    $response = array();
-   if (strstr($status, "alive"))
-   {
-     $response['result'] = TRUE;
-   } else {
-     $status = shell_exec($config['fping6'] . "$fping_params -e $hostname 2>/dev/null");
-     if (strstr($status, "alive"))
-     {
-       $response['result'] = TRUE;
-     } else {
+   $status = fping($hostname,$fping_params);
+   if ($status['loss'] == 100) {
        $response['result'] = FALSE;
-     }
+   } else {
+       $response['result'] = TRUE;
    }
-   if(is_numeric($device_id) && !empty($device_id))
-   {
-     preg_match('/(\d+\.*\d*) (ms)/', $status, $time);
-     $response['last_ping_timetaken'] = $time[1];
+   if (is_numeric($status['avg'])) {
+       $response['last_ping_timetaken'] = $status['avg'];
    }
+   $response['db'] = $status;
    return($response);
 }
 
@@ -524,14 +532,36 @@ function utime()
   return $sec + $usec;
 }
 
+function getpollergroup($poller_group='0')
+{
+  //Is poller group an integer
+  if (is_int($poller_group) || ctype_digit($poller_group)) {
+    return $poller_group;
+  } else {
+    //Check if it contains a comma
+    if (strpos($poller_group,',')!== FALSE) {
+      //If it has a comma use the first element as the poller group
+      $poller_group_array=explode(',',$poller_group);
+      return getpollergroup($poller_group_array[0]);
+    } else {
+      if ($config['distributed_poller_group']) {
+        //If not use the poller's group from the config
+        return getpollergroup($config['distributed_poller_group']);
+      } else {
+        //If all else fails use default
+        return '0';
+      }
+    }
+  }
+}
+
 function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0')
 {
   global $config;
   $host = trim(strtolower($host));
 
-  if (is_numeric($poller_group) === FALSE) {
-      $poller_group = $config['distributed_poller_group'];
-  }
+  $poller_group=getpollergroup($poller_group);
+
   $device = array('hostname' => $host,
                   'sysName' => $host,
                   'community' => $community,
@@ -1201,3 +1231,82 @@ function first_oid_match($device, $list) {
 	}
     }
 }
+
+function hex_to_ip($hex) {
+    $return = "";
+    if (filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === FALSE && filter_var($hex, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === FALSE) {
+        $hex_exp = explode(' ', $hex);
+        foreach ($hex_exp as $item) {
+            if (!empty($item) && $item != "\"") {
+                $return .= hexdec($item).'.';
+            }
+        }
+        $return = substr($return, 0, -1);
+    } else {
+        $return = $hex;
+    }
+    return $return;
+}
+function fix_integer_value($value) {
+    if ($value < 0) {
+        $return = 4294967296+$value;
+    } else {
+        $return = $value;
+    }
+    return $return;
+}
+
+function ip_exists($ip) {
+    // Function to check if an IP exists in the DB already
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== FALSE) {
+        if (!dbFetchRow("SELECT `ipv6_address_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip,$ip))) {
+            return false;
+        }
+    } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== FALSE) {
+        if (!dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip))) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+function fping($host,$params) {
+
+    global $config;
+
+    $descriptorspec = array(
+        0 => array("pipe", "r"),
+        1 => array("pipe", "w"),
+        2 => array("pipe", "w")
+    );
+
+    $process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
+    $read = '';
+
+    if (is_resource($process)) {
+
+       fclose($pipes[0]);
+
+       while (!feof($pipes[1])) {
+           $read .= fgets($pipes[1], 1024);
+       }
+       fclose($pipes[1]);
+       proc_close($process);
+    }
+
+    preg_match('/[0-9]+\/[0-9]+\/[0-9]+%/', $read, $loss_tmp);
+    preg_match('/[0-9\.]+\/[0-9\.]+\/[0-9\.]*$/', $read, $latency);
+    $loss = preg_replace("/%/","",$loss_tmp[0]);
+    list($xmt,$rcv,$loss) = preg_split("/\//", $loss);
+    list($min,$avg,$max) = preg_split("/\//", $latency[0]);
+    if ($loss < 0) {
+        $xmt = 1;
+        $rcv = 1;
+        $loss = 100;
+    }
+    $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
+    return $response;
+}
+
