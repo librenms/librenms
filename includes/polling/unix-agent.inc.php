@@ -121,7 +121,7 @@ if ($device['os_group'] == 'unix') {
                     if ($values != "") {
                         $values .=  ",";
                     }
-                    $values .= "('".$device['device_id']."','".$pid."','".$user."','".$vsz."','".$rss."','".$cputime."','".$command."')";
+                    $values .= "('".mres($device['device_id'])."','".mres($pid)."','".mres($user)."','".mres($vsz)."','".mres($rss)."','".mres($cputime)."','".mres($command)."')";
                 }
             }
             if ($values != "") {
