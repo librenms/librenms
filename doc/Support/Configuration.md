@@ -169,6 +169,14 @@ $config['enable_footer'] = 1;
 ```
 Disable the footer of the WebUI by setting `enable_footer` to 0.
 
+#### Add host settings
+The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
+If host is added by hostname this check is not performed.  If the setting is true hostnames are resovled and the check is also performed.  This helps prevents accidental duplicate hosts.
+```php
+$config['addhost_alwayscheckip']   = FALSE; #TRUE - check for duplicate ips even when adding host by name.
+                                            #FALSE- only check when adding host by ip.
+```
+
 #### SNMP Settings
 
 ```php
