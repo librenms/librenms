@@ -48,7 +48,7 @@ if ($_SESSION['userlevel'] >= "7")
               if ($vars['rev'] == $svnlog["rev"]) {
                   echo('<span class="pagemenu-selected">');
               }
-              $linktext = "r" . $svnlog["rev"] . " <small>" . date("d M H:i", strtotime($svnlog["date"])) . "</small>";
+              $linktext = "r" . $svnlog["rev"] . " <small>" . date($config['dateformat']['byminute'], strtotime($svnlog["date"])) . "</small>";
               echo(generate_link($linktext, array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog["rev"])));
 
               if ($vars['rev'] == $svnlog["rev"]) {
@@ -92,6 +92,9 @@ if ($_SESSION['userlevel'] >= "7")
   } elseif ($config['oxidized']['enabled'] === TRUE && isset($config['oxidized']['url'])) {
       $node_info = json_decode(file_get_contents($config['oxidized']['url']."/node/show/".$device['hostname']."?format=json"),TRUE);
       $text = file_get_contents($config['oxidized']['url']."/node/fetch/".$device['hostname']);
+      if ($text == "node not found") {
+          $text = file_get_contents($config['oxidized']['url']."/node/fetch/".$device['os']."/".$device['hostname']);
+      }
 
       if (is_array($node_info)) {
           echo('<br />

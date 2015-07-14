@@ -33,6 +33,8 @@ $config['fping']            = "/usr/bin/fping";
 $config['fping6']           = "/usr/bin/fping6";
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
+$config['fping_options']['count'] = 3;
+$config['fping_options']['millisec'] = 5;
 ```
 fping configuration options, this includes setting the timeout and retry options.
 
@@ -214,6 +216,8 @@ $config['autodiscovery']['nets-exclude'][] = "240.0.0.0/4";
 Arrays of subnets to exclude in auto discovery mode.
 
 #### Email configuration
+
+> You can configure these options within the WebUI now, please avoid setting these options within config.php
 
 ```php
 $config['email_backend']              = 'mail';
@@ -402,6 +406,7 @@ $config['syslog_purge']                                   = 30;
 $config['eventlog_purge']                                 = 30;
 $config['authlog_purge']                                  = 30;
 $config['perf_times_purge']                               = 30;
+$config['device_perf_purge']                              = 30;
 ```
 This option will ensure data within LibreNMS over 1 month old is automatically purged. You can alter these individually, 
 values are in days.
@@ -416,10 +421,23 @@ This array can be used to filter out syslog messages that you don't want to be s
 #### Virtualization
 
 ```php
-$config['enable_libvirt'] = 0;
+$config['enable_libvirt'] = 1;
 $config['libvirt_protocols']    = array("qemu+ssh","xen+ssh");
 ```
-Enable this to switch on support for libvirt along with `libvirt_protocols` to indicate how you connect to libvirt.
+Enable this to switch on support for libvirt along with `libvirt_protocols`
+to indicate how you connect to libvirt.  You also need to:
+
+ 1. Generate a non-password-protected ssh key for use by LibreNMS, as the
+    user which runs polling & discovery (usually `librenms`).
+ 2. On each VM host you wish to monitor:
+   - Configure public key authentication from your LibreNMS server/poller by
+     adding the librenms public key to `~root/.ssh/authorized_keys`.
+   - (xen+ssh only) Enable libvirtd to gather data from xend by setting
+     `(xend-unix-server yes)` in `/etc/xen/xend-config.sxp` and
+     restarting xend and libvirtd.
+
+To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
+`virsh -c xen+ssh://vmhost list` as your librenms polling user.
  
 #### BGP Support
 

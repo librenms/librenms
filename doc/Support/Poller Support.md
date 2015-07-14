@@ -70,6 +70,7 @@ $config['poller_modules']['aruba-controller']             = 1;
 $config['poller_modules']['entity-physical']              = 1;
 $config['poller_modules']['applications']                 = 1;
 $config['poller_modules']['cisco-asa-firewall']           = 1;
+$config['poller_modules']['mib']                          = 0;
 ```
 
 #### Poller modules
@@ -112,7 +113,7 @@ $config['poller_modules']['cisco-asa-firewall']           = 1;
 
 `ospf`: OSPF Support.
 
-`cisco-ipsec-flow-monitor': IPSec statistics support.
+`cisco-ipsec-flow-monitor`: IPSec statistics support.
 
 `cisco-remote-access-monitor`: Cisco remote access support.
 
@@ -137,6 +138,8 @@ $config['poller_modules']['cisco-asa-firewall']           = 1;
 `applications`: Device application support.
 
 `cisco-asa-firewall`: Cisco ASA firewall support.
+
+`mib`: Support for generic MIB parsing.
 
 #### Running
 

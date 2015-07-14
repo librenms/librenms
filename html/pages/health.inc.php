@@ -9,7 +9,8 @@ if ($used_sensors['voltage']) $datas[] = 'voltage';
 if ($used_sensors['frequency']) $datas[] = 'frequency';
 if ($used_sensors['current']) $datas[] = 'current';
 if ($used_sensors['power']) $datas[] = 'power';
-if ($used_sensors['dBm']) $datas[] = 'dBm';
+if ($used_sensors['dbm']) $datas[] = 'dbm';
+if ($used_sensors['load']) $datas[] = 'load';
 
 // FIXME generalize -> static-config ?
 $type_text['overview'] = "Overview";
@@ -17,7 +18,7 @@ $type_text['temperature'] = "Temperature";
 $type_text['charge'] = "Battery Charge";
 $type_text['humidity'] = "Humidity";
 $type_text['mempool'] = "Memory";
-$type_text['storage'] = "Disk Usage";
+$type_text['storage'] = "Storage";
 $type_text['diskio'] = "Disk I/O";
 $type_text['processor'] = "Processor";
 $type_text['voltage'] = "Voltage";
@@ -26,7 +27,8 @@ $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 $type_text['power'] = "Power";
 $type_text['toner'] = "Toner";
-$type_text['dBm'] = "dBm";
+$type_text['dbm'] = "dBm";
+$type_text['load'] = "Load";
 
 if (!$vars['metric']) { $vars['metric'] = "processor"; }
 if (!$vars['view']) { $vars['view'] = "detail"; }

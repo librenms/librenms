@@ -28,7 +28,7 @@ if (isset($options['g']) && $options['g'] >= 0) {
     array_shift($argv);
     array_unshift($argv, $cmd);
     $poller_group = $options['g'];
-} elseif ($config['distributed_poller_group'] > 0 && $config['distributed_poller'] === TRUE) {
+} elseif ($config['distributed_poller'] === TRUE) {
     $poller_group = $config['distributed_poller_group'];
 }
 
@@ -114,6 +114,9 @@ if (!empty($argv[1]))
         elseif (preg_match ('/^(sha|md5)$/i', $arg))
         {
           $v3['authalgo'] = $arg;
+        } else {
+          echo "Invalid argument: " . $arg . "\n" ;
+          return ;
         }
       }
 
@@ -147,6 +150,9 @@ if (!empty($argv[1]))
         elseif (preg_match ('/^(aes|des)$/i', $arg))
         {
           $v3['cryptoalgo'] = $arg;
+        } else {
+          echo "Invalid argument: " . $arg . "\n" ;
+          return ;
         }
       }
 

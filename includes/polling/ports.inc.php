@@ -164,7 +164,7 @@ foreach ($ports as $port)
 
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $this_port['ifDescr'], $matches)) { $this_port['ifDescr'] = $matches[1]; }
 
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $state = $memcache->get('port-'.$port['port_id'].'-state');
       if($debug) { print_r($state); }
@@ -184,7 +184,7 @@ foreach ($ports as $port)
       $port['update']['poll_period'] = $polled_period;
     }
 
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $port['state']['poll_time'] = $polled;
       $port['state']['poll_prev'] = $port['poll_time'];
@@ -215,7 +215,7 @@ foreach ($ports as $port)
       $this_port['ifOutMulticastPkts'] = $this_port['ifHCOutMulticastPkts'];
     }
 
-    // Overwrite ifSpeed with ifHighSpeed if it's over 10G
+    // Overwrite ifSpeed with ifHighSpeed if it's over 1G
     if (is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > "1000000000")
     {
       echo("HighSpeed ");
@@ -303,7 +303,7 @@ foreach ($ports as $port)
         $port['update'][$oid.'_prev'] = $port[$oid];
       }
 
-      if ($config['memcached']['enable'])
+      if ($config['memcached']['enable'] === TRUE)
       {
         $port['state'][$oid] = $this_port[$oid];
         $port['state'][$oid.'_prev'] = $port[$oid];
@@ -323,7 +323,7 @@ foreach ($ports as $port)
           $port['update'][$oid.'_delta'] = $oid_diff;
         }
 
-        if ($config['memcached']['enable'])
+        if ($config['memcached']['enable'] === TRUE)
         {
           $port['state'][$oid.'_rate'] = $oid_rate;
           $port['state'][$oid.'_delta'] = $oid_diff;
@@ -356,7 +356,7 @@ foreach ($ports as $port)
     echo('pkts('.format_si($port['stats']['ifInUcastPkts_rate']).'pps/'.format_si($port['stats']['ifOutUcastPkts_rate']).'pps)');
 
     // Store aggregate in/out state
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
        $port['state']['ifOctets_rate']    = $port['stats']['ifOutOctets_rate'] + $port['stats']['ifInOctets_rate'];
        $port['state']['ifUcastPkts_rate'] = $port['stats']['ifOutUcastPkts_rate'] + $port['stats']['ifInUcastPkts_rate'];
@@ -434,7 +434,7 @@ foreach ($ports as $port)
     if ($device['os'] == "aos") { include("port-alcatel.inc.php"); }
 
     // Update Memcached
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       if($debug) { print_r($port['state']); }
       $memcache->set('port-'.$port['port_id'].'-state', $port['state']);

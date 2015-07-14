@@ -30,5 +30,3 @@ if (isset($data[1]['entPhysicalModelName']) && $data[1]['entPhysicalModelName'] 
 if (isset($data[1]['entPhysicalSerialNum']) && $data[1]['entPhysicalSerialNum'] != "") {
     $serial = $data[1]['entPhysicalSerialNum'];
 }
-
-?>

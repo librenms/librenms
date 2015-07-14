@@ -1,0 +1,298 @@
+INET-ADDRESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, mib-2, Unsigned32 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                 FROM SNMPv2-TC;
+
+inetAddressMIB MODULE-IDENTITY
+    LAST-UPDATED "200205090000Z"
+    ORGANIZATION
+        "IETF Operations and Management Area"
+    CONTACT-INFO
+        "Juergen Schoenwaelder (Editor)
+         TU Braunschweig
+         Bueltenweg 74/75
+         38106 Braunschweig, Germany
+
+         Phone: +49 531 391-3289
+         EMail: schoenw@ibr.cs.tu-bs.de
+
+         Send comments to <mibs@ops.ietf.org>."
+    DESCRIPTION
+        "This MIB module defines textual conventions for
+         representing Internet addresses. An Internet
+         address can be an IPv4 address, an IPv6 address
+         or a DNS domain name. This module also defines
+         textual conventions for Internet port numbers,
+         autonomous system numbers and the length of an
+         Internet address prefix."
+    REVISION     "200205090000Z"
+    DESCRIPTION
+        "Second version, published as RFC 3291. This
+         revisions contains several clarifications and it
+
+         introduces several new textual conventions:
+         InetAddressPrefixLength, InetPortNumber,
+         InetAutonomousSystemNumber, InetAddressIPv4z,
+         and InetAddressIPv6z."
+    REVISION     "200006080000Z"
+    DESCRIPTION
+        "Initial version, published as RFC 2851."
+    ::= { mib-2 76 }
+
+InetAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value that represents a type of Internet address.
+         unknown(0)  An unknown address type. This value MUST
+                     be used if the value of the corresponding
+                     InetAddress object is a zero-length string.
+                     It may also be used to indicate an IP address
+                     which is not in one of the formats defined
+                     below.
+
+         ipv4(1)     An IPv4 address as defined by the
+                     InetAddressIPv4 textual convention.
+
+         ipv6(2)     A global IPv6 address as defined by the
+                     InetAddressIPv6 textual convention.
+
+         ipv4z(3)    A non-global IPv4 address including a zone
+                     index as defined by the InetAddressIPv4z
+                     textual convention.
+
+         ipv6z(4)    A non-global IPv6 address including a zone
+                     index as defined by the InetAddressIPv6z
+                     textual convention.
+
+         dns(16)     A DNS domain name as defined by the
+                     InetAddressDNS textual convention.
+
+         Each definition of a concrete InetAddressType value must be
+         accompanied by a definition of a textual convention for use
+         with that InetAddressType.
+
+         To support future extensions, the InetAddressType textual
+         convention SHOULD NOT be sub-typed in object type definitions.
+         It MAY be sub-typed in compliance statements in order to
+         require only a subset of these address types for a compliant
+         implementation.
+
+         Implementations must ensure that InetAddressType objects
+
+         and any dependent objects (e.g. InetAddress objects) are
+         consistent.  An inconsistentValue error must be generated
+         if an attempt to change an InetAddressType object would,
+         for example, lead to an undefined InetAddress value.  In
+         particular, InetAddressType/InetAddress pairs must be
+         changed together if the address type changes (e.g. from
+         ipv6(2) to ipv4(1))."
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    ipv4(1),
+                    ipv6(2),
+                    ipv4z(3),
+                    ipv6z(4),
+                    dns(16)
+                }
+
+InetAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Denotes a generic Internet address.
+
+         An InetAddress value is always interpreted within the context
+         of an InetAddressType value. Every usage of the InetAddress
+         textual convention is required to specify the InetAddressType
+         object which provides the context.  It is suggested that the
+         InetAddressType object is logically registered before the
+         object(s) which use the InetAddress textual convention if
+         they appear in the same logical row.
+
+         The value of an InetAddress object must always be
+         consistent with the value of the associated InetAddressType
+         object. Attempts to set an InetAddress object to a value
+         which is inconsistent with the associated InetAddressType
+         must fail with an inconsistentValue error.
+
+         When this textual convention is used as the syntax of an
+         index object, there may be issues with the limit of 128
+         sub-identifiers specified in SMIv2, STD 58. In this case,
+         the object definition MUST include a 'SIZE' clause to
+         limit the number of potential instance sub-identifiers."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+
+InetAddressIPv4 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d"
+    STATUS       current
+    DESCRIPTION
+        "Represents an IPv4 network address:
+
+           octets   contents         encoding
+            1-4     IPv4 address     network-byte order
+
+         The corresponding InetAddressType value is ipv4(1).
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions since it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType as a pair."
+    SYNTAX       OCTET STRING (SIZE (4))
+
+InetAddressIPv6 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS       current
+    DESCRIPTION
+        "Represents an IPv6 network address:
+
+           octets   contents         encoding
+            1-16    IPv6 address     network-byte order
+
+         The corresponding InetAddressType value is ipv6(2).
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions since it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType as a pair."
+    SYNTAX       OCTET STRING (SIZE (16))
+
+InetAddressIPv4z ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d%4d"
+    STATUS       current
+    DESCRIPTION
+        "Represents a non-global IPv4 network address together
+         with its zone index:
+
+           octets   contents         encoding
+            1-4     IPv4 address     network-byte order
+            5-8     zone index       network-byte order
+
+         The corresponding InetAddressType value is ipv4z(3).
+
+         The zone index (bytes 5-8) is used to disambiguate identical
+         address values on nodes which have interfaces attached to
+         different zones of the same scope. The zone index may contain
+         the special value 0 which refers to the default zone for each
+         scope.
+
+         This textual convention SHOULD NOT be used directly in object
+
+         definitions since it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType as a pair."
+    SYNTAX OCTET STRING (SIZE (8))
+
+InetAddressIPv6z ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x%4d"
+    STATUS       current
+    DESCRIPTION
+        "Represents a non-global IPv6 network address together
+         with its zone index:
+
+           octets   contents         encoding
+            1-16    IPv6 address     network-byte order
+           17-20    zone index       network-byte order
+
+         The corresponding InetAddressType value is ipv6z(4).
+
+         The zone index (bytes 17-20) is used to disambiguate
+         identical address values on nodes which have interfaces
+         attached to different zones of the same scope. The zone index
+         may contain the special value 0 which refers to the default
+         zone for each scope.
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions since it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType as a pair."
+    SYNTAX OCTET STRING (SIZE (20))
+
+InetAddressDNS ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "Represents a DNS domain name. The name SHOULD be fully
+         qualified whenever possible.
+
+         The corresponding InetAddressType is dns(16).
+
+         The DESCRIPTION clause of InetAddress objects that may have
+         InetAddressDNS values must fully describe how (and when) such
+         names are to be resolved to IP addresses.
+
+         This textual convention SHOULD NOT be used directly in object
+         definitions since it restricts addresses to a specific format.
+         However, if it is used, it MAY be used either on its own or in
+         conjunction with InetAddressType as a pair."
+    SYNTAX       OCTET STRING (SIZE (1..255))
+
+InetAddressPrefixLength ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Denotes the length of a generic Internet network address
+         prefix. A value of n corresponds to an IP address mask
+         which has n contiguous 1-bits from the most significant
+         bit (MSB) and all other bits set to 0.
+
+         An InetAddressPrefixLength value is always interpreted within
+         the context of an InetAddressType value. Every usage of the
+         InetAddressPrefixLength textual convention is required to
+         specify the InetAddressType object which provides the
+         context.  It is suggested that the InetAddressType object is
+         logically registered before the object(s) which use the
+         InetAddressPrefixLength textual convention if they appear in
+         the same logical row.
+
+         InetAddressPrefixLength values that are larger than
+         the maximum length of an IP address for a specific
+         InetAddressType are treated as the maximum significant
+         value applicable for the InetAddressType. The maximum
+         significant value is 32 for the InetAddressType
+         'ipv4(1)' and 'ipv4z(3)' and 128 for the InetAddressType
+         'ipv6(2)' and 'ipv6z(4)'. The maximum significant value
+         for the InetAddressType 'dns(16)' is 0.
+
+         The value zero is object-specific and must be defined as
+         part of the description of any object which uses this
+         syntax. Examples of the usage of zero might include
+         situations where the Internet network address prefix
+         is unknown or does not apply."
+    SYNTAX      Unsigned32
+
+InetPortNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents a 16 bit port number of an Internet transport
+         layer protocol. Port numbers are assigned by IANA. A
+         current list of all assignments is available from
+         <http://www.iana.org/>.
+
+         The value zero is object-specific and must be defined as
+         part of the description of any object which uses this
+         syntax. Examples of the usage of zero might include
+         situations where a port number is unknown, or when the
+         value zero is used as a wildcard in a filter."
+    REFERENCE  "STD 6 (RFC 768), STD 7 (RFC 793) and RFC 2960"
+    SYNTAX      Unsigned32 (0..65535)
+
+InetAutonomousSystemNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents an autonomous system number which identifies an
+         Autonomous System (AS). An AS is a set of routers under a
+         single technical administration, using an interior gateway
+         protocol and common metrics to route packets within the AS,
+         and using an exterior gateway protocol to route packets to
+         other ASs'. IANA maintains the AS number space and has
+         delegated large parts to the regional registries.
+
+         Autonomous system numbers are currently limited to 16 bits
+         (0..65535). There is however work in progress to enlarge the
+         autonomous system number space to 32 bits. This textual
+         convention therefore uses an Unsigned32 value without a
+         range restriction in order to support a larger autonomous
+         system number space."
+    REFERENCE  "RFC 1771, RFC 1930"
+    SYNTAX      Unsigned32
+
+END

@@ -1,8 +1,7 @@
 <?php
 
-if (!$os)
-{
-  if (strpos($sysDescr, "IES-") !== FALSE) { $os = "ies"; }
+if (!$os) {
+    if (strstr($sysDescr, 'IES-')) {
+        $os = 'ies';
+    }
 }
-
-?>

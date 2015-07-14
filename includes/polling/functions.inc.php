@@ -1,4 +1,4 @@
-	<?php
+<?php
 
 function poll_sensor($device, $class, $unit)
 {
@@ -99,7 +99,7 @@ function poll_sensor($device, $class, $unit)
       log_event(ucfirst($class) . ' ' . $sensor['sensor_descr'] . " above threshold: " . $sensor_value . " $unit (> " . $sensor['sensor_limit'] . " $unit)", $device, $class, $sensor['sensor_id']);
     }
 
-    if ($config['memcached']['enable'])
+    if ($config['memcached']['enable'] === TRUE)
     {
       $memcache->set('sensor-'.$sensor['sensor_id'].'-value', $sensor_value);
     } else {
@@ -132,24 +132,35 @@ function poll_device($device, $options)
   if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
 
   $ping_response = isPingable($device['hostname'],$device['device_id']);
+
+    $device_perf = $ping_response['db'];
+    $device_perf['device_id'] = $device['device_id'];
+    $device_perf['timestamp'] = array('NOW()');
+    if (is_array($device_perf)) {
+        dbInsert($device_perf, 'device_perf');
+    }
+
+
   $device['pingable'] = $ping_response['result'];
   $ping_time = $ping_response['last_ping_timetaken'];
   $response = array();
+  $status_reason = '';
   if ($device['pingable'])
   {
     $device['snmpable'] = isSNMPable($device);
     if ($device['snmpable'])
     {
       $status = "1";
+      $response['status_reason'] = '';
     } else {
       echo("SNMP Unreachable");
       $status = "0";
-      $response['status'] = 'snmp';
+      $response['status_reason'] = 'snmp';
     }
   } else {
     echo("Unpingable");
     $status = "0";
-    $response['status'] = 'icmp';
+    $response['status_reason'] = 'icmp';
   }
 
   if ($device['status'] != $status)
@@ -157,11 +168,11 @@ function poll_device($device, $options)
     $poll_update .= $poll_separator . "`status` = '$status'";
     $poll_separator = ", ";
 
-    dbUpdate(array('status' => $status), 'devices', 'device_id=?', array($device['device_id']));
+    dbUpdate(array('status' => $status,'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
     dbInsert(array('importance' => '0', 'device_id' => $device['device_id'], 'message' => "Device is " .($status == '1' ? 'up' : 'down')), 'alerts');
 
     log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
-    notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " " . $response['status']);
+    notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " " . $response['status_reason']);
   }
 
   if ($status == "1")
@@ -183,6 +194,7 @@ function poll_device($device, $options)
       {
         if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module])))
         {
+          // TODO per-module polling stats
           include('includes/polling/'.$module.'.inc.php');
         } elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == "0") {
           echo("Module [ $module ] disabled on host.\n");
@@ -201,11 +213,11 @@ function poll_device($device, $options)
 
       foreach (dbFetch("SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?", array($device['device_id'])) as $graph)
       {
-        if (!isset($graphs[$graph["graph"]]))
+        if (isset($graphs[$graph["graph"]]))
         {
-          dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph["graph"]));
-        } else {
           $oldgraphs[$graph["graph"]] = TRUE;
+        } else {
+          dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph["graph"]));
         }
       }
 
@@ -222,6 +234,7 @@ function poll_device($device, $options)
 
     $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
 
+    // TODO: These should be easy converts to rrd_create_update()
     // Poller performance rrd
     $poller_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/poller-perf.rrd";
     if (!is_file($poller_rrd))
@@ -266,7 +279,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 
   global $config;
 
-  echo("This is mag_poll_mib_def Processing\n");
+  echo("This is poll_mib_def Processing\n");
   $mib      = NULL;
 
   if (stristr($mib_name_table, "UBNT")) {
@@ -346,4 +359,37 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
   return TRUE;
 }
 
-?>
+/*
+ * Please use this instead of creating & updating RRD files manually.
+ * @param device Device object - only 'hostname' is used at present
+ * @param name Array of rrdname components
+ * @param def Array of data definitions
+ * @param val Array of value definitions
+ *
+ */
+function rrd_create_update($device, $name, $def, $val, $step = 300)
+{
+    global $config;
+    $rrd = rrd_name($device['hostname'], $name);
+
+    if (!is_file($rrd) && $def != null) {
+        // add the --step and the rra definitions to the array
+        $newdef = "--step $step ".implode(' ', $def).$config['rrd_rra'];
+        rrdtool_create($rrd, $newdef);
+    }
+
+    rrdtool_update($rrd, $val);
+}
+
+function get_main_serial($device) {
+
+    if ($device['os_group'] == 'cisco') {
+        $serial_output = snmp_get_multi($device, "entPhysicalSerialNum.1 entPhysicalSerialNum.1001", "-OQUs", "ENTITY-MIB:OLD-CISCO-CHASSIS-MIB");
+        if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
+            return $serial_output[1]['entPhysicalSerialNum'];
+        } elseif (!empty($serial_output[1001]['entPhysicalSerialNum'])) {
+            return $serial_output[1001]['entPhysicalSerialNum'];
+        }
+    }
+
+}

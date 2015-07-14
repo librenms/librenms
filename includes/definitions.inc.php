@@ -1,5 +1,25 @@
 <?php
 
+// Observium Includes
+include_once($config['install_dir'] . "/includes/dbFacile.php");
+include_once($config['install_dir'] . "/includes/mergecnf.inc.php");
+
+// Connect to database
+$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (!$database_link)
+{
+        echo("<h2>MySQL Error</h2>");
+        echo(mysql_error());
+        die;
+}
+$database_db = mysql_select_db($config['db_name'], $database_link);
+
+$clone = $config;
+foreach( dbFetchRows('select config_name,config_value from config') as $obj ) {
+    $clone = array_replace_recursive($clone,mergecnf($obj));
+}
+$config = array_replace_recursive($clone,$config);
+
 /////////////////////////////////////////////////////////
 #    NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
 /////////////////////////////////////////////////////////
@@ -388,7 +408,18 @@ $config['os'][$os]['over'][2]['graph']  = "device_mempool";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 $config['os'][$os]['icon']              = "cisco";
 
-
+// Brocade NOS
+$os = "nos";
+$config['os'][$os]['text']              = "Brocade NOS";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processor";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_mempool";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+$config['os'][$os]['icon']              = "brocade";
 
 // Cisco Small Business
 
@@ -640,9 +671,16 @@ $os = "powervault";
 $config['os'][$os]['text']              = "Dell PowerVault";
 $config['os'][$os]['icon']              = "dell";
 
+$os = "equallogic";
+$config['os'][$os]['text']              = "Dell EqualLogic";
+$config['os'][$os]['icon']              = "dell";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 $os = "drac";
 $config['os'][$os]['text']              = "Dell DRAC";
 $config['os'][$os]['icon']              = "dell";
+$config['os'][$os]['type']              = "server";
 
 $os = "bcm963";
 $config['os'][$os]['text']              = "Broadcom BCM963xx";
@@ -669,13 +707,6 @@ $os = "dlinkap";
 $config['os'][$os]['text']              = "D-Link Access Point";
 $config['os'][$os]['type']              = "wireless";
 $config['os'][$os]['icon']              = "dlink";
-
-//$os = "ubiquitiap";
-//$config['os'][$os]['text']              = "Ubiquiti Networks Wireless";
-//$config['os'][$os]['type']              = "wireless";
-//$config['os'][$os]['icon']              = "ubiquiti";
-//$config['os'][$os]['over'][0]['graph']  = "device_bits";
-//$config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "axiscam";
 $config['os'][$os]['text']              = "AXIS Network Camera";
@@ -827,6 +858,12 @@ $config['os'][$os]['icon']              = "mge";
 
 $os = "apc";
 $config['os'][$os]['text']              = "APC Management Module";
+$config['os'][$os]['type']              = "power";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
+$os = "webpower";
+$config['os'][$os]['text']              = "WebPower";
 $config['os'][$os]['type']              = "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
@@ -1123,6 +1160,29 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 $config['os'][$os]['icon']              = "pbn";
 
+// Enterasys 
+$os = "enterasys";
+$config['os'][$os]['text']              = "Enterasys";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['icon']              = "enterasys";
+
+// Multimatic UPS (Generex CS121 SNMP Adapter)
+$os = "multimatic";
+$config['os'][$os]['text']              = "Multimatic UPS";
+$config['os'][$os]['type']              = "power";
+$config['os'][$os]['icon']              = "multimatic";
+
+// Huawei UPS
+$os = "huaweiups";
+$config['os'][$os]['text']              = "Huawei UPS";
+$config['os'][$os]['group']             = "ups";
+$config['os'][$os]['type']              = "power";
+$config['os'][$os]['icon']              = "huawei";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
 foreach ($config['os'] as $this_os => $blah)
 {
   if (isset($config['os'][$this_os]['group']))
@@ -1141,9 +1201,34 @@ foreach ($config['os'] as $this_os => $blah)
   }
 }
 
+// Meraki Devices
+$os = "merakimx";
+$config['os'][$os]['text']              = "Meraki MX Appliance";
+$config['os'][$os]['type']              = "firewall";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
+$os = "merakimr";
+$config['os'][$os]['text']              = "Meraki AP";
+$config['os'][$os]['type']              = "wireless";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
+$os = "merakims";
+$config['os'][$os]['text']              = "Meraki Switch";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "meraki";
+$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 // Graph Types
 
-$config['graph_sections'] = array('general', 'system', 'firewall', 'netstats', 'wireless', 'storage', 'vpdn', 'load balancer');
+include_once($config['install_dir'] . "/includes/load_db_graph_types.inc.php");
 
 
 // Device - Wireless - AirMAX
@@ -1505,7 +1590,7 @@ $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order'] = '0';
 $config['graph_types']['device']['wifi_clients']['descr'] = 'Wireless Clients';
 
-$config['graph_types']['device']['agent']['section'] = 'system';
+$config['graph_types']['device']['agent']['section'] = 'poller';
 $config['graph_types']['device']['agent']['order'] = '0';
 $config['graph_types']['device']['agent']['descr'] = 'Agent Execution Time';
 
@@ -1749,17 +1834,7 @@ if (isset($_SERVER['HTTPS']))
   $config['base_url'] = preg_replace('/^http:/','https:', $config['base_url']);
 }
 
-// Connect to database
-$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
-if (!$database_link)
-{
-        echo("<h2>MySQL Error</h2>");
-        echo(mysql_error());
-        die;
-}
-$database_db = mysql_select_db($config['db_name'], $database_link);
-
-if ($config['memcached']['enable'])
+if ($config['memcached']['enable'] === TRUE)
 {
   if (class_exists("Memcached"))
   {
