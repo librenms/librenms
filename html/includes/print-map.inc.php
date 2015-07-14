@@ -61,7 +61,7 @@ foreach (dbFetchRows("SELECT
                              LEFT JOIN `ports` AS `P2` ON `P2`.`port_id`=`links`.`remote_port_id`
                       WHERE
                              `active`=1
-                             AND `remote_device_id`!=0
+                             $sql
                       ",$sql_array) as $items) {
     $local_device = array('device_id'=>$items['local_device_id'], 'os'=>$items['local_os'], 'hostname'=>$items['local_hostname']);
     $remote_device = array('device_id'=>$items['remote_device_id'], 'os'=>$items['remote_os'], 'hostname'=>$items['remote_hostname']);
