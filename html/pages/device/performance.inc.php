@@ -23,12 +23,43 @@
 
 if(!isset($vars['section'])) { $vars['section'] = "performance"; }
 
+if (empty($vars['dtpickerfrom'])) {
+    $vars['dtpickerfrom'] = date($config['dateformat']['byminute'], time() - 3600 * 24 * 2);
+}
+if (empty($vars['dtpickerto'])) {
+    $vars['dtpickerto'] = date($config['dateformat']['byminute']);
+}
+
+?>
+
+<hr />
+<form method="post" role="form" id="map" class="form-inline">
+    <div class="form-group">
+        <label for="dtpickerfrom">From</label>
+        <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16" value="<?php echo $vars['dtpickerfrom']; ?>" data-date-format="YYYY-MM-DD HH:mm">
+    </div>
+    <div class="form-group">
+        <label for="dtpickerto">To</label>
+        <input type="text" class="form-control" id="dtpickerto" name="dtpickerto" maxlength=16 value="<?php echo $vars['dtpickerto']; ?>" data-date-format="YYYY-MM-DD HH:mm">
+    </div>
+    <input type="submit" class="btn btn-default" id="submit" value="Update">
+</form>
+<hr />
+<script type="text/javascript">
+    $(function () {
+        $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
+        $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
+    });
+</script>
+
+
+<?php
 if (is_admin() === true || is_read() === true) {
-    $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf` WHERE `device_id` = ?";
-    $param = array($device['device_id']);
+    $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf` WHERE `device_id` = ? AND `timestamp` >= ? AND `timestamp` <= ?";
+    $param = array($device['device_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
 } else {
-    $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf`,`devices_perms` WHERE `device_id` = ? AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = " . $_SESSION['user_id'];
-    $param = array($device['device_id']);
+    $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf`,`devices_perms` WHERE `device_id` = ? AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = ? AND `timestamp` >= ? AND `timestamp` <= ?";
+    $param = array($device['device_id'], $_SESSION['user_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
 }
 
 ?>
