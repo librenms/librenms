@@ -1,15 +1,16 @@
 <?php
 
-$no_refresh = true;
+$no_refresh = TRUE;
 
 $param = array();
 
-if ($vars['action'] == 'expunge' && $_SESSION['userlevel'] >= '10') {
-    dbQuery('TRUNCATE TABLE `eventlog`');
-    print_message('Event log truncated');
+if ($vars['action'] == "expunge" && $_SESSION['userlevel'] >= '10')
+{
+  dbQuery("TRUNCATE TABLE `eventlog`");
+  print_message("Event log truncated");
 }
 
-$pagetitle[] = 'Eventlog';
+$pagetitle[] = "Eventlog";
 
 print_optionbar_start();
 
@@ -23,17 +24,15 @@ print_optionbar_start();
       <select name="device" id="device" class="form-control input-sm">
         <option value="">All Devices</option>
         <?php
-        foreach (get_all_devices() as $hostname) {
-            $device_id = getidbyname($hostname);
-            if (device_permitted($device_id)) {
-                echo "<option value='".$device_id."'";
-                if ($device_id == $_POST['device']) {
-                    echo 'selected';
-                }
-
-                echo '>'.$hostname.'</option>';
-            }
-        }
+          foreach (get_all_devices() as $hostname)
+          {
+              $device_id = getidbyname($hostname);
+              if (device_permitted($device_id)) {
+                  echo("<option value='".$device_id."'");
+                  if ($device_id == $_POST['device']) { echo("selected"); }
+                  echo(">".$hostname."</option>");
+              }
+          }
         ?>
       </select>
     </div>
@@ -41,7 +40,9 @@ print_optionbar_start();
 </form>
 
 <?php
+
 print_optionbar_end();
+
 ?>
 
 <table id="eventlog" class="table table-hover table-condensed table-striped">

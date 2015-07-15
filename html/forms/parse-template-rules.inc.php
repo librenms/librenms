@@ -12,17 +12,16 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+if(is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 $template_id = ($_POST['template_id']);
 
-if (is_numeric($template_id) && $template_id > 0) {
-    foreach (dbFetchRows('SELECT `alert_rule_id` FROM `alert_template_map` WHERE `alert_templates_id` = ?', array($template_id)) as $rule) {
+if(is_numeric($template_id) && $template_id > 0) {
+    foreach (dbFetchRows("SELECT `alert_rule_id` FROM `alert_template_map` WHERE `alert_templates_id` = ?",array($template_id)) as $rule) {
         $rules[] = $rule['alert_rule_id'];
     }
-
-    $output = array('rule_id' => $rules);
+    $output = array('rule_id'=>$rules);
     echo _json_encode($output);
 }

@@ -1,5 +1,5 @@
 <?php
-$no_refresh = true;
+$no_refresh = TRUE;
 ?>
 <table id="poll-log" class="table table-condensed table-hover table-striped">
     <thead>

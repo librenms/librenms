@@ -12,46 +12,39 @@
  * the source code distribution for details.
  */
 
-if (is_admin() === false) {
+if(is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-$pattern  = $_POST['patterns'];
+$pattern = $_POST['patterns'];
 $group_id = $_POST['group_id'];
-$name     = mres($_POST['name']);
-$desc     = mres($_POST['desc']);
+$name = mres($_POST['name']);
+$desc = mres($_POST['desc']);
 
-if (is_array($pattern)) {
-    $pattern = implode(' ', $pattern);
-}
-else if (!empty($_POST['pattern']) && !empty($_POST['condition']) && !empty($_POST['value'])) {
-    $pattern = '%'.$_POST['pattern'].' '.$_POST['condition'].' ';
-    if (is_numeric($_POST['value'])) {
-        $pattern .= $_POST['value'];
-    }
-    else {
-        $pattern .= '"'.$_POST['value'].'"';
-    }
+if( is_array($pattern) ) {
+	$pattern = implode(" ", $pattern);
+} elseif( !empty($_POST['pattern']) && !empty($_POST['condition']) && !empty($_POST['value']) ) {
+	$pattern = '%'.$_POST['pattern'].' '.$_POST['condition'].' ';
+	if( is_numeric($_POST['value']) ) {
+		$pattern .= $_POST['value'];
+	} else {
+		$pattern .= '"'.$_POST['value'].'"';
+	}
 }
 
-if (empty($pattern)) {
-    $update_message = 'ERROR: No group was generated';
-}
-else if (is_numeric($group_id) && $group_id > 0) {
-    if (dbUpdate(array('pattern' => $pattern, 'name' => $name, 'desc' => $desc), 'device_groups', 'id=?', array($group_id)) >= 0) {
-        $update_message = "Edited Group: <i>$name: $pattern</i>";
+if(empty($pattern)) {
+    $update_message = "ERROR: No group was generated";
+} elseif(is_numeric($group_id) && $group_id > 0) {
+    if(dbUpdate(array('pattern' => $pattern,'name'=>$name,'desc'=>$desc), 'device_groups', 'id=?',array($group_id)) >= 0) {
+            $update_message = "Edited Group: <i>$name: $pattern</i>";
+    } else {
+            $update_message = "ERROR: Failed to edit Group: <i>".$pattern."</i>";
     }
-    else {
-        $update_message = 'ERROR: Failed to edit Group: <i>'.$pattern.'</i>';
-    }
-}
-else {
-    if (dbInsert(array('pattern' => $pattern, 'name' => $name, 'desc' => $desc), 'device_groups')) {
+} else {
+    if( dbInsert(array('pattern'=>$pattern,'name'=>$name,'desc'=>$desc),'device_groups') ) {
         $update_message = "Added Group: <i>$name: $pattern</i>";
-    }
-    else {
-        $update_message = 'ERROR: Failed to add Group: <i>'.$pattern.'</i>';
+    } else {
+        $update_message = "ERROR: Failed to add Group: <i>".$pattern."</i>";
     }
 }
-
 echo $update_message;

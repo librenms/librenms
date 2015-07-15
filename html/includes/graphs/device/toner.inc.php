@@ -11,7 +11,8 @@ foreach (dbFetchRows('SELECT * FROM toner where device_id = ?', array($device['d
 
     if ($colour['left'] == null) {
         // FIXME generic colour function
-        switch ($iter) {
+        switch ($iter)
+        {
             case '1':
                 $colour['left'] = '000000';
             break;

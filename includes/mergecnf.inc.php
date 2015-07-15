@@ -1,6 +1,5 @@
 <?php
-/*
- * Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
+/* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,8 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * */
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /**
  * Merge config function
@@ -24,34 +22,26 @@
  * @subpackage Config
  */
 
-
 function mergecnf($obj) {
-    $pointer = array();
-    $val     = $obj['config_value'];
-    $obj     = $obj['config_name'];
-    $obj     = explode('.', $obj, 2);
-    if (!isset($obj[1])) {
-        if (filter_var($val, FILTER_VALIDATE_INT)) {
-            $val = (int) $val;
-        }
-        else if (filter_var($val, FILTER_VALIDATE_FLOAT)) {
-            $val = (float) $val;
-        }
-        else if (filter_var($val, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
-            $val = filter_var($val, FILTER_VALIDATE_BOOLEAN);
-        }
-
-        if (!empty($obj[0])) {
-            return array($obj[0] => $val);
-        }
-        else {
-            return array($val);
-        }
+  $pointer = array();
+  $val = $obj['config_value'];
+  $obj = $obj['config_name'];
+  $obj = explode('.',$obj,2);
+  if( !isset($obj[1]) ) {
+    if( filter_var($val,FILTER_VALIDATE_INT) ) {
+      $val = (int) $val;
+    } elseif( filter_var($val,FILTER_VALIDATE_FLOAT) ) {
+      $val = (float) $val;
+    } elseif( filter_var($val,FILTER_VALIDATE_BOOLEAN,FILTER_NULL_ON_FAILURE) !== NULL ) {
+      $val = filter_var($val,FILTER_VALIDATE_BOOLEAN);
     }
-    else {
-        $pointer[$obj[0]] = mergecnf(array('config_name' => $obj[1], 'config_value' => $val));
+    if( !empty($obj[0]) ) {
+      return array($obj[0] => $val);
+    } else {
+      return array($val);
     }
-
-    return $pointer;
-
-}//end mergecnf()
+  } else {
+    $pointer[$obj[0]] = mergecnf(array('config_name'=>$obj[1],'config_value'=>$val));
+  }
+  return $pointer;
+}

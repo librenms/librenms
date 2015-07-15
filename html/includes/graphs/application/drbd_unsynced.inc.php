@@ -2,24 +2,27 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+include("includes/graphs/common.inc.php");
 
-$drbd_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-drbd-'.$app['app_instance'].'.rrd';
+$drbd_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-drbd-".$app['app_instance'].".rrd";
 
-if (is_file($drbd_rrd)) {
-    $rrd_filename = $drbd_rrd;
+if (is_file($drbd_rrd))
+{
+  $rrd_filename = $drbd_rrd;
 }
 
-$ds = 'oos';
+$ds = "oos";
 
-$colour_area = 'CDEB8B';
-$colour_line = '006600';
+$colour_area = "CDEB8B";
+$colour_line = "006600";
 
-$colour_area_max = 'FFEE99';
+$colour_area_max = "FFEE99";
 
-$graph_max  = 1;
+$graph_max = 1;
 $multiplier = 8;
 
-$unit_text = 'Bytes';
+$unit_text = "Bytes";
 
-require 'includes/graphs/generic_simplex.inc.php';
+include("includes/graphs/generic_simplex.inc.php");
+
+?>

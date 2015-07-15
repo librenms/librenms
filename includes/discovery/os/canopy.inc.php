@@ -1,7 +1,7 @@
 <?php
 
 if (!$os) {
-    if (preg_match('/^CANOPY/', $sysDescr)) {
+    if (preg_match("/^CANOPY/", $sysDescr)) {
         $os = 'canopy';
     }
 }

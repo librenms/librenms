@@ -21,9 +21,7 @@
 */
 
 
-if(!isset($vars['section'])) {
-    $vars['section'] = "performance";
-}
+if(!isset($vars['section'])) { $vars['section'] = "performance"; }
 
 if (empty($vars['dtpickerfrom'])) {
     $vars['dtpickerfrom'] = date($config['dateformat']['byminute'], time() - 3600 * 24 * 2);
@@ -59,8 +57,7 @@ if (empty($vars['dtpickerto'])) {
 if (is_admin() === true || is_read() === true) {
     $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf` WHERE `device_id` = ? AND `timestamp` >= ? AND `timestamp` <= ?";
     $param = array($device['device_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
-}
-else {
+} else {
     $query = "SELECT DATE_FORMAT(timestamp, '".$config['alert_graph_date_format']."') Date, xmt,rcv,loss,min,max,avg FROM `device_perf`,`devices_perms` WHERE `device_id` = ? AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = ? AND `timestamp` >= ? AND `timestamp` <= ?";
     $param = array($device['device_id'], $_SESSION['user_id'], $vars['dtpickerfrom'], $vars['dtpickerto']);
 }
@@ -84,7 +81,7 @@ foreach(dbFetchRows($query, $param) as $return_value) {
     $avg = $return_value['avg'];
 
     if ($max > $max_val) {
-        $max_val = $max;
+        $max_val = $max;        
     }
 
     $data[] = array('x' => $date,'y' => $loss,'group' => 0);
@@ -189,3 +186,4 @@ echo $milisec_diff;
     var graph2d = new vis.Graph2d(container, items, groups, options);
 
 </script>
+

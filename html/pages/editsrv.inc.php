@@ -1,30 +1,35 @@
 <?php
 
-if (is_admin() === false && is_read() === false) {
-    include 'includes/error-no-perm.inc.php';
-}
-else {
-    $pagetitle[] = 'Edit service';
+if (is_admin() === FALSE && is_read() === FALSE) {
 
-    if ($_POST['confirm-editsrv']) {
-        if ($_SESSION['userlevel'] > '5') {
-            include 'includes/service-edit.inc.php';
+    include "includes/error-no-perm.inc.php";
+
+} else {
+
+    $pagetitle[] = "Edit service";
+
+    if ($_POST['confirm-editsrv'])
+    {
+        if ($_SESSION['userlevel'] > "5")
+        {
+            include("includes/service-edit.inc.php");
         }
     }
 
-    foreach (dbFetchRows('SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY hostname') as $device) {
-        $servicesform .= "<option value='".$device['service_id']."'>".$device['hostname'].' - '.$device['service_type'].'</option>';
+    foreach (dbFetchRows("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY hostname") as $device)
+    {
+        $servicesform .= "<option value='" . $device['service_id'] . "'>" . $device['hostname'] . " - " . $device['service_type'] .  "</option>";
     }
 
-    if ($updated) {
-        print_message('Service updated!');
-    }
+    if ($updated) { print_message("Service updated!"); }
 
     if ($_POST['editsrv'] == 'yes') {
-        include_once 'includes/print-service-edit.inc.php';
-    }
-    else {
-        echo "
+
+        require_once "includes/print-service-edit.inc.php";
+
+    } else {
+
+        echo("
         <h4>Delete Service</h4>
         <form id='editsrv' name='editsrv' method='post' action='' class='form-horizontal' role='form'>
           <input type=hidden name='delsrv' value='yes'>
@@ -41,6 +46,7 @@ else {
             </div>
             <button type='submit' name='editsrv' id='editsrv' value='yes' class='btn btn-primary input-sm'>Edit</button>
           </div>
-        </form>";
-    }//end if
-}//end if
+        </form>");
+    }
+
+}
