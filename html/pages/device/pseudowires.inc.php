@@ -89,7 +89,8 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I WHERE P.port_id
                     'upkts',
                     'errors',
                 );
-                foreach ($types as $graph_type) {
+                foreach ($types as $graph_type)
+                {
                     $pw_a['graph_type'] = 'port_'.$graph_type;
                     print_port_thumbnail($pw_a);
                 }

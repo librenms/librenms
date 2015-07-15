@@ -12,18 +12,8 @@ $services['up']       = dbFetchCell("SELECT COUNT(service_id) FROM `services` WH
 $services['down']     = dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE `device_id` = ? AND `service_status` = '0' AND `service_ignore` = '0'", array($device['device_id']));
 $services['disabled'] = dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE `device_id` = ? AND `service_ignore` = '1'", array($device['device_id']));
 
-if ($services['down']) {
-    $services_colour = $warn_colour_a;
-}
-else {
-    $services_colour = $list_colour_a;
-}
-if ($ports['down']) {
-    $ports_colour = $warn_colour_a;
-}
-else {
-    $ports_colour = $list_colour_a;
-}
+if ($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
+if ($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
 
 echo('
 <div class="container-fluid">
@@ -35,41 +25,39 @@ echo('
   <div class="row">
     <div class="col-md-6">
 ');
-require 'includes/dev-overview-data.inc.php';
+include("includes/dev-overview-data.inc.php");
 Plugins::call('device_overview_container',array($device));
 
-require 'overview/ports.inc.php';
+include("overview/ports.inc.php");
 echo('
     </div>
     <div class="col-md-6">
 ');
 // Right Pane
-require 'overview/processors.inc.php';
-require 'overview/mempools.inc.php';
-require 'overview/storage.inc.php';
+include("overview/processors.inc.php");
+include("overview/mempools.inc.php");
+include("overview/storage.inc.php");
 
-if(is_array($entity_state['group']['c6kxbar'])) {
-    require 'overview/c6kxbar.inc.php';
-}
+if(is_array($entity_state['group']['c6kxbar'])) { include("overview/c6kxbar.inc.php"); }
 
-require 'overview/toner.inc.php';
-require 'overview/sensors/charge.inc.php';
-require 'overview/sensors/temperatures.inc.php';
-require 'overview/sensors/humidity.inc.php';
-require 'overview/sensors/fanspeeds.inc.php';
-require 'overview/sensors/dbm.inc.php';
-require 'overview/sensors/voltages.inc.php';
-require 'overview/sensors/current.inc.php';
-require 'overview/sensors/power.inc.php';
-require 'overview/sensors/frequencies.inc.php';
-require 'overview/sensors/load.inc.php';
-require 'overview/sensors/state.inc.php';
-require 'overview/eventlog.inc.php';
-require 'overview/services.inc.php';
-require 'overview/syslog.inc.php';
+include("overview/toner.inc.php");
+include("overview/sensors/charge.inc.php");
+include("overview/sensors/temperatures.inc.php");
+include("overview/sensors/humidity.inc.php");
+include("overview/sensors/fanspeeds.inc.php");
+include("overview/sensors/dbm.inc.php");
+include("overview/sensors/voltages.inc.php");
+include("overview/sensors/current.inc.php");
+include("overview/sensors/power.inc.php");
+include("overview/sensors/frequencies.inc.php");
+include("overview/sensors/load.inc.php");
+include("overview/sensors/state.inc.php");
+include("overview/eventlog.inc.php");
+include("overview/services.inc.php");
+include("overview/syslog.inc.php");
 
 echo('</div></div></div>');
 
-#require 'overview/current.inc.php");
+#include("overview/current.inc.php");
 
 ?>

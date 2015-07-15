@@ -10,7 +10,7 @@ if ($device['os'] == 'firebox') {
     $descr = 'Processor';
     $usage = snmp_get($device, '.1.3.6.1.4.1.3097.6.3.78.0', '-OQUvs', 'WATCHGUARD-SYSTEM-STATISTICS-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/watchguard');
 
-    if (is_numeric($usage)) {
+    if (is_numeric($usage)) { 
         discover_processor($valid['processor'], $device, '1.3.6.1.4.1.3097.6.3.78.0', '0', 'firebox-fixed', $descr, '100', $usage, null, null);
     }
 }

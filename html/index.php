@@ -14,8 +14,7 @@
 
 if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") ) {
     $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'].$_SERVER['PHP_SELF'],"",$_SERVER['ORIG_SCRIPT_FILENAME']);
-}
-else {
+} else {
     $_SERVER['PATH_INFO'] = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
 }
 
@@ -32,40 +31,40 @@ function catchFatal() {
     }
 }
 
-if (strpos($_SERVER['PATH_INFO'], "debug")) {
-    $debug = "1";
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_reporting', E_ALL);
-    set_error_handler('logErrors');
-    register_shutdown_function('catchFatal');
-}
-else {
-    $debug = FALSE;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', 0);
+if (strpos($_SERVER['PATH_INFO'], "debug"))
+{
+  $debug = "1";
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', E_ALL);
+  set_error_handler('logErrors');
+  register_shutdown_function('catchFatal');
+} else {
+  $debug = FALSE;
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('error_reporting', 0);
 }
 
 // Set variables
 $msg_box = array();
 // Check for install.inc.php
-if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
-    // no config.php does so let's redirect to the install
-    header('Location: /install.php');
-    exit;
+if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php')
+{
+  // no config.php does so let's redirect to the install
+  header('Location: /install.php');
+  exit;
 }
 
-require '../includes/defaults.inc.php';
-require '../config.php';
-require_once '../includes/definitions.inc.php';
-require '../includes/functions.php';
-require 'includes/functions.inc.php';
-require 'includes/vars.inc.php';
-require 'includes/plugins.inc.php';
-
+include("../includes/defaults.inc.php");
+include("../config.php");
+include_once("../includes/definitions.inc.php");
+include("../includes/functions.php");
+include("includes/functions.inc.php");
+include("includes/vars.inc.php");
+include('includes/plugins.inc.php');
 Plugins::start();
 
 $runtime_start = utime();
@@ -75,33 +74,30 @@ ob_start();
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
-require 'includes/authenticate.inc.php';
+include("includes/authenticate.inc.php");
 
-if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) {
-    $_SESSION['widescreen'] = 1;
-}
-if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no')) {
-    unset($_SESSION['widescreen']);
-}
+if (strstr($_SERVER['REQUEST_URI'], 'widescreen=yes')) { $_SESSION['widescreen'] = 1; }
+if (strstr($_SERVER['REQUEST_URI'], 'widescreen=no'))  { unset($_SESSION['widescreen']); }
 
 # Load the settings for Multi-Tenancy.
-if (isset($config['branding']) && is_array($config['branding'])) {
-    if ($config['branding'][$_SERVER['SERVER_NAME']]) {
-        foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+if (isset($config['branding']) && is_array($config['branding']))
+{
+  if ($config['branding'][$_SERVER['SERVER_NAME']])
+  {
+    foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval)
+    {
+        eval("\$config['" . $confitem . "'] = \$confval;");
     }
-    else {
-        foreach ($config['branding']['default'] as $confitem => $confval) {
-            eval("\$config['" . $confitem . "'] = \$confval;");
-        }
+  } else {
+    foreach ($config['branding']['default'] as $confitem => $confval)
+    {
+      eval("\$config['" . $confitem . "'] = \$confval;");
     }
+  }
 }
 
 # page_title_prefix is displayed, unless page_title is set
-if (isset($config['page_title'])) {
-    $config['page_title_prefix'] = $config['page_title'];
-}
+if (isset($config['page_title'])) { $config['page_title_prefix'] = $config['page_title']; }
 
 ?>
 <!DOCTYPE HTML>
@@ -123,8 +119,7 @@ if (empty($config['favicon'])) {
   <link rel="icon" href="images/favicon-32.png" sizes="32x32">
   <meta name="msapplication-TileImage" content="images/favicon-144.png">
 <?php
-}
-else {
+} else {
     echo('  <link rel="shortcut icon" href="'.$config['favicon'].'" />' . "\n");
 }
 ?>
@@ -174,13 +169,14 @@ else {
 <?php
 
 if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
-    if ($_SESSION['authenticated']) {
-        require 'includes/print-menubar.php';
-    }
-}
-else {
+
+  if ($_SESSION['authenticated'])
+  {
+    include("includes/print-menubar.php");
+  }
+} else {
     echo "<style>body { padding-top: 0px !important;
-    padding-bottom: 0px !important; }</style>";
+          padding-bottom: 0px !important; }</style>";
 
 }
 
@@ -192,47 +188,50 @@ else {
 <?php
 
 // To help debug the new URLs :)
-if (isset($devel) || isset($vars['devel'])) {
-    echo("<pre>");
-    print_r($_GET);
-    print_r($vars);
-    echo("</pre>");
+if (isset($devel) || isset($vars['devel']))
+{
+  echo("<pre>");
+  print_r($_GET);
+  print_r($vars);
+  echo("</pre>");
 }
 
-if ($_SESSION['authenticated']) {
-    // Authenticated. Print a page.
-    if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
-        require "pages/" . $vars['page'] . ".inc.php";
+if ($_SESSION['authenticated'])
+{
+  // Authenticated. Print a page.
+  if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php"))
+  {
+    include("pages/" . $vars['page'] . ".inc.php");
+  } else {
+    if (isset($config['front_page']) && is_file($config['front_page']))
+    {
+      include($config['front_page']);
+    } else {
+      include("pages/front/default.php");
     }
-    else {
-        if (isset($config['front_page']) && is_file($config['front_page'])) {
-            require $config['front_page'];
-        }
-        else {
-            require 'pages/front/default.php';
-        }
-    }
+  }
 
-}
-else {
-    // Not Authenticated. Show status page if enabled
-    if ( $config['public_status'] === true ) {
-        if (isset($vars['page']) && strstr("login", $vars['page'])) {
-            require 'pages/logon.inc.php';
-        }
-        else {
-            echo '<div id="public-status">';
-            require 'pages/public.inc.php';
-            echo '</div>';
-            echo '<div id="public-logon" style="display:none;">';
-            echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" id="ToggleStatus">Status</button></h3></div>';
-            require 'pages/logon.inc.php';
-            echo '</div>';
-        }
+} else {
+  // Not Authenticated. Show status page if enabled
+  if ( $config['public_status'] === true )
+  {
+    if (isset($vars['page']) && strstr("login", $vars['page']))
+    {
+      include("pages/logon.inc.php");
+    } else {
+      echo '<div id="public-status">';
+      include("pages/public.inc.php");
+      echo '</div>';
+      echo '<div id="public-logon" style="display:none;">';
+      echo '<div class="well"><h3>Logon<button class="btn btn-default" type="submit" style="float:right;" id="ToggleStatus">Status</button></h3></div>';
+      include ("pages/logon.inc.php");
+      echo '</div>';
     }
-    else {
-        require 'pages/logon.inc.php';
-    }
+  }
+  else
+  {
+    include("pages/logon.inc.php");
+  }
 }
 ?>
     </div>
@@ -240,42 +239,37 @@ else {
 </div>
 <?php
 
-$runtime_end = utime();
-$runtime = $runtime_end - $runtime_start;
+$runtime_end = utime(); $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
 
 # FIXME - move this
-if ($config['page_gen']) {
-    echo('  <br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s'.
-        ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s'.
-        ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s'.
-        ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s');
+if ($config['page_gen'])
+{
+  echo('  <br />MySQL: Cell    '.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s'.
+                                 ' Row    '.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s'.
+                                 ' Rows   '.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s'.
+                                 ' Column '.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s');
 
-    $fullsize = memory_get_usage();
-    unset($cache);
-    $cachesize = $fullsize - memory_get_usage();
-    if ($cachesize < 0) {
-        $cachesize = 0;
-    } // Silly PHP!
+  $fullsize = memory_get_usage();
+  unset($cache);
+  $cachesize = $fullsize - memory_get_usage();
+  if ($cachesize < 0) { $cachesize = 0; } // Silly PHP!
 
-    echo('  <br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
-    echo('  <br />Generated in ' . $gentime . ' seconds.');
+  echo('  <br />Cached data in memory is '.formatStorage($cachesize).'. Page memory usage is '.formatStorage($fullsize).', peaked at '. formatStorage(memory_get_peak_usage()) .'.');
+  echo('  <br />Generated in ' . $gentime . ' seconds.');
 }
 
-if (isset($pagetitle) && is_array($pagetitle)) {
-    # if prefix is set, put it in front
-    if ($config['page_title_prefix']) {
-        array_unshift($pagetitle,$config['page_title_prefix']);
-    }
+if (isset($pagetitle) && is_array($pagetitle))
+{
+  # if prefix is set, put it in front
+  if ($config['page_title_prefix']) { array_unshift($pagetitle,$config['page_title_prefix']); }
 
-    # if suffix is set, put it in the back
-    if ($config['page_title_suffix']) {
-        $pagetitle[] = $config['page_title_suffix'];
-    }
+  # if suffix is set, put it in the back
+  if ($config['page_title_suffix']) { $pagetitle[] = $config['page_title_suffix']; }
 
-    # create and set the title
-    $title = join(" - ",$pagetitle);
-    echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
+  # create and set the title
+  $title = join(" - ",$pagetitle);
+  echo("<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>");
 }
 ?>
 
@@ -301,21 +295,23 @@ if(dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= 
 }
 
 if(is_array($msg_box)) {
-    echo("<script>
-        toastr.options.timeout = 10;
-        toastr.options.extendedTimeOut = 20;
-    ");
-    foreach ($msg_box as $message) {
-        $message['type'] = mres($message['type']);
-        $message['message'] = mres($message['message']);
-        $message['title'] = mres($message['title']);
-        echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
-    }
-    echo("</script>");
+  echo("<script>
+toastr.options.timeout = 10;
+toastr.options.extendedTimeOut = 20;
+");
+  foreach ($msg_box as $message) {
+    $message['type'] = mres($message['type']);
+    $message['message'] = mres($message['message']);
+    $message['title'] = mres($message['title']);
+    echo "toastr.".$message['type']."('".$message['message']."','".$message['title']."');\n";
+  }
+  echo("</script>");
 }
 
 if (is_array($sql_debug) && is_array($php_debug) && $_SESSION['authenticated'] === TRUE) {
-    require_once "includes/print-debug.php";
+
+    include_once "includes/print-debug.php";
+
 }
 
 if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
@@ -371,8 +367,7 @@ if ($no_refresh !== TRUE && $config['page_refresh'] != 0) {
         });
     </script>');
 
-}
-else {
+} else {
 
 echo('<script type="text/javascript">
     $(document).ready(function() {

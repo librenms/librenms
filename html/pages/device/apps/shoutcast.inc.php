@@ -8,7 +8,8 @@ $rrddir = $config['rrd_dir'].'/'.$device['hostname'];
 $files  = array();
 
 if ($handle = opendir($rrddir)) {
-    while (false !== ($file = readdir($handle))) {
+    while (false !== ($file = readdir($handle)))
+    {
         if ($file != '.' && $file != '..') {
             if (eregi('app-shoutcast-'.$app['app_id'], $file)) {
                 array_push($files, $file);
@@ -23,7 +24,8 @@ if (isset($total) && $total == true) {
         'shoutcast_multi_stats' => 'Shoutcast Statistics - Total of all Shoutcast servers',
     );
 
-    foreach ($graphs as $key => $text) {
+    foreach ($graphs as $key => $text)
+    {
         $graph_type            = $key;
         $graph_array['height'] = '100';
         $graph_array['width']  = '215';

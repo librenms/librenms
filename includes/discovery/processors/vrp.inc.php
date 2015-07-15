@@ -11,8 +11,9 @@ if ($device['os'] == 'vrp') {
     }
 
     if (is_array($processors_array)) {
-        foreach ($processors_array as $index => $entry) {
-            if ($entry['hwEntityMemSize'] != 0) {
+        foreach ($processors_array as $index => $entry)
+        {
+            if ($entry['hwEntityMemSize'] != 0) { 
                 if ($debug) {
                     echo $index.' '.$entry['hwEntityBomEnDesc'].' -> '.$entry['hwEntityCpuUsage'].' -> '.$entry['hwEntityMemSize']."\n";
                 }

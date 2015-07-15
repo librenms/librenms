@@ -33,10 +33,10 @@ echo ' Graphs: ';
 // "pkts"   => "Packets",
 // "errors" => "Errors");
 $graph_types = array(
-    'curr'   => 'CurrentConns',
-    'failed' => 'FailedConns',
-    'total'  => 'TotalConns',
-);
+                'curr'   => 'CurrentConns',
+                'failed' => 'FailedConns',
+                'total'  => 'TotalConns',
+               );
 
 foreach ($graph_types as $type => $descr) {
     echo "$type_sep";
@@ -66,8 +66,7 @@ foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = 
 
     if ($rserver['StateDescr'] == 'Server is now operational') {
         $rserver_class = 'green';
-    }
-    else {
+    } else {
         $rserver_class = 'red';
     }
 
@@ -88,7 +87,7 @@ foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = 
         $graph_array['id']     = $rserver['rserver_id'];
         $graph_array['type']   = $graph_type;
 
-        require 'includes/print-graphrow.inc.php';
+        include 'includes/print-graphrow.inc.php';
 
         // include("includes/print-interface-graphs.inc.php");
         echo '

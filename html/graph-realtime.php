@@ -13,28 +13,30 @@
  *
  */
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
+include_once("../includes/defaults.inc.php");
+include_once("../config.php");
+include_once("../includes/definitions.inc.php");
 
-require_once '../includes/common.php';
-require_once '../includes/dbFacile.php';
-require_once '../includes/rewrites.php';
-require_once 'includes/functions.inc.php';
-require_once 'includes/authenticate.inc.php';
+include_once("../includes/common.php");
+include_once("../includes/dbFacile.php");
+include_once("../includes/rewrites.php");
+include_once("includes/functions.inc.php");
+include_once("includes/authenticate.inc.php");
 
-require_once '../includes/snmp.inc.php';
+include_once("../includes/snmp.inc.php");
 
-if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted($_GET['id']))) {
-    $port   = get_port_by_id($_GET['id']);
-    $device = device_by_id_cache($port['device_id']);
-    $title  = generate_device_link($device);
-    $title .= " :: Port  ".generate_port_link($port);
-    $auth   = TRUE;
-}
-else {
-    echo("Unauthenticad");
-    die;
+if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted($_GET['id'])))
+{
+  $port   = get_port_by_id($_GET['id']);
+  $device = device_by_id_cache($port['device_id']);
+  $title  = generate_device_link($device);
+  $title .= " :: Port  ".generate_port_link($port);
+  $auth   = TRUE;
+} else {
+
+  echo("Unauthenticad");
+  die;
+
 }
 
 header("Content-type: image/svg+xml");
@@ -45,19 +47,16 @@ $ifname=ifLabel($port);
 $ifname=$ifname['label']; //Interface name that will be showed on top right of graph
 $hostname=shorthost($device['hostname']);
 
-if($_GET['title']) {
-    $ifname = $_GET['title'];
-}
+if($_GET['title']) { $ifname = $_GET['title']; }
 
 /********* Other conf *******/
 $scale_type="follow";               //Autoscale default setup : "up" = only increase scale; "follow" = increase and decrease scale according to current graphed datas
 $nb_plot=240;                   //NB plot in graph
 
 if(is_numeric($_GET['interval'])) {
-    $time_interval=$_GET['interval'];
-}
-else {
-    $time_interval=1;      //Refresh time Interval
+ $time_interval=$_GET['interval'];
+} else {
+ $time_interval=1;		//Refresh time Interval
 }
 
 $fetch_link = "data.php?id=".$_GET[id];
@@ -226,24 +225,24 @@ function plot_data(obj) {
   last_ifout = ifout;
 
   switch (plot_in.length) {
-    case 0:
-        SVGDoc.getElementById("collect_initial").setAttributeNS(null, 'visibility', 'visible');
-        plot_in[0] = diff_ifin / diff_ugmt;
-        plot_out[0] = diff_ifout / diff_ugmt;
-        setTimeout('fetch_data()',<?php echo(1000*$time_interval) ?>);
-        return;
-    case 1:
-        SVGDoc.getElementById("collect_initial").setAttributeNS(null, 'visibility', 'hidden');
-        break;
+  	case 0:
+  		SVGDoc.getElementById("collect_initial").setAttributeNS(null, 'visibility', 'visible');
+		plot_in[0] = diff_ifin / diff_ugmt;
+		plot_out[0] = diff_ifout / diff_ugmt;
+		setTimeout('fetch_data()',<?php echo(1000*$time_interval) ?>);
+		return;
+	case 1:
+    	SVGDoc.getElementById("collect_initial").setAttributeNS(null, 'visibility', 'hidden');
+    	break;
     case max_num_points:
-        // shift plot to left if the maximum number of plot points has been reached
-        var i = 0;
-        while (i < max_num_points) {
-          plot_in[i] = plot_in[i+1];
-          plot_out[i] = plot_out[++i];
-        }
-        plot_in.length--;
-        plot_out.length--;
+		// shift plot to left if the maximum number of plot points has been reached
+		var i = 0;
+		while (i < max_num_points) {
+		  plot_in[i] = plot_in[i+1];
+		  plot_out[i] = plot_out[++i];
+		}
+		plot_in.length--;
+		plot_out.length--;
   }
 
   plot_in[plot_in.length] = diff_ifin / diff_ugmt;

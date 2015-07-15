@@ -7,7 +7,8 @@ foreach ($rserver_db as $serverfarm) {
     $serverfarms[$serverfarm['farm_id']] = $serverfarm;
 }
 
-foreach ($rserver_array as $index => $serverfarm) {
+foreach ($rserver_array as $index => $serverfarm)
+{
     $clean_index = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', $index);
 
     $oids = array(
