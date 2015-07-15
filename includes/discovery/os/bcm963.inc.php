@@ -1,8 +1,7 @@
 <?php
 
-if (!$os)
-{
-  if (stripos($sysDescr, "bcm963") !== FALSE) { $os = "bcm963"; }
+if (!$os) {
+    if (stristr($sysDescr, 'bcm963')) {
+        $os = 'bcm963';
+    }
 }
-
-?>
