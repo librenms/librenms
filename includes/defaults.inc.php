@@ -114,7 +114,7 @@ $config['favicon']          = "";
 $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "300";  // Refresh the page every xx seconds, 0 to disable
 $config['front_page']       = "pages/front/default.php";
-$config['front_page_settings']['top']['ports'] = 10;
+$config['front_page_settings']['top']['ports'] = 0;
 $config['front_page_settings']['top']['devices'] = 10;
 $config['front_page_down_box_limit'] = 10;
 $config['vertical_summary'] = 0; // Enable to use vertical summary on front page instead of horizontal
@@ -632,4 +632,11 @@ $dyn_config['email_smtp_secure'] = array('', 'tls', 'ssl');
 $config['unix-agent-connection-time-out'] 		= 10; //seconds
 $config['unix-agent-read-time-out'] 			= 10; //seconds
 
-?>
+// Lat / Lon support for maps
+$config['geoloc']['latlng']                             = false; // True to enable translation of location to latlng co-ordinates
+$config['geoloc']['engine']                             = "google";
+$config['map']['engine']                                = "jquery-mapael";
+$config['leaflet']['default_lat']                       = "50.898482";
+$config['leaflet']['default_lng']                       = "-3.401402";
+
+$config['leaflet']['default_zoom']                       = 2;

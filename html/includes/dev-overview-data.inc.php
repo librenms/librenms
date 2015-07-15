@@ -64,6 +64,13 @@ if ($device['location'])
         <td>Location</td>
         <td>' . $device['location']. '</td>
       </tr>');
+    if (is_numeric($device['lat']) && is_numeric($device['lng'])) {
+        echo ("<tr>
+                   <td>Lat / Lng</td>
+                   <td>[".$device['lat'].",".$device['lng']."]</td>
+               </tr>");
+    }
+
   if (get_dev_attrib($device,'override_sysLocation_bool') && !empty($device['real_location']))
   {
     echo('<tr>

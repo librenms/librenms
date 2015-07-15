@@ -90,6 +90,58 @@ $poll_device['sysLocation'] = trim($poll_device['sysLocation'], "\\");
 if (!empty($poll_device['sysLocation']) && is_array($config['location_map']))
 {
     $poll_device['sysLocation'] = rewrite_location($poll_device['sysLocation']);
+
+  $poll_device['sysContact']  = str_replace("\"","", $poll_device['sysContact']);
+
+  // Remove leading & trailing backslashes added by VyOS/Vyatta/EdgeOS
+  $poll_device['sysContact'] = trim($poll_device['sysContact'], "\\");
+
+  if ($poll_device['sysLocation'] == "not set")
+  {
+    $poll_device['sysLocation'] = "";
+  }
+
+  if ($poll_device['sysContact'] == "not set")
+  {
+    $poll_device['sysContact'] = "";
+  }
+
+  if ($poll_device['sysContact'] && $poll_device['sysContact'] != $device['sysContact'])
+  {
+    $update_array['sysContact'] = $poll_device['sysContact'];
+    log_event("Contact -> ".$poll_device['sysContact'], $device, 'system');
+  }
+
+  if ($poll_device['sysObjectID'] && $poll_device['sysObjectID'] != $device['sysObjectID'])
+  {
+    $update_array['sysObjectID'] = $poll_device['sysObjectID'];
+    log_event("ObjectID -> ".$poll_device['sysObjectID'], $device, 'system');
+  }
+
+  if ($poll_device['sysName'] && $poll_device['sysName'] != $device['sysName'])
+  {
+    $update_array['sysName'] = $poll_device['sysName'];
+    log_event("sysName -> ".$poll_device['sysName'], $device, 'system');
+  }
+
+  if ($poll_device['sysDescr'] && $poll_device['sysDescr'] != $device['sysDescr'])
+  {
+    $update_array['sysDescr'] = $poll_device['sysDescr'];
+    log_event("sysDescr -> ".$poll_device['sysDescr'], $device, 'system');
+  }
+
+  $update_latlng = false;
+  if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'])
+  {
+      if (!get_dev_attrib($device,'override_sysLocation_bool'))
+      {
+        $update_array['location'] = $poll_device['sysLocation'];
+        log_event("Location -> ".$poll_device['sysLocation'], $device, 'system');
+          if ($config['geoloc']['latlng'] === true) {
+              $update_latlng = true;
+          }
+      }
+  }
 }
 
 $poll_device['sysContact']  = str_replace("\"","", $poll_device['sysContact']);
@@ -125,4 +177,8 @@ if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocat
     }
 }
 
-?>
+    if ($config['geoloc']['latlng'] === true || $update_latlng === true) {
+        if (strtotime($device['latlng_update']) < strtotime('-1 day')) {
+            location_to_latlng($device);
+        }
+    }
