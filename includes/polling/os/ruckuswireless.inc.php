@@ -44,6 +44,7 @@ if (isset($ruckuscountry) && $ruckuscountry != '') {
     $version .= " ($ruckuscountry)";
 }
 
+// FIXME: Move this to discovery, and just retrieve the list of MIBs from the database during polling
 $ruckus_mibs = array(
     'ruckusZDSystemStats'           => 'RUCKUS-ZD-SYSTEM-MIB',
     'ruckusZDWLANTable'             => 'RUCKUS-ZD-WLAN-MIB',

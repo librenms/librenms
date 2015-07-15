@@ -911,18 +911,57 @@ function snmp_mib_walk($mib, $module, $mibdir=null) {
 }//end snmp_mib_walk()
 
 
+function join_array($a, $b)
+{
+    return "$a=$b";
+}
+
 /*
- * @return an array containing all of the mib objects, keyed by object-type;
- * returns an empty array if something goes wrong.
+ * Update the given table in the database with the given row & column data.
+ * @param tablename The table to update
+ * @param columns   An array of column names
+ * @param numkeys   The number of columns which are in the primary key of the table; these primary keys must be first in the list of columns
+ * @param rows      Row data to insert, an array of arrays with column names as the second-level keys
  */
+function update_db_table($tablename, $columns, $numkeys, $rows)
+{
+    foreach ($rows as $nothing => $obj) {
+        // create a parameter list based on the columns
+        $params = array();
+        foreach ($columns as $column) {
+            $params[] = $obj[$column];
+        }
+        $column_placeholders = array_fill(0, count($columns), '?');
 
+        // build the "ON DUPLICATE KEY" part
+        $non_key_columns = array_slice($columns, $numkeys);
+        $non_key_placeholders = array_slice($column_placeholders, $numkeys);
+        $update_definitions = array_map("join_array", $non_key_columns, $non_key_placeholders);
+        $non_key_params = array_slice($params, $numkeys);
 
-function snmp_mib_load($mib, $module, $mibdir=null) {
+        $sql = 'INSERT INTO `' . $tablename . '` (' . implode(',', $columns) .
+            ') VALUES (' . implode(',', $column_placeholders) .
+            ') ON DUPLICATE KEY UPDATE ' . implode(',', $update_definitions);
+        $result = dbQuery($sql, array_merge($params, $non_key_params));
+        d_echo("Result: $result\n");
+    }
+}
+
+/*
+ * @return an array containing all of the MIB objects keyed by object-type,
+ * or an empty array if something goes wrong.
+ */
+function snmp_mib_load($mib, $module, $mibdir = null)
+{
     $mibs = array();
+    // FIXME: Measure whether it's more efficient to use the database
+    // to cache this rather than parse it via snmptranslate every time.
     foreach (snmp_mib_walk($mib, $module, $mibdir) as $obj) {
         $mibs[$obj['object_type']] = $obj;
     }
     d_print_r($mibs);
+    $columns = array('module', 'mib', 'object_type', 'oid', 'syntax', 'description', 'max_access', 'status');
+    update_db_table('mibdefs', $columns, 3, $mibs);
     return $mibs;
 
 }//end snmp_mib_load()
@@ -935,9 +974,8 @@ function snmp_mib_load($mib, $module, $mibdir=null) {
  * snmptranslate -m all -M mibs .1.3.6.1.4.1.8072.3.2.10 2>/dev/null
  * NET-SNMP-TC::linux
  */
-
-
-function snmp_translate($oid, $module, $mibdir=null) {
+function snmp_translate($oid, $module, $mibdir = null)
+{
     if ($module !== 'all') {
         $oid = "$module::$oid";
     }
@@ -972,9 +1010,8 @@ function snmp_translate($oid, $module, $mibdir=null) {
  * check if the type of the oid is a numeric type, and if so,
  * @return the name of RRD type that is best suited to saving it
  */
-
-
-function oid_rrd_type($oid, $mibdef) {
+function oid_rrd_type($oid, $mibdef)
+{
     if (!isset($mibdef[$oid])) {
         return false;
     }
@@ -1007,9 +1044,8 @@ function oid_rrd_type($oid, $mibdef) {
  * Update the database with graph definitions as needed.
  * We don't include the index in the graph name - that is handled at display time.
  */
-
-
-function tag_graphs($mibname, $oids, $mibdef, &$graphs) {
+function tag_graphs($mibname, $oids, $mibdef, &$graphs)
+{
     foreach ($oids as $index => $array) {
         foreach ($array as $oid => $val) {
             $graphname          = $mibname.'-'.$mibdef[$oid]['shortname'];
@@ -1023,9 +1059,8 @@ function tag_graphs($mibname, $oids, $mibdef, &$graphs) {
 /*
  * Ensure a graph_type definition exists in the database for the entities in this MIB
  */
-
-
-function update_mib_graph_types($mibname, $oids, $mibdef, $graphs) {
+function update_mib_graph_types($mibname, $oids, $mibdef, $graphs)
+{
     $seengraphs = array();
 
     // Get the list of graphs currently in the database
@@ -1061,9 +1096,8 @@ function update_mib_graph_types($mibname, $oids, $mibdef, $graphs) {
 /*
  * Save all of the measurable oids for the device in their own RRDs.
  */
-
-
-function save_mibs($device, $mibname, $oids, $mibdef, &$graphs) {
+function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
+{
     $usedoids = array();
     foreach ($oids as $index => $array) {
         foreach ($array as $oid => $val) {
@@ -1093,12 +1127,12 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs) {
 
 
 /*
- * Take a list of MIB name => module pairs.
- * Validate MIBs and poll based on the results.
+ * FIXME: Get list of MIBs from the database
+ * Poll based on the results.
  */
-
-
-function poll_mibs($list, $device, &$graphs) {
+function poll_mibs($list, $device, &$graphs)
+{
+    // FIXME: check that mib polling module is enabled
     if (!is_dev_attrib_enabled($device, 'poll_mib')) {
         d_echo('MIB module disabled for '.$device['hostname']."\n");
         return;
@@ -1116,16 +1150,28 @@ function poll_mibs($list, $device, &$graphs) {
             $mod           = $translated[0];
             $nam           = $translated[1];
             $mibdefs[$nam] = snmp_mib_load($nam, $mod);
-            $oids          = snmpwalk_cache_oid($device, $nam, array(), $mod, null, '-OQUsb');
-            d_print_r($oids);
-            save_mibs($device, $nam, $oids, $mibdefs[$nam], $graphs);
+            if (count($mibdefs[$nam] > 0)) {
+                $oids = snmpwalk_cache_oid($device, $nam, array(), $mod, null, "-OQUsb");
+                d_print_r($oids);
+                save_mibs($device, $nam, $oids, $mibdefs[$nam], $graphs);
+            }
+            else {
+                echo("MIB: Could not load definition for $mod::$nam\n");
+            }
         }
         else {
             d_echo("MIB: no match for $module::$name\n");
         }
     }
-
     d_echo('Done MIB-based polling');
     echo "\n";
-
 }//end poll_mibs()
+
+/*
+ * Take a list of MIB name => module pairs.
+ * Validate MIBs and store the device->mib mapping in the database.
+ * FIXME: Implement; most of code can be moved in from poll_mibs() above.
+ */
+function register_mibs($device, $mibs)
+{
+}
