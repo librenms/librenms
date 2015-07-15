@@ -25,8 +25,9 @@ if ($device['os'] == "powerconnect")
         *  Dell-Vendor-MIB::dellLanExtension.6132.1.1.1.1.4.4.0 = STRING: "5 Sec (6.99%),    1 Min (6.72%),   5 Min (9.06%)"
         */
         $temps = snmp_walk($device, "boxServicesTempSensorTemperature", "-OsqnU", "FASTPATH-BOXSERVICES-PRIVATE-MIB");
-        if ($debug) { echo($temps."\n"); }
-
+        if ($debug) {
+            echo($temps."\n");
+        }
         $index = 0;
         foreach (explode("\n",$temps) as $oids)
         {
@@ -37,8 +38,9 @@ if ($device['os'] == "powerconnect")
             $type = "powerconnect";
             $index++;
             $descr = "Internal Temperature";
-            if (count(explode("\n",$temps)) > 1) { $descr .= " $index"; }
-
+            if (count(explode("\n",$temps)) > 1) {
+                $descr .= " $index";
+            }
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
         }
     }
