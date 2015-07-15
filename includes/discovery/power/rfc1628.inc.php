@@ -55,5 +55,3 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
         discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
     }
 }
-
-?>

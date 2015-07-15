@@ -41,4 +41,3 @@ if(is_numeric($mode)) {
         break;
     }
 }
-?>
