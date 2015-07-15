@@ -1,6 +1,6 @@
 <?php
 
-$no_refresh = TRUE;
+$no_refresh = true;
 
 ?>
 
@@ -10,17 +10,17 @@ $no_refresh = TRUE;
     </div>
 </div>
 <?php
-require_once('includes/modal/alert_template.inc.php');
-require_once('includes/modal/delete_alert_template.inc.php');
-require_once('includes/modal/attach_alert_template.inc.php');
+require_once 'includes/modal/alert_template.inc.php';
+require_once 'includes/modal/delete_alert_template.inc.php';
+require_once 'includes/modal/attach_alert_template.inc.php';
 ?>
 
 <form method="post" action="" id="result_form">
 <?php
-
-if(isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
+if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
-} else {
+}
+else {
     $results = 50;
 }
 
@@ -34,37 +34,49 @@ echo '<div class="table-responsive">
     <td>';
 
 if ($_SESSION['userlevel'] >= '10') {
-    echo('<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template">Create new alert template</button>');
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template">Create new alert template</button>';
 }
 
 echo '</td>
 <td><select name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
-$result_options = array('10','50','100','250','500','1000','5000');
-foreach($result_options as $option) {
+$result_options = array(
+                   '10',
+                   '50',
+                   '100',
+                   '250',
+                   '500',
+                   '1000',
+                   '5000',
+                  );
+foreach ($result_options as $option) {
     echo "<option value='$option'";
-    if($results == $option) {
-        echo " selected";
+    if ($results == $option) {
+        echo ' selected';
     }
+
     echo ">$option</option>";
 }
-echo('</select></td>');
 
-$count_query = "SELECT COUNT(id)";
-$full_query = "SELECT *";
+echo '</select></td>';
 
-$query = " FROM `alert_templates`";
+$count_query = 'SELECT COUNT(id)';
+$full_query  = 'SELECT *';
 
-$count_query = $count_query . $query;
-$count = dbFetchCell($count_query,$param);
-if(!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
+$query = ' FROM `alert_templates`';
+
+$count_query = $count_query.$query;
+$count       = dbFetchCell($count_query, $param);
+if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
     $page_number = 1;
-} else {
+}
+else {
     $page_number = $_POST['page_number'];
 }
-$start = ($page_number - 1) * $results;
-$full_query = $full_query . $query . " LIMIT $start,$results";
 
-foreach( dbFetchRows($full_query, $param) as $template ) {
+$start      = (($page_number - 1) * $results);
+$full_query = $full_query.$query." LIMIT $start,$results";
+
+foreach (dbFetchRows($full_query, $param) as $template) {
     echo '<tr id="row_'.$template['id'].'">
             <td>'.$template['name'].'</td>
             <td>';
@@ -73,14 +85,15 @@ foreach( dbFetchRows($full_query, $param) as $template ) {
         echo "<button type='button' class='btn btn-danger btn-sm' data-toggle='modal' data-target='#confirm-delete-alert-template' data-template_id='".$template['id']."' name='delete-alert-template'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button> ";
         echo "<button type='button' class='btn btn-warning btn-sm' data-toggle='modal' data-target='#attach-alert-template' data-template_id='".$template['id']."' name='attach-alert-template'><span class='glyphicon glyphicon-th-list' aria-hidden='true'></span></button>";
     }
+
     echo '    </td>
           </tr>';
 }
 
-if($count % $results > 0) {
-    echo('    <tr>
-                  <td colspan="2" align="center">'. generate_pagination($count,$results,$page_number) .'</td>
-              </tr>');
+if (($count % $results) > 0) {
+    echo '    <tr>
+                  <td colspan="2" align="center">'.generate_pagination($count, $results, $page_number).'</td>
+              </tr>';
 }
 
 echo '</table>
