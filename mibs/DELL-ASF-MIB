@@ -1,0 +1,1172 @@
+-- *************************************************************
+-- The information and functionality described by this MIB file,
+-- like many MIB files, is subject to change without notice.
+-- Please examine the version number of this MIB and compare it
+-- to the version number you are expecting.
+
+-- Name		: DcAsfSrv.mib
+-- Description	: MIB file for Dell Server ASF PET events
+-- Revision	: 1.17
+-- *************************************************************
+
+DELL-ASF-MIB DEFINITIONS ::= BEGIN
+
+-- Title : ASF 1.0 Generic MIB file for DELL Systems.
+
+	IMPORTS
+		enterprises
+			FROM RFC1155-SMI
+        TRAP-TYPE
+            FROM RFC-1215;
+
+	wiredformgmt     OBJECT IDENTIFIER ::= { enterprises 3183 }
+	pet              OBJECT IDENTIFIER ::= { wiredformgmt 1 }
+
+
+-- MODULE IDENTIFICATION
+
+
+-- ****************************************
+-- SYSTEM INFORMATION BRANCH STARTS HERE.
+-- ****************************************
+
+-- means &lt;version&gt; under PET enterprise tree
+asfPetEvts OBJECT IDENTIFIER ::= { pet 1 }
+
+-- IPMI Alert Configuration Test Trap --
+ asfTrapIPMIAlertTest TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "IPMI Alert Configuration Test"
+
+ --#SUMMARY    "IPMI Alert Configuration Test"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 1001
+
+
+-- FAN --
+
+ -- Lower Non Critical threshold crossed 
+ asfTrapFanSpeedWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Generic Predictive Fan Failure ( predictive failure asserted )"
+ --#SUMMARY    "Generic Predictive Fan Failure ( predictive failure asserted )"
+ --#ARGUMENTS  {}
+ --#SEVERITY   MINOR
+ ::= 262400
+
+ -- Fan back to OK from warning level
+ asfTrapFanSPeedWarningCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Generic Predictive Fan Failure Cleared"
+ 
+ --#SUMMARY    "Generic Predictive Fan Failure Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 262528	
+
+ -- Lower Critical threshold crossed 
+ asfTrapFanSpeedProblem TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Generic Critical Fan Failure"
+
+ --#SUMMARY    "Generic Critical Fan Failure"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+ 
+ ::= 262402	
+
+ -- Fan back to OK from failure level
+ asfTrapFanSPeedProblemCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Generic Critical Fan Failure Cleared"
+ 
+ --#SUMMARY    "Generic Critical Fan Failure Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 262530
+
+
+-- BATTERY --
+
+ -- Battery Low (Predictive Failure)
+ asfTrapBatteryLowWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Battery Low (Predictive Failure)"
+
+ --#SUMMARY    "Battery Low (Predictive Failure)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 2715392	
+ 
+ -- Battery back to OK from warning level
+ asfTrapBatteryLowWarningCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Battery Low (Predictive Failure) Cleared"
+ 
+ --#SUMMARY    "Battery Low (Predictive Failure) Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 2715520	
+ 
+ -- Battery Failure 
+ asfTrapBatteryFailure TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Battery Failure"
+
+ --#SUMMARY    "Battery Failure"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 2715393	
+
+ -- Battery back to OK from failure level 
+ asfTrapBatteryFailCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Battery Failure Cleared"
+ 
+ --#SUMMARY    "Battery Failure Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 2715521	
+
+
+-- (Analog Voltage) --
+
+ -- Lower Non Critical threshold crossed
+ asfTrapUnderVoltageWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Under-Voltage Warning (Lower Non Critical - going low)"
+ 
+ --#SUMMARY    "Under-Voltage Warning (Lower Non Critical - going low)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 131328
+
+ -- Voltage back to OK from Lower Non Critical
+ asfTrapUnderVoltageWarningCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION "Under-Voltage Warning Cleared"
+
+ --#SUMMARY    "Under-Voltage Warning Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 131456
+
+ -- Lower Critical threshold crossed
+ asfTrapUnderVoltage TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Under-Voltage Problem (Lower Critical - going low)"
+
+ --#SUMMARY    "Under-Voltage Problem (Lower Critical - going low)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 131330
+
+ -- Voltage back to OK from Lower Non Critical
+ asfTrapUnderVoltageCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Under-Voltage Problem Cleared"
+
+ --#SUMMARY    "Under-Voltage Problem Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 131458
+
+ -- Upper Non Critical threshold crossed
+ asfTrapOverVoltageWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Voltage Warning (Upper Non Critical - going high)"
+
+ --#SUMMARY    "Over-Voltage Warning (Upper Non Critical - going high)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 131335
+
+ -- Voltage back to OK from Upper Non Critical Warning
+ asfTrapOverVoltageWarningCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Voltage Warning Cleared"
+
+ --#SUMMARY    "Over-Voltage Warning Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 131463 	
+
+ -- Upper Critical threshold crossed
+ asfTrapOverVoltage TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Voltage Problem (Upper Critical - going high)"
+
+ --#SUMMARY    "Over-Voltage Problem (Upper Critical - going high)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 131337
+
+ -- Analog Voltage OK
+ asfTrapVoltageCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Voltage Problem Cleared"
+
+ --#SUMMARY    "Over-Voltage Problem Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 131465
+
+
+-- Discrete Voltage --
+
+ asfTrapCriticalDiscreteVoltage TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Generic Critical Voltage Problem"
+
+ --#SUMMARY    "Generic Critical Voltage Problem"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 131841
+
+ asfTrapCriticalDiscreteVoltageCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Generic Critical Voltage Problem Cleared"
+
+ --#SUMMARY    "Generic Critical Voltage Problem Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 131840
+
+
+-- Temperature --
+
+ -- Lower Non Critical threshold crossed
+ asfTrapUnderTemperatureWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Under-Temperature Warning (Lower Non-Critical - going low)"
+
+ --#SUMMARY    "Under-Temperature Warning (Lower Non-Critical - going low)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 65792
+
+ -- Back to Normal from Lower Non Critical
+ asfTrapUnderTemperatureWarningCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Under-Temperature Warning Cleared"
+
+ --#SUMMARY    "Under-Temperature Warning Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 65920
+
+ -- Lower Critical threshold crossed
+ asfTrapUnderTemperature TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Under-Temperature Problem (Lower Critical - going low)"
+
+ --#SUMMARY    "Under-Temperature Problem (Lower Critical - going low)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 65794
+
+ -- Back to Normal from Lower Critical
+ asfTrapUnderTemperatureCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Under-Temperature Problem Cleared"
+
+ --#SUMMARY    "Under-Temperature Problem Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 65922
+
+ -- Upper Non Critical threshold crossed
+ asfTrapOverTemperatureWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Temperature Warning (Upper Non-Critical - going high)"
+
+ --#SUMMARY    "Over-Temperature Warning (Upper Non-Critical - going high)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 65799
+
+ -- Back to Normal from Upper Non Critical
+ asfTrapOverTemperatureWarningCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Temperature Warning Cleared"
+
+ --#SUMMARY    "Over-Temperature Warning Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 65927
+
+ -- Upper Critical threshold crossed
+ asfTrapOverTemperature TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Temperature Problem (Upper Critical - going high)"
+
+ --#SUMMARY    "Over-Temperature Problem (Upper Critical - going high)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 65801
+
+ -- Back to Normal from Upper Critical
+ asfTrapOverTemperatureCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-Temperature Problem Cleared"
+
+ --#SUMMARY    "Over-Temperature Problem Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 65929
+
+
+-- Intrusion --
+
+ -- Intrusion
+ asfTrapCaseIntrusion TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Chassis Intrusion - Physical Security Violation"
+
+ --#SUMMARY    "Chassis Intrusion - Physical Security Violation"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 356096
+
+ -- Intrusion cleared
+ asfTrapCaseIntrusionCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Chassis Intrusion (Physical Security Violation) Event Cleared"
+
+ --#SUMMARY    "Chassis Intrusion (Physical Security Violation) Event Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 356224
+
+
+-- Fan Redundancy --
+
+ -- Redundancy degraded
+ asfTrapFanRedundancyDegraded TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Fan redundancy has been degraded"
+
+ --#SUMMARY    "Fan Redundancy Degraded"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 264962
+
+ -- Redundancy lost 
+ asfTrapFanRedundancyLost TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Fan redundancy has been lost"
+
+ --#SUMMARY    "Fan Redundancy Lost"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 264961
+
+ -- Full Redundancy 
+ asfTrapFanFullRedundancy TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Fan redundancy Has Returned to Normal"
+
+ --#SUMMARY    "Fan redundancy Has Returned to Normal"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 264960
+
+
+-- PS Redundancy --
+
+ -- Redundancy degraded
+ asfTrapPSRedundancyDegraded TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Power Supply Redundancy Degraded"
+
+ --#SUMMARY    "Power Supply Redundancy Degraded"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 527106
+
+ -- Redundancy lost 
+ asfTrapPSRedundancyLost TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Power Supply Redundancy Lost"
+
+ --#SUMMARY    "Power Supply Redundancy Lost"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 527105
+
+ -- Full Redundancy 
+ asfTrapPSFullRedundancy TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Redundancy Has Returned to Normal"
+
+ --#SUMMARY    "Power Supply Redundancy Has Returned to Normal"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 527104
+
+
+-- CPU --
+
+ -- Thermal Trip
+ asfTrapCpuThermalTrip TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Thermal Trip (Over Temperature Shutdown)"
+
+ --#SUMMARY    "CPU Thermal Trip (Over Temperature Shutdown)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 487169
+
+ -- Back to normal from Thermal Trip
+ asfTrapCpuThermalTripCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Thermal Trip (Over Temperature Shutdown) Cleared"
+
+ --#SUMMARY    "CPU Thermal Trip (Over Temperature Shutdown) Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 487297   
+
+ -- CPU BIST Error
+ asfTrapCpuBistError TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU BIST (Built In Self Test) Failure"
+
+ --#SUMMARY    "CPU BIST (Built In Self Test) Failure"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 487170
+
+ -- CPU BIST Error cleared
+ asfTrapCpuBistErrorCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU BIST (Built In Self Test) Failure Cleared"
+
+ --#SUMMARY    "CPU BIST (Built In Self Test) Failure Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 487298
+ 
+ -- CPU internal error
+ asfTrapCpuIErr TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Internal Error"
+
+ --#SUMMARY    "CPU Internal Error"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 487168
+
+ -- CPU internal error
+ asfTrapCpuIErrCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Internal Error Cleared"
+
+ --#SUMMARY    "CPU Internal Error Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 487296
+
+ -- CPU config error
+ asfTrapCpuConfigError TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Configuration Error"
+
+ --#SUMMARY    "CPU Configuration Error"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 487173
+
+ -- CPU Disabled
+ asfTrapCpuDisabled TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Disabled (Processor Disabled)"
+
+ --#SUMMARY    "CPU Disabled (Processor Disabled)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 487176
+ 
+ -- CPU Enabled
+ asfTrapCpuEnabled TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Enabled (Processor Enabled)"
+
+ --#SUMMARY    "CPU Enabled (Processor Enabled)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 487304
+
+ -- CPU config error cleared
+ asfTrapCpuConfigErrorCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Configuration Error Cleared"
+
+ --#SUMMARY    "CPU Configuration Error Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 487301	
+ 
+ -- CPU presence detected
+ asfTrapCpuPresence TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Presence (Processor Presence Detected)"
+
+ --#SUMMARY    "CPU Presence (Processor Presence Detected)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 487175
+
+ -- CPU not present
+ asfTrapCpuNotPresent TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Not Present (Processor Not Present)"
+
+ --#SUMMARY    "CPU Not Present (Processor Not Present)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 487303
+
+ -- CPU throttle
+ asfTrapCpuThrottle TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Throttle (Processor Speed Reduced)"
+
+ --#SUMMARY    "CPU Throttle (Processor Speed Reduced)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 487178
+
+ -- CPU OK
+ asfTrapCpuThrottleCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "CPU Throttle Cleared (Normal Processor Speed)"
+
+ --#SUMMARY    "CPU Throttle Cleared (Normal Processor Speed)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 487306
+
+
+-- PS/VRM/D2D --
+
+ -- Presence detected
+ asfTrapPsPresenceDeteced TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Inserted"
+
+ --#SUMMARY    "Power Supply Inserted"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 552704
+
+ -- Presence Removed
+ asfTrapPsPresenceRemoved TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Removed"
+
+ --#SUMMARY    "Power Supply Removed"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 552832
+               
+ -- Failure
+ asfTrapPsFailure TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Failure"
+
+ --#SUMMARY    "Power Supply Failure"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 552705
+
+ -- Back to normal from failure
+ asfTrapPsFailureCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Failure Cleared"
+
+ --#SUMMARY    "Power Supply Failure Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 552833
+ 
+ -- Predictive Failure
+ asfTrapPsPredictiveFailure TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Warning"
+
+ --#SUMMARY    "Power Supply Warning"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 552706
+ 
+ -- Predictive Failure cleared 
+ asfTrapPsPredictiveFailureCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Warning Cleared"
+
+ --#SUMMARY    "Power Supply Warning Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 552834
+
+ -- AC Lost
+ asfTrapPsAcLost TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply AC Lost"
+
+ --#SUMMARY    "Power Supply AC Lost"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 552707
+
+ -- AC Back
+ asfTrapPsAcBack TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply AC Restored"
+
+ --#SUMMARY    "Power Supply AC Restored"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 552835
+
+
+-- SEL --
+
+ -- SEL Cleared
+ asfTrapSelCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "System Event Log (SEL) Cleared"
+
+ --#SUMMARY    "System Event Log (SEL) Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 1076994
+
+ -- SEL Full
+ asfTrapSelFull TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "System Event Log (SEL) Full (Logging Disabled)"
+
+ --#SUMMARY    "System Event Log (SEL) Full (Logging Disabled)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 1076996
+
+
+-- Automatic System Recovery (ASR) --
+
+ -- OS ASR (Watchdog) Timer Expired
+ asfTrapASRTimeout TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "ASR (Automatic System Recovery) Timer Expired"
+
+ --#SUMMARY    "ASR (Automatic System Recovery) Timer Expired"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 2322176
+
+ -- OS ASR (Watchdog) Reset
+ asfTrapASROsReset TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "ASR (Automatic System Recovery) Reset Occurred"
+
+ --#SUMMARY    "ASR (Automatic System Recovery) Reset Occurred"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 2322177
+
+ -- ASR (Watchdog) Power down
+ asfTrapASRPowerDown TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "ASR (Automatic System Recovery) Power Down Occurred"
+
+ --#SUMMARY    "ASR (Automatic System Recovery) Power Down Occurred"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 2322178
+
+ -- ASR (Watchdog) Power cycle
+ asfTrapASRPowerCycle TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "ASR (Automatic System Recovery) Power Cycle Occurred"
+
+ --#SUMMARY    "ASR (Automatic System Recovery) Power Cycle Occurred"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 2322179
+
+
+-- Power Monitoring --
+
+ -- Upper Non Critical threshold crossed
+ asfTrapOverSystemPowerWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-System Power Utilization Warning (Upper Non-Critical - going high)"
+
+ --#SUMMARY    "Over-System Power Utilization Warning (Upper Non-Critical - going high)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 2322180
+ 
+
+ -- Back to Normal from Upper Non Critical
+ asfTrapOverSystemPowerWarningCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-System Power Utilization Warning Cleared"
+
+ --#SUMMARY    "Over-System Power Utilization Warning Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 2322181
+ 
+ -- Upper Critical threshold crossed
+ asfTrapOverSystemPowerCritical TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-System Power Utilization Problem (Upper Critical - going high)"
+
+ --#SUMMARY    "Over-System Power Utilization Problem (Upper Critical - going high)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+ 
+ ::= 2322182
+ 
+
+ -- Back to Normal from Upper Critical
+ asfTrapOverSystemPowerCriticalCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Over-System Power Utilization Problem Cleared"
+
+ --#SUMMARY    "Over-System Power Utilization Problem Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 2322183
+
+-- Power Supply Mismatch --
+-- Power Supply Mismatch from OK to Error
+asfTrapPSUMismatch TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Mismatch (Configuration Error)"
+
+ --#SUMMARY    "Power Supply Mismatch (Configuration Error)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 552710
+
+-- Power Supply Mismatch from Warning to OK 
+asfTrapPSUMismatchNormal TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Power Supply Mismatch Error Cleared (Configuration Error Cleared)"
+
+ --#SUMMARY    "Power Supply Mismatch Error Cleared (Configuration Error Cleared)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 552838
+
+-- Power Budget --
+-- Power Required Exceeds PSU rated Wattage OK to Warning 
+asfTrapSystemPowerExceedsWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "System Power Exceeds than PSU Wattage (Warning)"
+
+ --#SUMMARY    "System Power Exceeds than PSU Wattage (Warning)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 552711
+
+-- Power Required Exceeds PSU rated Wattage Warning to OK 
+asfTrapSystemPowerNormal TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "System Power Exceeds Warning Cleared"
+
+ --#SUMMARY    "System Power Exceeds Warning Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 552839
+
+-- Power Required Exceeds PSU rated Wattage OK to Error 
+asfTrapSystemPowerExceedsError TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "System Power Exceeds than PSU Wattage (Error)"
+
+ --#SUMMARY    "System Power Exceeds than PSU Wattage (Error)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 12611334
+
+-- Power Required Exceeds PSU rated Wattage Error to OK 
+asfTrapSystemPowerExceedsCleared TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "System Power Exceeds Error Cleared"
+
+ --#SUMMARY    "System Power Exceeds Error Cleared"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 12611462
+
+-- SD Card Failure Error
+asfTrapModuleSDCardFailedError TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Module SD Card Failure Error"
+
+ --#SUMMARY    "Module SD Card Failed (Error)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 1404932
+
+-- SD Card Write Protect Warning
+asfTrapModuleSDWriteProtectWarning TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Module SD Card Write Protect Warning"
+
+ --#SUMMARY    "Module SD Card Write Protect (Warning)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 1404935
+
+-- SD Card Presence detected
+asfTrapModuleSDCardPresence TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Module SD Card Present (SD Card Presence Detected)"
+
+ --#SUMMARY    "Module SD Card Present (Presence Detected)"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 1405056
+
+-- SD Card not Present
+asfTrapModuleSDCardNotPresent TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Module SD Card not Present "
+
+ --#SUMMARY    "Module SD Card not Present"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 1404928
+
+-- SD Card Redundancy --
+
+ -- Redundancy degraded
+ asfTrapSDRedundancyDegraded TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "SD Card redundancy has been degraded"
+
+ --#SUMMARY    "SD Card Redundancy Degraded"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 1379074
+
+ -- Redundancy lost 
+ asfTrapSDRedundancyLost TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "SD Card redundancy has been lost"
+
+ --#SUMMARY    "SD Card Redundancy Lost"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 1379073
+
+ -- Full Redundancy 
+ asfTrapSDFullRedundancy TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "SD Card redundancy Has Returned to Normal"
+
+ --#SUMMARY    "SD Card redundancy Has Returned to Normal"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 1379072
+
+
+-- Internal Dual SD Module --
+
+-- Internal Dual SD Module present
+asfTrapInternalDualSDModulePresent TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+ "Internal Dual SD Module is present"
+
+ --#SUMMARY    "Internal Dual SD Module is present"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 13201152
+
+-- Internal Dual SD Module absent
+ asfTrapInternalDualSDModuleAbsent TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is absent"
+
+ --#SUMMARY    "Internal Dual SD Module is absent"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 13201280
+
+-- Internal Dual SD Module offline
+ asfTrapInternalDualSDModuleOffline TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is offline"
+
+ --#SUMMARY    "Internal Dual SD Module is offline"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 13201153
+
+-- Internal Dual SD Module online
+ asfTrapInternalDualSDModuleOnline TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is online"
+
+ --#SUMMARY    "Internal Dual SD Module is online"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 13201281
+
+-- Internal Dual SD Module failure detected
+ asfTrapInternalDualSDModuleFailure TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Failure detected on Internal Dual SD Module"
+
+ --#SUMMARY    "Failure detected on Internal Dual SD Module"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 13201154
+
+-- Internal Dual SD Module normal
+ asfTrapInternalDualSDModuleNormal TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is operating normally"
+
+ --#SUMMARY    "Internal Dual SD Module is operating normally"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 13201282
+
+-- Internal Dual SD Module write protected
+ asfTrapInternalDualSDModuleWriteProtected TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is write protected"
+
+ --#SUMMARY    "Internal Dual SD Module is write protected"
+ --#ARGUMENTS  {}
+ --#SEVERITY   WARNING
+
+ ::= 13201155
+
+-- Internal Dual SD Module writable
+ asfTrapInternalDualSDModuleWriteable TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is writable"
+
+ --#SUMMARY    "Internal Dual SD Module is writable"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 13201283
+
+-- Internal Dual SD Module redundant
+ asfTrapInternalDualSDModuleRedundant TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is redundant"
+
+ --#SUMMARY    "Internal Dual SD Module is redundant"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 13175552
+
+-- Internal Dual SD Module redundancy lost
+ asfTrapInternalDualSDModuleRedundancyLost TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module redundancy is lost"
+
+ --#SUMMARY    "Internal Dual SD Module redundancy is lost"
+ --#ARGUMENTS  {}
+ --#SEVERITY   CRITICAL
+
+ ::= 13175553
+
+-- Internal Dual SD Module not redundant
+ asfTrapInternalDualSDModuleNotRedundant TRAP-TYPE
+ ENTERPRISE asfPetEvts
+ DESCRIPTION 
+  "Internal Dual SD Module is not redundant"
+
+ --#SUMMARY    "Internal Dual SD Module is not redundant"
+ --#ARGUMENTS  {}
+ --#SEVERITY   INFORMATIONAL
+
+ ::= 13175555
+
+END
+

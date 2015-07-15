@@ -1,7 +1,5 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/". safename("cbgp-" . $data['bgpPeerIdentifier'] . ".ipv4.multicast.rrd");
+$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cbgp-'.$data['bgpPeerIdentifier'].'.ipv4.multicast.rrd');
 
-include("includes/graphs/bgp/prefixes.inc.php");
-
-?>
+require 'includes/graphs/bgp/prefixes.inc.php';

@@ -246,5 +246,3 @@ $( "#name, #suggest, #value" ).blur(function() {
 <?php
 
 }
-
-?>

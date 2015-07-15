@@ -2,33 +2,29 @@
 
 <?php
 
-if ($_SESSION['userlevel'] < 10)
-{
-  include("includes/error-no-perm.inc.php");
-
-  exit;
+if ($_SESSION['userlevel'] < 10) {
+    require 'includes/error-no-perm.inc.php';
+    exit;
 }
 
 $pagetitle[] = "Delete device";
 
 if ($_SESSION['userlevel'] == 11) {
     demo_account();
-} else {
+}
+else {
 
-if (is_numeric($_REQUEST['id']))
-{
-  echo('
-  <div class="row">
-    <div class="col-sm-offset-2 col-sm-7">
-');
-  if ($_REQUEST['confirm'])
-  {
-    print_message(nl2br(delete_device(mres($_REQUEST['id'])))."\n");
-  }
-  else
-  {
-    $device = device_by_id_cache($_REQUEST['id']);
-    print_error("Are you sure you want to delete device " . $device['hostname'] . "?");
+    if (is_numeric($_REQUEST['id'])) {
+        echo('
+            <div class="row">
+            <div class="col-sm-offset-2 col-sm-7">
+            ');
+        if ($_REQUEST['confirm']) {
+            print_message(nl2br(delete_device(mres($_REQUEST['id'])))."\n");
+        }
+        else {
+            $device = device_by_id_cache($_REQUEST['id']);
+            print_error("Are you sure you want to delete device " . $device['hostname'] . "?");
 ?>
 <br />
 <form name="form1" method="post" action="" class="form-horizontal" role="form">
@@ -42,14 +38,12 @@ if (is_numeric($_REQUEST['id']))
   </div>
 </form>
 <?php
-  }
-  echo('
+        }
+        echo('
     </div>
-  </div>
-');
-}
-else
-{
+  </div>');
+    }
+    else {
 ?>
 
 <form name="form1" method="post" action="" class="form-horizontal" role="form">
@@ -66,9 +60,8 @@ else
 
 <?php
 
-foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data)
-{
-  echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
+foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data) {
+    echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
 }
 
 ?>
@@ -86,6 +79,5 @@ foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data)
   </div>
 </form>
 <?php
+    }
 }
-}
-?>

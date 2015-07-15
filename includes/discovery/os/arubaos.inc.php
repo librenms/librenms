@@ -1,8 +1,7 @@
 <?php
 
-if (!$os)
-{
-  if (strstr($sysDescr, "ArubaOS")) { $os = "arubaos"; }
+if (!$os) {
+    if (strstr($sysDescr, 'ArubaOS')) {
+        $os = 'arubaos';
+    }
 }
-
-?>

@@ -1,9 +1,7 @@
 <?php
 
-$graph_type = "sensor_voltage";
-$class = "voltage";
-$unit = "V";
+$graph_type = 'sensor_voltage';
+$class      = 'voltage';
+$unit       = 'V';
 
-include("pages/health/sensors.inc.php");
-
-?>
+require 'pages/health/sensors.inc.php';

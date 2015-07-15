@@ -4,14 +4,15 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * Two-Factor Authentication Library
@@ -44,14 +45,14 @@ const otpWindow = 4;
  * Base32 Decoding dictionary
  */
 $base32 = array(
-	"A" => 0,	"B" => 1,	"C" => 2,	"D" => 3,
-	"E" => 4,	"F" => 5,	"G" => 6,	"H" => 7,
-	"I" => 8,	"J" => 9,	"K" => 10,	"L" => 11,
-	"M" => 12,	"N" => 13,	"O" => 14,	"P" => 15,
-	"Q" => 16,	"R" => 17,	"S" => 18,	"T" => 19,
-	"U" => 20,	"V" => 21,	"W" => 22,	"X" => 23,
-	"Y" => 24,	"Z" => 25,	"2" => 26,	"3" => 27,
-	"4" => 28,	"5" => 29,	"6" => 30,	"7" => 31
+    "A" => 0,	"B" => 1,	"C" => 2,	"D" => 3,
+    "E" => 4,	"F" => 5,	"G" => 6,	"H" => 7,
+    "I" => 8,	"J" => 9,	"K" => 10,	"L" => 11,
+    "M" => 12,	"N" => 13,	"O" => 14,	"P" => 15,
+    "Q" => 16,	"R" => 17,	"S" => 18,	"T" => 19,
+    "U" => 20,	"V" => 21,	"W" => 22,	"X" => 23,
+    "Y" => 24,	"Z" => 25,	"2" => 26,	"3" => 27,
+    "4" => 28,	"5" => 29,	"6" => 30,	"7" => 31
 );
 
 /**
@@ -128,14 +129,16 @@ function oath_hotp($key, $counter=false) {
 function verify_hotp($key,$otp,$counter=false) {
 	if( oath_hotp($key,$counter) == $otp ) {
 		return true;
-	} else {
+    }
+    else {
 		if( $counter === false ) {
 			//TimeBased HOTP requires lookbehind and lookahead.
 			$counter   = floor(microtime(true)/keyInterval);
 			$initcount = $counter-((otpWindow+1)*keyInterval);
 			$endcount  = $counter+(otpWindow*keyInterval);
 			$totp      = true;
-		} else {
+        }
+        else {
 			//Counter based HOTP only has lookahead, not lookbehind.
 			$initcount = $counter-1;
 			$endcount  = $counter+otpWindow;
@@ -145,7 +148,8 @@ function verify_hotp($key,$otp,$counter=false) {
 			if( oath_hotp($key,$initcount) == $otp ) {
 				if( !$totp ) {
 					return $initcount;
-				} else {
+                }
+                else {
 					return true;
 				}
 			}
@@ -200,23 +204,28 @@ function twofactor_auth() {
 	$twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
 	if( empty($twofactor['twofactor']) ) {
 		$_SESSION['twofactor'] = true;
-	} else {
+    }
+    else {
 		$twofactor = json_decode($twofactor['twofactor'],true);
 		if( $twofactor['fails'] >= 3 && (!$config['twofactor_lock'] || (time()-$twofactor['last']) < $config['twofactor_lock']) ) {
 			$auth_message = "Too many failures, please ".($config['twofactor_lock'] ? "wait ".$config['twofactor_lock']." seconds" : "contact administrator").".";
-		} else {
+        }
+        else {
 			if( !$_POST['twofactor'] ) {
 				$twofactorform = true;
-			} else {
+            }
+            else {
 				if( ($server_c = verify_hotp($twofactor['key'],$_POST['twofactor'],$twofactor['counter'])) === false ) {
 					$twofactor['fails']++;
 					$twofactor['last'] = time();
 					$auth_message = "Wrong Two-Factor Token.";
-				} else {
+                }
+                else {
 					if( $twofactor['counter'] !== false ) {
 						if( $server_c !== true && $server_c !== $twofactor['counter'] ) {
 							$twofactor['counter'] = $server_c+1;
-						} else {
+                        }
+                        else {
 							$twofactor['counter']++;
 						}
 					}
