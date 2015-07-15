@@ -35,7 +35,7 @@ if (is_admin() === false && is_read() === false) {
 $tmp_devices = array();
 $tmp_ids = array();
 $tmp_links = array();
-
+$tmp_link_ids = array();
 
 $ports = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
@@ -161,6 +161,10 @@ foreach ($list as $items) {
     }
     $link_color = $config['map_legend'][$link_used];
     $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',0,1),'width'=>$width,'color'=>$link_color);
+    if (!in_array($items['remote_port_id'],$tmp_link_ids)) {
+        $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',0,1),'width'=>$width,'color'=>$link_color);
+    }
+    array_push($tmp_link_ids,$items['local_port_id']);
 }
 
 $node_devices = $tmp_devices;
