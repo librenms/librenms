@@ -13,36 +13,28 @@
  */
 
 // FUA
-
-if(!is_numeric($_POST['config_id']))
-{
-  echo('error with data');
-  exit;
-}
-else
-{
-  if($_POST['state'] == 'true')
-  {
-    $state = 1;
-  }
-  elseif($_POST['state'] == 'false')
-  {
-    $state = 0;
-  }
-  else
-  {
-    $state = 0;
-  }
-  $update = dbUpdate(array('config_disabled' => $state), 'config', '`config_id` = ?', array($_POST['config_id']));
-  if(!empty($update) || $update == '0')
-  {
-    echo('success');
+if (!is_numeric($_POST['config_id'])) {
+    echo 'error with data';
     exit;
-  }
-  else
-  {
-    echo('error');
-    exit;
-  }
 }
+else {
+    if ($_POST['state'] == 'true') {
+        $state = 1;
+    }
+    else if ($_POST['state'] == 'false') {
+        $state = 0;
+    }
+    else {
+        $state = 0;
+    }
 
+    $update = dbUpdate(array('config_disabled' => $state), 'config', '`config_id` = ?', array($_POST['config_id']));
+    if (!empty($update) || $update == '0') {
+        echo 'success';
+        exit;
+    }
+    else {
+        echo 'error';
+        exit;
+    }
+}//end if

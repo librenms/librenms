@@ -12,9 +12,8 @@
  * the source code distribution for details.
  */
 
-$entPhysicalMfgName = snmp_get($device, "ENTITY-MIB::entPhysicalMfgName.1", "-Osqnv");
+$entPhysicalMfgName = snmp_get($device, 'ENTITY-MIB::entPhysicalMfgName.1', '-Osqnv');
 
 if ($entPhysicalMfgName == 'Siklu') {
     $os = 'siklu';
 }
-

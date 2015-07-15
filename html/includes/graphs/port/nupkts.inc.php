@@ -1,7 +1,7 @@
 <?php
 
 // FIXME uhh..
-if (1) {     
+if (1) {
     // $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
     // $rrd_list[1]['descr'] = $int['ifDescr'];
     // $rrd_list[1]['ds_in'] = "INNUCASTPKTS";

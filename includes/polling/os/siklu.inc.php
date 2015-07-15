@@ -12,5 +12,5 @@
  * the source code distribution for details.
  */
 
-$version = snmp_get($device, "rbSwBank1Version.0", "-Osqnv", "+RADIO-BRIDGE-MIB");
+$version  = snmp_get($device, 'rbSwBank1Version.0', '-Osqnv', '+RADIO-BRIDGE-MIB');
 $hardware = $poll_device['sysDescr'];

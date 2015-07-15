@@ -11,8 +11,7 @@ if ($device['os'] == 'vrp') {
     }
 
     if (is_array($mempools_array)) {
-        foreach ($mempools_array as $index => $entry)
-        {
+        foreach ($mempools_array as $index => $entry) {
             if ($entry['hwEntityMemSize'] != 0) {
                 if ($debug) {
                     echo $index.' '.$entry['hwEntityBomEnDesc'].' -> '.$entry['hwEntityMemUsage'].' -> '.$entry['hwEntityMemSize']."\n";
