@@ -12,17 +12,27 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
 $group_id = $_POST['group_id'];
 
-if(is_numeric($group_id) && $group_id > 0) {
-    $group = dbFetchRow("SELECT * FROM `device_groups` WHERE `id` = ? LIMIT 1",array($group_id));
-    $group_split = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@]+[&&\|\|]+)/',$group['pattern'], -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-    $count = count($group_split) - 1;
-    $group_split[$count] = $group_split[$count].'  &&';
-    $output = array('name'=>$group['name'],'desc'=>$group['desc'],'pattern'=>$group_split);
+if (is_numeric($group_id) && $group_id > 0) {
+    $group       = dbFetchRow('SELECT * FROM `device_groups` WHERE `id` = ? LIMIT 1', array($group_id));
+    $group_split = preg_split('/([a-zA-Z0-9_\-\.\=\%\<\>\ \"\'\!\~\(\)\*\/\@\[\]]+[&&\|\|]+)/', $group['pattern'], -1, (PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
+    $count       = (count($group_split) - 1);
+    if (preg_match('/\&\&$/', $group_split[$count]) == 1 || preg_match('/\|\|$/', $group_split[$count]) == 1) {
+        $group_split[$count] = $group_split[$count];
+    }
+    else {
+        $group_split[$count] = $group_split[$count].'  &&';
+    }
+
+    $output = array(
+        'name'    => $group['name'],
+        'desc'    => $group['desc'],
+        'pattern' => $group_split,
+    );
     echo _json_encode($output);
 }

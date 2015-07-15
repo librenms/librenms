@@ -1,28 +1,26 @@
 <?php
 
-if ($_SESSION['userlevel'] < '5')
-{
-  include("includes/error-no-perm.inc.php");
-} else {
+if ($_SESSION['userlevel'] < '5') {
+    include 'includes/error-no-perm.inc.php';
+}
+else {
+    $pagetitle[] = 'Delete service';
 
-  $pagetitle[] = "Delete service";
-
-  if ($_POST['delsrv'])
-  {
-    if ($_SESSION['userlevel'] > "5")
-    {
-      include("includes/service-delete.inc.php");
+    if ($_POST['delsrv']) {
+        if ($_SESSION['userlevel'] > '5') {
+            include 'includes/service-delete.inc.php';
+        }
     }
-  }
 
-  foreach (dbFetchRows("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY hostname") as $device)
-  {
-    $servicesform .= "<option value='" . $device['service_id'] . "'>" . $device['service_id'] .  "." . $device['hostname'] . " - " . $device['service_type'] .  "</option>";
-  }
+    foreach (dbFetchRows('SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY hostname') as $device) {
+        $servicesform .= "<option value='".$device['service_id']."'>".$device['service_id'].'.'.$device['hostname'].' - '.$device['service_type'].'</option>';
+    }
 
-  if ($updated) { print_message("Service Deleted!"); }
+    if ($updated) {
+        print_message('Service Deleted!');
+    }
 
-  echo("
+    echo "
 <h4>Delete Service</h4>
 <form id='addsrv' name='addsrv' method='post' action='' class='form-horizontal' role='form'>
   <input type=hidden name='delsrv' value='yes'>
@@ -39,8 +37,5 @@ if ($_SESSION['userlevel'] < '5')
     </div>
     <button type='submit' name='Submit' class='btn btn-danger input-sm'>Delete</button>
   </div>
-</form>");
-
-}
-
-?>
+</form>";
+}//end if

@@ -1,52 +1,56 @@
 <?php
-	include("includes/defaults.inc.php");
-	include("config.php");
+require 'includes/defaults.inc.php';
+require 'config.php';
 
-	$basepath = $config['rrd_dir'].'/';
+$basepath = $config['rrd_dir'].'/';
 
-	$files = (getDirectoryTree($basepath));
+$files = (getDirectoryTree($basepath));
 
-	$count = count($files);
+$count = count($files);
 
-        if ($config['rrdcached'])
-        {
-          $rrdcached = " --daemon " . $config['rrdcached'];
+if ($config['rrdcached']) {
+    $rrdcached = ' --daemon '.$config['rrdcached'];
+}
+
+echo $count." Files \n";
+$start = date('U');
+$i = 0;
+foreach ($files as $file) {
+    fixRdd($file);
+    $i++;
+    if ((date('U') - $start) > 1) {
+        echo (round((($i / $count) * 100), 2)."%  \r");
+    }
+}
+
+
+function getDirectoryTree($outerDir, &$files=array())
+{
+    $dirs = array_diff(scandir($outerDir), array( '.', '..' ));
+    foreach ($dirs as $d) {
+        if (is_dir($outerDir.'/'.$d)) {
+            getDirectoryTree($outerDir.'/'.$d, $files);
         }
+        else {
+            if (preg_match('/^[\d]+.rrd$/', $d)) {
+                array_push($files, preg_replace('/\/+/', '/', $outerDir.'/'.$d));
+            }
+        }
+    }
 
-	echo($count . " Files \n");
-	$start = date("U");
-        $i = 0;
-	foreach ($files as $file){
-		fixRdd($file);
-		$i++;
-		if (date("U") - $start > 1)
-			echo(round(($i / $count) * 100, 2) . "%  \r");
-	}
+    return $files;
 
-	function getDirectoryTree( $outerDir, &$files = array()){
-
-		$dirs = array_diff( scandir( $outerDir ), Array( ".", ".." ) );
-    		foreach ( $dirs as $d ){
-        		if (is_dir($outerDir."/".$d)  ){
-				getDirectoryTree($outerDir.'/'. $d, $files);
-        		}else{
-				if (preg_match('/^[\d]+.rrd$/', $d))
-					array_push($files, preg_replace('/\/+/', '/',  $outerDir.'/'. $d));
-
-			}
-    		}
-  		return $files;
-	}
+}//end getDirectoryTree()
 
 
-	function fixRdd($file){
-		global $config;
-                global $rrdcached;
-		$fileC = shell_exec( "{$config['rrdtool']} dump $file $rrdcached" );
+function fixRdd($file)
+{
+    global $config;
+    global $rrdcached;
+    $fileC = shell_exec("{$config['rrdtool']} dump $file $rrdcached");
 
-#---------------------------------------------------------------------------------------------------------
-
-$first = <<<FIRST
+    // ---------------------------------------------------------------------------------------------------------
+    $first = <<<FIRST
         <ds>
                 <name> INDISCARDS </name>
                 <type> DERIVE </type>
@@ -54,9 +58,9 @@ $first = <<<FIRST
                 <min> 0.0000000000e+00 </min>
                 <max> 1.2500000000e+10 </max>
                 <!-- PDP Status -->
-		<last_ds> UNKN </last_ds>
-		<value> 0.0000000000e+00 </value>
-		<unknown_sec> 0 </unknown_sec>
+        <last_ds> UNKN </last_ds>
+        <value> 0.0000000000e+00 </value>
+        <unknown_sec> 0 </unknown_sec>
         </ds>
         <ds>
                 <name> OUTDISCARDS </name>
@@ -65,9 +69,9 @@ $first = <<<FIRST
                 <min> 0.0000000000e+00 </min>
                 <max> 1.2500000000e+10 </max>
                 <!-- PDP Status -->
-		<last_ds> UNKN </last_ds>
-		<value> 0.0000000000e+00 </value>
-		<unknown_sec> 0 </unknown_sec>
+        <last_ds> UNKN </last_ds>
+        <value> 0.0000000000e+00 </value>
+        <unknown_sec> 0 </unknown_sec>
         </ds>
         <ds>
                 <name> INUNKNOWNPROTOS </name>
@@ -128,20 +132,18 @@ $first = <<<FIRST
 <!-- Round Robin Archives -->
 FIRST;
 
-
-
-$second = <<<SECOND
-			<ds>
-				<primary_value> 0.0000000000e+00 </primary_value>
-		                <secondary_value> NaN </secondary_value>
-		                <value> NaN </value>
-		                <unknown_datapoints> 0 </unknown_datapoints>
+    $second = <<<SECOND
+            <ds>
+                <primary_value> 0.0000000000e+00 </primary_value>
+                        <secondary_value> NaN </secondary_value>
+                        <value> NaN </value>
+                        <unknown_datapoints> 0 </unknown_datapoints>
                         </ds>
-			<ds>
-				<primary_value> 0.0000000000e+00 </primary_value>
-		                <secondary_value> NaN </secondary_value>
-		                <value> NaN </value>
-		                <unknown_datapoints> 0 </unknown_datapoints>
+            <ds>
+                <primary_value> 0.0000000000e+00 </primary_value>
+                        <secondary_value> NaN </secondary_value>
+                        <value> NaN </value>
+                        <unknown_datapoints> 0 </unknown_datapoints>
                         </ds>
                         <ds>
                                 <primary_value> 0.0000000000e+00 </primary_value>
@@ -173,35 +175,28 @@ $second = <<<SECOND
                                 <value> NaN </value>
                                 <unknown_datapoints> 0 </unknown_datapoints>
                         </ds>
-	</cdp_prep>
+    </cdp_prep>
 SECOND;
 
-$third = <<<THIRD
+    $third = <<<THIRD
 <v> NaN </v><v> NaN </v><v> NaN </v><v> NaN </v><v> NaN </v><v> NaN </v><v> NaN </v></row>
 THIRD;
 
+    // ---------------------------------------------------------------------------------------------------------
+    if (!preg_match('/DISCARDS/', $fileC)) {
+        $fileC    = str_replace('<!-- Round Robin Archives -->', $first, $fileC);
+        $fileC    = str_replace('</cdp_prep>', $second, $fileC);
+        $fileC    = str_replace('</row>', $third, $fileC);
+        $tmpfname = tempnam('/tmp', 'OBS');
+        file_put_contents($tmpfname, $fileC);
+        @unlink($file);
+        $newfile = preg_replace('/(\d+)\.rrd/', 'port-\\1.rrd', $file);
+        @unlink($newfile);
+        shell_exec($config['rrdtool']." restore $tmpfname  $newfile");
+        unlink($tmpfname);
+    }
+
+}//end fixRdd()
 
 
-
-#---------------------------------------------------------------------------------------------------------
-		if (!preg_match('/DISCARDS/', $fileC)){
-			$fileC = str_replace('<!-- Round Robin Archives -->', $first, $fileC);
-			$fileC = str_replace('</cdp_prep>', $second, $fileC);
-			$fileC = str_replace('</row>', $third, $fileC);
-			$tmpfname = tempnam("/tmp", "OBS");
-			file_put_contents($tmpfname, $fileC);
-			@unlink($file);
-			$newfile = preg_replace("/(\d+)\.rrd/", "port-\\1.rrd", $file);
-			@unlink($newfile);
-			shell_exec($config['rrdtool'] . " restore $tmpfname  $newfile");
-			unlink($tmpfname);
-
-		}
-
-
-	}
-
-	echo("\n");
-
-?>
-
+echo "\n";

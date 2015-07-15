@@ -37,6 +37,21 @@ if ($foo == 5) {
 }
 ```
 
+Start else and elsif on new lines, e.g.
+```php
+if ($foo == 5) {
+    echo 'foo is 5';
+}
+elsif ($foo == 4) {
+    echo 'foo is 4';
+}
+else {
+    echo 'foo is something else';
+}
+```
+This makes diffs much cleaner when moving around blocks of code.
+
+
 ### Including files
 Using parenthesis around file includes isn't required, instead just place the file in between ''
 ```php

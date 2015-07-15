@@ -1,9 +1,7 @@
 <?php
 
-$class     = "temperature";
-$unit      = "C";
-$unit_long = "Degree C";
+$class     = 'temperature';
+$unit      = 'C';
+$unit_long = 'Degree C';
 
-include("includes/graphs/device/sensor.inc.php");
-
-?>
+require 'includes/graphs/device/sensor.inc.php';
