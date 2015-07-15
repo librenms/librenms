@@ -125,5 +125,3 @@ elseif ($device['os'] == "pfsense") {
     $version = $output[2];
     $hardware = $output[6];
 }
-
-?>

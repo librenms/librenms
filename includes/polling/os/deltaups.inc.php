@@ -9,5 +9,3 @@ $hardware .= ' ' . trim(snmp_get($device, "dupsIdentModel.0", "-OQv", "DeltaUPS-
 $version = trim(snmp_get($device, "dupsIdentUPSSoftwareVersion.0", "-OQv", "DeltaUPS-MIB", ""),'" ');
 
 # DeltaUPS-MIB::dupsIdentAgentSoftwareVersion.0 = STRING: "2.0h "
-
-?>
