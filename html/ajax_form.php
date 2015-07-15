@@ -13,32 +13,28 @@
  */
 
 // FUA
-
-if (isset($_REQUEST['debug']))
-{
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('allow_url_fopen', 0);
-  ini_set('error_reporting', E_ALL);
+if (isset($_REQUEST['debug'])) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 0);
+    ini_set('log_errors', 0);
+    ini_set('allow_url_fopen', 0);
+    ini_set('error_reporting', E_ALL);
 }
 
-include_once("../includes/defaults.inc.php");
-include_once("../config.php");
-include_once("../includes/definitions.inc.php");
-include_once("includes/functions.inc.php");
-include_once("../includes/functions.php");
-include_once("includes/authenticate.inc.php");
+require_once '../includes/defaults.inc.php';
+require_once '../config.php';
+require_once '../includes/definitions.inc.php';
+require_once 'includes/functions.inc.php';
+require_once '../includes/functions.php';
+require_once 'includes/authenticate.inc.php';
 
-if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
-
-if(preg_match("/^[a-zA-Z0-9\-]+$/", $_POST['type']) == 1) {
-
-  if(file_exists('forms/'.$_POST['type'].'.inc.php'))
-  {
-    include_once('forms/'.$_POST['type'].'.inc.php');
-  }
-
+if (!$_SESSION['authenticated']) {
+    echo 'unauthenticated';
+    exit;
 }
 
-?>
+if (preg_match('/^[a-zA-Z0-9\-]+$/', $_POST['type']) == 1) {
+    if (file_exists('forms/'.$_POST['type'].'.inc.php')) {
+        include_once 'forms/'.$_POST['type'].'.inc.php';
+    }
+}

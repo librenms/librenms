@@ -98,16 +98,20 @@ class Findpolygon {
             array_pop($b);
         }
 
-        $n1 = count($a); $n2 = count($b);
-        if( $n1 != $n2 )
+        $n1 = count($a);
+        $n2 = count($b);
+        if( $n1 != $n2 ) {
             return false;
+        }
 
         $i=0;
-        while( ($i < $n2) && ($a[0] != $b[$i]) )
+        while( ($i < $n2) && ($a[0] != $b[$i]) ) {
             ++$i;
+        }
 
-        if( $i >= $n2 )
+        if( $i >= $n2 ) {
             return false;
+        }
 
         $j=0;
         if( $forward ) {
