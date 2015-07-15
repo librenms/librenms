@@ -7,7 +7,7 @@ $rrd_options .= ' -l 0 -E ';
 $iter         = '1';
 $rrd_options .= " COMMENT:'Toner level            Cur     Min      Max\\n'";
 foreach (dbFetchRows('SELECT * FROM toner where device_id = ?', array($device['device_id'])) as $toner) {
-    $colour = toner2colour($toner['toner_descr']);
+    $colour = toner2colour($toner['toner_descr'], 100 - $toner['toner_current']);
 
     if ($colour['left'] == null) {
         // FIXME generic colour function
