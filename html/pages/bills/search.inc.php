@@ -9,7 +9,7 @@
     Bills
   </div>
   <div class="form-group">
-    <input type="text" name="hostname" id="hostname" class="form-control input-sm" value="<?php echo $_POST['hostname']; ?>" />
+    <input type="text" name="hostname" id="hostname" class="form-control input-sm" value="<?php echo($_POST['hostname']); ?>" />
   </div>
   <div class="form-group">
     <select name='os' id='os' class="form-control input-sm">
@@ -34,13 +34,15 @@
   <button type="submit" class="btn btn-default input-sm">Search</button>
   <div class="form-group">
 <?php
-if ($vars['view'] == 'history') {
-    echo '<a href="bills/"><img src="images/16/clock.png" align=absmiddle alt="Current Billing Period"> Current Billing Period</a>';
-}
-else {
+
+  if ($vars['view'] == "history")
+  {
+    echo('<a href="bills/"><img src="images/16/clock.png" align=absmiddle alt="Current Billing Period"> Current Billing Period</a>');
+  } else
+  {
     // FIXME - generate_url
-    echo '<a href="bills/view=history/"><img src="images/16/clock_red.png" align=absmiddle alt="Previous Billing Period"> Previous Billing Period</a>';
-}
+    echo('<a href="bills/view=history/"><img src="images/16/clock_red.png" align=absmiddle alt="Previous Billing Period"> Previous Billing Period</a>');
+  }
 
 ?>
   </div>
@@ -50,4 +52,7 @@ else {
 </form>
 
 <?php
-print_optionbar_end();
+
+  print_optionbar_end();
+
+?>

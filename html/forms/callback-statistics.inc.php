@@ -14,11 +14,9 @@
 
 if ($_POST['state'] == 'true') {
     $state = 1;
-}
-elseif ($_POST['state'] == 'false') {
+} elseif ($_POST['state'] == 'false') {
     $state = 0;
-}
-else {
+} else {
     $state = 0;
 }
 

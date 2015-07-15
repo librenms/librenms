@@ -12,37 +12,39 @@
  * the source code distribution for details.
  */
 
-if (isset($_REQUEST['debug'])) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('allow_url_fopen', 0);
-    ini_set('error_reporting', E_ALL);
+if (isset($_REQUEST['debug']))
+{
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('allow_url_fopen', 0);
+  ini_set('error_reporting', E_ALL);
 }
 
-require_once '../includes/defaults.inc.php';
-require_once '../config.php';
-require_once '../includes/definitions.inc.php';
-require_once 'includes/functions.inc.php';
-require_once '../includes/functions.php';
-require_once 'includes/authenticate.inc.php';
+include_once("../includes/defaults.inc.php");
+include_once("../config.php");
+include_once("../includes/definitions.inc.php");
+include_once("includes/functions.inc.php");
+include_once("../includes/functions.php");
+include_once("includes/authenticate.inc.php");
 
 $current = $_POST['current'];
-settype($current, 'integer');
+settype($current,"integer");
 $rowCount = $_POST['rowCount'];
-settype($rowCount, 'integer');
+settype($rowCount,"integer");
 if (isset($_POST['sort']) && is_array($_POST['sort'])) {
-    foreach ($_POST['sort'] as $k => $v) {
+    foreach ($_POST['sort'] as $k=>$v) {
         $sort .= " $k $v";
     }
 }
-
 $searchPhrase = mres($_POST['searchPhrase']);
-$id           = mres($_POST['id']);
-$response     = array();
+$id = mres($_POST['id']);
+$response = array();
 
 if (isset($id)) {
     if (file_exists("includes/table/$id.inc.php")) {
-        include_once "includes/table/$id.inc.php";
+        require_once "includes/table/$id.inc.php";
     }
 }
+
+?>

@@ -30,12 +30,8 @@ $type_text['toner'] = "Toner";
 $type_text['dbm'] = "dBm";
 $type_text['load'] = "Load";
 
-if (!$vars['metric']) {
-    $vars['metric'] = "processor";
-}
-if (!$vars['view']) {
-    $vars['view'] = "detail";
-}
+if (!$vars['metric']) { $vars['metric'] = "processor"; }
+if (!$vars['view']) { $vars['view'] = "detail"; }
 
 $link_array = array('page'    => 'health');
 
@@ -46,44 +42,48 @@ print_optionbar_start('', '');
 echo('<span style="font-weight: bold;">Health</span> &#187; ');
 
 $sep = "";
-foreach ($datas as $texttype) {
-    $metric = strtolower($texttype);
-    echo($sep);
-    if ($vars['metric'] == $metric) {
-        echo("<span class='pagemenu-selected'>");
-    }
+foreach ($datas as $texttype)
+{
+  $metric = strtolower($texttype);
+  echo($sep);
+  if ($vars['metric'] == $metric)
+  {
+    echo("<span class='pagemenu-selected'>");
+  }
 
-    echo(generate_link($type_text[$metric],$link_array,array('metric'=> $metric, 'view' => $vars['view'])));
+  echo(generate_link($type_text[$metric],$link_array,array('metric'=> $metric, 'view' => $vars['view'])));
 
-    if ($vars['metric'] == $metric) {
-        echo("</span>");
-    }
+  if ($vars['metric'] == $metric) { echo("</span>"); }
 
-    $sep = ' | ';
+  $sep = ' | ';
 }
 
 unset ($sep);
 
 echo('<div style="float: right;">');
 
-if ($vars['view'] == "graphs") {
-    echo('<span class="pagemenu-selected">');
+if ($vars['view'] == "graphs")
+{
+  echo('<span class="pagemenu-selected">');
 }
 echo(generate_link("Graphs",$link_array,array('metric'=> $vars['metric'], 'view' => "graphs")));
-if ($vars['view'] == "graphs") {
-    echo('</span>');
+if ($vars['view'] == "graphs")
+{
+  echo('</span>');
 }
 
 echo(' | ');
 
-if ($vars['view'] != "graphs") {
-    echo('<span class="pagemenu-selected">');
+if ($vars['view'] != "graphs")
+{
+  echo('<span class="pagemenu-selected">');
 }
 
 echo(generate_link("No Graphs",$link_array,array('metric'=> $vars['metric'], 'view' => "detail")));
 
-if ($vars['view'] != "graphs") {
-    echo('</span>');
+if ($vars['view'] != "graphs")
+{
+  echo('</span>');
 }
 
 echo('</div>');
@@ -91,14 +91,16 @@ echo('</div>');
 print_optionbar_end();
 
 if (in_array($vars['metric'],array_keys($used_sensors))
-    || $vars['metric'] == 'processor'
-    || $vars['metric'] == 'storage'
-    || $vars['metric'] == 'toner'
-    || $vars['metric'] == 'mempool') {
-    include('pages/health/'.$vars['metric'].'.inc.php');
+  || $vars['metric'] == 'processor'
+  || $vars['metric'] == 'storage'
+  || $vars['metric'] == 'toner'
+  || $vars['metric'] == 'mempool')
+{
+  include('pages/health/'.$vars['metric'].'.inc.php');
 }
-else {
-    echo("No sensors of type " . $vars['metric'] . " found.");
+else
+{
+  echo("No sensors of type " . $vars['metric'] . " found.");
 }
 
 ?>

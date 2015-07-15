@@ -1,18 +1,23 @@
 <?php
 
-//
-// Hardcoded discovery of cpu usage on HP Procurve devices.
-//
-// STATISTICS-MIB::hpSwitchCpuStat.0 = INTEGER: 10
-if ($device['os'] == 'procurve') {
-    echo 'Procurve : ';
+///
+//  Hardcoded discovery of cpu usage on HP Procurve devices.
+///
+//  STATISTICS-MIB::hpSwitchCpuStat.0 = INTEGER: 10
 
-    $descr = 'Processor';
-    $usage = snmp_get($device, '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0', '-OQUvs', 'STATISTICS-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/hp');
+if ($device['os'] == "procurve")
+{
+  echo("Procurve : ");
 
-    if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, '1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0', '0', 'procurve-fixed', $descr, '1', $usage, null, null);
-    }
+  $descr = "Processor";
+  $usage = snmp_get($device, ".1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0", "-OQUvs", "STATISTICS-MIB", $config['mib_dir'].":".$config['mib_dir']."/hp");
+
+  if (is_numeric($usage))
+  {
+    discover_processor($valid['processor'], $device, "1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0", "0", "procurve-fixed", $descr, "1", $usage, NULL, NULL);
+  }
 }
 
-unset($processors_array);
+unset ($processors_array);
+
+?>

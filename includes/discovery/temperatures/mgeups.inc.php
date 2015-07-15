@@ -39,7 +39,8 @@ if ($device['os'] == 'mgeups') {
         upsmgEnvironmentInput2State.1 = open
     */
 
-    foreach (array_keys($mge_env_data) as $index) {
+    foreach (array_keys($mge_env_data) as $index)
+    {
         $descr      = $mge_env_data[$index]['upsmgConfigSensorName'];
         $current    = $mge_env_data[$index]['upsmgEnvironmentTemperature'];
         $sensorType = 'mge';

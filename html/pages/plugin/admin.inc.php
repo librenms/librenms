@@ -1,26 +1,33 @@
 <?php
 
-if ($_SESSION['userlevel'] >= '10') {
-    // Scan for new plugins and add to the database
-    $new_plugins = scan_new_plugins();
+if ($_SESSION['userlevel'] >= '10')
+{
+  
+  // Scan for new plugins and add to the database
+  $new_plugins = scan_new_plugins();
 
 
-    // Check if we have to toggle enabled / disable a particular module
-    $plugin_id     = $_POST['plugin_id'];
-    $plugin_active = $_POST['plugin_active'];
-    if (is_numeric($plugin_id) && is_numeric($plugin_active)) {
-        if ($plugin_active == '0') {
-            $plugin_active = 1;
-        }
-        else if ($plugin_active == '1') {
-            $plugin_active = 0;
-        }
-        else {
-            $plugin_active = 0;
-        }
+  // Check if we have to toggle enabled / disable a particular module
+  $plugin_id = $_POST['plugin_id'];
+  $plugin_active = $_POST['plugin_active'];
+  if(is_numeric($plugin_id) && is_numeric($plugin_active))
+  {
+    if( $plugin_active == '0')
+    {
+      $plugin_active = 1;
+    }
+    elseif( $plugin_active == '1')
+    {
+      $plugin_active = 0;
+    }
+    else
+    {
+      $plugin_active = 0;
+    }
 
-        if (dbUpdate(array('plugin_active' => $plugin_active), 'plugins', '`plugin_id` = ?', array($plugin_id))) {
-            echo '
+    if(dbUpdate(array('plugin_active' => $plugin_active), 'plugins', '`plugin_id` = ?', array($plugin_id)))
+    {
+      echo('
 <script type="text/javascript">
 $.ajax({
     url: "",
@@ -30,9 +37,10 @@ $.ajax({
     }
 });
 </script>
-';
-        }
-    }//end if
+');
+    }
+
+  }
 
 ?>
 
@@ -41,13 +49,14 @@ $.ajax({
     <strong>System plugins</strong>
   </div>
 <?php
-if ($new_plugins > 0) {
-    echo '<div class="panel-body">
+  if($new_plugins > 0)
+  {
+    echo('<div class="panel-body">
     <div class="alert alert-warning">
-      We have found '.$new_plugins.' new plugins that need to be configured and enabled
+      We have found ' . $new_plugins . ' new plugins that need to be configured and enabled
     </div>
-  </div>';
-}
+  </div>');
+  }
 ?>
   <table class="table table-condensed">
     <tr>
@@ -56,21 +65,24 @@ if ($new_plugins > 0) {
     </tr>
 
 <?php
-foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
-    if ($plugins['plugin_active'] == 1) {
-        $plugin_colour = 'bg-success';
-        $plugin_button = 'danger';
-        $plugin_label  = 'Disable';
-    }
-    else {
-        $plugin_colour = 'bg-danger';
-        $plugin_button = 'success';
-        $plugin_label  = 'Enable';
-    }
 
-    echo '<tr class="'.$plugin_colour.'">
+  foreach (dbFetchRows("SELECT * FROM plugins") as $plugins)
+  {
+    if($plugins['plugin_active'] == 1)
+    {
+      $plugin_colour = 'bg-success';
+      $plugin_button = 'danger';
+      $plugin_label = 'Disable';
+    }
+    else
+    {
+      $plugin_colour = 'bg-danger';
+      $plugin_button = 'success';
+      $plugin_label = 'Enable';
+    }
+    echo('<tr class="'. $plugin_colour .'">
             <td>
-              '.$plugins['plugin_name'].'
+              '. $plugins['plugin_name'] . '
             </td>
             <td>
               <form class="form-inline" role="form" action="" method="post" id="'.$plugins['plugin_id'].'" name=="'.$plugins['plugin_id'].'">
@@ -79,14 +91,18 @@ foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
                 <button type="submit" class="btn btn-sm btn-'.$plugin_button.'">'.$plugin_label.'</button>
               </form>
             </td>
-          </tr>';
-}//end foreach
+          </tr>');
+  }
+
 ?>
   </table>
 </div>
 
 <?php
 }
-else {
-    include 'includes/error-no-perm.inc.php';
-}//end if
+else
+{
+  include("includes/error-no-perm.inc.php");
+}
+
+?>

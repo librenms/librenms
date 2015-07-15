@@ -17,7 +17,8 @@
 <div class="row">
     <div class="col-sm-12">
 <?php
-print_error('Documentation for the API has now been moved to GitHub, you can go straight to the API Wiki from <a href="https://github.com/librenms/librenms/wiki/API-Docs" target="_blank">here</a>.');
+    print_error('Documentation for the API has now been moved to GitHub, you can go straight to the API Wiki from <a href="https://github.com/librenms/librenms/wiki/API-Docs" target="_blank">here</a>.');
 ?>
     </div>
 </div>
+

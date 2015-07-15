@@ -9,7 +9,8 @@ if ($device['os'] == 'netbotz') {
     $oids = trim($oids);
     if ($oids) {
         echo 'Netbotz ';
-        foreach (explode("\n", $oids) as $data) {
+        foreach (explode("\n", $oids) as $data)
+        {
             list($oid,$descr) = explode(' ', $data, 2);
             $split_oid        = explode('.', $oid);
             $humidity_id      = $split_oid[(count($split_oid) - 1)];

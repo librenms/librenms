@@ -2,7 +2,7 @@
 
 $scale_min = 0;
 
-require 'includes/graphs/common.inc.php';
+include("includes/graphs/common.inc.php");
 
 $graph_max = 1;
 
@@ -16,4 +16,6 @@ $colour_area_max = "FFEE99";
 $nototal   = 1;
 $unit_text = "Conns";
 
-require 'includes/graphs/generic_simplex.inc.php';
+include("includes/graphs/generic_simplex.inc.php");
+
+?>

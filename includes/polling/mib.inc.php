@@ -12,5 +12,5 @@
  * the source code distribution for details.
  */
 
-$devicemib = array($device['sysObjectID'] => 'all');
+$devicemib = array($device['sysObjectID'] => "all");
 poll_mibs($devicemib, $device, $graphs);
