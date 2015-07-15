@@ -12,20 +12,21 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == "linux") {
-    $oids = snmp_walk($device, "virtualDiskNumber", "-Oesqn", "StorageManagement-MIB");
-    $main_oid = ".1.3.6.1.4.1.674.10893.1.20.140.1.1.";
+if ($device['os'] == 'linux') {
+    $oids     = snmp_walk($device, 'virtualDiskNumber', '-Oesqn', 'StorageManagement-MIB');
+    $main_oid = '.1.3.6.1.4.1.674.10893.1.20.140.1.1.';
     if ($debug) {
         echo $oids."\n";
     }
+
     $oids = trim($oids);
     if ($oids) {
-        echo "Dell ";
+        echo 'Dell ';
         foreach (explode("\n", $oids) as $data) {
-            list($oid,) = explode(" ", $data, 2);
-            $state_oid = "4.1";
-            $state_current = snmp_get($device, $main_oid.$state_oid, "-Oevq");
-            discover_sensor($valid['sensor'], 'state', $device, $main_oid.$state_oid, "virtualDiskState.$state_oid", 'dell', 'Raid State', '1', '1', NULL, NULL, NULL, NULL, $state_current);
+            list($oid,)    = explode(' ', $data, 2);
+            $state_oid     = '4.1';
+            $state_current = snmp_get($device, $main_oid.$state_oid, '-Oevq');
+            discover_sensor($valid['sensor'], 'state', $device, $main_oid.$state_oid, "virtualDiskState.$state_oid", 'dell', 'Raid State', '1', '1', null, null, null, null, $state_current);
         }
     }
 }

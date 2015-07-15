@@ -43,7 +43,7 @@ foreach ($dbq as $ds) {
 
             $colour = $config['graph_colours']['mixed'][$c_i];
             $c_i++;
-        } 
+        }
         else {
             $colour = $ds['colour'];
         }

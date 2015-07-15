@@ -1,9 +1,7 @@
 <?php
 
-$class = "charge";
-$unit  = "%";
-$graph_type = "sensor_charge";
+$class      = 'charge';
+$unit       = '%';
+$graph_type = 'sensor_charge';
 
-include("sensors.inc.php");
-
-?>
+require 'sensors.inc.php';
