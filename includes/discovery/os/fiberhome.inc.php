@@ -9,4 +9,3 @@ if (!$os){
         $os = "fiberhome";
     }
 }
-?>

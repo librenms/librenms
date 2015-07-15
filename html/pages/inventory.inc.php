@@ -1,6 +1,6 @@
 <?php
 
-$pagetitle[] = "Inventory";
+$pagetitle[] = 'Inventory';
 
 ?>
 
@@ -29,46 +29,53 @@ var grid = $("#inventory").bootgrid({
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
                 "<div class=\"form-group\">"+
-                "<input type=\"text\" name=\"string\" id=\"string\" value=\"<?php echo($_POST['string']); ?>\" placeholder=\"Description\" class=\"form-control input-sm\" />"+
+                "<input type=\"text\" name=\"string\" id=\"string\" value=\"<?php echo $_POST['string']; ?>\" placeholder=\"Description\" class=\"form-control input-sm\" />"+
                 "</div>"+
                 "<div class=\"form-group\">"+
                 "<strong>&nbsp;Part No&nbsp;</strong>"+
                 "<select name=\"part\" id=\"part\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Parts</option>"+
 <?php
-foreach (dbFetchRows("SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY `entPhysicalModelName` ORDER BY `entPhysicalModelName`") as $data) {
-    echo('"<option value=\"'.$data['entPhysicalModelName'].'\""+');
+foreach (dbFetchRows('SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY `entPhysicalModelName` ORDER BY `entPhysicalModelName`') as $data) {
+    echo '"<option value=\"'.$data['entPhysicalModelName'].'\""+';
     if ($data['entPhysicalModelName'] == $_POST['part']) {
-        echo('" selected"+');
+        echo '" selected"+';
     }
-    echo('">'.$data['entPhysicalModelName'].'</option>"+');
+
+    echo '">'.$data['entPhysicalModelName'].'</option>"+';
 }
 ?>
                  "</select>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
-                 "<input type=\"text\" name=\"serial\" id=\"serial\" value=\"<?php echo($_POST['serial']); ?>\" placeholder=\"Serial\" class=\"form-control input-sm\"/>"+
+                 "<input type=\"text\" name=\"serial\" id=\"serial\" value=\"<?php echo $_POST['serial']; ?>\" placeholder=\"Serial\" class=\"form-control input-sm\"/>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
                  "<strong>&nbsp;Device&nbsp;</strong>"+
                  "<select name=\"device\" id=\"device\" class=\"form-control input-sm\">"+
                  "<option value=\"\">All Devices</option>"+
 <?php
-
-foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data) {
+foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
     if (device_permitted($data['device_id'])) {
-        echo('"<option value=\"'.$data['device_id'].'\""+');
+        echo '"<option value=\"'.$data['device_id'].'\""+';
         if ($data['device_id'] == $_POST['device']) {
-            echo('" selected"+');
+            echo '" selected"+';
         }
-        echo('">'.$data['hostname'].'</option>"+');
+
+        echo '">'.$data['hostname'].'</option>"+';
     }
 }
 ?>
                  "</select>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
-                 "<input type=\"text\" size=24 name=\"device_string\" id=\"device_string\" value=\"<?php if ($_POST['device_string']) { echo($_POST['device_string']); } ?>\" placeholder=\"Description\" class=\"form-control input-sm\"/>"+
+                 "<input type=\"text\" size=24 name=\"device_string\" id=\"device_string\" value=\"
+                    <?php
+                    if ($_POST['device_string']) {
+                        echo $_POST['device_string'];
+                    };
+?>
+\" placeholder=\"Description\" class=\"form-control input-sm\"/>"+
                  "</div>"+
                  "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
                  "</form></span></div>"+
