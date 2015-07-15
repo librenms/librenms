@@ -10,8 +10,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     }
 
     $oids = trim($oids);
-    foreach (explode("\n", $oids) as $data)
-    {
+    foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
         if ($data) {
             list($oid,$descr) = explode(' ', $data, 2);

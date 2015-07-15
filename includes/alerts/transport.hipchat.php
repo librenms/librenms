@@ -1,3 +1,5 @@
+<?php
+
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>, Tyler Christiansen <code@tylerc.me>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,34 +24,36 @@
  */
 
 foreach($opts as $option) {
-  $url = $option['url'];
-  foreach($obj as $key=>$value) {
-    $api = str_replace("%".$key, $method == "get" ? urlencode($value) : $value, $api);
-  }
-  $curl = curl_init();
-  $data = array(
-    "message" => $obj["msg"],
-    "room_id" => $option["room_id"],
-    "from" => $option["from"],
-    "color" => $option["color"],
-    "notify" => $option["notify"],
-    "message_format" => $option["message_format"]
-  );
-  // Sane default of making the message color green if the message indicates
-  // that the alert recovered.
-  if(strpos($data["message"], "recovered")) { $data["color"] = "green"; }
-  curl_setopt($curl, CURLOPT_URL, $url);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_POST, true);
-  curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-  $ret = curl_exec($curl);
+    $url = $option['url'];
+    foreach($obj as $key=>$value) {
+        $api = str_replace("%".$key, $method == "get" ? urlencode($value) : $value, $api);
+    }
+    $curl = curl_init();
+    $data = array(
+        "message" => $obj["msg"],
+        "room_id" => $option["room_id"],
+        "from" => $option["from"],
+        "color" => $option["color"],
+        "notify" => $option["notify"],
+        "message_format" => $option["message_format"]
+    );
+    // Sane default of making the message color green if the message indicates
+    // that the alert recovered.
+    if(strstr($data["message"], "recovered")) {
+        $data["color"] = "green";
+    }
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    $ret = curl_exec($curl);
 
-  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-  if($code != 200) {
-    var_dump("API '$url' returned Error");
-    var_dump("Params: " . $message);
-    var_dump("Return: " . $ret);
-    return false;
-  }
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if($code != 200) {
+        var_dump("API '$url' returned Error");
+        var_dump("Params: " . $message);
+        var_dump("Return: " . $ret);
+        return false;
+    }
 }
 return true;

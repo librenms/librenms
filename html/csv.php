@@ -12,41 +12,42 @@
  * the source code distribution for details.
  */
 
-if (strpos($_SERVER['PATH_INFO'], "debug"))
-{
-  $debug = "1";
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  ini_set('log_errors', 1);
-  ini_set('error_reporting', E_ALL);
-} else {
-  $debug = FALSE;
-  ini_set('display_errors', 0);
-  ini_set('display_startup_errors', 0);
-  ini_set('log_errors', 0);
-  ini_set('error_reporting', 0);
+if (strpos($_SERVER['PATH_INFO'], 'debug')) {
+    $debug = '1';
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    ini_set('log_errors', 1);
+    ini_set('error_reporting', E_ALL);
+}
+else {
+    $debug = false;
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    ini_set('log_errors', 0);
+    ini_set('error_reporting', 0);
 }
 
-include "../includes/defaults.inc.php";
-include "../config.php";
-include_once "../includes/definitions.inc.php";
-include "../includes/functions.php";
-include "includes/functions.inc.php";
-include "includes/vars.inc.php";
-include "includes/authenticate.inc.php";
+require '../includes/defaults.inc.php';
+require '../config.php';
+require_once '../includes/definitions.inc.php';
+require '../includes/functions.php';
+require 'includes/functions.inc.php';
+require 'includes/vars.inc.php';
+require 'includes/authenticate.inc.php';
 
 $report = mres($vars['report']);
-if( !empty($report) && file_exists("includes/reports/$report.csv.inc.php")) {
-	if( $debug == false ) {
-		header("Content-Type: text/csv");
-		header('Content-Disposition: attachment; filename="'.$report.'-'.date('Ymd').'.csv"');
-	}
-	$csv = array();
-	include_once "includes/reports/$report.csv.inc.php";
-	foreach( $csv as $line ) {
-		echo implode(',',$line)."\n";
-	}
-} else {
-	echo "Report not found.\n";
+if (!empty($report) && file_exists("includes/reports/$report.csv.inc.php")) {
+    if ($debug == false) {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="'.$report.'-'.date('Ymd').'.csv"');
+    }
+
+    $csv = array();
+    include_once "includes/reports/$report.csv.inc.php";
+    foreach ($csv as $line) {
+        echo implode(',', $line)."\n";
+    }
 }
-?>
+else {
+    echo "Report not found.\n";
+}

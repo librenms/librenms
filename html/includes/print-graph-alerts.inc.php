@@ -1,14 +1,15 @@
 <?php
 /*
-* LibreNMS
-*
-* Copyright (c) 2015 Søren Friis Rosiak <sorenrosiak@gmail.com>
-* This program is free software: you can redistribute it and/or modify it
-* under the terms of the GNU General Public License as published by the
-* Free Software Foundation, either version 3 of the License, or (at your
-* option) any later version.  Please see LICENSE.txt at the top level of
-* the source code distribution for details.
-*/
+ * LibreNMS
+ *
+ * Copyright (c) 2015 Søren Friis Rosiak <sorenrosiak@gmail.com>
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
+
 $pagetitle[] = "Alert Stats";
 
 $sql = "";
@@ -31,7 +32,7 @@ if ($_SESSION['userlevel'] < '5') {
 <script src="js/vis.min.js"></script>
 <div id="visualization"></div>
 <script type="text/javascript">
- 
+
     var container = document.getElementById('visualization');
     <?php
 $groups = array();
@@ -65,7 +66,7 @@ foreach($groups as $group) {
 }
 
 ?>
- 
+
     var items =
         <?php
 echo $graph_data; ?>
@@ -97,5 +98,5 @@ echo $milisec_diff;
         orientation:'top'
     };
     var graph2d = new vis.Graph2d(container, items, groups, options);
- 
+
 </script>

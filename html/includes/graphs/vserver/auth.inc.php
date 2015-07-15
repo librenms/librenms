@@ -1,6 +1,6 @@
 <?php
 
-if (is_numeric($vars['id'])) {     
+if (is_numeric($vars['id'])) {
     // $auth= TRUE;
     $vserver = dbFetchRow('SELECT * FROM `loadbalancer_vservers` AS I, `devices` AS D WHERE I.classmap_id = ? AND I.device_id = D.device_id', array($vars['id']));
 
