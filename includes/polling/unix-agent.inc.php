@@ -112,20 +112,16 @@ if ($device['os_group'] == 'unix') {
         if (!empty($agent_data['ps'])) {
             echo 'Processes: ';
             dbDelete('processes', 'device_id = ?', array($device['device_id']));
-            $query = "INSERT INTO `processes` (`device_id`,`pid`,`user`,`vsz`,`rss`,`cputime`,`command`)  VALUES ";
-            $values = "";
+            $data=array();
             foreach (explode("\n", $agent_data['ps']) as $process) {
                 $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9\:]*),([0-9]*)\)\ (.*)/', '\\1|\\2|\\3|\\4|\\5|\\6', $process);
                 list($user, $vsz, $rss, $cputime, $pid, $command) = explode('|', $process, 6);
                 if (!empty($command)) {
-                    if ($values != "") {
-                        $values .=  ",";
-                    }
-                    $values .= "('".mres($device['device_id'])."','".mres($pid)."','".mres($user)."','".mres($vsz)."','".mres($rss)."','".mres($cputime)."','".mres($command)."')";
+                    $data[]=array('device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command);
                 }
             }
-            if ($values != "") {
-                dbQuery($query.$values);
+            if (count($data) > 0) {
+                dbBulkInsert('processes',$data);
             }
             echo "\n";
         }
