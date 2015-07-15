@@ -391,5 +391,3 @@ $( "#suggest, #value" ).blur(function() {
 <?php
 
 }
-
-?>
