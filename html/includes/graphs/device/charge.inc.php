@@ -1,7 +1,9 @@
 <?php
 
-$class     = 'charge';
-$unit      = '%%';
-$unit_long = 'Percent';
+$class     = "charge";
+$unit      = "%%";
+$unit_long = "Percent";
 
-require 'includes/graphs/device/sensor.inc.php';
+include("includes/graphs/device/sensor.inc.php");
+
+?>

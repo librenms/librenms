@@ -1,6 +1,6 @@
 <?php
 if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.4413')) {
-        $os = 'edgeswitch';
-    }
+	if (strstr($sysObjectId, ".1.3.6.1.4.1.4413")) {
+		$os = "edgeswitch";
+	}
 }

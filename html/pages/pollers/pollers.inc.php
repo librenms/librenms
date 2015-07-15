@@ -24,28 +24,26 @@
         </tr>
 
 <?php
-$query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`) AS `then` FROM `pollers`';
+
+$query = "SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`) AS `then` FROM `pollers`";
 
 foreach (dbFetchRows($query) as $poller) {
-    $old = ($poller['now'] - $poller['then']);
+    $old = $poller['now'] - $poller['then'];
     if ($old >= 300) {
         $row_class = 'danger';
-    }
-    else if ($old >= 280 && $old < 300) {
+    } elseif ($old >= 280 && $old < 300) {
         $row_class = 'warning';
-    }
-    else {
+    } else {
         $row_class = 'success';
     }
-
-    echo '
+    echo('
         <tr class="'.$row_class.'">
             <td>'.$poller['poller_name'].'</td>
             <td>'.$poller['devices'].'</td>
             <td>'.$poller['time_taken'].' Seconds</td>
             <td>'.$poller['last_polled'].'</td>
         </tr>
-';
+');
 }
 
 ?>

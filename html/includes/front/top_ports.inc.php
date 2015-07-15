@@ -14,9 +14,9 @@
  */
 
 $minutes = 15;
-$seconds = ($minutes * 60);
-$top     = $config['front_page_settings']['top']['ports'];
-if (is_admin() === true || is_read() === true) {
+$seconds = $minutes * 60;
+$top = $config['front_page_settings']['top']['ports'];
+if (is_admin() === TRUE || is_read() === TRUE) {
     $query = "
         SELECT *, p.ifInOctets_rate + p.ifOutOctets_rate as total
         FROM ports as p, devices as d
@@ -26,10 +26,9 @@ if (is_admin() === true || is_read() === true) {
         OR p.ifOutOctets_rate > 0 )
         ORDER BY total desc
         LIMIT $top
-        ";
-}
-else {
-    $query   = "
+    ";
+} else {
+    $query = "
         SELECT *, I.ifInOctets_rate + I.ifOutOctets_rate as total
         FROM ports as I, devices as d,
         `devices_perms` AS `P`, `ports_perms` AS `PP`
@@ -40,17 +39,19 @@ else {
         OR I.ifOutOctets_rate > 0 )
         ORDER BY total desc
         LIMIT $top
-        ";
-    $param[] = array(
-        $_SESSION['user_id'],
-        $_SESSION['user_id'],
-    );
-}//end if
-
-echo "<strong>Top $top ports (last $minutes minutes)</strong>\n";
-echo "<table class='simple'>\n";
-foreach (dbFetchRows($query, $param) as $result) {
-    echo '<tr class=top10>'.'<td class=top10>'.generate_device_link($result, shorthost($result['hostname'])).'</td>'.'<td class=top10>'.generate_port_link($result).'</td>'.'<td class=top10>'.generate_port_link($result, generate_port_thumbnail($result)).'</td>'."</tr>\n";
+    ";
+    $param[] = array($_SESSION['user_id'],$_SESSION['user_id']);
 }
 
-echo "</table>\n";
+echo("<strong>Top $top ports (last $minutes minutes)</strong>\n");
+echo("<table class='simple'>\n");
+foreach (dbFetchRows($query,$param) as $result) {
+  echo("<tr class=top10>".
+    "<td class=top10>".generate_device_link($result, shorthost($result['hostname']))."</td>".
+    "<td class=top10>".generate_port_link($result)."</td>".
+    "<td class=top10>".generate_port_link($result, generate_port_thumbnail($result))."</td>".
+    "</tr>\n");
+}
+echo("</table>\n");
+
+?>

@@ -2,23 +2,23 @@
 
 $valid['sensor'] = array();
 
-echo 'Sensors: ';
+echo("Sensors: ");
 
-require 'includes/discovery/cisco-entity-sensor.inc.php';
-require 'includes/discovery/entity-sensor.inc.php';
-require 'includes/discovery/ipmi.inc.php';
+include("includes/discovery/cisco-entity-sensor.inc.php");
+include("includes/discovery/entity-sensor.inc.php");
+include("includes/discovery/ipmi.inc.php");
 
-if ($device['os'] == 'netscaler') {
-    include 'includes/discovery/sensors-netscaler.inc.php';
-}
+if($device['os'] == "netscaler") { include("includes/discovery/sensors-netscaler.inc.php"); }
 
-require 'includes/discovery/temperatures.inc.php';
-require 'includes/discovery/humidity.inc.php';
-require 'includes/discovery/voltages.inc.php';
-require 'includes/discovery/frequencies.inc.php';
-require 'includes/discovery/current.inc.php';
-require 'includes/discovery/power.inc.php';
-require 'includes/discovery/fanspeeds.inc.php';
-require 'includes/discovery/charge.inc.php';
-require 'includes/discovery/load.inc.php';
-require 'includes/discovery/states.inc.php';
+include("includes/discovery/temperatures.inc.php");
+include("includes/discovery/humidity.inc.php");
+include("includes/discovery/voltages.inc.php");
+include("includes/discovery/frequencies.inc.php");
+include("includes/discovery/current.inc.php");
+include("includes/discovery/power.inc.php");
+include("includes/discovery/fanspeeds.inc.php");
+include("includes/discovery/charge.inc.php");
+include("includes/discovery/load.inc.php");
+include "includes/discovery/states.inc.php";
+
+?>

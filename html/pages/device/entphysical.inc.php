@@ -1,11 +1,13 @@
 <?php
 
 
-function printEntPhysical($ent, $level, $class) {
+function printEntPhysical($ent, $level, $class)
+{
     global $device;
 
     $ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', array($device['device_id'], $ent));
-    foreach ($ents as $ent) {
+    foreach ($ents as $ent)
+    {
         echo "
  <li class='$class'>";
 
@@ -31,8 +33,7 @@ function printEntPhysical($ent, $level, $class) {
             if (count($sensor)) {
                 $link = " href='device/device=".$device['device_id'].'/tab=health/metric='.$sensor['sensor_class']."/' onmouseover=\"return overlib('<img src=\'graph.php?id=".$sensor['sensor_id'].'&amp;type=sensor_'.$sensor['sensor_class'].'&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a='.$ent['entPhysical_id']."\'><img src=\'graph.php?id=".$sensor['sensor_id'].'&amp;type=sensor_'.$sensor['sensor_class'].'&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a='.$ent['entPhysical_id']."\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"";
             }
-        }
-        else {
+        } else {
             unset($link);
         }
 

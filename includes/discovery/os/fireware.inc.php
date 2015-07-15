@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
-if (preg_match('/^(XTM|FBX)/i', $sysDescr)) {
-    $os = 'fireware';
+if (preg_match("/^(XTM|FBX)/i", $sysDescr)) {
+    $os = "fireware";
 }
+

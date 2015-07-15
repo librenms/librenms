@@ -1,7 +1,9 @@
 <?php
 
-$class     = 'load';
-$unit      = '%%';
-$unit_long = 'Load';
+$class     = "load";
+$unit      = "%%";
+$unit_long = "Load";
 
-require 'includes/graphs/device/sensor.inc.php';
+include("includes/graphs/device/sensor.inc.php");
+
+?>

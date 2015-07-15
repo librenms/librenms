@@ -3,25 +3,25 @@
  * Color.php
  *
  * PHP version 5
- *
+ * 
  * Copyright (c) 2007 Stefan Walk
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"), to 
+ * deal in the Software without restriction, including without limitation the 
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+ * sell copies of the Software, and to permit persons to whom the Software is 
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
+ * The above copyright notice and this permission notice shall be included in 
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
  * IN THE SOFTWARE.
  *
  * @category Console
@@ -32,11 +32,11 @@
  */
 
 
-
+    
 /**
  * A simple class to use ANSI Colorcodes.
  *
- * Of all the functions, you probably only want to use convert() and escape().
+ * Of all the functions, you probably only want to use convert() and escape(). 
  * They are easier to use. However, if you want to access colorcodes more
  * directly, look into the other functions.
  *
@@ -51,74 +51,65 @@ class Console_Color2
 
     protected $color_codes;
 
-
-    public function __construct()
-    {
-        $this->setColorCodes(
-            array(
-                'color'      => array(
-                    'black'  => 30,
-                    'red'    => 31,
-                    'green'  => 32,
-                    'brown'  => 33,
-                    'blue'   => 34,
-                    'purple' => 35,
-                    'cyan'   => 36,
-                    'grey'   => 37,
-                    'yellow' => 33,
+    public function __construct() {
+        $this->setColorCodes(array(
+                'color' => array(
+                        'black'  => 30,
+                        'red'    => 31,
+                        'green'  => 32,
+                        'brown'  => 33,
+                        'blue'   => 34,
+                        'purple' => 35,
+                        'cyan'   => 36,
+                        'grey'   => 37,
+                        'yellow' => 33
                 ),
-                'style'      => array(
-                    'normal'     => 0,
-                    'bold'       => 1,
-                    'light'      => 1,
-                    'underscore' => 4,
-                    'underline'  => 4,
-                    'blink'      => 5,
-                    'inverse'    => 6,
-                    'hidden'     => 8,
-                    'concealed'  => 8,
+                'style' => array(
+                        'normal'     => 0,
+                        'bold'       => 1,
+                        'light'      => 1,
+                        'underscore' => 4,
+                        'underline'  => 4,
+                        'blink'      => 5,
+                        'inverse'    => 6,
+                        'hidden'     => 8,
+                        'concealed'  => 8
                 ),
                 'background' => array(
-                    'black'  => 40,
-                    'red'    => 41,
-                    'green'  => 42,
-                    'brown'  => 43,
-                    'yellow' => 43,
-                    'blue'   => 44,
-                    'purple' => 45,
-                    'cyan'   => 46,
-                    'grey'   => 47,
-                ),
+                        'black'  => 40,
+                        'red'    => 41,
+                        'green'  => 42,
+                        'brown'  => 43,
+                        'yellow' => 43,
+                        'blue'   => 44,
+                        'purple' => 45,
+                        'cyan'   => 46,
+                        'grey'   => 47
+                )
             )
         );
+    }
 
-    }//end __construct()
-
-
-    public function setColorCodes($color_codes)
+    public function setColorCodes($color_codes) 
     {
         $this->color_codes = $color_codes;
+    }
 
-    }//end setColorCodes()
-
-
-    public function getColorCodes()
+    public function getColorCodes() 
     {
         return $this->color_codes;
-
-    }//end getColorCodes()
-
+    }
 
     /**
      * Returns an ANSI-Controlcode
-     *
+     * 
      * Takes 1 to 3 Arguments: either 1 to 3 strings containing the name of the
      * FG Color, style and BG color, or one array with the indices color, style
      * or background.
      *
      * @param mixed  $color      Optional.
      *                           Either a string with the name of the foreground
-     *                           color, or an array with the indices 'color',
+     *                           color, or an array with the indices 'color', 
      *                           'style', 'background' and corresponding names as
      *                           values.
      * @param string $style      Optional name of the style
@@ -126,7 +117,7 @@ class Console_Color2
      *
      * @return string
      */
-    public function color($color=null, $style=null, $background=null)
+    public function color($color = null, $style = null, $background = null) // {{{
     {
         $colors = $this->getColorCodes();
         if (is_array($color)) {
@@ -158,12 +149,7 @@ class Console_Color2
 
         $code = implode(';', $code);
         return "\033[{$code}m";
-
-    }//end color()
-
-
-    // }}}
-
+    } // }}}
 
     /**
      * Returns a FG color controlcode
@@ -177,10 +163,8 @@ class Console_Color2
         $colors = $this->getColorCodes();
 
         return "\033[".$colors['color'][$name].'m';
-
-    }//end fgcolor()
-
-
+    }
+    
     /**
      * Returns a style controlcode
      *
@@ -192,15 +176,13 @@ class Console_Color2
     {
         $colors = $this->getColorCodes();
         return "\033[".$colors['background'][$name].'m';
-
-    }//end bgcolor()
-
+    }
 
     /**
      * Converts colorcodes in the format %y (for yellow) into ansi-control
      * codes. The conversion table is: ('bold' meaning 'light' on some
      * terminals). It's almost the same conversion table irssi uses.
-     * <pre>
+     * <pre> 
      *                  text      text            background
      *      ------------------------------------------------
      *      %k %K %0    black     dark grey       black
@@ -225,94 +207,36 @@ class Console_Color2
      * colors should be used. It defaults to true, if set to false, the
      * colorcodes will just be removed (And %% will be transformed into %)
      *
-     * @param string  $string  String to convert
-     * @param boolean $colored Should the string be colored?
+     * @param string $string  String to convert
+     * @param bool   $colored Should the string be colored?
      *
      * @return string
      */
-    public function convert($string, $colored=true)
+    public function convert($string, $colored = true)
     {
-        static $conversions = array(
-            // static so the array doesn't get built
-            // everytime
+        static $conversions = array ( // static so the array doesn't get built
+                                      // everytime
             // %y - yellow, and so on... {{{
-            '%y' => array(
-                'color' => 'yellow',
-                'style' => 'normal',
-            ),
-            '%g' => array(
-                'color' => 'green',
-                'style' => 'normal',
-            ),
-            '%b' => array(
-                'color' => 'blue',
-                'style' => 'normal',
-            ),
-            '%r' => array(
-                'color' => 'red',
-                'style' => 'normal',
-            ),
-            '%p' => array(
-                'color' => 'purple',
-                'style' => 'normal',
-            ),
-            '%m' => array(
-                'color' => 'purple',
-                'style' => 'normal',
-            ),
-            '%c' => array(
-                'color' => 'cyan',
-                'style' => 'normal',
-            ),
-            '%w' => array(
-                'color' => 'grey',
-                'style' => 'normal',
-            ),
-            '%k' => array(
-                'color' => 'black',
-                'style' => 'normal',
-            ),
+            '%y' => array('color' => 'yellow',  'style' => 'normal'),
+            '%g' => array('color' => 'green',   'style' => 'normal'),
+            '%b' => array('color' => 'blue',    'style' => 'normal'),
+            '%r' => array('color' => 'red',     'style' => 'normal'),
+            '%p' => array('color' => 'purple',  'style' => 'normal'),
+            '%m' => array('color' => 'purple',  'style' => 'normal'),
+            '%c' => array('color' => 'cyan',    'style' => 'normal'),
+            '%w' => array('color' => 'grey',    'style' => 'normal'),
+            '%k' => array('color' => 'black',   'style' => 'normal'),
             '%n' => array('color' => 'reset' ),
-            '%Y' => array(
-                'color' => 'yellow',
-                'style' => 'light',
-            ),
-            '%G' => array(
-                'color' => 'green',
-                'style' => 'light',
-            ),
-            '%B' => array(
-                'color' => 'blue',
-                'style' => 'light',
-            ),
-            '%R' => array(
-                'color' => 'red',
-                'style' => 'light',
-            ),
-            '%P' => array(
-                'color' => 'purple',
-                'style' => 'light',
-            ),
-            '%M' => array(
-                'color' => 'purple',
-                'style' => 'light',
-            ),
-            '%C' => array(
-                'color' => 'cyan',
-                'style' => 'light',
-            ),
-            '%W' => array(
-                'color' => 'grey',
-                'style' => 'light',
-            ),
-            '%K' => array(
-                'color' => 'black',
-                'style' => 'light',
-            ),
-            '%N' => array(
-                'color' => 'reset',
-                'style' => 'light',
-            ),
+            '%Y' => array('color' => 'yellow',  'style' => 'light'),
+            '%G' => array('color' => 'green',   'style' => 'light'),
+            '%B' => array('color' => 'blue',    'style' => 'light'),
+            '%R' => array('color' => 'red',     'style' => 'light'),
+            '%P' => array('color' => 'purple',  'style' => 'light'),
+            '%M' => array('color' => 'purple',  'style' => 'light'),
+            '%C' => array('color' => 'cyan',    'style' => 'light'),
+            '%W' => array('color' => 'grey',    'style' => 'light'),
+            '%K' => array('color' => 'black',   'style' => 'light'),
+            '%N' => array('color' => 'reset',   'style' => 'light'),
             '%3' => array('background' => 'yellow'),
             '%2' => array('background' => 'green' ),
             '%4' => array('background' => 'blue'  ),
@@ -326,58 +250,48 @@ class Console_Color2
             '%U' => array('style' => 'underline'),
             '%8' => array('style' => 'inverse'),
             '%9' => array('style' => 'bold'),
-            '%_' => array('style' => 'bold'),
+            '%_' => array('style' => 'bold')
             // }}}
         );
 
         if ($colored) {
             $string = str_replace('%%', '% ', $string);
             foreach ($conversions as $key => $value) {
-                $string = str_replace(
-                    $key,
-                    $this->color($value),
-                    $string
-                );
+                $string = str_replace($key, $this->color($value),
+                          $string);
             }
-
             $string = str_replace('% ', '%', $string);
-        }
-        else {
+
+        } else {
             $string = preg_replace('/%((%)|.)/', '$2', $string);
         }
 
         return $string;
-
-    }//end convert()
-
+    }
 
     /**
      * Escapes % so they don't get interpreted as color codes
-     *
+     * 
      * @param string $string String to escape
      *
      * @return string
      */
-    public function escape($string)
+    public function escape($string) 
     {
         return str_replace('%', '%%', $string);
-
-    }//end escape()
-
+    }
 
     /**
      * Strips ANSI color codes from a string
      *
      * @param string $string String to strip
      *
-     * @acess  public
+     * @acess public
      * @return string
      */
-    public function strip($string)
+    public function strip($string) 
     {
         return preg_replace('/\033\[[\d;]+m/', '', $string);
+    }
 
-    }//end strip()
-
-
-}//end class
+}

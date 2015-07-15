@@ -26,23 +26,22 @@ var grid = $("#ipv6-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-$sql = 'SELECT `devices`.`device_id`,`hostname` FROM `devices`';
+$sql = "SELECT `devices`.`device_id`,`hostname` FROM `devices`";
 
-if (is_admin() === false && is_read() === false) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where  .= ' WHERE `DP`.`user_id`=?';
+if (is_admin() === FALSE && is_read() === FALSE) {
+    $sql .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
+    $where .= " WHERE `DP`.`user_id`=?";
     $param[] = $_SESSION['user_id'];
 }
 
 $sql .= " $where GROUP BY `hostname` ORDER BY `hostname`";
 
-foreach (dbFetchRows($sql, $param) as $data) {
-    echo '"<option value=\"'.$data['device_id'].'\""+';
+foreach (dbFetchRows($sql,$param) as $data) {
+    echo('"<option value=\"'.$data['device_id'].'\""+');
     if ($data['device_id'] == $_POST['device_id']) {
-        echo '" selected"+';
+        echo('" selected"+');
     }
-
-    echo '">'.$data['hostname'].'</option>"+';
+    echo('">'.$data['hostname'].'</option>"+');
 }
 ?>
                 "</select>"+
@@ -52,8 +51,9 @@ foreach (dbFetchRows($sql, $param) as $data) {
                 "<option value=\"\">All Interfaces</option>"+
                 "<option value=\"Loopback%\""+
 <?php
-if ($_POST['interface'] == 'Loopback%') {
-    echo '" selected "+';
+
+if ($_POST['interface'] == "Loopback%") {
+    echo('" selected "+');
 }
 
 ?>
@@ -61,8 +61,9 @@ if ($_POST['interface'] == 'Loopback%') {
                 ">Loopbacks</option>"+
                 "<option value=\"Vlan%\""+
 <?php
-if ($_POST['interface'] == 'Vlan%') {
-    echo '" selected "+';
+
+if ($_POST['interface'] == "Vlan%") {
+    echo('" selected "+');
 }
 
 ?>
@@ -71,7 +72,7 @@ if ($_POST['interface'] == 'Vlan%') {
                 "</select>"+
                 "</div>"+
                 "<div class=\"form-group\">"+
-                "<input type=\"text\" name=\"address\" id=\"address\" size=40 value=\"<?php echo $_POST['address']; ?>\" class=\"form-control input-sm\" placeholder=\"IPv6 Address\"/>"+
+                "<input type=\"text\" name=\"address\" id=\"address\" size=40 value=\"<?php echo($_POST['address']); ?>\" class=\"form-control input-sm\" placeholder=\"IPv6 Address\"/>"+
                 "</div>"+
                 "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
                 "</form></span></div>"+

@@ -13,9 +13,7 @@
 
 if(is_admin() === false) {
     echo ('ERROR: You need to be admin');
-}
-else {
-
+} else {
 ?>
 
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
@@ -157,3 +155,4 @@ $('#create-group').click('', function(e) {
 
 <?php
 }
+?>

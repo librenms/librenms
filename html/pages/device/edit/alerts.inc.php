@@ -1,48 +1,35 @@
 <?php
-if ($_POST['editing']) {
-    if ($_SESSION['userlevel'] > '7') {
-        $override_sysContact_bool = mres($_POST['override_sysContact']);
-        if (isset($_POST['sysContact'])) {
-            $override_sysContact_string = mres($_POST['sysContact']);
-        }
+if ($_POST['editing'])
+{
+  if ($_SESSION['userlevel'] > "7")
+  {
+    $override_sysContact_bool = mres($_POST['override_sysContact']);
+    if (isset($_POST['sysContact'])) { $override_sysContact_string  = mres($_POST['sysContact']); }
+    $disable_notify  = mres($_POST['disable_notify']);
 
-        $disable_notify = mres($_POST['disable_notify']);
+    if ($override_sysContact_bool) { set_dev_attrib($device, 'override_sysContact_bool', '1'); } else { del_dev_attrib($device, 'override_sysContact_bool'); }
+    if (isset($override_sysContact_string)) { set_dev_attrib($device, 'override_sysContact_string', $override_sysContact_string); };
+    if ($disable_notify) { set_dev_attrib($device, 'disable_notify', '1'); } else { del_dev_attrib($device, 'disable_notify'); }
 
-        if ($override_sysContact_bool) {
-            set_dev_attrib($device, 'override_sysContact_bool', '1');
-        }
-        else {
-            del_dev_attrib($device, 'override_sysContact_bool');
-        }
-
-        if (isset($override_sysContact_string)) {
-            set_dev_attrib($device, 'override_sysContact_string', $override_sysContact_string);
-        };
-        if ($disable_notify) {
-            set_dev_attrib($device, 'disable_notify', '1');
-        }
-        else {
-            del_dev_attrib($device, 'disable_notify');
-        }
-
-        $update_message = 'Device alert settings updated.';
-        $updated        = 1;
-    }
-    else {
-        include 'includes/error-no-perm.inc.php';
-    }//end if
-}//end if
-
-if ($updated && $update_message) {
-    print_message($update_message);
-}
-else if ($update_message) {
-    print_error($update_message);
+    $update_message = "Device alert settings updated.";
+    $updated = 1;
+  }
+  else
+  {
+    include("includes/error-no-perm.inc.php");
+  }
 }
 
-$override_sysContact_bool   = get_dev_attrib($device, 'override_sysContact_bool');
-$override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string');
-$disable_notify             = get_dev_attrib($device, 'disable_notify');
+if ($updated && $update_message)
+{
+  print_message($update_message);
+} elseif ($update_message) {
+  print_error($update_message);
+}
+
+$override_sysContact_bool = get_dev_attrib($device,'override_sysContact_bool');
+$override_sysContact_string = get_dev_attrib($device,'override_sysContact_string');
+$disable_notify = get_dev_attrib($device,'disable_notify');
 ?>
 
 <div class="row">
@@ -58,44 +45,26 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
   <div class="form-group">
     <label for="override_sysContact" class="col-sm-3 control-label">Override sysContact:</label>
     <div class="col-sm-6">
-      <input onclick="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact"
-<?php
-if ($override_sysContact_bool) {
-    echo ' checked="1"';
-};
-?>
- />
+      <input onclick="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact"<?php if ($override_sysContact_bool) { echo(' checked="1"'); } ?> />
     </div>
   </div>
   <div class="form-group">
     <div class="col-sm-3">
     </div>
     <div class="col-sm-6">
-      <input id="sysContact" class="form-control" name="sysContact" size="32"
-<?php
-if (!$override_sysContact_bool) {
-    echo ' disabled="1"';
-};
-?>
- value="<?php echo $override_sysContact_string; ?>" />
+      <input id="sysContact" class="form-control" name="sysContact" size="32"<?php if (!$override_sysContact_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysContact_string); ?>" />
     </div>
   </div>
   <div class="form-group">
     <label for="disable_notify" class="col-sm-3 control-label">Disable all alerting for this host: </label>
     <div class="col-sm-6">
-      <input id="disable_notify" type="checkbox" name="disable_notify"
-<?php
-if ($disable_notify) {
-    echo ' checked="1"';
-};
-?>
- />
+      <input id="disable_notify" type="checkbox" name="disable_notify"<?php if ($disable_notify) { echo(' checked="1"'); } ?> />
     </div>
   </div>
   <button class="btn btn-default btn-sm" type="submit" name="Submit">Save</button>
 </form>
 
 <?php
-require_once 'includes/modal/new_alert_rule.inc.php';
+require_once("includes/modal/new_alert_rule.inc.php");
 ?>
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="<?php echo $device['device_id']; ?>">Create new alert rule</button>
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="<?php echo $device['device_id'];?>">Create new alert rule</button>

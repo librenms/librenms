@@ -13,29 +13,25 @@
  */
 
 $alert_id = mres($_POST['alert_id']);
-$state    = mres($_POST['state']);
-if (!is_numeric($alert_id)) {
-    echo 'ERROR: No alert selected';
+$state = mres($_POST['state']);
+if(!is_numeric($alert_id)) {
+    echo('ERROR: No alert selected');
     exit;
-}
-else if (!is_numeric($state)) {
-    echo 'ERROR: No state passed';
+} elseif(!is_numeric($state)) {
+    echo('ERROR: No state passed');
     exit;
-}
-else {
-    if ($state == 2) {
-        $state = dbFetchCell('SELECT alerted FROM alerts WHERE id = ?', array($alert_id));
-    }
-    else if ($state >= 1) {
+} else {
+    if($state == 2) {
+        $state = dbFetchCell('SELECT alerted FROM alerts WHERE id = ?',array($alert_id));
+    } elseif($state >= 1) {
         $state = 2;
     }
+    if(dbUpdate(array('state' => $state), 'alerts', 'id=?',array($alert_id)) >= 0) {
+      echo('Alert acknowledged status changed.');
+      exit;
+    } else {
+      echo('ERROR: Alert has not been acknowledged.');
+      exit;
+    }
+}
 
-    if (dbUpdate(array('state' => $state), 'alerts', 'id=?', array($alert_id)) >= 0) {
-        echo 'Alert acknowledged status changed.';
-        exit;
-    }
-    else {
-        echo 'ERROR: Alert has not been acknowledged.';
-        exit;
-    }
-}//end if

@@ -16,3 +16,5 @@ echo("
    </tr></table>");
 print_optionbar_end();
 echo("</div>");
+
+?>
