@@ -9,8 +9,7 @@ $app_rows = dbFetchRows('SELECT * FROM `applications` WHERE `device_id`  = ?', a
 
 if (count($app_rows)) {
     echo 'Applications: ';
-    foreach ($app_rows as $app)
-    {
+    foreach ($app_rows as $app) {
         $app_include = $config['install_dir'].'/includes/polling/applications/'.$app['app_type'].'.inc.php';
         if (is_file($app_include)) {
             include $app_include;

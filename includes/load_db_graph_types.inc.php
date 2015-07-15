@@ -16,8 +16,9 @@
 foreach (dbFetchRows('select * from graph_types') as $graph) {
     // remove leading 'graph_' from column names
     foreach ($graph as $k => $v) {
-        $key = strpos($k, 'graph_') == 0 ? str_replace('graph_', '', $k) : $k;
+        $key     = strpos($k, 'graph_') == 0 ? str_replace('graph_', '', $k) : $k;
         $g[$key] = $v;
     }
+
     $config['graph_types'][$g['type']][$g['subtype']] = $g;
 }

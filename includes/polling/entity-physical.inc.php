@@ -9,8 +9,7 @@ if ($device['os'] == 'ios') {
     $chan_stats = snmpwalk_cache_oid($device, 'cc6kxbarModuleChannelTable', array(), 'CISCO-CAT6K-CROSSBAR-MIB');
     $chan_stats = snmpwalk_cache_oid($device, 'cc6kxbarStatisticsTable', $chan_stats, 'CISCO-CAT6K-CROSSBAR-MIB');
 
-    foreach ($mod_stats as $index => $entry)
-    {
+    foreach ($mod_stats as $index => $entry) {
         $group = 'c6kxbar';
         foreach ($entry as $key => $value) {
             $subindex = null;
@@ -18,8 +17,7 @@ if ($device['os'] == 'ios') {
         }
     }
 
-    foreach ($chan_stats as $index => $entry)
-    {
+    foreach ($chan_stats as $index => $entry) {
         list($index,$subindex) = explode('.', $index, 2);
         $group                 = 'c6kxbar';
         foreach ($entry as $key => $value) {

@@ -19,5 +19,5 @@ if (is_numeric($sensor['sensor_limit'])) {
 }
 
 if (is_numeric($sensor['sensor_limit_low'])) {
-    $rrd_options .= ' HRULE:'.$sensor['sensor_limit_low'].'#999999::dashes'; 
+    $rrd_options .= ' HRULE:'.$sensor['sensor_limit_low'].'#999999::dashes';
 }

@@ -13,41 +13,33 @@
  */
 
 // FUA
-
 if (isset($_POST['sub_type']) && !empty($_POST['sub_type'])) {
     dbUpdate(array('sensor_custom' => 'No'), 'sensors', '`sensor_id` = ?', array($_POST['sensor_id']));
-} else {
+}
+else {
+    if (!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id'])) {
+        echo 'error with data';
+        exit;
+    }
+    else {
+        if ($_POST['state'] == 'true') {
+            $state = 1;
+        }
+        else if ($_POST['state'] == 'false') {
+            $state = 0;
+        }
+        else {
+            $state = 0;
+        }
 
-if(!is_numeric($_POST['device_id']) || !is_numeric($_POST['sensor_id']))
-{
-  echo('error with data');
-  exit;
+        $update = dbUpdate(array('sensor_alert' => $state), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($_POST['sensor_id'], $_POST['device_id']));
+        if (!empty($update) || $update == '0') {
+            echo 'success';
+            exit;
+        }
+        else {
+            echo 'error';
+            exit;
+        }
+    }
 }
-else
-{
-  if($_POST['state'] == 'true')
-  {
-    $state = 1;
-  }
-  elseif($_POST['state'] == 'false')
-  {
-    $state = 0;
-  }
-  else
-  {
-    $state = 0;
-  }
-  $update = dbUpdate(array('sensor_alert' => $state), 'sensors', '`sensor_id` = ? AND `device_id` = ?', array($_POST['sensor_id'],$_POST['device_id']));
-  if(!empty($update) || $update == '0')
-  {
-    echo('success');
-    exit;
-  }
-  else
-  {
-    echo('error');
-    exit;
-  }
-}
-}
-
