@@ -32,6 +32,10 @@
  * @return string
  */
 function GenGroupSQL($pattern, $search='') {
+    $pattern = RunGroupMacros($pattern);
+    if ($pattern === false) {
+       return false;
+    }
     $tmp    = explode(' ', $pattern);
     $tables = array();
     foreach ($tmp as $opt) {
@@ -109,3 +113,27 @@ function GetGroupsFromDevice($device) {
     return $ret;
 
 }//end GetGroupsFromDevice()
+
+/**
+ * Process Macros
+ * @param string $rule Rule to process
+ * @param int $x Recursion-Anchor
+ * @return string|boolean
+ */
+function RunGroupMacros($rule,$x=1) {
+    global $config;
+    krsort($config['alert']['macros']['group']);
+    foreach( $config['alert']['macros']['group'] as $macro=>$value ) {
+        if( !strstr($macro," ") ) {
+            $rule = str_replace('%macros.'.$macro,'('.$value.')',$rule);
+        }
+    }
+    if( strstr($rule,"%macros") ) {
+        if( ++$x < 30 ) {
+            $rule = RunGroupMacros($rule,$x);
+        } else {
+            return false;
+        }
+    }
+    return $rule;
+}//end RunGroupMacros()
