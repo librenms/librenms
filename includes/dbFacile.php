@@ -109,6 +109,63 @@ function dbInsert($data, $table) {
 
 
 /*
+ * Passed an array and a table name, it attempts to insert the data into the table.
+ * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
+ * Check for boolean false to determine whether insert failed
+ * */
+
+
+function dbBulkInsert($data, $table) {
+    global $fullSql;
+    global $db_stats;
+    // the following block swaps the parameters if they were given in the wrong order.
+    // it allows the method to work for those that would rather it (or expect it to)
+    // follow closer with SQL convention:
+    // insert into the TABLE this DATA
+    if (is_string($data) && is_array($table)) {
+        $tmp   = $data;
+        $data  = $table;
+        $table = $tmp;
+        // trigger_error('QDB - Parameters passed to insert() were in reverse order, but it has been allowed', E_USER_NOTICE);
+    }
+    if (count($data) === 0) {
+        return false;
+    }
+    if (count($data[0]) === 0) {
+        return false;
+    }
+
+    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data[0])).'`)  VALUES ';
+    $values ='';
+
+    foreach ($data as $row) {
+        if ($values != '') {
+            $values .= ',';
+        }
+        $rowvalues='';
+        foreach ($row as $key => $value) {
+            if ($rowvalues != '') {
+                $rowvalues .= ',';
+            }
+            $rowvalues .= "'".mres($value)."'";
+        }
+        $values .= "(".$rowvalues.")";
+    }
+
+    $time_start = microtime(true);
+    $result = dbQuery($sql.$values);
+
+    // logfile($fullSql);
+    $time_end                = microtime(true);
+    $db_stats['insert_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['insert']++;
+
+    return $id;
+
+}//end dbBulkInsert()
+
+
+/*
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
  * Returns the number of affected rows
  * */
