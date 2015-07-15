@@ -1,26 +1,23 @@
 <?php
-
 if ($device['os'] == "powerconnect")
 {
     $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
-    private function radLanTemperatureSensor($device){
-        /** Operating Temperature: 0º C to 45º C **/
-        $temperature = trim(snmp_get($device, ".1.3.6.1.4.1.89.53.15.1.9.1", "-Ovq"));
-        discover_sensor($valid['sensor'], 'temperature', $device , ".1.3.6.1.4.1.89.53.15.1.9.1", 0 , "powerconnect" , "Internal Temperature" , '1', '1', "0" , NULL, NULL, "45", $temperature);
-    }
-
     switch ($sysObjectId) {
         /**
-         * Dell Powerconnect 5548
-         */
+        * Dell Powerconnect 5548
+        * Operating Temperature: 0º C to 45º C
+        */
         case ".1.3.6.1.4.1.674.10895.3031":
-        radLanTemperatureSensor($device);
+        $temperature = trim(snmp_get($device, ".1.3.6.1.4.1.89.53.15.1.9.1", "-Ovq"));
+        discover_sensor($valid['sensor'], 'temperature', $device , ".1.3.6.1.4.1.89.53.15.1.9.1", 0 , "powerconnect" , "Internal Temperature" , '1', '1', "0" , NULL, NULL, "45", $temperature);
         break;
         /**
-         * Dell Powerconnect 3548
-         */
+        * Dell Powerconnect 3548
+        * Operating Temperature: 0º C to 45º C
+        */
         case ".1.3.6.1.4.1.674.10895.3017":
-        radLanTemperatureSensor($device);
+        $temperature = trim(snmp_get($device, ".1.3.6.1.4.1.89.53.15.1.9.1", "-Ovq"));
+        discover_sensor($valid['sensor'], 'temperature', $device , ".1.3.6.1.4.1.89.53.15.1.9.1", 0 , "powerconnect" , "Internal Temperature" , '1', '1', "0" , NULL, NULL, "45", $temperature);
         break;
         default :
         /**
