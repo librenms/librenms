@@ -459,10 +459,7 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr) {
 function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id) {
     global $config, $debug, $link_exists;
 
-    if ($debug) {
-        echo "\n";
-        var_dump($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version);
-    }
+    d_echo("$local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version");
 
     if (dbFetchCell(
         'SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?',
