@@ -12,8 +12,6 @@
  * the source code distribution for details.
  */
 
-$pagetitle[] = "Map";
+$pagetitle[] = 'Map';
 
-require_once "includes/print-map.inc.php";
-
-?>
+require_once 'includes/print-map.inc.php';

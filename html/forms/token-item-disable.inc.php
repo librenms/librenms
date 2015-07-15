@@ -12,34 +12,28 @@
  * the source code distribution for details.
  */
 
-if(!is_numeric($_POST['token_id']))
-{
-  echo('error with data');
-  exit;
-}
-else
-{
-  if($_POST['state'] == 'true')
-  {
-    $state = 1;
-  }
-  elseif($_POST['state'] == 'false')
-  {
-    $state = 0;
-  }
-  else
-  {
-    $state = 0;
-  }
-  $update = dbUpdate(array('disabled' => $state), 'api_tokens', '`id` = ?', array($_POST['token_id']));
-  if(!empty($update) || $update == '0')
-  {
-    echo('success');
+if (!is_numeric($_POST['token_id'])) {
+    echo 'error with data';
     exit;
-  }
-  else
-  {
-    echo('error');
-    exit;
-  }
 }
+else {
+    if ($_POST['state'] == 'true') {
+        $state = 1;
+    }
+    else if ($_POST['state'] == 'false') {
+        $state = 0;
+    }
+    else {
+        $state = 0;
+    }
+
+    $update = dbUpdate(array('disabled' => $state), 'api_tokens', '`id` = ?', array($_POST['token_id']));
+    if (!empty($update) || $update == '0') {
+        echo 'success';
+        exit;
+    }
+    else {
+        echo 'error';
+        exit;
+    }
+}//end if

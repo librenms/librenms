@@ -24,4 +24,3 @@ function createInterfaces(index)
 }
 
 </script>
-

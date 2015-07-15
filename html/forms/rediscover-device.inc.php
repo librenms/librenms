@@ -13,20 +13,26 @@
  */
 
 // FIXME: Make this part of the API instead of a standalone function
-
-if(!is_numeric($_POST['device_id'])) {
-    $status = "error";
-    $message = "Invalid device id";
-} else {
+if (!is_numeric($_POST['device_id'])) {
+    $status  = 'error';
+    $message = 'Invalid device id';
+}
+else {
     $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
-    if(!empty($update) || $update == '0') {
-       $status = "ok";
-       $message = "Device will be rediscovered";
-    } else {
-         $status = "error";
-         $message = "Error rediscovering device";
+    if (!empty($update) || $update == '0') {
+        $status  = 'ok';
+        $message = 'Device will be rediscovered';
+    }
+    else {
+         $status  = 'error';
+         $message = 'Error rediscovering device';
     }
 }
-$output = array("status" => $status, "message" => $message);
-header("Content-type: application/json");
+
+$output = array(
+    'status'  => $status,
+    'message' => $message,
+);
+
+header('Content-type: application/json');
 echo _json_encode($output);
