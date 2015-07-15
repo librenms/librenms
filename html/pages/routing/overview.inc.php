@@ -1,7 +1,7 @@
 <?php
 
 foreach ($datas as $type) {
-    if ($type != 'overview') { 
+    if ($type != 'overview') {
         if (is_file('pages/routing/overview/'.mres($type).'.inc.php')) {
             $g_i++;
             if (!is_integer($g_i / 2)) {

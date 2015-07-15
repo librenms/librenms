@@ -12,8 +12,7 @@ $config_file   = 'config.php';
 // move to install dir
 chdir(dirname($argv[0]));
 
-function iscli()
-{
+function iscli() {
     if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
         return true;
     }

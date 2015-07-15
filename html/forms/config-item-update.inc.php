@@ -13,25 +13,19 @@
  */
 
 // FUA
-
-if(!is_numeric($_POST['config_id']) || empty($_POST['data']))
-{
-  echo('error with data');
-  exit;
-}
-else
-{
-  $data = mres($_POST['data']);
-  $update = dbUpdate(array('config_value' => "$data"), 'config', '`config_id` = ?', array($_POST['config_id']));
-  if(!empty($update) || $update == '0')
-  {
-    echo('success');
+if (!is_numeric($_POST['config_id']) || empty($_POST['data'])) {
+    echo 'error with data';
     exit;
-  }
-  else
-  {
-    echo('error');
-    exit;
-  }
 }
-
+else {
+    $data   = mres($_POST['data']);
+    $update = dbUpdate(array('config_value' => "$data"), 'config', '`config_id` = ?', array($_POST['config_id']));
+    if (!empty($update) || $update == '0') {
+        echo 'success';
+        exit;
+    }
+    else {
+        echo 'error';
+        exit;
+    }
+}
