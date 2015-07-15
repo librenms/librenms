@@ -112,7 +112,7 @@ if ($count <= 1) {
 $i = '0';
 
 foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC', array($bill_id, $start, $end)) as $row) {
-    @$timestamp = $row['formatted_date'];
+    $timestamp = $row['formatted_date'];
     if (!$first) {
         $first = $timestamp;
     }
