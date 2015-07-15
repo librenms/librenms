@@ -3,7 +3,8 @@
 $pagetitle[] = 'Deleted ports';
 
 if ($vars['purge'] == 'all') {
-    foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface) {
+    foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface)
+    {
         if (port_permitted($interface['port_id'], $interface['device_id'])) {
             delete_port($interface['port_id']);
             echo '<div class=infobox>Deleted '.generate_device_link($interface).' - '.generate_port_link($interface).'</div>';

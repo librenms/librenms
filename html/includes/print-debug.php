@@ -1,6 +1,6 @@
 <?php
 
-    $total_queries    = count($sql_debug);
+    $total_queries = count($sql_debug);
     $total_php_issues = count($php_debug);
 ?>
 
@@ -14,23 +14,25 @@
       <div class="modal-body">
       <table class="table table-condensed table-hover">
 <?php
+
 foreach ($sql_debug as $sql_error) {
-    echo "
+    echo ("
           <tr>
               <td>
                   $sql_error
               </td>
           </tr>
-    ";
+    ");
 }
 
-    echo "
+    echo ("
           <tr>
               <td>
                   $total_queries total SQL queries run.
               </td>
           </tr>
-    ";
+    ");
+
 ?>
       </table>
       </div>
@@ -50,25 +52,26 @@ foreach ($sql_debug as $sql_error) {
       <div class="modal-body">
       <table class="table table-condensed table-hover">
 <?php
+
 foreach ($php_debug as $php_error) {
-    echo '
+    echo ("
           <tr>
               <td>
-    ';
+    ");
     print_r($php_error);
-    echo '
+    echo("
               </td>
           </tr>
-    ';
+    ");
 }
 
-    echo "
+    echo ("
           <tr>
               <td>
                   $total_php_issues total PHP issues / errors.
               </td>
           </tr>
-    ";
+    ");
 
 ?>
       </table>

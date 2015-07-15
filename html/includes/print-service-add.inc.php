@@ -1,6 +1,6 @@
 <?php
 
-echo "
+echo("
 <h3><span class='label label-success threeqtr-width'>Add Service</span></h3>
 <form id='addsrv' name='addsrv' method='post' action='' class='form-horizontal' role='form'>
   <div class='well well-lg'>
@@ -51,4 +51,4 @@ echo "
     </div>
     <button type='submit' name='Submit' class='btn btn-success input-sm'>Add Service</button>
   </div>
-</form>";
+</form>");

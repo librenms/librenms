@@ -74,3 +74,5 @@ $('#sched-maintenance-removal').click('', function(e) {
 <?php
 
 }
+
+?>

@@ -14,9 +14,9 @@
  */
 
 $minutes = 15;
-$seconds = ($minutes * 60);
-$top     = $config['front_page_settings']['top']['devices'];
-if (is_admin() === true || is_read() === true) {
+$seconds = $minutes * 60;
+$top = $config['front_page_settings']['top']['devices'];
+if (is_admin() === TRUE || is_read() === TRUE) {
     $query = "
         SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
         FROM ports as p, devices as d
@@ -27,10 +27,9 @@ if (is_admin() === true || is_read() === true) {
         GROUP BY d.device_id
         ORDER BY total desc
         LIMIT $top
-        ";
-}
-else {
-    $query   = "
+    ";
+} else {
+    $query = "
         SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
         FROM ports as p, devices as d, `devices_perms` AS `P`
         WHERE `P`.`user_id` = ? AND `P`.`device_id` = `d`.`device_id` AND
@@ -41,21 +40,19 @@ else {
         GROUP BY d.device_id
         ORDER BY total desc
         LIMIT $top
-        ";
+    ";
     $param[] = array($_SESSION['user_id']);
-}//end if
-
-echo "<strong>Top $top devices (last $minutes minutes)</strong>\n";
-echo "<table class='simple'>\n";
-foreach (dbFetchRows($query, $param) as $result) {
-    echo '<tr class=top10>'.'<td class=top10>'.generate_device_link($result, shorthost($result['hostname'])).'</td>'.'<td class=top10>'.generate_device_link(
-        $result,
-        generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], 'device_bits', 'no', 150, 21, '&', 'top10'),
-        array(),
-        0,
-        0,
-        0
-    ).'</td>'."</tr>\n";
 }
 
-echo "</table>\n";
+echo("<strong>Top $top devices (last $minutes minutes)</strong>\n");
+echo("<table class='simple'>\n");
+foreach (dbFetchRows($query,$param) as $result) {
+  echo("<tr class=top10>".
+    "<td class=top10>".generate_device_link($result, shorthost($result['hostname']))."</td>".
+    "<td class=top10>".generate_device_link($result,
+      generate_minigraph_image($result, $config['time']['day'], $config['time']['now'], "device_bits", "no", 150, 21, '&', "top10"), array(), 0, 0, 0)."</td>".
+    "</tr>\n");
+}
+echo("</table>\n");
+
+?>

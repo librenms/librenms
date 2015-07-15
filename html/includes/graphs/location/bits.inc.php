@@ -6,10 +6,12 @@ $ds_out = 'OUTOCTETS';
 
 $i = 1;
 foreach ($devices as $device) {
-    foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($device['device_id'])) as $int) {
+    foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($device['device_id'])) as $int)
+    {
         $ignore = 0;
         if (is_array($config['device_traffic_iftype'])) {
-            foreach ($config['device_traffic_iftype'] as $iftype) {
+            foreach ($config['device_traffic_iftype'] as $iftype)
+            {
                 if (preg_match($iftype.'i', $int['ifType'])) {
                     $ignore = 1;
                 }
@@ -17,7 +19,8 @@ foreach ($devices as $device) {
         }
 
         if (is_array($config['device_traffic_descr'])) {
-            foreach ($config['device_traffic_descr'] as $ifdescr) {
+            foreach ($config['device_traffic_descr'] as $ifdescr)
+            {
                 if (preg_match($ifdescr.'i', $int['ifDescr']) || preg_match($ifdescr.'i', $int['ifName']) || preg_match($ifdescr.'i', $int['portName'])) {
                     $ignore = 1;
                 }

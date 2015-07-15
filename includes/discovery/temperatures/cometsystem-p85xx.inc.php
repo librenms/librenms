@@ -17,13 +17,14 @@ if ($device['os'] == 'cometsystem-p85xx') {
     // if ($debug) { echo($oids."\n"); }
     if ($oids) {
         $out = array();
-        foreach (explode("\n", $oids) as $line) {
+        foreach (explode("\n", $oids) as $line)
+        {
             preg_match($regexp, $line, $match);
             if ($match['name']) {
                 $out[$match['id']]['name'] = $match['name'];
             }
 
-            if ($match['temp_intval']) {
+            if ($match['temp_intval']) { 
                 $out[$match['id']]['temp_intval'] = $match['temp_intval'];
             }
 

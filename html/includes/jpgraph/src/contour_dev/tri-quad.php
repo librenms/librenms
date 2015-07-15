@@ -59,14 +59,11 @@ class ContCanvas {
     function DrawLinePolygons($p,$color='red') {
         $this->shape->SetColor($color);
         for ($i = 0 ; $i < count($p) ; $i++) {
-            $x1 = $p[$i][0][0];
-            $y1 = $p[$i][0][1];
+            $x1 = $p[$i][0][0]; $y1 = $p[$i][0][1];
             for ($j = 1 ; $j < count($p[$i]) ; $j++) {
-                $x2=$p[$i][$j][0];
-                $y2 = $p[$i][$j][1];
+                $x2=$p[$i][$j][0]; $y2 = $p[$i][$j][1];
                 $this->shape->Line($x1, $y1, $x2, $y2);
-                $x1=$x2;
-                $y1=$y2;
+                $x1=$x2; $y1=$y2;
             }
         }
     }
@@ -141,7 +138,7 @@ class SingleTestTriangle {
         //$this->g->InitFrame();
 
         self::$t = new Text();
-        self::$t->SetColor('black');
+        self::$t->SetColor('black');        
         self::$t->SetFont(FF_ARIAL,FS_BOLD,9);
         self::$t->SetAlign('center','center');
     }
@@ -490,8 +487,7 @@ class SingleTestTriangle {
                                 $pl1 = array($x1p,$y1p,$x4p,$y4p);
                                 $colorl2 = $this->GetColor($v2p);
                                 $pl2 = array($x2p,$y2p,$x3p,$y3p);
-                                $vl1 = $v1p;
-                                $vl2 = $v2p;
+                                $vl1 = $v1p; $vl2 = $v2p;
 
                             }
                             else {
@@ -509,8 +505,7 @@ class SingleTestTriangle {
                                 $pl1 = array($x1p,$y1p,$x2p,$y2p);
                                 $colorl2 = $this->GetColor($v4p);
                                 $pl2 = array($x4p,$y4p,$x3p,$y3p);
-                                $vl1 = $v1p;
-                                $vl2 = $v4p;
+                                $vl1 = $v1p; $vl2 = $v4p;
                             }
                         }
                         else {
@@ -531,8 +526,7 @@ class SingleTestTriangle {
                                 $pl1 = array($x1p,$y1p,$x2p,$y2p);
                                 $colorl2 = $this->GetColor($v4p);
                                 $pl2 = array($x4p,$y4p,$x3p,$y3p);
-                                $vl1 = $v1p;
-                                $vl2 = $v4p;
+                                $vl1 = $v1p; $vl2 = $v4p;
                             }
                             else { //( $v1p == $v4p )
                                 // "\"
@@ -549,8 +543,7 @@ class SingleTestTriangle {
                                 $pl1 = array($x1p,$y1p,$x4p,$y4p);
                                 $colorl2 = $this->GetColor($v2p);
                                 $pl2 = array($x2p,$y2p,$x3p,$y3p);
-                                $vl1 = $v1p;
-                                $vl2 = $v2p;
+                                $vl1 = $v1p; $vl2 = $v2p;
                             }
                         }
                         $this->FillPolygon($color1,$p1);
@@ -737,12 +730,9 @@ class SingleTestTriangle {
     }
 
     function Fill($v1,$v2,$v3,$maxdepth) {
-        $x1=0;
-        $y1=1;
-        $x2=1;
-        $y2=0;
-        $x3=1;
-        $y3=1;
+        $x1=0; $y1=1;
+        $x2=1; $y2=0;
+        $x3=1; $y3=1;
         self::$maxdepth = $maxdepth;
         $this->TriFill($v1, $v2, $v3, $x1, $y1, $x2, $y2, $x3, $y3, 0);
     }

@@ -26,7 +26,8 @@ if ($device['os'] == 'ipoman') {
     $oids_out = snmpwalk_cache_multi_oid($device, 'outletStatusCurrent', $oids_out, 'IPOMANII-MIB');
 
     if (is_array($oids_in)) {
-        foreach ($oids_in as $index => $entry) {
+        foreach ($oids_in as $index => $entry)
+        {
             $cur_oid    = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.3.'.$index;
             $divisor    = 1000;
             $descr      = (trim($cache['ipoman']['in'][$index]['inletConfigDesc'], '"') != '' ? trim($cache['ipoman']['in'][$index]['inletConfigDesc'], '"') : "Inlet $index");
@@ -39,7 +40,8 @@ if ($device['os'] == 'ipoman') {
     }
 
     if (is_array($oids_out)) {
-        foreach ($oids_out as $index => $entry) {
+        foreach ($oids_out as $index => $entry)
+        {
             $cur_oid    = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.3.'.$index;
             $divisor    = 1000;
             $descr      = (trim($cache['ipoman']['out'][$index]['outletConfigDesc'], '"') != '' ? trim($cache['ipoman']['out'][$index]['outletConfigDesc'], '"') : "Output $index");

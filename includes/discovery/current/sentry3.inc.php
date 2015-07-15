@@ -54,7 +54,8 @@ if ($device['os'] == 'sentry3') {
                     echo 'ServerTech Sentry Outlet ';
                 }
 
-                foreach (explode("\n", $outlet_oids) as $outlet_data) {
+                foreach (explode("\n", $outlet_oids) as $outlet_data)
+                {
                     $outlet_data = trim($outlet_data);
                     if ($outlet_data) {
                         list($outlet_oid,$outlet_descr) = explode(' ', $outlet_data, 2);

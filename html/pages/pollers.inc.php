@@ -12,32 +12,25 @@
  * the source code distribution for details.
  */
 
-$no_refresh = true;
+$no_refresh = TRUE;
 
-echo '<ul class="nav nav-tabs">';
+echo('<ul class="nav nav-tabs">');
 
-$poll_tabs = array(
-    array(
-        'name' => 'Pollers',
-        'icon' => 'clock_link',
-    ),
-    array(
-        'name' => 'Groups',
-        'icon' => 'clock_add',
-    ),
-);
+$poll_tabs = array(array("name" => 'Pollers', 'icon' => 'clock_link'),
+             array("name" => 'Groups', 'icon' => 'clock_add'));
 
 foreach ($poll_tabs as $tab) {
-    echo '
+    echo('
             <li>
-                <a href="/pollers/tab='.lcfirst($tab['name']).'">
-                   <img src="images/16/'.$tab['icon'].'.png" align="absmiddle" border="0"> '.$tab['name'].'
+                <a href="/pollers/tab='. lcfirst($tab["name"]) .'">
+                   <img src="images/16/'. $tab["icon"] .'.png" align="absmiddle" border="0"> ' . $tab["name"] . '
                 </a>
-            </li>';
+            </li>');
+
 }
 
-echo '</ul>';
+echo ('</ul>');
 
 if (isset($vars['tab'])) {
-    include_once 'pages/pollers/'.mres($vars['tab']).'.inc.php';
+    require_once "pages/pollers/".mres($vars['tab']).".inc.php";
 }

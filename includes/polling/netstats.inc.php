@@ -1,12 +1,14 @@
 <?php
 
-echo 'Polling Netstats:';
+  echo("Polling Netstats:");
 
-require 'netstats-ip.inc.php';
-require 'netstats-tcp.inc.php';
-require 'netstats-udp.inc.php';
-require 'netstats-icmp.inc.php';
-require 'netstats-snmp.inc.php';
-require 'netstats-ip_forward.inc.php';
+  include("netstats-ip.inc.php");
+  include("netstats-tcp.inc.php");
+  include("netstats-udp.inc.php");
+  include("netstats-icmp.inc.php");
+  include("netstats-snmp.inc.php");
+  include("netstats-ip_forward.inc.php");
 
-echo "\n";
+  echo("\n");
+
+?>

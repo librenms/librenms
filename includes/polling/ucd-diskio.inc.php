@@ -8,7 +8,8 @@ if (count($diskio_data)) {
 
     echo 'Checking UCD DiskIO MIB: ';
 
-    foreach ($diskio_data as $diskio) {
+    foreach ($diskio_data as $diskio)
+    {
         $index = $diskio['diskio_index'];
 
         $entry = $diskio_cache[$index];

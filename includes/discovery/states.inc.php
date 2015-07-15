@@ -12,10 +12,10 @@
  * the source code distribution for details.
  */
 
-echo 'States: ';
+echo "States: ";
 
-$include_dir = 'includes/discovery/states';
-require 'includes/include-dir.inc.php';
+$include_dir = "includes/discovery/states";
+include("includes/include-dir.inc.php");
 
 if ($debug) {
     print_r($valid['sensor']['states']);

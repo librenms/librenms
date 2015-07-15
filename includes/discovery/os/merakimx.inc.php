@@ -8,10 +8,10 @@
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
+ */    
 
 if (!$os) {
-    if (preg_match('/^Meraki MX/', $sysDescr)) {
-        $os = 'merakimx';
+    if (preg_match("/^Meraki MX/", $sysDescr)) {
+        $os = "merakimx";
     }
 }
