@@ -673,6 +673,7 @@ function overlibprint($text) {
 
 
 function humanmedia($media) {
+    global $rewrite_iftype;
     array_preg_replace($rewrite_iftype, $media);
     return $media;
 
@@ -825,7 +826,7 @@ function generate_ap_link($args, $text=null, $type=null) {
 
     $url = generate_ap_url($args);
     if (port_permitted($args['interface_id'], $args['device_id'])) {
-        return overlib_link($url, $text, $content, $class);
+        return overlib_link($url, $text, $content, null);
     }
     else {
         return fixifName($text);
