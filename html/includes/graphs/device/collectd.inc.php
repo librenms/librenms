@@ -94,6 +94,7 @@ function error($code, $code_msg, $title, $msg) {
     imagestring($png, 5, 60, 35, sprintf('%s [%d]', $code_msg, $code), $c_etxt);
     if (function_exists('imagettfbbox') && is_file($config['error_font'])) {
         // Detailled error message
+        $errorfont = $config['error_font'];
         $fmt_msg = makeTextBlock($msg, $errorfont, 10, ($w - 86));
         $fmtbox  = imagettfbbox(12, 0, $errorfont, $fmt_msg);
         imagettftext($png, 10, 0, 55, (35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1]), $c_txt, $errorfont, $fmt_msg);
@@ -274,7 +275,7 @@ else if ($rrd_cmd) {
     header('Cache-Control: max-age=60');
     $rt = 0;
     passthru($rrd_cmd, $rt);
-    if ($rt != 0) {
+    if ($rt !== 0) {
         return error500($graph_identifier, 'RRD failed to generate the graph: '.$rt);
     }
 

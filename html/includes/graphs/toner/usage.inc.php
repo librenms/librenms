@@ -6,7 +6,7 @@ require 'includes/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                                 Cur    Max\\n'";
 
-$colour = toner2colour($toner['toner_descr']);
+$colour = toner2colour($toner['toner_descr'], 100 - $toner['toner_current']);
 if ($colour['left'] == null) {
     $colour['left'] = 'CC0000';
 }
