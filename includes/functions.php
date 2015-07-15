@@ -270,7 +270,12 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
     list($hostshort) = explode(".", $host);
     // Test Database Exists
     if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0') {
-        if (ip_exists($host) === false) {
+        if ($config['addhost_alwayscheckip'] === TRUE) {
+            $ip = gethostbyname($host);
+        } else {
+            $ip = $host;
+        }
+        if (ip_exists($ip) === false) {
             // Test reachability
             if ($force_add == 1 || isPingable($host)) {
                 if (empty($snmpver)) {

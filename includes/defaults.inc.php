@@ -148,6 +148,8 @@ $config['show_services'] = 0;
 // Enable Services on menu
 $config['ports_page_default'] = 'details';
 // eg "details" or "basic"
+// Adding Host Settings
+$config['addhost_alwayscheckip']   = FALSE;   # TRUE - check for duplicate ips even when adding host by name. FALSE- only check when adding host by ip.
 // SNMP Settings - Timeouts/Retries disabled as default
 // $config['snmp']['timeout'] = 1;            # timeout in seconds
 // $config['snmp']['retries'] = 5;            # how many times to retry the query
