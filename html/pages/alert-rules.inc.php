@@ -13,7 +13,5 @@
  */
 
 $device['device_id'] = '-1';
-require_once('includes/print-alert-rules.php');
+require_once 'includes/print-alert-rules.php';
 unset($device['device_id']);
-
-?>

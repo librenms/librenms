@@ -1,4 +1,4 @@
-<?php // vim:fenc=utf-8:filetype=php:ts=4
+<?php
 /*
  * Copyright (C) 2099  Bruno Prémont <bonbons AT linux-vserver.org>
  *
@@ -16,17 +16,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02150-1301, USA.
  */
 
-error_reporting(E_ALL | E_NOTICE | E_WARNING);
+error_reporting((E_ALL | E_NOTICE | E_WARNING));
 
-require('includes/collectd/config.php');
-require('includes/collectd/functions.php');
-require('includes/collectd/definitions.php');
-
-#require('config.php');
-#require('functions.php');
-#require('definitions.php');
+require 'includes/collectd/config.php';
+require 'includes/collectd/functions.php';
+require 'includes/collectd/definitions.php';
 
 load_graph_definitions();
+
 
 /**
  * Send back new list content
@@ -34,79 +31,99 @@ load_graph_definitions();
  * @method Name of Javascript method that will be called to process data
  */
 function dhtml_response_list(&$items, $method) {
-        header("Content-Type: text/xml");
+    header('Content-Type: text/xml');
 
-        print('<?xml version="1.0" encoding="utf-8" ?>'."\n");
-        print("<response>\n");
-        printf(" <method>%s</method>\n", htmlspecialchars($method));
-        print(" <result>\n");
-        foreach ($items as &$item)
-                printf('  <option>%s</option>'."\n", htmlspecialchars($item));
-        print(" </result>\n");
-        print("</response>");
-}
+    print ('<?xml version="1.0" encoding="utf-8" ?>'."\n");
+    print ("<response>\n");
+    printf(" <method>%s</method>\n", htmlspecialchars($method));
+    print (" <result>\n");
+    foreach ($items as &$item) {
+        printf('  <option>%s</option>'."\n", htmlspecialchars($item));
+    }
+
+    print (" </result>\n");
+    print ('</response>');
+
+}//end dhtml_response_list()
+
 
 print_optionbar_start();
 
-$link_array = array('page'    => 'device',
-                    'device'  => $device['device_id'],
-                    'tab' => 'collectd');
+$link_array = array(
+    'page'   => 'device',
+    'device' => $device['device_id'],
+    'tab'    => 'collectd',
+);
 
-    $plugins = collectd_list_plugins($device['hostname']);
-    unset($sep);
-    foreach ($plugins as &$plugin) {
-       if (!$vars['plugin']) { $vars['plugin'] = $plugin; }
-       echo($sep);
-       if ($vars['plugin'] == $plugin) { echo("<span class='pagemenu-selected'>"); }
-       echo(generate_link(htmlspecialchars($plugin),$link_array,array('plugin'=>$plugin)));
-       if ($vars['plugin'] == $plugin) { echo("</span>"); }
-       $sep = ' | ';
+$plugins = collectd_list_plugins($device['hostname']);
+unset($sep);
+foreach ($plugins as &$plugin) {
+    if (!$vars['plugin']) {
+        $vars['plugin'] = $plugin;
     }
-    unset ($sep);
+
+    echo $sep;
+    if ($vars['plugin'] == $plugin) {
+        echo "<span class='pagemenu-selected'>";
+    }
+
+    echo generate_link(htmlspecialchars($plugin), $link_array, array('plugin' => $plugin));
+    if ($vars['plugin'] == $plugin) {
+        echo '</span>';
+    }
+
+    $sep = ' | ';
+}
+
+unset($sep);
 
 print_optionbar_end();
 
-   $i=0;
+$i = 0;
 
-    $pinsts = collectd_list_pinsts($device['hostname'], $vars['plugin']);
-    foreach ($pinsts as &$instance) {
+$pinsts = collectd_list_pinsts($device['hostname'], $vars['plugin']);
+foreach ($pinsts as &$instance) {
+    $types = collectd_list_types($device['hostname'], $vars['plugin'], $instance);
+    foreach ($types as &$type) {
+        $typeinstances = collectd_list_tinsts($device['hostname'], $vars['plugin'], $instance, $type);
 
-     $types = collectd_list_types($device['hostname'], $vars['plugin'], $instance);
-     foreach ($types as &$type) {
+        if ($MetaGraphDefs[$type]) {
+            $typeinstances = array($MetaGraphDefs[$type]);
+        }
 
-     $typeinstances = collectd_list_tinsts($device['hostname'], $vars['plugin'], $instance, $type);
+        foreach ($typeinstances as &$tinst) {
+            $i++;
+            if (!is_integer($i / 2)) {
+                $row_colour = $list_colour_a;
+            }
+            else {
+                $row_colour = $list_colour_b;
+            }
 
-     if ($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
+            echo '<div style="background-color: '.$row_colour.';">';
+            echo '<div class="graphhead" style="padding:4px 0px 0px 8px;">';
+            if ($tinst) {
+                echo $vars['plugin']." $instance - $type - $tinst";
+            }
+            else {
+                echo $vars['plugin']." $instance - $type";
+            }
 
-     foreach ($typeinstances as &$tinst) {
-       $i++;
-       if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+            echo '</div>';
 
-       echo('<div style="background-color: '.$row_colour.';">');
-       echo('<div class="graphhead" style="padding:4px 0px 0px 8px;">');
-       if ($tinst) {
-       echo($vars['plugin']." $instance - $type - $tinst");
-       } else {
-        echo($vars['plugin']." $instance - $type");
-       }
-       echo("</div>");
+            $graph_array['type']   = 'device_collectd';
+            $graph_array['device'] = $device['device_id'];
 
-       $graph_array['type']                    = "device_collectd";
-       $graph_array['device']                      = $device['device_id'];
+            $graph_array['c_plugin']          = $vars['plugin'];
+            $graph_array['c_plugin_instance'] = $instance;
+            $graph_array['c_type']            = $type;
+            $graph_array['c_type_instance']   = $tinst;
 
-       $graph_array['c_plugin']           = $vars['plugin'];
-       $graph_array['c_plugin_instance'] = $instance;
-       $graph_array['c_type']                 = $type;
-       $graph_array['c_type_instance']   = $tinst;
+            include 'includes/print-graphrow.inc.php';
 
-       include("includes/print-graphrow.inc.php");
-
-       echo("</div>");
-
-      }
-     }
-
+            echo '</div>';
+        }
     }
+}
 
-$pagetitle[] = "CollectD";
-?>
+$pagetitle[] = 'CollectD';
