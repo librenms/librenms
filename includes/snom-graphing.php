@@ -3,8 +3,7 @@
 // FIXME not used, do we still need this?
 
 
-function callsgraphSNOM($rrd, $graph, $from, $to, $width, $height, $title, $vertical)
-{
+function callsgraphSNOM($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
     global $config;
 
     $database = $config['rrd_dir'].'/'.$rrd;

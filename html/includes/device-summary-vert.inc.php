@@ -1,5 +1,5 @@
 <?php
-include_once("includes/object-cache.inc.php");
+require_once 'includes/object-cache.inc.php';
 ?>
 <div class="panel panel-default panel-condensed table-responsive">
 <table class="table table-hover table-condensed table-striped">

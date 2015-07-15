@@ -12,26 +12,28 @@
  * the source code distribution for details.
  */
 
-if(is_admin() === false) {
+if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-if(!is_numeric($_POST['group_id'])) {
-    echo('ERROR: No group selected');
+if (!is_numeric($_POST['group_id'])) {
+    echo 'ERROR: No group selected';
     exit;
-} else {
-    if(dbDelete('device_groups', "`id` =  ?", array($_POST['group_id']))) {
-      if( dbFetchCell('SELECT COUNT(id) FROM alert_map WHERE target = ?',array('g'.$_POST['group_id'])) >= 1 ) {
-        foreach( dbFetchRows('SELECT id FROM alert_map WHERE target = ?',array('g'.$_POST['group_id'])) as $map ) {
-          $_POST['map_id'] = $map['id'];
-          include('forms/delete-alert-map.inc.php');
+}
+else {
+    if (dbDelete('device_groups', '`id` =  ?', array($_POST['group_id']))) {
+        if (dbFetchCell('SELECT COUNT(id) FROM alert_map WHERE target = ?', array('g'.$_POST['group_id'])) >= 1) {
+            foreach (dbFetchRows('SELECT id FROM alert_map WHERE target = ?', array('g'.$_POST['group_id'])) as $map) {
+                $_POST['map_id'] = $map['id'];
+                include 'forms/delete-alert-map.inc.php';
+            }
         }
-      }
-      echo('Group has been deleted.');
-      exit;
-    } else {
-      echo('ERROR: Group has not been deleted.');
-      exit;
+
+        echo 'Group has been deleted.';
+        exit;
+    }
+    else {
+        echo 'ERROR: Group has not been deleted.';
+        exit;
     }
 }
-
