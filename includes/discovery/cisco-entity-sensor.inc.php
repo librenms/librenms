@@ -6,7 +6,7 @@ if ($device['os_group'] == 'cisco') {
     $oids = array();
     echo 'Caching OIDs:';
 
-    if (!is_array($entity_array)) {
+    if (!is_array($entity_array)) { 
         $entity_array = array();
         echo ' entPhysicalDescr';
         $entity_array = snmpwalk_cache_multi_oid($device, 'entPhysicalDescr', $entity_array, 'CISCO-ENTITY-SENSOR-MIB');
@@ -49,7 +49,8 @@ if ($device['os_group'] == 'cisco') {
     $entitysensor['dBm']       = 'dbm';
 
     if (is_array($oids)) {
-        foreach ($oids as $index => $entry) {
+        foreach ($oids as $index => $entry)
+        {
             // echo("[" . $entry['entSensorType'] . "|" . $entry['entSensorValue']. "|" . $index . "]");
             if ($entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index)) {
                 $entPhysicalIndex = $index;

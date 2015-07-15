@@ -7,8 +7,8 @@
  *
  * @package    observium
  * @subpackage discovery
- * @author     Adam Armstrong <adama@memetic.org>
- * @copyright  (C) 2006 - 2012 Adam Armstrong
+ * @author     Squiz Pty Ltd <products@squiz.net>
+ * @copyright  2015 Squiz Pty Ltd (ABN 77 084 670 600)
  */
 
 // MIB-Dell-10892::temperatureProbechassisIndex.1.1 = INTEGER: 1

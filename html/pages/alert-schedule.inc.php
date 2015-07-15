@@ -12,11 +12,12 @@
  * the source code distribution for details.
  */
 
-$pagetitle[] = 'Alert Schedule';
-$no_refresh  = true;
-if (is_admin() !== false) {
-    include_once 'includes/modal/alert_schedule.inc.php';
-    include_once 'includes/modal/remove_alert_schedule.inc.php';
+$pagetitle[] = "Alert Schedule";
+$no_refresh = TRUE;
+if(is_admin() !== false) {
+
+require_once("includes/modal/alert_schedule.inc.php");
+require_once("includes/modal/remove_alert_schedule.inc.php");
 
 ?>
 
@@ -50,7 +51,7 @@ var grid = $("#alert-schedule").bootgrid({
             if (row.status == 1) {
                 return '<button type="button" class="btn btn-xs btn-danger" disabled>Lapsed</button>';
             } else {
-                var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " +
+                var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " + 
                     "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
                 if (row.status == 2) {
                     response = response + ' <button type="button" class="btn btn-xs btn-success" disabled>Current</button>';
@@ -91,4 +92,7 @@ var grid = $("#alert-schedule").bootgrid({
 </script>
 
 <?php
-}//end if
+
+}
+
+?>

@@ -12,7 +12,7 @@ foreach ($slas as $sla) {
     $sla_type = $sla['rtt_type'];
 
     if (!in_array($sla_type, $sla_types)) {
-        if (isset($config['sla_type_labels'][$sla_type])) {
+        if (isset($config['sla_type_labels'][$sla_type])) { 
             $text = $config['sla_type_labels'][$sla_type];
         }
     }

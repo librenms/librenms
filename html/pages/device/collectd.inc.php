@@ -30,7 +30,8 @@ load_graph_definitions();
  * @items Array of options values to return to browser
  * @method Name of Javascript method that will be called to process data
  */
-function dhtml_response_list(&$items, $method) {
+function dhtml_response_list(&$items, $method)
+{
     header('Content-Type: text/xml');
 
     print ('<?xml version="1.0" encoding="utf-8" ?>'."\n");

@@ -9,7 +9,8 @@ if ($device['os'] == 'ftos' || $device['os_group'] == 'ftos') {
     echo 'FTOS C-Series ';
     $oids = snmpwalk_cache_oid($device, 'chSysCardTemp', array(), 'F10-C-SERIES-CHASSIS-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/ftos');
     if (is_array($oids)) {
-        foreach ($oids as $index => $entry) {
+        foreach ($oids as $index => $entry)
+        {
             $entry['descr']   = 'Slot '.$index;
             $entry['oid']     = '.1.3.6.1.4.1.6027.3.8.1.2.1.1.5.'.$index;
             $entry['current'] = $entry['chSysCardTemp'];

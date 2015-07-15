@@ -1,85 +1,79 @@
 <?php
 
-$no_refresh = true;
+$no_refresh = TRUE;
 
-if ($_SESSION['userlevel'] < 10) {
-    include 'includes/error-no-perm.inc.php';
+if ($_SESSION['userlevel'] < 10)
+{
+  include("includes/error-no-perm.inc.php");
 
-    exit;
+  exit;
 }
 
-if ($_POST['hostname']) {
-    echo '<div class="row">
+if ($_POST['hostname'])
+{
+  echo('<div class="row">
             <div class="col-sm-3">
             </div>
-            <div class="col-sm-6">';
-    if ($_SESSION['userlevel'] > '5') {
-        // Settings common to SNMPv2 & v3
-        $hostname = mres($_POST['hostname']);
-        if ($_POST['port']) {
-            $port = mres($_POST['port']);
-        }
-        else {
-            $port = $config['snmp']['port'];
-        }
+            <div class="col-sm-6">');
+  if ($_SESSION['userlevel'] > '5')
+  {
+    // Settings common to SNMPv2 & v3
+    $hostname = mres($_POST['hostname']);
+    if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = $config['snmp']['port']; }
+    if ($_POST['transport']) { $transport = mres($_POST['transport']); } else { $transport = "udp"; }
 
-        if ($_POST['transport']) {
-            $transport = mres($_POST['transport']);
-        }
-        else {
-            $transport = 'udp';
-        }
+    if ($_POST['snmpver'] === "v2c" or $_POST['snmpver'] === "v1")
+    {
+      if ($_POST['community'])
+      {
+        $config['snmp']['community'] = array($_POST['community']);
+      }
 
-        if ($_POST['snmpver'] === 'v2c' or $_POST['snmpver'] === 'v1') {
-            if ($_POST['community']) {
-                $config['snmp']['community'] = array($_POST['community']);
-            }
-
-            $snmpver = mres($_POST['snmpver']);
-            print_message("Adding host $hostname communit".(count($config['snmp']['community']) == 1 ? 'y' : 'ies').' '.implode(', ', $config['snmp']['community'])." port $port using $transport");
-        }
-        else if ($_POST['snmpver'] === 'v3') {
-            $v3 = array(
-                   'authlevel'  => mres($_POST['authlevel']),
-                   'authname'   => mres($_POST['authname']),
-                   'authpass'   => mres($_POST['authpass']),
-                   'authalgo'   => mres($_POST['authalgo']),
-                   'cryptopass' => mres($_POST['cryptopass']),
-                   'cryptoalgo' => mres($_POST['cryptoalgo']),
-                  );
-
-            array_push($config['snmp']['v3'], $v3);
-
-            $snmpver = 'v3';
-            print_message("Adding SNMPv3 host $hostname port $port");
-        }
-        else {
-            print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
-        }//end if
-        $poller_group = $_POST['poller_group'];
-        $force_add    = $_POST['force_add'];
-        if ($force_add == 'on') {
-            $force_add = 1;
-        }
-        else {
-            $force_add = 0;
-        }
-
-        $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add);
-        if ($result) {
-            print_message("Device added ($result)");
-        }
+      $snmpver = mres($_POST['snmpver']);
+      print_message("Adding host $hostname communit" . (count($config['snmp']['community']) == 1 ? "y" : "ies") . " "  . implode(', ',$config['snmp']['community']) . " port $port using $transport");
     }
-    else {
-        print_error("You don't have the necessary privileges to add hosts.");
-    }//end if
-    echo '    </div>
+    elseif ($_POST['snmpver'] === "v3")
+    {
+      $v3 = array (
+        'authlevel' => mres($_POST['authlevel']),
+        'authname' => mres($_POST['authname']),
+        'authpass' => mres($_POST['authpass']),
+        'authalgo' => mres($_POST['authalgo']),
+        'cryptopass' => mres($_POST['cryptopass']),
+        'cryptoalgo' => mres($_POST['cryptoalgo']),
+      );
+
+      array_push($config['snmp']['v3'], $v3);
+
+      $snmpver = "v3";
+      print_message("Adding SNMPv3 host $hostname port $port");
+    }
+    else
+    {
+      print_error("Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?");
+    }
+    $poller_group = $_POST['poller_group'];
+    $force_add = $_POST['force_add'];
+    if ($force_add == 'on') {
+        $force_add = 1;
+    } else {
+        $force_add = 0;
+    }
+    $result = addHost($hostname, $snmpver, $port, $transport,0,$poller_group,$force_add);
+    if ($result)
+    {
+      print_message("Device added ($result)");
+    }
+  } else {
+    print_error("You don't have the necessary privileges to add hosts.");
+  }
+  echo('    </div>
             <div class="col-sm-3">
             </div>
-        </div>';
-}//end if
+        </div>');
+}
 
-$pagetitle[] = 'Add host';
+$pagetitle[] = "Add host";
 
 ?>
 
@@ -112,13 +106,13 @@ $pagetitle[] = 'Add host';
       <div class="col-sm-3">
         <select name="transport" id="transport" class="form-control input-sm">
 <?php
-foreach ($config['snmp']['transports'] as $transport) {
-    echo "<option value='".$transport."'";
+foreach ($config['snmp']['transports'] as $transport)
+{
+    echo("<option value='".$transport."'");
     if ($transport == $device['transport']) {
-        echo " selected='selected'";
+        echo(" selected='selected'");
     }
-
-    echo '>'.$transport.'</option>';
+    echo(">".$transport."</option>");
 }
 ?>
         </select>
@@ -191,20 +185,21 @@ foreach ($config['snmp']['transports'] as $transport) {
       </div>
     </div>
 <?php
-if ($config['distributed_poller'] === true) {
-    echo '
+
+if ($config['distributed_poller'] === TRUE) {
+    echo('
       <div class="form-group">
           <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
           <div class="col-sm-9">
               <select name="poller_group" id="poller_group" class="form-control input-sm">
                   <option value="0"> Default poller group</option>
-    ';
+    ');
 
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups`') as $group) {
-        echo '<option value="'.$group['id'].'">'.$group['group_name'].'</option>';
+    foreach (dbFetchRows("SELECT `id`,`group_name` FROM `poller_groups`") as $group) {
+        echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
     }
 
-    echo '
+    echo('
               </select>
           </div>
       </div>
@@ -217,8 +212,8 @@ if ($config['distributed_poller'] === true) {
               </div>
           </div>
       </div>
-    ';
-}//end if
+    ');
+}
 
 ?>
     <button type="submit" class="btn btn-default input-sm" name="Submit">Add Host</button>
@@ -234,8 +229,7 @@ if ($config['distributed_poller'] === true) {
         if(snmpVersion == 'v1' || snmpVersion == 'v2c') {
             $('#snmpv1_2').show();
             $('#snmpv3').hide();
-        }
-        else if(snmpVersion == 'v3') {
+        } else if(snmpVersion == 'v3') {
             $('#snmpv1_2').hide();
             $('#snmpv3').show();
         }

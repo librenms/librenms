@@ -16,9 +16,8 @@ $where = 1;
 
 if ($_SESSION['userlevel'] >= '5') {
     $sql = " FROM `alert_schedule` AS S WHERE $where";
-}
-else {
-    $sql     = " FROM `alert_schedule` AS S WHERE $where";
+} else {
+    $sql = " FROM `alert_schedule` AS S WHERE $where";
     $param[] = $_SESSION['user_id'];
 }
 
@@ -27,7 +26,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 }
 
 $count_sql = "SELECT COUNT(`id`) $sql";
-$total     = dbFetchCell($count_sql, $param);
+$total = dbFetchCell($count_sql,$param);
 if (empty($total)) {
     $total = 0;
 }
@@ -39,7 +38,7 @@ if (!isset($sort) || empty($sort)) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low  = (($current * $rowCount) - ($rowCount));
+    $limit_low = ($current * $rowCount) - ($rowCount);
     $limit_high = $rowCount;
 }
 
@@ -49,29 +48,20 @@ if ($rowCount != -1) {
 
 $sql = "SELECT `S`.`schedule_id`, DATE_FORMAT(`S`.`start`, '".$config['dateformat']['mysql']['compact']."') AS `start`, DATE_FORMAT(`S`.`end`, '".$config['dateformat']['mysql']['compact']."') AS `end`, `S`.`title` $sql";
 
-foreach (dbFetchRows($sql, $param) as $schedule) {
+foreach (dbFetchRows($sql,$param) as $schedule) {
     $status = 0;
     if ($schedule['end'] < date('dS M Y H:i::s')) {
         $status = 1;
     }
-
     if (date('dS M Y H:i::s') >= $schedule['start'] && date('dS M Y H:i::s') < $schedule['end']) {
         $status = 2;
     }
-
-    $response[] = array(
-        'title'  => $schedule['title'],
-        'start'  => $schedule['start'],
-        'end'    => $schedule['end'],
-        'id'     => $schedule['schedule_id'],
-        'status' => $status,
-    );
+    $response[] = array('title'=>$schedule['title'],
+                        'start'=>$schedule['start'],
+                        'end'=>$schedule['end'],
+                        'id'=>$schedule['schedule_id'],
+                        'status'=>$status);
 }
 
-$output = array(
-    'current'  => $current,
-    'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
-);
+$output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
 echo _json_encode($output);

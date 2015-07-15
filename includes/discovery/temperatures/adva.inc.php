@@ -4,14 +4,15 @@
 // 5 SELECTS
 // 4 INSERTS
 // 4 UPDATES
-/*
-    Disabled needing rewrite
 
-    $id = $device['device_id'];
-    $hostname = $device['hostname'];
-    $community = $device['community'];
-    $snmpver = $device['snmpver'];
-    $port = $device['port'];
+/*
+Disabled needing rewrite
+
+  $id = $device['device_id'];
+  $hostname = $device['hostname'];
+  $community = $device['community'];
+  $snmpver = $device['snmpver'];
+  $port = $device['port'];
 
     $oid_chassis = "1.3.6.1.4.1.2544.1.9.2.4.1.2.1.1.1";
     $descr_chassis = "chassis";
@@ -90,3 +91,4 @@
       $temperature_exists[] = "$id $oid_hss2";
     }
 */
+?>

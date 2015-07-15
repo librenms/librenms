@@ -12,22 +12,22 @@
  * the source code distribution for details.
  */
 
-if ($_SESSION['userlevel'] >= '10') {
-if (empty($_POST['token'])) {
+if ($_SESSION['userlevel'] >= '10')
+{
+if(empty($_POST['token'])) {
     $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
 }
-
 ?>
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
-      <div class="modal-content">
+      <div class="modal-content">          
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <h5 class="modal-title" id="Delete">Confirm Delete</h5>
         </div>
         <div class="modal-body">
           <p>If you would like to remove the API token then please click Delete.</p>
-        </div>
+        </div>        
         <div class="modal-footer">
           <form role="form" class="remove_token_form">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -54,8 +54,10 @@ if (empty($_POST['token'])) {
               <div class="col-sm-4">
                 <select class="form-control" id="user_id" name="user_id">
 <?php
-foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'", array()) as $users) {
-    echo '<option value="'.$users['user_id'].'">'.$users['username'].'</option>';
+
+foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'", array()) as $users)
+{
+  echo('<option value="'.$users['user_id'].'">'.$users['username'].'</option>');
 }
 
 ?>
@@ -65,7 +67,7 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
             <div class="form-group">
               <label for="token" class="col-sm-2 control-label">Token: </label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="token" name="token" value="<?php echo $_POST['token']; ?>" readonly>
+                <input type="text" class="form-control" id="token" name="token" value="<?php echo $_POST['token'];?>" readonly>
               </div>
               <div class="col-sm-2">
               </div>
@@ -73,7 +75,7 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
             <div class="form-group">
               <label for="description" class="col-sm-2 control-label">Descr: </label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="description" name="description" value="<?php echo $_POST['description']; ?>">
+                <input type="text" class="form-control" id="description" name="description" value="<?php echo $_POST['description'];?>">
               </div>
             </div>
         </div>
@@ -90,21 +92,21 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
     </div>
   </div>
 <?php
-echo '
+  echo('
   <div class="row">
     <div class="col-md-12">
       <span id="thanks"></span>
     </div>
   </div>
-';
-if ($_SESSION['api_token'] === true) {
-    echo "<script>
+');
+  if($_SESSION['api_token'] === TRUE)
+  {
+    echo("<script>
       $('#thanks').html('<div class=\"alert alert-info\">The API token has been added.</div>');</script>
-    ";
+    ");
     unset($_SESSION['api_token']);
-}
-
-echo '
+  }
+echo('
   <div class="row">
     <div class="col-sm-2">
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
@@ -125,17 +127,19 @@ echo '
           <th>Disabled</th>
           <th>Remove</th>
         </tr>
-';
+');
 
-foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN users AS U ON AT.user_id=U.user_id ORDER BY AT.user_id') as $api) {
-    if ($api['disabled'] == '1') {
-        $api_disabled = 'checked';
+  foreach (dbFetchRows("SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN users AS U ON AT.user_id=U.user_id ORDER BY AT.user_id") as $api)
+  {
+    if($api['disabled'] == '1')
+    {
+      $api_disabled = 'checked';
     }
-    else {
-        $api_disabled = '';
+    else
+    {
+      $api_disabled = '';
     }
-
-    echo '
+    echo('
         <tr id="'.$api['id'].'">
           <td>'.$api['username'].'</td>
           <td>'.$api['token_hash'].'</td>
@@ -143,14 +147,14 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
           <td><input type="checkbox" name="token-status" data-token_id="'.$api['id'].'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
           <td><button type="button" class="btn btn-primary btn-xs" id="'.$api['id'].'" data-token_id="'.$api['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
-';
-}
+');
+  }
 
-  echo '
+  echo('
       </table>
     </div>
   </div>
-';
+');
 ?>
 <script>
   $("[name='token-status']").bootstrapSwitch('offColor','success');
@@ -221,7 +225,8 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
 </script>
 
 <?php
+} else {
+  include("includes/error-no-perm.inc.php");
 }
-else {
-    include 'includes/error-no-perm.inc.php';
-}//end if
+
+?>

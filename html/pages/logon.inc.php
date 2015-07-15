@@ -1,8 +1,7 @@
 <?php
 if( $config['twofactor'] && isset($twofactorform) ) {
   echo twofactor_form();
-}
-else {
+} else { 
 ?>
       <form class="form-horizontal" role="form" action="" method="post" name="logonform">
         <div class="form-group">
@@ -33,12 +32,14 @@ else {
           </div>
         </div>
 <?php
-if (isset($auth_message)) {
+if (isset($auth_message))
+{
     $msg_box[] = array('type'=>'error','message'=>$auth_message,'title'=>'Login error');
 }
 ?>
 <?php
-if (isset($config['login_message'])) {
+if (isset($config['login_message']))
+{
   echo('
         <div class="form-group">
           <div class="col-sm-offset-4 col-sm-4">
