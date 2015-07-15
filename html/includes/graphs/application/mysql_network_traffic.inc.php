@@ -1,19 +1,16 @@
 <?php
 
-include("includes/graphs/common.inc.php");
+require 'includes/graphs/common.inc.php';
 
-$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$mysql_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-mysql-'.$app['app_id'].'.rrd';
 
-if (is_file($mysql_rrd))
-{
-  $rrd_filename = $mysql_rrd;
+if (is_file($mysql_rrd)) {
+    $rrd_filename = $mysql_rrd;
 }
 
 $multiplier = 8;
 
-$ds_in = "BRd";
-$ds_out = "BSt";
+$ds_in  = 'BRd';
+$ds_out = 'BSt';
 
-include("includes/graphs/generic_data.inc.php");
-
-?>
+require 'includes/graphs/generic_data.inc.php';

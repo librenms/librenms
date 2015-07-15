@@ -13,24 +13,25 @@
  */
 
 $rrd_list = array();
-$prefix = rrd_name($device['hostname'], array($subtype, ""), "");
-foreach (glob($prefix."*.rrd") as $filename) {
+$prefix   = rrd_name($device['hostname'], array($subtype, ''), '');
+foreach (glob($prefix.'*.rrd') as $filename) {
     // find out what * expanded to
-    $globpart = str_replace($prefix, '', $filename);    // take off the prefix
-    $instance = substr($globpart, 0, -4);               // take off ".rrd"
-
-    $ds = array();
-    $mibparts = explode("-", $subtype);
-    $mibvar = end($mibparts);
-    $ds['ds'] = name_shorten($mibvar);
-    $ds['descr'] = "$mibvar-$instance";
+    $globpart = str_replace($prefix, '', $filename);
+    // take off the prefix
+    $instance = substr($globpart, 0, -4);
+    // take off ".rrd"
+    $ds             = array();
+    $mibparts       = explode('-', $subtype);
+    $mibvar         = end($mibparts);
+    $ds['ds']       = name_shorten($mibvar);
+    $ds['descr']    = "$mibvar-$instance";
     $ds['filename'] = $filename;
-    $rrd_list[] = $ds;
+    $rrd_list[]     = $ds;
 }
 
 $colours    = 'mixed';
-$scale_min  = "0";
+$scale_min  = '0';
 $nototal    = 0;
 $simple_rrd = true;
 
-include("includes/graphs/generic_multi_line.inc.php");
+require 'includes/graphs/generic_multi_line.inc.php';
