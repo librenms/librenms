@@ -1,8 +1,7 @@
 <?php
 
-if (!$os)
-{
-  if (strstr($sysDescr, "Novell NetWare")) { $os = "netware"; }
+if (!$os) {
+    if (strstr($sysDescr, 'Novell NetWare')) {
+        $os = 'netware';
+    }
 }
-
-?>

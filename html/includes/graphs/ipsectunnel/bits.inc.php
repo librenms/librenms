@@ -1,10 +1,8 @@
 <?php
 
-$ds_in = "TunInOctets";
-$ds_out = "TunOutOctets";
+$ds_in  = 'TunInOctets';
+$ds_out = 'TunOutOctets';
 
-$format = "octets";
+$format = 'octets';
 
-include("includes/graphs/generic_data.inc.php");
-
-?>
+require 'includes/graphs/generic_data.inc.php';

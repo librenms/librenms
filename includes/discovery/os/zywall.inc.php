@@ -1,8 +1,7 @@
 <?php
 
-if (!$os)
-{
-  if (strpos($sysDescr, "ZyWALL") !== FALSE) { $os = "zywall"; }
+if (!$os) {
+    if (strstr($sysDescr, 'ZyWALL')) {
+        $os = 'zywall';
+    }
 }
-
-?>
