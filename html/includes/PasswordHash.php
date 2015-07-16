@@ -47,8 +47,6 @@ class PasswordHash {
 
 	function get_random_bytes($count)
 	{
-		$output = '';
-		
 		$output = openssl_random_pseudo_bytes($count,$strong);
 		
 		if(empty($output))

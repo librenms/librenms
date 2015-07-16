@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-require_once "includes/modal/poller_groups.inc.php";
+require_once 'includes/modal/poller_groups.inc.php';
 
 ?>
 <br />
@@ -28,18 +28,17 @@ require_once "includes/modal/poller_groups.inc.php";
         </tr>
 
 <?php
-
-$query = "SELECT * FROM `poller_groups`";
+$query = 'SELECT * FROM `poller_groups`';
 
 foreach (dbFetchRows($query) as $group) {
-    echo('
-        <tr id="'. $group['id'] .'">
+    echo '
+        <tr id="'.$group['id'].'">
             <td>'.$group['id'].'</td>
             <td>'.$group['group_name'].'</td>
             <td>'.$group['descr'].'</td>
             <td><button type="button" class="btn btn-success btn-xs" id="'.$group['id'].'" data-group_id="'.$group['id'].'" data-toggle="modal" data-target="#poller-groups">Edit</button> <button type="button" class="btn btn-danger btn-xs" id="'.$group['id'].'" data-group_id="'.$group['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
-');
+';
 }
 
 ?>

@@ -1,10 +1,7 @@
 <?php
 
-# Jetdirect compatible
+// Jetdirect compatible
+require 'includes/polling/os/jetdirect.inc.php';
 
-include('includes/polling/os/jetdirect.inc.php');
-
-# Strip off useless brand fields
-$hardware = str_replace('OKI ','',$hardware);
-
-?>
+// Strip off useless brand fields
+$hardware = str_replace('OKI ', '', $hardware);

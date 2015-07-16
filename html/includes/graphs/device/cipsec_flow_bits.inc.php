@@ -1,10 +1,8 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cipsec_flow.rrd";
+$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/cipsec_flow.rrd';
 
-$ds_in = "InOctets";
-$ds_out = "OutOctets";
+$ds_in  = 'InOctets';
+$ds_out = 'OutOctets';
 
-include("includes/graphs/generic_data.inc.php");
-
-?>
+require 'includes/graphs/generic_data.inc.php';

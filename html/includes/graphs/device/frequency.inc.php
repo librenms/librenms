@@ -1,9 +1,7 @@
 <?php
 
-$class     = "frequency";
-$unit      = "Hz";
-$unit_long = "Hertz";
+$class     = 'frequency';
+$unit      = 'Hz';
+$unit_long = 'Hertz';
 
-include("includes/graphs/device/sensor.inc.php");
-
-?>
+require 'includes/graphs/device/sensor.inc.php';

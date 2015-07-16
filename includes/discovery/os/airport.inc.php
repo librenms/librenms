@@ -1,10 +1,13 @@
 <?php
 
-if (!$os)
-{
-  if (strpos($sysDescr, "Apple AirPort") !== FALSE) { $os = "airport"; }
-  else if (strpos($sysDescr, "Apple Base Station") !== FALSE) { $os = "airport"; }
-  else if (strpos($sysDescr, "Base Station V3.84") !== FALSE) { $os = "airport"; }
+if (!$os) {
+    if (strstr($sysDescr, 'Apple AirPort')) {
+        $os = 'airport';
+    }
+    if (strstr($sysDescr, 'Apple Base Station')) {
+        $os = 'airport';
+    }
+    if (strstr($sysDescr, 'Base Station V3.84')) {
+        $os = 'airport';
+    }
 }
-
-?>

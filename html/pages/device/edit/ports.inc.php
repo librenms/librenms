@@ -1,28 +1,26 @@
 <?php
 
-echo('<div style="padding: 10px;">');
+echo '<div style="padding: 10px;">';
 
-if ($_POST['ignoreport'])
-{
-  if ($_SESSION['userlevel'] == '10')
-  {
-    include("includes/port-edit.inc.php");
-  }
+if ($_POST['ignoreport']) {
+    if ($_SESSION['userlevel'] == '10') {
+        include 'includes/port-edit.inc.php';
+    }
 }
 
-if ($updated && $update_message)
-{
-  print_message($update_message);
-} elseif ($update_message) {
-  print_error($update_message);
+if ($updated && $update_message) {
+    print_message($update_message);
+}
+else if ($update_message) {
+    print_error($update_message);
 }
 
-echo("<div style='float: left; width: 100%'>
+echo "<div style='float: left; width: 100%'>
 <form id='ignoreport' name='ignoreport' method='post' action='' role='form' class='form-inline'>
   <input type=hidden name='ignoreport' value='yes'>
-  <input type=hidden name=device value='".$device['device_id']."'>");
+  <input type=hidden name=device value='".$device['device_id']."'>";
 
-echo("<table class='table table-condensed table-responsive table-striped'>
+echo "<table class='table table-condensed table-responsive table-striped'>
   <tr>
                  <th>Index</th>
                  <th>Name</th>
@@ -41,14 +39,14 @@ echo("<table class='table table-condensed table-responsive table-striped'>
     <td><button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alerting for all ports'/>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alerting on all ports'/>Select All</button></td>
     <td></td>
 </tr>
-");
+";
 ?>
 
 <script>
     $('#disable-toggle').click(function(event) {
         // invert selection on all disable buttons
         event.preventDefault();
-        $('input[name^="disabled_"]').trigger('click'); 
+        $('input[name^="disabled_"]').trigger('click');
     });
     $('#ignore-toggle').click(function(event) {
         // invert selection on all ignore buttons
@@ -100,46 +98,47 @@ echo("<table class='table table-condensed table-responsive table-striped'>
 </script>
 
 <?php
+$row = 1;
 
-$row=1;
+foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIndex` ', array($device['device_id'])) as $port) {
+    $port = ifLabel($port);
 
-foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIndex` ", array($device['device_id'])) as $port)
-{
-  $port = ifLabel($port);
+    if (is_integer($row / 2)) {
+        $row_colour = $list_colour_a;
+    }
+    else {
+        $row_colour = $list_colour_b;
+    }
 
-  if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+    echo '<tr>';
+    echo '<td>'.$port['ifIndex'].'</td>';
+    echo '<td>'.$port['label'].'</td>';
+    echo '<td>'.$port['ifAdminStatus'].'</td>';
 
-  echo("<tr>");
-  echo("<td>". $port['ifIndex']."</td>");
-  echo("<td>".$port['label'] . "</td>");
-  echo("<td>". $port['ifAdminStatus']."</td>");
+    // Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
+    // - as to draw the attention to a possible problem.
+    $isportbad = ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
+    $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
+    $outofsync = $dowecare ? " class='red'" : '';
 
-  # Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
-  # - as to draw the attention to a possible problem.
-  $isportbad = ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
-  $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
-  $outofsync = $dowecare ? " class='red'" : "";
+    echo "<td><span name='operstatus_".$port['port_id']."'".$outofsync.'>'.$port['ifOperStatus'].'</span></td>';
 
-  echo("<td><span name='operstatus_".$port['port_id']."'".$outofsync.">". $port['ifOperStatus']."</span></td>");
+    echo '<td>';
+    echo "<input type=checkbox class='disable-check' name='disabled_".$port['port_id']."'".($port['disabled'] ? 'checked' : '').'>';
+    echo "<input type=hidden name='olddis_".$port['port_id']."' value=".($port['disabled'] ? 1 : 0).'>';
+    echo '</td>';
 
-  echo("<td>");
-  echo("<input type=checkbox class='disable-check' name='disabled_".$port['port_id']."'".($port['disabled'] ? 'checked' : '').">");
-  echo("<input type=hidden name='olddis_".$port['port_id']."' value=".($port['disabled'] ? 1 : 0).">");
-  echo("</td>");
+    echo '<td>';
+    echo "<input type=checkbox class='ignore-check' name='ignore_".$port['port_id']."'".($port['ignore'] ? 'checked' : '').'>';
+    echo "<input type=hidden name='oldign_".$port['port_id']."' value=".($port['ignore'] ? 1 : 0).'>';
+    echo '</td>';
+    echo '<td>'.$port['ifAlias'].'</td>';
 
-  echo("<td>");
-  echo("<input type=checkbox class='ignore-check' name='ignore_".$port['port_id']."'".($port['ignore'] ? 'checked' : '').">");
-  echo("<input type=hidden name='oldign_".$port['port_id']."' value=".($port['ignore'] ? 1 : 0).">");
-  echo("</td>");
-  echo("<td>".$port['ifAlias'] . "</td>");
+    echo "</tr>\n";
 
-  echo("</tr>\n");
+    $row++;
+}//end foreach
 
-  $row++;
-}
-
-echo('</table>');
-echo('</form>');
-echo('</div>');
-
-?>
+echo '</table>';
+echo '</form>';
+echo '</div>';

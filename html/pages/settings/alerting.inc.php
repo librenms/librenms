@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-$no_refresh = TRUE;
+$no_refresh = true;
 
 ?>
 
@@ -151,18 +151,20 @@ if (isset($_GET['error'])) {
 }
 
 if (isset($_GET['account']) && isset($_GET['service_key']) && isset($_GET['service_name'])) {
-    set_config_name('alert.transports.pagerduty',$_GET['service_key']);
-    set_config_name('alert.pagerduty.account',$_GET['account']);
-    set_config_name('alert.pagerduty.service',$_GET['service_name']);
+    set_config_name('alert.transports.pagerduty', $_GET['service_key']);
+    set_config_name('alert.pagerduty.account', $_GET['account']);
+    set_config_name('alert.pagerduty.service', $_GET['service_name']);
 }
 
 $config_groups = get_config_by_group('alerting');
 
 if (isset($config['base_url'])) {
     $callback = $config['base_url'].'/'.$_SERVER['REQUEST_URI'].'/';
-} else {
+}
+else {
     $callback = get_url().'/';
 }
+
 $callback = urlencode($callback);
 
 echo '
@@ -250,13 +252,14 @@ echo '
                         <div data-toggle="tooltip" title="'.$config_groups['email_backend']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
                         <div class="col-sm-4">
                             <select id="email_backend" class="form-control" name="global-config-select" data-config_id="'.$config_groups['email_backend']['config_id'].'">';
-                            foreach ($dyn_config['email_backend'] as $backend) {
-                                echo '<option value="'.$backend.'"';
-                                if ($config_groups['email_backend']['config_value'] == $backend) {
-                                    echo ' selected';
-                                }
-                                echo '>'.$backend.'</option>';
-                            }                            
+foreach ($dyn_config['email_backend'] as $backend) {
+    echo '<option value="'.$backend.'"';
+    if ($config_groups['email_backend']['config_value'] == $backend) {
+        echo ' selected';
+    }
+
+    echo '>'.$backend.'</option>';
+}
 
 
                             echo '</select>
@@ -316,13 +319,15 @@ echo '
                         <div data-toggle="tooltip" title="'.$config_groups['email_smtp_secure']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
                         <div class="col-sm-4">
                             <select id="email_smtp_secure" class="form-control"name="global-config-select" data-config_id="'.$config_groups['email_smtp_secure']['config_id'].'">';
-                            foreach ($dyn_config['email_smtp_secure'] as $secure) {
-                                echo "<option value='$secure'";
-                                if ($config_groups['email_smtp_secure']['config_value'] == $secure) {
-                                    echo " selected";
-                                }
-                                echo ">$secure</option>";
-                            }
+foreach ($dyn_config['email_smtp_secure'] as $secure) {
+    echo "<option value='$secure'";
+    if ($config_groups['email_smtp_secure']['config_value'] == $secure) {
+        echo ' selected';
+    }
+
+    echo ">$secure</option>";
+}
+
                             echo '</select>
                             <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                         </div>
@@ -367,10 +372,10 @@ echo '
                         </div>
                     </div>';
                     $api_urls = get_config_like_name('alert.transports.api.%.');
-                    foreach ($api_urls as $api_url) {
-                        $api_split = split("\.", $api_url['config_name']);
-                        $api_method = $api_split[3];
-                        echo '<div class="form-group has-feedback" id="'.$api_url['config_id'].'">
+foreach ($api_urls as $api_url) {
+    $api_split  = split('\.', $api_url['config_name']);
+    $api_method = $api_split[3];
+    echo '<div class="form-group has-feedback" id="'.$api_url['config_id'].'">
                         <label for="api_url" class="col-sm-4 control-label">API URL ('.$api_method.') </label>
                         <div class="col-sm-4">
                             <input id="api_url" class="form-control" type="text" name="global-config-input" value="'.$api_url['config_value'].'" data-config_id="'.$api_url['config_id'].'">
@@ -380,7 +385,8 @@ echo '
                             <button type="button" class="btn btn-danger del-api-config" name="del-api-call" data-config_id="'.$api_url['config_id'].'"><i class="fa fa-minus"></i></button>
                         </div>
                     </div>';
-                    }
+}
+
                     echo '<div class="form-group has-feedback hide" id="api_url_template">
                         <label for="api_url" class="col-sm-4 control-label api-method">API URL </label>
                         <div class="col-sm-4">
@@ -407,11 +413,13 @@ echo '
                             <a href="https://connect.pagerduty.com/connect?vendor=2fc7c9f3c8030e74aae6&callback='.$callback.'"><img src="images/pd_connect_button.png" width="202" height="36" alt="Connect to PagerDuty"></a>
                         </div>
                         <div class="col-sm-1">';
-                            if (empty($config_groups['alert.transports.pagerduty']['config_value']) === FALSE) {
-                                echo "<i class='fa fa-check-square-o fa-col-success fa-3x'></i>";
-                            } else {
-                                echo "<i class='fa fa-check-square-o fa-col-danger fa-3x'></i>";
-                            }
+if (empty($config_groups['alert.transports.pagerduty']['config_value']) === false) {
+    echo "<i class='fa fa-check-square-o fa-col-success fa-3x'></i>";
+}
+else {
+    echo "<i class='fa fa-check-square-o fa-col-danger fa-3x'></i>";
+}
+
                     echo '</div>
                     </div>
                 </div>
@@ -468,18 +476,19 @@ echo '
                         </div>
                     </div>';
                     $slack_urls = get_config_like_name('alert.transports.slack.%.url');
-                    foreach ($slack_urls as $slack_url) {
-                        unset($upd_slack_extra);
-                        $new_slack_extra = array();
-                        $slack_extras = get_config_like_name('alert.transports.slack.'.$slack_url['config_id'].'.%');
-                        foreach ($slack_extras as $extra) {
-                            $split_extra = explode('.',$extra['config_name']);
-                            if ($split_extra[4] != 'url') {
-                                $new_slack_extra[] = $split_extra[4] . '=' . $extra['config_value'];
-                            }
-                        }
-                        $upd_slack_extra = implode(PHP_EOL,$new_slack_extra);
-                        echo '<div id="'.$slack_url['config_id'].'">
+foreach ($slack_urls as $slack_url) {
+    unset($upd_slack_extra);
+    $new_slack_extra = array();
+    $slack_extras    = get_config_like_name('alert.transports.slack.'.$slack_url['config_id'].'.%');
+    foreach ($slack_extras as $extra) {
+        $split_extra = explode('.', $extra['config_name']);
+        if ($split_extra[4] != 'url') {
+            $new_slack_extra[] = $split_extra[4].'='.$extra['config_value'];
+        }
+    }
+
+    $upd_slack_extra = implode(PHP_EOL, $new_slack_extra);
+    echo '<div id="'.$slack_url['config_id'].'">
                         <div class="form-group has-feedback">
                             <label for="slack_url" class="col-sm-4 control-label">Slack URL </label>
                             <div class="col-sm-4">
@@ -497,7 +506,8 @@ echo '
                             </div>
                         </div>
                     </div>';
-                    }
+}//end foreach
+
                     echo '<div class="hide" id="slack_url_template">
                         <div class="form-group has-feedback">
                             <label for="slack_url" class="col-sm-4 control-label api-method">Slack URL </label>
@@ -532,20 +542,21 @@ echo '
                         </div>
                     </div>';
                     $hipchat_urls = get_config_like_name('alert.transports.hipchat.%.url');
-                    foreach ($hipchat_urls as $hipchat_url) {
-                        unset($upd_hipchat_extra);
-                        $new_hipchat_extra = array();
-                        $hipchat_extras = get_config_like_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.%');
-                        $hipchat_room_id = get_config_by_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.room_id');
-                        $hipchat_from = get_config_by_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.from');
-                        foreach ($hipchat_extras as $extra) {
-                            $split_extra = explode('.',$extra['config_name']);
-                            if ($split_extra[4] != 'url' && $split_extra[4] != 'room_id' && $split_extra[4] != 'from') {
-                                $new_hipchat_extra[] = $split_extra[4] . '=' . $extra['config_value'];
-                            }
-                        }
-                        $upd_hipchat_extra = implode(PHP_EOL,$new_hipchat_extra);
-                        echo '<div id="'.$hipchat_url['config_id'].'">
+foreach ($hipchat_urls as $hipchat_url) {
+    unset($upd_hipchat_extra);
+    $new_hipchat_extra = array();
+    $hipchat_extras    = get_config_like_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.%');
+    $hipchat_room_id   = get_config_by_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.room_id');
+    $hipchat_from      = get_config_by_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.from');
+    foreach ($hipchat_extras as $extra) {
+        $split_extra = explode('.', $extra['config_name']);
+        if ($split_extra[4] != 'url' && $split_extra[4] != 'room_id' && $split_extra[4] != 'from') {
+            $new_hipchat_extra[] = $split_extra[4].'='.$extra['config_value'];
+        }
+    }
+
+    $upd_hipchat_extra = implode(PHP_EOL, $new_hipchat_extra);
+    echo '<div id="'.$hipchat_url['config_id'].'">
                         <div class="form-group has-feedback">
                             <label for="hipchat_url" class="col-sm-4 control-label">Hipchat URL </label>
                             <div class="col-sm-4">
@@ -577,7 +588,8 @@ echo '
                             </div>
                         </div>
                     </div>';
-                    }
+}//end foreach
+
                     echo '<div id="hipchat_url_template" class="hide">
                         <div class="form-group has-feedback">
                             <label for="hipchat_url" class="col-sm-4 control-label api-method">Hipchat URL </label>
@@ -629,15 +641,16 @@ $pushover_appkeys = get_config_like_name('alert.transports.pushover.%.appkey');
 foreach ($pushover_appkeys as $pushover_appkey) {
     unset($upd_pushover_extra);
     $new_pushover_extra = array();
-    $pushover_extras = get_config_like_name('alert.transports.pushover.'.$pushover_appkey['config_id'].'.%');
-    $pushover_userkey = get_config_by_name('alert.transports.pushover.'.$pushover_appkey['config_id'].'.userkey');
+    $pushover_extras    = get_config_like_name('alert.transports.pushover.'.$pushover_appkey['config_id'].'.%');
+    $pushover_userkey   = get_config_by_name('alert.transports.pushover.'.$pushover_appkey['config_id'].'.userkey');
     foreach ($pushover_extras as $extra) {
-        $split_extra = explode('.',$extra['config_name']);
+        $split_extra = explode('.', $extra['config_name']);
         if ($split_extra[4] != 'appkey' && $split_extra[4] != 'userkey') {
-            $new_pushover_extra[] = $split_extra[4] . '=' . $extra['config_value'];
+            $new_pushover_extra[] = $split_extra[4].'='.$extra['config_value'];
         }
     }
-    $upd_pushover_extra = implode(PHP_EOL,$new_pushover_extra);
+
+    $upd_pushover_extra = implode(PHP_EOL, $new_pushover_extra);
     echo '<div id="'.$pushover_appkey['config_id'].'">
                         <div class="form-group has-feedback">
                             <label for="pushover_appkey" class="col-sm-4 control-label">Pushover Appkey </label>
@@ -663,7 +676,8 @@ foreach ($pushover_appkeys as $pushover_appkey) {
                             </div>
                         </div>
                     </div>';
-}
+}//end foreach
+
 echo '<div id="pushover_appkey_template" class="hide">
                         <div class="form-group has-feedback">
                             <label for="pushover_appkey" class="col-sm-4 control-label api-method">Pushover Appkey </label>
@@ -694,15 +708,14 @@ echo '<div id="pushover_appkey_template" class="hide">
     </form>
 </div>
 ';
-
 ?>
 
 <script>
 
     <?php
-        if(isset($_GET['service_key'])) {
-            echo "$('#pagerduty_transport_expand').collapse('show');";
-        }
+    if (isset($_GET['service_key'])) {
+        echo "$('#pagerduty_transport_expand').collapse('show');";
+    }
     ?>
 
     $(".toolTip").tooltip();

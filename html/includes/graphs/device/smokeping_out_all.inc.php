@@ -1,7 +1,5 @@
 <?php
 
-$direction = "out";
+$direction = 'out';
 
-include("smokeping_all_common.inc.php");
-
-?>
+require 'smokeping_all_common.inc.php';

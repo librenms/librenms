@@ -1,5 +1,7 @@
 <?php
 
 if (!$os) {
-    if (stristr($sysDescr, "ProSafe")) { $os = "netgear"; }
+    if (stristr($sysDescr, 'ProSafe')) {
+        $os = 'netgear';
+    }
 }
