@@ -89,32 +89,28 @@ db_dbname = config['db_name']
 try:
     amount_of_workers = int(config['poller_service_workers'])
     if amount_of_workers == 0:
-        log.critical("ERROR: 0 threads is not a valid value")
-        sys.exit(2)
+        amount_of_workers = 16
 except KeyError:
     amount_of_workers = 16
 
 try:
     poll_frequency = int(config['poller_service_poll_frequency'])
     if poll_frequency == 0:
-        log.critical("ERROR: 0 seconds is not a valid value")
-        sys.exit(2)
+        poll_frequency = 300
 except KeyError:
     poll_frequency = 300
 
 try:
     discover_frequency = int(config['poller_service_discover_frequency'])
     if discover_frequency == 0:
-        log.critical("ERROR: 0 seconds is not a valid value")
-        sys.exit(2)
+        discover_frequency = 21600
 except KeyError:
     discover_frequency = 21600
 
 try:
     down_retry = int(config['poller_service_down_retry'])
     if down_retry == 0:
-        log.critical("ERROR: 0 seconds is not a valid value")
-        sys.exit(2)
+        down_retry = 60
 except KeyError:
     down_retry = 60
 
