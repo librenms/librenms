@@ -87,12 +87,6 @@ $config['rrd_colors'] = array(
     'f_13' => '555555',
 );
 /*
- * URL to collectd's unix socket (unixsock plugin)
- *  enabled:  'unix:///var/run/collectd/collectd-unixsock'
- *  disabled: null
- */
-$config['collectd_sock'] = null;
-/*
  * Path to TTF font file to use in error images
  * (fallback when file does not exist is GD fixed font)
  */
