@@ -68,10 +68,13 @@ if ($_SESSION['userlevel'] >= '10') {
 ?>
             </ul>
           </li>
+          <li class="dropdown-submenu">
+           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Maps</a>
+           <ul class="dropdown-menu scrollable-menu">
+           <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
+           </ul>
+          </li>
             <li role="presentation" class="divider"></li>
-<?php if (isset($config['enable_map']) && $config['enable_map']) {
-  echo('              <li><a href="'.generate_url(array('page'=>'overview')).'"><i class="fa fa-globe fa-fw fa-lg"></i> Network Map</a></li>');
-} ?>
             <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-book fa-fw fa-lg"></i> Eventlog</a></li>
 <?php if (isset($config['enable_syslog']) && $config['enable_syslog']) {
   echo('              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-book fa-fw fa-lg"></i> Syslog</a></li>');
