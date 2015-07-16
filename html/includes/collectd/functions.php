@@ -330,26 +330,6 @@ function collectd_flush($identifier) {
         return false;
     }
 
-    if (is_null($host) || !is_string($host) || strlen($host) == 0) {
-        return false;
-    }
-
-    if (is_null($plugin) || !is_string($plugin) || strlen($plugin) == 0) {
-        return false;
-    }
-
-    if (is_null($pinst) || !is_string($pinst)) {
-        return false;
-    }
-
-    if (is_null($type) || !is_string($type) || strlen($type) == 0) {
-        return false;
-    }
-
-    if (is_null($tinst) || (is_array($tinst) && count($tinst) == 0) || !(is_string($tinst) || is_array($tinst))) {
-        return false;
-    }
-
     $u_errno  = 0;
     $u_errmsg = '';
     if ($socket = @fsockopen($config['collectd_sock'], 0, $u_errno, $u_errmsg)) {
