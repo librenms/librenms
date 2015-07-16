@@ -17,68 +17,57 @@
       </tr>
 <?php
 
-foreach ($config['poller_modules'] as $module => $module_status)
-{
-  echo('
+foreach ($config['poller_modules'] as $module => $module_status) {
+    echo('
       <tr>
         <td><strong>'.$module.'</strong></td>
         <td>
-');
+        ');
 
-  if($module_status == 1)
-  {
-    echo('<span class="text-success">Enabled</span>');
-  }
-  else
-  {
-    echo('<span class="text-danger">Disabled</span>');
-  }
+    if($module_status == 1) {
+        echo('<span class="text-success">Enabled</span>');
+    }
+    else {
+        echo('<span class="text-danger">Disabled</span>');
+    }
 
-  echo('
+    echo('
         </td>
         <td>
-');
+        ');
 
-  if (isset($attribs['poll_'.$module]))
-  {
-    if ($attribs['poll_'.$module])
-    {
-      echo('<span id="poller-module-'.$module.'" class="text-success">Enabled</span>');
-      $module_checked = 'checked';
+    if (isset($attribs['poll_'.$module])) {
+        if ($attribs['poll_'.$module]) {
+            echo('<span id="poller-module-'.$module.'" class="text-success">Enabled</span>');
+            $module_checked = 'checked';
+        }
+        else {
+            echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
+            $module_checked = '';
+        }
     }
-    else
-    {
-      echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
-      $module_checked = '';
+    else {
+        if($module_status == 1) {
+            echo('<span id="poller-module-'.$module.'"class="text-success">Enabled</span>');
+            $module_checked = 'checked';
+        }
+        else {
+            echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
+            $module_checked = '';
+        }
     }
-  }
-  else
-  {
-    if($module_status == 1)
-    {
-      echo('<span id="poller-module-'.$module.'"class="text-success">Enabled</span>');
-      $module_checked = 'checked';
-    }
-    else
-    {
-      echo('<span id="poller-module-'.$module.'"class="text-danger">Disabled</span>');
-      $module_checked = '';
-    }
-  }
 
-  echo('
+    echo('
        </td>
        <td>
-');
+       ');
 
-  echo('
-<input type="checkbox" name="poller-module" data-poller_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>
-');
+    echo('<input type="checkbox" name="poller-module" data-poller_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>');
 
-  echo('
+    echo('
        </td>
      </tr>
-');
+     ');
 }
 
 ?>
@@ -96,71 +85,56 @@ foreach ($config['poller_modules'] as $module => $module_status)
 
 <?php
 
-foreach ($config['discovery_modules'] as $module => $module_status)
-{
-
-  echo('
+foreach ($config['discovery_modules'] as $module => $module_status) {
+    echo('
       <tr>
         <td>
           <strong>'.$module.'</strong>
         </td>
         <td>
-');
+        ');
 
-  if($module_status == 1)
-  {
-    echo('<span class="text-success">Enabled</span>');
-  }
-  else
-  {
-    echo('<span class="text-danger">Disabled</span>');
-  }
+    if($module_status == 1) {
+        echo('<span class="text-success">Enabled</span>');
+    }
+    else {
+        echo('<span class="text-danger">Disabled</span>');
+    }
 
-  echo('
+    echo('
         </td>
-        <td>
-');
+        <td>');
 
-  if (isset($attribs['discover_'.$module]))
-  {
-    if($attribs['discover_'.$module])
-    {
-      echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
-      $module_checked = 'checked';
+    if (isset($attribs['discover_'.$module])) {
+        if($attribs['discover_'.$module]) {
+            echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
+            $module_checked = 'checked';
+        }
+        else {
+            echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
+            $module_checked = '';
+        }
     }
-    else
-    {
-      echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
-      $module_checked = '';
+    else {
+        if($module_status == 1) {
+            echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
+            $module_checked = 'checked';
+        }
+        else {
+            echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
+            $module_checked = '';
+        }
     }
-  }
-  else
-  {
-    if($module_status == 1)
-    {
-      echo('<span id="discovery-module-'.$module.'" class="text-success">Enabled</span>');
-      $module_checked = 'checked';
-    }
-    else
-    {
-      echo('<span id="discovery-module-'.$module.'" class="text-danger">Disabled</span>');
-      $module_checked = '';
-    }
-  }
 
-  echo('
+    echo('
         </td>
-        <td>
-');
+        <td>');
 
-  echo('
-          <input type="checkbox" name="discovery-module" data-discovery_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>
-');  
+    echo('<input type="checkbox" name="discovery-module" data-discovery_module="'.$module.'" data-device_id="'.$device['device_id'].'" '.$module_checked.'>');
 
-  echo('
+    echo('
         </td>
-      </tr>
-');
+      </tr>');
 
 }
 echo('

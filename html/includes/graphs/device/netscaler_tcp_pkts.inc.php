@@ -1,21 +1,19 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netscaler-stats-tcp.rrd";
+$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/netscaler-stats-tcp.rrd';
 
-$ds_in = "TotRxBytes";
-$ds_out = "TotTxBytes";
+$ds_in  = 'TotRxBytes';
+$ds_out = 'TotTxBytes';
 
-$colour_area_in = "AA66AA";
-$colour_line_in = "330033";
-$colour_area_out = "FFDD88";
-$colour_line_out = "FF6600";
+$colour_area_in  = 'AA66AA';
+$colour_line_in  = '330033';
+$colour_area_out = 'FFDD88';
+$colour_line_out = 'FF6600';
 
-$colour_area_in_max = "cc88cc";
-$colour_area_out_max = "FFefaa";
+$colour_area_in_max  = 'cc88cc';
+$colour_area_out_max = 'FFefaa';
 
 $graph_max = 1;
-$unit_text = "Packets";
+$unit_text = 'Packets';
 
-include("includes/graphs/generic_duplex.inc.php");
-
-?>
+require 'includes/graphs/generic_duplex.inc.php';

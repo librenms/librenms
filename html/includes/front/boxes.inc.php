@@ -11,31 +11,23 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-?>
-<?php
 
-echo('
+echo '
 <div class="cycle-slideshow"
-    data-cycle-fx="fade"
-    data-cycle-timeout="10000"
-    data-cycle-slides="> div"
-    style="clear: both">
-');
+data-cycle-fx="fade"
+data-cycle-timeout="10000"
+data-cycle-slides="> div"
+style="clear: both">
+';
 
-foreach (get_matching_files($config['html_dir']."/includes/front/", "/^top_.*\.php$/") as $file)
-{
-  if(($file == 'top_ports.inc.php' && $config['top_ports'] == 0) || ($file == 'top_device_bits.inc.php' && $config['top_devices'] == 0))
-  {
-  }
-  else
-  {
-    echo("<div class=box>\n");
-    include_once($file);
-    echo("</div>\n");
-  }  
+foreach (get_matching_files($config['html_dir'].'/includes/front/', '/^top_.*\.php$/') as $file) {
+    if (($file == 'top_ports.inc.php' && $config['top_ports'] == 0) || ($file == 'top_device_bits.inc.php' && $config['top_devices'] == 0)) {
+    }
+    else {
+        echo "<div class=box>\n";
+        include_once $file;
+        echo "</div>\n";
+    }
 }
 
-echo("</div>\n");
-
-?>
-
+echo "</div>\n";

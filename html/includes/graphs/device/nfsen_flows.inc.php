@@ -1,7 +1,5 @@
 <?php
-$dsdescr = "Flows/s ";
-$dsprefix = "flows_";
+$dsdescr  = 'Flows/s ';
+$dsprefix = 'flows_';
 
-include("nfsen_common.inc.php");
-
-?>
+require 'nfsen_common.inc.php';
