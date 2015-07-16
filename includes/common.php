@@ -701,21 +701,22 @@ function get_graph_subtypes($type) {
 
 function get_smokeping_files($device) {
     global $config;
+    $smokeping_files = array();
     if (isset($config['smokeping']['dir'])) {
-        $smokeping_files = array();
         $smokeping_dir = generate_smokeping_file($device);
         if ($handle = opendir($smokeping_dir)) {
             while (false !== ($file = readdir($handle))) {
-                if ($file != "." && $file != "..") {
-                    if (eregi(".rrd", $file)) {
-                        if (eregi("~", $file)) {
-                            list($target,$slave) = explode("~", str_replace(".rrd", "", $file));
-                            $target = str_replace("_", ".", $target);
+                if ($file != '.' && $file != '..') {
+                    if (eregi('.rrd', $file)) {
+                        if (eregi('~', $file)) {
+                            list($target,$slave) = explode('~', str_replace('.rrd', '', $file));
+                            $target = str_replace('_', '.', $target);
                             $smokeping_files['in'][$target][$slave] = $file;
                             $smokeping_files['out'][$slave][$target] = $file;
-                        } else {
-                            $target = str_replace(".rrd", "", $file);
-                            $target = str_replace("_", ".", $target);
+                        }
+                        else {
+                            $target = str_replace('.rrd', '', $file);
+                            $target = str_replace('_', '.', $target);
                             $smokeping_files['in'][$target][$config['own_hostname']] = $file;
                             $smokeping_files['out'][$config['own_hostname']][$target] = $file;
                         }
@@ -731,7 +732,8 @@ function generate_smokeping_file($device,$file='') {
     global $config;
     if ($config['smokeping']['integration'] === true) {
         return $config['smokeping']['dir'] .'/'. $device['type'] .'/' . $file;
-    } else {
+    }
+    else {
         return $config['smokeping']['dir'] . '/' . $file;
     }
 }
