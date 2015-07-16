@@ -71,7 +71,7 @@ if ($vars['view'] == 'incoming') {
             }
             if (is_numeric($host['device_id'])) {
                 echo '<tr><td>';
-                echo('<h3>'.generate_device_link($dest).'</h3>');
+                echo '<h3>'.generate_device_link($dest).'</h3>';
                 $graph_array['type']   = 'smokeping_in';
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['src']    = $host['device_id'];
