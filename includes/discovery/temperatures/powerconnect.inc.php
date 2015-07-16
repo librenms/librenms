@@ -1,6 +1,6 @@
 <?php
 if ($device['os'] == 'powerconnect') {
-    $sysObjectId = snmp_get ($device, 'SNMPv2-MIB::sysObjectID.0', '-Ovqn');
+    $sysObjectId = snmp_get($device, 'SNMPv2-MIB::sysObjectID.0', '-Ovqn');
     switch ($sysObjectId) {
         /**
         * Dell Powerconnect 5548
