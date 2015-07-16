@@ -305,6 +305,11 @@ $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 Specify the location of the collectd rrd files.
 
 ```php
+$config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
+```
+Specify the location of the collectd unix socket. Using a socket allows the collectd graphs to be flushed to disk before being drawn. Be sure that your web server has permissions to write to this socket.
+
+```php
 $config['smokeping']['dir']             = "/var/lib/smokeping/";
 ```
 Set the smokeping directory location.
