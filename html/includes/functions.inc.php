@@ -256,7 +256,7 @@ function overlib_link($url, $text, $contents, $class) {
         $output .= '>';
     }
     else {
-        $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].', WRAP,HAUTO,VAUTO);" onmouseout="return nd();">';
+        $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].",WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
     }
 
     $output .= $text.'</a>';
@@ -429,6 +429,26 @@ function generate_graph_tag($args) {
     return '<img src="graph.php?'.implode('&amp;', $urlargs).'" border="0" />';
 
 }//end generate_graph_tag()
+
+function generate_lazy_graph_tag($args) {
+    $urlargs = array();
+    $w = 0;
+    $h = 0;
+    foreach ($args as $key => $arg) {
+        switch (strtolower($key)) {
+            case 'width':
+                $w = $arg;
+                break;
+            case 'height':
+                $h = $arg;
+                break;
+        }
+        $urlargs[] = $key."=".urlencode($arg);
+    }
+
+    return '<img class="lazy" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+
+}//end generate_lazy_graph_tag()
 
 
 function generate_graph_js_state($args) {

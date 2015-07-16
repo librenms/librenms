@@ -52,9 +52,9 @@ foreach ($periods as $period) {
     $link = generate_url($link_array);
 
     if ($return_data === true) {
-        $graph_data[] = overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+        $graph_data[] = overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
     }
     else {
-        echo overlib_link($link, generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+        echo(overlib_link($link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
     }
 }
