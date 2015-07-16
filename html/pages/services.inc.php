@@ -113,7 +113,7 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
                 $graph_array_zoom           = $graph_array;
                 $graph_array_zoom['height'] = '150';
                 $graph_array_zoom['width']  = '400';
-                echo overlib_link('', generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
+                echo overlib_link('', generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
             }
 
             echo '</td></tr>';
