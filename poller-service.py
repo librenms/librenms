@@ -4,12 +4,12 @@
                 devices that have been polled within the last $poll_frequency seconds. It will prioritize devices based
                 on the last time polled. If resources are sufficient, this service should poll every device every
                 $poll_frequency seconds, but should gracefully degrade if resources are inefficient, polling devices as
-                frequently as possible. This service is based on poller-wrapper.py.
+                frequently as possible. This service is based on Job Snijders' poller-wrapper.py.
 
  Author:        Clint Armstrong <clint@clintarmstrong.net>
  Date:          July 2015
 
- License:       BSD
+ License:       BSD 2-Clause
 """
 
 import json
