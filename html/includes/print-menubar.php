@@ -72,6 +72,7 @@ if ($_SESSION['userlevel'] >= '10') {
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Maps</a>
            <ul class="dropdown-menu scrollable-menu">
            <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
+           <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Device</a></li>
            </ul>
           </li>
             <li role="presentation" class="divider"></li>
@@ -147,8 +148,6 @@ if ($_SESSION['userlevel'] >= '10') {
 }
 
 ?>
-              <li role="presentation" class="divider"></li>
-              <li><a href="map/"><img src="images/16/chart_organisation.png" border="0" alt="Network Map" width="16" height="16" /> Network Map</a></li>
           </ul>
         </li>
 
