@@ -199,7 +199,8 @@ dev_query = ('SELECT device_id, status,                                         
              'AND ( last_poll_attempted < DATE_SUB(NOW(), INTERVAL {2} SECOND )  '
              '  OR last_poll_attempted IS NULL )                                 '
              '{3}                                                                '
-             'ORDER BY next_poll asc                                             ').format(poll_frequency,
+             'ORDER BY next_poll asc                                             '
+             'LIMIT 5                                                            ').format(poll_frequency,
                                                                                            discover_frequency,
                                                                                            down_retry,
                                                                                            poller_group)
@@ -251,11 +252,9 @@ while True:
         # add queue lock, so we lock the next device against any other pollers
         # if this fails, the device is locked by another poller already
         if not getLock('queued.{}'.format(device_id)):
-            time.sleep(.5)
             continue
         if not lockFree('polling.{}'.format(device_id)):
             releaseLock('queued.{}'.format(device_id))
-            time.sleep(.5)
             continue
 
         if next_poll and next_poll > datetime.now():
@@ -278,9 +277,9 @@ while True:
         # If we made it this far, break out of the loop and query again.
         break
 
-    # Looping with no break causes the service to be killed by init.
     # This point is only reached if the query is empty, so sleep half a second before querying again.
     time.sleep(.5)
 
-    # Make sure we're not holding any device queue locks in this connection before querying again.
+    # Make sure we're not holding any device queue locks in this connection before querying again
+    # by locking a different string.
     getLock('unlock.{}'.format(config['distributed_poller_name']))
