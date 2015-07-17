@@ -33,8 +33,8 @@ foreach(dbFetchRows($sql) as $device) {
     else {
         $btn_type = 'btn-danger';
     }
+    echo "<a href='" .generate_url(array('page' => 'device', 'device' => $device['device_id'])). "' role='button' class='btn " . $btn_type . " btn-xs' title='" . $device['hostname'] . "' style='min-height:25px; min-width:25px; border-radius:0px;'></a>";
 
-    echo "<a href='/graphs/type=device_uptime/device=" . $device['device_id'] . "/' role='button' class='btn " . $btn_type . " btn-xs' title='" . $device['hostname'] . "' style='min-height:25px; min-width:25px; border-radius:0px;'></a>";
 }
 
 echo "</div>";
