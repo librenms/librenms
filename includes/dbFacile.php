@@ -116,7 +116,6 @@ function dbInsert($data, $table) {
 
 
 function dbBulkInsert($data, $table) {
-    global $fullSql;
     global $db_stats;
     // the following block swaps the parameters if they were given in the wrong order.
     // it allows the method to work for those that would rather it (or expect it to)
@@ -126,7 +125,6 @@ function dbBulkInsert($data, $table) {
         $tmp   = $data;
         $data  = $table;
         $table = $tmp;
-        // trigger_error('QDB - Parameters passed to insert() were in reverse order, but it has been allowed', E_USER_NOTICE);
     }
     if (count($data) === 0) {
         return false;
