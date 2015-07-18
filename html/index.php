@@ -155,6 +155,8 @@ else {
   <script src="js/jquery.bootgrid.min.js"></script>
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
+  <script src="js/jquery.lazyload.min.js"></script>
+  <script src="js/lazyload.js"></script>
   <script type="text/javascript">
 
     <!-- Begin
