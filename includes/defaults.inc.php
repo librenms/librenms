@@ -306,7 +306,7 @@ $config['graph_colours']['purples'] = array(
 $config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
 // Map colors
-$config['map_legend'] = array(
+$config['network_map_legend'] = array(
     '0'   => '#aeaeae',
     '10'  => '#79847e',
     '20'  => '#97ffca',
@@ -319,7 +319,7 @@ $config['map_legend'] = array(
     '90'  => '#ff6600',
     '100' => '#ff0000',
 );
-$config['map_items'] = array('xdp','mac');
+$config['network_map_items'] = array('xdp','mac');
 
 // Device page options
 $config['show_overview_tab'] = true;
