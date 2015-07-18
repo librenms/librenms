@@ -1,9 +1,10 @@
 {
   "name": "vis",
-  "version": "3.11.0",
+  "version": "4.5.0",
   "main": ["dist/vis.min.js", "dist/vis.min.css"],
   "description": "A dynamic, browser-based visualization library.",
   "homepage": "http://visjs.org/",
+  "license": ["Apache-2.0", "MIT"],
   "repository": {
     "type": "git",
     "url": "git://github.com/almende/vis.git"
@@ -13,6 +14,7 @@
     "node_modules",
     "test",
     "tools",
+    "lib",
     ".idea",
     ".npmignore",
     ".gitignore"
