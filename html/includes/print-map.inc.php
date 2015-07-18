@@ -37,7 +37,8 @@ $tmp_ids = array();
 $tmp_links = array();
 $tmp_link_ids = array();
 
-$ports = dbFetchRows("SELECT
+if (in_array('mac',$config['map_items'])) {
+    $ports = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
                              `D1`.`hostname` AS `local_hostname`,
@@ -73,8 +74,10 @@ $ports = dbFetchRows("SELECT
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
                      ", $sql_array);
+}
 
-$devices = dbFetchRows("SELECT
+if (in_array('xdp', $config['map_items'])) {
+    $devices = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
                              `D1`.`hostname` AS `local_hostname`,
@@ -112,6 +115,7 @@ $devices = dbFetchRows("SELECT
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
                       ", $sql_array);
+}
 
 $list = array_merge($ports,$devices);
 
@@ -218,7 +222,7 @@ var options = {
         face: 'sans',
         background: 'white',
         strokeWidth:3,
-        align: 'bottom'
+        align: 'horizontal'
     }
   },
   "physics": {
