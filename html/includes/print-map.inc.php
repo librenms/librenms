@@ -37,7 +37,7 @@ $tmp_ids = array();
 $tmp_links = array();
 $tmp_link_ids = array();
 
-if (in_array('mac',$config['map_items'])) {
+if (in_array('mac',$config['network_map_items'])) {
     $ports = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
@@ -76,7 +76,7 @@ if (in_array('mac',$config['map_items'])) {
                      ", $sql_array);
 }
 
-if (in_array('xdp', $config['map_items'])) {
+if (in_array('xdp', $config['network_map_items'])) {
     $devices = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
@@ -165,7 +165,7 @@ foreach ($list as $items) {
     if ($link_used > 100) {
         $link_used = 100;
     }
-    $link_color = $config['map_legend'][$link_used];
+    $link_color = $config['network_map_legend'][$link_used];
     $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',0,1),'width'=>$width,'color'=>$link_color);
     if (!in_array($items['remote_port_id'],$tmp_link_ids)) {
         $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>\n",'',0,1),'width'=>$width,'color'=>$link_color);
