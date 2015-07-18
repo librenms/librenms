@@ -602,6 +602,9 @@ if ($(window).width() < 768) {
 devices.initialize();
 ports.initialize();
 bgp.initialize();
+$('#gsearch').bind('typeahead:select', function(ev, suggestion) {
+    window.location.href = suggestion.url;
+});
 $('#gsearch').typeahead({
     hint: true,
     highlight: true,
