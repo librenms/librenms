@@ -37,7 +37,8 @@ $tmp_ids = array();
 $tmp_links = array();
 $tmp_link_ids = array();
 
-$ports = dbFetchRows("SELECT
+if (in_array('mac',$config['network_map_items'])) {
+    $ports = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
                              `D1`.`hostname` AS `local_hostname`,
@@ -71,9 +72,12 @@ $ports = dbFetchRows("SELECT
                              `P2`.`port_id` IS NOT NULL AND
                              `D1`.`device_id` != `D2`.`device_id`
                              $sql
+                      GROUP BY `P1`.`port_id`,`P2`.`port_id`
                      ", $sql_array);
+}
 
-$devices = dbFetchRows("SELECT
+if (in_array('xdp', $config['network_map_items'])) {
+    $devices = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
                              `D1`.`os` AS `local_os`,
                              `D1`.`hostname` AS `local_hostname`,
@@ -109,7 +113,9 @@ $devices = dbFetchRows("SELECT
                              `local_device_id` IS NOT NULL AND
                              `remote_device_id` IS NOT NULL
                              $sql
+                      GROUP BY `P1`.`port_id`,`P2`.`port_id`
                       ", $sql_array);
+}
 
 $list = array_merge($ports,$devices);
 
@@ -159,12 +165,14 @@ foreach ($list as $items) {
     if ($link_used > 100) {
         $link_used = 100;
     }
-    $link_color = $config['map_legend'][$link_used];
-    $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',0,1),'width'=>$width,'color'=>$link_color);
-    if (!in_array($items['remote_port_id'],$tmp_link_ids)) {
-        $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>",'',0,1),'width'=>$width,'color'=>$link_color);
+    $link_color = $config['network_map_legend'][$link_used];
+    $id1 = $items['local_port_id'].':'.$items['remote_port_id'];
+    $id2 = $items['remote_port_id'].':'.$items['local_port_id'];
+    if (!in_array($id1,$tmp_link_ids) || !in_array($id2,$tmp_link_ids)) {
+        $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>\n",'',0,1),'width'=>$width,'color'=>$link_color);
     }
-    array_push($tmp_link_ids,$items['local_port_id']);
+    array_push($tmp_link_ids,$id1);
+    array_push($tmp_link_ids,$id2);
 }
 
 $node_devices = $tmp_devices;
@@ -201,27 +209,39 @@ echo $edges;
         edges: edges,
         stabilize: true
     };
-    var options = {
-       autoResize: true,
-       height: '100%',
-       width: '100%',
-       physics: {
-           barnesHut: {
-               gravitationalConstant: -10000, springConstant: 0.001, springLength: 50
-           }
-       },
-       tooltip: {
-           color: {
-               background: '#ffffff'
-           }
-       },
-       smoothCurves: {dynamic:false, type: "continuous"},
-       edges: {
-           color: {
-               color: '#000000'
-           }
-       }
-    };
+var options = {
+  layout:{
+      randomSeed:2
+  },
+  "edges": {
+    "smooth": {
+      "type": "continuous",
+      "roundness": 0.95
+    },
+    font: {
+        size: 12,
+        color: 'red',
+        face: 'sans',
+        background: 'white',
+        strokeWidth:3,
+        align: 'horizontal'
+    }
+  },
+  "physics": {
+    "forceAtlas2Based": {
+      "gravitationalConstant": -800,
+      "centralGravity": 0.03,
+      "springLength": 50,
+      "springConstant": 0,
+      "damping": 1,
+      "avoidOverlap": 1
+    },
+    "maxVelocity": 50,
+    "minVelocity": 0.01,
+    "solver": "forceAtlas2Based",
+    "timestep": 0.30
+  }
+}
     var network = new vis.Network(container, data, options);
     network.on('click', function (properties) {
         if (properties.nodes > 0) {
