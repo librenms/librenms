@@ -57,7 +57,7 @@ if (count($sensors)) {
         $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
 
         echo '<tr>
-            <td><strong>'.overlib_link($link, $sensor['sensor_descr'], $overlib_content).'</strong></td>
+            <td><strong>'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content).'</strong></td>
             <td>'.overlib_link($link, $sensor_minigraph, $overlib_content).'</td>
             <td>'.overlib_link($link, '<span '.($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '').'>'.$sensor['sensor_current'].$sensor_unit.'</span>', $overlib_content).'</td>
             </tr>';
