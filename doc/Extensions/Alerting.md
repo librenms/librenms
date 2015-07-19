@@ -16,6 +16,7 @@ Table of Content:
     - [HipChat](#transports-hipchat)
     - [PagerDuty](#transports-pagerduty)
     - [Pushover](#transports-pushover)
+    - [Boxcar](#transports-boxcar)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -306,6 +307,26 @@ $config['alert']['transports']['pushover'][] = array(
                                                     "appkey" => 'APPLICATIONAPIKEYGOESHERE',
                                                     "userkey" => 'USERKEYGOESHERE',
                                                     "sound_critical" => 'siren',
+                                                    );
+```
+
+## <a name="transports-boxcar">Boxcar</a>
+
+Enabling Boxcar support is super easy. 
+Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport in your config.php like:
+
+```php
+$config['alert']['transports']['boxcar'][] = array(
+                                                    "access_token" => 'ACCESSTOKENGOESHERE',
+                                                    );
+```
+
+To modify the Critical alert sound, add the 'sound_critical' parameter, example:
+
+```php
+$config['alert']['transports']['boxcar'][] = array(
+                                                    "access_token" => 'ACCESSTOKENGOESHERE',
+                                                    "sound_critical" => 'detonator-charge',
                                                     );
 ```
 
