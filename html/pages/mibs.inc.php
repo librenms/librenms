@@ -11,6 +11,7 @@
                 <th data-column-id="description">Description</th>
                 <th data-column-id="max_access">Maximum Access</th>
                 <th data-column-id="status">Status</th>
+                <th data-column-id="last_used">Last Used</th>
             </tr>
         </thead>
     </table>
