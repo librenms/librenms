@@ -44,7 +44,7 @@ def get_config_data():
     except:
         log.critical("ERROR: Could not execute: %s" % config_cmd)
         sys.exit(2)
-    return proc.communicate()[0]
+    return proc.communicate()[0].decode()
 
 try:
     with open(config_file) as f:
@@ -60,13 +60,12 @@ except:
     sys.exit(2)
 
 try:
-    loglevel = logging.getLevelName(config['poller_service_loglevel'].upper())
+    log.setLevel(config['poller_service_loglevel'].upper())
 except KeyError:
-    loglevel = logging.getLevelName('INFO')
-if not isinstance(loglevel, int):
-    log.warning('ERROR: {0} is not a valid log level'.format(str(loglevel)))
-    loglevel = logging.getLevelName('INFO')
-log.setLevel(loglevel)
+    log.setLevel('INFO')
+except ValueError:
+    log.warning('ERROR: {0} is not a valid log level'.format(config['poller_service_loglevel']))
+    log.setLevel('INFO')
 
 poller_path = config['install_dir'] + '/poller.php'
 discover_path = config['install_dir'] + '/discovery.php'
