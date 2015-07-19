@@ -64,7 +64,7 @@ try:
 except KeyError:
     loglevel = logging.getLevelName('INFO')
 if not isinstance(loglevel, int):
-    log.warning('ERROR: {} is not a valid log level'.format(str(loglevel)))
+    log.warning('ERROR: {0} is not a valid log level'.format(str(loglevel)))
     loglevel = logging.getLevelName('INFO')
 log.setLevel(loglevel)
 
@@ -147,21 +147,21 @@ def poll_worker(device_id, action):
 
 def lockFree(lock):
     global cursor
-    query = "SELECT IS_FREE_LOCK('{}')".format(lock)
+    query = "SELECT IS_FREE_LOCK('{0}')".format(lock)
     cursor.execute(query)
     return cursor.fetchall()[0][0] == 1
 
 
 def getLock(lock):
     global cursor
-    query = "SELECT GET_LOCK('{}', 0)".format(lock)
+    query = "SELECT GET_LOCK('{0}', 0)".format(lock)
     cursor.execute(query)
     return cursor.fetchall()[0][0] == 1
 
 
 def releaseLock(lock):
     global cursor
-    query = "SELECT RELEASE_LOCK('{}')".format(lock)
+    query = "SELECT RELEASE_LOCK('{0}')".format(lock)
     cursor.execute(query)
     return cursor.fetchall()[0][0] == 1
 
@@ -174,7 +174,7 @@ def sleep_until(timestamp):
         sleeptime = 0
     time.sleep(sleeptime)
 
-poller_group = ('and poller_group IN({}) '
+poller_group = ('and poller_group IN({0}) '
                 .format(str(config['distributed_poller_group'])) if 'distributed_poller_group' in config else '')
 
 # Add last_polled and last_polled_timetaken so we can sort by the time the last poll started, with the goal
@@ -213,7 +213,7 @@ while True:
     cur_threads = threading.active_count()
     if cur_threads != threads:
         threads = cur_threads
-        log.debug('DEBUG: {} threads currently active'.format(threads))
+        log.debug('DEBUG: {0} threads currently active'.format(threads))
 
     if next_update < datetime.now():
         seconds_taken = (datetime.now() - (next_update - timedelta(minutes=1))).seconds
@@ -234,7 +234,7 @@ while True:
             log.critical('ERROR: MySQL query error. Is your schema up to date?')
             sys.exit(2)
         cursor.fetchall()
-        log.info('INFO: {} devices scanned in the last 5 minutes'.format(devices_scanned))
+        log.info('INFO: {0} devices scanned in the last 5 minutes'.format(devices_scanned))
         devices_scanned = 0
         next_update = datetime.now() + timedelta(minutes=1)
 
@@ -251,10 +251,10 @@ while True:
     for device_id, status, next_poll, next_discovery in devices:
         # add queue lock, so we lock the next device against any other pollers
         # if this fails, the device is locked by another poller already
-        if not getLock('queued.{}'.format(device_id)):
+        if not getLock('queued.{0}'.format(device_id)):
             continue
-        if not lockFree('polling.{}'.format(device_id)):
-            releaseLock('queued.{}'.format(device_id))
+        if not lockFree('polling.{0}'.format(device_id)):
+            releaseLock('queued.{0}'.format(device_id))
             continue
 
         if next_poll and next_poll > datetime.now():
@@ -265,10 +265,10 @@ while True:
         if (not next_discovery or next_discovery < datetime.now()) and status == 1:
             action = 'discovery'
 
-        log.debug('DEBUG: Starting {} of device {}'.format(action, device_id))
+        log.debug('DEBUG: Starting {0} of device {1}'.format(action, device_id))
         devices_scanned += 1
 
-        cursor.execute('UPDATE devices SET last_poll_attempted = NOW() WHERE device_id = {}'.format(device_id))
+        cursor.execute('UPDATE devices SET last_poll_attempted = NOW() WHERE device_id = {0}'.format(device_id))
         cursor.fetchall()
 
         t = threading.Thread(target=poll_worker, args=[device_id, action])
@@ -282,4 +282,4 @@ while True:
 
     # Make sure we're not holding any device queue locks in this connection before querying again
     # by locking a different string.
-    getLock('unlock.{}'.format(config['distributed_poller_name']))
+    getLock('unlock.{0}'.format(config['distributed_poller_name']))
