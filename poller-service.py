@@ -60,12 +60,14 @@ except:
     sys.exit(2)
 
 try:
-    loglevel = logging.getLevelName(config['poller_service_loglevel'].upper())
+    loglevel = config['poller_service_loglevel']
 except KeyError:
-    loglevel = logging.getLevelName('INFO')
+    loglevel = 20
 if not isinstance(loglevel, int):
-    log.warning('ERROR: {0} is not a valid log level'.format(str(loglevel)))
-    loglevel = logging.getLevelName('INFO')
+    loglevel = logging.getLevelName(loglevel)
+if not isinstance(loglevel, int):
+    log.warning('ERROR: {0} is not a valid log level. If using python 3.4.0-3.4.1 you must specify loglevel by number'.format(str(loglevel)))
+    loglevel = 20
 log.setLevel(loglevel)
 
 poller_path = config['install_dir'] + '/poller.php'
