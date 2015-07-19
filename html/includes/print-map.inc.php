@@ -169,7 +169,9 @@ foreach ($list as $items) {
     $id1 = $items['local_port_id'].':'.$items['remote_port_id'];
     $id2 = $items['remote_port_id'].':'.$items['local_port_id'];
     if (!in_array($id1,$tmp_link_ids) || !in_array($id2,$tmp_link_ids)) {
-        $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($items['local_ifname']) . ' > ' . shorten_interface_type($items['remote_ifname']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>\n",'',0,1),'width'=>$width,'color'=>$link_color);
+        $local_port = ifNameDescr($local_port);
+        $remote_port = ifNameDescr($remote_port);
+        $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>\n",'',0,1),'width'=>$width,'color'=>$link_color);
     }
     array_push($tmp_link_ids,$id1);
     array_push($tmp_link_ids,$id2);
@@ -215,8 +217,7 @@ var options = {
   },
   "edges": {
     "smooth": {
-      "type": "continuous",
-      "roundness": 0.95
+        enabled: false
     },
     font: {
         size: 12,
@@ -224,7 +225,8 @@ var options = {
         face: 'sans',
         background: 'white',
         strokeWidth:3,
-        align: 'horizontal'
+        align: 'middle',
+        strokeWidth: 2
     }
   },
   "physics": {
