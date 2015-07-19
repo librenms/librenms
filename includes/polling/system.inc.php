@@ -28,40 +28,40 @@ if (!empty($agent_data['uptime'])) {
 }
 
 if (empty($uptime)) {
-    $uptime = (integer) snmp_get($device, 'snmpEngineTime.0', '-OUqv', 'SNMP-FRAMEWORK-MIB');
-    if (!is_numeric($snmpEngineTime)) {
-        $hrSystemUptime = snmp_get($device, 'hrSystemUptime.0', '-Oqv', 'HOST-RESOURCES-MIB');
-        if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, 'No') && ($device['os'] != 'windows')) {
-            echo 'Using hrSystemUptime ('.$hrSystemUptime.")\n";
-            $agent_uptime = $uptime;
-            // Move uptime into agent_uptime
-            // HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
-            $hrSystemUptime                  = str_replace('(', '', $hrSystemUptime);
-            $hrSystemUptime                  = str_replace(')', '', $hrSystemUptime);
-            list($days,$hours, $mins, $secs) = explode(':', $hrSystemUptime);
-            list($secs, $microsecs)          = explode('.', $secs);
-            $hours  = ($hours + ($days * 24));
-            $mins   = ($mins + ($hours * 60));
-            $secs   = ($secs + ($mins * 60));
-            $uptime = $secs;
-        }
-        else {
-            echo 'Using SNMP Agent Uptime ('.$poll_device['sysUpTime'].")\n";
-            // SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
-            $poll_device['sysUpTime']         = str_replace('(', '', $poll_device['sysUpTime']);
-            $poll_device['sysUpTime']         = str_replace(')', '', $poll_device['sysUpTime']);
-            list($days, $hours, $mins, $secs) = explode(':', $poll_device['sysUpTime']);
-            list($secs, $microsecs)           = explode('.', $secs);
-            $hours  = ($hours + ($days * 24));
-            $mins   = ($mins + ($hours * 60));
-            $secs   = ($secs + ($mins * 60));
-            $uptime = $secs;
-        }//end if
+    $snmp_uptime = (integer) snmp_get($device, 'snmpEngineTime.0', '-OUqv', 'SNMP-FRAMEWORK-MIB');
+    $hrSystemUptime = snmp_get($device, 'hrSystemUptime.0', '-Oqv', 'HOST-RESOURCES-MIB');
+    if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, 'No') && ($device['os'] != 'windows')) {
+        echo 'Using hrSystemUptime ('.$hrSystemUptime.")\n";
+        $agent_uptime = $uptime;
+        // Move uptime into agent_uptime
+        // HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
+        $hrSystemUptime                  = str_replace('(', '', $hrSystemUptime);
+        $hrSystemUptime                  = str_replace(')', '', $hrSystemUptime);
+        list($days,$hours, $mins, $secs) = explode(':', $hrSystemUptime);
+        list($secs, $microsecs)          = explode('.', $secs);
+        $hours  = ($hours + ($days * 24));
+        $mins   = ($mins + ($hours * 60));
+        $secs   = ($secs + ($mins * 60));
+        $uptime = $secs;
     }
     else {
-        echo 'Using snmpEngineTime ('.$uptime.")\n";
+        echo 'Using SNMP Agent Uptime ('.$poll_device['sysUpTime'].")\n";
+        // SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
+        $poll_device['sysUpTime']         = str_replace('(', '', $poll_device['sysUpTime']);
+        $poll_device['sysUpTime']         = str_replace(')', '', $poll_device['sysUpTime']);
+        list($days, $hours, $mins, $secs) = explode(':', $poll_device['sysUpTime']);
+        list($secs, $microsecs)           = explode('.', $secs);
+        $hours  = ($hours + ($days * 24));
+        $mins   = ($mins + ($hours * 60));
+        $secs   = ($secs + ($mins * 60));
+        $uptime = $secs;
     }//end if
 }//end if
+
+if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
+    $uptime = $snmp_uptime;
+    d_echo('hrSystemUptime or sysUpTime looks like to have rolled, using snmpEngineTime instead');
+}
 
 if (is_numeric($uptime)) {
     if ($uptime < $device['uptime']) {
