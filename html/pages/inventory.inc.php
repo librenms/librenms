@@ -69,13 +69,13 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
                  "</select>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
-                 "<input type=\"text\" size=24 name=\"device_string\" id=\"device_string\" value=\"
+                 "<input type=\"text\" size=24 name=\"device_string\" id=\"device_string\" value=\""+
                     <?php
                     if ($_POST['device_string']) {
                         echo $_POST['device_string'];
                     };
 ?>
-\" placeholder=\"Description\" class=\"form-control input-sm\"/>"+
+                 "\" placeholder=\"Description\" class=\"form-control input-sm\"/>"+
                  "</div>"+
                  "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
                  "</form></span></div>"+
