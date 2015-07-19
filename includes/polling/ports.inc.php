@@ -352,6 +352,11 @@ foreach ($ports as $port) {
             }
         }//end foreach
 
+        if (($port['update']['ifAlias'] == '' || $port['update']['ifAlias'] == NULL) && $config['os'][$os]['ifalias_null'] == 1) {
+            $port['update']['ifAlias'] = $port['ifDescr'];
+            d_echo('Using ifDescr due to ifAlias being NULL');
+        }
+
         // Parse description (usually ifAlias) if config option set
         if (isset($config['port_descr_parser']) && is_file($config['install_dir'].'/'.$config['port_descr_parser'])) {
             $port_attribs = array(
