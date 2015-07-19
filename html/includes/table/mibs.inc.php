@@ -25,6 +25,7 @@ $columns = array(
     'description',
     'max_access',
     'status',
+    'last_used',
 );
 
 function search_phrase_column($c)
