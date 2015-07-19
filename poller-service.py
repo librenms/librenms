@@ -64,7 +64,7 @@ try:
 except KeyError:
     log.setLevel('INFO')
 except ValueError:
-    log.warning('ERROR: {0} is not a valid log level'.format(config['poller_service_loglevel'].upper()))
+    log.warning('ERROR: {0} is not a valid log level'.format(config['poller_service_loglevel']))
     log.setLevel('INFO')
 
 poller_path = config['install_dir'] + '/poller.php'
