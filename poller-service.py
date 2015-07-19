@@ -44,7 +44,7 @@ def get_config_data():
     except:
         log.critical("ERROR: Could not execute: %s" % config_cmd)
         sys.exit(2)
-    return proc.communicate()[0]
+    return proc.communicate()[0].decode()
 
 try:
     with open(config_file) as f:
