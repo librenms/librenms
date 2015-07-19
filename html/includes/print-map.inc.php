@@ -36,6 +36,8 @@ $tmp_devices = array();
 $tmp_ids = array();
 $tmp_links = array();
 $tmp_link_ids = array();
+$ports = array();
+$devices = array();
 
 if (in_array('mac',$config['network_map_items'])) {
     $ports = dbFetchRows("SELECT
