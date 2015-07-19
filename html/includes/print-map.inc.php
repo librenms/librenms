@@ -68,6 +68,7 @@ if (in_array('mac',$config['network_map_items'])) {
                              LEFT JOIN `devices` AS `D2` ON `P2`.`device_id`=`D2`.`device_id`
                              $join_sql
                       WHERE
+                             `M`.`mac_address` NOT IN ('000000000000','ffffffffffff') AND
                              `P1`.`port_id` IS NOT NULL AND
                              `P2`.`port_id` IS NOT NULL AND
                              `D1`.`device_id` != `D2`.`device_id`
