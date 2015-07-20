@@ -827,7 +827,6 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
         // then the name of the object type
         if ($f[1] && $f[1] == 'OBJECT-TYPE') {
             $result['object_type'] = $f[0];
-            $result['shortname']   = str_replace($mib, '', $f[0]);
             continue;
         }
 
@@ -948,21 +947,21 @@ function update_db_table($tablename, $columns, $numkeys, $rows)
 }
 
 /*
- * @return an array containing all of the MIB objects keyed by object-type,
- * or an empty array if something goes wrong.
+ * Load the given MIB into the database.
+ * @return count of objects loaded
  */
-function snmp_mib_load($mib, $module, $mibdir = null)
+function snmp_mib_load($mib, $module, $included_by, $mibdir = null)
 {
     $mibs = array();
-    // FIXME: Measure whether it's more efficient to use the database
-    // to cache this rather than parse it via snmptranslate every time.
     foreach (snmp_mib_walk($mib, $module, $mibdir) as $obj) {
         $mibs[$obj['object_type']] = $obj;
+        $mibs[$obj['object_type']]['included_by'] = $included_by;
     }
     d_print_r($mibs);
-    $columns = array('module', 'mib', 'object_type', 'oid', 'syntax', 'description', 'max_access', 'status');
+    // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
+    $columns = array('module', 'mib', 'object_type', 'oid', 'syntax', 'description', 'max_access', 'status', 'included_by');
     update_db_table('mibdefs', $columns, 3, $mibs);
-    return $mibs;
+    return count($mibs);
 
 }//end snmp_mib_load()
 
@@ -1125,53 +1124,123 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
 
 }//end save_mibs()
 
+/*
+ * @return an array of MIB objects matching $module, $name, keyed by object_type
+ */
+function load_mibdefs($module, $name)
+{
+    $params = array($module, $name);
+    $result = array();
+    $object_types = array();
+    foreach (dbFetchRows("SELECT * FROM `mibdefs` WHERE `module` = ? AND `mib` = ?", $params) as $row) {
+        $mib = $row['object_type'];
+        $object_types[] = $mib;
+        $result[$mib] = $row;
+    }
+
+    // add shortname to each element
+    $prefix = longest_matching_prefix($name, $object_types);
+    foreach ($result as $mib => $m) {
+        $result[$mib]['shortname'] = str_replace($prefix, '', $m['object_type']);
+    }
+
+    d_print_r($result);
+    return $result;
+}
 
 /*
- * FIXME: Get list of MIBs from the database
- * Poll based on the results.
+ * @return an array of MIB names and modules for $device from the database
  */
-function poll_mibs($list, $device, &$graphs)
+function load_device_mibs($device)
 {
-    // FIXME: check that mib polling module is enabled
+    $params = array($device['device_id']);
+    $result = array();
+    foreach (dbFetchRows("SELECT `mib`, `module` FROM device_mibs WHERE device_id = ?", $params) as $row) {
+        $result[$row['mib']] = $row['module'];
+    }
+    return $result;
+}
+
+
+/*
+ * @return true if this device should be polled with MIB-based discovery
+ */
+function is_mib_poller_enabled($device)
+{
+    if (!is_module_enabled('poller', 'mib')) {
+        d_echo("MIB polling module disabled globally.\n");
+        return false;
+    }
+
     if (!is_dev_attrib_enabled($device, 'poll_mib')) {
         d_echo('MIB module disabled for '.$device['hostname']."\n");
+        return false;
+    }
+
+    return true;
+}
+
+/*
+ * Run MIB-based polling for $device.  Update $graphs with the results.
+ */
+function poll_mibs($device, &$graphs)
+{
+    if (!is_mib_poller_enabled($device)) {
         return;
     }
 
-    $mibdefs = array();
-    echo 'MIB-based polling:';
+    echo 'MIB: polling ';
     d_echo("\n");
 
-    foreach ($list as $name => $module) {
-        $translated = snmp_translate($name, $module);
-        if ($translated) {
-            echo " $module::$name";
-            d_echo("\n");
-            $mod           = $translated[0];
-            $nam           = $translated[1];
-            $mibdefs[$nam] = snmp_mib_load($nam, $mod);
-            if (count($mibdefs[$nam] > 0)) {
-                $oids = snmpwalk_cache_oid($device, $nam, array(), $mod, null, "-OQUsb");
-                d_print_r($oids);
-                save_mibs($device, $nam, $oids, $mibdefs[$nam], $graphs);
-            }
-            else {
-                echo("MIB: Could not load definition for $mod::$nam\n");
-            }
-        }
-        else {
-            d_echo("MIB: no match for $module::$name\n");
-        }
+    foreach (load_device_mibs($device) as $name => $module) {
+        echo "$name ";
+        d_echo("\n");
+        $oids = snmpwalk_cache_oid($device, $name, array(), $module, null, "-OQUsb");
+        d_print_r($oids);
+        save_mibs($device, $name, $oids, load_mibdefs($module, $name), $graphs);
     }
-    d_echo('Done MIB-based polling');
     echo "\n";
 }//end poll_mibs()
 
 /*
  * Take a list of MIB name => module pairs.
  * Validate MIBs and store the device->mib mapping in the database.
- * FIXME: Implement; most of code can be moved in from poll_mibs() above.
+ * See includes/discovery/os/ruckuswireless.inc.php for an example of usage.
  */
-function register_mibs($device, $mibs)
+function register_mibs($device, $mibs, $included_by)
 {
+    if (!is_mib_poller_enabled($device)) {
+        return;
+    }
+
+    echo "MIB: registering\n";
+
+    foreach ($mibs as $name => $module) {
+        $translated = snmp_translate($name, $module);
+        if ($translated) {
+            $mod = $translated[0];
+            $nam = $translated[1];
+            echo "     $mod::$nam\n";
+            if (snmp_mib_load($nam, $mod, $included_by) > 0) {
+                // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
+                $columns = array('device_id', 'module', 'mib', 'included_by');
+                $rows = array();
+                $rows[] = array(
+                    'device_id'   => $device['device_id'],
+                    'module'      => $mod,
+                    'mib'         => $nam,
+                    'included_by' => $included_by,
+                );
+                update_db_table('device_mibs', $columns, 3, $rows);
+            }
+            else {
+                echo("MIB: Could not load definition for $mod::$nam\n");
+            }
+        }
+        else {
+            echo("MIB: Could not find $module::$name\n");
+        }
+    }
+
+    echo "\n";
 }

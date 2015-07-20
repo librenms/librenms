@@ -836,6 +836,50 @@ function can_ping_device($attribs) {
     }
 } // end can_ping_device
 
+/*
+ * @return true if the requested module type & name is globally enabled
+ */
+function is_module_enabled($type, $module)
+{
+    global $config;
+    if (isset($config[$type.'_modules'][$module])) {
+        return $config[$type.'_modules'][$module] == 1;
+    }
+    else {
+        return false;
+    }
+} // is_module_enabled
+
+/*
+ * @return true if every string in $arr begins with $str
+ */
+function begins_with($str, $arr)
+{
+    foreach ($arr as $s) {
+        $pos = strpos($s, $str);
+        if ($pos === false || $pos > 0) {
+            return false;
+        }
+    }
+    return true;
+} // begins_with
+
+/*
+ * @return the longest starting portion of $str that matches everything in $arr
+ */
+function longest_matching_prefix($str, $arr)
+{
+    $len = strlen($str);
+    while ($len > 0) {
+        $prefix = substr($str, 0, $len);
+        if (begins_with($prefix, $arr)) {
+            return $prefix;
+        }
+        $len -= 1;
+    }
+    return '';
+} // longest_matching_prefix
+
 /**
  * Constructs the path to an RRD for the Ceph application
  * @param string $gtype The type of rrd we're looking for
