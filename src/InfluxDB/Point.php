@@ -54,8 +54,10 @@ class Point
         }
 
         $this->measurement = (string) $measurement;
-        $this->tags        = $tags;
-        $this->fields      = array_merge($additionalFields, array('value' => (float) $value));
+        $this->tags = $tags;
+        $this->fields = $additionalFields;
+
+        $this->fields['value'] = (float) $value;
 
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
             throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
@@ -113,11 +115,7 @@ class Point
             return true;
         }
 
-        if ($timestamp <= PHP_INT_MAX) {
-            return true;
-        }
-
-        if ($timestamp >= ~PHP_INT_MAX) {
+        if ($timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX) {
             return true;
         }
 
