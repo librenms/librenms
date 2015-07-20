@@ -138,11 +138,6 @@ class Client
      */
     public function selectDB($name)
     {
-
-        if (empty($name)) {
-            throw new \InvalidArgumentException(sprintf('No name provided'));
-        }
-
         return new Database($name, $this);
     }
 
@@ -156,11 +151,11 @@ class Client
      * @return ResultSet
      * @throws Exception
      */
-    public function query($database = null, $query, $params = array())
+    public function query($database, $query, $params = array())
     {
 
         if ($database) {
-            $params += array('db' => $database);
+            $params['db'] = $database;
         }
 
         $params = '?'.http_build_query(array_merge(array('q' => $query), $params));
