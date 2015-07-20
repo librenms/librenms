@@ -78,7 +78,7 @@ if (!empty($_POST['location']) && $_POST['location'] == 'Unset') {
 }
 
 if (!empty($_POST['location'])) {
-    $sql    .= " AND (((`DB`.`attrib_value`='1' AND `DA`.`attrib_type`='override_sysLocation_string' AND `DA`.`attrib_value` = ?)) OR `location` = ?)";
+    $sql    .= " AND `location` = ?";
     $param[] = mres($_POST['location']);
     $param[] = mres($_POST['location']);
 }
@@ -166,10 +166,6 @@ foreach (dbFetchRows($sql, $param) as $device) {
     $device['os_text'] = $config['os'][$device['os']]['text'];
     $port_count        = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE `device_id` = ?', array($device['device_id']));
     $sensor_count      = dbFetchCell('SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ?', array($device['device_id']));
-
-    if (get_dev_attrib($device, 'override_sysLocation_bool')) {
-        $device['location'] = get_dev_attrib($device, 'override_sysLocation_string');
-    }
 
     $actions  = ('<div class="row">
         <div class="col-xs-1">');
