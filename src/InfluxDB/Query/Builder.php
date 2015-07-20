@@ -187,8 +187,8 @@ class Builder
      */
     public function setTimeRange($from, $to)
     {
-        $fromDate = date('Y-m-d H:i:s', $from);
-        $toDate = date('Y-m-d H:i:s', $to);
+        $fromDate = date('Y-m-d H:i:s', (int) $from);
+        $toDate = date('Y-m-d H:i:s', (int) $to);
 
         $this->where(array("time > '$fromDate'", "time < '$toDate'"));
 
