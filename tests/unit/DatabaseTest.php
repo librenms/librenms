@@ -2,7 +2,6 @@
 
 namespace InfluxDB\Test;
 
-
 use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Point;

@@ -3,6 +3,9 @@
 namespace InfluxDB;
 
 use InfluxDB\Client\Exception as ClientException;
+use InfluxDB\Driver\DriverInterface;
+use InfluxDB\Driver\Guzzle;
+use InfluxDB\Driver\QueryDriverInterface;
 
 /**
  * Class Client
@@ -73,6 +76,11 @@ class Client
     protected $options = array();
 
     /**
+     * @var DriverInterface
+     */
+    protected $driver;
+
+    /**
      * @param string $host
      * @param int    $port
      * @param string $username
@@ -80,8 +88,6 @@ class Client
      * @param bool   $ssl
      * @param bool   $verifySSL
      * @param int    $timeout
-     *
-     * @todo add UDP support
      */
     public function __construct(
         $host,
@@ -101,25 +107,18 @@ class Client
 
         if ($ssl) {
             $this->scheme = 'https';
-            $this->options += array('verify' => $verifySSL);
+            $this->options['verify'] = $verifySSL;
         }
 
         // the the base URI
         $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
-        $this->httpClient = new \Guzzle\Http\Client($this->getBaseURI());
-    }
 
-    /**
-     * For testing
-     *
-     * @param  \Guzzle\Http\Client $client
-     * @return $this
-     */
-    public function setHttpClient(\Guzzle\Http\Client $client)
-    {
-        $this->httpClient = $client;
-
-        return $this;
+        // set the default driver to guzzle
+        $this->driver = new Guzzle([
+            'timeout' => $this->timeout,
+            'base_uri' => $this->baseURI,
+            'verify' => $this->verifySSL
+        ]);
     }
 
     /**
@@ -142,53 +141,31 @@ class Client
      * @return ResultSet
      * @throws Exception
      */
-    public function query($database, $query, $params = array())
+    public function query($database, $query, $params = [])
     {
+
+        if (!$this->driver instanceof QueryDriverInterface) {
+            throw new Exception('The currently configured driver does not support query operations');
+        }
+
         if ($database) {
             $params['db'] = $database;
         }
 
-        $params = '?' . http_build_query(array_merge(array('q' => $query), $params));
-
-        $options = array_merge($this->options, array('exceptions' => false, 'timeout' => $this->getTimeout()));
+        $this->driver->setParameters([
+           'url' => 'query?' . http_build_query(array_merge(['q' => $query], $params)),
+           'database' => $database,
+           'method' => 'get'
+        ]);
 
         try {
-            $response = $this->httpClient->get('query'.$params, null, $options);
+            // send the data
+            $this->driver->send();
 
-            $raw = (string) $response->send()->getBody();
+            return $this->driver->getResultSet();
 
-            return new ResultSet($raw);
         } catch (\Exception $e) {
             throw new Exception(sprintf('Query has failed, exception: %s', $e->getMessage()));
-        }
-    }
-
-    /**
-     * Write points to the database
-     *
-     * @param  string $database
-     * @param  string $data
-     * @param  string $precision The timestamp precision
-     * @return bool
-     * @throws Exception
-     *
-     * @internal Internal method, do not use directly
-     */
-    public function write($database, $data, $precision)
-    {
-        try {
-            $result = $this->httpClient->post(
-                $this->getBaseURI() .
-                '/write?db=' . $database .
-                '&precision=' . $precision,
-                null,
-                $data,
-                array('timeout' => $this->getTimeout())
-            )->send();
-
-            return $result->getStatusCode() === 204;
-        } catch (\Exception $e) {
-            throw new Exception(sprintf('Writing has failed, exception: %s', $e->getMessage()));
         }
     }
 
@@ -275,17 +252,49 @@ class Client
     }
 
     /**
-     * @param  array $points
+     * @param  Point[] $points
      * @return array
      */
     protected function pointsToArray(array $points)
     {
-        $names = array();
+        $names = [];
 
         foreach ($points as $item) {
             $names[] = $item['name'];
         }
 
         return $names;
+    }
+
+    /**
+     * @param Driver\DriverInterface $driver
+     */
+    public function setDriver(DriverInterface $driver)
+    {
+        $this->driver = $driver;
+    }
+
+    /**
+     * @return DriverInterface
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * @return DriverInterface
+     */
+    public function getDefaultDriver()
+    {
+        return $this->defaultDriver;
     }
 }

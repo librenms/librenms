@@ -19,12 +19,12 @@ class Point
     /**
      * @var array
      */
-    private $tags = array();
+    private $tags = [];
 
     /**
      * @var array
      */
-    private $fields = array();
+    private $fields = [];
 
     /**
      * @var string
@@ -96,7 +96,7 @@ class Point
      */
     private function arrayToString(array $arr)
     {
-        $strParts = array();
+        $strParts = [];
 
         foreach ($arr as $key => $value) {
             $strParts[] = sprintf('%s=%s', $key, $value);

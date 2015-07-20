@@ -105,7 +105,7 @@ Writing data is done by providing an array of points to the writePoints method o
     );
 
     // we are writing unix timestamps, which have a second precision
-    $newPoints = $database->writePoints($points, Database::PRECISION_SECONDS);
+    $result = $database->writePoints($points, Database::PRECISION_SECONDS);
     
 ```
 
@@ -114,6 +114,27 @@ measurements to InfluxDB. The point class allows one to easily write data in bat
 
 The name of a measurement and the value are mandatory. Additional fields, tags and a timestamp are optional.
 InfluxDB takes the current time as the default timestamp.
+
+#### Writing data using udp
+
+First, set your InfluxDB host to support incoming UDP sockets:
+
+```ini
+[udp]
+  enabled = true
+  bind-address = ":4444"
+  database = "test_db"  
+```
+
+Then, configure the UDP driver in the client:
+
+```php
+    // set the udp driver
+    $client->setDriver(new \InfluxDB\Driver\UDP($client->getHost(), 4444));
+    
+    // now just write your points like you normally would
+    $result = $database->writePoints($points, Database::PRECISION_SECONDS);
+```
 
 #### Timestamp precision
 
@@ -147,7 +168,14 @@ This library makes it easy to provide a retention policy when creating a databas
     $database = $client->selectDB('influx_test_db');
 
     // create the database with a retention policy
-    $result = $database->create(new RetentionPolicy('test', '5d', 1, true));    
+    $result = $database->create(new RetentionPolicy('test', '5d', 1, true));   
+     
+     // check if a database exists then create it if it doesn't
+    $database = $client->selectDB('test_db');
+    
+    if (!$database->exists()) {
+        $database->create(new RetentionPolicy('test', '1d', 2, true));
+    } 
     
 ```
 
