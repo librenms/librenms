@@ -75,18 +75,18 @@ class ResultSet
      */
     public function getSeries()
     {
-        return array_shift(
-            array_map(
-                function ($object) {
-                    if (isset($object['error'])) {
-                        throw new ClientException($object['error']);
-                    }
+        $series = array_map(
+            function ($object) {
+                if (isset($object['error'])) {
+                    throw new ClientException($object['error']);
+                }
 
-                    return isset($object['series']) ? $object['series'] : array();
-                },
-                $this->parsedResults['results']
-            )
+                return isset($object['series']) ? $object['series'] : array();
+            },
+            $this->parsedResults['results']
         );
+
+        return array_shift($series);
     }
 
     /**
