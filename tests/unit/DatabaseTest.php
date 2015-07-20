@@ -8,8 +8,9 @@ use InfluxDB\Database;
 use InfluxDB\Point;
 use InfluxDB\ResultSet;
 use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit_Framework_TestCase;
 
-class DatabaseTest extends \PHPUnit_Framework_TestCase
+class DatabaseTest extends PHPUnit_Framework_TestCase
 {
 
     /** @var Database $db */
@@ -54,6 +55,12 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             ->method('query')
             ->will($this->returnValue(new ResultSet($this->resultData)));
 
+
+        $this->mockClient->expects($this->any())
+            ->method('listDatabases')
+            ->will($this->returnValue(array('test123', 'test')));
+
+
         $this->db = new Database('influx_test_db', $this->mockClient);
 
         $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/input.example.json');
@@ -96,6 +103,20 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         new Database(null, $this->mockClient);
     }
 
+    public function testExists()
+    {
+        $database = new Database('test', $this->mockClient);
+
+        $this->assertEquals($database->exists(), true);
+    }
+
+
+    public function testNotExists()
+    {
+        $database = new Database('test_not_exists', $this->mockClient);
+
+        $this->assertEquals($database->exists(), false);
+    }
 
     public function testWritePointsInASingleCall()
     {

@@ -31,6 +31,17 @@ class Database
      */
     protected $client;
 
+
+    /**
+     * Precision constants
+     */
+    const PRECISION_NANOSECONDS = 'n';
+    const PRECISION_MICROSECONDS = 'u';
+    const PRECISION_MILLISECONDS = 'ms';
+    const PRECISION_SECONDS = 's';
+    const PRECISION_MINUTES = 'm';
+    const PRECISION_HOURS = 'h';
+
     /**
      * Construct a database object
      *
@@ -102,6 +113,8 @@ class Database
 
     /**
      * @param RetentionPolicy $retentionPolicy
+     *
+     * @return ResultSet
      */
     public function createRetentionPolicy(RetentionPolicy $retentionPolicy)
     {
@@ -111,12 +124,13 @@ class Database
     /**
      * Writes points into InfluxDB
      *
-     * @param array $points
+     * @param Point[]  $points    Array of points
+     * @param string   $precision The timestamp precision (defaults to nanoseconds)
      *
      * @return bool
      * @throws Exception
      */
-    public function writePoints(array $points)
+    public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS)
     {
         $payload = array();
 
@@ -129,7 +143,17 @@ class Database
             $payload[] = (string) $point;
         }
 
-        return $this->client->write($this->name, implode(PHP_EOL, $payload));
+        return $this->client->write($this->name, implode(PHP_EOL, $payload), $precision);
+    }
+
+    /**
+     * @return bool
+     */
+    public function exists()
+    {
+        $databases = $this->client->listDatabases();
+
+        return in_array($this->name, $databases);
     }
 
     /**

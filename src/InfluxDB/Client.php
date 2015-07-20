@@ -184,17 +184,21 @@ class Client
      *
      * @param string $database
      * @param string $data
+     * @param string $precision The timestamp precision
      *
      * @return bool
      *
      * @internal Internal method, do not use directly
      * @throws Exception
      */
-    public function write($database, $data)
+    public function write($database, $data, $precision)
     {
         try {
 
-            $result = $this->httpClient->post($this->getBaseURI() . '/write?db=' . $database, null, $data,
+            $result = $this->httpClient->post($this->getBaseURI()
+                . '/write?db=' . $database
+                . '&precision=' . $precision
+                , null, $data,
                 array('timeout' => $this->getTimeout())
             )->send();
 
