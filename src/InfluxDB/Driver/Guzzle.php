@@ -21,14 +21,6 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     private $parameters;
 
     /**
-     *
-     * Configuration for this driver
-     *
-     * @var array
-     */
-    private $config;
-
-    /**
      * @var Client
      */
     private $httpClient;
@@ -41,19 +33,13 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     /**
      * Set the config for this driver
      *
-     * @param array $config
+     * @param Client $client
      *
      * @return mixed
      */
-    public function __construct(array $config)
+    public function __construct(Client $client)
     {
-        $this->httpClient = new Client([
-           'timeout' => $config['timeout'],
-           'verify' => $config['verify'],
-           'base_uri' => $config['base_uri']
-        ]);
-
-        $this->config = $config;
+        $this->httpClient = $client;
     }
 
     /**

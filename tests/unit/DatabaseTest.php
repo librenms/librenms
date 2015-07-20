@@ -4,6 +4,7 @@ namespace InfluxDB\Test;
 
 use InfluxDB\Client;
 use InfluxDB\Database;
+use InfluxDB\Driver\Guzzle;
 use InfluxDB\Point;
 use InfluxDB\ResultSet;
 use PHPUnit_Framework_MockObject_MockObject;
@@ -59,6 +60,12 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
             ->method('listDatabases')
             ->will($this->returnValue(array('test123', 'test')));
 
+        $httpMockClient = new Guzzle(ClientTest::buildHttpMockClient(''));
+
+        // make sure the client has a valid driver
+        $this->mockClient->expects($this->any())
+            ->method('getDriver')
+            ->will($this->returnValue($httpMockClient));
 
         $this->db = new Database('influx_test_db', $this->mockClient);
 
@@ -132,13 +139,6 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
             0.84
         );
 
-        $payloadExpected ="$point1\n$point2";
-
-        $this->mockClient->expects($this->once())
-            ->method('write')
-            ->with($this->equalTo($this->db->getName()), $this->equalTo($payloadExpected))
-            ->will($this->returnValue(true));
-
-        $this->db->writePoints(array($point1, $point2));
+        $this->assertEquals(true, $this->db->writePoints(array($point1, $point2)));
     }
 }
