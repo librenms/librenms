@@ -114,11 +114,9 @@ foreach (array('sysContact', 'sysObjectID', 'sysName', 'sysDescr') as $elem) {
     }
 }
 
-if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation']) {
-    if (!get_dev_attrib($device, 'override_sysLocation_bool')) {
-        $update_array['location'] = $poll_device['sysLocation'];
-        log_event('Location -> '.$poll_device['sysLocation'], $device, 'system');
-    }
+if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocation'] && $device['override_sysLocation'] == 0) {
+    $update_array['location'] = $poll_device['sysLocation'];
+    log_event('Location -> '.$poll_device['sysLocation'], $device, 'system');
 }
 
 if ($config['geoloc']['latlng'] === true) {
