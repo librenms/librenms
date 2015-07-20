@@ -50,7 +50,7 @@ class Database
             throw new \InvalidArgumentException('No database name provided');
         }
 
-        $this->name   = $name;
+        $this->name = (string) $name;
         $this->client = $client;
     }
 
