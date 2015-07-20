@@ -7,6 +7,10 @@ $device_id = $_POST['device_id'];
 $sql = 'FROM `ports` WHERE `device_id` = ?';
 $param = array($device_id);
 
+if (isset($searchPhrase) && !empty($searchPhrase)) {
+    $sql .= " AND (`ifName` LIKE '%$searchPhrase%' OR `ifAlias` LIKE '%$searchPhrase%' OR `ifDescr` LIKE '%$searchPhrase%')";
+}
+
 $count_sql = "SELECT COUNT(`port_id`) $sql";
 $total     = dbFetchCell($count_sql, $param);
 if (empty($total)) {
@@ -53,7 +57,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
 
     $response[] = array(
         'ifIndex' => $port['ifIndex'],
-        'label' => $port['label'],
+        'ifName' => $port['label'],
         'ifAdminStatus' => $port['ifAdminStatus'],
         'ifOperStatus' => '<span name="operstatus_'.$port['port_id'].'"'.$outofsync.'>'.$port['ifOperStatus'].'</span>',
         'disabled' => '<input type="checkbox" class="disable-check" name="disabled_'.$port['port_id'].'"'.($port['disabled'] ? 'checked' : '').'>
