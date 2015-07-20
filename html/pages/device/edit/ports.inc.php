@@ -8,11 +8,11 @@
         <thead>
             <tr>
                 <th data-column-id='ifIndex'>Index</th>
-                <th data-column-id='label'>Name</th>
+                <th data-column-id='ifName'>Name</th>
                 <th data-column-id='ifAdminStatus'>Admin</th>
                 <th data-column-id='ifOperStatus'>Oper</th>
-                <th data-column-id='disabled'>Disable</th>
-                <th data-column-id='ignore'>Ignore</th>
+                <th data-column-id='disabled' data-sortable='false'>Disable</th>
+                <th data-column-id='ignore' data-sortable='false'>Ignore</th>
                 <th data-column-id='ifAlias'>Description</th>
             </tr>
         </thead>
