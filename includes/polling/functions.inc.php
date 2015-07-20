@@ -416,3 +416,60 @@ function get_main_serial($device) {
     }
 
 }//end get_main_serial()
+
+
+function location_to_latlng($device) {
+    if (function_check('curl_version') !== true) {
+        d_echo("Curl support for PHP not enabled\n");
+        return false;
+        exit;
+    }
+    $bad_loc = false;
+    $device_location = $device['location'];
+    if (!empty($device_location)) {
+        $device_location = preg_replace("/ /","+",$device_location);
+        // We have a location string for the device.
+        $loc = dbFetchRow("SELECT `lat`,`lng` FROM `coordinates` WHERE `location`=? LIMIT 1", array($device_location));
+        if (is_array($loc) === false) {
+            // Grab data from which ever Geocode service we use.
+            switch ($config['geoloc']['engine']) {
+                case "google":
+                default:
+                    d_echo("Google geocode engine being used\n");
+                    $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$device_location";
+                break;
+            }
+            $curl_init = curl_init($api_url);
+            set_curl_proxy($curl_init);
+            curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, true);
+            $data = json_decode(curl_exec($curl_init),true);
+            // Parse the data from the specific Geocode services.
+            switch ($config['geoloc']['engine']) {
+                case "google":
+                default:
+                    if ($data['status'] == 'OK') {
+                        $loc = $data['results'][0]['geometry']['location'];
+                    } else {
+                        $bad_loc = true;
+                    }
+                break;
+            }
+            if ($bad_loc === true) {
+                d_echo("Bad lat / lng received\n");
+            }
+            else {
+                $loc['timestamp'] = array('NOW()');
+                $loc['location'] = $device_location;
+                if (dbInsert($loc, 'coordinates')) {
+                    d_echo("Device lat/lng created\n");
+                }
+                else {
+                    d_echo("Device lat/lng could not be created\n");
+                }
+            }
+        }
+        else {
+            d_echo("Using cached lat/lng from other device\n");
+        }
+    }
+}// end location_to_latlng()

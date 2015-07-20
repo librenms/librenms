@@ -120,3 +120,7 @@ if ($poll_device['sysLocation'] && $device['location'] != $poll_device['sysLocat
         log_event('Location -> '.$poll_device['sysLocation'], $device, 'system');
     }
 }
+
+if ($config['geoloc']['latlng'] === true) {
+    location_to_latlng($device);
+}
