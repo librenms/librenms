@@ -1,10 +1,6 @@
 <?php
-/**
- * @author Stephen "TheCodeAssassin" Hoogendijk
- */
 
 namespace InfluxDB;
-
 
 use InfluxDB\Client\Exception as ClientException;
 
@@ -12,6 +8,7 @@ use InfluxDB\Client\Exception as ClientException;
  * Class Client
  *
  * @package InfluxDB
+ * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 class Client
 {
@@ -94,21 +91,17 @@ class Client
         $ssl = false,
         $verifySSL = true,
         $timeout = 0
-    )
-    {
-
-        $this->host = $host;
-        $this->port = (int) $port;
-        $this->username = $username;
-        $this->password = $password;
-        $this->timeout = $timeout;
+    ) {
+        $this->host      = (string) $host;
+        $this->port      = (int) $port;
+        $this->username  = (string) $username;
+        $this->password  = (string) $password;
+        $this->timeout   = (int) $timeout;
         $this->verifySSL = (bool) $verifySSL;
 
         if ($ssl) {
             $this->scheme = 'https';
-            $this->options += array(
-                'verify' => $verifySSL
-            );
+            $this->options += array('verify' => $verifySSL);
         }
 
         // the the base URI
@@ -119,7 +112,8 @@ class Client
 
     /**
      * For testing
-     * @param \Guzzle\Http\Client $client
+     *
+     * @param  \Guzzle\Http\Client $client
      * @return $this
      */
     public function setHttpClient(\Guzzle\Http\Client $client)
@@ -132,8 +126,7 @@ class Client
     /**
      * Use the given database
      *
-     * @param string $name
-     *
+     * @param  string $name
      * @return Database
      */
     public function selectDB($name)
@@ -144,21 +137,19 @@ class Client
     /**
      * Query influxDB
      *
-     * @param string $database
-     * @param string $query
-     * @param array  $params
-     *
+     * @param  string $database
+     * @param  string $query
+     * @param  array  $params
      * @return ResultSet
      * @throws Exception
      */
     public function query($database, $query, $params = array())
     {
-
         if ($database) {
             $params['db'] = $database;
         }
 
-        $params = '?'.http_build_query(array_merge(array('q' => $query), $params));
+        $params = '?' . http_build_query(array_merge(array('q' => $query), $params));
 
         $options = array_merge($this->options, array('exceptions' => false, 'timeout' => $this->getTimeout()));
 
@@ -168,7 +159,6 @@ class Client
             $raw = (string) $response->send()->getBody();
 
             return new ResultSet($raw);
-
         } catch (\Exception $e) {
             throw new Exception(sprintf('Query has failed, exception: %s', $e->getMessage()));
         }
@@ -177,28 +167,27 @@ class Client
     /**
      * Write points to the database
      *
-     * @param string $database
-     * @param string $data
-     * @param string $precision The timestamp precision
-     *
+     * @param  string $database
+     * @param  string $data
+     * @param  string $precision The timestamp precision
      * @return bool
+     * @throws Exception
      *
      * @internal Internal method, do not use directly
-     * @throws Exception
      */
     public function write($database, $data, $precision)
     {
         try {
-
-            $result = $this->httpClient->post($this->getBaseURI()
-                . '/write?db=' . $database
-                . '&precision=' . $precision
-                , null, $data,
+            $result = $this->httpClient->post(
+                $this->getBaseURI() .
+                '/write?db=' . $database .
+                '&precision=' . $precision,
+                null,
+                $data,
                 array('timeout' => $this->getTimeout())
             )->send();
 
-            return $result->getStatusCode() == 204;
-
+            return $result->getStatusCode() === 204;
         } catch (\Exception $e) {
             throw new Exception(sprintf('Writing has failed, exception: %s', $e->getMessage()));
         }
@@ -218,7 +207,6 @@ class Client
      * List all the users
      *
      * @return array
-     *
      * @throws Exception
      */
     public function listUsers()
@@ -230,37 +218,33 @@ class Client
 
     /**
      * Build the client from a dsn
-     *
      * Example: https+influxdb://username:pass@localhost:8086/databasename', timeout=5
      *
-     * @param string $dsn
-     *
-     * @param int    $timeout
-     * @param bool   $verifySSL
-     *
+     * @param  string $dsn
+     * @param  int    $timeout
+     * @param  bool   $verifySSL
      * @return Client|Database
-     *
      * @throws ClientException
      */
     public static function fromDSN($dsn, $timeout = 0, $verifySSL = false)
     {
         $connParams = parse_url($dsn);
         $schemeInfo = explode('+', $connParams['scheme']);
-        $dbName = null;
-        $modifier = null;
-        $scheme = $schemeInfo[0];
+        $dbName     = null;
+        $modifier   = null;
+        $scheme     = $schemeInfo[0];
 
         if (isset($schemeInfo[1])) {
             $modifier = $schemeInfo[0];
-            $scheme = $schemeInfo[1];
+            $scheme   = $schemeInfo[1];
         }
 
         if ($scheme != 'influxdb') {
             throw new ClientException(sprintf('%s is not a valid scheme', $scheme));
         }
 
-        $ssl = ($modifier && $modifier == 'https' ? true : false);
-        $dbName = ($connParams['path'] ? substr($connParams['path'], 1) : null);
+        $ssl    = $modifier === 'https' ? true : false;
+        $dbName = $connParams['path'] ? substr($connParams['path'], 1) : null;
 
         $client = new self(
             $connParams['host'],
@@ -274,6 +258,7 @@ class Client
 
         return ($dbName ? $client->selectDB($dbName) : $client);
     }
+
     /**
      * @return mixed
      */

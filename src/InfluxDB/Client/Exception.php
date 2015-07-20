@@ -9,5 +9,4 @@ namespace InfluxDB\Client;
  */
 class Exception extends \InfluxDB\Exception
 {
-
 }

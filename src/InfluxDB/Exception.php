@@ -1,12 +1,10 @@
 <?php
-/**
- * @author Stephen "TheCodeAssassin" Hoogendijk
- */
 
 namespace InfluxDB;
 
-
+/**
+ * @author Stephen "TheCodeAssassin" Hoogendijk
+ */
 class Exception extends \Exception
 {
-
 }

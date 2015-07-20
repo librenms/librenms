@@ -11,42 +11,51 @@ use InfluxDB\Database\Exception as DatabaseException;
  */
 class Point
 {
+    /**
+     * @var string
+     */
     private $measurement;
+
     /**
      * @var array
      */
     private $tags = array();
+
     /**
      * @var array
      */
     private $fields = array();
+
     /**
      * @var string
      */
-    private $timestamp = null;
+    private $timestamp;
 
     /**
-     * The timestamp is optional.
-     * If you do not specify a timestamp the server’s local timestamp will be used
+     * The timestamp is optional. If you do not specify a timestamp the server’s
+     * local timestamp will be used
      *
-     * @param string $measurement      Name of the measurement
-     * @param float  $value            Value of the measurement
-     * @param array  $tags             Array of tags
-     * @param array  $additionalFields Array of optional fields
-     * @param int    $timestamp        Optional timestamp
-     *
+     * @param  string $measurement
+     * @param  float  $value
+     * @param  array  $tags
+     * @param  array  $additionalFields
+     * @param  null   $timestamp
      * @throws DatabaseException
      */
-    public function __construct($measurement, $value, array $tags = array(), array $additionalFields = array(), $timestamp = null)
-    {
-
+    public function __construct(
+        $measurement,
+        $value,
+        array $tags = array(),
+        array $additionalFields = array(),
+        $timestamp = null
+    ) {
         if (empty($measurement)) {
             throw new DatabaseException('Invalid measurement name provided');
         }
 
         $this->measurement = (string) $measurement;
-        $this->tags = $tags;
-        $this->fields = $additionalFields;
+        $this->tags        = $tags;
+        $this->fields      = $additionalFields;
 
         $this->fields += array('value' => (float) $value);
 
@@ -72,7 +81,7 @@ class Point
             $string .=  ',' . $this->arrayToString($this->tags);
         }
 
-        $string .= ' ' .$this->arrayToString($this->fields);
+        $string .= ' ' . $this->arrayToString($this->fields);
 
         if ($this->timestamp) {
             $string .= ' '.$this->timestamp;
@@ -81,26 +90,39 @@ class Point
         return $string;
     }
 
+    /**
+     * @param  array $arr
+     * @return string
+     */
     private function arrayToString(array $arr)
     {
         $strParts = array();
 
         foreach ($arr as $key => $value) {
-            $strParts[] = "{$key}={$value}";
+            $strParts[] = sprintf('%s=%s', $key, $value);
         }
 
-        return implode(",", $strParts);
+        return implode(',', $strParts);
     }
 
     /**
-     * @param $timestamp
-     *
+     * @param  int $timestamp
      * @return bool
      */
     private function isValidTimeStamp($timestamp)
     {
-        return ((int) $timestamp === $timestamp)
-        && ($timestamp <= PHP_INT_MAX)
-        && ($timestamp >= ~PHP_INT_MAX);
+        if ((int) $timestamp === $timestamp) {
+            return true;
+        }
+
+        if ($timestamp <= PHP_INT_MAX) {
+            return true;
+        }
+
+        if ($timestamp >= ~PHP_INT_MAX) {
+            return true;
+        }
+
+        return false;
     }
 }

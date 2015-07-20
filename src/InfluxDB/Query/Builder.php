@@ -1,7 +1,4 @@
 <?php
-/**
- * @author Stephen "TheCodeAssassin" Hoogendijk <s.hoogendijk@tech.leaseweb.com>
- */
 
 namespace InfluxDB\Query;
 
@@ -24,16 +21,43 @@ use InfluxDB\ResultSet;
  * @todo add merge
  *
  * @package InfluxDB\Query
+ * @author Stephen "TheCodeAssassin" Hoogendijk <s.hoogendijk@tech.leaseweb.com>
  */
 class Builder
 {
+    /**
+     * @var Database
+     */
+    protected $db;
 
-    protected $db = null;
+    /**
+     * @var string
+     */
     protected $selection = '*';
+
+    /**
+     * @var string[]
+     */
     protected $where = array();
-    protected $startTime = null;
-    protected $endTime = null;
-    protected $metric = null;
+
+    /**
+     * @var string
+     */
+    protected $startTime;
+
+    /**
+     * @var string
+     */
+    protected $endTime;
+
+    /**
+     * @var string
+     */
+    protected $metric;
+
+    /**
+     * @var string
+     */
     protected $limitClause = '';
 
     /**
@@ -45,8 +69,7 @@ class Builder
     }
 
     /**
-     * @param string $metric The metric to select (required)
-     *
+     * @param  string $metric The metric to select (required)
      * @return $this
      */
     public function from($metric)
@@ -63,8 +86,7 @@ class Builder
      *
      * $series->select('sum(value)',
      *
-     * @param string $customSelect
-     *
+     * @param  string $customSelect
      * @return $this
      */
     public function select($customSelect)
@@ -83,7 +105,6 @@ class Builder
      */
     public function where(array $conditions)
     {
-
         foreach ($conditions as $condition) {
             $this->where[] = $condition;
         }
@@ -92,8 +113,7 @@ class Builder
     }
 
     /**
-     * @param string $field
-     *
+     * @param  string $field
      * @return $this
      */
     public function count($field = 'type')
@@ -104,8 +124,7 @@ class Builder
     }
 
     /**
-     * @param string $field
-     *
+     * @param  string $field
      * @return $this
      */
     public function median($field = 'type')
@@ -116,8 +135,7 @@ class Builder
     }
 
     /**
-     * @param string $field
-     *
+     * @param  string $field
      * @return $this
      */
     public function mean($field = 'type')
@@ -128,8 +146,7 @@ class Builder
     }
 
     /**
-     * @param string $field
-     *
+     * @param  string $field
      * @return $this
      */
     public function sum($field = 'type')
@@ -140,8 +157,7 @@ class Builder
     }
 
     /**
-     * @param string $field
-     *
+     * @param  string $field
      * @return $this
      */
     public function first($field = 'type')
@@ -152,8 +168,7 @@ class Builder
     }
 
     /**
-     * @param string $field
-     *
+     * @param  string $field
      * @return $this
      */
     public function last($field = 'type')
@@ -166,9 +181,8 @@ class Builder
     /**
      * Set's the time range to select data from
      *
-     * @param int $from Unix timestamp from
-     * @param int $to   Unix timestamp to
-     *
+     * @param  int $from
+     * @param  int $to
      * @return $this
      */
     public function setTimeRange($from, $to)
@@ -207,7 +221,6 @@ class Builder
         return $this;
     }
 
-
     /**
      * @return string
      */
@@ -233,12 +246,13 @@ class Builder
     {
         $query = sprintf("SELECT %s FROM %s", $this->selection, $this->metric);
 
-        if (!$this->metric) {
+        if (! $this->metric) {
             throw new \InvalidArgumentException('No metric provided to from()');
         }
 
-        for ($i=0; $i < count($this->where); $i++) {
+        for ($i = 0; $i < count($this->where); $i++) {
             $selection = 'WHERE';
+
             if ($i > 0) {
                 $selection = 'AND';
             }
