@@ -1,4 +1,19 @@
 <?php
+/*
+ * LibreNMS - SNMP Functions
+ *
+ * Original Observium code by: Adam Armstrong, Tom Laermans
+ * Copyright (c) 2010-2012 Adam Armstrong.
+ *
+ * Additions for LibreNMS by Paul Gear
+ * Copyright (c) 2014-2015 Gear Consulting Pty Ltd <http://libertysys.com.au/>
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
 
 function string_to_oid($string) {
     $oid = strlen($string);
@@ -1021,8 +1036,16 @@ function oid_rrd_type($oid, $mibdef)
         return false;
 
     case 'TimeTicks':
-        // Need to find a way to flag that this should be parsed
-        // return 'COUNTER';
+        // FIXME
+        return false;
+
+    case 'INTEGER':
+    case 'Integer32':
+        // FIXME
+        return false;
+
+    case 'Counter32':
+        // FIXME
         return false;
 
     case 'Counter64':
