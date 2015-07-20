@@ -15,7 +15,7 @@ class ResultSet
     /**
      * @var array|mixed
      */
-    protected $parsedResults = array();
+    protected $parsedResults = [];
 
     /**
      * @param string $raw
@@ -48,7 +48,7 @@ class ResultSet
      */
     public function getPoints($metricName = '', array $tags = array())
     {
-        $points = array();
+        $points = [];
         $series = $this->getSeries();
 
         foreach ($series as $serie) {
@@ -81,7 +81,7 @@ class ResultSet
                     throw new ClientException($object['error']);
                 }
 
-                return isset($object['series']) ? $object['series'] : array();
+                return isset($object['series']) ? $object['series'] : [];
             },
             $this->parsedResults['results']
         );
@@ -95,7 +95,7 @@ class ResultSet
      */
     private function getPointsFromSerie(array $serie)
     {
-        $points = array();
+        $points = [];
 
         foreach ($serie['values'] as $point) {
             $points[] = array_combine($serie['columns'], $point);

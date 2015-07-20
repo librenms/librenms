@@ -70,7 +70,7 @@ class Database
      * @return ResultSet
      * @throws Exception
      */
-    public function query($query, $params = array())
+    public function query($query, $params = [])
     {
         return $this->client->query($this->name, $query, $params);
     }
@@ -124,7 +124,22 @@ class Database
             $points
         );
 
-        return $this->client->write($this->name, implode(PHP_EOL, $payload), $precision);
+        try {
+            $driver = $this->client->getDriver();
+            $driver->setParameters([
+                    'url' => sprintf('write?db=%s&precision=%s', $this->name, $precision),
+                    'database' => $this->name,
+                    'method' => 'post'
+                ]);
+
+            // send the points to influxDB
+            $driver->send(implode(PHP_EOL, $payload));
+
+            return $driver->isSuccess();
+
+        } catch (\Exception $e) {
+            throw new Exception(sprintf('Writing has failed, exception: %s', $e->getMessage()));
+        }
     }
 
     /**
@@ -187,7 +202,7 @@ class Database
      */
     protected function getRetentionPolicyQuery($method, RetentionPolicy $retentionPolicy)
     {
-        if (!in_array($method, array('CREATE', 'ALTER'))) {
+        if (!in_array($method, ['CREATE', 'ALTER'])) {
             throw new \InvalidArgumentException(sprintf('%s is not a valid method'));
         }
 
