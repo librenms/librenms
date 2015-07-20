@@ -1,7 +1,4 @@
 <?php
-/**
- * @author Stephen "TheCodeAssassin" Hoogendijk
- */
 
 namespace InfluxDB;
 
@@ -11,49 +8,42 @@ use InfluxDB\Client\Exception as ClientException;
  * Class ResultSet
  *
  * @package InfluxDB
+ * @author  Stephen "TheCodeAssassin" Hoogendijk
  */
 class ResultSet
 {
-    /**
-     * @var string
-     */
-    protected $raw = '';
-
     /**
      * @var array|mixed
      */
     protected $parsedResults = array();
 
     /**
-     * @param $raw
-     *
+     * @param string $raw
      * @throws \InvalidArgumentException
      * @throws Exception
      */
     public function __construct($raw)
     {
-        $this->raw = $raw;
-
-        $this->parsedResults = json_decode($raw, true);
+        $this->parsedResults = json_decode((string) $raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException("Invalid JSON");
+            throw new \InvalidArgumentException('Invalid JSON');
         }
 
         // There was an error in the query thrown by influxdb
         if (isset($this->parsedResults['error'])) {
             throw new ClientException($this->parsedResults['error']);
+        }
 
-            // Check if there are errors in the first serie
-        } elseif (isset($this->parsedResults['results'][0]['error'])) {
+        // Check if there are errors in the first serie
+        if (isset($this->parsedResults['results'][0]['error'])) {
             throw new ClientException($this->parsedResults['results'][0]['error']);
         }
     }
 
     /**
-     * @param $metricName
-     * @param array $tags
-     *
+     * @param  $metricName
+     * @param  array $tags
      * @return array $points
      */
     public function getPoints($metricName = '', array $tags = array())
@@ -62,7 +52,6 @@ class ResultSet
         $series = $this->getSeries();
 
         foreach ($series as $serie) {
-
             if ((empty($metricName) && empty($tags)
                 || $serie['name'] == $metricName
                 || (isset($serie['tags']) && array_intersect($tags, $serie['tags'])))
@@ -82,30 +71,26 @@ class ResultSet
      * each containing the keys for a series
      *
      * @throws Exception
-     *
      * @return array $series
      */
     public function getSeries()
     {
-        $pickSeries = function ($object) {
+        $series = array_map(
+            function ($object) {
+                if (isset($object['error'])) {
+                    throw new ClientException($object['error']);
+                }
 
-            if (isset($object['error'])) {
-                throw new ClientException($object['error']);
-            }
-
-            return (isset($object['series']) ? $object['series'] : array());
-        };
-
-        // we use array_shift because of compatibility with php5.3
-        // Foreach object, pick series key
-        $map = array_map($pickSeries, $this->parsedResults['results']);
-        return array_shift(
-            $map
+                return isset($object['series']) ? $object['series'] : array();
+            },
+            $this->parsedResults['results']
         );
+
+        return array_shift($series);
     }
 
     /**
-     * @param array $serie
+     * @param  array $serie
      * @return array
      */
     private function getPointsFromSerie(array $serie)
@@ -113,13 +98,9 @@ class ResultSet
         $points = array();
 
         foreach ($serie['values'] as $point) {
-            $points[] = array_combine(
-                $serie['columns'],
-                $point
-            );
+            $points[] = array_combine($serie['columns'], $point);
         }
 
         return $points;
     }
-
 }
