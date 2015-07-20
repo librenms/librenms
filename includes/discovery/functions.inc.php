@@ -704,25 +704,3 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     }//end if
 
 }//end discover_process_ipv6()
-
-
-// maintain a simple cache of seen IPs during ARP discovery
-
-
-function arp_discovery_add_cache($ip) {
-    global $arp_discovery;
-    $arp_discovery[$ip] = true;
-
-}//end arp_discovery_add_cache()
-
-
-function arp_discovery_is_cached($ip) {
-    global $arp_discovery;
-    if (array_key_exists($ip, $arp_discovery)) {
-        return $arp_discovery[$ip];
-    }
-    else {
-        return false;
-    }
-
-}//end arp_discovery_is_cached()

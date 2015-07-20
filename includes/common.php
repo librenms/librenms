@@ -800,6 +800,28 @@ function enable_graphs($device, &$graph_enable)
     enable_os_graphs($device['os'], $graph_enable);
 }
 
+//
+// maintain a simple cache of objects
+//
+
+function object_add_cache($section, $obj)
+{
+    global $object_cache;
+    $object_cache[$section][$obj] = true;
+}
+
+
+function object_is_cached($section, $obj)
+{
+    global $object_cache;
+    if (array_key_exists($obj, $object_cache)) {
+        return $object_cache[$obj];
+    }
+    else {
+        return false;
+    }
+}
+
 /**
  * Checks if config allows us to ping this device
  * $attribs contains an array of all of this devices
@@ -811,9 +833,6 @@ function can_ping_device($attribs) {
     global $config;
     if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
         return true;
-    }
-    else {
-        return false;
     }
 } // end can_ping_device
 
