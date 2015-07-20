@@ -427,7 +427,7 @@ function location_to_latlng($device) {
     $bad_loc = false;
     $device_location = $device['location'];
     if (!empty($device_location)) {
-        $device_location = preg_replace("/ /","+",$device_location);
+        $new_device_location = preg_replace("/ /","+",$device_location);
         // We have a location string for the device.
         $loc = dbFetchRow("SELECT `lat`,`lng` FROM `coordinates` WHERE `location`=? LIMIT 1", array($device_location));
         if (is_array($loc) === false) {
@@ -436,7 +436,7 @@ function location_to_latlng($device) {
                 case "google":
                 default:
                     d_echo("Google geocode engine being used\n");
-                    $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$device_location";
+                    $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location";
                 break;
             }
             $curl_init = curl_init($api_url);

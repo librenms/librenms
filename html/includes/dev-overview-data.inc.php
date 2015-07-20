@@ -73,6 +73,14 @@ if ($device['location']) {
     }
 }
 
+$loc = dbFetchRow("SELECT `lat`,`lng` FROM `coordinates` WHERE `location`=? LIMIT 1", array($device['location']));
+if (is_array($loc)) {
+    echo '<tr>
+        <td>Lat / Lng</td>
+        <td>['.$loc['lat'].','.$loc['lng'].']</td>
+    </tr>';
+}
+
 if ($uptime) {
     echo '<tr>
         <td>Uptime</td>
