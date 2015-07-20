@@ -43,7 +43,7 @@ foreach (getlocations() as $location) {
     $devices_up = array();
     $count = 0;
     $down  = 0;
-    foreach (dbFetchRows("SELECT devices.device_id,devices.hostname,devices.status FROM devices LEFT JOIN devices_attribs ON devices.device_id = devices_attribs.device_id WHERE ( devices.location = ? || ( devices_attribs.attrib_type = 'override_sysLocation_string' && devices_attribs.attrib_value = ? ) ) && devices.disabled = 0 && devices.ignore = 0 GROUP BY devices.hostname", array($location,$location)) as $device) {
+    foreach (dbFetchRows("SELECT devices.device_id,devices.hostname,devices.status FROM devices LEFT JOIN devices_attribs ON devices.device_id = devices_attribs.device_id WHERE devices.location = ?  && devices.disabled = 0 && devices.ignore = 0 GROUP BY devices.hostname", array($location)) as $device) {
         if( $config['frontpage_globe']['markers'] == 'devices' || empty($config['frontpage_globe']['markers']) ) {
             $devices[] = $device['hostname'];
             $count++;
