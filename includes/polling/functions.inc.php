@@ -419,10 +419,10 @@ function get_main_serial($device) {
 
 
 function location_to_latlng($device) {
+    global $config;
     if (function_check('curl_version') !== true) {
         d_echo("Curl support for PHP not enabled\n");
         return false;
-        exit;
     }
     $bad_loc = false;
     $device_location = $device['location'];
