@@ -117,15 +117,12 @@ class Database
      */
     public function writePoints(array $points, $precision = self::PRECISION_NANOSECONDS)
     {
-        $payload = array();
-
-        foreach ($points as $point) {
-            if (! $point instanceof Point) {
-                throw new \InvalidArgumentException('An array of Point[] should be passed');
-            }
-
-            $payload[] = (string) $point;
-        }
+        $payload = array_map(
+            function (Point $point) {
+                return (string) $point;
+            },
+            $points
+        );
 
         return $this->client->write($this->name, implode(PHP_EOL, $payload), $precision);
     }
@@ -190,7 +187,6 @@ class Database
      */
     protected function getRetentionPolicyQuery($method, RetentionPolicy $retentionPolicy)
     {
-
         if (!in_array($method, array('CREATE', 'ALTER'))) {
             throw new \InvalidArgumentException(sprintf('%s is not a valid method'));
         }
