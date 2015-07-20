@@ -212,7 +212,6 @@ Some functions are too general for a database. So these are available in the cli
 
 ## Todo
 
-* Add UDP support
 * Add more admin features
 * More unit tests
 * Increase documentation (wiki?)
@@ -221,6 +220,11 @@ Some functions are too general for a database. So these are available in the cli
 
 
 ## Changelog
+
+####1.0.0
+* Dropped support for php 5.3 and php 5.4
+* Allowing for custom drivers
+* UDP support
 
 ####0.1.2
 * Added exists method to Database class
