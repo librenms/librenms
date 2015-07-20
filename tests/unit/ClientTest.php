@@ -2,22 +2,24 @@
 
 namespace InfluxDB\Test;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use InfluxDB\Client;
-use InfluxDB\ResultSet;
+use InfluxDB\Driver\Guzzle;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
 
     /** @var Client $client */
     protected $client = null;
-    
+
     public function testBaseURl()
     {
         $client = new Client('localhost', 8086);
 
-        $this->assertEquals(
-            $client->getBaseURI(), 'http://localhost:8086'
-        );
+        $this->assertEquals($client->getBaseURI(), 'http://localhost:8086');
     }
 
     public function testSelectDbShouldReturnDatabaseInstance()
@@ -25,25 +27,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new Client('localhost', 8086);
 
         $dbName = 'test-database';
-        $db = $client->selectDB($dbName);
+        $database = $client->selectDB($dbName);
 
-        $this->assertInstanceOf('\InfluxDB\Database', $db);
+        $this->assertInstanceOf('\InfluxDB\Database', $database);
 
-        $this->assertEquals($dbName, $db->getName());
+        $this->assertEquals($dbName, $database->getName());
     }
 
 
     /**
      */
-    public function testQuery()
+    public function testGuzzleQuery()
     {
         $client = new Client('localhost', 8086);
         $query = "some-bad-query";
 
         $bodyResponse = file_get_contents(dirname(__FILE__) . '/result.example.json');
-        $httpMockClient = $this->buildHttpMockClient($bodyResponse);
+        $httpMockClient = self::buildHttpMockClient($bodyResponse);
 
-        $client->setHttpClient($httpMockClient);
+        $client->setDriver(new Guzzle($httpMockClient));
 
         /** @var \InfluxDB\ResultSet $result */
         $result = $client->query(null, $query);
@@ -54,15 +56,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \Guzzle\Http\Client
      */
-    protected function buildHttpMockClient($body)
+    public static function buildHttpMockClient($body)
     {
-        $plugin = new \Guzzle\Plugin\Mock\MockPlugin();
-        $response= new \Guzzle\Http\Message\Response(200);
-        $response->setBody($body);
-        $plugin->addResponse($response);
-        $mockedClient = new \Guzzle\Http\Client();
-        $mockedClient->addSubscriber($plugin);
+        // Create a mock and queue two responses.
+        $mock = new MockHandler([new Response(200, array(), $body)]);
 
-        return $mockedClient;
+        $handler = HandlerStack::create($mock);
+        return new GuzzleClient(['handler' => $handler]);
     }
 }

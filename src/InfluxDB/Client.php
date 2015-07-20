@@ -114,11 +114,15 @@ class Client
         $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
 
         // set the default driver to guzzle
-        $this->driver = new Guzzle([
-            'timeout' => $this->timeout,
-            'base_uri' => $this->baseURI,
-            'verify' => $this->verifySSL
-        ]);
+        $this->driver = new Guzzle(
+            new \GuzzleHttp\Client(
+                [
+                    'timeout' => $this->timeout,
+                    'base_uri' => $this->baseURI,
+                    'verify' => $this->verifySSL
+                ]
+            )
+        );
     }
 
     /**
@@ -152,7 +156,9 @@ class Client
             $params['db'] = $database;
         }
 
-        $this->driver->setParameters([
+        $driver = $this->getDriver();
+
+        $driver->setParameters([
            'url' => 'query?' . http_build_query(array_merge(['q' => $query], $params)),
            'database' => $database,
            'method' => 'get'
@@ -160,9 +166,9 @@ class Client
 
         try {
             // send the data
-            $this->driver->send();
+            $driver->send();
 
-            return $this->driver->getResultSet();
+            return $driver->getResultSet();
 
         } catch (\Exception $e) {
             throw new Exception(sprintf('Query has failed, exception: %s', $e->getMessage()));
@@ -275,7 +281,7 @@ class Client
     }
 
     /**
-     * @return DriverInterface
+     * @return DriverInterface|QueryDriverInterface
      */
     public function getDriver()
     {
@@ -288,13 +294,5 @@ class Client
     public function getHost()
     {
         return $this->host;
-    }
-
-    /**
-     * @return DriverInterface
-     */
-    public function getDefaultDriver()
-    {
-        return $this->defaultDriver;
     }
 }

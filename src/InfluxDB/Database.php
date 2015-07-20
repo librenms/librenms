@@ -127,10 +127,10 @@ class Database
         try {
             $driver = $this->client->getDriver();
             $driver->setParameters([
-                    'url' => sprintf('write?db=%s&precision=%s', $this->name, $precision),
-                    'database' => $this->name,
-                    'method' => 'post'
-                ]);
+                'url' => sprintf('write?db=%s&precision=%s', $this->name, $precision),
+                'database' => $this->name,
+                'method' => 'post'
+            ]);
 
             // send the points to influxDB
             $driver->send(implode(PHP_EOL, $payload));
