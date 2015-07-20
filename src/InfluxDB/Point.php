@@ -55,9 +55,7 @@ class Point
 
         $this->measurement = (string) $measurement;
         $this->tags        = $tags;
-        $this->fields      = $additionalFields;
-
-        $this->fields += array('value' => (float) $value);
+        $this->fields      = array_merge($additionalFields, array('value' => (float) $value));
 
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
             throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
