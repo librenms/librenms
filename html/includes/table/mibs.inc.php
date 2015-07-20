@@ -25,7 +25,8 @@ $columns = array(
     'description',
     'max_access',
     'status',
-    'last_used',
+    'included_by',
+    'last_modified',
 );
 
 function search_phrase_column($c)
@@ -87,6 +88,5 @@ $output = array(
     'rowCount' => $rowCount,
     'rows'     => $response,
     'total'    => $total,
-    'sql'      => $sql,
 );
 echo _json_encode($output);
