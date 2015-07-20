@@ -1,13 +1,10 @@
 <?php
-/**
- * @author Stephen "TheCodeAssassin" Hoogendijk
- */
 
 namespace InfluxDB;
 
+use InfluxDB\Database\Exception as DatabaseException;
 use InfluxDB\Database\RetentionPolicy;
 use InfluxDB\Query\Builder as QueryBuilder;
-use InfluxDB\Database\Exception as DatabaseException;
 
 /**
  * Class Database
@@ -15,10 +12,10 @@ use InfluxDB\Database\Exception as DatabaseException;
  * @todo admin functionality
  *
  * @package InfluxDB
+ * @author  Stephen "TheCodeAssassin" Hoogendijk
  */
 class Database
 {
-
     /**
      * The name of the Database
      *
@@ -30,7 +27,6 @@ class Database
      * @var Client
      */
     protected $client;
-
 
     /**
      * Precision constants
@@ -47,23 +43,19 @@ class Database
      *
      * @param string $name
      * @param Client $client
-     *
-     * @throws DatabaseException
      */
     public function __construct($name, Client $client)
     {
-        $this->client = $client;
-
-        if (!$name) {
+        if (empty($name)) {
             throw new \InvalidArgumentException('No database name provided');
         }
 
-        $this->name = $name;
-
+        $this->name   = $name;
+        $this->client = $client;
     }
 
     /**
-     * @return string db name
+     * @return string
      */
     public function getName()
     {
@@ -73,11 +65,9 @@ class Database
     /**
      * Query influxDB
      *
-     * @param string $query
-     * @param array $params
-     *
+     * @param  string $query
+     * @param  array  $params
      * @return ResultSet
-     *
      * @throws Exception
      */
     public function query($query, $params = array())
@@ -88,10 +78,8 @@ class Database
     /**
      * Create this database
      *
-     * @param RetentionPolicy $retentionPolicy
-     *
+     * @param  RetentionPolicy $retentionPolicy
      * @return ResultSet
-     *
      * @throws DatabaseException
      * @throws Exception
      */
@@ -103,7 +91,6 @@ class Database
             if ($retentionPolicy) {
                 $this->createRetentionPolicy($retentionPolicy);
             }
-
         } catch (\Exception $e) {
             throw new DatabaseException(
                 sprintf('Failed to created database %s, exception: %s', $this->name, $e->getMessage())
@@ -112,8 +99,7 @@ class Database
     }
 
     /**
-     * @param RetentionPolicy $retentionPolicy
-     *
+     * @param  RetentionPolicy $retentionPolicy
      * @return ResultSet
      */
     public function createRetentionPolicy(RetentionPolicy $retentionPolicy)
@@ -124,9 +110,8 @@ class Database
     /**
      * Writes points into InfluxDB
      *
-     * @param Point[]  $points    Array of points
-     * @param string   $precision The timestamp precision (defaults to nanoseconds)
-     *
+     * @param  Point[] $points    Array of points
+     * @param  string  $precision The timestamp precision (defaults to nanoseconds)
      * @return bool
      * @throws Exception
      */
@@ -135,8 +120,7 @@ class Database
         $payload = array();
 
         foreach ($points as $point) {
-
-            if (!$point instanceof Point) {
+            if (! $point instanceof Point) {
                 throw new \InvalidArgumentException('An array of Point[] should be passed');
             }
 
@@ -166,14 +150,12 @@ class Database
 
     /**
      * @return array
-     *
      * @throws Exception
      */
     public function listRetentionPolicies()
     {
         return $this->query(sprintf('SHOW RETENTION POLICIES %s', $this->name))->getPoints();
     }
-
 
     /**
      * Drop this database
@@ -202,9 +184,8 @@ class Database
     }
 
     /**
-     * @param                 $method
-     * @param RetentionPolicy $retentionPolicy
-     *
+     * @param  string          $method
+     * @param  RetentionPolicy $retentionPolicy
      * @return string
      */
     protected function getRetentionPolicyQuery($method, RetentionPolicy $retentionPolicy)
@@ -229,5 +210,4 @@ class Database
 
         return $query;
     }
-
 }
