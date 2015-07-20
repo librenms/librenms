@@ -40,9 +40,9 @@ class RetentionPolicy
      */
     public function __construct($name, $duration = '1d', $replication = 1, $default = false)
     {
-        $this->name        = (string) $name;
-        $this->duration    = $duration;
+        $this->name = (string) $name;
+        $this->duration = $duration;
         $this->replication = (int) $replication;
-        $this->default     = (bool) $default;
+        $this->default = (bool) $default;
     }
 }

@@ -92,11 +92,11 @@ class Client
         $verifySSL = true,
         $timeout = 0
     ) {
-        $this->host      = (string) $host;
-        $this->port      = (int) $port;
-        $this->username  = (string) $username;
-        $this->password  = (string) $password;
-        $this->timeout   = (int) $timeout;
+        $this->host = (string) $host;
+        $this->port = (int) $port;
+        $this->username = (string) $username;
+        $this->password = (string) $password;
+        $this->timeout = (int) $timeout;
         $this->verifySSL = (bool) $verifySSL;
 
         if ($ssl) {
@@ -107,7 +107,6 @@ class Client
         // the the base URI
         $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
         $this->httpClient = new \Guzzle\Http\Client($this->getBaseURI());
-
     }
 
     /**
@@ -230,20 +229,20 @@ class Client
     {
         $connParams = parse_url($dsn);
         $schemeInfo = explode('+', $connParams['scheme']);
-        $dbName     = null;
-        $modifier   = null;
-        $scheme     = $schemeInfo[0];
+        $dbName = null;
+        $modifier = null;
+        $scheme = $schemeInfo[0];
 
         if (isset($schemeInfo[1])) {
             $modifier = $schemeInfo[0];
-            $scheme   = $schemeInfo[1];
+            $scheme = $schemeInfo[1];
         }
 
         if ($scheme != 'influxdb') {
             throw new ClientException(sprintf('%s is not a valid scheme', $scheme));
         }
 
-        $ssl    = $modifier === 'https' ? true : false;
+        $ssl = $modifier === 'https' ? true : false;
         $dbName = $connParams['path'] ? substr($connParams['path'], 1) : null;
 
         $client = new self(
@@ -276,8 +275,7 @@ class Client
     }
 
     /**
-     * @param array $points
-     *
+     * @param  array $points
      * @return array
      */
     protected function pointsToArray(array $points)
