@@ -1,53 +1,47 @@
 {
-  "name": "influxdb/influxdb-php",
-  "description": "InfluxDB client library for PHP",
-  "keywords": [
-    "influxdb",
-    "client",
-    "time series",
-    "influxdb client",
-    "influxdb class",
-    "influxdb library"
-  ],
-  "minimum-stability": "dev",
-  "authors": [
-    {
-      "name": "Stephen Hoogendijk",
-      "email": "stephen@tca0.nl"
-    },
-    {
-      "name": "Daniel Martinez",
-      "email": "danimartcas@hotmail.com"
-    }
-  ],
-  "require": {
-    "php": ">=5.3",
-    "guzzlehttp/guzzle": "3.*",
-    "symfony/event-dispatcher": "2.*"
-
-  },
-  "require-dev": {
-    "codeclimate/php-test-reporter": "0.*",
-    "symfony/config": "~2.8",
-    "symfony/console": "~2.8",
-    "symfony/filesystem": "~2.8",
-    "symfony/stopwatch": "~2.8",
-    "symfony/yaml": "~2.8"
-  },
-  "scripts": {
-    "post-install-cmd": [
+    "name": "influxdb/influxdb-php",
+    "description": "InfluxDB client library for PHP",
+    "license": "MIT",
+    "keywords": [
+        "influxdb",
+        "client",
+        "time series",
+        "influxdb client",
+        "influxdb class",
+        "influxdb library"
     ],
-    "post-update-cmd": [
-    ]
-  },
-  "autoload": {
-    "psr-4": {
-      "InfluxDB\\": "src/InfluxDB"
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Stephen Hoogendijk",
+            "email": "stephen@tca0.nl"
+        },
+        {
+            "name": "Daniel Martinez",
+            "email": "danimartcas@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "guzzlehttp/guzzle": "3.*",
+        "symfony/event-dispatcher": "2.*"
+    },
+    "require-dev": {
+        "codeclimate/php-test-reporter": "0.*",
+        "symfony/config": "~2.8",
+        "symfony/console": "~2.8",
+        "symfony/filesystem": "~2.8",
+        "symfony/stopwatch": "~2.8",
+        "symfony/yaml": "~2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "InfluxDB\\": "src/InfluxDB"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "InfluxDB\\Test\\": "tests"
+        }
     }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "InfluxDB\\Test\\": "tests"
-    }
-  }
 }

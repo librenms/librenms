@@ -1,7 +1,4 @@
 <?php
-/**
- * @author Stephen "TheCodeAssassin" Hoogendijk
- */
 
 namespace InfluxDB\Database;
 
@@ -9,6 +6,7 @@ namespace InfluxDB\Database;
  * Class RetentionPolicy
  *
  * @package InfluxDB\Database
+ * @author Stephen "TheCodeAssassin" Hoogendijk
  */
 class RetentionPolicy
 {
@@ -16,19 +14,21 @@ class RetentionPolicy
      * @var string
      */
     public $name;
+
     /**
      * @var string
      */
     public $duration;
+
     /**
      * @var int
      */
     public $replication;
+
     /**
      * @var bool
      */
     public $default;
-
 
     /**
      * @param string $name
@@ -40,10 +40,9 @@ class RetentionPolicy
      */
     public function __construct($name, $duration = '1d', $replication = 1, $default = false)
     {
-        $this->name = $name;
+        $this->name = (string) $name;
         $this->duration = $duration;
-        $this->replication = $replication;
-
+        $this->replication = (int) $replication;
         $this->default = (bool) $default;
     }
 }
