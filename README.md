@@ -93,26 +93,43 @@ Writing data is done by providing an array of points to the writePoints method o
             0.64,
             array('host' => 'server01', 'region' => 'us-west'),
             array('cpucount' => 10),
-            1435255849
+            1435255849 // Time precision has to be set to seconds!
         ),
         new Point(
             'test_metric',
             0.84,
             array('host' => 'server01', 'region' => 'us-west'),
             array('cpucount' => 10),
-            1435255850
+            1435255850 // Time precision has to be set to seconds!
         )
     );
 
-    $newPoints = $database->writePoints($points);
+    // we are writing unix timestamps, which have a second precision
+    $newPoints = $database->writePoints($points, Database::PRECISION_SECONDS);
     
 ```
+
+It's possible to add multiple [fields](https://influxdb.com/docs/v0.9/concepts/key_concepts.html) when writing
+measurements to InfluxDB. The point class allows one to easily write data in batches to influxDB.
 
 The name of a measurement and the value are mandatory. Additional fields, tags and a timestamp are optional.
 InfluxDB takes the current time as the default timestamp.
 
-It's possible to add multiple [fields](https://influxdb.com/docs/v0.9/concepts/key_concepts.html) when writing
-measurements to InfluxDB. The point class allows one to easily write data in batches to influxDB.
+#### Timestamp precision
+
+It's important to provide the correct precision when adding a timestamp to a Point object. This is because
+if you specify a timestamp in seconds and the default (nanosecond) precision is set; the entered timestamp will be invalid.
+
+```php
+    // Points will require a nanosecond precision (this is default as per influxdb standard)
+    $newPoints = $database->writePoints($points);
+
+    // Points will require second precision
+    $newPoints = $database->writePoints($points, Database::PRECISION_SECONDS);
+    
+    // Points will require microsecond precision
+    $newPoints = $database->writePoints($points, Database::PRECISION_MICROSECONDS);
+```
 
 ### Creating databases
 
@@ -176,6 +193,10 @@ Some functions are too general for a database. So these are available in the cli
 
 
 ## Changelog
+
+####0.1.2
+* Added exists method to Database class
+* Added time precision to database class
 
 ####0.1.1
 * Merged repository to influxdb/influxdb-php
