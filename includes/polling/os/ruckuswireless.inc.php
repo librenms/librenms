@@ -43,12 +43,3 @@ $ruckuscountry = first_oid_match($device, $ruckuscountries);
 if (isset($ruckuscountry) && $ruckuscountry != '') {
     $version .= " ($ruckuscountry)";
 }
-
-// FIXME: Move this to discovery, and just retrieve the list of MIBs from the database during polling
-$ruckus_mibs = array(
-    'ruckusZDSystemStats'           => 'RUCKUS-ZD-SYSTEM-MIB',
-    'ruckusZDWLANTable'             => 'RUCKUS-ZD-WLAN-MIB',
-    'ruckusZDWLANAPTable'           => 'RUCKUS-ZD-WLAN-MIB',
-    'ruckusZDWLANAPRadioStatsTable' => 'RUCKUS-ZD-WLAN-MIB',
-);
-poll_mibs($ruckus_mibs, $device, $graphs);
