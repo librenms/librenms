@@ -10,4 +10,3 @@ if ($device['os'] == 'xos') {
     $mempool['free']  = ($avail * 1024);
     $mempool['used']  = (($total - $avail) * 1024);
 }
-?>
