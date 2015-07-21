@@ -699,4 +699,19 @@ function get_graph_subtypes($type) {
     return $types;
 }
 
+/*
+ * @return rounded value to 10th/100th/1000th depending on input (valid: 10, 100, 1000)
+ */
+function round_Nth($val = 0, $round_to) {
+    if (($round_to == "10") || ($round_to == "100") || ($round_to == "1000")) {
+        $diff = $val % $round_to;
+        if ($diff >= ($round_to / 2)) {
+            $ret = $val + ($round_to-$diff);
+        } else {
+            $ret = $val - $diff;
+        }
+        return $ret;
+    }
+} 
+
 ?>
