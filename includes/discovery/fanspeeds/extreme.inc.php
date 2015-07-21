@@ -24,9 +24,9 @@ if ($device['os'] == 'xos') {
         $index = $matches[1];
         // substract 100 from index to start from 1 instead of 101
         $modindex = ($index - 100);
-        $oid	= "1.3.6.1.4.1.1916.1.1.1.9.1.4.$index";
-        $value	= snmp_get($device, $oid, '-Oqv', 'EXTREME-BASE-MIB');
-        $descr	= "Fan Speed $modindex";
+        $oid    = "1.3.6.1.4.1.1916.1.1.1.9.1.4.$index";
+        $value  = snmp_get($device, $oid, '-Oqv', 'EXTREME-BASE-MIB');
+        $descr  = "Fan Speed $modindex";
         $high_limit		= roundme($value * 1.5);
         $high_warn_limit	= roundme($value * 1.25);
         $low_warn_limit		= roundme($value * 0.75);
