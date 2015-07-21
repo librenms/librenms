@@ -394,7 +394,7 @@ $rewrite_extreme_hardware = array(
     '.1.3.6.1.4.1.1916.2.90'  => 'Summit X250-24x',
     '.1.3.6.1.4.1.1916.2.92'  => 'Summit X250-48p',
     '.1.3.6.1.4.1.1916.2.91'  => 'Summit X250-48t',
-    '.1.3.6.1.4.1.1916.2.93'  => 'Summit X250e-24t (3-Stack)',
+    '.1.3.6.1.4.1.1916.2.93'  => 'Summit X250/X450-24t (3-Stack)',
     '.1.3.6.1.4.1.1916.2.88'  => 'Summit X250e-24t (Single)',
     '.1.3.6.1.4.1.1916.2.66'  => 'Summit X450-24t',
     '.1.3.6.1.4.1.1916.2.65'  => 'Summit X450-24x',
@@ -412,6 +412,8 @@ $rewrite_extreme_hardware = array(
     '.1.3.6.1.4.1.1916.2.129' => 'NWI-e450a',
     '.1.3.6.1.4.1.1916.2.133' => 'Summit x480-48t',
     '.1.3.6.1.4.1.1916.2.141' => 'Summit x480-48x',
+    '.1.3.6.1.4.1.1916.2.167' => 'Summit x670-48x',
+    '.1.3.6.1.4.1.1916.2.168' => 'Summit x670v-48x',
 );
 
 $rewrite_ironware_hardware = array(
@@ -665,6 +667,7 @@ $rewrite_ironware_hardware = array(
     'snFESX624P'                             => 'FESX624POE+2XG-PREM',
     'snFWSX424'                              => 'FWSX24G',
     'snFWSX424Switch'                        => 'FWSX424',
+    'FWSX24GSwitch'                          => 'FWSX424',
     'snFWSX424Router'                        => 'FWSX424',
     'snFWSX424Plus1XG'                       => 'FWSX24G + 1 10G',
     'snFWSX424Plus1XGSwitch'                 => 'FWSX424+1XG',
@@ -846,6 +849,7 @@ $rewrite_ironware_hardware = array(
     'snCer2048C'                             => 'NetIron CER 2048C',
     'snCer2048FX'                            => 'NetIron CER 2048F + 2x10G',
     'snCer2048CX'                            => 'NetIron CER 2048C + 2x10G',
+    'snTI2X24Router'                         => 'Stackable TurboIron-X24',
 );
 
 $rewrite_ios_features = array(
