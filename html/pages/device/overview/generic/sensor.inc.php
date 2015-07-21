@@ -52,12 +52,12 @@ if (count($sensors)) {
         $graph_array['bg']     = 'ffffff00';
         // the 00 at the end makes the area transparent.
         $graph_array['from'] = $config['time']['day'];
-        $sensor_minigraph    = generate_graph_tag($graph_array);
+        $sensor_minigraph =  generate_lazy_graph_tag($graph_array);
 
         $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
 
         echo '<tr>
-            <td><strong>'.overlib_link($link, $sensor['sensor_descr'], $overlib_content).'</strong></td>
+            <td><strong>'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content).'</strong></td>
             <td>'.overlib_link($link, $sensor_minigraph, $overlib_content).'</td>
             <td>'.overlib_link($link, '<span '.($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '').'>'.$sensor['sensor_current'].$sensor_unit.'</span>', $overlib_content).'</td>
             </tr>';

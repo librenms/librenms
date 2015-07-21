@@ -39,6 +39,8 @@ Contributors to LibreNMS:
 - Travis Hegner <travis.hegner@gmail.com> (travishegner)
 - Will Jones <email@willjones.eu> (willjones)
 - Job Snijders <job@instituut.net> (job)
+- Rasmus Aberg <rasmus@sthix.net> (rasssta)
+- Jan Saner <jan@trick77.com> (trick77)
 
 [1]: http://observium.org/ "Observium web site"
 

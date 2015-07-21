@@ -399,6 +399,7 @@ $os = 'nos';
 $config['os'][$os]['text']             = 'Brocade NOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['ifalias_null']     = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -465,6 +466,17 @@ $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['bad_if'][]         = 'cpu';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
+$os = 'netonix';
+$config['os'][$os]['text']             = 'Netonix';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'netonix';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 // Juniper
 $os = 'junos';
@@ -576,6 +588,17 @@ $os = 'ftos';
 $config['os'][$os]['text']             = 'Force10 FTOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'force10';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'dnos';
+$config['os'][$os]['text']             = 'Dell Networking OS';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'dell';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
