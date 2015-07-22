@@ -49,4 +49,5 @@ $temp_output .= '
 </div>
 ';
 
+unset($common_output);
 $common_output[] = $temp_output;
