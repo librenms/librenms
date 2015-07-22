@@ -89,18 +89,18 @@ Writing data is done by providing an array of points to the writePoints method o
     // create an array of points
     $points = array(
         new Point(
-            'test_metric',
-            0.64,
-            ['host' => 'server01', 'region' => 'us-west'],
-            ['cpucount' => 10],
+            'test_metric', // name of the measurement
+            0.64, // the measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // optional tags
+            ['cpucount' => 10], // optional additional fields
             1435255849 // Time precision has to be set to seconds!
         ),
         new Point(
-            'test_metric',
-            0.84,
-            ['host' => 'server01', 'region' => 'us-west'],
-            array('cpucount' => 10),
-            1435255850 // Time precision has to be set to seconds!
+           'test_metric', // name of the measurement
+            0.84, // the measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // optional tags
+            ['cpucount' => 10], // optional additional fields
+            1435255849 // Time precision has to be set to seconds!
         )
     );
 
@@ -114,6 +114,28 @@ measurements to InfluxDB. The point class allows one to easily write data in bat
 
 The name of a measurement and the value are mandatory. Additional fields, tags and a timestamp are optional.
 InfluxDB takes the current time as the default timestamp.
+
+You can also write multiple fields to a measurement without specifying a value:
+
+```php
+    $points = [
+        new Point(
+            'instance', // the name of the measurement
+            null, // measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // measurement tags
+            ['cpucount' => 10, 'free' => 1], // measurement fields
+            exec('date +%s%N') // timestamp in nanoseconds
+        ),
+        new Point(
+            'instance', // the name of the measurement
+            null, // measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // measurement tags
+            ['cpucount' => 10, 'free' => 2], // measurement fields
+            exec('date +%s%N') // timestamp in nanoseconds
+        )
+    ];
+
+```
 
 #### Writing data using udp
 
