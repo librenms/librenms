@@ -17,7 +17,8 @@ if ($device['os'] == "linux" || $device['os'] == "endian") {
     else if (strstr($poll_device['sysDescr'], "mips")) {
         $hardware = "Generic MIPS";
     }
-    else if (strstr($poll_device['sysDescr'], "armv5")) {
+    // Except iDrac6 from being detected as armv5
+    else if (strstr($poll_device['sysDescr'], "armv5") && $poll_device['sysObjectID'] != '.1.3.6.1.4.1.674.10892.2') {
         $hardware = "Generic ARMv5";
     }
     else if (strstr($poll_device['sysDescr'], "armv6")) {
