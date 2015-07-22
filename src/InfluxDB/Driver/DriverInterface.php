@@ -38,7 +38,7 @@ interface DriverInterface
      *
      * @return mixed
      */
-    public function send($data = null);
+    public function write($data = null);
 
     /**
      * Should return if sending the data was successful

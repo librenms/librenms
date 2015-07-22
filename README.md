@@ -30,7 +30,7 @@ $client = new InfluxDB\Client($host, $port);
 
 This will create a new client object which you can use to read and write points to InfluxDB.
 
-It's also possible to create a client from a DSN:
+It's also possible to create a client from a DSN (Data Source Name):
 
 ```php
     
@@ -91,14 +91,14 @@ Writing data is done by providing an array of points to the writePoints method o
         new Point(
             'test_metric',
             0.64,
-            array('host' => 'server01', 'region' => 'us-west'),
-            array('cpucount' => 10),
+            ['host' => 'server01', 'region' => 'us-west'],
+            ['cpucount' => 10],
             1435255849 // Time precision has to be set to seconds!
         ),
         new Point(
             'test_metric',
             0.84,
-            array('host' => 'server01', 'region' => 'us-west'),
+            ['host' => 'server01', 'region' => 'us-west'],
             array('cpucount' => 10),
             1435255850 // Time precision has to be set to seconds!
         )
@@ -129,12 +129,37 @@ First, set your InfluxDB host to support incoming UDP sockets:
 Then, configure the UDP driver in the client:
 
 ```php
-    // set the udp driver
+   
+     // set the UDP driver in the client
     $client->setDriver(new \InfluxDB\Driver\UDP($client->getHost(), 4444));
     
+    $points = [
+        new Point(
+            'test_metric',
+            0.84,
+            ['host' => 'server01', 'region' => 'us-west'],
+            ['cpucount' => 10],
+            exec('date +%s%N') // this will produce a nanosecond timestamp in Linux operating systems
+        )
+    ];
+    
     // now just write your points like you normally would
-    $result = $database->writePoints($points, Database::PRECISION_SECONDS);
+    $result = $database->writePoints($points);
 ```
+
+Or simply use a DSN (Data Source Name) to send metrics using UDP:
+
+```php
+
+    // get a database object using a DSN (Data Source Name) 
+    $database = \InfluxDB\Client::fromDSN('udp+influxdb://username:pass@localhost:4444/test123');
+    
+    // write your points
+    $result = $database->writePoints($points);    
+```
+
+*Note:* It is import to note that precision will be *ignored* when you use UDP. You should always use nanosecond
+precision when writing data to InfluxDB using UDP.
 
 #### Timestamp precision
 

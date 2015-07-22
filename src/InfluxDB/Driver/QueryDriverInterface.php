@@ -18,5 +18,5 @@ interface QueryDriverInterface
     /**
      * @return ResultSet
      */
-    public function getResultSet();
+    public function query();
 }
