@@ -786,6 +786,13 @@ $config['os'][$os]['icon']             = 'ibmnos';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+$os = 'ibmtl';
+$config['os'][$os]['text']             = 'IBM Tape Library';
+$config['os'][$os]['type']             = 'storage';
+$config['os'][$os]['icon']             = 'generic';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 $os = 'comware';
 $config['os'][$os]['text']             = 'HP Comware';
 $config['os'][$os]['type']             = 'network';
