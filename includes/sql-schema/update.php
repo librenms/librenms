@@ -88,7 +88,7 @@ if (explode('.', max($filelist), 2)[0] <= $db_rev) {
     if ($debug) {
         echo "DB Schema already up to date.\n";
     }
-    exit(0);
+    return;
 }
 
 if (!dbGetLock('schema_update')) {
