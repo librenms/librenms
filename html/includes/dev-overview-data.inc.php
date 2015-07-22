@@ -25,6 +25,11 @@ if ($device['features']) {
 
 $device['os_text'] = $config['os'][$device['os']]['text'];
 
+echo '<tr>
+        <td>System Name</td>
+        <td>'.$device['sysName'].' </td>
+      </tr>';
+
 if ($device['hardware']) {
     echo '<tr>
         <td>Hardware</td>
