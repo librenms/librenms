@@ -238,7 +238,7 @@ while True:
             log.critical('ERROR: MySQL query error. Is your schema up to date?')
             sys.exit(2)
         cursor.fetchall()
-        log.info('INFO: {0} devices scanned in the last 5 minutes'.format(devices_scanned))
+        log.info('INFO: {0} devices scanned in the last minute'.format(devices_scanned))
         devices_scanned = 0
         next_update = datetime.now() + timedelta(minutes=1)
 
