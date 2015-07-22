@@ -41,6 +41,7 @@ Contributors to LibreNMS:
 - Job Snijders <job@instituut.net> (job)
 - Rasmus Aberg <rasmus@sthix.net> (rasssta)
 - Jan Saner <jan@trick77.com> (trick77)
+- Mikhail Bratchikov <mbratchikov@odin.com> (pepyaka)
 
 [1]: http://observium.org/ "Observium web site"
 
