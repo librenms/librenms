@@ -31,6 +31,11 @@ if (!isset($debug)) {
     }
 }
 
+if (!dbGetLock('schema_update')) {
+    echo "Schema update already in progress. Exiting";
+    exit(1);
+}
+
 $insert = 0;
 
 if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
