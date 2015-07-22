@@ -44,7 +44,7 @@ class Point
      */
     public function __construct(
         $measurement,
-        $value,
+        $value = null,
         array $tags = array(),
         array $additionalFields = array(),
         $timestamp = null
@@ -57,7 +57,9 @@ class Point
         $this->tags = $tags;
         $this->fields = $additionalFields;
 
-        $this->fields['value'] = (float) $value;
+        if ($value) {
+            $this->fields['value'] = (float) $value;
+        }
 
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
             throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
