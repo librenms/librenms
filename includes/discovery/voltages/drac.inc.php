@@ -21,9 +21,9 @@ if ($device['os'] == "drac") {
             $descr         = trim(snmp_get($device, $descr_oid, "-Oqv", "IDRAC-MIB-SMIv2"),'"');
             $descr         = preg_replace("/(Status)/","", $descr);
             $current       = snmp_get($device, $fan_oid, "-Oqv", "IDRAC-MIB-SMIv2");
-            $low_limit     = snmp_get($device, $limit_oid, "-Oqv", "IDRAC-MIB-SMIv2");
+            $high_limit     = snmp_get($device, $limit_oid, "-Oqv", "IDRAC-MIB-SMIv2");
             $divisor       = "1";
-            discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, 'drac', $descr, $divisor, '1', $low_limit, NULL, NULL, NULL, $current);
+            discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, 'drac', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current);
         }
     }
 }
