@@ -32,7 +32,7 @@ if (!isset($debug)) {
 }
 
 if (!dbGetLock('schema_update')) {
-    echo "Schema update already in progress. Exiting";
+    echo "Schema update already in progress. Exiting\n";
     exit(1);
 } //end if
 
@@ -92,6 +92,13 @@ if ($handle = opendir($config['install_dir'].'/sql-schema')) {
 }
 
 asort($filelist);
+
+if (explode('.', max($filelist), 2) <= $db_rev) {
+    if ($debug) {
+        echo "DB Schema already up to date.\n";
+    }
+    exit(0);
+}
 
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
