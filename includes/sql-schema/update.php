@@ -84,7 +84,7 @@ if ($handle = opendir($config['install_dir'].'/sql-schema')) {
 
 asort($filelist);
 
-if (explode('.', max($filelist), 2) <= $db_rev) {
+if (explode('.', max($filelist), 2)[0] <= $db_rev) {
     if ($debug) {
         echo "DB Schema already up to date.\n";
     }
