@@ -31,15 +31,6 @@ if (!isset($debug)) {
     }
 }
 
-if (!dbGetLock('schema_update')) {
-    echo "Schema update already in progress. Exiting\n";
-    exit(1);
-} //end if
-
-do {
-    sleep(1);
-} while (@dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE NOT IS_FREE_LOCK(CONCAT("polling.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("queued.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("discovering.", device_id))') > 0);
-
 $insert = 0;
 
 if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
@@ -99,6 +90,15 @@ if (explode('.', max($filelist), 2) <= $db_rev) {
     }
     exit(0);
 }
+
+if (!dbGetLock('schema_update')) {
+    echo "Schema update already in progress. Exiting\n";
+    exit(1);
+} //end if
+
+do {
+    sleep(1);
+} while (@dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE NOT IS_FREE_LOCK(CONCAT("polling.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("queued.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("discovering.", device_id))') > 0);
 
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
