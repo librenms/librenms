@@ -242,7 +242,7 @@ while True:
         devices_scanned = 0
         next_update = datetime.now() + timedelta(minutes=1)
 
-    while threading.active_count() >= amount_of_workers:
+    while threading.active_count() >= amount_of_workers or not lockFree('schema_update'):
         time.sleep(.5)
 
     try:
