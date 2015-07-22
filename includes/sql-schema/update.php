@@ -169,3 +169,5 @@ if ($updating) {
 
     echo "-- Done\n";
 }
+
+dbReleaseLock('schema_update');
