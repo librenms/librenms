@@ -34,7 +34,11 @@ if (!isset($debug)) {
 if (!dbGetLock('schema_update')) {
     echo "Schema update already in progress. Exiting";
     exit(1);
-}
+} //end if
+
+do {
+    sleep(1);
+} while (@dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE NOT IS_FREE_LOCK(CONCAT("polling.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("queued.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("discovering.", device_id))') > 0);
 
 $insert = 0;
 
