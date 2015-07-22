@@ -54,7 +54,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Guzzle\Http\Client
+     * @return GuzzleClient
      */
     public static function buildHttpMockClient($body)
     {

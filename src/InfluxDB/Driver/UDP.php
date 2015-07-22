@@ -35,13 +35,7 @@ class UDP implements DriverInterface
         $this->config['host'] = $host;
         $this->config['port'] = $port;
 
-        // create a socket connection to check if InfluxDB is alive
-        $socket = fsockopen('udp://' .$host, $port);
-        if (!$socket) {
-            throw new Exception('There is no InfluxDB UDP service running on port '. $port);
-        }
 
-        fclose($socket);
     }
 
     /**
@@ -71,11 +65,15 @@ class UDP implements DriverInterface
      *
      * @return mixed
      */
-    public function send($data = null)
+    public function write($data = null)
     {
-        $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-        socket_sendto($socket, $data, strlen($data), 0, $this->config['host'], $this->config['port']);
-        socket_close($socket);
+
+        $host = sprintf('udp://%s:%d', $this->config['host'], $this->config['port']);
+
+        // stream the data using UDP and suppress any errors
+        $stream = @stream_socket_client($host);
+        @stream_socket_sendto($stream, $data);
+        @fclose($stream);
 
         return true;
     }

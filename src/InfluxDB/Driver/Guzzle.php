@@ -10,6 +10,11 @@ use Guzzle\Http\Message\Response;
 use GuzzleHttp\Psr7\Request;
 use InfluxDB\ResultSet;
 
+/**
+ * Class Guzzle
+ *
+ * @package InfluxDB\Driver
+ */
 class Guzzle implements DriverInterface, QueryDriverInterface
 {
 
@@ -70,11 +75,22 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      * @throws Exception
      * @return mixed
      */
-    public function send($data = null)
+    public function write($data = null)
     {
-        $requestObject = new Request($this->parameters['method'], $this->parameters['url'], [], $data);
+        $this->response = $this->httpClient->post($this->parameters['url'], ['body' => $data]);
+    }
 
-        $this->response = $this->httpClient->send($requestObject);
+    /**
+     * @return ResultSet
+     */
+    public function query()
+    {
+        $response = $this->httpClient->get($this->parameters['url']);
+
+        $raw = (string) $response->getBody();
+
+        return new ResultSet($raw);
+
     }
 
     /**
@@ -85,15 +101,5 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     public function isSuccess()
     {
         return in_array($this->response->getStatusCode(), ['200', '204']);
-    }
-
-    /**
-     * @return ResultSet
-     */
-    public function getResultSet()
-    {
-        $raw = (string) $this->response->getBody(true);
-
-        return new ResultSet($raw);
     }
 }

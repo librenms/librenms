@@ -133,7 +133,7 @@ class Database
             ]);
 
             // send the points to influxDB
-            $driver->send(implode(PHP_EOL, $payload));
+            $driver->write(implode(PHP_EOL, $payload));
 
             return $driver->isSuccess();
 

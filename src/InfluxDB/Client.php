@@ -6,6 +6,7 @@ use InfluxDB\Client\Exception as ClientException;
 use InfluxDB\Driver\DriverInterface;
 use InfluxDB\Driver\Guzzle;
 use InfluxDB\Driver\QueryDriverInterface;
+use InfluxDB\Driver\UDP;
 
 /**
  * Class Client
@@ -165,10 +166,8 @@ class Client
         ]);
 
         try {
-            // send the data
-            $driver->send();
-
-            return $driver->getResultSet();
+            // perform the query and return the resultset
+            return $driver->query();
 
         } catch (\Exception $e) {
             throw new Exception(sprintf('Query has failed, exception: %s', $e->getMessage()));
@@ -200,12 +199,16 @@ class Client
 
     /**
      * Build the client from a dsn
-     * Example: https+influxdb://username:pass@localhost:8086/databasename', timeout=5
+     * Examples:
+     *
+     * https+influxdb://username:pass@localhost:8086/databasename
+     * udp+influxdb://username:pass@localhost:4444/databasename
      *
      * @param  string $dsn
      * @param  int    $timeout
      * @param  bool   $verifySSL
-     * @return Client|Database
+     *
+*@return Client|Database
      * @throws ClientException
      */
     public static function fromDSN($dsn, $timeout = 0, $verifySSL = false)
@@ -217,12 +220,12 @@ class Client
         $scheme = $schemeInfo[0];
 
         if (isset($schemeInfo[1])) {
-            $modifier = $schemeInfo[0];
+            $modifier = strtolower($schemeInfo[0]);
             $scheme = $schemeInfo[1];
         }
 
         if ($scheme != 'influxdb') {
-            throw new ClientException(sprintf('%s is not a valid scheme', $scheme));
+            throw new ClientException($scheme . ' is not a valid scheme');
         }
 
         $ssl = $modifier === 'https' ? true : false;
@@ -237,6 +240,11 @@ class Client
             $verifySSL,
             $timeout
         );
+
+        // set the UDP driver when the DSN specifies UDP
+        if ($modifier == 'udp') {
+            $client->setDriver(new UDP($connParams['host'], $connParams['port']));
+        }
 
         return ($dbName ? $client->selectDB($dbName) : $client);
     }
