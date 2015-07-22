@@ -5,6 +5,9 @@ if (!$os) {
     if (stristr($sysDescr, 'PowerConnect ')) {
         $os = 'powerconnect';
     }
+    else if (stristr($sysDescr, 'Dell Networking N')) {
+        $os = 'powerconnect';
+    }
     else if (preg_match('/Dell.*Gigabit\ Ethernet/i', $sysDescr)) {
         $os = 'powerconnect';
     } //end if
