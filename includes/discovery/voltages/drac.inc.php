@@ -23,7 +23,7 @@ if ($device['os'] == "drac") {
             $current       = snmp_get($device, $voltage_oid, "-Oqv", "IDRAC-MIB-SMIv2");
             $high_limit     = snmp_get($device, $limit_oid, "-Oqv", "IDRAC-MIB-SMIv2");
             $divisor       = "1";
-            discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, 'drac', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current);
+            discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $index, 'drac', $descr, $divisor, '1', 0, NULL, NULL, $high_limit, $current);
         }
     }
 }
