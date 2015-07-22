@@ -12,6 +12,6 @@
 
 if (!$os) {
     if (strstr($sysObjectId, '.1.3.6.1.4.1.2.6.182.1.0.401.1')) {
-        $os = 'ibmtapelibrary';
+        $os = 'ibmtl';
     }
 }
