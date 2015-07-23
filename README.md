@@ -17,6 +17,11 @@ Installation can be done with composer:
 
 composer require influxdb/influxdb-php:dev-master
 
+### NOTE for PHP 5.3 and PHP 5.4 users
+
+If you use either PHP 5.3 and PHP 5.4, the 0.1.x release is still supported (bug fixes and new release fixes).
+The 0.1.x branch will work on PHP 5.3 and PHP 5.4 but doesn't contain all the features that the 1.0.0 release has such as UDP support.
+
 ### Getting started
 
 Initialize a new client object:
