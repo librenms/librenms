@@ -966,6 +966,25 @@ function is_read() {
 
 }//end is_read()
 
+function is_demo_user() {
+
+    if ($_SESSION['userlevel'] == 11) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}// end is_demo_user();
+
+function is_normal_user() {
+
+    if (is_admin() === false && is_read() === false && is_demo_user() === false) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}// end is_normal_user()
 
 function demo_account() {
     print_error("You are logged in as a demo account, this page isn't accessible to you");
@@ -1130,3 +1149,4 @@ function alert_details($details) {
     return $fault_detail;
 
 }//end alert_details()
+
