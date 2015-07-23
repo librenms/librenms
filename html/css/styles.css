@@ -1703,7 +1703,7 @@ tr.search:nth-child(odd) {
     background: red!important;
 }
 
-.tile_header {
+.widget_header {
     padding: 0.8em;
     background-color: #000000;
     color: #ffffff;
@@ -1713,6 +1713,6 @@ tr.search:nth-child(odd) {
           border-top-right-radius: 4px;
 }
 
-.tile_body {
+.widget_body {
     padding: 0.8em;
 }
