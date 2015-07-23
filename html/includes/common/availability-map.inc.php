@@ -12,7 +12,7 @@
 
 $sql = 'SELECT `D`.`hostname`,`D`.`device_id`,`D`.`status`,`D`.`uptime` FROM `devices` AS `D`';
 
-if (is_admin() === false && is_read() === false) {
+if (is_normal_user() === true) {
     $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND';
     $param = array($_SESSION['user_id']);
 }
