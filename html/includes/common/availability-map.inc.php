@@ -9,6 +9,7 @@
 * option) any later version.  Please see LICENSE.txt at the top level of
 * the source code distribution for details.
 */
+require_once 'includes/object-cache.inc.php';
 
 $sql = 'SELECT `D`.`hostname`,`D`.`device_id`,`D`.`status`,`D`.`uptime` FROM `devices` AS `D`';
 
@@ -40,5 +41,5 @@ foreach(dbFetchRows($sql,$param) as $device) {
 $temp_rows = count($temp_output);
 
 $temp_output[] = '</div>';
-$temp_header = array('<div style="margin-left:auto; margin-right:auto;"><center><h3>All Devices(' . $temp_rows . ')</h3></center>');
+$temp_header = array('<div style="margin-left:auto; margin-right:auto;"><center><h5><i class="fa fa-check" style="color:green">'.$devices['up'].' </i> <i class="fa fa-exclamation-triangle" style="color:orange"> 0</i> <i class="fa fa-exclamation-circle" style="color:red"> '.$devices['down'].'</i></h5></center><br>');
 $common_output = array_merge($temp_header,$temp_output);
