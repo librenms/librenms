@@ -28,6 +28,7 @@ if (!empty($agent_data['uptime'])) {
 }
 
 if (empty($uptime)) {
+    $snmp_uptime = (integer) snmp_get($device, 'snmpEngineTime.0', '-OUqv', 'SNMP-FRAMEWORK-MIB');
     $hrSystemUptime = snmp_get($device, 'hrSystemUptime.0', '-Oqv', 'HOST-RESOURCES-MIB');
     if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, 'No') && ($device['os'] != 'windows')) {
         echo 'Using hrSystemUptime ('.$hrSystemUptime.")\n";
@@ -57,14 +58,13 @@ if (empty($uptime)) {
     }//end if
 }//end if
 
-// Use snmpEngineTime (68 year rollover) to cross-reference for false positives in device rebooting due to sysUpTime rollover issues
-$snmpEngineTime = (integer) snmp_get($device, 'snmpEngineTime.0', '-OUqv', 'SNMP-FRAMEWORK-MIB');
-if (!is_numeric($snmpEngineTime)) {
-    $snmpEngineTime = 0;
+if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
+    $uptime = $snmp_uptime;
+    d_echo('hrSystemUptime or sysUpTime looks like to have rolled, using snmpEngineTime instead');
 }
 
 if (is_numeric($uptime)) {
-    if ($uptime < $device['uptime'] && $uptime >= $snmpEngineTime) {
+    if ($uptime < $device['uptime']) {
         notify($device, 'Device rebooted: '.$device['hostname'], 'Device Rebooted : '.$device['hostname'].' '.formatUptime($uptime).' ago.');
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
     }

@@ -348,7 +348,7 @@ foreach ($dyn_config['email_smtp_secure'] as $secure) {
                         </div>
                     </div>
                     <div class="form-group has-feedback">
-                        <label for="email_smtp_password" class="col-sm-4 control-label">SMTP AUthentication passoword </label>
+                        <label for="email_smtp_password" class="col-sm-4 control-label">SMTP Authentication password </label>
                         <div data-toggle="tooltip" title="'.$config_groups['email_smtp_password']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
                         <div class="col-sm-4">
                             <input id="email_smtp_password" class="form-control" type="text" name="global-config-input" value="'.$config_groups['email_smtp_password']['config_value'].'" data-config_id="'.$config_groups['email_smtp_password']['config_id'].'">

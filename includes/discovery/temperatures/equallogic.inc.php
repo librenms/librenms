@@ -31,7 +31,7 @@ if ($device['os'] == 'equallogic') {
                 $num_index        = $part_oid.'.'.$num_index;
                 $base_oid         = '.1.3.6.1.4.1.12740.2.1.6.1.3.1.';
                 $oid              = $base_oid.$num_index;
-                $extra            = snmp_get_multi($device, "eqlMemberHealthDetailsTemperatureValue.3.329840783.$index eqlMemberHealthDetailsTemperatureCurrentState.3.329840783.$index eqlMemberHealthDetailsTemperatureHighCriticalThreshold.3.329840783.$index eqlMemberHealthDetailsTemperatureHighWarningThreshold.3.329840783.$index eqlMemberHealthDetailsTemperatureLowCriticalThreshold.3.329840783.$index eqlMemberHealthDetailsTemperatureLowWarningThreshold.3.329840783.$index", '-OQUs', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
+                $extra            = snmp_get_multi($device, "eqlMemberHealthDetailsTemperatureValue.1.$num_index eqlMemberHealthDetailsTemperatureCurrentState.1.$num_index eqlMemberHealthDetailsTemperatureHighCriticalThreshold.1.$num_index eqlMemberHealthDetailsTemperatureHighWarningThreshold.1.$num_index eqlMemberHealthDetailsTemperatureLowCriticalThreshold.1.$num_index eqlMemberHealthDetailsTemperatureLowWarningThreshold.1.$num_index", '-OQUs', 'EQLMEMBER-MIB', $config['install_dir'].'/mibs/equallogic');
                 $keys             = array_keys($extra);
                 $temperature      = $extra[$keys[0]]['eqlMemberHealthDetailsTemperatureValue'];
                 $low_limit        = $extra[$keys[0]]['eqlMemberHealthDetailsTemperatureLowCriticalThreshold'];

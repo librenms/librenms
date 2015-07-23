@@ -169,6 +169,14 @@ $config['enable_footer'] = 1;
 ```
 Disable the footer of the WebUI by setting `enable_footer` to 0.
 
+#### Add host settings
+The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
+If host is added by hostname this check is not performed.  If the setting is true hostnames are resovled and the check is also performed.  This helps prevents accidental duplicate hosts.
+```php
+$config['addhost_alwayscheckip']   = FALSE; #TRUE - check for duplicate ips even when adding host by name.
+                                            #FALSE- only check when adding host by ip.
+```
+
 #### SNMP Settings
 
 ```php
@@ -295,6 +303,11 @@ is then used to retrieve the config for devices.
 $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 ```
 Specify the location of the collectd rrd files.
+
+```php
+$config['collectd_sock']                 = 'unix:///var/run/collectd.sock';
+```
+Specify the location of the collectd unix socket. Using a socket allows the collectd graphs to be flushed to disk before being drawn. Be sure that your web server has permissions to write to this socket.
 
 ```php
 $config['smokeping']['dir']             = "/var/lib/smokeping/";

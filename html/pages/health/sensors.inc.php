@@ -9,16 +9,15 @@ else {
     $sql   = "SELECT * FROM `sensors` AS S, `devices` AS D, devices_perms as P WHERE S.sensor_class='".$class."' AND S.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = ? ORDER BY D.hostname, S.sensor_descr";
     $param = array($_SESSION['user_id']);
 }
-
-echo '<table cellspacing="0" cellpadding="6" width="100%">';
-
-echo '<tr class=tablehead>
-        <th width="280">Device</th>
-        <th width="180">Sensor</th>
+echo '<div class="table-responsive">';
+echo '<table class="table table-condensed">';
+echo '<tr class="tablehead">
+        <th >Device</th>
+        <th>Sensor</th>
         <th></th>
         <th></th>
-        <th width="100">Current</th>
-        <th width="250">Range limit</th>
+        <th class="text-center">Current</th>
+        <th class="text-center">Range limit</th>
         <th>Notes</th>
       </tr>';
 
@@ -76,17 +75,17 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $graph_array['bg']     = 'ffffff00';
     // the 00 at the end makes the area transparent.
     $graph_array['from'] = $config['time']['day'];
-    $sensor_minigraph    = generate_graph_tag($graph_array);
+    $sensor_minigraph =  generate_lazy_graph_tag($graph_array);
 
     $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
 
     echo '<tr class="health">
           <td class=list-bold>'.generate_device_link($sensor).'</td>
           <td>'.overlib_link($link, $sensor['sensor_descr'], $overlib_content).'</td>
-          <td width=100>'.overlib_link($link_graph, $sensor_minigraph, $overlib_content).'</td>
-          <td width=50>'.$alert.'</td>
-          <td style="text-align: center; font-weight: bold;">'.$sensor['sensor_current'].$unit.'</td>
-          <td style="text-align: center">'.round($sensor['sensor_limit_low'], 2).$unit.' - '.round($sensor['sensor_limit'], 2).$unit.'</td>
+          <td >'.overlib_link($link_graph, $sensor_minigraph, $overlib_content).'</td>
+          <td >'.$alert.'</td>
+          <td class="text-center"><strong>'.$sensor['sensor_current'].$unit.'</strong></td>
+          <td class="text-center">'.round($sensor['sensor_limit_low'], 2).$unit.' - '.round($sensor['sensor_limit'], 2).$unit.'</td>
           <td>'.(isset($sensor['sensor_notes']) ? $sensor['sensor_notes'] : '').'</td>
         </tr>
      ';
@@ -119,3 +118,4 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 }//end foreach
 
 echo '</table>';
+echo '</div>';
