@@ -93,7 +93,9 @@ class Database
             }
         } catch (\Exception $e) {
             throw new DatabaseException(
-                sprintf('Failed to created database %s, exception: %s', $this->name, $e->getMessage())
+                sprintf('Failed to created database %s', $this->name),
+                $e->getCode(),
+                $e
             );
         }
     }
@@ -138,7 +140,7 @@ class Database
             return $driver->isSuccess();
 
         } catch (\Exception $e) {
-            throw new Exception(sprintf('Writing has failed, exception: %s', $e->getMessage()));
+            throw new Exception('Writing has failed', $e->getCode(), $e);
         }
     }
 
