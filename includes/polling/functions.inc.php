@@ -429,7 +429,7 @@ function location_to_latlng($device) {
     if (!empty($device_location)) {
         $new_device_location = preg_replace("/ /","+",$device_location);
         // We have a location string for the device.
-        $loc = dbFetchRow("SELECT `lat`,`lng` FROM `location` WHERE `location`=? LIMIT 1", array($device_location));
+        $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device_location));
         if (is_array($loc) === false) {
             // Grab data from which ever Geocode service we use.
             switch ($config['geoloc']['engine']) {
