@@ -27,8 +27,11 @@ $dash_config = unserialize(stripslashes($data));
 
 ?>
 
-<a class="btn btn-primary" role="button" data-toggle="collapse" href="#add_widget" aria-expanded="false" aria-controls="add_widget"">Add Widget <i class="fa fa-caret-down fa-fw"></i></a> 
-<a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets">Clear dashboard <i class="fa fa-times fa-fw"></i></a>
+<div class="btn-group" role="group">
+    <a class="btn btn-default disabled" role="button">Widgets</a>
+    <a class="btn btn-success" role="button" data-toggle="collapse" href="#add_widget" aria-expanded="false" aria-controls="add_widget"><i class="fa fa-plus fa-fw"></i></a>
+    <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
+</div>
 <div class="collapse" id="add_widget">
   <div class="well">
 <?php
