@@ -9,7 +9,7 @@
 #                    This polls devices monitored by LibreNMS
 ### END INIT INFO
 
-./lib/lsb/init-functions
+. /lib/lsb/init-functions
 
 NAME=poller-service
 
