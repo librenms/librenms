@@ -13,6 +13,12 @@ if ($sub_type == 'remove' && is_numeric($widget_id)) {
         $message = '';
     }
 }
+elseif ($sub_type == 'remove-all') {
+    if (dbDelete('users_widgets','`user_id`=?', array($_SESSION['user_id']))) {
+        $status = 'ok';
+        $message = '';
+    }
+}
 elseif ($sub_type == 'add' && is_numeric($widget_id)) {
     $dupe_check = dbFetchCEll('SELECT `user_widget_id` FROM `users_widgets` WHERE `user_id`=? AND `widget_id`=?',array($_SESSION['user_id'],$widget_id));
 
