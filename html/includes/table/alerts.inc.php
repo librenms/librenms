@@ -105,7 +105,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $response[] = array(
         'id'        => $rulei++,
-        'rule'      => '<i title="'.htmlentities($alert['rule']).'">'.htmlentities($alert['name']).'</i>',
+        'rule'      => '<i title="'.htmlentities($alert['rule']).'"><a href="'.generate_url(array('page'=>'alert-rules')).'">'.htmlentities($alert['name']).'</a></i>',
         'details'   => '<a class="glyphicon glyphicon-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
         'hostname'  => $hostname,
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),

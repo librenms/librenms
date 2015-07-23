@@ -192,6 +192,12 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     }
 
     $rule_extra = json_decode($rule['extra'], true);
+    if ($rule['device_id'] == ':-1' || $rule['device_id'] == '-1') {
+        $popover_msg = 'Global alert rule';
+    }
+    else {
+        $popover_msg = 'Device specific rule';
+    }
     echo "<tr class='".$extra."' id='row_".$rule['id']."'>";
     echo '<td><i>#'.((int) $rulei++).'</i></td>';
     echo '<td>'.$rule['name'].'</td>';
@@ -210,14 +216,14 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
     echo '<td>';
     if ($_SESSION['userlevel'] >= '10') {
-        echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small'>";
+        echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small' data-content='".$popover_msg."' data-toggle='modal'>";
     }
 
     echo '</td>';
     echo '<td>';
     if ($_SESSION['userlevel'] >= '10') {
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";
+        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#create-alert' data-device_id='".$rule['device_id']."' data-alert_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button> ";
+        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";
     }
 
     echo '</td>';
@@ -253,6 +259,10 @@ if ($count < 1) {
 ?>
 
 <script>
+$("[data-toggle='modal'], [data-toggle='popover']").popover({
+    trigger: 'hover',
+        'placement': 'top'
+});
 $('#ack-alert').click('', function(e) {
     event.preventDefault();
     var alert_id = $(this).data("alert_id");

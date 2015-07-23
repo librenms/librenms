@@ -148,6 +148,8 @@ $config['show_services'] = 0;
 // Enable Services on menu
 $config['ports_page_default'] = 'details';
 // eg "details" or "basic"
+// Adding Host Settings
+$config['addhost_alwayscheckip']   = FALSE;   # TRUE - check for duplicate ips even when adding host by name. FALSE- only check when adding host by ip.
 // SNMP Settings - Timeouts/Retries disabled as default
 // $config['snmp']['timeout'] = 1;            # timeout in seconds
 // $config['snmp']['retries'] = 5;            # how many times to retry the query
@@ -304,7 +306,7 @@ $config['graph_colours']['purples'] = array(
 $config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
 // Map colors
-$config['map_legend'] = array(
+$config['network_map_legend'] = array(
     '0'   => '#aeaeae',
     '10'  => '#79847e',
     '20'  => '#97ffca',
@@ -317,6 +319,7 @@ $config['map_legend'] = array(
     '90'  => '#ff6600',
     '100' => '#ff0000',
 );
+$config['network_map_items'] = array('xdp','mac');
 
 // Device page options
 $config['show_overview_tab'] = true;
@@ -493,6 +496,7 @@ $config['auth_ldap_prefix'] = 'uid=';
 $config['auth_ldap_suffix'] = ',ou=People,dc=example,dc=com';
 $config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com';
 
+$config['auth_ldap_attr']['uid'] = "uid";
 $config['auth_ldap_groupbase']                  = 'ou=group,dc=example,dc=com';
 $config['auth_ldap_groups']['admin']['level']   = 10;
 $config['auth_ldap_groups']['pfy']['level']     = 7;
