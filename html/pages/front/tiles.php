@@ -27,7 +27,7 @@ $dash_config = unserialize(stripslashes($data));
 
 ?>
 
-<a class="btn btn-primary" role="button" data-toggle="collapse" href="#add_widget" aria-expanded="false" aria-controls="add_widget"">Add Widget</a>
+<a class="btn btn-primary" role="button" data-toggle="collapse" href="#add_widget" aria-expanded="false" aria-controls="add_widget"">Add Widget <i class="fa fa-caret-down fa-fw"></i></a>
 <div class="collapse" id="add_widget">
   <div class="well">
 <?php
