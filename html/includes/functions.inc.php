@@ -736,7 +736,6 @@ function devclass($device) {
 
 
 function getlocations() {
-    $ignore_dev_location = array();
     $locations           = array();
 
     // Fetch regular locations
