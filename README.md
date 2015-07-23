@@ -269,7 +269,7 @@ Some functions are too general for a database. So these are available in the cli
 ## Changelog
 
 ####1.0.0
-* Dropped support for php 5.3 and php 5.4
+* -BREAKING CHANGE- Dropped support for PHP 5.3 and PHP 5.4
 * Allowing for custom drivers
 * UDP support
 
