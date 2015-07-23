@@ -30,7 +30,7 @@ $client = new InfluxDB\Client($host, $port);
 
 This will create a new client object which you can use to read and write points to InfluxDB.
 
-It's also possible to create a client from a DSN:
+It's also possible to create a client from a DSN (Data Source Name):
 
 ```php
     
@@ -89,23 +89,23 @@ Writing data is done by providing an array of points to the writePoints method o
     // create an array of points
     $points = array(
         new Point(
-            'test_metric',
-            0.64,
-            array('host' => 'server01', 'region' => 'us-west'),
-            array('cpucount' => 10),
+            'test_metric', // name of the measurement
+            0.64, // the measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // optional tags
+            ['cpucount' => 10], // optional additional fields
             1435255849 // Time precision has to be set to seconds!
         ),
         new Point(
-            'test_metric',
-            0.84,
-            array('host' => 'server01', 'region' => 'us-west'),
-            array('cpucount' => 10),
-            1435255850 // Time precision has to be set to seconds!
+           'test_metric', // name of the measurement
+            0.84, // the measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // optional tags
+            ['cpucount' => 10], // optional additional fields
+            1435255849 // Time precision has to be set to seconds!
         )
     );
 
     // we are writing unix timestamps, which have a second precision
-    $newPoints = $database->writePoints($points, Database::PRECISION_SECONDS);
+    $result = $database->writePoints($points, Database::PRECISION_SECONDS);
     
 ```
 
@@ -114,6 +114,74 @@ measurements to InfluxDB. The point class allows one to easily write data in bat
 
 The name of a measurement and the value are mandatory. Additional fields, tags and a timestamp are optional.
 InfluxDB takes the current time as the default timestamp.
+
+You can also write multiple fields to a measurement without specifying a value:
+
+```php
+    $points = [
+        new Point(
+            'instance', // the name of the measurement
+            null, // measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // measurement tags
+            ['cpucount' => 10, 'free' => 1], // measurement fields
+            exec('date +%s%N') // timestamp in nanoseconds
+        ),
+        new Point(
+            'instance', // the name of the measurement
+            null, // measurement value
+            ['host' => 'server01', 'region' => 'us-west'], // measurement tags
+            ['cpucount' => 10, 'free' => 2], // measurement fields
+            exec('date +%s%N') // timestamp in nanoseconds
+        )
+    ];
+
+```
+
+#### Writing data using udp
+
+First, set your InfluxDB host to support incoming UDP sockets:
+
+```ini
+[udp]
+  enabled = true
+  bind-address = ":4444"
+  database = "test_db"  
+```
+
+Then, configure the UDP driver in the client:
+
+```php
+   
+     // set the UDP driver in the client
+    $client->setDriver(new \InfluxDB\Driver\UDP($client->getHost(), 4444));
+    
+    $points = [
+        new Point(
+            'test_metric',
+            0.84,
+            ['host' => 'server01', 'region' => 'us-west'],
+            ['cpucount' => 10],
+            exec('date +%s%N') // this will produce a nanosecond timestamp in Linux operating systems
+        )
+    ];
+    
+    // now just write your points like you normally would
+    $result = $database->writePoints($points);
+```
+
+Or simply use a DSN (Data Source Name) to send metrics using UDP:
+
+```php
+
+    // get a database object using a DSN (Data Source Name) 
+    $database = \InfluxDB\Client::fromDSN('udp+influxdb://username:pass@localhost:4444/test123');
+    
+    // write your points
+    $result = $database->writePoints($points);    
+```
+
+*Note:* It is import to note that precision will be *ignored* when you use UDP. You should always use nanosecond
+precision when writing data to InfluxDB using UDP.
 
 #### Timestamp precision
 
@@ -147,7 +215,14 @@ This library makes it easy to provide a retention policy when creating a databas
     $database = $client->selectDB('influx_test_db');
 
     // create the database with a retention policy
-    $result = $database->create(new RetentionPolicy('test', '5d', 1, true));    
+    $result = $database->create(new RetentionPolicy('test', '5d', 1, true));   
+     
+     // check if a database exists then create it if it doesn't
+    $database = $client->selectDB('test_db');
+    
+    if (!$database->exists()) {
+        $database->create(new RetentionPolicy('test', '1d', 2, true));
+    } 
     
 ```
 
@@ -184,7 +259,6 @@ Some functions are too general for a database. So these are available in the cli
 
 ## Todo
 
-* Add UDP support
 * Add more admin features
 * More unit tests
 * Increase documentation (wiki?)
@@ -193,6 +267,11 @@ Some functions are too general for a database. So these are available in the cli
 
 
 ## Changelog
+
+####1.0.0
+* -BREAKING CHANGE- Dropped support for PHP 5.3 and PHP 5.4
+* Allowing for custom drivers
+* UDP support
 
 ####0.1.2
 * Added exists method to Database class

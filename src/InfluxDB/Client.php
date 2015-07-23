@@ -3,6 +3,10 @@
 namespace InfluxDB;
 
 use InfluxDB\Client\Exception as ClientException;
+use InfluxDB\Driver\DriverInterface;
+use InfluxDB\Driver\Guzzle;
+use InfluxDB\Driver\QueryDriverInterface;
+use InfluxDB\Driver\UDP;
 
 /**
  * Class Client
@@ -73,6 +77,11 @@ class Client
     protected $options = array();
 
     /**
+     * @var DriverInterface
+     */
+    protected $driver;
+
+    /**
      * @param string $host
      * @param int    $port
      * @param string $username
@@ -80,8 +89,6 @@ class Client
      * @param bool   $ssl
      * @param bool   $verifySSL
      * @param int    $timeout
-     *
-     * @todo add UDP support
      */
     public function __construct(
         $host,
@@ -101,25 +108,22 @@ class Client
 
         if ($ssl) {
             $this->scheme = 'https';
-            $this->options += array('verify' => $verifySSL);
+            $this->options['verify'] = $verifySSL;
         }
 
         // the the base URI
         $this->baseURI = sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
-        $this->httpClient = new \Guzzle\Http\Client($this->getBaseURI());
-    }
 
-    /**
-     * For testing
-     *
-     * @param  \Guzzle\Http\Client $client
-     * @return $this
-     */
-    public function setHttpClient(\Guzzle\Http\Client $client)
-    {
-        $this->httpClient = $client;
-
-        return $this;
+        // set the default driver to guzzle
+        $this->driver = new Guzzle(
+            new \GuzzleHttp\Client(
+                [
+                    'timeout' => $this->timeout,
+                    'base_uri' => $this->baseURI,
+                    'verify' => $this->verifySSL
+                ]
+            )
+        );
     }
 
     /**
@@ -142,53 +146,31 @@ class Client
      * @return ResultSet
      * @throws Exception
      */
-    public function query($database, $query, $params = array())
+    public function query($database, $query, $params = [])
     {
+
+        if (!$this->driver instanceof QueryDriverInterface) {
+            throw new Exception('The currently configured driver does not support query operations');
+        }
+
         if ($database) {
             $params['db'] = $database;
         }
 
-        $params = '?' . http_build_query(array_merge(array('q' => $query), $params));
+        $driver = $this->getDriver();
 
-        $options = array_merge($this->options, array('exceptions' => false, 'timeout' => $this->getTimeout()));
+        $driver->setParameters([
+           'url' => 'query?' . http_build_query(array_merge(['q' => $query], $params)),
+           'database' => $database,
+           'method' => 'get'
+        ]);
 
         try {
-            $response = $this->httpClient->get('query'.$params, null, $options);
+            // perform the query and return the resultset
+            return $driver->query();
 
-            $raw = (string) $response->send()->getBody();
-
-            return new ResultSet($raw);
         } catch (\Exception $e) {
-            throw new Exception(sprintf('Query has failed, exception: %s', $e->getMessage()));
-        }
-    }
-
-    /**
-     * Write points to the database
-     *
-     * @param  string $database
-     * @param  string $data
-     * @param  string $precision The timestamp precision
-     * @return bool
-     * @throws Exception
-     *
-     * @internal Internal method, do not use directly
-     */
-    public function write($database, $data, $precision)
-    {
-        try {
-            $result = $this->httpClient->post(
-                $this->getBaseURI() .
-                '/write?db=' . $database .
-                '&precision=' . $precision,
-                null,
-                $data,
-                array('timeout' => $this->getTimeout())
-            )->send();
-
-            return $result->getStatusCode() === 204;
-        } catch (\Exception $e) {
-            throw new Exception(sprintf('Writing has failed, exception: %s', $e->getMessage()));
+            throw new Exception('Query has failed', $e->getCode(), $e);
         }
     }
 
@@ -217,12 +199,16 @@ class Client
 
     /**
      * Build the client from a dsn
-     * Example: https+influxdb://username:pass@localhost:8086/databasename', timeout=5
+     * Examples:
+     *
+     * https+influxdb://username:pass@localhost:8086/databasename
+     * udp+influxdb://username:pass@localhost:4444/databasename
      *
      * @param  string $dsn
      * @param  int    $timeout
      * @param  bool   $verifySSL
-     * @return Client|Database
+     *
+*@return Client|Database
      * @throws ClientException
      */
     public static function fromDSN($dsn, $timeout = 0, $verifySSL = false)
@@ -234,12 +220,12 @@ class Client
         $scheme = $schemeInfo[0];
 
         if (isset($schemeInfo[1])) {
-            $modifier = $schemeInfo[0];
+            $modifier = strtolower($schemeInfo[0]);
             $scheme = $schemeInfo[1];
         }
 
         if ($scheme != 'influxdb') {
-            throw new ClientException(sprintf('%s is not a valid scheme', $scheme));
+            throw new ClientException($scheme . ' is not a valid scheme');
         }
 
         $ssl = $modifier === 'https' ? true : false;
@@ -254,6 +240,11 @@ class Client
             $verifySSL,
             $timeout
         );
+
+        // set the UDP driver when the DSN specifies UDP
+        if ($modifier == 'udp') {
+            $client->setDriver(new UDP($connParams['host'], $connParams['port']));
+        }
 
         return ($dbName ? $client->selectDB($dbName) : $client);
     }
@@ -275,17 +266,41 @@ class Client
     }
 
     /**
-     * @param  array $points
+     * @param  Point[] $points
      * @return array
      */
     protected function pointsToArray(array $points)
     {
-        $names = array();
+        $names = [];
 
         foreach ($points as $item) {
             $names[] = $item['name'];
         }
 
         return $names;
+    }
+
+    /**
+     * @param Driver\DriverInterface $driver
+     */
+    public function setDriver(DriverInterface $driver)
+    {
+        $this->driver = $driver;
+    }
+
+    /**
+     * @return DriverInterface|QueryDriverInterface
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
     }
 }
