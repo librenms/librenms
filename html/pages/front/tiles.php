@@ -27,7 +27,8 @@ $dash_config = unserialize(stripslashes($data));
 
 ?>
 
-<a class="btn btn-primary" role="button" data-toggle="collapse" href="#add_widget" aria-expanded="false" aria-controls="add_widget"">Add Widget <i class="fa fa-caret-down fa-fw"></i></a>
+<a class="btn btn-primary" role="button" data-toggle="collapse" href="#add_widget" aria-expanded="false" aria-controls="add_widget"">Add Widget <i class="fa fa-caret-down fa-fw"></i></a> 
+<a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets">Clear dashboard <i class="fa fa-times fa-fw"></i></a>
 <div class="collapse" id="add_widget">
   <div class="well">
 <?php
@@ -120,6 +121,27 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                 '</li>',
                 parseInt(this.size_x), parseInt(this.size_y), parseInt(this.col), parseInt(this.row)
             );
+        });
+
+        $(document).on('click','#clear_widgets', function() {
+            var widget_id = $(this).data('widget-id');
+            $.ajax({
+                type: 'POST',
+                url: '/ajax_form.php',
+                data: {type: "update-dashboard-config", sub_type: 'remove-all'},
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == 'ok') {
+                        gridster.remove_all_widgets();
+                    }
+                    else {
+                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                    }
+                },
+                error: function () {
+                    $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+                }
+            });
         });
 
         $('a[name="place_widget"]').on('click',  function(event, state) {
