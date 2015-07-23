@@ -22,8 +22,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3",
-        "guzzlehttp/guzzle": "3.*",
+        "php": ">=5.5",
+        "guzzlehttp/guzzle": "6.*",
         "symfony/event-dispatcher": "2.*"
     },
     "require-dev": {
