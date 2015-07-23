@@ -140,11 +140,10 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                             '<li id="'+widget_id+'">'+
                             '\<script\>var timeout'+widget_id+' = grab_data('+widget_id+',60,\''+widget+'\');\<\/script\>'+
                             '<header class="widget_header">'+title+'<button type="button" class="close close-widget" data-widget-id="'+widget_id+'" aria-label="Close"><span aria-hidden="true">&times;</span></button></header>'+
-                            '<div class="wiwdget_body" id="widget_body_'+widget_id+'">'+widget+'</div>'+
+                            '<div class="widget_body" id="widget_body_'+widget_id+'">'+widget+'</div>'+
                             '</li>',
                             parseInt(size_x), parseInt(size_y)
                         );
-                        $('#new-widget').popover('hide')
                         updatePos(gridster);
                     }
                     else {
