@@ -399,6 +399,7 @@ $os = 'nos';
 $config['os'][$os]['text']             = 'Brocade NOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['ifalias_null']     = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -465,6 +466,17 @@ $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['bad_if'][]         = 'cpu';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
+$os = 'netonix';
+$config['os'][$os]['text']             = 'Netonix';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'netonix';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 // Juniper
 $os = 'junos';
@@ -576,6 +588,17 @@ $os = 'ftos';
 $config['os'][$os]['text']             = 'Force10 FTOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'force10';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'dnos';
+$config['os'][$os]['text']             = 'Dell Networking OS';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'dell';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -760,6 +783,13 @@ $os = 'ibmnos';
 $config['os'][$os]['text']             = 'IBM Networking Operating System';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'ibmnos';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+$os = 'ibmtl';
+$config['os'][$os]['text']             = 'IBM Tape Library';
+$config['os'][$os]['type']             = 'storage';
+$config['os'][$os]['icon']             = 'generic';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
@@ -1214,522 +1244,127 @@ require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
 
 // Device - Wireless - AirMAX
-$config['graph_types']['device']['ubnt_airmax_WlStatStaCount'] = array(
-    'section'   => 'wireless',
-    'order'     => '0',
-    'descr'     => 'Wireless Clients',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'Number',
-    'ds'        => array(
-        'WlStatStaCount' => array(
-            'label' => 'Clients',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_WlStatStaCount']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_WlStatStaCount']['order'] = '0';
+$config['graph_types']['device']['ubnt_airmax_WlStatStaCount']['descr'] = 'Wireless Clients';
 
-$config['graph_types']['device']['ubnt_airmax_RadioDistance'] = array(
-    'section'   => 'wireless',
-    'order'     => '1',
-    'descr'     => 'Radio Distance',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'Metres',
-    'ds'        => array(
-        'RadioDistance' => array(
-            'label' => 'Distance',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_RadioDistance']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_RadioDistance']['order'] = '1';
+$config['graph_types']['device']['ubnt_airmax_RadioDistance']['descr'] = 'Radio Distance';
 
-$config['graph_types']['device']['ubnt_airmax_RadioFreq'] = array(
-    'section'   => 'wireless',
-    'order'     => '2',
-    'descr'     => 'Radio Frequency',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'Mhz',
-    'ds'        => array(
-        'RadioFreq' => array(
-            'label'   => 'Frequency',
-            'draw'    => 'LINE',
-            'line'    => true,
-            'rra_min' => false,
-            'rra_max' => false,
-            'colour'  => '3ca3c1',
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_RadioFreq']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_RadioFreq']['order'] = '2';
+$config['graph_types']['device']['ubnt_airmax_RadioFreq']['descr'] = 'Radio Frequency';
 
-$config['graph_types']['device']['ubnt_airmax_RadioTxPower'] = array(
-    'section'   => 'wireless',
-    'order'     => '3',
-    'descr'     => 'Radio Tx Power',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'RadioTxPower' => array(
-            'label' => 'Tx Power',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_RadioTxPower']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_RadioTxPower']['order'] = '3';
+$config['graph_types']['device']['ubnt_airmax_RadioTxPower']['descr'] = 'Radio Tx Power';
 
-$config['graph_types']['device']['ubnt_airmax_RadioRssi_0'] = array(
-    'section'   => 'wireless',
-    'order'     => '4',
-    'descr'     => 'Radio Rssi Chain 0',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'RadioRssi_0' => array(
-            'label' => 'RSSI',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_RadioRssi_0']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_RadioRssi_0']['order'] = '4';
+$config['graph_types']['device']['ubnt_airmax_RadioRssi_0']['descr'] = 'Radio Rssi Chain 0';
 
-$config['graph_types']['device']['ubnt_airmax_RadioRssi_1'] = array(
-    'section'   => 'wireless',
-    'order'     => '5',
-    'descr'     => 'Radio Rssi Chain 1',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'RadioRssi_1' => array(
-            'label' => 'RSSI',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_RadioRssi_1']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_RadioRssi_1']['order'] = '5';
+$config['graph_types']['device']['ubnt_airmax_RadioRssi_1']['descr'] = 'Radio Rssi Chain 1';
 
-$config['graph_types']['device']['ubnt_airmax_WlStatSignal'] = array(
-    'section'   => 'wireless',
-    'order'     => '6',
-    'descr'     => 'Radio Signal',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'WlStatSignal' => array(
-            'label' => 'Signal',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_WlStatSignal']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_WlStatSignal']['order'] = '6';
+$config['graph_types']['device']['ubnt_airmax_WlStatSignal']['descr'] = 'Radio Signal';
 
-$config['graph_types']['device']['ubnt_airmax_WlStatRssi'] = array(
-    'section'   => 'wireless',
-    'order'     => '7',
-    'descr'     => 'Radio Overall RSSI',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'WlStatRssi' => array(
-            'label' => 'RSSI',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_WlStatRssi']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_WlStatRssi']['order'] = '7';
+$config['graph_types']['device']['ubnt_airmax_WlStatRssi']['descr'] = 'Radio Overall RSSI';
 
-$config['graph_types']['device']['ubnt_airmax_WlStatCcq'] = array(
-    'section'   => 'wireless',
-    'order'     => '8',
-    'descr'     => 'Radio CCQ',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'Percent',
-    'ds'        => array(
-        'WlStatCcq' => array(
-            'label' => 'CCQ',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_WlStatCcq']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_WlStatCcq']['order'] = '8';
+$config['graph_types']['device']['ubnt_airmax_WlStatCcq']['descr'] = 'Radio CCQ';
 
-$config['graph_types']['device']['ubnt_airmax_WlStatNoiseFloor'] = array(
-    'section'   => 'wireless',
-    'order'     => '10',
-    'descr'     => 'Radio Noise Floor',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'WlStatNoiseFloor' => array(
-            'label' => 'Noise',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_WlStatNoiseFloor']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_WlStatNoiseFloor']['order'] = '10';
+$config['graph_types']['device']['ubnt_airmax_WlStatNoiseFloor']['descr'] = 'Radio Noise Floor';
 
-$config['graph_types']['device']['ubnt_airmax_WlStatTxRate'] = array(
-    'section'   => 'wireless',
-    'order'     => '11',
-    'descr'     => 'Radio Tx Rate',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'mbps',
-    'ds'        => array(
-        'WlStatTxRate' => array(
-            'label' => 'Tx Rate',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_WlStatTxRate']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_WlStatTxRate']['order'] = '11';
+$config['graph_types']['device']['ubnt_airmax_WlStatTxRate']['descr'] = 'Radio Tx Rate';
 
-$config['graph_types']['device']['ubnt_airmax_WlStatRxRate'] = array(
-    'section'   => 'wireless',
-    'order'     => '12',
-    'descr'     => 'Radio Rx Rate',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'greens',
-    'unit_text' => 'mbps',
-    'ds'        => array(
-        'WlStatRxRate' => array(
-            'label' => 'Rx Rate',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_WlStatRxRate']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_WlStatRxRate']['order'] = '12';
+$config['graph_types']['device']['ubnt_airmax_WlStatRxRate']['descr'] = 'Radio Rx Rate';
 
-$config['graph_types']['device']['ubnt_airmax_AirMaxQuality'] = array(
-    'section'   => 'wireless',
-    'order'     => '13',
-    'descr'     => 'AirMax Quality',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'greens',
-    'unit_text' => 'Percent',
-    'ds'        => array(
-        'AirMaxQuality' => array(
-            'label' => 'Quality',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_AirMaxQuality']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_AirMaxQuality']['order'] = '13';
+$config['graph_types']['device']['ubnt_airmax_AirMaxQuality']['descr'] = 'AirMax Quality';
 
-$config['graph_types']['device']['ubnt_airmax_AirMaxCapacity'] = array(
-    'section'   => 'wireless',
-    'order'     => '14',
-    'descr'     => 'AirMax Capacity',
-    'file'      => 'ubnt-airmax-mib.rrd',
-    'colours'   => 'greens',
-    'unit_text' => 'Percent',
-    'ds'        => array(
-        'AirMaxCapacity' => array(
-            'label' => 'Capacity',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airmax_AirMaxCapacity']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airmax_AirMaxCapacity']['order'] = '14';
+$config['graph_types']['device']['ubnt_airmax_AirMaxCapacity']['descr'] = 'AirMax Capacity';
 
 // Device  - AirFIBER
-$config['graph_types']['device']['ubnt_airfiber_RadioFreqs'] = array(
-    'section'   => 'wireless',
-    'order'     => '0',
-    'descr'     => 'Radio Frequencies',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'Mhz',
-    'ds'        => array(
-        'txFrequency' => array(
-            'label' => 'Tx Frequency',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rxFrequency' => array(
-            'label' => 'Rx Frequency',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_RadioFreqs']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RadioFreqs']['order'] = '0';
+$config['graph_types']['device']['ubnt_airfiber_RadioFreqs']['descr'] = 'Radio Frequencies';
 
-$config['graph_types']['device']['ubnt_airfiber_TxPower'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'Radio Tx Power',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'txPower' => array(
-            'label' => 'Tx Power',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_TxPower']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_TxPower']['order'] = '0';
+$config['graph_types']['device']['ubnt_airfiber_TxPower']['descr'] = 'Radio Tx Power';
 
-$config['graph_types']['device']['ubnt_airfiber_LinkDist'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'Link Distance',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'Metres',
-    'ds'        => array(
-        'radioLinkDistM' => array(
-            'label' => 'Distance',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_LinkDist']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_LinkDist']['order'] = '1';
+$config['graph_types']['device']['ubnt_airfiber_LinkDist']['descr'] = 'Link Distance';
 
-$config['graph_types']['device']['ubnt_airfiber_Capacity'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'Link Capacity',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'bps',
-    'ds'        => array(
-        'rxCapacity' => array(
-            'label' => 'Rx Capacity',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'txCapacity' => array(
-            'label' => 'Tx Capacity',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_Capacity']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_Capacity']['order'] = '2';
+$config['graph_types']['device']['ubnt_airfiber_Capacity']['descr'] = 'Link Capacity';
 
-$config['graph_types']['device']['ubnt_airfiber_RadioTemp'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'Radio Temperatures',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'Deg C',
-    'ds'        => array(
-        'radio0TempC' => array(
-            'label' => 'Radio 0 Temp',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'radio1TempC' => array(
-            'label' => 'Radio 1 Temp',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_RadioTemp']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RadioTemp']['order'] = '3';
+$config['graph_types']['device']['ubnt_airfiber_RadioTemp']['descr'] = 'Radio Temperatures';
 
-$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsTx'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'RF Total Octets Tx',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'Octets',
-    'ds'        => array(
-        'txoctetsAll' => array(
-            'label' => 'Octets',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsTx']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsTx']['order'] = '4';
+$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsTx']['descr'] = 'RF Total Octets Tx';
 
-$config['graph_types']['device']['ubnt_airfiber_RFTotPktsTx'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'RF Total Packets Tx',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'Packets',
-    'ds'        => array(
-        'txpktsAll' => array(
-            'label' => 'Packets',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_RFTotPktsTx']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RFTotPktsTx']['order'] = '5';
+$config['graph_types']['device']['ubnt_airfiber_RFTotPktsTx']['descr'] = 'RF Total Packets Tx';
 
-$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsRx'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'RF Total Octets Rx',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'greens',
-    'unit_text' => 'Octets',
-    'ds'        => array(
-        'rxoctetsAll' => array(
-            'label' => 'Octets',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsRx']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsRx']['order'] = '6';
+$config['graph_types']['device']['ubnt_airfiber_RFTotOctetsRx']['descr'] = 'RF Total Octets Rx';
 
-$config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx'] = array(
-    'section'   => 'wireless',
-    'descr'     => 'RF Total Packets Rx',
-    'file'      => 'ubnt-airfiber-mib.rrd',
-    'colours'   => 'greens',
-    'unit_text' => 'Packets',
-    'ds'        => array(
-        'rxpktsAll' => array(
-            'label' => 'Packets',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['section'] = 'wireless';
+$config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['order'] = '7';
+$config['graph_types']['device']['ubnt_airfiber_RFTotPktsRx']['descr'] = 'RF Total Packets Rx';
 
 // Siklu support
-$config['graph_types']['device']['siklu_rfAverageRssi']          = array(
-    'section'   => 'wireless',
-    'order'     => '0',
-    'descr'     => 'Radio Average RSSI',
-    'file'      => 'siklu-wireless.rrd',
-    'colours'   => 'blues',
-    'unit_text' => 'dBm',
-    'ds'        => array(
-        'rfAverageRssi' => array(
-            'label' => 'RSSI',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
-$config['graph_types']['device']['siklu_rfAverageCinr']          = array(
-    'section'   => 'wireless',
-    'order'     => '1',
-    'descr'     => 'Radio Average CINR',
-    'file'      => 'siklu-wireless.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'dB',
-    'ds'        => array(
-        'rfAverageCinr' => array(
-            'label' => 'CINR',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
-$config['graph_types']['device']['siklu_rfOperationalFrequency'] = array(
-    'section'   => 'wireless',
-    'order'     => '2',
-    'descr'     => 'Operational Frequency',
-    'file'      => 'siklu-wireless.rrd',
-    'colours'   => 'reds',
-    'unit_text' => 'GHz',
-    'ds'        => array(
-        'rfOperFreq' => array(
-            'label' => 'Hz',
-            'draw'  => 'AREA',
-            'line'  => true,
-        ),
-    ),
-);
-$config['graph_types']['device']['siklu_rfinterfacePkts']        = array(
-    'section'   => 'wireless',
-    'order'     => '3',
-    'descr'     => 'Packets',
-    'file'      => 'siklu-interface.rrd',
-    'unit_text' => 'pps',
-    'ds'        => array(
-        'rfIPkts'   => array(
-            'label' => 'In bps',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rfOutPkts' => array(
-            'label' => 'Out bps',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
-$config['graph_types']['device']['siklu_rfinterfaceOtherPkts']   = array(
-    'section'   => 'wireless',
-    'order'     => '4',
-    'descr'     => 'Other Packets',
-    'file'      => 'siklu-interface.rrd',
-    'unit_text' => 'pps',
-    'ds'        => array(
-        'rfInGoodPkts'    => array(
-            'label' => 'Good Pkts',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rfInErroredPkts' => array(
-            'label' => 'Errored Pkts',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rfInLostPkts'    => array(
-            'label' => 'Lost Pkts',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
-$config['graph_types']['device']['siklu_rfinterfaceOctets']      = array(
-    'section'   => 'wireless',
-    'order'     => '5',
-    'descr'     => 'Traffic',
-    'file'      => 'siklu-interface.rrd',
-    'unit_text' => 'bps',
-    'ds'        => array(
-        'rfInOctets'  => array(
-            'label' => 'In bps',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rfOutOctets' => array(
-            'label' => 'Out bps',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
-$config['graph_types']['device']['siklu_rfinterfaceOtherOctets'] = array(
-    'section'   => 'wireless',
-    'order'     => '6',
-    'descr'     => 'Other Octets',
-    'file'      => 'siklu-interface.rrd',
-    'unit_text' => 'bps',
-    'ds'        => array(
-        'rfInIdleOctets'     => array(
-            'label' => 'In Idle',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rfOutIdleOctets'    => array(
-            'label' => 'Out Idle',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rfInGoodOctets'     => array(
-            'label' => 'Good Octets',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-        'rfInErroredOctetts' => array(
-            'label' => 'Errored Octets',
-            'draw'  => 'LINE',
-            'line'  => true,
-        ),
-    ),
-);
+$config['graph_types']['device']['siklu_rfAverageRssi']['section'] = 'wireless';
+$config['graph_types']['device']['siklu_rfAverageRssi']['order'] = '0';
+$config['graph_types']['device']['siklu_rfAverageRssi']['descr'] = 'Radio Average RSSI';
+
+$config['graph_types']['device']['siklu_rfAverageCinr']['section'] = 'wireless';
+$config['graph_types']['device']['siklu_rfAverageCinr']['order'] = '1';
+$config['graph_types']['device']['siklu_rfAverageCinr']['descr'] = 'Radio Average CINR';
+
+$config['graph_types']['device']['siklu_rfOperationalFrequency']['section'] = 'wireless';
+$config['graph_types']['device']['siklu_rfOperationalFrequency']['order'] = '2';
+$config['graph_types']['device']['siklu_rfOperationalFrequency']['descr'] = 'Operational Frequency';
+
+$config['graph_types']['device']['siklu_rfinterfacePkts']['section'] = 'wireless';
+$config['graph_types']['device']['siklu_rfinterfacePkts']['order'] = '3';
+$config['graph_types']['device']['siklu_rfinterfacePkts']['descr'] = 'Packets';
+
+$config['graph_types']['device']['siklu_rfinterfaceOtherPkts']['section'] = 'wireless';
+$config['graph_types']['device']['siklu_rfinterfaceOtherPkts']['order'] = '4';
+$config['graph_types']['device']['siklu_rfinterfaceOtherPkts']['descr'] = 'Other Packets';
+
+$config['graph_types']['device']['siklu_rfinterfaceOctets']['section'] = 'wireless';
+$config['graph_types']['device']['siklu_rfinterfaceOctets']['order'] = '5';
+$config['graph_types']['device']['siklu_rfinterfaceOctets']['descr'] = 'Traffic';
+
+$config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['section'] = 'wireless';
+$config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['order'] = '6';
+$config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['descr'] = 'Other Octets';
 
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order']   = '0';

@@ -254,7 +254,18 @@ else {
 
                 update_user($vars['user_id'], $vars['new_realname'], $vars['new_level'], $vars['can_modify_passwd'], $vars['new_email']);
                 print_message('User has been updated');
+                if (!empty($vars['new_pass1']) && $vars['new_pass1'] == $vars['new_pass2'] && passwordscanchange($vars['cur_username'])) {
+                    if (changepassword($vars['cur_username'],$vars['new_pass1']) == 1) {
+                        print_message("User password has been updated");
+                }
+                else {
+                    print_error("Password couldn't be updated");
+                }
             }
+            elseif (!empty($vars['new_pass1']) && $vars['new_pass1'] != $vars['new_pass2']) {
+                print_error("The supplied passwords didn't match so weren't updated");
+            }
+        }
 
             if (can_update_users() == '1') {
                 $users_details = get_user($vars['user_id']);
@@ -303,6 +314,7 @@ else {
 
                     echo "<form class='form-horizontal' role='form' method='post' action=''>
   <input type='hidden' name='user_id' value='".$vars['user_id']."'>
+  <input type='hidden' name='cur_username' value='" . $users_details['username'] . "'>
   <input type='hidden' name='edit' value='yes'>
   <div class='form-group'>
     <label for='new_realname' class='col-sm-2 control-label'>Realname</label>
@@ -344,8 +356,26 @@ else {
     </div>
     <div class='col-sm-6'>
     </div>
-  </div>
-  <div class='form-group'>
+  </div>";
+
+if (passwordscanchange($users_details['username'])) {
+    echo "
+        <div class='form-group'>
+            <label for='new_pass1' class='col-sm-2 control-label'>Password</label>
+            <div class='col-sm-4'>
+                <input type='password' name='new_pass1' class='form-control input-sm' value='". $vars['new_pass1'] ."'>
+            </div>
+        </div>
+        <div class='form-group'>
+            <label for='new_pass2' class='col-sm-2 control-label'>Confirm Password</label>
+            <div class='col-sm-4'>
+                <input type='password' name='new_pass2' class='form-control input-sm' value='". $vars['new_pass2'] ."'>
+            </div>
+        </div>
+        ";
+}
+
+  echo "<div class='form-group'>
     <div class='col-sm-6'>
       <div class='checkbox'>
         <label>

@@ -37,7 +37,7 @@ require 'includes/authenticate.inc.php';
 
 $report = mres($vars['report']);
 if (!empty($report) && file_exists("includes/reports/$report.csv.inc.php")) {
-    if ($debug == false) {
+    if ($debug === false) {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="'.$report.'-'.date('Ymd').'.csv"');
     }
