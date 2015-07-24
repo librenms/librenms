@@ -171,12 +171,11 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
       }
     });
   });
-  $('#confirm-delete').on('show.bs.modal', function(e) {
-    token_id = $(e.relatedTarget).data('token_id');
+  $('#confirm-delete').on('show.bs.modal', function(event) {
+    token_id = $(event.relatedTarget).data('token_id');
     $("#token_id").val(token_id);
-    event.preventDefault();
   });
-  $('#token-removal').click('', function(e) {
+  $('#token-removal').click('', function(event) {
     event.preventDefault();
     token_id = $("#token_id").val();
     $.ajax({
@@ -194,7 +193,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
       }
     });
   });
-  $('#token-create').click('', function(e) {
+  $('#token-create').click('', function(event) {
     event.preventDefault();
     $.ajax({
       type: "POST",
@@ -213,7 +212,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
       }
     });
   });
-  $('#pass-gen').click('', function(e) {
+  $('#pass-gen').click('', function(event) {
     event.preventDefault();
     token = $.password(32,false);
     $('#token').val(token);
