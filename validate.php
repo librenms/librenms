@@ -25,7 +25,8 @@ if (isset($options['h'])) {
     Usage: ./validate.php [-m <module>] [-h]
         -h This help section.
         -m Any sub modules you want to run, comma separated:
-        - mail: this will test your email settings  (uses default_mail option even if default_only is not set).
+          - mail: this will test your email settings  (uses default_mail option even if default_only is not set).
+          - dist-poller: this will test for the install running as a distributed poller.
 
         Example: ./validate.php -m mail.
 
@@ -154,6 +155,35 @@ foreach ($modules as $module) {
                 }
             }
         }//end if
+        break;
+    case 'dist-poller':
+        if ($config['distributed_poller'] !== true) {
+            print_fail('You have not enabled distributed_poller');
+        }
+        else {
+            if (empty($config['distributed_poller_memcached_host'])) {
+                print_fail('You have not configured $config[\'distributed_poller_memcached_host\']');
+            }
+            elseif (empty($config['distributed_poller_memcached_port'])) {
+                print_fail('You have not configured $config[\'distributed_poller_memcached_port\']');
+            }
+            else {
+                $memcache = new Memcached();
+                $memcache->addServer($config['distributed_poller_memcached_host'], $config['distributed_poller_memcached_port']);
+                if (!$memcache->getStats()) {
+                    print_fail('We could not get memcached stats, it is possible that we cannot connect to your memcached server, please check');
+                }
+            }
+            if (empty($config['rrdcached'])) {
+                print_fail('You have not configured $config[\'rrdcached\']'); 
+            }
+            elseif (empty($config['rrd_dir'])) {
+                print_fail('You have not configured $config[\'rrd_dir\']');
+            }
+            else {
+                
+            }
+        }
         break;
     }//end switch
 }//end foreach
