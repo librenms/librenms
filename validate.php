@@ -168,10 +168,13 @@ foreach ($modules as $module) {
                 print_fail('You have not configured $config[\'distributed_poller_memcached_port\']');
             }
             else {
-                $memcache = new Memcached();
-                $memcache->addServer($config['distributed_poller_memcached_host'], $config['distributed_poller_memcached_port']);
-                if (!$memcache->getStats()) {
+                $connection = @fsockopen($config['distributed_poller_memcached_host'], $config['distributed_poller_memcached_port']);
+                if (!is_resource($connection)) {
                     print_fail('We could not get memcached stats, it is possible that we cannot connect to your memcached server, please check');
+                }
+                else {
+                    fclose($connection);
+                    print_ok('Connection to memcached is ok');
                 }
             }
             if (empty($config['rrdcached'])) {
@@ -181,7 +184,15 @@ foreach ($modules as $module) {
                 print_fail('You have not configured $config[\'rrd_dir\']');
             }
             else {
-                
+                list($host,$port) = explode(':',$config['rrdcached']);
+                $connection = @fsockopen($host, $port);
+                if (is_resource($connection)) {
+                    fclose($connection);
+                    print_ok('Connection to rrdcached is ok');
+                }
+                else {
+                    print_fail('Cannot connect to rrdcached instance');
+                }
             }
         }
         break;
