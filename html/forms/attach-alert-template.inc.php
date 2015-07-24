@@ -36,7 +36,7 @@ else {
     }
 
     if ($success === true) {
-        dbDelete('alert_template_map', 'id NOT IN ('.implode(',', $ids).')');
+        dbDelete('alert_template_map', 'id NOT IN ('.implode(',', $ids).') AND alert_templates_id =?',array($_POST['template_id']));
         echo "Alert rules have been attached to this template. $template_map_ids";
         exit;
     }
