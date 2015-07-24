@@ -57,6 +57,7 @@ $('#alert-template-removal').click('', function(event) {
             if(msg.indexOf("ERROR:") <= -1) {
                 $("#row_"+template_id).remove();
             }
+            $("#template_id").val('');
             $("#message").html('<div class="alert alert-info">'+msg+'</div>');
             $("#confirm-delete-alert-template").modal('hide');
         },
