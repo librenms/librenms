@@ -34,7 +34,7 @@ echo '<div class="table-responsive">
     <td>';
 
 if ($_SESSION['userlevel'] >= '10') {
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template">Create new alert template</button>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button>';
 }
 
 echo '</td>
