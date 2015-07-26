@@ -6,11 +6,6 @@ require_once $config['install_dir'].'/includes/object-cache.inc.php';
 // FIXME: This appears to keep a complete cache of device details in memory for every page load.
 // It would be interesting to know where this is used.  It probably should have its own API.
 foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $device) {
-    if (get_dev_attrib($device, 'override_sysLocation_bool')) {
-        $device['real_location'] = $device['location'];
-        $device['location']      = get_dev_attrib($device, 'override_sysLocation_string');
-    }
-
     $cache['devices']['hostname'][$device['hostname']] = $device['device_id'];
     $cache['devices']['id'][$device['device_id']]      = $device;
 

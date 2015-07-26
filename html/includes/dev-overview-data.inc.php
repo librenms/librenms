@@ -25,6 +25,11 @@ if ($device['features']) {
 
 $device['os_text'] = $config['os'][$device['os']]['text'];
 
+echo '<tr>
+        <td>System Name</td>
+        <td>'.$device['sysName'].' </td>
+      </tr>';
+
 if ($device['hardware']) {
     echo '<tr>
         <td>Hardware</td>
@@ -71,6 +76,14 @@ if ($device['location']) {
         <td>'.$device['real_location'].'</td>
       </tr>';
     }
+}
+
+$loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device['location']));
+if (is_array($loc)) {
+    echo '<tr>
+        <td>Lat / Lng</td>
+        <td>['.$loc['lat'].','.$loc['lng'].']</td>
+    </tr>';
 }
 
 if ($uptime) {
