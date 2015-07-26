@@ -30,18 +30,19 @@ else {
     $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))." RTT      Loss    SDev   RTT\:SDev                              \l'";
 }
 
+$filename_dir = generate_smokeping_file($device);
 if ($src['hostname'] == $config['own_hostname']) {
-    $filename = $config['smokeping']['dir'].$device['hostname'].'.rrd';
-    if (!file_exists($filename)) {
+    $filename = $filename_dir . $device['hostname'].'.rrd';
+    if (!file_exists($filename_dir.$device['hostname'].'.rrd')) {
         // Try with dots in hostname replaced by underscores
-        $filename = $config['smokeping']['dir'].str_replace('.', '_', $device['hostname']).'.rrd';
+        $filename = $filename_dir . str_replace('.', '_', $device['hostname']).'.rrd';
     }
 }
 else {
-    $filename = $config['smokeping']['dir'].$device['hostname'].'~'.$src['hostname'].'.rrd';
+    $filename = $filename_dir . $device['hostname'] .'~'.$src['hostname'].'.rrd';
     if (!file_exists($filename)) {
         // Try with dots in hostname replaced by underscores
-        $filename = $config['smokeping']['dir'].str_replace('.', '-', $device['hostname']).'~'.$src['hostname'].'.rrd';
+        $filename = $filename_dir . str_replace('.', '-', $device['hostname']) .'~'.$src['hostname'].'.rrd';
     }
 }
 

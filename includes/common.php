@@ -699,6 +699,45 @@ function get_graph_subtypes($type) {
     return $types;
 }
 
+function get_smokeping_files($device) {
+    global $config;
+    $smokeping_files = array();
+    if (isset($config['smokeping']['dir'])) {
+        $smokeping_dir = generate_smokeping_file($device);
+        if ($handle = opendir($smokeping_dir)) {
+            while (false !== ($file = readdir($handle))) {
+                if ($file != '.' && $file != '..') {
+                    if (eregi('.rrd', $file)) {
+                        if (eregi('~', $file)) {
+                            list($target,$slave) = explode('~', str_replace('.rrd', '', $file));
+                            $target = str_replace('_', '.', $target);
+                            $smokeping_files['in'][$target][$slave] = $file;
+                            $smokeping_files['out'][$slave][$target] = $file;
+                        }
+                        else {
+                            $target = str_replace('.rrd', '', $file);
+                            $target = str_replace('_', '.', $target);
+                            $smokeping_files['in'][$target][$config['own_hostname']] = $file;
+                            $smokeping_files['out'][$config['own_hostname']][$target] = $file;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return $smokeping_files;
+} // end get_smokeping_files
+
+function generate_smokeping_file($device,$file='') {
+    global $config;
+    if ($config['smokeping']['integration'] === true) {
+        return $config['smokeping']['dir'] .'/'. $device['type'] .'/' . $file;
+    }
+    else {
+        return $config['smokeping']['dir'] . '/' . $file;
+    }
+}
+
 /*
  * @return rounded value to 10th/100th/1000th depending on input (valid: 10, 100, 1000)
  */
@@ -712,6 +751,5 @@ function round_Nth($val = 0, $round_to) {
         }
         return $ret;
     }
-} 
+} // end round_Nth 
 
-?>
