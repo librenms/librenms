@@ -1278,3 +1278,7 @@ function fping($host,$params) {
     $response = array('xmt'=>$xmt,'rcv'=>$rcv,'loss'=>$loss,'min'=>$min,'max'=>$max,'avg'=>$avg);
     return $response;
 }
+
+function function_check($function) {
+    return function_exists($function);
+}
