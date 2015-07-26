@@ -296,10 +296,6 @@ function device_by_id_cache($device_id, $refresh = '0') {
     }
     else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
-        if (get_dev_attrib($device,'override_sysLocation_bool')) {
-            $device['real_location'] = $device['location'];
-            $device['location'] = get_dev_attrib($device,'override_sysLocation_string');
-        }
         $cache['devices']['id'][$device_id] = $device;
     }
     return $device;
