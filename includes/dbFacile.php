@@ -60,6 +60,40 @@ function dbQuery($sql, $parameters=array()) {
 
 
 /*
+ * Aquire a lock on a string
+ * */
+
+
+function dbGetLock($data, $timeout = 0) {
+    $sql = 'SELECT GET_LOCK(\'' . $data . '\',' . $timeout . ')';
+    $result = dbFetchCell($sql);
+    return $result;
+}
+
+/*
+ * Check a lock on a string
+ * */
+
+
+function dbCheckLock($data, $timeout = 0) {
+    $sql = 'SELECT IS_FREE_LOCK(\'' . $data . '\')';
+    $result = dbFetchCell($sql);
+    return $result;
+}
+
+/*
+ * Release a lock on a string
+ * */
+
+
+function dbReleaseLock($data, $timeout = 0) {
+    $sql = 'SELECT RELEASE_LOCK(\'' . $data . '\')';
+    $result = dbFetchCell($sql);
+    return $result;
+}
+
+
+/*
  * Passed an array and a table name, it attempts to insert the data into the table.
  * Check for boolean false to determine whether insert failed
  * */
