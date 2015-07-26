@@ -12,6 +12,10 @@
  * the source code distribution for details.
  */
 
+/*
+ * Code for Gridster.sort_by_row_and_col_asc(serialization) call is from http://gridster.net/demos/grid-from-serialize.html
+ */
+
 $no_refresh = true;
 
 foreach (dbFetchRows('SELECT * FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `user_id`=?',array($_SESSION['user_id'])) as $items) {
