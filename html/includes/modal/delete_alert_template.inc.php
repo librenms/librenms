@@ -40,9 +40,8 @@ if(is_admin() === false) {
 </div>
 
 <script>
-$('#confirm-delete-alert-template').on('show.bs.modal', function(e) {
-    event.preventDefault();
-    template_id = $(e.relatedTarget).data('template_id');
+$('#confirm-delete-alert-template').on('show.bs.modal', function(event) {
+    template_id = $(event.relatedTarget).data('template_id');
     $("#template_id").val(template_id);
 });
 
@@ -58,6 +57,7 @@ $('#alert-template-removal').click('', function(event) {
             if(msg.indexOf("ERROR:") <= -1) {
                 $("#row_"+template_id).remove();
             }
+            $("#template_id").val('');
             $("#message").html('<div class="alert alert-info">'+msg+'</div>');
             $("#confirm-delete-alert-template").modal('hide');
         },

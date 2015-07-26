@@ -139,6 +139,10 @@ else {
   <link href="css/vis.min.css" rel="stylesheet" type="text/css" />
   <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
   <link href="css/jquery.gridster.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
+  <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
+  <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
+  <link href="css/leaflet.awesome-markers.css" rel="stylesheet" type="text/css" />
   <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link href="css/<?php echo $config['site_style']; ?>.css" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>

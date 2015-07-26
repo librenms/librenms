@@ -736,20 +736,7 @@ function devclass($device) {
 
 
 function getlocations() {
-    $ignore_dev_location = array();
     $locations           = array();
-    // Fetch override locations, not through get_dev_attrib, this would be a huge number of queries
-    $rows = dbFetchRows("SELECT attrib_type,attrib_value,device_id FROM devices_attribs WHERE attrib_type LIKE 'override_sysLocation%' ORDER BY attrib_type");
-    foreach ($rows as $row) {
-        if ($row['attrib_type'] == 'override_sysLocation_bool' && $row['attrib_value'] == 1) {
-            $ignore_dev_location[$row['device_id']] = 1;
-        } //end if
-        else if ($row['attrib_type'] == 'override_sysLocation_string' && (isset($ignore_dev_location[$row['device_id']]) && $ignore_dev_location[$row['device_id']] == 1)) {
-            if (!in_array($row['attrib_value'], $locations)) {
-                $locations[] = $row['attrib_value'];
-            }
-        }
-    }
 
     // Fetch regular locations
     if ($_SESSION['userlevel'] >= '5') {
@@ -761,7 +748,7 @@ function getlocations() {
 
     foreach ($rows as $row) {
         // Only add it as a location if it wasn't overridden (and not already there)
-        if ($row['location'] != '' && !isset($ignore_dev_location[$row['device_id']])) {
+        if ($row['location'] != '') {
             if (!in_array($row['location'], $locations)) {
                 $locations[] = $row['location'];
             }
