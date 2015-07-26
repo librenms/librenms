@@ -33,7 +33,7 @@ $config_userkey   = mres($_POST['config_userkey']);
 $status           = 'error';
 $message          = 'Error with config';
 
-if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover') {
+if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar') {
     $config_id = mres($_POST['config_id']);
     if (empty($config_id)) {
         $message = 'No config id passed';
@@ -48,6 +48,9 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
             }
             else if ($action == 'remove-pushover') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.pushover.$config_id.%'");
+            }
+            elseif ($action == 'remove-boxcar') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.boxcar.$config_id.%'");
             }
 
             $status  = 'ok';
@@ -122,6 +125,29 @@ else if ($action == 'add-pushover') {
                 list($k,$v) = explode('=', $option, 2);
                 if (!empty($k) || !empty($v)) {
                     dbInsert(array('config_name' => 'alert.transports.pushover.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Pushover '.$v), 'config');
+                }
+            }
+        }
+        else {
+            $message = 'Could not create config item';
+        }
+    }
+}
+else if ($action == 'add-boxcar') {
+    if (empty($config_value)) {
+        $message = 'No Boxcar access token provided';
+    }
+    else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.boxcar.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Boxcar Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.access_token'), 'config', 'config_id=?', array($config_id));
+            $status                   = 'ok';
+            $message                  = 'Config item created';
+            $extras                   = explode('\n', $config_extra);
+            foreach ($extras as $option) {
+                list($k,$v) = explode('=', $option, 2);
+                if (!empty($k) || !empty($v)) {
+                    dbInsert(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Boxcar '.$v), 'config');
                 }
             }
         }

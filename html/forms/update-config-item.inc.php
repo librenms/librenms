@@ -39,6 +39,9 @@ else if ($action == 'update-textarea') {
             else if ($config_type == 'pushover') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.pushover.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Pushover Transport'), 'config');
             }
+            elseif ($config_type == 'boxcar') {
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Boxcar Transport'), 'config');
+            }
         }
     }
 
@@ -56,6 +59,9 @@ else if ($action == 'update-textarea') {
         }
         else if ($config_type == 'pushover') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.pushover.$config_id.%' AND (`config_name` != 'alert.transports.pushover.$config_id.appkey' AND `config_name` != 'alert.transports.pushover.$config_id.userkey') AND `config_id` NOT IN ($db_inserts))");
+        }
+        else if ($config_type == 'boxcar') {
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.boxcar.$config_id.%' AND (`config_name` != 'alert.transports.boxcar.$config_id.access_token' AND `config_name` != 'alert.transports.boxcar.$config_id.userkey') AND `config_id` NOT IN ($db_inserts))");
         }
     }
 
