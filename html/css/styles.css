@@ -1715,6 +1715,7 @@ tr.search:nth-child(odd) {
 
 .widget_body {
     padding: 0.8em;
+}
 
 .mapTooltip {
     position : fixed;
