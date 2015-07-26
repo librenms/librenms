@@ -508,6 +508,7 @@ $config['auth_ldap_prefix'] = 'uid=';
 $config['auth_ldap_suffix'] = ',ou=People,dc=example,dc=com';
 $config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com';
 
+$config['auth_ldap_attr']['uid'] = "uid";
 $config['auth_ldap_groupbase']                  = 'ou=group,dc=example,dc=com';
 $config['auth_ldap_groups']['admin']['level']   = 10;
 $config['auth_ldap_groups']['pfy']['level']     = 7;
@@ -744,3 +745,12 @@ $config['unix-agent-connection-time-out'] = 10;
 // seconds
 $config['unix-agent-read-time-out'] = 10;
 // seconds
+
+// Lat / Lon support for maps
+$config['geoloc']['latlng']                             = false; // True to enable translation of location to latlng co-ordinates
+$config['geoloc']['engine']                             = 'google';
+$config['map']['engine']                                = 'leaflet';
+$config['mapael']['default_map']                        = 'maps/world_countries.js';
+$config['leaflet']['default_lat']                       = '50.898482';
+$config['leaflet']['default_lng']                       = '-3.401402';
+$config['leaflet']['default_zoom']                       = 2;

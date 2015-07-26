@@ -64,12 +64,18 @@ $('#attach-alert-template').on('show.bs.modal', function(e) {
         data: { type: "parse-template-rules", template_id: template_id },
         dataType: "json",
         success: function(output) {
-            arr = [];
+            selected_items = [];
             $.each( output.rule_id, function( i, elem) {
-                $('#rules_list option[value='+elem+']').attr("selected", true);
+                elem = parseInt(elem);
+                selected_items.push(elem);
             });
+            $('#rules_list').val(selected_items);
         }
     });
+});
+
+$('#attach-alert-template').on('hide.bs.modal', function(e) {
+    $('#rules_list').val([]);
 });
 
 $('#alert-template-attach').click('', function(event) {

@@ -203,9 +203,15 @@ function update_user($user_id, $realname, $level, $can_modify_passwd, $email) {
 
 
 function get_membername($username) {
-    global $config;
+    global $config, $ds;
     if ($config['auth_ldap_groupmembertype'] == 'fulldn') {
         $membername = $config['auth_ldap_prefix'].$username.$config['auth_ldap_suffix'];
+    }
+    elseif ($config['auth_ldap_groupmembertype'] == 'puredn') {
+        $filter  = '('.$config['auth_ldap_attr']['uid'].'='.$username.')';
+        $search  = ldap_search($ds, $config['auth_ldap_groupbase'], $filter);
+        $entries = ldap_get_entries($ds, $search);
+        $membername = $entries[0]['dn'];
     }
     else {
         $membername = $username;
