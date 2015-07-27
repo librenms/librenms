@@ -1526,6 +1526,22 @@ $config['graph_types']['device']['asa_conns']['section'] = 'firewall';
 $config['graph_types']['device']['asa_conns']['order']   = '0';
 $config['graph_types']['device']['asa_conns']['descr']   = 'Current connections';
 
+$config['graph_types']['device']['cisco-pri']['section']  = 'voice';
+$config['graph_types']['device']['cisco-pri']['order']    = '0';
+$config['graph_types']['device']['cisco-pri']['descr']    = 'PRI Utilisation';
+
+$config['graph_types']['device']['cisco-dsp']['section']  = 'voice';
+$config['graph_types']['device']['cisco-dsp']['order']    = '0';
+$config['graph_types']['device']['cisco-dsp']['descr']    = 'DSP Utilisation';
+
+$config['graph_types']['device']['cisco-hwmtp']['section']  = 'voice';
+$config['graph_types']['device']['cisco-hwmtp']['order']    = '0';
+$config['graph_types']['device']['cisco-hwmtp']['descr']    = 'Hardware MTP Utilisation';
+
+$config['graph_types']['device']['cisco-xcode']['section']  = 'voice';
+$config['graph_types']['device']['cisco-xcode']['order']    = '0';
+$config['graph_types']['device']['cisco-xcode']['descr']    = 'Transcoder Utilisation';
+
 $config['graph_descr']['device_smokeping_in_all'] = 'This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation.';
 $config['graph_descr']['device_processor']        = 'This is an aggregate graph of all processors in the system.';
 
