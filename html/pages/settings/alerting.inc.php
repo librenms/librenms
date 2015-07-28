@@ -145,6 +145,34 @@ $no_refresh = true;
 </div>
 <!-- End Pushover Modal -->
 
+<!-- Boxcar Modal -->
+<div class="modal fade" id="new-config-boxcar" role="dialog" aria-hidden="true" title="Create new config item">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form role="form" class="new_config_form">
+                    <div class="form-group">
+                        <span class="message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="pushover_value">Boxcar Access token</label>
+                        <input type="text" class="form-control" name="boxcar_value" id="boxcar_value" placeholder="Enter the Boxcar Access token">
+                    </div>
+                    <div class="form-group">
+                        <label for="pushover_extra">Boxcar options (specify one per line key=value)</label>
+                        <textarea class="form-control" name="boxcar_extra" id="boxcar_extra" placeholder="Enter the config options"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="submit-boxcar">Add config</button>
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Boxcar Modal -->
+
 <?php
 if (isset($_GET['error'])) {
     print_error('We had issues connecting to your Pager Duty account, please try again');
@@ -705,6 +733,72 @@ echo '<div id="pushover_appkey_template" class="hide">
                 </div>
             </div>
         </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#boxcar_transport_expand">Boxcar transport</a>
+                </h4>
+            </div>
+            <div id="boxcar_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-boxcar">Add Boxcar config</button>
+                        </div>
+                    </div>';
+$boxcar_appkeys = get_config_like_name('alert.transports.boxcar.%.access_token');
+foreach ($boxcar_appkeys as $boxcar_appkey) {
+    unset($upd_boxcar_extra);
+    $new_boxcar_extra = array();
+    $boxcar_extras    = get_config_like_name('alert.transports.boxcar.'.$boxcar_appkey['config_id'].'.%');
+    foreach ($boxcar_extras as $extra) {
+        $split_extra = explode('.', $extra['config_name']);
+        if ($split_extra[4] != 'access_token') {
+            $new_boxcar_extra[] = $split_extra[4].'='.$extra['config_value'];
+        }
+    }
+
+    $upd_boxcar_extra = implode(PHP_EOL, $new_boxcar_extra);
+    echo '<div id="'.$boxcar_appkey['config_id'].'">
+                        <div class="form-group has-feedback">
+                            <label for="boxcar_access_token" class="col-sm-4 control-label">Boxcar Access token </label>
+                            <div class="col-sm-4">
+                                <input id="boxcar_access_token" class="form-control" type="text" name="global-config-input" value="'.$boxcar_appkey['config_value'].'" data-config_id="'.$boxcar_appkey['config_id'].'">
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-boxcar-config" name="del-boxcar-call" data-config_id="'.$boxcar_appkey['config_id'].'"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <div class="col-sm-offset-4 col-sm-4">
+                                <textarea class="form-control" name="global-config-textarea" id="upd_boxcar_extra" placeholder="Enter the config options" data-config_id="'.$boxcar_appkey['config_id'].'" data-type="boxcar">'.$upd_boxcar_extra.'</textarea>
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    </div>';
+}//end foreach
+
+echo '<div id="boxcar_appkey_template" class="hide">
+                        <div class="form-group has-feedback">
+                            <label for="boxcar_access_token" class="col-sm-4 control-label api-method">Boxcar Access token </label>
+                            <div class="col-sm-4">
+                                <input id="boxcar_access_token" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
+                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-danger del-boxcar-config" id="del-boxcar-call" name="del-boxcar-call" data-config_id=""><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <div class="col-sm-offset-4 col-sm-4">
+                                <textarea class="form-control" name="global-config-textarea" id="upd_boxcar_extra" placeholder="Enter the config options" data-config_id="" data-type="boxcar"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 ';
@@ -873,6 +967,42 @@ echo '<div id="pushover_appkey_template" class="hide">
         });
     });// End Add Pushover config
 
+    // Add Boxcar config
+    itemIndex = 0;
+    $("button#submit-boxcar").click(function(){
+        var config_value = $('#boxcar_value').val();
+        var config_extra = $('#boxcar_extra').val();
+        $.ajax({
+            type: "POST",
+            url: "/ajax_form.php",
+            data: {type: "config-item", action: 'add-boxcar', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    itemIndex++;
+                    var $template = $('#boxcar_appkey_template'),
+                        $clone    = $template
+                            .clone()
+                            .removeClass('hide')
+                            .attr('id',data.config_id)
+                            .attr('boxcar-appkey-index', itemIndex)
+                            .insertBefore($template);
+                    $clone.find('[id="boxcar_access_token"]').attr('data-config_id',data.config_id);
+                    $clone.find('[id="del-boxcar-call"]').attr('data-config_id',data.config_id);
+                    $clone.find('[name="global-config-input"]').attr('value', config_value);
+                    $clone.find('[id="upd_boxcar_extra"]').val(config_extra);
+                    $clone.find('[id="upd_boxcar_extra"]').attr('data-config_id',data.config_id);
+                    $("#new-config-boxcar").modal('hide');
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function(){
+                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
+            }
+        });
+    });// End Add Boxcar config
+
     // Delete api config
     $(document).on('click', 'button[name="del-api-call"]', function(event) {
         var config_id = $(this).data('config_id');
@@ -956,6 +1086,27 @@ echo '<div id="pushover_appkey_template" class="hide">
             }
         });
     });// End delete pushover config
+
+    // Delete Boxcar config
+    $(document).on('click', 'button[name="del-boxcar-call"]', function(event) {
+        var config_id = $(this).data('config_id');
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_form.php',
+            data: {type: "config-item", action: 'remove-boxcar', config_id: config_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $("#"+config_id).remove();
+                } else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function () {
+                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
+            }
+        });
+    });// End delete Boxcar config
 
     $("[name='global-config-check']").bootstrapSwitch('offColor','danger');
     $('input[name="global-config-check"]').on('switchChange.bootstrapSwitch',  function(event, state) {

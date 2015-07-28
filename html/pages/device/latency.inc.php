@@ -63,9 +63,15 @@ if ($vars['view'] == 'incoming') {
         foreach ($smokeping_files['in'][$device['hostname']] as $src => $host) {
             $hostname = str_replace('.rrd', '', $host);
             $host     = device_by_name($src);
+            if ($config['smokeping']['integration'] === true) {
+                $dest = device_by_name(str_replace("_",".",$hostname));
+            }
+            else {
+                $dest = $host;
+            }
             if (is_numeric($host['device_id'])) {
                 echo '<tr><td>';
-                echo '<h3>'.generate_device_link($host).'</h3>';
+                echo '<h3>'.generate_device_link($dest).'</h3>';
                 $graph_array['type']   = 'smokeping_in';
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['src']    = $host['device_id'];

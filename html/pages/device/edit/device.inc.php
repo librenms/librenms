@@ -9,20 +9,22 @@ if ($_POST['editing']) {
             $override_sysLocation_string = mres($_POST['sysLocation']);
         }
 
-        if (get_dev_attrib($device,'override_sysLocation_bool') != $override_sysLocation_bool
-            || get_dev_attrib($device,'override_sysLocation_string') != $override_sysLocation_string) {
-                $updated = 1;
-            }
+        if ($device['override_sysLocation'] != $override_sysLocation_bool || $device['location'] != $override_sysLocation_string) {
+            $updated = 1;
+        }
 
         if ($override_sysLocation_bool) {
-            set_dev_attrib($device, 'override_sysLocation_bool', '1');
+            $override_sysLocation = 1;
         }
         else {
-            del_dev_attrib($device, 'override_sysLocation_bool');
+            $override_sysLocation = 0;
         }
+
+        dbUpdate(array('override_sysLocation'=>$override_sysLocation), 'devices', '`device_id`=?' ,array($device['device_id']));
+
         if (isset($override_sysLocation_string)) {
-            set_dev_attrib($device, 'override_sysLocation_string', $override_sysLocation_string);
-        };
+            dbUpdate(array('location'=>$override_sysLocation_string), 'devices', '`device_id`=?' ,array($device['device_id']));
+        }
 
         #FIXME needs more sanity checking! and better feedback
 
@@ -50,8 +52,8 @@ if ($_POST['editing']) {
 
 $descr  = $device['purpose'];
 
-$override_sysLocation_bool = get_dev_attrib($device,'override_sysLocation_bool');
-$override_sysLocation_string = get_dev_attrib($device,'override_sysLocation_string');
+$override_sysLocation = $device['override_sysLocation'];
+$override_sysLocation_string = $device['location'];
 
 if ($updated && $update_message) {
     print_message($update_message);
@@ -116,7 +118,7 @@ if ($unknown) {
     <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
     <div class="col-sm-6">
      <div class="checkbox">
-       <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation_bool) echo(' checked="1"'); ?> />
+       <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked" type="checkbox" name="override_sysLocation"<?php if ($override_sysLocation) echo(' checked="1"'); ?> />
      </div>
     </div>
   </div>
@@ -124,7 +126,7 @@ if ($unknown) {
     <div class="col-sm-2">
     </div>
     <div class="col-sm-6">
-      <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation_bool) echo(' disabled="1"'); ?> value="<?php echo($override_sysLocation_string); ?>" />
+      <input id="sysLocation" name="sysLocation" class="form-control" <?php if (!$override_sysLocation) echo(' disabled="1"'); ?> value="<?php echo($override_sysLocation_string); ?>" />
     </div>
   </div>
   <div class="form-group">

@@ -1,5 +1,8 @@
 <?php
 
+$status           = 'error';
+$message          = 'Error with config';
+
 // enable/disable ports/interfaces on devices.
 $device_id    = intval($_POST['device']);
 $rows_updated = 0;
@@ -52,14 +55,19 @@ foreach ($_POST as $key => $val) {
 }//end foreach
 
 if ($rows_updated > 0) {
-    $update_message = $rows_updated.' Device record updated.';
-    $updated        = 1;
+    $message = $rows_updated.' Device record updated.';
+    $status         = 'ok';
 }
 else if ($rows_updated = '-1') {
-    $update_message = 'Device record unchanged. No update necessary.';
-    $updated        = -1;
+    $message = 'Device record unchanged. No update necessary.';
+    $status         = 'ok';
 }
 else {
-    $update_message = 'Device record update error.';
-    $updated        = 0;
+    $message = 'Device record update error.';
 }
+
+$response = array(
+    'status'        => $status,
+    'message'       => $message,
+);
+echo _json_encode($response);
