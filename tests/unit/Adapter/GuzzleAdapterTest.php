@@ -73,7 +73,11 @@ class GuzzleAdapterTest extends \PHPUnit_Framework_TestCase
         $httpClient = $this->prophesize("GuzzleHttp\\Client");
         $httpClient->post(Argument::Any(), [
             "auth" => ["root", "root"],
-            "body" => '{"database":"db","retentionPolicy":"default"}',
+            "query" => [
+                "db" => "db",
+                "retentionPolicy" => "default",
+            ],
+            "body" => null,
         ])->shouldBeCalledTimes(1);
 
         $adapter = new InfluxHttpAdapter($httpClient->reveal(), $options);
@@ -85,12 +89,17 @@ class GuzzleAdapterTest extends \PHPUnit_Framework_TestCase
         $guzzleHttp = $this->prophesize("GuzzleHttp\Client");
         $guzzleHttp->post("http://localhost:8086/write", [
             "auth" => ["root", "root"],
-            "body" => '{"database":"db","retentionPolicy":"default","points":[{"measurement":"tcp.test","fields":{"mark":"element"}}]}',
+            "query" => [
+                "db" => "db",
+                "retentionPolicy" => "default",
+            ],
+            "body" => 'tcp.test mark="element" 1257894000000000000',
         ])->shouldBeCalledTimes(1);
         $options = (new Options())->setDatabase("db");
         $adapter = new InfluxHttpAdapter($guzzleHttp->reveal(), $options);
 
         $adapter->send([
+            "time" => "2009-11-10T23:00:00Z",
             "points" => [
                 [
                     "measurement" => "tcp.test",
@@ -109,7 +118,11 @@ class GuzzleAdapterTest extends \PHPUnit_Framework_TestCase
         $httpClient = $this->prophesize("GuzzleHttp\\Client");
         $httpClient->post(Argument::Any(), [
             "auth" => ["root", "root"],
-            "body" => '{"database":"mydb","retentionPolicy":"myPolicy"}',
+            "query" => [
+                "db" => "mydb",
+                "retentionPolicy" => "myPolicy",
+            ],
+            "body" => null,
         ])->shouldBeCalledTimes(1);
 
         $adapter = new InfluxHttpAdapter($httpClient->reveal(), $options);
@@ -126,14 +139,24 @@ class GuzzleAdapterTest extends \PHPUnit_Framework_TestCase
         $httpClient = $this->prophesize("GuzzleHttp\\Client");
         $httpClient->post(Argument::Any(), [
             "auth" => ["root", "root"],
-            "body" => '{"database":"mydb","retentionPolicy":"myPolicy"}',
+            "query" => [
+                "db" => "db",
+                "retentionPolicy" => "default",
+            ],
+            "body" => 'tcp.test mark="element" 1257894000000000000',
         ])->shouldBeCalledTimes(1);
 
         $adapter = new InfluxHttpAdapter($httpClient->reveal(), $options);
         $adapter->send([
-            "database" => "mydb",
-            "retentionPolicy" => "myPolicy",
-            "tags" => [],
+            "time" => "2009-11-10T23:00:00Z",
+            "points" => [
+                [
+                    "measurement" => "tcp.test",
+                    "fields" => [
+                        "mark" => "element"
+                    ]
+                ]
+            ]
         ]);
     }
 
@@ -147,13 +170,24 @@ class GuzzleAdapterTest extends \PHPUnit_Framework_TestCase
         $httpClient = $this->prophesize("GuzzleHttp\\Client");
         $httpClient->post(Argument::Any(), [
             "auth" => ["root", "root"],
-            "body" => '{"database":"mydb","retentionPolicy":"myPolicy","tags":{"dc":"us-west"}}',
+            "query" => [
+                "db" => "db",
+                "retentionPolicy" => "default",
+            ],
+            "body" => 'tcp.test,dc=us-west mark="element" 1257894000000000000',
         ])->shouldBeCalledTimes(1);
 
         $adapter = new InfluxHttpAdapter($httpClient->reveal(), $options);
         $adapter->send([
-            "database" => "mydb",
-            "retentionPolicy" => "myPolicy",
+            "time" => "2009-11-10T23:00:00Z",
+            "points" => [
+                [
+                    "measurement" => "tcp.test",
+                    "fields" => [
+                        "mark" => "element"
+                    ]
+                ]
+            ]
         ]);
     }
 
@@ -167,14 +201,25 @@ class GuzzleAdapterTest extends \PHPUnit_Framework_TestCase
         $httpClient = $this->prophesize("GuzzleHttp\\Client");
         $httpClient->post(Argument::Any(), [
             "auth" => ["root", "root"],
-            "body" => '{"database":"mydb","retentionPolicy":"myPolicy","tags":{"dc":"us-west","region":"us"}}',
+            "query" => [
+                "db" => "db",
+                "retentionPolicy" => "default",
+            ],
+            "body" => 'tcp.test,dc=us-west,region=us mark="element" 1257894000000000000',
         ])->shouldBeCalledTimes(1);
 
         $adapter = new InfluxHttpAdapter($httpClient->reveal(), $options);
         $adapter->send([
-            "database" => "mydb",
-            "retentionPolicy" => "myPolicy",
+            "time" => "2009-11-10T23:00:00Z",
             "tags" => ["region" => "us"],
+            "points" => [
+                [
+                    "measurement" => "tcp.test",
+                    "fields" => [
+                        "mark" => "element"
+                    ]
+                ]
+            ]
         ]);
     }
 }
