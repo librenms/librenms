@@ -11,7 +11,8 @@
 */
 
 if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.2.6.182.1.0.401.1')) {
+    $ibmtl_snmpget = snmp_get($device, 'SML-MIB::product-Name.0', '-Oqv', '');
+    if (stristr($ibmtl_snmpget, 'IBM System Storage TS3500 Tape Library')) {
         $os = 'ibmtl';
     }
 }
