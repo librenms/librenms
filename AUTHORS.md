@@ -42,6 +42,7 @@ Contributors to LibreNMS:
 - Rasmus Aberg <rasmus@sthix.net> (rasssta)
 - Jan Saner <jan@trick77.com> (trick77)
 - Mikhail Bratchikov <mbratchikov@odin.com> (pepyaka)
+- Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 
 [1]: http://observium.org/ "Observium web site"
 
