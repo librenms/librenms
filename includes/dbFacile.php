@@ -75,7 +75,7 @@ function dbGetLock($data, $timeout = 0) {
  * */
 
 
-function dbCheckLock($data, $timeout = 0) {
+function dbCheckLock($data) {
     $sql = 'SELECT IS_FREE_LOCK(\'' . $data . '\')';
     $result = dbFetchCell($sql);
     return $result;
@@ -86,7 +86,7 @@ function dbCheckLock($data, $timeout = 0) {
  * */
 
 
-function dbReleaseLock($data, $timeout = 0) {
+function dbReleaseLock($data) {
     $sql = 'SELECT RELEASE_LOCK(\'' . $data . '\')';
     $result = dbFetchCell($sql);
     return $result;
