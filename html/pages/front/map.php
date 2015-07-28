@@ -31,7 +31,7 @@ if ($config['map']['engine'] == 'leaflet') {
 <script>
 <?php
 
-$map_init = "[" . $config['leaflet']['default_lat'] . ", " . $config['leaflet']['default_lng'] . "], " . $config['leaflet']['default_zoom'];
+$map_init = "[" . $config['leaflet']['default_lat'] . ", " . $config['leaflet']['default_lng'] . "], " . sprintf("%01.0f", $config['leaflet']['default_zoom']);
 
 ?>
 var map = L.map('leaflet-map').setView(<?php echo $map_init; ?>);
