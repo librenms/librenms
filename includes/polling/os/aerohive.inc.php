@@ -9,6 +9,6 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if (preg_match('/^(.+?),/', $poll_device['sysDescr'], $hardware) {
+if (preg_match('/^(.+?),/', $poll_device['sysDescr'], $hardware)) {
     $hardware = $store[1];
 }
