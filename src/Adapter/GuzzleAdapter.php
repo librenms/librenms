@@ -25,7 +25,11 @@ class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
 
         $httpMessage = [
             "auth" => [$this->getOptions()->getUsername(), $this->getOptions()->getPassword()],
-            "body" => json_encode($message)
+            'query' => [
+                "db" => $message["database"],
+                "retentionPolicy" => $message["retentionPolicy"],
+            ],
+            "body" => message_to_inline_protocol($message)
         ];
 
         $endpoint = $this->getHttpSeriesEndpoint();
