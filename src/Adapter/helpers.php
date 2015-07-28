@@ -5,6 +5,10 @@ use DateTime;
 
 function message_to_inline_protocol(array $message)
 {
+    if (!array_key_exists("points", $message)) {
+        return;
+    }
+
     $unixepoch = (int)(microtime(true) * 1e9);
     if (array_key_exists("time", $message)) {
         $dt = new DateTime($message["time"]);
