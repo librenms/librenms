@@ -14,4 +14,8 @@ if (!$os) {
     if (preg_match('/^RouterOS/', $sysDescr)) {
         $os = 'routeros';
     }
+
+    if ($sysDescr == 'RB260GS') {
+        $os = 'routeros';
+    }
 }
