@@ -52,7 +52,7 @@ class GuzzleAdapter extends AdapterAbstract implements QueryableInterface
     private function get(array $httpMessage)
     {
         $endpoint = $this->getHttpQueryEndpoint();
-        return $this->httpClient->get($endpoint, $httpMessage)->json();
+        return json_decode($this->httpClient->get($endpoint, $httpMessage)->getBody(), true);
     }
 
     protected function getHttpSeriesEndpoint()
