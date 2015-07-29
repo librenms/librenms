@@ -12,21 +12,41 @@ any other means), you assert that:
   or due to it being released to you under a compatible license.
 
 - You are not aware of any third party claims on the code, including
-  copyright infringement, patent, or any other claim.
+  copyright, patent, trademark, or any other legal claim.
+
+- You have acknowledged in the content of your contribution (usually as a
+  source code comment) any and all sources and influences used in the
+  production of that contribution.
 
 - You have not viewed code written under the [Observium License][4] in the
   production of contributed code.  This includes all Observium code after
   Subversion revision 3250 and any patches or other code covered by that
   license after Tue May 29 13:08:01 2012 +0000 (the date of Observium r3250).
 
-To agree with these assertions, please submit a github pull request against
-[AUTHORS.md][5] including your name, email address, and github user id in
-the file (so that it can be matched to your commits), and stating in the
-commit log:
+- You are not running a copy of non-GPLed Observium, whether as part of your
+  work duties, or personally, or in any other capacity, and you have removed
+  any copies of non-GPLed Observium source code from your personal and work
+  systems.
+
+
+To agree with these assertions, please submit a Github pull request against
+[AUTHORS.md][5], adding or altering a **single line** *containing your name,
+email address, and Github user id* in the file (so that it can be matched to
+your commits), and stating in the *commit log* (not the pull request text):
 ```
 	I agree to the conditions of the Contributor Agreement
 	contained in doc/General/Contributing.md.
 ```
+
+Local patches
+-------------
+
+Please note that the above contributor agreement means that if you have
+developed a feature for a non-GPL version of Observium, we can't include it
+in LibreNMS, even if you have not released it to the public.  If there's a
+feature you use to which this applies, please document its functionality in
+an issue, and we'll do our best to include equivalent functionality in
+LibreNMS.
 
 
 Copyright
@@ -41,7 +61,7 @@ appropriate (although this is not legal advice ;-):
   /*
    * LibreNMS module to frob blurgs from a foo bar
    *
-   * Copyright (c) 2014 Internet Widgitz Pty Ltd <http://example.com/>
+   * Copyright (c) 2015 Internet Widgitz Pty Ltd <http://example.com/>
    *
    * This program is free software: you can redistribute it and/or modify it
    * under the terms of the GNU General Public License as published by the
