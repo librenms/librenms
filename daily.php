@@ -27,7 +27,7 @@ if ($options['f'] === 'update') {
                         Because of this we have stopped the auto-update running to ensure your system is ok.
 
                         You currently have a configured innodb_buffer_pool_size of ' . $pool_size / 1024 / 1024 / 1024 . 'G but is 
-                        currently using ' . $pool_used / 1024 / 1024 / 1024 . '
+                        currently using ' . $pool_used / 1024 / 1024 / 1024 . 'G
 
                         Take a look at https://dev.mysql.com/doc/refman/5.6/en/innodb-buffer-pool.html for further details.
 
