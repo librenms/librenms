@@ -58,7 +58,7 @@ class Point
         $this->fields = $additionalFields;
 
         if ($value) {
-            $this->fields['value'] = (float) $value;
+            $this->fields['value'] = $value;
         }
 
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
