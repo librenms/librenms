@@ -11,12 +11,11 @@
    * the source code distribution for details.
    */
 
-include("includes/graphs/common.inc.php");
+include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_filename = $config['rrd_dir']."/".$device['hostname']."/cisco-xcode.rrd";
 
-if (file_exists($rrd_filename))
-{
+if (file_exists($rrd_filename)) {
 	$rrd_options .= " COMMENT:'                            Cur   Min  Max\\n'";
 	$rrd_options .= " DEF:Total=" . $rrd_filename . ":total:AVERAGE ";
 	$rrd_options .= " AREA:Total#c099ff ";
