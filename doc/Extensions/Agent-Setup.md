@@ -3,7 +3,7 @@ Agent setup
 
 To gather data from remote systems you can use LibreNMS in combination with check_mk (included in the scripts directory).
 
-Make sure that ixnetd is installed on the host you want to run the agent on.
+Make sure that xinetd is installed on the host you want to run the agent on.
 
 The agent uses TCP-Port 6556, please allow access from the LibreNMS-Host and Poller-Nodes if you're using the Distributed Polling setup.
 
