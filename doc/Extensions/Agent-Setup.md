@@ -28,7 +28,7 @@ cp check_mk_xinetd /etc/xinetd.d/check_mk
 mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 ```
 
-* Copy each of the scripts from `agent-local/` into `/usr/lib/check_mk_agent/local`
+* Copy each of the scripts from `agent-local/` into `/usr/lib/check_mk_agent/local` that you require to be graphed.
 * Make each one executable that you want to use with `chmod +x /usr/lib/check_mk_agent/local/$script`
 * And restart xinetd.
 
