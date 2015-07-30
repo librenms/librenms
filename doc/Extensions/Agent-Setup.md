@@ -3,21 +3,25 @@ Agent setup
 
 To gather data from remote systems you can use LibreNMS in combination with check_mk (included in the scripts directory).
 
+Make sure that xinetd is installed on the host you want to run the agent on.
+
 The agent uses TCP-Port 6556, please allow access from the LibreNMS-Host and Poller-Nodes if you're using the Distributed Polling setup.
 
 On each of the hosts you would like to use the agent on then you need to do the following:
 
-* Copy the `check_mk_agent` script into `/usr/bin` and make it executable.
+* Clone the `librenms-agent` repository:
 
 ```shell
-cp scripts/check_mk_agent /usr/bin/check_mk_agent
+cd /opt/
+git clone https://github.com/librenms/librenms-agent.git
+cp check_mk_agent /usr/bin/check_mk_agent
 chmod +x /usr/bin/check_mk_agent
 ```
 
 * Copy the xinetd config file into place.
 
 ```shell
-cp scripts/check_mk_xinetd /etc/xinetd.d/check_mk
+cp check_mk_xinetd /etc/xinetd.d/check_mk
 ```
 
 * Create the relevant directories.
@@ -26,7 +30,8 @@ cp scripts/check_mk_xinetd /etc/xinetd.d/check_mk
 mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 ```
 
-* Copy each of the scripts from `scripts/agent-local/` into `/usr/lib/check_mk_agent/local`
+* Copy each of the scripts from `agent-local/` into `/usr/lib/check_mk_agent/local` that you require to be graphed.
+* Make each one executable that you want to use with `chmod +x /usr/lib/check_mk_agent/local/$script`
 * And restart xinetd.
 
 ```shell
