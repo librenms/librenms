@@ -31,7 +31,7 @@ if ($config['map']['engine'] == 'leaflet') {
 <script>
 <?php
 
-$map_init = "[" . $config['leaflet']['default_lat'] . ", " . $config['leaflet']['default_lng'] . "], " . $config['leaflet']['default_zoom'];
+$map_init = "[" . $config['leaflet']['default_lat'] . ", " . $config['leaflet']['default_lng'] . "], " . sprintf("%01.0f", $config['leaflet']['default_zoom']);
 
 ?>
 var map = L.map('leaflet-map').setView(<?php echo $map_init; ?>);
@@ -51,13 +51,13 @@ var greenMarker = L.AwesomeMarkers.icon({
   });
 
 <?php
-foreach (dbFetchRows("SELECT `hostname`,`status`,`lat`,`lng` FROM `devices` LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location` WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != '' ORDER BY `status` ASC, `hostname`") as $map_devices) {
+foreach (dbFetchRows("SELECT `device_id`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices` LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location` WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != '' ORDER BY `status` ASC, `hostname`") as $map_devices) {
     $icon = 'greenMarker';
     if ($map_devices['status'] == 0) {
         $icon = 'redMarker';
     }
 
-    echo "var title = '" . $map_devices['hostname'] . "';
+    echo "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getImageSrc($map_devices)."\" width=\"32\" height=\"32\" alt=\"\">".$map_devices['hostname']."</a>';
          var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: title, icon: $icon});
          marker.bindPopup(title);
          markers.addLayer(marker);\n";

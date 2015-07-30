@@ -5,12 +5,12 @@ LibreNMS is a fork of [Observium][1].  Observium was written by:
 
 Contributors to LibreNMS:
 - Paul Gear <github@libertysys.com.au> (paulgear)
-- Neil Lathwood <neil@lathwood.co.uk> (laf)
-- Daniel Preussker <f0o@devilcode.org> (f0o)
+- Neil Lathwood <neil@librenms.org> (laf)
+- Daniel Preussker <f0o@librenms.org> (f0o)
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
 - Toni Cunyat <elbuit@gmail.com> (elbuit)
 - Tuomas Riihimäki <tuomari@iudex.fi> (tuomari)
-- Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
+- Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak) 
 - Mike Rostermund <mike@kollegienet.dk> (saaldjormike)
 - Nicolas Armando <nicearma@yahoo.com> (nicearma)
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
@@ -33,7 +33,7 @@ Contributors to LibreNMS:
 - James Campbell <neokjames@gmail.com> (neokjames)
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
-- Louis Rossouw <lrossouw@gmail.com> (spinza)
+- Louis Rossouw <lrossouw@gmail.com> (spinza) 
 - Clint Armstrong <clint@clintarmstrong.net> (clinta)
 - Tony Ditchfield <tony.ditchfield@gmail.com> (arnoldthebat)
 - Travis Hegner <travis.hegner@gmail.com> (travishegner)
@@ -42,6 +42,7 @@ Contributors to LibreNMS:
 - Rasmus Aberg <rasmus@sthix.net> (rasssta)
 - Jan Saner <jan@trick77.com> (trick77)
 - Mikhail Bratchikov <mbratchikov@odin.com> (pepyaka)
+- Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 
 [1]: http://observium.org/ "Observium web site"
 
