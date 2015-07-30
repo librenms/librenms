@@ -780,3 +780,6 @@ $config['mapael']['default_map']                        = 'maps/world_countries.
 $config['leaflet']['default_lat']                       = '50.898482';
 $config['leaflet']['default_lng']                       = '-3.401402';
 $config['leaflet']['default_zoom']                       = 2;
+
+// Navbar variables
+$config['navbar']['manage_groups']['hide']              = 0;
