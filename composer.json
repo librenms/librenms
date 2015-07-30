@@ -4,7 +4,7 @@
     "description": "Send your app metrics to InfluxDB",
     "require": {
          "php": ">=5.4",
-         "guzzlehttp/guzzle": "~4|~5|~6",
+         "guzzlehttp/guzzle": "4.2.*",
          "zendframework/zend-stdlib": "~2",
          "zendframework/zend-filter": "~2",
          "zendframework/zend-servicemanager": "~2"
