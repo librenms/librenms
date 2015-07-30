@@ -20,6 +20,9 @@ $config['poller_service_down_retry']                     = 60;
 ## Distributed Polling
 Distributed polling is possible, and uses the same configuration options as are described for traditional distributed polling, except that the memcached options are not necessary. The database must be acessable from the distributed pollers, and properly configured. Remote access to the RRD directory must also be configured as described in the Distributed Poller documentation. Memcache is not required. Concurrency is managed using mysql GET_LOCK to ensure that devices are only being polled by one device at at time. The poller service is compatible with poller groups.
 
+## Multi-Master MySQL considerations
+Because locks are not replicated in Multi-Master MySQL configurations, if you are using such a configuration, you will need to make sure that all pollers are using the same MySQL server.
+
 ## Service Installation
 An upstart configuration `poller-service.conf` is provided. To install run `ln -s /opt/librenms/poller-service.conf /etc/init/poller-service.conf`. The service will start on boot and can be started manually by running `start poller-service`. If you recieve an error that the service does not exist, run `initctl reload-configuration`. The service is configured to run as the user `librenms` and will fail if that user does not exist.
 
