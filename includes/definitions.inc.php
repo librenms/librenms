@@ -184,6 +184,11 @@ $config['os'][$os]['type']  = 'server';
 $config['os'][$os]['group'] = 'unix';
 $config['os'][$os]['text']  = 'FreeBSD';
 
+$os = 'pfsense';
+$config['os'][$os]['type']  = 'server';
+$config['os'][$os]['group'] = 'unix';
+$config['os'][$os]['text']  = 'pfSense';
+
 $os = 'openbsd';
 $config['os'][$os]['type']  = 'server';
 $config['os'][$os]['group'] = 'unix';
