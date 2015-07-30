@@ -319,7 +319,45 @@ $config['network_map_legend'] = array(
     '90'  => '#ff6600',
     '100' => '#ff0000',
 );
+
+// Network Map Items
 $config['network_map_items'] = array('xdp','mac');
+
+// Network Map Visualization Options
+// See http://visjs.org/docs/network/ for description of these options.
+$config['network_map_vis_options'] = '{
+  layout:{
+      randomSeed:2
+  },
+  "edges": {
+    "smooth": {
+        enabled: false
+    },
+    font: {
+        size: 12,
+        color: "red",
+        face: "sans",
+        background: "white",
+        strokeWidth:3,
+        align: "middle",
+        strokeWidth: 2
+    }
+  },
+  "physics": {
+    "forceAtlas2Based": {
+      "gravitationalConstant": -800,
+      "centralGravity": 0.03,
+      "springLength": 50,
+      "springConstant": 0,
+      "damping": 1,
+      "avoidOverlap": 1
+    },
+    "maxVelocity": 50,
+    "minVelocity": 0.01,
+    "solver": "forceAtlas2Based",
+    "timestep": 0.30
+  }
+}';
 
 // Device page options
 $config['show_overview_tab'] = true;

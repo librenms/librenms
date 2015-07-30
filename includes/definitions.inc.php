@@ -1239,6 +1239,13 @@ $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
+// Aerohive
+$os = 'aerohive';
+$config['os'][$os]['text']             = 'Aerohive HiveOS';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
