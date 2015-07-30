@@ -214,39 +214,7 @@ echo $edges;
         edges: edges,
         stabilize: true
     };
-var options = {
-  layout:{
-      randomSeed:2
-  },
-  "edges": {
-    "smooth": {
-        enabled: false
-    },
-    font: {
-        size: 12,
-        color: 'red',
-        face: 'sans',
-        background: 'white',
-        strokeWidth:3,
-        align: 'middle',
-        strokeWidth: 2
-    }
-  },
-  "physics": {
-    "forceAtlas2Based": {
-      "gravitationalConstant": -800,
-      "centralGravity": 0.03,
-      "springLength": 50,
-      "springConstant": 0,
-      "damping": 1,
-      "avoidOverlap": 1
-    },
-    "maxVelocity": 50,
-    "minVelocity": 0.01,
-    "solver": "forceAtlas2Based",
-    "timestep": 0.30
-  }
-}
+    var options =  <?php echo $config['network_map_vis_options']; ?>;
     var network = new vis.Network(container, data, options);
     network.on('click', function (properties) {
         if (properties.nodes > 0) {

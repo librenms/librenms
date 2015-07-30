@@ -13,7 +13,33 @@ require 'includes/functions.php';
 $options = getopt('f:');
 
 if ($options['f'] === 'update') {
-    echo $config['update'];
+    $pool_size = dbFetchCell('SELECT @@innodb_buffer_pool_size');
+    // The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
+    $pool_used = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
+    if ($pool_used > $pool_size) {
+        if (!empty($config['default_mail'])) {
+            $subject = $config['project_name'] . ' auto-update action required';
+            $message = '
+                        Hi,
+
+                        We have just tried to update your installation but it looks like the InnoDB buffer size is too low.
+
+                        Because of this we have stopped the auto-update running to ensure your system is ok.
+
+                        You currently have a configured innodb_buffer_pool_size of ' . $pool_size / 1024 / 1024 / 1024 . 'G but is 
+                        currently using ' . $pool_used / 1024 / 1024 / 1024 . 'G
+
+                        Take a look at https://dev.mysql.com/doc/refman/5.6/en/innodb-buffer-pool.html for further details.
+
+                        The ' . $config['project_name'] . ' team.
+            ';
+            send_mail($config['default_mail'],$subject,$message,$html=false);
+        }
+        echo 0;
+    }
+    else {
+        echo $config['update'];
+    }
 }
 
 if ($options['f'] === 'syslog') {

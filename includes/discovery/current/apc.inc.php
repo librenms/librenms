@@ -60,7 +60,7 @@ if ($device['os'] == 'apc') {
     unset($oids);
 
     // v2 firmware- first bank is total, v3 firmware, 3rd bank is total
-    $oids = snmp_walk($device, 'rPDULoadBankConfigIndex', '-OsqnU', 'PowerNet-MIB');
+    $oids = snmp_walk($device, 'rPDULoadStatusIndex', '-OsqnU', 'PowerNet-MIB');
     // should work with firmware v2 and v3
     if ($oids) {
         echo 'APC PowerNet-MIB Banks ';
