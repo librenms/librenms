@@ -160,7 +160,8 @@ if ($config['vertical_summary']) {
 }
 else {
     echo '   <div class="col-md-4">';
-    include_once 'includes/device-summary-horiz.inc.php';
+    include_once 'includes/common/device-summary-horiz.inc.php';
+    echo implode('',$common_output);
 }
 
 echo '
