@@ -102,7 +102,9 @@ echo "
 $sql = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog,devices WHERE syslog.device_id = devices.device_id ORDER BY seq DESC LIMIT 20";
 echo '<table cellspacing=0 cellpadding=2 width=100%>';
 foreach (dbFetchRows($sql) as $entry) {
+    unset($syslog_output);
     include 'includes/print-syslog.inc.php';
+    echo $syslog_output;
 }
 
 echo '</table>';

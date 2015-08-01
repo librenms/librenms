@@ -23,50 +23,8 @@
  */
 
 if ($config['map']['engine'] == 'leaflet') {
-?>
-<script src="js/leaflet.js"></script>
-<script src="js/leaflet.markercluster-src.js"></script>
-<script src="js/leaflet.awesome-markers.min.js"></script>
-<div id="leaflet-map"></div>
-<script>
-<?php
-
-$map_init = "[" . $config['leaflet']['default_lat'] . ", " . $config['leaflet']['default_lng'] . "], " . sprintf("%01.0f", $config['leaflet']['default_zoom']);
-
-?>
-var map = L.map('leaflet-map').setView(<?php echo $map_init; ?>);
-
-L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-var markers = L.markerClusterGroup();
-var redMarker = L.AwesomeMarkers.icon({
-    icon: 'server',
-    markerColor: 'red', prefix: 'fa', iconColor: 'white'
-  });
-var greenMarker = L.AwesomeMarkers.icon({
-    icon: 'server',
-    markerColor: 'green', prefix: 'fa', iconColor: 'white'
-  });
-
-<?php
-foreach (dbFetchRows("SELECT `device_id`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices` LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location` WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != '' ORDER BY `status` ASC, `hostname`") as $map_devices) {
-    $icon = 'greenMarker';
-    if ($map_devices['status'] == 0) {
-        $icon = 'redMarker';
-    }
-
-    echo "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getImageSrc($map_devices)."\" width=\"32\" height=\"32\" alt=\"\">".$map_devices['hostname']."</a>';
-         var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: title, icon: $icon});
-         marker.bindPopup(title);
-         markers.addLayer(marker);\n";
-}
-?>
-
-map.addLayer(markers);
-</script>
-<?php
+    require_once 'includes/common/worldmap.inc.php';
+    echo implode('',$common_output);
 } else {
 
 if (isset($config['mapael']['default_map']) && is_file($config['html_dir'].'/js/'.$config['mapael']['default_map'])) {
@@ -216,7 +174,9 @@ echo('<div class="container-fluid">
   {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
 
+    unset($syslog_output);
     include("includes/print-syslog.inc.php");
+    echo $syslog_output;
   }
   echo("</table>");
   echo("</div>");
@@ -250,10 +210,9 @@ echo('<div class="container-fluid">
               </div>
               <table class="table table-hover table-condensed table-striped">');
 
-  foreach (dbFetchRows($query) as $entry)
-  {
-    include("includes/print-event.inc.php");
-  }
+    foreach (dbFetchRows($query) as $entry) {
+        include 'includes/print-event.inc.php';
+    }
 
   echo("</table>");
   echo("</div>");

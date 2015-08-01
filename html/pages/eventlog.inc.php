@@ -42,31 +42,9 @@ print_optionbar_start();
 
 <?php
 print_optionbar_end();
+
+require_once 'includes/common/eventlog.inc.php';
+echo implode('',$common_output);
+
 ?>
 
-<table id="eventlog" class="table table-hover table-condensed table-striped">
-    <thead>
-        <tr>
-            <th data-column-id="datetime" data-order="desc">Datetime</th>
-            <th data-column-id="hostname">Hostname</th>
-            <th data-column-id="type">Type</th>
-            <th data-column-id="message">Message</th>
-        </tr>
-    </thead>
-</table>
-
-<script>
-
-var grid = $("#eventlog").bootgrid({
-    ajax: true,
-    post: function ()
-    {
-        return {
-            id: "eventlog",
-            device: '<?php echo htmlspecialchars($_POST['device']); ?>'
-        };
-    },
-    url: "/ajax_table.php"
-});
-
-</script>
