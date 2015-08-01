@@ -39,6 +39,7 @@ $temp_output .= "
 
 $locations = array();
 foreach (getlocations() as $location) {
+    $location = mres($location);
     $devices = array();
     $devices_down = array();
     $devices_up = array();
