@@ -42,7 +42,7 @@ require 'includes/functions.php';
 require 'includes/discovery/functions.inc.php';
 
 function perform_snmp_scan($net) {
-    global $stats, $config;
+    global $stats, $config, $quiet;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
     $config['snmp']['retries'] = 0;
@@ -58,12 +58,12 @@ function perform_snmp_scan($net) {
             echo '.';
             continue;
         }
+        if (ip_exists($host)) {
+            $stats['known']++;
+            echo '*';
+            continue;
+        }
         foreach (array('udp','tcp') as $transport) {
-            if (ip_exists($host)) {
-                $stats['known']++;
-                echo '*';
-                continue;
-            }
             if ($device_id !== false && $device_id > 0) {
                 $stats['added']++;
                 echo '+';
