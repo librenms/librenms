@@ -41,39 +41,13 @@ if ($config['autodiscovery']['snmpscan'] == false) {
 require 'includes/functions.php';
 require 'includes/discovery/functions.inc.php';
 
-$opts  = getopt('r:d::l::h::');
-$stats = array('count'=> 0, 'known'=>0, 'added'=>0, 'failed'=>0);
-$start = false;
-$debug = false;
-$quiet = 1;
-$net   = false;
-
-if (isset($opts['h']) || empty($opts)) {
-    echo 'Usage: '.$argv[0].' -r <CIDR_Range> [-d] [-l] [-h]'.PHP_EOL;
-    echo '  -r CIDR_Range     CIDR noted IP-Range to scan'.PHP_EOL;
-    echo '                    Example: 192.168.0.0/24'.PHP_EOL;
-    echo '  -d                Enable Debug'.PHP_EOL;
-    echo '  -l                Show Legend'.PHP_EOL;
-    echo '  -h                Print this text'.PHP_EOL;
-    exit(0);
-}
-if (isset($opts['d'])) {
-    $debug = true;
-    $quiet = 0;
-}
-if (isset($opts['r'])) {
-    $net   = Net_IPv4::parseAddress($opts['r']);
-    $start = ip2long($net->network);
-}
-
-if ($start !== false) {
-    if (isset($opts['l'])) {
-        echo 'Legend:  * = Known Device;  . = Unpingable Device;  + = Added Device;  - = Failed To Add Device;'.PHP_EOL;
-    }
+function perform_snmp_scan($net) {
+    global $stats, $config;
     echo 'Range: '.$net->network.'/'.$net->bitmask.PHP_EOL;
     $config['snmp']['timeout'] = 1;
     $config['snmp']['retries'] = 0;
     $config['fping_options']['retries']  = 0;
+    $start = ip2long($net->network);
     $end   = ip2long($net->broadcast)-1;
     while ($start++ < $end) {
         $stats['count']++;
@@ -102,10 +76,54 @@ if ($start !== false) {
         }
     }
     echo PHP_EOL;
+}
+
+$opts  = getopt('r:d::l::h::');
+$stats = array('count'=> 0, 'known'=>0, 'added'=>0, 'failed'=>0);
+$start = false;
+$debug = false;
+$quiet = 1;
+$net   = false;
+
+if (isset($opts['h']) || (empty($opts) && (!isset($config['nets']) || empty($config['nets'])))) {
+    echo 'Usage: '.$argv[0].' -r <CIDR_Range> [-d] [-l] [-h]'.PHP_EOL;
+    echo '  -r CIDR_Range     CIDR noted IP-Range to scan'.PHP_EOL;
+    echo '                    This argument is only requied if $config[\'nets\'] is not set'.PHP_EOL;
+    echo '                    Example: 192.168.0.0/24'.PHP_EOL;
+    echo '  -d                Enable Debug'.PHP_EOL;
+    echo '  -l                Show Legend'.PHP_EOL;
+    echo '  -h                Print this text'.PHP_EOL;
+    exit(0);
+}
+if (isset($opts['d'])) {
+    $debug = true;
+    $quiet = 0;
+}
+if (isset($opts['l'])) {
+    echo '   * = Known Device;   . = Unpingable Device;   + = Added Device;   - = Failed To Add Device;'.PHP_EOL;
+}
+if (isset($opts['r'])) {
+    $net = Net_IPv4::parseAddress($opts['r']);
+    if (ip2long($net->network) !== false) {
+        perform_snmp_scan($net);
+        echo 'Scanned '.$stats['count'].' IPs, Already know '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
+        echo 'Runtime: '.(microtime(true)-$ts).' secs'.PHP_EOL;
+    } else {
+        echo 'Could not interpret supplied CIDR noted IP-Range: '.$opts['r'].PHP_EOL;
+        exit(2);
+    }
+} elseif (isset($config['nets']) && !empty($config['nets'])) {
+    if (!is_array($config['nets'])) {
+        $config['nets'] = array( $config['nets'] );
+    }
+    foreach( $config['nets'] as $subnet ) {
+        $net = Net_IPv4::parseAddress($subnet);
+        perform_snmp_scan($net);
+    }
     echo 'Scanned '.$stats['count'].' IPs, Already know '.$stats['known'].' Devices, Added '.$stats['added'].' Devices, Failed to add '.$stats['failed'].' Devices.'.PHP_EOL;
     echo 'Runtime: '.(microtime(true)-$ts).' secs'.PHP_EOL;
-    exit(0);
 } else {
-    echo 'Could not interpret supplied CIDR noted IP-Range: '.$opts['r'].PHP_EOL;
+    echo 'Please either add a range argument with \'-r <CIDR_RANGE>\' or define $config[\'nets\'] in your config.php'.PHP_EOL;
     exit(2);
 }
+
