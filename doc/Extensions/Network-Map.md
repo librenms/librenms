@@ -1,6 +1,6 @@
 # Network Map
 
-## LibreNMS has the ability to show you a network mab based on:
+## LibreNMS has the ability to show you a network map based on:
 
 - xDP Discovery
 - MAC addresses

@@ -14,6 +14,7 @@ On each of the hosts you would like to use the agent on then you need to do the 
 ```shell
 cd /opt/
 git clone https://github.com/librenms/librenms-agent.git
+cd librenms-agent
 cp check_mk_agent /usr/bin/check_mk_agent
 chmod +x /usr/bin/check_mk_agent
 ```
