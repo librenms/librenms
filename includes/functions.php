@@ -780,50 +780,6 @@ function send_mail($emails,$subject,$message,$html=false) {
     }
 }
 
-function notify($device,$title,$message) {
-    global $config;
-
-    if ($config['alerts']['email']['enable']) {
-        if (!get_dev_attrib($device,'disable_notify')) {
-            if ($config['alerts']['email']['default_only']) {
-                $email = $config['alerts']['email']['default'];
-            }
-            else {
-                if (get_dev_attrib($device,'override_sysContact_bool')) {
-                    $email = get_dev_attrib($device,'override_sysContact_string');
-                }
-                elseif ($device['sysContact']) {
-                    $email = $device['sysContact'];
-                }
-                else {
-                    $email = $config['alerts']['email']['default'];
-                }
-            }
-            $emails = parse_email($email);
-            if ($emails) {
-                $message_header = $config['page_title_prefix']."\n\n";		// FIXME: use different config element
-                $message_footer = "\n\nE-mail sent to: ";
-                $i = 0;
-                $count = count($emails);
-                foreach ($emails as $email => $email_name) {
-                    $i++;
-                    $message_footer .= $email;
-                    if ($i < $count) {
-                        $message_footer .= ", ";
-                    }
-                    else {
-                        $message_footer .= "\n";
-                    }
-                }
-                $message_footer .= "E-mail sent at: " . date($config['timestamp_format']) . "\n";
-                if( ($err = send_mail($emails,$title, $message_header.$message.$message_footer)) !== true) {
-                    echo "Mailer Error: ".$err."\n";
-                }
-            }
-        }
-    }
-}
-
 function formatCiscoHardware(&$device, $short = false) {
     if ($device['os'] == "ios") {
         if ($device['hardware']) {
