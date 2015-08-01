@@ -166,15 +166,15 @@ SNMP Response
 
 ### SNMP Scan
 
-Apart from before mentioned Auto-Discovery options LibreNMS is also able to proactively scan a network for SNMP-enabled devices using the configured version/credentials.
+Apart from the aforementioned Auto-Discovery options, LibreNMS is also able to proactively scan a network for SNMP-enabled devices using the configured version/credentials.
 
-Using the SNMP-Scanner may take long time to finish depending on the size of your network. Tests have shown that a sparsely populated /24 is scanned within 2 Minutes whereas a sparsely populated /16 will take about 11 Hours.
+Using the SNMP-Scanner may take a long time to finish depending on the size of your network. Tests have shown that a sparsely-populated /24 is scanned within 2 Minutes whereas a sparsely populated /16 will take about 11 Hours.
 
-If possible, devide your network into smaller subnet segments and scan these subnets instead. You can use an utility like the GNU Screen or tmux to avoid aborting the scan when logging out of your Shell. You can run several instances of the SNMP-Scanner simultaneously.
+If possible, divide your network into smaller subnets and scan these subnets instead. You can use an utility like the GNU Screen or tmux to avoid aborting the scan when logging out of your Shell. You can run several instances of the SNMP-Scanner simultaneously.
 
 To run the SNMP-Scanner you need to execute the `snmp-scan.php` from within your LibreNMS installation directory.
 
-Here the script's help-page as reference:
+Here the script's help-page for reference:
 ```text
 Usage: ./snmp-scan.php -r <CIDR_Range> [-d] [-l] [-h]
   -r CIDR_Range     CIDR noted IP-Range to scan
