@@ -3,7 +3,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
+ * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -11,8 +11,6 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-
-// FUA
 
 require_once '../includes/defaults.inc.php';
 set_debug($_REQUEST['debug']);
@@ -27,8 +25,23 @@ if (!$_SESSION['authenticated']) {
     exit;
 }
 
-if (preg_match('/^[a-zA-Z0-9\-]+$/', $_POST['type']) == 1) {
-    if (file_exists('forms/'.$_POST['type'].'.inc.php')) {
-        include_once 'forms/'.$_POST['type'].'.inc.php';
-    }
+$type = mres($_POST['type']);
+
+if ($type == 'placeholder') {
+    $output = 'Please add a Widget to get started';
+    $status = 'ok';
 }
+elseif (is_file('includes/common/'.$type.'.inc.php')) {
+
+    include 'includes/common/'.$type.'.inc.php';
+    $output = implode('', $common_output);
+    $status = 'ok';
+
+}
+
+$response = array(
+                  'status' => $status,
+                  'html' => $output,
+                 );
+
+echo _json_encode($response);

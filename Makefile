@@ -47,6 +47,9 @@ vis:
 typeahead:
 	$(GIT_SUBTREE) --prefix=lib/typeahead https://github.com/twitter/typeahead.js.git master
 
+gridster:
+	$(GIT_SUBTREE) --prefix=lib/gridster https://github.com/ducksboard/gridster.js.git master
+
 jquery-mapael:
 	$(GIT_SUBTREE) --prefix=lib/jQuery-Mapael https://github.com/neveldo/jQuery-Mapael.git master
 
