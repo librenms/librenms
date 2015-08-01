@@ -4,13 +4,31 @@ NOTE: These instructions assume you are the root user.  If you are not, prepend 
 
 ### On the DB Server ###
 
-    yum install net-snmp mysql-server
-    service snmpd start
-    service mysqld start
-    chkconfig mysqld on
-    chkconfig snmpd on
-    mysql_secure_installation
-    mysql -uroot -p
+You are free to chose between using MySQL or MariaDB:
+
+**MySQL**
+```bash
+yum install net-snmp mysql-server mysql-client
+chkconfig mysqld on
+service mysqld start
+```
+
+**MariaDB**
+```bash
+yum install net-snmp mariadb-server mariadb-client
+chkconfig mariadb on
+service mariadb start
+```
+
+Now continue with the installation:
+
+```bash
+yum install net-snmp mysql-server
+service snmpd start
+chkconfig snmpd on
+mysql_secure_installation
+mysql -uroot -p
+```
 
 Enter the MySQL root password to enter the MySQL command-line interface.
 
