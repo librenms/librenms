@@ -70,6 +70,10 @@ if ($config['enable_sla'] && $device['os_group'] == 'cisco') {
                         $data['tag'] = preg_replace('/:0*([0-9])/', ':$1', $data['tag']);
                     }
                 break;
+
+                case 'jitter':
+                    $data['tag'] = $sla_config['rttMonEchoAdminCodecType'] ." (". preg_replace('/milliseconds/', 'ms', $sla_config['rttMonEchoAdminCodecInterval']) .")";
+                    break;
             }//end switch
         }//end if
 
