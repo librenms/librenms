@@ -109,9 +109,11 @@ if (!isset($query)) {
 
 foreach (dbFetch($query) as $device) {
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
-    poll_device($device, $options);
-    RunRules($device['device_id']);
-    echo "\r\n";
+    if (dbGetLock('polling.' . $device['device_id'])) {
+        poll_device($device, $options);
+        RunRules($device['device_id']);
+        echo "\r\n";
+    }
     $polled_devices++;
 }
 
