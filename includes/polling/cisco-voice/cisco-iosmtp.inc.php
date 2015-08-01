@@ -24,14 +24,14 @@ if ($device['os_group'] == "cisco") {
         // Active
         $active = $total - $available;
 
-        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-hwmtp.rrd");
+        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-iosmtp.rrd");
         if (!file_exists ($rrd_filename)) {
             rrdtool_create ($rrd_filename, " DS:total:GAUGE:600:0:U DS:active:GAUGE:600:0:U" . $config['rrd_rra']);
         }
         rrdtool_update ($rrd_filename, "N:" . $total . ":" . $active);
 
-        $graphs['cisco-hwmtp'] = TRUE;
-        echo (" Cisco HW MTP ");
+        $graphs['cisco-iosmtp'] = TRUE;
+        echo (" Cisco IOS MTP ");
     }
     unset($rrd_filename, $total, $active, $available);
 }

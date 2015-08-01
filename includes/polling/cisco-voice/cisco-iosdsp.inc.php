@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS module to Graph Primary Rate ISDN Resources in a Cisco Voice Router
+ * LibreNMS module to Graph Digital Signal Processor (DSP) Resources in a Cisco Voice Router
  *
  * Copyright (c) 2015 Aaron Daniels <aaron@daniels.id.au>
  *
@@ -12,31 +12,27 @@
  */
 
 if ($device['os_group'] == "cisco") {
-    // TODO: Need to test partial PRI.
-
     // Total
     $total = 0;
-    foreach ( snmpwalk_cache_oid_num ($device, "1.3.6.1.2.1.2.2.1.3", NULL) as $key => $value) {
-        // 81 is the ifType for DS0's
-        if ($value[''] == "81") {
-            $total++;
-        }
+    foreach (snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.6", NULL) as $key => $value) {
+        $total += $value[''];
     }
 
-    // Active
-    $active = snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.10.19.1.1.4.0", NULL);
-    $active = $active['1.3.6.1.4.1.9.10.19.1.1.4.0'][''];
+    if (isset($total) && ($total != "") && ($total != 0)) {
+        // Active
+        $active = 0;
+        foreach ( snmpwalk_cache_oid_num ($device, "1.3.6.1.4.1.9.9.86.1.2.1.1.7", NULL) as $key => $value) {
+            $active += $value[''];
+        }
 
-    if (isset($active) && ($active != "") && ($total != 0)) {
-        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-pri.rrd");
-
+        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ("cisco-iosdsp.rrd");
         if (!file_exists ($rrd_filename)) {
             rrdtool_create ($rrd_filename, " DS:total:GAUGE:600:0:U DS:active:GAUGE:600:0:U" . $config['rrd_rra']);
         }
         rrdtool_update ($rrd_filename, "N:" . $total . ":" . $active);
 
-        $graphs['cisco-pri'] = TRUE;
-        echo (" Cisco PRI ");
+        $graphs['cisco-iosdsp'] = TRUE;
+        echo (" Cisco IOS DSP ");
     }
     unset($rrd_filename, $total, $active);
 }
