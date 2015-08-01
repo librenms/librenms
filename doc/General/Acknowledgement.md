@@ -22,6 +22,7 @@ LibreNMS 3rd party acknowledgements
   - Moment (http://momentjs.com/): MIT
   - Tag Manager (http://soliantconsulting.github.io/tagmanager/): MIT
   - TW Sack (https://code.google.com/p/tw-sack/): GPLv3
+  - Gridster (http://gridster.net/): MIT
 
 #### 3rd Party GPLv3 Non-compliant
 

@@ -1654,6 +1654,69 @@ tr.search:nth-child(odd) {
 	color: #FFFFFF;
 }
 
+.gridster * {
+  margin:0;
+}
+
+.grid ul {
+  list-style-type: none;
+}
+
+.gridster li {
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    line-height: 100%;
+}
+
+
+.gridster {
+    margin: 0 auto;
+
+    opacity: .8;
+
+    -webkit-transition: opacity .6s;
+    -moz-transition: opacity .6s;
+    -o-transition: opacity .6s;
+    -ms-transition: opacity .6s;
+    transition: opacity .6s;
+}
+
+.gridster .gs-w {
+    background: #ffffff;
+    box-shadow: inset 0 0 2px #000;
+    color: 000000
+    cursor: pointer;
+    -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+
+}
+
+.gridster .player {
+    background: #BBB;
+}
+
+
+.gridster .preview-holder {
+    border: none!important;
+    background: red!important;
+}
+
+.widget_header {
+    padding: 0.8em;
+    background-color: #000000;
+    color: #ffffff;
+    -webkit-border-top-left-radius: 4px;
+     -moz-border-top-right-radius: 4px;
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+}
+
+.widget_body {
+    padding: 0.8em;
+}
+
 .mapTooltip {
     position : fixed;
     background-color : #B2B3B1;
