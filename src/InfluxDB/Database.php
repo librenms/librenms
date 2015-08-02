@@ -9,8 +9,6 @@ use InfluxDB\Query\Builder as QueryBuilder;
 /**
  * Class Database
  *
- * @todo admin functionality
- *
  * @package InfluxDB
  * @author  Stephen "TheCodeAssassin" Hoogendijk
  */
@@ -128,11 +126,19 @@ class Database
 
         try {
             $driver = $this->client->getDriver();
-            $driver->setParameters([
+
+            $parameters = [
                 'url' => sprintf('write?db=%s&precision=%s', $this->name, $precision),
                 'database' => $this->name,
                 'method' => 'post'
-            ]);
+            ];
+
+            // add authentication to the driver if needed
+            if (!empty($this->username) && !empty($this->password)) {
+                $parameters += ['auth' => [$this->username, $this->password]];
+            }
+
+            $driver->setParameters($parameters);
 
             // send the points to influxDB
             $driver->write(implode(PHP_EOL, $payload));
@@ -140,7 +146,7 @@ class Database
             return $driver->isSuccess();
 
         } catch (\Exception $e) {
-            throw new Exception('Writing has failed', $e->getCode(), $e);
+            throw new Exception($e->getMessage(), $e->getCode());
         }
     }
 

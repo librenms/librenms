@@ -10,29 +10,13 @@ use InfluxDB\ResultSet;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 
-class DatabaseTest extends PHPUnit_Framework_TestCase
+class DatabaseTest extends AbstractTest
 {
-
-    /** @var Database $db */
-    protected $db = null;
-
-    /** @var  Client|PHPUnit_Framework_MockObject_MockObject $client */
-    protected $mockClient;
 
     /**
      * @var string
      */
     protected $dataToInsert;
-
-    /**
-     * @var string
-     */
-    protected $resultData;
-
-    /**
-     * @var string
-     */
-    static $emptyResult = '{"results":[{}]}';
 
     /**
      * @var
@@ -41,33 +25,13 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->mockClient = $this->getMockBuilder('\InfluxDB\Client')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
         $this->resultData = file_get_contents(dirname(__FILE__) . '/result.example.json');
 
         $this->mockClient->expects($this->any())
-            ->method('getBaseURI')
-            ->will($this->returnValue($this->equalTo('http://localhost:8086')));
-
-        $this->mockClient->expects($this->any())
-            ->method('query')
-            ->will($this->returnValue(new ResultSet($this->resultData)));
-
-
-        $this->mockClient->expects($this->any())
             ->method('listDatabases')
             ->will($this->returnValue(array('test123', 'test')));
-
-        $httpMockClient = new Guzzle(ClientTest::buildHttpMockClient(''));
-
-        // make sure the client has a valid driver
-        $this->mockClient->expects($this->any())
-            ->method('getDriver')
-            ->will($this->returnValue($httpMockClient));
-
-        $this->db = new Database('influx_test_db', $this->mockClient);
 
         $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/input.example.json');
 
@@ -79,26 +43,18 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
     public function testQuery()
     {
         $testResultSet = new ResultSet($this->resultData);
-        $this->assertEquals($this->db->query('SELECT * FROM test_metric'), $testResultSet);
+        $this->assertEquals($this->database->query('SELECT * FROM test_metric'), $testResultSet);
     }
 
     public function testCreateRetentionPolicy()
     {
         $retentionPolicy = new Database\RetentionPolicy('test', '1d', 1, true);
 
-        $mockClient = $this->getMockBuilder('\InfluxDB\Client')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockClient->expects($this->once())
-            ->method('query')
-            ->will($this->returnValue(new ResultSet(self::$emptyResult)));
-
-
+        $mockClient = $this->getClientMock(true);
 
         $database = new Database('test', $mockClient);
 
-        $this->assertEquals($database->createRetentionPolicy($retentionPolicy), new ResultSet(self::$emptyResult));
+        $this->assertEquals($database->createRetentionPolicy($retentionPolicy), new ResultSet($this->getEmptyResult()));
     }
 
     /**
@@ -139,6 +95,6 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
             0.84
         );
 
-        $this->assertEquals(true, $this->db->writePoints(array($point1, $point2)));
+        $this->assertEquals(true, $this->database->writePoints(array($point1, $point2)));
     }
 }

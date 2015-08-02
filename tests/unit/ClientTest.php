@@ -2,15 +2,19 @@
 
 namespace InfluxDB\Test;
 
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
 use InfluxDB\Client;
 use InfluxDB\Driver\Guzzle;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends AbstractTest
 {
+
+    /**
+     *
+     */
+    public function setUp()
+    {
+        parent::setUp();
+    }
 
     /** @var Client $client */
     protected $client = null;
@@ -43,7 +47,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $query = "some-bad-query";
 
         $bodyResponse = file_get_contents(dirname(__FILE__) . '/result.example.json');
-        $httpMockClient = self::buildHttpMockClient($bodyResponse);
+        $httpMockClient = $this->buildHttpMockClient($bodyResponse);
 
         $client->setDriver(new Guzzle($httpMockClient));
 
@@ -53,15 +57,4 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\InfluxDB\ResultSet', $result);
     }
 
-    /**
-     * @return GuzzleClient
-     */
-    public static function buildHttpMockClient($body)
-    {
-        // Create a mock and queue two responses.
-        $mock = new MockHandler([new Response(200, array(), $body)]);
-
-        $handler = HandlerStack::create($mock);
-        return new GuzzleClient(['handler' => $handler]);
-    }
 }
