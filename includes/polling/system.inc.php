@@ -65,7 +65,6 @@ if ($snmp_uptime > $uptime && is_numeric($snmp_uptime)) {
 
 if (is_numeric($uptime)) {
     if ($uptime < $device['uptime']) {
-        notify($device, 'Device rebooted: '.$device['hostname'], 'Device Rebooted : '.$device['hostname'].' '.formatUptime($uptime).' ago.');
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
     }
 
