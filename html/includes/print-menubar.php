@@ -140,11 +140,17 @@ if ($_SESSION['userlevel'] >= '10') {
             </li>
             ');
     }
-    echo('
+    echo '
             <li role="presentation" class="divider"></li>
-            <li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>
+         ';
+
+    if ($config['navbar']['manage_groups']['hide'] === 0) {
+        echo '<li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>';
+    }
+
+     echo '
             <li><a href="addhost/"><i class="fa fa-plus fa-col-success fa-fw fa-lg"></i> Add Device</a></li>
-            <li><a href="delhost/"><i class="fa fa-trash fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>');
+            <li><a href="delhost/"><i class="fa fa-trash fa-col-info fa-fw fa-lg"></i> Delete Device</a></li>';
 }
 
 ?>

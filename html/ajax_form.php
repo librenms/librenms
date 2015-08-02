@@ -13,15 +13,9 @@
  */
 
 // FUA
-if (isset($_REQUEST['debug'])) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('allow_url_fopen', 0);
-    ini_set('error_reporting', E_ALL);
-}
 
 require_once '../includes/defaults.inc.php';
+set_debug($_REQUEST['debug']);
 require_once '../config.php';
 require_once '../includes/definitions.inc.php';
 require_once 'includes/functions.inc.php';

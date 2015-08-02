@@ -7,8 +7,19 @@
 
 This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
 
-    apt-get install mysql-server mysql-client
-    mysql -uroot -p
+You are free to chose between using MySQL or MariaDB:
+
+**MySQL**
+```bash
+apt-get install mysql-server mysql-client
+mysql -uroot -p
+```
+
+**MariaDB**
+```bash
+apt-get install mariadb-server mariadb-client
+mysql -uroot -p
+```
 
 Input the MySQL root password to enter the MySQL command-line interface.
 
