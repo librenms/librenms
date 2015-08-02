@@ -580,7 +580,12 @@ function edit_service($service, $descr, $service_ip, $service_param = "", $servi
 function d_echo($text, $no_debug_text = null) {
     global $debug;
     if ($debug) {
-        echo "$text";
+        if (is_array($text)) {
+            print_r($text);
+        }
+        else {
+            echo "$text";
+        }
     }
     elseif ($no_debug_text) {
         echo "$no_debug_text";
