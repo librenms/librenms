@@ -48,7 +48,9 @@ echo '      <div class="panel panel-default panel-condensed">
               </div>
               <table class="table table-hover table-condensed table-striped">';
 foreach (dbFetchRows($sql, $param) as $entry) {
+    unset($syslog_output);
     include 'includes/print-syslog.inc.php';
+    echo $syslog_output;
 }
 
 echo '        </table>
