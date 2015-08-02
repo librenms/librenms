@@ -7,7 +7,7 @@
 
 This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
 
-You are free to chose between using MySQL or MariaDB:
+You are free to choose between using MySQL or MariaDB:
 
 **MySQL**
 ```bash

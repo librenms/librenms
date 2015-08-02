@@ -4,7 +4,7 @@ NOTE: These instructions assume you are the root user.  If you are not, prepend 
 
 ### On the DB Server ###
 
-You are free to chose between using MySQL or MariaDB:
+You are free to choose between using MySQL or MariaDB:
 
 **MySQL**
 ```bash
