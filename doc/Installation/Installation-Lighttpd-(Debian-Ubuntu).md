@@ -4,8 +4,19 @@
 
 ### On the DB Server ###
 
-    apt-get install mysql-server mysql-client snmpd
-    mysql -uroot -p
+You are free to chose between using MySQL or MariaDB:
+
+**MySQL**
+```bash
+apt-get install mysql-server mysql-client
+mysql -uroot -p
+```
+
+**MariaDB**
+```bash
+apt-get install mariadb-server mariadb-client
+mysql -uroot -p
+```
 
 Enter the MySQL root password to enter the MySQL command-line interface.
 
