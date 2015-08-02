@@ -9,6 +9,9 @@ $slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 
 // Collect types
 $sla_types = array('all' => 'All');
 foreach ($slas as $sla) {
+    // Set a default type, if we know about it, it will be overwritten below.
+    $text = 'Unknown';
+
     $sla_type = $sla['rtt_type'];
 
     if (!in_array($sla_type, $sla_types)) {
