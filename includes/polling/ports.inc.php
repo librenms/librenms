@@ -463,7 +463,6 @@ foreach ($ports as $port) {
             echo 'IN: '.$port['stats']['ifInBits_rate'].' OUT: '.$port['stats']['ifOutBits_rate'].' THRESH: '.$saturation_threshold;
             if (($port['stats']['ifInBits_rate'] >= $saturation_threshold || $port['stats']['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0) {
                 log_event('Port reached saturation threshold: '.formatRates($port['stats']['ifInBits_rate']).'/'.formatRates($port['stats']['ifOutBits_rate']).' - ifspeed: '.formatRates($this_port['stats']['ifSpeed']), $device, 'interface', $port['port_id']);
-                notify($device, 'Port saturation threshold reached on '.$device['hostname'], 'Port saturation threshold alarm: '.$device['hostname'].' on '.$port['ifDescr']."\nRates:".formatRates($port['stats']['ifInBits_rate']).'/'.formatRates($port['stats']['ifOutBits_rate']).' - ifspeed: '.formatRates($this_port['ifSpeed']));
             }
         }
 
@@ -569,27 +568,6 @@ foreach ($ports as $port) {
         }
 
         // End Update Database
-        // Send alerts for interface flaps.
-        if ($config['alerts']['port']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus']) && $port['ignore'] == 0) {
-            if ($this_port['ifAlias']) {
-                $falias = preg_replace('/^"/', '', $this_port['ifAlias']);
-                $falias = preg_replace('/"$/', '', $falias);
-                $full   = $this_port['ifDescr'].' ('.$falias.')';
-            }
-            else {
-                $full = $this_port['ifDescr'];
-            }
-
-            switch ($this_port['ifOperStatus']) {
-            case 'up':
-                notify($device, 'Interface UP - '.$device['hostname'].' - '.$full, 'Device:    '.$device['hostname']."\nInterface: ".$full);
-                break;
-
-            case 'down':
-                notify($device, 'Interface DOWN - '.$device['hostname'].' - '.$full, 'Device:    '.$device['hostname']."\nInterface: ".$full);
-                break;
-            }
-        }
     }
     else if ($port['disabled'] != '1') {
         echo 'Port Deleted';
