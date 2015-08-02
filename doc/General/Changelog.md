@@ -1,44 +1,82 @@
 ### July 2015
 
 #### Bug fixes
-  - Fixed API not functioning. (PR1367)
-  - Fixed API not storing alert rule names (PR1372)
-  - Fixed datetimepicker use (PR1376)
-  - Do not allow master to rejoin itself. (PR1377)
-  - Fixed Nginx config file (PR1389)
-  - Fixed a number of permission issues (PR1411)
-  - Added 'running' status for BGP peers as up (PR1412)
-  - Fixed the remove search link in devices (PR1413)
-  - Fixed poller group query in discovery (PR1433)
-  - Fixed clicking anywhere in a search result will now take you to where you want (PR1472)
-  - Fixed inventory page not displaying results (PR1488)
+  - WebUI:
+    - Fixed API not functioning. (PR1367)
+    - Fixed API not storing alert rule names (PR1372)
+    - Fixed datetimepicker use (PR1376)
+    - Added 'running' status for BGP peers as up (PR1412)
+    - Fixed the remove search link in devices (PR1413)
+    - Fixed clicking anywhere in a search result will now take you to where you want (PR1472)
+    - Fixed inventory page not displaying results (PR1488)
+    - Fixed buggy alert templating in WebUI (PR1527)
+    - Fixed bug in creating api tokens in Firefox (PR1530)
+  - Discovery / Poller:
+    - Do not allow master to rejoin itself. (PR1377)
+    - Fixed poller group query in discovery (PR1433)
+    - Fixed ARMv5 detection (PR1522)
+    - Fixed pfSense detection (PR1567)
+  - Sensors:
+    - Fixed bug in EqualLogic sensors (PR1513)
+    - Fixed bug in DRAC voltage sensor (PR1521)
+    - Fixed bug in APC bank detection (PR1560)
+  - Documentation:
+    - Fixed Nginx config file (PR1389)
+  - General:
+    - Fixed a number of permission issues (PR1411)
 
 #### Improvements
-  - Added additional support for Rielo UPS (PR1381)
-  - Improved service check support (PR1385,PR1386,PR1387,PR1388)
-  - Added missing load and state icons (PR1392)
-  - Added basic detection for:
+  - Added detection for:
     - Meraki (PR1402)
     - Brocade (PR1404)
     - Dell iDrac (PR1419,PR1420,PR1423,PR1427)
     - Dell Networking OS (PR1474)
     - Netonix (PR1476)
-  - Updated discovery of IP based devices (PR1406)
-  - Added using cronic for poller-wrapper.py to allow cron to send emails (PR1408)
-  - Added BGP discovery code (PR1414)
-  - Code cleanup and formatting (PR1415,PR1416,PR1431,PR1434,PR1439,PR1444,PR1450)
-  - Updated Cisco MIBs to latest versions (PR1436)
-  - Added ability to update users passwords in WebUI (PR1440)
-  - Default to two days performance data being shown (PR1442)
-  - Improve performance of unix-agent processes DB code (PR1447,PR1460)
-  - Added PowerConnect 3548 support (PR1452)
-  - Improved sensors page for mobile view (PR1454)
-  - Improvements to network map (PR1455,PR1470,PR1486)
-  - Added support for CollectD flush (PR1463)
-  - Added availability map (PR1464)
-  - Use snmpEngineTime as a fallback to uptime (PR1477)
-  - Added fallback support for devices not reporting ifAlias (PR1479)
-  - Added Boxcar (www.boxcar.io) transport for alerting (PR1481)
+    - IBM Tape Library (PR1519,PR1550)
+    - Aerohive (PR1546)
+    - Cisco Voice Gateways (PR1565)
+  - Improved detection for:
+    - RouterOS RB260GS (PR1545)
+    - Dell PowerConnect (PR1452,PR1517)
+    - Brocade (PR1548)
+    - Rielo UPS (PR1381)
+    - Cisco IPSLAs (PR1586)
+  - Additional Sensors:
+    - Added power, temperature and fan speed support for XOS (PR1493,PR1494,PR1496)
+  - WebUI Updates:
+    - Added missing load and state icons (PR1392)
+    - Added ability to update users passwords in WebUI (PR1440)
+    - Default to two days performance data being shown (PR1442)
+    - Improved sensors page for mobile view (PR1454)
+    - Improvements to network map (PR1455,PR1470,PR1486,PR1528,PR1557)
+    - Added availability map (PR1464)
+    - Updated edit ports page to use Bootstrap (PR1498)
+    - Added new World Map and support for lat/lng lookup (PR1501,PR1552)
+    - Added sysName to overview page for device (PR1520)
+    - Added New Overview dashboard uilising Widgets (PR1523,PR1580)
+    - Added new config option to disable Device groups (PR1569)
+  - Discovery / Poller Updates:
+    - Updated discovery of IP based devices (PR1406)
+    - Added using cronic for poller-wrapper.py to allow cron to send emails (PR1408,PR1531)
+    - Updated Cisco MIBs to latest versions (PR1436)
+    - Improve performance of unix-agent processes DB code (PR1447,PR1460)
+    - Added BGP discovery code (PR1414)
+    - Use snmpEngineTime as a fallback to uptime (PR1477)
+    - Added fallback support for devices not reporting ifAlias (PR1479)
+    - Git pull and schema updates will now pause if InnoDB buffers overused (PR1563)
+  - Documentation:
+    - Updated Unix-Agent docs to use LibreNMS repo for scripts (PR1568,PR1570,PR1573)
+    - Added info on using MariaDB (PR1585)
+  - Alerting:
+    - Added Boxcar (www.boxcar.io) transport for alerting (PR1481)
+    - Removed old alerting code (PR1581)
+  - General:
+    - Code cleanup and formatting (PR1415,PR1416,PR1431,PR1434,PR1439,PR1444,PR1450)
+    - Added support for CollectD flush (PR1463)
+    - Added support for LDAP pure DN member groups (PR1516)
+    - Updated validate.php to check for distributed poller setup issues (PR1526)
+    - Improved service check support (PR1385,PR1386,PR1387,PR1388)
+    - Added SNMP Scanner to discover devices within subnets and docs (PR1577)
 
 ### June 2015
 
