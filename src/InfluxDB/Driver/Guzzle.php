@@ -7,6 +7,7 @@ namespace InfluxDB\Driver;
 
 use GuzzleHttp\Client;
 use Guzzle\Http\Message\Response;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use InfluxDB\ResultSet;
 
@@ -77,17 +78,25 @@ class Guzzle implements DriverInterface, QueryDriverInterface
      */
     public function write($data = null)
     {
-        $this->response = $this->httpClient->post($this->parameters['url'], ['body' => $data]);
+        $this->response = $this->httpClient->post($this->parameters['url'], $this->getRequestParameters($data));
     }
 
     /**
+     * @throws Exception
      * @return ResultSet
      */
     public function query()
     {
-        $response = $this->httpClient->get($this->parameters['url']);
+
+        $response = $this->httpClient->get($this->parameters['url'], $this->getRequestParameters());
 
         $raw = (string) $response->getBody();
+
+        $responseJson = json_encode($raw);
+
+        if (isset($responseJson->error)) {
+            throw new Exception($responseJson->error);
+        }
 
         return new ResultSet($raw);
 
@@ -101,5 +110,25 @@ class Guzzle implements DriverInterface, QueryDriverInterface
     public function isSuccess()
     {
         return in_array($this->response->getStatusCode(), ['200', '204']);
+    }
+
+    /**
+     * @param null $data
+     *
+     * @return array
+     */
+    protected function getRequestParameters($data = null)
+    {
+        $requestParameters = ['http_errors' => false];
+
+        if ($data) {
+            $requestParameters += ['body' => $data];
+        }
+
+        if (isset($this->parameters['auth'])) {
+            $requestParameters += ['auth' => $this->parameters['auth']];
+        }
+
+        return $requestParameters;
     }
 }

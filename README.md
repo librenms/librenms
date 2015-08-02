@@ -262,9 +262,58 @@ Some functions are too general for a database. So these are available in the cli
     $result = $client->listDatabases();
 ```
 
+### Admin functionality
+
+You can use the client's $client->admin functionality to administer InfluxDB via the API.
+
+```php
+    // add a new user without privileges
+    $client->admin->createUser('testuser123', 'testpassword');
+
+    // add a new user with ALL cluster-wide privileges
+    $client->admin->createUser('admin_user', 'password', \InfluxDB\Client\Admin::PRIVILEGE_ALL);
+    
+    // drop user testuser123
+    $client->admin->dropUser('testuser123');
+```
+
+List all the users:
+
+```php
+    // show a list of all users
+    $results = $client->admin->showUsers();
+        
+    // show users returns a ResultSet object
+    $users = $results->getPoints();
+```
+
+#### Granting and revoking privileges
+
+Granting permissions can be done on both the database level and cluster-wide. 
+To grant a user specific privileges on a database, provide a database object or a database name.
+
+```php
+
+    // grant permissions using a database object
+    $database = $client->selectDB('test_db');
+    $client->admin->grant(\InfluxDB\Client\Admin::PRIVILEGE_READ, 'testuser123', $database);
+
+    // give user testuser123 read privileges on database test_db
+    $client->admin->grant(\InfluxDB\Client\Admin::PRIVILEGE_READ, 'testuser123', 'test_db');
+    
+    // revoke user testuser123's read privileges on database test_db
+     $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_READ, 'testuser123', 'test_db');
+
+    // grant a user cluster-wide privileges
+    $client->admin->grant(\InfluxDB\Client\Admin::PRIVILEGE_READ, 'testuser123');
+    
+    // Revoke an admin's cluster-wide privileges
+    $client->admin->revoke(\InfluxDB\Client\Admin::PRIVILEGE_ALL, 'admin_user');
+    
+```
+
 ## Todo
 
-* Add more admin features
 * More unit tests
 * Increase documentation (wiki?)
 * Add more features to the query builder
@@ -272,6 +321,10 @@ Some functions are too general for a database. So these are available in the cli
 
 
 ## Changelog
+
+####1.0.1 
+* Added support for authentication in the guzzle driver
+* Added admin functionality
 
 ####1.0.0
 * -BREAKING CHANGE- Dropped support for PHP 5.3 and PHP 5.4

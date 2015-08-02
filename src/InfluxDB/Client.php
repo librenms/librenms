@@ -2,8 +2,10 @@
 
 namespace InfluxDB;
 
+use InfluxDB\Client\Admin;
 use InfluxDB\Client\Exception as ClientException;
 use InfluxDB\Driver\DriverInterface;
+use InfluxDB\Driver\Exception as DriverException;
 use InfluxDB\Driver\Guzzle;
 use InfluxDB\Driver\QueryDriverInterface;
 use InfluxDB\Driver\UDP;
@@ -16,6 +18,11 @@ use InfluxDB\Driver\UDP;
  */
 class Client
 {
+    /**
+     * @var Admin
+     */
+    public $admin;
+
     /**
      * @var string
      */
@@ -124,6 +131,8 @@ class Client
                 ]
             )
         );
+
+        $this->admin = new Admin($this);
     }
 
     /**
@@ -142,11 +151,12 @@ class Client
      *
      * @param  string $database
      * @param  string $query
-     * @param  array  $params
+     * @param  array  $parameters
+     *
      * @return ResultSet
      * @throws Exception
      */
-    public function query($database, $query, $params = [])
+    public function query($database, $query, $parameters = [])
     {
 
         if (!$this->driver instanceof QueryDriverInterface) {
@@ -154,22 +164,29 @@ class Client
         }
 
         if ($database) {
-            $params['db'] = $database;
+            $parameters['db'] = $database;
         }
 
         $driver = $this->getDriver();
 
-        $driver->setParameters([
-           'url' => 'query?' . http_build_query(array_merge(['q' => $query], $params)),
-           'database' => $database,
-           'method' => 'get'
-        ]);
+        $parameters = [
+            'url' => 'query?' . http_build_query(array_merge(['q' => $query], $parameters)),
+            'database' => $database,
+            'method' => 'get'
+        ];
+
+        // add authentication to the driver if needed
+        if (!empty($this->username) && !empty($this->password)) {
+            $parameters += ['auth' => [$this->username, $this->password]];
+        }
+
+        $driver->setParameters($parameters);
 
         try {
             // perform the query and return the resultset
             return $driver->query();
 
-        } catch (\Exception $e) {
+        } catch (DriverException $e) {
             throw new Exception('Query has failed', $e->getCode(), $e);
         }
     }
@@ -266,21 +283,6 @@ class Client
     }
 
     /**
-     * @param  Point[] $points
-     * @return array
-     */
-    protected function pointsToArray(array $points)
-    {
-        $names = [];
-
-        foreach ($points as $item) {
-            $names[] = $item['name'];
-        }
-
-        return $names;
-    }
-
-    /**
      * @param Driver\DriverInterface $driver
      */
     public function setDriver(DriverInterface $driver)
@@ -303,4 +305,20 @@ class Client
     {
         return $this->host;
     }
+
+    /**
+     * @param  Point[] $points
+     * @return array
+     */
+    protected function pointsToArray(array $points)
+    {
+        $names = [];
+
+        foreach ($points as $item) {
+            $names[] = $item['name'];
+        }
+
+        return $names;
+    }
+
 }

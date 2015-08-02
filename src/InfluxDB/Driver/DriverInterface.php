@@ -13,7 +13,6 @@ namespace InfluxDB\Driver;
 interface DriverInterface
 {
 
-
     /**
      * Called by the client write() method, will pass an array of required parameters such as db name
      *
