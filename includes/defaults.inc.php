@@ -23,6 +23,18 @@
 //
 error_reporting(E_ERROR);
 
+function set_debug($debug) {
+
+    if (isset($debug)) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 0);
+        ini_set('log_errors', 0);
+        ini_set('allow_url_fopen', 0);
+        ini_set('error_reporting', E_ALL);
+    }
+
+}//end set_debug()
+
 // Default directories
 $config['project_name'] = 'LibreNMS';
 $config['project_id']   = strtolower($config['project_name']);
@@ -660,6 +672,7 @@ $config['poller_modules']['entity-physical']             = 1;
 $config['poller_modules']['applications']                = 1;
 $config['poller_modules']['cisco-asa-firewall']          = 1;
 $config['poller_modules']['mib'] = 0;
+$config['poller_modules']['cisco-voice']                 = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -780,3 +793,6 @@ $config['mapael']['default_map']                        = 'maps/world_countries.
 $config['leaflet']['default_lat']                       = '50.898482';
 $config['leaflet']['default_lng']                       = '-3.401402';
 $config['leaflet']['default_zoom']                       = 2;
+
+// Navbar variables
+$config['navbar']['manage_groups']['hide']              = 0;

@@ -138,6 +138,7 @@ else {
   <link href="css/mktree.css" rel="stylesheet" type="text/css" />
   <link href="css/vis.min.css" rel="stylesheet" type="text/css" />
   <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/jquery.gridster.min.css" rel="stylesheet" type="text/css" />
   <link href="css/leaflet.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.css" rel="stylesheet" type="text/css" />
   <link href="css/MarkerCluster.Default.css" rel="stylesheet" type="text/css" />
