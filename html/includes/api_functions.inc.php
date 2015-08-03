@@ -847,6 +847,7 @@ function list_oxidized() {
 function list_bills() {
     global $config;
     $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
     $status = 'ok';
     $err_msg = '';
     $message = '';
