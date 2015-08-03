@@ -29,7 +29,7 @@ Contributors to LibreNMS:
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Freddie Cash (fjwcash@gmail.com) (fjwcash)
 - Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
-- Vitali Kari <vitali.kari@gmail.com> (vitalisator)
+- Vitali Kari <vitali.kari@gmail.com> (vitalisator) 
 - James Campbell <neokjames@gmail.com> (neokjames)
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
