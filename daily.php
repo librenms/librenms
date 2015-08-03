@@ -17,28 +17,31 @@ if ($options['f'] === 'update') {
     // The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
     $pool_used = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
     if ($pool_used > $pool_size) {
-        if (!empty($config['default_mail'])) {
+        if (!empty($config['alert']['default_mail'])) {
             $subject = $config['project_name'] . ' auto-update action required';
             $message = '
-                        Hi,
+Hi,
 
-                        We have just tried to update your installation but it looks like the InnoDB buffer size is too low.
+We have just tried to update your installation but it looks like the InnoDB buffer size is too low.
 
-                        Because of this we have stopped the auto-update running to ensure your system is ok.
+Because of this we have stopped the auto-update running to ensure your system is ok.
 
-                        You currently have a configured innodb_buffer_pool_size of ' . $pool_size / 1024 / 1024 / 1024 . 'G but is 
-                        currently using ' . $pool_used / 1024 / 1024 / 1024 . 'G
+You currently have a configured innodb_buffer_pool_size of ' . $pool_size / 1024 / 1024 . ' MiB but is currently using ' . $pool_used / 1024 / 1024 . ' MiB
 
-                        Take a look at https://dev.mysql.com/doc/refman/5.6/en/innodb-buffer-pool.html for further details.
+Take a look at https://dev.mysql.com/doc/refman/5.6/en/innodb-buffer-pool.html for further details.
 
-                        The ' . $config['project_name'] . ' team.
-            ';
-            send_mail($config['default_mail'],$subject,$message,$html=false);
+The ' . $config['project_name'] . ' team.';
+            send_mail($config['alert']['default_mail'],$subject,$message,$html=false);
+        } else {
+            echo 'InnoDB Buffersize too small.'.PHP_EOL;
+            echo 'Current size: '.($pool_size / 1024 / 1024).' MiB'.PHP_EOL;
+            echo 'Minimum Required: '.($pool_used / 1024 / 1024).' MiB'.PHP_EOL;
+            echo 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
         }
-        echo 0;
+        exit(2);
     }
     else {
-        echo $config['update'];
+        exit((int) $config['update']);
     }
 }
 
