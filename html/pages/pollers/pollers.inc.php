@@ -24,7 +24,7 @@
         </tr>
 
 <?php
-$query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`) AS `then` FROM `pollers`';
+$query = 'SELECT *,UNIX_TIMESTAMP(NOW()) AS `now`, UNIX_TIMESTAMP(`last_polled`) AS `then` FROM `pollers` ORDER BY poller_name';
 
 foreach (dbFetchRows($query) as $poller) {
     $old = ($poller['now'] - $poller['then']);
