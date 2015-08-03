@@ -431,7 +431,8 @@ function location_to_latlng($device) {
                 case "google":
                 default:
                     d_echo("Google geocode engine being used\n");
-                    if (!empty($api_key = ($config['geoloc']['api_key']))) {
+                    $api_key = ($config['geoloc']['api_key']);
+                    if (!empty($api_key)) {
                         d_echo("Use Google API key: $api_key\n");
                         $api_url = "https://maps.googleapis.com/maps/api/geocode/json?address=$new_device_location&key=$api_key";
                     } else {
