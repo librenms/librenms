@@ -34,6 +34,8 @@ else {
     $panes['health'] = 'Health';
   }
 
+  $panes['storage']  = 'Storage';
+
   print_optionbar_start();
 
   unset($sep);
