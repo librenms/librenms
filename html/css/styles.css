@@ -1759,3 +1759,7 @@ tr.search:nth-child(odd) {
 #leaflet-map {
     height: 600px;
 }
+
+.edit-storage-input {
+    width: 100px;
+}
