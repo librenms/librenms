@@ -5,7 +5,7 @@ set -eu
 cd "$(dirname "$0")"
 
 up=$(php daily.php -f update >&2; echo $?)
-if [ $up -eq 1 ]; then
+if [ "$up" -eq 1 ]; then
     git pull --quiet
     php includes/sql-schema/update.php
 fi
