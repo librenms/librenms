@@ -92,7 +92,7 @@ function GetDevicesFromGroup($group_id) {
  * @return array
  */
 function GetDeviceGroups() {
-    return dbFetchRows('SELECT * FROM device_groups');
+    return dbFetchRows('SELECT * FROM device_groups ORDER BY name');
 
 }//end GetDeviceGroups()
 
