@@ -75,5 +75,3 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
 //	return collectd_draw_meta_stack($opts, $sources);
 	return collectd_draw_meta_line($opts, $sources);
 }
-
-?>
