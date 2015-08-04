@@ -2091,5 +2091,3 @@ function meta_graph_tcp_connections($host, $plugin, $plugin_instance, $type, $ty
 
 	return collectd_draw_meta_stack($opts, $sources);
 }
-
-?>

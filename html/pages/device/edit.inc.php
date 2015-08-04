@@ -67,5 +67,3 @@ else {
 }
 
 $pagetitle[] = "Settings";
-
-?>
