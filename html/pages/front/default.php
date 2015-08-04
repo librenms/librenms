@@ -157,6 +157,7 @@ echo '
 if ($config['vertical_summary']) {
     echo '   <div class="col-md-3">';
     include_once 'includes/device-summary-vert.inc.php';
+    echo implode('',$common_output);
 }
 else {
     echo '   <div class="col-md-4">';
