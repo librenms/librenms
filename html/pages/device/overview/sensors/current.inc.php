@@ -6,5 +6,3 @@ $sensor_unit = "A";
 $sensor_type = "Current";
 
 include('pages/device/overview/generic/sensor.inc.php');
-
-?>

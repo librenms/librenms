@@ -237,4 +237,3 @@ function twofactor_auth() {
 		}
 	}
 }
-?>

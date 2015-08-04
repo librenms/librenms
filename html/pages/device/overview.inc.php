@@ -71,5 +71,3 @@ require 'overview/syslog.inc.php';
 echo('</div></div></div>');
 
 #require 'overview/current.inc.php");
-
-?>
