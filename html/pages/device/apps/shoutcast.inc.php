@@ -17,7 +17,7 @@ if ($handle = opendir($rrddir)) {
     }
 }
 
-if (isset($total) && $total == true) {
+if (isset($total) && $total === true) {
     $graphs = array(
         'shoutcast_multi_bits'  => 'Traffic Statistics - Total of all Shoutcast servers',
         'shoutcast_multi_stats' => 'Shoutcast Statistics - Total of all Shoutcast servers',
