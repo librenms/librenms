@@ -55,7 +55,6 @@
             var device_id = $(this).data("device_id");
             var storage_id = $(this).data("storage_id");
             var data = $(this).val();
-            alert(device_id + ' ' + storage_id + ' ' + data);
             var $this = $(this);
             $.ajax({
                 type: 'POST',
@@ -69,14 +68,14 @@
                             $this.closest('.form-group').removeClass('has-success');
                         }, 2000);
                     } else {
-                        $(this).closest('.form-group').addClass('has-error');
+                        $this.closest('.form-group').addClass('has-error');
                         setTimeout(function () {
                             $this.closest('.form-group').removeClass('has-error');
                         }, 2000);
                     }
                 },
                 error: function () {
-                    $(this).closest('.form-group').addClass('has-error');
+                    $this.closest('.form-group').addClass('has-error');
                     setTimeout(function () {
                         $this.closest('.form-group').removeClass('has-error');
                     }, 2000);
