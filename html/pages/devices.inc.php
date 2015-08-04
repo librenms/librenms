@@ -191,14 +191,25 @@ if($format == "graph") {
                     $width=315;
                 }
 
-                echo("<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+78)."px; max-width:".($width+78)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>
-        <a href='device/device=".$device['device_id']."/' onmouseover=\"return overlib('\
-        <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$interface['ifDescr']."</div>\
-        <img src=\'graph.php?type=$graph_type&amp;device=".$device['device_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150&amp;title=yes\'>\
-        ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-        "<img class='lazy' height='110' width='$width' data-original='graph.php?type=$graph_type&amp;device=".$device['device_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=".$width."&amp;height=110&amp;legend=no&amp;title=yes'>
-        </a>
-        </div>");
+                $graph_array                = array();
+                $graph_array['type']        = $graph_type;
+                $graph_array['device']      = $device['device_id'];
+                $graph_array['to']          = $config['time']['now'];
+                $graph_array['from']        = $config['time']['day'];
+                $graph_array['height']      = '110';
+                $graph_array['width']       = $width;
+                $graph_array['legend']      = 'no';
+                $graph_array['title']       = 'yes';
+
+                $graph_array_zoom           = $graph_array;
+                $graph_array_zoom['height'] = '150';
+                $graph_array_zoom['width']  = '400';
+                $graph_array_zoom['legend'] = 'yes';
+
+                $overlib_link = "device/device=".$device['device_id']."/";
+                echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+78)."px; max-width:".($width+78)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
+                echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
+                echo "</div>\n\n";
             }
         }
     }
