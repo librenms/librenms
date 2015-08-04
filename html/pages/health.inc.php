@@ -100,5 +100,3 @@ if (in_array($vars['metric'],array_keys($used_sensors))
 else {
     echo("No sensors of type " . $vars['metric'] . " found.");
 }
-
-?>
