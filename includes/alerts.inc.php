@@ -349,4 +349,3 @@ function GetContacts($results) {
     }
     return $contacts;
 }
-?>
