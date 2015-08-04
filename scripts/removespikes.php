@@ -733,6 +733,7 @@ function updateXML(&$output, &$rra) {
 }
 
 function removeComments(&$output) {
+    $new_array = array();
 	if (sizeof($output)) {
 		foreach($output as $line) {
 			$line = trim($line);

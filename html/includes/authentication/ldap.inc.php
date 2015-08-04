@@ -4,7 +4,7 @@ $ds = @ldap_connect($config['auth_ldap_server'], $config['auth_ldap_port']);
 
 if ($config['auth_ldap_starttls'] && ($config['auth_ldap_starttls'] == 'optional' || $config['auth_ldap_starttls'] == 'require')) {
     $tls = ldap_start_tls($ds);
-    if ($config['auth_ldap_starttls'] == 'require' && $tls == false) {
+    if ($config['auth_ldap_starttls'] == 'require' && $tls === false) {
         echo '<h2>Fatal error: LDAP TLS required but not successfully negotiated:'.ldap_error($ds).'</h2>';
         exit;
     }
