@@ -20,5 +20,3 @@ if ($ifOperStatus != $interface['ifOperStatus']) {
   log_event("Interface went Up : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['port_id']);
   dbUpdate(array('ifOperStatus' => 'up'), 'ports', 'port_id=?',array($interface['port_id']));
 }
-
-?>
