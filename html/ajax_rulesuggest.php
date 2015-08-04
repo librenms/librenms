@@ -119,7 +119,7 @@ if (isset($_GET['term'],$_GET['device_id'])) {
         $obj          = array_chunk($obj, 20, true);
         $obj          = $obj[0];
         $flds = array();
-        if ($current == true) {
+        if ($current === true) {
             foreach ($obj as $fld) {
                 $flds[] = $fld['name'];
             }

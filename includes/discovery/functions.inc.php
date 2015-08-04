@@ -653,7 +653,9 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision='1
         }
         else {
             echo '.';
-            $update_data['mempool_descr'] = $descr;
+            $update_data = array(
+                'mempool_descr' => $descr,
+            );
 
             if (!empty($entPhysicalIndex)) {
                 $update_data['entPhysicalIndex'] = $entPhysicalIndex;

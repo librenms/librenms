@@ -311,6 +311,7 @@ function snmp_cache_ifIndex($device) {
     $data      = trim(external_exec($cmd));
     $device_id = $device['device_id'];
 
+    $array = array();
     foreach (explode("\n", $data) as $entry) {
         list ($this_oid, $this_value) = preg_split('/=/', $entry);
         list ($this_oid, $this_index) = explode('.', $this_oid, 2);
