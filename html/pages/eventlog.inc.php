@@ -37,6 +37,25 @@ print_optionbar_start();
         ?>
       </select>
     </div>
+    <div class="form-group">
+        <label>
+            <strong>Type: </strong>
+        </label>
+        <select name="type" id="type" class="form-control input-sm">
+            <option value="">All types</option>
+<?php
+
+foreach (dbFetchRows("SELECT `type` FROM `eventlog` GROUP BY `type`") as $types) {
+    echo '<option value="'.$types['type'].'"';
+    if ($types['type'] === $_POST['type']) {
+        echo ' selected';
+    }
+    echo '>'.$types['type'].'</option>';
+}
+
+?>
+        </select>
+    </div>
     <button type="submit" class="btn btn-default input-sm">Filter</button>
 </form>
 
