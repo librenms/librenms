@@ -41,7 +41,12 @@ if ($device['os'] == 'ironware' && $config['autodiscovery']['xdp'] === true) {
 echo ' CISCO-CDP-MIB: ';
 unset($cdp_array);
 if ($config['autodiscovery']['xdp'] === true) {
-    $cdp_array = snmpwalk_cache_twopart_oid($device, 'cdpCache', array(), 'CISCO-CDP-MIB');
+    if ($device['os'] == 'pbn') {
+        $cdp_array = snmpwalk_cache_oid($device, 'cdpCache', array(), 'CISCO-CDP-MIB');
+    }
+    else {
+        $cdp_array = snmpwalk_cache_twopart_oid($device, 'cdpCache', array(), 'CISCO-CDP-MIB');
+    }
     d_echo($cdp_array);
     if ($cdp_array) {
         unset($cdp_links);
