@@ -7,6 +7,11 @@ if (is_numeric($_POST['device'])) {
     $param[] = $_POST['device'];
 }
 
+if (!empty($_POST['type'])) {
+    $where .= ' AND `E`.`type` = ?';
+    $param[] = $_POST['type'];
+}
+
 if ($_POST['string']) {
     $where  .= ' AND E.message LIKE ?';
     $param[] = '%'.$_POST['string'].'%';
@@ -54,7 +59,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
         $type    = '<b>'.generate_port_link($this_if, makeshortif(strtolower($this_if['label']))).'</b>';
     }
     else {
-        $type = 'System';
+        $type = $eventlog['type'];;
     }
 
     $response[] = array(
