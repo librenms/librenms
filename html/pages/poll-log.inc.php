@@ -6,6 +6,7 @@ $no_refresh = true;
         <tr>
             <th data-column-id="hostname">Hostname</th>
             <th data-column-id="last_polled">Last Polled</th>
+            <th data-column-id="poller_group">Poller Group</th>
             <th data-column-id="last_polled_timetaken" data-order="desc">Polling Duration (Seconds)</th>
         </tr>
     </thead>
