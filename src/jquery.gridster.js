@@ -1490,9 +1490,13 @@
 		if (this.$player === null) {
 			return false;
 		}
+		
+		var margin_sides = this.options.widget_margins[0];
+
+		var placeholder_column = this.$preview_holder.attr('data-col');
 
 		var abs_offset = {
-			left: ui.position.left + this.baseX,
+			left: ui.position.left + this.baseX - (margin_sides * placeholder_column),
 			top: ui.position.top + this.baseY
 		};
 
@@ -1540,8 +1544,12 @@
 	fn.on_stop_drag = function (event, ui) {
 		this.$helper.add(this.$player).add(this.$wrapper)
 				.removeClass('dragging');
+				
+		var margin_sides = this.options.widget_margins[0];
 
-		ui.position.left = ui.position.left + this.baseX;
+		var placeholder_column = this.$preview_holder.attr('data-col');
+
+		ui.position.left = ui.position.left + this.baseX - (margin_sides * placeholder_column);
 		ui.position.top = ui.position.top + this.baseY;
 		this.colliders_data = this.collision_api.get_closest_colliders(
 				ui.position);
