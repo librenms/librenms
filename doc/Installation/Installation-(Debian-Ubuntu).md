@@ -7,6 +7,8 @@
 
 This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
 
+> ** Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
+
 You are free to choose between using MySQL or MariaDB:
 
 **MySQL**
@@ -44,6 +46,8 @@ If you are deploying a separate database server, you need to change the `bind-ad
 Find the line: `bind-address = 127.0.0.1`
 
 Change `127.0.0.1` to the IP address that your MySQL server should listen on.  Restart MySQL:
+
+If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
 
     service mysql restart
 
