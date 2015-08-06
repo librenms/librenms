@@ -100,6 +100,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = button.data('template_id');
     var action = button.data('template_action');
+    $('#template').val();
     $('#line').val('');
     $('#value').val('');
     if(action == 'edit') {
@@ -110,7 +111,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
             data: { type: "parse-alert-template", template_id: template_id },
             dataType: "json",
             success: function(output) {
-                $('#template').append(output['template']);
+                $('#template').val(output['template']);
                 $('#name').val(output['name']);
             }
         });
