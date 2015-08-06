@@ -35,10 +35,10 @@ if (isset($config['site_style']) && ($config['site_style'] == 'dark' || $config[
 <?php
 
 if ($config['title_image']) {
-    echo('<a class="navbar-brand" href=""><img src="' . $config['title_image'] . '" /></a>');
+    echo('<a class="hidden-md hidden-sm navbar-brand" href=""><img src="' . $config['title_image'] . '" /></a>');
 }
 else {
-    echo('<a class="navbar-brand" href="">'.$config['project_name'].'</a>');
+    echo('<a class="hidden-md hidden-sm navbar-brand" href="">'.$config['project_name'].'</a>');
 }
 
 ?>
@@ -430,7 +430,7 @@ if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
 ?>
 
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons"></i> Plugins</a>
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons"></i> <span class="hidden-md hidden-sm">Plugins</span></a>
           <ul class="dropdown-menu">
 <?php
 Plugins::call('menu');
