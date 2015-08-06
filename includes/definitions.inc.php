@@ -775,6 +775,7 @@ $config['os'][$os]['text'] = 'Apple AirPort';
 $config['os'][$os]['icon'] = 'apple';
 
 $os = 'windows';
+$config['os'][$os]['type']              = 'server';
 $config['os'][$os]['text']              = 'Microsoft Windows';
 $config['os'][$os]['ifname']            = 1;
 $config['os'][$os]['processor_stacked'] = 1;
