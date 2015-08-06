@@ -13,13 +13,10 @@
  * the source code distribution for details.
  */
 
-require 'includes/console_colour.php';
-$console_color = new Console_Color2();
-
 $options = getopt('m:h::');
 
 if (isset($options['h'])) {
-    print $console_color->convert(
+    echo  
         "\n Validate setup tool
 
     Usage: ./validate.php [-m <module>] [-h]
@@ -31,7 +28,7 @@ if (isset($options['h'])) {
         Example: ./validate.php -m mail.
 
         "
-    );
+    ;
     exit;
 }
 
@@ -69,6 +66,12 @@ if (mysqli_connect_error()) {
 }
 else {
     print_ok('Database connection successful');
+}
+
+// Test for MySQL Strict mode
+$strict_mode = dbFetchCell("SELECT @@global.sql_mode");
+if(strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
+    print_warn('You have MySQL STRICT_TRANS_TABLES enabled, it is advisable to disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
 }
 
 // Test transports
@@ -203,21 +206,18 @@ foreach ($modules as $module) {
 
 
 function print_ok($msg) {
-    global $console_color;
-    print $console_color->convert("%g[OK]%n      %W$msg\n");
+    echo "[OK]      $msg\n";
 
 }//end print_ok()
 
 
 function print_fail($msg) {
-    global $console_color;
-    print $console_color->convert("%r[FAIL]%n    %W$msg\n");
+    echo "[FAIL]    $msg\n";
 
 }//end print_fail()
 
 
 function print_warn($msg) {
-    global $console_color;
-    print $console_color->convert("%y[WARN]%n    %W$msg\n");
+    echo "[WARN]    $msg\n";
 
 }//end print_warn()
