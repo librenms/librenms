@@ -324,6 +324,12 @@ foreach ($ports as $port) {
         // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
         echo 'VLAN == '.$this_port['ifVlan'];
 
+	// When devices do not provide ifAlias data, populate with ifDescr data if configured
+        if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) && $config['os'][$device['os']]['ifalias_null'] == 1) {
+            $this_port['ifAlias'] = $this_port['ifDescr'];
+            d_echo('Using ifDescr due to ifAlias being NULL');
+        }
+
         // Update IF-MIB data
         foreach ($data_oids as $oid) {
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
@@ -351,12 +357,6 @@ foreach ($ports as $port) {
                 break;
             }
         }//end foreach
-
-        if (($port['update']['ifAlias'] == '' || $port['update']['ifAlias'] == NULL) && $config['os'][$device['os']]['ifalias_null'] == 1) {
-            $port['update']['ifAlias'] = $port['ifDescr'];
-            $this_port['ifAlias'] = $port['ifDescr'];
-            d_echo('Using ifDescr due to ifAlias being NULL');
-        }
 
         // Parse description (usually ifAlias) if config option set
         if (isset($config['port_descr_parser']) && is_file($config['install_dir'].'/'.$config['port_descr_parser'])) {
