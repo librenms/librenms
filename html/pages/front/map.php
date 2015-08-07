@@ -131,22 +131,24 @@ $(function () {
 </div>
 <?php
 }
-include_once("includes/object-cache.inc.php");
+include_once 'includes/object-cache.inc.php';
 echo '<div class="container-fluid">
 	<div class="row">
 		<div class="col-md-4">';
-			include_once("includes/front/boxes.inc.php");
+			include_once 'includes/front/boxes.inc.php';
 echo '		</div>
                 <div class="col-md-2">
                 </div>
 		<div class="col-md-4">';
-			include_once("includes/device-summary-vert.inc.php");
+			include_once 'includes/common/device-summary-vert.inc.php';
+                        echo implode('',$common_output);
 echo '		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">';
 			$device['device_id'] = '-1';
-			require_once('includes/print-alerts.php');
+			require_once 'includes/common/alerts.inc.php';
+                        echo implode('',$common_output);
 			unset($device['device_id']);
 echo '		</div>
 	</div>
