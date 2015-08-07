@@ -206,6 +206,9 @@ foreach (dbFetchRows($sql, $param) as $device) {
     $uptime = formatUptime($device['uptime'], 'short').'<br />'.$location;
     if ($subformat == 'detail') {
         $hostname .= '<br />'.$device['sysName'];
+        if (empty($port_count)) {
+            $port_count = 0;
+        }
         if ($port_count) {
             $col_port = ' <img src="images/icons/port.png" align=absmiddle /> '.$port_count.'<br />';
         }
