@@ -44,6 +44,7 @@ Contributors to LibreNMS:
 - Mikhail Bratchikov <mbratchikov@odin.com> (pepyaka)
 - Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 - David M. Syzdek <david@syzdek.net> (syzdek)
+- Gerben Meijer <gerben@daybyday.nl> (infernix)
 
 [1]: http://observium.org/ "Observium web site"
 
