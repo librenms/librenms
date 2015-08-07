@@ -352,8 +352,9 @@ foreach ($ports as $port) {
             }
         }//end foreach
 
-        if (($port['update']['ifAlias'] == '' || $port['update']['ifAlias'] == NULL) && $config['os'][$os]['ifalias_null'] == 1) {
+        if (($port['update']['ifAlias'] == '' || $port['update']['ifAlias'] == NULL) && $config['os'][$device['os']]['ifalias_null'] == 1) {
             $port['update']['ifAlias'] = $port['ifDescr'];
+            $this_port['ifAlias'] = $port['ifDescr'];
             d_echo('Using ifDescr due to ifAlias being NULL');
         }
 
