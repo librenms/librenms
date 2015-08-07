@@ -4,6 +4,10 @@ NOTE: These instructions assume you are the root user.  If you are not, prepend 
 
 ### On the DB Server ###
 
+This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
+
+> ** Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
+
 You are free to choose between using MySQL or MariaDB:
 
 **MySQL**
@@ -55,6 +59,8 @@ Add the following line:
     bind-address = <ip>
 
 Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
+
+If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
 
     service mysqld restart
 
