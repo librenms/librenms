@@ -2,7 +2,7 @@
 
 // MYSQL Check - FIXME
 // 1 UNKNOWN
-require 'config.php';
+include 'config.php';
 
 if (!isset($sql_file)) {
     $sql_file = 'build.sql';
