@@ -102,7 +102,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
     if (schedule_id > 0) {
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: { type: "schedule-maintenance", sub_type: "parse-maintenance", schedule_id: schedule_id },
             dataType: "json",
             success: function(output) {
@@ -124,7 +124,7 @@ $('#sched-submit').click('', function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
-        url: "/ajax_form.php",
+        url: "ajax_form.php",
         data: $('form.schedule-maintenance-form').serialize(),
         dataType: "json",
         success: function(data){
