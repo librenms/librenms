@@ -14,7 +14,7 @@ $common_output[] = '
 
 <script>
 
-var grid = $("#eventlog").bootgrid({
+var eventlog_grid = $("#eventlog").bootgrid({
     ajax: true,
     post: function ()
     {
