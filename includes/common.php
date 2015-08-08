@@ -319,7 +319,13 @@ function truncate($substring, $max = 50, $rep = '...') {
 
 function mres($string) {
     // short function wrapper because the real one is stupidly long and ugly. aesthetics.
-    return mysql_real_escape_string($string);
+    global $config, $database_link;
+    if ($config['db']['extension'] == 'mysqli') {
+        return mysqli_real_escape_string($database_link,$string);
+    }
+    else {
+        return mysql_real_escape_string($string);
+    }
 }
 
 function getifhost($id) {
