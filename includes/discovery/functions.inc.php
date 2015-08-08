@@ -545,9 +545,6 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
                 ),
                 'storage'
             );
-            if ($debug) {
-                mysql_error();
-            }
 
             echo '+';
         }
