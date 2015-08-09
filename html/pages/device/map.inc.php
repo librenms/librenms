@@ -14,4 +14,13 @@
 
 $pagetitle[] = 'Map';
 
-require_once 'includes/print-map.inc.php';
+if ($config['gui']['network-map']['style'] == 'old') {
+    echo '
+<center style="height:100%">
+    <object data="network-map.php?device='.$device['device_id'].'&format=svg" type="image/svg+xml" style="width: 100%; height:100%"></object>
+</center>
+    ';
+}
+else {
+    require_once 'includes/print-map.inc.php';
+}

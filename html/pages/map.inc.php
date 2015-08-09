@@ -11,4 +11,10 @@
  * the source code distribution for details.
  */
 $pagetitle[] = 'Map';
-require_once 'includes/print-map.inc.php';
+
+if ($config['gui']['network-map']['style'] == 'old') {
+    print_error('You are using the old style network map, a global map is not available');
+}
+else {
+    require_once 'includes/print-map.inc.php';
+}
