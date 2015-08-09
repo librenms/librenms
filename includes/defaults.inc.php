@@ -794,5 +794,8 @@ $config['leaflet']['default_lat']                       = '50.898482';
 $config['leaflet']['default_lng']                       = '-3.401402';
 $config['leaflet']['default_zoom']                       = 2;
 
+// General GUI options
+$config['gui']['network-map']['style']                  = 'new';//old is also valid
+
 // Navbar variables
 $config['navbar']['manage_groups']['hide']              = 0;
