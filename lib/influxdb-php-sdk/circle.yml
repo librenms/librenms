@@ -1,0 +1,51 @@
+machine:
+  timezone:
+    Europe/Rome
+  php:
+    version: 5.6.5
+
+dependencies:
+  pre:
+    - sudo apt-get update
+    - sudo apt-get install nginx
+    - wget https://s3.amazonaws.com/influxdb/influxdb_latest_amd64.deb
+    - sudo useradd influxdb
+    - sudo dpkg -i influxdb_latest_amd64.deb
+    - sudo cp ./scripts/influxdb_conf.toml /etc/opt/influxdb/influxdb.conf
+    - sudo /opt/influxdb/influxd -config /etc/opt/influxdb/influxdb.conf: {background: true}
+    - sudo cp scripts/nginx_proxy.conf /etc/nginx/conf.d/proxy.conf
+    - sudo service nginx stop
+    - sleep 2
+    - sudo service nginx start
+    - sed -i 's/^;//' ~/.phpenv/versions/$(phpenv global)/etc/conf.d/xdebug.ini
+  override:
+    - phpenv global 5.6.5
+    - composer install --prefer-source --no-interaction
+    - phpenv global 5.5.21
+    - composer install --prefer-source --no-interaction
+
+test:
+  override:
+    - phpenv global 5.6.5
+    - composer require guzzlehttp/guzzle:~6 --prefer-source --no-interaction --update-with-dependencies
+    - composer show -i
+    - vendor/bin/phpunit --coverage-clover clover.xml
+    - composer require guzzlehttp/guzzle:~5 --prefer-source --no-interaction --update-with-dependencies
+    - composer show -i
+    - vendor/bin/phpunit
+    - composer require guzzlehttp/guzzle:~4 --prefer-source --no-interaction --update-with-dependencies
+    - composer show -i
+    - vendor/bin/phpunit
+    - phpenv global 5.5.21
+    - composer require guzzlehttp/guzzle:~6 --prefer-source --no-interaction --update-with-dependencies
+    - composer show -i
+    - vendor/bin/phpunit
+    - composer require guzzlehttp/guzzle:~5 --prefer-source --no-interaction --update-with-dependencies
+    - composer show -i
+    - vendor/bin/phpunit
+    - composer require guzzlehttp/guzzle:~4 --prefer-source --no-interaction --update-with-dependencies
+    - composer show -i
+    - vendor/bin/phpunit
+  post:
+    - wget https://scrutinizer-ci.com/ocular.phar
+    - php ocular.phar code-coverage:upload --format=php-clover clover.xml
