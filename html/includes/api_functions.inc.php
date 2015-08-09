@@ -878,7 +878,6 @@ function list_bills() {
     }
 
     foreach (dbFetchRows("SELECT `bills`.*,COUNT(port_id) AS `ports_total` FROM `bills` LEFT JOIN `bill_ports` ON `bill_ports`.`bill_id`=`bills`.`bill_id` $sql GROUP BY `bill_name`,`bill_ref` ORDER BY `bill_name`",$param) as $bill) {
-        $day_data     = getDates($bill['bill_day']);
         $rate_data    = $bill;
         $allowed = '';
         $used = '';
