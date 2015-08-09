@@ -12,7 +12,7 @@ if ($device['os'] == 'dsm') {
     // Get DiskStation temperature
     $diskstation_temperature = snmp_get($device, $diskstation_temperature_oid, '-Oqv');
     // Save the DiskStation temperature
-    discover_sensor($valid['sensor'], 'temperature', $device, $diskstation_temperature_oid, '2', 'snmp', 'System Temperature', '1', '1', null, null, null, null, $diskstation_temperature);
+    discover_sensor($valid['sensor'], 'temperature', $device, $diskstation_temperature_oid, '99', 'snmp', 'System Temperature', '1', '1', null, null, null, null, $diskstation_temperature);
 
 
     // Get all disks in the device
