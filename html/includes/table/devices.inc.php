@@ -79,8 +79,7 @@ if (!empty($_POST['location']) && $_POST['location'] == 'Unset') {
 
 if (!empty($_POST['location'])) {
     $sql    .= " AND `location` = ?";
-    $param[] = mres($_POST['location']);
-    $param[] = mres($_POST['location']);
+    $param[] = $_POST['location'];
 }
 
 if (!empty($_POST['group'])) {
