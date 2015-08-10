@@ -301,7 +301,7 @@ elseif($stage == "2") {
      <div class="col-md-3">
      </div>
      <div class="col-md-6">
-         <h5 class="text-center">Importing MySQL DB - Do not close this page or interupt the import</h5>
+         <h5 class="text-center">Importing MySQL DB - Do not close this page or interrupt the import</h5>
 <?php
 // Ok now let's set the db connection up
     $config['db_host']=$dbhost;
