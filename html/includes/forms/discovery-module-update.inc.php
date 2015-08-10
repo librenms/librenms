@@ -1,8 +1,13 @@
 <?php
 
 // FUA
+
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
+
 $device['device_id'] = $_POST['device_id'];
-$module              = 'poll_'.$_POST['poller_module'];
+$module              = 'discover_'.$_POST['discovery_module'];
 
 if (!isset($module) && validate_device_id($device['device_id']) === false) {
     echo 'error with data';
@@ -19,7 +24,7 @@ else {
         $state = 0;
     }
 
-    if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] != $config['poller_modules'][$module]) {
+    if (isset($attribs['discover_'.$module]) && $attribs['discover_'.$module] != $config['discover_modules'][$module]) {
         del_dev_attrib($device, $module);
     }
     else {
