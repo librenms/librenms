@@ -12,6 +12,10 @@
  * the source code distribution for details.
  */
 
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
+
 if (!is_numeric($_POST['user_id']) || !isset($_POST['token'])) {
     echo 'ERROR: error with data, please ensure a valid user and token have been specified.';
     exit;
