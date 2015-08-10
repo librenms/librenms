@@ -12,20 +12,24 @@
  * the source code distribution for details.
  */
 
-if (!is_numeric($_POST['group_id'])) {
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
+
+if (!is_numeric($_POST['token_id'])) {
     echo 'error with data';
     exit;
 }
 else {
     if ($_POST['confirm'] == 'yes') {
-        $delete = dbDelete('poller_groups', '`id` = ?', array($_POST['group_id']));
+        $delete = dbDelete('api_tokens', '`id` = ?', array($_POST['token_id']));
         if ($delete > '0') {
-            echo 'Poller group has been removed';
+            echo 'API token has been removed';
             exit;
         }
         else {
-            echo 'An error occurred removing the Poller group';
+            echo 'An error occurred removing the API token';
             exit;
         }
     }
-}
+}//end if
