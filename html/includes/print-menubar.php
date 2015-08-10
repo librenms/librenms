@@ -77,9 +77,17 @@ if ($_SESSION['userlevel'] >= '10') {
           </li>
             <li role="presentation" class="divider"></li>
             <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-book fa-fw fa-lg"></i> Eventlog</a></li>
-<?php if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-  echo('              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-book fa-fw fa-lg"></i> Syslog</a></li>');
-} ?>
+<?php
+
+if (isset($config['enable_syslog']) && $config['enable_syslog']) {
+    echo '              <li><a href="'.generate_url(array('page'=>'syslog')).'"><i class="fa fa-book fa-fw fa-lg"></i> Syslog</a></li>';
+}
+
+if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
+    echo '              <li><a href="'.generate_url(array('page'=>'graylog')).'"><i class="fa fa-book fa-fw fa-lg"></i> Graylog</a></li>';
+}
+
+?>
             <li><a href="<?php echo(generate_url(array('page'=>'inventory'))); ?>"><i class="fa fa-cube fa-fw fa-lg"></i> Inventory</a></li>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header"> Search</li>
