@@ -73,7 +73,7 @@ var grid = $("#alert-schedule").bootgrid({
             id: "alert-schedule",
         };
     },
-    url: "/ajax_table.php"
+    url: "ajax_table.php"
 }).on("loaded.rs.jquery.bootgrid", function()
 {
     /* Executes after data is loaded and rendered */

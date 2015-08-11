@@ -119,7 +119,7 @@ $('#create-group').on('show.bs.modal', function (event) {
     });
     $.ajax({
         type: "POST",
-        url: "/ajax_form.php",
+        url: "ajax_form.php",
         data: { type: "parse-device-group", group_id: group_id },
         dataType: "json",
         success: function(output) {
@@ -192,7 +192,7 @@ $('#group-submit').click('', function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
-        url: "/ajax_form.php",
+        url: "ajax_form.php",
         data: $('form.group-form').serialize(),
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {
