@@ -29,7 +29,7 @@ if($stage == "4" || $stage == "3") {
 
 require '../includes/defaults.inc.php';
 // Work out the install directory
-$cur_dir = explode('/',__DIR__);
+$cur_dir = explode('/',$_SERVER['DOCUMENT_ROOT']);
 $check = end($cur_dir);
 if( empty($check) ) {
     $install_dir = array_pop($cur_dir);
@@ -90,6 +90,7 @@ $complete = 1;
 <html>
 <head>
   <title><?php echo($config['page_title_prefix']); ?></title>
+  <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
   <meta http-equiv="content-language" content="en-us" />
@@ -300,7 +301,7 @@ elseif($stage == "2") {
      <div class="col-md-3">
      </div>
      <div class="col-md-6">
-         <h5 class="text-center">Importing MySQL DB - Do not close this page or interupt the import</h5>
+         <h5 class="text-center">Importing MySQL DB - Do not close this page or interrupt the import</h5>
 <?php
 // Ok now let's set the db connection up
     $config['db_host']=$dbhost;

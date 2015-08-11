@@ -44,6 +44,13 @@ function poll_sensor($device, $class, $unit) {
             else if ($class == 'state') {
                 $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-Oevq', 'SNMPv2-MIB')));
             }
+            else if ($class == 'dbm') {
+                $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
+                //iosxr does not expose dbm values through SNMP so we convert Watts to dbm to have a nice graph to show
+                if ($device['os'] == "iosxr") {
+                    $sensor_value = round(10*log10($sensor_value/1000),3);
+                }
+            }
             else {
                 if ($sensor['sensor_type'] == 'apc') {
                     $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB:PowerNet-MIB$mib")));
