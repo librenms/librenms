@@ -57,7 +57,7 @@ $('#create-map').on('show.bs.modal', function (event) {
     $('#map_id').val(map_id);
     $.ajax({
         type: "POST",
-        url: "/ajax_form.php",
+        url: "ajax_form.php",
         data: { type: "parse-alert-map", map_id: map_id },
         dataType: "json",
         success: function(output) {
@@ -166,7 +166,7 @@ $('#map-submit').click('', function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
-        url: "/ajax_form.php",
+        url: "ajax_form.php",
         data: $('form.maps-form').serialize(),
         success: function(msg){
             $("#message").html('<div class="alert alert-info">'+msg+'</div>');

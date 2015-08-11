@@ -50,7 +50,7 @@ $('#alert-template-removal').click('', function(event) {
     var template_id = $("#template_id").val();
     $.ajax({
         type: 'POST',
-        url: '/ajax_form.php',
+        url: 'ajax_form.php',
         data: { type: "delete-alert-template", template_id: template_id },
         dataType: "html",
         success: function(msg) {
