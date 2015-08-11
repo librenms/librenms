@@ -99,7 +99,7 @@ else if ($vars['view'] == 'add') {
         }
     }
 
-    echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><img align=absmiddle src="images/16/arrow_left.png"> Back to Bills</a></div>';
+    echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><img align=absmiddle src="/images/16/arrow_left.png"> Back to Bills</a></div>';
     print_optionbar_end();
 ?>
 

@@ -22,7 +22,7 @@ var grid = $("#poll-log").bootgrid({
             id: "poll-log"
         };
     },
-    url: "ajax_table.php"
+    url: "/ajax_table.php"
 });
 
 </script>
