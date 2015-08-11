@@ -33,7 +33,7 @@ if ($vars['page'] == 'logout' && $_SESSION['authenticated']) {
     setcookie('auth', '', (time() - 60 * 60 * 24 * $config['auth_remember']), '/');
     session_destroy();
     $auth_message = 'Logged Out';
-    header('Location: ' . $config['base_url']);
+    header('Location: /');
     exit;
 }
 

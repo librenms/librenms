@@ -63,7 +63,7 @@ ul ul ul { list-style: square outside; }
 }
 
 .submit {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAATCAIAAAA4QDsKAAAABGdBTUEAALGPC/xhBQAAAEZJREFUeJyVjMEJACEQA2dlSxD7r2/xcdhAfNwJig/PfJIhISaJocQk/9ccwTDAEYAQ4K99sylfXm+gtbFl1p4WNUouUaMDPUI2q6SigUIAAAAASUVORK5CYII=');
+  background-image: url('/images/submitbg.png');
   background-position: 0 100%;
   border-color: #B2B2B2 #525252 #525252 #B2B2B2;
 }
