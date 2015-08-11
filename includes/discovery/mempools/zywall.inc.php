@@ -17,6 +17,6 @@ if ($device['os'] == 'zywall') {
     $oid = '.1.3.6.1.4.1.890.1.6.22.1.2.0';
     $usage = snmp_get($device,$oid, '-Ovq');
     if (is_numeric($usage)) {
-        discover_mempool($valid_mempool, $device, 10, 'zywall', 'Memory', '1', null, null);
+        discover_mempool($valid_mempool, $device, $oid, 'zywall', 'Memory', '1', null, null);
     }
 }
