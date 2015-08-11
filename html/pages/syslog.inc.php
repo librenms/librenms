@@ -87,7 +87,7 @@ var grid = $("#syslog").bootgrid({
             from: '<?php echo htmlspecialchars($vars['from']); ?>',
         };
     },
-    url: "ajax_table.php"
+    url: "/ajax_table.php"
 });
 
 $(function () {

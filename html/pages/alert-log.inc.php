@@ -72,7 +72,7 @@ foreach (get_all_devices() as $hostname) {
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "/ajax_table.php"
 }).on("loaded.rs.jquery.bootgrid", function() {
 
     var results = $("div.infos").text().split(" ");

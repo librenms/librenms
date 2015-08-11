@@ -50,7 +50,7 @@ $('#alert-rule-removal').click('', function(event) {
     var alert_id = $("#alert_id").val();
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: '/ajax_form.php',
         data: { type: "delete-alert-rule", alert_id: alert_id },
         dataType: "html",
         success: function(msg) {
