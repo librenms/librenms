@@ -12,6 +12,8 @@ foreach ($_GET as $key => $get_var) {
 }
 
 $segments = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+$base_url = parse_url($config["base_url"]);
+$segments = explode('/', trim(str_replace($base_url["path"], "", $_SERVER['REQUEST_URI']), '/'));
 
 foreach ($segments as $pos => $segment) {
     $segment = urldecode($segment);
