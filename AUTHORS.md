@@ -23,7 +23,7 @@ Contributors to LibreNMS:
 - Stuart Henderson <stu@spacehopper.org> (sthen)
 - Filippo Giunchedi <filippo@esaurito.net> (filippog)
 - Lasse Leegaard <lasse@brandbil.dk> (lasseleegaard)
-- Mickael Marchand <mmarchand@corp.free.fr> (mmarchand)
+- Mickael Marchand  <mmarchand@corp.free.fr> (mmarchand)
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
@@ -35,7 +35,7 @@ Contributors to LibreNMS:
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
 - Louis Rossouw <lrossouw@gmail.com> (spinza) 
 - Clint Armstrong <clint@clintarmstrong.net> (clinta)
-- Tony Ditchfield <tony.ditchfield@gmail.com> (arnoldthebat)
+- Tony Ditchfield  <tony.ditchfield@gmail.com> (arnoldthebat)
 - Travis Hegner <travis.hegner@gmail.com> (travishegner)
 - Will Jones <email@willjones.eu> (willjones)
 - Job Snijders <job@instituut.net> (job)
@@ -45,8 +45,6 @@ Contributors to LibreNMS:
 - Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 - David M. Syzdek <david@syzdek.net> (syzdek)
 - Gerben Meijer <gerben@daybyday.nl> (infernix)
-- Michael Newton <mnewton@pofp.com> (miken32)
-
 
 [1]: http://observium.org/ "Observium web site"
 

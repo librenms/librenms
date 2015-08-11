@@ -60,7 +60,7 @@ $('#attach-alert-template').on('show.bs.modal', function(e) {
     $("#template_id").val(template_id);
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "/ajax_form.php",
         data: { type: "parse-template-rules", template_id: template_id },
         dataType: "json",
         success: function(output) {
@@ -88,7 +88,7 @@ $('#alert-template-attach').click('', function(event) {
     var rules = items.join(',');
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: '/ajax_form.php',
         data: { type: "attach-alert-template", template_id: template_id, rule_id: rules },
         dataType: "html",
         success: function(msg) {

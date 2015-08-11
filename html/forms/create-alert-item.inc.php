@@ -73,7 +73,7 @@ else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' 
             $device_id = ':'.$device_id;
         }
 
-        if (dbInsert(array('device_id' => $device_id, 'rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'name' => $name), 'alert_rules')) {
+        if (dbInsert(array('device_id' => $device_id, 'rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'disabled' => 0, 'name' => $name), 'alert_rules')) {
             $update_message = "Added Rule: <i>$name: $rule</i>";
             if (is_array($_POST['maps'])) {
                 foreach ($_POST['maps'] as $target) {

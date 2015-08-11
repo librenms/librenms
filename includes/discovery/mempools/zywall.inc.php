@@ -12,15 +12,11 @@
  * the source code distribution for details.
  */
 
-$pagetitle[] = 'Map';
-
-if ($config['gui']['network-map']['style'] == 'old') {
-    echo '
-<center style="height:100%">
-    <object data="network-map.php?device='.$device['device_id'].'&format=svg" type="image/svg+xml" style="width: 100%; height:100%"></object>
-</center>
-    ';
-}
-else {
-    require_once 'includes/print-map.inc.php';
+if ($device['os'] == 'zywall') {
+    echo 'Zywall mempool: ';
+    $oid = '.1.3.6.1.4.1.890.1.6.22.1.2.0';
+    $usage = snmp_get($device,$oid, '-Ovq');
+    if (is_numeric($usage)) {
+        discover_mempool($valid_mempool, $device, $oid, 'zywall', 'Memory', '1', null, null);
+    }
 }
