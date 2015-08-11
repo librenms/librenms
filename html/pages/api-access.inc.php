@@ -160,7 +160,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     var token_id = $(this).data("token_id");
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      url: '/ajax_form.php',
       data: { type: "token-item-disable", token_id: token_id, state: state},
       dataType: "html",
       success: function(data){
@@ -180,7 +180,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     token_id = $("#token_id").val();
     $.ajax({
       type: "POST",
-      url: "ajax_form.php",
+      url: "/ajax_form.php",
       data: $('form.remove_token_form').serialize() ,
       success: function(msg){
         $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');
@@ -197,7 +197,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     event.preventDefault();
     $.ajax({
       type: "POST",
-      url: "ajax_form.php",
+      url: "/ajax_form.php",
       data: $('form.create_token_form').serialize(),
       success: function(msg){
         $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');

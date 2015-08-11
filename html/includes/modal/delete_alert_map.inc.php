@@ -50,7 +50,7 @@ $('#alert-map-removal').click('', function(event) {
     var map_id = $("#map_id").val();
     $.ajax({
         type: 'POST',
-        url: 'ajax_form.php',
+        url: '/ajax_form.php',
         data: { type: "delete-alert-map", map_id: map_id },
         dataType: "html",
         success: function(msg) {

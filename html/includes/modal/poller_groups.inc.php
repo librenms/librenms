@@ -93,7 +93,7 @@ $('#group-removal').click('', function(e) {
     group_id = $("#group_id").val();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "/ajax_form.php",
         data: $('form.remove_group_form').serialize() ,
         success: function(msg) {
             $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');
@@ -115,7 +115,7 @@ $('#poller-groups').on('show.bs.modal', function (event) {
         $('#group_id').val(group_id);
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: "/ajax_form.php",
             data: { type: "parse-poller-groups", group_id: group_id },
             dataType: "json",
             success: function(output) {
@@ -133,7 +133,7 @@ $('#create-group').click('', function(e) {
     var group_id = $('#group_id').val();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "/ajax_form.php",
         data: { type: "poller-groups", group_name: group_name, descr: descr, group_id: group_id },
         dataType: "html",
         success: function(msg){
