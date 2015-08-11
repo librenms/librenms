@@ -30,7 +30,7 @@ else {
 }
 
 if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', array($port['port_id']))) {
-    $mac = "<a href='".generate_port_url($port, array('view' => 'macaccounting'))."'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
+    $mac = "<a href='".generate_port_url($port, array('view' => 'macaccounting'))."'><img src='images/16/chart_curve.png' align='absmiddle'></a>";
 }
 else {
     $mac = '';

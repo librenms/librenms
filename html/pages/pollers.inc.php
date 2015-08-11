@@ -30,7 +30,7 @@ $poll_tabs = array(
 foreach ($poll_tabs as $tab) {
     echo '
             <li>
-                <a href="/pollers/tab='.lcfirst($tab['name']).'">
+                <a href="' . generate_url(array('page'=>'pollers','tab'=>lcfirst($tab['name']))) . '">
                    <img src="images/16/'.$tab['icon'].'.png" align="absmiddle" border="0"> '.$tab['name'].'
                 </a>
             </li>';

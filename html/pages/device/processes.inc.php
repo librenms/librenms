@@ -85,7 +85,7 @@ foreach ($heads as $head => $extra) {
         $icon .= "'";
     }
 
-    echo '<th><a href="/device/device='.$device['device_id'].'/tab=processes/order='.$lhead.'/by='.$bhead.'"><span'.$icon.'>&nbsp;';
+    echo '<th><a href="' . generate_url(array('page'=>'device','device'=>$device['device_id'], 'tab'=>'processes', 'order'=>$lhead, 'by'=>$bhead)) . '"><span'.$icon.'>&nbsp;';
     if (!empty($extra)) {
         echo "<abbr title='$extra'>$head</abbr>";
     }
