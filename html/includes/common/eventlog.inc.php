@@ -14,7 +14,7 @@ $common_output[] = '
 
 <script>
 
-var grid = $("#eventlog").bootgrid({
+var eventlog_grid = $("#eventlog").bootgrid({
     ajax: true,
     post: function ()
     {
@@ -24,7 +24,7 @@ var grid = $("#eventlog").bootgrid({
             type: "' .mres($vars['type']) .'",
         };
     },
-    url: "ajax_table.php"
+    url: "/ajax_table.php"
 });
 
 </script>

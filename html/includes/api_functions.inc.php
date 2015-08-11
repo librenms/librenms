@@ -878,33 +878,25 @@ function list_bills() {
     }
 
     foreach (dbFetchRows("SELECT `bills`.*,COUNT(port_id) AS `ports_total` FROM `bills` LEFT JOIN `bill_ports` ON `bill_ports`.`bill_id`=`bills`.`bill_id` $sql GROUP BY `bill_name`,`bill_ref` ORDER BY `bill_name`",$param) as $bill) {
-        $day_data     = getDates($bill['bill_day']);
-        $ports_total  = $bill['ports_total'];
-        $datefrom     = $day_data['0'];
-        $dateto       = $day_data['1'];
         $rate_data    = $bill;
-        $rate_95th    = $rate_data['rate_95th'];
-        $dir_95th     = $rate_data['dir_95th'];
-        $total_data   = $rate_data['total_data'];
-        $rate_average = $rate_data['rate_average'];
+        $allowed = '';
+        $used = '';
+        $percent = '';
+        $overuse = '';
 
         if ($bill['bill_type'] == "cdr") {
-            $type = "CDR";
             $allowed = format_si($bill['bill_cdr'])."bps";
             $used    = format_si($rate_data['rate_95th'])."bps";
             $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100,2);
-            $background = get_percentage_colours($percent);
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
             $overuse = (($overuse <= 0) ? "-" : format_si($overuse));
         }
         elseif ($bill['bill_type'] == "quota") {
-            $type = "Quota";
             $allowed = format_bytes_billing($bill['bill_quota']);
             $used    = format_bytes_billing($rate_data['total_data']);
             $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100,2);
-            $background = get_percentage_colours($percent);
             $overuse = $rate_data['total_data'] - $bill['bill_quota'];
-            $overuse = (($overuse <= 0) ? "-" : format_bytes_billing($overus));
+            $overuse = (($overuse <= 0) ? "-" : format_bytes_billing($overuse));
         }
         $bill['allowed'] = $allowed;
         $bill['used'] = $used;
@@ -913,7 +905,14 @@ function list_bills() {
         $bills[] = $bill;
     }
     $count = count($bills);
-    $output = array("status" => $status, "err-msg" => $err_msg, "count" => $count, "bills" => $bills);
+    $output = array(
+        'status' => $status,
+        'message' => $message,
+        'err-msg' => $err_msg,
+        'count' => $count,
+        'bills' => $bills
+    );
+    $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }

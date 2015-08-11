@@ -30,7 +30,7 @@ elseif ($sub_type == 'add' && is_numeric($widget_id)) {
         $widget = dbFetchRow('SELECT * FROM `widgets` WHERE `widget_id`=?', array($widget_id));
         if (is_array($widget)) {
             list($x,$y) = explode(',',$widget['base_dimensions']);
-            $item_id = dbInsert(array('user_id'=>$_SESSION['user_id'],'widget_id'=>$widget_id,'title'=>$widget['widget_title'],'size_x'=>$x,'size_y'=>$y),'users_widgets');
+            $item_id = dbInsert(array('user_id'=>$_SESSION['user_id'],'widget_id'=>$widget_id, 'col'=>1,'row'=>1,'refresh'=>60,'title'=>$widget['widget_title'],'size_x'=>$x,'size_y'=>$y),'users_widgets');
             if (is_numeric($item_id)) {
                 $extra = array('widget_id'=>$item_id,'title'=>$widget['widget_title'],'widget'=>$widget['widget'],'size_x'=>$x,'size_y'=>$y);
                 $status = 'ok';

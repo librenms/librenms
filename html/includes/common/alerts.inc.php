@@ -22,7 +22,7 @@ $common_output[] = '
     </table>
 </div>
 <script>
-var grid = $("#alerts").bootgrid({
+var alerts_grid = $("#alerts").bootgrid({
     ajax: true,
     post: function ()
     {
@@ -31,7 +31,7 @@ var grid = $("#alerts").bootgrid({
             device_id: \'' . $device['device_id'] .'\'
         };
     },
-    url: "ajax_table.php",
+    url: "/ajax_table.php",
     formatters: {
         "status": function(column,row) {
             return "<h4><span class=\'label label-"+row.extra+" threeqtr-width\'>" + row.msg + "</span></h4>";
@@ -43,14 +43,14 @@ var grid = $("#alerts").bootgrid({
     templates: {
     }
 }).on("loaded.rs.jquery.bootgrid", function() {
-    grid.find(".incident-toggle").each( function() {
+    alerts_grid.find(".incident-toggle").each( function() {
       $(this).parent().addClass(\'incident-toggle-td\');
     }).on("click", function(e) {
       var target = $(this).data("target");
       $(target).collapse(\'toggle\');
       $(this).toggleClass(\'glyphicon-plus glyphicon-minus\');
     });
-    grid.find(".incident").each( function() {
+    alerts_grid.find(".incident").each( function() {
       $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
       $(this).parent().parent().on("mouseenter", function() {
         $(this).find(".incident-toggle").fadeIn(200);
@@ -64,13 +64,13 @@ var grid = $("#alerts").bootgrid({
         }
       });
     });
-    grid.find(".command-ack-alert").on("click", function(e) {
+    alerts_grid.find(".command-ack-alert").on("click", function(e) {
         e.preventDefault();
         var alert_id = $(this).data("alert_id");
         var state = $(this).data("state");
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: "/ajax_form.php",
             data: { type: "ack-alert", alert_id: alert_id, state: state },
             success: function(msg){
                 $("#message").html(\'<div class="alert alert-info">\'+msg+\'</div>\');
