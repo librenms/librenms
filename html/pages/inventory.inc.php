@@ -92,7 +92,7 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
             serial: '<?php echo mres($_POST['serial']); ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "/ajax_table.php"
 });
 
 </script>

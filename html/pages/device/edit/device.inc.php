@@ -149,7 +149,7 @@ if ($unknown) {
         var device_id = $(this).data("device_id");
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: '/ajax_form.php',
             data: { type: "rediscover-device", device_id: device_id },
             dataType: "json",
             success: function(data){
