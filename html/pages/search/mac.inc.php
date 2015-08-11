@@ -88,7 +88,7 @@ echo '"'.$_POST['address'].'"+';
             address: '<?php echo mres($_POST['address']); ?>'
         };
     },
-    url: "/ajax_table.php"
+    url: "ajax_table.php"
 });
 
 </script>
