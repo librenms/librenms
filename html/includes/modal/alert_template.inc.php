@@ -107,7 +107,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
         $('#template_id').val(template_id);
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: "/ajax_form.php",
             data: { type: "parse-alert-template", template_id: template_id },
             dataType: "json",
             success: function(output) {
@@ -125,7 +125,7 @@ $('#create-template').click('', function(e) {
     var name = $("#name").val();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        url: "/ajax_form.php",
         data: { type: "alert-templates", template: template , name: name, template_id: template_id},
         dataType: "html",
         success: function(msg){

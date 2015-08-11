@@ -54,7 +54,7 @@ $msg_box = array();
 // Check for install.inc.php
 if (!file_exists('../config.php') && $_SERVER['PATH_INFO'] != '/install.php') {
     // no config.php does so let's redirect to the install
-    header('Location: install.php');
+    header('Location: /install.php');
     exit;
 }
 
