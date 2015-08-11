@@ -42,7 +42,8 @@ $graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] .
 
 $context = stream_context_create(array(
     'http' => array(
-        'header'  => "Authorization: Basic " . base64_encode($config['graylog']['username'].':'.$config['graylog']['password'])
+        'header'  => "Authorization: Basic " . base64_encode($config['graylog']['username'].':'.$config['graylog']['password']) . "\r\n" .
+                     "Accept: application/json",
     )
 ));
 
