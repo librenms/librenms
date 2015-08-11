@@ -4,10 +4,8 @@ container of your choosing. If using a virtual host, place the directives in the
 `/etc/apache2/sites-available/default`.
 
 ```apache
-#This directive is never put inside a virtual host
-AllowEncodedSlashes On
-
 #These directives can be inside a virtual host or in the base server configuration
+AllowEncodedSlashes On
 Alias /librenms /opt/librenms/html
 
 <Directory "/opt/librenms/html">
