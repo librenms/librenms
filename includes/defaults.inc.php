@@ -53,7 +53,6 @@ $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
 $config['fping_options']['millisec'] = 20;
-$config['fping6']                    = '/usr/bin/fping6';
 $config['snmpwalk']                  = '/usr/bin/snmpwalk';
 $config['snmpget']                   = '/usr/bin/snmpget';
 $config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
@@ -65,10 +64,7 @@ $config['nagios_plugins'] = '/usr/lib/nagios/plugins';
 $config['ipmitool']       = '/usr/bin/ipmitool';
 $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
-$config['unflatten']      = '/usr/bin/unflatten';
-$config['neato']          = '/usr/bin/neato';
 $config['sfdp']           = '/usr/bin/sfdp';
-$config['svn']            = '/usr/bin/svn';
 
 // Memcached - Keep immediate statistics
 $config['memcached']['enable'] = false;
@@ -102,7 +98,6 @@ if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
     }
 }
 
-$config['project_url']    = 'https://github.com/librenms/';
 $config['project_home']   = 'http://www.librenms.org/';
 $config['project_issues'] = 'https://github.com/librenms/librenms/issues';
 $config['site_style']     = 'light';
@@ -110,7 +105,6 @@ $config['site_style']     = 'light';
 $config['stylesheet']   = 'css/styles.css';
 $config['mono_font']    = 'DejaVuSansMono';
 $config['favicon']      = '';
-$config['header_color'] = '#1F334E';
 $config['page_refresh'] = '300';
 // Refresh the page every xx seconds, 0 to disable
 $config['front_page'] = 'pages/front/default.php';
@@ -383,14 +377,6 @@ $config['version_check'] = 0;
 // Poller/Discovery Modules
 $config['enable_bgp'] = 1;
 // Enable BGP session collection and display
-$config['enable_rip'] = 1;
-// Enable RIP session collection and display
-$config['enable_ospf'] = 1;
-// Enable OSPF session collection and display
-$config['enable_isis'] = 1;
-// Enable ISIS session collection and display
-$config['enable_eigrp'] = 1;
-// Enable EIGRP session collection and display
 $config['enable_syslog'] = 0;
 // Enable Syslog
 $config['enable_inventory'] = 1;
@@ -406,8 +392,6 @@ $config['enable_sla'] = 0;
 // Ports extension modules
 $config['port_descr_parser'] = 'includes/port-descr-parser.inc.php';
 // Parse port descriptions into fields
-$config['enable_ports_Xbcmc'] = 1;
-// Enable ifXEntry broadcast/multicast
 $config['enable_ports_etherlike'] = 0;
 // Enable Polling EtherLike-MIB (doubles interface processing time)
 $config['enable_ports_junoseatmvp'] = 0;
@@ -490,8 +474,6 @@ $config['bad_if_regexp'][] = '/^sl[0-9]/';
 
 // Rewrite Interfaces
 $config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
-
-$config['processor_filter'][] = 'An electronic chip that makes the computer work.';
 
 $config['ignore_mount_removable'] = 1;
 // Ignore removable disk storage
@@ -592,7 +574,6 @@ $config['ignore_mount_removable'] = 1;
 $config['ignore_mount_network'] = 1;
 // Ignore network mounted storage
 // Syslog Settings
-$config['syslog_age'] = '1 month';
 // Entries older than this will be removed
 $config['syslog_filter'][] = 'last message repeated';
 $config['syslog_filter'][] = 'Connection from UDP: [';
