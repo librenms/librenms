@@ -253,6 +253,8 @@ function rrdtool_update($filename, $options) {
         $options = implode(':', $values);
     }
 
+    
+
     return rrdtool('update', $filename, $options);
 
 }
@@ -300,4 +302,28 @@ function rrdtool_escape($string, $maxlength=null){
     $result = str_replace(':', '\:', $result);
     return $result.' ';
 
+}
+
+function influx_update($device,$measurement,$tags=array(),$fields) {
+    $tmp_tags = array();
+    $tmp_fields = array();
+    foreach ($tags as $k => $v) {
+        $tmp_tags[] = "$k=$v";
+    }
+    foreach ($fields as $k => $v) {
+        $tmp_fields[] = "$k=$v";
+    }
+
+    $tags = implode(',', $tmp_tags);
+    $fields = implode(',', $tmp_fields);
+
+    $influx_url = 'http://localhost:8086/write?db=librenms';
+
+    $ch = curl_init($influx_url);
+    $post = "$measurement,host=".$device['hostname'].",$tags $fields";
+    curl_setopt($ch, CURLOPT_BINARYTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+    $response = curl_exec($ch);
+    echo "YEAH $response END\n";
+    d_echo($response);
 }
