@@ -109,10 +109,10 @@ foreach ($filelist as $file) {
 
                     if ($line[0] != '#') {
                         if ($config['db']['extension'] == 'mysqli') {
-                            
+                            $update = mysqli_query($database_link, $line);
                         }
                         else {
-                            $update = mysql_query($database_link, $line);
+                            $update = mysql_query($line);
                         }
                         if (!$update) {
                             $err++;
