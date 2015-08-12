@@ -5,14 +5,30 @@ require_once $config['install_dir'].'/includes/dbFacile.php';
 require_once $config['install_dir'].'/includes/mergecnf.inc.php';
 
 // Connect to database
-$database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+if ($config['db']['extension'] == 'mysqli') {
+    $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
+}
+else {
+    $database_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+}
+
 if (!$database_link) {
     echo '<h2>MySQL Error</h2>';
-    echo mysql_error();
+    if ($config['db']['extension'] == 'mysqli') {
+        echo mysqli_error($database_link);
+    }
+    else {
+        echo mysql_error();
+    }
 die;
 }
 
-$database_db = mysql_select_db($config['db_name'], $database_link);
+if ($config['db']['extension'] == 'mysqli') {
+    $database_db = mysqli_select_db($database_link, $config['db_name']);
+}
+else {
+    $database_db = mysql_select_db($config['db_name'], $database_link);
+}
 
 $clone = $config;
 foreach (dbFetchRows('select config_name,config_value from config') as $obj) {
