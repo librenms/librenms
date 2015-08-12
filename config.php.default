@@ -7,6 +7,7 @@ $config['db_host'] = "localhost";
 $config['db_user'] = "USERNAME";
 $config['db_pass'] = "PASSWORD";
 $config['db_name'] = "librenms";
+$config['db']['extension'] = 'mysqli';// mysql or mysqli
 
 ### Memcached config - We use this to store realtime usage
 $config['memcached']['enable']  = FALSE;

@@ -352,6 +352,7 @@ $config_file = <<<"EOD"
 \$config\['db_user'\] = "$dbuser";
 \$config\['db_pass'\] = "$dbpass";
 \$config\['db_name'\] = "$dbname";
+\$config\['db'\]\['extension'\] = "mysqli";// mysql or mysqli
 
 ### Memcached config - We use this to store realtime usage
 \$config\['memcached'\]\['enable'\]  = FALSE;
