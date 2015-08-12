@@ -260,10 +260,6 @@ Please see [Billing](http://docs.librenms.org/Extensions/Billing-Module/) sectio
 
 ```php
 $config['enable_bgp']                   = 1; # Enable BGP session collection and display
-$config['enable_rip']                   = 1; # Enable RIP session collection and display
-$config['enable_ospf']                  = 1; # Enable OSPF session collection and display
-$config['enable_isis']                  = 1; # Enable ISIS session collection and display
-$config['enable_eigrp']                 = 1; # Enable EIGRP session collection and display
 $config['enable_syslog']                = 0; # Enable Syslog
 $config['enable_inventory']             = 1; # Enable Inventory
 $config['enable_pseudowires']           = 1; # Enable Pseudowires
