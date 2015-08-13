@@ -26,7 +26,7 @@ if (1) {
     $rrd_list[4]['colour_area_out'] = 'c0a060';
 
     $units       = '';
-    $units_descr = 'Packets/sec';
+    $units_descr = 'Packets';
     $total_units = 'B';
     $colours_in  = 'purples';
     $multiplier  = '1';
