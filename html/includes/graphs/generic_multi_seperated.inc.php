@@ -15,7 +15,7 @@ else {
 }
 
 $i            = 0;
-$rrd_options .= " COMMENT:'$units_descr Now       Ave      Max'";
+$rrd_options .= " COMMENT:'$units_descr Now       Avg      Max'";
 if (!$nototal) {
     $rrd_options .= " COMMENT:'Total'";
 }
