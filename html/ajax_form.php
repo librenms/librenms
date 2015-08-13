@@ -28,7 +28,7 @@ if (!$_SESSION['authenticated']) {
 }
 
 if (preg_match('/^[a-zA-Z0-9\-]+$/', $_POST['type']) == 1) {
-    if (file_exists('forms/'.$_POST['type'].'.inc.php')) {
-        include_once 'forms/'.$_POST['type'].'.inc.php';
+    if (file_exists('includes/forms/'.$_POST['type'].'.inc.php')) {
+        include_once 'includes/forms/'.$_POST['type'].'.inc.php';
     }
 }
