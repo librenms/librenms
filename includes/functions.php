@@ -583,7 +583,8 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'transport' => $transport,
         'status' => '1',
         'snmpver' => $snmpver,
-        'poller_group' => $poller_group
+        'poller_group' => $poller_group,
+        'status_reason' => '',
     );
 
     $device = array_merge($device, $v3);
