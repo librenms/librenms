@@ -12,6 +12,10 @@
  * the source code distribution for details.
  */
 
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
+
 if ($_POST['state'] == 'true') {
     $state = 1;
 }
