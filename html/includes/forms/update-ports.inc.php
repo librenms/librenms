@@ -1,5 +1,14 @@
 <?php
 
+if (is_admin() === false) {
+    $response = array(
+        'status'  => 'error',
+        'message' => 'Need to be admin',
+    );
+    echo _json_encode($response);
+    exit;
+}
+
 $status           = 'error';
 $message          = 'Error with config';
 
