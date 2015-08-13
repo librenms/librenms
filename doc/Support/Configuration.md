@@ -19,6 +19,22 @@ $config['log_dir'] = "/opt/librenms/logs";
 ```
 Log files created by LibreNMS will be stored within this directory.
 
+#### Database config
+
+These are the configuration options you will need to use to specify to get started.
+
+```php
+$config['db_host'] = "127.0.0.1";
+$config['db_user'] = "";
+$config['db_pass'] = "";
+$config['db_name'] = "";
+```
+
+You can also select between the mysql and mysqli php extensions:
+
+```php
+$config['db']['extension'] = 'mysqli';
+```
 
 #### Progams
 
@@ -260,10 +276,6 @@ Please see [Billing](http://docs.librenms.org/Extensions/Billing-Module/) sectio
 
 ```php
 $config['enable_bgp']                   = 1; # Enable BGP session collection and display
-$config['enable_rip']                   = 1; # Enable RIP session collection and display
-$config['enable_ospf']                  = 1; # Enable OSPF session collection and display
-$config['enable_isis']                  = 1; # Enable ISIS session collection and display
-$config['enable_eigrp']                 = 1; # Enable EIGRP session collection and display
 $config['enable_syslog']                = 0; # Enable Syslog
 $config['enable_inventory']             = 1; # Enable Inventory
 $config['enable_pseudowires']           = 1; # Enable Pseudowires

@@ -1,7 +1,6 @@
 <?php
 
 $sql  = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
-$query = mysql_query($sql);
 
 $syslog_output = '
 <div class="container-fluid">
