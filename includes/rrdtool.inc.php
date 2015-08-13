@@ -305,8 +305,8 @@ function rrdtool_escape($string, $maxlength=null){
 }
 
 function influx_update($device,$measurement,$tags=array(),$fields) {
-    $tmp_tags = array();
     $tmp_fields = array();
+    $tmp_tags[] = "host=".$device['hostname'];
     foreach ($tags as $k => $v) {
         $tmp_tags[] = "$k=$v";
     }
@@ -320,7 +320,7 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
     $influx_url = 'http://localhost:8086/write?db=librenms';
 
     $ch = curl_init($influx_url);
-    $post = "$measurement,host=".$device['hostname'].",$tags $fields";
+    $post = "$measurement,$tags $fields";
     curl_setopt($ch, CURLOPT_BINARYTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
     $response = curl_exec($ch);
