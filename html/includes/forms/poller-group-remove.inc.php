@@ -12,28 +12,24 @@
  * the source code distribution for details.
  */
 
-if (!is_numeric($_POST['token_id'])) {
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
+
+if (!is_numeric($_POST['group_id'])) {
     echo 'error with data';
     exit;
 }
 else {
-    if ($_POST['state'] == 'true') {
-        $state = 1;
+    if ($_POST['confirm'] == 'yes') {
+        $delete = dbDelete('poller_groups', '`id` = ?', array($_POST['group_id']));
+        if ($delete > '0') {
+            echo 'Poller group has been removed';
+            exit;
+        }
+        else {
+            echo 'An error occurred removing the Poller group';
+            exit;
+        }
     }
-    else if ($_POST['state'] == 'false') {
-        $state = 0;
-    }
-    else {
-        $state = 0;
-    }
-
-    $update = dbUpdate(array('disabled' => $state), 'api_tokens', '`id` = ?', array($_POST['token_id']));
-    if (!empty($update) || $update == '0') {
-        echo 'success';
-        exit;
-    }
-    else {
-        echo 'error';
-        exit;
-    }
-}//end if
+}

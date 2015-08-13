@@ -13,6 +13,11 @@
  */
 
 // FUA
+
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
+
 if (isset($_POST['sub_type']) && !empty($_POST['sub_type'])) {
     dbUpdate(array('sensor_custom' => 'No'), 'sensors', '`sensor_id` = ?', array($_POST['sensor_id']));
 }
