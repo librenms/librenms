@@ -328,13 +328,16 @@ function ExtTransports($obj) {
             echo $transport.' => ';
             eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' };');
             $tmp = $tmp($obj,$opts);
+            $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
+            $prefix[3] = &$prefix[0];
+            $prefix[4] = &$prefix[0];
             if ($tmp) {
                 echo 'OK';
-                log_event('Issued '.$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
+                log_event('Issued '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             }
             else {
                 echo 'ERROR';
-                log_event('Could not issue '.$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
+                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             }
         }
 
