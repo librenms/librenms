@@ -31,7 +31,7 @@ var alerts_grid = $("#alerts").bootgrid({
             device_id: \'' . $device['device_id'] .'\'
         };
     },
-    url: "/ajax_table.php",
+    url: "ajax_table.php",
     formatters: {
         "status": function(column,row) {
             return "<h4><span class=\'label label-"+row.extra+" threeqtr-width\'>" + row.msg + "</span></h4>";
@@ -70,7 +70,7 @@ var alerts_grid = $("#alerts").bootgrid({
         var state = $(this).data("state");
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: { type: "ack-alert", alert_id: alert_id, state: state },
             success: function(msg){
                 $("#message").html(\'<div class="alert alert-info">\'+msg+\'</div>\');

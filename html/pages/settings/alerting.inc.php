@@ -833,7 +833,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_value = $('#new_conf_value').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", config_group: "alerting", config_sub_group: "transports", config_name: config_name, config_value: config_value},
             dataType: "json",
             success: function(data){
@@ -869,7 +869,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_extra = $('#slack_extra').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-slack', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
             dataType: "json",
             success: function(data){
@@ -907,7 +907,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_from = $('#new_from').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-hipchat', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value, config_room_id: config_room_id, config_from: config_from},
             dataType: "json",
             success: function(data){
@@ -946,7 +946,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_userkey = $('#new_userkey').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-pushover', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value, config_userkey: config_userkey},
             dataType: "json",
             success: function(data){
@@ -984,7 +984,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_extra = $('#boxcar_extra').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-boxcar', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
             dataType: "json",
             success: function(data){
@@ -1018,7 +1018,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1039,7 +1039,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-slack', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1060,7 +1060,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-hipchat', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1081,7 +1081,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-pushover', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1102,7 +1102,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-boxcar', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1124,7 +1124,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data("config_id");
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", config_id: config_id, config_value: state},
             dataType: "json",
             success: function (data) {
@@ -1145,7 +1145,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_value = $this.val();
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {
@@ -1177,7 +1177,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_value = $this.val();
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {
@@ -1210,7 +1210,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_type = $this.data("type");
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", action: 'update-textarea', config_type: config_type, config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {
