@@ -76,7 +76,7 @@ function print_error($text) {
         print $console_color->convert("%r".$text."%n\n", false);
     }
     else {
-        echo('<div class="alert alert-danger"><img src="/images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-danger"><img src="images/16/exclamation.png" align="absmiddle"> '.$text.'</div>');
     }
 }
 
@@ -85,7 +85,7 @@ function print_message($text) {
         print Console_Color2::convert("%g".$text."%n\n", false);
     }
     else {
-        echo('<div class="alert alert-success"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
+        echo('<div class="alert alert-success"><img src="images/16/tick.png" align="absmiddle"> '.$text.'</div>');
     }
 }
 
