@@ -46,6 +46,7 @@ Contributors to LibreNMS:
 - David M. Syzdek <david@syzdek.net> (syzdek)
 - Gerben Meijer <gerben@daybyday.nl> (infernix)
 - Michael Newton <mnewton@pofp.com> (miken32)
+- Tom Ferguson <tom.ferguson.public@outlook.com> (Tawmu)
 
 
 [1]: http://observium.org/ "Observium web site"
