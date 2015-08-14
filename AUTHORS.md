@@ -45,6 +45,7 @@ Contributors to LibreNMS:
 - Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 - David M. Syzdek <david@syzdek.net> (syzdek)
 - Gerben Meijer <gerben@daybyday.nl> (infernix)
+- Tom Ferguson <tom.ferguson.public@outlook.com (Tawmu)
 
 [1]: http://observium.org/ "Observium web site"
 
