@@ -54,7 +54,7 @@ if ($device['os'] == 'dsm') {
 
 
     // DSM Upgrade Available OID (Value : 1 Available, 2 Unavailable, 3 Connecting, 4 Disconnected, 5 Others)
-    $dsm_upgrade_available_oid = '.1.3.6.1.4.1.6574.1.4.2.0';
+    $dsm_upgrade_available_oid = '.1.3.6.1.4.1.6574.1.5.4.0';
     $dsm_upgrade_available     = snmp_get($device, $dsm_upgrade_available_oid, '-Oqv');
     discover_sensor($valid['sensor'], 'state', $device, $dsm_upgrade_available_oid, 'DSMUpgradeStatus', 'snmp', 'DSM Upgrade Status', '1', '1', null, null, null, null, $dsm_upgrade_available);
 
