@@ -20,7 +20,7 @@ if ($connection === false) {
     exit(1);
 }
 
-$select = mysqli_select_db($config['db_name']);
+$select = mysqli_select_db($connection, $config['db_name']);
 if ($select === false) {
     echo 'ERROR: Cannot select database: '.mysqli_error($connection)."\n";
     exit(1);
