@@ -109,7 +109,7 @@ foreach ($filelist as $file) {
 
                     if ($line[0] != '#') {
                         if ($config['db']['extension'] == 'mysqli') {
-                            $update = mysqli_query($connection, $line);
+                            $update = mysqli_query($database_link, $line);
                         }
                         else {
                             $update = mysql_query($line);
@@ -118,7 +118,7 @@ foreach ($filelist as $file) {
                             $err++;
                             if ($debug) {
                                 if ($config['db']['extension'] == 'mysqli') {
-                                    echo mysqli_error($connection)."\n";
+                                    echo mysqli_error($database_link)."\n";
                                 }
                                 else {                           
                                     echo mysql_error()."\n";
