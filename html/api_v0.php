@@ -49,6 +49,8 @@ $app->group(
                         // api/v0/devices/$hostname/graphs
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
                         // api/v0/devices/$hostname/ports
+                        $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
+                        // api/v0/devices/$hostname/components
                         $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
                         // api/v0/devices/$hostname/$type
                         $app->get('/:hostname/ports/:ifname', 'authToken', 'get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname');
