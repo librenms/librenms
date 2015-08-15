@@ -307,6 +307,7 @@ elseif($stage == "2") {
     $config['db_user']=$dbuser;
     $config['db_pass']=$dbpass;
     $config['db_name']=$dbname;
+    $config['db']['extension']='mysqli';
     $sql_file = '../build.sql';
     require '../build-base.php';
 ?>
