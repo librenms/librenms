@@ -13,6 +13,7 @@
         - [`get_graphs`](#api-route-5)
         - [`get_graph_generic_by_hostname`](#api-route-6)
         - [`get_port_graphs`](#api-route-7)
+        - [`get_components`](#api-route-25)
         - [`get_port_stats_by_port_hostname`](#api-route-8)
         - [`get_graph_by_port_hostname`](#api-route-9)
         - [`list_devices`](#api-route-10)
@@ -264,6 +265,70 @@ Output:
             "ifName": "eth1"
         }
     ]
+}
+```
+
+### <a name="api-route-25">Function: `get_components`</a> [`top`](#top)
+
+Get a list of components for a particular device.
+
+Route: /api/v0/devices/:hostname/components
+
+- hostname can be either the device hostname or id
+
+Input:
+
+ - type: Filter the result by type (Equals).
+ - id: Filter the result by id (Equals).
+ - label: Filter the result by label (Contains).
+ - status: Filter the result by status (Equals).
+ - disabled: Filter the result by disabled (Equals).
+ - ignore: Filter the result by ignore (Equals).
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components
+```
+
+Output:
+
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 3,
+    "components": {
+        "2": {
+            "TestAttribute-1": "Value1",
+            "TestAttribute-2": "Value2",
+            "TestAttribute-3": "Value3",
+            "type": "TestComponent-1",
+            "label": "This is a really cool blue component",
+            "status": "1",
+            "ignore": "0",
+            "disabled": "0"
+        },
+        "20": {
+            "TestAttribute-1": "Value4",
+            "TestAttribute-2": "Value5",
+            "TestAttribute-3": "Value6",
+            "type": "TestComponent-1",
+            "label": "This is a really cool red component",
+            "status": "1",
+            "ignore": "0",
+            "disabled": "0"
+        },
+        "27": {
+            "TestAttribute-1": "Value7",
+            "TestAttribute-2": "Value8",
+            "TestAttribute-3": "Value9",
+            "type": "TestComponent-2",
+            "label": "This is a really cool yellow widget",
+            "status": "1",
+            "ignore": "0",
+            "disabled": "0"
+        }
+    }
 }
 ```
 

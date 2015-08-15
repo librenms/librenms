@@ -13,6 +13,7 @@
  */
 
 require_once '../includes/functions.php';
+require_once '../includes/component.php';
 
 
 function authToken(\Slim\Route $route) {
@@ -497,6 +498,59 @@ function get_graph_by_portgroup() {
     $app->response->headers->set('Content-Type', 'image/png');
     include 'includes/graphs/graph.inc.php';
 
+}
+
+
+function get_components() {
+    global $config;
+    $code     = 200;
+    $status   = 'ok';
+    $message  = '';
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+
+    // Do some filtering if the user requests.
+    $options = array();
+    if (isset($_GET['type'])) {
+        // set a type = filter
+        $options['filter']['type'] = array('=',$_GET['type']);
+    }
+    if (isset($_GET['id'])) {
+        // set a id = filter
+        $options['filter']['id'] = array('=',$_GET['id']);
+    }
+    if (isset($_GET['label'])) {
+        // set a label like filter
+        $options['filter']['label'] = array('LIKE',$_GET['label']);
+    }
+    if (isset($_GET['status'])) {
+        // set a status = filter
+        $options['filter']['status'] = array('=',$_GET['status']);
+    }
+    if (isset($_GET['disabled'])) {
+        // set a disabled = filter
+        $options['filter']['disabled'] = array('=',$_GET['disabled']);
+    }
+    if (isset($_GET['ignore'])) {
+        // set a ignore = filter
+        $options['filter']['ignore'] = array('=',$_GET['ignore']);
+    }
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $COMPONENT = new component();
+    $components = $COMPONENT->getComponents($device_id,$options);
+
+    $output       = array(
+        'status'  => "$status",
+        'err-msg' => $message,
+        'count'   => count($components[$device_id]),
+        'components'  => $components[$device_id],
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
 }
 
 
