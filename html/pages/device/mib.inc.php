@@ -32,6 +32,23 @@ if (!isset($vars['section'])) {
     </table>
 </div>
 
+<h4><i class="fa fa-file-text-o"></i> Device MIB values</h4>
+<div class="table-responsive">
+    <table id="oids" class="table table-hover table-condensed mibs">
+        <thead>
+            <tr>
+                <th data-column-id="module">Module</th>
+                <th data-column-id="mib">MIB</th>
+                <th data-column-id="object_type">Object type</th>
+                <th data-column-id="oid">OID</th>
+                <th data-column-id="value">Value</th>
+                <th data-column-id="numvalue">Numeric Value</th>
+                <th data-column-id="last_modified">Last Modified</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
 <script>
     var grid = $("#mibs").bootgrid({
         ajax: true,
@@ -40,6 +57,25 @@ if (!isset($vars['section'])) {
         {
             return {
                 id: "device_mibs",
+                device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
+            };
+        },
+        url: "/ajax_table.php",
+        formatters: {
+        },
+        templates: {
+        }
+    });
+</script>
+
+<script>
+    var grid2 = $("#oids").bootgrid({
+        ajax: true,
+        rowCount: [50,100,250,-1],
+        post: function ()
+        {
+            return {
+                id: "device_oids",
                 device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
             };
         },

@@ -131,6 +131,11 @@ function discover_device($device, $options=null) {
         }
     }
 
+    if (is_mib_poller_enabled($device)) {
+        $devicemib = array($device['sysObjectID'] => 'all');
+        register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
+    }
+
     // Set type to a predefined type for the OS if it's not already set
     if ($device['type'] == 'unknown' || $device['type'] == '') {
         if ($config['os'][$device['os']]['type']) {
