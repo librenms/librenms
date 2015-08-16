@@ -904,7 +904,8 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
  */
 
 
-function snmp_mib_walk($mib, $module, $mibdir=null) {
+function snmp_mib_walk($mib, $module, $mibdir=null)
+{
     $cmd    = 'snmptranslate -Ts';
     $cmd   .= mibdir($mibdir);
     $cmd   .= ' -m '.$module;

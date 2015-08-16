@@ -34,7 +34,7 @@ function quote_sql_word($c)
 }
 
 
-$params = array( 
+$params = array(
     $_POST['device_id'],
 );
 
