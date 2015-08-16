@@ -739,6 +739,9 @@ function round_Nth($val = 0, $round_to) {
     }
 } // end round_Nth 
 
+/*
+ * FIXME: Dummy implementation
+ */
 function count_mib_mempools($device)
 {
     if ($device['os'] == 'ruckuswireless') {
@@ -747,6 +750,9 @@ function count_mib_mempools($device)
     return 0;
 }
 
+/*
+ * FIXME: Dummy implementation
+ */
 function count_mib_processors($device)
 {
     if ($device['os'] == 'ruckuswireless') {
@@ -761,6 +767,7 @@ function count_mib_health($device)
 }
 
 /*
+ * FIXME: Dummy implementation
  * @return true if there is a custom graph defined for this type, subtype, and device
  */
 function is_custom_graph($type, $subtype, $device)
@@ -777,6 +784,7 @@ function is_custom_graph($type, $subtype, $device)
 }
 
 /*
+ * FIXME: Dummy implementation
  * Set section/graph entries in $graph_enable for graphs specific to $os.
  */
 function enable_os_graphs($os, &$graph_enable)

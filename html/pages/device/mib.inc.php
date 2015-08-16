@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS device MIB association browser
+ * LibreNMS device MIB browser
  *
  * Copyright (c) 2015 Gear Consulting Pty Ltd <github@libertysys.com.au>
  *
