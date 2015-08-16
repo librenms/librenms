@@ -926,10 +926,17 @@ function snmp_mib_walk($mib, $module, $mibdir=null)
 }//end snmp_mib_walk()
 
 
+function quote_column($a)
+{
+    return '`'.$a.'`';
+}
+
+
 function join_array($a, $b)
 {
-    return "$a=$b";
+    return quote_column($a).'='.$b;
 }
+
 
 /*
  * Update the given table in the database with the given row & column data.
@@ -940,6 +947,7 @@ function join_array($a, $b)
  */
 function update_db_table($tablename, $columns, $numkeys, $rows)
 {
+    dbBeginTransaction();
     foreach ($rows as $nothing => $obj) {
         // create a parameter list based on the columns
         $params = array();
@@ -954,12 +962,14 @@ function update_db_table($tablename, $columns, $numkeys, $rows)
         $update_definitions = array_map("join_array", $non_key_columns, $non_key_placeholders);
         $non_key_params = array_slice($params, $numkeys);
 
-        $sql = 'INSERT INTO `' . $tablename . '` (' . implode(',', $columns) .
+        $sql = 'INSERT INTO `' . $tablename . '` (' .
+            implode(',', array_map("quote_column", $columns)) .
             ') VALUES (' . implode(',', $column_placeholders) .
             ') ON DUPLICATE KEY UPDATE ' . implode(',', $update_definitions);
         $result = dbQuery($sql, array_merge($params, $non_key_params));
         d_echo("Result: $result\n");
     }
+    dbCommitTransaction();
 }
 
 /*
@@ -1118,23 +1128,37 @@ function update_mib_graph_types($mibname, $oids, $mibdef, $graphs)
 
 /*
  * Save all of the measurable oids for the device in their own RRDs.
+ * Save the current value of all the oids in the database.
  */
 function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
 {
     $usedoids = array();
+    $deviceoids = array();
     foreach ($oids as $index => $array) {
-        foreach ($array as $oid => $val) {
-            $type = oid_rrd_type($oid, $mibdef);
+        foreach ($array as $obj => $val) {
+            // build up the device_oid row for saving into the database
+            $numvalue = preg_match('/^\d+$/', $val) ? $val : null;
+            $deviceoids[] = array(
+                'device_id'     => $device['device_id'],
+                'oid'           => $mibdef[$obj]['oid'].".".$index,
+                'module'        => $mibdef[$obj]['module'],
+                'mib'           => $mibdef[$obj]['mib'],
+                'object_type'   => $obj,
+                'value'         => $val,
+                'numvalue'      => $numvalue,
+            );
+
+            $type = oid_rrd_type($obj, $mibdef);
             if ($type === false) {
                 continue;
             }
 
-            $usedoids[$index][$oid] = $val;
+            $usedoids[$index][$obj] = $val;
             rrd_create_update(
                 $device,
                 array(
                     $mibname,
-                    $mibdef[$oid]['shortname'],
+                    $mibdef[$obj]['shortname'],
                     $index,
                 ),
                 array("DS:mibval:$type"),
@@ -1146,6 +1170,9 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
     tag_graphs($mibname, $usedoids, $mibdef, $graphs);
     update_mib_graph_types($mibname, $usedoids, $mibdef, $graphs);
 
+    // update database
+    $columns = array('device_id', 'oid', 'module', 'mib', 'object_type', 'value', 'numvalue');
+    update_db_table('device_oids', $columns, 2, $deviceoids);
 }//end save_mibs()
 
 /*
