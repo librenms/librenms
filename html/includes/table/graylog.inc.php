@@ -53,7 +53,7 @@ $messages = json_decode(file_get_contents($graylog_url, false, $context),true);
 foreach ($messages['messages'] as $message) {
     $response[] = array(
                       'timestamp' => $message['message']['timestamp'],
-                      'source'    => $message['message']['source'],
+                      'source'    => generate_url(array('page'=>'device', 'device'=>$message['message']['source'])),
                       'message'    => $message['message']['message'],
                       'facility'  => $message['message']['facility'],
                       'level'     => $message['message']['level'],
