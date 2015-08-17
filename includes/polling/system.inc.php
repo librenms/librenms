@@ -75,8 +75,7 @@ if (is_numeric($uptime)) {
     }
 
     $measurement = 'uptime';
-    echo "BOOM " . sprintf("%.1f",$uptime) . " YAH\n";
-    $fields = array('uptime' => $uptime);
+    $fields = array('uptime' => force_influx_data('f',$uptime));
     influx_update($device,$measurement,$tags,$fields);
 
     rrdtool_update($uptime_rrd, 'N:'.$uptime);
