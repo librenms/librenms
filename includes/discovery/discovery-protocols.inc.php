@@ -83,7 +83,7 @@ unset($lldp_array);
 
 if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
 
-    echo ' NMS-LLDP-MIB: ';
+    echo ' NMS-LLDP-MIB: '; 
     $lldp_array  = snmpwalk_cache_oid($device, 'lldpRemoteSystemsData', array(), 'NMS-LLDP-MIB');
     d_echo($lldp_array);
     if ($lldp_array) {
