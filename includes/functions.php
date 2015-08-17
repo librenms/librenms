@@ -1238,3 +1238,9 @@ function fping($host,$params) {
 function function_check($function) {
     return function_exists($function);
 }
+
+function force_influx_data($type,$data) {
+    if ($type == 'f' || $type == 'float') {
+        return(sprintf("%.1f",$data));
+    }
+}// end force_influx_data

@@ -304,9 +304,34 @@ function rrdtool_escape($string, $maxlength=null){
 
 }
 
+function influx_connect() {
+    global $config;
+    if ($config['influxdb']['transport'] == 'http') {
+
+        $influx_url = $config['influxdb']['url'] . '/write?db=' . $config['influxdb']['db'];
+
+        $ch = curl_init($influx_url);
+
+        if (!empty($config['influxdb']['username']) && !empty($config['influxdb']['password'])) {
+             curl_setopt($ch, CURLOPT_USERPWD, $config['influxdb']['username'] . ":" . $config['influxdb']['password']);
+             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        }
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, TRUE);
+        return($ch);
+    }
+}// end influx_connect
+
+function influx_write($ch,$data) {
+    global $config;
+    if ($config['influxdb']['transport'] == 'http') {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        return(curl_exec($ch));
+    }
+}// end influx_write
+
 function influx_update($device,$measurement,$tags=array(),$fields) {
     $tmp_fields = array();
-    $tmp_tags[] = "host=".$device['hostname'];
+    $tmp_tags[] = "hostname=".$device['hostname'];
     foreach ($tags as $k => $v) {
         $tmp_tags[] = "$k=$v";
     }
@@ -317,13 +342,9 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
     $tags = implode(',', $tmp_tags);
     $fields = implode(',', $tmp_fields);
 
-    $influx_url = 'http://localhost:8086/write?db=librenms';
+    $influx_conn = influx_connect();
 
-    $ch = curl_init($influx_url);
-    $post = "$measurement,$tags $fields";
-    curl_setopt($ch, CURLOPT_BINARYTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-    $response = curl_exec($ch);
-    echo "YEAH $response END\n";
+    $data = "$measurement,$tags $fields";
+    $response = influx_write($influx_conn,$data);
     d_echo($response);
-}
+}// end influx_update
