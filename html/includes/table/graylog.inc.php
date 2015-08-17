@@ -35,7 +35,8 @@ if (!empty($filter_hostname)) {
     if (!empty($query)) {
         $query .= ' && ';
     }
-    $query .= 'source:"'.$filter_hostname.'"';
+    $ip = gethostbyname($filter_hostname);
+    $query .= 'source:"'.$filter_hostname.'" || source:"'.$ip.'"';
 }
 
 $graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] . '/search/universal/relative?query=' . urlencode($query) . '&range='. $filter_range . $extra_query;
@@ -59,7 +60,12 @@ foreach ($messages['messages'] as $message) {
     );
 }
 
-$total = $messages['total_results'];
+if (empty($messages['total_results'])) {
+    $total = 0;
+}
+else {
+    $total = $messages['total_results'];
+}
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
 echo _json_encode($output);
