@@ -41,6 +41,18 @@ foreach ($servers as $item => $server) {
             );
         }
 
-        rrdtool_update($rrdfile, "N:$bitrate:$traf_in:$traf_out:$current:$status:$peak:$max:$unique");
+        $fields = array(
+                        'bitrate'    => $bitrate,
+                        'traf_in'    => $traf_in,
+                        'traf_out'   => $traf_out,
+                        'current'    => $current,
+                        'status'     => $status,
+                        'peak'       => $peak,
+                        'max'        => $max,
+                        'unique'     => $unique,
+        );
+
+        rrdtool_update($rrdfile, $fields);
+
     }//end if
 }//end foreach

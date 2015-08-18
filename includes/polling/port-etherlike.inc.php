@@ -25,13 +25,13 @@ if ($port_stats[$port['ifIndex']] &&
         }
     }
 
-    $rrdupdate = 'N';
+    $fields = array();
     foreach ($etherlike_oids as $oid) {
         $data           = ($this_port[$oid] + 0);
-        $rrdupdate .= ":$data";
+        $fields[$oid] = $data;
     }
 
-    rrdtool_update($rrdfile, $rrdupdate);
+    rrdtool_update($rrdfile, $fields);
 
     echo 'EtherLike ';
 }

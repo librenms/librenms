@@ -1088,7 +1088,7 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs) {
                     $index,
                 ),
                 array('DS:'.$mibdef[$oid]['dsname'].":$type"),
-                "N:$val"
+                array($mibdef[$oid]['dsname'] => $val)
             );
         }
     }

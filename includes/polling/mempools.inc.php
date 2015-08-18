@@ -26,7 +26,11 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
         rrdtool_create($mempool_rrd, '--step 300 DS:used:GAUGE:600:0:U DS:free:GAUGE:600:0:U '.$config['rrd_rra']);
     }
 
-    rrdtool_update($mempool_rrd, 'N:'.$mempool['used'].':'.$mempool['free']);
+    $fields = array(
+        'used' => $mempool['used'],
+        'free' => $mempool['free'],
+    );
+    rrdtool_update($mempool_rrd, $fields);
 
     $mempool['state'] = array(
                          'mempool_used'  => $mempool['used'],

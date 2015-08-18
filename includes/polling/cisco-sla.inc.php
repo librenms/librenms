@@ -50,15 +50,17 @@ foreach (dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` =
     if (isset($sla_table[$sla['sla_nr']])) {
         $slaval = $sla_table[$sla['sla_nr']];
         echo $slaval['CompletionTime'].'ms at '.$slaval['TimeStr'];
-        $ts  = $slaval['UnixTime'];
         $val = $slaval['CompletionTime'];
     }
     else {
         echo 'NaN';
-        $ts  = 'N';
         $val = 'U';
     }
 
-    rrdtool_update($slarrd, $ts.':'.$val);
+    $fields = array(
+        'rtt' => $val,
+    );
+
+    rrdtool_update($slarrd, $fields);
     echo "\n";
 }//end foreach

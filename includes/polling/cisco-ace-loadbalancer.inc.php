@@ -39,7 +39,7 @@ foreach ($rserver_array as $index => $serverfarm) {
         $rrd_create .= " DS:$oid_ds:GAUGE:600:-1:100000000";
     }
 
-    $rrdupdate = 'N';
+    $fields = array();
 
     foreach ($oids as $oid) {
         if (is_numeric($serverfarm[$oid])) {
@@ -48,8 +48,7 @@ foreach ($rserver_array as $index => $serverfarm) {
         else {
             $value = '0';
         }
-
-        $rrdupdate .= ":$value";
+        $fields[$oid] = $value;
     }
 
     $rrd_create .= ' '.$config['rrd_rra'];
@@ -58,8 +57,7 @@ foreach ($rserver_array as $index => $serverfarm) {
         if (!file_exists($rrd_file)) {
             rrdtool_create($rrd_file, $rrd_create);
         }
-
-        rrdtool_update($rrd_file, $rrdupdate);
+        rrdtool_update($rrd_file, $fields);
     }
 }//end foreach
 
