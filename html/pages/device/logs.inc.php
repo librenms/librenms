@@ -30,9 +30,21 @@ if (isset($config['enable_syslog']) && $config['enable_syslog'] == 1) {
     }
 }
 
+if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
+    echo ' | ';
+    if ($vars['section'] == 'graylog') {
+        echo '<span class="pagemenu-selected">';
+    }
+    echo generate_link('Graylog', $vars, array('section' => 'graylog'));
+    if ($vars['section'] == 'graylog') {
+        echo '</span>';
+    }
+}
+
 switch ($vars['section']) {
     case 'syslog':
     case 'eventlog':
+    case 'graylog':
         include 'pages/device/logs/'.$vars['section'].'.inc.php';
         break;
 

@@ -74,7 +74,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         var s = JSON.stringify(gridster.serialize());
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-dashboard-config", data: s},
             dataType: "json",
             success: function (data) {
@@ -134,7 +134,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             var widget_id = $(this).data('widget-id');
             $.ajax({
                 type: 'POST',
-                url: '/ajax_form.php',
+                url: 'ajax_form.php',
                 data: {type: "update-dashboard-config", sub_type: 'remove-all'},
                 dataType: "json",
                 success: function (data) {
@@ -155,7 +155,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             var widget_id = $(this).data('widget_id');
             $.ajax({
                 type: 'POST',
-                url: '/ajax_form.php',
+                url: 'ajax_form.php',
                 data: {type: "update-dashboard-config", sub_type: 'add', widget_id: widget_id},
                 dataType: "json",
                 success: function (data) {
@@ -189,7 +189,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             var widget_id = $(this).data('widget-id');
             $.ajax({
                 type: 'POST',
-                url: '/ajax_form.php',
+                url: 'ajax_form.php',
                 data: {type: "update-dashboard-config", sub_type: 'remove', widget_id: widget_id},
                 dataType: "json",
                 success: function (data) {
@@ -213,7 +213,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
        new_refresh = refresh * 1000;
        $.ajax({
            type: 'POST',
-           url: '/ajax_dash.php',
+           url: 'ajax_dash.php',
            data: {type: data_type},
            dataType: "json",
            success: function (data) {
