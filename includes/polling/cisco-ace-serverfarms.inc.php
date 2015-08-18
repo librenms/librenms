@@ -45,7 +45,7 @@ foreach ($serverfarm_array as $index => $vserver) {
         $rrd_create .= " DS:$oid_ds:COUNTER:600:U:1000000000";
     }
 
-    $rrdupdate = 'N';
+    $fields = array();
 
     foreach ($oids as $oid) {
         if (is_numeric($vserver[$oid])) {
@@ -54,16 +54,14 @@ foreach ($serverfarm_array as $index => $vserver) {
         else {
             $value = '0';
         }
-
-        $rrdupdate .= ":$value";
+        $fields[$oid] = $value;
     }
 
     if (isset($classmaps[$classmap])) {
         if (!file_exists($rrd_file)) {
             rrdtool_create($rrd_file, $rrd_create);
         }
-
-        rrdtool_update($rrd_file, $rrdupdate);
+        rrdtool_update($rrd_file, $fields);
     }
 }//end foreach
 

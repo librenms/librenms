@@ -79,7 +79,11 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
             );
         }
 
-        rrdtool_update($wificlientsrrd, array($wificlients1));
+        $fields = array(
+            'wificlients' => $wificlients1,
+        );
+
+        rrdtool_update($wificlientsrrd, $fields);
 
         $graphs['wifi_clients'] = true;
     }
@@ -95,7 +99,11 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
             );
         }
 
-        rrdtool_update($wificlientsrrd, array($wificlients2));
+        $fields = array(
+            'wificlients' => $wificlients2,
+        );
+
+        rrdtool_update($wificlientsrrd, $fields);
 
         $graphs['wifi_clients'] = true;
     }

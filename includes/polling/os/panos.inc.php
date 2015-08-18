@@ -13,6 +13,11 @@ if (is_numeric($sessions)) {
         rrdtool_create($sessrrd, ' --step 300 DS:sessions:GAUGE:600:0:3000000 '.$config['rrd_rra']);
     }
 
-    rrdtool_update($sessrrd, "N:$sessions");
+    $fields = array(
+        'sessions' => $sessions,
+    );
+
+    rrdtool_update($sessrrd, $fields);
+
     $graphs['panos_sessions'] = true;
 }

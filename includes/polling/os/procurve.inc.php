@@ -44,7 +44,11 @@ if (is_numeric($FdbAddressCount)) {
         );
     }
 
-    rrdtool_update($fdb_rrd_file, "N:$FdbAddressCount");
+    $fields = array(
+        'value' => $FdbAddressCount,
+    );
+
+    rrdtool_update($fdb_rrd_file, $fields);
 
     $graphs['fdb_count'] = true;
 

@@ -105,7 +105,11 @@ function poll_sensor($device, $class, $unit) {
 
         echo "$sensor_value $unit\n";
 
-        rrdtool_update($rrd_file, "N:$sensor_value");
+        $fields = array(
+            'sensor' => $sensor_value,
+        );
+
+        rrdtool_update($rrd_file, $fields);
 
         // FIXME also warn when crossing WARN level!!
         if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value <= $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
@@ -259,7 +263,10 @@ function poll_device($device, $options) {
         }
 
         if (!empty($device_time)) {
-            rrdtool_update($poller_rrd, "N:$device_time");
+            $fields = array(
+                'poller' => $device_time,
+            );
+            rrdtool_update($poller_rrd, $fields);
         }
 
         // Ping response rrd
@@ -269,7 +276,11 @@ function poll_device($device, $options) {
         }
 
         if (!empty($ping_time)) {
-            rrdtool_update($ping_rrd, "N:$ping_time");
+            $fields = array(
+                'ping' => $ping_time,
+            );
+
+            rrdtool_update($ping_rrd, $fields);
         }
 
         $update_array['last_polled']           = array('NOW()');
@@ -316,6 +327,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 
     $rrdcreate = '--step 300 ';
     $oidglist  = array();
+    $oidnamelist = array();
     foreach ($mib_oids as $oid => $param) {
         $oidindex  = $param[0];
         $oiddsname = $param[1];
@@ -342,6 +354,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 
         // Add to oid GET list
         $oidglist[] = $fulloid;
+        $oidnamelist[] = $oiddsname;
     }//end foreach
 
     // Implde for LibreNMS Version
@@ -353,15 +366,16 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
         return false;
     }
 
-    $rrdupdate = 'N';
+    $oid_count = 0;
     foreach ($oidglist as $fulloid) {
         list($splitoid, $splitindex) = explode('.', $fulloid, 2);
         if (is_numeric($snmpdata[$splitindex][$splitoid])) {
-            $rrdupdate .= ':'.$snmpdata[$splitindex][$splitoid];
+            $fields[$oidnamelist[$oid_count]] = $snmpdata[$splitindex][$splitoid];
         }
         else {
-            $rrdupdate .= ':U';
+            $fields[$oidnamelist[$oid_count]] = 'U';
         }
+        $oid_count++;
     }
 
     $rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/'.$rrd_file;
@@ -370,7 +384,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
         rrdtool_create($rrdfilename, $rrdcreate.' '.$config['rrd_rra']);
     }
 
-    rrdtool_update($rrdfilename, $rrdupdate);
+    rrdtool_update($rrdfilename, $fields);
 
     foreach ($mib_graphs as $graphtoenable) {
         $graphs[$graphtoenable] = true;
