@@ -78,7 +78,7 @@ else {
             else {
                 $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
                 if (empty($twofactor['twofactor'])) {
-                    echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "/preferences/";</script>';
+                    echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "preferences/";</script>';
                 }
                 else {
                     $twofactor = json_decode($twofactor['twofactor'], true);
@@ -94,13 +94,13 @@ else {
                 }
                 else {
                     session_destroy();
-                    echo '<div class="alert alert-danger">Error: Supplied TwoFactor Token is wrong, you\'ve been logged out.</div><script>window.location = "/";</script>';
+                    echo '<div class="alert alert-danger">Error: Supplied TwoFactor Token is wrong, you\'ve been logged out.</div><script>window.location = "' . $config['base_url'] . '";</script>';
                 }
             }//end if
         }
         else {
             $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
-            echo '<script src="/js/jquery.qrcode.min.js"></script>';
+            echo '<script src="js/jquery.qrcode.min.js"></script>';
             echo '<div class="well"><h3>Two-Factor Authentication</h3>';
             if (!empty($twofactor['twofactor'])) {
                 $twofactor         = json_decode($twofactor['twofactor'], true);
@@ -154,7 +154,7 @@ else {
                             echo '<div class="alert alert-danger">Error inserting TwoFactor details. Please try again later and contact Administrator if error persists.</div>';
                         }
                         else {
-                            echo '<div class="alert alert-success">Added TwoFactor credentials. Please reload page.</div><script>window.location = "/preferences/";</script>';
+                            echo '<div class="alert alert-success">Added TwoFactor credentials. Please reload page.</div><script>window.location = "preferences/";</script>';
                         }
                     }
                     else {

@@ -12,6 +12,10 @@
  * the source code distribution for details.
  */
 
+if(is_admin() === false) {
+    die('ERROR: You need to be admin');
+}
+
 if (!is_numeric($_POST['token_id'])) {
     echo 'error with data';
     exit;

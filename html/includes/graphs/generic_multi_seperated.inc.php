@@ -15,7 +15,7 @@ else {
 }
 
 $i            = 0;
-$rrd_options .= " COMMENT:'$units_descr Current  Average  Maximum'";
+$rrd_options .= " COMMENT:'$units_descr Now       Avg      Max'";
 if (!$nototal) {
     $rrd_options .= " COMMENT:'Total'";
 }
@@ -74,7 +74,7 @@ foreach ($rrd_list as $rrd) {
         $stack = 'STACK';
     }
 
-    $rrd_options .= ' AREA:inbits'.$i.'#'.$colour_in.":'".rrdtool_escape($rrd['descr'], 10)."In ':$stack";
+    $rrd_options .= ' AREA:inbits'.$i.'#'.$colour_in.":'".rrdtool_escape($rrd['descr'], 9)."In ':$stack";
     $rrd_options .= ' GPRINT:inbits'.$i.':LAST:%6.2lf%s';
     $rrd_options .= ' GPRINT:inbits'.$i.':AVERAGE:%6.2lf%s';
     $rrd_options .= ' GPRINT:inbits'.$i.':MAX:%6.2lf%s';
@@ -85,7 +85,7 @@ foreach ($rrd_list as $rrd) {
 
     $rrd_options  .= " COMMENT:'\\n'";
     $rrd_optionsb .= ' AREA:outbits'.$i.'_neg#'.$colour_out."::$stack";
-    $rrd_options  .= '  HRULE:999999999999999#'.$colour_out.":'".str_pad('', 11)."Out':";
+    $rrd_options  .= ' HRULE:999999999999999#'.$colour_out.":'".str_pad('', 10)."Out':";
     $rrd_options  .= ' GPRINT:outbits'.$i.':LAST:%6.2lf%s';
     $rrd_options  .= ' GPRINT:outbits'.$i.':AVERAGE:%6.2lf%s';
     $rrd_options  .= ' GPRINT:outbits'.$i.':MAX:%6.2lf%s';
@@ -141,21 +141,21 @@ if (!$args['nototal']) {
 
     $rrd_options .= " COMMENT:' \\n'";
 
-    $rrd_options .= " HRULE:999999999999999#FFFFFF:'".str_pad('Total', 11)."In ':";
+    $rrd_options .= " HRULE:999999999999999#FFFFFF:'".str_pad('Total', 10)."In ':";
     $rrd_options .= ' GPRINT:inbits:LAST:%6.2lf%s';
     $rrd_options .= ' GPRINT:inbits:AVERAGE:%6.2lf%s';
     $rrd_options .= ' GPRINT:inbits:MAX:%6.2lf%s';
     $rrd_options .= " GPRINT:totin:%6.2lf%s$total_units";
     $rrd_options .= " COMMENT:'\\n'";
 
-    $rrd_options .= " HRULE:999999999999990#FFFFFF:'".str_pad('', 11)."Out':";
+    $rrd_options .= " HRULE:999999999999990#FFFFFF:'".str_pad('', 10)."Out':";
     $rrd_options .= ' GPRINT:outbits:LAST:%6.2lf%s';
     $rrd_options .= ' GPRINT:outbits:AVERAGE:%6.2lf%s';
     $rrd_options .= ' GPRINT:outbits:MAX:%6.2lf%s';
     $rrd_options .= " GPRINT:totout:%6.2lf%s$total_units";
     $rrd_options .= " COMMENT:'\\n'";
 
-    $rrd_options .= " HRULE:999999999999990#FFFFFF:'".str_pad('', 11)."Agg':";
+    $rrd_options .= " HRULE:999999999999990#FFFFFF:'".str_pad('', 10)."Agg':";
     $rrd_options .= ' GPRINT:bits:LAST:%6.2lf%s';
     $rrd_options .= ' GPRINT:bits:AVERAGE:%6.2lf%s';
     $rrd_options .= ' GPRINT:bits:MAX:%6.2lf%s';

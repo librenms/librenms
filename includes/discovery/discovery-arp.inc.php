@@ -12,7 +12,6 @@
 // Author:  Paul Gear <librenms@libertysys.com.au>
 // License: GPLv3
 //
-include_once '../../includes/print-interface.inc.php';
 
 echo 'ARP Discovery: ';
 

@@ -1,6 +1,48 @@
 # vis.js history
 http://visjs.org
 
+
+## 2015-07-27, version 4.7.0
+
+### Timeline
+
+- Fixed #192: Items keep their group offset while dragging items located in 
+  multiple groups. Thanks @Fice.
+- Fixed #1118: since v4.6.0, grid of time axis was wrongly positioned on some 
+  scales.
+
+### Network
+
+- Added moveNode method.
+- Added cubic Bezier curves.
+
+
+## 2015-07-22, version 4.6.0
+
+### Timeline
+
+- Implemented #24: support for custom timezones, see configuration option `moment`.
+
+### Graph2d
+
+- Implemented #24: support for custom timezones, see configuration option `moment`.
+
+### Network
+
+- Fixed #1111, check if edges exist was not correct on update.
+- Fixed #1112, network now works in firefox on unix again.
+- Added #931, borderRadius in shapeProperties for the box shape.
+- Added #936, useImageSize for images and circularImages
+
+## 2015-07-20, version 4.5.1
+
+### Network
+
+- Fixed another clustering bug, phantom edges should be gone now.
+- Fixed disabling hierarchical layout.
+- Fixed delete button when using multiple selected items in manipulation system.
+
+
 ## 2015-07-17, version 4.5.0
 
 ### General

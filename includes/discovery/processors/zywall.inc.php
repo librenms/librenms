@@ -12,4 +12,12 @@
  * the source code distribution for details.
  */
 
-dbUpdate(array('value' => '2'), 'callback', '`name` = "enabled"', array());
+if ($device['os'] == 'zywall') {
+    echo 'Zywall Processors: ';
+    $descr = 'Processor';
+    $oid = '.1.3.6.1.4.1.890.1.6.22.1.1.0';
+    $usage = snmp_get($device, $oid, '-OQUvs');
+    if (is_numeric($usage)) {
+        discover_processor($valid['processor'], $device, $oid, '0', 'zywall', $descr, 1, $usage, null, null);
+    }
+}
