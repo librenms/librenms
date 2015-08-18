@@ -1,28 +1,27 @@
 <?php
-
-$sql  = "SELECT *, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
-
-$syslog_output = '
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default panel-condensed">
-                <div class="panel-heading">
-                    <strong>Syslog entries</strong>
-                </div>
-                <table class="table table-hover table-condensed table-striped">';
-
-foreach (dbFetchRows($sql) as $entry) {
-    $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
-    include 'includes/print-syslog.inc.php';
-}
-
-$syslog_output .= '
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+$common_output[] = '
+<table id="sysloglog" class="table table-hover table-condensed table-striped">
+    <thead>
+        <tr>
+            <th data-column-id="datetime" data-order="desc">Datetime</th>
+            <th data-column-id="hostname">Hostname</th>
+            <th data-column-id="program">Program</th>
+            <th data-column-id="message">Message</th>
+        </tr>
+    </thead>
+</table>
+<script>
+var syslog_grid = $("#syslog").bootgrid({
+    ajax: true,
+    post: function ()
+    {
+        return {
+            id: "syslog",
+            device: "' .mres($vars['device']) .'",
+            type: "' .mres($vars['type']) .'",
+        };
+    },
+    url: "ajax_table.php"
+});
+</script>
 ';
-
-$common_output[] = $syslog_output;
