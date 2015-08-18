@@ -110,7 +110,7 @@ $config['mono_font']    = 'DejaVuSansMono';
 $config['favicon']      = '';
 $config['page_refresh'] = '300';
 // Refresh the page every xx seconds, 0 to disable
-$config['front_page'] = 'pages/front/default.php';
+$config['front_page'] = 'pages/front/tiles.php';
 $config['front_page_settings']['top']['ports']   = 10;
 $config['front_page_settings']['top']['devices'] = 10;
 $config['front_page_down_box_limit']             = 10;
