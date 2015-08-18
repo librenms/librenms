@@ -145,7 +145,6 @@
 
     <h2 id="Contents">Contents</h2>
     <ul>
-        <li><a href="#Overview">Overview</a></li>
         <li><a href="#Data_Format">Data Format</a>
             <ul>
                 <li><a href="#items">Items</a></li>
@@ -161,8 +160,8 @@
         <li><a href="#Methods">Methods</a></li>
         <li><a href="#Events">Events</a></li>
         <li><a href="#Localization">Localization</a></li>
+        <li><a href="#Time_zone">Time zone</a></li>
         <li><a href="#Styles">Styles</a></li>
-        <li><a href="#Data_Policy">Data Policy</a></li>
     </ul>
 
 
@@ -227,7 +226,7 @@
             Options is a name-value map in the JSON format. The available options
             are described in section <a href="#Configuration_Options">Configuration Options</a>.
             Groups is a vis <code>DataSet</code> containing groups. The available options and the method of construction
-            are described in section <a href="#Group_Options">Data Format</a>.
+            are described in section <a href="#Data_Format">Data Format</a>.
         </p>
         <pre class="prettyprint lang-js options">var graph = new vis.Graph2d(container [, data] [, groups] [, options]);</pre>
         For backwards compatibility, groups and options can be interchanged.
@@ -245,7 +244,7 @@
 
     <h2 id="Data_Format">Data Format</h2>
     <p>
-        Graph2d can load data from an <code>Array</code>, a <code>DataSet</code> or a <code>DataView</code>.
+        Graph2d can load data from an <code>Array</code>, a <code>DataSet</code> (offering 2 way data binding), or a <code>DataView</code> (offering one way data binding).
         Objects are added to this DataSet by using the <code>add()</code> function.
         Data points must have properties <code>x</code>, <code>y</code>, and <code>z</code>,
         and can optionally have a property <code>style</code> and <code>filter</code>.
@@ -718,6 +717,14 @@ onRender: function(item, group, graph2d) {
             <td>'top-right'</td>
             <td>Determine the position of the legend coupled to the right axis. Options are 'top-left', 'top-right', 'bottom-left' or 'bottom-right'.</td>
         </tr>
+
+        <tr>
+            <td>moment</td>
+            <td>function</td>
+            <td>vis.moment</td>
+            <td>A constructor for creating a moment.js Date. Allows for applying a custom time zone. See section <a href="#Time_zone">Time zone</a> for more information.</td>
+        </tr>
+
         <tr>
             <td class="greenField">sampling</td>
             <td>Boolean</td>
@@ -1424,6 +1431,32 @@ Graph2d.off('rangechanged', onChange);
             </td>
         </tr>
     </table>
+
+    <h2 id="Time_zone">Time zone</h2>
+    <p>
+        By default, the Timeline displays time in local time. To display a Timeline in an other time zone or in UTC, the date constructor can be overloaded via the configuration option <code>moment</code>, which by default is the constructor function of moment.js. More information about UTC with moment.js can be found in the docs: <a href="http://momentjs.com/docs/#/parsing/utc/">http://momentjs.com/docs/#/parsing/utc/</a>.
+    </p>
+
+    <p>
+        Examples:
+    </p>
+
+<pre class="prettyprint lang-js">// display in UTC
+var options = {
+  moment: function(date) {
+    return vis.moment(date).utc();
+  }
+};
+
+// display in UTC +08:00
+var options = {
+  moment: function(date) {
+    return vis.moment(date).utcOffset('+08:00');
+  }
+};
+</pre>
+
+
 
     <h2 id="Styles">Styles</h2>
     <p>
