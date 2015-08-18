@@ -1,3 +1,61 @@
+### August 2015
+
+#### Bug fixes
+  - WebUI:
+    - Fix web_mouseover not honoured on All Devices page (PR1592)
+    - Fixed bug with edit/create alert template to clear out previous values (PR1636)
+    - Initialise $port_count in devices list (PR1640)
+    - Fixed Web installer due to code tidying update (PR1644)
+    - Updated gridster variable names to make unique (PR1646)
+    - Fixed issues with displaying devices with ' in location (PR1655)
+  - DB:
+    - Added proper indexes on device_perf table (PR1621)
+    - Fixed multiple mysql strict issues (PR1638, PR1659)
+    - Convert bgpPeerRemoteAs to bigint (PR1691)
+  - Discovery / Poller:
+    - Fixed Synology system temps (PR1649)
+    - Fixed discovery-arp not running since code formatting update (PR1671)
+    - Correct the DSM upgrade OID (PR1696)
+    - Fix MySQL agent host variable usage (PR1710)
+  - General:
+    - Fixed path to defaults.inc.php in config.php.default (PR1673)
+
+#### Improvements
+  - WebUI Updates:
+    - Added support for Google API key in Geo coding (PR1594)
+    - Added ability to updated storage % warning (PR1613)
+    - Updated eventlog page to allow filtering by type (PR1623)
+    - Hide logo and plugins text on smaller windows (PR1624)
+    - Added poller group name to poller groups table (PR1634)
+    - Updated Customers page to use Bootgrid (PR1658)
+    - Added basic Graylog integration support (PR1665)
+    - Added support for running under sub-directory (PR1667)
+    - Updated vis.js to latest version (PR1708)
+    - Added border on availability map (PR1713)
+  - API Updates:
+    - Improvided billing support in API (PR1599)
+  - Added detection for:
+    - Perle Media convertors (PR1607)
+  - Improved detection for:
+    - Windows devices (PR1639)
+    - Zywall CPU, Version and Memory (PR1660)
+    - Added LLDP support for PBN devices (PR1705)
+  - Additional Sensors:
+    - Added Compressor state for PCOWEB (PR1600)
+    - Added dbm support for IOS-XR (PR1661)
+  - Discovery / Poller:
+    - Updated autodiscovery function to log new type (PR1623)
+  - DB:
+    - Added MySQLi support (PR1647)
+  - Documentation:
+    - Added docs on MySQL strict mode (PR1635)
+    - Updated billing docs to use librenms user in cron (PR1676)
+    - Updated LDAP docs to indicate php-ldap module needs installing (PR1716)
+  - Alerting:
+    - Reformatted eventlog message to show state for alerts (PR1685)
+  - General:
+    - Added more debugging and checks to discovery-protocols (PR1590)
+
 ### July 2015
 
 #### Bug fixes
