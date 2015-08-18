@@ -39,13 +39,14 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
             rrdtool_create($rrd_filename, $rrd_create);
         }
 
-        $rrd_update  = 'N';
-        $rrd_update .= ':'.$data['currentInUse']['data'];
+        $fields = array(
+            'connections' => $data['currentInUse']['data'],
+        );
 
-        rrdtool_update($rrd_filename, $rrd_update);
+        rrdtool_update($rrd_filename, $fields);
         $graphs['asa_conns'] = true;
         echo ' ASA Connections';
     }
 
-    unset($data,$rrd_filename,$rrd_create,$rrd_update);
+    unset($data,$rrd_filename,$rrd_create);
 }//end if

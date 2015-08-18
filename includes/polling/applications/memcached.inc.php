@@ -32,30 +32,25 @@ if (!is_file($rrd_filename)) {
     );
 }
 
-$dslist = array(
-    'uptime',
-    'threads',
-    'rusage_user_microseconds',
-    'rusage_system_microseconds',
-    'curr_items',
-    'total_items',
-    'limit_maxbytes',
-    'curr_connections',
-    'total_connections',
-    'connection_structures',
-    'bytes',
-    'cmd_get',
-    'cmd_set',
-    'get_hits',
-    'get_misses',
-    'evictions',
-    'bytes_read',
-    'bytes_written',
+$fields = array(
+    'uptime'            => $data['uptime'],
+    'threads'           => $data['threads'],
+    'rusage_user_ms'    => $data['rusage_user_microseconds'],
+    'rusage_system_ms'  => $data['rusage_system_microseconds'],
+    'curr_items'        => $data['curr_items'],
+    'total_items'       => $data['total_items'],
+    'limit_maxbytes'    => $data['limit_maxbytes'],
+    'curr_connections'  => $data['curr_connections'],
+    'total_connections' => $data['total_connections'],
+    'conn_structures'   => $data['connection_structures'],
+    'bytes'             => $data['bytes'],
+    'cmd_get'           => $data['cmd_get'],
+    'cmd_set'           => $data['cmd_set'],
+    'get_hits'          => $data['get_hits'],
+    'get_misses'        => $data['get_misses'],
+    'evictions'         => $data['evictions'],
+    'bytes_read'        => $data['bytes_read'],
+    'bytes_written'     => $data['bytes_written'],
 );
 
-$values = array();
-foreach ($dslist as $ds) {
-    $values[] = isset($data[$ds]) ? $data[$ds] : (-1);
-}
-
-rrdtool_update($rrd_filename, 'N:'.implode(':', $values));
+rrdtool_update($rrd_filename, $fields);

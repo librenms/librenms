@@ -31,6 +31,11 @@ foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($devi
 
     echo $proc."%\n";
 
-    rrdtool_update($procrrd, "N:$proc");
+    $fields = array(
+        'usage' => $proc,
+    );
+
+    rrdtool_update($procrrd, $fields);
+
     dbUpdate(array('processor_usage' => $proc), 'processors', '`processor_id` = ?', array($processor['processor_id']));
 }//end foreach

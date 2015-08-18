@@ -372,8 +372,13 @@ if (!is_file($filename)) {
                     );
 }
 
-$rrd_update = 'N:'.$ospf_instance_count.':'.$ospf_area_count.':'.$ospf_port_count.':'.$ospf_neighbour_count;
-$ret        = rrdtool_update("$filename", $rrd_update);
+$fields = array(
+    'instances'   => $ospf_instance_count,
+    'areas'       => $ospf_area_count,
+    'ports'       => $ospf_port_count,
+    'neighbours'  => $ospf_neighbour_count,
+);
+$ret        = rrdtool_update("$filename", $fields);
 
 unset($ospf_ports_db);
 unset($ospf_ports_poll);

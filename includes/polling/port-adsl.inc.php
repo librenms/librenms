@@ -151,7 +151,7 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding'])) {
         $this_port['adslAturCurrSnrMgn'] = 'U';
     }
 
-    $rrdupdate = 'N';
+    $fields = array();
     foreach ($adsl_oids as $oid) {
         $oid  = 'adsl'.$oid;
         $data = str_replace('"', '', $this_port[$oid]);
@@ -159,15 +159,14 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding'])) {
         if (!is_numeric($data)) {
             $data = 'U';
         }
-
-        $rrdupdate .= ":$data";
+        $fields[$oid] = $data;
     }
 
     if (!is_file($rrdfile)) {
         rrdtool_create($rrdfile, $rrd_create);
     }
 
-    rrdtool_update($rrdfile, $rrdupdate);
+    rrdtool_update($rrdfile, $fields);
 
     echo 'ADSL ('.$this_port['adslLineCoding'].'/'.formatRates($this_port['adslAtucChanCurrTxRate']).'/'.formatRates($this_port['adslAturChanCurrTxRate']).')';
 }//end if
