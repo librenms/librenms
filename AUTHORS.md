@@ -4,7 +4,7 @@ LibreNMS is a fork of [Observium][1].  Observium was written by:
 - various others as indicated in the file contents and commit logs
 
 Contributors to LibreNMS:
-- Paul Gear <github@libertysys.com.au> (paulgear)
+- Paul Gear <paul@librenms.org> (paulgear)
 - Neil Lathwood <neil@librenms.org> (laf)
 - Daniel Preussker <f0o@librenms.org> (f0o)
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
