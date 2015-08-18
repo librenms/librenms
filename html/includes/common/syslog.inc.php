@@ -3,10 +3,10 @@ $common_output[] = '
 <table id="sysloglog" class="table table-hover table-condensed table-striped">
     <thead>
         <tr>
-            <th data-column-id="datetime" data-order="desc">Datetime</th>
-            <th data-column-id="hostname">Hostname</th>
+            <th data-column-id="timestamp" data-order="desc">Datetime</th>
+            <th data-column-id="device_id">Hostname</th>
             <th data-column-id="program">Program</th>
-            <th data-column-id="message">Message</th>
+            <th data-column-id="msg">Message</th>
         </tr>
     </thead>
 </table>
