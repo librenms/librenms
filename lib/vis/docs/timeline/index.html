@@ -108,8 +108,8 @@
     <li><a href="#Editing_Items">Editing Items</a></li>
     <li><a href="#Templates">Templates</a></li>
     <li><a href="#Localization">Localization</a></li>
+    <li><a href="#Time_zone">Time zone</a></li>
     <li><a href="#Styles">Styles</a></li>
-    <li><a href="#Data_Policy">Data Policy</a></li>
   </ul>
 
   <h2 id="Example">Example</h2>
@@ -209,19 +209,20 @@
 
   <h3 id="items">Items</h3>
   <p>
-    The Timeline uses regular Arrays and Objects as data format.
-    Data items can contain the properties <code>start</code>,
+    For items, the Timeline accepts an Array, a DataSet (offering 2 way data binding),
+    or a DataView (offering 1 way data binding).
+    Items are regular objects and can contain the properties <code>start</code>,
     <code>end</code> (optional), <code>content</code>,
     <code>group</code> (optional), <code>className</code> (optional), 
     <code>editable</code> (optional), and <code>style</code> (optional).
   </p>
 
   <p>
-    A table is constructed as:
+    A DataSet is constructed as:
   </p>
 
 <pre class="prettyprint lang-js">
-var items = [
+var items = new vis.DataSet([
   {
     start: new Date(2010, 7, 15),
     end: new Date(2010, 8, 2),  // end is optional
@@ -343,7 +344,9 @@ var items = [
 
   <h3 id="groups">Groups</h3>
   <p>
-    Like the items, groups are regular JavaScript Arrays and Objects.
+    For the items, groups can be an Array, a DataSet (offering 2 way data binding),
+    or a DataView (offering 1 way data binding).
+
     Using groups, items can be grouped together.
     Items are filtered per group, and displayed as
 
@@ -636,6 +639,13 @@ function (option, path) {
       <td>Object</td>
       <td>none</td>
       <td>A map with i18n locales. See section <a href="#Localization">Localization</a> for more information.</td>
+    </tr>
+
+    <tr>
+      <td>moment</td>
+      <td>function</td>
+      <td>vis.moment</td>
+      <td>A constructor for creating a moment.js Date. Allows for applying a custom time zone. See section <a href="#Time_zone">Time zone</a> for more information.</td>
     </tr>
 
     <tr class='toggle collapsible' onclick="toggleTable('optionTable','margin', this);">
@@ -1120,9 +1130,9 @@ document.getElementById('myTimeline').onclick = function (event) {
       <td>none</td>
       <td>Set both groups and items at once. Both properties are optional. This is a convenience method for individually calling both <code>setItems(items)</code> and <code>setGroups(groups)</code>.
         Both <code>items</code> and <code>groups</code> can be an Array with Objects,
-        a DataSet, or a DataView. For each of the groups, the items of the
-        timeline are filtered on the property <code>group</code>, which
-        must correspond with the id of the group.
+        a DataSet (offering 2 way data binding), or a DataView (offering 1 way data binding).
+        For each of the groups, the items of the timeline are filtered on the
+        property <code>group</code>, which must correspond with the id of the group.
       </td>
     </tr>
 
@@ -1131,9 +1141,9 @@ document.getElementById('myTimeline').onclick = function (event) {
       <td>none</td>
       <td>Set a data set with groups for the Timeline.
         <code>groups</code> can be an Array with Objects,
-        a DataSet, or a DataView. For each of the groups, the items of the
-        timeline are filtered on the property <code>group</code>, which
-        must correspond with the id of the group.
+        a DataSet (offering 2 way data binding), or a DataView (offering 1 way data binding).
+        For each of the groups, the items of the timeline are filtered on the
+        property <code>group</code>, which must correspond with the id of the group.
       </td>
     </tr>
 
@@ -1142,7 +1152,7 @@ document.getElementById('myTimeline').onclick = function (event) {
       <td>none</td>
       <td>Set a data set with items for the Timeline.
         <code>items</code> can be an Array with Objects,
-        a DataSet, or a DataView.
+        a DataSet (offering 2 way data binding), or a DataView (offering 1 way data binding).
       </td>
     </tr>
 
@@ -1540,6 +1550,32 @@ var options = {
   </table>
 
 
+  <h2 id="Time_zone">Time zone</h2>
+  <p>
+    By default, the Timeline displays time in local time. To display a Timeline in an other time zone or in UTC, the date constructor can be overloaded via the configuration option <code>moment</code>, which by default is the constructor function of moment.js. More information about UTC with moment.js can be found in the docs: <a href="http://momentjs.com/docs/#/parsing/utc/">http://momentjs.com/docs/#/parsing/utc/</a>.
+  </p>
+
+  <p>
+    Examples:
+  </p>
+
+<pre class="prettyprint lang-js">// display in UTC
+var options = {
+  moment: function(date) {
+    return vis.moment(date).utc();
+  }
+};
+
+// display in UTC +08:00
+var options = {
+  moment: function(date) {
+    return vis.moment(date).utcOffset('+08:00');
+  }
+};
+</pre>
+
+
+
   <h2 id="Styles">Styles</h2>
   <p>
     All parts of the Timeline have a class name and a default css style.
@@ -1616,13 +1652,6 @@ var options = {
   }
 &lt;/style&gt;
 </pre>
-
-
-  <h2 id="Data_Policy">Data Policy</h2>
-  <p>
-    All code and data is processed and rendered in the browser.
-    No data is sent to any server.
-  </p>
 
 </div>
 
