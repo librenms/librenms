@@ -509,25 +509,6 @@ foreach ($ports as $port) {
             $this_port['ifOutMulticastPkts'],
         );
 
-        $measurement = 'port';
-        $tags = array('ifIndex' => $this_port['ifIndex']);
-        $fields = array('ifInOctets' => $this_port['ifInOctets'],
-                        'ifOutOctets' => $this_port['ifOutOctets'],
-                        'ifInErrors' => $this_port['ifInErrors'],
-                        'ifOutErrors' => $this_port['ifOutErrors'],
-                        'ifInUcastPkts' => $this_port['ifInUcastPkts'],
-                        'ifOutUcastPkts' => $this_port['ifOutUcastPkts'],
-                        'ifInNUcastPkts' => $this_port['ifInNUcastPkts'],
-                        'ifOutNUcastPkts' => $this_port['ifOutNUcastPkts'],
-                        'ifInDiscards' => $this_port['ifInDiscards'],
-                        'ifOutDiscards' => $this_port['ifOutDiscards'],
-                        'ifInUnknownProtos' => $this_port['ifInUnknownProtos'],
-                        'ifInBroadcastPkts' => $this_port['ifInBroadcastPkts'],
-                        'ifOutBroadcastPkts' => $this_port['ifOutBroadcastPkts'],
-                        'ifInMulticastPkts' => $this_port['ifInMulticastPkts'],
-                        'ifOutMulticastPkts' => $this_port['ifOutMulticastPkts']
-                       );
-        influx_update($device,$measurement,$tags,$fields);
         rrdtool_update("$rrdfile", $this_port['rrd_update']);
         // End Update IF-MIB
         // Update PAgP

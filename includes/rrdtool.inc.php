@@ -253,8 +253,6 @@ function rrdtool_update($filename, $options) {
         $options = implode(':', $values);
     }
 
-    
-
     return rrdtool('update', $filename, $options);
 
 }
@@ -303,48 +301,3 @@ function rrdtool_escape($string, $maxlength=null){
     return $result.' ';
 
 }
-
-function influx_connect() {
-    global $config;
-    if ($config['influxdb']['transport'] == 'http') {
-
-        $influx_url = $config['influxdb']['url'] . '/write?db=' . $config['influxdb']['db'];
-
-        $ch = curl_init($influx_url);
-
-        if (!empty($config['influxdb']['username']) && !empty($config['influxdb']['password'])) {
-             curl_setopt($ch, CURLOPT_USERPWD, $config['influxdb']['username'] . ":" . $config['influxdb']['password']);
-             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        }
-        curl_setopt($ch, CURLOPT_BINARYTRANSFER, TRUE);
-        return($ch);
-    }
-}// end influx_connect
-
-function influx_write($ch,$data) {
-    global $config;
-    if ($config['influxdb']['transport'] == 'http') {
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        return(curl_exec($ch));
-    }
-}// end influx_write
-
-function influx_update($device,$measurement,$tags=array(),$fields) {
-    $tmp_fields = array();
-    $tmp_tags[] = "hostname=".$device['hostname'];
-    foreach ($tags as $k => $v) {
-        $tmp_tags[] = "$k=$v";
-    }
-    foreach ($fields as $k => $v) {
-        $tmp_fields[] = "$k=$v";
-    }
-
-    $tags = implode(',', $tmp_tags);
-    $fields = implode(',', $tmp_fields);
-
-    $influx_conn = influx_connect();
-
-    $data = "$measurement,$tags $fields";
-    $response = influx_write($influx_conn,$data);
-    d_echo($response);
-}// end influx_update
