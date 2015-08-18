@@ -33,6 +33,8 @@ if ($type == 'placeholder') {
 }
 elseif (is_file('includes/common/'.$type.'.inc.php')) {
 
+    $results_limit = 10;
+    $no_form = true;
     include 'includes/common/'.$type.'.inc.php';
     $output = implode('', $common_output);
     $status = 'ok';

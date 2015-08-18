@@ -56,11 +56,9 @@ $sql = "SELECT * FROM `hrDevice` WHERE `device_id`  = '".$device['device_id']."'
 foreach (dbFetchRows($sql) as $test_hrDevice) {
     if (!$valid_hrDevice[$test_hrDevice['hrDeviceIndex']]) {
         echo '-';
-        mysql_query("DELETE FROM `hrDevice` WHERE hrDevice_id = '".$test_hrDevice['hrDevice_id']."'");
         dbDelete('hrDevice', '`hrDevice_id` = ?', array($test_hrDevice['hrDevice_id']));
         if ($debug) {
             print_r($test_hrDevice);
-            echo mysql_affected_rows().' row deleted';
         }
     }
 }

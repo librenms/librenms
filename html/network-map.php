@@ -212,7 +212,6 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format'])) {
     }
 
     if ($where == '') {
-#        $maptool = $config['unflatten'] . ' -f -l 5 | ' . $config['sfdp'] . ' -Gpack -Goverlap=prism -Gcharset=latin1 | dot';
         $maptool = $config['sfdp'] . ' -Gpack -Goverlap=prism -Gcharset=latin1 -Gsize=20,20';
         $maptool = $config['dot'];
     }

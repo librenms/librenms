@@ -108,11 +108,21 @@ foreach ($filelist as $file) {
                     }
 
                     if ($line[0] != '#') {
-                        $update = mysql_query($line);
+                        if ($config['db']['extension'] == 'mysqli') {
+                            $update = mysqli_query($database_link, $line);
+                        }
+                        else {
+                            $update = mysql_query($line);
+                        }
                         if (!$update) {
                             $err++;
                             if ($debug) {
-                                echo mysql_error()."\n";
+                                if ($config['db']['extension'] == 'mysqli') {
+                                    echo mysqli_error($database_link)."\n";
+                                }
+                                else {                           
+                                    echo mysql_error()."\n";
+                                }
                             }
                         }
                     }
