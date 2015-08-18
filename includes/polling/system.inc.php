@@ -74,10 +74,6 @@ if (is_numeric($uptime)) {
         rrdtool_create($uptime_rrd, 'DS:uptime:GAUGE:600:0:U '.$config['rrd_rra']);
     }
 
-    $measurement = 'uptime';
-    $fields = array('uptime' => force_influx_data('f',$uptime));
-    influx_update($device,$measurement,$tags,$fields);
-
     rrdtool_update($uptime_rrd, 'N:'.$uptime);
 
     $graphs['uptime'] = true;
