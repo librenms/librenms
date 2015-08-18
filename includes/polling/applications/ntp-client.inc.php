@@ -23,4 +23,12 @@ if (!is_file($rrd_filename)) {
     );
 }
 
-rrdtool_update($rrd_filename, "N:$offset:$frequency:$jitter:$noise:$stability");
+$fields = array(
+                'offset'    => $offset,
+                'frequency' => $frequency,
+                'jitter'    => $jitter,
+                'noise'     => $noise,
+                'stability' => $stability,
+);
+
+rrdtool_update($rrd_filename, $fields);

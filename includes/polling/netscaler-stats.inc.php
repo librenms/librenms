@@ -95,7 +95,7 @@ if ($device['os'] == 'netscaler') {
 
     $oids = array_merge($oids_gauge, $oids_counter);
 
-    unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
+    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
     $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/netscaler-stats-tcp.rrd';
 
     $rrd_create = $config['rrd_rra'];
@@ -112,22 +112,23 @@ if ($device['os'] == 'netscaler') {
 
     $data = snmpwalk_cache_oid($device, 'nsTcpStatsGroup', array(), 'NS-ROOT-MIB');
 
-    $rrdupdate = 'N';
+    $fields = array();
 
     foreach ($oids as $oid) {
         if (is_numeric($data[0][$oid])) {
-            $rrdupdate .= ':'.$data[0][$oid];
+            $rrdupdate = ':'.$data[0][$oid];
         }
         else {
-            $rrdupdate .= ':U';
+            $rrdupdate = 'U';
         }
+        $fields[$oid] = $rrdupdate;
     }
 
     if (!file_exists($rrd_file)) {
         rrdtool_create($rrd_file, $rrd_create);
     }
 
-    rrdtool_update($rrd_file, $rrdupdate);
+    rrdtool_update($rrd_file, $fields);
     $graphs['netscaler_tcp_conn'] = true;
     $graphs['netscaler_tcp_bits'] = true;
     $graphs['netscaler_tcp_pkts'] = true;

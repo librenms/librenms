@@ -26,7 +26,15 @@ if (!is_file($nginx_rrd)) {
 }
 
 print "active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req";
-rrdtool_update($nginx_rrd, "N:$req:$active:$reading:$writing:$waiting");
+$fields = array(
+                'Requests' => $req,
+                'Active'   => $active,
+                'Reading'  => $reading,
+                'Writing'  => $writing,
+                'Waiting'  => $waiting,
+);
+
+rrdtool_update($nginx_rrd, $fields);
 
 // Unset the variables we set here
 unset($nginx);

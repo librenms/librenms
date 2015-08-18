@@ -86,5 +86,19 @@ if (!empty($agent_data['app']['bind']) && $app['app_id'] > 0) {
         );
     }
 
-    rrdtool_update($rrd_filename, 'N:'.((int) $bind_parsed['incoming_queries']['any']).':'.((int) $bind_parsed['incoming_queries']['a']).':'.((int) $bind_parsed['incoming_queries']['aaaa']).':'.((int) $bind_parsed['incoming_queries']['cname']).':'.((int) $bind_parsed['incoming_queries']['mx']).':'.((int) $bind_parsed['incoming_queries']['ns']).':'.((int) $bind_parsed['incoming_queries']['ptr']).':'.((int) $bind_parsed['incoming_queries']['soa']).':'.((int) $bind_parsed['incoming_queries']['srv']).':'.((int) $bind_parsed['incoming_queries']['spf']));
+    $fields = array(
+                    'any'   => ((int) $bind_parsed['incoming_queries']['any']),
+                    'a'     => ((int) $bind_parsed['incoming_queries']['a']),
+                    'aaaa'  => ((int) $bind_parsed['incoming_queries']['aaaa']),
+                    'cname' => ((int) $bind_parsed['incoming_queries']['cname']),
+                    'mx'    => ((int) $bind_parsed['incoming_queries']['mx']),
+                    'ns'    => ((int) $bind_parsed['incoming_queries']['ns']),
+                    'ptr'   => ((int) $bind_parsed['incoming_queries']['ptr']),
+                    'soa'   => ((int) $bind_parsed['incoming_queries']['soa']),
+                    'srv'   => ((int) $bind_parsed['incoming_queries']['srv']),
+                    'spf'   => ((int) $bind_parsed['incoming_queries']['spf']),
+    );
+
+    rrdtool_update($rrd_filename, $fields);
+
 }//end if

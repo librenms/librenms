@@ -158,7 +158,14 @@ if ($config['enable_bgp']) {
             rrdtool_create($peerrrd, $create_rrd);
         }
 
-        rrdtool_update("$peerrrd", "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
+        $fields = array(
+            'bgpPeerOutUpdates'    => $bgpPeerOutUpdates,
+            'bgpPeerInUpdates'     => $bgpPeerInUpdates,
+            'bgpPeerOutTotal'      => $bgpPeerOutTotalMessages,
+            'bgpPeerInTotal'       => $bgpPeerInTotalMessages,
+            'bgpPeerEstablished'   => $bgpPeerFsmEstablishedTime,
+        );
+        rrdtool_update("$peerrrd", $fields);
 
         $peer['update']['bgpPeerState']              = $bgpPeerState;
         $peer['update']['bgpPeerAdminStatus']        = $bgpPeerAdminStatus;
@@ -321,7 +328,15 @@ if ($config['enable_bgp']) {
                     rrdtool_create($cbgp_rrd, $rrd_create);
                 }
 
-                rrdtool_update("$cbgp_rrd", "N:$cbgpPeerAcceptedPrefixes:$cbgpPeerDeniedPrefixes:$cbgpPeerAdvertisedPrefixes:$cbgpPeerSuppressedPrefixes:$cbgpPeerWithdrawnPrefixes");
+                $fields = array(
+                    'AcceptedPrefixes'    => $cbgpPeerAcceptedPrefixes,
+                    'DeniedPrefixes'      => $cbgpPeerDeniedPrefixes,
+                    'AdvertisedPrefixes'  => $cbgpPeerAdvertisedPrefixes,
+                    'SuppressedPrefixes'  => $cbgpPeerSuppressedPrefixes,
+                    'WithdrawnPrefixes'   => $cbgpPeerWithdrawnPrefixes,
+                );
+                rrdtool_update("$cbgp_rrd", $fields);
+
             } //end foreach
         } //end if
         echo "\n";
