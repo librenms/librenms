@@ -25,4 +25,14 @@ if (!is_file($rrd_filename)) {
     );
 }
 
-rrdtool_update($rrd_filename, "N:$msg_recv:$msg_rejected:$msg_relay:$msg_sent:$msg_waiting:$spam:$virus");
+$fields = array(
+                'msg_recv'     => $msg_recv,
+                'msg_rejected' => $msg_rejected,
+                'msg_relay'    => $msg_relay,
+                'msg_sent'     => $msg_sent,
+                'msg_waiting'  => $msg_waiting,
+                'spam'         => $spam,
+                'virus'        => $virus,
+);
+
+rrdtool_update($rrd_filename, $fields);

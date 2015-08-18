@@ -109,7 +109,11 @@ if (!empty($agent_data['munin'])) {
                     rrdtool_create($filename, $cmd);
                 }
 
-                rrdtool_update($filename, 'N:'.$data['value']);
+                $fields = array(
+                    'val' => $data['value'],
+                );
+
+                rrdtool_update($filename, $fields);
 
                 if (empty($ds_list[$ds_uniq])) {
                     $insert = array(
