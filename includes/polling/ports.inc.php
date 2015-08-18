@@ -491,25 +491,25 @@ foreach ($ports as $port) {
             );
         }//end if
 
-        $this_port['rrd_update'] = array(
-            $this_port['ifInOctets'],
-            $this_port['ifOutOctets'],
-            $this_port['ifInErrors'],
-            $this_port['ifOutErrors'],
-            $this_port['ifInUcastPkts'],
-            $this_port['ifOutUcastPkts'],
-            $this_port['ifInNUcastPkts'],
-            $this_port['ifOutNUcastPkts'],
-            $this_port['ifInDiscards'],
-            $this_port['ifOutDiscards'],
-            $this_port['ifInUnknownProtos'],
-            $this_port['ifInBroadcastPkts'],
-            $this_port['ifOutBroadcastPkts'],
-            $this_port['ifInMulticastPkts'],
-            $this_port['ifOutMulticastPkts'],
+        $fields = array(
+            'INOCTETS'         => $this_port['ifInOctets'],
+            'OUTOCTETS'        => $this_port['ifOutOctets'],
+            'INERRORS'         => $this_port['ifInErrors'],
+            'OUTERRORS'        => $this_port['ifOutErrors'],
+            'INUCASTPKTS'      => $this_port['ifInUcastPkts'],
+            'OUTUCASTPKTS'     => $this_port['ifOutUcastPkts'],
+            'INNUCASTPKTS'     => $this_port['ifInNUcastPkts'],
+            'OUTNUCASTPKTS'    => $this_port['ifOutNUcastPkts'],
+            'INDISCARDS'       => $this_port['ifInDiscards'],
+            'OUTDISCARDS'      => $this_port['ifOutDiscards'],
+            'INUNKNOWNPROTOS'  => $this_port['ifInUnknownProtos'],
+            'INBROADCASTPKTS'  => $this_port['ifInBroadcastPkts'],
+            'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'],
+            'INMULTICASTPKTS'  => $this_port['ifInMulticastPkts'],
+            'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
         );
 
-        rrdtool_update("$rrdfile", $this_port['rrd_update']);
+        rrdtool_update("$rrdfile", $fields);
         // End Update IF-MIB
         // Update PAgP
         if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {

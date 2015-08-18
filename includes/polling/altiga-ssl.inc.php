@@ -13,7 +13,7 @@ if ($device['os'] == 'asa' || $device['os'] == 'pix') {
         'alSslStatsPostEncryptOctets',
     );
 
-    unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
+    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
 
     $rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('altiga-ssl.rrd');
 
@@ -28,7 +28,7 @@ if ($device['os'] == 'asa' || $device['os'] == 'pix') {
 
     $data_array = snmpwalk_cache_oid($device, $proto, array(), 'ALTIGA-SSL-STATS-MIB');
 
-    $rrdupdate = 'N';
+    $fields = array();
 
     foreach ($oids as $oid) {
         if (is_numeric($data_array[0][$oid])) {
@@ -37,13 +37,12 @@ if ($device['os'] == 'asa' || $device['os'] == 'pix') {
         else {
             $value = '0';
         }
-
-        $rrdupdate .= ":$value";
+        $fields[$oid] = $value;
     }
 
     if ($data_array[0]['alSslStatsTotalSessions'] || is_file($rrdfile)) {
-        rrdtool_update($rrdfile, $rrdupdate);
+        rrdtool_update($rrdfile, $fields);
     }
 
-    unset($rrdfile, $rrdupdate, $data_array);
+    unset($rrdfile, $fields, $data_array);
 }//end if

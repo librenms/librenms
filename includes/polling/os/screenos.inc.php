@@ -19,6 +19,12 @@ if (!is_file($sessrrd)) {
     );
 }
 
-rrdtool_update("$sessrrd", "N:$sessalloc:$sessmax:$sessfailed");
+$fields = array(
+    'allocate'  => $sessalloc,
+    'max'       => $sessmax,
+    'failed'    => $sessfailed,
+);
+
+rrdtool_update("$sessrrd", $fields);
 
 $graphs['screenos_sessions'] = true;

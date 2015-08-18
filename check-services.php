@@ -52,16 +52,4 @@ foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
         $status = '0';
     }//end if
 
-    $rrd = $config['rrd_dir'].'/'.$service['hostname'].'/'.safename('service-'.$service['service_type'].'-'.$service['service_id'].'.rrd');
-
-    if (!is_file($rrd)) {
-        rrdtool_create($rrd, 'DS:status:GAUGE:600:0:1 '.$config['rrd_rra']);
-    }
-
-    if ($status == '1' || $status == '0') {
-        rrdtool_update($rrd, 'N:'.$status);
-    }
-    else {
-        rrdtool_update($rrd, 'N:U');
-    }
 } //end foreach
