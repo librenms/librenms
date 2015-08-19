@@ -1,10 +1,14 @@
 <?php
+
 $no_refresh = true;
+
 $param = array();
+
 if ($vars['action'] == 'expunge' && $_SESSION['userlevel'] >= '10') {
     dbQuery('TRUNCATE TABLE `syslog`');
     print_message('syslog truncated');
 }
+
 $pagetitle[] = 'Syslog';
 ?>
 
@@ -22,6 +26,7 @@ $pagetitle[] = 'Syslog';
 </div>
 
 <script>
+
 var grid = $("#syslog").bootgrid({
     ajax: true,
     templates: {
@@ -39,6 +44,7 @@ var grid = $("#syslog").bootgrid({
                         if ($device_id == $vars['device']) {
                             echo ' selected';
                         }
+
                         echo '>'.$hostname.'</option>"+';
                     }
                 }
@@ -54,6 +60,7 @@ var grid = $("#syslog").bootgrid({
                     if ($data['program'] == $vars['program']) {
                         echo ' selected';
                     }
+
                     echo '>'.$data['program'].'</option>"+';
                 }
                 ?>
@@ -68,6 +75,7 @@ var grid = $("#syslog").bootgrid({
                 "<button type=\"submit\" class=\"btn btn-default input-sm\">Filter</button>"+
                 "</form></span></div>"+
                 "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+
     },
     post: function ()
     {
@@ -81,6 +89,7 @@ var grid = $("#syslog").bootgrid({
     },
     url: "ajax_table.php"
 });
+
 $(function () {
     $("#dtpickerfrom").datetimepicker();
     $("#dtpickerfrom").on("dp.change", function (e) {
