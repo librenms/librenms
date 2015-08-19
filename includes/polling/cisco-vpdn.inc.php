@@ -26,6 +26,9 @@ if ($device['os_group'] == 'cisco') {
 
             rrdtool_update($rrd_filename, $fields);
 
+            $tags = array('type' => $type);
+            influx_update($device,'vpdn',$tags,$fields);
+
             $graphs['vpdn_sessions_'.$type] = true;
             $graphs['vpdn_tunnels_'.$type]  = true;
 

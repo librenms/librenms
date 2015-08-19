@@ -30,6 +30,9 @@ if (is_numeric($sessions)) {
 
     rrdtool_update($sessrrd, $fields);
 
+    $tags = array();
+    influx_update($device,'fortigate)sessions',$tags,$fields);
+
     $graphs['fortigate_sessions'] = true;
 }
 
@@ -48,6 +51,9 @@ if (is_numeric($cpu_usage)) {
     );
 
     rrdtool_update($cpurrd, $fields);
+
+    $tags = array();
+    influx_update($device,'fortigate_cpu',$tags,$fields);
 
     $graphs['fortigate_cpu'] = true;
 }

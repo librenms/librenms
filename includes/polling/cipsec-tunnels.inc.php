@@ -96,6 +96,10 @@ foreach ($ipsec_array as $index => $tunnel) {
             rrdtool_create($rrd_file, $rrd_create);
         }
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array('address' => $address);
+        influx_update($device,'ipsectunnel',$tags,$fields);
+
         // $graphs['ipsec_tunnels'] = TRUE;
     }
 }//end foreach

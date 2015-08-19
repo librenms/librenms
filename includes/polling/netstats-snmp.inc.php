@@ -65,6 +65,10 @@ if ($device['os'] != 'Snom') {
         }
 
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array();
+        influx_update($device,'netstats-snmp',$tags,$fields);
+
         $graphs['netstat_snmp']     = true;
         $graphs['netstat_snmp_pkt'] = true;
     }

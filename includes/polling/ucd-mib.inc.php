@@ -56,6 +56,10 @@ if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_num
     );
 
     rrdtool_update($cpu_rrd, $fields);
+
+    $tags = array();
+    influx_update($device,'ucd_cpu',$tags,$fields);
+
     $graphs['ucd_cpu'] = true;
 }
 
@@ -90,6 +94,10 @@ foreach ($collect_oids as $oid) {
         );
 
         rrdtool_update($filename, $fields);
+
+        $tags = array('oid' => $oid);
+        influx_update($device,'ucd_cpu',$tags,$fields);
+
         $graphs['ucd_cpu'] = true;
     }
 }
@@ -165,6 +173,9 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
 
     rrdtool_update($mem_rrd, $fields);
 
+    $tags = array();
+    influx_update($device,'ucd_mem',$tags,$fields);
+
     $graphs['ucd_memory'] = true;
 }
 
@@ -188,6 +199,10 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
     );
 
     rrdtool_update($load_rrd, $fields);
+
+    $tags = array();
+    influx_update($device,'ucd_load',$tags,$fields);
+
     $graphs['ucd_load'] = 'TRUE';
 }
 

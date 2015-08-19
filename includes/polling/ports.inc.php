@@ -510,6 +510,13 @@ foreach ($ports as $port) {
         );
 
         rrdtool_update("$rrdfile", $fields);
+
+        $fields['ifSpeed'] = $port['ifSpeed'];
+print_r($this_port);
+
+        $tags = array('ifName' => $this_port['ifName']);
+        influx_update($device,'ports',$tags,$fields);
+
         // End Update IF-MIB
         // Update PAgP
         if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {

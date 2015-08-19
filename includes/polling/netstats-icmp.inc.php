@@ -66,6 +66,10 @@ if ($device['os'] != 'Snom') {
         }
 
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array();
+        influx_update($device,'netstats-icmp',$tags,$fields);
+
         $graphs['netstat_icmp']      = true;
         $graphs['netstat_icmp_info'] = true;
     }

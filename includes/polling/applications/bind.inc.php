@@ -101,4 +101,7 @@ if (!empty($agent_data['app']['bind']) && $app['app_id'] > 0) {
 
     rrdtool_update($rrd_filename, $fields);
 
+    $tags = array('name' => 'bind', 'app_id' => $app['app_id']);
+    influx_update($device,'app',$tags,$fields);
+
 }//end if
