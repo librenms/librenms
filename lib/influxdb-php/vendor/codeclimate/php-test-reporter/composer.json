@@ -1,0 +1,37 @@
+{
+    "name": "codeclimate/php-test-reporter",
+    "description": "PHP client for reporting test coverage to Code Climate",
+    "keywords": ["codeclimate", "coverage"],
+    "homepage": "https://github.com/codeclimate/php-test-reporter",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Code Climate",
+            "email": "hello@codeclimate.com",
+            "homepage": "https://codeclimate.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "ext-curl": "*",
+        "satooshi/php-coveralls": "0.6.*",
+        "symfony/console": ">=2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*@stable",
+        "ext-xdebug": "*"
+    },
+    "autoload": {
+        "psr-0": {
+          "CodeClimate\\Component": "src/",
+          "CodeClimate\\Bundle": "src/"
+        }
+    },
+    "bin": ["composer/bin/test-reporter"],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+       }
+    }
+}
