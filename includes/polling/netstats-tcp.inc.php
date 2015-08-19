@@ -56,6 +56,10 @@ if ($device['os'] != 'Snom') {
         }
 
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array();
+        influx_update($device,'netstats-tcp',$tags,$fields);
+
         $graphs['netstat_tcp'] = true;
     }
 

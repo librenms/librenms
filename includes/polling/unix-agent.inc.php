@@ -45,6 +45,10 @@ if ($device['os_group'] == 'unix') {
         );
  
         rrdtool_update($agent_rrd, $fields);
+
+        $tags = array();
+        influx_update($device,'agent',$tags,$fields);
+
         $graphs['agent'] = true;
 
         foreach (explode('<<<', $agent_raw) as $section) {

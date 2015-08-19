@@ -106,6 +106,9 @@ if ($device['os_group'] == 'cisco') {
         );
         rrdtool_update($rrd_filename, $fields);
 
+        $tags = array();
+        influx_update($device,'cipsec_flow',$tags,$fields);
+
         $graphs['cipsec_flow_tunnels'] = true;
         $graphs['cipsec_flow_pkts']    = true;
         $graphs['cipsec_flow_bits']    = true;

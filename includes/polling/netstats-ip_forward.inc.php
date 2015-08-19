@@ -38,6 +38,11 @@ if ($device['os'] != 'Snom') {
         }
 
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array();
+        influx_update($device,'netstats-ip_forward',$tags,$fields);
+
+
         $graphs['netstat_ip_forward'] = true;
     }
 }

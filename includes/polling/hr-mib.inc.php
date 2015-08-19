@@ -22,6 +22,10 @@ if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {
     );
 
     rrdtool_update($rrd_file, $fields);
+
+    $tags = array();
+    influx_update($device,'hr_processes',$tags,$fields);
+
     $graphs['hr_processes'] = true;
     echo ' Processes';
 }
@@ -41,6 +45,10 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
     );
 
     rrdtool_update($rrd_file, $fields);
+
+    $tags = array();
+    influx_update($device,'hr_users',$tags,$fields);
+
     $graphs['hr_users'] = true;
     echo ' Users';
 }

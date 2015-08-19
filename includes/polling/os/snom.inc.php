@@ -46,3 +46,6 @@ $fields = array(
 );
 
 rrdtool_update("$rrdfile", $fields);
+
+$tags = array();
+influx_update($device,'snom-data',$tags,$fields);

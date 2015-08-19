@@ -27,4 +27,7 @@ $fields = array(
 
 rrdtool_update("$sessrrd", $fields);
 
+$tags = array();
+influx_update($device,'screenos_sessions',$tags,$fields);
+
 $graphs['screenos_sessions'] = true;

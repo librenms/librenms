@@ -56,6 +56,9 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     );
     $ret             = rrdtool_update($rrdfile, $fields);
 
+    $tags = array();
+    influx_update($device,'aruba-controller',$tags,$fields);
+
     // also save the info about how many clients in the same place as the wireless module
     $wificlientsrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('wificlients-radio1.rrd');
 
@@ -67,6 +70,9 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         'wificlients' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
     );
     rrdtool_update($wificlientsrrd, $fields);
+
+    $tags = array('radio' => '1');
+    influx_update($device,'wificlients',$tags,$fields);
 
     $graphs['wifi_clients'] = true;
 
@@ -126,6 +132,9 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
             );
 
             rrdtool_update($rrd_file, $fields);
+
+            $tags = array('name' => $name, 'radionum' => $radionum);
+            influx_update($device,'aruba',$tags,$fields);
 
         }
 

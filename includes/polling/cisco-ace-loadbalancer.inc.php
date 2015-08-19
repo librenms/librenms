@@ -58,6 +58,10 @@ foreach ($rserver_array as $index => $serverfarm) {
             rrdtool_create($rrd_file, $rrd_create);
         }
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array('farm_id' => $clean_index);
+        influx_update($device,'rservers',$tags,$fields);
+
     }
 }//end foreach
 

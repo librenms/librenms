@@ -54,3 +54,7 @@ $fields = array(
 );
 
 rrdtool_update($rrd_filename, $fields);
+
+$tags = array('name' => 'memcached', 'app_id' => $app['app_id']);
+influx_update($device,'app',$tags,$fields);
+

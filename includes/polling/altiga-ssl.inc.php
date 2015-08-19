@@ -42,6 +42,10 @@ if ($device['os'] == 'asa' || $device['os'] == 'pix') {
 
     if ($data_array[0]['alSslStatsTotalSessions'] || is_file($rrdfile)) {
         rrdtool_update($rrdfile, $fields);
+
+        $tags = array();
+        influx_update($device,'altiga-ssl',$tags,$fields);
+
     }
 
     unset($rrdfile, $fields, $data_array);
