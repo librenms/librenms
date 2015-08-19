@@ -129,14 +129,14 @@ You can also write multiple fields to a measurement without specifying a value:
             null, // measurement value
             ['host' => 'server01', 'region' => 'us-west'], // measurement tags
             ['cpucount' => 10, 'free' => 1], // measurement fields
-            exec('date +%s%N') // timestamp in nanoseconds
+            exec('date +%s%N') // timestamp in nanoseconds on Linux ONLY
         ),
         new Point(
             'instance', // the name of the measurement
             null, // measurement value
             ['host' => 'server01', 'region' => 'us-west'], // measurement tags
             ['cpucount' => 10, 'free' => 2], // measurement fields
-            exec('date +%s%N') // timestamp in nanoseconds
+            exec('date +%s%N') // timestamp in nanoseconds on Linux ONLY
         )
     ];
 
@@ -166,7 +166,7 @@ Then, configure the UDP driver in the client:
             0.84,
             ['host' => 'server01', 'region' => 'us-west'],
             ['cpucount' => 10],
-            exec('date +%s%N') // this will produce a nanosecond timestamp in Linux operating systems
+            exec('date +%s%N') // this will produce a nanosecond timestamp on Linux ONLY
         )
     ];
     
@@ -202,6 +202,13 @@ if you specify a timestamp in seconds and the default (nanosecond) precision is 
     
     // Points will require microsecond precision
     $newPoints = $database->writePoints($points, Database::PRECISION_MICROSECONDS);
+```
+
+Please note that `exec('date + %s%N')` does NOT work under MacOS; you can use PHP's `microtime` to get a timestamp with microsecond precision, like such:
+
+```php
+    list( $usec, $sec ) = explode(' ', microtime() );
+	$timestamp = sprintf( '%d%06d', $sec, $usec*1000000 );
 ```
 
 ### Creating databases
