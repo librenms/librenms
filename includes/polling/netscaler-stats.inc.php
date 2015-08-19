@@ -129,6 +129,10 @@ if ($device['os'] == 'netscaler') {
     }
 
     rrdtool_update($rrd_file, $fields);
+
+    $tags = array();
+    influx_update($device,'netscaler-stats-tcp',$tags,$fields);
+
     $graphs['netscaler_tcp_conn'] = true;
     $graphs['netscaler_tcp_bits'] = true;
     $graphs['netscaler_tcp_pkts'] = true;

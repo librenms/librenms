@@ -54,6 +54,10 @@ if ($device['os'] != 'Snom') {
         }
 
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array();
+        influx_update($device,'netstats-ip',$tags,$fields);
+
         $graphs['netstat_ip']      = true;
         $graphs['netstat_ip_frag'] = true;
     }

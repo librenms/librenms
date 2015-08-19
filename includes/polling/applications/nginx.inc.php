@@ -36,6 +36,9 @@ $fields = array(
 
 rrdtool_update($nginx_rrd, $fields);
 
+$tags = array('name' => 'nginx', 'app_id' => $app['app_id']);
+influx_update($device,'app',$tags,$fields);
+
 // Unset the variables we set here
 unset($nginx);
 unset($nginx_rrd);

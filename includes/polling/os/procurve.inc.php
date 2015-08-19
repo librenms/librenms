@@ -50,6 +50,9 @@ if (is_numeric($FdbAddressCount)) {
 
     rrdtool_update($fdb_rrd_file, $fields);
 
+    $tags = array();
+    influx_update($device,'fdb_count',$tags,$fields);
+
     $graphs['fdb_count'] = true;
 
     echo 'FDB Count ';

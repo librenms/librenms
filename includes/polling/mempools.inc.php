@@ -32,6 +32,9 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     );
     rrdtool_update($mempool_rrd, $fields);
 
+    $tags = array('mempool_type' => $mempool['mempool_type'], 'mempool_index' => $mempool['mempool_index']);
+    influx_update($device,'mempool',$tags,$fields);
+
     $mempool['state'] = array(
                          'mempool_used'  => $mempool['used'],
                          'mempool_perc'  => $percent,
