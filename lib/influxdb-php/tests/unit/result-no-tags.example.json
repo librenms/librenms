@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "series": [
+        {
+          "name": "cpu_load_short",
+          "columns": [
+            "time",
+            "value"
+          ],
+          "values": [
+            [
+              "2015-01-29T21:51:28.968422294Z",
+              0.64
+            ]
+          ]
+        },
+        {
+          "name": "cpu_load_short",
+          "columns": [
+            "time",
+            "value"
+          ],
+          "values": [
+            [
+              "2015-01-29T21:51:28.968422294Z",
+              0.65
+            ]
+          ]
+        },
+        {
+          "name": "other_serie",
+          "columns": [
+            "time",
+            "value"
+          ],
+          "values": [
+            [
+              "2015-01-29T21:51:28.968422294Z",
+              0.66
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
