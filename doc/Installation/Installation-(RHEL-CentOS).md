@@ -184,9 +184,9 @@ Initiate the follow database with the following command:
 
 Create the admin user - priv should be 10
 
-    php adduser.php <name> <pass> 10
+    php adduser.php <name> <pass> 10 <email>
 
-Substitute your desired username and password--and leave the angled brackets off.
+Substitute your desired username, password and email address--and leave the angled brackets off.
 
 ### Web Interface ###
 
@@ -195,13 +195,13 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
+    chown -R librenms:librenms /opt/librenms
     # For HTTPd (Apache):
     chown apache:apache logs
     # For Nginx:
     chown nginx:nginx logs
 
     chmod 775 rrd
-    chown librenms:librenms rrd
 
 > If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
@@ -218,9 +218,9 @@ Start the web-server:
 
 This assumes you haven't made community changes--if you have, replace `public` with your community.  It also assumes SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
 
-Discover localhost and poll it for the first time:
+Discover localhost:
 
-    php discovery.php -h all && php poller.php -h all
+    php discovery.php -h all
 
 ### Create cronjob ###
 
@@ -250,6 +250,9 @@ so that it looks like this:
     $config['update'] = 0;
 
 ### Install complete ###
+
+Please allow for 2-3 runs of the poller-wrapper for data to start appearing in the WebUI.
+If you don't see data after this, please refer to the [FAQ](http://docs.librenms.org/Support/FAQ/) for assistance.
 
 That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
 
