@@ -36,49 +36,37 @@ if (is_array($hrstorage_array)) {
         foreach ($config['ignore_mount'] as $bi) {
             if ($bi == $descr) {
                 $deny = 1;
-                if ($debug) {
-                    echo "$bi == $descr \n";
-                }
+                d_echo("$bi == $descr \n");
             }
         }
 
         foreach ($config['ignore_mount_string'] as $bi) {
             if (strpos($descr, $bi) !== false) {
                 $deny = 1;
-                if ($debug) {
-                    echo "strpos: $descr, $bi \n";
-                }
+                d_echo("strpos: $descr, $bi \n");
             }
         }
 
         foreach ($config['ignore_mount_regexp'] as $bi) {
             if (preg_match($bi, $descr) > '0') {
                 $deny = 1;
-                if ($debug) {
-                    echo "preg_match $bi, $descr \n";
-                }
+                d_echo("preg_match $bi, $descr \n");
             }
         }
 
         if (isset($config['ignore_mount_removable']) && $config['ignore_mount_removable'] && $fstype == 'hrStorageRemovableDisk') {
             $deny = 1;
-            if ($debug) {
-                echo "skip(removable)\n";
-            }
+            d_echo("skip(removable)\n");
         }
 
         if (isset($config['ignore_mount_network']) && $config['ignore_mount_network'] && $fstype == 'hrStorageNetworkDisk') {
             $deny = 1;
-            if ($debug) {
-                echo "skip(network)\n";
-            }
+            d_echo("skip(network)\n");
         }
 
         if (isset($config['ignore_mount_optical']) && $config['ignore_mount_optical'] && $fstype == 'hrStorageCompactDisc') {
             $deny = 1;
-            if ($debug) {
-                echo "skip(cd)\n";
-            }
+            d_echo("skip(cd)\n");
         }
 
         if (!$deny && is_numeric($index)) {

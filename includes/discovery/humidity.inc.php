@@ -6,9 +6,7 @@ echo 'Humidity : ';
 $include_dir = 'includes/discovery/humidity';
 require 'includes/include-dir.inc.php';
 
-if ($debug) {
-    print_r($valid['sensor']['humidity']);
-}
+d_echo($valid['sensor']['humidity']);
 
 check_valid_sensors($device, 'humidity', $valid['sensor']);
 

@@ -7,9 +7,7 @@ $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
 
 // End Building SNMP Cache Array
-if ($debug) {
-    print_r($port_stats);
-}
+d_echo($port_stats);
 
 // Build array of ports in the database
 // FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>

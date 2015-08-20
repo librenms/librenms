@@ -17,9 +17,7 @@ echo 'States: ';
 $include_dir = 'includes/discovery/states';
 require 'includes/include-dir.inc.php';
 
-if ($debug) {
-    print_r($valid['sensor']['states']);
-}
+d_echo($valid['sensor']['states']);
 
 check_valid_sensors($device, 'states', $valid['sensor']);
 

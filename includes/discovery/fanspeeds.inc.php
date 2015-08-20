@@ -6,9 +6,7 @@ echo 'Fanspeeds : ';
 $include_dir = 'includes/discovery/fanspeeds';
 require 'includes/include-dir.inc.php';
 
-if ($debug) {
-    print_r($valid['sensor']['fanspeed']);
-}
+d_echo($valid['sensor']['fanspeed']);
 
 check_valid_sensors($device, 'fanspeed', $valid['sensor']);
 

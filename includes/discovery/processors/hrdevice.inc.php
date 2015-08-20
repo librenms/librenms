@@ -60,9 +60,7 @@ if (is_array($hrDevice_array)) {
             $old_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('hrProcessor-'.$index.'.rrd');
             $new_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('processor-hr-'.$index.'.rrd');
 
-            if ($debug) {
-                echo "$old_rrd $new_rrd";
-            }
+            d_echo("$old_rrd $new_rrd");
 
             if (is_file($old_rrd)) {
                 rename($old_rrd, $new_rrd);
