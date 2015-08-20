@@ -11,14 +11,10 @@ if (is_numeric($vars['id'])) {
 
     if (is_array($acc)) {
         if ($auth || port_permitted($acc['port_id'])) {
-            if ($debug) {
-                echo $config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd');
-            }
+            d_echo($config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd'));
 
             if (is_file($config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd'))) {
-                if ($debug) {
-                    echo 'exists';
-                }
+                d_echo('exists');
 
                 $rrd_filename = $config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd');
                 $port         = get_port_by_id($acc['port_id']);

@@ -24,9 +24,7 @@ echo '<tr class="tablehead">
 foreach (dbFetchRows($sql, $param) as $sensor) {
     if ($config['memcached']['enable'] === true) {
         $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
-        if ($debug) {
-            echo 'Memcached['.'sensor-'.$sensor['sensor_id'].'-value'.'='.$sensor['sensor_current'].']';
-        }
+        d_echo('Memcached['.'sensor-'.$sensor['sensor_id'].'-value'.'='.$sensor['sensor_current'].']');
     }
 
     if (empty($sensor['sensor_current'])) {
