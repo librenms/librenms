@@ -1,7 +1,5 @@
 <?php
 
-global $debug;
-
 if ($config['enable_bgp']) {
     // Discover BGP peers
     echo 'BGP Sessions : ';
@@ -25,9 +23,7 @@ if ($config['enable_bgp']) {
             $peer2 = true;
         }
 
-        if ($debug) {
-            echo "Peers : $peers_data \n";
-        }
+        d_echo("Peers : $peers_data \n");
 
         $peers = trim(str_replace('CISCO-BGP4-MIB::cbgpPeer2RemoteAs.', '', $peers_data));
         $peers = trim(str_replace('BGP4-MIB::bgpPeerRemoteAs.', '', $peers));
@@ -45,9 +41,7 @@ if ($config['enable_bgp']) {
             }
 
             if ($peer && $peer_ip != '0.0.0.0') {
-                if ($debug) {
-                    echo "Found peer $peer_ip (AS$peer_as)\n";
-                }
+                d_echo("Found peer $peer_ip (AS$peer_as)\n");
 
                 $peerlist[] = array(
                     'ip'  => $peer_ip,
@@ -70,9 +64,7 @@ if ($config['enable_bgp']) {
                 $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 16)))));
 
                 if ($peer) {
-                    if ($debug) {
-                        echo "Found peer $peer_ip (AS$peer_as)\n";
-                    }
+                    d_echo("Found peer $peer_ip (AS$peer_as)\n");
 
                     $peerlist[] = array(
                         'ip' => $peer_ip,
@@ -121,19 +113,15 @@ if ($config['enable_bgp']) {
                         $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB', $config['mibdir']);
                     }
 
-                    if ($debug) {
-                        echo 'afi data :: ';
-                        print_r($af_data);
-                    }
+                    d_echo('afi data :: ';
+                    d_echo($af_data);
 
                     foreach ($af_data as $k => $v) {
                         if ($peer2 === true) {
                             list(,$k) = explode('.', $k, 2);
                         }
 
-                        if ($debug) {
-                            echo "AFISAFI = $k\n";
-                        }
+                        d_echo("AFISAFI = $k\n");
 
                         $afisafi_tmp = explode('.', $k);
                         $safi        = array_pop($afisafi_tmp);
@@ -162,9 +150,7 @@ if ($config['enable_bgp']) {
                             switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
                                 case 'ipv4':
                                     $ip = long2ip(hexdec($entry['jnxBgpM2PeerRemoteAddr']));
-                                    if ($debug) {
-                                        echo "peerindex for ipv4 $ip is ".$entry['jnxBgpM2PeerIndex']."\n";
-                                    }
+                                    d_echo("peerindex for ipv4 $ip is ".$entry['jnxBgpM2PeerIndex']."\n");
 
                                     $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
                                     break;
@@ -173,9 +159,7 @@ if ($config['enable_bgp']) {
                                     $ip6 = trim(str_replace(' ', '', $entry['jnxBgpM2PeerRemoteAddr']), '"');
                                     $ip6 = substr($ip6, 0, 4).':'.substr($ip6, 4, 4).':'.substr($ip6, 8, 4).':'.substr($ip6, 12, 4).':'.substr($ip6, 16, 4).':'.substr($ip6, 20, 4).':'.substr($ip6, 24, 4).':'.substr($ip6, 28, 4);
                                     $ip6 = Net_IPv6::compress($ip6);
-                                    if ($debug) {
-                                        echo "peerindex for ipv6 $ip6 is ".$entry['jnxBgpM2PeerIndex']."\n";
-                                    }
+                                    d_echo("peerindex for ipv6 $ip6 is ".$entry['jnxBgpM2PeerIndex']."\n");
 
                                     $j_peerIndexes[$ip6] = $entry['jnxBgpM2PeerIndex'];
                                     break;

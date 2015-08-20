@@ -6,9 +6,7 @@ echo 'Frequencies: ';
 $include_dir = 'includes/discovery/frequencies';
 require 'includes/include-dir.inc.php';
 
-if ($debug) {
-    print_r($valid['sensor']['frequency']);
-}
+d_echo($valid['sensor']['frequency']);
 
 check_valid_sensors($device, 'frequency', $valid['sensor']);
 

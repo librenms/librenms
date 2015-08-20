@@ -3,9 +3,7 @@
 // APC
 if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.8.5.3.2.1.4', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo 'APC In ';
@@ -26,9 +24,7 @@ if ($device['os'] == 'apc') {
     }
 
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.8.5.4.2.1.4', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' APC Out ';
@@ -53,9 +49,7 @@ if ($device['os'] == 'apc') {
     }
 
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.3.2.4.0', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' APC In ';
@@ -68,9 +62,7 @@ if ($device['os'] == 'apc') {
     }
 
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.4.2.2.0', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' APC Out ';

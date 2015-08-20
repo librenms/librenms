@@ -4,9 +4,7 @@ if ($device['os'] == 'sentry3') {
     $oids       = snmp_walk($device, 'tempHumidSensorHumidValue', '-Osqn', 'Sentry3-MIB');
     $divisor    = '1';
     $multiplier = '1';
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

@@ -7,9 +7,7 @@ if ($device['os'] == 'junose' && $config['enable_ports_junoseatmvp']) {
     echo 'JunOSe ATM vps : ';
     $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', $config['install_dir'].'/mibs/junose');
     $valid_vp = array();
-    if ($debug) {
-        print_r($vp_array);
-    }
+    d_echo($vp_array);
 
     if (is_array($vp_array)) {
         foreach ($vp_array as $index => $entry) {
@@ -28,16 +26,12 @@ if ($device['os'] == 'junose' && $config['enable_ports_junoseatmvp']) {
     // Remove ATM vps which weren't redetected here
     $sql = "SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id`  = '".$device['device_id']."' AND J.port_id = P.port_id";
 
-    if ($debug) {
-        print_r($valid_vp);
-    }
+    d_echo($valid_vp);
 
     foreach (dbFetchRows($sql) as $test) {
         $port_id = $test['port_id'];
         $vp_id   = $test['vp_id'];
-        if ($debug) {
-            echo $port_id.' -> '.$vp_id."\n";
-        }
+        d_echo($port_id.' -> '.$vp_id."\n");
 
         if (!$valid_vp[$port_id][$vp_id]) {
             echo '-';
