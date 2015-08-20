@@ -140,9 +140,9 @@ echo "      </select>
     <label for='authlevel' class='col-sm-2 control-label'>Auth Level</label>
     <div class='col-sm-4'>
     <select id='authlevel' name='authlevel' class='form-control'>
-    <option value='NoAuthNoPriv'>NoAuthNoPriv</option>
-    <option value='AuthNoPriv' ".($device['authlevel'] == 'authNoPriv' ? 'selected' : '').">AuthNoPriv</option>
-    <option value='AuthPriv' ".($device['authlevel'] == 'authPriv' ? 'selected' : '').">AuthPriv</option>
+    <option value='noAuthNoPriv'>noAuthNoPriv</option>
+    <option value='authNoPriv' ".($device['authlevel'] == 'authNoPriv' ? 'selected' : '').">authNoPriv</option>
+    <option value='authPriv' ".($device['authlevel'] == 'authPriv' ? 'selected' : '').">authPriv</option>
     </select>
     </div>
     </div>
