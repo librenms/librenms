@@ -118,9 +118,7 @@ if ($discovered_devices) {
 }
 
 $string = $argv[0]." $doing ".date($config['dateformat']['compact'])." - $discovered_devices devices discovered in $proctime secs";
-if ($debug) {
-    echo "$string\n";
-}
+d_echo("$string\n");
 
 if ($options['h'] != 'new' && $config['version_check']) {
     include 'includes/versioncheck.inc.php';

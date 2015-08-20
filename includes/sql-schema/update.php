@@ -103,9 +103,7 @@ foreach ($filelist as $file) {
 
             foreach (explode("\n", $data) as $line) {
                 if (trim($line)) {
-                    if ($debug) {
-                        echo "$line \n";
-                    }
+                    d_echo("$line \n");
 
                     if ($line[0] != '#') {
                         if ($config['db']['extension'] == 'mysqli') {
