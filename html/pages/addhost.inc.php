@@ -147,9 +147,9 @@ foreach ($config['snmp']['transports'] as $transport) {
         <label for="authlevel" class="col-sm-3 control-label">Auth Level</label>
         <div class="col-sm-3">
           <select name="authlevel" id="authlevel" class="form-control input-sm">
-            <option value="noAuthNoPriv" selected>NoAuthNoPriv</option>
-            <option value="authNoPriv">AuthNoPriv</option>
-            <option value="authPriv">AuthPriv</option>
+            <option value="noAuthNoPriv" selected>noAuthNoPriv</option>
+            <option value="authNoPriv">authNoPriv</option>
+            <option value="authPriv">authPriv</option>
           </select>
         </div>
       </div>
