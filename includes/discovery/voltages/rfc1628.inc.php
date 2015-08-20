@@ -5,9 +5,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     echo 'RFC1628 ';
 
     $oids = snmp_walk($device, '1.3.6.1.2.1.33.1.2.5', '-Osqn', 'UPS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     foreach (explode("\n", $oids) as $data) {
@@ -31,9 +29,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     }
 
     $oids = trim(snmp_walk($device, '1.3.6.1.2.1.33.1.4.3.0', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -55,9 +51,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     }
 
     $oids = trim(snmp_walk($device, '1.3.6.1.2.1.33.1.3.2.0', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -79,9 +73,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     }
 
     $oids = trim(snmp_walk($device, '1.3.6.1.2.1.33.1.5.2.0', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {

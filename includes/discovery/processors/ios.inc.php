@@ -3,9 +3,7 @@
 if ($device['os_group'] == 'cisco' || $device['os'] == 'acsw') {
     echo 'CISCO-PROCESS-MIB: ';
     $processors_array = snmpwalk_cache_oid($device, 'cpmCPU', null, 'CISCO-PROCESS-MIB');
-    if ($debug) {
-        print_r($processors_array);
-    }
+    d_echo($processors_array);
 
     foreach ($processors_array as $index => $entry) {
         if (is_numeric($entry['cpmCPUTotal5minRev']) || is_numeric($entry['cpmCPUTotal5min'])) {
@@ -34,9 +32,7 @@ if ($device['os_group'] == 'cisco' || $device['os'] == 'acsw') {
 
             if (is_file($old_rrd)) {
                 rename($old_rrd, $new_rrd);
-                if ($debug) {
-                    echo "$old_rrd $new_rrd";
-                }
+                d_echo("$old_rrd $new_rrd");
 
                 echo 'Moved RRD ';
             }

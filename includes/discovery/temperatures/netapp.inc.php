@@ -3,9 +3,7 @@
 if ($device['os'] == "netapp") {
     $main_oid = ".1.3.6.1.4.1.789.1.21.1.2.1";
     $oids = snmp_walk($device, $main_oid.'.25', "-Osqn");
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
     $oids = trim($oids);
     if ($oids) {
         echo "NetApp ";

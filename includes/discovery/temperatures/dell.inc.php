@@ -27,9 +27,7 @@
 if (strstr($device['hardware'], 'Dell')) {
     // stuff partially copied from akcp sensor
     $oids = snmp_walk($device, 'temperatureProbeStatus', '-Osqn', 'MIB-Dell-10892');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {
@@ -40,9 +38,7 @@ if (strstr($device['hardware'], 'Dell')) {
     $data = trim($data);
         if ($data) {
             list($oid,$status) = explode(' ', $data, 2);
-            if ($debug) {
-                echo 'status : '.$status."\n";
-            }
+            d_echo('status : '.$status."\n");
 
             if ($status == 'ok') {
                 // 2 = normal, 0 = not connected

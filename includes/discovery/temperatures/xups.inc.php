@@ -5,9 +5,7 @@ if ($device['os'] == 'powerware') {
     // XUPS-MIB::xupsEnvAmbientLowerLimit.0 = INTEGER: 0
     // XUPS-MIB::xupsEnvAmbientUpperLimit.0 = INTEGER: 70
     $oids = snmp_walk($device, 'xupsEnvAmbientTemp', '-Osqn', 'XUPS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

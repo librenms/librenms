@@ -3,9 +3,7 @@
 // LMSensors Voltages
 if ($device['os'] == 'linux') {
     $oids = snmp_walk($device, 'lmVoltSensorsDevice', '-OsqnU', 'LM-SENSORS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo 'LM-SENSORS ';

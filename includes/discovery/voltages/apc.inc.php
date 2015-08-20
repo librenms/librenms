@@ -3,9 +3,7 @@
 // APC Voltages
 if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.8.5.3.3.1.3', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo 'APC In ';
@@ -27,9 +25,7 @@ if ($device['os'] == 'apc') {
     }
 
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.8.5.4.3.1.3', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' APC Out ';
@@ -54,9 +50,7 @@ if ($device['os'] == 'apc') {
     }
 
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.3.2.1.0', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' APC In ';
@@ -70,9 +64,7 @@ if ($device['os'] == 'apc') {
     }
 
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.4.2.1.0', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' APC Out ';
@@ -88,9 +80,7 @@ if ($device['os'] == 'apc') {
     // PDU
     // $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.12.1.15.0", "-OsqnU", "");
     $oids = snmp_walk($device, 'rPDUIdentDeviceLinetoLineVoltage.0', '-OsqnU', 'PowerNet-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' Voltage In ';
@@ -104,9 +94,7 @@ if ($device['os'] == 'apc') {
     }
 
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.26.6.3.1.6', '-OsqnU', 'PowerNet-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo ' Voltage In ';

@@ -1,7 +1,5 @@
 <?php
 
-global $debug;
-
 if ($config['enable_printers']) {
     $valid_toner = array();
 
@@ -13,9 +11,7 @@ if ($config['enable_printers']) {
             $oids = trim(snmp_walk($device, 'SNMPv2-SMI::mib-2.43.11.1.1.2.1 ', '-OsqnU'));
         }
 
-        if ($debug) {
-            echo $oids."\n";
-        }
+        d_echo($oids."\n");
 
         if ($oids) {
             echo 'Jetdirect ';
@@ -49,10 +45,8 @@ if ($config['enable_printers']) {
     }//end if
 
     // Delete removed toners
-    if ($debug) {
-        echo "\n Checking ... \n";
-        print_r($valid_toner);
-    }
+    d_echo("\n Checking ... \n");
+    d_echo($valid_toner);
 
     $sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
     foreach (dbFetchRows($sql) as $test_toner) {

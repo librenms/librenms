@@ -9,16 +9,12 @@ require 'includes/include-dir.inc.php';
 // Remove storage which weren't redetected here
 $sql = "SELECT * FROM `storage` WHERE `device_id`  = '".$device['device_id']."'";
 
-if ($debug) {
-    print_r($valid_storage);
-}
+d_echo($valid_storage);
 
 foreach (dbFetchRows($sql) as $test_storage) {
     $storage_index = $test_storage['storage_index'];
     $storage_mib   = $test_storage['storage_mib'];
-    if ($debug) {
-        echo $storage_index.' -> '.$storage_mib."\n";
-    }
+    d_echo($storage_index.' -> '.$storage_mib."\n");
 
     if (!$valid_storage[$storage_mib][$storage_index]) {
         echo '-';

@@ -6,9 +6,7 @@ echo 'Battery Charge: ';
 $include_dir = 'includes/discovery/charge';
 require 'includes/include-dir.inc.php';
 
-if ($debug) {
-    print_r($valid['sensor']['charge']);
-}
+d_echo($valid['sensor']['charge']);
 
 check_valid_sensors($device, 'charge', $valid['sensor']);
 
