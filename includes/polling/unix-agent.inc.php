@@ -83,16 +83,6 @@ if ($device['os_group'] == 'unix') {
             }
         }
 
-        foreach (array_keys($agent_data['app']) as $key) {
-            if (file_exists("includes/polling/applications/$key.inc.php")) {
-                if ($debug) {
-                    echo "Including: applications/$key.inc.php";
-                }
-
-                include "applications/$key.inc.php";
-            }
-        }
-
         // Processes
         if (!empty($agent_data['ps'])) {
             echo 'Processes: ';
@@ -111,12 +101,18 @@ if ($device['os_group'] == 'unix') {
             echo "\n";
         }
 
-        // Apache
-        if (!empty($agent_data['app']['apache'])) {
-            $app_found['apache'] = true;
-            if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], 'apache')) == '0') {
-                echo "Found new application 'Apache'\n";
-                dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'apache'), 'applications');
+        foreach (array_keys($agent_data['app']) as $key) {
+            if (file_exists("includes/polling/applications/$key.inc.php")) {
+                if ($debug) {
+                    echo "Enabling $key for $device['hostname'] if not yet enabled\n";
+                }
+
+                if (in_array($key, array('apache', 'mysql', 'nginx')) {
+                    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], $key)) == '0') {
+                        echo "Found new application '$key'\n";
+                        dbInsert(array('device_id' => $device['device_id'], 'app_type' => $key), 'applications');
+                    }
+                }
             }
         }
 
@@ -128,15 +124,6 @@ if ($device['os_group'] == 'unix') {
                     echo "Found new application 'Memcached' $memcached_host\n";
                     dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'memcached', 'app_instance' => $memcached_host), 'applications');
                 }
-            }
-        }
-
-        // MySQL
-        if (!empty($agent_data['app']['mysql'])) {
-            $app_found['mysql'] = true;
-            if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], 'mysql')) == '0') {
-                echo "Found new application 'MySQL'\n";
-                dbInsert(array('device_id' => $device['device_id'], 'app_type' => 'mysql'), 'applications');
             }
         }
 
