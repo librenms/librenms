@@ -66,18 +66,14 @@ if ($device['os_group'] == 'unix') {
             }
         }//end foreach
 
-        if ($debug) {
-            print_r($agent_data);
-        }
+        d_echo($agent_data);
 
         include 'unix-agent/packages.inc.php';
         include 'unix-agent/munin-plugins.inc.php';
 
         foreach (array_keys($agent_data) as $key) {
             if (file_exists("includes/polling/unix-agent/$key.inc.php")) {
-                if ($debug) {
-                    echo "Including: unix-agent/$key.inc.php";
-                }
+                d_echo("Including: unix-agent/$key.inc.php");
 
                 include "unix-agent/$key.inc.php";
             }
@@ -103,11 +99,9 @@ if ($device['os_group'] == 'unix') {
 
         foreach (array_keys($agent_data['app']) as $key) {
             if (file_exists("includes/polling/applications/$key.inc.php")) {
-                if ($debug) {
-                    echo "Enabling $key for $device['hostname'] if not yet enabled\n";
-                }
+                d_echo("Enabling $key for ".$device['hostname']." if not yet enabled\n");
 
-                if (in_array($key, array('apache', 'mysql', 'nginx')) {
+                if (in_array($key, array('apache', 'mysql', 'nginx'))) {
                     if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], $key)) == '0') {
                         echo "Found new application '$key'\n";
                         dbInsert(array('device_id' => $device['device_id'], 'app_type' => $key), 'applications');
