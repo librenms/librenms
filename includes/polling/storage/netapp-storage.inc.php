@@ -2,9 +2,7 @@
 
 if (!is_array($storage_cache['netapp-storage'])) {
     $storage_cache['netapp-storage'] = snmpwalk_cache_oid($device, 'dfEntry', null, 'NETAPP-MIB');
-    if ($debug) {
-        print_r($storage_cache);
-    }
+    d_echo($storage_cache);
 }
 
 $entry = $storage_cache['netapp-storage'][$storage[storage_index]];

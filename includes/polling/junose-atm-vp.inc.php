@@ -20,9 +20,7 @@ if (count($vp_rows)) {
 
         $oid = $vp['ifIndex'].'.'.$vp['vp_id'];
 
-        if ($debug) {
-            echo "$oid ";
-        }
+        d_echo("$oid ");
 
         $t_vp = $vp_cache[$oid];
 
@@ -33,9 +31,7 @@ if (count($vp_rows)) {
 
         $rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('vp-'.$vp['ifIndex'].'-'.$vp['vp_id'].'.rrd');
 
-        if ($debug) {
-            echo "$rrd ";
-        }
+        d_echo("$rrd ");
 
         if (!is_file($rrd)) {
             rrdtool_create(
