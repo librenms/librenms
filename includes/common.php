@@ -33,15 +33,9 @@ function format_number_short($number, $sf) {
 }
 
 function external_exec($command) {
-    global $debug;
-
-    if ($debug) {
-        echo($command."\n");
-    }
+    d_echo($command."\n");
     $output = shell_exec($command);
-    if ($debug) {
-        echo($output."\n");
-    }
+    d_echo($output."\n");
 
     return $output;
 }
