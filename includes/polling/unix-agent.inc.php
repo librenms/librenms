@@ -47,32 +47,17 @@ if ($device['os_group'] == 'unix') {
             list($section, $data) = explode('>>>', $section);
             list($sa, $sb)    = explode('-', $section, 2);
 
-            if ($section == 'apache') {
-                $sa = 'app';
-                $sb = 'apache';
+            $agentapps = array(
+                "apache",
+                "mysql",
+                "nginx",
+                "bind",
+                "tinydns");
+
+            if (in_array($section, $agentapps)) {
+                $agent_data['app'][$section] = trim($data);
             }
 
-            if ($section == 'mysql') {
-                $sa = 'app';
-                $sb = 'mysql';
-            }
-
-            if ($section == 'nginx') {
-                $sa = 'app';
-                $sb = 'nginx';
-            }
-
-            if ($section == 'bind') {
-                $sa = 'app';
-                $sb = 'bind';
-            }
-
-            if ($section == 'tinydns') {
-                $sa = 'app';
-                $sb = 'tinydns';
-            }
-
-            // if ($section == "drbd")   { $sa = "app"; $sb = "drbd"; }
             if (!empty($sa) && !empty($sb)) {
                 $agent_data[$sa][$sb] = trim($data);
             }
