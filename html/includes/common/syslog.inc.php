@@ -1,5 +1,4 @@
 <?php
-
 $no_refresh = true;
 
 $param = array();
@@ -10,8 +9,7 @@ if ($vars['action'] == 'expunge' && $_SESSION['userlevel'] >= '10') {
 }
 
 $pagetitle[] = 'Syslog';
-?>
-
+$syslog_output = '
 <div class="table-responsive">
 <table id="syslog" class="table table-hover table-condensed table-striped">
     <thead>
@@ -36,7 +34,7 @@ var grid = $("#syslog").bootgrid({
                 "<div class=\"form-group\">"+
                 "<select name=\"device\" id=\"device\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
-                <?php
+';
                 foreach (get_all_devices() as $hostname) {
                     $device_id = getidbyname($hostname);
                     if (device_permitted($device_id)) {
@@ -48,13 +46,13 @@ var grid = $("#syslog").bootgrid({
                         echo '>'.$hostname.'</option>"+';
                     }
                 }
-                ?>
+$syslog_output .= '
                 "</select>"+
                 "</div>"+
                 "<div class=\"form-group\">"+
                 "<select name=\"program\" id=\"program\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Programs</option>"+
-                <?php
+';
                 foreach (dbFetchRows('SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`') as $data) {
                     echo '"<option value=\"'.$data['program'].'\"';
                     if ($data['program'] == $vars['program']) {
@@ -63,7 +61,7 @@ var grid = $("#syslog").bootgrid({
 
                     echo '>'.$data['program'].'</option>"+';
                 }
-                ?>
+$syslog_output .= '
                 "</select>"+
                 "</div>"+
                 "<div class=\"form-group\">"+
@@ -81,10 +79,10 @@ var grid = $("#syslog").bootgrid({
     {
         return {
             id: "syslog",
-            device: '<?php echo htmlspecialchars($vars['device']); ?>',
-            program: '<?php echo htmlspecialchars($vars['program']); ?>',
-            to: '<?php echo htmlspecialchars($vars['to']); ?>',
-            from: '<?php echo htmlspecialchars($vars['from']); ?>',
+            device: "' .mres($vars['device']) .'",
+            program: "' .mres($vars['program']) .'",
+            to: "' .mres($vars['to']) .'",
+            from: "' .mres($vars['from']) .'",
         };
     },
     url: "ajax_table.php"
@@ -105,7 +103,9 @@ $(function () {
     if( $("#dtpickerto").val() != "" ) {
         $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
     } else {
-        $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo date($config['dateformat']['byminute']); ?>');
+        $("#dtpickerto").data("DateTimePicker").maxDate("'.mres($config['dateformat']['byminute']) .')";
     }
 });
 </script>
+';
+$common_output[] = $syslog_output;
