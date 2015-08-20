@@ -1,7 +1,5 @@
 <?php
 
-global $debug;
-
 if ($device['os_group'] == 'unix') {
     echo $config['project_name'].' UNIX Agent: ';
 

@@ -2,21 +2,15 @@
 
 $oid = $mempool['mempool_index'];
 
-if ($debug) {
-    echo 'Huawei VRP Mempool';
-}
+d_echo('Huawei VRP Mempool');
 
 if (!is_array($mempool_cache['vrp'])) {
-    if ($debug) {
-        echo 'caching';
-    }
+    d_echo('caching');
 
     $mempool_cache['vrp'] = array();
     $mempool_cache['vrp'] = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $mempool_cache['vrp'], 'HUAWEI-ENTITY-EXTENT-MIB', $config['install_dir'].'/mibs');
     $mempool_cache['vrp'] = snmpwalk_cache_multi_oid($device, 'hwEntityMemUsage', $mempool_cache['vrp'], 'HUAWEI-ENTITY-EXTENT-MIB', $config['install_dir'].'/mibs');
-    if ($debug) {
-        print_r($mempool_cache);
-    }
+    d_echo($mempool_cache);
 }
 
 $entry = $mempool_cache['vrp'][$mempool[mempool_index]];

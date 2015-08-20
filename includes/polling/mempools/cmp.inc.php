@@ -7,9 +7,7 @@ $pool_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -m CISCO-MEMORY-POOL-
 $pool_cmd .= " ciscoMemoryPoolUsed.$oid ciscoMemoryPoolFree.$oid ciscoMemoryPoolLargestFree.$oid";
 $pool_cmd .= " | cut -f 1 -d ' '";
 
-if ($debug) {
-    echo "$pool_cmd";
-}
+d_echo("$pool_cmd");
 
 $pool = shell_exec($pool_cmd);
 
