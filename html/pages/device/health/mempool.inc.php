@@ -18,9 +18,7 @@ foreach (dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($devi
 
     if ($config['memcached']['enable'] === true) {
         $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
-        if ($debug) {
-            print_r($state);
-        }
+        d_echo($state);
 
         if (is_array($state)) {
             $mempool = array_merge($mempool, $state);
