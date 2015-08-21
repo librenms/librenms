@@ -48,6 +48,7 @@ Contributors to LibreNMS:
 - Michael Newton <mnewton@pofp.com> (miken32)
 - Tom Ferguson <tom.ferguson.public@outlook.com> (Tawmu)
 - Jimmy Cleuren <jimmy.cleuren@gmail.com> (jimmycleuren)
+- Mark Schouten <mark@tuxis.nl> (tuxis-ie)
 
 
 [1]: http://observium.org/ "Observium web site"
