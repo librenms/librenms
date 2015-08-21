@@ -511,8 +511,12 @@ foreach ($ports as $port) {
 
         rrdtool_update("$rrdfile", $fields);
 
-        $fields['ifSpeed'] = $port['ifSpeed'];
-print_r($this_port);
+        $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
+        $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
+        $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
+        $fields['ifOutErrors_rate'] = $port['ifOutErrors_rate'];
+        $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
+        $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
         $tags = array('ifName' => $this_port['ifName']);
         influx_update($device,'ports',$tags,$fields);

@@ -24,7 +24,7 @@ function influxdb_connect() {
         $influxdb_cred = $config['influxdb']['username'].':'.$config['influxdb']['password'].'@';
         d_echo('Using authentication for InfluxDB');
     }
-    $influxdb_url = $influxdb_cred.$influxdb_cred.$config['influxdb']['host'].':'.$config['influxdb']['port'].'/'.$config['influxdb']['db'];
+    $influxdb_url = $influxdb_cred.$config['influxdb']['host'].':'.$config['influxdb']['port'].'/'.$config['influxdb']['db'];
     d_echo($config['influxdb']['transport'] . " transport being used");
     if ($config['influxdb']['transport'] == 'http') {
         $influxdb_conn = 'influxdb';
@@ -68,7 +68,6 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
             )
         );
         $result = $influxdb->writePoints($points);
-        d_echo($result);
     }
     else {
         print $console_color->convert('[%gInfluxDB Disabled%n] ', false);
