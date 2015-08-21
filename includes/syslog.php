@@ -46,6 +46,7 @@ function process_syslog($entry, $update) {
         }
     }
 
+    $entry['host'] = preg_replace("/^::ffff:/", "", $entry['host']);
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {
         $os = get_cache($entry['host'], 'os');
