@@ -1,16 +1,6 @@
 <?php
-$no_refresh = true;
 
-$param = array();
-
-if ($vars['action'] == 'expunge' && $_SESSION['userlevel'] >= '10') {
-    dbQuery('TRUNCATE TABLE `syslog`');
-    print_message('syslog truncated');
-}
-
-$pagetitle[] = 'Syslog';
-$syslog_output = '
-<div class="table-responsive">
+$common_output[] = '
 <table id="syslog" class="table table-hover table-condensed table-striped">
     <thead>
         <tr>
@@ -21,91 +11,20 @@ $syslog_output = '
         </tr>
     </thead>
 </table>
-</div>
 
 <script>
 
-var grid = $("#syslog").bootgrid({
+var syslog_grid = $("#syslog").bootgrid({
     ajax: true,
-    templates: {
-        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
-                "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\" id=\"result_form\">"+
-                "<div class=\"form-group\">"+
-                "<select name=\"device\" id=\"device\" class=\"form-control input-sm\">"+
-                "<option value=\"\">All Devices</option>"+
-';
-                foreach (get_all_devices() as $hostname) {
-                    $device_id = getidbyname($hostname);
-                    if (device_permitted($device_id)) {
-                        echo '"<option value=\"'.$device_id.'\"';
-                        if ($device_id == $vars['device']) {
-                            echo ' selected';
-                        }
-
-                        echo '>'.$hostname.'</option>"+';
-                    }
-                }
-$syslog_output .= '
-                "</select>"+
-                "</div>"+
-                "<div class=\"form-group\">"+
-                "<select name=\"program\" id=\"program\" class=\"form-control input-sm\">"+
-                "<option value=\"\">All Programs</option>"+
-';
-                foreach (dbFetchRows('SELECT DISTINCT `program` FROM `syslog` ORDER BY `program`') as $data) {
-                    echo '"<option value=\"'.$data['program'].'\"';
-                    if ($data['program'] == $vars['program']) {
-                        echo ' selected';
-                    }
-
-                    echo '>'.$data['program'].'</option>"+';
-                }
-$syslog_output .= '
-                "</select>"+
-                "</div>"+
-                "<div class=\"form-group\">"+
-                "<input name=\"from\" type=\"text\" class=\"form-control input-sm\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"<?php echo $vars['from']; ?>\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
-                "</div>"+
-                "<div class=\"form-group\">"+
-                "<input name=\"to\" type=\"text\" class=\"form-control input-sm\" id=\"dtpickerto\" maxlength=\"16\" value=\"<?php echo $vars['to']; ?>\" placeholder=\"To\" data-date-format=\"YYYY-MM-DD HH:mm\">"+
-                "</div>"+
-                "<button type=\"submit\" class=\"btn btn-default input-sm\">Filter</button>"+
-                "</form></span></div>"+
-                "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
-
-    },
     post: function ()
     {
         return {
             id: "syslog",
             device: "' .mres($vars['device']) .'",
-            program: "' .mres($vars['program']) .'",
-            to: "' .mres($vars['to']) .'",
-            from: "' .mres($vars['from']) .'",
         };
     },
     url: "ajax_table.php"
 });
 
-$(function () {
-    $("#dtpickerfrom").datetimepicker();
-    $("#dtpickerfrom").on("dp.change", function (e) {
-        $("#dtpickerto").data("DateTimePicker").minDate(e.date);
-    });
-    $("#dtpickerto").datetimepicker();
-    $("#dtpickerto").on("dp.change", function (e) {
-        $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
-    });
-    if( $("#dtpickerfrom").val() != "" ) {
-        $("#dtpickerto").data("DateTimePicker").minDate($("#dtpickerfrom").val());
-    }
-    if( $("#dtpickerto").val() != "" ) {
-        $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
-    } else {
-        $("#dtpickerto").data("DateTimePicker").maxDate("'.mres($config['dateformat']['byminute']) .')";
-    }
-});
 </script>
 ';
-$common_output[] = $syslog_output;
