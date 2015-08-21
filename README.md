@@ -12,7 +12,7 @@ We intend LibreNMS to be a viable project and community that:
 - offers a welcoming, friendly environment for everyone.
 
 The [Debian Social Contract][10] will be the basis of our priority system,
-and mutual respect the basis of our behaviour towards others.  For more
+and mutual respect is the basis of our behaviour towards others.  For more
 about the culture we're trying to build, please read the [Freenode
 philosophy][13], including [guidelines for running an IRC channel][6] and
 [being a community catalyst][7].
