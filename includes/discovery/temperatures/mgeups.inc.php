@@ -50,7 +50,7 @@ if ($device['os'] == 'mgeups') {
         $low_warn_limit  = ($low_limit + $hysteresis);
         $high_warn_limit = ($high_limit - $hysteresis);
 
-        d_echo("low_limit : $low_limit\nlow_warn_limit : $low_warn_limit\nhigh_warn_limit : $high_warn_limit\nhigh_limit : $high_limit\n"):
+        d_echo("low_limit : $low_limit\nlow_warn_limit : $low_warn_limit\nhigh_warn_limit : $high_warn_limit\nhigh_limit : $high_limit\n");
 
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '10', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, ($current / 10));
     }

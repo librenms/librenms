@@ -113,7 +113,7 @@ if ($config['enable_bgp']) {
                         $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', $cbgp, 'CISCO-BGP4-MIB', $config['mibdir']);
                     }
 
-                    d_echo('afi data :: ';
+                    d_echo('afi data :: ');
                     d_echo($af_data);
 
                     foreach ($af_data as $k => $v) {
