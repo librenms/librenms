@@ -77,9 +77,7 @@ if ($device['os'] == 'netscaler') {
         print_r($vsvr);
     }
 
-    if ($debug) {
-        print_r($vsvrs);
-    }
+    d_echo($vsvrs);
 
     foreach ($vsvr_array as $index => $vsvr) {
         if (isset($vsvr['vsvrName'])) {
@@ -129,9 +127,7 @@ if ($device['os'] == 'netscaler') {
         }//end if
     }//end foreach
 
-    if ($debug) {
-        print_r($vsvr_exist);
-    }
+    d_echo($vsvr_exist);
 
     foreach ($vsvrs as $db_name => $db_id) {
         if (!$vsvr_exist[$db_name]) {

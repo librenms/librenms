@@ -20,9 +20,7 @@ if ($type && $descr) {
     $port_ifAlias['speed']   = $speed;
     $port_ifAlias['notes']   = $notes;
 
-    if ($debug) {
-        print_r($port_ifAlias);
-    }
+    d_echo($port_ifAlias);
 }
 
 unset($port_type, $port_descr, $port_circuit, $port_notes, $port_speed);

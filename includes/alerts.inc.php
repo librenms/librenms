@@ -220,7 +220,6 @@ function IsMaintenance( $device ) {
  * @return void
  */
 function RunRules($device) {
-    global $debug;
     if( IsMaintenance($device) > 0 ) {
         echo "Under Maintenance, Skipping alerts.\r\n";
         return false;

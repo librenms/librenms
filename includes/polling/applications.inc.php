@@ -1,9 +1,7 @@
 <?php
 
 $sql = "SELECT * FROM `applications` WHERE `device_id`  = '".$device['device_id']."'";
-if ($debug) {
-    echo $sql."\n";
-}
+d_echo($sql."\n");
 
 $app_rows = dbFetchRows('SELECT * FROM `applications` WHERE `device_id`  = ?', array($device['device_id']));
 

@@ -2,9 +2,7 @@
 
 if ($device['os'] == 'akcp' || $device['os'] == 'minkelsrms') {
     $oids = snmp_walk($device, '.1.3.6.1.4.1.3854.1.2.2.1.16.1.4', '-Osqn', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

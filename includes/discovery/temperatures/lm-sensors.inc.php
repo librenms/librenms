@@ -2,9 +2,7 @@
 
 if ($device['os'] == 'linux') {
     $oids = snmp_walk($device, 'lmTempSensorsDevice', '-Osqn', 'LM-SENSORS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

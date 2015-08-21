@@ -34,10 +34,8 @@ if ($config['enable_vrfs']) {
             $ports_oid  = '.1.3.6.1.2.1.10.166.11.1.2.1.1.2';
         }
 
-        if ($debug) {
-            echo "\n[DEBUG]\nUsing $vpnmib\n[/DEBUG]\n";
-            echo "\n[DEBUG OIDS]\n$rds\n[/DEBUG]\n";
-        }
+        d_echo("\n[DEBUG]\nUsing $vpnmib\n[/DEBUG]\n");
+        d_echo("\n[DEBUG OIDS]\n$rds\n[/DEBUG]\n");
 
         $rds = trim($rds);
 

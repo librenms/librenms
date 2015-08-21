@@ -59,9 +59,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     }
 
                     $xml = simplexml_load_string('<?xml version="1.0"?> '.$vm_info_xml);
-                    if ($debug) {
-                        print_r($xml);
-                    }
+                    d_echo($xml);
 
                     $vmwVmDisplayName = $xml->name;
                     $vmwVmGuestOS     = '';

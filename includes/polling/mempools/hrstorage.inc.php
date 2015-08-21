@@ -3,14 +3,10 @@
 // HOST-RESOURCES-MIB - Memory Objects
 if (!is_array($storage_cache['hrstorage'])) {
     $storage_cache['hrstorage'] = snmpwalk_cache_oid($device, 'hrStorageEntry', null, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
-    if ($debug) {
-        print_r($storage_cache);
-    }
+    d_echo($storage_cache);
 }
 else {
-    if ($debug) {
-        echo 'Cached!';
-    }
+    d_echo('Cached!');
 }
 
 $entry = $storage_cache['hrstorage'][$mempool[mempool_index]];

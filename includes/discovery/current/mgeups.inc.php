@@ -4,9 +4,7 @@
 if ($device['os'] == 'mgeups') {
     echo 'MGE ';
     $oids = trim(snmp_walk($device, '1.3.6.1.4.1.705.1.7.1', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $numPhase = count(explode("\n", $oids));
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -36,9 +34,7 @@ if ($device['os'] == 'mgeups') {
     }//end for
 
     $oids = trim(snmp_walk($device, '1.3.6.1.4.1.705.1.6.1', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $numPhase = count(explode("\n", $oids));
     for ($i = 1; $i <= $numPhase; $i++) {

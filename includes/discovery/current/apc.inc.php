@@ -9,9 +9,7 @@ if ($device['os'] == 'apc') {
     }
 
     if ($oids) {
-        if ($debug) {
-            echo $oids."\n";
-        }
+        d_echo($oids."\n");
 
         $oids = trim($oids);
         if ($oids) {
@@ -64,9 +62,7 @@ if ($device['os'] == 'apc') {
     // should work with firmware v2 and v3
     if ($oids) {
         echo 'APC PowerNet-MIB Banks ';
-        if ($debug) {
-            echo $oids."\n";
-        }
+        d_echo($oids."\n");
 
         $oids      = trim($oids);
         $type      = 'apc';
@@ -132,9 +128,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.26.9.4.3.1.1', '-t 30 -OsqnU', 'PowerNet-MIB');
     if ($oids) {
         echo 'APC PowerNet-MIB Outlets ';
-        if ($debug) {
-            echo $oids."\n";
-        }
+        d_echo($oids."\n");
 
         $oids      = trim($oids);
         $type      = 'apc';
@@ -179,9 +173,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, 'atsConfigPhaseTableIndex', '-OsqnU', 'PowerNet-MIB');
     if ($oids) {
         $type = 'apc';
-        if ($debug) {
-            print_r($oids);
-        }
+        d_echo($oids."\n");
 
         $oids = trim($oids);
         if ($oids) {
@@ -239,9 +231,7 @@ if ($device['os'] == 'apc') {
         }
 
         if (!empty($oids)) {
-            if ($debug) {
-                print_r($oids);
-            }
+            d_echo($oids."\n");
 
             $oids = trim($oids);
             if ($oids) {

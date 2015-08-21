@@ -3,9 +3,7 @@
 // Areca Voltages
 if ($device['os'] == 'areca') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.18928.1.2.2.1.8.1.2', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo 'Areca ';
