@@ -8,9 +8,7 @@ $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($vars['por
 
 if ($config['memcached']['enable'] === true) {
     $state = $memcache->get('port-'.$port['port_id'].'-state');
-    if ($debug) {
-        print_r($state);
-    }
+    d_echo($state);
 
     if (is_array($state)) {
         $port = array_merge($port, $state);

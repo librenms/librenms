@@ -327,9 +327,7 @@ if (is_array($ospf_nbrs_db)) {
 
             foreach ($ospf_nbr_oids as $oid) {
                 // Loop the OIDs
-                if ($debug) {
-                    echo $ospf_nbr_db[$oid].'|'.$ospf_nbr_poll[$oid]."\n";
-                }
+                d_echo($ospf_nbr_db[$oid].'|'.$ospf_nbr_poll[$oid]."\n");
 
                 if ($ospf_nbr_db[$oid] != $ospf_nbr_poll[$oid]) {
                     // If data has changed, build a query

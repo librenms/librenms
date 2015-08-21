@@ -43,9 +43,7 @@ foreach (explode("\n", $ipNetToMedia_data) as $data) {
             $old_mac = dbFetchCell('SELECT mac_address from ipv4_mac WHERE ipv4_address=? AND port_id=?', array($ip, $interface['port_id']));
 
             if ($clean_mac != $old_mac && $clean_mac != '' && $old_mac != '') {
-                if ($debug) {
-                    echo "Changed mac address for $ip from $old_mac to $clean_mac\n";
-                }
+                d_echo("Changed mac address for $ip from $old_mac to $clean_mac\n");
 
                 log_event("MAC change: $ip : ".mac_clean_to_readable($old_mac).' -> '.mac_clean_to_readable($clean_mac), $device, 'interface', $interface['port_id']);
             }
@@ -73,9 +71,7 @@ foreach (dbFetchRows($sql) as $entry) {
     $entry_if  = $entry['port_id'];
     if (!$mac_table[$entry_if][$entry_mac]) {
         dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ?', array($entry_if, $entry_mac));
-        if ($debug) {
-            echo "Removing MAC $entry_mac from interface ".$interface['ifName'];
-        }
+        d_echo("Removing MAC $entry_mac from interface ".$interface['ifName']);
 
         echo '-';
     }

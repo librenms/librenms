@@ -186,25 +186,19 @@ else {
     echo "disabled\n";
 }
 
-if ($debug) {
-    print_r($link_exists);
-}
+d_echo($link_exists);
 
 $sql = "SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = '".$device['device_id']."'";
 foreach (dbFetchRows($sql) as $test) {
     $local_port_id   = $test['local_port_id'];
     $remote_hostname = $test['remote_hostname'];
     $remote_port     = $test['remote_port'];
-    if ($debug) {
-        echo "$local_port_id -> $remote_hostname -> $remote_port \n";
-    }
+    d_echo("$local_port_id -> $remote_hostname -> $remote_port \n");
 
     if (!$link_exists[$local_port_id][$remote_hostname][$remote_port]) {
         echo '-';
         $rows = dbDelete('links', '`id` = ?', array($test['id']));
-        if ($debug) {
-            echo "$rows deleted ";
-        }
+        d_echo("$rows deleted ");
     }
 }
 

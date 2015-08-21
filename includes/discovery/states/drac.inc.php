@@ -15,9 +15,7 @@
 if ($device['os'] == "drac") {
     $oids = snmp_walk($device, "virtualDiskNumber", "-Oesqn", "IDRAC-MIB-SMIv2");
     $main_oid = ".1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.";
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
     $oids = trim($oids);
     if ($oids) {
         echo "Dell iDRAC";

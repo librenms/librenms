@@ -138,9 +138,7 @@ else {
     foreach ($ports as $port) {
         if ($config['memcached']['enable'] === true) {
             $state = $memcache->get('port-'.$port['port_id'].'-state');
-            if ($debug) {
-                print_r($state);
-            }
+            d_echo($state);
 
             if (is_array($state)) {
                 $port = array_merge($port, $state);

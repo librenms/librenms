@@ -13,9 +13,7 @@
 
 if (strstr($device['os'], 'drac')) {
     $oids = snmp_walk($device, 'temperatureProbeStatus', '-Osqn', 'IDRAC-MIB-SMIv2');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {
@@ -26,9 +24,7 @@ if (strstr($device['os'], 'drac')) {
         $data = trim($data);
         if ($data) {
             list($oid,$status) = explode(' ', $data, 2);
-            if ($debug) {
-                echo 'status : '.$status."\n";
-            }
+            d_echo('status : '.$status."\n");
 
             if ($status == 'ok') {
                 $split_oid        = explode('.', $oid);
