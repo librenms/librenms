@@ -15,15 +15,11 @@ if (count($diskio_data)) {
 
         echo $diskio['diskio_descr'].' ';
 
-        if ($debug) {
-            print_r($entry);
-        }
+        d_echo($entry);
 
         $rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('ucd_diskio-'.$diskio['diskio_descr'].'.rrd');
 
-        if ($debug) {
-            echo "$rrd ";
-        }
+        d_echo("$rrd ");
 
         if (!is_file($rrd)) {
             rrdtool_create(

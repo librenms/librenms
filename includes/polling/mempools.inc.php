@@ -44,9 +44,7 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     }
 
     if ($config['memcached']['enable'] === true) {
-        if ($debug) {
-            print_r($mempool['state']);
-        }
+        d_echo($mempool['state']);
 
         $memcache->set('mempool-'.$mempool['mempool_id'].'-value', $mempool['state']);
     }

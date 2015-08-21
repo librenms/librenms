@@ -32,9 +32,7 @@ if ($device['os'] == 'ios') {
 
         $rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('c6kxbar-'.$index.'-'.$subindex.'.rrd');
 
-        if ($debug) {
-            echo "$rrd ";
-        }
+        d_echo("$rrd ");
 
         if (!is_file($rrd)) {
             rrdtool_create(

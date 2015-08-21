@@ -13,9 +13,7 @@ if ($device['os_group'] == 'cisco') {
         $cefs_db[$cef_id] = $ceftmp['cef_switching_id'];
     }
 
-    if ($debug) {
-        print_r($cefs);
-    }
+    d_echo($cefs);
 
     if (is_array($cefs)) {
         if (!is_array($entity_array)) {

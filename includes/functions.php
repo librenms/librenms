@@ -95,14 +95,12 @@ function logfile($string) {
 }
 
 function getHostOS($device){
-    global $config, $debug;
+    global $config;
 
     $sysDescr    = snmp_get ($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
     $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
-    if ($debug) {
-        echo("| $sysDescr | $sysObjectId | ");
-    }
+    d_echo("| $sysDescr | $sysObjectId | ");
 
     $path = $config['install_dir'] . "/includes/discovery/os";
     $dir_handle = @opendir($path) or die("Unable to open $path");
@@ -698,8 +696,6 @@ function get_astext($asn) {
 
 # Use this function to write to the eventlog table
 function log_event($text, $device = NULL, $type = NULL, $reference = NULL) {
-    global $debug;
-
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
     }
@@ -830,7 +826,7 @@ function isHexString($str) {
 
 # Include all .inc.php files in $dir
 function include_dir($dir, $regex = "") {
-    global $device, $config, $debug, $valid;
+    global $device, $config, $valid;
 
     if ($regex == "") {
         $regex = "/\.inc\.php$/";
@@ -839,9 +835,7 @@ function include_dir($dir, $regex = "") {
     if ($handle = opendir($config['install_dir'] . '/' . $dir)) {
         while (false !== ($file = readdir($handle))) {
             if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file)) {
-                if ($debug) {
-                    echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n");
-                }
+                d_echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n");
 
                 include($config['install_dir'] . '/' . $dir . '/' . $file);
             }
@@ -853,7 +847,7 @@ function include_dir($dir, $regex = "") {
 
 function is_port_valid($port, $device) {
 
-    global $config, $debug;
+    global $config;
 
     if (strstr($port['ifDescr'], "irtual")) {
         $valid = 0;
@@ -868,9 +862,7 @@ function is_port_valid($port, $device) {
         foreach ($fringe as $bi) {
             if (strstr($if, $bi)) {
                 $valid = 0;
-                if ($debug) {
-                    echo("ignored : $bi : $if");
-                }
+                d_echo("ignored : $bi : $if");
             }
         }
         if (is_array($config['bad_if_regexp'])) {
@@ -881,9 +873,7 @@ function is_port_valid($port, $device) {
             foreach ($fringe as $bi) {
                 if (preg_match($bi ."i", $if)) {
                     $valid = 0;
-                    if ($debug) {
-                        echo("ignored : $bi : ".$if);
-                    }
+                    d_echo("ignored : $bi : ".$if);
                 }
             }
         }
@@ -895,9 +885,7 @@ function is_port_valid($port, $device) {
             foreach ($fringe as $bi) {
                 if (strstr($port['ifType'], $bi)) {
                     $valid = 0;
-                    if ($debug) {
-                        echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
-                    }
+                    d_echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
                 }
             }
         }
@@ -917,7 +905,7 @@ function is_port_valid($port, $device) {
 
 function scan_new_plugins() {
 
-    global $config, $debug;
+    global $config;
 
     $installed = 0; // Track how many plugins we install.
 

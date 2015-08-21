@@ -4,9 +4,7 @@
 if ($device['os'] == 'mgeups') {
     echo 'MGE ';
     $oids = trim(snmp_walk($device, 'mgoutputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $numPhase = count(explode("\n", $oids));
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -31,9 +29,7 @@ if ($device['os'] == 'mgeups') {
     }
 
     $oids = trim(snmp_walk($device, 'mgeinputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $numPhase = count(explode("\n", $oids));
     for ($i = 1; $i <= $numPhase; $i++) {
