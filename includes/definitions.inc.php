@@ -1664,7 +1664,6 @@ if ($config['memcached']['enable'] === true) {
     if (class_exists('Memcached')) {
         $memcache = new Memcached();
         $memcache->addServer($config['memcached']['host'], $config['memcached']['port']);
-        d_echo($memcache->getStats());
     }
     else {
         echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
