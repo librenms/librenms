@@ -1137,3 +1137,6 @@ function alert_details($details) {
 
 }//end alert_details()
 
+function gen_alert_button($size='sm', $device, $type, $type_id) {
+    return "<button type='button' class='btn btn-primary btn-$size' data-toggle='modal' data-target='#create-alert' data-device_id='".$device['device_id']."' data-type='$type' data-type_id='$type_id'>Create alert rule</button>";
+}//end gen_alert_button
