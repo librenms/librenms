@@ -294,7 +294,7 @@ foreach ($ports as $port) {
         }
 
         // Overwrite ifSpeed with ifHighSpeed if it's over 1G
-        if (is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > '1000000000') {
+        if (is_numeric($this_port['ifHighSpeed']) && ($this_port['ifSpeed'] > '1000000000' || $this_port['ifSpeed'] == 0)) {
             echo 'HighSpeed ';
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
         }
