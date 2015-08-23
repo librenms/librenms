@@ -333,8 +333,16 @@ Route: /api/v0/devices
 Input:
 
  - order: How to order the output, default is by hostname. Can be prepended by DESC or ASC to change the order.
- - type: can be one of the following, all, ignored, up, down, disabled to filter by that device status.
-
+ - type: can be one of the following to filter or search by:
+   - all: All devices
+   - ignored: Only ignored devices
+   - up: Only devices that are up
+   - down: Only devices that are down
+   - disabled: Disabled devices
+   - mac: search by mac address
+   - ipv4: search by IPv4 address
+   - ipv6: search by IPv6 address (compressed or uncompressed)
+ - query: If searching by, then this will be used as the input.
 Example:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?order=hostname%20DESC&type=down
@@ -345,6 +353,30 @@ Output:
 ```text
 {
  "status": "ok",
+ "count": 1,
+ "devices": [
+  {
+   "device_id": "1",
+   "hostname": "localhost",
+   ...
+   "serial": null,
+   "icon": null
+  }
+ ]
+}
+```
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?type=mac&query=00000c9ff013
+```
+
+Output:
+
+```text
+{
+ "status": "ok",
+ "count": 1,
  "devices": [
   {
    "device_id": "1",
