@@ -155,6 +155,9 @@ function list_devices() {
     $app   = \Slim\Slim::getInstance();
     $order = $_GET['order'];
     $type  = $_GET['type'];
+    $query = mres($_GET['query']);
+    $param = array();
+    $join = '';
     if (empty($order)) {
         $order = 'hostname';
     }
@@ -166,28 +169,46 @@ function list_devices() {
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     }
-    else if ($type == 'ignored') {
+    elseif ($type == 'ignored') {
         $sql = "ignore='1' AND disabled='0'";
     }
-    else if ($type == 'up') {
+    elseif ($type == 'up') {
         $sql = "status='1' AND ignore='0' AND disabled='0'";
     }
-    else if ($type == 'down') {
+    elseif ($type == 'down') {
         $sql = "status='0' AND ignore='0' AND disabled='0'";
     }
-    else if ($type == 'disabled') {
+    elseif ($type == 'disabled') {
         $sql = "disabled='1'";
+    }
+    elseif ($type == 'mac') {
+        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_mac` ON `ports`.`port_id`=`ipv4_mac`.`port_id` ";
+        $sql = "`ipv4_mac`.`mac_address`=?";
+        $param[] = $query;
+    }
+    elseif ($type == 'ipv4') {
+        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_addresses` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` ";
+        $sql = "`ipv4_addresses`.`ipv4_address`=?";
+        $param[] = $query;
+    }
+    elseif ($type == 'ipv6') {
+        $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv6_addresses` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` ";
+        $sql = "`ipv6_addresses`.`ipv6_address`=? OR `ipv6_addresses`.`ipv6_compressed`=?";
+        $param = array($query,$query);
     }
     else {
         $sql = '1';
     }
     $devices = array();
-    foreach (dbFetchRows("SELECT * FROM `devices` WHERE $sql ORDER by $order") as $device) {
+    foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
         $devices[] = $device;
     }
 
+    $count = count($devices);
+
     $output = array(
         'status'  => 'ok',
+        'count'   => $count,
         'devices' => $devices,
     );
     $app->response->headers->set('Content-Type', 'application/json');
@@ -211,7 +232,7 @@ function add_device() {
         $message = 'No information has been provided to add this new device';
     }
 
-    else if (empty($data['hostname'])) {
+    elseif (empty($data['hostname'])) {
         $message = 'Missing the device hostname';
     }
 
@@ -227,7 +248,7 @@ function add_device() {
 
         $snmpver = mres($data['version']);
     }
-    else if ($data['version'] == 'v3') {
+    elseif ($data['version'] == 'v3') {
         $v3 = array(
             'authlevel'  => mres($data['authlevel']),
             'authname'   => mres($data['authname']),
@@ -625,7 +646,7 @@ function add_edit_rule() {
     if (empty($device_id) && !isset($rule_id)) {
         $message = 'Missing the device id or global device id (-1)';
     }
-    else if ($device_id == 0) {
+    elseif ($device_id == 0) {
         $device_id = '-1';
     }
 
@@ -687,7 +708,7 @@ function add_edit_rule() {
                 $message = 'Failed to update existing alert rule';
             }
         }
-        else if (dbInsert(array('name' => $name, 'device_id' => $device_id, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
+        elseif (dbInsert(array('name' => $name, 'device_id' => $device_id, 'rule' => $rule, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json), 'alert_rules')) {
             $status = 'ok';
             $code   = 200;
         }
