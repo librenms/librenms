@@ -40,6 +40,8 @@ Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
 
 - MIBS (mibs): unknown/various
+  - APC PowerNet MIB (mibs/apc/PowerNet-MIB)
+    Copyright (c) 2015 American Power Conversion, Inc.
 
 - html/graph-realtime.php: BSD (original?)
 
