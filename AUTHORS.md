@@ -26,7 +26,6 @@ Contributors to LibreNMS:
 - Mickael Marchand  <mmarchand@corp.free.fr> (mmarchand)
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
-- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Freddie Cash (fjwcash@gmail.com) (fjwcash)
 - Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
 - Vitali Kari <vitali.kari@gmail.com> (vitalisator) 
@@ -50,7 +49,7 @@ Contributors to LibreNMS:
 - Jimmy Cleuren <jimmy.cleuren@gmail.com> (jimmycleuren)
 - Mark Schouten <mark@tuxis.nl> (tuxis-ie) 
 - Todd Eddy <vr@vrillusions.com> (vrillusions)
+- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 
 
 [1]: http://observium.org/ "Observium web site"
-
