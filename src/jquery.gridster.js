@@ -460,7 +460,7 @@
 		}
 
 		this.options.show_element.call(this, $w, callback);
-		
+
 		return $w;
 	};
 
@@ -992,7 +992,7 @@
 		$nexts.not(exclude).each($.proxy(function(i, widget) {
 			this.move_widget_up( $(widget), size_y );
 		}, this));
-		
+
 		this.set_dom_grid_height();
 
 		return this;
@@ -1490,14 +1490,15 @@
 		if (this.$player === null) {
 			return false;
 		}
-		
-		var margin_sides = this.options.widget_margins[0];
+
+		var margin_sides = this.options.widget_margins;
 
 		var placeholder_column = this.$preview_holder.attr('data-col');
+		var placeholder_row = this.$preview_holder.attr('data-row');
 
 		var abs_offset = {
-			left: ui.position.left + this.baseX - (margin_sides * placeholder_column),
-			top: ui.position.top + this.baseY
+			left: ui.position.left + this.baseX - (margin_sides[0] * placeholder_column),
+			top: ui.position.top + this.baseY - (margin_sides[1] * placeholder_row)
 		};
 
 		// auto grow cols
@@ -1544,13 +1545,14 @@
 	fn.on_stop_drag = function (event, ui) {
 		this.$helper.add(this.$player).add(this.$wrapper)
 				.removeClass('dragging');
-				
-		var margin_sides = this.options.widget_margins[0];
+
+		var margin_sides = this.options.widget_margins;
 
 		var placeholder_column = this.$preview_holder.attr('data-col');
+		var placeholder_row = this.$preview_holder.attr('data-row');
 
-		ui.position.left = ui.position.left + this.baseX - (margin_sides * placeholder_column);
-		ui.position.top = ui.position.top + this.baseY;
+		ui.position.left = ui.position.left + this.baseX - (margin_sides[0] * placeholder_column);
+		ui.position.top = ui.position.top + this.baseY - (margin_sides[1] * placeholder_row);
 		this.colliders_data = this.collision_api.get_closest_colliders(
 				ui.position);
 
