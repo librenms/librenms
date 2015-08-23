@@ -348,10 +348,6 @@ foreach ($ports as $port) {
                     echo $oid.' ';
                 }
             }
-
-            if (( $oid == 'ifOperStatus' || $oid == 'ifAdminStatus' ) && $this_port[$oid] == 'down') {
-                break;
-            }
         }//end foreach
 
         // Parse description (usually ifAlias) if config option set
