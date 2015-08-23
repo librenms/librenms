@@ -49,6 +49,7 @@ Contributors to LibreNMS:
 - Tom Ferguson <tom.ferguson.public@outlook.com> (Tawmu)
 - Jimmy Cleuren <jimmy.cleuren@gmail.com> (jimmycleuren)
 - Mark Schouten <mark@tuxis.nl> (tuxis-ie) 
+- Todd Eddy <vr@vrillusions.com> (vrillusions)
 
 
 [1]: http://observium.org/ "Observium web site"
