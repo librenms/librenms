@@ -201,9 +201,9 @@ else {
 
     echo generate_graph_js_state($graph_array);
 
-    echo('<div style="width: '.$graph_array['width'].'; margin: auto;">');
+    echo('<div style="width: '.$graph_array['width'].'; margin: auto;"><center>');
     echo generate_lazy_graph_tag($graph_array);
-    echo("</div>");
+    echo("</center></div>");
 
     if (isset($config['graph_descr'][$vars['type']])) {
 
