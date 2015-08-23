@@ -220,7 +220,7 @@ else {
 
 <div class="panel panel-default panel-condensed">
     <div class="table-responsive">
-        <table id="devices" class="table table-hover">
+        <table id="devices" class="table table-condensed table-hover">
             <thead>
                 <tr>
                     <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status">Status</th>
