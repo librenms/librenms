@@ -23,11 +23,11 @@ require 'includes/discovery/functions.inc.php';
 $start         = utime();
 $runtime_stats = array();
 
-// Observium Device Discovery
 $options = getopt('h:m:i:n:d::a::q');
 
 if (!isset($options['q'])) {
-    echo $config['project_name_version']." Discovery\n\n";
+    echo $config['project_name_version']." Discovery\n";
+    echo `git log -n 1|grep 'commit '`."\n";
 }
 
 if (isset($options['h'])) {
