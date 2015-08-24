@@ -367,6 +367,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     }
 
     $oid_count = 0;
+    $fields = array();
     foreach ($oidglist as $fulloid) {
         list($splitoid, $splitindex) = explode('.', $fulloid, 2);
         if (is_numeric($snmpdata[$splitindex][$splitoid])) {
