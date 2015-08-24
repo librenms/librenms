@@ -187,8 +187,13 @@ $('#create-alert').on('show.bs.modal', function (event) {
         var type = button.data('type');
         var type_id = button.data('type_id');
         var arr = [];
-        if (type == 'sensor') {
-            arr.push('%sensors.sensor_current > %sensors.sensor_limit &&');
+        if (type == 'sensor-high' || type == 'sensor-low') {
+            if (type == 'sensor-high') {
+                arr.push('%sensors.sensor_current > %sensors.sensor_limit &&');
+            }
+            else if (type == 'sensor-low') {
+                arr.push('%sensors.sensor_current < %sensors.sensor_limit_low &&');
+            }
             arr.push('%devices.device_id = ' + device_id + ' &&');
             arr.push('%sensors.sensor_id = ' + type_id);
         }
