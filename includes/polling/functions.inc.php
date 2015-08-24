@@ -278,7 +278,8 @@ function poll_device($device, $options) {
         // echo("$device_end - $device_start; $device_time $device_run");
         echo "Polled in $device_time seconds\n";
 
-        d_echo('Updating '.$device['hostname'].' - '.print_r($update_array)." \n");
+        d_echo('Updating '.$device['hostname']."\n");
+        d_echo($update_array);
 
         $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
         if ($updated) {
