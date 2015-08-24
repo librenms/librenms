@@ -50,6 +50,7 @@ if ($device['os_group'] == 'unix') {
                 "mysql",
                 "nginx",
                 "bind",
+                "memcached",
                 "tinydns");
 
             if (in_array($section, $agentapps)) {
