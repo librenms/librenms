@@ -17,6 +17,7 @@ Table of Content:
     - [PagerDuty](#transports-pagerduty)
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
+    - [Pushbullet](#transports-pushbullet)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -357,6 +358,17 @@ $config['alert']['transports']['boxcar'][] = array(
                                                     "access_token" => 'ACCESSTOKENGOESHERE',
                                                     "sound_critical" => 'detonator-charge',
                                                     );
+```
+~~
+
+## <a name="transports-pushbullet">Pushbullet</a>
+
+Enabling Pushbullet is a piece of cake.
+Get your Access Token from your Pushbullet's settings page and set it in your config like:
+
+~~
+```php
+$config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 ```
 ~~
 
