@@ -1227,3 +1227,7 @@ function fping($host,$params) {
 function function_check($function) {
     return function_exists($function);
 }
+
+function get_last_commit() {
+    return `git log -n 1|head -n1`;
+}//end get_last_commit 
