@@ -23,7 +23,7 @@ require 'includes/alerts.inc.php';
 
 $poller_start = utime();
 echo $config['project_name_version']." Poller\n";
-echo `git log -n 1|grep 'commit '`."\n";
+echo get_last_commit()."\n";
 
 $options = getopt('h:m:i:n:r::d::a::');
 
