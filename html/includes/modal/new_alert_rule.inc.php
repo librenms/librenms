@@ -182,45 +182,65 @@ $('#create-alert').on('show.bs.modal', function (event) {
     } else {
         $('#preseed-maps').hide();
     }
-    $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: { type: "parse-alert-rule", alert_id: alert_id },
-        dataType: "json",
-        success: function(output) {
-            var arr = [];
-            $.each ( output['rules'], function( key, value ) {
-                arr.push(value);
-            });
-            $('#response').data('tagmanager').populate(arr);
-            $('#severity').val(output['severity']).change;
-            var extra = $.parseJSON(output['extra']);
-            $('#count').val(extra['count']);
-            if((extra['delay'] / 86400) >= 1) {
-                var delay = extra['delay'] / 86400 + ' d';
-            } else if((extra['delay'] / 3600) >= 1) {
-                var delay = extra['delay'] / 3600 + ' h';
-            } else if((extra['delay'] / 60) >= 1) {
-                var delay = extra['delay'] / 60 + ' m';
-            } else {
-                var delay = extra['delay'];
+
+    if (!alert_id) {
+        var type = button.data('type');
+        var type_id = button.data('type_id');
+        var arr = [];
+        if (type == 'sensor-high' || type == 'sensor-low') {
+            if (type == 'sensor-high') {
+                arr.push('%sensors.sensor_current > %sensors.sensor_limit &&');
             }
-            $('#delay').val(delay);
-            if((extra['interval'] / 86400) >= 1) {
-                var interval = extra['interval'] / 86400 + ' d';
-            } else if((extra['interval'] / 3600) >= 1) {
-                var interval = extra['interval'] / 3600 + ' h';
-            } else if((extra['interval'] / 60) >= 1) {
-                var interval = extra['interval'] / 60 + ' m';
-            } else {
-                var interval = extra['interval'];
+            else if (type == 'sensor-low') {
+                arr.push('%sensors.sensor_current < %sensors.sensor_limit_low &&');
             }
-            $('#interval').val(interval);
-            $("[name='mute']").bootstrapSwitch('state',extra['mute']);
-            $("[name='invert']").bootstrapSwitch('state',extra['invert']);
-            $('#name').val(output['name']);
+            arr.push('%devices.device_id = ' + device_id + ' &&');
+            arr.push('%sensors.sensor_id = ' + type_id);
         }
-    });
+        $('#response').data('tagmanager').populate(arr);
+    }
+
+    if (alert_id > 0) {
+        $.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: { type: "parse-alert-rule", alert_id: alert_id },
+            dataType: "json",
+            success: function(output) {
+                var arr = [];
+                $.each ( output['rules'], function( key, value ) {
+                    arr.push(value);
+                });
+                $('#response').data('tagmanager').populate(arr);
+                $('#severity').val(output['severity']).change;
+                var extra = $.parseJSON(output['extra']);
+                $('#count').val(extra['count']);
+                if((extra['delay'] / 86400) >= 1) {
+                    var delay = extra['delay'] / 86400 + ' d';
+                } else if((extra['delay'] / 3600) >= 1) {
+                    var delay = extra['delay'] / 3600 + ' h';
+                } else if((extra['delay'] / 60) >= 1) {
+                    var delay = extra['delay'] / 60 + ' m';
+                } else {
+                    var delay = extra['delay'];
+                }
+                $('#delay').val(delay);
+                if((extra['interval'] / 86400) >= 1) {
+                    var interval = extra['interval'] / 86400 + ' d';
+                } else if((extra['interval'] / 3600) >= 1) {
+                    var interval = extra['interval'] / 3600 + ' h';
+                } else if((extra['interval'] / 60) >= 1) {
+                    var interval = extra['interval'] / 60 + ' m';
+                } else {
+                    var interval = extra['interval'];
+                }
+                $('#interval').val(interval);
+                $("[name='mute']").bootstrapSwitch('state',extra['mute']);
+                $("[name='invert']").bootstrapSwitch('state',extra['invert']);
+                $('#name').val(output['name']);
+            }
+        });
+    }
 });
 </script>
 

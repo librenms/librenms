@@ -1,25 +1,32 @@
 <?php
 
-echo '<table cellspacing=0 cellpadding=5 width=100%>';
+require_once 'includes/modal/new_alert_rule.inc.php';
+
+echo '<table class="table table-condensed table-hover">
+          <tr>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Current</th>
+              <th>High Limit</th>
+              <th>Low Limit</th>
+              <th>Action</th>
+          </tr>
+';
 
 $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_descr`', array($class, $device['device_id'])) as $sensor) {
-    if (!is_integer($row / 2)) {
-        $row_colour = $list_colour_a;
-    }
-    else {
-        $row_colour = $list_colour_b;
-    }
 
-    echo "<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
-          <td width=500>".$sensor['sensor_descr'].'</td>
-          <td>'.$sensor['sensor_type'].'</td>
-          <td width=50>'.format_si($sensor['sensor_current']).$unit.'</td>
-          <td width=50>'.format_si($sensor['sensor_limit']).$unit.'</td>
-          <td width=50>'.format_si($sensor['sensor_limit_low']).$unit."</td>
+    echo "<tr>
+          <td>".$sensor['sensor_descr']."</td>
+          <td>".$sensor['sensor_type']."</td>
+          <td>".format_si($sensor['sensor_current']).$unit."</td>
+          <td>".format_si($sensor['sensor_limit']).$unit."</td>
+          <td>".format_si($sensor['sensor_limit_low']).$unit."</td>
+          <td>". gen_alert_button('xs', '+ high alert rule', $device, 'sensor-high', $sensor['sensor_id']) ." 
+          ". gen_alert_button('xs', '+ low alert rule', $device, 'sensor-low', $sensor['sensor_id']) ."</td>
         </tr>\n";
-    echo "<tr  bgcolor=$row_colour><td colspan='5'>";
+    echo "<tr><td colspan='6'>";
 
     $graph_array['id']   = $sensor['sensor_id'];
     $graph_array['type'] = $graph_type;
