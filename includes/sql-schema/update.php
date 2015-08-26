@@ -84,6 +84,22 @@ if ($handle = opendir($config['install_dir'].'/sql-schema')) {
 
 asort($filelist);
 
+if (explode('.', max($filelist), 2)[0] <= $db_rev) {
+    if ($debug) {
+        echo "DB Schema already up to date.\n";
+    }
+    return;
+}
+
+if (!dbGetLock('schema_update')) {
+    echo "Schema update already in progress. Exiting\n";
+    exit(1);
+} //end if
+
+do {
+    sleep(1);
+} while (@dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE NOT IS_FREE_LOCK(CONCAT("polling.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("queued.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("discovering.", device_id))') > 0);
+
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
@@ -153,3 +169,5 @@ if ($updating) {
 
     echo "-- Done\n";
 }
+
+dbReleaseLock('schema_update');
