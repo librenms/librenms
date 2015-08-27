@@ -834,12 +834,33 @@ echo '<div id="boxcar_appkey_template" class="hide">
     $(".toolTip").tooltip();
 
     $("button#test-alert").click(function() {
-        var transport = $(this).data("transport");
+        var $this = $(this);
+        var transport = $this.data("transport");
         $.ajax({
             type: 'POST',
             url: '/ajax_form.php',
             data: { type: "test-transport", transport: transport },
-            dataType: "json"
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    $this.removeClass('btn-primary').addClass('btn-success');
+                    setTimeout(function(){
+                        $this.removeClass('btn-success').addClass('btn-primary');
+                    }, 2000);
+                }
+                else {
+                    $this.removeClass('btn-primary').addClass('btn-danger');
+                    setTimeout(function(){
+                        $this.removeClass('btn-danger').addClass('btn-primary');
+                    }, 2000);
+                }
+            },
+            error: function(){
+                $this.removeClass('btn-primary').addClass('btn-danger');
+                setTimeout(function(){
+                    $this.removeClass('btn-danger').addClass('btn-primary');
+                }, 2000);
+            }
         });
     });
 
