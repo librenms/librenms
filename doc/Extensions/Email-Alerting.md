@@ -2,11 +2,15 @@
 
 #### Please see [The new alerting docs](http://docs.librenms.org/Extensions/Alerting/#transports-email)
 
-Currently, the email alerts needs to be set up in the config. If you want to enable it, paste this in your config and change it:
+> None of these configuration options will work on builds older than the 1st of August 2015.
+
+
+~~Currently, the email alerts needs to be set up in the config. If you want to enable it, paste this in your config and change it:~~
+
 
 ```php
 // Mailer backend Settings
-$config['email_backend']              = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
+~~$config['email_backend']              = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
 $config['email_from']                 = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
 $config['email_user']                 = $config['project_id'];
 $config['email_sendmail_path']        = '/usr/sbin/sendmail'; // The location of the sendmail program.
@@ -23,5 +27,5 @@ $config['alerts']['email']['default']      = 'sendto@somewhere.com';    // Defau
 $config['alerts']['email']['default_only'] = FALSE;   // Only use default recipient
 $config['alerts']['email']['enable']       = TRUE;    // Enable email alerts
 $config['alerts']['bgp']['whitelist']      = NULL;    // Populate as an array() with ASNs to alert on.
-$config['alerts']['port']['ifdown']        = FALSE;   // Generate alerts for ports that go down
+$config['alerts']['port']['ifdown']        = FALSE;   // Generate alerts for ports that go down~~
 ```
