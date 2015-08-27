@@ -383,6 +383,26 @@ if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0") {
 <?php
 }
 
+if (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
+	$pmxcl = dbFetchRows("SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ?", array('proxmox'));
+
+	if(count($pmxcl) > 0) {
+?>
+        <li class="dropdown">
+          <a href="proxmox/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"></i> Proxmox</a>
+          <ul class="dropdown-menu">
+<?php
+	  foreach ($pmxcl as $pmxc) {
+            echo('<li><a href="/proxmox/cluster='.$pmxc['app_instance'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> '.nicecase($pmxc['app_instance']).' </a></li>');
+          }
+?>
+
+          </ul>
+        </li>
+<?php
+	}
+}
+
 $routing_count['bgp']  = dbFetchCell("SELECT COUNT(bgpPeer_id) from `bgpPeers` LEFT JOIN devices AS D ON bgpPeers.device_id=D.device_id WHERE D.device_id IS NOT NULL");
 $routing_count['ospf'] = dbFetchCell("SELECT COUNT(ospf_instance_id) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'");
 $routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_switching`");
