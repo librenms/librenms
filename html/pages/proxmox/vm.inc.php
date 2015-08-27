@@ -5,9 +5,6 @@ global $vars;
 
 $vm = proxmox_vm_info(var_get('vmid'), var_get('cluster'));
 
-print '<pre>';
-var_dump($vm);
-print '</pre>';
 $graphs = array(
     'proxmox_traffic'       => 'Traffic',
 );
