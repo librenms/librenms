@@ -12,6 +12,29 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+function var_isset($v) {
+    global $vars;
+    return isset($vars[$v]);
+}
+
+function var_eq($v, $t) {
+    global $vars;
+    if (isset($vars[$v]) && $vars[$v] == $t) {
+        return true;
+    }
+
+    return false;
+}
+
+function var_get($v) {
+    global $vars;
+    if (isset($vars[$v])) {
+        return $vars[$v];
+    }
+
+    return false;
+}
+
 
 function data_uri($file, $mime) {
     $contents = file_get_contents($file);
