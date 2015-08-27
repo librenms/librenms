@@ -7,8 +7,6 @@ if (is_file($mysql_rrd)) {
     $rrd_filename = $mysql_rrd;
 }
 
-$multiplier = 8;
-
 $ds_in  = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
