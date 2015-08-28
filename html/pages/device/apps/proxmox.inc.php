@@ -20,35 +20,40 @@ include('includes/application/proxmox.inc.php');
 
 global $config;
 
-$graphs = array(
-    'proxmox_traffic'       => 'Traffic',
-);
+if (!isset($config['enable_proxmox']) || !$config['enable_proxmox']) {
+    print_error('Proxmox agent was discovered on this host. Please enable Proxmox in your config.');
+} else {
 
-foreach (proxmox_node_vms(var_get('device')) as $nvm) {
-    $vm = proxmox_vm_info($nvm['vmid'], $nvm['cluster']);
+    $graphs = array(
+        'proxmox_traffic'       => 'Traffic',
+    );
 
-    foreach ($vm['ports'] as $port) {
-        foreach ($graphs as $key => $text) {
-	        $graph_type = 'proxmox_traffic';
-	
-	        $graph_array['height']    = '100';
-	        $graph_array['width']     = '215';
-	        $graph_array['to']        = $config['time']['now'];
-	        $graph_array['id']        = $vm['app_id'];
-	        $graph_array['device_id'] = $vm['device_id'];
-	        $graph_array['type']      = 'application_'.$key;
-	        $graph_array['port']      = $port['port'];
-	        $graph_array['vmid']      = $vm['vmid'];
-	        $graph_array['cluster']   = $vm['cluster'];
-	        $graph_array['hostname']  = $vm['description'];
-	
-	        echo '<h3>'.$text.' '.$port['port'].'@'.$vm['description'].'</h3>';
-	
-	        echo "<tr bgcolor='$row_colour'><td colspan=5>";
+    foreach (proxmox_node_vms(var_get('device')) as $nvm) {
+        $vm = proxmox_vm_info($nvm['vmid'], $nvm['cluster']);
 
-            include 'includes/print-graphrow.inc.php';
+        foreach ($vm['ports'] as $port) {
+            foreach ($graphs as $key => $text) {
+                $graph_type = 'proxmox_traffic';
 
-            echo '</td></tr>';
+                $graph_array['height']    = '100';
+                $graph_array['width']     = '215';
+                $graph_array['to']        = $config['time']['now'];
+                $graph_array['id']        = $vm['app_id'];
+                $graph_array['device_id'] = $vm['device_id'];
+                $graph_array['type']      = 'application_'.$key;
+                $graph_array['port']      = $port['port'];
+                $graph_array['vmid']      = $vm['vmid'];
+                $graph_array['cluster']   = $vm['cluster'];
+                $graph_array['hostname']  = $vm['description'];
+
+                echo '<h3>'.$text.' '.$port['port'].'@'.$vm['description'].'</h3>';
+
+                echo "<tr bgcolor='$row_colour'><td colspan=5>";
+
+                include 'includes/print-graphrow.inc.php';
+
+                echo '</td></tr>';
+            }
         }
     }
 }
