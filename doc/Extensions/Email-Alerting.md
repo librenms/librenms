@@ -2,7 +2,10 @@
 
 #### Please see [The new alerting docs](http://docs.librenms.org/Extensions/Alerting/#transports-email)
 
-Currently, the email alerts needs to be set up in the config. If you want to enable it, paste this in your config and change it:
+> None of these configuration options will work on builds older than the 1st of August 2015.
+
+
+~~Currently, the email alerts needs to be set up in the config. If you want to enable it, paste this in your config and change it:~~
 
 ```php
 // Mailer backend Settings
