@@ -360,47 +360,38 @@ foreach (array_keys($menu_sensors) as $item) {
         </li>
 <?php
 
-$app_count = dbFetchCell("SELECT COUNT(`app_id`) FROM `applications`");
+$app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applications` ORDER BY `app_type`");
 
-if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0") {
+if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
 ?>
         <li class="dropdown">
           <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"></i> Apps</a>
           <ul class="dropdown-menu">
 <?php
 
-    $app_list = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
     foreach ($app_list as $app) {
         if (isset($app['app_type'])) {
+            $app_i_list = dbFetchRows("SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ? ORDER BY `app_instance`", array($app['app_type']));
             $image = $config['html_dir']."/images/icons/".$app['app_type'].".png";
             $icon = (file_exists($image) ? $app['app_type'] : "apps");
-            echo('<li><a href="apps/app='.$app['app_type'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> '.nicecase($app['app_type']).' </a></li>');
+            if (count($app_i_list) > 1) {
+                echo '<li class="dropdown-submenu">';
+                echo '<a href="apps/app='.$app['app_type'].'/"><i class="fa fa-server fa-fw fa-lg"></i> '.nicecase($app['app_type']).' </a>';
+                echo '<ul class="dropdown-menu scrollable-menu">';
+                foreach ($app_i_list as $instance) {
+                    echo '            <li><a href="apps/app='.$app['app_type'].'/instance='.$instance['app_instance'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> ' . nicecase($instance['app_instance']) . '</a></li>';
+                }
+                echo '</ul></li>';
+            }
+            else {
+                echo('<li><a href="apps/app='.$app['app_type'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> '.nicecase($app['app_type']).' </a></li>');
+            }
         }
     }
 ?>
           </ul>
         </li>
 <?php
-}
-
-if (isset($config['enable_proxmox']) && $config['enable_proxmox']) {
-	$pmxcl = dbFetchRows("SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ?", array('proxmox'));
-
-	if(count($pmxcl) > 0) {
-?>
-        <li class="dropdown">
-          <a href="proxmox/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"></i> Proxmox</a>
-          <ul class="dropdown-menu">
-<?php
-	  foreach ($pmxcl as $pmxc) {
-            echo('<li><a href="/proxmox/cluster='.$pmxc['app_instance'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> '.nicecase($pmxc['app_instance']).' </a></li>');
-          }
-?>
-
-          </ul>
-        </li>
-<?php
-	}
 }
 
 $routing_count['bgp']  = dbFetchCell("SELECT COUNT(bgpPeer_id) from `bgpPeers` LEFT JOIN devices AS D ON bgpPeers.device_id=D.device_id WHERE D.device_id IS NOT NULL");
