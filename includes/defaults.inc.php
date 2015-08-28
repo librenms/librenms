@@ -783,3 +783,6 @@ $config['gui']['network-map']['style']                  = 'new';//old is also va
 
 // Navbar variables
 $config['navbar']['manage_groups']['hide']              = 0;
+
+// Show errored ports in the summary table on the dashboard
+$config['summary_errors']                               = 0;
