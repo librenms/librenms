@@ -3,7 +3,7 @@
 // Force10 S-Series
 // F10-S-SERIES-CHASSIS-MIB::chStackUnitTemp.1 = Gauge32: 47
 // F10-S-SERIES-CHASSIS-MIB::chStackUnitModelID.1 = STRING: S25-01-GE-24V
-if ($device['os'] == 'ftos' || $device['os_group'] == 'ftos') {
+if ($device['os'] == 'ftos' || $device['os_group'] == 'ftos' || $device['os'] == 'dnos') {
     echo 'FTOS C-Series ';
 
     $oids = snmpwalk_cache_oid($device, 'chStackUnitTemp', array(), 'F10-S-SERIES-CHASSIS-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/ftos');
