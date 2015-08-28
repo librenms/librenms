@@ -7,8 +7,7 @@
 
 ~~Currently, the email alerts needs to be set up in the config. If you want to enable it, paste this in your config and change it:~~
 
-
-~~```php
+```php
 // Mailer backend Settings
 $config['email_backend']              = 'mail';               // Mail backend. Allowed: "mail" (PHP's built-in), "sendmail", "smtp".
 $config['email_from']                 = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
@@ -28,4 +27,4 @@ $config['alerts']['email']['default_only'] = FALSE;   // Only use default recipi
 $config['alerts']['email']['enable']       = TRUE;    // Enable email alerts
 $config['alerts']['bgp']['whitelist']      = NULL;    // Populate as an array() with ASNs to alert on.
 $config['alerts']['port']['ifdown']        = FALSE;   // Generate alerts for ports that go down
-```~~
+```
