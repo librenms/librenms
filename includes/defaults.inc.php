@@ -339,6 +339,9 @@ $config['network_map_vis_options'] = '{
       randomSeed:2
   },
   "edges": {
+    arrows: {
+          to:     {enabled: true, scaleFactor:0.5},
+    },
     "smooth": {
         enabled: false
     },
