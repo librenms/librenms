@@ -1,5 +1,6 @@
 <?php
-
+echo "<h3>Authlog</h3>";
+echo "<hr>";
 if ($_SESSION['userlevel'] >= '10') {
     echo '<table cellspacing=0 cellpadding=1 width=100%>';
 
