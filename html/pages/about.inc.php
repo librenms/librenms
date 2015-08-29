@@ -1,4 +1,5 @@
 <?php
+$pagetitle[] = 'About';
 $git_log = `git log -10`;
 ?>
 <div class="modal fade" id="git_log" tabindex="-1" role="dialog" aria-labelledby="git_log_label" aria-hidden="true">
