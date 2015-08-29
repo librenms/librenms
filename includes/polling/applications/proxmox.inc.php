@@ -57,13 +57,15 @@ if (count($pmxlines) > 2) {
         rrdtool_update($rrd_filename, 'N:'.$vmpin.':'.$vmpout);
         if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
             dbUpdate(array('device_id' => $device['device_id'], 'last_seen' => array('NOW()'), 'description' => $vmdesc), 'proxmox', '`vmid` = ? AND `cluster` = ?', array($vmid, $pmxcluster));
-        } else {
+        }
+        else {
             $pmxcache[$pmxcluster][$vmid] = dbInsert(array('cluster' => $pmxcluster, 'vmid' => $vmid, 'description' => $vmdesc, 'device_id' => $device['device_id']), 'proxmox');
         }
 
         if ($portid = proxmox_port_exists($vmid, $pmxcluster, $vmport) !== false) {
             dbUpdate(array('last_seen' => array('NOW()')), 'proxmox_ports', '`vm_id` = ? AND `port` = ?', array($pmxcache[$pmxcluster][$vmid], $vmport));
-        } else {
+        }
+        else {
             dbInsert(array('vm_id' => $pmxcache[$pmxcluster][$vmid], 'port' => $vmport), 'proxmox_ports');
         }
 
