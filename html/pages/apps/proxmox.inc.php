@@ -15,7 +15,9 @@ echo "<span style='font-weight: bold;'>Proxmox</span> &#187; ";
 unset($sep);
 
 foreach ($pmxcl as $pmxc) {
-    if (isset($sep)) { echo $sep; };
+    if (isset($sep)) {
+        echo $sep;
+    };
 
     if (var_eq('instance', $pmxc['app_instance'])) {
         echo "<span class='pagemenu-selected'>";
