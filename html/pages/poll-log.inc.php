@@ -1,5 +1,6 @@
 <?php
 $no_refresh = true;
+$pagetitle[] = 'Poll Log';
 ?>
 <table id="poll-log" class="table table-condensed table-hover table-striped">
     <thead>
