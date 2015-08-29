@@ -21,13 +21,14 @@ echo '</tr></thead><tbody>';
 	    echo '</td>';
 	    echo '</tr>';
 	}
-} else { //if $group_count_check is empty, aka no group found, then display a message to the user.
+} 
+else { //if $group_count_check is empty, aka no group found, then display a message to the user.
 	echo "<center>Looks like no groups have been created, let's create one now. Click on <b>Create New Group</b> to create one.</center><br>";
 	echo "<center><button type='button' class='btn btn-primary btn-sm' aria-label='Add' data-toggle='modal' data-target='#create-group' data-group_id='' name='create-device-group'>Create new Group</button></center>";
 }	
 echo '</tbody></table></div>';
 
 if(!empty($group_count_check)) { //display create new node group when $group_count_check has a value so that the user can define more groups in the future.
-echo "<hr>";
-echo "<center><button type='button' class='btn btn-primary btn-sm' aria-label='Add' data-toggle='modal' data-target='#create-group' data-group_id='' name='create-device-group'>Create new Group</button></center>";
+	echo "<hr>";
+	echo "<center><button type='button' class='btn btn-primary btn-sm' aria-label='Add' data-toggle='modal' data-target='#create-group' data-group_id='' name='create-device-group'>Create new Group</button></center>";
 }
