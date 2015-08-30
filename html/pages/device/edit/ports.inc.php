@@ -28,14 +28,13 @@
         var descr = $this.val();
         var device_id = $this.data('device_id');
         var port_id = $this.data('port_id');
-        var ifName = $this.data('ifName');
+        var ifName = $this.data('ifname');
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: "update-ifalias", descr: descr, ifName: ifName, port_id: port_id},
+            data: {type: "update-ifalias", descr: descr, ifName: ifName, port_id: port_id, device_id: device_id},
             dataType: "json",
             success: function (data) {
-            alert(data.status);
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
                     $this.next().addClass('glyphicon-ok');

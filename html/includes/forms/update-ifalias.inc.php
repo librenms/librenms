@@ -15,19 +15,21 @@
 $status  = 'error';
 
 $descr = mres($_POST['descr']);
-$device_id = mres($POST['device_id']);
+$device_id = mres($_POST['device_id']);
 $ifName = mres($_POST['ifName']);
 $port_id = mres($_POST['port_id']);
 
+logfile($descr . ','. $device_id . ','. $ifName. ','. $port_id);
+
 if (!empty($ifName) && is_numeric($port_id)) {
     // We have ifName and  port id so update ifAlias
-    if (dbUpdate(array('ifAlias'=>$descr), '`ports`', '`port_id`=?', array($port_id)) > 0) {
+    if (dbUpdate(array('ifAlias'=>$descr), 'ports', '`port_id`=?', array($port_id)) > 0) {
         $device = device_by_id_cache($device_id);
         if (empty($descr)) {
-            del_device_attrib($device, 'ifName');
+            del_dev_attrib($device, 'ifName');
         }
         else {
-            set_device_attrib($device, 'ifName', $ifName);
+            set_dev_attrib($device, 'ifName', $ifName);
         }
         $status = 'ok';
     }
@@ -35,3 +37,8 @@ if (!empty($ifName) && is_numeric($port_id)) {
         $status = 'na';
     }
 }
+
+$response = array(
+    'status'        => $status,
+);
+echo _json_encode($response);
