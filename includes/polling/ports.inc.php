@@ -333,6 +333,13 @@ foreach ($ports as $port) {
 
         // Update IF-MIB data
         foreach ($data_oids as $oid) {
+
+            if ($oid == 'ifAlias') {
+                if (get_dev_attrib($device, 'ifName', $port['ifName'])) {
+                    $this_port['ifAlias'] = $port['ifAlias'];
+                }
+            }
+
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
                 log_event($oid.': '.$port[$oid].' -> NULL', $device, 'interface', $port['port_id']);

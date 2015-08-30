@@ -29,7 +29,7 @@ if (!empty($ifName) && is_numeric($port_id)) {
     }
     if (dbUpdate(array('ifAlias'=>$descr), 'ports', '`port_id`=?', array($port_id)) > 0) {
         $device = device_by_id_cache($device_id);
-        if (empty($descr)) {
+        if ($descr === 'repoll') {
             del_dev_attrib($device, 'ifName');
         }
         else {
