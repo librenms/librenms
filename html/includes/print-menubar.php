@@ -89,6 +89,15 @@ if (isset($config['graylog']['server']) && isset($config['graylog']['port'])) {
 
 ?>
             <li><a href="<?php echo(generate_url(array('page'=>'inventory'))); ?>"><i class="fa fa-cube fa-fw fa-lg"></i> Inventory</a></li>
+<?php
+if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
+?>
+        <li>
+          <a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><i class="fa fa-archive fa-fw fa-lg fa-nav-icons"></i> Packages</a>
+        </li>
+<?php
+} # if ($packages)
+?>
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header"> Search</li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv4'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> IPv4 Search</a></li>
@@ -427,14 +436,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 <?php
 }
-
-if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
-?>
-        <li>
-          <a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><i class="fa fa-archive fa-fw fa-lg fa-nav-icons"></i> Packages</a>
-        </li>
-<?php
-} # if ($packages)
 ?>
 
         <li class="dropdown">
