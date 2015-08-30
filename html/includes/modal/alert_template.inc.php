@@ -125,10 +125,12 @@ $('#create-template').click('', function(e) {
     var template = $("#template").val();
     var template_id = $("#template_id").val();
     var name = $("#name").val();
+    var title = $("#title").val();
+    var title_rec = $("#title_rec").val();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template , name: name, template_id: template_id},
+        data: { type: "alert-templates", template: template , name: name, template_id: template_id, title: title, title_rec: title_rec},
         dataType: "html",
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {
