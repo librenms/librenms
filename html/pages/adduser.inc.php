@@ -10,6 +10,7 @@ else if ($_SESSION['userlevel'] == 11) {
 }
 else {
     echo '<h3>Add User</h3>';
+    echo '<hr>';
 
     $pagetitle[] = 'Add user';
 
@@ -37,7 +38,6 @@ else {
                 echo '<div class="red">Please enter a username!</div>';
             }//end if
         }//end if
-
         echo "<form method='post' action='adduser/' class='form-horizontal' role='form'> <input type='hidden' value='add' name='action'>";
         echo "
   <div class='form-group'>
@@ -89,22 +89,25 @@ else {
         <option value='10'>Administrator</option>
         <option value='11'>Demo account</option>
       </select>
+      <div class='checkbox'>
+        <label>
+          <input type='checkbox' checked='checked' name='can_modify_passwd'> Allow the user to change his password.
+        </label>
+      </div>
+      <hr>
+      <center><button type='submit' class='btn btn-default'>Add User</button></center>
     </div>
     <div class='col-sm-6'>
     </div>
   </div>";
     echo "<div class='form-group'>
     <div class='col-sm-6'>
-      <div class='checkbox'>
-        <label>
-          <input type='checkbox' checked='checked' name='can_modify_passwd'> Allow the user to change his password.
-        </label>
-      </div>
+      
     </div>
     <div class='col-sm-6'>
     </div>
   </div>";
-    echo "<button type='submit' class='btn btn-default'>Add</button>";
+    
     echo '</form>';
     }
     else {
