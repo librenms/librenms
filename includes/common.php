@@ -436,6 +436,7 @@ function get_dev_entity_state($device) {
 }
 
 function get_dev_attrib($device, $attrib_type, $attrib_value='') {
+    $sql = '';
     $params = array($device['device_id'], $attrib_type);
     if (!empty($attrib_value)) {
         $sql = " AND `attrib_value`=?";
