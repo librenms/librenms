@@ -65,6 +65,14 @@ if ($_SESSION['userlevel'] >= '10') {
 <li><a href="<?php echo(generate_url(array('page'=>'templates'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Templates</a></li>
 <?php
 }
+
+if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
+?>
+        <li>
+          <a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><i class="fa fa-archive fa-fw fa-lg fa-nav-icons"></i> Packages</a>
+        </li>
+<?php
+} # if ($packages)
 ?>
             </ul>
           </li>
@@ -427,14 +435,6 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 <?php
 }
-
-if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
-?>
-        <li>
-          <a href="<?php echo(generate_url(array('page'=>'search','search'=>'packages'))); ?>"><i class="fa fa-archive fa-fw fa-lg fa-nav-icons"></i> Packages</a>
-        </li>
-<?php
-} # if ($packages)
 ?>
 
         <li class="dropdown">
