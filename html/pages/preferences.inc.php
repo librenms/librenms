@@ -4,7 +4,8 @@ $no_refresh = true;
 
 $pagetitle[] = 'Preferences';
 
-echo '<h3>User Preferences</h3>';
+echo '<h2>User Preferences</h2>';
+echo '<hr>';
 
 if ($_SESSION['userlevel'] == 11) {
     demo_account();
@@ -30,10 +31,12 @@ else {
 
     include 'includes/update-preferences-password.inc.php';
 
-    echo "<div class='well'>";
+    
 
     if (passwordscanchange($_SESSION['username'])) {
         echo '<h3>Change Password</h3>';
+        echo '<hr>';
+        echo "<div class='well'>";
         echo $changepass_message;
         echo "<form method='post' action='preferences/' class='form-horizontal' role='form'>
   <input type=hidden name='action' value='changepass'>
@@ -57,11 +60,13 @@ else {
     <label for='new_pass2' class='col-sm-2 control-label'>New Password</label>
     <div class='col-sm-4'>
       <input type=password name=new_pass2 autocomplete='off' class='form-control input-sm'>
+      <hr>
+  <center><button type='submit' class='btn btn-default'>Submit</button></center>
     </div>
     <div class='col-sm-6'>
     </div>
   </div>
-  <button type='submit' class='btn btn-default'>Submit</button>
+
 </form>";
         echo '</div>';
     }//end if
@@ -183,9 +188,10 @@ else {
     }//end if
 }//end if
 
-echo "<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>";
-echo "<div style='font-size: 18px; font-weight: bold; margin-bottom: 5px;'>Device Permissions</div>";
 
+echo "<h3>Device Permissions</h3>";
+echo "<hr>";
+echo "<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>";
 if ($_SESSION['userlevel'] == '10') {
     echo "<strong class='blue'>Global Administrative Access</strong>";
 }
