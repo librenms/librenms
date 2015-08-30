@@ -115,6 +115,8 @@ $('#alert-template').on('show.bs.modal', function (event) {
             success: function(output) {
                 $('#template').val(output['template']);
                 $('#name').val(output['name']);
+                $('#title').val(output['title']);
+                $('#title_rec').val(output['title_rec']);
             }
         });
     }
