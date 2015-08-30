@@ -1,3 +1,4 @@
+</form>
 <span id="message"><small><div class="alert alert-danger">n.b For the first time, please click any button twice.</div></small></span>
 
 <form id='ignoreport' name='ignoreport' method='post' action='' role='form' class='form-inline'>
@@ -20,6 +21,42 @@
 </form>
 <script>
 
+    $(document).on('blur', "[name='if-alias']", function (){
+        var $this = $(this);
+        var ifIndex = $this.data('ifIndex');
+        var ifName = $this.data('ifName');
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: "update-ifalias", ifIndex: ifIndex, ifName: ifName},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $this.closest('.form-group').addClass('has-success');
+                    $this.next().addClass('glyphicon-ok');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-success');
+                        $this.next().removeClass('glyphicon-ok');
+                    }, 2000);
+                } else {
+                    $(this).closest('.form-group').addClass('has-error');
+                    $this.next().addClass('glyphicon-remove');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-error');
+                        $this.next().removeClass('glyphicon-remove');
+                    }, 2000);
+                }
+            },
+            error: function () {
+                $(this).closest('.form-group').addClass('has-error');
+                $this.next().addClass('glyphicon-remove');
+                setTimeout(function(){
+                   $this.closest('.form-group').removeClass('has-error');
+                   $this.next().removeClass('glyphicon-remove');
+                }, 2000);
+            }
+        });
+    });
     $(document).ready(function() {
         $('form#ignoreport').submit(function (event) {
             $('#disable-toggle').click(function (event) {
@@ -96,6 +133,7 @@
             });
             event.preventDefault();
         });
+
     });
 
     var grid = $("#edit-ports").bootgrid({
