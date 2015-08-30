@@ -96,24 +96,14 @@ function IssueAlert($alert) {
         return true;
     }
 
-    $default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
-    // FIXME: Put somewhere else?
     if ($config['alert']['fixed-contacts'] == false) {
         $alert['details']['contacts'] = GetContacts($alert['details']['rule']);
     }
 
     $obj = DescribeAlert($alert);
     if (is_array($obj)) {
-        $tpl = dbFetchRow('SELECT `template` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
-        if (isset($tpl['template'])) {
-            $tpl = $tpl['template'];
-        }
-        else {
-            $tpl = $default_tpl;
-        }
-
         echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
-        $msg        = FormatAlertTpl($tpl, $obj);
+        $msg        = FormatAlertTpl($obj);
         $obj['msg'] = $msg;
         if (!empty($config['alert']['transports'])) {
             ExtTransports($obj);
@@ -349,12 +339,11 @@ function ExtTransports($obj) {
 
 /**
  * Format Alert
- * @param string $tpl Template
  * @param array  $obj Alert-Array
  * @return string
  */
-function FormatAlertTpl($tpl, $obj) {
-    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
+function FormatAlertTpl($obj) {
+    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($obj["template"])).'";';
     $parsed = $msg;
     $s      = strlen($msg);
     $x      = $pos = -1;
@@ -426,11 +415,21 @@ function DescribeAlert($alert) {
     $obj              = array();
     $i                = 0;
     $device           = dbFetchRow('SELECT hostname FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $tpl              = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
+    $default_tpl      = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
     $obj['hostname']  = $device['hostname'];
     $obj['device_id'] = $alert['device_id'];
     $extra            = $alert['details'];
+    if (!isset($tpl['template'])) {
+        $tpl['template'] = $default_tpl;
+    }
     if ($alert['state'] >= 1) {
-        $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        if (!empty($tpl['title'])) {
+	    $obj['title'] = $tpl['title'];
+        }
+        else {
+            $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        }
         if ($alert['state'] == 2) {
             $obj['title'] .= ' got acknowledged';
         }
@@ -458,7 +457,12 @@ function DescribeAlert($alert) {
         }
 
         $extra          = json_decode(gzuncompress($id['details']), true);
-        $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
+	if (!empty($tpl['title_rec'])) {
+	    $obj['title'] = $tpl['title_rec'];
+	}
+	else {
+            $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        }
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
         $obj['id']      = $id['id'];
         $obj['faults']  = false;
