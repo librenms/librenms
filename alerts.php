@@ -343,7 +343,8 @@ function ExtTransports($obj) {
  * @return string
  */
 function FormatAlertTpl($obj) {
-    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($obj["template"])).'";';
+    $tpl    = $obj["template"];
+    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
     $parsed = $msg;
     $s      = strlen($msg);
     $x      = $pos = -1;
@@ -421,7 +422,9 @@ function DescribeAlert($alert) {
     $obj['device_id'] = $alert['device_id'];
     $extra            = $alert['details'];
     if (!isset($tpl['template'])) {
-        $tpl['template'] = $default_tpl;
+        $obj['template'] = $default_tpl;
+    } else {
+        $obj['template'] = $tpl['template'];
     }
     if ($alert['state'] >= 1) {
         if (!empty($tpl['title'])) {
