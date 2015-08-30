@@ -51,6 +51,8 @@ if(is_admin() === false) {
                             <textarea class="form-control" id="template" name="template" rows="15"></textarea><br /><br />
                             <strong><em>Give your template a name: </em></strong><br />
                             <input type="text" class="form-control input-sm" id="name" name="name"><br />
+                            <em>Optionally, add custom titles: </em><br />
+                            <input type="text" class="form-control input-sm" id="title" name="title" placeholder="Alert Title"><input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title"><br />
                             <span id="error"></span><br />
                             <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
                         </div>
