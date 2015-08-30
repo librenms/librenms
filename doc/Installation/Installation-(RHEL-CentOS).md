@@ -27,14 +27,13 @@ service mariadb start
 Now continue with the installation:
 
 ```bash
-yum install net-snmp mysql-server
 service snmpd start
 chkconfig snmpd on
 mysql_secure_installation
 mysql -uroot -p
 ```
 
-Enter the MySQL root password to enter the MySQL command-line interface.
+Enter the MySQL/MariaDB root password to enter the command-line interface.
 
 Create database.
 
