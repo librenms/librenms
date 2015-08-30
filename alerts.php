@@ -480,6 +480,9 @@ function DescribeAlert($alert) {
     $obj['timestamp'] = $alert['time_logged'];
     $obj['contacts']  = $extra['contacts'];
     $obj['state']     = $alert['state'];
+    if (strstr($obj['title'],'%')) {
+        $obj['title'] = RunJail('$ret = "'.populate(addslashes($obj['title'])).'";', $obj);
+    }
     return $obj;
 
 }//end DescribeAlert()
