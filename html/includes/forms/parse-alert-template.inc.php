@@ -21,8 +21,10 @@ $template_id = ($_POST['template_id']);
 if (is_numeric($template_id) && $template_id > 0) {
     $template = dbFetchRow('SELECT * FROM `alert_templates` WHERE `id` = ? LIMIT 1', array($template_id));
     $output   = array(
-        'template' => $template['template'],
-        'name'     => $template['name'],
+        'template'  => $template['template'],
+        'name'      => $template['name'],
+        'title'     => $template['title'],
+        'title_rec' => $template['title_rec'],
     );
     echo _json_encode($output);
 }
