@@ -23,6 +23,10 @@ logfile($descr . ','. $device_id . ','. $ifName. ','. $port_id);
 
 if (!empty($ifName) && is_numeric($port_id)) {
     // We have ifName and  port id so update ifAlias
+    if (empty($descr)) {
+        $descr = 'repoll';
+        // Set to repoll so we avoid using ifDescr on port poll
+    }
     if (dbUpdate(array('ifAlias'=>$descr), 'ports', '`port_id`=?', array($port_id)) > 0) {
         $device = device_by_id_cache($device_id);
         if (empty($descr)) {
