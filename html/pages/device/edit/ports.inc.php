@@ -5,7 +5,8 @@
     <input type='hidden' name='ignoreport' value='yes'>
     <input type='hidden' name='type' value='update-ports'>
     <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>
-    <table id='edit-ports' class='table table-condensed table-responsive table-striped'>
+    <div class='table-responsibe'>
+    <table id='edit-ports' class='table table-striped'>
         <thead>
             <tr>
                 <th data-column-id='ifIndex'>Index</th>
@@ -18,19 +19,23 @@
             </tr>
         </thead>
     </table>
+    </div>
 </form>
 <script>
 
     $(document).on('blur', "[name='if-alias']", function (){
         var $this = $(this);
-        var ifIndex = $this.data('ifIndex');
+        var descr = $this.val();
+        var device_id = $this.data('device_id');
+        var port_id = $this.data('port_id');
         var ifName = $this.data('ifName');
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: "update-ifalias", ifIndex: ifIndex, ifName: ifName},
+            data: {type: "update-ifalias", descr: descr, ifName: ifName, port_id: port_id},
             dataType: "json",
             success: function (data) {
+            alert(data.status);
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
                     $this.next().addClass('glyphicon-ok');
@@ -38,6 +43,8 @@
                         $this.closest('.form-group').removeClass('has-success');
                         $this.next().removeClass('glyphicon-ok');
                     }, 2000);
+                } else if (data.status == 'na') {
+
                 } else {
                     $(this).closest('.form-group').addClass('has-error');
                     $this.next().addClass('glyphicon-remove');
