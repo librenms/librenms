@@ -34,20 +34,22 @@ foreach ($pmxcl as $pmxc) {
 
 print_optionbar_end();
 
-if (!var_isset('instance')) {
+if (!isset($vars['instance'])) {
     echo 'Select a cluster:';
     echo '<ul>';
     foreach ($pmxcl as $pmxc) {
         echo '<li>'.generate_link(nicecase($pmxc['app_instance']), array('page' => 'apps', 'app' => 'proxmox', 'instance' => $pmxc['app_instance'])).'</li>';
     }
     echo '</ul>';
-} elseif (!var_isset('vmid')) {
+}
+elseif (!isset($vars['vmid'])) {
     echo '<ul>';
     foreach (proxmox_cluster_vms(var_get('instance')) as $pmxvm) {
         echo '<li>'.generate_link($pmxvm['vmid']." (".$pmxvm['description'].")", array('page' => 'apps', 'app' => 'proxmox', 'instance' => var_get('instance'), 'vmid' => $pmxvm['vmid'])).'</li>';
     }
     echo '</ul>';
-} else {
+}
+else {
     include("pages/apps/proxmox/vm.inc.php");
 }
    
