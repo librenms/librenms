@@ -12,11 +12,6 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
-function var_isset($v) {
-    global $vars;
-    return isset($vars[$v]);
-}
-
 function var_eq($v, $t) {
     global $vars;
     if (isset($vars[$v]) && $vars[$v] == $t) {
