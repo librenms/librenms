@@ -64,6 +64,15 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname`,`os`,`status`,`lat`,`lng` FR
 }
 
 $temp_output .= 'map.addLayer(markers);
+map.scrollWheelZoom.disable();
+$(document).ready(function(){
+    $("#leaflet-map").on("click", function(event) {  
+        map.scrollWheelZoom.enable();
+    });
+    $("#leaflet-map").mouseleave(function(event) {  
+        map.scrollWheelZoom.disable();
+    });
+});
 </script>';
 
 } else {
