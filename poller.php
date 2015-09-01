@@ -114,6 +114,7 @@ foreach (dbFetch($query) as $device) {
         poll_device($device, $options);
         RunRules($device['device_id']);
         echo "\r\n";
+        dbReleaseLock('polling.' . $device['device_id']);
     }
     $polled_devices++;
 }
