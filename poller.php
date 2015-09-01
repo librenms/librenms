@@ -100,6 +100,13 @@ if (isset($options['r'])) {
     $config['norrd'] = true;
 }
 
+echo 'Checking for MySQL Locks:';
+while (!dbCheckLock('schema_update')) {
+    echo '.';
+    sleep(1);
+}
+echo PHP_EOL;
+
 rrdtool_pipe_open($rrd_process, $rrd_pipes);
 
 echo "Starting polling run:\n\n";
