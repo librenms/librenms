@@ -13,8 +13,11 @@ if ($sql_fh === false) {
     echo 'ERROR: Cannot open SQL build script '.$sql_file."\n";
     exit(1);
 }
-
-$database_link = mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (is_resource($test_db)) {
+    $database_link = &$test_db;
+} else {
+    $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
+}
 if ($database_link === false) {
     echo 'ERROR: Cannot connect to database: '.mysqli_error($database_link)."\n";
     exit(1);
