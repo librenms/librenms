@@ -360,21 +360,32 @@ foreach (array_keys($menu_sensors) as $item) {
         </li>
 <?php
 
-$app_count = dbFetchCell("SELECT COUNT(`app_id`) FROM `applications`");
+$app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applications` ORDER BY `app_type`");
 
-if ($_SESSION['userlevel'] >= '5' && ($app_count) > "0") {
+if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
 ?>
         <li class="dropdown">
           <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"></i> Apps</a>
           <ul class="dropdown-menu">
 <?php
 
-    $app_list = dbFetchRows("SELECT `app_type` FROM `applications` GROUP BY `app_type` ORDER BY `app_type`");
     foreach ($app_list as $app) {
         if (isset($app['app_type'])) {
+            $app_i_list = dbFetchRows("SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ? ORDER BY `app_instance`", array($app['app_type']));
             $image = $config['html_dir']."/images/icons/".$app['app_type'].".png";
             $icon = (file_exists($image) ? $app['app_type'] : "apps");
-            echo('<li><a href="apps/app='.$app['app_type'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> '.nicecase($app['app_type']).' </a></li>');
+            if (count($app_i_list) > 1) {
+                echo '<li class="dropdown-submenu">';
+                echo '<a href="apps/app='.$app['app_type'].'/"><i class="fa fa-server fa-fw fa-lg"></i> '.nicecase($app['app_type']).' </a>';
+                echo '<ul class="dropdown-menu scrollable-menu">';
+                foreach ($app_i_list as $instance) {
+                    echo '            <li><a href="apps/app='.$app['app_type'].'/instance='.$instance['app_instance'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> ' . nicecase($instance['app_instance']) . '</a></li>';
+                }
+                echo '</ul></li>';
+            }
+            else {
+                echo('<li><a href="apps/app='.$app['app_type'].'/"><i class="fa fa-angle-double-right fa-fw fa-lg"></i> '.nicecase($app['app_type']).' </a></li>');
+            }
         }
     }
 ?>
