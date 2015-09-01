@@ -318,7 +318,7 @@ elseif($stage == "2") {
     $config['db_name']=$dbname;
     $config['db']['extension']='mysqli';
     $sql_file = '../build.sql';
-    if ($_REQUEST['offset'] =< 100) {
+    if ($_REQUEST['offset'] <= 100) {
         require '../build-base.php';
     }
     else {
