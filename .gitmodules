@@ -1,0 +1,3 @@
+[submodule "mibs"]
+	path = mibs
+	url = https://github.com/librenms/librenms-mibs.git
