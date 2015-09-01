@@ -28,6 +28,7 @@ if($stage == "4" || $stage == "3") {
 }
 
 require '../includes/defaults.inc.php';
+$config['db']['extension']='mysqli';
 // Work out the install directory
 $cur_dir = explode('/',__DIR__);
 $check = end($cur_dir);
@@ -47,7 +48,7 @@ require 'includes/functions.inc.php';
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if($stage == 2) {
-    $test_db = mysqli_connect($dbhost,$dbuser,$dbpass,$dbname);
+    $test_db = mysqli_connect('p:'.$dbhost,$dbuser,$dbpass,$dbname);
     if(mysqli_connect_error()) {
         $stage = 1;
         $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
