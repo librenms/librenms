@@ -318,7 +318,12 @@ elseif($stage == "2") {
     $config['db_name']=$dbname;
     $config['db']['extension']='mysqli';
     $sql_file = '../build.sql';
-    require '../build-base.php';
+    if ($_REQUEST['offset'] =< 100) {
+        require '../build-base.php';
+    }
+    else {
+        require '../includes/sql-schema/update.php';
+    }
 ?>
 </pre>
      </div>
