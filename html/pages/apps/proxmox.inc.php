@@ -1,6 +1,6 @@
 <?php
 
-include('includes/application/proxmox.inc.php');
+require_once('includes/application/proxmox.inc.php');
 $graphs['proxmox']    = array(
     'netif'
 );
@@ -34,6 +34,8 @@ foreach ($pmxcl as $pmxc) {
 
 print_optionbar_end();
 
+echo '<div class="container"><div class="row"><div class="col-md-12">';
+
 if (!isset($vars['instance'])) {
     echo 'Select a cluster:';
     echo '<ul>';
@@ -52,5 +54,7 @@ elseif (!isset($vars['vmid'])) {
 else {
     include("pages/apps/proxmox/vm.inc.php");
 }
-   
+
+echo '</div></div></div>';
+
 $pagetitle[] = 'Proxmox';
