@@ -168,5 +168,8 @@ foreach ($filelist as $file) {
 
 if ($updating) {
     echo "-- Done\n";
+    if( isset($_SESSION['stage']) ) {
+        $_SESSION['build-ok'] = true;
+    }
 }
 
