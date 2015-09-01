@@ -100,7 +100,7 @@ foreach ($filelist as $file) {
         if ( abs($limit-$_REQUEST['offset']) > 6) {
             $_SESSION['offset'] = $limit;
             echo '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
-            die();
+            return;
         }
     }
 
