@@ -54,7 +54,3 @@ while (!feof($sql_fh)) {
 fclose($sql_fh);
 
 require 'includes/sql-schema/update.php';
-
-if( isset($_SESSION['stage']) ) {
-    $_SESSION['build-ok'] = true;
-}
