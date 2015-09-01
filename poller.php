@@ -118,6 +118,7 @@ if (!isset($query)) {
 foreach (dbFetch($query) as $device) {
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
     if (dbGetLock('polling.' . $device['device_id'])) {
+        register_shutdown_function('dbReleaseLock','polling.'.$device['device_id']);
         poll_device($device, $options);
         RunRules($device['device_id']);
         echo "\r\n";
