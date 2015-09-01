@@ -96,6 +96,8 @@ if (!dbGetLock('schema_update')) {
     exit(1);
 } //end if
 
+register_shutdown_function('dbReleaseLock','schema_update');
+
 do {
     sleep(1);
 } while (@dbFetchCell('SELECT COUNT(*) FROM `devices` WHERE NOT IS_FREE_LOCK(CONCAT("polling.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("queued.", device_id)) OR NOT IS_FREE_LOCK(CONCAT("discovering.", device_id))') > 0);
@@ -134,7 +136,7 @@ foreach ($filelist as $file) {
                                 if ($config['db']['extension'] == 'mysqli') {
                                     echo mysqli_error($database_link)."\n";
                                 }
-                                else {                           
+                                else {
                                     echo mysql_error()."\n";
                                 }
                             }
@@ -169,5 +171,3 @@ if ($updating) {
 
     echo "-- Done\n";
 }
-
-dbReleaseLock('schema_update');
