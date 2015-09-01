@@ -52,10 +52,8 @@ while (!feof($sql_fh)) {
 }
 
 fclose($sql_fh);
+dbInsert(array('version' => 67), 'dbSchema');
 
-if( !isset($_SESSION['stage']) ) {
-    require 'includes/sql-schema/update.php';
-} else {
+if( isset($_SESSION['stage']) ) {
     $_SESSION['build-ok'] = true;
-    dbInsert(array('version' => 67), 'dbSchema');
 }
