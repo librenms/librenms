@@ -435,8 +435,14 @@ function get_dev_entity_state($device) {
     return $state;
 }
 
-function get_dev_attrib($device, $attrib_type) {
-    if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type))) {
+function get_dev_attrib($device, $attrib_type, $attrib_value='') {
+    $sql = '';
+    $params = array($device['device_id'], $attrib_type);
+    if (!empty($attrib_value)) {
+        $sql = " AND `attrib_value`=?";
+        array_push($params, $attrib_value);
+    }
+    if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ? $sql", $params)) {
         return $row['attrib_value'];
     }
     else {
