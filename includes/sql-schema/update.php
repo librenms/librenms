@@ -94,6 +94,16 @@ if ($tmp[0] <= $db_rev) {
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
+
+    if (isset($_SESSION['stage']) ) {
+        $limit++;
+        if ( abs($limit-$_REQUEST['offset']) > 6) {
+            $_SESSION['offset'] = $limit;
+            echo '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
+            die();
+        }
+    }
+
         if (!$updating) {
             echo "-- Updating database schema\n";
         }
