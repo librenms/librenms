@@ -13,11 +13,8 @@ if ($sql_fh === false) {
     echo 'ERROR: Cannot open SQL build script '.$sql_file."\n";
     exit(1);
 }
-if (is_resource($test_db)) {
-    $database_link = &$test_db;
-} else {
-    $database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
-}
+
+$database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
 if ($database_link === false) {
     echo 'ERROR: Cannot connect to database: '.mysqli_error($database_link)."\n";
     exit(1);
@@ -29,11 +26,26 @@ if ($select === false) {
     exit(1);
 }
 
+$limit = 0;
 while (!feof($sql_fh)) {
     $line = fgetss($sql_fh);
+    if (isset($_SESSION['stage']) ) {
+        $limit++;
+        if (isset($_SESSION['offset']) && $limit < $_REQUEST['offset']) {
+            continue;
+        }
+        elseif ( abs($limit-$_REQUEST['offset']) > 6) {
+            $_SESSION['offset'] = $limit;
+            echo '<b>Installing, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
+            return;
+        } else {
+            echo 'Step #'.$limit.' ...'.PHP_EOL;
+        }
+    }
+
     if (!empty($line)) {
         $creation = mysqli_query($database_link, $line);
-        if (!$creation) {
+        if (!$creation && ($limit <= 100 || $limit > 391) ) {
             echo 'WARNING: Cannot execute query ('.$line.'): '.mysqli_error($database_link)."\n";
         }
     }
@@ -41,4 +53,9 @@ while (!feof($sql_fh)) {
 
 fclose($sql_fh);
 
-require 'includes/sql-schema/update.php';
+if( !isset($_SESSION['stage']) ) {
+    require 'includes/sql-schema/update.php';
+} else {
+    $_SESSION['build-ok'] = true;
+    dbInsert(array('version' => 67), 'dbSchema');
+}
