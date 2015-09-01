@@ -7,6 +7,7 @@ cd "$(dirname "$0")"
 up=$(php daily.php -f update >&2; echo $?)
 if [ "$up" -eq 1 ]; then
     echo 'Checking GitHub..'
+    git submodule --quiet init
     git pull --quiet --recurse-submodules || {
         git pull --quiet
         git submodule --quiet update
