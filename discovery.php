@@ -114,6 +114,7 @@ echo PHP_EOL;
 
 foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC") as $device) {
     if (dbGetLock('discovering.' . $device['device_id'])) {
+        register_shutdown_function('dbReleaseLock','discovering.'.$device['device_id']);
         discover_device($device, $options);
         dbReleaseLock('discovering.' . $device['device_id']);
     }
