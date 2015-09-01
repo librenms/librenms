@@ -183,7 +183,7 @@ function RunFollowUp() {
             $state = 4;
         }
 
-        if ($state > 0) {
+        if ($state > 0 && $n > 0) {
             $alert['details']['rule'] = $chk;
             if (dbInsert(array('state' => $state, 'device_id' => $alert['device_id'], 'rule_id' => $alert['rule_id'], 'details' => gzcompress(json_encode($alert['details']), 9)), 'alert_log')) {
                 dbUpdate(array('state' => $state, 'open' => 1, 'alerted' => 1), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
