@@ -82,7 +82,7 @@ LibreNMS is installed using git.  If you're not familiar with git, check out the
 You can clone the repository via HTTPS or SSH.  In either case, you need to ensure that the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
 
     cd /opt
-    git clone https://github.com/librenms/librenms.git librenms
+    git clone --recursive https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
 
 The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
@@ -90,7 +90,7 @@ The recommended method of cloning a git repository is HTTPS.  If you would like 
 Sometimes the initial clone can take quite a while (nearly 3 minutes on a 10 Mbps fibre connection in Australia is a recent example).  If it's a big problem to you, you can save about 50% of the bandwidth by not pulling down the full git history.  This comes with some limitations (namely that you can't use it as the basis for further git repos), but if you're not planning to develop for LibreNMS it's an acceptable option.  To perform the initial clone without full history, run the following instead:
 
     cd /opt
-    git clone --depth 1 https://github.com/librenms/librenms.git librenms
+    git clone --recursive --depth 1 https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
 
 

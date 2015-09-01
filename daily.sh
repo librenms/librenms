@@ -6,7 +6,11 @@ cd "$(dirname "$0")"
 
 up=$(php daily.php -f update >&2; echo $?)
 if [ "$up" -eq 1 ]; then
-    git pull --quiet
+    echo 'Checking GitHub..'
+    git pull --quiet --recurse-submodules || {
+        git pull --quiet
+        git submodule --quiet update
+    }
     php includes/sql-schema/update.php
 fi
 

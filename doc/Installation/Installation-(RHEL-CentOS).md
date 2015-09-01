@@ -152,7 +152,7 @@ server {
 You can clone the repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
 
     cd /opt
-    git clone https://github.com/librenms/librenms.git librenms
+    git clone --recursive https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
 
 At this stage you can either launch the web installer by going to http://IP/install.php, follow the on-screen instructions then skip to the 'Web Interface' section further down. Alternatively if you want
