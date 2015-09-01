@@ -147,17 +147,16 @@ foreach ($filelist as $file) {
 
         $updating++;
         $db_rev = $filename;
+        if ($insert) {
+            dbInsert(array('version' => $db_rev), 'dbSchema');
+        }
+        else {
+            dbUpdate(array('version' => $db_rev), 'dbSchema');
+        }
     }//end if
 }//end foreach
 
 if ($updating) {
-    if ($insert) {
-        dbInsert(array('version' => $db_rev), 'dbSchema');
-    }
-    else {
-        dbUpdate(array('version' => $db_rev), 'dbSchema');
-    }
-
     echo "-- Done\n";
 }
 
