@@ -37,16 +37,18 @@ print_optionbar_end();
 $pagetitle[] = 'Proxmox';
 $pagetitle[] = $instance;
 
-if (!isset($vars['vmid'])) {
+if (!isset($vars['instance'])) {
     $instance = $pmxcl[0]['app_instance'];
-} else {
+}
+else {
     $instance = var_get('instance');
 }
 
 if (isset($vars['vmid'])) {
     include("pages/apps/proxmox/vm.inc.php");
     $pagetitle[] = $vars['vmid'];
-} else {
+}
+else {
     echo '
 <div class="container-fluid">
     <div class="row">
