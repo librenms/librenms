@@ -1,17 +1,18 @@
 <?php
 
 $common_output[] = '
-<table id="syslog" class="table table-hover table-condensed table-striped">
-    <thead>
-        <tr>
-            <th data-column-id="timestamp" data-order="desc">Datetime</th>
-            <th data-column-id="device_id">Hostname</th>
-            <th data-column-id="program">Program</th>
-            <th data-column-id="msg">Message</th>
-        </tr>
-    </thead>
-</table>
-
+<div class="table-responsive">
+    <table id="syslog" class="table table-hover table-condensed table-striped">
+        <thead>
+            <tr>
+                <th data-column-id="timestamp" data-order="desc">Datetime</th>
+                <th data-column-id="device_id">Hostname</th>
+                <th data-column-id="program">Program</th>
+                <th data-column-id="msg">Message</th>
+            </tr>
+        </thead>
+    </table>
+</div>
 <script>
 
 var syslog_grid = $("#syslog").bootgrid({
