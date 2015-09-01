@@ -1,8 +1,5 @@
 <?php
 
-
-global $vars;
-
 $vm = proxmox_vm_info(var_get('vmid'), var_get('instance'));
 
 $graphs = array(
