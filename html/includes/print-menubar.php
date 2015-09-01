@@ -509,7 +509,7 @@ if ($_SESSION['userlevel'] >= '10') {
            <li class="dropdown-submenu">
                <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> Pollers</a>
                <ul class="dropdown-menu scrollable-menu">
-               <li><a href="poll-log/"><i class="fa fa-exclamation fa-fw fa-lg"></i> Poll-log</a></li>');
+               <li><a href="poll-log/"><i class="fa fa-list-alt fa-fw fa-lg"></i> Poll-log</a></li>');
 
     if($config['distributed_poller'] === TRUE) {
         echo ('
