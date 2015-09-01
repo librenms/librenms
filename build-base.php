@@ -36,7 +36,7 @@ while (!feof($sql_fh)) {
         }
         elseif ( abs($limit-$_REQUEST['offset']) > 6) {
             $_SESSION['offset'] = $limit;
-            echo '<b>Installing, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
+            $GLOBALS['refresh'] = '<b>Installing, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
             return;
         } else {
             echo 'Step #'.$limit.' ...'.PHP_EOL;
