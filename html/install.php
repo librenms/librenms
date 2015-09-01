@@ -10,7 +10,6 @@ $stage = $_POST['stage'];
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
 if(file_exists('../config.php') && $stage != "6") {
-    session_destroy();
     header("Location: /");
     exit;
 }
@@ -76,6 +75,7 @@ elseif($stage == "4") {
     }
 }
 elseif($stage == "6") {
+    session_destroy();
     // If we get here then let's do some final checks.
     if(!file_exists("../config.php")) {
         // config.php file doesn't exist. go back to that stage
