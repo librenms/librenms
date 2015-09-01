@@ -45,7 +45,7 @@ while (!feof($sql_fh)) {
 
     if (!empty($line)) {
         $creation = mysqli_query($database_link, $line);
-        if (!$creation && ($limit <= 100 || $limit > 391) ) {
+        if (!$creation) {
             echo 'WARNING: Cannot execute query ('.$line.'): '.mysqli_error($database_link)."\n";
         }
     }
