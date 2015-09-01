@@ -309,7 +309,6 @@ elseif($stage == "2") {
      </div>
      <div class="col-md-6">
          <h5 class="text-center">Importing MySQL DB - Do not close this page or interrupt the import</h5>
-<pre>
 <?php
 // Ok now let's set the db connection up
     $config['db_host']=$dbhost;
@@ -318,14 +317,20 @@ elseif($stage == "2") {
     $config['db_name']=$dbname;
     $config['db']['extension']='mysqli';
     $sql_file = '../build.sql';
-    if ($_REQUEST['offset'] <= 100) {
+    ob_end_flush();
+    ob_start();
+    if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
         require '../build-base.php';
     }
     else {
         require '../includes/sql-schema/update.php';
     }
+    $_SESSION['out'] .= ob_get_clean().PHP_EOL;
+    ob_end_clean();
+    ob_start();
+    echo $GLOBALS['refresh'];
+    echo "<pre>".$_SESSION['out']."</pre>";
 ?>
-</pre>
      </div>
      <div class="col-md-3">
      </div>
