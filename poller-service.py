@@ -292,7 +292,7 @@ while True:
     cur_threads = threading.active_count()
     if cur_threads != threads:
         threads = cur_threads
-        log.debug('DEBUG: {0} threads currently active'.format(threads))
+        log.debug('DEBUG: {0} threads currently active'.format(str(threads - 1)))
 
     if next_update < datetime.now():
         seconds_taken = (datetime.now() - (next_update - timedelta(minutes=1))).seconds
