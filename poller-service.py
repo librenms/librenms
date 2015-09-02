@@ -205,7 +205,6 @@ def getThreadQueueLock(device_id):
                 else:
                     thread_cursor.in_use = False
                     return False
-        log.debug("DEBUG: No threads avaliable")
         time.sleep(.5)
 
 
