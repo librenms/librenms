@@ -204,6 +204,8 @@ def getThreadQueueLock(device_id):
                     return True
                 else:
                     thread_cursor.in_use = False
+                    return False
+        log.debug("DEBUG: No threads avaliable")
         time.sleep(.5)
 
 
@@ -217,6 +219,8 @@ def getThreadActionLock(device_id, action):
                 return True
             else:
                 thread_cursor.in_use = False
+                releaseLock('queue.{0}'.format(device_id), thread_cursor.cursor)
+                return False
     return False
 
 
