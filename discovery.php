@@ -105,19 +105,8 @@ if ($config['distributed_poller'] === true) {
     $where .= ' AND poller_group IN('.$config['distributed_poller_group'].')';
 }
 
-echo 'Checking for MySQL Locks:';
-while (!dbCheckLock('schema_update')) {
-    echo '.';
-    sleep(1);
-}
-echo PHP_EOL;
-
 foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC") as $device) {
-    if (dbGetLock('discovering.' . $device['device_id'])) {
-        register_shutdown_function('dbReleaseLock','discovering.'.$device['device_id']);
-        discover_device($device, $options);
-        dbReleaseLock('discovering.' . $device['device_id']);
-    }
+    discover_device($device, $options);
 }
 
 $end      = utime();

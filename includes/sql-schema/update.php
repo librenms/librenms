@@ -91,13 +91,6 @@ if ($tmp[0] <= $db_rev) {
     return;
 }
 
-if (!dbGetLock('schema_update')) {
-    echo "Schema update already in progress. Exiting\n";
-    exit(1);
-} //end if
-
-register_shutdown_function('dbReleaseLock','schema_update');
-
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
@@ -168,4 +161,3 @@ if ($updating) {
     echo "-- Done\n";
 }
 
-dbReleaseLock('schema_update');
