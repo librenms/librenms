@@ -200,7 +200,10 @@ def getThreadQueueLock(device_id):
         for thread_cursor in thread_cursors:
             if not thread_cursor.in_use:
                 thread_cursor.in_use = 'queue.{0}'.format(device_id)
-                return getLock('queue.{0}'.format(device_id), thread_cursor.cursor)
+                if getLock('queue.{0}'.format(device_id), thread_cursor.cursor):
+                    return True
+                else:
+                    thread_cursor.in_use = False
         time.sleep(.5)
 
 
@@ -210,7 +213,10 @@ def getThreadActionLock(device_id, action):
     for thread_cursor in thread_cursors:
         if thread_cursor.in_use == 'queue.{0}'.format(device_id):
             thread_cursor.in_use = '{0}.{1}'.format(action, device_id)
-            return getLock('{0}.{1}'.format(action, device_id), thread_cursor.cursor)
+            if getLock('{0}.{1}'.format(action, device_id), thread_cursor.cursor):
+                return True
+            else:
+                thread_cursor.in_use = False
     return False
 
 
