@@ -100,13 +100,6 @@ if (isset($options['r'])) {
     $config['norrd'] = true;
 }
 
-echo 'Checking for MySQL Locks:';
-while (!dbCheckLock('schema_update')) {
-    echo '.';
-    sleep(1);
-}
-echo PHP_EOL;
-
 rrdtool_pipe_open($rrd_process, $rrd_pipes);
 
 echo "Starting polling run:\n\n";
@@ -117,13 +110,9 @@ if (!isset($query)) {
 
 foreach (dbFetch($query) as $device) {
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
-    if (dbGetLock('polling.' . $device['device_id'])) {
-        register_shutdown_function('dbReleaseLock','polling.'.$device['device_id']);
-        poll_device($device, $options);
-        RunRules($device['device_id']);
-        echo "\r\n";
-        dbReleaseLock('polling.' . $device['device_id']);
-    }
+    poll_device($device, $options);
+    RunRules($device['device_id']);
+    echo "\r\n";
     $polled_devices++;
 }
 
