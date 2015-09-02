@@ -138,12 +138,17 @@ def connectDB():
             db_inst = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
         db_inst.autocommit(True)
         cursor_inst = db_inst.cursor()
-        return cursor_inst
+        ret = namedtuple('db_connection', ['db', 'cursor'])
+        ret.db = db_inst
+        ret.cursor = cursor_inst
+        return ret
     except:
         log.critical("ERROR: Could not connect to MySQL database!")
         sys.exit(2)
 
-cursor = connectDB()
+db_connection = connectDB()
+db = db_connection.db
+cursor = db_connection.cursor
 
 def poll_worker(device_id, action):
     try:
@@ -180,9 +185,11 @@ def getLock(lock, cursor=cursor):
 
 thread_cursors = []
 for i in range(0, amount_of_workers):
-    thread_cursors.append(namedtuple('Cursor{}'.format(i), ['in_use', 'cursor']))
+    thread_cursors.append(namedtuple('Cursor{}'.format(i), ['in_use', 'cursor', 'db']))
     thread_cursors[i].in_use = False
-    thread_cursors[i].cursor = connectDB
+    thread_db_connection = connectDB()
+    thread_cursors[i].cursor = thread_db_connection.cursor
+    thread_cursors[i].db = thread_db_connection.db
 
 
 def getThreadLock(lock):
