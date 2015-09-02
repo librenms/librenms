@@ -251,7 +251,6 @@ dev_query = ('SELECT device_id, status,                                         
              'FROM devices WHERE                                                 '
              'disabled = 0                                                       '
              'AND IS_FREE_LOCK(CONCAT("polling.", device_id))                    '
-             'AND IS_FREE_LOCK(CONCAT("queued.", device_id))                     '
              'AND ( last_poll_attempted < DATE_SUB(NOW(), INTERVAL {2} SECOND )  '
              '  OR last_poll_attempted IS NULL )                                 '
              '{3}                                                                '
@@ -305,14 +304,6 @@ while True:
 
     devices = cursor.fetchall()
     for device_id, status, next_poll, next_discovery in devices:
-        # add queue lock, so we lock the next device against any other pollers
-        # if this fails, the device is locked by another poller already
-        if not getLock('queued.{0}'.format(device_id)):
-            continue
-        if not lockFree('polling.{0}'.format(device_id)):
-            releaseLock('queued.{0}'.format(device_id))
-            continue
-
         if next_poll and next_poll > datetime.now():
             log.debug('DEBUG: Sleeping until {0} before polling {1}'.format(next_poll, device_id))
             sleep_until(next_poll)
