@@ -185,7 +185,7 @@ def getLock(lock, cursor=cursor):
 
 thread_cursors = []
 for i in range(0, amount_of_workers):
-    thread_cursors.append(namedtuple('Cursor{}'.format(i), ['in_use', 'cursor', 'db']))
+    thread_cursors.append(namedtuple('Cursor{0}'.format(i), ['in_use', 'cursor', 'db']))
     thread_cursors[i].in_use = False
     thread_db_connection = connectDB()
     thread_cursors[i].cursor = thread_db_connection.cursor
