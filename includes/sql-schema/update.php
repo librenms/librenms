@@ -91,19 +91,19 @@ if ($tmp[0] <= $db_rev) {
     return;
 }
 
-$limit = @$limit?: $_REQUEST['offset'];
+$limit = 150; //magic marker far enough in the future
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
 
-    if (isset($_SESSION['stage']) ) {
-        $limit++;
-        if ( abs($limit-$_REQUEST['offset']) > 6) {
-            $_SESSION['offset'] = $limit;
-            $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
-            return;
+        if (isset($_SESSION['stage']) ) {
+            $limit++;
+            if ( time()-$_SESSION['last'] > 45 ) {
+                $_SESSION['offset'] = $limit;
+                $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
+                return;
+            }
         }
-    }
 
         if (!$updating) {
             echo "-- Updating database schema\n";
