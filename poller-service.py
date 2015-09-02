@@ -160,6 +160,8 @@ def poll_worker(device_id, action):
         if getThreadLock('{0}.{1}'.format(action, device_id)):
             subprocess.check_call(command, shell=True)
             releaseThreadLock('{0}.{1}'.format(action, device_id))
+        else:
+            log.debug("DEBUG: Couldn't get lock on {0}.{1}".format(action, device_id))
         elapsed_time = int(time.time() - start_time)
         if elapsed_time < 300:
             log.debug("DEBUG: worker finished %s of device %s in %s seconds" % (action, device_id, elapsed_time))
