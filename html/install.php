@@ -317,6 +317,7 @@ elseif($stage == "2") {
     $config['db_name']=$dbname;
     $config['db']['extension']='mysqli';
     $sql_file = '../build.sql';
+    $_SESSION['last'] = time();
     ob_end_flush();
     ob_start();
     if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
@@ -325,11 +326,11 @@ elseif($stage == "2") {
     else {
         require '../includes/sql-schema/update.php';
     }
-    $_SESSION['out'] .= ob_get_clean().PHP_EOL;
+    $_SESSION['out'] .= ob_get_clean();
     ob_end_clean();
     ob_start();
     echo $GLOBALS['refresh'];
-    echo "<pre>".$_SESSION['out']."</pre>";
+    echo "<pre>".trim($_SESSION['out'])."</pre>";
 ?>
      </div>
      <div class="col-md-3">
