@@ -228,7 +228,7 @@ function RunAlerts() {
         if (!empty($rextra['count']) && empty($rextra['interval'])) {
             // This check below is for compat-reasons
             if (!empty($rextra['delay'])) {
-                if ((time() - strtotime($alert['time_logged']) + $config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $config['alert']['tolerance-window']) < $rextra['delay'])) {
+                if ((time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $config['alert']['tolerance_window']) < $rextra['delay'])) {
                     continue;
                 }
                 else {
@@ -248,12 +248,12 @@ function RunAlerts() {
         }
         else {
             // This is the new way
-            if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $config['alert']['tolerance-window']) < $rextra['delay']) {
+            if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay']) {
                 continue;
             }
 
             if (!empty($rextra['interval'])) {
-                if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $config['alert']['tolerance-window']) < $rextra['interval']) {
+                if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $config['alert']['tolerance_window']) < $rextra['interval']) {
                     continue;
                 }
                 else {
