@@ -34,7 +34,7 @@ $obj = array(
     "name"      => "Test-Rule",
     "timestamp" => date("Y-m-d H:i:s"),
     "contacts"  => $tmp['contacts'],
-    "state"     => "0",
+    "state"     => "1",
     "msg"       => "This is a test alert",
 );
 
