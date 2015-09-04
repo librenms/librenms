@@ -1,4 +1,10 @@
 <?php
+session_start();
+if( empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
+    $_POST = $_SESSION;
+} else {
+    $_SESSION = $_POST;
+}
 
 $stage = $_POST['stage'];
 
@@ -11,13 +17,13 @@ if(file_exists('../config.php') && $stage != "6") {
 // List of php modules we expect to see
 $modules = array('gd','mysql','snmp','mcrypt');
 
-$dbhost = $_POST['dbhost'] ?: 'localhost';
-$dbuser = $_POST['dbuser'] ?: 'librenms';
-$dbpass = $_POST['dbpass'] ?: '';
-$dbname = $_POST['dbname'] ?: 'librenms';
-$add_user = $_POST['add_user'] ?: '';
-$add_pass = $_POST['add_pass'] ?: '';
-$add_email = $_POST['add_email'] ?: '';
+$dbhost = @$_POST['dbhost'] ?: 'localhost';
+$dbuser = @$_POST['dbuser'] ?: 'librenms';
+$dbpass = @$_POST['dbpass'] ?: '';
+$dbname = @$_POST['dbname'] ?: 'librenms';
+$add_user = @$_POST['add_user'] ?: '';
+$add_pass = @$_POST['add_pass'] ?: '';
+$add_email = @$_POST['add_email'] ?: '';
 
 if($stage == "4" || $stage == "3") {
     // Ok now let's set the db connection up
@@ -28,6 +34,7 @@ if($stage == "4" || $stage == "3") {
 }
 
 require '../includes/defaults.inc.php';
+$config['db']['extension']='mysqli';
 // Work out the install directory
 $cur_dir = explode('/',__DIR__);
 $check = end($cur_dir);
@@ -46,28 +53,29 @@ require '../includes/functions.php';
 require 'includes/functions.inc.php';
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
-if($stage == 2) {
-    $test_db = mysqli_connect($dbhost,$dbuser,$dbpass,$dbname);
+if($stage == 2 || $stage == 3) {
+    $database_link = mysqli_connect('p:'.$dbhost,$dbuser,$dbpass,$dbname);
     if(mysqli_connect_error()) {
         $stage = 1;
         $msg = "Couldn't connect to the database, please check your details<br /> " . mysqli_connect_error();
     }
-    else {
-        $sql = "SELECT * FROM users LIMIT 1";
-        if(mysqli_query($test_db,$sql)) {
-            $stage = 3;
-            $msg = "It appears that the database is already setup so have moved onto stage $stage";
+    elseif ($stage != 3) {
+        if($_SESSION['build-ok'] == true) {
+                    $stage = 3;
+                    $msg = "It appears that the database is already setup so have moved onto stage $stage";
         }
     }
+    $_SESSION['stage'] = $stage;
 }
 elseif($stage == "4") {
     // Now check we have a username, password and email before adding new user
     if(empty($add_user) || empty($add_pass) || empty($add_email)) {
-        $stage = 4;
+        $stage = 3;
         $msg = "You haven't entered enough information to add the user account, please check below and re-try";
     }
 }
 elseif($stage == "6") {
+    session_destroy();
     // If we get here then let's do some final checks.
     if(!file_exists("../config.php")) {
         // config.php file doesn't exist. go back to that stage
@@ -309,7 +317,20 @@ elseif($stage == "2") {
     $config['db_name']=$dbname;
     $config['db']['extension']='mysqli';
     $sql_file = '../build.sql';
-    require '../build-base.php';
+    $_SESSION['last'] = time();
+    ob_end_flush();
+    ob_start();
+    if ($_SESSION['offset'] < 100 && $_REQUEST['offset'] < 94) {
+        require '../build-base.php';
+    }
+    else {
+        require '../includes/sql-schema/update.php';
+    }
+    $_SESSION['out'] .= ob_get_clean();
+    ob_end_clean();
+    ob_start();
+    echo $GLOBALS['refresh'];
+    echo "<pre>".trim($_SESSION['out'])."</pre>";
 ?>
      </div>
      <div class="col-md-3">
