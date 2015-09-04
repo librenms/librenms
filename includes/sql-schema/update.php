@@ -91,9 +91,20 @@ if ($tmp[0] <= $db_rev) {
     return;
 }
 
+$limit = 150; //magic marker far enough in the future
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
+
+        if (isset($_SESSION['stage']) ) {
+            $limit++;
+            if ( time()-$_SESSION['last'] > 45 ) {
+                $_SESSION['offset'] = $limit;
+                $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
+                return;
+            }
+        }
+
         if (!$updating) {
             echo "-- Updating database schema\n";
         }
@@ -147,17 +158,19 @@ foreach ($filelist as $file) {
 
         $updating++;
         $db_rev = $filename;
+        if ($insert) {
+            dbInsert(array('version' => $db_rev), 'dbSchema');
+        }
+        else {
+            dbUpdate(array('version' => $db_rev), 'dbSchema');
+        }
     }//end if
 }//end foreach
 
 if ($updating) {
-    if ($insert) {
-        dbInsert(array('version' => $db_rev), 'dbSchema');
-    }
-    else {
-        dbUpdate(array('version' => $db_rev), 'dbSchema');
-    }
-
     echo "-- Done\n";
+    if( isset($_SESSION['stage']) ) {
+        $_SESSION['build-ok'] = true;
+    }
 }
 
