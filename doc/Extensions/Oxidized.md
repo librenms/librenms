@@ -12,7 +12,7 @@ $config['oxidized']['enabled']         = TRUE;
 $config['oxidized']['url']             = 'http://127.0.0.1:8888';
 ```
 
-We also support config versioning within Oxidized, this will allow you to see the old configs stored. At present this is waiting on a [PR](https://github.com/ytti/oxidized-web/pull/25) to be merged upstream into Oxidized but you could simply patch your local install in the meantime.
+We also support config versioning within Oxidized, this will allow you to see the old configs stored.
 
 ```php
 $config['oxidized']['features']['versioning'] = true;
