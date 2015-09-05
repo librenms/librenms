@@ -18,7 +18,7 @@
 
 $no_refresh = true;
 
-foreach (dbFetchRows('SELECT * FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `user_id`=?',array($_SESSION['user_id'])) as $items) {
+foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `user_id`=?',array($_SESSION['user_id'])) as $items) {
     $data[] = $items;
 }
 
@@ -121,7 +121,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         gridster.remove_all_widgets();
         $.each(serialization, function() {
             gridster.add_widget(
-                '<li id="'+this.user_widget_id+'">'+
+                '<li id="'+this.user_widget_id+'" data-type="'+this.widget+'">'+
                 '\<script\>var timeout'+this.user_widget_id+' = grab_data('+this.user_widget_id+','+this.refresh+',\''+this.widget+'\');\<\/script\>'+
                 '<header class="widget_header">'+this.title+'<button style="color: #ffffff" type="button" class="close close-widget" data-widget-id="'+this.user_widget_id+'" aria-label="Close"><span aria-hidden="true">&times;</span></button></header>'+
                 '<div class="widget_body" id="widget_body_'+this.user_widget_id+'">'+this.widget+'</div>'+
@@ -166,7 +166,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                         var size_x = data.extra.size_x;
                         var size_y = data.extra.size_y;
                         gridster.add_widget(
-                            '<li id="'+widget_id+'">'+
+                            '<li id="'+widget_id+'" data-type="'+widget+'">'+
                             '\<script\>var timeout'+widget_id+' = grab_data('+widget_id+',60,\''+widget+'\');\<\/script\>'+
                             '<header class="widget_header">'+title+'<button type="button" class="close close-widget" data-widget-id="'+widget_id+'" aria-label="Close"><span aria-hidden="true">&times;</span></button></header>'+
                             '<div class="widget_body" id="widget_body_'+widget_id+'">'+widget+'</div>'+
@@ -209,12 +209,40 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
 
    });
 
-   function grab_data(id,refresh,data_type) {
-       new_refresh = refresh * 1000;
+   function widget_settings(data) {
+       var widget_settings = {};
+       var widget_id = 0;
+       datas = $(data).serializeArray();
+       for( var field in datas ) {
+           widget_settings[datas[field].name] = datas[field].value;
+       }
+console.log(widget_settings);
+       $('.gridster').find('div[id^=widget_body_]').each(function() {
+           if(this.contains(data)) {
+               widget_id = $(this).parent().attr('id');
+               widget_type = $(this).parent().data('type');
+           }
+       });
+       if( widget_id > 0 && widget_settings != {} ) {
+           $.ajax({
+               type: 'POST',
+               url: 'ajax_form.php',
+               data: {type: 'widget-settings', id: widget_id, settings: widget_settings},
+               dataType: "json",
+               success: function (data) {
+                   if( data.status == "ok" ) {
+                       widget_reload(widget_id,widget_type);
+                   }
+               }
+           });
+       }
+   }
+
+   function widget_reload(id,data_type) {
        $.ajax({
            type: 'POST',
            url: 'ajax_dash.php',
-           data: {type: data_type},
+           data: {type: data_type, id: id},
            dataType: "json",
            success: function (data) {
                if (data.status == 'ok') {
@@ -228,7 +256,11 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
            }
        });
-     
+   }
+
+   function grab_data(id,refresh,data_type) {
+       new_refresh = refresh * 1000;
+       widget_reload(id,data_type);
        setTimeout(function() {
            grab_data(id,refresh,data_type);
        },
