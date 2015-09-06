@@ -693,9 +693,7 @@ function get_graph_subtypes($type) {
 
     // find the MIB subtypes
     foreach ($config['graph_types'] as $type => $unused1) {
-        print_r($type);
         foreach ($config['graph_types'][$type] as $subtype => $unused2) {
-            print_r($subtype);
             if (is_mib_graph($type, $subtype)) {
                 $types[] = $subtype;
             }
