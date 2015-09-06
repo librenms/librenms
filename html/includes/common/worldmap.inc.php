@@ -69,7 +69,6 @@ else {
             AND `devices_perms`.`user_id` = '".$_SESSION['user_id']."'
             ORDER BY `status` ASC, `hostname`";
 }
-// Slightly modified foreach - grabbing SQL query string from above
 foreach (dbFetchRows($sql) as $map_devices) {
     $icon = 'greenMarker';
     if ($map_devices['status'] == 0) {
