@@ -103,31 +103,25 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             },
             resize: {
                 enabled: true,
-                stop: function(e, ui, $widget) {
+                stop: function(e, ui, widget) {
                     updatePos(gridster);
+                    widget_reload(widget.attr('id'),widget.data('type'));
                 }
             },
-            serialize_params: function($w, wgd) { 
-                return { 
-                    id: $($w).attr('id'), 
-                    col: wgd.col, 
-                    row: wgd.row, 
-                    size_x: wgd.size_x, 
-                    size_y: wgd.size_y 
+            serialize_params: function(w, wgd) {
+                return {
+                    id: $(w).attr('id'),
+                    col: wgd.col,
+                    row: wgd.row,
+                    size_x: wgd.size_x,
+                    size_y: wgd.size_y
                 };
             }
         }).data('gridster');
 
         gridster.remove_all_widgets();
         $.each(serialization, function() {
-            gridster.add_widget(
-                '<li id="'+this.user_widget_id+'" data-type="'+this.widget+'">'+
-                '\<script\>var timeout'+this.user_widget_id+' = grab_data('+this.user_widget_id+','+this.refresh+',\''+this.widget+'\');\<\/script\>'+
-                '<header class="widget_header">'+this.title+'<button style="color: #ffffff" type="button" class="close close-widget" data-widget-id="'+this.user_widget_id+'" aria-label="Close"><span aria-hidden="true">&times;</span></button></header>'+
-                '<div class="widget_body" id="widget_body_'+this.user_widget_id+'">'+this.widget+'</div>'+
-                '</li>',
-                parseInt(this.size_x), parseInt(this.size_y), parseInt(this.col), parseInt(this.row)
-            );
+            widget_dom(this);
         });
 
         $(document).on('click','#clear_widgets', function() {
@@ -160,19 +154,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
-                        var widget_id = data.extra.widget_id;
-                        var title = data.extra.title;
-                        var widget = data.extra.widget;
-                        var size_x = data.extra.size_x;
-                        var size_y = data.extra.size_y;
-                        gridster.add_widget(
-                            '<li id="'+widget_id+'" data-type="'+widget+'">'+
-                            '\<script\>var timeout'+widget_id+' = grab_data('+widget_id+',60,\''+widget+'\');\<\/script\>'+
-                            '<header class="widget_header">'+title+'<button type="button" class="close close-widget" data-widget-id="'+widget_id+'" aria-label="Close"><span aria-hidden="true">&times;</span></button></header>'+
-                            '<div class="widget_body" id="widget_body_'+widget_id+'">'+widget+'</div>'+
-                            '</li>',
-                            parseInt(size_x), parseInt(size_y)
-                        );
+                        widget_dom(data.extra);
                         updatePos(gridster);
                     }
                     else {
@@ -207,65 +189,96 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             });
         });
 
+        $(document).on("click",".edit-widget",function() {
+            obj = $(this).parent().parent();
+            if( obj.data('settings') == 1 ) {
+                obj.data('settings','0');
+            } else {
+                obj.data('settings','1');
+            }
+            widget_reload(obj.attr('id'),obj.data('type'));
+        });
+
    });
 
-   function widget_settings(data) {
-       var widget_settings = {};
-       var widget_id = 0;
-       datas = $(data).serializeArray();
-       for( var field in datas ) {
-           widget_settings[datas[field].name] = datas[field].value;
-       }
-console.log(widget_settings);
-       $('.gridster').find('div[id^=widget_body_]').each(function() {
-           if(this.contains(data)) {
-               widget_id = $(this).parent().attr('id');
-               widget_type = $(this).parent().data('type');
-           }
-       });
-       if( widget_id > 0 && widget_settings != {} ) {
-           $.ajax({
-               type: 'POST',
-               url: 'ajax_form.php',
-               data: {type: 'widget-settings', id: widget_id, settings: widget_settings},
-               dataType: "json",
-               success: function (data) {
-                   if( data.status == "ok" ) {
-                       widget_reload(widget_id,widget_type);
-                   }
-               }
-           });
-       }
-   }
+    function widget_dom(data) {
+        dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'">'+
+              '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+'</span>'+
+              '<button style="color: #ffffff;" type="button" class="fa fa-times close close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close">&nbsp;</button>'+
+              '<button style="color: #ffffff;" type="button" class="fa fa-pencil-square-o close edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings">&nbsp;</button>'+
+              '</header>'+
+              '<div class="widget_body" id="widget_body_'+data.user_widget_id+'" style="height: 100%; width:100%;">'+data.widget+'</div>'+
+              '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.refresh+',\''+data.widget+'\');\<\/script\>'+
+              '</li>';
+        if (data.hasOwnProperty('col') && data.hasOwnProperty('row')) {
+            gridster.add_widget(dom, parseInt(data.size_x), parseInt(data.size_y), parseInt(data.col), parseInt(data.row));
+        } else {
+            gridster.add_widget(dom, parseInt(data.size_x), parseInt(data.size_y));
+        }
+    }
 
-   function widget_reload(id,data_type) {
-       $.ajax({
-           type: 'POST',
-           url: 'ajax_dash.php',
-           data: {type: data_type, id: id},
-           dataType: "json",
-           success: function (data) {
-               if (data.status == 'ok') {
-                   $("#widget_body_"+id).html(data.html);
-               }
-               else {
-                   $("#widget_body_"+id).html('<div class="alert alert-info">' + data.message + '</div>');
-               }
-           },
-           error: function () {
-               $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
-           }
-       });
-   }
+    function widget_settings(data) {
+        var widget_settings = {};
+        var widget_id = 0;
+        datas = $(data).serializeArray();
+        for( var field in datas ) {
+            widget_settings[datas[field].name] = datas[field].value;
+        }
+        $('.gridster').find('div[id^=widget_body_]').each(function() {
+            if(this.contains(data)) {
+                widget_id = $(this).parent().attr('id');
+                widget_type = $(this).parent().data('type');
+                $(this).parent().data('settings','0');
+            }
+        });
+        if( widget_id > 0 && widget_settings != {} ) {
+            $.ajax({
+                type: 'POST',
+                url: 'ajax_form.php',
+                data: {type: 'widget-settings', id: widget_id, settings: widget_settings},
+                dataType: "json",
+                success: function (data) {
+                    if( data.status == "ok" ) {
+                        widget_reload(widget_id,widget_type);
+                    }
+                }
+            });
+        }
+    }
 
-   function grab_data(id,refresh,data_type) {
-       new_refresh = refresh * 1000;
-       widget_reload(id,data_type);
-       setTimeout(function() {
-           grab_data(id,refresh,data_type);
-       },
-       new_refresh);
-   }
-$('#new-widget').popover();
+    function widget_reload(id,data_type) {
+        if( $("#widget_body_"+id).parent().data('settings') == 1 ) {
+            settings = 1;
+        } else {
+            settings = 0;
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_dash.php',
+            data: {type: data_type, id: id, dimensions: {x:$("#widget_body_"+id).innerWidth()-50, y:$("#widget_body_"+id).innerHeight()-50}, settings:settings},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $("#widget_title_"+id).html(data.title);
+                    $("#widget_body_"+id).html(data.html);
+                }
+                else {
+                    $("#widget_body_"+id).html('<div class="alert alert-info">' + data.message + '</div>');
+                }
+            },
+            error: function () {
+                $("#widget_body_"+id).html('<div class="alert alert-info">Problem with backend</div>');
+            }
+        });
+    }
 
+    function grab_data(id,refresh,data_type) {
+        new_refresh = refresh * 1000;
+        widget_reload(id,data_type);
+        setTimeout(function() {
+            grab_data(id,refresh,data_type);
+        },
+        new_refresh);
+    }
+    $('#new-widget').popover();
 </script>

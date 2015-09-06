@@ -22,13 +22,13 @@
  * @subpackage Widgets
  */
 
-if( empty($widget_settings) ) {
+if( defined('show_settings') || empty($widget_settings) ) {
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
   <div class="form-group">
     <label for="device_id" class="col-sm-2 control-label">Device: </label>
     <div class="col-sm-10">
-      <input type="text" class="form-control input-sm widget-device-input" name="graph_device" placeholder="Device Name">
+      <input type="text" class="form-control input-sm widget-device-input-'.$unique_id.'" name="graph_device" placeholder="Device Name" value="'.$widget_settings['graph_device'].'">
     </div>
   </div>
   <div class="form-group">
@@ -37,10 +37,10 @@ if( empty($widget_settings) ) {
       <select class="form-control input-sm" name="graph_type">';
     foreach (get_graph_subtypes('device') as $avail_type) {
         $common_output[] = '<option value="device_'.$avail_type.'"';
-        if ($avail_type == $subtype) {
+        if ('device_'.$avail_type == $widget_settings['graph_type']) {
             $common_output[] = " selected";
         }
-        $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+        $display_type = is_mib_graph('device', $avail_type) ? $avail_type : nicecase($avail_type);
         $common_output[] = '>'.$display_type.'</option>';
     }
     $common_output[] = '
@@ -49,30 +49,24 @@ if( empty($widget_settings) ) {
     <div class="col-sm-offset-10 col-sm-2">
       <div class="checkbox input-sm">
         <label>
-          <input type="checkbox" name="graph_legend" class="widget_setting" value="1"> Legend
+          <input type="checkbox" name="graph_legend" class="widget_setting" value="1" '.($widget_settings['graph_legend'] ? 'checked' : '').'> Legend
         </label>
       </div>
     </div>
   </div>
-  <div class="form-group">
-    <label for="graph_width" class="col-sm-2 control-label">Width: </label>
-    <div class="col-sm-10">
-      <input type="number" class="form-control input-sm" name="graph_width" value="485" min="100">
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="graph_height"class="col-sm-2 control-label">Height </label>
-    <div class="col-sm-10">
-      <input type="number" class="form-control input-sm" name="graph_height" value="100" min="100">
-    </div>
-  </div>
   <button type="submit" class="btn btn-default">Set</button>
 </form>
+<style>
+.twitter-typeahead {
+  width: 100%;
+}
+</style>
 <script>
-graph_devices = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  remote: {
+function '.$unique_id.'() {
+  var '.$unique_id.' = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
       url: "ajax_search.php?search=%QUERY&type=device&map=1",
         filter: function (output) {
             return $.map(output, function (item) {
@@ -82,33 +76,48 @@ graph_devices = new Bloodhound({
             });
         },
       wildcard: "%QUERY"
-  }
-});
-graph_devices.initialize();
-$(".widget-device-input").typeahead({
+    }
+  });
+  '.$unique_id.'.initialize();
+  $(".widget-device-input-'.$unique_id.'").typeahead({
     hint: true,
     highlight: true,
     minLength: 1,
     classNames: {
         menu: "typeahead-left"
     }
-},
-{
-  source: graph_devices.ttAdapter(),
-  async: true,
-  displayKey: "name",
-  valueKey: "name",
+  },
+  {
+    source: '.$unique_id.'.ttAdapter(),
+    async: true,
+    displayKey: "name",
+    valueKey: "name",
     templates: {
-        header: "<h5><strong>&nbsp;Devices</strong></h5>",
-        suggestion: Handlebars.compile("<p>&nbsp;{{name}}</p>")
+      header: "<h5><strong>&nbsp;Devices</strong></h5>",
+      suggestion: Handlebars.compile("<p>&nbsp;{{name}}</p>")
     }
-});
+  });
+}
+</script>
+<script>
+$(function() { '.$unique_id.'(); });
 </script>';
 }
 else {
     $widget_settings['device_id'] = dbFetchCell('select device_id from devices where hostname = ?',array($widget_settings['graph_device']));
-    $common_output[] = "<header>".$widget_settings['graph_device']." / ".$widget_settings['graph_type']."</header>";
-    $common_output[] = generate_minigraph_image(array('device_id'=>(int) $widget_settings['device_id']), $config['time']['day'], $config['time']['now'], $widget_settings['graph_type'], $widget_settings['graph_legend'] == 1 ? 'yes' : 'no', $widget_settings['graph_width'], $widget_settings['graph_height'], '&', $widget_settings['graph_type']);
+    $widget_settings['title']     = $widget_settings['graph_device']." / ".$widget_settings['graph_type'];
+    $common_output[]              = generate_minigraph_image(
+                                        array('device_id'=>(int) $widget_settings['device_id']),
+                                        $config['time']['day'],
+                                        $config['time']['now'],
+                                        $widget_settings['graph_type'],
+                                        $widget_settings['graph_legend'] == 1 ? 'yes' : 'no',
+                                        $widget_dimensions['x'],
+                                        $widget_dimensions['y'],
+                                        '&',
+                                        'minigraph-image',
+                                        1
+                                    );
 }
 ?>
 
