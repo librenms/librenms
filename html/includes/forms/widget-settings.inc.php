@@ -49,4 +49,3 @@ die(json_encode(array(
     'status'  => $status,
     'message' => $message
 )));
-?>
