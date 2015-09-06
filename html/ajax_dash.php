@@ -30,23 +30,30 @@ $type = mres($_POST['type']);
 if ($type == 'placeholder') {
     $output = 'Please add a Widget to get started';
     $status = 'ok';
+    $title = 'Placeholder';
 }
 elseif (is_file('includes/common/'.$type.'.inc.php')) {
 
     $results_limit     = 10;
     $no_form           = true;
+    $title             = ucfirst($type);
+    $unique_id         = str_replace(array("-","."),"_",uniqid($type,true));
     $widget_id         = mres($_POST['id']);
     $widget_settings   = json_decode(dbFetchCell('select settings from users_widgets where user_widget_id = ?',array($widget_id)),true);
-    $widget_dimensions = dbfetchRow('select size_x,size_y from users_widgets where user_widget_id = ?',array($widget_id));
+    $widget_dimensions = $_POST['dimensions'];
+    if( !empty($_POST['settings']) ) {
+        define('show_settings',true);
+    }
     include 'includes/common/'.$type.'.inc.php';
     $output = implode('', $common_output);
     $status = 'ok';
-
+    $title  = $widget_settings['title'] ?: $title;
 }
 
 $response = array(
                   'status' => $status,
                   'html' => $output,
+                  'title' => $title,
                  );
 
 echo _json_encode($response);
