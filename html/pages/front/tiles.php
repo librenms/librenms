@@ -96,7 +96,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             widget_margins: [5, 5],
             avoid_overlapped_widgets: true,
             draggable: {
-                handle: 'header',
+                handle: 'header, span',
                 stop: function(e, ui, $widget) {
                     updatePos(gridster);
                 },
