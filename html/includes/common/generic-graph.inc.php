@@ -26,35 +26,107 @@ if( defined('show_settings') || empty($widget_settings) ) {
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
   <div class="form-group">
-    <label for="device_id" class="col-sm-2 control-label">Device: </label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control input-sm widget-device-input-'.$unique_id.'" name="graph_device" placeholder="Device Name" value="'.$widget_settings['graph_device'].'">
+    <div class="col-sm-2">
+      <label for="graph_type" class="control-label">Graph: </label>
     </div>
-  </div>
-  <div class="form-group">
-    <label for="graph_type" class="col-sm-2 control-label">Graph: </label>
     <div class="col-sm-8">
-      <select class="form-control input-sm" name="graph_type">';
-    foreach (get_graph_subtypes('device') as $avail_type) {
-        $common_output[] = '<option value="device_'.$avail_type.'"';
-        if ('device_'.$avail_type == $widget_settings['graph_type']) {
-            $common_output[] = " selected";
+      <select class="form-control" name="graph_type" id="select_'.$unique_id.'" onchange="switch_'.$unique_id.'($(this).val());">';
+    if (empty($widget_settings['graph_type'])) {
+        $common_output[] = '<option disabled selected>Select a Graph</option>';
+    }
+    $sub = '';
+    $old = '';
+    foreach (array('device','port','application','munin') as $type) {
+        $common_output[] = '<option disabled>'.nicecase($type).':</option>';
+        foreach (get_graph_subtypes($type) as $avail_type) {
+            $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+            if( strstr($display_type,'_') ) {
+                $sub = array_shift(explode('_',$display_type,2));
+                if( $sub != $old ) {
+                    $old = $sub;
+                    $common_output[] = '<option disabled>&nbsp;&nbsp;&nbsp;'.nicecase($sub).':</option>';
+                }
+                $display_type = str_replace($sub.'_','',$display_type);
+                $space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+            } else {
+                $space = '&nbsp;&nbsp;&nbsp;';
+            }
+            $common_output[] = '<option value="'.$type.'_'.$avail_type.'"';
+            if ($type.'_'.$avail_type == $widget_settings['graph_type']) {
+                $common_output[] = " selected";
+            }
+            $common_output[] = '>'.$space.nicecase($display_type).'</option>';
         }
-        $display_type = is_mib_graph('device', $avail_type) ? $avail_type : nicecase($avail_type);
-        $common_output[] = '>'.$display_type.'</option>';
+        $common_output[] = '<option disabled></option>';
     }
     $common_output[] = '
       </select>
     </div>
     <div class="col-sm-offset-10 col-sm-2">
       <div class="checkbox input-sm">
-        <label>
+        <label class="control-label">
           <input type="checkbox" name="graph_legend" class="widget_setting" value="1" '.($widget_settings['graph_legend'] ? 'checked' : '').'> Legend
         </label>
       </div>
     </div>
   </div>
-  <button type="submit" class="btn btn-default">Set</button>
+  <div class="clearfix"></div>
+  <div class="form-group">
+    <div class="col-sm-2">
+      <label for="graph_range" class="control-label">Range: </label>
+    </div>
+    <div class="col-sm-10">
+      <select class="form-control" name="graph_range">';
+    $checked = '';
+    foreach( array_diff_key($config['time'],array('now'=>'')) as $k=>$v ) {
+        if ($widget_settings['graph_range'] == $k) {
+            $checked = ' selected';
+        } else {
+            $checked = '';
+        }
+        $common_output[] = '<option value="'.$k.'"'.$checked.'>'.nicecase($k).'</option>';
+    }
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_device">
+    <div class="col-sm-2">
+      <label for="graph_device" class="control-label">Device: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'_device" name="graph_device" placeholder="Device Name" value="'.htmlspecialchars($widget_settings['graph_device']).'">
+    </div>
+  </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_port">
+    <div class="col-sm-2">
+      <label for="graph_port" class="control-label">Port: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'_port" name="graph_port" placeholder="Port" value="'.htmlspecialchars($widget_settings['graph_port']).'">
+    </div>
+  </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_application">
+    <div class="col-sm-2">
+      <label for="graph_application" class="control-label">Application: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'_application" name="graph_application" placeholder="Application" value="'.htmlspecialchars($widget_settings['graph_application']).'">
+    </div>
+  </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_munin">
+    <div class="col-sm-2">
+      <label for="graph_munin" class="control-label">Munin Plugin: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'_munin" name="graph_munin" placeholder="Munin Plugin" value="'.htmlspecialchars($widget_settings['graph_munin']).'">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-2">
+      <button type="submit" class="btn btn-default">Set</button>
+    </div>
+  </div>
 </form>
 <style>
 .twitter-typeahead {
@@ -63,23 +135,30 @@ if( defined('show_settings') || empty($widget_settings) ) {
 </style>
 <script>
 function '.$unique_id.'() {
-  var '.$unique_id.' = new Bloodhound({
+  var '.$unique_id.'_device = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {
-      url: "ajax_search.php?search=%QUERY&type=device&map=1",
+      url: "ajax_search.php?search=%QUERY&type=device",
         filter: function (output) {
             return $.map(output, function (item) {
                 return {
-                    name: item.name,
+                    device_id:       item.device_id,
+                    device_image:    item.device_image,
+                    name:            item.name,
+                    device_os:       item.device_os,
+                    version:         item.version,
+                    device_hardware: item.device_hardware,
+                    device_ports:    item.device_ports,
+                    location:        item.location
                 };
             });
         },
       wildcard: "%QUERY"
     }
   });
-  '.$unique_id.'.initialize();
-  $(".widget-device-input-'.$unique_id.'").typeahead({
+  '.$unique_id.'_device.initialize();
+  $(".input_'.$unique_id.'_device").typeahead({
     hint: true,
     highlight: true,
     minLength: 1,
@@ -88,35 +167,160 @@ function '.$unique_id.'() {
     }
   },
   {
-    source: '.$unique_id.'.ttAdapter(),
-    async: true,
-    displayKey: "name",
-    valueKey: "name",
+    source: '.$unique_id.'_device.ttAdapter(),
+    async: false,
     templates: {
       header: "<h5><strong>&nbsp;Devices</strong></h5>",
-      suggestion: Handlebars.compile("<p>&nbsp;{{name}}</p>")
+      suggestion: Handlebars.compile(\'<p><img src="{{device_image}}" border="0"> <small><strong>{{name}}</strong> | {{device_os}} | {{version}} | {{device_hardware}} with {{device_ports}} port(s) | {{location}}</small></p>\')
     }
   });
+
+  var '.$unique_id.'_port = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace("port_id"),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: "ajax_search.php?search=%QUERY&type=ports",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name:        item.name,
+                    description: item.description,
+                    hostname:    item.hostname,
+                    port_id:     item.port_id
+                };
+            });
+        },
+      wildcard: "%QUERY"
+    }
+  });
+  '.$unique_id.'_port.initialize();
+  $(".input_'.$unique_id.'_port").typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: "typeahead-left"
+    }
+  },
+  {
+    source: '.$unique_id.'_port.ttAdapter(),
+    async: false,
+    templates: {
+      header: "<h5><strong>&nbsp;Ports</strong></h5>",
+      suggestion: Handlebars.compile(\'<p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}} - <i>{{description}}</i></small></p>\')
+    }
+  });
+
+  var '.$unique_id.'_application = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace("app_id"),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: "ajax_search.php?search=%QUERY&type=applications",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name:        item.name,
+                    hostname:    item.hostname,
+                    app_id:      item.app_id
+                };
+            });
+        },
+      wildcard: "%QUERY"
+    }
+  });
+  '.$unique_id.'_application.initialize();
+  $(".input_'.$unique_id.'_application").typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: "typeahead-left"
+    }
+  },
+  {
+    source: '.$unique_id.'_application.ttAdapter(),
+    async: false,
+    templates: {
+      header: "<h5><strong>&nbsp;Applications</strong></h5>",
+      suggestion: Handlebars.compile(\'<p><small><img src="images/icons/port.png" /> <strong>{{name}}</strong> – {{hostname}}</small></p>\')
+    }
+  });
+
+  var '.$unique_id.'_munin = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace("munin"),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: "ajax_search.php?search=%QUERY&type=munin",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    desc:        item.name,
+                    name:        item.plugin,
+                    hostname:    item.hostname,
+                    plugin:      item.plugin,
+                    device_id:   item.device_id,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+    }
+  });
+  '.$unique_id.'_munin.initialize();
+  $(".input_'.$unique_id.'_munin").typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: "typeahead-left"
+    }
+  },
+  {
+    source: '.$unique_id.'_munin.ttAdapter(),
+    async: false,
+    templates: {
+      header: "<h5><strong>&nbsp;Munin</strong></h5>",
+      suggestion: Handlebars.compile(\'<p><small><img src="images/icons/port.png" /> <strong>{{plugin}}</strong> – {{hostname}}</small></p>\')
+    }
+  });
+
+  switch_'.$unique_id.'($("#select_'.$unique_id.'").val());
+}
+function switch_'.$unique_id.'(data) {
+    $(".input_'.$unique_id.'").fadeOut();
+    if (data != undefined && data != "") {
+        data = data.split("_");
+        type = data.shift();
+        data = data.join("_");
+        $("#input_'.$unique_id.'_"+type).fadeIn();
+    }
 }
 </script>
-<script>
-$(function() { '.$unique_id.'(); });
+<script id="js_'.$unique_id.'">
+$(function() {
+  $("#js_'.$unique_id.'").parent().parent().data("settings","1");
+  '.$unique_id.'();
+});
 </script>';
 }
 else {
-    $widget_settings['device_id'] = dbFetchCell('select device_id from devices where hostname = ?',array($widget_settings['graph_device']));
-    $widget_settings['title']     = $widget_settings['graph_device']." / ".$widget_settings['graph_type'];
-    $common_output[]              = generate_minigraph_image(
-                                        array('device_id'=>(int) $widget_settings['device_id']),
-                                        $config['time']['day'],
-                                        $config['time']['now'],
-                                        $widget_settings['graph_type'],
-                                        $widget_settings['graph_legend'] == 1 ? 'yes' : 'no',
-                                        $widget_dimensions['x'],
-                                        $widget_dimensions['y'],
-                                        '&',
-                                        'minigraph-image',
-                                        1
-                                    );
+    $widget_settings['title']         = "";
+    $type                             = array_shift(explode('_',$widget_settings['graph_type'],2));
+    $widget_settings['graph_'.$type] = json_decode($widget_settings['graph_'.$type],true);
+    if ($type == 'device') {
+        $widget_settings['title']     = $widget_settings['graph_device']['name']." / ".$widget_settings['graph_type'];
+        $param                        = 'device='.$widget_settings['graph_device']['device_id'];
+    }
+    elseif ($type == 'application') {
+        $param                        = 'id='.$widget_settings['graph_'.$type]['app_id'];
+    }
+    elseif ($type == 'munin') {
+        $param                        = 'device='.$widget_settings['graph_'.$type]['device_id'].'&plugin='.$widget_settings['graph_'.$type]['name'];
+    }
+    else {
+        $param                        = 'id='.$widget_settings['graph_'.$type][$type.'_id'];
+    }
+    if (empty($widget_settings['title'])) {
+        $widget_settings['title']     = $widget_settings['graph_'.$type]['hostname']." / ".$widget_settings['graph_'.$type]['name']." / ".$widget_settings['graph_type'];
+    }
+    $common_output[]                  = '<img class="minigraph-image" src="graph.php?'.$param.'&from='.$config['time'][$widget_settings['graph_range']].'&to='.$config['time']['now'].'&width='.$widget_dimensions['x'].'&height='.$widget_dimensions['y'].'&type='.$widget_settings['graph_type'].'&legend='.($widget_settings['graph_legend'] == 1 ? 'yes' : 'no').'&absolute=1"/>';
 }
-
