@@ -50,6 +50,7 @@ Contributors to LibreNMS:
 - Mark Schouten <mark@tuxis.nl> (tuxis-ie) 
 - Todd Eddy <vr@vrillusions.com> (vrillusions)
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
+- Sergiusz Paprzycki <serek@walcz.net> (spaprzycki)
 
 
 [1]: http://observium.org/ "Observium web site"
