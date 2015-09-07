@@ -202,7 +202,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
    });
 
     function widget_dom(data) {
-        dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'">'+
+        dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+'</span>'+
               '<button style="color: #ffffff;" type="button" class="fa fa-times close close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close">&nbsp;</button>'+
               '<button style="color: #ffffff;" type="button" class="fa fa-pencil-square-o close edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings">&nbsp;</button>'+
@@ -273,8 +273,10 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
     }
 
     function grab_data(id,refresh,data_type) {
+        if( $("#widget_body_"+id).parent().data('settings') == 0 ) {
+            widget_reload(id,data_type);
+        }
         new_refresh = refresh * 1000;
-        widget_reload(id,data_type);
         setTimeout(function() {
             grab_data(id,refresh,data_type);
         },
