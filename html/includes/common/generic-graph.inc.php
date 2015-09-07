@@ -41,7 +41,8 @@ if( defined('show_settings') || empty($widget_settings) ) {
         foreach (get_graph_subtypes($type) as $avail_type) {
             $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
             if( strstr($display_type,'_') ) {
-                $sub = array_shift(explode('_',$display_type,2));
+                $sub = explode('_',$display_type,2);
+                $sub = array_shift($sub);
                 if( $sub != $old ) {
                     $old = $sub;
                     $common_output[] = '<option disabled>&nbsp;&nbsp;&nbsp;'.nicecase($sub).':</option>';
@@ -304,7 +305,8 @@ $(function() {
 }
 else {
     $widget_settings['title']         = "";
-    $type                             = array_shift(explode('_',$widget_settings['graph_type'],2));
+    $type                             = explode('_',$widget_settings['graph_type'],2);
+    $type                             = array_shift($type);
     $widget_settings['graph_'.$type] = json_decode($widget_settings['graph_'.$type],true);
     if ($type == 'device') {
         $widget_settings['title']     = $widget_settings['graph_device']['name']." / ".$widget_settings['graph_type'];
