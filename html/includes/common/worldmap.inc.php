@@ -66,10 +66,10 @@ else {
             LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
             WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
             AND `devices`.`device_id` = `devices_perms`.`device_id`
-            AND `devices_perms`.`user_id` = '".$_SESSION['user_id']."'
+            AND `devices_perms`.`user_id` = ?
             ORDER BY `status` ASC, `hostname`";
 }
-foreach (dbFetchRows($sql) as $map_devices) {
+foreach (dbFetchRows($sql, array($_SESSION['user_id'])) as $map_devices) {
     $icon = 'greenMarker';
     if ($map_devices['status'] == 0) {
         $icon = 'redMarker';
