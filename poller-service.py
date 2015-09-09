@@ -240,7 +240,8 @@ def poll_worker(thread_id):
     while True:
         dev_row = db.query(dev_query)
         if len(dev_row) < 1:
-            #log.warning("WARNING: Thread {0} returned no devices from query".format(thread_id))
+            # Sleep 1 second after getting an empty query, don't hammer the sql server for no reason.
+            time.sleep(1)
             continue
             
         device_id, status, next_poll, next_discovery  = dev_row[0]
@@ -296,24 +297,25 @@ for i in range(0, amount_of_workers):
 
 
 while True:
-    if next_update < datetime.now():
-        seconds_taken = (datetime.now() - (next_update - timedelta(minutes=1))).seconds
-        update_query = ('INSERT INTO pollers(poller_name,     '
-                        '                    last_polled,     '
-                        '                    devices,         '
-                        '                    time_taken)      '
-                        '  values("{0}", NOW(), "{1}", "{2}") '
-                        'ON DUPLICATE KEY UPDATE              '
-                        '  last_polled=values(last_polled),   '
-                        '  devices=values(devices),           '
-                        '  time_taken=values(time_taken)      ').format(config['distributed_poller_name'].strip(),
-                                                                        devices_scanned,
-                                                                        seconds_taken)
-        try:
-            db.query(update_query)
-        except:
-            log.critical('ERROR: MySQL query error. Is your schema up to date?')
-            sys.exit(2)
-        log.info('INFO: {0} devices scanned in the last minute'.format(devices_scanned))
-        devices_scanned = 0
-        next_update = datetime.now() + timedelta(minutes=1)
+    sleep_until(next_update)
+
+    seconds_taken = (datetime.now() - (next_update - timedelta(minutes=1))).seconds
+    update_query = ('INSERT INTO pollers(poller_name,     '
+                    '                    last_polled,     '
+                    '                    devices,         '
+                    '                    time_taken)      '
+                    '  values("{0}", NOW(), "{1}", "{2}") '
+                    'ON DUPLICATE KEY UPDATE              '
+                    '  last_polled=values(last_polled),   '
+                    '  devices=values(devices),           '
+                    '  time_taken=values(time_taken)      ').format(config['distributed_poller_name'].strip(),
+                                                                    devices_scanned,
+                                                                    seconds_taken)
+    try:
+        db.query(update_query)
+    except:
+        log.critical('ERROR: MySQL query error. Is your schema up to date?')
+        sys.exit(2)
+    log.info('INFO: {0} devices scanned in the last minute'.format(devices_scanned))
+    devices_scanned = 0
+    next_update = datetime.now() + timedelta(minutes=1)
