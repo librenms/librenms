@@ -51,7 +51,25 @@ var greenMarker = L.AwesomeMarkers.icon({
   });
 ';
 
-foreach (dbFetchRows("SELECT `device_id`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices` LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location` WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != '' ORDER BY `status` ASC, `hostname`") as $map_devices) {
+// Checking user permissions
+if (is_admin() || is_read()) {
+// Admin or global read-only - show all devices
+    $sql = "SELECT `device_id`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
+            LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
+            WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
+            ORDER BY `status` ASC, `hostname`";
+}
+else {
+// Normal user - grab devices that user has permissions to
+    $sql = "SELECT `devices`.`device_id` as `device_id`,`hostname`,`os`,`status`,`lat`,`lng`
+            FROM `devices_perms`, `devices`
+            LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
+            WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
+            AND `devices`.`device_id` = `devices_perms`.`device_id`
+            AND `devices_perms`.`user_id` = ?
+            ORDER BY `status` ASC, `hostname`";
+}
+foreach (dbFetchRows($sql, array($_SESSION['user_id'])) as $map_devices) {
     $icon = 'greenMarker';
     if ($map_devices['status'] == 0) {
         $icon = 'redMarker';
