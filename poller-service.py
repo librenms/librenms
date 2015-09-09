@@ -291,6 +291,7 @@ def poll_worker(thread_id):
 t = []
 for i in range(0, amount_of_workers):
     t.append(threading.Thread(target=poll_worker, args=[i]))
+    t[i].daemon = True
     t[i].start()
 
 
