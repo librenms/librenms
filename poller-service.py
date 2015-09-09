@@ -58,6 +58,7 @@ class DB:
         else:
             self.conn = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
         self.conn.autocommit(True)
+        self.conn.ping(True)
 
     def query(self, sql):
         try:
