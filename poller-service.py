@@ -236,7 +236,7 @@ devices_scanned = 0
 def poll_worker():
     global dev_query
     global devices_scanned
-    thread_id = threading.current_thread().ident
+    thread_id = threading.current_thread().name
     db = DB()
     while True:
         dev_row = db.query(dev_query)
@@ -292,6 +292,7 @@ def poll_worker():
 
 for i in range(0, amount_of_workers):
     t = threading.Thread(target=poll_worker)
+    t.name = i
     t.daemon = True
     t.start()
 
