@@ -238,7 +238,12 @@ def poll_worker(thread_id):
     global devices_scanned
     db = DB()
     while True:
-        device_id, status, next_poll, next_discovery  = db.query(dev_query)[0]
+        dev_row = db.query(dev_query)
+        if len(dev_row) < 1:
+            log.warning("WARNING: Thread {0} returned no devices from query".format(thread_id))
+            continue
+            
+        device_id, status, next_poll, next_discovery  = dev_row[0]
 
         if not getLock('queue.{0}'.format(device_id), db):
             continue
