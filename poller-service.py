@@ -53,10 +53,18 @@ class DB:
     conn = None
 
     def connect(self):
-        if db_port == 0:
-            self.conn = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
-        else:
-            self.conn = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
+        while True:
+            try:
+                if db_port == 0:
+                    self.conn = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+                else:
+                    self.conn = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
+                break
+            except (AttributeError, MySQLdb.OperationalError):
+                log.warning('WARNING: MySQL Error, reconnecting.')
+                time.sleep(.5)
+                pass
+
         self.conn.autocommit(True)
         self.conn.ping(True)
 
