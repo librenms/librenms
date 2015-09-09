@@ -189,14 +189,12 @@ def poll_worker(device_id, action):
 
 def lockFree(lock, db=db):
     query = "SELECT IS_FREE_LOCK('{0}')".format(lock)
-    cursor = db.query(query)
-    return cursor.fetchall()[0][0] == 1
+    return db.query(query)[0][0] == 1
 
 
 def getLock(lock, db=db):
     query = "SELECT GET_LOCK('{0}', 0)".format(lock)
-    cursor = db.query(query)
-    return cursor.fetchall()[0][0] == 1
+    return db.query(query)[0][0] == 1
 
 
 thread_cursors = []
@@ -239,7 +237,7 @@ def getThreadActionLock(device_id, action):
 def releaseLock(lock, db=db):
     query = "SELECT RELEASE_LOCK('{0}')".format(lock)
     cursor = db.query(query)
-    return cursor.fetchall()[0][0] == 1
+    return db.query(query)[0][0] == 1
 
 
 def releaseThreadLock(device_id, action):
@@ -321,22 +319,20 @@ while True:
                                                                         devices_scanned,
                                                                         seconds_taken)
         try:
-            cursor = db.query(update_query)
+            db.query(update_query)
         except:
             log.critical('ERROR: MySQL query error. Is your schema up to date?')
             sys.exit(2)
-        cursor.fetchall()
         log.info('INFO: {0} devices scanned in the last minute'.format(devices_scanned))
         devices_scanned = 0
         next_update = datetime.now() + timedelta(minutes=1)
 
     try:
-        cursor = db.query(dev_query)
+        devices = db.query(dev_query)
     except:
         log.critical('ERROR: MySQL query error. Is your schema up to date?')
         sys.exit(2)
 
-    devices = cursor.fetchall()
     for device_id, status, next_poll, next_discovery in devices:
         if not getThreadQueueLock(device_id):
             continue
@@ -352,8 +348,7 @@ while True:
         log.debug('DEBUG: Starting {0} of device {1}'.format(action, device_id))
         devices_scanned += 1
 
-        cursor = db.query('UPDATE devices SET last_poll_attempted = NOW() WHERE device_id = {0}'.format(device_id))
-        cursor.fetchall()
+        db.query('UPDATE devices SET last_poll_attempted = NOW() WHERE device_id = {0}'.format(device_id))
 
         if not getThreadActionLock(device_id, action):
             continue
