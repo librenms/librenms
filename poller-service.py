@@ -240,12 +240,13 @@ def poll_worker(thread_id):
     while True:
         dev_row = db.query(dev_query)
         if len(dev_row) < 1:
-            log.warning("WARNING: Thread {0} returned no devices from query".format(thread_id))
+            #log.warning("WARNING: Thread {0} returned no devices from query".format(thread_id))
             continue
             
         device_id, status, next_poll, next_discovery  = dev_row[0]
 
         if not getLock('queue.{0}'.format(device_id), db):
+            releaseLock('queue.{0}'.format(device_id), db):
             continue
 
         if next_poll and next_poll > datetime.now():
@@ -263,9 +264,10 @@ def poll_worker(thread_id):
 
         if not getLock('{0}.{1}'.format(action, device_id), db):
             releaseLock('{0}.{1}'.format(action, device_id), db)
+            releaseLock('queue.{0}'.format(device_id), db):
             continue
 
-        releaseLock('{0}.{1}'.format(action, device_id), db)
+        releaseLock('queue.{0}'.format(device_id), db):
         try:
             start_time = time.time()
             path = poller_path
