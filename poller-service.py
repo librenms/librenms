@@ -61,23 +61,25 @@ class DB:
                     self.conn = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
                 break
             except (AttributeError, MySQLdb.OperationalError):
-                log.warning('WARNING: MySQL Error during connect, reconnecting.')
+                log.warning('WARNING: MySQL Error, reconnecting.')
                 time.sleep(.5)
-                pass
 
         self.conn.autocommit(True)
         self.conn.ping(True)
 
     def query(self, sql):
-        try:
-            cursor = self.conn.cursor()
-            cursor.execute(sql)
-        except (AttributeError, MySQLdb.OperationalError):
-            log.warning('WARNING: MySQL Error during query, reconnecting.')
-            self.connect()
-            cursor = self.conn.cursor()
-            cursor.execute(sql)
-        return cursor
+        while True:
+            try:
+                cursor = self.conn.cursor()
+                cursor.execute(sql)
+                ret = cursor.fetchall()
+                cursor.close()
+                return ret
+            except (AttributeError, MySQLdb.OperationalError):
+                log.warning('WARNING: MySQL Operational Error during query, reconnecting.')
+                self.connect()
+            except (AttributeError, MySQLdb.ProgrammingError):
+                log.warning('WARNING: MySQL Programming Error during query, attempting query again.')
 
 
 def get_config_data():
