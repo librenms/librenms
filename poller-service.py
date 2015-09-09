@@ -233,9 +233,10 @@ next_update = datetime.now() + timedelta(minutes=1)
 devices_scanned = 0
 
 
-def poll_worker(thread_id):
+def poll_worker():
     global dev_query
     global devices_scanned
+    thread_id = threading.current_thread().ident
     db = DB()
     while True:
         dev_row = db.query(dev_query)
@@ -289,11 +290,10 @@ def poll_worker(thread_id):
             releaseLock('{0}.{1}'.format(action, device_id), db)
         
 
-t = []
 for i in range(0, amount_of_workers):
-    t.append(threading.Thread(target=poll_worker, args=[i]))
-    t[i].daemon = True
-    t[i].start()
+    t = threading.Thread(target=poll_worker)
+    t.daemon = True
+    t.start()
 
 
 while True:
