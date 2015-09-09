@@ -166,27 +166,6 @@ except KeyError:
 
 db = DB()
 
-def poll_worker(device_id, action):
-    try:
-        start_time = time.time()
-        path = poller_path
-        if action == 'discovery':
-            path = discover_path
-        command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (path, device_id)
-        subprocess.check_call(command, shell=True)
-        elapsed_time = int(time.time() - start_time)
-        if elapsed_time < 300:
-            log.debug("DEBUG: worker finished %s of device %s in %s seconds" % (action, device_id, elapsed_time))
-        else:
-            log.warning("WARNING: worker finished %s of device %s in %s seconds" % (action, device_id, elapsed_time))
-    except (KeyboardInterrupt, SystemExit):
-        raise
-    except:
-        pass
-    finally:
-        releaseThreadLock(device_id, action)
-        
-
 
 def lockFree(lock, db=db):
     query = "SELECT IS_FREE_LOCK('{0}')".format(lock)
@@ -198,56 +177,10 @@ def getLock(lock, db=db):
     return db.query(query)[0][0] == 1
 
 
-thread_cursors = []
-for i in range(0, amount_of_workers):
-    thread_cursors.append(namedtuple('Cursor{0}'.format(i), ['in_use', 'db']))
-    thread_cursors[i].in_use = False
-    thread_cursors[i].db = DB()
-
-
-def getThreadQueueLock(device_id):
-    global thread_cursors
-    # This is how threads are limited, by the numver of cursors available
-    while True:
-        for thread_cursor in thread_cursors:
-            if not thread_cursor.in_use:
-                thread_cursor.in_use = 'queue.{0}'.format(device_id)
-                if getLock('queue.{0}'.format(device_id), thread_cursor.db):
-                    return True
-                else:
-                    thread_cursor.in_use = False
-                    return False
-        time.sleep(.5)
-
-
-def getThreadActionLock(device_id, action):
-    global thread_cursors
-    # This is how threads are limited, by the numver of cursors available
-    for thread_cursor in thread_cursors:
-        if thread_cursor.in_use == 'queue.{0}'.format(device_id):
-            thread_cursor.in_use = '{0}.{1}'.format(action, device_id)
-            releaseLock('queue.{0}'.format(device_id), thread_cursor.db)
-            if getLock('{0}.{1}'.format(action, device_id), thread_cursor.db):
-                return True
-            else:
-                thread_cursor.in_use = False
-                return False
-    return False
-
-
 def releaseLock(lock, db=db):
     query = "SELECT RELEASE_LOCK('{0}')".format(lock)
     cursor = db.query(query)
     return db.query(query)[0][0] == 1
-
-
-def releaseThreadLock(device_id, action):
-    global thread_cursors
-    for thread_cursor in thread_cursors:
-        if thread_cursor.in_use == '{0}.{1}'.format(action, device_id):
-            thread_cursor.in_use = False
-            return releaseLock('{0}.{1}'.format(action, device_id), thread_cursor.db)
-    return False
 
 
 def sleep_until(timestamp):
@@ -291,21 +224,70 @@ dev_query = ('SELECT device_id, status,                                         
              '  OR last_poll_attempted IS NULL )                                 '
              '{3}                                                                '
              'ORDER BY next_poll asc                                             '
-             'LIMIT 5                                                            ').format(poll_frequency,
+             'LIMIT 1                                                            ').format(poll_frequency,
                                                                                            discover_frequency,
                                                                                            down_retry,
                                                                                            poller_group)
 
-threads = 0
 next_update = datetime.now() + timedelta(minutes=1)
 devices_scanned = 0
 
-while True:
-    cur_threads = threading.active_count()
-    if cur_threads != threads:
-        threads = cur_threads
-        log.debug('DEBUG: {0} threads currently active'.format(str(threads - 1)))
 
+def poll_worker():
+    global dev_query
+    global devices_scanned
+    db = DB()
+    while True:
+        device_id, status, next_poll, next_discovery  = db.query(dev_query)[0]
+
+        if not getLock('queue.{0}'.format(device_id), db):
+            continue
+
+        if next_poll and next_poll > datetime.now():
+            log.debug('DEBUG: Sleeping until {0} before polling {1}'.format(next_poll, device_id))
+            sleep_until(next_poll)
+
+        action = 'poll'
+        if (not next_discovery or next_discovery < datetime.now()) and status == 1:
+            action = 'discovery'
+
+        log.debug('DEBUG: Starting {0} of device {1}'.format(action, device_id))
+        devices_scanned += 1
+
+        db.query('UPDATE devices SET last_poll_attempted = NOW() WHERE device_id = {0}'.format(device_id))
+
+        if not getLock('{0}.{1}'.format(action, device_id), db):
+            releaseLock('{0}.{1}'.format(action, device_id), db)
+            continue
+
+        releaseLock('{0}.{1}'.format(action, device_id), db)
+        try:
+            start_time = time.time()
+            path = poller_path
+            if action == 'discovery':
+                path = discover_path
+            command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (path, device_id)
+            subprocess.check_call(command, shell=True)
+            elapsed_time = int(time.time() - start_time)
+            if elapsed_time < 300:
+                log.debug("DEBUG: worker finished %s of device %s in %s seconds" % (action, device_id, elapsed_time))
+            else:
+                log.warning("WARNING: worker finished %s of device %s in %s seconds" % (action, device_id, elapsed_time))
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            pass
+        finally:
+            releaseLock('{0}.{1}'.format(action, device_id), db)
+        
+
+t = []
+for i in range(0, amount_of_workers):
+    t.append(threading.Thread(target=poll_worker))
+    t[i].start()
+
+
+while True:
     if next_update < datetime.now():
         seconds_taken = (datetime.now() - (next_update - timedelta(minutes=1))).seconds
         update_query = ('INSERT INTO pollers(poller_name,     '
@@ -327,42 +309,3 @@ while True:
         log.info('INFO: {0} devices scanned in the last minute'.format(devices_scanned))
         devices_scanned = 0
         next_update = datetime.now() + timedelta(minutes=1)
-
-    try:
-        devices = db.query(dev_query)
-    except:
-        log.critical('ERROR: MySQL query error. Is your schema up to date?')
-        sys.exit(2)
-
-    for device_id, status, next_poll, next_discovery in devices:
-        if not getThreadQueueLock(device_id):
-            continue
-
-        if next_poll and next_poll > datetime.now():
-            log.debug('DEBUG: Sleeping until {0} before polling {1}'.format(next_poll, device_id))
-            sleep_until(next_poll)
-
-        action = 'poll'
-        if (not next_discovery or next_discovery < datetime.now()) and status == 1:
-            action = 'discovery'
-
-        log.debug('DEBUG: Starting {0} of device {1}'.format(action, device_id))
-        devices_scanned += 1
-
-        db.query('UPDATE devices SET last_poll_attempted = NOW() WHERE device_id = {0}'.format(device_id))
-
-        if not getThreadActionLock(device_id, action):
-            continue
-
-        t = threading.Thread(target=poll_worker, args=[device_id, action])
-        t.start()
-
-        # If we made it this far, break out of the loop and query again.
-        break
-
-    # This point is only reached if the query is empty, so sleep half a second before querying again.
-    time.sleep(.5)
-
-    # Make sure we're not holding any device queue locks in this connection before querying again
-    # by locking a different string.
-    getLock('unlock.{0}'.format(config['distributed_poller_name']))
