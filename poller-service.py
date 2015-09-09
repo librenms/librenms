@@ -236,7 +236,7 @@ devices_scanned = 0
 def poll_worker():
     global dev_query
     global devices_scanned
-    thread_id = threading.current_thread().ident
+    thread_id = threading.current_thread().name
     db = DB()
     while True:
         dev_row = db.query(dev_query)
@@ -282,6 +282,7 @@ def poll_worker():
                 log.debug("DEBUG: Thread {0} finished {1} of device {2} in {3} seconds".format(thread_id, action, device_id, elapsed_time))
             else:
                 log.warning("WARNING: Thread {0} finished {1} of device {2} in {3} seconds".format(thread_id, action, device_id, elapsed_time))
+            thread_stats[thread_id]['last_completed_poll'] = datetime.now()
         except (KeyboardInterrupt, SystemExit):
             raise
         except:
@@ -290,14 +291,20 @@ def poll_worker():
             releaseLock('{0}.{1}'.format(action, device_id), db)
         
 
+thread_stats = {}
 for i in range(0, amount_of_workers):
+    thread_stats[i] = {}
     t = threading.Thread(target=poll_worker)
+    t.name = i
     t.daemon = True
     t.start()
 
 
 while True:
     sleep_until(next_update)
+
+    for thread, data in thread_stats.iteritems():
+        log.debug('DEBUG: Thread {0} last completed at {1}'.format(thread, data['last_completed_poll']))
 
     seconds_taken = (datetime.now() - (next_update - timedelta(minutes=1))).seconds
     update_query = ('INSERT INTO pollers(poller_name,     '
