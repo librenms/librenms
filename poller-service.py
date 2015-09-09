@@ -293,7 +293,7 @@ def poll_worker():
 
 thread_stats = {}
 for i in range(0, amount_of_workers):
-    thread_stats[i] = {}
+    thread_stats[i] = {'last_completed_poll', 0}
     t = threading.Thread(target=poll_worker)
     t.name = i
     t.daemon = True
