@@ -17,34 +17,94 @@
  */
 
 $no_refresh = true;
-
-foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `user_id`=?',array($_SESSION['user_id'])) as $items) {
-    $data[] = $items;
+if (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?',array($_SESSION['user_id'])) == 0) {
+    $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']),'dashboards');
 }
-
-if (!is_array($data)) {
-    $data[] = array('user_widget_id'=>'0','widget_id'=>1,'title'=>'Add a widget','widget'=>'placeholder','col'=>1,'row'=>1,'size_x'=>2,'size_y'=>2,'refresh'=>60);
+if (empty($vars['dashboard'])) {
+    $vars['dashboard'] = dbFetchRow('select dashboard_id,dashboard_name from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
+} else {
+    $vars['dashboard'] = dbFetchRow('select dashboard_id,dashboard_name from dashboards where user_id = ? && dashboard_id = ? order by dashboard_id limit 1',array($_SESSION['user_id'],$vars['dashboard']));
+}
+$data = array();
+foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `user_id`=? AND `dashboard_id`=?',array($_SESSION['user_id'],$vars['dashboard']['dashboard_id'])) as $items) {
+    $data[] = $items;
 }
 
 $data = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
 
+$dashboards = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",array($_SESSION['user_id']));
+
 ?>
 
 <div class="btn-group" role="group">
-    <a class="btn btn-default disabled" role="button">Widgets</a>
-    <a class="btn btn-success" role="button" data-toggle="collapse" href="#add_widget" aria-expanded="false" aria-controls="add_widget"><i class="fa fa-plus fa-fw"></i></a>
-    <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
+  <a class="btn btn-default disabled" role="button">Dashboards</a>
+<?php
+foreach ($dashboards as $dash) {
+    echo '  <a class="btn btn-'.($dash[dashboard_id] == $vars['dashboard']['dashboard_id'] ? 'info' : 'default').'" role="button" href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a>';
+    if ($dash[dashboard_id] == $vars['dashboard']['dashboard_id']) {
+        echo '<a class="btn btn-info" role="button" data-toggle="collapse" href="#edit_dash" aria-expanded="false" aria-controls="edit_dash"><i class="fa fa-wrench fa-fw"></i></a>';
+    }
+}
+?>
+  <a class="btn btn-success" role="button" data-toggle="collapse" href="#add_dash" aria-expanded="false" aria-controls="add_dash"><i class="fa fa-plus fa-fw"></i></a>
 </div>
-<div class="collapse" id="add_widget">
+
+<div class="clear-fix">
+
+<div class="collapse" id="add_dash">
   <div class="well">
+    <div class="row">
+      <form class="form-inline" onsubmit="dashboard_add(this); return false;">
+        <div class="col-sm-3 col-sx-6">
+          <div class="input-group">
+            <span class="input-group-btn">
+              <a class="btn btn-default disabled" type="button">New Dashboard</a>
+            </span>
+            <input class="form-control" type="text" placeholder="Name" name="dashboard_name">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="submit">Add</button>
+            </span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="collapse" id="edit_dash">
+  <div id="add_widget">
+    <div class="well">
+      <div class="row">
+        <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
+          <div class="col-md-4 col-sm-6 col-sx-12">
+            <div class="input-group">
+              <span class="input-group-btn">
+                <a class="btn btn-default disabled" type="button" style="width:161px;">Dashboard Name</a>
+                <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="<?php echo $vars['dashboard']['dashboard_id']; ?>"><i class="fa fa-trash fa-fw"></i></button>
+              </span>
+              <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="<?php echo $vars['dashboard']['dashboard_name']; ?>">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">Update</button>
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div style="margin-top:5px">
+        <div class="btn-group" role="group">
+          <a class="btn btn-default disabled" role="button" style="width:160px;">Available Widgets</a>
+          <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
+        </div>
 <?php
 
 foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
-    echo '<a class="btn btn-success" role="button" id="place_widget" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a> ';
+    echo '<a class="btn btn-success" role="button" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a> ';
 }
 
 ?>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -75,7 +135,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: "update-dashboard-config", data: s},
+            data: {type: "update-dashboard-config", data: s, dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
@@ -129,7 +189,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "update-dashboard-config", sub_type: 'remove-all'},
+                data: {type: "update-dashboard-config", sub_type: 'remove-all', dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -150,7 +210,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "update-dashboard-config", sub_type: 'add', widget_id: widget_id},
+                data: {type: "update-dashboard-config", sub_type: 'add', widget_id: widget_id, dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -172,7 +232,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
-                data: {type: "update-dashboard-config", sub_type: 'remove', widget_id: widget_id},
+                data: {type: "update-dashboard-config", sub_type: 'remove', widget_id: widget_id, dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -200,6 +260,58 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         });
 
    });
+
+    function dashboard_delete(data) {
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: 'delete-dashboard', dashboard_id: $(data).data('dashboard')},
+            dataType: "json",
+            success: function (data) {
+                if( data.status == "ok" ) {
+                    window.location.href="<?php echo $config['base_url']; ?>/overview";
+                }
+            }
+        });
+    }
+
+    function dashboard_edit(data) {
+        datas = $(data).serializeArray();
+        data = [];
+        for( var field in datas ) {
+            data[datas[field].name] = datas[field].value;
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: 'edit-dashboard', dashboard_name: data['dashboard_name'], dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
+            dataType: "json",
+            success: function (data) {
+                if( data.status == "ok" ) {
+                    window.location.href="<?php echo $config['base_url']; ?>/overview/dashboard=<?php echo $vars['dashboard']['dashboard_id']; ?>";
+                }
+            }
+        });
+    }
+
+    function dashboard_add(data) {
+        datas = $(data).serializeArray();
+        data = [];
+        for( var field in datas ) {
+            data[datas[field].name] = datas[field].value;
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: 'add-dashboard', dashboard_name: data['dashboard_name']},
+            dataType: "json",
+            success: function (data) {
+                if( data.status == "ok" ) {
+                    window.location.href="<?php echo $config['base_url']; ?>/overview/dashboard="+data.dashboard_id;
+                }
+            }
+        });
+    }
 
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
