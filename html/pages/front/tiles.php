@@ -19,6 +19,9 @@
 $no_refresh = true;
 if (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?',array($_SESSION['user_id'])) == 0) {
     $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']),'dashboards');
+    if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0)) == 1) {
+        dbUpdate(array('dashboard_id'=>$vars['dashboard']),'users_widgets','user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0));
+    }
 }
 if (empty($vars['dashboard'])) {
     $vars['dashboard'] = dbFetchRow('select dashboard_id,dashboard_name from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
@@ -29,12 +32,12 @@ $data = array();
 foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `user_id`=? AND `dashboard_id`=?',array($_SESSION['user_id'],$vars['dashboard']['dashboard_id'])) as $items) {
     $data[] = $items;
 }
-
-$data = serialize(json_encode($data));
+if (empty($data)) {
+    $data[] = array('user_widget_id'=>'0','widget_id'=>1,'title'=>'Add a widget','widget'=>'placeholder','col'=>1,'row'=>1,'size_x'=>2,'size_y'=>2,'refresh'=>60);
+}
+$data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
-
-$dashboards = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",array($_SESSION['user_id']));
-
+$dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",array($_SESSION['user_id']));
 ?>
 
 <div class="btn-group" role="group">
