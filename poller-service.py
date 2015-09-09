@@ -61,7 +61,7 @@ class DB:
                     self.conn = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
                 break
             except (AttributeError, MySQLdb.OperationalError):
-                log.warning('WARNING: MySQL Error, reconnecting.')
+                log.warning('WARNING: MySQL Error during connect, reconnecting.')
                 time.sleep(.5)
                 pass
 
@@ -73,6 +73,7 @@ class DB:
             cursor = self.conn.cursor()
             cursor.execute(sql)
         except (AttributeError, MySQLdb.OperationalError):
+            log.warning('WARNING: MySQL Error during query, reconnecting.')
             self.connect()
             cursor = self.conn.cursor()
             cursor.execute(sql)
