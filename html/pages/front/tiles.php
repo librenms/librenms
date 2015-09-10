@@ -40,31 +40,48 @@ $dash_config = unserialize(stripslashes($data));
 $dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",array($_SESSION['user_id']));
 ?>
 
-<div class="btn-group" role="group">
-  <a class="btn btn-default disabled" role="button">Dashboards</a>
+<div class="row">
+  <div class="col-md-6">
+    <div class="btn-group btn-lg">
+      <button class="btn btn-default disabled" style="width:160px;"><span class="pull-left">Dashboards</span></button>
+      <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:160px;"><span class="pull-left"><?php echo $vars['dashboard']['dashboard_name']; ?></span>
+          <span class="pull-right">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </span>
+        </button>
+        <ul class="dropdown-menu">
 <?php
-foreach ($dashboards as $dash) {
-    echo '  <a class="btn btn-'.($dash[dashboard_id] == $vars['dashboard']['dashboard_id'] ? 'info' : 'default').'" role="button" href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a>';
-    if ($dash[dashboard_id] == $vars['dashboard']['dashboard_id']) {
-        echo '<a class="btn btn-info" role="button" data-toggle="collapse" href="#edit_dash" aria-expanded="false" aria-controls="edit_dash"><i class="fa fa-pencil-square-o fa-fw"></i></a>';
+if (sizeof($dashboards) > 1) {
+    foreach ($dashboards as $dash) {
+        if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
+            echo '          <li><a href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
+        }
     }
+} else {
+    echo  '          <li><a>No other Dashboards</a></li>';
 }
 ?>
-  <a class="btn btn-success" role="button" data-toggle="collapse" href="#add_dash" aria-expanded="false" aria-controls="add_dash"><i class="fa fa-plus fa-fw"></i></a>
+        </ul>
+      </div>
+      <button class="btn btn-default" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))"><i class="fa fa-pencil-square-o fa-fw"></i></button>
+      <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))"><i class="fa fa-trash fa-fw"></i></button>
+      <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))"><i class="fa fa-plus fa-fw"></i></button>
+    </div>
+  </div>
 </div>
 
-<div class="clear-fix">
-
-<div class="collapse" id="add_dash">
-  <div class="well">
-    <div class="row">
+<div class="dash-collapse" id="add_dash">
+  <div class="row">
+    <div class="col-md-6">
       <form class="form-inline" onsubmit="dashboard_add(this); return false;">
         <div class="col-sm-3 col-sx-6">
           <div class="input-group">
             <span class="input-group-btn">
-              <a class="btn btn-default disabled" type="button">New Dashboard</a>
+              <a class="btn btn-default disabled" type="button" style="width:160px;"><span class="pull-left">New Dashboard</span></a>
             </span>
-            <input class="form-control" type="text" placeholder="Name" name="dashboard_name">
+            <input class="form-control" type="text" placeholder="Name" name="dashboard_name" style="width:160px;">
             <span class="input-group-btn">
               <button class="btn btn-default" type="submit">Add</button>
             </span>
@@ -75,18 +92,17 @@ foreach ($dashboards as $dash) {
   </div>
 </div>
 
-<div class="collapse" id="edit_dash">
+<div class="dash-collapse" id="edit_dash">
   <div id="add_widget">
-    <div class="well">
-      <div class="row">
+    <div class="row" style="margin-top:5px;">
+      <div class="col-md-6">
         <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
-          <div class="col-md-4 col-sm-6 col-sx-12">
+          <div class="col-md-6 col-sm-12">
             <div class="input-group">
               <span class="input-group-btn">
-                <a class="btn btn-default disabled" type="button" style="width:161px;">Dashboard Name</a>
-                <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="<?php echo $vars['dashboard']['dashboard_id']; ?>"><i class="fa fa-trash fa-fw"></i></button>
+                <a class="btn btn-default disabled" type="button" style="width:160px;"><span class="pull-left">Dashboard Name</span></a>
               </span>
-              <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="<?php echo $vars['dashboard']['dashboard_name']; ?>">
+              <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="<?php echo $vars['dashboard']['dashboard_name']; ?>" style="width:160px;">
               <span class="input-group-btn">
                 <button class="btn btn-default" type="submit">Update</button>
               </span>
@@ -94,18 +110,30 @@ foreach ($dashboards as $dash) {
           </div>
         </form>
       </div>
-      <div style="margin-top:5px">
-        <div class="btn-group" role="group">
-          <a class="btn btn-default disabled" role="button" style="width:160px;">Available Widgets</a>
-          <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
-        </div>
+    </div>
+    <div class="row" style="margin-top:5px;">
+      <div class="col-md-12">
+        <div class="col-md-12">
+          <div class="btn-group" role="group">
+            <a class="btn btn-default disabled" role="button" style="width:160px;"><span class="pull-left">Available Widgets</span></a>
+            <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
+          </div>
 <?php
-
 foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
-    echo '<a class="btn btn-success" role="button" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a> ';
+    echo '          <a class="btn btn-success" role="button" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a> ';
 }
-
 ?>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dash-collapse" id="del_dash">
+  <div class="row" style="margin-top:5px;">
+    <div class="col-md-6">
+      <div class="col-md-6">
+        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="<?php echo $vars['dashboard']['dashboard_id']; ?>" style="width:160px;">Delete Dashboard</button>
       </div>
     </div>
   </div>
@@ -154,6 +182,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
     }
 
     $(function(){
+        dashboard_collapse();
         gridster = $(".gridster ul").gridster({
             widget_base_dimensions: [100, 100],
             widget_margins: [5, 5],
@@ -263,6 +292,17 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         });
 
    });
+
+    function dashboard_collapse(target) {
+        if (target !== undefined) {
+            $('.dash-collapse:not('+target+')').each(function() {
+                $(this).fadeOut(150);
+            });
+            $(target).fadeToggle(150);
+        } else {
+            $('.dash-collapse').fadeOut(0);
+        }
+    }
 
     function dashboard_delete(data) {
         $.ajax({
