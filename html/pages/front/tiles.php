@@ -46,7 +46,7 @@ $dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",arra
 foreach ($dashboards as $dash) {
     echo '  <a class="btn btn-'.($dash[dashboard_id] == $vars['dashboard']['dashboard_id'] ? 'info' : 'default').'" role="button" href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a>';
     if ($dash[dashboard_id] == $vars['dashboard']['dashboard_id']) {
-        echo '<a class="btn btn-info" role="button" data-toggle="collapse" href="#edit_dash" aria-expanded="false" aria-controls="edit_dash"><i class="fa fa-wrench fa-fw"></i></a>';
+        echo '<a class="btn btn-info" role="button" data-toggle="collapse" href="#edit_dash" aria-expanded="false" aria-controls="edit_dash"><i class="fa fa-pencil-square-o fa-fw"></i></a>';
     }
 }
 ?>
