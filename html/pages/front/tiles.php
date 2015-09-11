@@ -65,7 +65,7 @@ $nodash = 0;
 if (sizeof($dashboards) > 0 || $vars['dashboard']['user_id'] != $_SESSION['user_id']) {
     foreach ($dashboards as $dash) {
         if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
-            echo '          <li><a href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
+            echo '          <li><a href="'.rtrim($config['base_url'],'/').'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
             $nodash = 1;
         }
     }
@@ -79,7 +79,7 @@ if (!empty($shared_dashboards)) {
     echo '          <li class="dropdown-header">Shared Dashboards</li>';
     foreach ($shared_dashboards as $dash) {
         if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
-            echo '          <li><a href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">&nbsp;&nbsp;&nbsp;'.$dash['username'].':'.$dash['dashboard_name'].($dash['access'] == 1 ? ' (Read)' : '').'</a></li>';
+            echo '          <li><a href="'.rtrim($config['base_url'],'/').'/overview/dashboard='.$dash['dashboard_id'].'">&nbsp;&nbsp;&nbsp;'.$dash['username'].':'.$dash['dashboard_name'].($dash['access'] == 1 ? ' (Read)' : '').'</a></li>';
         }
     }
 }
@@ -361,7 +361,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             success: function (data) {
                 if( data.status == "ok" ) {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo $config['base_url']; ?>/overview";
+                    window.location.href="<?php echo rtrim($config['base_url'],'/'); ?>/overview";
                 }
                 else {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -384,7 +384,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             success: function (data) {
                 if( data.status == "ok" ) {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo $config['base_url']; ?>/overview/dashboard=<?php echo $vars['dashboard']['dashboard_id']; ?>";
+                    window.location.href="<?php echo rtrim($config['base_url'],'/'); ?>/overview/dashboard=<?php echo $vars['dashboard']['dashboard_id']; ?>";
                 }
                 else {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -407,7 +407,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             success: function (data) {
                 if( data.status == "ok" ) {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                    window.location.href="<?php echo $config['base_url']; ?>/overview/dashboard="+data.dashboard_id;
+                    window.location.href="<?php echo rtrim($config['base_url'],'/'); ?>/overview/dashboard="+data.dashboard_id;
                 }
                 else {
                     $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
