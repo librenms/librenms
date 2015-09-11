@@ -386,8 +386,12 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     $fields = array();
     foreach ($oidglist as $fulloid) {
         list($splitoid, $splitindex) = explode('.', $fulloid, 2);
-        if (is_numeric($snmpdata[$splitindex][$splitoid])) {
-            $fields[$oidnamelist[$oid_count]] = $snmpdata[$splitindex][$splitoid];
+        $val = $snmpdata[$splitindex][$splitoid];
+        if (is_numeric($val)) {
+            $rrdupdate .= ':'.$val;
+        }
+        elseif (preg_match("/^\"(.*)\"$/", $val, $number) && is_numeric($number[1])) {
+            $rrdupdate .= ':'.$number[1];
         }
         else {
             $fields[$oidnamelist[$oid_count]] = 'U';
