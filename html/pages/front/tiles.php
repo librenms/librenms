@@ -93,7 +93,7 @@ if (!empty($shared_dashboards)) {
   </div>
 </div>
 <div class="dash-collapse" id="add_dash">
-  <div class="row">
+  <div class="row" style="margin-top:5px;">
     <div class="col-md-6">
       <form class="form-inline" onsubmit="dashboard_add(this); return false;">
         <div class="col-sm-3 col-sx-6">
@@ -103,16 +103,17 @@ if (!empty($shared_dashboards)) {
             </span>
             <input class="form-control" type="text" placeholder="Name" name="dashboard_name" style="width:160px;">
             <span class="input-group-btn">
-              <button class="btn btn-default" type="submit">Add</button>
+              <button class="btn btn-primary" type="submit">Add</button>
             </span>
           </div>
         </div>
       </form>
     </div>
   </div>
+  <hr>
 </div>
-
 <div class="dash-collapse" id="edit_dash">
+<!-- Start Dashboard-Settings -->
   <div class="row" style="margin-top:5px;">
     <div class="col-md-12">
       <div class="col-md-12">
@@ -131,7 +132,7 @@ foreach (array('Private','Shared (Read)','Shared') as $k=>$v) {
 ?>
               </select>
               <span class="input-group-btn pull-left">
-                <button class="btn btn-default" type="submit">Update</button>
+                <button class="btn btn-primary" type="submit">Update</button>
               </span>
             </div>
           </div>
@@ -139,32 +140,53 @@ foreach (array('Private','Shared (Read)','Shared') as $k=>$v) {
       </div>
     </div>
   </div>
+<!-- End Dashboard-Settings -->
+
+<!-- Start Widget-Select -->
   <div class="row" style="margin-top:5px;">
     <div class="col-md-12">
       <div class="col-md-12">
         <div class="btn-group" role="group">
-          <a class="btn btn-default disabled" role="button" style="width:160px;"><span class="pull-left">Available Widgets</span></a>
-          <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
-        </div>
+          <a class="btn btn-default disabled" role="button" style="width:160px;"><span class="pull-left">Add Widgets</span></a>
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:160px;"><span class="pull-left">Select Widget</span>
+              <span class="pull-right">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </span>
+            </button>
+            <ul class="dropdown-menu">
 <?php
 foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
-    echo '        <a class="btn btn-success" role="button" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a> ';
+    echo '              <li><a href="javascript:return false;" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a></li>';
 }
 ?>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+<!-- End Widget-Select -->
+  <hr>
 </div>
 <div class="dash-collapse" id="del_dash">
   <div class="row" style="margin-top:5px;">
     <div class="col-md-6">
       <div class="col-md-6">
-        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="<?php echo $vars['dashboard']['dashboard_id']; ?>" style="width:160px;">Delete Dashboard</button>
+        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
       </div>
     </div>
   </div>
+  <div class="row" style="margin-top:5px;">
+    <div class="col-md-6">
+      <div class="col-md-6">
+        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="<?php echo $vars['dashboard']['dashboard_id']; ?>" style="width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
+      </div>
+    </div>
+  </div>
+  <hr>
 </div>
-
 <script src='https://www.google.com/jsapi'></script>
 <script src="js/jquery.gridster.min.js"></script>
 
@@ -338,7 +360,11 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                     window.location.href="<?php echo $config['base_url']; ?>/overview";
+                }
+                else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             }
         });
@@ -357,7 +383,11 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                     window.location.href="<?php echo $config['base_url']; ?>/overview/dashboard=<?php echo $vars['dashboard']['dashboard_id']; ?>";
+                }
+                else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             }
         });
@@ -376,7 +406,11 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                     window.location.href="<?php echo $config['base_url']; ?>/overview/dashboard="+data.dashboard_id;
+                }
+                else {
+                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             }
         });
@@ -421,6 +455,9 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                 success: function (data) {
                     if( data.status == "ok" ) {
                         widget_reload(widget_id,widget_type);
+                    }
+                    else {
+                        $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
                     }
                 }
             });
