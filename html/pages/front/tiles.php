@@ -23,13 +23,21 @@ if (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?',array($_SE
         dbUpdate(array('dashboard_id'=>$vars['dashboard']),'users_widgets','user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0));
     }
 }
+if (!empty($vars['dashboard'])) {
+    $orig = $vars['dashboard'];
+    $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? && dashboard_id = ? order by dashboard_id limit 1',array($_SESSION['user_id'],$vars['dashboard']));
+    if (empty($vars['dashboard'])) {
+        $vars['dashboard'] = dbFetchRow('select dashboards.*,users.username from dashboards inner join users on dashboards.user_id = users.user_id where dashboards.dashboard_id = ? && dashboards.access > 0',array($orig));
+    }
+}
 if (empty($vars['dashboard'])) {
-    $vars['dashboard'] = dbFetchRow('select dashboard_id,dashboard_name from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
-} else {
-    $vars['dashboard'] = dbFetchRow('select dashboard_id,dashboard_name from dashboards where user_id = ? && dashboard_id = ? order by dashboard_id limit 1',array($_SESSION['user_id'],$vars['dashboard']));
+    $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
+    if (isset($orig)) {
+        $msg_box[] = array('type' => 'error', 'message' => 'Dashboard <code>#'.$orig.'</code> does not exist! Loaded <code>'.$vars['dashboard']['dashboard_name'].'</code> instead.','title' => 'Requested Dashboard Not Found!');
+    }
 }
 $data = array();
-foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `user_id`=? AND `dashboard_id`=?',array($_SESSION['user_id'],$vars['dashboard']['dashboard_id'])) as $items) {
+foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget,col,row,size_x,size_y,refresh FROM `users_widgets` LEFT JOIN `widgets` ON `widgets`.`widget_id`=`users_widgets`.`widget_id` WHERE `dashboard_id`=?',array($vars['dashboard']['dashboard_id'])) as $items) {
     $data[] = $items;
 }
 if (empty($data)) {
@@ -37,7 +45,7 @@ if (empty($data)) {
 }
 $data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
-$dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",array($_SESSION['user_id']));
+$dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ? && `dashboard_id` != ?",array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
 ?>
 
 <div class="row">
@@ -45,7 +53,7 @@ $dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",arra
     <div class="btn-group btn-lg">
       <button class="btn btn-default disabled" style="width:160px;"><span class="pull-left">Dashboards</span></button>
       <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:160px;"><span class="pull-left"><?php echo $vars['dashboard']['dashboard_name']; ?></span>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != $_SESSION['user_id'] ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
           <span class="pull-right">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
@@ -53,14 +61,27 @@ $dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ?",arra
         </button>
         <ul class="dropdown-menu">
 <?php
-if (sizeof($dashboards) > 1) {
+$nodash = 0;
+if (sizeof($dashboards) > 0 || $vars['dashboard']['user_id'] != $_SESSION['user_id']) {
     foreach ($dashboards as $dash) {
         if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
             echo '          <li><a href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">'.$dash['dashboard_name'].'</a></li>';
+            $nodash = 1;
         }
     }
-} else {
+}
+if ($nodash == 0) {
     echo  '          <li><a>No other Dashboards</a></li>';
+}
+$shared_dashboards = dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE dashboards.access > 0 && dashboards.user_id != ? && dashboards.dashboard_id != ?",array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
+if (!empty($shared_dashboards)) {
+    echo '          <li role="separator" class="divider"></li>';
+    echo '          <li class="dropdown-header">Shared Dashboards</li>';
+    foreach ($shared_dashboards as $dash) {
+        if ($dash['dashboard_id'] != $vars['dashboard']['dashboard_id']) {
+            echo '          <li><a href="'.$config['base_url'].'/overview/dashboard='.$dash['dashboard_id'].'">&nbsp;&nbsp;&nbsp;'.$dash['username'].':'.$dash['dashboard_name'].($dash['access'] == 1 ? ' (Read)' : '').'</a></li>';
+        }
+    }
 }
 ?>
         </ul>
@@ -71,7 +92,6 @@ if (sizeof($dashboards) > 1) {
     </div>
   </div>
 </div>
-
 <div class="dash-collapse" id="add_dash">
   <div class="row">
     <div class="col-md-6">
@@ -93,17 +113,24 @@ if (sizeof($dashboards) > 1) {
 </div>
 
 <div class="dash-collapse" id="edit_dash">
-  <div id="add_widget">
-    <div class="row" style="margin-top:5px;">
-      <div class="col-md-6">
+  <div class="row" style="margin-top:5px;">
+    <div class="col-md-12">
+      <div class="col-md-12">
         <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
-          <div class="col-md-6 col-sm-12">
+          <div class="form-group">
             <div class="input-group">
               <span class="input-group-btn">
                 <a class="btn btn-default disabled" type="button" style="width:160px;"><span class="pull-left">Dashboard Name</span></a>
               </span>
               <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="<?php echo $vars['dashboard']['dashboard_name']; ?>" style="width:160px;">
-              <span class="input-group-btn">
+              <select class="form-control" name="access" style="width:160px;">
+<?php
+foreach (array('Private','Shared (Read)','Shared') as $k=>$v) {
+    echo '                <option value="'.$k.'"'.($vars['dashboard']['access'] == $k ? 'selected' : '').'>'.$v.'</option>';
+}
+?>
+              </select>
+              <span class="input-group-btn pull-left">
                 <button class="btn btn-default" type="submit">Update</button>
               </span>
             </div>
@@ -111,24 +138,23 @@ if (sizeof($dashboards) > 1) {
         </form>
       </div>
     </div>
-    <div class="row" style="margin-top:5px;">
+  </div>
+  <div class="row" style="margin-top:5px;">
+    <div class="col-md-12">
       <div class="col-md-12">
-        <div class="col-md-12">
-          <div class="btn-group" role="group">
-            <a class="btn btn-default disabled" role="button" style="width:160px;"><span class="pull-left">Available Widgets</span></a>
-            <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
-          </div>
+        <div class="btn-group" role="group">
+          <a class="btn btn-default disabled" role="button" style="width:160px;"><span class="pull-left">Available Widgets</span></a>
+          <a class="btn btn-danger" role="button" id="clear_widgets" name="clear_widgets"><i class="fa fa-trash fa-fw"></i></a>
+        </div>
 <?php
 foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
-    echo '          <a class="btn btn-success" role="button" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a> ';
+    echo '        <a class="btn btn-success" role="button" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a> ';
 }
 ?>
-        </div>
       </div>
     </div>
   </div>
 </div>
-
 <div class="dash-collapse" id="del_dash">
   <div class="row" style="margin-top:5px;">
     <div class="col-md-6">
@@ -296,9 +322,9 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
     function dashboard_collapse(target) {
         if (target !== undefined) {
             $('.dash-collapse:not('+target+')').each(function() {
-                $(this).fadeOut(150);
+                $(this).fadeOut(0);
             });
-            $(target).fadeToggle(150);
+            $(target).fadeToggle(300);
         } else {
             $('.dash-collapse').fadeOut(0);
         }
@@ -327,7 +353,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: 'edit-dashboard', dashboard_name: data['dashboard_name'], dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>},
+            data: {type: 'edit-dashboard', dashboard_name: data['dashboard_name'], dashboard_id: <?php echo $vars['dashboard']['dashboard_id']; ?>, access: data['access']},
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
