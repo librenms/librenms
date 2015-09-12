@@ -35,13 +35,19 @@ else {
     if (!is_array($widget_settings)) {
         $widget_settings = array();
     }
-    if (dbUpdate(array('settings'=>json_encode($widget_settings)),'users_widgets','user_widget_id=?',array($widget_id))) {
-        $status  = 'ok';
-        $message = 'Updated';
+    if (dbFetchCell('select 1 from users_widgets inner join dashboards on users_widgets.dashboard_id = dashboards.dashboard_id where user_widget_id = ? && (users_widgets.user_id = ? || dashboards.access = 2)',array($widget_id,$_SESSION['user_id'])) == 1) {
+        if (dbUpdate(array('settings'=>json_encode($widget_settings)),'users_widgets','user_widget_id=?',array($widget_id))) {
+            $status  = 'ok';
+            $message = 'Updated';
+        }
+        else {
+            $status  = 'error';
+            $message = 'ERROR: Could not update';
+        }
     }
     else {
         $status  = 'error';
-        $message = 'ERROR: Could not update';
+        $message = 'ERROR: You have no write-access to this dashboard';
     }
 }
 
