@@ -51,9 +51,9 @@ $dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ? && `d
 <div class="row">
   <div class="col-md-6">
     <div class="btn-group btn-lg">
-      <button class="btn btn-default disabled" style="width:160px;"><span class="pull-left">Dashboards</span></button>
+      <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
       <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != $_SESSION['user_id'] ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left"><?php echo ($vars['dashboard']['user_id'] != $_SESSION['user_id'] ? $vars['dashboard']['username'].':' : ''); ?><?php echo $vars['dashboard']['dashboard_name']; ?></span>
           <span class="pull-right">
             <span class="caret"></span>
             <span class="sr-only">Toggle Dropdown</span>
@@ -99,9 +99,9 @@ if (!empty($shared_dashboards)) {
         <div class="col-sm-3 col-sx-6">
           <div class="input-group">
             <span class="input-group-btn">
-              <a class="btn btn-default disabled" type="button" style="width:160px;"><span class="pull-left">New Dashboard</span></a>
+              <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">New Dashboard</span></a>
             </span>
-            <input class="form-control" type="text" placeholder="Name" name="dashboard_name" style="width:160px;">
+            <input class="form-control" type="text" placeholder="Name" name="dashboard_name" style="min-width:160px;">
             <span class="input-group-btn">
               <button class="btn btn-primary" type="submit">Add</button>
             </span>
@@ -121,7 +121,7 @@ if (!empty($shared_dashboards)) {
           <div class="form-group">
             <div class="input-group">
               <span class="input-group-btn">
-                <a class="btn btn-default disabled" type="button" style="width:160px;"><span class="pull-left">Dashboard Name</span></a>
+                <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">Dashboard Name</span></a>
               </span>
               <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="<?php echo $vars['dashboard']['dashboard_name']; ?>" style="width:160px;">
               <select class="form-control" name="access" style="width:160px;">
@@ -147,9 +147,9 @@ foreach (array('Private','Shared (Read)','Shared') as $k=>$v) {
     <div class="col-md-12">
       <div class="col-md-12">
         <div class="btn-group" role="group">
-          <a class="btn btn-default disabled" role="button" style="width:160px;"><span class="pull-left">Add Widgets</span></a>
+          <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">Add Widgets</span></a>
           <div class="btn-group">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:160px;"><span class="pull-left">Select Widget</span>
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">Select Widget</span>
               <span class="pull-right">
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
@@ -174,14 +174,14 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
   <div class="row" style="margin-top:5px;">
     <div class="col-md-6">
       <div class="col-md-6">
-        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
+        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
       </div>
     </div>
   </div>
   <div class="row" style="margin-top:5px;">
     <div class="col-md-6">
       <div class="col-md-6">
-        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="<?php echo $vars['dashboard']['dashboard_id']; ?>" style="width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
+        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="<?php echo $vars['dashboard']['dashboard_id']; ?>" style="min-width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
       </div>
     </div>
   </div>
