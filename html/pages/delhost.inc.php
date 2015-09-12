@@ -26,7 +26,7 @@ else {
 ?>
 <br />
 <center>
-  <i class="fa fa-exclamation-triangle fa-5x"></i>
+  <font color="red"></font><i class="fa fa-exclamation-triangle fa-3x"></i></font>
   <br>
   <form name="form1" method="post" action="" class="form-horizontal" role="form">
     <div class="form-group">
