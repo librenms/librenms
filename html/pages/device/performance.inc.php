@@ -35,7 +35,7 @@ if (empty($vars['dtpickerto'])) {
 ?>
 
 <hr />
-<center>
+<div class="center-block">
     <form method="post" role="form" id="map" class="form-inline">
         <div class="form-group">
             <label for="dtpickerfrom">From</label>
@@ -47,7 +47,7 @@ if (empty($vars['dtpickerto'])) {
         </div>
         <input type="submit" class="btn btn-default" id="submit" value="Update">
     </form>
-</center>
+</div>
 <hr />
 <script type="text/javascript">
     $(function () {
