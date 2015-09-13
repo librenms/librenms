@@ -33,7 +33,7 @@ if( defined('show_settings') || empty($widget_settings) ) {
       <label for="graph_type" class="control-label">Number of Interfaces: </label>
     </div>
     <div class="col-sm-4">
-      <input class="form-control" name="interface_count" id="input_'.$unique_id.'" placeholder="ie. 5" value="'.$widget_settings['interface_count'].'">
+      <input class="form-control" name="interface_count" id="input_count_'.$unique_id.'" placeholder="ie. 5" value="'.$widget_settings['interface_count'].'">
     </div>
   </div>
   <div class="clearfix"></div>
@@ -42,7 +42,7 @@ if( defined('show_settings') || empty($widget_settings) ) {
       <label for="graph_type" class="control-label">Time interval (minutes): </label>
     </div>
     <div class="col-sm-4">
-      <input class="form-control" name="time_interval" id="input_'.$unique_id.'" placeholder="ie. 15" value="'.$widget_settings['time_interval'].'">
+      <input class="form-control" name="time_interval" id="input_time_'.$unique_id.'" placeholder="ie. 15" value="'.$widget_settings['time_interval'].'">
     </div>
   </div>
   <div class="form-group">
