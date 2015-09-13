@@ -55,39 +55,40 @@ if( defined('show_settings') || empty($widget_settings) ) {
 }
 else {
     $interval = $widget_settings['time_interval'];
-    $interval_seconds = ($interval * 60);
-    $device_count = $widget_settings['device_count'];
+    (integer) $interval_seconds = ($interval * 60);
+    (integer) $device_count = $widget_settings['device_count'];
     $common_output[] = '
 <h4>Top '.$device_count.' devices (last '.$interval.' minutes)</h4>
     ';
+    $params = array('user' => $_SESSION['user_id'], 'interval' => array($interval_seconds), 'count' => array($device_count));
     if (is_admin() || is_read()) {
         $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d
             WHERE d.device_id = p.device_id
-            AND unix_timestamp() - p.poll_time < ? 
+            AND unix_timestamp() - p.poll_time < :interval 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
             ORDER BY total desc
-            LIMIT ?
+            LIMIT :count
             ';
-        $params = array($interval_seconds, $device_count);
+//        $params = array(array($interval_seconds), array($device_count));
     }
     else {
         $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d, `devices_perms` AS `P`
-            WHERE `P`.`user_id` = ? AND `P`.`device_id` = `d`.`device_id` AND
+            WHERE `P`.`user_id` = :user AND `P`.`device_id` = `d`.`device_id` AND
             d.device_id = p.device_id
-            AND unix_timestamp() - p.poll_time < ? 
+            AND unix_timestamp() - p.poll_time < :interval 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
             ORDER BY total desc
-            LIMIT ?
+            LIMIT :count
             ';
-        $params = array($_SESSION['user_id'], $interval_seconds, $device_count);
+//        $params = array($_SESSION['user_id'], array($interval_seconds), array($device_count));
     }
     $common_output[] = '
 <div class="table-responsive">
@@ -111,7 +112,7 @@ else {
         $result, $config['time']['day'],
         $config['time']['now'],
         'device_bits',
-        'no', 150, 21, '&', 'top10'),
+        'no', 150, 21),
         array(), 0, 0, 0).'
       </td>
     </tr>

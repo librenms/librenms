@@ -55,40 +55,41 @@ if( defined('show_settings') || empty($widget_settings) ) {
 }
 else {
     $interval = $widget_settings['time_interval'];
-    $interval_seconds = ($interval * 60);
-    $interface_count = $widget_settings['interface_count'];
+    (integer) $interval_seconds = ($interval * 60);
+    (integer) $interface_count = $widget_settings['interface_count'];
     $common_output[] = '
 <h4>Top '.$interface_count.' interfaces (last '.$interval.' minutes)</h4>
     ';
+    $params = array('user' => $_SESSION['user_id'], 'interval' => array($interval_seconds), 'count' => array($interface_count));
     if (is_admin() || is_read()) {
         $query = '
             SELECT *, p.ifInOctets_rate + p.ifOutOctets_rate as total
             FROM ports as p, devices as d
             WHERE d.device_id = p.device_id
-            AND unix_timestamp() - p.poll_time < ? 
+            AND unix_timestamp() - p.poll_time < :interval 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             ORDER BY total desc
-            LIMIT ?
+            LIMIT :count
         ';
-        $params = array($interval_seconds, $interface_count);
+//        $params = array(array($interval_seconds), array($interface_count));
     }
     else {
         $query = '
             SELECT *, I.ifInOctets_rate + I.ifOutOctets_rate as total
             FROM ports as I, devices as d,
             `devices_perms` AS `P`, `ports_perms` AS `PP`
-            WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `d`.`device_id`) 
-            OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` 
+            WHERE ((`P`.`user_id` = :user AND `P`.`device_id` = `d`.`device_id`) 
+            OR (`PP`.`user_id` = :user AND `PP`.`port_id` = `I`.`port_id` 
             AND `I`.`device_id` = `d`.`device_id`)) AND
             d.device_id = I.device_id
-            AND unix_timestamp() - I.poll_time < ? 
+            AND unix_timestamp() - I.poll_time < :interval 
             AND ( I.ifInOctets_rate > 0
             OR I.ifOutOctets_rate > 0 )
             ORDER BY total desc
-            LIMIT ?
+            LIMIT :count
         ';
-        $params = array($_SESSION['user_id'], $interval_seconds, $device_count);
+//        $params = array($_SESSION['user_id'], $_SESSION['user_id'], array($interval_seconds), array($interface_count));
     }
     
     $common_output[] = '
