@@ -65,12 +65,13 @@ else {
             SELECT *, p.ifInOctets_rate + p.ifOutOctets_rate as total
             FROM ports as p, devices as d
             WHERE d.device_id = p.device_id
-            AND unix_timestamp() - p.poll_time < '.$interval_seconds.' 
+            AND unix_timestamp() - p.poll_time < ? 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             ORDER BY total desc
-            LIMIT '.$interface_count.'
+            LIMIT ?
         ';
+        $params = array($interval_seconds, $interface_count);
     }
     else {
         $query = '
@@ -81,12 +82,13 @@ else {
             OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` 
             AND `I`.`device_id` = `d`.`device_id`)) AND
             d.device_id = I.device_id
-            AND unix_timestamp() - I.poll_time < '.$interval_seconds.' 
+            AND unix_timestamp() - I.poll_time < ? 
             AND ( I.ifInOctets_rate > 0
             OR I.ifOutOctets_rate > 0 )
             ORDER BY total desc
-            LIMIT '.$interface_count.'
+            LIMIT ?
         ';
+        $params = array($_SESSION['user_id'], $interval_seconds, $device_count);
     }
     
     $common_output[] = '
@@ -102,7 +104,7 @@ else {
   <tbody>
     ';
 
-    foreach (dbFetchRows($query, array($_SESSION['user_id'])) as $result) {
+    foreach (dbFetchRows($query, $params) as $result) {
         $common_output[] = '
     <tr>
       <td class="text-left">'.generate_device_link($result, shorthost($result['hostname'])).'</td>
