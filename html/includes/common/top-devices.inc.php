@@ -60,19 +60,19 @@ else {
     $common_output[] = '
 <h4>Top '.$device_count.' devices (last '.$interval.' minutes)</h4>
     ';
-
     if (is_admin() || is_read()) {
         $query = '
             SELECT *, sum(p.ifInOctets_rate + p.ifOutOctets_rate) as total
             FROM ports as p, devices as d
             WHERE d.device_id = p.device_id
-            AND unix_timestamp() - p.poll_time < '.$interval_seconds.' 
+            AND unix_timestamp() - p.poll_time < ? 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
             ORDER BY total desc
-            LIMIT '.$device_count.'
-        ';
+            LIMIT ?
+            ';
+        $params = array($interval_seconds, $device_count);
     }
     else {
         $query = '
@@ -80,15 +80,15 @@ else {
             FROM ports as p, devices as d, `devices_perms` AS `P`
             WHERE `P`.`user_id` = ? AND `P`.`device_id` = `d`.`device_id` AND
             d.device_id = p.device_id
-            AND unix_timestamp() - p.poll_time < '.$interval_seconds.' 
+            AND unix_timestamp() - p.poll_time < ? 
             AND ( p.ifInOctets_rate > 0
             OR p.ifOutOctets_rate > 0 )
             GROUP BY d.device_id
             ORDER BY total desc
-            LIMIT '.$device_count.'
+            LIMIT ?
             ';
+        $params = array($_SESSION['user_id'], $interval_seconds, $device_count);
     }
-    
     $common_output[] = '
 <div class="table-responsive">
 <table class="table table-hover table-condensed table-striped bootgrid-table">
@@ -101,7 +101,7 @@ else {
   <tbody>
     ';
 
-    foreach (dbFetchRows($query, array($_SESSION['user_id'])) as $result) {
+    foreach (dbFetchRows($query, $params) as $result) {
         $common_output[] = '
     <tr>
       <td class="text-left">'.generate_device_link($result, shorthost($result['hostname'])).'</td>
