@@ -79,7 +79,7 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
         </div>
         <div class="modal-footer">
           <div class="form-group">
-            <div class="col-sm-4">
+            <div class="pull-right">
               <input type="hidden" name="type" id="type" value="token-item-create">
               <button type="submit" class="btn btn-success" name="token-create" id="token-create">Create API Token</button>
             </div>
@@ -105,18 +105,13 @@ if ($_SESSION['api_token'] === true) {
 }
 
 echo '
-  <div class="row">
-    <div class="col-sm-2">
-      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
-    </div>
-  </div>
+  <h3>API Access</h3>
+  <hr>
   <div class="row">
     <div class="col-sm-12">
       &nbsp;
     </div>
   </div>
-  <div class="row">
-    <div class="col-sm-6">
       <table class="table table-bordered table-condensed">
         <tr>
           <th>User</th>
@@ -134,7 +129,6 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     else {
         $api_disabled = '';
     }
-
     echo '
         <tr id="'.$api['id'].'">
           <td>'.$api['username'].'</td>
@@ -148,8 +142,9 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
 
   echo '
       </table>
-    </div>
-  </div>
+      <center>
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
+      </center>
 ';
 ?>
 <script>
