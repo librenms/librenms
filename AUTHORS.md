@@ -51,6 +51,7 @@ Contributors to LibreNMS:
 - Todd Eddy <vr@vrillusions.com> (vrillusions)
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Sergiusz Paprzycki <serek@walcz.net> (spaprzycki)
+- Juho Vanhanen <juho@vanhanen.me> (juhovan)
 
 
 [1]: http://observium.org/ "Observium web site"
