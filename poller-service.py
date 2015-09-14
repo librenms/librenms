@@ -55,6 +55,11 @@ class DB:
     def connect(self):
         while True:
             try:
+                self.conn.close()
+            except:
+                pass
+
+            try:
                 if db_port == 0:
                     self.conn = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
                 else:
