@@ -73,7 +73,6 @@ else {
             ORDER BY total desc
             LIMIT :count
             ';
-//        $params = array(array($interval_seconds), array($device_count));
     }
     else {
         $query = '
@@ -88,7 +87,6 @@ else {
             ORDER BY total desc
             LIMIT :count
             ';
-//        $params = array($_SESSION['user_id'], array($interval_seconds), array($device_count));
     }
     $common_output[] = '
 <div class="table-responsive">
