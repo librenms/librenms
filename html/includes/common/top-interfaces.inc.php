@@ -72,24 +72,26 @@ else {
             ORDER BY total desc
             LIMIT :count
         ';
-//        $params = array(array($interval_seconds), array($interface_count));
     }
     else {
         $query = '
-            SELECT *, I.ifInOctets_rate + I.ifOutOctets_rate as total
-            FROM ports as I, devices as d,
-            `devices_perms` AS `P`, `ports_perms` AS `PP`
-            WHERE ((`P`.`user_id` = :user AND `P`.`device_id` = `d`.`device_id`) 
-            OR (`PP`.`user_id` = :user AND `PP`.`port_id` = `I`.`port_id` 
-            AND `I`.`device_id` = `d`.`device_id`)) AND
-            d.device_id = I.device_id
-            AND unix_timestamp() - I.poll_time < :interval 
-            AND ( I.ifInOctets_rate > 0
-            OR I.ifOutOctets_rate > 0 )
-            ORDER BY total desc
-            LIMIT :count
-        ';
-//        $params = array($_SESSION['user_id'], $_SESSION['user_id'], array($interval_seconds), array($interface_count));
+            SELECT ports.*, devices.hostname, ports.ifInOctets_rate + ports.ifOutOctets_rate as total 
+            FROM devices, ports 
+            LEFT JOIN ports_perms ON ports.port_id = ports_perms.port_id 
+            WHERE ports_perms.user_id = :user 
+            AND unix_timestamp() - ports.poll_time < :interval 
+            AND (ports.ifInOctets_rate > 0 OR ports.ifOutOctets_rate > 0) 
+            GROUP BY ports.port_id 
+            UNION ALL 
+            SELECT ports.*, devices.hostname, ports.ifInOctets_rate + ports.ifOutOctets_rate as total 
+            FROM ports, devices LEFT JOIN devices_perms ON devices.device_id = devices_perms.device_id 
+            WHERE devices_perms.user_id = :user 
+            AND ports.device_id = devices.device_id 
+            AND unix_timestamp() - ports.poll_time < :interval 
+            AND (ports.ifInOctets_rate > 0 OR ports.ifOutOctets_rate > 0) 
+            GROUP BY ports.port_id 
+            ORDER BY total DESC LIMIT :count
+            ';
     }
     
     $common_output[] = '
