@@ -54,8 +54,12 @@ class DB:
 
     def __init__(self):
         self.in_use = False
+        self.connect()
 
     def connect(self):
+        while self.in_use:
+            continue
+
         self.in_use = True
         while True:
             try:
