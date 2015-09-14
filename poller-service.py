@@ -164,6 +164,13 @@ try:
 except KeyError:
     down_retry = 60
 
+try:
+    retry_query = int(config['poller_service_retry_query'])
+    if retry_query == 0:
+        retry_query = 1
+except KeyError:
+    retry_query = 1
+
 db = DB()
 
 
@@ -232,16 +239,22 @@ dev_query = ('SELECT device_id, status,                                         
 next_update = datetime.now() + timedelta(minutes=1)
 devices_scanned = 0
 
+dont_query_until = datetime.fromtimestamp(0)
 
 def poll_worker():
     global dev_query
     global devices_scanned
+    global dont_query_until
     thread_id = threading.current_thread().name
     db = DB()
     while True:
+        if datetime.now() < dont_query_until:
+            time.sleep(1)
+            continue
+
         dev_row = db.query(dev_query)
         if len(dev_row) < 1:
-            # Sleep 1 second after getting an empty query, don't hammer the sql server for no reason.
+            dont_query_until = datetime.now() + timedelta(seconds=retry_query)
             time.sleep(1)
             continue
             
