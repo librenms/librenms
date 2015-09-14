@@ -8,7 +8,7 @@ At first you need to copy the MIB file to the right directory. Look at inside th
 /opt/librenms/mibs //for example
 ```
 
-Here you can test and OID with the snmpget command:
+Here you can test the OID with the snmpget command:
 
 ```bash
 snmpget -v2c -c public -OUsb -m PULSESECURE-PSG-MIB -M /opt/librenms/mibs -t 30 secure iveCpuUtil.0
