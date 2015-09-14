@@ -96,7 +96,10 @@ class DB:
                 self.connect()
             except (AttributeError, MySQLdb.ProgrammingError):
                 log.warning('WARNING: MySQL Programming Error during query, attempting query again.')
-                cursor.close()
+                try:
+                    cursor.close()
+                except:
+                    pass
 
 
 def get_config_data():
