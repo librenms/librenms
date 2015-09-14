@@ -59,7 +59,7 @@ You need to create a new file named as you OS definition and in this directory:
 includes/discovery/os/pulse.inc.php
 ```
 
-You can check other files to get help in the code. For the example, it can be like this :
+You can lookt at other files to get help in the code structure. For this example, it can be like this :
 
 ```php
 // Pulse Secure OS definition
