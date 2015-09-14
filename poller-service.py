@@ -266,8 +266,14 @@ def poll_worker():
     global dev_query
     global devices_scanned
     global dont_query_until
+    global single_connection
     thread_id = threading.current_thread().name
-    db = DB()
+
+    if single_connection:
+        global db
+    else:
+        db = DB()
+
     while True:
         if datetime.now() < dont_query_until:
             time.sleep(1)
