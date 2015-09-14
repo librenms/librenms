@@ -53,14 +53,11 @@ class DB:
     conn = None
 
     def __init__(self):
-        self.in_use = False
+        self.in_use = threading.Lock()
         self.connect()
 
     def connect(self):
-        while self.in_use:
-            continue
-
-        self.in_use = True
+        self.in_use.acquire(True)
         while True:
             try:
                 self.conn.close()
@@ -79,24 +76,21 @@ class DB:
 
         self.conn.autocommit(True)
         self.conn.ping(True)
-        self.in_use = False
+        self.in_use.release()
 
     def query(self, sql):
-        while self.in_use:
-            continue
-
-        self.in_use = True
+        self.in_use.acquire(True)
         while True:
             try:
                 cursor = self.conn.cursor()
                 cursor.execute(sql)
                 ret = cursor.fetchall()
                 cursor.close()
-                self.in_use = False
+                self.in_use.release()
                 return ret
             except (AttributeError, MySQLdb.OperationalError):
                 log.warning('WARNING: MySQL Operational Error during query, reconnecting.')
-                self.in_use = False
+                self.in_use.release()
                 self.connect()
             except (AttributeError, MySQLdb.ProgrammingError):
                 log.warning('WARNING: MySQL Programming Error during query, attempting query again.')
