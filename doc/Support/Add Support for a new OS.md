@@ -71,7 +71,7 @@ if (!$os) {
 }
 ```
 
-As we declare Memory and CPU graphs before, we need to declare the OID in a PHP file in the following directories:
+As we declare Memory and CPU graphs before, we need to declare the OID in a PHP file :
 
 
 **Memory**
@@ -123,7 +123,7 @@ if ($device['os'] == 'pulse') {
 
 #### Polling OS
 
-We wil now do the same for the polling process for retrieving the informations.
+We will now do the same for the polling process and for retrieving all the informations.
 
 **Memory**
 
@@ -183,7 +183,7 @@ Here are the specific graphs based on the OID in the vendor MIB:
 ```bash
 includes/polling/os/pulse.inc.php
 ```
-For exemple, here we declare two specific graphs for users and sessions numbers. Theses two graphs will be display on the firewall section of the graphs tab.
+For exemple, here we declare two specific graphs for users and sessions numbers. Theses two graphs will be display on the firewall section of the graphs tab as it was written in the definition include php file.
 
 ```php
 <?php
@@ -233,7 +233,7 @@ INSERT INTO `graph_types`(`graph_type`, `graph_subtype`, `graph_section`, `graph
 
 #### Displaying
 
-To the specific graphs, we need to write the PHP code in this directory:
+To display the specific graphs, we need to write the PHP code :
 
 **Pulse Sessions**
 
@@ -303,4 +303,4 @@ Test of the polling process
 ./poller.php -h hostname
 ```
 
-At this step we should see all the right information in LibreNMS.
+At this step we should see all the values retrieved in LibreNMS.
