@@ -52,7 +52,11 @@ log.info('INFO: Starting poller-service')
 class DB:
     conn = None
 
+    def __init__(self):
+        self.in_use = False
+
     def connect(self):
+        self.in_use = True
         while True:
             try:
                 self.conn.close()
@@ -71,17 +75,24 @@ class DB:
 
         self.conn.autocommit(True)
         self.conn.ping(True)
+        self.in_use = False
 
     def query(self, sql):
+        while self.in_use:
+            continue
+
+        self.in_use = True
         while True:
             try:
                 cursor = self.conn.cursor()
                 cursor.execute(sql)
                 ret = cursor.fetchall()
                 cursor.close()
+                self.in_use = False
                 return ret
             except (AttributeError, MySQLdb.OperationalError):
                 log.warning('WARNING: MySQL Operational Error during query, reconnecting.')
+                self.in_use = False
                 self.connect()
             except (AttributeError, MySQLdb.ProgrammingError):
                 log.warning('WARNING: MySQL Programming Error during query, attempting query again.')
@@ -175,6 +186,11 @@ try:
         retry_query = 1
 except KeyError:
     retry_query = 1
+
+try:
+    single_connection = bool(config['poller_service_single_connection'])
+except KeyError:
+    single_connection = False
 
 db = DB()
 
