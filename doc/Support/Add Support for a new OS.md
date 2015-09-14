@@ -71,7 +71,7 @@ if (!$os) {
 }
 ```
 
-As we declare Memory and CPU graphs, we need to declare the right OID in a PHP file in the following directories:
+As we declare Memory and CPU graphs before, we need to declare the OID in a PHP file in the following directories:
 
 
 **Memory**
