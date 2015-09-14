@@ -20,7 +20,7 @@ iveCpuUtil.0 = Gauge32: 28
 
 #### New OS definition
 
-You then need to declare the new OS in the definition file located here:
+You need to declare the new OS in the definition file located here:
 
 ```bash
 includes/definitions.inc.php
