@@ -19,6 +19,7 @@ $config['poller_service_poll_frequency']                 = 300;
 $config['poller_service_discover_frequency']             = 21600;
 $config['poller_service_down_retry']                     = 60;
 $config['poller_service_retry_query']                    = 1;
+$config['poller_service_single_connection']              = false;
 ```
 
 ## Distributed Polling
@@ -26,6 +27,9 @@ Distributed polling is possible, and uses the same configuration options as are 
 
 ## Multi-Master MySQL considerations
 Because locks are not replicated in Multi-Master MySQL configurations, if you are using such a configuration, you will need to make sure that all pollers are using the same MySQL server.
+
+## Single Connection
+If you are running MariaDB 10.2 or newer, you can tell poller-service to use a single mysql connectino for managing locks by setting `$config['poller_service_single_connection']` to `true`. *DO NOT* configure this for any version of MariaDB less than 10.2 or any version of MySQL.
 
 ## Service Installation
 An upstart configuration `poller-service.conf` is provided. To install run `ln -s /opt/librenms/poller-service.conf /etc/init/poller-service.conf`. The service will start on boot and can be started manually by running `start poller-service`. If you recieve an error that the service does not exist, run `initctl reload-configuration`. The service is configured to run as the user `librenms` and will fail if that user does not exist.
