@@ -12,7 +12,7 @@ Here you can test and OID with the snmpget command:
 
 ```bash
 snmpget -v2c -c public -OUsb -m PULSESECURE-PSG-MIB -M /opt/librenms/mibs -t 30 secure iveCpuUtil.0
-//quick explanation -m MIBFILE -M MIB directory hostname OID
+//quick explanation : -m MIBFILE -M MIB directory hostname OID
 
 iveCpuUtil.0 = Gauge32: 28
 ```
