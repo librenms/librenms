@@ -65,23 +65,23 @@ elseif ($update_message) {
 ?>
 
 <div class="row">
+    <div class="col-sm-2"></div>
     <div class="col-sm-1">
         <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
             <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
-            <button type="submit" class="btn btn-danger" name="Submit">Delete device</button>
+            <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
         </form>
     </div>
+    <div class="col-sm-1"></div>
     <div class="col-sm-1">
+        <?php
+        if($config['enable_clear_discovery'] == 1) {
+        ?>
+            <button type="submit" id="rediscover" data-device_id="<?php echo($device['device_id']); ?>" class="btn btn-primary" name="rediscover"><i class="fa fa-retweet"></i> Rediscover device</button>
+        <?php
+        }
+        ?>
     </div>
-<?php
-if($config['enable_clear_discovery'] == 1) {
-?>
-    <div class="col-sm-1">
-        <button type="submit" id="rediscover" data-device_id="<?php echo($device['device_id']); ?>" class="btn btn-primary" name="rediscover">Rediscover device</button>
-    </div>
-<?php
-}
-?>
 </div>
 <br />
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
@@ -141,7 +141,8 @@ if ($unknown) {
       <input name="ignore" type="checkbox" id="ignore" value="1" <?php if ($device['ignore']) echo("checked=checked"); ?> />
     </div>
   </div>
-  <button type="submit" name="Submit"  class="btn btn-default">Save</button>
+  <div class="col-sm-2"></div>
+  <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
 </form>
 <br />
 <script>

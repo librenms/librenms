@@ -211,7 +211,8 @@ if ($config['distributed_poller'] === true) {
 
 
 echo '
-    <button type="submit" name="Submit" class="btn btn-default">Save</button>
+    <div class="col-sm-2"></div>
+    <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
     </form>
     ';
 
