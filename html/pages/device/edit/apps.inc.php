@@ -61,7 +61,7 @@ if (count($apps_enabled)) {
 echo "
     <form id='appedit' name='appedit' method='post' action='' role='form' class='form-horizontal'>
     <input type=hidden name=device value='".$device['device_id']."'>
-    <table class='table table-hover table-responsive'>
+    <table class='table table-condensed table-hover table-responsive'>
     <tr align=center>
     <th>Enable</th>
     <th>Application</th>
