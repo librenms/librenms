@@ -70,17 +70,12 @@ if ($_POST['editing']) {
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
 $descr  = $device['purpose'];
 
-echo '<div class="row">
-    <div class="col-sm-6">';
 if ($updated && $update_message) {
     print_message($update_message);
 }
 else if ($update_message) {
     print_error($update_message);
 }
-
-echo '    </div>
-    </div>';
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
