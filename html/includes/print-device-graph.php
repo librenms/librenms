@@ -15,12 +15,12 @@ if (!is_integer($g_i / 2)) {
 else {
     $row_colour = $list_colour_b;
 }
-
-echo '<div style="background-color: '.$row_colour.';">';
-echo '<div style="padding:4px 0px 0px 8px;" class=graphhead>'.$graph_title.'</div>';
-
-require 'includes/print-graphrow.inc.php';
-
-echo '</div>';
-
+echo '<div class="panel panel-default">
+  		<div class="panel-heading">
+    		<h3 class="panel-title">'.$graph_title.'</h3>
+  		</div>
+  		<div class="panel-body">';
+		require 'includes/print-graphrow.inc.php';
+		echo '</div>';
+	echo '</div>';
 $g_i++;
