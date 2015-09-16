@@ -92,13 +92,19 @@ if ($disable_notify) {
  />
     </div>
   </div>
-  <div class="col-sm-3"></div>
-    <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+<div class="row">
+    <div class="col-md-1 col-md-offset-3">
+        <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+    </div>
+</div>
 </form>
 
 <?php
 require_once 'includes/modal/new_alert_rule.inc.php';
 ?>
 <br>
-<div class="col-sm-3"></div>
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="<?php echo $device['device_id']; ?>"><i class="fa fa-plus"></i> Create new alert rule</button>
+<div class="row">
+    <div class="col-md-1 col-md-offset-3">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="<?php echo $device['device_id']; ?>"><i class="fa fa-plus"></i> Create new alert rule</button>
+    </div>
+</div>
