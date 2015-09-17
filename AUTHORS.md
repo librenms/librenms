@@ -52,6 +52,6 @@ Contributors to LibreNMS:
 - Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Sergiusz Paprzycki <serek@walcz.net> (spaprzycki)
 - Juho Vanhanen <juho@vanhanen.me> (juhovan)
-
+- Bart de Bruijn <bart_de_bruijn@yahoo.com> (bartdebruijn)
 
 [1]: http://observium.org/ "Observium web site"
