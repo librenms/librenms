@@ -5,9 +5,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     echo 'RFC1628 ';
 
     $oids = trim(snmp_walk($device, '1.3.6.1.2.1.33.1.3.2.0', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {

@@ -1,10 +1,12 @@
+</form>
 <span id="message"><small><div class="alert alert-danger">n.b For the first time, please click any button twice.</div></small></span>
 
 <form id='ignoreport' name='ignoreport' method='post' action='' role='form' class='form-inline'>
     <input type='hidden' name='ignoreport' value='yes'>
     <input type='hidden' name='type' value='update-ports'>
     <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>
-    <table id='edit-ports' class='table table-condensed table-responsive table-striped'>
+    <div class='table-responsibe'>
+    <table id='edit-ports' class='table table-striped'>
         <thead>
             <tr>
                 <th data-column-id='ifIndex'>Index</th>
@@ -17,9 +19,50 @@
             </tr>
         </thead>
     </table>
+    </div>
 </form>
 <script>
 
+    $(document).on('blur', "[name='if-alias']", function (){
+        var $this = $(this);
+        var descr = $this.val();
+        var device_id = $this.data('device_id');
+        var port_id = $this.data('port_id');
+        var ifName = $this.data('ifname');
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: "update-ifalias", descr: descr, ifName: ifName, port_id: port_id, device_id: device_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $this.closest('.form-group').addClass('has-success');
+                    $this.next().addClass('glyphicon-ok');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-success');
+                        $this.next().removeClass('glyphicon-ok');
+                    }, 2000);
+                } else if (data.status == 'na') {
+
+                } else {
+                    $(this).closest('.form-group').addClass('has-error');
+                    $this.next().addClass('glyphicon-remove');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-error');
+                        $this.next().removeClass('glyphicon-remove');
+                    }, 2000);
+                }
+            },
+            error: function () {
+                $(this).closest('.form-group').addClass('has-error');
+                $this.next().addClass('glyphicon-remove');
+                setTimeout(function(){
+                   $this.closest('.form-group').removeClass('has-error');
+                   $this.next().removeClass('glyphicon-remove');
+                }, 2000);
+            }
+        });
+    });
     $(document).ready(function() {
         $('form#ignoreport').submit(function (event) {
             $('#disable-toggle').click(function (event) {
@@ -96,6 +139,7 @@
             });
             event.preventDefault();
         });
+
     });
 
     var grid = $("#edit-ports").bootgrid({

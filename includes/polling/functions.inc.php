@@ -23,9 +23,7 @@ function poll_sensor($device, $class, $unit) {
                 else {
                     // Try 5 times to get a valid temp reading
                     for ($i = 0; $i < 5; $i++) {
-                        if ($debug) {
-                            echo "Attempt $i ";
-                        }
+                        d_echo("Attempt $i ");
 
                         $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
                         preg_match('/[\d\.]+/', $sensor_value, $temp_response);
@@ -280,9 +278,8 @@ function poll_device($device, $options) {
         // echo("$device_end - $device_start; $device_time $device_run");
         echo "Polled in $device_time seconds\n";
 
-        if ($debug) {
-            echo 'Updating '.$device['hostname'].' - '.print_r($update_array)." \n";
-        }
+        d_echo('Updating '.$device['hostname']."\n");
+        d_echo($update_array);
 
         $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
         if ($updated) {

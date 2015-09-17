@@ -3,9 +3,7 @@
 // Plugins
 if (!empty($agent_data['munin'])) {
     echo 'Munin Plugins:';
-    if ($debug) {
-        print_r($agent_data['munin']);
-    }
+    d_echo($agent_data['munin']);
 
     // Build array of existing plugins
     $plugins_dbq = dbFetchRows('SELECT * FROM `munin_plugins` WHERE `device_id` = ?', array($device['device_id']));
@@ -38,9 +36,7 @@ if (!empty($agent_data['munin'])) {
         $plugin_rrd  = $plugins_rrd_dir.'/'.$plugin_type;
         $plugin_uniq = $plugin_type.'_';
         // }
-        if ($debug) {
-            echo "\n[$plugin_data]\n";
-        }
+        d_echo("\n[$plugin_data]\n");
 
         foreach (explode("\n", $plugin_data) as $line) {
             list($key, $value) = explode(' ', $line, 2);
@@ -101,7 +97,7 @@ if (!empty($agent_data['munin'])) {
                     $data['draw'] = 'LINE1.5';
                 }
 
-                $cmd      = '--step 300 DS:val:'.$data['type'].':600:0:U ';
+                $cmd      = '--step 300 DS:val:'.$data['type'].':600:U:U ';
                 $cmd     .= $config['rrd_rra'];
                 $ds_uniq  = $mplug_id.'_'.$name;
                 $filename = $plugin_rrd.'_'.$name.'.rrd';

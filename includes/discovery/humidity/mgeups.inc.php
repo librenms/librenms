@@ -1,7 +1,5 @@
 <?php
 
-global $debug;
-
 if ($device['os'] == 'mgeups') {
     // blatently copyied from APC
     echo 'MGE UPS External ';
@@ -52,9 +50,7 @@ if ($device['os'] == 'mgeups') {
         $low_warn_limit  = ($low_limit + $hysteresis);
         $high_warn_limit = ($high_limit - $hysteresis);
 
-        if ($debug) {
-            echo "low_limit : $low_limit\nlow_warn_limit : $low_warn_limit\nhigh_warn_limit : $high_warn_limit\nhigh_limit : $high_limit\n";
-        }
+        d_echo("low_limit : $low_limit\nlow_warn_limit : $low_warn_limit\nhigh_warn_limit : $high_warn_limit\nhigh_limit : $high_limit\n");
 
         if ($current != 0) {
             // Humidity = 0 -> Sensor not available

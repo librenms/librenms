@@ -1276,6 +1276,26 @@ $config['os'][$os]['icon']             = 'perle';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// MACOSX
+$os = 'macosx';
+$config['os'][$os]['text']             = 'Apple OS X';
+$config['os'][$os]['type']             = 'server';
+$config['os'][$os]['icon']             = 'generic';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// Appliances
+$os = 'fortios';
+$config['os'][$os]['text']             = 'FortiOS';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'fortios';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
@@ -1630,10 +1650,15 @@ if (isset($config['enable_printers']) && $config['enable_printers']) {
     $config['device_types'][$i]['icon'] = 'printer.png';
 }
 
+$i++;
+$config['device_types'][$i]['text'] = 'Appliance';
+$config['device_types'][$i]['type'] = 'appliance';
+$config['device_types'][$i]['icon'] = 'appliance.png';
+
 //
 // No changes below this line #
 //
-$config['version']              = '2014.master';
+$config['version']              = '2015.master';
 $config['project_name_version'] = $config['project_name'].' '.$config['version'];
 
 if (isset($config['rrdgraph_def_text'])) {
@@ -1664,9 +1689,7 @@ if ($config['memcached']['enable'] === true) {
     if (class_exists('Memcached')) {
         $memcache = new Memcached();
         $memcache->addServer($config['memcached']['host'], $config['memcached']['port']);
-        if ($debug) {
-            print_r($memcache->getStats());
-        }
+        $memcache->getStats();
     }
     else {
         echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";

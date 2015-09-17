@@ -2,9 +2,7 @@
 // RFC1628 UPS
 if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modules_compat']['rfc1628'][$device['os']]) {
     $oids = snmp_walk($device, '1.3.6.1.2.1.33.1.2.7', '-Osqn', 'UPS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

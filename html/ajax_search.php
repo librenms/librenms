@@ -96,23 +96,22 @@ if (isset($_REQUEST['search'])) {
             }//end if
 
             $json = json_encode($device);
-            print_r($json);
-            exit;
+            die($json);
         }
         else if ($_REQUEST['type'] == 'ports') {
             // Search ports
             if (is_admin() === true || is_read() === true) {
-                $results = dbFetchRows("SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE '%".$search."%' OR `ifDescr` LIKE '%".$search."%' ORDER BY ifDescr LIMIT 8");
+                $results = dbFetchRows("SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE '%".$search."%' OR `ifDescr` LIKE '%".$search."%' OR `ifName` LIKE '%".$search."%' ORDER BY ifDescr LIMIT 8");
             }
             else {
-                $results = dbFetchRows("SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE '%".$search."%' OR `ifDescr` LIKE '%".$search."%') ORDER BY ifDescr LIMIT 8", array($_SESSION['user_id'], $_SESSION['user_id']));
+                $results = dbFetchRows("SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE '%".$search."%' OR `ifDescr` LIKE '%".$search."%' OR `ifName` LIKE '%".$search."%') ORDER BY ifDescr LIMIT 8", array($_SESSION['user_id'], $_SESSION['user_id']));
             }
 
             if (count($results)) {
                 $found = 1;
 
                 foreach ($results as $result) {
-                    $name        = $result['ifDescr'];
+                    $name        = $result['ifDescr'] == $result['ifAlias'] ? $result['ifName'] : $result['ifDescr'];
                     $description = $result['ifAlias'];
 
                     if ($result['deleted'] == 0 && ($result['ignore'] == 0 || $result['ignore'] == 0) && ($result['ifInErrors_delta'] > 0 || $result['ifOutErrors_delta'] > 0)) {
@@ -143,13 +142,13 @@ if (isset($_REQUEST['search'])) {
                         'description' => $description,
                         'colours'     => $highlight_colour,
                         'hostname'    => $result['hostname'],
+                        'port_id'     => $result['port_id'],
                     );
                 }//end foreach
             }//end if
 
             $json = json_encode($ports);
-            print_r($json);
-            exit;
+            die($json);
         }
         else if ($_REQUEST['type'] == 'bgp') {
             // Search bgp peers
@@ -204,8 +203,99 @@ if (isset($_REQUEST['search'])) {
             }//end if
 
             $json = json_encode($bgp);
-            print_r($json);
-            exit;
+            die($json);
+        }
+        else if ($_REQUEST['type'] == 'applications') {
+            // Device search
+            if (is_admin() === true || is_read() === true) {
+                $results = dbFetchRows("SELECT * FROM `applications` INNER JOIN `devices` ON devices.device_id = applications.device_id WHERE `app_type` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%' ORDER BY hostname LIMIT 8");
+            }
+            else {
+                $results = dbFetchRows("SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`app_type` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%') ORDER BY hostname LIMIT 8", array($_SESSION['user_id']));
+            }
+
+            if (count($results)) {
+                $found   = 1;
+                $devices = count($results);
+
+                foreach ($results as $result) {
+                    $name = $result['app_type'];
+                    if ($result['disabled'] == 1) {
+                        $highlight_colour = '#808080';
+                    }
+                    else if ($result['ignored'] == 1 && $result['disabled'] == 0) {
+                        $highlight_colour = '#000000';
+                    }
+                    else if ($result['status'] == 0 && $result['ignore'] == 0 && $result['disabled'] == 0) {
+                        $highlight_colour = '#ff0000';
+                    }
+                    else if ($result['status'] == 1 && $result['ignore'] == 0 && $result['disabled'] == 0) {
+                        $highlight_colour = '#008000';
+                    }
+
+                    $device[] = array(
+                        'name'            => $name,
+                        'hostname'        => $result['hostname'],
+                        'app_id'          => $result['app_id'],
+                        'device_id'       => $result['device_id'],
+                        'colours'         => $highlight_colour,
+                        'device_image'    => getImageSrc($result),
+                        'device_hardware' => $result['hardware'],
+                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'version'         => $result['version'],
+                        'location'        => $result['location'],
+                    );
+                }//end foreach
+            }//end if
+
+            $json = json_encode($device);
+            die($json);
+        }
+        else if ($_REQUEST['type'] == 'munin') {
+            // Device search
+            if (is_admin() === true || is_read() === true) {
+                $results = dbFetchRows("SELECT * FROM `munin_plugins` INNER JOIN `devices` ON devices.device_id = munin_plugins.device_id WHERE `mplug_type` LIKE '%".$search."%' OR `mplug_title` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%' ORDER BY hostname LIMIT 8");
+            }
+            else {
+                $results = dbFetchRows("SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`mplug_type` LIKE '%".$search."%' OR `mplug_title` LIKE '%".$search."%' OR `hostname` LIKE '%".$search."%') ORDER BY hostname LIMIT 8", array($_SESSION['user_id']));
+            }
+
+            if (count($results)) {
+                $found   = 1;
+                $devices = count($results);
+
+                foreach ($results as $result) {
+                    $name = $result['mplug_title'];
+                    if ($result['disabled'] == 1) {
+                        $highlight_colour = '#808080';
+                    }
+                    else if ($result['ignored'] == 1 && $result['disabled'] == 0) {
+                        $highlight_colour = '#000000';
+                    }
+                    else if ($result['status'] == 0 && $result['ignore'] == 0 && $result['disabled'] == 0) {
+                        $highlight_colour = '#ff0000';
+                    }
+                    else if ($result['status'] == 1 && $result['ignore'] == 0 && $result['disabled'] == 0) {
+                        $highlight_colour = '#008000';
+                    }
+
+                    $device[] = array(
+                        'name'            => $name,
+                        'hostname'        => $result['hostname'],
+                        'device_id'       => $result['device_id'],
+                        'colours'         => $highlight_colour,
+                        'device_image'    => getImageSrc($result),
+                        'device_hardware' => $result['hardware'],
+                        'device_os'       => $config['os'][$result['os']]['text'],
+                        'version'         => $result['version'],
+                        'location'        => $result['location'],
+                        'plugin'          => $result['mplug_type'],
+                    );
+                }//end foreach
+            }//end if
+
+            $json = json_encode($device);
+            die($json);
         }//end if
     }//end if
 }//end if

@@ -35,9 +35,6 @@ $peth_oids = array(
     'pethMainPseConsumptionPower',
 );
 
-$port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
-
 if ($port_stats[$port['ifIndex']]
     && $port['ifType'] == 'ethernetCsmacd'
     && isset($port_stats[$port['ifIndex']]['dot3StatsIndex'])) {

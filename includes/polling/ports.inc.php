@@ -145,6 +145,11 @@ if ($device['adsl_count'] > '0') {
     $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1.1.7.1.7', $port_stats, 'ADSL-LINE-MIB');
 }//end if
 
+if ($config['enable_ports_poe']) {
+    $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
+    $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
+}
+
 // FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
 // foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
 // foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
@@ -192,9 +197,7 @@ else {
 $polled = time();
 
 // End Building SNMP Cache Array
-if ($debug) {
-    print_r($port_stats);
-}
+d_echo($port_stats);
 
 // Build array of ports in the database
 // FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
@@ -243,9 +246,7 @@ foreach ($ports as $port) {
 
         if ($config['memcached']['enable'] === true) {
             $state = $memcache->get('port-'.$port['port_id'].'-state');
-            if ($debug) {
-                print_r($state);
-            }
+            d_echo($state);
 
             if (is_array($state)) {
                 $port = array_merge($port, $state);
@@ -293,7 +294,7 @@ foreach ($ports as $port) {
         }
 
         // Overwrite ifSpeed with ifHighSpeed if it's over 1G
-        if (is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > '1000000000') {
+        if (is_numeric($this_port['ifHighSpeed']) && ($this_port['ifSpeed'] > '1000000000' || $this_port['ifSpeed'] == 0)) {
             echo 'HighSpeed ';
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
         }
@@ -332,11 +333,18 @@ foreach ($ports as $port) {
 
         // Update IF-MIB data
         foreach ($data_oids as $oid) {
+
+            if ($oid == 'ifAlias') {
+                if (get_dev_attrib($device, 'ifName', $port['ifName'])) {
+                    $this_port['ifAlias'] = $port['ifAlias'];
+                }
+            }
+
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
                 log_event($oid.': '.$port[$oid].' -> NULL', $device, 'interface', $port['port_id']);
                 if ($debug) {
-                    echo $oid.': '.$port[$oid].' -> NULL ';
+                    d_echo($oid.': '.$port[$oid].' -> NULL ');
                 }
                 else {
                     echo $oid.' ';
@@ -346,15 +354,11 @@ foreach ($ports as $port) {
                 $port['update'][$oid] = $this_port[$oid];
                 log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
-                    echo $oid.': '.$port[$oid].' -> '.$this_port[$oid].' ';
+                    d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ');
                 }
                 else {
                     echo $oid.' ';
                 }
-            }
-
-            if (( $oid == 'ifOperStatus' || $oid == 'ifAdminStatus' ) && $this_port[$oid] == 'down') {
-                break;
             }
         }//end foreach
 
@@ -423,9 +427,7 @@ foreach ($ports as $port) {
                     $port['state'][$oid.'_delta'] = $oid_diff;
                 }
 
-                if ($debug) {
-                    echo "\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n";
-                }
+                d_echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n");
             }//end if
         }//end foreach
 
@@ -547,9 +549,7 @@ foreach ($ports as $port) {
 
         // Update Memcached
         if ($config['memcached']['enable'] === true) {
-            if ($debug) {
-                print_r($port['state']);
-            }
+            d_echo($port['state']);
 
             $memcache->set('port-'.$port['port_id'].'-state', $port['state']);
         }
@@ -563,9 +563,7 @@ foreach ($ports as $port) {
         // Update Database
         if (count($port['update'])) {
             $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port['port_id']));
-            if ($debug) {
-                echo "$updated updated";
-            }
+            d_echo("$updated updated");
         }
 
         // End Update Database

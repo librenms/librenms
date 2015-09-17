@@ -53,16 +53,12 @@ if ($device['os_group'] == 'cisco') {
                         $oid_rate = ($oid_diff / $polled_period);
                         $acc['update'][$oid_dir.'_rate']  = $oid_rate;
                         $acc['update'][$oid_dir.'_delta'] = $oid_diff;
-                        if ($debug) {
-                            echo "\n $oid_dir ($oid_diff B) $oid_rate Bps $polled_period secs\n";
-                        }
+                        d_echo("\n $oid_dir ($oid_diff B) $oid_rate Bps $polled_period secs\n");
                     }
                 }
             }
 
-            if ($debug) {
-                echo "\n".$acc['hostname'].' '.$acc['ifDescr']."  $mac -> $b_in:$b_out:$p_in:$p_out ";
-            }
+            d_echo("\n".$acc['hostname'].' '.$acc['ifDescr']."  $mac -> $b_in:$b_out:$p_in:$p_out ");
 
             $rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd');
 

@@ -147,9 +147,9 @@ foreach ($config['snmp']['transports'] as $transport) {
         <label for="authlevel" class="col-sm-3 control-label">Auth Level</label>
         <div class="col-sm-3">
           <select name="authlevel" id="authlevel" class="form-control input-sm">
-            <option value="noAuthNoPriv" selected>NoAuthNoPriv</option>
-            <option value="authNoPriv">AuthNoPriv</option>
-            <option value="authPriv">AuthPriv</option>
+            <option value="noAuthNoPriv" selected>noAuthNoPriv</option>
+            <option value="authNoPriv">authNoPriv</option>
+            <option value="authPriv">authPriv</option>
           </select>
         </div>
       </div>
@@ -221,7 +221,8 @@ if ($config['distributed_poller'] === true) {
 }//end if
 
 ?>
-    <button type="submit" class="btn btn-default input-sm" name="Submit">Add Host</button>
+    <hr>
+    <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>
 </form>
   </div>

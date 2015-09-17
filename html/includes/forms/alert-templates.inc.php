@@ -52,7 +52,7 @@ if(!empty($name)) {
     elseif( $_REQUEST['template'] && is_numeric($_REQUEST['template_id']) ) {
         //Update template-text
 
-        if($ret = dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
+        if($ret = dbUpdate(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates", "id = ?", array($_REQUEST['template_id']))) {
             $ok = "Updated template";
         }
         else {
@@ -62,7 +62,7 @@ if(!empty($name)) {
     elseif( $_REQUEST['template'] ) {
         //Create new template
 
-        if(dbInsert(array('template' => $_REQUEST['template'], 'name' => $name), "alert_templates")) {
+        if(dbInsert(array('template' => $_REQUEST['template'], 'name' => $name, 'title' => $_REQUEST['title'], 'title_rec' => $_REQUEST['title_rec']), "alert_templates")) {
             $ok = "Alert template has been created.";
         }
         else {

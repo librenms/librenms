@@ -23,10 +23,12 @@
  * @package LibreNMS
  * @subpackage Page
  */
-
+$pagetitle[] = 'Global Settings';
 ?>
 
 <div class="container-fluid">
+    <h2>Global Settings</h2>
+    <hr>
     <div class="row">
         <div class="col-md-12">
             <span id="message"></span>

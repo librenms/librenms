@@ -42,7 +42,7 @@ foreach(dbFetchRows($sql, $param) as $device) {
     $temp_output[] = '<a href="' . generate_url(array(
         'page' => 'device',
         'device' => $device['device_id']
-    )) . '" role="button" class="btn ' . $btn_type . ' btn-xs" title="' . $device['hostname'] . '" style="min-height:25px; min-width:25px; border-radius:0px; border:0px; margin:0; padding:0;"></a>';
+    )) . '" role="button" class="btn ' . $btn_type . ' btn-xs" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '" style="min-height:25px; min-width:25px; border-radius:0px; margin:0; padding:0;"></a>';
 }
 
 $temp_rows = count($temp_output);
