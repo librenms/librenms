@@ -21,7 +21,7 @@ $data = dbFetchRow("SELECT `notes` FROM `devices` WHERE device_id = ?", array(
     <div class="form-group">
         <div class="col-sm-10">
             <textarea class="form-control" rows="6" name="notes" id="device-notes"><?php
-echo $data['notes']; ?></textarea>
+echo htmlentities($data['notes']); ?></textarea>
         </div>
     </div>
     <div class="form-group">
