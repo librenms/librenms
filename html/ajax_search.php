@@ -296,6 +296,28 @@ if (isset($_REQUEST['search'])) {
 
             $json = json_encode($device);
             die($json);
+        }
+        else if ($_REQUEST['type'] == 'iftype') {
+            // Device search
+            if (is_admin() === true || is_read() === true) {
+                $results = dbFetchRows("SELECT `ports`.ifType FROM `ports` WHERE `ifType` LIKE '%".$search."%' GROUP BY ifType ORDER BY ifType LIMIT 8");
+            }
+            else {
+                $results = dbFetchRows("SELECT `I`.ifType FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifType` LIKE '%".$search."%') GROUP BY ifType ORDER BY ifType LIMIT 8", array($_SESSION['user_id'], $_SESSION['user_id']));
+            }
+            if (count($results)) {
+                $found   = 1;
+                $devices = count($results);
+
+                foreach ($results as $result) {
+                    $device[] = array(
+                        'filter'            => $result['ifType'],
+                    );
+                }//end foreach
+            }//end if
+
+            $json = json_encode($device);
+            die($json);
         }//end if
     }//end if
 }//end if
