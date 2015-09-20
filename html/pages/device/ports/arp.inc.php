@@ -1,6 +1,6 @@
 <?php
 
-echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
+echo '<table class="table table-condensed">';
 echo '<tr><th>Port</th><th>MAC address</th><th>IPv4 address</th><th>Remote device</th><th>Remote port</th></tr>';
 
 $i = '1';
