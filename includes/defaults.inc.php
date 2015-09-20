@@ -771,9 +771,9 @@ $config['geoloc']['latlng']                             = false; // True to enab
 $config['geoloc']['engine']                             = 'google';
 $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
-$config['leaflet']['default_lat']                       = '50.898482';
-$config['leaflet']['default_lng']                       = '-3.401402';
-$config['leaflet']['default_zoom']                       = 2;
+$config['leaflet']['default_lat']                       = '51.4800';
+$config['leaflet']['default_lng']                       = '0';
+$config['leaflet']['default_zoom']                       = 1;
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
