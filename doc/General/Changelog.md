@@ -5,6 +5,13 @@
     - Process followups if there are changes (PR1817)
     - Typo in alert_window setting (PR1841)
     - Issue alert-trigger as test object (PR1850)
+  - WebUI:
+    - Fix permissions for World-map widget (PR1866)
+    - Clean up Gloabl / World Map name mixup (PR1874)
+  - Services:
+    - Honour IP field for DNS checks (PR1933)
+  - Discovery / Poller:
+    - Fix Huawei VRP os detection (PR1931)t
   - General:
     - Remove 'sh' from cronjob (PR1818)
     - Remove MySQL Locks (PR1822,PR1826,PR1829,PR1836)
@@ -15,19 +22,26 @@
     - Honour Mouseout/Mouseleave on map widget (PR1814)
     - Make syslog/eventlog responsive (PR1816)
     - Reformat Proxmox UI (PR1825,PR1827)
-    - Misc Changes (PR1828,PR1830)
+    - Misc Changes (PR1828,PR1830,PR1875,PR1885,PR1886,PR1887,PR1891,PR1896,PR1901,PR1913)
     - Added support for Oxidized versioning (PR1842)
-    - Added graph widget + settings for widgets (PR1835)
+    - Added graph widget + settings for widgets (PR1835,PR1861)
+    - Added Support for multiple dashboards (PR1869)
+    - Added settings page for Worldmap widget (PR1872)
+    - Added uptime to availability widget (PR1881)
+    - Added top devices and ports widgets (PR1903)
+    - Added support for saving notes for devices (PR1927)
   - Added detection for:
     - FortiOS (PR1815)
   - Discovery / Poller:
     - Added Proxmox support (PR1789)
   - Documentation:
     - Add varnish docs (PR1809)
+    - Added CentOS 7 RRCached docs (1893)
   - General:
     - Make installer more responsive (PR1832)
     - Update fping millisec option to 200 default (PR1833)
     - Reduced cleanup of device_perf (PR1837)
+    - Added support for negative values in munin-plugins (PR1907)
 
 ### August 2015
 
