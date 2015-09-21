@@ -854,6 +854,8 @@ $config['os'][$os]['text']             = 'SonicWALL';
 $config['os'][$os]['type']             = 'firewall';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][1]['text']  = 'Memory Utilization';
 
 $os = 'zywall';
 $config['os'][$os]['text']             = 'ZyXEL ZyWALL';
