@@ -23,7 +23,7 @@
  */
 
 if ($config['map']['engine'] == 'leaflet') {
-    if ((defined('show_settings') || empty($widget_settings)) && $config['front_page'] == "pages/front/tiles.php") {
+    if (defined('show_settings') && $config['front_page'] == "pages/front/tiles.php") {
         $temp_output = '
 <form class="form" onsubmit="widget_settings(this); return false;">
   <div class="form-group">
@@ -77,7 +77,7 @@ if ($config['map']['engine'] == 'leaflet') {
 <div id="leaflet-map"></div>
 <script>
         ';
-        if (!empty($widget_settings)) {
+        if (!empty($widget_settings) && !empty($widget_settings['init_lat']) && !empty($widget_settings['init_lng'])) {
             $init_lat = $widget_settings['init_lat'];
             $init_lng = $widget_settings['init_lng'];
             $init_zoom = $widget_settings['init_zoom'];
