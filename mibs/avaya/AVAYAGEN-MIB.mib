@@ -1,0 +1,104 @@
+--========================================================
+--
+-- MIB      : AvayaGen  Avaya Inc.
+--
+-- Version  : 1.4.0    27 January 2004
+-- ========================================================
+--- This AVAYA SNMP Management Information Base Specification (Specification) 
+-- embodies AVAYA confidential and Proprietary intellectual property.  
+-- AVAYA retains all Title and ownership in the Specification, including any 
+-- revisions.
+-- 
+-- It is AVAYA's intent to encourage the widespread use of this Specification 
+-- in connection with the management of AVAYA products. AVAYA grants vendors, 
+-- end-users, and other interested parties a non-exclusive license to use this 
+-- Specification in connection with the management of AVAYA products.
+-- 
+-- This Specification is supplied "as is," and AVAYA makes no warranty, either 
+-- express or implied, as to the use, operation, condition, or performance of 
+-- the Specification.
+--========================================================
+AVAYAGEN-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+	enterprises,MODULE-IDENTITY
+	FROM SNMPv2-SMI;
+avaya  MODULE-IDENTITY
+LAST-UPDATED 	"0401270900Z" -- 27 January 2004  
+ORGANIZATION 	"Avaya Inc."
+CONTACT-INFO 
+				"Avaya Customer Services
+				Postal: Avaya, Inc.
+				        211 Mt Airy Rd.
+				        Basking Ridge, NJ 07920
+				        USA
+				Tel:    +1 908 953 6000
+				WWW:    http://www.avaya.com
+				"
+DESCRIPTION
+    "Avaya top-level OID tree.
+    This MIB module deals defines the Avaya enterprise-specific tree.
+    Development organizations within Avaya who wish to register MIBs 
+    under the Avaya enterprise OID, should:
+    a. Contact the maintainer of this module, and get an organization OID and
+       group OID.
+    b. Import the definition of their Organization OID from this MIB.
+    "
+REVISION 	"0401270900Z" -- 27 January 2004
+DESCRIPTION
+    "Rev 1.4.0 - Meir Deutsch.
+    adds avGatewayProducts under avayaProducts.
+    adds avGatewayMibs under avayaMibs.  
+    "
+REVISION 	"0208150900Z" -- 15 August 2002
+DESCRIPTION
+    "Rev 1.3.0 - Itai Zilbershterin.
+    adds avayaSystemStats under lsg.
+    "
+REVISION 	"0207280900Z" -- 28 July 2002
+DESCRIPTION
+    "Rev 1.2.0 - Itai Zilbershterin.
+    adds avayaEISTopology under lsg.
+    "
+REVISION 	"0108091700Z" -- 09 August 2001
+DESCRIPTION
+    "Rev 1.1.0 - Itai Zilbershterin.
+    adds products OID to those defined.
+    "
+REVISION 	"0106211155Z" -- 21 June 2001
+DESCRIPTION
+    "Rev 1.0.0 - Itai Zilbershterin.
+    Fixed the mibs placement error. Avaya Mibs
+    reside under avaya.2 and not avaya.1.
+    The MIB branch is called avayaMibs."
+
+REVISION 	"0010151045Z" -- 15 Oct. 2000
+DESCRIPTION
+    "Rev 0.9.0 - Itai Zilbershterin.
+    The initial version of this MIB module. 
+
+    The following Organizational top-level groups are defined:
+    lsg - Mibs of the LAN System Group (Concord & Israel)."
+REVISION 	"0010151305Z" -- 15 Oct. 2000
+DESCRIPTION
+    "Rev 0.9.1 - Itai Zilbershterin.
+    Dates in Revisions changed from 'yyyymmddhhmm' to 'yymmddhhmm', to support
+    older development environments."
+::= {  enterprises 6889 }
+-- ****************************
+-- ****************************
+-- Product OIDs
+products	OBJECT IDENTIFIER ::= { avaya 1 }
+-- MIBs
+mibs	OBJECT IDENTIFIER ::= { avaya 2 }    
+-- Gateway
+avGatewayProducts OBJECT IDENTIFIER ::= { products 6 }
+avGatewayMibs OBJECT IDENTIFIER ::= { mibs 6 }
+-- **********************************
+-- LAN System Group's
+-- **********************************
+lsg	OBJECT IDENTIFIER ::= { mibs 1 }
+-- Sub branches which are NOT MIB modules (MIB modules directly under lsg
+-- will define their OID in relation to lsg)
+avayaEISTopology  OBJECT IDENTIFIER ::= {lsg 10 }
+avayaSystemStats  OBJECT IDENTIFIER ::= {lsg 11 }
+END

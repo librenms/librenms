@@ -1,0 +1,334 @@
+--========================================================
+--
+-- MIB      : SME Platform Avaya Inc.
+--
+-- Version  : 0.03.00   11 January 2013
+--
+--========================================================
+--
+-- Copyright (c) 2013 Avaya Inc.
+-- All Rights Reserved.
+--
+--========================================================
+AV-SME-PLATFORM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    sysDescr
+        FROM SNMPv2-MIB
+    ItuPerceivedSeverity
+        FROM ITU-ALARM-TC-MIB
+    ifIndex
+        FROM IF-MIB
+    mibs
+        FROM AVAYAGEN-MIB
+;
+
+avSMEPlatformMIB MODULE-IDENTITY
+    LAST-UPDATED    "201301111405Z" -- 11 January 2013
+    ORGANIZATION    "Avaya Inc."
+    CONTACT-INFO
+        "Avaya Customer Services
+         Postal: Avaya, Inc.
+                 211 Mt Airy Rd.
+                 Basking Ridge, NJ 07920
+                 USA
+         Tel:    +1 908 953 6000
+
+         WWW:    http://www.avaya.com"
+    DESCRIPTION
+        "Avaya IP Office MIBs OID tree.
+
+         This MIB module defines the root items for MIBs for
+         use with Avaya SME Embedded Platform."
+
+
+    REVISION     "201301111405Z" -- 11 January 2013
+    DESCRIPTION
+        "Rev 0.03.00
+         Added the WebManagement application value for smepGTEventAppIdentity."
+    REVISION     "201007061347Z" -- 06 July 2010
+    DESCRIPTION
+        "Rev 0.02.00
+        Corrected base OID to one properly allocated in Avaya tree."
+    REVISION     "201007021437Z" -- 02 July 2010
+    DESCRIPTION
+        "Rev 0.01.00
+        The first rough draft of this MIB module."
+    ::= { mibs 48 }
+
+-- sub-tree for SME Embedded Platform wide objects and events
+-- irrespective of function
+smepGeneric         OBJECT IDENTIFIER ::= { avSMEPlatformMIB 1 }
+
+-- sub-tree for SME Embedded Platform functional MIBs
+smepGenMibs         OBJECT IDENTIFIER ::= { smepGeneric 1 }
+
+-- sub-tree for SME EMbedded Platform wide traps/notifications
+smepGenTraps        OBJECT IDENTIFIER ::= { smepGeneric 2 }
+
+-- sub-tree for SME Embedded Platform wide conformance information
+smepGenConformance  OBJECT IDENTIFIER ::= { smepGeneric 3 }
+
+--********************************************************************
+-- SME Embedded Platform wide traps/notifications
+--********************************************************************
+
+smepGTEvents  OBJECT IDENTIFIER ::= { smepGenTraps 0 }
+smepGTObjects OBJECT IDENTIFIER ::= { smepGenTraps 1 }
+
+--
+-- trap objects
+--
+
+smepGTEventStdSeverity OBJECT-TYPE
+    SYNTAX      ItuPerceivedSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Severity of the event that has occurred.
+
+        The event severity depends upon the type of
+        entity/notification that the operational state change event
+        relates to. The severity values that are normally used are
+        detailed below:
+
+        The enterprise versions of standard SNMP traps all have a
+        severity of major (4).
+
+        GenAppEvents:
+          Severity depends on event condition
+              crash       - severity is critical (3)"
+    ::= { smepGTObjects 1 }
+
+smepGTEventDateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Date and time of the occurence of the event."
+    ::= { smepGTObjects 2 }
+
+smepGTEventDevID OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (10))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A unique textual identifier of the alarming device."
+    ::= { smepGTObjects 3 }
+
+smepGTEventAppEntity OBJECT-TYPE
+    SYNTAX      INTEGER {
+          voiceMailPro(1),
+          onex(2),
+          ipOffice(3),
+          jade(4),
+          webmanagement(5)
+		  }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The SME Embedded Platform application to which a
+        notification/trap relates."
+    ::= { smepGTObjects 4 }
+
+smepGTEventAppEvent OBJECT-TYPE
+    SYNTAX      INTEGER {
+          crash(1) -- severity: Critical
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "SME Embedded Platform application event states. The
+        associated event severity of the notification/trap the object
+        is carried in varies depending upon the event condition. The
+        appropriate severity is detailed against event enumeration."
+    ::= { smepGTObjects 5 }
+
+--
+-- traps
+--
+
+smepGenColdStartEvent NOTIFICATION-TYPE
+    OBJECTS {
+        smepGTEventStdSeverity,
+        smepGTEventDateTime,
+        smepGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard coldstart trap featuring
+         device identification information. A coldStart trap
+         signifies that the sending protocol entity is reinitializing
+         itself such that the agent's configuration or the protocol
+         entity implementation may be altered."
+    ::= { smepGTEvents 1 }
+
+smepGenWarmStartEvent NOTIFICATION-TYPE
+    OBJECTS {
+        smepGTEventStdSeverity,
+        smepGTEventDateTime,
+        smepGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard warmstart trap featuring
+         device identification information. A warmStart trap
+         signifies that the sending protocol entity is reinitializing
+         that neither the agent configuration nor the protocol entity
+         implementation is altered."
+    ::= { smepGTEvents 2 }
+
+smepGenLinkDownEvent NOTIFICATION-TYPE
+    OBJECTS {
+        smepGTEventStdSeverity,
+        smepGTEventDateTime,
+        smepGTEventDevID,
+        sysDescr,
+        ifIndex
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard linkDown trap featuring device
+         identification information. A linkDown trap signifies that
+         the sending protocol entity recognizes a failure in one of
+         the communication links represented in the agent's
+         configuration."
+    ::= { smepGTEvents 3 }
+
+smepGenLinkUpEvent NOTIFICATION-TYPE
+    OBJECTS {
+        smepGTEventStdSeverity,
+        smepGTEventDateTime,
+        smepGTEventDevID,
+        sysDescr,
+        ifIndex
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard linkUp trap featuring device
+         identification information. A linkUp trap signifies that the
+         sending protocol entity recognizes that one of the
+         communication links represented in the agent's configuration
+         has come up."
+    ::= { smepGTEvents 4 }
+
+smepGenAuthFailureEvent NOTIFICATION-TYPE
+    OBJECTS {
+        smepGTEventStdSeverity,
+        smepGTEventDateTime,
+        smepGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard authenticationFailure trap
+         featuring device identification information. An
+         authenticationFailure trap signifies that the sending
+         protocol entity is the addressee of a protocol message that
+         is not properly authenticated. While implementations of the
+         SNMP must be capable of generating this trap, they must also
+         be capable of suppressing the emission of such traps via an
+         implementation- specific mechanism."
+    ::= { smepGTEvents 5 }
+
+smepGenAppEvent NOTIFICATION-TYPE
+    OBJECTS {
+        smepGTEventStdSeverity,
+        smepGTEventDateTime,
+        smepGTEventDevID,
+        sysDescr,
+        smepGTEventAppEntity,
+        smepGTEventAppEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "A smepGenAppEvent notification is generated whenever a
+        application entity of the SME Embedded Platform experiences an
+        event. It signifies that the SNMP entity, acting as a proxy
+        for the application, has detected an event on the application
+        entity.
+
+        The event severity varies dependent upon the event condition."
+    ::= { smepGTEvents 6 }
+
+
+--********************************************************************
+-- SME Embedded Platform wide compliance
+--********************************************************************
+
+smepGenCompliances OBJECT IDENTIFIER ::= { smepGenConformance 1 }
+smepGenGroups      OBJECT IDENTIFIER ::= { smepGenConformance 2 }
+
+--
+-- compliance statements
+--
+
+smepGenCompliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for SME Embedded Platform agents
+         which implement this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        smepGenNotificationObjectsGroup,
+        smepGenEntGenNotificationsGroup,
+        smepGenAppNotificationsGroup
+    }	
+    ::= { smepGenCompliances 1 }
+
+--
+-- MIB groupings
+--
+
+smepGenNotificationObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        smepGTEventStdSeverity,
+        smepGTEventDevID,
+        smepGTEventDateTime,
+        smepGTEventAppEntity,
+        smepGTEventAppEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "Objects that are contained in SME Embedded Platform wide
+        notifications."
+    ::= { smepGenGroups 1 }
+
+smepGenEntGenNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        smepGenColdStartEvent,
+        smepGenWarmStartEvent,
+        smepGenLinkDownEvent,
+        smepGenLinkUpEvent,
+        smepGenAuthFailureEvent
+   }
+    STATUS current
+    DESCRIPTION
+        "SME Embedded Platform Enterpise versions of the generic traps
+        as defined RFC1215 that provide more identification of the entity
+        concerned."
+    ::= { smepGenGroups 2 }
+
+smepGenAppNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        smepGenAppEvent
+   }
+    STATUS current
+    DESCRIPTION
+        "The service notifications which indicate specific changes in
+        the state of Applications on the SME Embedded Platform."
+    ::= { smepGenGroups 3 }
+
+END

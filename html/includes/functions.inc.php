@@ -12,6 +12,35 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+/**
+ * Compare $t with the value of $vars[$v], if that exists
+ * @param string $v Name of the var to test
+ * @param string $t Value to compare $vars[$v] to
+ * @return boolean true, if values are the same, false if $vars[$v] is unset or values differ
+ */
+function var_eq($v, $t) {
+    global $vars;
+    if (isset($vars[$v]) && $vars[$v] == $t) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Get the value of $vars[$v], if it exists
+ * @param string $v Name of the var to get
+ * @return string|boolean The value of $vars[$v] if it exists, false if it does not exist
+ */
+function var_get($v) {
+    global $vars;
+    if (isset($vars[$v])) {
+        return $vars[$v];
+    }
+
+    return false;
+}
+
 
 function data_uri($file, $mime) {
     $contents = file_get_contents($file);
@@ -152,8 +181,8 @@ function get_percentage_colours($percentage) {
 }//end get_percentage_colours()
 
 
-function generate_minigraph_image($device, $start, $end, $type, $legend='no', $width=275, $height=100, $sep='&amp;', $class='minigraph-image') {
-    return '<img class="'.$class.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend")).'">';
+function generate_minigraph_image($device, $start, $end, $type, $legend='no', $width=275, $height=100, $sep='&amp;', $class='minigraph-image',$absolute_size=0) {
+    return '<img class="'.$class.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")).'">';
 
 }//end generate_minigraph_image()
 

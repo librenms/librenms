@@ -94,26 +94,76 @@ if ($_SESSION['userlevel'] >= '7') {
     }
     else if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
         $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$device['hostname'].'?format=json'), true);
-        $text      = file_get_contents($config['oxidized']['url'].'/node/fetch/'.$device['hostname']);
-        if ($text == 'node not found') {
-            $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.$device['os'].'/'.$device['hostname']);
+        if ($config['oxidized']['features']['versioning'] === true && isset($_POST['config'])) {
+            list($oid,$date,$version) = explode('|',mres($_POST['config']));
+            $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group=&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
+            if ($text == 'node not found') {
+                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.$device['os'].'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
+            }
+        }
+        else {
+            $text      = file_get_contents($config['oxidized']['url'].'/node/fetch/'.$device['hostname']);
+            if ($text == 'node not found') {
+                $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.$device['os'].'/'.$device['hostname']);
+            }
+        }
+        if ($config['oxidized']['features']['versioning'] === true) {
+            $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.$device['hostname'].'&format=json'), true);
         }
 
-        if (is_array($node_info)) {
+        if (is_array($node_info) || is_array($config_versions)) {
             echo '<br />
                 <div class="row">
-                <div class="col-sm-4">
-                <div class="panel panel-primary">
-                <div class="panel-heading">Sync status: <strong>'.$node_info['last']['status'].'</strong></div>
-                <ul class="list-group">
-                <li class="list-group-item"><strong>Node:</strong> '.$node_info['name'].'</strong></li>
-                <li class="list-group-item"><strong>IP:</strong> '.$node_info['ip'].'</strong></li>
-                <li class="list-group-item"><strong>Model:</strong> '.$node_info['model'].'</strong></li>
-                <li class="list-group-item"><strong>Last Sync:</strong> '.$node_info['last']['end'].'</strong></li>
-                </ul>
-                </div>
-                </div>
-                </div>';
+            ';
+
+            if (is_array($node_info)) {
+                echo '
+                      <div class="col-sm-4">
+                          <div class="panel panel-primary">
+                              <div class="panel-heading">Sync status: <strong>'.$node_info['last']['status'].'</strong></div>
+                              <ul class="list-group">
+                                  <li class="list-group-item"><strong>Node:</strong> '.$node_info['name'].'</strong></li>
+                                  <li class="list-group-item"><strong>IP:</strong> '.$node_info['ip'].'</strong></li>
+                                  <li class="list-group-item"><strong>Model:</strong> '.$node_info['model'].'</strong></li>
+                                  <li class="list-group-item"><strong>Last Sync:</strong> '.$node_info['last']['end'].'</strong></li>
+                              </ul>
+                          </div>
+                      </div>
+                ';
+            }
+
+            if (is_array($config_versions)) {
+                echo '
+                    <div class="col-sm-8">
+                        <form class="form-horizontal" action="" method="post">
+                            <div class="form-group">
+                                <label for="config" class="col-sm-2 control-label">Config version</label>
+                                <div class="col-sm-6">
+                                    <select id="config" name="config" class="form-control">
+                                        <option value="">Select version</option>
+                ';
+
+                $config_total = count($config_versions);
+                foreach ($config_versions as $version) {
+                    echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'">'.$config_total.' :: '.$version['date'].' - '.$version['message'].'</option>';
+                    $config_total--;
+                }
+
+                echo '
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-6">
+                                      <button type="submit" class="btn btn-primary btn-sm">Show version</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                ';
+            }
+
+            echo '</div>';
         }
         else {
             echo '<br />';

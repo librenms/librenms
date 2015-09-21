@@ -22,7 +22,8 @@ require 'includes/polling/functions.inc.php';
 require 'includes/alerts.inc.php';
 
 $poller_start = utime();
-echo $config['project_name_version']." Poller\n\n";
+echo $config['project_name_version']." Poller\n";
+echo get_last_commit()."\n";
 
 $options = getopt('h:m:i:n:r::d::a::');
 

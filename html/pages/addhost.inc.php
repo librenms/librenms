@@ -221,7 +221,8 @@ if ($config['distributed_poller'] === true) {
 }//end if
 
 ?>
-    <button type="submit" class="btn btn-default input-sm" name="Submit">Add Host</button>
+    <hr>
+    <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>
 </form>
   </div>

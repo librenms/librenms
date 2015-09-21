@@ -799,6 +799,25 @@ echo '<div id="boxcar_appkey_template" class="hide">
                 </div>
             </div>
         </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pushbullet_transport_expand">Pushbullet</a> <button name="test-alert" id="test-alert" type="button" data-transport="pushbullet" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="pushbullet_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="pushbullet" class="col-sm-4 control-label">Pushbullet Access Token </label>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.pushbullet']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div class="col-sm-4">
+                            <input id="pushbullet" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.pushbullet']['config_value'].'" data-config_id="'.$config_groups['alert.transports.pushbullet']['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 ';
@@ -815,12 +834,33 @@ echo '<div id="boxcar_appkey_template" class="hide">
     $(".toolTip").tooltip();
 
     $("button#test-alert").click(function() {
-        var transport = $(this).data("transport");
+        var $this = $(this);
+        var transport = $this.data("transport");
         $.ajax({
             type: 'POST',
             url: '/ajax_form.php',
             data: { type: "test-transport", transport: transport },
-            dataType: "json"
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    $this.removeClass('btn-primary').addClass('btn-success');
+                    setTimeout(function(){
+                        $this.removeClass('btn-success').addClass('btn-primary');
+                    }, 2000);
+                }
+                else {
+                    $this.removeClass('btn-primary').addClass('btn-danger');
+                    setTimeout(function(){
+                        $this.removeClass('btn-danger').addClass('btn-primary');
+                    }, 2000);
+                }
+            },
+            error: function(){
+                $this.removeClass('btn-primary').addClass('btn-danger');
+                setTimeout(function(){
+                    $this.removeClass('btn-danger').addClass('btn-primary');
+                }, 2000);
+            }
         });
     });
 

@@ -1,3 +1,48 @@
+### September 2015
+
+#### Bug fixes
+  - Alerting:
+    - Process followups if there are changes (PR1817)
+    - Typo in alert_window setting (PR1841)
+    - Issue alert-trigger as test object (PR1850)
+  - WebUI:
+    - Fix permissions for World-map widget (PR1866)
+    - Clean up Gloabl / World Map name mixup (PR1874)
+  - Services:
+    - Honour IP field for DNS checks (PR1933)
+  - Discovery / Poller:
+    - Fix Huawei VRP os detection (PR1931)t
+  - General:
+    - Remove 'sh' from cronjob (PR1818)
+    - Remove MySQL Locks (PR1822,PR1826,PR1829,PR1836)
+
+#### Improvements
+  - WebUI:
+    - Ability to edit ifAlias (PR1811)
+    - Honour Mouseout/Mouseleave on map widget (PR1814)
+    - Make syslog/eventlog responsive (PR1816)
+    - Reformat Proxmox UI (PR1825,PR1827)
+    - Misc Changes (PR1828,PR1830,PR1875,PR1885,PR1886,PR1887,PR1891,PR1896,PR1901,PR1913)
+    - Added support for Oxidized versioning (PR1842)
+    - Added graph widget + settings for widgets (PR1835,PR1861)
+    - Added Support for multiple dashboards (PR1869)
+    - Added settings page for Worldmap widget (PR1872)
+    - Added uptime to availability widget (PR1881)
+    - Added top devices and ports widgets (PR1903)
+    - Added support for saving notes for devices (PR1927)
+  - Added detection for:
+    - FortiOS (PR1815)
+  - Discovery / Poller:
+    - Added Proxmox support (PR1789)
+  - Documentation:
+    - Add varnish docs (PR1809)
+    - Added CentOS 7 RRCached docs (1893)
+  - General:
+    - Make installer more responsive (PR1832)
+    - Update fping millisec option to 200 default (PR1833)
+    - Reduced cleanup of device_perf (PR1837)
+    - Added support for negative values in munin-plugins (PR1907)
+
 ### August 2015
 
 #### Bug fixes
@@ -8,6 +53,9 @@
     - Fixed Web installer due to code tidying update (PR1644)
     - Updated gridster variable names to make unique (PR1646)
     - Fixed issues with displaying devices with ' in location (PR1655)
+    - Fixes updating snmpv3 details in webui (PR1727)
+    - Check for user perms before listing neighbour ports (PR1749)
+    - Fixed Test-Transport button (PR1772)
   - DB:
     - Added proper indexes on device_perf table (PR1621)
     - Fixed multiple mysql strict issues (PR1638, PR1659)
@@ -17,8 +65,18 @@
     - Fixed discovery-arp not running since code formatting update (PR1671)
     - Correct the DSM upgrade OID (PR1696)
     - Fix MySQL agent host variable usage (PR1710)
+    - Pass snmp-auth parameters enclosed by single-quotes (PR1730)
+    - Revert change which skips over down ports (PR1742)
+    - Stop PoE polling for each port (PR1747)
+    - Use ifHighSpeed if ifSpeed equals 0 (PR1750)
+    - Keep PHP Backwards compatibility (PR1766)
+    - False identification of Zyxel as Cisco (PR1776)
+    - Fix MySQL statement in poller-service.py (PR1794)
+    - Fix upstart script for poller-service.py (PR1812)
   - General:
     - Fixed path to defaults.inc.php in config.php.default (PR1673)
+    - Strip '::ffff:' from syslog input (PR1734)
+    - Fix RRA (PR1791)
 
 #### Improvements
   - WebUI Updates:
@@ -32,29 +90,50 @@
     - Added support for running under sub-directory (PR1667)
     - Updated vis.js to latest version (PR1708)
     - Added border on availability map (PR1713)
+    - Make new dashboard the default (PR1719)
+    - Rearrange about page (PR1735,PR1743)
+    - Center/Cleanup graphs (PR1736)
+    - Added Hover-Effect on devices table (PR1738)
+    - Show Test-Transport result (PR1777)
+    - Add arrows to the network map (PR1787)
+    - Add errored ports to summary widget (PR1788)
+    - Show message if no Device-Groups exist (PR1796)
+    - Misc UI fixes (Titles, Headers, ...) (PR1797,PR1798,PR1800,PR1801,PR1802,PR1803,PR1804,PR1805)
+    - Move packages to overview dropdown (PR1810)
   - API Updates:
     - Improvided billing support in API (PR1599)
+    - Extended support for list devices to support mac/ipv4 and ipv6 filtering (PR1744)
   - Added detection for:
     - Perle Media convertors (PR1607)
+    - Mac OSX 10 (PR1774)
   - Improved detection for:
     - Windows devices (PR1639)
-    - Zywall CPU, Version and Memory (PR1660)
+    - Zywall CPU, Version and Memory (PR1660,PR1784)
     - Added LLDP support for PBN devices (PR1705)
+    - Netgear GS110TP (PR1751)
   - Additional Sensors:
     - Added Compressor state for PCOWEB (PR1600)
     - Added dbm support for IOS-XR (PR1661)
+    - Added temperature support for DNOS (PR1782)
   - Discovery / Poller:
     - Updated autodiscovery function to log new type (PR1623)
+    - Improve application polling (PR1724)
+    - Improve debug output (PR1756)
   - DB:
     - Added MySQLi support (PR1647)
   - Documentation:
     - Added docs on MySQL strict mode (PR1635)
     - Updated billing docs to use librenms user in cron (PR1676)
     - Updated LDAP docs to indicate php-ldap module needs installing (PR1716)
+    - Typo/Spellchecks (PR1731,PR1806)
+    - Improved Alerting and Device-Groups (PR1781)
   - Alerting:
     - Reformatted eventlog message to show state for alerts (PR1685)
+    - Add basic Pushbullet transport (PR1721)
+    - Allow custom titles (PR1807)
   - General:
     - Added more debugging and checks to discovery-protocols (PR1590)
+    - Cleanup debug statements (PR1725,PR1737)
 
 ### July 2015
 
