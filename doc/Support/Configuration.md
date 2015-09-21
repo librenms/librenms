@@ -52,7 +52,12 @@ $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
 $config['fping_options']['millisec'] = 200;
 ```
-fping configuration options, this includes setting the timeout and retry options.
+`fping` configuration options:
+
+* `retries` (`fping` parameter `-r`): Number of times an attempt at pinging a target will be made, not including the first try.
+* `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds).
+* `count` (`fping` parameter `-c`): Number of request packets to send to each target.
+* `millisec` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
 
 ```php
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
