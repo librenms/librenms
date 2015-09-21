@@ -54,5 +54,6 @@ Contributors to LibreNMS:
 - Juho Vanhanen <juho@vanhanen.me> (juhovan)
 - Bart de Bruijn <bart_de_bruijn@yahoo.com> (bartdebruijn)
 - Christophe Martinet <martinet.christophe@gmail.com> (chrisgfx)
+- Nils Steinger <librenms@voidptr.de> (n-st)
 
 [1]: http://observium.org/ "Observium web site"
