@@ -369,10 +369,10 @@ $config_file = <<<"EOD"
 ## Have a look in defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
 
 ### Database config
-\$config\['db_host'\] = \"$dbhost\";
-\$config\['db_user'\] = "$dbuser";
-\$config\['db_pass'\] = "$dbpass";
-\$config\['db_name'\] = "$dbname";
+\$config\['db_host'\] = '$dbhost';
+\$config\['db_user'\] = '$dbuser';
+\$config\['db_pass'\] = '$dbpass';
+\$config\['db_name'\] = '$dbname';
 \$config\['db'\]\['extension'\] = "mysqli";// mysql or mysqli
 
 ### Memcached config - We use this to store realtime usage
