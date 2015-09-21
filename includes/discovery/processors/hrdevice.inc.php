@@ -53,6 +53,12 @@ if (is_array($hrDevice_array)) {
                 $descr = 'Processor';
             }
 
+            // Workaround for Linux where some CPUs don't have a description
+            if ($device['os'] == 'linux' && empty($entry['hrDeviceDescr'])) {
+                $descr = 'Processor';
+            }
+
+
             $descr = str_replace('CPU ', '', $descr);
             $descr = str_replace('(TM)', '', $descr);
             $descr = str_replace('(R)', '', $descr);
