@@ -62,7 +62,7 @@ echo "<div class='row'>
     <div class='col-md-4'>
     <form id='appedit' name='appedit' method='post' action='' role='form' class='form-horizontal'>
     <input type=hidden name=device value='".$device['device_id']."'>
-    <table class='table table-hover table-condensed table-responsive'>
+    <table class='table table-hover table-responsive'>
     <tr align=center>
     <th>Enable</th>
     <th>Application</th>
