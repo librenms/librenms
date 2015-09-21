@@ -36,7 +36,7 @@ You can also select between the mysql and mysqli php extensions:
 $config['db']['extension'] = 'mysqli';
 ```
 
-#### Progams
+#### Programs
 
 A lot of these are self explanatory so no further information may be provided.
 
