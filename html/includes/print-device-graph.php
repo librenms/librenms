@@ -16,11 +16,11 @@ else {
     $row_colour = $list_colour_b;
 }
 echo '<div class="panel panel-default">
-	<div class="panel-heading">
-		<h3 class="panel-title">'.$graph_title.'</h3>
-  	</div>
-  	<div class="panel-body">';
-		require 'includes/print-graphrow.inc.php';
-		echo '</div>';
-	echo '</div>';
+    <div class="panel-heading">
+    <h3 class="panel-title">'.$graph_title.'</h3>
+     </div>
+      <div class="panel-body">';
+    require 'includes/print-graphrow.inc.php';
+     echo '</div>';
+    echo '</div>';
 $g_i++;
