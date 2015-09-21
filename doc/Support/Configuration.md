@@ -24,10 +24,10 @@ Log files created by LibreNMS will be stored within this directory.
 These are the configuration options you will need to use to specify to get started.
 
 ```php
-$config['db_host'] = "127.0.0.1";
-$config['db_user'] = "";
-$config['db_pass'] = "";
-$config['db_name'] = "";
+$config['db_host'] = '127.0.0.1';
+$config['db_user'] = '';
+$config['db_pass'] = '';
+$config['db_name'] = '';
 ```
 
 You can also select between the mysql and mysqli php extensions:
