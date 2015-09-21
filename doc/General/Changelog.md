@@ -32,6 +32,7 @@
     - Added support for saving notes for devices (PR1927)
   - Added detection for:
     - FortiOS (PR1815)
+    - HP MSM (PR1953)
   - Discovery / Poller:
     - Added Proxmox support (PR1789)
   - Documentation:
