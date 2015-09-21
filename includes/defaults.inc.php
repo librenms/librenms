@@ -773,7 +773,7 @@ $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
 $config['leaflet']['default_lat']                       = '51.4800';
 $config['leaflet']['default_lng']                       = '0';
-$config['leaflet']['default_zoom']                       = 1;
+$config['leaflet']['default_zoom']                       = 2;
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
