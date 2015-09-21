@@ -182,7 +182,7 @@ function get_percentage_colours($percentage) {
 
 
 function generate_minigraph_image($device, $start, $end, $type, $legend='no', $width=275, $height=100, $sep='&amp;', $class='minigraph-image',$absolute_size=0) {
-    return '<img class="'.$class.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")).'">';
+    return '<img class="'.$class.'" width="'.$width.'" height="'.$height.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")).'">';
 
 }//end generate_minigraph_image()
 
