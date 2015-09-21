@@ -634,6 +634,12 @@ $config['os'][$os]['icon']             = 'avaya';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
+$os = 'avaya-ipo';
+$config['os'][$os]['text']             = 'IP Office Firmware';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'avaya';
+
+
 $os = 'arista_eos';
 $config['os'][$os]['text']             = 'Arista EOS';
 $config['os'][$os]['type']             = 'network';
@@ -1276,6 +1282,26 @@ $config['os'][$os]['icon']             = 'perle';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// MACOSX
+$os = 'macosx';
+$config['os'][$os]['text']             = 'Apple OS X';
+$config['os'][$os]['type']             = 'server';
+$config['os'][$os]['icon']             = 'generic';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// Appliances
+$os = 'fortios';
+$config['os'][$os]['text']             = 'FortiOS';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'fortios';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
@@ -1630,10 +1656,15 @@ if (isset($config['enable_printers']) && $config['enable_printers']) {
     $config['device_types'][$i]['icon'] = 'printer.png';
 }
 
+$i++;
+$config['device_types'][$i]['text'] = 'Appliance';
+$config['device_types'][$i]['type'] = 'appliance';
+$config['device_types'][$i]['icon'] = 'appliance.png';
+
 //
 // No changes below this line #
 //
-$config['version']              = '2014.master';
+$config['version']              = '2015.master';
 $config['project_name_version'] = $config['project_name'].' '.$config['version'];
 
 if (isset($config['rrdgraph_def_text'])) {

@@ -145,6 +145,11 @@ if ($device['adsl_count'] > '0') {
     $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1.1.7.1.7', $port_stats, 'ADSL-LINE-MIB');
 }//end if
 
+if ($config['enable_ports_poe']) {
+    $port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
+    $port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
+}
+
 // FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
 // foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
 // foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
@@ -289,7 +294,7 @@ foreach ($ports as $port) {
         }
 
         // Overwrite ifSpeed with ifHighSpeed if it's over 1G
-        if (is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > '1000000000') {
+        if (is_numeric($this_port['ifHighSpeed']) && ($this_port['ifSpeed'] > '1000000000' || $this_port['ifSpeed'] == 0)) {
             echo 'HighSpeed ';
             $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
         }
@@ -328,6 +333,13 @@ foreach ($ports as $port) {
 
         // Update IF-MIB data
         foreach ($data_oids as $oid) {
+
+            if ($oid == 'ifAlias') {
+                if (get_dev_attrib($device, 'ifName', $port['ifName'])) {
+                    $this_port['ifAlias'] = $port['ifAlias'];
+                }
+            }
+
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
                 log_event($oid.': '.$port[$oid].' -> NULL', $device, 'interface', $port['port_id']);
