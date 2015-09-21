@@ -375,6 +375,10 @@ $config_file = <<<"EOD"
 \$config\['db_name'\] = "$dbname";
 \$config\['db'\]\['extension'\] = "mysqli";// mysql or mysqli
 
+// This is the user LibreNMS will run as
+//Please ensure this user is created and has the correct permissions to your install
+\$config['user'] = 'librenms';
+
 ### Memcached config - We use this to store realtime usage
 \$config\['memcached'\]\['enable'\]  = FALSE;
 \$config\['memcached'\]\['host'\]    = "localhost";

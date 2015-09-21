@@ -14,6 +14,10 @@ $config['memcached']['enable']  = FALSE;
 $config['memcached']['host']    = "localhost";
 $config['memcached']['port']    = 11211;
 
+// This is the user LibreNMS will run as
+//Please ensure this user is created and has the correct permissions to your install
+$config['user'] = 'librenms';
+
 ### Locations - it is recommended to keep the default
 #$config['install_dir']  = "/opt/librenms";
 

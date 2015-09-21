@@ -59,6 +59,25 @@ require_once 'includes/definitions.inc.php';
 require_once 'includes/functions.php';
 require_once $config['install_dir'].'/includes/alerts.inc.php';
 
+// Let's test the user configured if we have it
+if (isset($config['user'])) {
+    $tmp_user = $config['user'];
+    $tmp_dir = $config['install_dir'];
+    $tmp_log = $config['log_dir'];
+    $find_result = rtrim(`find $tmp_dir \! -user $tmp_user -not -path $tmp_log`);
+    if (!empty($find_result)) {
+        // This isn't just the log directory, let's print the list to the user
+        $files = explode(PHP_EOL, $find_result);
+        if (is_array($files)) {
+            print_fail("We have found some files that are owned by a different user than $tmp_user, this will stop you updating automatically and / or rrd files being updated causing graphs to fail:\n");
+            foreach ($files as $file) {
+                echo "$file\n";
+            }
+            echo "\n";
+        }
+    }
+}
+
 // Run test on MySQL
 $test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
 if (mysqli_connect_error()) {
