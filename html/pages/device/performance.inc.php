@@ -35,19 +35,19 @@ if (empty($vars['dtpickerto'])) {
 ?>
 
 <hr />
-<div class="center-block">
-    <form method="post" role="form" id="map" class="form-inline">
-        <div class="form-group">
-            <label for="dtpickerfrom">From</label>
-            <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16" value="<?php echo $vars['dtpickerfrom']; ?>" data-date-format="YYYY-MM-DD HH:mm">
-        </div>
-        <div class="form-group">
-            <label for="dtpickerto">To</label>
-            <input type="text" class="form-control" id="dtpickerto" name="dtpickerto" maxlength=16 value="<?php echo $vars['dtpickerto']; ?>" data-date-format="YYYY-MM-DD HH:mm">
-        </div>
-        <input type="submit" class="btn btn-default" id="submit" value="Update">
-    </form>
-</div>
+<center>
+<form method="post" role="form" id="map" class="form-inline">
+    <div class="form-group">
+        <label for="dtpickerfrom">From</label>
+        <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16" value="<?php echo $vars['dtpickerfrom']; ?>" data-date-format="YYYY-MM-DD HH:mm">
+    </div>
+    <div class="form-group">
+        <label for="dtpickerto">To</label>
+        <input type="text" class="form-control" id="dtpickerto" name="dtpickerto" maxlength=16 value="<?php echo $vars['dtpickerto']; ?>" data-date-format="YYYY-MM-DD HH:mm">
+    </div>
+    <input type="submit" class="btn btn-default" id="submit" value="Update">
+</form>
+</center>
 <hr />
 <script type="text/javascript">
     $(function () {
