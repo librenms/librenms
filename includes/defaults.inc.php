@@ -56,7 +56,7 @@ $config['fping']                    = '/usr/bin/fping';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
-$config['fping_options']['millisec'] = 20;
+$config['fping_options']['millisec'] = 200;
 $config['snmpwalk']                  = '/usr/bin/snmpwalk';
 $config['snmpget']                   = '/usr/bin/snmpget';
 $config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
@@ -192,14 +192,7 @@ $config['snmp']['v3'][0]['cryptopass'] = '';
 // Privacy (Encryption) Passphrase
 $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 // AES | DES
-// RRD Format Settings
-// These should not normally be changed
-// Though one could conceivably increase or decrease the size of each RRA if one had performance problems
-// Or if one had a very fast I/O subsystem with no performance worries.
-$config['rrd_rra']  = ' RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ';
-$config['rrd_rra'] .= ' RRA:MAX:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:LAST:0.5:1:1440 ';
+
 
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
@@ -340,6 +333,9 @@ $config['network_map_vis_options'] = '{
       randomSeed:2
   },
   "edges": {
+    arrows: {
+          to:     {enabled: true, scaleFactor:0.5},
+    },
     "smooth": {
         enabled: false
     },
@@ -709,9 +705,10 @@ $config['eventlog_purge'] = 30;
 $config['authlog_purge'] = 30;
 // Number in days of how long to keep authlog entries for.
 $config['perf_times_purge'] = 30;
-// Number in days of how long to keep performace pooling stats  entries for.
-$config['device_perf_purge'] = 30;
+// Number in days of how long to keep performace polling stats  entries for.
+$config['device_perf_purge'] = 7;
 // Number in days of how long to keep device performance data for.
+
 // Date format for PHP date()s
 $config['dateformat']['long'] = 'r';
 // RFC2822 style
@@ -784,3 +781,6 @@ $config['gui']['network-map']['style']                  = 'new';//old is also va
 
 // Navbar variables
 $config['navbar']['manage_groups']['hide']              = 0;
+
+// Show errored ports in the summary table on the dashboard
+$config['summary_errors']                               = 0;

@@ -97,7 +97,7 @@ if (!empty($agent_data['munin'])) {
                     $data['draw'] = 'LINE1.5';
                 }
 
-                $cmd      = '--step 300 DS:val:'.$data['type'].':600:0:U ';
+                $cmd      = '--step 300 DS:val:'.$data['type'].':600:U:U ';
                 $cmd     .= $config['rrd_rra'];
                 $ds_uniq  = $mplug_id.'_'.$name;
                 $filename = $plugin_rrd.'_'.$name.'.rrd';

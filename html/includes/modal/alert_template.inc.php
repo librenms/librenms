@@ -51,6 +51,8 @@ if(is_admin() === false) {
                             <textarea class="form-control" id="template" name="template" rows="15"></textarea><br /><br />
                             <strong><em>Give your template a name: </em></strong><br />
                             <input type="text" class="form-control input-sm" id="name" name="name"><br />
+                            <em>Optionally, add custom titles: </em><br />
+                            <input type="text" class="form-control input-sm" id="title" name="title" placeholder="Alert Title"><input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title"><br />
                             <span id="error"></span><br />
                             <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
                         </div>
@@ -113,6 +115,8 @@ $('#alert-template').on('show.bs.modal', function (event) {
             success: function(output) {
                 $('#template').val(output['template']);
                 $('#name').val(output['name']);
+                $('#title').val(output['title']);
+                $('#title_rec').val(output['title_rec']);
             }
         });
     }
@@ -123,10 +127,12 @@ $('#create-template').click('', function(e) {
     var template = $("#template").val();
     var template_id = $("#template_id").val();
     var name = $("#name").val();
+    var title = $("#title").val();
+    var title_rec = $("#title_rec").val();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template , name: name, template_id: template_id},
+        data: { type: "alert-templates", template: template , name: name, template_id: template_id, title: title, title_rec: title_rec},
         dataType: "html",
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {

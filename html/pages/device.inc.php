@@ -357,6 +357,12 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             </a>
             </li>';
 
+        echo '<li class="'.$select['notes'].'">
+            <a href="'.generate_device_url($device, array('tab' => 'notes')).'">
+            <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Notes
+            </a>
+            </li>';
+
 
         echo '<li style="float: right;"><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"></a></li>
             <li style="float: right;"><a href="ssh://'.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"></a></li>

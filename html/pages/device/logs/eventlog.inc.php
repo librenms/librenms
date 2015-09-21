@@ -1,27 +1,27 @@
 <hr />
+<form method="post" action="">
+  <div class="row">
+    <div class="col-md-4">
+      <input type="text" name="string" placeholder="Search" class="form-control" id="string" value="<?php echo $_POST['string']; ?>" required/>
+    </div>
+    <div class="col-md-4">
+        <select name="type" class="form-control" id="type">
+          <option value="">All Types</option>
+          <option value="system">System</option>
+            <?php
+            foreach (dbFetchRows('SELECT `type` FROM `eventlog` WHERE device_id = ? GROUP BY `type` ORDER BY `type`', array($device['device_id'])) as $data) {
+                echo "<option value='".$data['type']."'";
+                if ($data['type'] == $_POST['type']) {
+                    echo 'selected';
+                }
 
-  <form method="post" action="">
-  <label><strong>Search</strong>
-    <input type="text" name="string" id="string" value="<?php echo $_POST['string']; ?>" />
-  </label>
-  <label>
-    <strong>Type</strong>
-    <select name="type" id="type">
-      <option value="">All Types</option>
-      <option value="system">System</option>
-        <?php
-        foreach (dbFetchRows('SELECT `type` FROM `eventlog` WHERE device_id = ? GROUP BY `type` ORDER BY `type`', array($device['device_id'])) as $data) {
-            echo "<option value='".$data['type']."'";
-            if ($data['type'] == $_POST['type']) {
-                echo 'selected';
+                echo '>'.$data['type'].'</option>';
             }
-
-            echo '>'.$data['type'].'</option>';
-        }
-        ?>
-    </select>
-  </label>
-  <input class="submit" type="submit" value="Search">
+            ?>
+        </select>
+    </div>
+    <div class="col-md-4"><input class="btn btn-default" type="submit" value="Search"></div>
+  </div>
 </form>
 
 <?php

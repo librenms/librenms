@@ -50,7 +50,7 @@ $config['fping6']           = "/usr/bin/fping6";
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
-$config['fping_options']['millisec'] = 5;
+$config['fping_options']['millisec'] = 200;
 ```
 fping configuration options, this includes setting the timeout and retry options.
 
@@ -143,6 +143,7 @@ $config['show_locations']          = 1;  # Enable Locations on menu
 $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 0;  # Enable Services on menu
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
+$config['summary_errors']          = 0;  # Show Errored ports in summary boxes on the dashboard
 $config['customers_descr']         = 'cust'; // The description to look for in ifDescr. Can be an array as well array('cust','cid');
 $config['transit_descr']           = ""; // Add custom transit descriptions (can be an array)
 $config['peering_descr']           = ""; // Add custom peering descriptions (can be an array)

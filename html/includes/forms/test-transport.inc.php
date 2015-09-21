@@ -18,31 +18,32 @@ if (is_admin() === false) {
 
 $transport = mres($_POST['transport']);
 
+require_once $config['install_dir'].'/includes/alerts.inc.php';
+$tmp = array(dbFetchRow('select device_id,hostname from devices order by device_id asc limit 1'));
+$tmp['contacts'] = GetContacts($tmp);
 $obj = array(
-    'contacts' => $config['alert']['default_mail'],
-    'title'    => 'Testing transport from ' . $config['project_name'],
-    'msg'      => 'This is a test alert',
-    'severity' => 'critical',
-    'state'    => 'critical',
-    'hostname' => 'testing',
-    'name'     => 'Testing rule',
+    "hostname"  => $tmp[0]['hostname'],
+    "device_id" => $tmp[0]['device_id'],
+    "title"     => "Testing transport from ".$config['project_name'],
+    "elapsed"   => "11s",
+    "id"        => "000",
+    "faults"    => false,
+    "uid"       => "000",
+    "severity"  => "critical",
+    "rule"      => "%macros.device = 1",
+    "name"      => "Test-Rule",
+    "timestamp" => date("Y-m-d H:i:s"),
+    "contacts"  => $tmp['contacts'],
+    "state"     => "1",
+    "msg"       => "This is a test alert",
 );
-
-unset($obj);
-$obj['contacts'] = 'test';
-$obj['title'] = 'test';
-$obj['msg'] = 'test';
-$obj['severity'] = 'test';
-$obj['state'] = 'test';
-$obj['hostname'] = 'test';
-$obj['name'] = 'test';
 
 $status = 'error';
 
-if (file_exists($config['install_dir']."/includes/alerts/transport.$transport.php")) {
+if (file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php")) {
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
-        eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' };');
+        eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
         $tmp = $tmp($obj,$opts);
         if ($tmp) {
             $status = 'ok';
