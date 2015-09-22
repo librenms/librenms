@@ -276,7 +276,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         if (ip_exists($ip) === false) {
             // Test reachability
             $address_family = snmpTransportToAddressFamily($transport);
-            if ($force_add == 1 || isPingable($host, $addressFamily)) {
+            if ($force_add == 1 || isPingable($host, $address_family)) {
                 if (empty($snmpver)) {
                     // Try SNMPv2c
                     $snmpver = 'v2c';
