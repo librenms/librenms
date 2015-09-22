@@ -59,7 +59,13 @@ elif [ "${OS}" = "Linux" ] ; then
   fi
 
 #  OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
-  OSSTR="${DIST} ${REV}"
+  if [ -n "${REV}" ]
+  then
+    OSSTR="${DIST} ${REV}"
+  else
+    OSSTR="${DIST}"
+  fi
+
 elif [ "${OS}" = "Darwin" ] ; then
   if [ -f /usr/bin/sw_vers ] ; then
     OSSTR=`/usr/bin/sw_vers|grep -v Build|sed 's/^.*:.//'| tr "\n" ' '`
