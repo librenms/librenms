@@ -106,14 +106,14 @@ var greenMarker = L.AwesomeMarkers.icon({
         // Checking user permissions
         if (is_admin() || is_read()) {
         // Admin or global read-only - show all devices
-            $sql = "SELECT `device_id`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
+            $sql = "SELECT DISTINCT(`device_id`),`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
                     ORDER BY `status` ASC, `hostname`";
         }
         else {
         // Normal user - grab devices that user has permissions to
-            $sql = "SELECT `devices`.`device_id` as `device_id`,`hostname`,`os`,`status`,`lat`,`lng`
+            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`hostname`,`os`,`status`,`lat`,`lng`
                     FROM `devices_perms`, `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
                     WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
