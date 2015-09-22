@@ -36,7 +36,7 @@ if ($device['os'] != 'Snom') {
         'snmpProxyDrops',
     );
 
-    unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
+    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
     $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('netstats-snmp.rrd');
 
     $rrd_create = $config['rrd_rra'];
@@ -48,7 +48,7 @@ if ($device['os'] != 'Snom') {
 
     $data_array = snmpwalk_cache_oid($device, 'snmp', array(), 'SNMPv2-MIB');
 
-    $rrdupdate = array();
+    $fields = array();
     foreach ($oids as $oid) {
         if (is_numeric($data_array[0][$oid])) {
             $value = $data_array[0][$oid];
@@ -56,8 +56,7 @@ if ($device['os'] != 'Snom') {
         else {
             $value = 'U';
         }
-
-        $rrdupdate[] = $value;
+        $fields[$oid] = $value;
     }
 
     if (isset($data_array[0]['snmpInPkts']) && isset($data_array[0]['snmpOutPkts'])) {
@@ -65,7 +64,7 @@ if ($device['os'] != 'Snom') {
             rrdtool_create($rrd_file, $rrd_create);
         }
 
-        rrdtool_update($rrd_file, $rrdupdate);
+        rrdtool_update($rrd_file, $fields);
         $graphs['netstat_snmp']     = true;
         $graphs['netstat_snmp_pkt'] = true;
     }

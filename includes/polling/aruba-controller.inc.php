@@ -50,8 +50,11 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         rrdtool_create($rrdfile, ' --step 300 DS:NUMAPS:GAUGE:600:0:12500000000 DS:NUMCLIENTS:GAUGE:600:0:12500000000 '.$config['rrd_rra']);
     }
 
-    $cont_rrd_update = "$polled:".$aruba_stats[0]['wlsxSwitchTotalNumAccessPoints'].':'.$aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'];
-    $ret             = rrdtool_update($rrdfile, $cont_rrd_update);
+    $fields = array(
+        'NUMAPS'     => $aruba_stats[0]['wlsxSwitchTotalNumAccessPoints'],
+        'NUMCLIENTS' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
+    );
+    $ret             = rrdtool_update($rrdfile, $fields);
 
     // also save the info about how many clients in the same place as the wireless module
     $wificlientsrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('wificlients-radio1.rrd');
@@ -60,7 +63,10 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         rrdtool_create($wificlientsrrd, '--step 300 DS:wificlients:GAUGE:600:-273:10000 '.$config['rrd_rra']);
     }
 
-    rrdtool_update($wificlientsrrd, 'N:'.$aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated']);
+    $fields = array(
+        'wificlients' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
+    );
+    rrdtool_update($wificlientsrrd, $fields);
 
     $graphs['wifi_clients'] = true;
 
@@ -109,7 +115,18 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
                 rrdtool_create($rrd_file, "--step 300 $dslist ".$config['rrd_rra']);
             }
 
-            rrdtool_update($rrd_file, "$polled:".$channel.':'.$txpow.':'.$radioutil.':'.$nummonclients.':'.$nummonbssid.':'.$numasoclients.':'.$interference);
+            $fields = array(
+                'channel'         => $channel,
+                'txpow'           => $txpow,
+                'radioutil'       => $radioutil,
+                'nummonclients'   => $nummonclients,
+                'nummonbssid'     => $nummonbssid,
+                'numasoclients'   => $numasoclients,
+                'interference'    => $interference,
+            );
+
+            rrdtool_update($rrd_file, $fields);
+
         }
 
         // generate the mac address

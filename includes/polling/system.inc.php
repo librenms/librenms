@@ -74,7 +74,11 @@ if (is_numeric($uptime)) {
         rrdtool_create($uptime_rrd, 'DS:uptime:GAUGE:600:0:U '.$config['rrd_rra']);
     }
 
-    rrdtool_update($uptime_rrd, 'N:'.$uptime);
+    $fields = array(
+        'uptime' => $uptime,
+    );
+
+    rrdtool_update($uptime_rrd, $fields);
 
     $graphs['uptime'] = true;
 

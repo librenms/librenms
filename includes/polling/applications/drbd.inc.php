@@ -27,25 +27,20 @@ if (!is_file($rrd_filename)) {
     );
 }
 
-$ds_list = array(
-    'ns',
-    'nr',
-    'dw',
-    'dr',
-    'al',
-    'bm',
-    'lo',
-    'pe',
-    'ua',
-    'ap',
-    'oos',
+$fields = array(
+    'ns'  => $drbd['ns'],
+    'nr'  => $drbd['nr'],
+    'dw'  => $drbd['dw'],
+    'dr'  => $drbd['dr'],
+    'al'  => $drbd['al'],
+    'bm'  => $drbd['bm'],
+    'lo'  => $drbd['lo'],
+    'pe'  => $drbd['pe'],
+    'ua'  => $drbd['ua'],
+    'ap'  => $drbd['ap'],
+    'oos' => $drbd['oos'],
 );
-foreach ($ds_list as $ds) {
-    if (empty($drbd[$ds])) {
-        $drbd[$ds] = 'U';
-    }
-}
 
-rrdtool_update($rrd_filename, 'N:'.$drbd['ns'].':'.$drbd['nr'].':'.$drbd['dw'].':'.$drbd['dr'].':'.$drbd['al'].':'.$drbd['bm'].':'.$drbd['lo'].':'.$drbd['pe'].':'.$drbd['ua'].':'.$drbd['ap'].':'.$drbd['oop']);
+rrdtool_update($rrd_filename, $fields);
 
 unset($drbd);

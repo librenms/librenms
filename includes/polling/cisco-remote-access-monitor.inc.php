@@ -50,19 +50,20 @@ if ($device['os_group'] == 'cisco') {
             rrdtool_create($rrd_filename, $rrd_create);
         }
 
-        $rrd_update  = 'N';
-        $rrd_update .= ':'.$data['crasEmailNumSessions'];
-        $rrd_update .= ':'.$data['crasIPSecNumSessions'];
-        $rrd_update .= ':'.$data['crasL2LNumSessions'];
-        $rrd_update .= ':'.$data['crasLBNumSessions'];
-        $rrd_update .= ':'.$data['crasSVCNumSessions'];
-        $rrd_update .= ':'.$data['crasWebvpnNumSessions'];
+        $fields = array(
+            'email'   => $data['crasEmailNumSessions'],
+            'ipsec'   => $data['crasIPSecNumSessions'],
+            'l2l'     => $data['crasL2LNumSessions'],
+            'lb'      => $data['crasLBNumSessions'],
+            'svc'     => $data['crasSVCNumSessions'],
+            'webvpn'  => $data['crasWebvpnNumSessions'],
+        );
 
-        rrdtool_update($rrd_filename, $rrd_update);
+        rrdtool_update($rrd_filename, $fields);
 
         $graphs['cras_sessions'] = true;
         echo ' CRAS Sessions';
     }
 
-    unset($data, $$rrd_filename, $rrd_create, $rrd_update);
+    unset($data, $$rrd_filename, $rrd_create, $fields);
 }//end if

@@ -56,7 +56,15 @@ if ($port_stats[$port['ifIndex']]
     }
 
     $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.$port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];
-    $ret = rrdtool_update("$rrdfile", $upd);
+
+    $fields = array(
+        'PortPwrAllocated'   => $port['cpeExtPsePortPwrAllocated'],
+        'PortPwrAvailable'   => $port['cpeExtPsePortPwrAvailable'],
+        'PortConsumption'    => $port['cpeExtPsePortPwrConsumption'],
+        'PortMaxPwrDrawn'    => $port['cpeExtPsePortMaxPwrDrawn'],
+    );
+
+    $ret = rrdtool_update("$rrdfile", $fields);
 
     echo 'PoE ';
 }//end if
