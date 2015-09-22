@@ -46,7 +46,7 @@ $config['rrdtool'] = "/usr/bin/rrdtool";
 
 ```php
 $config['fping']            = "/usr/bin/fping";
-$config['fping6']           = "/usr/bin/fping6";
+$config['fping6']           = "fping6";
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
