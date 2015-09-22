@@ -43,7 +43,11 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
         echo $sensor." $unit\n";
 
-        rrdtool_update($rrd_file, "N:$sensor");
+        $fields = array(
+            'sensor' => $sensor,
+        );
+
+        rrdtool_update($rrd_file, $fields);
 
         // FIXME warnings in event & mail not done here yet!
         dbUpdate(array('sensor_current' => $sensor), 'sensors', 'poller_type = ? AND sensor_class = ? AND sensor_id = ?', array('ipmi', $ipmisensors['sensor_class'], $ipmisensors['sensor_id']));

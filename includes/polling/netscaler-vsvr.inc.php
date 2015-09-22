@@ -55,7 +55,7 @@ if ($device['os'] == 'netscaler') {
 
     $oids = array_merge($oids_gauge, $oids_counter);
 
-    unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
+    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
 
     $rrd_create = $config['rrd_rra'];
 
@@ -83,14 +83,14 @@ if ($device['os'] == 'netscaler') {
         if (isset($vsvr['vsvrName'])) {
             $vsvr_exist[$vsvr['vsvrName']] = 1;
             $rrd_file  = $config['rrd_dir'].'/'.$device['hostname'].'/netscaler-vsvr-'.safename($vsvr['vsvrName']).'.rrd';
-            $rrdupdate = 'N';
 
+            $fields = array();
             foreach ($oids as $oid) {
                 if (is_numeric($vsvr[$oid])) {
-                    $rrdupdate .= ':'.$vsvr[$oid];
+                    $fields[$oid] = $vsvr[$oid];
                 }
                 else {
-                    $rrdupdate .= ':U';
+                    $fields[$oid] = 'U';
                 }
             }
 
@@ -121,9 +121,9 @@ if ($device['os'] == 'netscaler') {
                 rrdtool_create($rrd_file, $rrd_create);
             }
 
-                rrdtool_update($rrd_file, $rrdupdate);
+            rrdtool_update($rrd_file, $fields);
 
-                echo "\n";
+            echo "\n";
         }//end if
     }//end foreach
 
