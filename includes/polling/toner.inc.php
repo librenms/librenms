@@ -30,7 +30,11 @@ if ($config['enable_printers']) {
 
         echo $tonerperc." %\n";
 
-        rrdtool_update($tonerrrd, "N:$tonerperc");
+        $fields = array(
+            'toner' => $tonerperc,
+        );
+
+        rrdtool_update($tonerrrd, $fields);
 
         // FIXME should report for toner out... :)
         // Log toner swap

@@ -234,20 +234,23 @@ function rrdtool_create($filename, $options) {
 function rrdtool_update($filename, $options) {
     $values = array();
     // Do some sanitisation on the data if passed as an array.
+
     if (is_array($options)) {
         $values[] = 'N';
-        foreach ($options as $value) {
-            if (!is_numeric($value)) {
-                $value = U;
+        foreach ($options as $k => $v) {
+            if (!is_numeric($v)) {
+                $v = U;
             }
 
-            $values[] = $value;
+            $values[] = $v;
         }
 
         $options = implode(':', $values);
+        return rrdtool('update', $filename, $options);
     }
-
-    return rrdtool('update', $filename, $options);
+    else {
+        return 'Bad options passed to rrdtool_update';
+    }
 
 }
 

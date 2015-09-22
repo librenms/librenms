@@ -34,4 +34,21 @@ if (!is_file($rrd_filename)) {
     );
 }
 
-rrdtool_update($rrd_filename, "N:$stratum:$offset:$frequency:$jitter:$noise:$stability:$uptime:$buffer_recv:$buffer_free:$buffer_used:$packets_drop:$packets_ignore:$packets_recv:$packets_sent");
+$fields = array(
+    'stratum'        => $stratum,
+    'offset'         => $offset,
+    'frequency'      => $frequency,
+    'jitter'         => $jitter,
+    'noise'          => $noise,
+    'stability'      => $stability,
+    'uptime'         => $uptime,
+    'buffer_recv'    => $buffer_recv,
+    'buffer_free'    => $buffer_free,
+    'buffer_used'    => $buffer_used,
+    'packets_drop'   => $packets_drop,
+    'packets_ignore' => $packets_ignore,
+    'packets_recv'   => $packets_recv,
+    'packets_sent'   => $packets_sent,
+);
+
+rrdtool_update($rrd_filename, $fields);

@@ -32,7 +32,14 @@ if (count($diskio_data)) {
             );
         }
 
-        rrdtool_update($rrd, array($entry['diskIONReadX'], $entry['diskIONWrittenX'], $entry['diskIOReads'], $entry['diskIOWrites']));
+        $fields = array(
+            'read'    => $entry['diskIONReadX'],
+            'written' => $entry['diskIONWrittenX'],
+            'reads'   => $entry['diskIOReads'],
+            'writes'  => $entry['diskIOWrites'],
+        );
+
+        rrdtool_update($rrd, $fields);
     }//end foreach
 
     echo "\n";

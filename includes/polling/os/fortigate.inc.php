@@ -23,7 +23,13 @@ if (is_numeric($sessions)) {
     }
 
     print "Sessions: $sessions\n";
-    rrdtool_update($sessrrd, 'N:'.$sessions);
+
+    $fields = array(
+        'sessions' => $sessions,
+    );
+
+    rrdtool_update($sessrrd, $fields);
+
     $graphs['fortigate_sessions'] = true;
 }
 
@@ -36,6 +42,12 @@ if (is_numeric($cpu_usage)) {
     }
 
     echo "CPU: $cpu_usage%\n";
-    rrdtool_update($cpurrd, " N:$cpu_usage");
+
+    $fields = array(
+        'LOAD' => $cpu_usage,
+    );
+
+    rrdtool_update($cpurrd, $fields);
+
     $graphs['fortigate_cpu'] = true;
 }
