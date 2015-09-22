@@ -1,27 +1,17 @@
-This document will explain how to add full support for a new OS. **Some knowledge in PHP is needed.**
+This document will explain how to add basic and full support for a new OS. **Some knowledge in PHP is needed for the full support.**
 
-#### MIB
 
-At first we copy the MIB file into the default directory:
+#### BASIC SUPPORT FOR A NEW OS
+
+### MIB
+
+If we have the MIB, we can copy the file into the default directory:
 
 ```bash
 /opt/librenms/mibs
 ```
 
-We are now ready to look at inside the file and find the OID we want to use. _For this documentation we'll use Pulse Secure devices._
-
-Then we can test it with the snmpget command (hostname must be reachabled):
-
-```bash
-//for example the OID iveCpuUtil.0:
-snmpget -v2c -c public -OUsb -m PULSESECURE-PSG-MIB -M /opt/librenms/mibs -t 30 secure iveCpuUtil.0
-//quick explanation : snmpget -v2c -c COMMUNITY -OUsb -m MIBFILE -M MIB DIRECTORY HOSTNAME OID
-
-//Result here:
-iveCpuUtil.0 = Gauge32: 28
-```
-
-#### New OS definition
+### New OS definition
 Let's begin to declare the new OS in LibreNMS. At first we modify the definition file located here:
 
 ```bash
@@ -41,6 +31,125 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+//The icon described before is the image we have to create and put in the directory html/images/os
+```
+
+### Discovery OS
+
+We create a new file named as our OS definition and in this directory:
+
+```bash
+includes/discovery/os/pulse.inc.php
+```
+This file just sets the $os variable, done by checking the SNMP tree for a particular value that matches the OS you are adding. Typically, this will come from the presence of specific values in sysObjectID or sysDescr, or the existence of a particular enterprise tree.
+Look at other files to get help in the code structure.
+
+```php
+<?php
+
+if (!$os) {
+    if (strstr($sysDescr, 'Pulse Connect Secure')) {
+        $os = 'pulse';
+    }
+}
+```
+
+Here is the file location for polling the new OS within a vendor MIB or a standart one:
+
+```bash
+includes/polling/os/pulse.inc.php
+```
+This file will usually set the variables for $version, $hardware and $hostname retrieved from an snmp lookup.
+
+```php
+<?php
+
+$version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
+$hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
+$hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
+```
+
+Quick explanation and examples : 
+
+```bash
+snmpwalk -v2c -c public -m SNMPv2-MIB -M mibs
+//will give the overall OIDs that can be retrieve with this Standart MIB. OID on the left side and the result on the right side
+//Then we have just to pick the wanted OID and do a check
+
+snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 HOSTNAME SNMPv2-SMI::mib-2.1.1.0
+//sysDescr.0 = STRING: Juniper Networks,Inc,Pulse Connect Secure,VA-DTE,8.1R1 (build 33493)
+
+snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 HOSTNAME SNMPv2-SMI::mib-2.1.5.0
+//sysName.0 = STRING: pulse-secure
+
+//Here the same with the vendor MIB and the specific OID
+snmpget -v2c -c public -OUsb -m PULSESECURE-PSG-MIB -M /opt/librenms_old/mibs -t 30 HOSTNAME productName.0
+//productName.0 = STRING: "Pulse Connect Secure,VA-DTE"
+
+snmpget -v2c -c public -OUsb -m PULSESECURE-PSG-MIB -M /opt/librenms/mibs -t 30 HOSTNAME productVersion.0
+//productVersion.0 = STRING: "8.1R1 (build 33493)"
+```
+
+#### The final check
+
+Discovery
+```bash
+./discovery.php -h HOSTNAME
+```
+
+Polling
+```bash
+./poller.php -h HOSTNAME
+```
+
+At this step we should see all the values retrieved in LibreNMS.
+
+
+
+#### FULL SUPPORT FOR A NEW OS
+
+### MIB
+
+At first we copy the MIB file into the default directory:
+
+```bash
+/opt/librenms/mibs
+```
+
+We are now ready to look at inside the file and find the OID we want to use. _For this documentation we'll use Pulse Secure devices._
+
+Then we can test it with the snmpget command (hostname must be reachabled):
+
+```bash
+//for example the OID iveCpuUtil.0:
+snmpget -v2c -c public -OUsb -m PULSESECURE-PSG-MIB -M /opt/librenms/mibs -t 30 HOSTNAME iveCpuUtil.0
+//quick explanation : snmpget -v2c -c COMMUNITY -OUsb -m MIBFILE -M MIB DIRECTORY HOSTNAME OID
+
+//Result here:
+iveCpuUtil.0 = Gauge32: 28
+```
+
+### New OS definition
+Let's begin to declare the new OS in LibreNMS. At first we modify the definition file located here:
+
+```bash
+includes/definitions.inc.php
+```
+
+```php
+// Pulse Secure OS definition
+$os = 'pulse';
+$config['os'][$os]['text']             = 'Pulse Secure';
+$config['os'][$os]['type']             = 'firewall';
+$config['os'][$os]['icon']             = 'junos';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+//The icon described before is the image we have to create and put in the directory html/images/os
 
 //Don't forget to declare the specific graphs if needed. It will be located near the end of the file.
 
@@ -53,7 +162,7 @@ $config['graph_types']['device']['pulse_sessions']['order']        = '0';
 $config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
 ```
 
-#### Discovery OS
+### Discovery OS
 
 We create a new file named as our OS definition and in this directory:
 
@@ -295,12 +404,12 @@ require 'includes/graphs/generic_simplex.inc.php';
 
 Discovery
 ```bash
-./discovery.php -h hostname
+./discovery.php -h HOSTNAME
 ```
 
 Polling
 ```bash
-./poller.php -h hostname
+./poller.php -h HOSTNAME
 ```
 
 At this step we should see all the values retrieved in LibreNMS.
