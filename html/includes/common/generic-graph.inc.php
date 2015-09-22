@@ -61,6 +61,9 @@ if( defined('show_settings') || empty($widget_settings) ) {
         $common_output[] = '<option disabled></option>';
     }
     $common_output[] = '
+        <option value="transit"'.($widget_settings['graph_type'] == 'transit' ? ' selected' : '').'>Transit</option>
+        <option value="peering"'.($widget_settings['graph_type'] == 'peering' ? ' selected' : '').'>Peering</option>
+        <option value="core"'.($widget_settings['graph_type'] == 'core' ? ' selected' : '').'>Core</option>
       </select>
     </div>
     <div class="col-sm-offset-10 col-sm-2">
@@ -317,6 +320,29 @@ else {
     }
     elseif ($type == 'munin') {
         $param                        = 'device='.$widget_settings['graph_'.$type]['device_id'].'&plugin='.$widget_settings['graph_'.$type]['name'];
+    }
+    elseif ($type == 'transit' || $type == 'peering' || $type == 'core') {
+        $type_where = ' (';
+        if (is_array($config[$type.'_descr']) === false) {
+            $config[$type.'_descr'] = array($config[$type.'_descr']);
+        }
+        foreach ($config[$type.'_descr'] as $additional_type) {
+            if (!empty($additional_type)) {
+                $type_where  .= " $or `port_descr_type` = ?";
+                $or           = 'OR';
+                $type_param[] = $additional_type;
+            }
+        }
+        $type_where  .= " $or `port_descr_type` = ?";
+        $or           = 'OR';
+        $type_param[] = $type;
+        $type_where .= ') ';
+        foreach (dbFetchRows("SELECT port_id FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param) as $port) {
+            $tmp[] = $port['port_id'];
+        }
+        $param                        = 'id='.implode(',',$tmp);
+        $widget_settings['graph_type']= 'multiport_bits_separate';
+        $widget_settings['title']     = 'Overall '.ucfirst($type).' Bits ('.$widget_settings['graph_range'].')';
     }
     else {
         $param                        = 'id='.$widget_settings['graph_'.$type][$type.'_id'];
