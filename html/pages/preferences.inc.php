@@ -41,7 +41,7 @@ else {
         echo "<form method='post' action='preferences/' class='form-horizontal' role='form'>
   <input type=hidden name='action' value='changepass'>
   <div class='form-group'>
-    <label for='old_pass' class='col-sm-2 control-label'>Old Password</label>
+    <label for='old_pass' class='col-sm-2 control-label'>Current Password</label>
     <div class='col-sm-4'>
       <input type=password name=old_pass autocomplete='off' class='form-control input-sm'>
     </div>
@@ -60,7 +60,7 @@ else {
     <label for='new_pass2' class='col-sm-2 control-label'>New Password</label>
     <div class='col-sm-4'>
       <input type=password name=new_pass2 autocomplete='off' class='form-control input-sm'>
-      <hr>
+      <br>
   <center><button type='submit' class='btn btn-default'>Submit</button></center>
     </div>
     <div class='col-sm-6'>
