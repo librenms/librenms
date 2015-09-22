@@ -43,9 +43,7 @@ elif [ "${OS}" = "Linux" ] ; then
   elif [ -f /etc/arch-release ] ; then
     DIST="Arch Linux"
     REV="" # Omit version since Arch Linux uses rolling releases
-  fi
-
-  if [ -f /etc/UnitedLinux-release ] ; then
+  elif [ -f /etc/UnitedLinux-release ] ; then
     DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
   fi
 
@@ -58,7 +56,6 @@ elif [ "${OS}" = "Linux" ] ; then
     fi
   fi
 
-#  OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
   if [ -n "${REV}" ]
   then
     OSSTR="${DIST} ${REV}"
