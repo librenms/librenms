@@ -275,7 +275,8 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         }
         if (ip_exists($ip) === false) {
             // Test reachability
-            if ($force_add == 1 || isPingable($host)) {
+            $address_family = snmpTransportToAddressFamily($transport);
+            if ($force_add == 1 || isPingable($host, $addressFamily)) {
                 if (empty($snmpver)) {
                     // Try SNMPv2c
                     $snmpver = 'v2c';
@@ -501,7 +502,7 @@ function isSNMPable($device) {
     }
 }
 
-function isPingable($hostname,$device_id = FALSE) {
+function isPingable($hostname,$address_family = AF_INET,$device_id = FALSE) {
     global $config;
 
     $fping_params = '';
@@ -518,7 +519,7 @@ function isPingable($hostname,$device_id = FALSE) {
         $fping_params .= ' -p ' . $config['fping_options']['millisec'];
     }
     $response = array();
-    $status = fping($hostname,$fping_params);
+    $status = fping($hostname,$fping_params,$address_family);
     if ($status['loss'] == 100) {
         $response['result'] = FALSE;
     }
@@ -1186,7 +1187,7 @@ function ip_exists($ip) {
     return true;
 }
 
-function fping($host,$params) {
+function fping($host,$params,$address_family = AF_INET) {
 
     global $config;
 
@@ -1196,7 +1197,13 @@ function fping($host,$params) {
         2 => array("pipe", "w")
     );
 
-    $process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
+    // Default to AF_INET (IPv4)
+    $fping_path = $config['fping'];
+    if ($address_family == AF_INET6) {
+        $fping_path = $config['fping6'];
+    }
+
+    $process = proc_open($fping_path . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
     $read = '';
 
     if (is_resource($process)) {
@@ -1230,4 +1237,17 @@ function function_check($function) {
 
 function get_last_commit() {
     return `git log -n 1|head -n1`;
-}//end get_last_commit 
+}//end get_last_commit
+
+function snmpTransportToAddressFamily($transport) {
+    if (!isset($transport)) {
+        $transport = 'udp';
+    }
+
+    if ($transport == 'udp6' || $transport == 'tcp6') {
+        return AF_INET6;
+    }
+    else {
+        return AF_INET;
+    }
+}
