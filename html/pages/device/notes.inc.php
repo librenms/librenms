@@ -19,18 +19,19 @@ $data = dbFetchRow("SELECT `notes` FROM `devices` WHERE device_id = ?", array(
     <h3>Device Notes</h3>
     <hr>
     <div class="form-group">
-        <div class="col-sm-10">
-            <textarea class="form-control" rows="6" name="notes" id="device-notes"><?php
-echo htmlentities($data['notes']); ?></textarea>
+        <div class="col-sm-12">
+            <textarea class="form-control" rows="6" name="notes" id="device-notes">
+                <?php echo htmlentities($data['notes']); ?>
+            </textarea>
         </div>
     </div>
-    <div class="form-group">
-        <div class="col-sm-10">
+    <div class="row">
+        <div class="col-md-1 col-md-offset-5">
             <?php
-echo '
-            <button type="submit" name="btn-update-notes" id="btn-update-notes" class="btn btn-primary" data-device_id="' . $device['device_id'] . '">Submit</button>
+            echo '
+                <button type="submit" name="btn-update-notes" id="btn-update-notes" class="btn btn-default" data-device_id="' . $device['device_id'] . '"><i class="fa fa-check"></i> Save</button>
             ';
-?>
+            ?>
         </div>
     </div>
 </form>
