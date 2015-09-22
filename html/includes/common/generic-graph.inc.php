@@ -133,7 +133,11 @@ if( defined('show_settings') || empty($widget_settings) ) {
       <label for="graph_munin" class="control-label">Custom Port-Desc: </label>
     </div>
     <div class="col-sm-10">
-      <input type="text" class="form-control input_'.$unique_id.'_custom" name="graph_custom" placeholder="i.e. Gateway" value="'.htmlspecialchars($widget_settings['graph_custom']).'">
+      <select class="form-control input_'.$unique_id.'_custom" name="graph_custom">';
+    foreach ($config['custom_descr'] as $opt) {
+        $common_output[] = '<option value="'.$opt.'" '.($widget_settings['graph_custom'] == $opt ? 'selected' : '').'>'.ucfirst($opt).'</option>';
+    }
+    $common_output[] = '      </select>
     </div>
   </div>
   <div class="form-group">
