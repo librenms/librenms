@@ -324,5 +324,5 @@ else {
     if (empty($widget_settings['title'])) {
         $widget_settings['title']     = $widget_settings['graph_'.$type]['hostname']." / ".$widget_settings['graph_'.$type]['name']." / ".$widget_settings['graph_type'];
     }
-    $common_output[]                  = '<img class="minigraph-image" src="graph.php?'.$param.'&from='.$config['time'][$widget_settings['graph_range']].'&to='.$config['time']['now'].'&width='.$widget_dimensions['x'].'&height='.$widget_dimensions['y'].'&type='.$widget_settings['graph_type'].'&legend='.($widget_settings['graph_legend'] == 1 ? 'yes' : 'no').'&absolute=1"/>';
+    $common_output[]                  = '<img class="minigraph-image" width="'.$widget_dimensions['x'].'" height="'.$widget_dimensions['y'].'" src="graph.php?'.$param.'&from='.$config['time'][$widget_settings['graph_range']].'&to='.$config['time']['now'].'&width='.$widget_dimensions['x'].'&height='.$widget_dimensions['y'].'&type='.$widget_settings['graph_type'].'&legend='.($widget_settings['graph_legend'] == 1 ? 'yes' : 'no').'&absolute=1"/>';
 }
