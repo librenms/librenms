@@ -149,31 +149,7 @@ function interface_errors($rrd_file, $period = '-1d') {
 function getImage($device) {
     global $config;
 
-    $device['os'] = strtolower($device['os']);
-
-    if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
-        $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['icon'] . '.png" />';
-    }
-    elseif (isset($config['os'][$device['os']]['icon']) && $config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
-        $image = '<img src="' . $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png" />';
-    }
-    else {
-        if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
-            $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['os'] . '.png" />';
-        }
-        if ($device['os'] == "linux") {
-            $features = strtolower(trim($device['features']));
-            list($distro) = explode(" ", $features);
-            if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
-                $image = '<img src="' . $config['base_url'] . '/images/os/' . $distro . '.png" />';
-            }
-        }
-        if (empty($image)) {
-            $image = '<img src="' . $config['base_url'] . '/images/os/generic.png" />';
-        }
-    }
-
-    return $image;
+    return '<img src="' . getImageSrc($device) . '" />';
 }
 
 function getImageSrc($device) {
