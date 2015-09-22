@@ -11,6 +11,9 @@ So, to try and help with some of the general issues people come across we've put
  - Checks if you are running the older alerting system.
  - Checks your rrd directory setup if not running rrdcached.
  - Checks disk space for where /opt/librenms is installed.
+ - Checks location to fping
+ - Tests MySQL strict mode being enabled
+ - Tests for files not owned by librenms user (if configured)
 
 Optionally you can also pass -m and a module name for that to be tested. Current modules are:
 
