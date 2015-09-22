@@ -160,7 +160,7 @@ function getImageSrc($device) {
     if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
         $image = $config['base_url'] . '/images/os/' . $device['icon'] . '.png';
     }
-    elseif ($config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
+    elseif (isset($config['os'][$device['os']]['icon']) && $config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
         $image = $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png';
     }
     else {
