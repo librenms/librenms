@@ -61,6 +61,11 @@ if( defined('show_settings') || empty($widget_settings) ) {
         $common_output[] = '<option disabled></option>';
     }
     $common_output[] = '
+        <option disabled>Port Aggregators:</option>
+        <option value="transit"'.($widget_settings['graph_type'] == 'transit' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Transit</option>
+        <option value="peering"'.($widget_settings['graph_type'] == 'peering' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Peering</option>
+        <option value="core"'.($widget_settings['graph_type'] == 'core' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Core</option>
+        <option value="custom"'.($widget_settings['graph_type'] == 'custom' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Custom Descr</option>
       </select>
     </div>
     <div class="col-sm-offset-10 col-sm-2">
@@ -121,6 +126,18 @@ if( defined('show_settings') || empty($widget_settings) ) {
     </div>
     <div class="col-sm-10">
       <input type="text" class="form-control input_'.$unique_id.'_munin" name="graph_munin" placeholder="Munin Plugin" value="'.htmlspecialchars($widget_settings['graph_munin']).'">
+    </div>
+  </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_custom">
+    <div class="col-sm-2">
+      <label for="graph_munin" class="control-label">Custom Port-Desc: </label>
+    </div>
+    <div class="col-sm-10">
+      <select class="form-control input_'.$unique_id.'_custom" name="graph_custom">';
+    foreach ($config['custom_descr'] as $opt) {
+        $common_output[] = '<option value="'.$opt.'" '.($widget_settings['graph_custom'] == $opt ? 'selected' : '').'>'.ucfirst($opt).'</option>';
+    }
+    $common_output[] = '      </select>
     </div>
   </div>
   <div class="form-group">
@@ -307,7 +324,7 @@ else {
     $widget_settings['title']         = "";
     $type                             = explode('_',$widget_settings['graph_type'],2);
     $type                             = array_shift($type);
-    $widget_settings['graph_'.$type] = json_decode($widget_settings['graph_'.$type],true);
+    $widget_settings['graph_'.$type] = json_decode($widget_settings['graph_'.$type],true)?:$widget_settings['graph_'.$type];
     if ($type == 'device') {
         $widget_settings['title']     = $widget_settings['graph_device']['name']." / ".$widget_settings['graph_type'];
         $param                        = 'device='.$widget_settings['graph_device']['device_id'];
@@ -317,6 +334,37 @@ else {
     }
     elseif ($type == 'munin') {
         $param                        = 'device='.$widget_settings['graph_'.$type]['device_id'].'&plugin='.$widget_settings['graph_'.$type]['name'];
+    }
+    elseif ($type == 'transit' || $type == 'peering' || $type == 'core') {
+        $type_where = ' (';
+        if (is_array($config[$type.'_descr']) === false) {
+            $config[$type.'_descr'] = array($config[$type.'_descr']);
+        }
+        foreach ($config[$type.'_descr'] as $additional_type) {
+            if (!empty($additional_type)) {
+                $type_where  .= " $or `port_descr_type` = ?";
+                $or           = 'OR';
+                $type_param[] = $additional_type;
+            }
+        }
+        $type_where  .= " $or `port_descr_type` = ?";
+        $or           = 'OR';
+        $type_param[] = $type;
+        $type_where .= ') ';
+        foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE $type_where ORDER BY ifAlias", $type_param) as $port) {
+            $tmp[] = $port['port_id'];
+        }
+        $param                        = 'id='.implode(',',$tmp);
+        $widget_settings['graph_type']= 'multiport_bits_separate';
+        $widget_settings['title']     = 'Overall '.ucfirst($type).' Bits ('.$widget_settings['graph_range'].')';
+    }
+    elseif ($type == 'custom') {
+        foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE `port_descr_type` = ? ORDER BY ifAlias", array($widget_settings['graph_custom'])) as $port) {
+            $tmp[] = $port['port_id'];
+        }
+        $param                        = 'id='.implode(',',$tmp);
+        $widget_settings['graph_type']= 'multiport_bits_separate';
+        $widget_settings['title']     = 'Overall '.ucfirst(htmlspecialchars($widget_settings['graph_custom'])).' Bits ('.$widget_settings['graph_range'].')';
     }
     else {
         $param                        = 'id='.$widget_settings['graph_'.$type][$type.'_id'];
