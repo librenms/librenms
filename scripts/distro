@@ -40,6 +40,9 @@ elif [ "${OS}" = "Linux" ] ; then
   elif [ -f /etc/gentoo-release ] ; then
     DIST="Gentoo"
     REV=$(tr -d '[[:alpha:]]' </etc/gentoo-release | tr -d " ")
+  elif [ -f /etc/arch-release ] ; then
+    DIST="Arch Linux"
+    REV="" # Omit version since Arch Linux uses rolling releases
   fi
 
   if [ -f /etc/UnitedLinux-release ] ; then
