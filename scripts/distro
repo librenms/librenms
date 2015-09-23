@@ -27,9 +27,6 @@ elif [ "${OS}" = "Linux" ] ; then
 
     PSEUDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
     REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
-  elif [ -f /etc/SuSE-release ] ; then
-    DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
-    REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
   elif [ -f /etc/mandrake-release ] ; then
     DIST='Mandrake'
     PSEUDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
@@ -52,6 +49,9 @@ elif [ "${OS}" = "Linux" ] ; then
       DIST=$LSB_DIST
       REV=$LSB_REV
     fi
+  elif [ -f /etc/os-release ] ; then
+    DIST="$(grep '^NAME=' /etc/os-release | cut -d= -f2- | tr -d '\"')"
+    REV="$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2- | tr -d '\"')"
   fi
 
   if [ -n "${REV}" ]
