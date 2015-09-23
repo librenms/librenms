@@ -40,13 +40,12 @@ elif [ "${OS}" = "Linux" ] ; then
   elif [ -f /etc/gentoo-release ] ; then
     DIST="Gentoo"
     REV=$(tr -d '[[:alpha:]]' </etc/gentoo-release | tr -d " ")
-  fi
-
-  if [ -f /etc/UnitedLinux-release ] ; then
+  elif [ -f /etc/arch-release ] ; then
+    DIST="Arch Linux"
+    REV="" # Omit version since Arch Linux uses rolling releases
+  elif [ -f /etc/UnitedLinux-release ] ; then
     DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
-  fi
-
-  if [ -f /etc/lsb-release ] ; then
+  elif [ -f /etc/lsb-release ] ; then
     LSB_DIST="`cat /etc/lsb-release | grep DISTRIB_ID | cut -d "=" -f2`"
     LSB_REV="`cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d "=" -f2`"
     if [ "$LSB_DIST" != "" ] ; then
@@ -55,8 +54,13 @@ elif [ "${OS}" = "Linux" ] ; then
     fi
   fi
 
-#  OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
-  OSSTR="${DIST} ${REV}"
+  if [ -n "${REV}" ]
+  then
+    OSSTR="${DIST} ${REV}"
+  else
+    OSSTR="${DIST}"
+  fi
+
 elif [ "${OS}" = "Darwin" ] ; then
   if [ -f /usr/bin/sw_vers ] ; then
     OSSTR=`/usr/bin/sw_vers|grep -v Build|sed 's/^.*:.//'| tr "\n" ' '`
