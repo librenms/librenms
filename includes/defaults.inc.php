@@ -785,4 +785,4 @@ $config['navbar']['manage_groups']['hide']              = 0;
 $config['summary_errors']                               = 0;
 
 // Default width of the availability map's tiles
-$config['availability-map-width']                       = 20;
+$config['availability-map-width']                       = 25;
