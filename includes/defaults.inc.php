@@ -783,3 +783,6 @@ $config['navbar']['manage_groups']['hide']              = 0;
 
 // Show errored ports in the summary table on the dashboard
 $config['summary_errors']                               = 0;
+
+// Default width of the availability map's tiles
+$config['availability-map-width']                       = 25;
