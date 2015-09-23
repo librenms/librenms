@@ -1,6 +1,5 @@
 <?php
 echo "<h3>Authlog</h3>";
-echo "<hr>";
 if ($_SESSION['userlevel'] >= '10') {
     echo '<table class="table table-hover table-condensed">';
     echo "<th>Timestamp</th><th>User</th><th>IP Address</th><th>Result</th>";
