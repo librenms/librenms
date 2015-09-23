@@ -41,7 +41,7 @@ if (isset($_POST['create-default'])) {
         'severity'  => 'critical',
         'extra'     => '{"mute":false,"count":"1","delay":"300"}',
         'disabled'  => 0,
-        'name'      => 'BGP Session establised',
+        'name'      => 'BGP Session established',
     );
     $default_rules[] = array(
         'device_id' => '-1',
