@@ -147,7 +147,7 @@ else {
         $common_output[] = '
     <tr>
       <td class="text-left">'.generate_device_link($result, shorthost($result['hostname'])).'</td>
-      <td class="text-left">'.generate_port_link($result).'</td>
+      <td class="text-left">'.generate_port_link($result, shorten_interface_type($result['ifName'])).'</td>
       <td class="text-left">'.generate_port_link($result, generate_port_thumbnail($result)).'</td>
     </tr>
         ';
