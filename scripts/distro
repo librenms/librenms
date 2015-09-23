@@ -42,8 +42,8 @@ elif [ "${OS}" = "Linux" ] ; then
     REV="" # Omit version since Arch Linux uses rolling releases
     IGNORE_LSB=1 # /etc/lsb-release would overwrite $REV with "rolling"
   elif [ -f /etc/os-release ] ; then
-    DIST="$(grep '^NAME=' /etc/os-release | cut -d= -f2- | tr -d '\"')"
-    REV="$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2- | tr -d '\"')"
+    DIST=$(grep '^NAME=' /etc/os-release | cut -d= -f2- | tr -d '"')
+    REV=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2- | tr -d '"')
   fi
 
   if [ -f /etc/lsb-release -a "${IGNORE_LSB}" != 1 ] ; then
