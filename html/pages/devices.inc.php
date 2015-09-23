@@ -207,9 +207,10 @@ if($format == "graph") {
                 $graph_array_zoom['legend'] = 'yes';
 
                 $overlib_link = "device/device=".$device['device_id']."/";
-                echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+78)."px; max-width:".($width+78)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
+                echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+90)."px; max-width:".($width+90)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
+                echo '<div class="panel panel-default">';
                 echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
-                echo "</div>\n\n";
+                echo "</div></div>\n\n";
             }
         }
     }
