@@ -1,9 +1,8 @@
 <?php
 echo "<h3>Authlog</h3>";
-echo "<hr>";
 if ($_SESSION['userlevel'] >= '10') {
-    echo '<table cellspacing=0 cellpadding=1 width=100%>';
-
+    echo '<table class="table table-hover table-condensed">';
+    echo "<th>Timestamp</th><th>User</th><th>IP Address</th><th>Result</th>";
     foreach (dbFetchRows("SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `authlog` ORDER BY `datetime` DESC LIMIT 0,250") as $entry) {
         if ($bg == $list_colour_a) {
             $bg = $list_colour_b;
@@ -12,20 +11,19 @@ if ($_SESSION['userlevel'] >= '10') {
             $bg = $list_colour_a;
         }
 
-        echo "<tr style=\"background-color: $bg\">
-            <td class=syslog width=160>
+        echo "<tr>
+            <td>
             ".$entry['datetime'].'
             </td>
-            <td class=list-bold width=125>
+            <td>
             '.$entry['user'].'
             </td>
-            <td class=syslog width=250>
+            <td>
             '.$entry['address'].'
             </td>
-            <td class=syslog width=150>
+            <td>
             '.$entry['result'].'
             </td>
-            <td></td>
             ';
     }//end foreach
 
