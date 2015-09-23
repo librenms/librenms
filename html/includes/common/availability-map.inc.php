@@ -32,7 +32,7 @@ if (defined('show_settings')) {
 else {
 
     require_once 'includes/object-cache.inc.php';
-    $tile_width = $widget_settings['tile_width'];
+    $tile_width = $widget_settings['tile_width']?:$config['availability-map-width'];
 
     $sql = 'SELECT `D`.`hostname`,`D`.`device_id`,`D`.`status`,`D`.`uptime` FROM `devices` AS `D`';
 
@@ -65,7 +65,7 @@ else {
         $temp_output[] = '<a href="' . generate_url(array(
             'page' => 'device',
             'device' => $device['device_id']
-        )) . '" role="button" class="btn ' . $btn_type . ' btn-xs" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '" style="min-height:' . $tile_width . 'px; min-width: ' . $tile_width . 'px; border-radius:0px; margin:0; padding:0;"></a>';
+        )) . '" role="button" class="btn ' . $btn_type . ' btn-xs" title="' . $device['hostname'] . " - " . formatUptime($device['uptime']) . '" style="min-height:' . $tile_width . 'px; min-width: ' . $tile_width . 'px; border-radius:0px; margin:0px; padding:0px;"></a>';
     }
 
     $temp_rows = count($temp_output);
