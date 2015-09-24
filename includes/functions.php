@@ -511,7 +511,7 @@ function isSNMPable($device) {
  *
  * @return bool TRUE if the host responded to at least one ping request, FALSE otherwise.
  */
-function isPingable($hostname,$address_family = AF_INET,$device_id = FALSE) {
+function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
     global $config;
 
     $fping_params = '';
