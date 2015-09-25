@@ -1253,7 +1253,9 @@ function snmpTransportToAddressFamily($transport) {
         $transport = 'udp';
     }
 
-    if ($transport == 'udp6' || $transport == 'tcp6') {
+    $ipv6_snmp_transport_specifiers = array('udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6');
+
+    if (in_array($transport, $ipv6_snmp_transport_specifiers)) {
         return AF_INET6;
     }
     else {
