@@ -1248,6 +1248,18 @@ function get_last_commit() {
     return `git log -n 1|head -n1`;
 }//end get_last_commit
 
+/**
+ * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
+ * transport specifier (like "udp", "udp6", etc.).
+ *
+ * @param string $transport The SNMP transport specifier, for example "udp",
+ *                          "udp6", "tcp", or "tcp6". See `man snmpcmd`,
+ *                          section "Agent Specification" for a full list.
+ *
+ * @return int The address family associated with the given transport
+ *             specifier: AF_INET for IPv4 (or local connections not associated
+ *             with an IP stack), AF_INET6 for IPv6.
+ */
 function snmpTransportToAddressFamily($transport) {
     if (!isset($transport)) {
         $transport = 'udp';
