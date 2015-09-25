@@ -57,11 +57,11 @@ chown librenms:librenms /var/run/rrdcached
 chmod 755 /var/run/rrdcached
 ```
 
-- Create an rrdcache service for easy daemon management.
+- Create an rrdcached service for easy daemon management.
 ```ssh
-touch /etc/systemd/system/rrdcache.service
+touch /etc/systemd/system/rrdcached.service
 ```
-- Edit rrdcache.service and paste the example config:
+- Edit rrdcached.service and paste the example config:
 ```ssh
 [Unit]
 Description=RRDtool Cache
@@ -77,11 +77,11 @@ RRDC_USER=librenms
 WantedBy=default.target
 ```
 
-- Restart the systemctl daemon so it can recognize the newly created rrdcache.service. Enable the rrdcache.service on boot, and start the service.
+- Restart the systemctl daemon so it can recognize the newly created rrdcached.service. Enable the rrdcached.service on boot, and start the service.
 ```ssh
 systemctl daemon-reload
-systemctl enable rrdcache.service
-systemctl start rrdcache.service
+systemctl enable rrdcached.service
+systemctl start rrdcached.service
 ```
 
 - Edit /opt/librenms/config.php to include:
