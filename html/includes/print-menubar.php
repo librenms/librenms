@@ -51,7 +51,7 @@ else {
           <ul class="dropdown-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
           <li class="dropdown-submenu">
-            <a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-exclamation-circle fa-fw fa-lg"></i> Alerts</a>
+            <a><i class="fa fa-exclamation-circle fa-fw fa-lg"> </i>Alerts</a>
             <ul class="dropdown-menu scrollable-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
