@@ -14,7 +14,7 @@
 
 
 function discover_new_device($hostname, $device='', $method='', $interface='') {
-    global $config, $debug;
+    global $config;
 
     if (!empty($config['mydomain']) && isDomainResolves($hostname.'.'.$config['mydomain'])) {
         $dst_host = $hostname.'.'.$config['mydomain'];
@@ -23,32 +23,24 @@ function discover_new_device($hostname, $device='', $method='', $interface='') {
         $dst_host = $hostname;
     }
 
-    if ($debug) {
-        echo "discovering $dst_host\n";
-    }
+    d_echo("discovering $dst_host\n");
 
     $ip = gethostbyname($dst_host);
     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
         // $ip isn't a valid IP so it must be a name.
         if ($ip == $dst_host) {
-            if ($debug) {
-                echo "name lookup of $dst_host failed\n";
-            }
+            d_echo("name lookup of $dst_host failed\n");
 
             return false;
         }
     }
 
-    if ($debug) {
-        echo "ip lookup result: $ip\n";
-    }
+    d_echo("ip lookup result: $ip\n");
 
     $dst_host = rtrim($dst_host, '.');
     // remove trailing dot
     if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
-        if ($debug) {
-            echo "$ip in an excluded network - skipping\n";
-        }
+        d_echo("$ip in an excluded network - skipping\n");
 
         return false;
     }
@@ -77,9 +69,7 @@ function discover_new_device($hostname, $device='', $method='', $interface='') {
         }
     }
     else {
-        if ($debug) {
-            echo "$ip not in a matched network - skipping\n";
-        }
+        d_echo("$ip not in a matched network - skipping\n");
     }//end if
 
 }//end discover_new_device()
@@ -161,11 +151,9 @@ function discover_device($device, $options=null) {
 
 
 function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor='1', $multiplier='1', $low_limit=null, $low_warn_limit=null, $warn_limit=null, $high_limit=null, $current=null, $poller_type='snmp', $entPhysicalIndex=null, $entPhysicalIndex_measured=null) {
-    global $config, $debug;
+    global $config;
 
-    if ($debug) {
-        echo "Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n";
-    }
+    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $precision, $entPhysicalIndex\n");
 
     if (is_null($low_warn_limit) && !is_null($warn_limit)) {
         // Warn limits only make sense when we have both a high and a low limit
@@ -218,9 +206,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
         $inserted = dbInsert($insert, 'sensors');
 
-        if ($debug) {
-            echo "( $inserted inserted )\n";
-        }
+        d_echo("( $inserted inserted )\n");
 
         echo '+';
         log_event('Sensor Added: '.mres($class).' '.mres($type).' '.mres($index).' '.mres($descr), $device, 'sensor', $inserted);
@@ -258,9 +244,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         if ($high_limit != $sensor_entry['sensor_limit'] && $sensor_entry['sensor_custom'] == 'No') {
             $update  = array('sensor_limit' => ($high_limit == null ? array('NULL') : $high_limit));
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
-            if ($debug) {
-                echo "( $updated updated )\n";
-            }
+            d_echo("( $updated updated )\n");
 
             echo 'H';
             log_event('Sensor High Limit Updated: '.mres($class).' '.mres($type).' '.mres($index).' '.mres($descr).' ('.$high_limit.')', $device, 'sensor', $sensor_id);
@@ -269,9 +253,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         if ($sensor_entry['sensor_limit_low'] != $low_limit && $sensor_entry['sensor_custom'] == 'No') {
             $update  = array('sensor_limit_low' => ($low_limit == null ? array('NULL') : $low_limit));
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
-            if ($debug) {
-                echo "( $updated updated )\n";
-            }
+            d_echo("( $updated updated )\n");
 
             echo 'L';
             log_event('Sensor Low Limit Updated: '.mres($class).' '.mres($type).' '.mres($index).' '.mres($descr).' ('.$low_limit.')', $device, 'sensor', $sensor_id);
@@ -280,9 +262,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         if ($warn_limit != $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
             $update  = array('sensor_limit_warn' => ($warn_limit == null ? array('NULL') : $warn_limit));
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
-            if ($debug) {
-                echo "( $updated updated )\n";
-            }
+            d_echo("( $updated updated )\n");
 
             echo 'WH';
             log_event('Sensor Warn High Limit Updated: '.mres($class).' '.mres($type).' '.mres($index).' '.mres($descr).' ('.$warn_limit.')', $device, 'sensor', $sensor_id);
@@ -291,9 +271,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
             $update  = array('sensor_limit_low_warn' => ($low_warn_limit == null ? array('NULL') : $low_warn_limit));
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
-            if ($debug) {
-                echo "( $updated updated )\n";
-            }
+            d_echo("( $updated updated )\n");
 
             echo 'WL';
             log_event('Sensor Warn Low Limit Updated: '.mres($class).' '.mres($type).' '.mres($index).' '.mres($descr).' ('.$low_warn_limit.')', $device, 'sensor', $sensor_id);
@@ -314,9 +292,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', array($sensor_entry['sensor_id']));
             echo 'U';
             log_event('Sensor Updated: '.mres($class).' '.mres($type).' '.mres($index).' '.mres($descr), $device, 'sensor', $sensor_id);
-            if ($debug) {
-                echo "( $updated updated )\n";
-            }
+            d_echo("( $updated updated )\n");
         }
     }//end if
     $valid[$class][$type][$index] = 1;
@@ -417,9 +393,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type='snmp') {
         foreach ($entries as $entry) {
             $index = $entry['sensor_index'];
             $type  = $entry['sensor_type'];
-            if ($debug) {
-                echo $index.' -> '.$type."\n";
-            }
+            d_echo($index.' -> '.$type."\n");
 
             if (!$valid[$class][$type][$index]) {
                 echo '-';
@@ -436,13 +410,11 @@ function check_valid_sensors($device, $class, $valid, $poller_type='snmp') {
 
 
 function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr) {
-    global $config, $debug;
+    global $config;
 
     if (dbFetchCell('SELECT COUNT(*) FROM `juniAtmVp` WHERE `port_id` = ? AND `vp_id` = ?', array($port_id, $vp_id)) == '0') {
         $inserted = dbInsert(array('port_id' => $port_id, 'vp_id' => $vp_id, 'vp_descr' => $vp_descr), 'juniAtmVp');
-        if ($debug) {
-            echo "( $inserted inserted )\n";
-        }
+        d_echo("( $inserted inserted )\n");
 
         // FIXME vv no $device!
         log_event('Juniper ATM VP Added: port '.mres($port_id).' vp '.mres($vp_id).' descr'.mres($vp_descr), 'juniAtmVp', $inserted);
@@ -457,7 +429,7 @@ function discover_juniAtmVp(&$valid, $port_id, $vp_id, $vp_descr) {
 
 
 function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id) {
-    global $config, $debug, $link_exists;
+    global $config, $link_exists;
 
     d_echo("$local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version");
 
@@ -488,9 +460,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
         $inserted = dbInsert($insert_data, 'links');
 
         echo '+';
-        if ($debug) {
-            echo "( $inserted inserted )";
-        }
+        d_echo("( $inserted inserted )");
     }
     else {
         $data = dbFetchRow('SELECT * FROM `links` WHERE `remote_hostname` = ? AND `local_port_id` = ? AND `protocol` = ? AND `remote_port` = ?', array($remote_hostname, $local_port_id, $protocol, $remote_port));
@@ -512,9 +482,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
             $updated = dbUpdate($update_data, 'links', '`id` = ?', array($data['id']));
             echo 'U';
-            if ($debug) {
-                echo "( $updated updated )";
-            }
+            d_echo("( $updated updated )");
         }//end if
     }//end if
     $link_exists[$local_port_id][$remote_hostname][$remote_port] = 1;
@@ -523,11 +491,9 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 
 
 function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used=null) {
-    global $config, $debug;
+    global $config;
 
-    if ($debug) {
-        echo "$device, $index, $type, $mib, $descr, $units, $used, $size\n";
-    }
+    d_echo("$device, $index, $type, $mib, $descr, $units, $used, $size\n");
 
     if ($descr && $size > '0') {
         $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', array($index, $device['device_id'], $mib));
@@ -545,9 +511,6 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
                 ),
                 'storage'
             );
-            if ($debug) {
-                mysql_error();
-            }
 
             echo '+';
         }
@@ -568,11 +531,9 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
 
 
 function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $precision='1', $current=null, $entPhysicalIndex=null, $hrDeviceIndex=null) {
-    global $config, $debug;
+    global $config;
 
-    if ($debug) {
-        echo "$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n";
-    }
+    d_echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
 
     if ($descr) {
         $descr = trim(str_replace('"', '', $descr));
@@ -607,9 +568,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
                 'processor_precision' => $precision,
             );
             dbUpdate($update_data, 'processors', '`device_id`=? AND `processor_index`=? AND `processor_type`=?', array($device['device_id'], $index, $type));
-            if ($debug) {
-                print $query."\n";
-            }
+            d_echo($query."\n");
         }//end if
         $valid[$type][$index] = 1;
     }//end if
@@ -618,11 +577,9 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 
 
 function discover_mempool(&$valid, $device, $index, $type, $descr, $precision='1', $entPhysicalIndex=null, $hrDeviceIndex=null) {
-    global $config, $debug;
+    global $config;
 
-    if ($debug) {
-        echo "$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n";
-    }
+    d_echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n");
 
     // FIXME implement the mempool_perc, mempool_used, etc.
     if ($descr) {
@@ -666,9 +623,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision='1
             }
 
             dbUpdate($update_data, 'mempools', 'device_id=? AND mempool_index=? AND mempool_type=?', array($device['device_id'], $index, $type));
-            if ($debug) {
-                print $query."\n";
-            }
+            d_echo($query."\n");
         }//end if
         $valid[$type][$index] = 1;
     }//end if
@@ -677,11 +632,9 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision='1
 
 
 function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity_oid=null, $capacity=null, $current=null) {
-    global $config, $debug;
+    global $config;
 
-    if ($debug) {
-        echo "$oid, $index, $type, $descr, $capacity, $capacity_oid\n";
-    }
+    d_echo("$oid, $index, $type, $descr, $capacity, $capacity_oid\n");
 
     if (dbFetchCell('SELECT COUNT(toner_id) FROM `toner` WHERE device_id = ? AND toner_type = ? AND `toner_index` = ? AND `toner_capacity_oid` =?', array($device['device_id'], $type, $index, $capacity_oid)) == '0') {
         $inserted = dbInsert(array('device_id' => $device['device_id'], 'toner_oid' => $oid, 'toner_capacity_oid' => $capacity_oid, 'toner_index' => $index, 'toner_type' => $type, 'toner_descr' => $descr, 'toner_capacity' => $capacity, 'toner_current' => $current), 'toner');

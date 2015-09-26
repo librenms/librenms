@@ -63,6 +63,8 @@ Config option: `ldap`
 
 This one is a little more complicated :)
 
+First of all, install ___php-ldap___ forCentOS/RHEL or ___php5-ldap___ for Ubuntu/Debian.
+
 ```php
 $config['auth_ldap_version'] = 3; # v2 or v3
 $config['auth_ldap_server'] = "ldap.example.com";

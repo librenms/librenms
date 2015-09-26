@@ -220,7 +220,6 @@ function IsMaintenance( $device ) {
  * @return void
  */
 function RunRules($device) {
-    global $debug;
     if( IsMaintenance($device) > 0 ) {
         echo "Under Maintenance, Skipping alerts.\r\n";
         return false;
@@ -261,7 +260,7 @@ function RunRules($device) {
                 $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)),9);
                 if( dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra),'alert_log') ) {
                     if( !dbUpdate(array('state' => 1, 'open' => 1),'alerts','device_id = ? && rule_id = ?', array($device,$rule['id'])) ) {
-                        dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1),'alerts');
+                        dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0),'alerts');
                     }
                     echo " ALERT ";
                 }
@@ -274,7 +273,7 @@ function RunRules($device) {
             else {
                 if( dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id']),'alert_log') ){
                     if( !dbUpdate(array('state' => 0, 'open' => 1),'alerts','device_id = ? && rule_id = ?', array($device,$rule['id'])) ) {
-                        dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1),'alerts');
+                        dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0),'alerts');
                     }
                     echo " OK    ";
                 }

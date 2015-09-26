@@ -36,5 +36,13 @@ if (!is_file($rrdfile)) {
     );
 }
 
-$rrdupdate = "N:$rxbytes:$txbytes:$rxpkts:$rxbytes:$calls:$registrations";
-rrdtool_update("$rrdfile", $rrdupdate);
+$fields = array(
+    'INOCTETS'      => $rxbytes,
+    'OUTOCTETS'     => $txbytes,
+    'INPKTS'        => $rxpkts,
+    'OUTPKTS'       => $rxbytes,
+    'CALLS'         => $calls,
+    'REGISTRATIONS' => $registrations,
+);
+
+rrdtool_update("$rrdfile", $fields);

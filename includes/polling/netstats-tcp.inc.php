@@ -19,7 +19,7 @@ if ($device['os'] != 'Snom') {
     // $oids['tcp_collect'] = $oids['tcp'];
     // $oids['tcp_collect'][] = 'tcpHCInSegs';
     // $oids['tcp_collect'][] = 'tcpHCOutSegs';
-    unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
+    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
     $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/netstats-tcp.rrd';
 
     $rrd_create = $config['rrd_rra'];
@@ -36,7 +36,7 @@ if ($device['os'] != 'Snom') {
 
     $data = snmp_get_multi($device, $snmpstring, '-OQUs', 'TCP-MIB');
 
-    $rrdupdate = 'N';
+    $fields = array();
 
     foreach ($oids as $oid) {
         if (is_numeric($data[0][$oid])) {
@@ -45,8 +45,7 @@ if ($device['os'] != 'Snom') {
         else {
             $value = 'U';
         }
-
-        $rrdupdate .= ":$value";
+        $fields[$oid] = $value;
     }
 
     unset($snmpstring);
@@ -56,7 +55,7 @@ if ($device['os'] != 'Snom') {
             rrdtool_create($rrd_file, $rrd_create);
         }
 
-        rrdtool_update($rrd_file, $rrdupdate);
+        rrdtool_update($rrd_file, $fields);
         $graphs['netstat_tcp'] = true;
     }
 

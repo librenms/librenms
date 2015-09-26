@@ -19,8 +19,24 @@ $config['log_dir'] = "/opt/librenms/logs";
 ```
 Log files created by LibreNMS will be stored within this directory.
 
+#### Database config
 
-#### Progams
+These are the configuration options you will need to use to specify to get started.
+
+```php
+$config['db_host'] = '127.0.0.1';
+$config['db_user'] = '';
+$config['db_pass'] = '';
+$config['db_name'] = '';
+```
+
+You can also select between the mysql and mysqli php extensions:
+
+```php
+$config['db']['extension'] = 'mysqli';
+```
+
+#### Programs
 
 A lot of these are self explanatory so no further information may be provided.
 
@@ -34,9 +50,14 @@ $config['fping6']           = "/usr/bin/fping6";
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
-$config['fping_options']['millisec'] = 5;
+$config['fping_options']['millisec'] = 200;
 ```
-fping configuration options, this includes setting the timeout and retry options.
+`fping` configuration options:
+
+* `retries` (`fping` parameter `-r`): Number of times an attempt at pinging a target will be made, not including the first try.
+* `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds).
+* `count` (`fping` parameter `-c`): Number of request packets to send to each target.
+* `millisec` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
 
 ```php
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
@@ -127,6 +148,7 @@ $config['show_locations']          = 1;  # Enable Locations on menu
 $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 0;  # Enable Services on menu
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
+$config['summary_errors']          = 0;  # Show Errored ports in summary boxes on the dashboard
 $config['customers_descr']         = 'cust'; // The description to look for in ifDescr. Can be an array as well array('cust','cid');
 $config['transit_descr']           = ""; // Add custom transit descriptions (can be an array)
 $config['peering_descr']           = ""; // Add custom peering descriptions (can be an array)
@@ -260,10 +282,6 @@ Please see [Billing](http://docs.librenms.org/Extensions/Billing-Module/) sectio
 
 ```php
 $config['enable_bgp']                   = 1; # Enable BGP session collection and display
-$config['enable_rip']                   = 1; # Enable RIP session collection and display
-$config['enable_ospf']                  = 1; # Enable OSPF session collection and display
-$config['enable_isis']                  = 1; # Enable ISIS session collection and display
-$config['enable_eigrp']                 = 1; # Enable EIGRP session collection and display
 $config['enable_syslog']                = 0; # Enable Syslog
 $config['enable_inventory']             = 1; # Enable Inventory
 $config['enable_pseudowires']           = 1; # Enable Pseudowires

@@ -62,7 +62,7 @@ echo "<div class='row'>
     <div class='col-md-4'>
     <form id='appedit' name='appedit' method='post' action='' role='form' class='form-horizontal'>
     <input type=hidden name=device value='".$device['device_id']."'>
-    <table class='table table-condensed table-striped table-responsive'>
+    <table class='table table-hover table-responsive'>
     <tr align=center>
     <th>Enable</th>
     <th>Application</th>
@@ -90,14 +90,13 @@ foreach ($applications as $app) {
     $row++;
 }
 
-echo '<tr>
-    <td>
-    <button type="submit" class="btn btn-default" value="Save">Save</button>
-    </td>
-    <td>
-    </td>
-    </tr>';
 echo '</table>';
+echo '<div class="row">
+        <div class="col-md-1">
+        <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+        </div>
+    </div>
+';
 echo '</form>';
 echo '</div>';
 echo '</div>';

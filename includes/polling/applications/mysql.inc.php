@@ -109,8 +109,8 @@ $mapping = array(
 );
 
 $values = array();
-foreach ($mapping as $key) {
-    $values[] = isset($map[$key]) ? $map[$key] : (-1);
+foreach ($mapping as $k => $v) {
+    $fields[$k] = isset($map[$v]) ? $map[$v] : (-1);
 }
 
 $string = implode(':', $values);
@@ -201,7 +201,7 @@ if (!is_file($mysql_rrd)) {
     );
 }//end if
 
-rrdtool_update($mysql_rrd, "N:$string");
+rrdtool_update($mysql_rrd, $fields);
 
 // Process state statistics
 $mysql_status_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-mysql-'.$app['app_id'].'-status.rrd';
@@ -227,8 +227,9 @@ $mapping_status = array(
 
 $values     = array();
 $rrd_create = '';
+unset($fields);
 foreach ($mapping_status as $desc => $id) {
-    $values[]    = isset($map[$id]) ? $map[$id] : (-1);
+    $fields[$desc]    = isset($map[$id]) ? $map[$id] : (-1);
     $rrd_create .= ' DS:'.$id.':GAUGE:600:0:125000000000';
 }
 
@@ -238,4 +239,4 @@ if (!is_file($mysql_status_rrd)) {
     rrdtool_create($mysql_status_rrd, '--step 300 '.$rrd_create.' '.$config['rrd_rra']);
 }
 
-rrdtool_update($mysql_status_rrd, "N:$string");
+rrdtool_update($mysql_status_rrd, $fields);

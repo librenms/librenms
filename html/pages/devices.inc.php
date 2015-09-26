@@ -207,9 +207,10 @@ if($format == "graph") {
                 $graph_array_zoom['legend'] = 'yes';
 
                 $overlib_link = "device/device=".$device['device_id']."/";
-                echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+78)."px; max-width:".($width+78)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
+                echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+90)."px; max-width:".($width+90)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
+                echo '<div class="panel panel-default">';
                 echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
-                echo "</div>\n\n";
+                echo "</div></div>\n\n";
             }
         }
     }
@@ -220,11 +221,11 @@ else {
 
 <div class="panel panel-default panel-condensed">
     <div class="table-responsive">
-        <table id="devices" class="table table-condensed">
+        <table id="devices" class="table table-condensed table-hover">
             <thead>
                 <tr>
-                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status"></th>
-                    <th data-column-id="icon" data-sortable="false" data-searchable="false"></th>
+                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status">Status</th>
+                    <th data-column-id="icon" data-sortable="false" data-searchable="false">Vendor</th>
                     <th data-column-id="hostname" data-order="asc">Device</th>
                     <th data-column-id="ports" data-sortable="false" data-searchable="false"></th>
                     <th data-column-id="hardware">Platform</th>
@@ -435,7 +436,7 @@ var grid = $("#devices").bootgrid({
             group: '<?php echo mres($vars['group']); ?>',
         };
     },
-    url: "/ajax_table.php"
+    url: "ajax_table.php"
 });
 
 </script>

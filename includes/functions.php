@@ -95,14 +95,12 @@ function logfile($string) {
 }
 
 function getHostOS($device){
-    global $config, $debug;
+    global $config;
 
     $sysDescr    = snmp_get ($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
     $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
-    if ($debug) {
-        echo("| $sysDescr | $sysObjectId | ");
-    }
+    d_echo("| $sysDescr | $sysObjectId | ");
 
     $path = $config['install_dir'] . "/includes/discovery/os";
     $dir_handle = @opendir($path) or die("Unable to open $path");
@@ -151,31 +149,7 @@ function interface_errors($rrd_file, $period = '-1d') {
 function getImage($device) {
     global $config;
 
-    $device['os'] = strtolower($device['os']);
-
-    if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
-        $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['icon'] . '.png" />';
-    }
-    elseif (isset($config['os'][$device['os']]['icon']) && $config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
-        $image = '<img src="' . $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png" />';
-    }
-    else {
-        if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
-            $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['os'] . '.png" />';
-        }
-        if ($device['os'] == "linux") {
-            $features = strtolower(trim($device['features']));
-            list($distro) = explode(" ", $features);
-            if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
-                $image = '<img src="' . $config['base_url'] . '/images/os/' . $distro . '.png" />';
-            }
-        }
-        if (empty($image)) {
-            $image = '<img src="' . $config['base_url'] . '/images/os/generic.png" />';
-        }
-    }
-
-    return $image;
+    return '<img src="' . getImageSrc($device) . '" />';
 }
 
 function getImageSrc($device) {
@@ -183,10 +157,10 @@ function getImageSrc($device) {
 
     $device['os'] = strtolower($device['os']);
 
-    if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+    if (!empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
         $image = $config['base_url'] . '/images/os/' . $device['icon'] . '.png';
     }
-    elseif ($config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
+    elseif (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
         $image = $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png';
     }
     else {
@@ -583,7 +557,8 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'transport' => $transport,
         'status' => '1',
         'snmpver' => $snmpver,
-        'poller_group' => $poller_group
+        'poller_group' => $poller_group,
+        'status_reason' => '',
     );
 
     $device = array_merge($device, $v3);
@@ -697,8 +672,6 @@ function get_astext($asn) {
 
 # Use this function to write to the eventlog table
 function log_event($text, $device = NULL, $type = NULL, $reference = NULL) {
-    global $debug;
-
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
     }
@@ -829,7 +802,7 @@ function isHexString($str) {
 
 # Include all .inc.php files in $dir
 function include_dir($dir, $regex = "") {
-    global $device, $config, $debug, $valid;
+    global $device, $config, $valid;
 
     if ($regex == "") {
         $regex = "/\.inc\.php$/";
@@ -838,9 +811,7 @@ function include_dir($dir, $regex = "") {
     if ($handle = opendir($config['install_dir'] . '/' . $dir)) {
         while (false !== ($file = readdir($handle))) {
             if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file)) {
-                if ($debug) {
-                    echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n");
-                }
+                d_echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n");
 
                 include($config['install_dir'] . '/' . $dir . '/' . $file);
             }
@@ -852,7 +823,7 @@ function include_dir($dir, $regex = "") {
 
 function is_port_valid($port, $device) {
 
-    global $config, $debug;
+    global $config;
 
     if (strstr($port['ifDescr'], "irtual")) {
         $valid = 0;
@@ -867,9 +838,7 @@ function is_port_valid($port, $device) {
         foreach ($fringe as $bi) {
             if (strstr($if, $bi)) {
                 $valid = 0;
-                if ($debug) {
-                    echo("ignored : $bi : $if");
-                }
+                d_echo("ignored : $bi : $if");
             }
         }
         if (is_array($config['bad_if_regexp'])) {
@@ -880,9 +849,7 @@ function is_port_valid($port, $device) {
             foreach ($fringe as $bi) {
                 if (preg_match($bi ."i", $if)) {
                     $valid = 0;
-                    if ($debug) {
-                        echo("ignored : $bi : ".$if);
-                    }
+                    d_echo("ignored : $bi : ".$if);
                 }
             }
         }
@@ -894,9 +861,7 @@ function is_port_valid($port, $device) {
             foreach ($fringe as $bi) {
                 if (strstr($port['ifType'], $bi)) {
                     $valid = 0;
-                    if ($debug) {
-                        echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
-                    }
+                    d_echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
                 }
             }
         }
@@ -916,7 +881,7 @@ function is_port_valid($port, $device) {
 
 function scan_new_plugins() {
 
-    global $config, $debug;
+    global $config;
 
     $installed = 0; // Track how many plugins we install.
 
@@ -1238,3 +1203,7 @@ function fping($host,$params) {
 function function_check($function) {
     return function_exists($function);
 }
+
+function get_last_commit() {
+    return `git log -n 1|head -n1`;
+}//end get_last_commit 

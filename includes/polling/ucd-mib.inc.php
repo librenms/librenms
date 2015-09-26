@@ -48,7 +48,14 @@ if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_num
         rrdtool_create($cpu_rrd, $cpu_rrd_create);
     }
 
-    rrdtool_update($cpu_rrd, array($ss['ssCpuRawUser'], $ss['ssCpuRawSystem'], $ss['ssCpuRawNice'], $ss['ssCpuRawIdle']));
+    $fields = array(
+        'user'    => $ss['ssCpuRawUser'],
+        'system'  => $ss['ssCpuRawSystem'],
+        'nice'    => $ss['ssCpuRawNice'],
+        'idle'    => $ss['ssCpuRawIdle'],
+    );
+
+    rrdtool_update($cpu_rrd, $fields);
     $graphs['ucd_cpu'] = true;
 }
 
@@ -78,7 +85,11 @@ foreach ($collect_oids as $oid) {
             rrdtool_create($filename, ' --step 300 DS:value:COUNTER:600:0:U '.$config['rrd_rra']);
         }
 
-        rrdtool_update($filename, 'N:'.$value);
+        $fields = array(
+            'value' => $value,
+        );
+
+        rrdtool_update($filename, $fields);
         $graphs['ucd_cpu'] = true;
     }
 }
@@ -141,7 +152,19 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
         rrdtool_create($mem_rrd, $mem_rrd_create);
     }
 
-    rrdtool_update($mem_rrd, array($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached));
+    $fields = array(
+        'totalswap'    => $memTotalSwap,
+        'availswap'    => $memAvailSwap,
+        'totalreal'    => $memTotalReal,
+        'availreal'    => $memAvailReal,
+        'totalfree'    => $memTotalFree,
+        'shared'       => $memShared,
+        'buffered'     => $memBuffer,
+        'cached'       => $memCached,
+    );
+
+    rrdtool_update($mem_rrd, $fields);
+
     $graphs['ucd_memory'] = true;
 }
 
@@ -158,7 +181,13 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
         rrdtool_create($load_rrd, ' --step 300 DS:1min:GAUGE:600:0:5000 DS:5min:GAUGE:600:0:5000 DS:15min:GAUGE:600:0:5000 '.$config['rrd_rra']);
     }
 
-    rrdtool_update($load_rrd, array($load_raw[1]['laLoadInt'], $load_raw[2]['laLoadInt'], $load_raw[3]['laLoadInt']));
+    $fields = array(
+        '1min'   => $load_raw[1]['laLoadInt'],
+        '5min'   => $load_raw[2]['laLoadInt'],
+        '15min'  => $load_raw[3]['laLoadInt'],
+    );
+
+    rrdtool_update($load_rrd, $fields);
     $graphs['ucd_load'] = 'TRUE';
 }
 

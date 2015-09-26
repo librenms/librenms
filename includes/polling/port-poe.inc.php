@@ -35,9 +35,6 @@ $peth_oids = array(
     'pethMainPseConsumptionPower',
 );
 
-$port_stats = snmpwalk_cache_oid($device, 'pethPsePortEntry', $port_stats, 'POWER-ETHERNET-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', $port_stats, 'CISCO-POWER-ETHERNET-EXT-MIB');
-
 if ($port_stats[$port['ifIndex']]
     && $port['ifType'] == 'ethernetCsmacd'
     && isset($port_stats[$port['ifIndex']]['dot3StatsIndex'])) {
@@ -59,7 +56,15 @@ if ($port_stats[$port['ifIndex']]
     }
 
     $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].':'.$port['cpeExtPsePortPwrAvailable'].':'.$port['cpeExtPsePortPwrConsumption'].':'.$port['cpeExtPsePortMaxPwrDrawn'];
-    $ret = rrdtool_update("$rrdfile", $upd);
+
+    $fields = array(
+        'PortPwrAllocated'   => $port['cpeExtPsePortPwrAllocated'],
+        'PortPwrAvailable'   => $port['cpeExtPsePortPwrAvailable'],
+        'PortConsumption'    => $port['cpeExtPsePortPwrConsumption'],
+        'PortMaxPwrDrawn'    => $port['cpeExtPsePortMaxPwrDrawn'],
+    );
+
+    $ret = rrdtool_update("$rrdfile", $fields);
 
     echo 'PoE ';
 }//end if

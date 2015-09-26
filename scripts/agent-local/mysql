@@ -268,8 +268,7 @@ function ss_get_mysql_stats( $options ) {
    $heartbeat = isset($options['heartbeat']) ? $options['heartbeat'] : $heartbeat;
    # If there is a port, or if it's a non-standard port, we add ":$port" to the
    # hostname.
-   $host_str  = $host
-              . $port != 3306 ? ":$port" : '';
+   $host_str  = $host.($port != 3306 ? ":$port" : '');
    debug(array('connecting to', $host_str, $user, $pass));
    if (!extension_loaded('mysql') ) {
       debug("The MySQL extension is not loaded");

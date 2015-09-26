@@ -83,10 +83,28 @@ if ($handle = opendir($config['install_dir'].'/sql-schema')) {
 }
 
 asort($filelist);
+$tmp = explode('.', max($filelist), 2);
+if ($tmp[0] <= $db_rev) {
+    if ($debug) {
+        echo "DB Schema already up to date.\n";
+    }
+    return;
+}
 
+$limit = 150; //magic marker far enough in the future
 foreach ($filelist as $file) {
     list($filename,$extension) = explode('.', $file, 2);
     if ($filename > $db_rev) {
+
+        if (isset($_SESSION['stage']) ) {
+            $limit++;
+            if ( time()-$_SESSION['last'] > 45 ) {
+                $_SESSION['offset'] = $limit;
+                $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
+                return;
+            }
+        }
+
         if (!$updating) {
             echo "-- Updating database schema\n";
         }
@@ -103,16 +121,24 @@ foreach ($filelist as $file) {
 
             foreach (explode("\n", $data) as $line) {
                 if (trim($line)) {
-                    if ($debug) {
-                        echo "$line \n";
-                    }
+                    d_echo("$line \n");
 
                     if ($line[0] != '#') {
-                        $update = mysql_query($line);
+                        if ($config['db']['extension'] == 'mysqli') {
+                            $update = mysqli_query($database_link, $line);
+                        }
+                        else {
+                            $update = mysql_query($line);
+                        }
                         if (!$update) {
                             $err++;
                             if ($debug) {
-                                echo mysql_error()."\n";
+                                if ($config['db']['extension'] == 'mysqli') {
+                                    echo mysqli_error($database_link)."\n";
+                                }
+                                else {
+                                    echo mysql_error()."\n";
+                                }
                             }
                         }
                     }
@@ -132,16 +158,19 @@ foreach ($filelist as $file) {
 
         $updating++;
         $db_rev = $filename;
+        if ($insert) {
+            dbInsert(array('version' => $db_rev), 'dbSchema');
+        }
+        else {
+            dbUpdate(array('version' => $db_rev), 'dbSchema');
+        }
     }//end if
 }//end foreach
 
 if ($updating) {
-    if ($insert) {
-        dbInsert(array('version' => $db_rev), 'dbSchema');
-    }
-    else {
-        dbUpdate(array('version' => $db_rev), 'dbSchema');
-    }
-
     echo "-- Done\n";
+    if( isset($_SESSION['stage']) ) {
+        $_SESSION['build-ok'] = true;
+    }
 }
+

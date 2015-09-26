@@ -96,24 +96,14 @@ function IssueAlert($alert) {
         return true;
     }
 
-    $default_tpl = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
-    // FIXME: Put somewhere else?
     if ($config['alert']['fixed-contacts'] == false) {
         $alert['details']['contacts'] = GetContacts($alert['details']['rule']);
     }
 
     $obj = DescribeAlert($alert);
     if (is_array($obj)) {
-        $tpl = dbFetchRow('SELECT `template` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
-        if (isset($tpl['template'])) {
-            $tpl = $tpl['template'];
-        }
-        else {
-            $tpl = $default_tpl;
-        }
-
         echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
-        $msg        = FormatAlertTpl($tpl, $obj);
+        $msg        = FormatAlertTpl($obj);
         $obj['msg'] = $msg;
         if (!empty($config['alert']['transports'])) {
             ExtTransports($obj);
@@ -193,7 +183,7 @@ function RunFollowUp() {
             $state = 4;
         }
 
-        if ($state > 0) {
+        if ($state > 0 && $n > 0) {
             $alert['details']['rule'] = $chk;
             if (dbInsert(array('state' => $state, 'device_id' => $alert['device_id'], 'rule_id' => $alert['rule_id'], 'details' => gzcompress(json_encode($alert['details']), 9)), 'alert_log')) {
                 dbUpdate(array('state' => $state, 'open' => 1, 'alerted' => 1), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
@@ -238,7 +228,7 @@ function RunAlerts() {
         if (!empty($rextra['count']) && empty($rextra['interval'])) {
             // This check below is for compat-reasons
             if (!empty($rextra['delay'])) {
-                if ((time() - strtotime($alert['time_logged']) + $config['alert']['tolerance-window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $config['alert']['tolerance-window']) < $rextra['delay'])) {
+                if ((time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $config['alert']['tolerance_window']) < $rextra['delay'])) {
                     continue;
                 }
                 else {
@@ -258,12 +248,12 @@ function RunAlerts() {
         }
         else {
             // This is the new way
-            if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $config['alert']['tolerance-window']) < $rextra['delay']) {
+            if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $config['alert']['tolerance_window']) < $rextra['delay']) {
                 continue;
             }
 
             if (!empty($rextra['interval'])) {
-                if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $config['alert']['tolerance-window']) < $rextra['interval']) {
+                if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $config['alert']['tolerance_window']) < $rextra['interval']) {
                     continue;
                 }
                 else {
@@ -326,15 +316,18 @@ function ExtTransports($obj) {
     foreach ($config['alert']['transports'] as $transport => $opts) {
         if (($opts === true || !empty($opts)) && $opts != false && file_exists($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php')) {
             echo $transport.' => ';
-            eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' };');
+            eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
             $tmp = $tmp($obj,$opts);
+            $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
+            $prefix[3] = &$prefix[0];
+            $prefix[4] = &$prefix[0];
             if ($tmp) {
                 echo 'OK';
-                log_event('Issued '.$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
+                log_event('Issued '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             }
             else {
                 echo 'ERROR';
-                log_event('Could not issue '.$obj['severity']." alert for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
+                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             }
         }
 
@@ -346,11 +339,11 @@ function ExtTransports($obj) {
 
 /**
  * Format Alert
- * @param string $tpl Template
  * @param array  $obj Alert-Array
  * @return string
  */
-function FormatAlertTpl($tpl, $obj) {
+function FormatAlertTpl($obj) {
+    $tpl    = $obj["template"];
     $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
     $parsed = $msg;
     $s      = strlen($msg);
@@ -423,11 +416,23 @@ function DescribeAlert($alert) {
     $obj              = array();
     $i                = 0;
     $device           = dbFetchRow('SELECT hostname FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $tpl              = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
+    $default_tpl      = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
     $obj['hostname']  = $device['hostname'];
     $obj['device_id'] = $alert['device_id'];
     $extra            = $alert['details'];
+    if (!isset($tpl['template'])) {
+        $obj['template'] = $default_tpl;
+    } else {
+        $obj['template'] = $tpl['template'];
+    }
     if ($alert['state'] >= 1) {
-        $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        if (!empty($tpl['title'])) {
+	    $obj['title'] = $tpl['title'];
+        }
+        else {
+            $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        }
         if ($alert['state'] == 2) {
             $obj['title'] .= ' got acknowledged';
         }
@@ -455,7 +460,12 @@ function DescribeAlert($alert) {
         }
 
         $extra          = json_decode(gzuncompress($id['details']), true);
-        $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
+	if (!empty($tpl['title_rec'])) {
+	    $obj['title'] = $tpl['title_rec'];
+	}
+	else {
+            $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
+        }
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
         $obj['id']      = $id['id'];
         $obj['faults']  = false;
@@ -470,6 +480,9 @@ function DescribeAlert($alert) {
     $obj['timestamp'] = $alert['time_logged'];
     $obj['contacts']  = $extra['contacts'];
     $obj['state']     = $alert['state'];
+    if (strstr($obj['title'],'%')) {
+        $obj['title'] = RunJail('$ret = "'.populate(addslashes($obj['title'])).'";', $obj);
+    }
     return $obj;
 
 }//end DescribeAlert()

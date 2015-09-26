@@ -30,7 +30,7 @@ else {
 }
 
 if (dbFetchCell('SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?', array($port['port_id']))) {
-    $mac = "<a href='".generate_port_url($port, array('view' => 'macaccounting'))."'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
+    $mac = "<a href='".generate_port_url($port, array('view' => 'macaccounting'))."'><img src='images/16/chart_curve.png' align='absmiddle'></a>";
 }
 else {
     $mac = '';
@@ -233,7 +233,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
         }//end foreach
     }//end if
 
-    if ($port_details && $config['enable_port_relationship'] === true) {
+    if ($port_details && $config['enable_port_relationship'] === true && port_permitted($int_link,$device['device_id'])) {
         foreach ($int_links as $int_link) {
             $link_if = dbFetchRow('SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.port_id = ?', array($int_link));
 
@@ -263,7 +263,7 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     // unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 }//end if
 
-if ($port_details && $config['enable_port_relationship'] === true) {
+if ($port_details && $config['enable_port_relationship'] === true && port_permitted($port['port_id'], $device['device_id'])) {
     foreach (dbFetchRows('SELECT * FROM `pseudowires` WHERE `port_id` = ?', array($port['port_id'])) as $pseudowire) {
         // `port_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
         $pw_peer_dev = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($pseudowire['peer_device_id']));

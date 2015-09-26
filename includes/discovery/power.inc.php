@@ -6,9 +6,7 @@ echo 'Power: ';
 $include_dir = 'includes/discovery/power';
 require 'includes/include-dir.inc.php';
 
-if ($debug) {
-    print_r($valid['sensor']['power']);
-}
+d_echo($valid['sensor']['power']);
 
 check_valid_sensors($device, 'power', $valid['sensor']);
 

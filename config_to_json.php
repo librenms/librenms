@@ -22,7 +22,7 @@ function iscli() {
 
 }
 
-// check if we are running throw the CLI, otherwise abort
+// check if we are running through the CLI, otherwise abort
 if (iscli()) {
     include_once $defaults_file;
     include_once $config_file;

@@ -2,9 +2,7 @@
 
 if ($device['os'] == 'linux') {
     $oids = snmp_walk($device, 'coolingDevicechassisIndex.1', '-OsqnU', 'MIB-Dell-10892');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

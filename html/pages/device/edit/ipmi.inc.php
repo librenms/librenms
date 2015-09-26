@@ -66,6 +66,13 @@ else if ($update_message) {
       <input id="ipmi_password" name="ipmi_password" type="password" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_password'); ?>" />
     </div>
   </div>
-  <button class="btn btn-default btn-sm" type="submit" name="Submit">Save</button>
+  <div class="row">
+    <div class="col-md-1 col-md-offset-2">
+        <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+    </div>
+  </div>
+  <br><br>
+  <div class="alert alert-info" role="alert">
+    <p>To disable IPMI polling, please clear the setting fields and click <b>Save</b>.</p>
+  </div>
 </form>
-<p>To disable IPMI polling, please clear the setting fields and click <b>Save</b>.</p>

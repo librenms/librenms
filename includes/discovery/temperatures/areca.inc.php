@@ -2,9 +2,7 @@
 
 if ($device['os'] == 'areca') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.18928.1.1.2.14.1.2', '-Osqn', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {
@@ -29,9 +27,7 @@ if ($device['os'] == 'areca') {
     }
 
     $oids = snmp_walk($device, '1.3.6.1.4.1.18928.1.2.2.1.10.1.2', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     if ($oids) {
         echo 'Areca Controller ';

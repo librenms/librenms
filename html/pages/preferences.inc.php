@@ -4,7 +4,8 @@ $no_refresh = true;
 
 $pagetitle[] = 'Preferences';
 
-echo '<h3>User Preferences</h3>';
+echo '<h2>User Preferences</h2>';
+echo '<hr>';
 
 if ($_SESSION['userlevel'] == 11) {
     demo_account();
@@ -30,15 +31,17 @@ else {
 
     include 'includes/update-preferences-password.inc.php';
 
-    echo "<div class='well'>";
+    
 
     if (passwordscanchange($_SESSION['username'])) {
         echo '<h3>Change Password</h3>';
+        echo '<hr>';
+        echo "<div class='well'>";
         echo $changepass_message;
         echo "<form method='post' action='preferences/' class='form-horizontal' role='form'>
   <input type=hidden name='action' value='changepass'>
   <div class='form-group'>
-    <label for='old_pass' class='col-sm-2 control-label'>Old Password</label>
+    <label for='old_pass' class='col-sm-2 control-label'>Current Password</label>
     <div class='col-sm-4'>
       <input type=password name=old_pass autocomplete='off' class='form-control input-sm'>
     </div>
@@ -57,11 +60,13 @@ else {
     <label for='new_pass2' class='col-sm-2 control-label'>New Password</label>
     <div class='col-sm-4'>
       <input type=password name=new_pass2 autocomplete='off' class='form-control input-sm'>
+      <br>
+  <center><button type='submit' class='btn btn-default'>Submit</button></center>
     </div>
     <div class='col-sm-6'>
     </div>
   </div>
-  <button type='submit' class='btn btn-default'>Submit</button>
+
 </form>";
         echo '</div>';
     }//end if
@@ -78,7 +83,7 @@ else {
             else {
                 $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
                 if (empty($twofactor['twofactor'])) {
-                    echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "/preferences/";</script>';
+                    echo '<div class="alert alert-danger">Error: How did you even get here?!</div><script>window.location = "preferences/";</script>';
                 }
                 else {
                     $twofactor = json_decode($twofactor['twofactor'], true);
@@ -94,13 +99,13 @@ else {
                 }
                 else {
                     session_destroy();
-                    echo '<div class="alert alert-danger">Error: Supplied TwoFactor Token is wrong, you\'ve been logged out.</div><script>window.location = "/";</script>';
+                    echo '<div class="alert alert-danger">Error: Supplied TwoFactor Token is wrong, you\'ve been logged out.</div><script>window.location = "' . $config['base_url'] . '";</script>';
                 }
             }//end if
         }
         else {
             $twofactor = dbFetchRow('SELECT twofactor FROM users WHERE username = ?', array($_SESSION['username']));
-            echo '<script src="/js/jquery.qrcode.min.js"></script>';
+            echo '<script src="js/jquery.qrcode.min.js"></script>';
             echo '<div class="well"><h3>Two-Factor Authentication</h3>';
             if (!empty($twofactor['twofactor'])) {
                 $twofactor         = json_decode($twofactor['twofactor'], true);
@@ -154,7 +159,7 @@ else {
                             echo '<div class="alert alert-danger">Error inserting TwoFactor details. Please try again later and contact Administrator if error persists.</div>';
                         }
                         else {
-                            echo '<div class="alert alert-success">Added TwoFactor credentials. Please reload page.</div><script>window.location = "/preferences/";</script>';
+                            echo '<div class="alert alert-success">Added TwoFactor credentials. Please reload page.</div><script>window.location = "preferences/";</script>';
                         }
                     }
                     else {
@@ -183,9 +188,10 @@ else {
     }//end if
 }//end if
 
-echo "<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>";
-echo "<div style='font-size: 18px; font-weight: bold; margin-bottom: 5px;'>Device Permissions</div>";
 
+echo "<h3>Device Permissions</h3>";
+echo "<hr>";
+echo "<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>";
 if ($_SESSION['userlevel'] == '10') {
     echo "<strong class='blue'>Global Administrative Access</strong>";
 }

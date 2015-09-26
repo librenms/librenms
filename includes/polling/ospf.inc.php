@@ -327,9 +327,7 @@ if (is_array($ospf_nbrs_db)) {
 
             foreach ($ospf_nbr_oids as $oid) {
                 // Loop the OIDs
-                if ($debug) {
-                    echo $ospf_nbr_db[$oid].'|'.$ospf_nbr_poll[$oid]."\n";
-                }
+                d_echo($ospf_nbr_db[$oid].'|'.$ospf_nbr_poll[$oid]."\n");
 
                 if ($ospf_nbr_db[$oid] != $ospf_nbr_poll[$oid]) {
                     // If data has changed, build a query
@@ -372,8 +370,13 @@ if (!is_file($filename)) {
                     );
 }
 
-$rrd_update = 'N:'.$ospf_instance_count.':'.$ospf_area_count.':'.$ospf_port_count.':'.$ospf_neighbour_count;
-$ret        = rrdtool_update("$filename", $rrd_update);
+$fields = array(
+    'instances'   => $ospf_instance_count,
+    'areas'       => $ospf_area_count,
+    'ports'       => $ospf_port_count,
+    'neighbours'  => $ospf_neighbour_count,
+);
+$ret        = rrdtool_update("$filename", $fields);
 
 unset($ospf_ports_db);
 unset($ospf_ports_poll);

@@ -20,9 +20,7 @@ if (count($vp_rows)) {
 
         $oid = $vp['ifIndex'].'.'.$vp['vp_id'];
 
-        if ($debug) {
-            echo "$oid ";
-        }
+        d_echo("$oid ");
 
         $t_vp = $vp_cache[$oid];
 
@@ -33,9 +31,7 @@ if (count($vp_rows)) {
 
         $rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('vp-'.$vp['ifIndex'].'-'.$vp['vp_id'].'.rrd');
 
-        if ($debug) {
-            echo "$rrd ";
-        }
+        d_echo("$rrd ");
 
         if (!is_file($rrd)) {
             rrdtool_create(
@@ -53,7 +49,19 @@ if (count($vp_rows)) {
             );
         }
 
-        rrdtool_update($rrd, "N:$vp_update");
+        $fields = array(
+            'incells'         => $t_vp['juniAtmVpStatsInCells'],
+            'outcells'        => $t_vp['juniAtmVpStatsOutCells'],
+            'inpackets'       => $t_vp['juniAtmVpStatsInPackets'],
+            'outpackets'      => $t_vp['juniAtmVpStatsOutPackets'],
+            'inpacketoctets'  => $t_vp['juniAtmVpStatsInPacketOctets'],
+            'outpacketoctets' => $t_vp['juniAtmVpStatsOutPacketOctets'],
+            'inpacketerrors'  => $t_vp['juniAtmVpStatsInPacketErrors'],
+            'outpacketerrors' => $t_vp['juniAtmVpStatsOutPacketErrors'],
+        );
+
+        rrdtool_update($rrd, $fields);
+
     }//end foreach
 
     echo "\n";

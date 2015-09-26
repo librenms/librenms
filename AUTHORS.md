@@ -4,14 +4,14 @@ LibreNMS is a fork of [Observium][1].  Observium was written by:
 - various others as indicated in the file contents and commit logs
 
 Contributors to LibreNMS:
-- Paul Gear <github@libertysys.com.au> (paulgear)
+- Paul Gear <paul@librenms.org> (paulgear)
 - Neil Lathwood <neil@librenms.org> (laf)
 - Daniel Preussker <f0o@librenms.org> (f0o)
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
 - Toni Cunyat <elbuit@gmail.com> (elbuit)
 - Tuomas Riihimäki <tuomari@iudex.fi> (tuomari)
 - Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
-- Mike Rostermund <mike@kollegienet.dk> (saaldjormike)
+- Mike Rostermund <mike@kollegienet.dk> (SaaldjorMike)
 - Nicolas Armando <nicearma@yahoo.com> (nicearma)
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
 - Kevin Fleshman <fleshmank@hotmail.com> (KFleshman)
@@ -26,7 +26,6 @@ Contributors to LibreNMS:
 - Mickael Marchand  <mmarchand@corp.free.fr> (mmarchand)
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
-- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Freddie Cash (fjwcash@gmail.com) (fjwcash)
 - Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
 - Vitali Kari <vitali.kari@gmail.com> (vitalisator) 
@@ -45,6 +44,17 @@ Contributors to LibreNMS:
 - Aaron Daniels <aaron@daniels.id.au> (adaniels21487)
 - David M. Syzdek <david@syzdek.net> (syzdek)
 - Gerben Meijer <gerben@daybyday.nl> (infernix)
+- Michael Newton <mnewton@pofp.com> (miken32)
+- Tom Ferguson <tom.ferguson.public@outlook.com> (Tawmu)
+- Jimmy Cleuren <jimmy.cleuren@gmail.com> (jimmycleuren)
+- Mark Schouten <mark@tuxis.nl> (tuxis-ie) 
+- Todd Eddy <vr@vrillusions.com> (vrillusions)
+- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
+- Sergiusz Paprzycki <serek@walcz.net> (spaprzycki)
+- Juho Vanhanen <juho@vanhanen.me> (juhovan)
+- Bart de Bruijn <bart_de_bruijn@yahoo.com> (bartdebruijn)
+- Christophe Martinet <martinet.christophe@gmail.com> (chrisgfx)
+- Nils Steinger <librenms@voidptr.de> (n-st)
+- Mark Nagel <mnagel@willingminds.com> (ciscoqid)
 
 [1]: http://observium.org/ "Observium web site"
-

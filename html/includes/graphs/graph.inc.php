@@ -69,9 +69,7 @@ function graph_error($string) {
 
     if ($height > '99') {
         shell_exec($rrd_cmd);
-        if ($debug) {
-            echo '<pre>'.$rrd_cmd.'</pre>';
-        }
+        d_echo('<pre>'.$rrd_cmd.'</pre>');
 
         if (is_file($graphfile) && !$debug) {
             header('Content-type: image/png');
@@ -135,9 +133,7 @@ else {
     else {
         if ($rrd_options) {
             rrdtool_graph($graphfile, $rrd_options);
-            if ($debug) {
-                echo $rrd_cmd;
-            }
+            d_echo($rrd_cmd);
 
             if (is_file($graphfile)) {
                 if (!$debug) {

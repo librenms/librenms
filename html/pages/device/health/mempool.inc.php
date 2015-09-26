@@ -2,9 +2,6 @@
 
 $graph_type = 'mempool_usage';
 
-echo "<div style='margin-top: 5px; padding: 0px;'>";
-echo '<table width=100% cellpadding=6 cellspacing=0>';
-
 $i = '1';
 
 // FIXME css alternating colours
@@ -18,9 +15,7 @@ foreach (dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($devi
 
     if ($config['memcached']['enable'] === true) {
         $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
-        if ($debug) {
-            print_r($state);
-        }
+        d_echo($state);
 
         if (is_array($state)) {
             $mempool = array_merge($mempool, $state);
@@ -48,25 +43,16 @@ foreach (dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($devi
     $right_background = $background['right'];
     $left_background  = $background['left'];
 
-    echo "<tr bgcolor=$row_colour><td class=tablehead><a href='".$mempool_url."' $mempool_popup>".$text_descr."</a></td>
-        <td width=90><a href='".$mempool_url."'  $mempool_popup><img src='$mini_url'></a></td>
-        <td width=200><a href='".$mempool_url."' $mempool_popup>
-        ".print_percentage_bar(400, 20, $perc, "$used / $total", 'ffffff', $left_background, $free, 'ffffff', $right_background).'
-        </a></td>
-        <td width=50>'.$perc.'%</td>
-        </tr>';
-
-    echo "<tr bgcolor='$row_colour'><td colspan=5>";
-
     $graph_array['id']   = $mempool['mempool_id'];
     $graph_array['type'] = $graph_type;
 
+    echo "<div class='panel panel-default'>
+            <div class='panel-heading'>
+                <h3 class='panel-title'>$text_descr <div class='pull-right'>$used/$total - $perc% used</div></h3>
+            </div>";
+    echo "<div class='panel-body'>";
     include 'includes/print-graphrow.inc.php';
-
-    echo '</td></tr>';
+    echo "</div></div>";
 
     $i++;
 }//end foreach
-
-echo '</table>';
-echo '</div>';

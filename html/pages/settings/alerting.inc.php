@@ -263,7 +263,7 @@ echo '
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#email_transport_expand">Email transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#email_transport_expand">Email transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="mail" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="email_transport_expand" class="panel-collapse collapse">
@@ -389,7 +389,7 @@ foreach ($dyn_config['email_smtp_secure'] as $secure) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#api_transport_expand">API transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#api_transport_expand">API transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="api" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="api_transport_expand" class="panel-collapse collapse">
@@ -431,7 +431,7 @@ foreach ($api_urls as $api_url) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#pagerduty_transport_expand">Pagerduty transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pagerduty_transport_expand">Pagerduty transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="pagerduty" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="pagerduty_transport_expand" class="panel-collapse collapse">
@@ -456,7 +456,7 @@ else {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#nagios_transport_expand">Nagios compatible transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#nagios_transport_expand">Nagios compatible transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="nagios" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="nagios_transport_expand" class="panel-collapse collapse">
@@ -475,7 +475,7 @@ else {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#irc_transport_expand">IRC transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#irc_transport_expand">IRC transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="irc" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="irc_transport_expand" class="panel-collapse collapse">
@@ -493,7 +493,7 @@ else {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#slack_transport_expand">Slack transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#slack_transport_expand">Slack transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="slack" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="slack_transport_expand" class="panel-collapse collapse">
@@ -559,7 +559,7 @@ foreach ($slack_urls as $slack_url) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#hipchat_transport_expand">Hipchat transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#hipchat_transport_expand">Hipchat transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="hipchat" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="hipchat_transport_expand" class="panel-collapse collapse">
@@ -655,7 +655,7 @@ foreach ($hipchat_urls as $hipchat_url) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#pushover_transport_expand">Pushover transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pushover_transport_expand">Pushover transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="pushover" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="pushover_transport_expand" class="panel-collapse collapse">
@@ -736,7 +736,7 @@ echo '<div id="pushover_appkey_template" class="hide">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#boxcar_transport_expand">Boxcar transport</a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#boxcar_transport_expand">Boxcar transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="boxcar" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="boxcar_transport_expand" class="panel-collapse collapse">
@@ -799,6 +799,25 @@ echo '<div id="boxcar_appkey_template" class="hide">
                 </div>
             </div>
         </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pushbullet_transport_expand">Pushbullet</a> <button name="test-alert" id="test-alert" type="button" data-transport="pushbullet" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="pushbullet_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="pushbullet" class="col-sm-4 control-label">Pushbullet Access Token </label>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.pushbullet']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div class="col-sm-4">
+                            <input id="pushbullet" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.pushbullet']['config_value'].'" data-config_id="'.$config_groups['alert.transports.pushbullet']['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 ';
@@ -814,6 +833,37 @@ echo '<div id="boxcar_appkey_template" class="hide">
 
     $(".toolTip").tooltip();
 
+    $("button#test-alert").click(function() {
+        var $this = $(this);
+        var transport = $this.data("transport");
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_form.php',
+            data: { type: "test-transport", transport: transport },
+            dataType: "json",
+            success: function(data){
+                if (data.status == 'ok') {
+                    $this.removeClass('btn-primary').addClass('btn-success');
+                    setTimeout(function(){
+                        $this.removeClass('btn-success').addClass('btn-primary');
+                    }, 2000);
+                }
+                else {
+                    $this.removeClass('btn-primary').addClass('btn-danger');
+                    setTimeout(function(){
+                        $this.removeClass('btn-danger').addClass('btn-primary');
+                    }, 2000);
+                }
+            },
+            error: function(){
+                $this.removeClass('btn-primary').addClass('btn-danger');
+                setTimeout(function(){
+                    $this.removeClass('btn-danger').addClass('btn-primary');
+                }, 2000);
+            }
+        });
+    });
+
     apiIndex = 0;
 
     // Add API config
@@ -823,7 +873,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_value = $('#new_conf_value').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", config_group: "alerting", config_sub_group: "transports", config_name: config_name, config_value: config_value},
             dataType: "json",
             success: function(data){
@@ -859,7 +909,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_extra = $('#slack_extra').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-slack', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
             dataType: "json",
             success: function(data){
@@ -897,7 +947,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_from = $('#new_from').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-hipchat', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value, config_room_id: config_room_id, config_from: config_from},
             dataType: "json",
             success: function(data){
@@ -936,7 +986,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_userkey = $('#new_userkey').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-pushover', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value, config_userkey: config_userkey},
             dataType: "json",
             success: function(data){
@@ -974,7 +1024,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_extra = $('#boxcar_extra').val();
         $.ajax({
             type: "POST",
-            url: "/ajax_form.php",
+            url: "ajax_form.php",
             data: {type: "config-item", action: 'add-boxcar', config_group: "alerting", config_sub_group: "transports", config_extra: config_extra, config_value: config_value},
             dataType: "json",
             success: function(data){
@@ -1008,7 +1058,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1029,7 +1079,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-slack', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1050,7 +1100,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-hipchat', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1071,7 +1121,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-pushover', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1092,7 +1142,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data('config_id');
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "config-item", action: 'remove-boxcar', config_id: config_id},
             dataType: "json",
             success: function (data) {
@@ -1114,7 +1164,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_id = $(this).data("config_id");
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", config_id: config_id, config_value: state},
             dataType: "json",
             success: function (data) {
@@ -1135,7 +1185,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_value = $this.val();
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {
@@ -1167,7 +1217,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_value = $this.val();
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {
@@ -1200,7 +1250,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         var config_type = $this.data("type");
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: {type: "update-config-item", action: 'update-textarea', config_type: config_type, config_id: config_id, config_value: config_value},
             dataType: "json",
             success: function (data) {

@@ -79,7 +79,7 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
         </div>
         <div class="modal-footer">
           <div class="form-group">
-            <div class="col-sm-4">
+            <div class="pull-right">
               <input type="hidden" name="type" id="type" value="token-item-create">
               <button type="submit" class="btn btn-success" name="token-create" id="token-create">Create API Token</button>
             </div>
@@ -105,18 +105,13 @@ if ($_SESSION['api_token'] === true) {
 }
 
 echo '
-  <div class="row">
-    <div class="col-sm-2">
-      <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
-    </div>
-  </div>
+  <h3>API Access</h3>
+  <hr>
   <div class="row">
     <div class="col-sm-12">
       &nbsp;
     </div>
   </div>
-  <div class="row">
-    <div class="col-sm-6">
       <table class="table table-bordered table-condensed">
         <tr>
           <th>User</th>
@@ -134,22 +129,22 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     else {
         $api_disabled = '';
     }
-
     echo '
         <tr id="'.$api['id'].'">
           <td>'.$api['username'].'</td>
           <td>'.$api['token_hash'].'</td>
           <td>'.$api['description'].'</td>
           <td><input type="checkbox" name="token-status" data-token_id="'.$api['id'].'" data-off-text="No" data-on-text="Yes" data-on-color="danger" '.$api_disabled.' data-size="mini"></td>
-          <td><button type="button" class="btn btn-primary btn-xs" id="'.$api['id'].'" data-token_id="'.$api['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
+          <td><button type="button" class="btn btn-danger btn-xs" id="'.$api['id'].'" data-token_id="'.$api['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
 ';
 }
 
   echo '
       </table>
-    </div>
-  </div>
+      <center>
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
+      </center>
 ';
 ?>
 <script>
@@ -160,7 +155,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     var token_id = $(this).data("token_id");
     $.ajax({
       type: 'POST',
-      url: '/ajax_form.php',
+      url: 'ajax_form.php',
       data: { type: "token-item-disable", token_id: token_id, state: state},
       dataType: "html",
       success: function(data){
@@ -180,7 +175,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     token_id = $("#token_id").val();
     $.ajax({
       type: "POST",
-      url: "/ajax_form.php",
+      url: "ajax_form.php",
       data: $('form.remove_token_form').serialize() ,
       success: function(msg){
         $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');
@@ -197,7 +192,7 @@ foreach (dbFetchRows('SELECT `AT`.*,`U`.`username` FROM `api_tokens` AS AT JOIN 
     event.preventDefault();
     $.ajax({
       type: "POST",
-      url: "/ajax_form.php",
+      url: "ajax_form.php",
       data: $('form.create_token_form').serialize(),
       success: function(msg){
         $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');

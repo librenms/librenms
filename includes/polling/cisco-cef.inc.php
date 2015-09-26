@@ -13,9 +13,7 @@ if ($device['os_group'] == 'cisco') {
         $cefs_db[$cef_id] = $ceftmp['cef_switching_id'];
     }
 
-    if ($debug) {
-        print_r($cefs);
-    }
+    d_echo($cefs);
 
     if (is_array($cefs)) {
         if (!is_array($entity_array)) {
@@ -86,7 +84,13 @@ if ($device['os_group'] == 'cisco') {
 
                     dbUpdate($cef_stat['update'], 'cef_switching', '`device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?', array($device['device_id'], $entity, $afi, $path));
 
-                    $ret = rrdtool_update("$filename", array($cef_stat['cefSwitchingDrop'], $cef_stat['cefSwitchingPunt'], $cef_stat['cefSwitchingPunt2Host']));
+                    $fields = array(
+                        'drop'      => $cef_stat['cefSwitchingDrop'],
+                        'punt'      => $cef_stat['cefSwitchingPunt'],
+                        'hostpunt'  => $cef_stat['cefSwitchingPunt2Host'],
+                    );
+
+                    $ret = rrdtool_update("$filename", $fields);
 
                     echo "\n";
                 }//end foreach

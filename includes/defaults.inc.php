@@ -43,6 +43,9 @@ $config['temp_dir']    = '/tmp';
 $config['install_dir'] = '/opt/'.$config['project_id'];
 $config['log_dir']     = $config['install_dir'].'/logs';
 
+// MySQL extension to use
+$config['db']['extension']       = 'mysql';//mysql and mysqli available
+
 // What is my own hostname (used to identify this host in its own database)
 $config['own_hostname'] = 'localhost';
 
@@ -52,8 +55,7 @@ $config['fping']                    = '/usr/bin/fping';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
-$config['fping_options']['millisec'] = 20;
-$config['fping6']                    = '/usr/bin/fping6';
+$config['fping_options']['millisec'] = 200;
 $config['snmpwalk']                  = '/usr/bin/snmpwalk';
 $config['snmpget']                   = '/usr/bin/snmpget';
 $config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
@@ -65,10 +67,7 @@ $config['nagios_plugins'] = '/usr/lib/nagios/plugins';
 $config['ipmitool']       = '/usr/bin/ipmitool';
 $config['virsh']          = '/usr/bin/virsh';
 $config['dot']            = '/usr/bin/dot';
-$config['unflatten']      = '/usr/bin/unflatten';
-$config['neato']          = '/usr/bin/neato';
 $config['sfdp']           = '/usr/bin/sfdp';
-$config['svn']            = '/usr/bin/svn';
 
 // Memcached - Keep immediate statistics
 $config['memcached']['enable'] = false;
@@ -102,7 +101,6 @@ if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
     }
 }
 
-$config['project_url']    = 'https://github.com/librenms/';
 $config['project_home']   = 'http://www.librenms.org/';
 $config['project_issues'] = 'https://github.com/librenms/librenms/issues';
 $config['site_style']     = 'light';
@@ -110,10 +108,9 @@ $config['site_style']     = 'light';
 $config['stylesheet']   = 'css/styles.css';
 $config['mono_font']    = 'DejaVuSansMono';
 $config['favicon']      = '';
-$config['header_color'] = '#1F334E';
 $config['page_refresh'] = '300';
 // Refresh the page every xx seconds, 0 to disable
-$config['front_page'] = 'pages/front/default.php';
+$config['front_page'] = 'pages/front/tiles.php';
 $config['front_page_settings']['top']['ports']   = 10;
 $config['front_page_settings']['top']['devices'] = 10;
 $config['front_page_down_box_limit']             = 10;
@@ -194,14 +191,7 @@ $config['snmp']['v3'][0]['cryptopass'] = '';
 // Privacy (Encryption) Passphrase
 $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 // AES | DES
-// RRD Format Settings
-// These should not normally be changed
-// Though one could conceivably increase or decrease the size of each RRA if one had performance problems
-// Or if one had a very fast I/O subsystem with no performance worries.
-$config['rrd_rra']  = ' RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ';
-$config['rrd_rra'] .= ' RRA:MAX:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:LAST:0.5:1:1440 ';
+
 
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
@@ -342,6 +332,9 @@ $config['network_map_vis_options'] = '{
       randomSeed:2
   },
   "edges": {
+    arrows: {
+          to:     {enabled: true, scaleFactor:0.5},
+    },
     "smooth": {
         enabled: false
     },
@@ -383,14 +376,6 @@ $config['version_check'] = 0;
 // Poller/Discovery Modules
 $config['enable_bgp'] = 1;
 // Enable BGP session collection and display
-$config['enable_rip'] = 1;
-// Enable RIP session collection and display
-$config['enable_ospf'] = 1;
-// Enable OSPF session collection and display
-$config['enable_isis'] = 1;
-// Enable ISIS session collection and display
-$config['enable_eigrp'] = 1;
-// Enable EIGRP session collection and display
 $config['enable_syslog'] = 0;
 // Enable Syslog
 $config['enable_inventory'] = 1;
@@ -406,8 +391,6 @@ $config['enable_sla'] = 0;
 // Ports extension modules
 $config['port_descr_parser'] = 'includes/port-descr-parser.inc.php';
 // Parse port descriptions into fields
-$config['enable_ports_Xbcmc'] = 1;
-// Enable ifXEntry broadcast/multicast
 $config['enable_ports_etherlike'] = 0;
 // Enable Polling EtherLike-MIB (doubles interface processing time)
 $config['enable_ports_junoseatmvp'] = 0;
@@ -490,8 +473,6 @@ $config['bad_if_regexp'][] = '/^sl[0-9]/';
 
 // Rewrite Interfaces
 $config['rewrite_if_regexp']['/^cpu interface/'] = 'Mgmt';
-
-$config['processor_filter'][] = 'An electronic chip that makes the computer work.';
 
 $config['ignore_mount_removable'] = 1;
 // Ignore removable disk storage
@@ -592,7 +573,6 @@ $config['ignore_mount_removable'] = 1;
 $config['ignore_mount_network'] = 1;
 // Ignore network mounted storage
 // Syslog Settings
-$config['syslog_age'] = '1 month';
 // Entries older than this will be removed
 $config['syslog_filter'][] = 'last message repeated';
 $config['syslog_filter'][] = 'Connection from UDP: [';
@@ -724,9 +704,10 @@ $config['eventlog_purge'] = 30;
 $config['authlog_purge'] = 30;
 // Number in days of how long to keep authlog entries for.
 $config['perf_times_purge'] = 30;
-// Number in days of how long to keep performace pooling stats  entries for.
-$config['device_perf_purge'] = 30;
+// Number in days of how long to keep performace polling stats  entries for.
+$config['device_perf_purge'] = 7;
 // Number in days of how long to keep device performance data for.
+
 // Date format for PHP date()s
 $config['dateformat']['long'] = 'r';
 // RFC2822 style
@@ -790,8 +771,8 @@ $config['geoloc']['latlng']                             = false; // True to enab
 $config['geoloc']['engine']                             = 'google';
 $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
-$config['leaflet']['default_lat']                       = '50.898482';
-$config['leaflet']['default_lng']                       = '-3.401402';
+$config['leaflet']['default_lat']                       = '51.4800';
+$config['leaflet']['default_lng']                       = '0';
 $config['leaflet']['default_zoom']                       = 2;
 
 // General GUI options
@@ -799,3 +780,9 @@ $config['gui']['network-map']['style']                  = 'new';//old is also va
 
 // Navbar variables
 $config['navbar']['manage_groups']['hide']              = 0;
+
+// Show errored ports in the summary table on the dashboard
+$config['summary_errors']                               = 0;
+
+// Default width of the availability map's tiles
+$config['availability-map-width']                       = 25;

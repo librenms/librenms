@@ -28,7 +28,13 @@ if ($device['os_group'] == "cisco") {
         if (!file_exists ($rrd_filename)) {
             rrdtool_create ($rrd_filename, " DS:total:GAUGE:600:0:U DS:active:GAUGE:600:0:U" . $config['rrd_rra']);
         }
-        rrdtool_update ($rrd_filename, "N:" . $total . ":" . $active);
+
+        $fields = array(
+            'total'  => $total,
+            'active' => $active,
+        );
+
+        rrdtool_update ($rrd_filename, $fields);
 
         $graphs['cisco-iosmtp'] = TRUE;
         echo (" Cisco IOS MTP ");

@@ -8,9 +8,7 @@ $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($vars['por
 
 if ($config['memcached']['enable'] === true) {
     $state = $memcache->get('port-'.$port['port_id'].'-state');
-    if ($debug) {
-        print_r($state);
-    }
+    d_echo($state);
 
     if (is_array($state)) {
         $port = array_merge($port, $state);
@@ -192,7 +190,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='/device/device=".$device['device_id'].'/tab=port/port='.$port['port_id']."/junose-atm-vp/bits/'>Bits</a>";
+    echo "<a href='" . generate_url(array('page'=>'device','device'=>$device['device_id'], 'tab'=>'port', 'port'=>$port['port_id'])) . "/junose-atm-vp/bits/'>Bits</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -202,7 +200,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='device/device=".$device['device_id'].'/tab=port/port='.$port['port_id']."/junose-atm-vp/packets/'>Packets</a>";
+    echo "<a href='" . generate_url(array('page'=>'device','device'=>$device['device_id'], 'tab'=>'port', 'port'=>$port['port_id'])) . "/junose-atm-vp/packets/'>Packets</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -212,7 +210,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='device/device=".$device['device_id'].'/tab=port/port='.$port['port_id']."/junose-atm-vp/cells/'>Cells</a>";
+    echo "<a href='" . generate_url(array('page'=>'device','device'=>$device['device_id'], 'tab'=>'port', 'port'=>$port['port_id'])) . "/junose-atm-vp/cells/'>Cells</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -222,14 +220,14 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '".$port['port_i
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='device/device=".$device['device_id'].'/tab=port/port='.$port['port_id']."/junose-atm-vp/errors/'>Errors</a>";
+    echo "<a href='" . generate_url(array('page'=>'device','device'=>$device['device_id'], 'tab'=>'port', 'port'=>$port['port_id'])) . "/junose-atm-vp/errors/'>Errors</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
 }//end if
 
 if ($_SESSION['userlevel'] >= '10') {
-    echo "<span style='float: right;'><a href='bills/view=add/port=".$port['port_id']."/'><img src='images/16/money.png' border='0' align='absmiddle'> Create Bill</a></span>";
+    echo "<span style='float: right;'><a href='" . generate_url(array('page'=>'bills', 'view'=>'add', 'port'=>$port['port_id'])) . "'><img src='images/16/money.png' border='0' align='absmiddle'> Create Bill</a></span>";
 }
 
 print_optionbar_end();

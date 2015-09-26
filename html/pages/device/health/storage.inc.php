@@ -2,15 +2,6 @@
 
 $graph_type = 'storage_usage';
 
-echo '<table cellspacing=0 cellpadding=5 width=100%>';
-
-echo '<tr class=tablehead>
-        <th width=250>Drive</th>
-        <th width=420>Usage</th>
-        <th width=50>Free</th>
-        <th></th>
-      </tr>';
-
 $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY storage_descr', array($device['device_id'])) as $drive) {
@@ -28,6 +19,7 @@ foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
     $used  = formatStorage($used);
     $total = formatStorage($total);
     $free  = formatStorage($free);
+    $storage_descr = $drive['storage_descr'];
 
     $fs_url = 'graphs/id='.$drive['storage_id'].'/type=storage_usage/';
 
@@ -35,22 +27,17 @@ foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
     $fs_popup .= "</div><img src=\'graph.php?id=".$drive['storage_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['month'].'&amp;to='.$config['time']['now']."&amp;width=400&amp;height=125\'>";
     $fs_popup .= "', RIGHT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\"";
 
-    $background = get_percentage_colours($percent);
-
-    echo "<tr bgcolor='$row_colour'><td><a href='$fs_url' $fs_popup>".$drive['storage_descr']."</a></td><td>
-          <a href='$fs_url' $fs_popup>".print_percentage_bar(400, 20, $perc, "$used / $total", 'ffffff', $background['left'], $perc.'%', 'ffffff', $background['right']).'</a>
-          </td><td>'.$free.'</td><td></td></tr>';
 
     $graph_array['id']   = $drive['storage_id'];
     $graph_array['type'] = $graph_type;
 
-    echo "<tr bgcolor='$row_colour'><td colspan=4>";
-
+    echo "<div class='panel panel-default'>
+            <div class='panel-heading'>
+                <h3 class='panel-title'>$storage_descr <div class='pull-right'>$used/$total - $perc% used</div></h3>
+            </div>";
+    echo "<div class='panel-body'>";
     include 'includes/print-graphrow.inc.php';
-
-    echo '</td></tr>';
+    echo "</div></div>";
 
     $row++;
 }//end foreach
-
-echo '</table>';

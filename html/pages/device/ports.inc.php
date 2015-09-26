@@ -122,7 +122,7 @@ else {
         $port_details = 1;
     }
 
-    echo "<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
+    echo "<div style='margin: 0px;'><table class='table'>";
     $i = '1';
 
     global $port_cache, $port_index_cache;
@@ -138,9 +138,7 @@ else {
     foreach ($ports as $port) {
         if ($config['memcached']['enable'] === true) {
             $state = $memcache->get('port-'.$port['port_id'].'-state');
-            if ($debug) {
-                print_r($state);
-            }
+            d_echo($state);
 
             if (is_array($state)) {
                 $port = array_merge($port, $state);

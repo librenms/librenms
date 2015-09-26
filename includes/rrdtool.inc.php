@@ -23,7 +23,7 @@
 
 
 function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes) {
-    global $config, $debug;
+    global $config;
 
     $command = $config['rrdtool'].' -';
 
@@ -74,12 +74,8 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes) {
 
 
 function rrdtool_pipe_close($rrd_process, &$rrd_pipes) {
-    global $debug;
-
-    if ($debug) {
-        echo stream_get_contents($rrd_pipes[1]);
-        echo stream_get_contents($rrd_pipes[2]);
-    }
+    d_echo(stream_get_contents($rrd_pipes[1]));
+    d_echo(stream_get_contents($rrd_pipes[2]));
 
     fclose($rrd_pipes[0]);
     fclose($rrd_pipes[1]);
@@ -210,7 +206,7 @@ function rrdtool($command, $filename, $options) {
 
 
 function rrdtool_create($filename, $options) {
-    global $config, $debug, $console_color;
+    global $config, $console_color;
 
     if ($config['norrd']) {
         print $console_color->convert('[%gRRD Disabled%n] ', false);
@@ -219,9 +215,7 @@ function rrdtool_create($filename, $options) {
         $command = $config['rrdtool']." create $filename $options";
     }
 
-    if ($debug) {
-        print $console_color->convert('RRD[%g'.$command.'%n] ');
-    }
+    d_echo($console_color->convert('RRD[%g'.$command.'%n] '));
 
     return shell_exec($command);
 
@@ -240,20 +234,23 @@ function rrdtool_create($filename, $options) {
 function rrdtool_update($filename, $options) {
     $values = array();
     // Do some sanitisation on the data if passed as an array.
+
     if (is_array($options)) {
         $values[] = 'N';
-        foreach ($options as $value) {
-            if (!is_numeric($value)) {
-                $value = U;
+        foreach ($options as $k => $v) {
+            if (!is_numeric($v)) {
+                $v = U;
             }
 
-            $values[] = $value;
+            $values[] = $v;
         }
 
         $options = implode(':', $values);
+        return rrdtool('update', $filename, $options);
     }
-
-    return rrdtool('update', $filename, $options);
+    else {
+        return 'Bad options passed to rrdtool_update';
+    }
 
 }
 
