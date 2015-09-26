@@ -8,12 +8,12 @@ Patterns work in the same was as Entities within the alerting system, the format
 as __tablename.columnname__. If you are ensure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
 
 As a working example and a common question, let's assume you want to group devices by hostname. If you hostname format is dcX.[devicetype].example.com. You would use the pattern 
-devices.hostname. Select the condition which in this case would Like and then enter dc1.@.example.com. This would then match dc1.sw01.example.com, dc1.rtr01.example.com but not
+devices.hostname. Select the condition which in this case would Like and then enter `dc1\..*\.example.com`. This would then match dc1.sw01.example.com, dc1.rtr01.example.com but not
  dc2.sw01.example.com.
 
 #### Wildcards
 
-As used in the example above, wildcards are represented by the @ symbol. I.e @.example.com would match any hostnames under example.com.
+As with alerts, the `Like` operation allows RegExp.
 
 A list of common entities is maintained in our [Alerting docs](http://docs.librenms.org/Extensions/Alerting/#entities).
 
