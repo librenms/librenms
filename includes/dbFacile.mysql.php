@@ -24,7 +24,7 @@
 
 
 function dbQuery($sql, $parameters=array()) {
-    global $fullSql, $debug, $sql_debug;
+    global $fullSql, $debug, $sql_debug, $console_color;
     $fullSql = dbMakeQuery($sql, $parameters);
     if ($debug) {
         if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {

@@ -22,6 +22,7 @@
  * Used by the other _query functions.
  * */
 
+
 function dbQuery($sql, $parameters=array()) {
     global $fullSql, $debug, $sql_debug, $console_color, $database_link;
     $fullSql = dbMakeQuery($sql, $parameters);
