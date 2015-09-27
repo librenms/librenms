@@ -72,6 +72,9 @@ function post_notifications() {
  */
 function parse_rss($feed) {
     $obj = array();
+    if( !array_key_exists('0',$feed['channel']['item']) ) {
+        $feed['channel']['item'] = array( $feed['channel']['item'] );
+    }
     foreach ($feed['channel']['item'] as $item) {
         $obj[] = array('title'=>$item['title'],'body'=>$item['description'],'checksum'=>hash('sha512',$item['title'].$item['description']));
     }
@@ -85,6 +88,9 @@ function parse_rss($feed) {
  */
 function parse_atom($feed) {
     $obj = array();
+    if( !array_key_exists('0',$feed['entry']) ) {
+        $feed['entry'] = array( $feed['entry'] );
+    }
     foreach ($feed['entry'] as $item) {
         $obj[] = array('title'=>$item['title'],'body'=>$item['content'],'checksum'=>hash('sha512',$item['title'].$item['content']));
     }
