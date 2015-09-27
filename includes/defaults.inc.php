@@ -75,6 +75,7 @@ $config['sfdp']           = '/usr/bin/sfdp';
 $config['memcached']['enable'] = false;
 $config['memcached']['host']   = 'localhost';
 $config['memcached']['port']   = 11211;
+$config['memcached']['ttl']    = 240;
 
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
