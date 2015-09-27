@@ -30,6 +30,22 @@ else {
     $database_db = mysql_select_db($config['db_name'], $database_link);
 }
 
+$config['time']['now']      = time();
+$config['time']['now']     -= ($config['time']['now'] % 300);
+
+if ($config['memcached']['enable'] === true) {
+    if (class_exists('Memcached')) {
+        $config['memcached']['ttl']     += $config['time']['now'];
+        $config['memcached']['resource'] = new Memcached();
+        $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
+    }
+    else {
+        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
+        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
+        $config['memcached']['enable'] = 0;
+    }
+}
+
 $clone = $config;
 foreach (dbFetchRows('select config_name,config_value from config') as $obj) {
     $clone = array_replace_recursive($clone, mergecnf($obj));
@@ -1703,22 +1719,7 @@ if (isset($_SERVER['HTTPS'])) {
     $config['base_url'] = preg_replace('/^http:/', 'https:', $config['base_url']);
 }
 
-if ($config['memcached']['enable'] === true) {
-    if (class_exists('Memcached')) {
-        $memcache = new Memcached();
-        $memcache->addServer($config['memcached']['host'], $config['memcached']['port']);
-        $memcache->getStats();
-    }
-    else {
-        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
-        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
-        $config['memcached']['enable'] = 0;
-    }
-}
-
 // Set some times needed by loads of scripts (it's dynamic, so we do it here!)
-$config['time']['now']      = time();
-$config['time']['now']     -= ($config['time']['now'] % 300);
 $config['time']['fourhour'] = ($config['time']['now'] - 14400);
 // time() - (4 * 60 * 60);
 $config['time']['sixhour'] = ($config['time']['now'] - 21600);
