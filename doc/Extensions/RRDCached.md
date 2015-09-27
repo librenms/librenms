@@ -2,6 +2,13 @@
 
 This document will explain how to setup RRDCached for LibreNMS.
 
+> If you are using rrdtool / rrdcached version 1.5 or above then this now supports creating rrd files over rrdcached. To 
+enable this set the following config:
+
+```php
+$config['rrdtool_version'] = 1.5;
+```
+
 ### RRDCached installation CentOS 6
 This example is based on a fresh LibreNMS install, on a minimimal CentOS 6 installation.
 In this example, we'll use the Repoforge repository.
@@ -34,7 +41,7 @@ service rrdcached start
 ```
 
 - Edit /opt/librenms/config.php to include:
-```ssh
+```php
 $config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
 ```
 ### RRDCached installation CentOS 7
