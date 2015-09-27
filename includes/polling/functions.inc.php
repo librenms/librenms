@@ -158,7 +158,9 @@ function poll_device($device, $options) {
         echo "Created directory : $host_rrd\n";
     }
 
-    $ping_response = isPingable($device['hostname'], $device['device_id']);
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+
+    $ping_response = isPingable($device['hostname'], $address_family, $device['device_id']);
 
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
