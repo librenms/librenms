@@ -7,12 +7,12 @@ $temp_output = '
   <thead>
     <tr class="info">
       <th>&nbsp;</th>
-      <th>Total</th>
-      <th>Up</th>
-      <th>Down</th>
-      <th>Ignored</th>
-      <th>Disabled</th>
-      '.($config['summary_errors'] ? '<th>Errored</th>' : '').'
+      <th><center>Total</center></th>
+      <th><center>Up</center></th>
+      <th><center>Down</center></th>
+      <th><center>Ignored</center></th>
+      <th><center>Disabled</center></th>
+      '.($config['summary_errors'] ? '<th><center>Errored</center></th>' : '').'
     </tr>
   </thead>
   <tbody>
