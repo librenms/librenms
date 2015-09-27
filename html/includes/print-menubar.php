@@ -488,6 +488,12 @@ if(is_file("includes/print-menubar-custom.inc.php")) {
          </div>
      </form>
     <ul class="nav navbar-nav navbar-right">
+<?php
+$notifications = new ObjCache('notifications');
+if (($notifications['sticky_count']+$notifications['count']) != 0) {
+    echo '       <li><a href="notifications/"><span class="badge count-notif">'.($notifications['sticky_count']+$notifications['count']).'</span></a></li>';
+}
+?>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
         <ul class="dropdown-menu">

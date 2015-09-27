@@ -103,3 +103,7 @@ if ($options['f'] === 'device_perf') {
         }
     }
 }
+
+if ($options['f'] === 'notifications') {
+    include_once 'notifications.php';
+}
