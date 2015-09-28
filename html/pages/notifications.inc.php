@@ -68,7 +68,7 @@ $notifications = new ObjCache('notifications');
   <div class="well">
     <div class="row">
       <div class="col-md-12">
-        <h4 class="text-warning" id="<?php echo $notif['notifications_id']; ?>"><strong><i class="fa fa-bell-o"></i>&nbsp;&nbsp;&nbsp;<?php echo $notif['title']; ?></strong>&nbsp;<span class="pull-right"><?php echo ($notif['user_id'] != $_SESSION['user_id'] ? '<code>Sticky by '.dbFetchCell('select username from users where user_id = ?',array($notif['user_id'])).'</code>' : '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" style="margin-top:-10px;"></button>'); ?></span></h4>
+        <h4 class="text-warning" id="<?php echo $notif['notifications_id']; ?>"><strong><i class="fa fa-bell-o"></i>&nbsp;&nbsp;&nbsp;<?php echo $notif['title']; ?></strong>&nbsp;<span class="pull-right"><?php echo ($notif['user_id'] != $_SESSION['user_id'] ? '<code>Sticky by '.dbFetchCell('select username from users where user_id = ?',array($notif['user_id'])).'</code>' : '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>'); ?></span></h4>
       </div>
     </div>
     <div class="row">
@@ -93,9 +93,9 @@ $notifications = new ObjCache('notifications');
     <div class="row">
       <div class="col-md-12">
         <h4 class="text-success" id="<?php echo $notif['notifications_id']; ?>"><strong><?php echo $notif['title']; ?></strong><span class="pull-right">
-<?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-primary fa fa-bell-o stick-notif" style="margin-top:-10px;"></button>' : ''); ?>
+<?php echo ($_SESSION['userlevel'] == 10 ? '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>' : ''); ?>
 &nbsp;
-<button class="btn btn-primary fa fa-eye read-notif" style="margin-top:-10px;"></button>
+<button class="btn btn-primary fa fa-eye read-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Read" style="margin-top:-10px;"></button>
 </span>
 </h4>
       </div>
@@ -144,7 +144,7 @@ $notifications = new ObjCache('notifications');
 <?php } ?>
 <script>
 $(function() {
-
+  $('[data-toggle="tooltip"]').tooltip();
   $('.new-notif-collapse').fadeOut(0);
   $(document).on( "click", ".new-notif", function() {
       $('.new-notif-collapse').fadeToggle();
