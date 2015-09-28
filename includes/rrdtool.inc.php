@@ -206,7 +206,7 @@ function rrdtool($command, $filename, $options) {
 
 
 function rrdtool_create($filename, $options) {
-    return rrdtool('create', $filename, $options);
+    return rrdtool('create', $filename,  str_replace(array("\r", "\n"), '', $options));
 }
 
 
