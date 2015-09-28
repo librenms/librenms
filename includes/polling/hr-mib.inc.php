@@ -12,7 +12,7 @@ if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {
     if (!is_file($rrd_file)) {
         rrdtool_create(
             $rrd_file,
-            '--step 300 \
+            '--step 300 
             DS:procs:GAUGE:600:0:U '.$config['rrd_rra']
         );
     }
@@ -31,7 +31,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
     if (!is_file($rrd_file)) {
         rrdtool_create(
             $rrd_file,
-            '--step 300 \
+            '--step 300 
             DS:users:GAUGE:600:0:U '.$config['rrd_rra']
         );
     }

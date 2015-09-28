@@ -39,11 +39,11 @@ if ($device['os'] == 'ios') {
         if (!is_file($rrd)) {
             rrdtool_create(
                 $rrd,
-                '--step 300 \
-     DS:inutil:GAUGE:600:0:100 \
-     DS:oututil:GAUGE:600:0:100 \
-     DS:outdropped:DERIVE:600:0:125000000000 \
-     DS:outerrors:DERIVE:600:0:125000000000 \
+                '--step 300 
+     DS:inutil:GAUGE:600:0:100 
+     DS:oututil:GAUGE:600:0:100 
+     DS:outdropped:DERIVE:600:0:125000000000 
+     DS:outerrors:DERIVE:600:0:125000000000 
      DS:inerrors:DERIVE:600:0:125000000000 '.$config['rrd_rra']
             );
         }

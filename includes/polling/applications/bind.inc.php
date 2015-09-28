@@ -72,16 +72,16 @@ if (!empty($agent_data['app']['bind']) && $app['app_id'] > 0) {
     if (!is_file($rrd_filename)) {
         rrdtool_create(
             $rrd_filename,
-            '--step 300 \
-            DS:any:COUNTER:600:0:125000000000 \
-            DS:a:COUNTER:600:0:125000000000 \
-            DS:aaaa:COUNTER:600:0:125000000000 \
-            DS:cname:COUNTER:600:0:125000000000 \
-            DS:mx:COUNTER:600:0:125000000000 \
-            DS:ns:COUNTER:600:0:125000000000 \
-            DS:ptr:COUNTER:600:0:125000000000 \
-            DS:soa:COUNTER:600:0:125000000000 \
-            DS:srv:COUNTER:600:0:125000000000 \
+            '--step 300 
+            DS:any:COUNTER:600:0:125000000000 
+            DS:a:COUNTER:600:0:125000000000 
+            DS:aaaa:COUNTER:600:0:125000000000 
+            DS:cname:COUNTER:600:0:125000000000 
+            DS:mx:COUNTER:600:0:125000000000 
+            DS:ns:COUNTER:600:0:125000000000 
+            DS:ptr:COUNTER:600:0:125000000000 
+            DS:soa:COUNTER:600:0:125000000000 
+            DS:srv:COUNTER:600:0:125000000000 
             DS:spf:COUNTER:600:0:125000000000 '.$config['rrd_rra']
         );
     }
