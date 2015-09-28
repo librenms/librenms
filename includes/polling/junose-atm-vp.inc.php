@@ -36,15 +36,15 @@ if (count($vp_rows)) {
         if (!is_file($rrd)) {
             rrdtool_create(
                 $rrd,
-                '--step 300 \
-                DS:incells:DERIVE:600:0:125000000000 \
-                DS:outcells:DERIVE:600:0:125000000000 \
-                DS:inpackets:DERIVE:600:0:125000000000 \
-                DS:outpackets:DERIVE:600:0:125000000000 \
-                DS:inpacketoctets:DERIVE:600:0:125000000000 \
-                DS:outpacketoctets:DERIVE:600:0:125000000000 \
-                DS:inpacketerrors:DERIVE:600:0:125000000000 \
-                DS:outpacketerrors:DERIVE:600:0:125000000000 \
+                '--step 300 
+                DS:incells:DERIVE:600:0:125000000000 
+                DS:outcells:DERIVE:600:0:125000000000 
+                DS:inpackets:DERIVE:600:0:125000000000 
+                DS:outpackets:DERIVE:600:0:125000000000 
+                DS:inpacketoctets:DERIVE:600:0:125000000000 
+                DS:outpacketoctets:DERIVE:600:0:125000000000 
+                DS:inpacketerrors:DERIVE:600:0:125000000000 
+                DS:outpacketerrors:DERIVE:600:0:125000000000 
                 '.$config['rrd_rra']
             );
         }

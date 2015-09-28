@@ -52,9 +52,9 @@ if ($device['os_group'] == 'cisco') {
                     if (!is_file($filename)) {
                         rrdtool_create(
                             $filename,
-                            '--step 300 \
-                            DS:drop:DERIVE:600:0:1000000 \
-                            DS:punt:DERIVE:600:0:1000000 \
+                            '--step 300 
+                            DS:drop:DERIVE:600:0:1000000 
+                            DS:punt:DERIVE:600:0:1000000 
                             DS:hostpunt:DERIVE:600:0:1000000 '.$config['rrd_rra']
                         );
                     }
