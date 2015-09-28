@@ -39,7 +39,7 @@ if (is_numeric($FdbAddressCount)) {
     if (!is_file($fdb_rrd_file)) {
         rrdtool_create(
             $fdb_rrd_file,
-            ' --step 300 \
+            ' --step 300 
                     DS:value:GAUGE:600:-1:100000 '.$config['rrd_rra']
         );
     }

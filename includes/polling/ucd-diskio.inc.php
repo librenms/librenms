@@ -24,10 +24,10 @@ if (count($diskio_data)) {
         if (!is_file($rrd)) {
             rrdtool_create(
                 $rrd,
-                '--step 300 \
-      DS:read:DERIVE:600:0:125000000000 \
-      DS:written:DERIVE:600:0:125000000000 \
-      DS:reads:DERIVE:600:0:125000000000 \
+                '--step 300 
+      DS:read:DERIVE:600:0:125000000000 
+      DS:written:DERIVE:600:0:125000000000 
+      DS:reads:DERIVE:600:0:125000000000 
       DS:writes:DERIVE:600:0:125000000000 '.$config['rrd_rra']
             );
         }

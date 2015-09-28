@@ -22,26 +22,26 @@ list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
 if (!is_file($rrd_filename)) {
     rrdtool_create(
         $rrd_filename,
-        '--step 300 \
-        DS:access:DERIVE:600:0:125000000000 \
-        DS:kbyte:DERIVE:600:0:125000000000 \
-        DS:cpu:GAUGE:600:0:125000000000 \
-        DS:uptime:GAUGE:600:0:125000000000 \
-        DS:reqpersec:GAUGE:600:0:125000000000 \
-        DS:bytespersec:GAUGE:600:0:125000000000 \
-        DS:byesperreq:GAUGE:600:0:125000000000 \
-        DS:busyworkers:GAUGE:600:0:125000000000 \
-        DS:idleworkers:GAUGE:600:0:125000000000 \
-        DS:sb_wait:GAUGE:600:0:125000000000 \
-        DS:sb_start:GAUGE:600:0:125000000000 \
-        DS:sb_reading:GAUGE:600:0:125000000000 \
-        DS:sb_writing:GAUGE:600:0:125000000000 \
-        DS:sb_keepalive:GAUGE:600:0:125000000000 \
-        DS:sb_dns:GAUGE:600:0:125000000000 \
-        DS:sb_closing:GAUGE:600:0:125000000000 \
-        DS:sb_logging:GAUGE:600:0:125000000000 \
-        DS:sb_graceful:GAUGE:600:0:125000000000 \
-        DS:sb_idle:GAUGE:600:0:125000000000 \
+        '--step 300 
+        DS:access:DERIVE:600:0:125000000000 
+        DS:kbyte:DERIVE:600:0:125000000000 
+        DS:cpu:GAUGE:600:0:125000000000 
+        DS:uptime:GAUGE:600:0:125000000000 
+        DS:reqpersec:GAUGE:600:0:125000000000 
+        DS:bytespersec:GAUGE:600:0:125000000000 
+        DS:byesperreq:GAUGE:600:0:125000000000 
+        DS:busyworkers:GAUGE:600:0:125000000000 
+        DS:idleworkers:GAUGE:600:0:125000000000 
+        DS:sb_wait:GAUGE:600:0:125000000000 
+        DS:sb_start:GAUGE:600:0:125000000000 
+        DS:sb_reading:GAUGE:600:0:125000000000 
+        DS:sb_writing:GAUGE:600:0:125000000000 
+        DS:sb_keepalive:GAUGE:600:0:125000000000 
+        DS:sb_dns:GAUGE:600:0:125000000000 
+        DS:sb_closing:GAUGE:600:0:125000000000 
+        DS:sb_logging:GAUGE:600:0:125000000000 
+        DS:sb_graceful:GAUGE:600:0:125000000000 
+        DS:sb_idle:GAUGE:600:0:125000000000 
         DS:sb_open:GAUGE:600:0:125000000000 '.$config['rrd_rra']
     );
 }//end if
