@@ -64,7 +64,7 @@ if ($config['warn']['ifdown']) {
         if (!$interface['deleted']) {
             $interface = ifNameDescr($interface);
             generate_front_box(
-                'port-down',
+                'alert alert-danger',
                 generate_device_link($interface, shorthost($interface['hostname']))."<br />
         <span class=\"interface-updown\">Port Down</span><br />
 <!--      <img src='graph.php?type=bits&amp;if=".$interface['port_id'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now']."&amp;width=100&amp;height=32' /> -->
