@@ -362,10 +362,10 @@ $filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('ospf-statis
 if (!is_file($filename)) {
     rrdtool_create(
         $filename,
-        '--step 300 \
-            DS:instances:GAUGE:600:0:1000000 \
-                DS:areas:GAUGE:600:0:1000000 \
-                    DS:ports:GAUGE:600:0:1000000 \
+        '--step 300 
+            DS:instances:GAUGE:600:0:1000000 
+                DS:areas:GAUGE:600:0:1000000 
+                    DS:ports:GAUGE:600:0:1000000 
                         DS:neighbours:GAUGE:600:0:1000000 '.$config['rrd_rra']
                     );
 }

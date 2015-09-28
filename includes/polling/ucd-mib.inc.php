@@ -34,10 +34,10 @@ $ss = snmpwalk_cache_oid($device, 'systemStats', array(), 'UCD-SNMP-MIB');
 $ss = $ss[0];
 // Insert Nazi joke here.
 // Create CPU RRD if it doesn't already exist
-$cpu_rrd_create = ' --step 300 \
-    DS:user:COUNTER:600:0:U \
-    DS:system:COUNTER:600:0:U \
-    DS:nice:COUNTER:600:0:U \
+$cpu_rrd_create = ' --step 300 
+    DS:user:COUNTER:600:0:U 
+    DS:system:COUNTER:600:0:U 
+    DS:nice:COUNTER:600:0:U 
     DS:idle:COUNTER:600:0:U '.$config['rrd_rra'];
 
 // This is how we currently collect. We should collect one RRD per stat, for ease of handling differen formats,
@@ -125,14 +125,14 @@ if (is_numeric($ss['ssRawInterrupts'])) {
 // UCD-SNMP-MIB::memCached.0 = INTEGER: 2595556 kB
 // UCD-SNMP-MIB::memSwapError.0 = INTEGER: noError(0)
 // UCD-SNMP-MIB::memSwapErrorMsg.0 = STRING:
-$mem_rrd_create = ' --step 300 \
-    DS:totalswap:GAUGE:600:0:10000000000 \
-    DS:availswap:GAUGE:600:0:10000000000 \
-    DS:totalreal:GAUGE:600:0:10000000000 \
-    DS:availreal:GAUGE:600:0:10000000000 \
-    DS:totalfree:GAUGE:600:0:10000000000 \
-    DS:shared:GAUGE:600:0:10000000000 \
-    DS:buffered:GAUGE:600:0:10000000000 \
+$mem_rrd_create = ' --step 300 
+    DS:totalswap:GAUGE:600:0:10000000000 
+    DS:availswap:GAUGE:600:0:10000000000 
+    DS:totalreal:GAUGE:600:0:10000000000 
+    DS:availreal:GAUGE:600:0:10000000000 
+    DS:totalfree:GAUGE:600:0:10000000000 
+    DS:shared:GAUGE:600:0:10000000000 
+    DS:buffered:GAUGE:600:0:10000000000 
     DS:cached:GAUGE:600:0:10000000000 '.$config['rrd_rra'];
 
 $snmpdata = snmp_get_multi($device, 'memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0', '-OQUs', 'UCD-SNMP-MIB');

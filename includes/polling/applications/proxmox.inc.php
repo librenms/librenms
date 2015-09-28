@@ -63,8 +63,8 @@ if (count($pmxlines) > 2) {
         if (!is_file($rrd_filename)) {
             rrdtool_create(
                 $rrd_filename,
-                ' --step 300 \
-                DS:INOCTETS:DERIVE:600:0:12500000000 \
+                ' --step 300 
+                DS:INOCTETS:DERIVE:600:0:12500000000 
                 DS:OUTOCTETS:DERIVE:600:0:12500000000 '.$config['rrd_rra']);
         }
 

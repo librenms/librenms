@@ -96,7 +96,7 @@ function poll_sensor($device, $class, $unit) {
         if (!is_file($rrd_file)) {
             rrdtool_create(
                 $rrd_file,
-                '--step 300 \
+                '--step 300 
                 DS:sensor:GAUGE:600:-20000:20000 '.$config['rrd_rra']
             );
         }
