@@ -29,9 +29,9 @@ else {
                     </div>
                     <div class="form-group">
                       
-                        <div class="checkbox">
+                        <label class="checkbox">
                           <input type="checkbox" name="remember" id="remember" /> Remember me.
-                        </div>
+                        </label>
                       
                     </div>
                     <div class="form-group">
