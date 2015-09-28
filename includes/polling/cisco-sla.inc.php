@@ -42,7 +42,7 @@ foreach (dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` =
     if (!is_file($slarrd)) {
         rrdtool_create(
             $slarrd,
-            '--step 300 \
+            '--step 300 
      DS:rtt:GAUGE:600:0:300000 '.$config['rrd_rra']
         );
     }
