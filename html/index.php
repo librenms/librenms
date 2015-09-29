@@ -121,6 +121,7 @@ if (empty($config['favicon'])) {
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/favicon-72.png">
   <link rel="apple-touch-icon-precomposed" href="images/favicon-57.png">
   <link rel="icon" href="images/favicon-32.png" sizes="32x32">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="msapplication-TileImage" content="images/favicon-144.png">
 <?php
 }
