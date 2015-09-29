@@ -56,6 +56,10 @@ elif [ "${OS}" = "Linux" ] ; then
   elif [ -f /etc/openwrt_version ] ; then
     DIST="OpenWrt"
     REV=$(cat /etc/openwrt_version)
+
+  elif [ -f /etc/pld-release ] ; then
+    DIST=$(cat /etc/pld-release)
+    REV=""
   fi
 
   if [ -f /etc/lsb-release -a "${IGNORE_LSB}" != 1 ] ; then
