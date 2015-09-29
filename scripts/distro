@@ -52,6 +52,10 @@ elif [ "${OS}" = "Linux" ] ; then
   elif [ -f /etc/os-release ] ; then
     DIST=$(grep '^NAME=' /etc/os-release | cut -d= -f2- | tr -d '"')
     REV=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2- | tr -d '"')
+
+  elif [ -f /etc/openwrt_version ] ; then
+    DIST="OpenWrt"
+    REV=$(cat /etc/openwrt_version)
   fi
 
   if [ -f /etc/lsb-release -a "${IGNORE_LSB}" != 1 ] ; then
