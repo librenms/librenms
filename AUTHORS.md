@@ -57,5 +57,6 @@ Contributors to LibreNMS:
 - Nils Steinger <librenms@voidptr.de> (n-st)
 - Mark Nagel <mnagel@willingminds.com> (ciscoqid)
 - Sławomir Paszkiewicz <paszczus@pld-linux.org> (paszczus)
+- Frederik Mogensen <frederik@server-1.dk> (mogensen)
 
 [1]: http://observium.org/ "Observium web site"
