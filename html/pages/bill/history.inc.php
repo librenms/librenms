@@ -40,7 +40,7 @@ function showDetails($bill_id, $imgtype, $from, $to, $bittype='Quota') {
 // $url        = generate_url($vars, array('detail' => 'yes'));
 $url = $PHP_SELF.'/bill/'.$bill_id.'/history/detail=all/';
 
-echo '<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>
+echo '<table class="table">
     <tr style="font-weight: bold; ">
         <td width="7"></td>
         <td width="250">Period</td>
@@ -93,7 +93,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         echo '
             <tr style="background: '.$row_colour.';">
                 <td></td>
-                <td><span style="font-weight: bold;" class="interface">'.strftime('%Y-%m-%d', strtotime($datefrom)).' -> '.strftime('%Y-%m-%d', strtotime($dateto))."</span></td>
+                <td><span style="font-weight: bold;" class="interface">'.strftime('%Y-%m-%d', strtotime($datefrom)).' to '.strftime('%Y-%m-%d', strtotime($dateto))."</span></td>
                 <td>$type</td>
                 <td>$allowed</td>
                 <td>$in</td>
