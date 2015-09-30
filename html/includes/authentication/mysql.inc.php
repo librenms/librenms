@@ -3,7 +3,7 @@
 
 function authenticate($username, $password) {
     $encrypted_old = md5($password);
-    $row           = dbFetchRow('SELECT username,password FROM `users` WHERE `username`= ?', array($username));
+    $row           = dbFetchRow('SELECT username,password FROM `users` WHERE `username`= ?', array($username), true);
     if ($row['username'] && $row['username'] == $username) {
         // Migrate from old, unhashed password
         if ($row['password'] == $encrypted_old) {
@@ -36,7 +36,7 @@ function authenticate($username, $password) {
 
 function reauthenticate($sess_id, $token) {
     list($uname,$hash) = explode('|', $token);
-    $session           = dbFetchRow("SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'");
+    $session           = dbFetchRow("SELECT * FROM `session` WHERE `session_username` = '$uname' AND session_value='$sess_id'", array(), true);
     $hasher            = new PasswordHash(8, false);
     if ($hasher->CheckPassword($uname.$session['session_token'], $hash)) {
         $_SESSION['username'] = $uname;
@@ -59,7 +59,7 @@ function passwordscanchange($username='') {
         return 1;
     }
     else {
-        return dbFetchCell('SELECT can_modify_passwd FROM users WHERE username = ?', array($username));
+        return dbFetchCell('SELECT can_modify_passwd FROM users WHERE username = ?', array($username), true);
     }
 
 }//end passwordscanchange()
@@ -114,20 +114,20 @@ function adduser($username, $password, $level, $email='', $realname='', $can_mod
 
 
 function user_exists($username) {
-    $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username));
+    $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
     return $return;
 
 }//end user_exists()
 
 
 function get_userlevel($username) {
-    return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username));
+    return dbFetchCell('SELECT `level` FROM `users` WHERE `username` = ?', array($username), true);
 
 }//end get_userlevel()
 
 
 function get_userid($username) {
-    return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username));
+    return dbFetchCell('SELECT `user_id` FROM `users` WHERE `username` = ?', array($username), true);
 
 }//end get_userid()
 
@@ -158,7 +158,7 @@ function can_update_users() {
 
 
 function get_user($user_id) {
-    return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id));
+    return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id), true);
 
 }//end get_user()
 

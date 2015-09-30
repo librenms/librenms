@@ -238,10 +238,10 @@ function dbDelete($table, $where=null, $parameters=array()) {
  * */
 
 
-function dbFetchRows($sql, $parameters=array()) {
+function dbFetchRows($sql, $parameters=array(), $nocache=false) {
     global $db_stats, $config;
 
-    if ($config['memcached']['enable']) {
+    if ($config['memcached']['enable'] && $nocache === false) {
         $result = $config['memcached']['resource']->get(hash('sha512',$sql.'|'.serialize($parameters)));
         if (!empty($result)) {
             return $result;
@@ -258,7 +258,7 @@ function dbFetchRows($sql, $parameters=array()) {
         }
 
         mysql_free_result($result);
-        if ($config['memcached']['enable']) {
+        if ($config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512',$sql.'|'.serialize($parameters)),$rows,$config['memcached']['ttl']);
         }
         return $rows;
@@ -283,8 +283,8 @@ function dbFetchRows($sql, $parameters=array()) {
  * */
 
 
-function dbFetch($sql, $parameters=array()) {
-    return dbFetchRows($sql, $parameters);
+function dbFetch($sql, $parameters=array(), $nocache=false) {
+    return dbFetchRows($sql, $parameters, $nocache);
     /*
         // for now, don't do the iterator thing
         $result = dbQuery($sql, $parameters);
@@ -305,10 +305,10 @@ function dbFetch($sql, $parameters=array()) {
  * */
 
 
-function dbFetchRow($sql=null, $parameters=array()) {
+function dbFetchRow($sql=null, $parameters=array(), $nocache=false) {
     global $db_stats, $config;
 
-    if ($config['memcached']['enable']) {
+    if ($config['memcached']['enable'] && $nocache === false) {
         $result = $config['memcached']['resource']->get(hash('sha512',$sql.'|'.serialize($parameters)));
         if (!empty($result)) {
             return $result;
@@ -325,7 +325,7 @@ function dbFetchRow($sql=null, $parameters=array()) {
         $db_stats['fetchrow_sec'] += number_format(($time_end - $time_start), 8);
         $db_stats['fetchrow']++;
 
-        if ($config['memcached']['enable']) {
+        if ($config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512',$sql.'|'.serialize($parameters)),$row,$config['memcached']['ttl']);
         }
         return $row;
@@ -344,10 +344,10 @@ function dbFetchRow($sql=null, $parameters=array()) {
  * */
 
 
-function dbFetchCell($sql, $parameters=array()) {
+function dbFetchCell($sql, $parameters=array(), $nocache=false) {
     global $db_stats;
     $time_start = microtime(true);
-    $row            = dbFetchRow($sql, $parameters);
+    $row            = dbFetchRow($sql, $parameters, $nocache);
     if ($row) {
         return array_shift($row);
         // shift first field off first row
@@ -369,11 +369,11 @@ function dbFetchCell($sql, $parameters=array()) {
  * */
 
 
-function dbFetchColumn($sql, $parameters=array()) {
+function dbFetchColumn($sql, $parameters=array(), $nocache=false) {
     global $db_stats;
     $time_start = microtime(true);
     $cells          = array();
-    foreach (dbFetch($sql, $parameters) as $row) {
+    foreach (dbFetch($sql, $parameters, $nocache) as $row) {
         $cells[] = array_shift($row);
     }
 
