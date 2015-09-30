@@ -66,6 +66,8 @@ if( defined('show_settings') || empty($widget_settings) ) {
         <option value="peering"'.($widget_settings['graph_type'] == 'peering' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Peering</option>
         <option value="core"'.($widget_settings['graph_type'] == 'core' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Core</option>
         <option value="custom"'.($widget_settings['graph_type'] == 'custom' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Custom Descr</option>
+        <option disabled></option>
+        <option value="bill_bits"'.($widget_settings['graph_type'] == 'bill_bits' ? ' selected' : '').'>Bill</option>
       </select>
     </div>
     <div class="col-sm-offset-10 col-sm-2">
@@ -138,6 +140,14 @@ if( defined('show_settings') || empty($widget_settings) ) {
         $common_output[] = '<option value="'.$opt.'" '.($widget_settings['graph_custom'] == $opt ? 'selected' : '').'>'.ucfirst($opt).'</option>';
     }
     $common_output[] = '      </select>
+    </div>
+  </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_bill">
+    <div class="col-sm-2">
+      <label for="graph_bill" class="control-label">Bill: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'_bill" name="graph_bill" placeholder="Bill" value="'.htmlspecialchars($widget_settings['graph_bill']).'">
     </div>
   </div>
   <div class="form-group">
@@ -298,6 +308,40 @@ function '.$unique_id.'() {
     templates: {
       header: "<h5><strong>&nbsp;Munin</strong></h5>",
       suggestion: Handlebars.compile(\'<p><small><img src="images/icons/port.png" /> <strong>{{plugin}}</strong> – {{hostname}}</small></p>\')
+    }
+  });
+
+  var '.$unique_id.'_bill = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace("munin"),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: "ajax_search.php?search=%QUERY&type=bill",
+        filter: function (output) {
+            return $.map(output, function (item) {
+                return {
+                    name:        item.bill_name,
+                    bill_id:     item.bill_id,
+                };
+            });
+        },
+      wildcard: "%QUERY"
+    }
+  });
+  '.$unique_id.'_bill.initialize();
+  $(".input_'.$unique_id.'_bill").typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1,
+    classNames: {
+        menu: "typeahead-left"
+    }
+  },
+  {
+    source: '.$unique_id.'_bill.ttAdapter(),
+    async: false,
+    templates: {
+      header: "<h5><strong><i class=\'fa fa-money\'></i>&nbsp;Bill</strong></h5>",
+      suggestion: Handlebars.compile(\'<p><small><strong>{{name}}</strong></small></p>\')
     }
   });
 
