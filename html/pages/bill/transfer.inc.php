@@ -88,9 +88,8 @@ function showPercent($per) {
 
 
 echo '<h3>Bill Summary</h3>';
-echo '<h4>Quota Bill</h4>';
-echo '<table cellpadding="5" cellspacing="0" border="0" class="devicetable">';
-echo '  <tr><td colspan="7">Billing Period from '.$fromtext.' to '.$totext.'</td></tr>';
+echo '<h4>Quota Bill (Billing Period from '.$fromtext.' to '.$totext.')</h4>';
+echo '<table class="table">';
 echo '  <tr style="font-weight: bold;">';
 echo '    <td width="125">Bandwidth</td>';
 echo '    <td width="10"></td>';
