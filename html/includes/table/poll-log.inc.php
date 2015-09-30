@@ -42,7 +42,7 @@ if ($rowCount != -1) {
 
 $sql = "SELECT D.device_id,D.hostname AS `hostname`, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
 
-foreach (dbFetchRows($sql) as $device) {
+foreach (dbFetchRows($sql,array(),true) as $device) {
     if (empty($device['group_name'])) {
         $device['group_name'] = 'General';
     }

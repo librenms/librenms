@@ -30,12 +30,9 @@ else {
     $database_db = mysql_select_db($config['db_name'], $database_link);
 }
 
-$config['time']['now']      = time();
-$config['time']['now']     -= ($config['time']['now'] % 300);
-
 if ($config['memcached']['enable'] === true) {
     if (class_exists('Memcached')) {
-        $config['memcached']['ttl']     += $config['time']['now'];
+        $config['memcached']['ttl']      = 60;
         $config['memcached']['resource'] = new Memcached();
         $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
     }
@@ -1720,6 +1717,8 @@ if (isset($_SERVER['HTTPS'])) {
 }
 
 // Set some times needed by loads of scripts (it's dynamic, so we do it here!)
+$config['time']['now']      = time();
+$config['time']['now']     -= ($config['time']['now'] % 300);
 $config['time']['fourhour'] = ($config['time']['now'] - 14400);
 // time() - (4 * 60 * 60);
 $config['time']['sixhour'] = ($config['time']['now'] - 21600);
