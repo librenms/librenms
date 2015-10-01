@@ -42,14 +42,6 @@ else {
                         $msg_box[] = array('type'=>'error','message'=>$auth_message,'title'=>'Login error');
                     }
                     ?>
-                    <?php
-                    if (isset($config['login_message'])) {
-                      echo('
-                            <div class="form-group">
-                                <div class="alert alert-info text-center">'.$config['login_message'].'</div>
-                            </div>');
-                    }
-                    ?>
                     </form>
                     <script type="text/javascript">
                     <!--
@@ -61,6 +53,11 @@ else {
                     ?>
                     </div>
                   </div>
+                  <?php
+                    if (isset($config['login_message'])) {
+                      echo('<div class="panel-footer"><center>'.$config['login_message'].'</center></div>');
+                    }
+                    ?>
                 </div>
               </div>
             <div class="col-md-4"></div>
