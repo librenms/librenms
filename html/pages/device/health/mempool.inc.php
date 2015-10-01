@@ -13,17 +13,6 @@ foreach (dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($devi
         $row_colour = $list_colour_b;
     }
 
-    if ($config['memcached']['enable'] === true) {
-        $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
-        d_echo($state);
-
-        if (is_array($state)) {
-            $mempool = array_merge($mempool, $state);
-        }
-
-        unset($state);
-    }
-
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
     $mempool_url = 'graphs/id='.$mempool['mempool_id'].'/type=mempool_usage/';

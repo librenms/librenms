@@ -72,22 +72,16 @@ if (isset($_GET['term'],$_GET['device_id'])) {
     $_GET['device_id'] = mres($_GET['device_id']);
     if (strstr($_GET['term'], '.')) {
         $term = explode('.', $_GET['term']);
-        if ($config['memcached']['enable']) {
-            $chk = $memcache->get('rule-suggest_'.$term[0]);
-        }
-
-        if (!(sizeof($chk) > 0) || $chk === false) {
-            if ($term[0] == 'macros') {
-                foreach ($config['alert']['macros']['rule'] as $macro => $v) {
-                    $chk[] = 'macros.'.$macro;
-                }
+        if ($term[0] == 'macros') {
+            foreach ($config['alert']['macros']['rule'] as $macro => $v) {
+                $chk[] = 'macros.'.$macro;
             }
-            else {
-                $tmp = dbFetchRows('SHOW COLUMNS FROM '.$term[0]);
-                foreach ($tmp as $tst) {
-                    if (isset($tst['Field'])) {
-                        $chk[] = $term[0].'.'.$tst['Field'];
-                    }
+        }
+        else {
+            $tmp = dbFetchRows('SHOW COLUMNS FROM '.$term[0]);
+            foreach ($tmp as $tst) {
+                if (isset($tst['Field'])) {
+                    $chk[] = $term[0].'.'.$tst['Field'];
                 }
             }
         }
@@ -95,29 +89,18 @@ if (isset($_GET['term'],$_GET['device_id'])) {
         $current = true;
     }
     else {
-        if ($config['memcached']['enable']) {
-            $chk = $memcache->get('rule-suggest-toplvl');
+        $tmp = dbFetchRows("SELECT TABLE_NAME FROM information_schema.COLUMNS WHERE COLUMN_NAME = 'device_id'");
+        foreach ($tmp as $tst) {
+            $chk[] = $tst['TABLE_NAME'].'.';
         }
 
-        if (!(sizeof($chk) > 0) || $chk === false) {
-            $tmp = dbFetchRows("SELECT TABLE_NAME FROM information_schema.COLUMNS WHERE COLUMN_NAME = 'device_id'");
-            foreach ($tmp as $tst) {
-                $chk[] = $tst['TABLE_NAME'].'.';
-            }
-
-            $chk[] = 'macros.';
-            $chk[] = 'bills.';
-        }
+        $chk[] = 'macros.';
+        $chk[] = 'bills.';
     }
     if (sizeof($chk) > 0) {
-        if ($config['memcached']['enable']) {
-            $memcache->set('rule-suggest-'.$oterm, $chk, 86400);
-            // Cache for 24h
-        }
-
-        $obj          = levsort($_GET['term'], $chk);
-        $obj          = array_chunk($obj, 20, true);
-        $obj          = $obj[0];
+        $obj  = levsort($_GET['term'], $chk);
+        $obj  = array_chunk($obj, 20, true);
+        $obj  = $obj[0];
         $flds = array();
         if ($current === true) {
             foreach ($obj as $fld) {
