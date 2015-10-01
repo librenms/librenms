@@ -32,7 +32,7 @@ function catchFatal() {
     }
 }
 
-if (strpos($_SERVER['PATH_INFO'], "debug")) {
+if (strpos($_SERVER['PATH_INFO'], "debug") || true) {
     $debug = "1";
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 1);
@@ -65,6 +65,8 @@ require '../includes/functions.php';
 require 'includes/functions.inc.php';
 require 'includes/vars.inc.php';
 require 'includes/plugins.inc.php';
+
+$config['memcached']['ttl'] = $config['time']['now']+300;
 
 Plugins::start();
 

@@ -24,6 +24,7 @@
  * @subpackage Page
  */
 $pagetitle[] = 'Global Settings';
+$config['memcached']['enable'] = false;
 ?>
 
 <div class="container-fluid">
