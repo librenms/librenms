@@ -222,7 +222,7 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
     $url = generate_device_url($device, $vars);
 
     // beginning of overlib box contains large hostname followed by hardware & OS details
-    $contents = '<div><span class=list-large>'.$device['hostname'].'</span>';
+    $contents = '<div style="background-color: #FFFFFF;"><span class=list-large>'.$device['hostname'].'</span>';
     if ($device['hardware']) {
         $contents .= ' - '.$device['hardware'];
     }
@@ -248,7 +248,7 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
     foreach ($graphs as $entry) {
         $graph         = $entry['graph'];
         $graphhead = $entry['text'];
-        $contents .= '<div class=overlib-box>';
+        $contents .= '<div class=overlib-box style="background-color: #FFFFFF;">';
         $contents .= '<span class=overlib-title>'.$graphhead.'</span><br />';
         $contents .= generate_minigraph_image($device, $start, $end, $graph);
         $contents .= generate_minigraph_image($device, $config['time']['week'], $end, $graph);
