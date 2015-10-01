@@ -216,7 +216,7 @@ if($stage == 0) {
     }
 
     // Check for pear install
-    require_once 'System.php';
+    @include_once 'System.php';
 
     if(class_exists('System') === true) {
         $ext_loaded = 'yes';
