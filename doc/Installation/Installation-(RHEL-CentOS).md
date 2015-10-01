@@ -69,6 +69,9 @@ Install necessary software.  The packages listed below are an all-inclusive list
 
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
+# PHP 5.4+ is required, the standard version of PHP that's installed is 5.3 which returns the following error: PHP Parse error:  syntax error, unexpected '[' in /opt/librenms/includes/sql-schema/update.php on line 87.
+# I've loaded PHP 5.4 using a different repo via CentOS 6.X, which has cleared this error.
+
     yum install epel-release
     yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
     pear install Net_IPv4-1.3.4
