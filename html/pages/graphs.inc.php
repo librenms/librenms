@@ -41,6 +41,13 @@ if (!$auth) {
     require 'includes/error-no-perm.inc.php';
 }
 else {
+    echo '<div class="panel panel-default">';
+        echo '<table style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
+        require 'includes/device-header.inc.php';
+    echo '</table>';
+    echo '
+</div>';
+
     if (isset($config['graph_types'][$type][$subtype]['descr'])) {
         $title .= " :: ".$config['graph_types'][$type][$subtype]['descr'];
     }
@@ -97,7 +104,7 @@ else {
         $link = generate_url($link_array);
 
         echo('<td align=center>');
-        echo('<span class="device-head">'.$text.'</span><br />');
+        echo('<b>'.$text.'</b><br />');
         echo('<a href="'.$link.'">');
         echo generate_lazy_graph_tag($graph_array);
         echo('</a>');
