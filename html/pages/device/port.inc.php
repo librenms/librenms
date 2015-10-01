@@ -6,17 +6,6 @@ if (!isset($vars['view'])) {
 
 $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($vars['port']));
 
-if ($config['memcached']['enable'] === true) {
-    $state = $memcache->get('port-'.$port['port_id'].'-state');
-    d_echo($state);
-
-    if (is_array($state)) {
-        $port = array_merge($port, $state);
-    }
-
-    unset($state);
-}
-
 $port_details = 1;
 
 $hostname = $device['hostname'];
