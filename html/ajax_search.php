@@ -318,6 +318,17 @@ if (isset($_REQUEST['search'])) {
 
             $json = json_encode($device);
             die($json);
+        }
+        else if ($_REQUEST['type'] == 'bill') {
+            // Device search
+            if (is_admin() === true || is_read() === true) {
+                $results = dbFetchRows("SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` WHERE `bill_name` LIKE '%".$search."%' OR `bill_notes` LIKE '%".$search."%' LIMIT 8");
+            }
+            else {
+                $results = dbFetchRows("SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` INNER JOIN `bill_perms` ON `bills`.bill_id = `bill_perms`.bill_id WHERE `bill_perms`.user_id = ? AND (`bill_name` LIKE '%".$search."%' OR `bill_notes` LIKE '%".$search."%') LIMIT 8", array($_SESSION['user_id']));
+            }
+            $json = json_encode($results);
+            die($json);
         }//end if
     }//end if
 }//end if
