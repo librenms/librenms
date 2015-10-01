@@ -97,7 +97,7 @@ else {
         $link = generate_url($link_array);
 
         echo('<td align=center>');
-        echo('<span class="device-head">'.$text.'</span><br />');
+        echo('<b>'.$text.'</b><br>');
         echo('<a href="'.$link.'">');
         echo generate_lazy_graph_tag($graph_array);
         echo('</a>');
