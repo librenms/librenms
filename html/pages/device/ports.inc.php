@@ -136,19 +136,7 @@ else {
     }
 
     foreach ($ports as $port) {
-        if ($config['memcached']['enable'] === true) {
-            $state = $memcache->get('port-'.$port['port_id'].'-state');
-            d_echo($state);
-
-            if (is_array($state)) {
-                $port = array_merge($port, $state);
-            }
-
-            unset($state);
-        }
-
         include 'includes/print-interface.inc.php';
-
         $i++;
     }
 

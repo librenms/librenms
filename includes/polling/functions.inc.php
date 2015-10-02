@@ -96,7 +96,7 @@ function poll_sensor($device, $class, $unit) {
         if (!is_file($rrd_file)) {
             rrdtool_create(
                 $rrd_file,
-                '--step 300 \
+                '--step 300 
                 DS:sensor:GAUGE:600:-20000:20000 '.$config['rrd_rra']
             );
         }
@@ -119,12 +119,7 @@ function poll_sensor($device, $class, $unit) {
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
 
-        if ($config['memcached']['enable'] === true) {
-            $memcache->set('sensor-'.$sensor['sensor_id'].'-value', $sensor_value);
-        }
-        else {
-            dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
-        }
+        dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
     }//end foreach
 
 }//end poll_sensor()
@@ -158,7 +153,9 @@ function poll_device($device, $options) {
         echo "Created directory : $host_rrd\n";
     }
 
-    $ping_response = isPingable($device['hostname'], $device['device_id']);
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+
+    $ping_response = isPingable($device['hostname'], $address_family, $device['device_id']);
 
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];

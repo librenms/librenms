@@ -41,7 +41,7 @@ foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget
     $data[] = $items;
 }
 if (empty($data)) {
-    $data[] = array('user_widget_id'=>'0','widget_id'=>1,'title'=>'Add a widget','widget'=>'placeholder','col'=>1,'row'=>1,'size_x'=>2,'size_y'=>2,'refresh'=>60);
+    $data[] = array('user_widget_id'=>'0','widget_id'=>1,'title'=>'Add a widget','widget'=>'placeholder','col'=>1,'row'=>1,'size_x'=>6,'size_y'=>2,'refresh'=>60);
 }
 $data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
@@ -86,9 +86,9 @@ if (!empty($shared_dashboards)) {
 ?>
         </ul>
       </div>
-      <button class="btn btn-default" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))"><i class="fa fa-pencil-square-o fa-fw"></i></button>
-      <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))"><i class="fa fa-trash fa-fw"></i></button>
-      <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))"><i class="fa fa-plus fa-fw"></i></button>
+      <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-placement="top" title="Edit Dashboard"><i class="fa fa-pencil-square-o fa-fw"></i></button>
+      <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-placement="top" title="Remove Dashboard"><i class="fa fa-trash fa-fw"></i></button>
+      <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-placement="top" title="New Dashboard"><i class="fa fa-plus fa-fw"></i></button>
     </div>
   </div>
 </div>
@@ -229,7 +229,10 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         });
     }
 
+    var gridster_state = 0;
+
     $(function(){
+        $('[data-toggle="tooltip"]').tooltip();
         dashboard_collapse();
         gridster = $(".gridster ul").gridster({
             widget_base_dimensions: [100, 100],
@@ -260,8 +263,24 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         }).data('gridster');
 
         gridster.remove_all_widgets();
+        gridster.disable();
+        gridster.disable_resize();
         $.each(serialization, function() {
             widget_dom(this);
+        });
+        $(document).on('click','.edit-dash-btn', function() {
+            if (gridster_state == 0) {
+                gridster.enable();
+                gridster.enable_resize();
+                gridster_state = 1;
+                $('.fade-edit').fadeIn();
+            }
+            else {
+                gridster.disable();
+                gridster.disable_resize();
+                gridster_state = 0;
+                $('.fade-edit').fadeOut();
+            }
         });
 
         $(document).on('click','#clear_widgets', function() {
@@ -330,7 +349,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         });
 
         $(document).on("click",".edit-widget",function() {
-            obj = $(this).parent().parent();
+            obj = $(this).parent().parent().parent();
             if( obj.data('settings') == 1 ) {
                 obj.data('settings','0');
             } else {
@@ -347,6 +366,12 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                 $(this).fadeOut(0);
             });
             $(target).fadeToggle(300);
+            if (target != "#edit_dash") {
+                gridster.disable();
+                gridster.disable_resize();
+                gridster_state = 0;
+                $('.fade-edit').fadeOut();
+            }
         } else {
             $('.dash-collapse').fadeOut(0);
         }
@@ -418,9 +443,12 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
 
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
-              '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+'</span>'+
-              '<button style="color: #ffffff;" type="button" class="fa fa-times close close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close">&nbsp;</button>'+
-              '<button style="color: #ffffff;" type="button" class="fa fa-pencil-square-o close edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings">&nbsp;</button>'+
+              '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
+              '</span>'+
+              '<span class="fade-edit pull-right">'+
+              '<a href="javascript:return false;" class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</a>&nbsp;'+
+              '<a href="javascript:return false;" class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</a>&nbsp;'+
+              '</span>'+
               '</header>'+
               '<div class="widget_body" id="widget_body_'+data.user_widget_id+'" style="height: 100%; width:100%;">'+data.widget+'</div>'+
               '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.refresh+',\''+data.widget+'\');\<\/script\>'+
@@ -430,6 +458,10 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         } else {
             gridster.add_widget(dom, parseInt(data.size_x), parseInt(data.size_y));
         }
+        if (gridster_state == 0) {
+            $('.fade-edit').fadeOut(0);
+        }
+        $('[data-toggle="tooltip"]').tooltip();
     }
 
     function widget_settings(data) {
