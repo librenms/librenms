@@ -18,28 +18,28 @@ list ($corrupt, $def_cacheInserts, $def_cacheLookup, $latency, $pc_hit,
 if (!is_file($rrd_filename)) {
     rrdtool_create(
         $rrd_filename,
-        '--step 300 \
-        DS:corruptPackets:DERIVE:600:0:125000000000 \
-        DS:def_cacheInserts:DERIVE:600:0:125000000000 \
-        DS:def_cacheLookup:DERIVE:600:0:125000000000 \
-        DS:latency:DERIVE:600:0:125000000000 \
-        DS:pc_hit:DERIVE:600:0:125000000000 \
-        DS:pc_miss:DERIVE:600:0:125000000000 \
-        DS:pc_size:DERIVE:600:0:125000000000 \
-        DS:qsize:DERIVE:600:0:125000000000 \
-        DS:qc_hit:DERIVE:600:0:125000000000 \
-        DS:qc_miss:DERIVE:600:0:125000000000 \
-        DS:rec_answers:DERIVE:600:0:125000000000 \
-        DS:rec_questions:DERIVE:600:0:125000000000 \
-        DS:servfailPackets:DERIVE:600:0:125000000000 \
-        DS:q_tcpAnswers:DERIVE:600:0:125000000000 \
-        DS:q_tcpQueries:DERIVE:600:0:125000000000 \
-        DS:q_timedout:DERIVE:600:0:125000000000 \
-        DS:q_udpAnswers:DERIVE:600:0:125000000000 \
-        DS:q_udpQueries:DERIVE:600:0:125000000000 \
-        DS:q_udp4Answers:DERIVE:600:0:125000000000 \
-        DS:q_udp4Queries:DERIVE:600:0:125000000000 \
-        DS:q_udp6Answers:DERIVE:600:0:125000000000 \
+        '--step 300 
+        DS:corruptPackets:DERIVE:600:0:125000000000 
+        DS:def_cacheInserts:DERIVE:600:0:125000000000 
+        DS:def_cacheLookup:DERIVE:600:0:125000000000 
+        DS:latency:DERIVE:600:0:125000000000 
+        DS:pc_hit:DERIVE:600:0:125000000000 
+        DS:pc_miss:DERIVE:600:0:125000000000 
+        DS:pc_size:DERIVE:600:0:125000000000 
+        DS:qsize:DERIVE:600:0:125000000000 
+        DS:qc_hit:DERIVE:600:0:125000000000 
+        DS:qc_miss:DERIVE:600:0:125000000000 
+        DS:rec_answers:DERIVE:600:0:125000000000 
+        DS:rec_questions:DERIVE:600:0:125000000000 
+        DS:servfailPackets:DERIVE:600:0:125000000000 
+        DS:q_tcpAnswers:DERIVE:600:0:125000000000 
+        DS:q_tcpQueries:DERIVE:600:0:125000000000 
+        DS:q_timedout:DERIVE:600:0:125000000000 
+        DS:q_udpAnswers:DERIVE:600:0:125000000000 
+        DS:q_udpQueries:DERIVE:600:0:125000000000 
+        DS:q_udp4Answers:DERIVE:600:0:125000000000 
+        DS:q_udp4Queries:DERIVE:600:0:125000000000 
+        DS:q_udp6Answers:DERIVE:600:0:125000000000 
         DS:q_udp6Queries:DERIVE:600:0:125000000000 '.$config['rrd_rra']
     );
 }//end if

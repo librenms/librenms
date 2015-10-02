@@ -1,6 +1,7 @@
 <?php
 
 $no_refresh = TRUE;
+$config['memcached']['enable'] = false;
 
 $link_array = array('page'    => 'device',
     'device'  => $device['device_id'],

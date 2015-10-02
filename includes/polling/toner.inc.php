@@ -23,7 +23,7 @@ if ($config['enable_printers']) {
         if (!is_file($tonerrrd)) {
             rrdtool_create(
                 $tonerrrd,
-                '--step 300 \
+                '--step 300 
                 DS:toner:GAUGE:600:0:20000 '.$config['rrd_rra']
             );
         }

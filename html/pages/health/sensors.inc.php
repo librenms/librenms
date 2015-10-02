@@ -22,11 +22,6 @@ echo '<tr class="tablehead">
       </tr>';
 
 foreach (dbFetchRows($sql, $param) as $sensor) {
-    if ($config['memcached']['enable'] === true) {
-        $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
-        d_echo('Memcached['.'sensor-'.$sensor['sensor_id'].'-value'.'='.$sensor['sensor_current'].']');
-    }
-
     if (empty($sensor['sensor_current'])) {
         $sensor['sensor_current'] = 'NaN';
     }
