@@ -1,0 +1,627 @@
+--
+--defines ROOMALERT24E-MIB for SNMP agent extension of Room Alert 24E
+--Contents:	Global Registration Module
+--		Room Alert OIDs - Enterprise 20916
+--Version:	1.0.2 
+--Date:		11 September 2007
+--Developed By: AVTECH Software, Inc.
+
+--
+--Copyright (c) 2007 AVTECH Software, Inc.
+--
+
+ROOMALERT24E-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress, Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE 
+		FROM RFC-1215;
+
+
+avtech      OBJECT IDENTIFIER ::= { enterprises 20916 }
+products      OBJECT IDENTIFIER ::= { avtech 1 }
+roomalert24e      OBJECT IDENTIFIER ::= { products 5 }
+sensors       OBJECT IDENTIFIER ::= { roomalert24e 1 }
+traps	      OBJECT IDENTIFIER ::= { roomalert24e 2 }
+internal   OBJECT IDENTIFIER ::= { sensors 1 }
+temperature   OBJECT IDENTIFIER ::= { internal 1 }
+humidity   OBJECT IDENTIFIER ::= { internal 2 }
+heat-index   OBJECT IDENTIFIER ::= { internal 3 }
+digital   OBJECT IDENTIFIER ::= { sensors 2 }
+digital-sen1   OBJECT IDENTIFIER ::= { digital 1 }
+digital-sen2   OBJECT IDENTIFIER ::= { digital 2 }
+digital-sen3   OBJECT IDENTIFIER ::= { digital 3 }
+digital-sen4   OBJECT IDENTIFIER ::= { digital 4 }
+digital-sen5   OBJECT IDENTIFIER ::= { digital 5 }
+digital-sen6   OBJECT IDENTIFIER ::= { digital 6 }
+switch   OBJECT IDENTIFIER ::= { sensors 3 }
+
+ 
+-- Room Alert 24E MIB
+-- Parameters 
+
+
+internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal temperature reading in Fahrenheit. Because the SNMP Protocol does not support floating point numbers, values are scaled by 100 and should be divided by 100 to get the actual value."
+::= { temperature 1 }
+
+internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal temperature reading in Celsius. Because the SNMP Protocol does not support floating point numbers, values are scaled by 100 and should be divided by 100 to get the actual value."
+::= { temperature 2 }
+
+internal-humidity OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal relative humidity reading in %RH. Because the SNMP Protocol does not support floating point numbers, values are scaled by 100 and should be divided by 100 to get the actual value."
+::= { humidity 1 }
+
+internal-heat-index OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal heat index reading in Fahrenheit. Because the SNMP Protocol does not support floating point numbers, values are scaled by 100 and should be divided by 100 to get the actual value."
+::= { heat-index 1 }
+
+internal-heat-indexc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal heat index reading in Celsius. Because the SNMP Protocol does not support floating point numbers, values are scaled by 100 and should be divided by 100 to get the actual value."
+::= { heat-index 2 }
+
+digital-sen1-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius. If this sensor is a Digital Power Sensor, this value represents the Current reading in Amperage."
+::= { digital-sen1 1 }
+
+digital-sen1-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Power reading in Watts."
+::= { digital-sen1 2 }
+
+digital-sen1-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Digital Power Sensor, this value represents the Voltage reading in Volts."
+::= { digital-sen1 3 }
+
+digital-sen1-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Reference reading in Volts."
+::= { digital-sen1 4 }
+
+digital-sen1-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen1 5 }
+
+digital-sen2-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius. If this sensor is a Digital Power Sensor, this value represents the Current reading in Amperage."
+::= { digital-sen2 1 }
+
+digital-sen2-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Power reading in Watts."
+::= { digital-sen2 2 }
+
+digital-sen2-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Digital Power Sensor, this value represents the Voltage reading in Volts."
+::= { digital-sen2 3 }
+
+digital-sen2-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Reference reading in Volts."
+::= { digital-sen2 4 }
+
+digital-sen2-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen2 5 }
+
+digital-sen3-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius. If this sensor is a Digital Power Sensor, this value represents the Current reading in Amperage."
+::= { digital-sen3 1 }
+
+digital-sen3-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Power reading in Watts."
+::= { digital-sen3 2 }
+
+digital-sen3-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Digital Power Sensor, this value represents the Voltage reading in Volts."
+::= { digital-sen3 3 }
+
+digital-sen3-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Reference reading in Volts."
+::= { digital-sen3 4 }
+
+digital-sen3-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen3 5 }
+
+digital-sen4-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius. If this sensor is a Digital Power Sensor, this value represents the Current reading in Amperage."
+::= { digital-sen4 1 }
+
+digital-sen4-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Power reading in Watts."
+::= { digital-sen4 2 }
+
+digital-sen4-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Digital Power Sensor, this value represents the Voltage reading in Volts."
+::= { digital-sen4 3 }
+
+digital-sen4-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Reference reading in Volts."
+::= { digital-sen4 4 }
+
+digital-sen4-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen4 5 }
+
+digital-sen5-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius. If this sensor is a Digital Power Sensor, this value represents the Current reading in Amperage."
+::= { digital-sen5 1 }
+
+digital-sen5-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Power reading in Watts."
+::= { digital-sen5 2 }
+
+digital-sen5-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Digital Power Sensor, this value represents the Voltage reading in Volts."
+::= { digital-sen5 3 }
+
+digital-sen5-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Reference reading in Volts."
+::= { digital-sen5 4 }
+
+digital-sen5-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen5 5 }
+
+digital-sen6-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Celsius. If this sensor is a Digital Power Sensor, this value represents the Current reading in Amperage."
+::= { digital-sen6 1 }
+
+digital-sen6-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature or Temp/Humidity sensor, this value represents the current temperature in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Power reading in Watts."
+::= { digital-sen6 2 }
+
+digital-sen6-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Digital Power Sensor, this value represents the Voltage reading in Volts."
+::= { digital-sen6 3 }
+
+digital-sen6-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Digital Power Sensor, this value represents the Reference reading in Volts."
+::= { digital-sen6 4 }
+
+digital-sen6-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen6 5 }
+
+switch-sen1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 1 (0 = OPEN, 1 = CLOSED)."
+::= { switch 1 }
+
+switch-sen2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 2 (0 = OPEN, 1 = CLOSED)."
+::= { switch 2 }
+
+switch-sen3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 3 (0 = OPEN, 1 = CLOSED)."
+::= { switch 3 }
+
+switch-sen4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 4 (0 = OPEN, 1 = CLOSED)."
+::= { switch 4 }
+
+switch-sen5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 5 (0 = OPEN, 1 = CLOSED)."
+::= { switch 5 }
+
+switch-sen6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 6 (0 = OPEN, 1 = CLOSED)."
+::= { switch 6 }
+
+switch-sen7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 7 (0 = OPEN, 1 = CLOSED)."
+::= { switch 7 }
+
+switch-sen8 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 8 (0 = OPEN, 1 = CLOSED)."
+::= { switch 8 }
+
+switch-sen9 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 9 (0 = OPEN, 1 = CLOSED)."
+::= { switch 9 }
+
+switch-sen10 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 10 (0 = OPEN, 1 = CLOSED)."
+::= { switch 10 }
+
+switch-sen11 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 11 (0 = OPEN, 1 = CLOSED)."
+::= { switch 11 }
+
+switch-sen12 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 12 (0 = OPEN, 1 = CLOSED)."
+::= { switch 12 }
+
+switch-sen13 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 13 (0 = OPEN, 1 = CLOSED)."
+::= { switch 13 }
+
+switch-sen14 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 14 (0 = OPEN, 1 = CLOSED)."
+::= { switch 14 }
+
+switch-sen15 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 15 (0 = OPEN, 1 = CLOSED)."
+::= { switch 15 }
+
+switch-sen16 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 16 (0 = OPEN, 1 = CLOSED)."
+::= { switch 16 }
+	
+alarmmessage OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last Alarm Message"
+::= { traps 1 }	
+	
+	
+-- ROOMALERT24E TRAPS
+	
+tempalarm1-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempalarm1 trap signifies that the current
+			temperature on external sensor 1 is outside the 
+			defined high or low threshold."
+::= 1
+	
+room-alert-24e-snmp-trap TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A room-alert-24e-snmp-trap indicates that an alarm
+			condition has occurred on the sensor indicated
+			by the alarmmessage variable."
+::= 2
+	
+tempalarm2-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempalarm2 trap signifies that the current
+			temperature on external sensor 2 is outside the 
+			defined high or low threshold."
+::= 3
+
+tempclear2-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempclear2 trap signifies that the current
+			temperature on external sensor 2 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 4
+
+tempalarm3-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempalarm3 trap signifies that the current
+			temperature on external sensor 3 is outside the 
+			defined high or low threshold."
+::= 5
+	
+tempclear3-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempclear3 trap signifies that the current
+			temperature on external sensor 3 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 6
+	
+humidityalarm1-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityalarm1 trap signifies that the current
+			humidity on external sensor 1 is outside the 
+			defined high or low threshold."
+::= 7
+	
+humidityclear1-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityclear1 trap signifies that the current
+			humidity on external sensor 1 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 8
+	
+humidityalarm2-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityalarm2 trap signifies that the current
+			humidity on external sensor 2 is outside the 
+			defined high or low threshold."
+::= 9
+
+humidityclear2-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityclear2 trap signifies that the current
+			humidity on external sensor 2 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 10
+
+humidityalarm3-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityalarm3 trap signifies that the current
+			humidity on external sensor 3 is outside the 
+			defined high or low threshold."
+::= 11
+	
+humidityclear3-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityclear3 trap signifies that the current
+			humidity on external sensor 3 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 12
+	
+switchalarm1-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm1 trap signifies that switch sensor 1
+			is in an alarm state."
+::= 13
+	
+switchclear1-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear1 trap signifies that the switch sensor 1
+			has returned to a normal state."
+::= 14
+	
+switchalarm2-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm2 trap signifies that switch sensor 2
+			is in an alarm state."
+::= 15
+	
+switchclear2-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear2 trap signifies that the switch sensor 2
+			has returned to a normal state."
+::= 16
+	
+switchalarm3-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm1 trap signifies that switch sensor 1
+			is in an alarm state."
+::= 17
+	
+switchclear3-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear3 trap signifies that the switch sensor 3
+			has returned to a normal state."
+::= 18
+	
+switchalarm4-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm4 trap signifies that switch sensor 4
+			is in an alarm state."
+::= 19
+	
+switchclear4-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear4 trap signifies that the switch sensor 4
+			has returned to a normal state."
+::= 20
+	
+switchalarm5-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm5 trap signifies that switch sensor 5
+			is in an alarm state."
+::= 21
+	
+switchclear5-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear5 trap signifies that the switch sensor 5
+			has returned to a normal state."
+::= 22
+	
+switchalarm6-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm6 trap signifies that switch sensor 6
+			is in an alarm state."
+::= 23
+	
+switchclear6-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear6 trap signifies that the switch sensor 6
+			has returned to a normal state."
+::= 24
+	
+switchalarm7-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm7 trap signifies that switch sensor 7
+			is in an alarm state."
+::= 25
+	
+switchclear7-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear7 trap signifies that the switch sensor 7
+			has returned to a normal state."
+::= 26
+	
+switchalarm8-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm8 trap signifies that switch sensor 8
+			is in an alarm state."
+::= 27
+	
+switchclear8-24e TRAP-TYPE
+	ENTERPRISE	roomalert24e
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear8 trap signifies that the switch sensor 8
+			has returned to a normal state."
+::= 28
+END

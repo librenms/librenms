@@ -472,6 +472,15 @@ $config['os'][$os]['text']  = 'ZTE ZXR10';
 $config['os'][$os]['type']  = 'network';
 $config['os'][$os]['icon']  = 'zte';
 
+// RoomAlert 3E
+$os = "roomalert3e";
+$config['os'][$os]['text']                  = "AVTECH RoomAlert";
+$config['os'][$os]['type']                  = "environment";
+$config['os'][$os]['icon']                  = "avtech";
+$config['os'][$os]['over'][0]['graph']      = "device_temperature";
+$config['os'][$os]['over'][1]['graph']      = "device_humidity";
+$config['os'][$os]['sysDescr'][]            = "/^Room ?Alert/";
+
 // Ruckus Wireless
 $os = 'ruckuswireless';
 $config['os'][$os]['text']             = 'Ruckus Wireless';
