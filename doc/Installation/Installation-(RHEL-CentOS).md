@@ -215,6 +215,20 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
 > If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
+**SELinux**
+> if you're using SELinux you need to allow nginx to write into logs directory.
+> semanage tool is a part of policycoreutils-python, so if don't have it, you can install it
+
+```bash
+    yum install policycoreutils-python
+```
+
+```bash
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
+    restorecon -RFvv /opt/librenms/logs/
+```
+
 Start the web-server:
 
     # For HTTPd (Apache):
