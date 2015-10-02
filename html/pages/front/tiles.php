@@ -41,7 +41,7 @@ foreach (dbFetchRows('SELECT user_widget_id,users_widgets.widget_id,title,widget
     $data[] = $items;
 }
 if (empty($data)) {
-    $data[] = array('user_widget_id'=>'0','widget_id'=>1,'title'=>'Add a widget','widget'=>'placeholder','col'=>1,'row'=>1,'size_x'=>2,'size_y'=>2,'refresh'=>60);
+    $data[] = array('user_widget_id'=>'0','widget_id'=>1,'title'=>'Add a widget','widget'=>'placeholder','col'=>1,'row'=>1,'size_x'=>6,'size_y'=>2,'refresh'=>60);
 }
 $data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
@@ -445,10 +445,10 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
               '</span>'+
-              '<strong class="fade-edit pull-right">'+
-              '<a href="#" class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings">&nbsp;</a>&nbsp;'+
-              '<a href="#" class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close">&nbsp;</a>&nbsp;'+
-              '</strong>'+
+              '<span class="fade-edit pull-right">'+
+              '<a href="javascript:return false;" class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</a>&nbsp;'+
+              '<a href="javascript:return false;" class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</a>&nbsp;'+
+              '</span>'+
               '</header>'+
               '<div class="widget_body" id="widget_body_'+data.user_widget_id+'" style="height: 100%; width:100%;">'+data.widget+'</div>'+
               '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.refresh+',\''+data.widget+'\');\<\/script\>'+
@@ -461,6 +461,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         if (gridster_state == 0) {
             $('.fade-edit').fadeOut(0);
         }
+        $('[data-toggle="tooltip"]').tooltip();
     }
 
     function widget_settings(data) {
