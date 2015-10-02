@@ -123,6 +123,7 @@ Install necessary extra software and let it start on system boot.
 
 Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
+    mkdir /var/lib/php/session
     chown root:nginx /var/lib/php -R
     vi /etc/php-fpm.d/www.conf      # At line #12: Change `listen` to `/var/run/php5-fpm.sock`
                                     # At line #39-41: Change the `user` and `group` to `nginx`
