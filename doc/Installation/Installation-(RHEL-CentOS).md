@@ -1,4 +1,4 @@
-NOTE: What follows is a very rough list of commands.  This works on a fresh install of CentOS 6.4.
+NOTE: What follows is a very rough list of commands.  This works on a fresh install of CentOS 6.4 and CentOS 7.
 
 NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
 
@@ -10,7 +10,7 @@ This host is where the MySQL database runs.  It could be the same machine as you
 
 You are free to choose between using MySQL or MariaDB:
 
-**MySQL**
+**MySQL** (NOTE: In CentOS 7 there is only mariadb in official repo)
 ```bash
 yum install net-snmp mysql-server mysql-client
 chkconfig mysqld on
@@ -20,15 +20,15 @@ service mysqld start
 **MariaDB**
 ```bash
 yum install net-snmp mariadb-server mariadb-client
-chkconfig mariadb on
-service mariadb start
+systemctl enable mariadb
+systemctl start mariadb
 ```
 
 Now continue with the installation:
 
 ```bash
-service snmpd start
-chkconfig snmpd on
+chkconfig snmpd on (systemctl enable snmpd on CentOS 7)
+service snmpd start (systemctl start snmpd on CentOS 7)
 mysql_secure_installation
 mysql -uroot -p
 ```
@@ -70,20 +70,28 @@ Install necessary software.  The packages listed below are an all-inclusive list
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
     yum install epel-release
-    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
+(CentOS 6)    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
+(CentOS 7)    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
     pear install Net_IPv4-1.3.4
     pear install Net_IPv6-1.2.2b2
 
-### Adding the librenms-user ###
-
+### Adding the librenms-user for Apache ###
+```bash
     useradd librenms -d /opt/librenms -M -r
     usermod -a -G librenms apache
+```
+
+### Adding the librenms-user for Nginx ###
+```bash
+    useradd librenms -d /opt/librenms -M -r
+    usermod -a -G librenms nginx
+```
 
 ### Using HTTPd (Apache2) ###
 
 Set `httpd` to start on system boot.
 
-    chkconfig --levels 235 httpd on
+    chkconfig --levels 235 httpd on (systemctl enable httpd on CentOS 7)
 
 Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 
@@ -110,8 +118,8 @@ If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove th
 Install necessary extra software and let it start on system boot.
 
     yum install nginx php-fpm
-    chkconfig nginx on
-    chkconfig php-fpm on
+    chkconfig nginx on (systemctl enable nginx on CentOS 7)
+    chkconfig php-fpm on (systemctl enable php-fpm on CentOS 7)
 
 Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
@@ -193,23 +201,27 @@ To prepare the web interface (and adding devices shortly), you'll need to create
 
 First, create and chown the `rrd` directory and create the `logs` directory
 
+```bash
     mkdir rrd logs
     chown -R librenms:librenms /opt/librenms
+    chmod 775 rrd
+
     # For HTTPd (Apache):
     chown apache:apache logs
+
     # For Nginx:
     chown nginx:nginx logs
-
-    chmod 775 rrd
+```
 
 > If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 Start the web-server:
 
     # For HTTPd (Apache):
-    service httpd restart
+    service httpd restart (systemctl restart httpd on CentOS 7)
+
     # For Nginx:
-    service nginx restart
+    service nginx restart (systemctl restart nginx on CentOS 7)
 
 ### Add localhost ###
 
