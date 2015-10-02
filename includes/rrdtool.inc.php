@@ -191,7 +191,7 @@ function rrdtool($command, $filename, $options) {
         print $console_color->convert('RRD[%g'.$cmd.'%n] ');
     }
     else {
-        $tmp = stream_get_contents($rrd_pipes[1]).stream_get_contents($rrd_pipes[2]);
+        return array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
     }
 
 }
@@ -206,6 +206,12 @@ function rrdtool($command, $filename, $options) {
 
 
 function rrdtool_create($filename, $options) {
+    if( $config['rrdcached'] && $config['rrdtool_version'] >= 1.5 ) {
+        $chk = rrdtool('info', $filename);
+        if (!empty($chk[0])) {
+            return true;
+        }
+    }
     return rrdtool('create', $filename,  str_replace(array("\r", "\n"), '', $options));
 }
 
