@@ -12,10 +12,6 @@ if (count($sensors)) {
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     foreach ($sensors as $sensor) {
-        if ($config['memcached']['enable'] === true) {
-            $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
-        }
-
         if (empty($sensor['sensor_current'])) {
             $sensor['sensor_current'] = 'NaN';
         }

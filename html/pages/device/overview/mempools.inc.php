@@ -19,17 +19,6 @@ if (count($mempools)) {
         ';
 
     foreach ($mempools as $mempool) {
-        if ($config['memcached']['enable'] === true) {
-            $state = $memcache->get('mempool-'.$mempool['mempool_id'].'-state');
-            d_echo($state);
-
-            if (is_array($state)) {
-                $mempool = array_merge($mempool, $state);
-            }
-
-            unset($state);
-        }
-
         $percent    = round($mempool['mempool_perc'], 0);
         $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
         $total      = formatStorage($mempool['mempool_total']);

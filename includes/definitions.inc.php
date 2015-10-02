@@ -30,6 +30,19 @@ else {
     $database_db = mysql_select_db($config['db_name'], $database_link);
 }
 
+if ($config['memcached']['enable'] === true) {
+    if (class_exists('Memcached')) {
+        $config['memcached']['ttl']      = 60;
+        $config['memcached']['resource'] = new Memcached();
+        $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
+    }
+    else {
+        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
+        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
+        $config['memcached']['enable'] = 0;
+    }
+}
+
 $clone = $config;
 foreach (dbFetchRows('select config_name,config_value from config') as $obj) {
     $clone = array_replace_recursive($clone, mergecnf($obj));
@@ -413,6 +426,10 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['over'][3]['graph'] = 'device_ciscowlc_numaps';
+$config['os'][$os]['over'][3]['text']  = 'Number of APs';
+$config['os'][$os]['over'][4]['graph'] = 'device_ciscowlc_numclients';
+$config['os'][$os]['over'][4]['text']  = 'Number of Clients';
 $config['os'][$os]['icon']             = 'cisco';
 
 // Brocade NOS
@@ -1701,19 +1718,6 @@ $config['mib_dir'] = $config['mibdir'];
 // If we're on SSL, let's properly detect it
 if (isset($_SERVER['HTTPS'])) {
     $config['base_url'] = preg_replace('/^http:/', 'https:', $config['base_url']);
-}
-
-if ($config['memcached']['enable'] === true) {
-    if (class_exists('Memcached')) {
-        $memcache = new Memcached();
-        $memcache->addServer($config['memcached']['host'], $config['memcached']['port']);
-        $memcache->getStats();
-    }
-    else {
-        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
-        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
-        $config['memcached']['enable'] = 0;
-    }
 }
 
 // Set some times needed by loads of scripts (it's dynamic, so we do it here!)

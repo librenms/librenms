@@ -51,7 +51,9 @@ $config['own_hostname'] = 'localhost';
 
 // Location of executables
 $config['rrdtool']                  = '/usr/bin/rrdtool';
+$config['rrdtool_version']          = 1.4; // Doesn't need to contain minor numbers.
 $config['fping']                    = '/usr/bin/fping';
+$config['fping6']                   = 'fping6';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
@@ -73,6 +75,7 @@ $config['sfdp']           = '/usr/bin/sfdp';
 $config['memcached']['enable'] = false;
 $config['memcached']['host']   = 'localhost';
 $config['memcached']['port']   = 11211;
+$config['memcached']['ttl']    = 240;
 
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
