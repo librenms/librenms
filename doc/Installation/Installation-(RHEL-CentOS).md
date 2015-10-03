@@ -20,8 +20,8 @@ service mysqld start
 **MariaDB**
 ```bash
 yum install net-snmp mariadb-server mariadb-client
-systemctl enable mariadb
-systemctl start mariadb
+chkconfig mariadb on (systemctl enable mariadb on CentOS 7)
+service mariadb start (systemctl start mariadb on CentOS 7)
 ```
 
 Now continue with the installation:
