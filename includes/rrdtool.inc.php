@@ -206,8 +206,9 @@ function rrdtool($command, $filename, $options) {
 
 
 function rrdtool_create($filename, $options) {
+    global $config;
     if( $config['rrdcached'] && $config['rrdtool_version'] >= 1.5 ) {
-        $chk = rrdtool('info', $filename);
+        $chk = rrdtool('info', $filename, '');
         if (!empty($chk[0])) {
             return true;
         }
