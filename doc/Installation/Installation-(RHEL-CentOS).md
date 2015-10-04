@@ -219,6 +219,7 @@ First, create and chown the `rrd` directory and create the `logs` directory
 **SELinux**
 > if you're using SELinux you need to allow nginx to write into logs directory.
 > semanage tool is a part of policycoreutils-python, so if don't have it, you can install it
+> Please note that running LibreNMS with SELinux is still experimental and we cannot guarantee that everything will be working fine for now.
 
 ```bash
     yum install policycoreutils-python
