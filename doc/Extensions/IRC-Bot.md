@@ -23,6 +23,7 @@ Option | Default-Value | Notes
 --- | --- | ---
 `$config['irc_alert']` | `false` | Optional; Enables Alerting-Socket. `EXPERIMENTAL`
 `$config['irc_alert_chan']` | `false` | Optional; Multiple channels can be defined as Array or delimited with `,`. `EXPERIMENTAL`
+`$config['irc_alert_utf8']` | `false` | Optional; Enables use of strikethrough in alerts via UTF-8 encoded characters. Might cause trouble for some clients.
 `$config['irc_authtime']` | `3` | Optional; Defines how long in Hours an auth-session is valid.
 `$config['irc_chan']` | `##librenms` | Optional; Multiple channels can be defined as Array or delimited with `,`
 `$config['irc_debug']` | `false` | Optional; Enables debug output (Wall of text)
