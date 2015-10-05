@@ -74,7 +74,6 @@ class ircbot {
             $this->sql = $database_link;
         }
 
-        $this->j      = 2;
         $this->config = $config;
         $this->debug  = $this->config['irc_debug'];
         $this->config['irc_authtime'] = $this->config['irc_authtime'] ? $this->config['irc_authtime'] : 3;
@@ -150,6 +149,8 @@ class ircbot {
             $this->connect_alert();
         }
 
+        $this->j = 2;
+
         $this->connect();
         $this->log('Connected');
         if ($this->pass) {
@@ -159,7 +160,7 @@ class ircbot {
         $this->doAuth();
         while (true) {
             foreach ($this->socket as $n => $socket) {
-                if (!is_resource($socket)) {
+                if (!is_resource($socket) || feof($socket)) {
                     $this->log("Socket '$n' closed. Restarting.");
                     break 2;
                 }
