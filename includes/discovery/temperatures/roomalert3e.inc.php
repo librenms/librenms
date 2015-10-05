@@ -9,6 +9,6 @@ if ($device['os'] == 'roomalert3e') {
 	$divisor			=	100;
 	$multiplier			=	1;
 	if (is_numeric($value)) {
-		discover_sensor($valid['sensor'], 'temperature', $device, $oid, 1, 'roomalert3e', $description, $divisor, $multiplier, null, null, null, null, $value);
+		discover_sensor($valid['sensor'], 'temperature', $device, $value_oid, 1, 'roomalert3e', $description, $divisor, $multiplier, null, null, null, null, $value);
 	}
 }
