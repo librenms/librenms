@@ -8,9 +8,10 @@ This host is where the MySQL database runs.  It could be the same machine as you
 
 > ** Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
 
+**CentOS 6**:
 You are free to choose between using MySQL or MariaDB:
 
-**MySQL** (NOTE: In CentOS 7 there is only mariadb in official repo)
+**MySQL**
 ```bash
 yum install net-snmp mysql-server mysql-client
 chkconfig mysqld on
@@ -24,11 +25,30 @@ chkconfig mariadb on (systemctl enable mariadb on CentOS 7)
 service mariadb start (systemctl start mariadb on CentOS 7)
 ```
 
+**CentOS 7**
+
+(NOTE: In CentOS 7 there is only mariadb in official repo)
+**MariaDB**
+```bash
+yum install net-snmp mariadb-server mariadb-client
+systemctl enable mariadb
+systemctl start mariadb
+```
+
 Now continue with the installation:
 
+**CentOS 6**
 ```bash
-chkconfig snmpd on (systemctl enable snmpd on CentOS 7)
-service snmpd start (systemctl start snmpd on CentOS 7)
+chkconfig snmpd on
+service snmpd start
+mysql_secure_installation
+mysql -uroot -p
+```
+
+**CentOS 7**
+```bash
+systemctl enable snmpd
+systemctl start snmpd
 mysql_secure_installation
 mysql -uroot -p
 ```
@@ -69,11 +89,20 @@ Install necessary software.  The packages listed below are an all-inclusive list
 
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
+**CentOS 6**
+```bash
     yum install epel-release
-(CentOS 6)    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
-(CentOS 7)    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
+yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
     pear install Net_IPv4-1.3.4
     pear install Net_IPv6-1.2.2b2
+```
+
+**CentOS 7**
+```bash
+    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
+    pear install Net_IPv4-1.3.4
+    pear install Net_IPv6-1.2.2b2
+```
 
 ### Adding the librenms-user for Apache ###
 ```bash
@@ -91,7 +120,11 @@ Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardle
 
 Set `httpd` to start on system boot.
 
-    chkconfig --levels 235 httpd on (systemctl enable httpd on CentOS 7)
+**CentOS 6**
+    chkconfig --levels 235 httpd on
+
+**CentOS 7**
+    systemctl enable httpd
 
 Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 
@@ -117,9 +150,19 @@ If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove th
 
 Install necessary extra software and let it start on system boot.
 
+**CentOS 6**
+```bash
     yum install nginx php-fpm
-    chkconfig nginx on (systemctl enable nginx on CentOS 7)
-    chkconfig php-fpm on (systemctl enable php-fpm on CentOS 7)
+    chkconfig nginx on
+    chkconfig php-fpm on
+```
+
+**CentOS 7**
+```bash
+    yum install nginx php-fpm
+    systemctl enable nginx
+    systemctl enable php-fpm
+```
 
 Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
@@ -160,15 +203,19 @@ server {
 
 You can clone the repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
 
+```bash
     cd /opt
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
+```
 
 At this stage you can either launch the web installer by going to http://IP/install.php, follow the on-screen instructions then skip to the 'Web Interface' section further down. Alternatively if you want
 to continue the setup manually then just keep following these instructions.
 
+```bash
     cp config.php.default config.php
-    vim config.php
+    vim config.
+```
 
 NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
@@ -233,11 +280,21 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
 Start the web-server:
 
+**CentOS 6**
+
     # For HTTPd (Apache):
-    service httpd restart (systemctl restart httpd on CentOS 7)
+    service httpd restart
 
     # For Nginx:
-    service nginx restart (systemctl restart nginx on CentOS 7)
+    service nginx restart
+
+**CentOS 7**
+
+    # For HTTPd (Apache):
+    systemctl restart httpd
+
+    # For Nginx:
+    systemctl restart nginx
 
 ### Add localhost ###
 
