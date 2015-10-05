@@ -73,6 +73,12 @@ $config['os_group'][$os_group]['over'][1]['text']   = 'Memory Usage';
 $os = 'generic';
 $config['os'][$os]['text'] = 'Generic Device';
 
+// RoomAlert 3E
+$os = "roomalert3e";
+$config['os'][$os]['text']              = "AVTECH RoomAlert";
+$config['os'][$os]['type']              = "environment";
+$config['os'][$os]['icon']              = "avtech";
+
 // Linux-based routers/switches
 $os = 'vyatta';
 $config['os'][$os]['text']             = 'Vyatta';
