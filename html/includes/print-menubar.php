@@ -134,7 +134,7 @@ foreach (dbFetchRows($sql,$param) as $devtype) {
             require_once '../includes/device-groups.inc.php';
             $devices_groups = GetDeviceGroups();
             if (count($devices_groups) > 0 ){
-                echo '<li class="dropdown-submenu"><a ><i class="fa fa-th fa-fw fa-lg"></i> Device Groups</a><ul class="dropdown-menu scrollable-menu">';
+                echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups</a><ul class="dropdown-menu scrollable-menu">';
                 foreach( $devices_groups as $group ) {
                     echo '<li><a href="'.generate_url(array('page'=>'devices','group'=>$group['id'])).'" alt="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
                 }
