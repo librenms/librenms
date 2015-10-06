@@ -308,10 +308,7 @@ Discover localhost:
 
 ### Create cronjob ###
 
-The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in
-the public domain by its author.  By default, the LibreNMS cronjob runs `poller-
-wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 th
-reads per core.  The default if no thread count is `16 threads`.
+The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in the public domain by its author.  By default, the LibreNMS cronjob runs `poller-wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 threads per core.  The default if no thread count is `16 threads`.
 
 If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).
  Just add a number after `poller-wrapper.py`, as in the below example:
