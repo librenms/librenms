@@ -168,7 +168,7 @@ Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
     mkdir /var/lib/php/session
     chown root:nginx /var/lib/php -R
-    vi /etc/php-fpm.d/www.conf      # At line #12: Change `listen` to `/var/run/php5-fpm.sock`
+    vim /etc/php-fpm.d/www.conf      # At line #12: Change `listen` to `/var/run/php5-fpm.sock`
                                     # At line #39-41: Change the `user` and `group` to `nginx`
 
 Add configuration for `nginx` at `/etc/nginx/conf.d/librenms.conf` with the following content:
@@ -214,7 +214,7 @@ to continue the setup manually then just keep following these instructions.
 
 ```bash
     cp config.php.default config.php
-    vim config.
+    vim config.php
 ```
 
 NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
@@ -264,9 +264,9 @@ First, create and chown the `rrd` directory and create the `logs` directory
 > If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 **SELinux**
-> if you're using SELinux you need to allow nginx to write into logs directory.
+> if you're using SELinux you need to allow web server user to write into logs directory.
 > semanage tool is a part of policycoreutils-python, so if don't have it, you can install it
-> Please note that running LibreNMS with SELinux is still experimental and we cannot guarantee that everything will be working fine for now.
+> **Please note that running LibreNMS with SELinux is still experimental and we cannot guarantee that everything will be working fine for now.**
 
 ```bash
     yum install policycoreutils-python
