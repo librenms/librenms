@@ -1761,3 +1761,7 @@ tr.search:nth-child(odd) {
 .edit-storage-input {
     width: 100px;
 }
+
+label {
+    font-weight: normal;
+}
