@@ -195,6 +195,8 @@ $config['snmp']['v3'][0]['cryptopass'] = '';
 $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 // AES | DES
 
+// Devices must respond to icmp by default
+$config['icmp_check'] = true;
 
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
