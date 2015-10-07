@@ -59,5 +59,6 @@ Contributors to LibreNMS:
 - Sławomir Paszkiewicz <paszczus@pld-linux.org> (paszczus)
 - Frederik Mogensen <frederik@server-1.dk> (mogensen)
 - Matthew Scully <matt@mattz0r.me.uk> (mattz0r)
+- Xavier Beaudouin <kiwi@oav.net> (xbeaudouin)
 
 [1]: http://observium.org/ "Observium web site"
