@@ -60,5 +60,6 @@ Contributors to LibreNMS:
 - Frederik Mogensen <frederik@server-1.dk> (mogensen)
 - Matthew Scully <matt@mattz0r.me.uk> (mattz0r)
 - Xavier Beaudouin <kiwi@oav.net> (xbeaudouin)
+- Falk Stern <falk@fourecks.de> (fstern)
 
 [1]: http://observium.org/ "Observium web site"
