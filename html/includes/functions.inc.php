@@ -583,7 +583,7 @@ function generate_port_link($port, $text=null, $type=null, $overlib=1, $single_g
 
     $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
     if ($port['ifAlias']) {
-        $content .= $port['ifAlias'].'<br />';
+        $content .= escape_quotes($port['ifAlias']).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
