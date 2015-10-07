@@ -12,7 +12,7 @@ if (count($mempools)) {
         <div class="panel-heading">
         ';
     echo '<a href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">';
-    echo "<img src='images/icons/memory.png'> Memory Pools</a>";
+    echo "<img src='images/icons/memory.png'> <strong>Memory Pools</strong></a>";
     echo '
         </div>
         <table class="table table-hover table-condensed table-striped">
