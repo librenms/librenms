@@ -602,8 +602,8 @@ function list_alerts() {
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    if (isset($_POST['state'])) {
-        $param = array(mres($_POST['state']));
+    if (isset($_GET['state'])) {
+        $param = array(mres($_GET['state']));
     }
     else {
         $param = array('1');
