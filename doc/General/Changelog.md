@@ -11,7 +11,7 @@
   - Services:
     - Honour IP field for DNS checks (PR1933)
   - Discovery / Poller:
-    - Fix Huawei VRP os detection (PR1931)t
+    - Fix Huawei VRP os detection (PR1931)
   - General:
     - Remove 'sh' from cronjob (PR1818)
     - Remove MySQL Locks (PR1822,PR1826,PR1829,PR1836)
