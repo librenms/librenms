@@ -4,7 +4,7 @@ echo "<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 widt
 
 $i = '1';
 
-$ap = dbFetchRow("SELECT * FROM `accesspoint` WHERE `device_id` = ? AND `accesspoint_id` = ? AND `deleted` = '0' ORDER BY `name`,`radio_number` ASC", array($device['device_id'], $vars['ap']));
+$ap = dbFetchRow("SELECT * FROM `access_points` WHERE `device_id` = ? AND `accesspoint_id` = ? AND `deleted` = '0' ORDER BY `name`,`radio_number` ASC", array($device['device_id'], $vars['ap']));
 
 echo "<div class=ifcell style='margin: 0px;'><table width=100% cellpadding=10 cellspacing=0>";
 
