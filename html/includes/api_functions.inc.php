@@ -623,6 +623,7 @@ function list_alerts() {
         'err-msg' => '',
         'count'   => $total_alerts,
         'alerts'  => $alerts,
+        'debug' => $_GET['state']
     );
     $app->response->setStatus('200');
     $app->response->headers->set('Content-Type', 'application/json');
