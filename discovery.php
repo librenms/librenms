@@ -23,7 +23,7 @@ require 'includes/discovery/functions.inc.php';
 $start         = utime();
 $runtime_stats = array();
 
-$options = getopt('h:m:i:n:d::a::q');
+$options = getopt('h:m:i:n:d::a::q',['os:']);
 
 if (!isset($options['q'])) {
     echo $config['project_name_version']." Discovery\n";
@@ -63,6 +63,11 @@ if (isset($options['h'])) {
     }//end if
 }//end if
 
+if (isset($options['os'])) {
+        $where = $where." AND os = '".$options['os']."'";
+        $doing = $options['os'];
+}
+
 if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $where = 'AND MOD(device_id,'.$options['i'].") = '".$options['n']."'";
     $doing = $options['n'].'/'.$options['i'];
@@ -89,7 +94,8 @@ if (!$where) {
     echo "-h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)\n";
     echo "-h even                                      Poll even numbered devices (same as -i 2 -n 1)\n";
     echo "-h all                                       Poll all devices\n";
-    echo "-h new                                       Poll all devices that have not had a discovery run before\n\n";
+    echo "-h new                                       Poll all devices that have not had a discovery run before\n";
+    echo "-h [odd|even|new|all] --os <os_name>         Poll devices only with specified operating system\n\n";
     echo "-i <instances> -n <number>                   Poll as instance <number> of <instances>\n";
     echo "                                             Instances start at 0. 0-3 for -n 4\n\n";
     echo "\n";
