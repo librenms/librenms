@@ -101,7 +101,7 @@ if ($config['summary_errors']) {
 $temp_output .= '
     </tr>
     <tr class="active">
-      <th>Total</th>
+      <th><span class="grey">Total</span></th>
       <td><a href="devices/"><span>'. $devices['count'] .'</span></a></td>
       <td><a href="ports/"><span>'. $ports['count'] .'</span></a></td>
 ';
