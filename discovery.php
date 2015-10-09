@@ -47,6 +47,10 @@ if (isset($options['h'])) {
         $where = 'AND `last_discovered` IS NULL';
         $doing = 'new';
     }
+    else if ($options['h'] == 'linux') {
+        $where = 'AND os = "linux"';
+        $doing = 'linux';
+    }
     else if ($options['h']) {
         if (is_numeric($options['h'])) {
             $where = "AND `device_id` = '".$options['h']."'";
