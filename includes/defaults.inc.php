@@ -373,8 +373,6 @@ $config['show_overview_tab'] = true;
 // The device overview page options
 $config['overview_show_sysDescr'] = true;
 
-// Enable version checker & stats
-$config['version_check'] = 0;
 // Enable checking of version in discovery
 // Poller/Discovery Modules
 $config['enable_bgp'] = 1;
