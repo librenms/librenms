@@ -45,7 +45,7 @@ if (empty($data)) {
 }
 $data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
-$dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ? && `dashboard_id` != ?",array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
+$dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ? && `dashboard_id` != ? ORDER BY `dashboard_name`",array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
 ?>
 
 <div class="row">
