@@ -68,6 +68,11 @@ if (isset($options['os'])) {
         $doing = $options['os'];
 }
 
+if (isset($options['type'])) {
+        $where = $where." AND type = '".$options['type']."'";
+        $doing = $options['type'];
+}
+
 if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $where = 'AND MOD(device_id,'.$options['i'].") = '".$options['n']."'";
     $doing = $options['n'].'/'.$options['i'];
@@ -95,7 +100,8 @@ if (!$where) {
     echo "-h even                                      Poll even numbered devices (same as -i 2 -n 1)\n";
     echo "-h all                                       Poll all devices\n";
     echo "-h new                                       Poll all devices that have not had a discovery run before\n";
-    echo "-h [odd|even|new|all] --os <os_name>         Poll devices only with specified operating system\n\n";
+    echo "-h [odd|even|new|all] --os <os_name>         Poll devices only with specified operating system\n";
+    echo "-h [odd|even|new|all] --type <type>          Poll devices only with specified type\n\n";
     echo "-i <instances> -n <number>                   Poll as instance <number> of <instances>\n";
     echo "                                             Instances start at 0. 0-3 for -n 4\n\n";
     echo "\n";
