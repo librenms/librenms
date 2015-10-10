@@ -38,3 +38,5 @@ You will need to configure default credentials for your devices, LibreNMS doesn'
           headers:
             X-Auth-Token: '01582bf94c03104ecb7953dsadsadwed'
 ```
+
+If you have devices which you do not wish to appear in Oxidized then you can edit those devices in Device -> Edit -> Misc and enable "Exclude from Oxidized?"
