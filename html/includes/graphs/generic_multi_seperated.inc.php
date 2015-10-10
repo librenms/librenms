@@ -70,10 +70,6 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' VDEF:tot'.$i.'=octets'.$i.',TOTAL';
     }
 
-    if ($i) {
-        $stack = 'STACK';
-    }
-
     $rrd_options .= ' AREA:inbits'.$i.'#'.$colour_in.":'".rrdtool_escape($rrd['descr'], 9)."In '$stack";
     $rrd_options .= ' GPRINT:inbits'.$i.':LAST:%6.2lf%s';
     $rrd_options .= ' GPRINT:inbits'.$i.':AVERAGE:%6.2lf%s';
