@@ -65,6 +65,8 @@ else {
 
   print_optionbar_end();
 
+    echo '<script src="js/librenms.js"></script>';
+
   if (is_file("pages/device/edit/".mres($vars['section']).".inc.php")) {
     require "pages/device/edit/".mres($vars['section']).".inc.php";
   }
