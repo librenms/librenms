@@ -36,6 +36,7 @@ else {
   }
 
   $panes['storage']  = 'Storage';
+  $panes['misc']     = 'Misc';
 
   print_optionbar_start();
 
