@@ -318,7 +318,7 @@ foreach ($ports as $port) {
         foreach ($data_oids as $oid) {
 
             if ($oid == 'ifAlias') {
-                if (get_dev_attrib($device, 'ifName', $port['ifName'])) {
+                if (get_dev_attrib($device, 'ifName:'.$port['ifName'], 1)) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 }
             }
