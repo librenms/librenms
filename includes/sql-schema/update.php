@@ -135,14 +135,29 @@ function apply_line($line) {
     return true;
 }
 
-if (!dbFetchCell('select 1 from COLUMNS where TABLE_SCHEMA = ? && TABLE_NAME = ? && COLUMN_NAME = ?',array($config['db_name'],'dbSchema','component'))) {
+$pool_size = dbFetchCell('SELECT @@innodb_buffer_pool_size');
+// The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
+$pool_used = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
+if ($pool_used > $pool_size) {
+    echo 'InnoDB Buffersize too small.'.PHP_EOL;
+    echo 'Current size: '.($pool_size / 1024 / 1024).' MiB'.PHP_EOL;
+    echo 'Minimum Required: '.($pool_used / 1024 / 1024).' MiB'.PHP_EOL;
+    echo 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
+    return;
+}
+
+if (!dbFetchCell('select 1 from information_schema.COLUMNS where TABLE_SCHEMA = ? && TABLE_NAME = ? && COLUMN_NAME = ?',array($config['db_name'],'dbSchema','component'))) {
+    echo 'Migrating to component based versioning..'.PHP_EOL;
     dbQuery('alter table dbSchema add column `component` varchar(255) not null default ""');
     dbUpdate(array('component'=>'org.librenms.core'),'dbSchema','component=""');
+    echo 'Finished.'.PHP_EOL;
 }
 
 $apply   = array();
 $current = array();
 $limit   = 150;
+
+echo 'Caching components..';
 foreach (dbFetchRows('SELECT version,component FROM `dbSchema` ORDER BY component') as $data) {
     $current[$data['component']] = $data['version'];
 }
@@ -161,6 +176,7 @@ foreach ($components as $component) {
         }
     }
 }
+echo '. Done'.PHP_EOL;
 
 foreach ($apply as $component=>$patches) {
     if (!empty($patches)) {
