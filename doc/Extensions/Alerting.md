@@ -18,6 +18,8 @@ Table of Content:
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
     - [Pushbullet](#transports-pushbullet)
+    - [Clickatell](#transports-clickatell)
+    - [PlaySMS](#transports-playsms)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -369,6 +371,38 @@ Get your Access Token from your Pushbullet's settings page and set it in your co
 ~~
 ```php
 $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
+```
+~~
+
+## <a name="transports-clickatell">Clickatell</a>
+
+Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.  
+Please consult Clickatell's documentation regarding number formating.  
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['clickatell']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567890';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567891';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
+```
+~~
+
+## <a name="transports-playsms">PlaySMS</a>
+
+PlaySMS is an OpenSource SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.  
+Please consult PlaySMS's documentation regarding number formating.  
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['playsms']['url']   = 'https://localhost/index.php?app=ws';
+$config['alert']['transports']['playsms']['user']  = 'user1';
+$config['alert']['transports']['playsms']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['playsms']['to'][]  = '+1234567890';
+$config['alert']['transports']['playsms']['to'][]  = '+1234567891';
+$config['alert']['transports']['playsms']['to'][]  = '+1234567892';
 ```
 ~~
 
