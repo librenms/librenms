@@ -1167,3 +1167,18 @@ function alert_details($details) {
 
 }//end alert_details()
 
+/**
+ * Array-To-Table
+ * @param array $a N-Dimensional, Associative Array
+ * @return string
+ */
+function a2t($a) {
+    $r = "<table class='table table-condensed table-hover'><tbody>";
+    foreach( $a as $k=>$v ) {
+        if( !empty($v) ) {
+            $r .= "<tr><td class='col-md-2'><i><b>".$k."</b></i></td><td class='col-md-10'>".(is_array($v)?a2t($v):"<code>".wordwrap($v,75,"<br/>")."</code>")."</td></tr>";
+        }
+    }
+    $r .= '</tbody></table>';
+    return $r;
+}

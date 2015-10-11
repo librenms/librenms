@@ -152,15 +152,17 @@ $php_version     = phpversion();
 $mysql_version   = dbFetchCell('SELECT version()');
 $netsnmp_version = shell_exec($config['snmpget'].' --version 2>&1');
 $rrdtool_version = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
-$schema_version  = dbFetchCell('SELECT version FROM dbSchema');
 $version         = `git rev-parse --short HEAD`;
-
+$schema_versions = dbFetchRows('SELECT component,version FROM dbSchema');
+foreach ($schema_versions as $v) {
+    $schema_version[$v['component']] = $v['version'];
+}
 
 echo "
 <div class='table-responsive'>
     <table class='table table-condensed' border='0'>
       <tr><td><b>Version</b></td><td><a href='http://www.librenms.org/changelog.html'>$version</a></td></tr>
-      <tr><td><b>DB Schema</b></td><td>#$schema_version</td></tr>
+      <tr><td><b>DB Schema</b></td><td>".a2t($schema_version)."</td></tr>
       <tr><td><b>Apache</b></td><td>$apache_version</td></tr>
       <tr><td><b>PHP</b></td><td>$php_version</td></tr>
       <tr><td><b>MySQL</b></td><td>$mysql_version</td></tr>

@@ -31,146 +31,160 @@ if (!isset($debug)) {
     }
 }
 
-$insert = 0;
 
-if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
-}
-else {
-    $db_rev = 0;
-    $insert = 1;
-}
+/* Copyright (C) 2015 Daniel Preussker, QuxLabs UG <preussker@quxlabs.com>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-// For transition from old system
-if ($old_rev = @dbFetchCell('SELECT revision FROM `dbSchema`')) {
-    echo "-- Transitioning from old revision-based schema to database version system\n";
-    $db_rev = 6;
+/**
+ * SQL Schema Update
+ * @author Daniel Preussker
+ * @copyright 2015 Daniel Preussker, QuxLabs UG
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Updates
+ */
 
-    if ($old_rev <= 1000) {
-        $db_rev = 1;
+
+/**
+ * Apply collection of patches.
+ * @param mixed &$patches Collection
+ * @param mixed $component Component
+ * @return null|-1
+ */
+function apply_patches(&$patches,$component) {
+    global $config, $limit;
+    echo 'Component: '.$component.PHP_EOL;
+    $failed = true;
+    if (!is_array($patches)) {
+        return;
     }
-
-    if ($old_rev <= 1435) {
-        $db_rev = 2;
-    }
-
-    if ($old_rev <= 2245) {
-        $db_rev = 3;
-    }
-
-    if ($old_rev <= 2804) {
-        $db_rev = 4;
-    }
-
-    if ($old_rev <= 2827) {
-        $db_rev = 5;
-    }
-
-    $insert = 1;
-}//end if
-
-$updating = 0;
-
-$include_dir_regexp = '/\.sql$/';
-
-if ($handle = opendir($config['install_dir'].'/sql-schema')) {
-    while (false !== ($file = readdir($handle))) {
-        if (filetype($config['install_dir'].'/sql-schema/'.$file) == 'file' && preg_match($include_dir_regexp, $file)) {
-            $filelist[] = $file;
+    foreach ($patches as $k=>$patch) {
+        $file = $config['install_dir'].'/sql-schema/'.$component.'/'.$patch.'.sql';
+        if (file_exists($file)) {
+            echo '    '.($patch-1).' => '.((int) $patch).' ';
+            foreach (file($file) as $line) {
+                $line = trim($line);
+                if (!empty($line) && $line[0] != "#") {
+                    if (!apply_line($line)) {
+                        echo ' ERROR'.PHP_EOL;
+                        $failed = true;
+                        break 2;
+                    } else {
+                        echo '.';
+                        $failed = false;
+                    }
+                }
+            }
+            if ($failed === false) {
+                if ($patch == 1) {
+                    dbInsert(array('version'=>$patch,'component'=>$component),'dbSchema');
+                } else {
+                    dbUpdate(array('version'=>$patch),'dbSchema','component = ?',array($component));
+                }
+                echo 'OK'.PHP_EOL;
+                unset($patches[$k]);
+            }
         }
-    }
-
-    closedir($handle);
-}
-
-asort($filelist);
-$tmp = explode('.', max($filelist), 2);
-if ($tmp[0] <= $db_rev) {
-    if ($debug) {
-        echo "DB Schema already up to date.\n";
-    }
-    return;
-}
-
-$limit = 150; //magic marker far enough in the future
-foreach ($filelist as $file) {
-    list($filename,$extension) = explode('.', $file, 2);
-    if ($filename > $db_rev) {
-
         if (isset($_SESSION['stage']) ) {
             $limit++;
             if ( time()-$_SESSION['last'] > 45 ) {
                 $_SESSION['offset'] = $limit;
-                $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
-                return;
+                $GLOBALS['refresh'] = '<b>Updating Component <code>'.$component.'</code>, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
+                return -1;
             }
         }
-
-        if (!$updating) {
-            echo "-- Updating database schema\n";
-        }
-
-        echo sprintf('%03d', $db_rev).' -> '.sprintf('%03d', $filename).' ...';
-
-        $err = 0;
-
-        if ($fd = @fopen($config['install_dir'].'/sql-schema/'.$file, 'r')) {
-            $data = fread($fd, 4096);
-            while (!feof($fd)) {
-                $data .= fread($fd, 4096);
-            }
-
-            foreach (explode("\n", $data) as $line) {
-                if (trim($line)) {
-                    d_echo("$line \n");
-
-                    if ($line[0] != '#') {
-                        if ($config['db']['extension'] == 'mysqli') {
-                            $update = mysqli_query($database_link, $line);
-                        }
-                        else {
-                            $update = mysql_query($line);
-                        }
-                        if (!$update) {
-                            $err++;
-                            if ($debug) {
-                                if ($config['db']['extension'] == 'mysqli') {
-                                    echo mysqli_error($database_link)."\n";
-                                }
-                                else {
-                                    echo mysql_error()."\n";
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($db_rev < 5) {
-                echo " done.\n";
-            }
-            else {
-                echo " done ($err errors).\n";
-            }
-        }
-        else {
-            echo " Could not open file!\n";
-        }//end if
-
-        $updating++;
-        $db_rev = $filename;
-        if ($insert) {
-            dbInsert(array('version' => $db_rev), 'dbSchema');
-        }
-        else {
-            dbUpdate(array('version' => $db_rev), 'dbSchema');
-        }
-    }//end if
-}//end foreach
-
-if ($updating) {
-    echo "-- Done\n";
-    if( isset($_SESSION['stage']) ) {
-        $_SESSION['build-ok'] = true;
+    }
+    if ($failed === false) {
+        echo 'Sucessfully updated.'.PHP_EOL;
+    }
+    else {
+        echo 'Failed some patches.'.PHP_EOL;
     }
 }
 
+/**
+ * Apply line
+ * @param string $line Patch-Line
+ * @return bool
+ */
+function apply_line($line) {
+    global $config, $database_link;
+    if ($config['db']['extension'] == 'mysqli') {
+        if (!mysqli_query($database_link, $line)) {
+            echo mysqli_error($database_link);
+            return false;
+        }
+    }
+    else {
+        if (!mysql_query($line)) {
+            echo mysql_error();
+            return false;
+        }
+    }
+    return true;
+}
+
+$pool_size = dbFetchCell('SELECT @@innodb_buffer_pool_size');
+// The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
+$pool_used = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
+if ($pool_used > $pool_size) {
+    echo 'InnoDB Buffersize too small.'.PHP_EOL;
+    echo 'Current size: '.($pool_size / 1024 / 1024).' MiB'.PHP_EOL;
+    echo 'Minimum Required: '.($pool_used / 1024 / 1024).' MiB'.PHP_EOL;
+    echo 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
+    return;
+}
+
+if (!dbFetchCell('select 1 from information_schema.COLUMNS where TABLE_SCHEMA = ? && TABLE_NAME = ? && COLUMN_NAME = ?',array($config['db_name'],'dbSchema','component'))) {
+    echo 'Migrating to component based versioning..'.PHP_EOL;
+    dbQuery('alter table dbSchema add column `component` varchar(255) not null default ""');
+    dbUpdate(array('component'=>'org.librenms.core'),'dbSchema','component=""');
+    echo 'Finished.'.PHP_EOL;
+}
+
+$apply   = array();
+$current = array();
+$limit   = 150;
+
+echo 'Caching components..';
+foreach (dbFetchRows('SELECT version,component FROM `dbSchema` ORDER BY component') as $data) {
+    $current[$data['component']] = $data['version'];
+}
+
+$components = array_diff(scandir($config['install_dir'].'/sql-schema'),array('..','.'));
+foreach ($components as $component) {
+    if (is_dir($config['install_dir'].'/sql-schema/'.$component)) {
+        foreach (array_diff(scandir($config['install_dir'].'/sql-schema/'.$component),array('..','.')) as $v) {
+            $v = (string) str_replace('.sql','',$v);
+            if (empty($current[$component]) || $v > $current[$component]) {
+                $apply[$component][] = $v;
+            }
+        }
+        if (!empty($apply[$component])) {
+            sort($apply[$component],SORT_NUMERIC);
+        }
+    }
+}
+echo '. Done'.PHP_EOL;
+
+foreach ($apply as $component=>$patches) {
+    if (!empty($patches)) {
+        if (apply_patches($patches,$component) == -1) {
+            return;
+        }
+    }
+}
+if( isset($_SESSION['stage']) ) {
+    $_SESSION['build-ok'] = true;
+}

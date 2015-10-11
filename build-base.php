@@ -4,6 +4,8 @@
 // 1 UNKNOWN
 include 'config.php';
 
+echo 'LibreNMS Base-Installer'.PHP_EOL;
+
 if (!isset($sql_file)) {
     $sql_file = 'build.sql';
 }
@@ -38,19 +40,24 @@ while (!feof($sql_fh)) {
             $_SESSION['offset'] = $limit;
             $GLOBALS['refresh'] = '<b>Installing, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
             return;
-        } else {
+        }
+        else {
             echo 'Step #'.$limit.' ...'.PHP_EOL;
         }
+    }
+    else {
+        echo '.';
     }
 
     if (!empty($line)) {
         $creation = mysqli_query($database_link, $line);
         if (!$creation) {
             echo 'WARNING: Cannot execute query ('.$line.'): '.mysqli_error($database_link)."\n";
+            die(2);
         }
     }
 }
 
 fclose($sql_fh);
-
+echo PHP_EOL;
 require 'includes/sql-schema/update.php';
