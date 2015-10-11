@@ -166,7 +166,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     $port_count        = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE `device_id` = ?', array($device['device_id']));
     $sensor_count      = dbFetchCell('SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ?', array($device['device_id']));
 
-    $actions  = ('<div class="row">
+    $actions  = ('<div class="container-fluid"><div class="row">
         <div class="col-xs-1">');
     $actions .= '<a href="'.generate_device_url($device).'"> <img src="images/16/server.png" border="0" align="absmiddle" alt="View device" title="View device" /></a> ';
     $actions .= ('</div>
@@ -190,7 +190,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         <div class="col-xs-1">
         <a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"></a>
         </div>
-        </div>');
+        </div></div>');
 
     $hostname = generate_device_link($device);
     $platform = $device['hardware'].'<br />'.$device['features'];
