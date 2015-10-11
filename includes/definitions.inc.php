@@ -1331,6 +1331,14 @@ $config['os'][$os]['icon']             = 'hp';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Riverbed
+$os = 'riverbed';
+$config['os'][$os]['text']             = 'Riverbed';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'riverbed';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Appliances
 $os = 'fortios';
 $config['os'][$os]['text']             = 'FortiOS';
