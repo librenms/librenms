@@ -888,7 +888,7 @@ function list_oxidized() {
     $app->response->headers->set('Content-Type', 'application/json');
 
     $devices = array();
-    foreach (dbFetchRows("SELECT hostname,os FROM `devices` WHERE `status`='1'") as $device) {
+    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL)") as $device) {
         $devices[] = $device;
     }
 
