@@ -12,6 +12,10 @@ if ($device['os'] == 'netscaler') {
     include 'includes/discovery/sensors-netscaler.inc.php';
 }
 
+if ($device['os'] == 'openbsd') {
+    include 'includes/discovery/sensors-openbsd.inc.php';
+}
+
 require 'includes/discovery/temperatures.inc.php';
 require 'includes/discovery/humidity.inc.php';
 require 'includes/discovery/voltages.inc.php';
