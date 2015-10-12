@@ -27,6 +27,8 @@ $pagetitle[] = 'Global Settings';
 $config['memcached']['enable'] = false;
 ?>
 
+<script src="js/librenms.js"></script>
+
 <div class="container-fluid">
     <h2>Global Settings</h2>
     <hr>
