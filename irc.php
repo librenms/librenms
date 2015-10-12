@@ -295,7 +295,8 @@ class ircbot {
         }
 
         foreach ($this->chan as $chan) {
-            $this->irc_raw('JOIN '.$chan);
+            $chan = explode(" ",$chan)
+            $this->irc_raw('JOIN '.$chan[0].(isset($chan[1]) ? ' '.$chan[1] : ''));
         }
 
         return true;
