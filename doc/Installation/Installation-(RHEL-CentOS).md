@@ -193,7 +193,7 @@ server {
   deny all;
  }
  location @librenms {
-  rewrite ^api/v0(.*)$ /api_v0.php/$1 last;
+  rewrite api/v0(.*)$ /api_v0.php/$1 last;
   rewrite ^(.+)$ /index.php/$1 last;
  }
 }
