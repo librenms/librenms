@@ -31,29 +31,25 @@ $entitysensor['temperature'] = 'temperature';
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        // echo("[" . $entry['sensorType'] . "|" . $entry['sensorValue']. "|" . $index . "]");
+        // echo("[" . $entry['sensorType'] . "|" . $entry['sensorValue']. "|" . $index . "] ");
         if ($entitysensor[$entry['sensorType']] && is_numeric($entry['sensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid              = '.1.3.6.1.4.1.30155.2.1.2.1.5.'.$index;
             $current          = $entry['sensorValue'];
-            $descr = $entity_array[$index]['sensorDevice'].' '.$entity_array[$index]['sensorDescr'];
+            $descr = $entry['sensorDevice'].' '.$entry['sensorDescr'];
             $bogus = false;
 
             $type = $entitysensor[$entry['sensorType']];
 
             if ($type == 'voltage') {
-                $descr = preg_replace('/ (voltages|voltage)/i', '', $descr);
+                $descr = preg_replace('/ voltage/i', '', $descr);
             }
 
             if ($type == 'temperature') {
                 if ($current < -40 || $current > 200) {
                     $bogus = true;
                 }
-                $descr = preg_replace('/ (temperature|temp)/i', '', $descr);
-            }
-
-            if ($current == '-127') {
-                $bogus = true;
+                $descr = preg_replace('/ temperature/i', '', $descr);
             }
 
             // echo($descr . "|" . $index . "|" .$current . "|" . $bogus . "\n");
