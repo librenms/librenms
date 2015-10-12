@@ -1179,3 +1179,73 @@ function dynamic_override_config($type, $name, $device) {
         return '<input type="checkbox" id="override_config" name="override_config" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" data-size="small" '.$checked.'>';
     }
 }//end dynamic_override_config()
+
+function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$items=array(),$transport='') {
+    $anchor = md5($title);
+    $output = '
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#'.$anchor.'">'.$title.'</a>
+    ';
+    if (!empty($transport)) {
+        $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="'.$transport.'" class="btn btn-primary btn-xs pull-right">Test transport</button>';
+    }
+    $output .= '
+        </h4>
+    </div>
+    <div id="'.$anchor.'" class="panel-collapse collapse">
+        <div class="panel-body">
+    ';
+
+    if (!empty($items)) {
+        foreach ($items as $item) {
+            $output .= '
+            <div class="form-group has-feedback">
+                <label for="'.$item['name'].'"" class="col-sm-4 control-label">'.$item['descr'].' </label>
+                <div data-toggle="tooltip" title="'.$config_groups[$item['name']]['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                <div class="col-sm-4">
+            ';
+            if ($item['type'] == 'checkbox') {
+                $output .= '<input id="'.$item['name'].'" type="checkbox" name="global-config-check" '.$config_groups[$item['name']]['config_checked'].' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="'.$config_groups[$item['name']]['config_id'].'">';
+            }
+            elseif ($item['type'] == 'text') {
+                $output .= '
+                <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                ';
+            }
+            elseif ($item['type'] == 'select') {
+                $output .= '
+                <select id="'.$config_groups[$item['name']]['name'].'" class="form-control" name="global-config-select" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                ';
+                if (!empty($item['options'])) {
+                    foreach ($item['options'] as $option) {
+                        $output .= '<option value="'.$option.'"';
+                        if ($option == $config_groups[$item['name']]['config_value']) {
+                            $output .= ' selected';
+                        }
+                        $output .= '>'.$option.'</option>';
+                    }
+                }
+                $output .='
+                </select>
+                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                ';
+            }
+            $output .= '
+                </div>
+            </div>
+            ';
+        }
+    }
+
+    if ($end_panel === true) {
+        $output .= '
+        </div>
+    </div>
+</div>
+        ';
+    }
+    return $output;
+}//end generate_dynamic_config_panel()
