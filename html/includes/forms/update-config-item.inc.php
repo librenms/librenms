@@ -23,7 +23,7 @@ $config_type = mres($_POST['config_type']);
 $status = 'error';
 
 if (!is_numeric($config_id)) {
-    $message = 'ERROR: No alert selected';
+    $message = 'ERROR: No config item';
 }
 else if ($action == 'update-textarea') {
     $extras = explode(PHP_EOL, $_POST['config_value']);
