@@ -313,11 +313,13 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         }
 
         if ($device_config_file) {
-            echo '<li class="'.$select['showconfig'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
-                <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
-                </a>
-                </li>';
+            if (dbFetchCell("SELECT COUNT(device_id) FROM devices_attribs WHERE device_id = ? AND attrib_type = 'override_Oxidized_disable' AND attrib_value='true'",array($device['device_id']) ) == '0') {
+                echo '<li class="'.$select['showconfig'].'">
+                    <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
+                    <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
+                    </a>
+                    </li>';
+           }
         }
 
         if ($config['nfsen_enable']) {
