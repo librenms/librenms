@@ -491,7 +491,7 @@ function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
     global $config;
 
     $tmp_device = array('device_id'=>$device_id);
-    if ($config['icmp_check'] === true || get_dev_attrib($tmp_device,'override_icmp_disable') != "true") {
+    if ($config['icmp_check'] === true && get_dev_attrib($tmp_device,'override_icmp_disable') != "true") {
 
         $fping_params = '';
         if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
