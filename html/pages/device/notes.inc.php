@@ -20,9 +20,7 @@ $data = dbFetchRow("SELECT `notes` FROM `devices` WHERE device_id = ?", array(
     <hr>
     <div class="form-group">
         <div class="col-sm-12">
-            <textarea class="form-control" rows="6" name="notes" id="device-notes">
-                <?php echo htmlentities($data['notes']); ?>
-            </textarea>
+            <textarea class="form-control" rows="6" name="notes" id="device-notes"><?php echo htmlentities($data['notes']); ?></textarea>
         </div>
     </div>
     <div class="row">

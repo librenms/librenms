@@ -214,7 +214,7 @@ $config['os'][$os]['group'] = 'unix';
 $config['os'][$os]['text']  = 'FreeBSD';
 
 $os = 'pfsense';
-$config['os'][$os]['type']  = 'server';
+$config['os'][$os]['type']  = 'firewall';
 $config['os'][$os]['group'] = 'unix';
 $config['os'][$os]['text']  = 'pfSense';
 
@@ -546,6 +546,18 @@ $config['os'][$os]['icon'] = 'junos';
 $os = 'screenos';
 $config['os'][$os]['text']             = 'Juniper ScreenOS';
 $config['os'][$os]['type']             = 'firewall';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+// Pulse Secure OS definition
+$os = 'pulse';
+$config['os'][$os]['text']             = 'Pulse Secure';
+$config['os'][$os]['type']             = 'firewall';
+$config['os'][$os]['icon']             = 'junos';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -1319,6 +1331,14 @@ $config['os'][$os]['icon']             = 'hp';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Riverbed
+$os = 'riverbed';
+$config['os'][$os]['text']             = 'Riverbed';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'riverbed';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Appliances
 $os = 'fortios';
 $config['os'][$os]['text']             = 'FortiOS';
@@ -1493,6 +1513,14 @@ $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Ses
 $config['graph_types']['device']['panos_sessions']['section']      = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']        = '0';
 $config['graph_types']['device']['panos_sessions']['descr']        = 'Active Sessions';
+
+//Pulse Secure Graphs
+$config['graph_types']['device']['pulse_users']['section']         = 'firewall';
+$config['graph_types']['device']['pulse_users']['order']           = '0';
+$config['graph_types']['device']['pulse_users']['descr']           = 'Active Users';
+$config['graph_types']['device']['pulse_sessions']['section']      = 'firewall';
+$config['graph_types']['device']['pulse_sessions']['order']        = '0';
+$config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
 
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';

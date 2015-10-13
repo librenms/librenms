@@ -602,8 +602,8 @@ function list_alerts() {
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    if (isset($_POST['state'])) {
-        $param = array(mres($_POST['state']));
+    if (isset($_GET['state'])) {
+        $param = array(mres($_GET['state']));
     }
     else {
         $param = array('1');
@@ -795,7 +795,39 @@ function ack_alert() {
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
+}
 
+function unmute_alert() {
+    global $config;
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $alert_id = mres($router['id']);
+    $status   = 'error';
+    $err_msg  = '';
+    $message  = '';
+    $code     = 500;
+    if (is_numeric($alert_id)) {
+        $status = 'ok';
+        $code   = 200;
+        if (dbUpdate(array('state' => 1), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
+            $message = 'Alert has been unmuted';
+        }
+        else {
+            $message = 'No alert by that ID';
+        }
+    }
+    else {
+        $err_msg = 'Invalid alert has been provided';
+    }
+
+    $output = array(
+        'status'  => $status,
+        'err-msg' => $err_msg,
+        'message' => $message,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
 }
 
 
@@ -856,7 +888,7 @@ function list_oxidized() {
     $app->response->headers->set('Content-Type', 'application/json');
 
     $devices = array();
-    foreach (dbFetchRows("SELECT hostname,os FROM `devices` WHERE `status`='1'") as $device) {
+    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL)") as $device) {
         $devices[] = $device;
     }
 
