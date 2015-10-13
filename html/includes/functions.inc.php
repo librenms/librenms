@@ -583,7 +583,7 @@ function generate_port_link($port, $text=null, $type=null, $overlib=1, $single_g
 
     $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
     if ($port['ifAlias']) {
-        $content .= $port['ifAlias'].'<br />';
+        $content .= escape_quotes($port['ifAlias']).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -1167,3 +1167,15 @@ function alert_details($details) {
 
 }//end alert_details()
 
+function dynamic_override_config($type, $name, $device) {
+    $attrib_val = get_dev_attrib($device,$name);
+    if ($attrib_val == 'true') {
+        $checked = 'checked';
+    }
+    else {
+        $checked = '';
+    }
+    if ($type == 'checkbox') {
+        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" data-size="small" '.$checked.'>';
+    }
+}//end dynamic_override_config()
