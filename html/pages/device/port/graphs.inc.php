@@ -41,6 +41,16 @@ if (file_exists($config['rrd_dir'].'/'.$device['hostname'].'/port-'.$port['ifInd
         include 'includes/print-interface-graphs.inc.php';
     echo '</div></div>';
 
+    echo '<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Interface Average Packet Size</h3>
+            </div>';
+    $graph_type = 'port_pktsize';
+
+    echo '<div class="panel-body">';
+        include 'includes/print-interface-graphs.inc.php';
+    echo '</div></div>';
+
     if (is_file($config['rrd_dir'].'/'.$device['hostname'].'/port-'.$port['ifIndex'].'-dot3.rrd')) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">

@@ -22,10 +22,15 @@ $unit_text = str_pad(truncate($unit_text, $length), $length);
 $in_text   = str_pad(truncate($in_text, $length), $length);
 $out_text  = str_pad(truncate($out_text, $length), $length);
 
-$rrd_options .= ' DEF:'.$out.'='.$rrd_filename.':'.$ds_out.':AVERAGE';
-$rrd_options .= ' DEF:'.$in.'='.$rrd_filename.':'.$ds_in.':AVERAGE';
-$rrd_options .= ' DEF:'.$out.'_max='.$rrd_filename.':'.$ds_out.':MAX';
-$rrd_options .= ' DEF:'.$in.'_max='.$rrd_filename.':'.$ds_in.':MAX';
+if (isset($custom_defs)) {
+	$rrd_options .= $custom_defs;
+} else {
+	$rrd_options .= ' DEF:'.$out.'='.$rrd_filename.':'.$ds_out.':AVERAGE';
+	$rrd_options .= ' DEF:'.$in.'='.$rrd_filename.':'.$ds_in.':AVERAGE';
+	$rrd_options .= ' DEF:'.$out.'_max='.$rrd_filename.':'.$ds_out.':MAX';
+	$rrd_options .= ' DEF:'.$in.'_max='.$rrd_filename.':'.$ds_in.':MAX';
+}
+
 $rrd_options .= ' CDEF:dout_max=out_max,-1,*';
 $rrd_options .= ' CDEF:dout=out,-1,*';
 $rrd_options .= ' CDEF:both=in,out,+';
