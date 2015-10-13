@@ -61,5 +61,7 @@ Contributors to LibreNMS:
 - Matthew Scully <matt@mattz0r.me.uk> (mattz0r)
 - Xavier Beaudouin <kiwi@oav.net> (xbeaudouin)
 - Falk Stern <falk@fourecks.de> (fstern)
+- Donovan Bridoux <donovan.bridoux@gmail.com> (PandaWawawa)
+- Sebastian Neuner <sebastian@sneuner.org> (9er)
 
 [1]: http://observium.org/ "Observium web site"
