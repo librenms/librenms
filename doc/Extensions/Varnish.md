@@ -7,7 +7,7 @@ Varnish is caching software that sits logically between an HTTP client and an HT
 <br><br>
 ##### <center>Simplified block diagram of an Apache HTTP server with Varnish 4.0 Reverse Proxy.</center> #####
 
-![Block Diagram 1](http://www.librenms.org/img/varnish_block.png)
+![Block Diagram 1](http://docs.librenms.org/img/varnish_block.png)
 
 ### CentOS 7 Varnish Installation ###
 
