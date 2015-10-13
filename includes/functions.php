@@ -491,6 +491,7 @@ function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
     global $config;
 
     $tmp_device = array('device_id'=>$device_id);
+    $response = array();
     if ($config['icmp_check'] === true && get_dev_attrib($tmp_device,'override_icmp_disable') != "true") {
 
         $fping_params = '';
@@ -506,7 +507,6 @@ function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
         if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
             $fping_params .= ' -p ' . $config['fping_options']['millisec'];
         }
-        $response = array();
         $status = fping($hostname,$fping_params,$address_family);
         if ($status['loss'] == 100) {
             $response['result'] = FALSE;
