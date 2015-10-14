@@ -1,11 +1,5 @@
 <?php
 
-// If anybody has again the idea to implement the PHP internal library calls,
-// be aware that it was tried and banned by lead dev Adam
-//
-// TRUE STORY. THAT SHIT IS WHACK. -- adama.
-
-
 function string_to_oid($string) {
     $oid = strlen($string);
     for ($i = 0; $i != strlen($string); $i++) {
