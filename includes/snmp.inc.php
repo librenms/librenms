@@ -133,7 +133,7 @@ function snmp_get($device, $oid, $options=null, $mib=null, $mibdir=null) {
     if (is_string($data) && (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data))) {
         return false;
     }
-    else if ($data) {
+    elseif ($data || $data === '0') {
         return $data;
     }
     else {
