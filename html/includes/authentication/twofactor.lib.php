@@ -168,24 +168,31 @@ function twofactor_form($form=true){
 	$ret = "";
 	if( $form ) {
 		$ret .= '
-      <form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
+      <div class="row">
+        <div class="col-md-offset-4 col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">
+                <center>
+                  <img src="images/librenms_logo_light.png">
+                </center>
+              </h3>
+            </div>
+            <div class="panel-body">
+              <div class="container-fluid">
+                  <form class="form-horizontal" role="form" action="" method="post" name="twofactorform">';
 	}
 	$ret .= '
         <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
-            <h3>Please Enter TwoFactor Token:</h3>
+          <div class="col-md-12">
+            <input type="text" name="twofactor" id="twofactor" class="form-control" autocomplete="off" placeholder="Please enter auth token" />
           </div>
         </div>
         <div class="form-group">
-          <label for="twofactor" class="col-sm-2 control-label">Token</label>
-          <div class="col-sm-6">
-            <input type="text" name="twofactor" id="twofactor" class="form-control" autocomplete="off" placeholder="012345" />
+          <div class="col-md-12">
+            <button type="submit" class="btn btn-default btn-block" name="submit" type="submit">Login</button>
           </div>
-        </div>
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-6">
-            <button type="submit" class="btn btn-default input-sm" name="submit" type="submit">Login</button>
-          </div>
+         </div>
         </div>';
 	$ret .= '<script>document.twofactorform.twofactor.focus();</script>';
 	if( $form ) {
