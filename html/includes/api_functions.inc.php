@@ -697,7 +697,8 @@ function add_edit_rule() {
         if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
             $message = 'Addition failed : Name has already been used';
         }
-    }else {
+    }
+    else {
         if(dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
             $message = 'Edition failed : Name has already been used';
         }
