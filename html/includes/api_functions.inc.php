@@ -693,8 +693,15 @@ function add_edit_rule() {
     );
     $extra_json = json_encode($extra);
 
-    if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
-        $message = 'Name has already been used';
+    if(!isset($rule_id)) {
+        if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
+            $message = 'Addition failed : Name has already been used';
+        }
+    }
+    else {
+        if(dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
+            $message = 'Edition failed : Name has already been used';
+        }
     }
 
     if (empty($message)) {
