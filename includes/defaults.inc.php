@@ -788,3 +788,9 @@ $config['summary_errors']                               = 0;
 
 // Default width of the availability map's tiles
 $config['availability-map-width']                       = 25;
+
+// SSH Username
+$config['global_username_ssh'] = false;
+
+// Telnet Username
+$config['global_username_telnet'] = false;

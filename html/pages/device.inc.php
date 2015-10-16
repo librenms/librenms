@@ -1,5 +1,16 @@
 <?php
 
+$global_username_ssh = '';
+$global_username_telnet = '';
+
+if ($config['global_username_ssh'] !== FALSE) {
+    $global_username_ssh = $config['global_username_ssh'] . '@';
+}
+
+if ($config['global_username_telnet'] !== FALSE) {
+    $global_username_telnet = $config['global_username_telnet'] . '@';
+}
+
 if ($vars['tab'] == 'port' && is_numeric($vars['device']) && port_permitted($vars['port'])) {
     $check_device = get_device_id_by_port_id($vars['port']);
     $permit_ports = 1;
@@ -367,8 +378,8 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
 
 
         echo '<li style="float: right;"><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"></a></li>
-            <li style="float: right;"><a href="ssh://'.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"></a></li>
-            <li style="float: right;"><a href="telnet://'.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"></a></li>';
+            <li style="float: right;"><a href="ssh://'.$global_username_ssh.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"></a></li>
+            <li style="float: right;"><a href="telnet://'.$global_username_telnet.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"></a></li>';
 
         if ($_SESSION['userlevel'] >= '7') {
             echo '<li class="'.$select['edit'].'" style="float: right;">

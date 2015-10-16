@@ -2,6 +2,16 @@
 
 $where = 1;
 $param = array();
+$global_username_ssh = '';
+$global_username_telnet = '';
+
+if ($config['global_username_ssh'] !== FALSE) {
+    $global_username_ssh = $config['global_username_ssh'] . '@';
+}
+
+if ($config['global_username_telnet'] !== FALSE) {
+    $global_username_telnet = $config['global_username_telnet'] . '@';
+}
 
 $sql = ' FROM `devices`';
 
@@ -182,10 +192,10 @@ foreach (dbFetchRows($sql, $param) as $device) {
     $actions .= ('</div>
         <div class="row">
         <div class="col-xs-1">
-        <a href="telnet://'.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"></a>
+        <a href="telnet://'.$global_username_telnet.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"></a>
         </div>
         <div class="col-xs-1">
-        <a href="ssh://'.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"></a>
+        <a href="ssh://'.$global_username_ssh.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"></a>
         </div>
         <div class="col-xs-1">
         <a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"></a>
