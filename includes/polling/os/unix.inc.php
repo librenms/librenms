@@ -132,6 +132,9 @@ elseif ($device['os'] == "dsm") {
             $hardware = $value;
         }
     }
+
+    $version = snmp_get($device, "version.0", "-Osqnv", "SYNOLOGY-SYSTEM-MIB");
+
 }
 elseif ($device['os'] == "pfsense") {
     $output = preg_split("/ /", $poll_device['sysDescr']);
