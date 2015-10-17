@@ -160,7 +160,7 @@ function poll_device($device, $options) {
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
-    if (is_array($device_perf)) {
+    if (can_ping_device($attribs) === true && is_array($device_perf)) {
         dbInsert($device_perf, 'device_perf');
     }
 
