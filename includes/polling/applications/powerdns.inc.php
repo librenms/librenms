@@ -3,9 +3,10 @@
 // Polls powerdns statistics from script via SNMP
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-powerdns-'.$app['app_id'].'.rrd';
 $options      = '-O qv';
+$mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.8.112.111.119.101.114.100.110.115';
 
-$powerdns = snmp_get($device, $oid, $options);
+$powerdns = snmp_get($device, $oid, $options, $mib);
 
 echo ' powerdns';
 
