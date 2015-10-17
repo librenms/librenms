@@ -487,13 +487,11 @@ function isSNMPable($device) {
  *
  * @return bool TRUE if the host responded to at least one ping request, FALSE otherwise.
  */
-function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
+function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE, $attribs = false) {
     global $config;
 
-    $tmp_device = array('device_id'=>$device_id);
     $response = array();
-    if ($config['icmp_check'] === true && get_dev_attrib($tmp_device,'override_icmp_disable') != "true") {
-
+    if (can_ping_device($attribs) === true) {
         $fping_params = '';
         if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
             $fping_params .= ' -r ' . $config['fping_options']['retries'];
