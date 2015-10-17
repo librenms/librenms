@@ -155,7 +155,7 @@ function poll_device($device, $options) {
 
     $address_family = snmpTransportToAddressFamily($device['transport']);
 
-    $ping_response = isPingable($device['hostname'], $address_family, $device['device_id'], $attribs);
+    $ping_response = isPingable($device['hostname'], $address_family, $attribs);
 
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
