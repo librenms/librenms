@@ -490,31 +490,39 @@ function isSNMPable($device) {
 function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
     global $config;
 
-    $fping_params = '';
-    if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
-        $fping_params .= ' -r ' . $config['fping_options']['retries'];
-    }
-    if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
-        $fping_params .= ' -t ' . $config['fping_options']['timeout'];
-    }
-    if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
-        $fping_params .= ' -c ' . $config['fping_options']['count'];
-    }
-    if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
-        $fping_params .= ' -p ' . $config['fping_options']['millisec'];
-    }
+    $tmp_device = array('device_id'=>$device_id);
     $response = array();
-    $status = fping($hostname,$fping_params,$address_family);
-    if ($status['loss'] == 100) {
-        $response['result'] = FALSE;
+    if ($config['icmp_check'] === true && get_dev_attrib($tmp_device,'override_icmp_disable') != "true") {
+
+        $fping_params = '';
+        if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
+            $fping_params .= ' -r ' . $config['fping_options']['retries'];
+        }
+        if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
+            $fping_params .= ' -t ' . $config['fping_options']['timeout'];
+        }
+        if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+            $fping_params .= ' -c ' . $config['fping_options']['count'];
+        }
+        if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+            $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+        }
+        $status = fping($hostname,$fping_params,$address_family);
+        if ($status['loss'] == 100) {
+            $response['result'] = FALSE;
+        }
+        else {
+            $response['result'] = TRUE;
+        }
+        if (is_numeric($status['avg'])) {
+            $response['last_ping_timetaken'] = $status['avg'];
+        }
+        $response['db'] = $status;
     }
     else {
-        $response['result'] = TRUE;
+        $response['result'] = true;
+        $response['last_ping_timetaken'] = 0;
     }
-    if (is_numeric($status['avg'])) {
-        $response['last_ping_timetaken'] = $status['avg'];
-    }
-    $response['db'] = $status;
     return($response);
 }
 
