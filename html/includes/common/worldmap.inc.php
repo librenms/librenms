@@ -46,7 +46,7 @@ if ($config['map']['engine'] == 'leaflet') {
     <div class="col-sm-4">
       <label for="init_zoom" class="control-label">Initial Zoom: </label>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
       <select class="form-control" name="init_zoom" id="select_zoom'.$unique_id.'">
         ';
         for ($i=0; $i<19; $i++) {
@@ -59,6 +59,14 @@ if ($config['map']['engine'] == 'leaflet') {
         }
         $temp_output .= '
       </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-4">
+      <label for="group_radius" class="control-label">Grouping radius: </label>
+    </div>
+    <div class="col-sm-4">
+      <input class="form-control" name="group_radius" id="input_radius_'.$unique_id.'" value="'.$widget_settings['group_radius'].'" placeholder="default 80">
     </div>
   </div>
   <div class="form-group">
@@ -87,13 +95,21 @@ if ($config['map']['engine'] == 'leaflet') {
             $init_lng = $config['leaflet']['default_lng'];
             $init_zoom = $config['leaflet']['default_zoom'];
         }
+        if (!empty($widget_settings['group_radius'])) {
+            $group_radius = $widget_settings['group_radius'];
+        }
+        else {
+            $group_radius = 80;
+        }
         $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.0f", $init_zoom);
         $temp_output .= 'var map = L.map(\'leaflet-map\').setView('.$map_init.');
 L.tileLayer(\'//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
     attribution: \'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors\'
 }).addTo(map);
 
-var markers = L.markerClusterGroup();
+var markers = L.markerClusterGroup({
+    maxClusterRadius: ' . $group_radius . ',
+  });
 var redMarker = L.AwesomeMarkers.icon({
     icon: \'server\',
     markerColor: \'red\', prefix: \'fa\', iconColor: \'white\'
