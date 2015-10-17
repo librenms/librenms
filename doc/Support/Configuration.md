@@ -59,6 +59,17 @@ $config['fping_options']['millisec'] = 200;
 * `count` (`fping` parameter `-c`): Number of request packets to send to each target.
 * `millisec` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
 
+You can disable the fping / icmp check that is done for a device to be determined to be up on a global or per device basis.
+**We don't advice disabling the fping / icmp check unless you know the impact, at worst if you have a large number of devices down 
+then it's possible that the poller would no longer complete in 5 minutes due to waiting for snmp to timeout.**
+
+Globally disable fping / icmp check:
+```php
+$config['icmp_check'] = false;
+```
+
+If you would like to do this on a per device basis then you can do so under Device -> Edit -> Misc -> Disable ICMP Test? On
+
 ```php
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
 $config['snmpget']          = "/usr/bin/snmpget";
