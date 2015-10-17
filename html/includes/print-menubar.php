@@ -190,7 +190,7 @@ if ($config['show_services']) {
 if ($service_alerts) {
     echo('
             <li role="presentation" class="divider"></li>
-            <li><a href="services/status=0/"><i class="fa fa-bell-o fa-fw fa-lg"></i> Alerts ('.$service_alerts.')</a></li>');
+            <li><a href="services/state=down/"><i class="fa fa-bell-o fa-fw fa-lg"></i> Alerts ('.$service_alerts.')</a></li>');
 }
 
 if ($_SESSION['userlevel'] >= '10') {
