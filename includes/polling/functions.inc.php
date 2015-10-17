@@ -146,6 +146,7 @@ function poll_device($device, $options) {
     unset($poll_update_query);
     unset($poll_separator);
     $poll_update_array = array();
+    $update_array = array();
 
     $host_rrd = $config['rrd_dir'].'/'.$device['hostname'];
     if (!is_dir($host_rrd)) {
