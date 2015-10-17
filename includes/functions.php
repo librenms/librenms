@@ -483,11 +483,11 @@ function isSNMPable($device) {
  *
  * @param string $hostname The hostname or IP address to send ping requests to.
  * @param int $address_family The address family (AF_INET for IPv4 or AF_INET6 for IPv6) to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to AF_INET6 when pinging an IPv6 address or an IPv6-only host.
- * @param int $device_id This parameter is currently ignored.
+ * @param array $attribs The device attributes
  *
  * @return bool TRUE if the host responded to at least one ping request, FALSE otherwise.
  */
-function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE, $attribs = false) {
+function isPingable($hostname, $address_family = AF_INET, $attribs = array()) {
     global $config;
 
     $response = array();
