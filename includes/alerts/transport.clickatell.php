@@ -21,22 +21,19 @@
  * @subpackage Alerts
  */
 
-$data = array("text" => $obj['title'], "to" => $opts['to']);
-$data = json_encode($data);
-$curl = curl_init('https://api.clickatell.com/rest/message');
+$data = array("api_id" => $opts['api_id'], "user" => $opts['user'], "password" => $opts['password'], "to" => $opts['to'], "text" => $obj['title']);
+if (!empty($opts['from'])) {
+    $data['from'] = $opts['from'];
+}
+$url  = 'https://api.clickatell.com/http/sendmsg?'.http_build_query($data);
+$curl = curl_init($url);
 
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-    'Content-Type: application/json',
-    'Content-Length: '.strlen($data),
-    'Authorization: Bearer '.$opts['token'],
-));
 
 $ret  = curl_exec($curl);
 $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-if( $code > 202 ) {
+if( $code > 200 ) {
     if( $debug ) {
         var_dump($ret);
     }
