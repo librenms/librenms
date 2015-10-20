@@ -353,11 +353,13 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </li>';
         }
 
-        echo '<li class="'.$select['performance'].'">
-            <a href="'.generate_device_url($device, array('tab' => 'performance')).'">
-            <img src="images/16/chart_line.png" align="absmiddle" border="0" /> Performance
-            </a>
-            </li>';
+        if (can_ping_device($attribs) === true) {
+            echo '<li class="'.$select['performance'].'">
+                <a href="'.generate_device_url($device, array('tab' => 'performance')).'">
+                <img src="images/16/chart_line.png" align="absmiddle" border="0" /> Performance
+                </a>
+                </li>';
+        }
 
         echo '<li class="'.$select['notes'].'">
             <a href="'.generate_device_url($device, array('tab' => 'notes')).'">

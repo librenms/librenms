@@ -483,17 +483,15 @@ function isSNMPable($device) {
  *
  * @param string $hostname The hostname or IP address to send ping requests to.
  * @param int $address_family The address family (AF_INET for IPv4 or AF_INET6 for IPv6) to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to AF_INET6 when pinging an IPv6 address or an IPv6-only host.
- * @param int $device_id This parameter is currently ignored.
+ * @param array $attribs The device attributes
  *
  * @return bool TRUE if the host responded to at least one ping request, FALSE otherwise.
  */
-function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
+function isPingable($hostname, $address_family = AF_INET, $attribs = array()) {
     global $config;
 
-    $tmp_device = array('device_id'=>$device_id);
     $response = array();
-    if ($config['icmp_check'] === true && get_dev_attrib($tmp_device,'override_icmp_disable') != "true") {
-
+    if (can_ping_device($attribs) === true) {
         $fping_params = '';
         if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
             $fping_params .= ' -r ' . $config['fping_options']['retries'];
