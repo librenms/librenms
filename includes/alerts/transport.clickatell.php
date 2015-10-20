@@ -21,7 +21,7 @@
  * @subpackage Alerts
  */
 
-$data = array("api_id" => $opts['api_id'], "user" => $opts['user'], "password" => $opts['password'], "to" => $opts['to'], "text" => $obj['title']);
+$data = array("api_id" => $opts['api_id'], "user" => $opts['user'], "password" => $opts['password'], "to" => implode(',',$opts['to']), "text" => $obj['title']);
 if (!empty($opts['from'])) {
     $data['from'] = $opts['from'];
 }
