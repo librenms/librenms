@@ -21,8 +21,8 @@
  * @subpackage Alerts
  */
 
-$data = array("msg" => $obj['title'], "to" => implode(',',$opts['to']), "h" => $opts['token'], "u" => $opts['user']);
-$url  = $opts['url'].'&'.http_build_query($data);
+$data = array("u" => $opts['user'], "h" => $opts['token'], "to" => implode(',',$opts['to']), "msg" => $obj['title'],);
+$url  = $opts['url'].'&op=pv&'.http_build_query($data);
 $curl = curl_init($url);
 
 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
