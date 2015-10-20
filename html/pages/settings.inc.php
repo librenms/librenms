@@ -35,8 +35,6 @@ $pagetitle[] = $page_name . ' Settings';
 $config['memcached']['enable'] = false;
 ?>
 
-<script src="js/librenms.js"></script>
-
 <div class="container-fluid">
     <h2>
 <?php
