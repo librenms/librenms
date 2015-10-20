@@ -400,9 +400,9 @@ Here an example using 3 numbers, any amount of numbers is supported:
 $config['alert']['transports']['playsms']['url']   = 'https://localhost/index.php?app=ws';
 $config['alert']['transports']['playsms']['user']  = 'user1';
 $config['alert']['transports']['playsms']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['playsms']['from']  = '+1234567892'; //Optional
 $config['alert']['transports']['playsms']['to'][]  = '+1234567890';
 $config['alert']['transports']['playsms']['to'][]  = '+1234567891';
-$config['alert']['transports']['playsms']['to'][]  = '+1234567892';
 ```
 ~~
 
