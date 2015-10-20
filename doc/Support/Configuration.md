@@ -261,6 +261,11 @@ $config['autodiscovery']['nets-exclude'][] = "240.0.0.0/4";
 ```
 Arrays of subnets to exclude in auto discovery mode.
 
+```php
+$config['discovery_by_ip'] = true;
+```
+Enable auto discovery by IP. By default we only discover based on hostnames but manually adding by IP is allowed.
+
 #### Email configuration
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
