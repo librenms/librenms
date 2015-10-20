@@ -146,6 +146,7 @@ function poll_device($device, $options) {
     unset($poll_update_query);
     unset($poll_separator);
     $poll_update_array = array();
+    $update_array = array();
 
     $host_rrd = $config['rrd_dir'].'/'.$device['hostname'];
     if (!is_dir($host_rrd)) {
@@ -155,12 +156,12 @@ function poll_device($device, $options) {
 
     $address_family = snmpTransportToAddressFamily($device['transport']);
 
-    $ping_response = isPingable($device['hostname'], $address_family, $device['device_id']);
+    $ping_response = isPingable($device['hostname'], $address_family, $attribs);
 
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
-    if (is_array($device_perf)) {
+    if (can_ping_device($attribs) === true && is_array($device_perf)) {
         dbInsert($device_perf, 'device_perf');
     }
 
@@ -265,23 +266,27 @@ function poll_device($device, $options) {
         }
 
         // Ping response rrd
-        $ping_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/ping-perf.rrd';
-        if (!is_file($ping_rrd)) {
-            rrdtool_create($ping_rrd, 'DS:ping:GAUGE:600:0:65535 '.$config['rrd_rra']);
-        }
+        if (can_ping_device($attribs) === true) {
+            $ping_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/ping-perf.rrd';
+            if (!is_file($ping_rrd)) {
+                rrdtool_create($ping_rrd, 'DS:ping:GAUGE:600:0:65535 '.$config['rrd_rra']);
+            }
 
-        if (!empty($ping_time)) {
-            $fields = array(
-                'ping' => $ping_time,
-            );
+            if (!empty($ping_time)) {
+                $fields = array(
+                    'ping' => $ping_time,
+                );
 
-            rrdtool_update($ping_rrd, $fields);
+                rrdtool_update($ping_rrd, $fields);
+            }
+
+            $update_array['last_ping']             = array('NOW()');
+            $update_array['last_ping_timetaken']   = $ping_time;
+
         }
 
         $update_array['last_polled']           = array('NOW()');
         $update_array['last_polled_timetaken'] = $device_time;
-        $update_array['last_ping']             = array('NOW()');
-        $update_array['last_ping_timetaken']   = $ping_time;
 
         // echo("$device_end - $device_start; $device_time $device_run");
         echo "Polled in $device_time seconds\n";
