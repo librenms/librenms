@@ -97,3 +97,15 @@ $(document).ready(function() {
         });
     });
 });
+
+function submitCustomRange(frmdata) {
+    var reto = /to=([0-9])+/g;
+    var refrom = /from=([0-9])+/g;
+    var tsto = moment(frmdata.dtpickerto.value).unix();
+    var tsfrom = moment(frmdata.dtpickerfrom.value).unix();
+    frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
+    frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
+    frmdata.action = frmdata.selfaction.value;
+    return true;
+}
+
