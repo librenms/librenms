@@ -21,7 +21,10 @@
  * @subpackage Alerts
  */
 
-$data = array("u" => $opts['user'], "h" => $opts['token'], "to" => implode(',',$opts['to']), "msg" => $obj['title'],);
+$data = array("u" => $opts['user'], "h" => $opts['token'], "to" => implode(',',$opts['to']), "msg" => $obj['title']);
+if (!empty($opts['from'])) {
+    $data["from"] = $opts['from'];
+}
 $url  = $opts['url'].'&op=pv&'.http_build_query($data);
 $curl = curl_init($url);
 
