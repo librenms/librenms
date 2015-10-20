@@ -215,6 +215,8 @@ $config['autodiscovery']['nets-exclude'][] = '127.0.0.0/8';
 $config['autodiscovery']['nets-exclude'][] = '169.254.0.0/16';
 $config['autodiscovery']['nets-exclude'][] = '224.0.0.0/4';
 $config['autodiscovery']['nets-exclude'][] = '240.0.0.0/4';
+// Autodiscover by IP
+$config['discovery_by_ip'] = false;// Set to true if you want to enable auto discovery by IP.
 
 $config['alerts']['email']['enable'] = false;
 // Enable email alerts
