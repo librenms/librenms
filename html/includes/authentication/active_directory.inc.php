@@ -11,8 +11,8 @@ ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
 
 // disable certificate checking if required
 
-if (isset($config['auth_ad_dont_check_certificates'] &&
-          $config['auth_ad_dont_check_certificates'] > 1) {
+if (isset($config['auth_ad_dont_check_certificates']) &&
+          $config['auth_ad_dont_check_certificates'] > 0) {
     putenv('LDAPTLS_REQCERT=never');
 };
 
@@ -31,30 +31,34 @@ function authenticate($username, $password) {
     }
 
     return 0;
-    
 }
 
 function reauthenticate($sess_id, $token) {
+    // not supported so return 0
     return 0;
 }
 
 
 function passwordscanchange($username='') {
+    // not supported so return 0
     return 0;
 }
 
 
 function changepassword($username, $newpassword) {
+    // not supported so return 0
     return 0;
 }
 
 
 function auth_usermanagement() {
+    // not supported so return 0
     return 0;
 }
 
 
 function adduser($username, $password, $level, $email='', $realname='', $can_modify_passwd='1') {
+    // not supported so return 0
     return 0;
 }
 
@@ -72,7 +76,6 @@ function user_exists($username) {
     }
 
     return 0;
-
 }
 
 
@@ -95,7 +98,6 @@ function get_userlevel($username) {
     }
 
     return $userlevel;
-
 }
 
 
@@ -112,14 +114,12 @@ function get_userid($username) {
     }
 
     return -1;
-
 }
 
 
 function deluser($username) {
-    // Not supported
+    // not supported so return 0 
     return 0;
-
 }
 
 
@@ -142,11 +142,10 @@ function get_userlist() {
             foreach($results as $result) {
                 if(isset($result['samaccountname'][0])) {
                     $userid = preg_replace('/.*-(\d+)$/','$1',
-                                           sid_from_ldap($result[0]['objectsid'][0]));
-                    $username = $result['samaccountname'][0];
+                                           sid_from_ldap($result['objectsid'][0]));
 
                     // don't make duplicates, user may be member of more than one group
-                    $userhash[$username] = array(
+                    $userhash[$result['samaccountname'][0]] = array(
                         'realname' => $result['displayName'][0],
                         'user_id'  => $userid,
                         'email'    => $result['mail'][0]
@@ -156,7 +155,7 @@ function get_userlist() {
         }
     }
 
-    foreach($userhash[] as $key) {
+    foreach(array_keys($userhash) as $key) {
         $userlist[] = array(
             'username' => $key,
             'realname' => $userhash[$key]['realname'],
@@ -172,14 +171,12 @@ function get_userlist() {
 function can_update_users() {
     // not supported so return 0
     return 0;
-
 }
 
 
 function get_user($user_id) {
     // not supported so return 0
     return 0;
-
 }
 
 
@@ -255,7 +252,7 @@ function get_cn($dn) {
 
 function sid_from_ldap($sid)
 {
-        $sidHex = unpack('H*hex', $sid)['hex'];
+        $sidHex = unpack('H*hex', $sid);
         $subAuths = unpack('H2/H2/n/N/V*', $sid);        
         $revLevel = hexdec(substr($sidHex, 0, 2));
         $authIdent = hexdec(substr($sidHex, 4, 12));      
