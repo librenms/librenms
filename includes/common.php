@@ -612,6 +612,26 @@ function d_print_r($var, $no_debug_text = null) {
 }
 
 /*
+ * WARNING: DEPRECATED - used only by first release of MIB poller.
+ * Shorten the name so it works as an RRD data source name (limited to 19 chars by default).
+ * Substitute for $subst if necessary.
+ * @return the shortened name
+ */
+function name_shorten($name, $common = null, $subst = "mibval", $len = 19) {
+    if ($common !== null) {
+        // remove common from the beginning of the string, if present
+        if (strlen($name) > $len && strpos($name, $common) >= 0) {
+            $newname = str_replace($common, '', $name);
+            $name = $newname;
+        }
+    }
+    if (strlen($name) > $len) {
+        $name = $subst;
+    }
+    return $name;
+}
+
+/*
  * @return the name of the rrd file for $host's $extra component
  * @param host Host name
  * @param extra Components of RRD filename - will be separated with "-"
