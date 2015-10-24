@@ -803,7 +803,9 @@ function enable_graphs($device, &$graph_enable)
 {
     // These are standard graphs we should have for all systems
     $graph_enable['poller']['poller_perf'] = 'device_poller_perf';
-    $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
+    if (can_ping_device($attribs) === true) {
+        $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
+    }
 
     enable_os_graphs($device['os'], $graph_enable);
 }
@@ -841,6 +843,9 @@ function can_ping_device($attribs) {
     global $config;
     if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
         return true;
+    }
+    else {
+        return false;
     }
 } // end can_ping_device
 
