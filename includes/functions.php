@@ -243,7 +243,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
 
     list($hostshort) = explode(".", $host);
     // Test Database Exists
-    if (dup_host_check($host) === false) {
+    if (host_exists($host) === false) {
         if ($config['addhost_alwayscheckip'] === TRUE) {
             $ip = gethostbyname($host);
         } else {
@@ -583,7 +583,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
 
     if ($device['os']) {
 
-        if (dup_host_check($host) === false) {
+        if (host_exists($host) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
                 return($device_id);
@@ -1269,7 +1269,7 @@ function snmpTransportToAddressFamily($transport) {
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
 **/
-function dup_host_check($hostname) {
+function host_exists($hostname) {
     $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($hostname));
     if ($count > 0) {
         return true;
