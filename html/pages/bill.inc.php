@@ -188,7 +188,7 @@ if (bill_permitted($bill_id)) {
 
             $background = get_percentage_colours($percent);
 
-            echo '<p>'.print_percentage_bar(350, 20, $perc, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</p>';
+            echo '<p>'.print_percentage_bar(350, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</p>';
 
             $type = '&amp;ave=yes';
         }
