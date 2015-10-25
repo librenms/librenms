@@ -265,6 +265,7 @@ Arrays of subnets to exclude in auto discovery mode.
 $config['discovery_by_ip'] = true;
 ```
 Enable auto discovery by IP. By default we only discover based on hostnames but manually adding by IP is allowed.
+Please note this could lead to duplicate devices being added based on IP, Hostname or sysName.
 
 #### Email configuration
 
