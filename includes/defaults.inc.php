@@ -344,7 +344,7 @@ $config['network_map_vis_options'] = '{
         enabled: false
     },
     font: {
-        size: 12,
+        size: 14,
         color: "red",
         face: "sans",
         background: "white",
@@ -354,19 +354,53 @@ $config['network_map_vis_options'] = '{
     }
   },
   "physics": {
-    "forceAtlas2Based": {
-      "gravitationalConstant": -800,
-      "centralGravity": 0.03,
-      "springLength": 50,
-      "springConstant": 0,
-      "damping": 1,
+     "barnesHut": {
+      "gravitationalConstant": -2000,
+      "centralGravity": 0.3,
+      "springLength": 200,
+      "springConstant": 0.04,
+      "damping": 0.09,
       "avoidOverlap": 1
     },
-    "maxVelocity": 50,
-    "minVelocity": 0.01,
-    "solver": "forceAtlas2Based",
-    "timestep": 0.30
-  }
+
+     "forceAtlas2Based": {
+      "gravitationalConstant": -50,
+      "centralGravity": 0.01,
+      "springLength": 200,
+      "springConstant": 0.08,
+      "damping": 0.4,
+      "avoidOverlap": 1
+    },
+    
+     "repulsion": {
+      "centralGravity": 0.2,
+      "springLength": 250,
+      "springConstant": 0.2,
+      "nodeDistance": 200,
+      "damping": 0.07
+    },
+
+     "hierarchicalRepulsion": {
+      "nodeDistance": 300,
+      "centralGravity": 0.2,
+      "springLength": 300,
+      "springConstant": 0.2,
+      "damping": 0.07
+    },
+    
+  "maxVelocity": 50,
+  "minVelocity": 0.4,
+  "solver": "hierarchicalRepulsion",
+  "stabilization": {
+    "enabled": true,
+    "iterations": 1000,
+    "updateInterval": 100,
+    "onlyDynamicEdges": false,
+    "fit": true
+  },
+
+  "timestep": 0.4,
+ }
 }';
 
 // Device page options
