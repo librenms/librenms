@@ -34,17 +34,14 @@ if ($device['os'] == "linux" || $device['os'] == "endian") {
     # Distro "extend" support
 
     # NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
-    $features = snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB");
-    $features = str_replace("\"", "", $features);
+    $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB"));
 
     if (!$features) { # No "extend" support, try legacy UCD-MIB shell support
-        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
-        $features = str_replace("\"", "", $features);
+        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB"));
     }
 
     if (!$features) { # No "extend" support, try "exec" support
-        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
-        $features = str_replace("\"", "", $features);
+        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB"));
     }
 
     # Detect Dell hardware via OpenManage SNMP
@@ -87,12 +84,16 @@ elseif ($device['os'] == "freebsd") {
     }
 
     # Distro "extend" support
-    $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
-    $features = str_replace("\"", "", $features);
+
+    # NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
+    $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB"));
+
+    if (!$features) { # No "extend" support, try legacy UCD-MIB shell support
+        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB"));
+    }
 
     if (!$features) { # No "extend" support, try "exec" support
-        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
-        $features = str_replace("\"", "", $features);
+        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB"));
     }
 
     if (!$features) {
