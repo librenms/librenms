@@ -399,7 +399,7 @@ $config['network_map_vis_options'] = '{
     "fit": true
   },
 
-  "timestep": 0.5,
+  "timestep": 0.4,
  }
 }';
 
