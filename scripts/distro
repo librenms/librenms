@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Detects which OS and if it is Linux then it will detect which Linux Distribution.
 
 OS=`uname -s`
