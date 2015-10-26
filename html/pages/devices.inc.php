@@ -51,7 +51,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_'.$option) {
         echo("<span class='pagemenu-selected'>");
     }
-    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option, 'from' => $config['time']['day'], 'to' => $config['time']['now'])) . '">' . $text . '</a>');
+    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option, 'from' => '-24h', 'to' => 'now')) . '">' . $text . '</a>');
     if ($vars['format'] == 'graph_'.$option) {
         echo("</span>");
     }
