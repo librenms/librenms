@@ -68,7 +68,6 @@ echo '<div class="table-responsive">
     <tr>
         <th>Device</th>
         <th>Service</th>
-        <th>Status</th>
         <th>Changed</th>
         <th>Message</th>
     </tr>';
