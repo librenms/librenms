@@ -338,17 +338,17 @@ foreach ($vars as $var => $value) {
             break;
         case 'state':
             if ($value == "down") {
-                $where .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?";
+                $where .= " AND I.ifAdminStatus = ? AND I.ifOperStatus = ?";
                 $param[] = "up";
                 $param[] = "down";
             }
             elseif($value == "up") {
-                $where .= "AND I.ifAdminStatus = ? AND I.ifOperStatus = ?  AND I.ignore = '0' AND D.ignore='0' AND I.deleted='0'";
+                $where .= " AND I.ifAdminStatus = ? AND I.ifOperStatus = ?";
                 $param[] = "up";
                 $param[] = "up";
             }
             elseif($value == "admindown") {
-                $where .= "AND I.ifAdminStatus = ? AND D.ignore = 0";
+                $where .= " AND I.ifAdminStatus = ? AND D.ignore = 0";
                 $param[] = "down";
             }
             break;
