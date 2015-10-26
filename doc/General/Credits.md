@@ -35,6 +35,9 @@ LibreNMS ships with the following software components:
   Mika Tuupola <tuupola@appelsiini.net> (@tuupola on github)
   MIT License
 
+- influxdb-php
+  https://github.com/influxdb/influxdb-php
+  MIT License
 
 Other components (needs details filled in):
 - JpGraph (html/includes/jpgraph): QPL 1.0 license
