@@ -5,7 +5,11 @@ These machines can be in a different physical location and therefore minimize ne
 
 Devices can also be groupped together into a `poller_group` to pin these devices to a single or a group of designated pollers.
 
-All pollers need to share their RRD-folder, for example via NFS or a combination of NFS and rrdcached.  
+~~All pollers need to share their RRD-folder, for example via NFS or a combination of NFS and rrdcached.~~
+
+> This is no longer a strict requirement with the use of rrdtool 1.5 and above. If you are NOT running 1.5 then you will still 
+need to share the RRD-folder.
+
 It is also required that all pollers can access the central memcached to communicate with eachother.
 
 In order to enable distributed polling, set `$config['distributed_poller'] = true` and your memcached details into `$config['distributed_poller_memcached_host']` and `$config['distributed_poller_memcached_port']`.  
@@ -27,7 +31,7 @@ $config['distributed_poller_memcached_port']             = '11211';
 Below is an example setup based on a real deployment which at the time of writing covers over 2,500 devices and 50,000 ports. The setup is running within an Openstack environment with some commodity ha
 rdware for remote pollers. Here's a diagram of how you can scale LibreNMS out:
 
-![Example Setup](http://www.librenms.org/img/librenms-distributed-diagram.png)
+![Example Setup](http://docs.librenms.org/img/librenms-distributed-diagram.png)
 
 ###Architecture
 How you setup the distribution is entirely up to you, you can choose to host the majority of the required services on a single virtual machine or server and then a poller to actually query the devices being monitored all the way through to having a dedicated server for each of the individual roles. Below are notes on what you need to consider both from the software layer but also connectivity.
@@ -49,7 +53,14 @@ The pollers, web and API layers should all be able to access the database server
 ####RRD Storage
 Central storage should be provided so all RRD files can be read from and written to in one location. As suggested above, it's recommended that RRD Cached is configured and used.
 
-For this example, we are running RRDCached to allow all pollers and web/api servers to read/write to the rrd iles with the rrd directory also exported by NFS for simple access and maintenance.
+For this example, we are running RRDCached to allow all pollers and web/api servers to read/write to the rrd iles ~~with the rrd directory also exported by NFS for simple access and maintenance.~~
+
+Sharing rrd files via something like NFS is no longer required if you run rrdtool 1.5 or greater. If you don't - please share your rrd folder as before. If you run rrdtool 
+1.5 or greater then add this config to your pollers:
+
+```php
+$config['rrdtool_version'] = 1.5;
+```
 
 ####Memcache
 Memcache is required for the distributed pollers to be able to register to a central location and record what devices are polled. Memcache can run from any of the kit so long as it is accessable by all pollers.
@@ -86,6 +97,12 @@ RRDCached:
 $config['rrdcached']    = "127.0.0.1:42217";
 $config['rrd_dir']      = "/opt/librenms/rrd";
 $config['rrdcached_dir'] = "";
+```
+
+For rrdtool 1.5 or greater then you can enable support for rrdcached to create the rrd files:
+
+```php
+$config['rrdtool_version'] = 1.5;
 ```
 
 $config['rrdcached_dir'] Is only needed if you are using tcp connections for rrd cached and needs only to be set if you want to store rrd files within a sub directory of your rrdcached base directory.

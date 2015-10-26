@@ -33,15 +33,9 @@ function format_number_short($number, $sf) {
 }
 
 function external_exec($command) {
-    global $debug;
-
-    if ($debug) {
-        echo($command."\n");
-    }
+    d_echo($command."\n");
     $output = shell_exec($command);
-    if ($debug) {
-        echo($output."\n");
-    }
+    d_echo($output."\n");
 
     return $output;
 }
@@ -441,8 +435,14 @@ function get_dev_entity_state($device) {
     return $state;
 }
 
-function get_dev_attrib($device, $attrib_type) {
-    if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type))) {
+function get_dev_attrib($device, $attrib_type, $attrib_value='') {
+    $sql = '';
+    $params = array($device['device_id'], $attrib_type);
+    if (!empty($attrib_value)) {
+        $sql = " AND `attrib_value`=?";
+        array_push($params, $attrib_value);
+    }
+    if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ? $sql", $params)) {
         return $row['attrib_value'];
     }
     else {
@@ -693,9 +693,7 @@ function get_graph_subtypes($type) {
 
     // find the MIB subtypes
     foreach ($config['graph_types'] as $type => $unused1) {
-        print_r($type);
         foreach ($config['graph_types'][$type] as $subtype => $unused2) {
-            print_r($subtype);
             if (is_mib_graph($type, $subtype)) {
                 $types[] = $subtype;
             }
@@ -760,3 +758,19 @@ function round_Nth($val = 0, $round_to) {
     }
 } // end round_Nth 
 
+/**
+ * Checks if config allows us to ping this device
+ * $attribs contains an array of all of this devices
+ * attributes
+ * @param array $attribs Device attributes
+ * @return bool
+**/
+function can_ping_device($attribs) {
+    global $config;
+    if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
+        return true;
+    }
+    else {
+        return false;
+    }
+} // end can_ping_device

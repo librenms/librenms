@@ -1,4 +1,5 @@
 <?php
+$pagetitle[] = 'About';
 $git_log = `git log -10`;
 ?>
 <div class="modal fade" id="git_log" tabindex="-1" role="dialog" aria-labelledby="git_log_label" aria-hidden="true">
@@ -21,8 +22,8 @@ $git_log = `git log -10`;
   <div style="float: right; padding: 0px; width: 49%">
     <h3>License</h3>
     <pre>
-Copyright (C) 2006-2012 Adam Armstrong
 Copyright (C) 2013-<?php echo date('Y').' '.$config['project_name']; ?> Contributors
+Copyright (C) 2006-2012 Adam Armstrong
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -192,12 +193,12 @@ echo "
 
     <h3>Acknowledgements</h3>
 
-    <b>Observium</b> Codebase for fork. <br />
-    <b>Mark James</b> Silk Iconset. <br />
-    <b>Erik Bosrup</b> Overlib Library. <br />
-    <b>Jonathan De Graeve</b> SNMP code improvements. <br />
     <b>Bruno Pramont</b> Collectd code. <br />
     <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server). <br />
+    <b>Erik Bosrup</b> Overlib Library. <br />
+    <b>Jonathan De Graeve</b> SNMP code improvements. <br />
+    <b>Mark James</b> Silk Iconset. <br />
+    <b>Observium</b> Codebase for fork. <br />
 
   </div>
 </div>

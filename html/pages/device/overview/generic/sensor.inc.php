@@ -12,10 +12,6 @@ if (count($sensors)) {
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     foreach ($sensors as $sensor) {
-        if ($config['memcached']['enable'] === true) {
-            $sensor['sensor_current'] = $memcache->get('sensor-'.$sensor['sensor_id'].'-value');
-        }
-
         if (empty($sensor['sensor_current'])) {
             $sensor['sensor_current'] = 'NaN';
         }
@@ -57,7 +53,7 @@ if (count($sensors)) {
         $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
 
         echo '<tr>
-            <td><strong>'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content).'</strong></td>
+            <td>'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content).'</td>
             <td>'.overlib_link($link, $sensor_minigraph, $overlib_content).'</td>
             <td>'.overlib_link($link, '<span '.($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '').'>'.$sensor['sensor_current'].$sensor_unit.'</span>', $overlib_content).'</td>
             </tr>';

@@ -1,6 +1,7 @@
 <?php
-
-echo '<table width="100%">';
+echo '<h3>Inventory</h3>';
+echo '<hr>';
+echo '<table class="table table-condensed">';
 
 // FIXME missing heading
 foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `hrDeviceIndex`', array($device['device_id'])) as $hrdevice) {

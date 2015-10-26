@@ -170,7 +170,7 @@ project.
 Proposed workflow for submitting pull requests
 ----------------------------------------------
 
-Please see the new [Using Git](http://doc.librenms.org/Developing/Using-Git/) document which gives you step-by-step 
+Please see the new [Using Git](http://docs.librenms.org/Developing/Using-Git/) document which gives you step-by-step 
 instructions on using git to submit a pull request.
 
 [1]: http://www.gnu.org/licenses/license-list.html

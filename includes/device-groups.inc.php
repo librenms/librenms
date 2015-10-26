@@ -63,7 +63,7 @@ function GenGroupSQL($pattern, $search='') {
         $search .= ' &&';
     }
 
-    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id) FROM '.implode(',', $tables).' WHERE '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '%', 'NOT LIKE', 'LIKE'), $pattern).')';
+    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id) FROM '.implode(',', $tables).' WHERE '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
     return $sql;
 
 }//end GenGroupSQL()

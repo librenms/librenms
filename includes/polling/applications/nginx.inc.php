@@ -16,11 +16,11 @@ list($active, $reading, $writing, $waiting, $req) = explode("\n", $nginx);
 if (!is_file($nginx_rrd)) {
     rrdtool_create(
         $nginx_rrd,
-        '--step 300 \
-        DS:Requests:DERIVE:600:0:125000000000 \
-        DS:Active:GAUGE:600:0:125000000000 \
-        DS:Reading:GAUGE:600:0:125000000000 \
-        DS:Writing:GAUGE:600:0:125000000000 \
+        '--step 300 
+        DS:Requests:DERIVE:600:0:125000000000 
+        DS:Active:GAUGE:600:0:125000000000 
+        DS:Reading:GAUGE:600:0:125000000000 
+        DS:Writing:GAUGE:600:0:125000000000 
         DS:Waiting:GAUGE:600:0:125000000000 '.$config['rrd_rra']
     );
 }

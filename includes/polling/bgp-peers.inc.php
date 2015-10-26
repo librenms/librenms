@@ -1,8 +1,5 @@
 <?php
 
-// We should walk, so we can discover here too.
-global $debug;
-
 if ($config['enable_bgp']) {
     foreach (dbFetchRows('SELECT * FROM bgpPeers WHERE device_id = ?', array($device['device_id'])) as $peer) {
         // Poll BGP Peer
@@ -105,16 +102,12 @@ if ($config['enable_bgp']) {
                 $peer_cmd .= ' jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6.'.$junos_v6[$peer_ip];
                 $peer_cmd .= ' jnxBgpM2PeerLocalAddr.0.ipv6.'.$junos_v6[$peer_ip];
                 $peer_cmd .= '|grep -v "No Such Instance"';
-                if ($debug) {
-                    echo "\n$peer_cmd\n";
-                }
+                d_echo("\n$peer_cmd\n");
 
                 $peer_data = trim(`$peer_cmd`);
                 list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
 
-                if ($debug) {
-                    echo "State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n";
-                }
+                d_echo("State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n");
 
                 $bgpLocalAddr = str_replace('"', '', str_replace(' ', '', $bgpLocalAddr));
                 if ($bgpLocalAddr == '00000000000000000000000000000000') {
@@ -149,10 +142,10 @@ if ($config['enable_bgp']) {
 
         $peerrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('bgp-'.$peer['bgpPeerIdentifier'].'.rrd');
         if (!is_file($peerrrd)) {
-            $create_rrd = 'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000 \
-                DS:bgpPeerInUpdates:COUNTER:600:U:100000000000 \
-                DS:bgpPeerOutTotal:COUNTER:600:U:100000000000 \
-                DS:bgpPeerInTotal:COUNTER:600:U:100000000000 \
+            $create_rrd = 'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000 
+                DS:bgpPeerInUpdates:COUNTER:600:U:100000000000 
+                DS:bgpPeerOutTotal:COUNTER:600:U:100000000000 
+                DS:bgpPeerInTotal:COUNTER:600:U:100000000000 
                 DS:bgpPeerEstablished:GAUGE:600:0:U '.$config['rrd_rra'];
 
             rrdtool_create($peerrrd, $create_rrd);
@@ -185,9 +178,7 @@ if ($config['enable_bgp']) {
             foreach ($peer_afis as $peer_afi) {
                 $afi  = $peer_afi['afi'];
                 $safi = $peer_afi['safi'];
-                if ($debug) {
-                    echo "$afi $safi\n";
-                }
+                d_echo("$afi $safi\n");
 
                 if ($device['os_group'] == 'cisco') {
                     $bgp_peer_ident = ipv62snmp($peer['bgpPeerIdentifier']);
@@ -240,9 +231,7 @@ if ($config['enable_bgp']) {
                             $cbgp_data .= "$v\n";
                         }
 
-                        if ($debug) {
-                            echo "$cbgp_data\n";
-                        }
+                        d_echo("$cbgp_data\n");
                     }
                     else {
                         // FIXME - move to function
@@ -256,15 +245,11 @@ if ($config['enable_bgp']) {
                         $cbgp_cmd .= ' cbgpPeerSuppressedPrefixes.'.$peer['bgpPeerIdentifier'].".$afi.$safi";
                         $cbgp_cmd .= ' cbgpPeerWithdrawnPrefixes.'.$peer['bgpPeerIdentifier'].".$afi.$safi";
 
-                        if ($debug) {
-                            echo "$cbgp_cmd\n";
-                        }
+                        d_echo("$cbgp_cmd\n");
 
                         $cbgp_data = preg_replace('/^OID.*$/', '', trim(`$cbgp_cmd`));
                         $cbgp_data = preg_replace('/No Such Instance currently exists at this OID/', '0', $cbgp_data);
-                        if ($debug) {
-                            echo "$cbgp_data\n";
-                        }
+                        d_echo("$cbgp_data\n");
                     }//end if
                     list($cbgpPeerAcceptedPrefixes,$cbgpPeerDeniedPrefixes,$cbgpPeerPrefixAdminLimit,$cbgpPeerPrefixThreshold,$cbgpPeerPrefixClearThreshold,$cbgpPeerAdvertisedPrefixes,$cbgpPeerSuppressedPrefixes,$cbgpPeerWithdrawnPrefixes) = explode("\n", $cbgp_data);
                 }//end if
@@ -323,10 +308,10 @@ if ($config['enable_bgp']) {
 
                 $cbgp_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cbgp-'.$peer['bgpPeerIdentifier'].".$afi.$safi.rrd");
                 if (!is_file($cbgp_rrd)) {
-                    $rrd_create = 'DS:AcceptedPrefixes:GAUGE:600:U:100000000000 \
-                        DS:DeniedPrefixes:GAUGE:600:U:100000000000 \
-                        DS:AdvertisedPrefixes:GAUGE:600:U:100000000000 \
-                        DS:SuppressedPrefixes:GAUGE:600:U:100000000000 \
+                    $rrd_create = 'DS:AcceptedPrefixes:GAUGE:600:U:100000000000 
+                        DS:DeniedPrefixes:GAUGE:600:U:100000000000 
+                        DS:AdvertisedPrefixes:GAUGE:600:U:100000000000 
+                        DS:SuppressedPrefixes:GAUGE:600:U:100000000000 
                         DS:WithdrawnPrefixes:GAUGE:600:U:100000000000 '.$config['rrd_rra'];
                     rrdtool_create($cbgp_rrd, $rrd_create);
                 }

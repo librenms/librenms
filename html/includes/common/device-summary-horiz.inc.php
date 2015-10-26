@@ -7,11 +7,12 @@ $temp_output = '
   <thead>
     <tr class="info">
       <th>&nbsp;</th>
-      <th>Total</th>
-      <th>Up</th>
-      <th>Down</th>
-      <th>Ignored</th>
-      <th>Disabled</th>
+      <th><span class="grey">Total</span></th>
+      <th><span class="green">Up</span></th>
+      <th><span class="red">Down</span></th>
+      <th><span class="grey">Ignored</span></th>
+      <th><span class="black">Disabled</span></th>
+      '.($config['summary_errors'] ? '<th>Errored</th>' : '').'
     </tr>
   </thead>
   <tbody>
@@ -22,6 +23,7 @@ $temp_output = '
       <td><a href="devices/state=down/format=list_detail/"><span class="red"> '.$devices['down'].'</span></a></td>
       <td><a href="devices/ignore=1/format=list_detail/"><span class="grey"> '.$devices['ignored'].'</span></a></td>
       <td><a href="devices/disabled=1/format=list_detail/"><span class="black"> '.$devices['disabled'].'</span></a></td>
+      '.($config['summary_errors'] ? '<td>-</td>' : '').'
     </tr>
     <tr class="active">
       <td><a href="ports/">Ports</a></td>
@@ -30,6 +32,7 @@ $temp_output = '
       <td><a href="ports/format=list_detail/state=down/"><span class="red"> '.$ports['down'].'</span></a></td>
       <td><a href="ports/format=list_detail/ignore=1/"><span class="grey"> '.$ports['ignored'].'</span></a></td>
       <td><a href="ports/format=list_detail/state=admindown/"><span class="black"> '.$ports['shutdown'].'</span></a></td>
+      '.($config['summary_errors'] ? '<td><a href="ports/format=list_detail/errors=1/"><span class="black"> '.$ports['errored'].'</span></a></td>' : '').'
     </tr>';
 if ($config['show_services']) {
 
@@ -41,6 +44,7 @@ $temp_output .= '
       <td><a href="services/state=down/view=details/"><span class="red"> '.$services['down'].'</span></a></td>
       <td><a href="services/ignore=1/view=details/"><span class="grey"> '.$services['ignored'].'</span></a></td>
       <td><a href="services/disabled=1/view=details/"><span class="black"> '.$services['disabled'].'</span></a></td>
+      '.($config['summary_errors'] ? '<td>-</td>' : '').'
     </tr>';
 }
 $temp_output .= '

@@ -2,7 +2,7 @@
 
 if (!$os) {
     // if (strstr($sysDescr, "Neyland 24T")) { $os = "powerconnect"; } /* Powerconnect 5324 */
-    if (stristr($sysDescr, 'PowerConnect ')) {
+    if (stristr($sysDescr, 'PowerConnect ') && !stristr($sysDescr, 'ArubaOS')) {
         $os = 'powerconnect';
     }
     else if (preg_match('/Dell.*Gigabit\ Ethernet/i', $sysDescr)) {

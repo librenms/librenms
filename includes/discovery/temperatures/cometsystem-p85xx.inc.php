@@ -14,7 +14,6 @@ if ($device['os'] == 'cometsystem-p85xx') {
 /x';
 
     $oids = snmp_walk($device, '.1.3.6.1.4.1.22626.1.5.2', '-OsqnU', '');
-    // if ($debug) { echo($oids."\n"); }
     if ($oids) {
         $out = array();
         foreach (explode("\n", $oids) as $line) {

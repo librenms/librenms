@@ -4,9 +4,7 @@ if ($device['os_group'] == 'unix') {
     // FIXME snmp_walk
     // ObserverNMS-style temperature
     $cmd = $config['snmpwalk'].' -M '.$config['mibdir'].' -M '.$config['mibdir'].' -m SNMPv2-SMI -Osqn -CI '.snmp_gen_auth($device).' '.$device['transport'].':'.$device['hostname'].':'.$device['port']." .1.3.6.1.4.1.2021.7891 | sed s/.1.3.6.1.4.1.2021.7891.// | grep '.1.1 ' | grep -v '.101.' | cut -d'.' -f 1";
-    if ($debug) {
-        echo "$cmd\n";
-    }
+    d_echo($cmd."\n");
 
     $oids = shell_exec($cmd);
     $oids = trim($oids);

@@ -74,7 +74,6 @@ class ircbot {
             $this->sql = $database_link;
         }
 
-        $this->j      = 2;
         $this->config = $config;
         $this->debug  = $this->config['irc_debug'];
         $this->config['irc_authtime'] = $this->config['irc_authtime'] ? $this->config['irc_authtime'] : 3;
@@ -150,6 +149,8 @@ class ircbot {
             $this->connect_alert();
         }
 
+        $this->j = 2;
+
         $this->connect();
         $this->log('Connected');
         if ($this->pass) {
@@ -159,7 +160,7 @@ class ircbot {
         $this->doAuth();
         while (true) {
             foreach ($this->socket as $n => $socket) {
-                if (!is_resource($socket)) {
+                if (!is_resource($socket) || feof($socket)) {
                     $this->log("Socket '$n' closed. Restarting.");
                     break 2;
                 }
@@ -227,9 +228,20 @@ class ircbot {
                 return false;
             }
 
+            switch ($alert['state']):
+                case 3: $severity_extended = '+'; break;
+                case 4: $severity_extended = '-'; break;
+                default: $severity_extended = '';
+            endswitch;
+
+            $severity = str_replace(array('warning', 'critical'), array(chr(3).'8Warning', chr(3).'4Critical'), $alert['severity']).$severity_extended.chr(3).' ';
+            if ($alert['state'] == 0 and $this->config['irc_alert_utf8']) {
+                $severity = str_replace(array('Warning', 'Critical'), array('W̶a̶r̶n̶i̶n̶g̶', 'C̶r̶i̶t̶i̶c̶a̶l̶'), $severity);
+            }
+
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    $this->irc_raw('PRIVMSG '.$chan.' :'.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults:' : ''));
+                    $this->irc_raw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults:' : ''));
                     foreach ($alert['faults'] as $k => $v) {
                         $this->irc_raw('PRIVMSG '.$chan.' :#'.$k.' '.$v['string']);
                     }
@@ -238,7 +250,7 @@ class ircbot {
             else {
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
-                        $this->irc_raw('PRIVMSG '.$nick.' :'.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults'.(sizeof($alert['faults']) > 3 ? ' (showing first 3 out of '.sizeof($alert['faults']).' )' : '' ).':' : ''));
+                        $this->irc_raw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults'.(sizeof($alert['faults']) > 3 ? ' (showing first 3 out of '.sizeof($alert['faults']).' )' : '' ).':' : ''));
                         foreach ($alert['faults'] as $k => $v) {
                             $this->irc_raw('PRIVMSG '.$nick.' :#'.$k.' '.$v['string']);
                             if ($k >= 3) {

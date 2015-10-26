@@ -6,9 +6,7 @@ if ($device['os'] == 'powerware') {
 
     // XUPS-MIB::xupsBatVoltage.0 = INTEGER: 51
     $oids = snmp_walk($device, 'xupsBatVoltage', '-Osqn', 'XUPS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     foreach (explode("\n", $oids) as $data) {
@@ -30,9 +28,7 @@ if ($device['os'] == 'powerware') {
 
     // XUPS-MIB::xupsInputNumPhases.0 = INTEGER: 1
     $oids = trim(snmp_walk($device, 'xupsInputNumPhases', '-OsqnU', 'XUPS-MIB'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -53,9 +49,7 @@ if ($device['os'] == 'powerware') {
 
     // XUPS-MIB::xupsOutputNumPhases.0 = INTEGER: 1
     $oids = trim(snmp_walk($device, 'xupsOutputNumPhases', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -76,9 +70,7 @@ if ($device['os'] == 'powerware') {
 
     // XUPS-MIB::xupsBypassNumPhases.0 = INTEGER: 1
     $oids = trim(snmp_walk($device, 'xupsBypassNumPhases', '-OsqnU'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {

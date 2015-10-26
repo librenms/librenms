@@ -14,11 +14,11 @@ list ($offset, $frequency, $jitter, $noise, $stability) = explode("\n", $ntpclie
 if (!is_file($rrd_filename)) {
     rrdtool_create(
         $rrd_filename,
-        '--step 300 \
-        DS:offset:GAUGE:600:-1000:1000 \
-        DS:frequency:GAUGE:600:-1000:1000 \
-        DS:jitter:GAUGE:600:-1000:1000 \
-        DS:noise:GAUGE:600:-1000:1000 \
+        '--step 300 
+        DS:offset:GAUGE:600:-1000:1000 
+        DS:frequency:GAUGE:600:-1000:1000 
+        DS:jitter:GAUGE:600:-1000:1000 
+        DS:noise:GAUGE:600:-1000:1000 
         DS:stability:GAUGE:600:-1000:1000 '.$config['rrd_rra']
     );
 }

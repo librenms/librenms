@@ -3,9 +3,7 @@
 // Supermicro Fanspeeds
 if ($device['os'] == 'linux') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

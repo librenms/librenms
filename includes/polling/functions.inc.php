@@ -23,9 +23,7 @@ function poll_sensor($device, $class, $unit) {
                 else {
                     // Try 5 times to get a valid temp reading
                     for ($i = 0; $i < 5; $i++) {
-                        if ($debug) {
-                            echo "Attempt $i ";
-                        }
+                        d_echo("Attempt $i ");
 
                         $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
                         preg_match('/[\d\.]+/', $sensor_value, $temp_response);
@@ -98,7 +96,7 @@ function poll_sensor($device, $class, $unit) {
         if (!is_file($rrd_file)) {
             rrdtool_create(
                 $rrd_file,
-                '--step 300 \
+                '--step 300 
                 DS:sensor:GAUGE:600:-20000:20000 '.$config['rrd_rra']
             );
         }
@@ -124,12 +122,7 @@ function poll_sensor($device, $class, $unit) {
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
 
-        if ($config['memcached']['enable'] === true) {
-            $memcache->set('sensor-'.$sensor['sensor_id'].'-value', $sensor_value);
-        }
-        else {
-            dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
-        }
+        dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
     }//end foreach
 
 }//end poll_sensor()
@@ -156,6 +149,7 @@ function poll_device($device, $options) {
     unset($poll_update_query);
     unset($poll_separator);
     $poll_update_array = array();
+    $update_array = array();
 
     $host_rrd = $config['rrd_dir'].'/'.$device['hostname'];
     if (!is_dir($host_rrd)) {
@@ -163,12 +157,14 @@ function poll_device($device, $options) {
         echo "Created directory : $host_rrd\n";
     }
 
-    $ping_response = isPingable($device['hostname'], $device['device_id']);
+    $address_family = snmpTransportToAddressFamily($device['transport']);
+
+    $ping_response = isPingable($device['hostname'], $address_family, $attribs);
 
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
-    if (is_array($device_perf)) {
+    if (can_ping_device($attribs) === true && is_array($device_perf)) {
         dbInsert($device_perf, 'device_perf');
     }
 
@@ -277,15 +273,22 @@ function poll_device($device, $options) {
         }
 
         // Ping response rrd
-        $ping_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/ping-perf.rrd';
-        if (!is_file($ping_rrd)) {
-            rrdtool_create($ping_rrd, 'DS:ping:GAUGE:600:0:65535 '.$config['rrd_rra']);
-        }
+        if (can_ping_device($attribs) === true) {
+            $ping_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/ping-perf.rrd';
+            if (!is_file($ping_rrd)) {
+                rrdtool_create($ping_rrd, 'DS:ping:GAUGE:600:0:65535 '.$config['rrd_rra']);
+            }
 
-        if (!empty($ping_time)) {
-            $fields = array(
-                'ping' => $ping_time,
-            );
+            if (!empty($ping_time)) {
+                $fields = array(
+                    'ping' => $ping_time,
+                );
+
+                rrdtool_update($ping_rrd, $fields);
+            }
+
+            $update_array['last_ping']             = array('NOW()');
+            $update_array['last_ping_timetaken']   = $ping_time;
 
             rrdtool_update($ping_rrd, $fields);
 
@@ -296,15 +299,12 @@ function poll_device($device, $options) {
 
         $update_array['last_polled']           = array('NOW()');
         $update_array['last_polled_timetaken'] = $device_time;
-        $update_array['last_ping']             = array('NOW()');
-        $update_array['last_ping_timetaken']   = $ping_time;
 
         // echo("$device_end - $device_start; $device_time $device_run");
         echo "Polled in $device_time seconds\n";
 
-        if ($debug) {
-            echo 'Updating '.$device['hostname'].' - '.print_r($update_array)." \n";
-        }
+        d_echo('Updating '.$device['hostname']."\n");
+        d_echo($update_array);
 
         $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
         if ($updated) {
@@ -380,6 +380,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     }
 
     $oid_count = 0;
+    $fields = array();
     foreach ($oidglist as $fulloid) {
         list($splitoid, $splitindex) = explode('.', $fulloid, 2);
         if (is_numeric($snmpdata[$splitindex][$splitoid])) {

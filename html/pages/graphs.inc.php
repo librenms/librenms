@@ -97,7 +97,7 @@ else {
         $link = generate_url($link_array);
 
         echo('<td align=center>');
-        echo('<span class="device-head">'.$text.'</span><br />');
+        echo('<b>'.$text.'</b><br>');
         echo('<a href="'.$link.'">');
         echo generate_lazy_graph_tag($graph_array);
         echo('</a>');
@@ -113,60 +113,10 @@ else {
 
     echo("<hr />");
 
-    // datetime range picker
-?>
-    <script type="text/javascript">
-    function submitCustomRange(frmdata) {
-        var reto = /to=([0-9])+/g;
-        var refrom = /from=([0-9])+/g;
-        var tsto = moment(frmdata.dtpickerto.value).unix();
-        var tsfrom = moment(frmdata.dtpickerfrom.value).unix();
-        frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
-        frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
-        frmdata.action = frmdata.selfaction.value;
-        return true;
-    }
-    </script>
-<?php
-    echo("
-        <form class='form-inline' id='customrange' action='test'>
-        <input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>");
-    echo('
-        <div class="form-group">
-        <label for="dtpickerfrom">From</label>
-        <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . $graph_array['from'] . '" data-date-format="YYYY-MM-DD HH:mm">
-        </div>
-        <div class="form-group">
-        <label for="dtpickerto">To</label>
-        <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . $graph_array['to'] . '" data-date-format="YYYY-MM-DD HH:mm">
-        </div>
-        <input type="submit" class="btn btn-default" id="submit" value="Update" onclick="javascript:submitCustomRange(this.form);">
-        </form>
-        <script type="text/javascript">
-    $(function () {
-        var strfrom = new Date($("#dtpickerfrom").val()*1000);
-        $("#dtpickerfrom").val(strfrom.getFullYear()+"-"+
-            ("0"+(strfrom.getMonth()+1)).slice(-2)+"-"+
-            ("0"+strfrom.getDate()).slice(-2)+" "+
-            ("0"+strfrom.getHours()).slice(-2)+":"+
-            ("0"+strfrom.getMinutes()).slice(-2)
-        );
-        var strto = new Date($("#dtpickerto").val()*1000);
-        $("#dtpickerto").val(strto.getFullYear()+"-"+
-            ("0"+(strto.getMonth()+1)).slice(-2)+"-"+
-            ("0"+strto.getDate()).slice(-2)+" "+
-            ("0"+strto.getHours()).slice(-2)+":"+
-            ("0"+strto.getMinutes()).slice(-2)
-        );
-        $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
-        $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
-});
-    </script>
+    include_once 'includes/print-date-selector.inc.php';
 
-  ');
-
-    echo("<hr />");
-
+    echo ('<div style="padding-top: 5px";></div>');
+    echo('<center>');
     if ($vars['legend'] == "no") {
         echo(generate_link("Show Legend",$vars, array('page' => "graphs", 'legend' => NULL)));
     }
@@ -186,24 +136,22 @@ else {
     }
     #  }
 
-    echo('<div style="float: right;">');
-
+    echo(' | ');
     if ($vars['showcommand'] == "yes") {
         echo(generate_link("Hide RRD Command",$vars, array('page' => "graphs", 'showcommand' => NULL)));
     }
     else {
         echo(generate_link("Show RRD Command",$vars, array('page' => "graphs", 'showcommand' => "yes")));
     }
-
-    echo('</div>');
+    echo('</center>');
 
     print_optionbar_end();
 
     echo generate_graph_js_state($graph_array);
 
-    echo('<div style="width: '.$graph_array['width'].'; margin: auto;">');
+    echo('<div style="width: '.$graph_array['width'].'; margin: auto;"><center>');
     echo generate_lazy_graph_tag($graph_array);
-    echo("</div>");
+    echo("</center></div>");
 
     if (isset($config['graph_descr'][$vars['type']])) {
 

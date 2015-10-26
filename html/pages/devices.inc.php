@@ -51,7 +51,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_'.$option) {
         echo("<span class='pagemenu-selected'>");
     }
-    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option)) . '">' . $text . '</a>');
+    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option, 'from' => $config['time']['day'], 'to' => $config['time']['now'])) . '">' . $text . '</a>');
     if ($vars['format'] == 'graph_'.$option) {
         echo("</span>");
     }
@@ -90,6 +90,34 @@ print_optionbar_end();
 list($format, $subformat) = explode("_", $vars['format'], 2);
 
 if($format == "graph") {
+
+    if (!is_numeric($vars['from'])) {
+        $graph_array['from'] = $config['time']['day'];
+    }
+    else {
+        $graph_array['from'] = $vars['from'];
+    }
+    if (!is_numeric($vars['to'])) {
+        $graph_array['to'] = $config['time']['now'];
+    }
+    else {
+        $graph_array['to'] = $vars['to'];
+    }
+
+    echo "
+    <div class='well well-sm'>
+        <div class='container-fluid'>
+            <div class='row'>
+                <div class='col-md-12'>
+    ";
+    include_once 'includes/print-date-selector.inc.php';
+    echo '
+                </div>
+            </div>
+        </div>
+    </div>
+    ';
+
     $sql_param = array();
 
     if(isset($vars['state'])) {
@@ -191,25 +219,26 @@ if($format == "graph") {
                     $width=315;
                 }
 
-                $graph_array                = array();
-                $graph_array['type']        = $graph_type;
-                $graph_array['device']      = $device['device_id'];
-                $graph_array['to']          = $config['time']['now'];
-                $graph_array['from']        = $config['time']['day'];
-                $graph_array['height']      = '110';
-                $graph_array['width']       = $width;
-                $graph_array['legend']      = 'no';
-                $graph_array['title']       = 'yes';
+                $graph_array_new                = array();
+                $graph_array_new['type']        = $graph_type;
+                $graph_array_new['device']      = $device['device_id'];
+                $graph_array_new['height']      = '110';
+                $graph_array_new['width']       = $width;
+                $graph_array_new['legend']      = 'no';
+                $graph_array_new['title']       = 'yes';
+                $graph_array_new['from']        = $graph_array['from'];
+                $graph_array_new['to']        = $graph_array['to'];
 
-                $graph_array_zoom           = $graph_array;
+                $graph_array_zoom           = $graph_array_new;
                 $graph_array_zoom['height'] = '150';
                 $graph_array_zoom['width']  = '400';
                 $graph_array_zoom['legend'] = 'yes';
 
                 $overlib_link = "device/device=".$device['device_id']."/";
-                echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+78)."px; max-width:".($width+78)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
-                echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), NULL);
-                echo "</div>\n\n";
+                echo "<div style='display: block; padding: 1px; margin: 2px; min-width: ".($width+90)."px; max-width:".($width+90)."px; min-height:170px; max-height:170px; text-align: center; float: left; background-color: #f5f5f5;'>";
+                echo '<div class="panel panel-default">';
+                echo overlib_link($overlib_link, generate_lazy_graph_tag($graph_array_new), generate_graph_tag($graph_array_zoom), NULL);
+                echo "</div></div>\n\n";
             }
         }
     }
@@ -220,11 +249,11 @@ else {
 
 <div class="panel panel-default panel-condensed">
     <div class="table-responsive">
-        <table id="devices" class="table table-condensed">
+        <table id="devices" class="table table-condensed table-hover">
             <thead>
                 <tr>
-                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status"></th>
-                    <th data-column-id="icon" data-sortable="false" data-searchable="false"></th>
+                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status">Status</th>
+                    <th data-column-id="icon" data-sortable="false" data-searchable="false">Vendor</th>
                     <th data-column-id="hostname" data-order="asc">Device</th>
                     <th data-column-id="ports" data-sortable="false" data-searchable="false"></th>
                     <th data-column-id="hardware">Platform</th>

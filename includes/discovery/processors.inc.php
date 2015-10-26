@@ -12,16 +12,12 @@ require 'processors-ucd-old.inc.php';
 // Remove processors which weren't redetected here
 $sql = "SELECT * FROM `processors` WHERE `device_id`  = '".$device['device_id']."'";
 
-if ($debug) {
-    print_r($valid['processor']);
-}
+d_echo($valid['processor']);
 
 foreach (dbFetchRows($sql) as $test_processor) {
     $processor_index = $test_processor['processor_index'];
     $processor_type  = $test_processor['processor_type'];
-    if ($debug) {
-        echo $processor_index.' -> '.$processor_type."\n";
-    }
+    d_echo($processor_index.' -> '.$processor_type."\n");
 
     if (!$valid['processor'][$processor_type][$processor_index]) {
         echo '-';

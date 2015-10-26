@@ -20,9 +20,7 @@ if (count($vp_rows)) {
 
         $oid = $vp['ifIndex'].'.'.$vp['vp_id'];
 
-        if ($debug) {
-            echo "$oid ";
-        }
+        d_echo("$oid ");
 
         $t_vp = $vp_cache[$oid];
 
@@ -33,22 +31,20 @@ if (count($vp_rows)) {
 
         $rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('vp-'.$vp['ifIndex'].'-'.$vp['vp_id'].'.rrd');
 
-        if ($debug) {
-            echo "$rrd ";
-        }
+        d_echo("$rrd ");
 
         if (!is_file($rrd)) {
             rrdtool_create(
                 $rrd,
-                '--step 300 \
-                DS:incells:DERIVE:600:0:125000000000 \
-                DS:outcells:DERIVE:600:0:125000000000 \
-                DS:inpackets:DERIVE:600:0:125000000000 \
-                DS:outpackets:DERIVE:600:0:125000000000 \
-                DS:inpacketoctets:DERIVE:600:0:125000000000 \
-                DS:outpacketoctets:DERIVE:600:0:125000000000 \
-                DS:inpacketerrors:DERIVE:600:0:125000000000 \
-                DS:outpacketerrors:DERIVE:600:0:125000000000 \
+                '--step 300 
+                DS:incells:DERIVE:600:0:125000000000 
+                DS:outcells:DERIVE:600:0:125000000000 
+                DS:inpackets:DERIVE:600:0:125000000000 
+                DS:outpackets:DERIVE:600:0:125000000000 
+                DS:inpacketoctets:DERIVE:600:0:125000000000 
+                DS:outpacketoctets:DERIVE:600:0:125000000000 
+                DS:inpacketerrors:DERIVE:600:0:125000000000 
+                DS:outpacketerrors:DERIVE:600:0:125000000000 
                 '.$config['rrd_rra']
             );
         }

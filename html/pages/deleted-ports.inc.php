@@ -22,7 +22,7 @@ else if ($vars['purge']) {
 echo '<table cellpadding=5 cellspacing=0 border=0 width=100%>';
 echo "<tr><td></td><td></td><td></td><td><a href='deleted-ports/purge=all/'><img src='images/16/cross.png' align=absmiddle></img> Purge All</a></td></tr>";
 
-foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id") as $interface) {
+foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id",array(),true) as $interface) {
     $interface = ifLabel($interface, $interface);
     if (port_permitted($interface['port_id'], $interface['device_id'])) {
         echo '<tr class=list>';

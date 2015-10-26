@@ -70,17 +70,12 @@ if ($_POST['editing']) {
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
 $descr  = $device['purpose'];
 
-echo '<div class="row">
-    <div class="col-sm-6">';
 if ($updated && $update_message) {
     print_message($update_message);
 }
 else if ($update_message) {
     print_error($update_message);
 }
-
-echo '    </div>
-    </div>';
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
@@ -128,7 +123,7 @@ echo "      </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='".$device['community']."' />
+    <input id='community' class='form-control' name='community' value='".$device['community']."'/>
     </div>
     </div>
     </div>
@@ -140,9 +135,9 @@ echo "      </select>
     <label for='authlevel' class='col-sm-2 control-label'>Auth Level</label>
     <div class='col-sm-4'>
     <select id='authlevel' name='authlevel' class='form-control'>
-    <option value='NoAuthNoPriv'>NoAuthNoPriv</option>
-    <option value='AuthNoPriv' ".($device['authlevel'] == 'authNoPriv' ? 'selected' : '').">AuthNoPriv</option>
-    <option value='AuthPriv' ".($device['authlevel'] == 'authPriv' ? 'selected' : '').">AuthPriv</option>
+    <option value='noAuthNoPriv'>noAuthNoPriv</option>
+    <option value='authNoPriv' ".($device['authlevel'] == 'authNoPriv' ? 'selected' : '').">authNoPriv</option>
+    <option value='authPriv' ".($device['authlevel'] == 'authPriv' ? 'selected' : '').">authPriv</option>
     </select>
     </div>
     </div>
@@ -211,7 +206,11 @@ if ($config['distributed_poller'] === true) {
 
 
 echo '
-    <button type="submit" name="Submit" class="btn btn-default">Save</button>
+    <div class="row">
+        <div class="col-md-1 col-md-offset-2">
+            <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+        </div>
+    </div>
     </form>
     ';
 

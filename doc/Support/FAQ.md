@@ -22,7 +22,7 @@
 
 This is currently well documented within the doc folder of the installation files.
 
-For Debian / Ubuntu installs follow [Debian / Ubuntu](http://docs.librenms.org/Installation/Installation-(Debian-Ubuntu)
+For Debian / Ubuntu installs follow [Debian / Ubuntu](http://docs.librenms.org/Installation/Installation-(Debian-Ubuntu))
 
 For RedHat / CentOS installs follow [RedHat / CentOS](http://docs.librenms.org/Installation/Installation-(RHEL-CentOS))
 
@@ -60,7 +60,7 @@ However we will always aim to help wherever possible so if you are running a dis
 
 #### <a name="faq5"> Do you have a demo available?</a>
 
-We do indeed, you can find access to the demo [here](demo.librenms.org)
+We do indeed, you can find access to the demo [here](https://demo.librenms.org)
 
 #### <a name="faq6"> Why do I get blank pages sometimes in the WebUI?</a>
 

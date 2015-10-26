@@ -83,10 +83,25 @@ if ($config['show_services']) {
 
 }
 
+if ($config['summary_errors']) {
+    $temp_output .= '
+    </tr>
+    <tr class="active">
+      <th><span class="black">Errored</span></th>
+      <td>-</td>
+      <td><a href="ports/format=list_detail/errors=1/"><span class="black"> '.$ports['errored'].'</span></a></td>
+';
+    if ($config['show_services']) {
+        $temp_output .= '
+      <td>-</td>
+';
+    }
+}
+
 $temp_output .= '
     </tr>
     <tr class="active">
-      <th>Total</th>
+      <th><span class="grey">Total</span></th>
       <td><a href="devices/"><span>'. $devices['count'] .'</span></a></td>
       <td><a href="ports/"><span>'. $ports['count'] .'</span></a></td>
 ';

@@ -2,9 +2,7 @@
 
 if ($device['os'] == 'apc') {
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.2.3.1.0', '-OsqnU', '');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     // Try High-Precision First
     if (!empty($oids)) {
@@ -27,9 +25,7 @@ if ($device['os'] == 'apc') {
     else {
         // Try to just get capacity
         $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.2.2.1.0', '-OsqnU', '');
-        if ($debug) {
-            echo $oids."\n";
-        }
+        d_echo($oids."\n");
 
         if (!empty($oids)) {
             echo 'APC UPS Battery Charge';

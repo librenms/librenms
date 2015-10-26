@@ -7,9 +7,7 @@ $pool_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -m CISCO-ENHANCED-MEM
 $pool_cmd .= " cempMemPoolUsed.$oid cempMemPoolFree.$oid cempMemPoolLargestFree.$oid";
 $pool_cmd .= " | cut -f 1 -d ' '";
 
-if ($debug) {
-    echo "SNMP [ $pool_cmd ]\n";
-}
+d_echo("SNMP [ $pool_cmd ]\n");
 
 $pool = shell_exec($pool_cmd);
 

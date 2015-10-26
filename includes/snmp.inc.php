@@ -1,11 +1,5 @@
 <?php
 
-// If anybody has again the idea to implement the PHP internal library calls,
-// be aware that it was tried and banned by lead dev Adam
-//
-// TRUE STORY. THAT SHIT IS WHACK. -- adama.
-
-
 function string_to_oid($string) {
     $oid = strlen($string);
     for ($i = 0; $i != strlen($string); $i++) {
@@ -133,7 +127,7 @@ function snmp_get($device, $oid, $options=null, $mib=null, $mibdir=null) {
     if (is_string($data) && (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data))) {
         return false;
     }
-    else if ($data) {
+    elseif ($data || $data === '0') {
         return $data;
     }
     else {
@@ -748,7 +742,7 @@ function snmp_gen_auth(&$device) {
     $cmd = '';
 
     if ($device['snmpver'] === 'v3') {
-        $cmd = ' -v3 -n "" -l '.$device['authlevel'];
+        $cmd = " -v3 -n '' -l '".$device['authlevel']."'";
 
         if ($device['authlevel'] === 'noAuthNoPriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
@@ -756,16 +750,16 @@ function snmp_gen_auth(&$device) {
             $cmd .= ' -u root';
         }
         else if ($device['authlevel'] === 'authNoPriv') {
-            $cmd .= ' -a '.$device['authalgo'];
-            $cmd .= ' -A "'.$device['authpass'].'"';
-            $cmd .= ' -u '.$device['authname'];
+            $cmd .= " -a '".$device['authalgo']."'";
+            $cmd .= " -A '".$device['authpass']."'";
+            $cmd .= " -u '".$device['authname']."'";
         }
         else if ($device['authlevel'] === 'authPriv') {
-            $cmd .= ' -a '.$device['authalgo'];
-            $cmd .= ' -A "'.$device['authpass'].'"';
-            $cmd .= ' -u '.$device['authname'];
-            $cmd .= ' -x '.$device['cryptoalgo'];
-            $cmd .= ' -X "'.$device['cryptopass'].'"';
+            $cmd .= " -a '".$device['authalgo']."'";
+            $cmd .= " -A '".$device['authpass']."'";
+            $cmd .= " -u '".$device['authname']."'";
+            $cmd .= " -x '".$device['cryptoalgo']."'";
+            $cmd .= " -X '".$device['cryptopass']."'";
         }
         else {
             if ($debug) {

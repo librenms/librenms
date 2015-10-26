@@ -3,9 +3,7 @@
 if ($device['os'] == 'ironware' || $device['os_group'] == 'ironware') {
     echo 'IronWare : ';
     $processors_array = snmpwalk_cache_triple_oid($device, 'snAgentCpuUtilEntry', $processors_array, 'FOUNDRY-SN-AGENT-MIB');
-    if ($debug) {
-        print_r($processors_array);
-    }
+    d_echo($processors_array);
 
     foreach ($processors_array as $index => $entry) {
         if (($entry['snAgentCpuUtilValue'] || $entry['snAgentCpuUtil100thPercent']) && $entry['snAgentCpuUtilInterval'] == '300') {

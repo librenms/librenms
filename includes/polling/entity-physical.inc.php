@@ -34,18 +34,16 @@ if ($device['os'] == 'ios') {
 
         $rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('c6kxbar-'.$index.'-'.$subindex.'.rrd');
 
-        if ($debug) {
-            echo "$rrd ";
-        }
+        d_echo("$rrd ");
 
         if (!is_file($rrd)) {
             rrdtool_create(
                 $rrd,
-                '--step 300 \
-     DS:inutil:GAUGE:600:0:100 \
-     DS:oututil:GAUGE:600:0:100 \
-     DS:outdropped:DERIVE:600:0:125000000000 \
-     DS:outerrors:DERIVE:600:0:125000000000 \
+                '--step 300 
+     DS:inutil:GAUGE:600:0:100 
+     DS:oututil:GAUGE:600:0:100 
+     DS:outdropped:DERIVE:600:0:125000000000 
+     DS:outerrors:DERIVE:600:0:125000000000 
      DS:inerrors:DERIVE:600:0:125000000000 '.$config['rrd_rra']
             );
         }

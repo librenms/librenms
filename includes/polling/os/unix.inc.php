@@ -78,7 +78,19 @@ elseif ($device['os'] == "freebsd") {
     else {
         $hardware = "i386";
     }
-    $features = "GENERIC";
+
+    # Distro "extend" support
+    $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
+    $features = str_replace("\"", "", $features);
+
+    if (!$features) { # No "extend" support, try "exec" support
+        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
+        $features = str_replace("\"", "", $features);
+    }
+
+    if (!$features) {
+        $features = 'GENERIC';
+    }
 }
 elseif ($device['os'] == "dragonfly") {
     list(,,$version,,,$features,,$hardware) = explode (" ", $poll_device['sysDescr']);
@@ -120,6 +132,9 @@ elseif ($device['os'] == "dsm") {
             $hardware = $value;
         }
     }
+
+    $version = snmp_get($device, "version.0", "-Osqnv", "SYNOLOGY-SYSTEM-MIB");
+
 }
 elseif ($device['os'] == "pfsense") {
     $output = preg_split("/ /", $poll_device['sysDescr']);
