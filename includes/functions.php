@@ -243,7 +243,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
 
     list($hostshort) = explode(".", $host);
     // Test Database Exists
-    if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0') {
+    if (host_exists($host) === false) {
         if ($config['addhost_alwayscheckip'] === TRUE) {
             $ip = gethostbyname($host);
         } else {
@@ -583,13 +583,17 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
 
     if ($device['os']) {
 
-        $device_id = dbInsert($device, 'devices');
-
-        if ($device_id) {
-            return($device_id);
+        if (host_exists($host) === false) {
+            $device_id = dbInsert($device, 'devices');
+            if ($device_id) {
+                return($device_id);
+            }
+            else {
+                return false;
+            }
         }
         else {
-            return FALSE;
+            return false;
         }
     }
     else {
@@ -1254,5 +1258,23 @@ function snmpTransportToAddressFamily($transport) {
     }
     else {
         return AF_INET;
+    }
+}
+
+/**
+ * Checks if the $hostname provided exists in the DB already
+ *
+ * @param string $hostname The hostname to check for
+ *
+ * @return bool true if hostname already exists
+ *              false if hostname doesn't exist
+**/
+function host_exists($hostname) {
+    $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($hostname));
+    if ($count > 0) {
+        return true;
+    }
+    else {
+        return false;
     }
 }
