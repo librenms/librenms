@@ -91,13 +91,13 @@ list($format, $subformat) = explode("_", $vars['format'], 2);
 
 if($format == "graph") {
 
-    if (!is_numeric($vars['from'])) {
+    if (empty($vars['from'])) {
         $graph_array['from'] = $config['time']['day'];
     }
     else {
         $graph_array['from'] = $vars['from'];
     }
-    if (!is_numeric($vars['to'])) {
+    if (empty($vars['to'])) {
         $graph_array['to'] = $config['time']['now'];
     }
     else {
