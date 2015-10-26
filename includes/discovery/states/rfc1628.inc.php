@@ -5,9 +5,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     echo 'RFC1628 ';
 
     $oids = snmp_walk($device, '1.3.6.1.2.1.33.1.2.2', '-Osqn', 'UPS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     foreach (explode("\n", $oids) as $data) {
@@ -27,9 +25,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     }
 
     $oids = snmp_walk($device, '1.3.6.1.2.1.33.1.2.3', '-Osqn', 'UPS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     foreach (explode("\n", $oids) as $data) {

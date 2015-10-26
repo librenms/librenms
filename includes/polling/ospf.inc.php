@@ -327,9 +327,7 @@ if (is_array($ospf_nbrs_db)) {
 
             foreach ($ospf_nbr_oids as $oid) {
                 // Loop the OIDs
-                if ($debug) {
-                    echo $ospf_nbr_db[$oid].'|'.$ospf_nbr_poll[$oid]."\n";
-                }
+                d_echo($ospf_nbr_db[$oid].'|'.$ospf_nbr_poll[$oid]."\n");
 
                 if ($ospf_nbr_db[$oid] != $ospf_nbr_poll[$oid]) {
                     // If data has changed, build a query
@@ -364,10 +362,10 @@ $filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('ospf-statis
 if (!is_file($filename)) {
     rrdtool_create(
         $filename,
-        '--step 300 \
-            DS:instances:GAUGE:600:0:1000000 \
-                DS:areas:GAUGE:600:0:1000000 \
-                    DS:ports:GAUGE:600:0:1000000 \
+        '--step 300 
+            DS:instances:GAUGE:600:0:1000000 
+                DS:areas:GAUGE:600:0:1000000 
+                    DS:ports:GAUGE:600:0:1000000 
                         DS:neighbours:GAUGE:600:0:1000000 '.$config['rrd_rra']
                     );
 }

@@ -51,11 +51,13 @@ $config['own_hostname'] = 'localhost';
 
 // Location of executables
 $config['rrdtool']                  = '/usr/bin/rrdtool';
+$config['rrdtool_version']          = 1.4; // Doesn't need to contain minor numbers.
 $config['fping']                    = '/usr/bin/fping';
+$config['fping6']                   = 'fping6';
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count']   = 3;
-$config['fping_options']['millisec'] = 20;
+$config['fping_options']['millisec'] = 200;
 $config['snmpwalk']                  = '/usr/bin/snmpwalk';
 $config['snmpget']                   = '/usr/bin/snmpget';
 $config['snmpbulkwalk']              = '/usr/bin/snmpbulkwalk';
@@ -73,6 +75,7 @@ $config['sfdp']           = '/usr/bin/sfdp';
 $config['memcached']['enable'] = false;
 $config['memcached']['host']   = 'localhost';
 $config['memcached']['port']   = 11211;
+$config['memcached']['ttl']    = 240;
 
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
@@ -110,7 +113,7 @@ $config['mono_font']    = 'DejaVuSansMono';
 $config['favicon']      = '';
 $config['page_refresh'] = '300';
 // Refresh the page every xx seconds, 0 to disable
-$config['front_page'] = 'pages/front/default.php';
+$config['front_page'] = 'pages/front/tiles.php';
 $config['front_page_settings']['top']['ports']   = 10;
 $config['front_page_settings']['top']['devices'] = 10;
 $config['front_page_down_box_limit']             = 10;
@@ -191,14 +194,9 @@ $config['snmp']['v3'][0]['cryptopass'] = '';
 // Privacy (Encryption) Passphrase
 $config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
 // AES | DES
-// RRD Format Settings
-// These should not normally be changed
-// Though one could conceivably increase or decrease the size of each RRA if one had performance problems
-// Or if one had a very fast I/O subsystem with no performance worries.
-$config['rrd_rra']  = ' RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ';
-$config['rrd_rra'] .= ' RRA:MAX:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797 ';
-$config['rrd_rra'] .= ' RRA:LAST:0.5:1:1440 ';
+
+// Devices must respond to icmp by default
+$config['icmp_check'] = true;
 
 // Autodiscovery Settings
 $config['autodiscovery']['xdp'] = true;
@@ -339,11 +337,14 @@ $config['network_map_vis_options'] = '{
       randomSeed:2
   },
   "edges": {
+    arrows: {
+          to:     {enabled: true, scaleFactor:0.5},
+    },
     "smooth": {
         enabled: false
     },
     font: {
-        size: 12,
+        size: 14,
         color: "red",
         face: "sans",
         background: "white",
@@ -353,19 +354,53 @@ $config['network_map_vis_options'] = '{
     }
   },
   "physics": {
-    "forceAtlas2Based": {
-      "gravitationalConstant": -800,
-      "centralGravity": 0.03,
-      "springLength": 50,
-      "springConstant": 0,
-      "damping": 1,
+     "barnesHut": {
+      "gravitationalConstant": -2000,
+      "centralGravity": 0.3,
+      "springLength": 200,
+      "springConstant": 0.04,
+      "damping": 0.09,
       "avoidOverlap": 1
     },
-    "maxVelocity": 50,
-    "minVelocity": 0.01,
-    "solver": "forceAtlas2Based",
-    "timestep": 0.30
-  }
+
+     "forceAtlas2Based": {
+      "gravitationalConstant": -50,
+      "centralGravity": 0.01,
+      "springLength": 200,
+      "springConstant": 0.08,
+      "damping": 0.4,
+      "avoidOverlap": 1
+    },
+    
+     "repulsion": {
+      "centralGravity": 0.2,
+      "springLength": 250,
+      "springConstant": 0.2,
+      "nodeDistance": 200,
+      "damping": 0.07
+    },
+
+     "hierarchicalRepulsion": {
+      "nodeDistance": 300,
+      "centralGravity": 0.2,
+      "springLength": 300,
+      "springConstant": 0.2,
+      "damping": 0.07
+    },
+    
+  "maxVelocity": 50,
+  "minVelocity": 0.4,
+  "solver": "hierarchicalRepulsion",
+  "stabilization": {
+    "enabled": true,
+    "iterations": 1000,
+    "updateInterval": 100,
+    "onlyDynamicEdges": false,
+    "fit": true
+  },
+
+  "timestep": 0.4,
+ }
 }';
 
 // Device page options
@@ -374,8 +409,6 @@ $config['show_overview_tab'] = true;
 // The device overview page options
 $config['overview_show_sysDescr'] = true;
 
-// Enable version checker & stats
-$config['version_check'] = 0;
 // Enable checking of version in discovery
 // Poller/Discovery Modules
 $config['enable_bgp'] = 1;
@@ -502,16 +535,17 @@ $config['device_traffic_descr'][] = '/null/';
 $config['device_traffic_descr'][] = '/dummy/';
 
 // IRC Bot configuration
-$config['irc_host']     = '';
-$config['irc_port']     = '';
-$config['irc_maxretry'] = 3;
-$config['irc_nick']     = $config['project_name'];
-$config['irc_chan'][]   = '##'.$config['project_id'];
-$config['irc_pass']     = '';
-$config['irc_external'] = '';
-$config['irc_authtime'] = 3;
-$config['irc_debug']    = false;
-$config['irc_alert']    = false;
+$config['irc_host']       = '';
+$config['irc_port']       = '';
+$config['irc_maxretry']   = 3;
+$config['irc_nick']       = $config['project_name'];
+$config['irc_chan'][]     = '##'.$config['project_id'];
+$config['irc_pass']       = '';
+$config['irc_external']   = '';
+$config['irc_authtime']   = 3;
+$config['irc_debug']      = false;
+$config['irc_alert']      = false;
+$config['irc_alert_utf8'] = false;
 
 // Authentication
 $config['allow_unauth_graphs'] = 0;
@@ -708,9 +742,10 @@ $config['eventlog_purge'] = 30;
 $config['authlog_purge'] = 30;
 // Number in days of how long to keep authlog entries for.
 $config['perf_times_purge'] = 30;
-// Number in days of how long to keep performace pooling stats  entries for.
-$config['device_perf_purge'] = 30;
+// Number in days of how long to keep performace polling stats  entries for.
+$config['device_perf_purge'] = 7;
 // Number in days of how long to keep device performance data for.
+
 // Date format for PHP date()s
 $config['dateformat']['long'] = 'r';
 // RFC2822 style
@@ -774,8 +809,8 @@ $config['geoloc']['latlng']                             = false; // True to enab
 $config['geoloc']['engine']                             = 'google';
 $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
-$config['leaflet']['default_lat']                       = '50.898482';
-$config['leaflet']['default_lng']                       = '-3.401402';
+$config['leaflet']['default_lat']                       = '51.4800';
+$config['leaflet']['default_lng']                       = '0';
 $config['leaflet']['default_zoom']                       = 2;
 
 // General GUI options
@@ -783,3 +818,9 @@ $config['gui']['network-map']['style']                  = 'new';//old is also va
 
 // Navbar variables
 $config['navbar']['manage_groups']['hide']              = 0;
+
+// Show errored ports in the summary table on the dashboard
+$config['summary_errors']                               = 0;
+
+// Default width of the availability map's tiles
+$config['availability-map-width']                       = 25;

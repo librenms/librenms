@@ -20,6 +20,19 @@ New icons mostly start as requests by the [Font Awesome community on GitHub](../
 
 
 
+## Suggesting icon keyword addition/removal
+
+Icon filters are maintained by the [Font Awesome community on GitHub](../../pulls?q=is%3Apr+label%3Adoc).
+
+If you feel that an icon
+
+* is missing keyword(s)
+* contains invalid keyword(s)
+
+please send a [PR](https://help.github.com/articles/using-pull-requests/) to the `master` branch.
+
+
+
 ## Reporting issues
 
 We only accept issues that are icon requests, bug reports, or feature requests. Bugs must be isolated and reproducible problems that we can fix within the Font Awesome core. Please read the following guidelines to ensure you are the paragon of bug reporting.
@@ -33,7 +46,7 @@ We only accept issues that are icon requests, bug reports, or feature requests. 
 
 ## Key branches
 
-- `master` is the latest, deployed version (not to be used for pull requests)
+- `master` is the latest, deployed version (use for pull request if they only affect the docs)
 - `gh-pages` is the hosted docs (not to be used for pull requests)
 - `*-wip` branches are the official work in progress branches for the next releases. All pull requests should be submitted against the appropriate branch
 

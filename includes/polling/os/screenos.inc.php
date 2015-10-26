@@ -12,9 +12,9 @@ list ($sessalloc, $sessmax, $sessfailed) = explode("\n", $sess_data);
 if (!is_file($sessrrd)) {
     rrdtool_create(
         $sessrrd,
-        ' --step 300 \
-        DS:allocate:GAUGE:600:0:3000000 \
-        DS:max:GAUGE:600:0:3000000 \
+        ' --step 300 
+        DS:allocate:GAUGE:600:0:3000000 
+        DS:max:GAUGE:600:0:3000000 
         DS:failed:GAUGE:600:0:1000 '.$config['rrd_rra']
     );
 }

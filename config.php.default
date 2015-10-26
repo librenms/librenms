@@ -3,16 +3,20 @@
 ## Have a look in includes/defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
 
 ### Database config
-$config['db_host'] = "localhost";
-$config['db_user'] = "USERNAME";
-$config['db_pass'] = "PASSWORD";
-$config['db_name'] = "librenms";
+$config['db_host'] = 'localhost';
+$config['db_user'] = 'USERNAME';
+$config['db_pass'] = 'PASSWORD';
+$config['db_name'] = 'librenms';
 $config['db']['extension'] = 'mysqli';// mysql or mysqli
 
 ### Memcached config - We use this to store realtime usage
 $config['memcached']['enable']  = FALSE;
-$config['memcached']['host']    = "localhost";
+$config['memcached']['host']    = 'localhost';
 $config['memcached']['port']    = 11211;
+
+// This is the user LibreNMS will run as
+//Please ensure this user is created and has the correct permissions to your install
+$config['user'] = 'librenms';
 
 ### Locations - it is recommended to keep the default
 #$config['install_dir']  = "/opt/librenms";

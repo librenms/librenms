@@ -16,7 +16,7 @@ foreach (dbFetchRows('SELECT * FROM processors WHERE device_id = ?', array($devi
     if (!is_file($procrrd)) {
         rrdtool_create(
             $procrrd,
-            '--step 300 \
+            '--step 300 
             DS:usage:GAUGE:600:-273:1000 '.$config['rrd_rra']
         );
     }

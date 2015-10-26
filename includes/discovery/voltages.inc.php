@@ -6,9 +6,7 @@ echo 'Voltages: ';
 $include_dir = 'includes/discovery/voltages';
 require 'includes/include-dir.inc.php';
 
-if ($debug) {
-    print_r($valid['sensor']['voltage']);
-}
+d_echo($valid['sensor']['voltage']);
 
 check_valid_sensors($device, 'voltage', $valid['sensor']);
 

@@ -1,0 +1,105 @@
+-- *****************************************************************
+-- SONICWALL-SMI.MIB
+--
+-- February 2001, Susan Yan
+-- Apr  2003,     Change Postal, Susan Yan
+-- Nov  2007,     Added sonicwallCommon, Mike Uy
+-- Sep 19, 2008   Added sonicwallEmailSec, Mike Uy
+-- Jan 28, 2009   Added sonicwallDataCenter, Mike Uy
+-- Apr 07, 2009   Inserted sonicwallGMS Group, Mike Uy
+--                at index 3, bumped up sonicwallEmailSec to 4
+--                and sonicwallDataCenter to 5
+-- 04-17-09       Updated E-mail CONTACT-INFO, Rosalea Real
+-- 09-17-09       Added sonicwallSSLVPN and sonicwallCDP 
+--                groups; cosmetic/text changes, Mike Uy
+-- 11-11-09       Renamed this file from
+--                SW-SMI.MIB to
+--                SONICWALL-SMI.MIB, Mike Uy
+-- 07-23-12       Updated company copyright and 
+--                organization, Mike Uy
+--
+-- Copyright (c) 2012 DELL Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+SONICWALL-SMI
+ 
+--FORCE-INCLUDE <mib.h>
+--FORCE-INCLUDE <snmpdefs.h>
+--FORCE-INCLUDE "swPrivMibhand.h"
+
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        enterprises
+                FROM SNMPv2-SMI;
+
+sonicwall MODULE-IDENTITY
+        LAST-UPDATED "201207230000Z"
+        ORGANIZATION "DELL SonicWALL"
+        CONTACT-INFO
+                "       DELL SonicWall
+
+                Postal: 2001 Logic Drive
+                        San Jose, CA 95124-3452
+                        USA
+
+                   Tel: +1 408 745 9600
+                   Fax: +1 408 745 9300
+
+                E-mail: products@sonicwall.com"
+        DESCRIPTION
+                "The MIB Module for SonicWALL enterprise."
+        REVISION      "200304220000Z"
+        DESCRIPTION
+                "Initial version."
+        ::= { enterprises 8741 }
+
+
+sonicwallFw OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "sonicwallFw is the subtree for the SonicWALL firewall products."
+        ::= { sonicwall 1 }
+
+sonicwallCommon OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "Subtree for MIBs common for all SonicWALL products"
+        ::= { sonicwall 2 }
+
+sonicwallGMS OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "sonicwallGMS is the subtree for the SonicWALL Global Management System products."
+        ::= { sonicwall 3 }
+
+sonicwallEmailSec OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "sonicwallEmailSec is the subtree for SonicWALL email security products."
+        ::= { sonicwall 4 }
+
+sonicwallDataCenter OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "sonicwallDataCenter is the subtree for SonicWALL datacenter operations."
+        ::= { sonicwall 5 }
+
+sonicwallSSLVPN OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "sonicwallSSLVPN is the subtree for SonicWALL SSL VPN products."
+        ::= { sonicwall 6 }
+
+sonicwallCDP OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "sonicwallCDP is the subtree for SonicWALL CDP products."
+        ::= { sonicwall 7 }
+
+END

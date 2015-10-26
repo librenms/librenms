@@ -84,6 +84,8 @@ $app->group(
                         // api/v0/alerts
                         $app->put('/:id', 'authToken', 'ack_alert')->name('ack_alert');
                         // api/v0/alerts/$id (PUT)
+                        $app->put('/unmute/:id', 'authToken', 'unmute_alert')->name('unmute_alert');
+                        // api/v0/alerts/unmute/$id (PUT)
                     }
                 );
                 $app->get('/alerts', 'authToken', 'list_alerts')->name('list_alerts');

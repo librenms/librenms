@@ -30,9 +30,7 @@ if ($device['os'] == 'apc') {
         }
 
         if (!empty($oids)) {
-            if ($debug) {
-                print_r($oids);
-            }
+            d_echo($oids);
 
             $oids = trim($oids);
             if ($oids) {

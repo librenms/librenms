@@ -3,9 +3,7 @@
 // LMSensors Fanspeeds
 if ($device['os'] == 'linux') {
     $oids = snmp_walk($device, 'lmFanSensorsDevice', '-OsqnU', 'LM-SENSORS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

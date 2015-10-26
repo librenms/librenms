@@ -24,10 +24,10 @@ Log files created by LibreNMS will be stored within this directory.
 These are the configuration options you will need to use to specify to get started.
 
 ```php
-$config['db_host'] = "127.0.0.1";
-$config['db_user'] = "";
-$config['db_pass'] = "";
-$config['db_name'] = "";
+$config['db_host'] = '127.0.0.1';
+$config['db_user'] = '';
+$config['db_pass'] = '';
+$config['db_name'] = '';
 ```
 
 You can also select between the mysql and mysqli php extensions:
@@ -36,7 +36,7 @@ You can also select between the mysql and mysqli php extensions:
 $config['db']['extension'] = 'mysqli';
 ```
 
-#### Progams
+#### Programs
 
 A lot of these are self explanatory so no further information may be provided.
 
@@ -46,13 +46,29 @@ $config['rrdtool'] = "/usr/bin/rrdtool";
 
 ```php
 $config['fping']            = "/usr/bin/fping";
-$config['fping6']           = "/usr/bin/fping6";
+$config['fping6']           = "fping6";
 $config['fping_options']['retries'] = 3;
 $config['fping_options']['timeout'] = 500;
 $config['fping_options']['count'] = 3;
-$config['fping_options']['millisec'] = 5;
+$config['fping_options']['millisec'] = 200;
 ```
-fping configuration options, this includes setting the timeout and retry options.
+`fping` configuration options:
+
+* `retries` (`fping` parameter `-r`): Number of times an attempt at pinging a target will be made, not including the first try.
+* `timeout` (`fping` parameter `-t`): Amount of time that fping waits for a response to its first request (in milliseconds).
+* `count` (`fping` parameter `-c`): Number of request packets to send to each target.
+* `millisec` (`fping` parameter `-p`): Time in milliseconds that fping waits between successive packets to an individual target.
+
+You can disable the fping / icmp check that is done for a device to be determined to be up on a global or per device basis.
+**We don't advice disabling the fping / icmp check unless you know the impact, at worst if you have a large number of devices down 
+then it's possible that the poller would no longer complete in 5 minutes due to waiting for snmp to timeout.**
+
+Globally disable fping / icmp check:
+```php
+$config['icmp_check'] = false;
+```
+
+If you would like to do this on a per device basis then you can do so under Device -> Edit -> Misc -> Disable ICMP Test? On
 
 ```php
 $config['snmpwalk']         = "/usr/bin/snmpwalk";
@@ -143,6 +159,7 @@ $config['show_locations']          = 1;  # Enable Locations on menu
 $config['show_locations_dropdown'] = 1;  # Enable Locations dropdown on menu
 $config['show_services']           = 0;  # Enable Services on menu
 $config['int_customers']           = 1;  # Enable Customer Port Parsing
+$config['summary_errors']          = 0;  # Show Errored ports in summary boxes on the dashboard
 $config['customers_descr']         = 'cust'; // The description to look for in ifDescr. Can be an array as well array('cust','cid');
 $config['transit_descr']           = ""; // Add custom transit descriptions (can be an array)
 $config['peering_descr']           = ""; // Add custom peering descriptions (can be an array)

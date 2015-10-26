@@ -24,9 +24,26 @@
  * @subpackage Page
  */
 
+if (empty($vars['sub'])) {
+    $page_name = 'Global';
+}
+else {
+    $page_name = ucfirst($vars['sub']);
+}
+
+$pagetitle[] = $page_name . ' Settings';
+$config['memcached']['enable'] = false;
 ?>
 
 <div class="container-fluid">
+    <h2>
+<?php
+
+echo $pagetitle[0];
+
+?>
+    </h2>
+    <hr>
     <div class="row">
         <div class="col-md-12">
             <span id="message"></span>
@@ -56,7 +73,7 @@ else {
     foreach (dbFetchRows("SELECT `config_group` FROM `config` GROUP BY `config_group`") as $sub_page) {
         $sub_page = $sub_page['config_group'];
 ?>
-        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
             <a class="btn btn-primary" href="<?php echo(generate_url(array('page'=>'settings','sub'=>$sub_page))); ?>"><?php echo ucfirst($sub_page); ?> Settings</a>
         </div>
 <?php

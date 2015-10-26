@@ -96,14 +96,12 @@ function logfile($string) {
 }
 
 function getHostOS($device){
-    global $config, $debug;
+    global $config;
 
     $sysDescr    = snmp_get ($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
     $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
-    if ($debug) {
-        echo("| $sysDescr | $sysObjectId | ");
-    }
+    d_echo("| $sysDescr | $sysObjectId | ");
 
     $path = $config['install_dir'] . "/includes/discovery/os";
     $dir_handle = @opendir($path) or die("Unable to open $path");
@@ -152,31 +150,7 @@ function interface_errors($rrd_file, $period = '-1d') {
 function getImage($device) {
     global $config;
 
-    $device['os'] = strtolower($device['os']);
-
-    if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
-        $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['icon'] . '.png" />';
-    }
-    elseif (isset($config['os'][$device['os']]['icon']) && $config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
-        $image = '<img src="' . $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png" />';
-    }
-    else {
-        if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
-            $image = '<img src="' . $config['base_url'] . '/images/os/' . $device['os'] . '.png" />';
-        }
-        if ($device['os'] == "linux") {
-            $features = strtolower(trim($device['features']));
-            list($distro) = explode(" ", $features);
-            if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
-                $image = '<img src="' . $config['base_url'] . '/images/os/' . $distro . '.png" />';
-            }
-        }
-        if (empty($image)) {
-            $image = '<img src="' . $config['base_url'] . '/images/os/generic.png" />';
-        }
-    }
-
-    return $image;
+    return '<img src="' . getImageSrc($device) . '" />';
 }
 
 function getImageSrc($device) {
@@ -184,10 +158,10 @@ function getImageSrc($device) {
 
     $device['os'] = strtolower($device['os']);
 
-    if ($device['icon'] && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+    if (!empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
         $image = $config['base_url'] . '/images/os/' . $device['icon'] . '.png';
     }
-    elseif ($config['os'][$device['os']]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
+    elseif (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
         $image = $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png';
     }
     else {
@@ -270,7 +244,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
 
     list($hostshort) = explode(".", $host);
     // Test Database Exists
-    if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0') {
+    if (host_exists($host) === false) {
         if ($config['addhost_alwayscheckip'] === TRUE) {
             $ip = gethostbyname($host);
         } else {
@@ -278,7 +252,8 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
         }
         if (ip_exists($ip) === false) {
             // Test reachability
-            if ($force_add == 1 || isPingable($host)) {
+            $address_family = snmpTransportToAddressFamily($transport);
+            if ($force_add == 1 || isPingable($host, $address_family)) {
                 if (empty($snmpver)) {
                     // Try SNMPv2c
                     $snmpver = 'v2c';
@@ -504,34 +479,49 @@ function isSNMPable($device) {
     }
 }
 
-function isPingable($hostname,$device_id = FALSE) {
+/**
+ * Check if the given host responds to ICMP echo requests ("pings").
+ *
+ * @param string $hostname The hostname or IP address to send ping requests to.
+ * @param int $address_family The address family (AF_INET for IPv4 or AF_INET6 for IPv6) to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to AF_INET6 when pinging an IPv6 address or an IPv6-only host.
+ * @param array $attribs The device attributes
+ *
+ * @return bool TRUE if the host responded to at least one ping request, FALSE otherwise.
+ */
+function isPingable($hostname, $address_family = AF_INET, $attribs = array()) {
     global $config;
 
-    $fping_params = '';
-    if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
-        $fping_params .= ' -r ' . $config['fping_options']['retries'];
-    }
-    if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
-        $fping_params .= ' -t ' . $config['fping_options']['timeout'];
-    }
-    if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
-        $fping_params .= ' -c ' . $config['fping_options']['count'];
-    }
-    if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
-        $fping_params .= ' -p ' . $config['fping_options']['millisec'];
-    }
     $response = array();
-    $status = fping($hostname,$fping_params);
-    if ($status['loss'] == 100) {
-        $response['result'] = FALSE;
+    if (can_ping_device($attribs) === true) {
+        $fping_params = '';
+        if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
+            $fping_params .= ' -r ' . $config['fping_options']['retries'];
+        }
+        if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
+            $fping_params .= ' -t ' . $config['fping_options']['timeout'];
+        }
+        if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+            $fping_params .= ' -c ' . $config['fping_options']['count'];
+        }
+        if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+            $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+        }
+        $status = fping($hostname,$fping_params,$address_family);
+        if ($status['loss'] == 100) {
+            $response['result'] = FALSE;
+        }
+        else {
+            $response['result'] = TRUE;
+        }
+        if (is_numeric($status['avg'])) {
+            $response['last_ping_timetaken'] = $status['avg'];
+        }
+        $response['db'] = $status;
     }
     else {
-        $response['result'] = TRUE;
+        $response['result'] = true;
+        $response['last_ping_timetaken'] = 0;
     }
-    if (is_numeric($status['avg'])) {
-        $response['last_ping_timetaken'] = $status['avg'];
-    }
-    $response['db'] = $status;
     return($response);
 }
 
@@ -594,13 +584,17 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
 
     if ($device['os']) {
 
-        $device_id = dbInsert($device, 'devices');
-
-        if ($device_id) {
-            return($device_id);
+        if (host_exists($host) === false) {
+            $device_id = dbInsert($device, 'devices');
+            if ($device_id) {
+                return($device_id);
+            }
+            else {
+                return false;
+            }
         }
         else {
-            return FALSE;
+            return false;
         }
     }
     else {
@@ -699,8 +693,6 @@ function get_astext($asn) {
 
 # Use this function to write to the eventlog table
 function log_event($text, $device = NULL, $type = NULL, $reference = NULL) {
-    global $debug;
-
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
     }
@@ -831,7 +823,7 @@ function isHexString($str) {
 
 # Include all .inc.php files in $dir
 function include_dir($dir, $regex = "") {
-    global $device, $config, $debug, $valid;
+    global $device, $config, $valid;
 
     if ($regex == "") {
         $regex = "/\.inc\.php$/";
@@ -840,9 +832,7 @@ function include_dir($dir, $regex = "") {
     if ($handle = opendir($config['install_dir'] . '/' . $dir)) {
         while (false !== ($file = readdir($handle))) {
             if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file)) {
-                if ($debug) {
-                    echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n");
-                }
+                d_echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n");
 
                 include($config['install_dir'] . '/' . $dir . '/' . $file);
             }
@@ -854,7 +844,7 @@ function include_dir($dir, $regex = "") {
 
 function is_port_valid($port, $device) {
 
-    global $config, $debug;
+    global $config;
 
     if (strstr($port['ifDescr'], "irtual")) {
         $valid = 0;
@@ -869,9 +859,7 @@ function is_port_valid($port, $device) {
         foreach ($fringe as $bi) {
             if (strstr($if, $bi)) {
                 $valid = 0;
-                if ($debug) {
-                    echo("ignored : $bi : $if");
-                }
+                d_echo("ignored : $bi : $if");
             }
         }
         if (is_array($config['bad_if_regexp'])) {
@@ -882,9 +870,7 @@ function is_port_valid($port, $device) {
             foreach ($fringe as $bi) {
                 if (preg_match($bi ."i", $if)) {
                     $valid = 0;
-                    if ($debug) {
-                        echo("ignored : $bi : ".$if);
-                    }
+                    d_echo("ignored : $bi : ".$if);
                 }
             }
         }
@@ -896,9 +882,7 @@ function is_port_valid($port, $device) {
             foreach ($fringe as $bi) {
                 if (strstr($port['ifType'], $bi)) {
                     $valid = 0;
-                    if ($debug) {
-                        echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
-                    }
+                    d_echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
                 }
             }
         }
@@ -918,7 +902,7 @@ function is_port_valid($port, $device) {
 
 function scan_new_plugins() {
 
-    global $config, $debug;
+    global $config;
 
     $installed = 0; // Track how many plugins we install.
 
@@ -1199,7 +1183,7 @@ function ip_exists($ip) {
     return true;
 }
 
-function fping($host,$params) {
+function fping($host,$params,$address_family = AF_INET) {
 
     global $config;
 
@@ -1209,7 +1193,13 @@ function fping($host,$params) {
         2 => array("pipe", "w")
     );
 
-    $process = proc_open($config['fping'] . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
+    // Default to AF_INET (IPv4)
+    $fping_path = $config['fping'];
+    if ($address_family == AF_INET6) {
+        $fping_path = $config['fping6'];
+    }
+
+    $process = proc_open($fping_path . ' -e -q ' .$params . ' ' .$host.' 2>&1', $descriptorspec, $pipes);
     $read = '';
 
     if (is_resource($process)) {
@@ -1246,3 +1236,52 @@ function force_influx_data($type,$data) {
         return(sprintf("%.1f",$data));
     }
 }// end force_influx_data
+
+function get_last_commit() {
+    return `git log -n 1|head -n1`;
+}//end get_last_commit
+
+/**
+ * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
+ * transport specifier (like "udp", "udp6", etc.).
+ *
+ * @param string $transport The SNMP transport specifier, for example "udp",
+ *                          "udp6", "tcp", or "tcp6". See `man snmpcmd`,
+ *                          section "Agent Specification" for a full list.
+ *
+ * @return int The address family associated with the given transport
+ *             specifier: AF_INET for IPv4 (or local connections not associated
+ *             with an IP stack), AF_INET6 for IPv6.
+ */
+function snmpTransportToAddressFamily($transport) {
+    if (!isset($transport)) {
+        $transport = 'udp';
+    }
+
+    $ipv6_snmp_transport_specifiers = array('udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6');
+
+    if (in_array($transport, $ipv6_snmp_transport_specifiers)) {
+        return AF_INET6;
+    }
+    else {
+        return AF_INET;
+    }
+}
+
+/**
+ * Checks if the $hostname provided exists in the DB already
+ *
+ * @param string $hostname The hostname to check for
+ *
+ * @return bool true if hostname already exists
+ *              false if hostname doesn't exist
+**/
+function host_exists($hostname) {
+    $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($hostname));
+    if ($count > 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}

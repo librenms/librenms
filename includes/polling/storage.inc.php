@@ -19,9 +19,7 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
         // FIXME Generic poller goes here if we ever have a discovery module which uses it.
     }
 
-    if ($debug) {
-        print_r($storage);
-    }
+    d_echo($storage);
 
     if ($storage['size']) {
         $percent = round(($storage['used'] / $storage['size'] * 100));

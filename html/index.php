@@ -66,6 +66,8 @@ require 'includes/functions.inc.php';
 require 'includes/vars.inc.php';
 require 'includes/plugins.inc.php';
 
+$config['memcached']['ttl'] = $config['time']['now']+300;
+
 Plugins::start();
 
 $runtime_start = utime();
@@ -121,6 +123,7 @@ if (empty($config['favicon'])) {
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/favicon-72.png">
   <link rel="apple-touch-icon-precomposed" href="images/favicon-57.png">
   <link rel="icon" href="images/favicon-32.png" sizes="32x32">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="msapplication-TileImage" content="images/favicon-144.png">
 <?php
 }
@@ -162,6 +165,7 @@ else {
   <script src="js/pace.min.js"></script>
   <script src="js/jquery.lazyload.min.js"></script>
   <script src="js/lazyload.js"></script>
+  <script src="js/librenms.js"></script>
   <script type="text/javascript">
 
     <!-- Begin

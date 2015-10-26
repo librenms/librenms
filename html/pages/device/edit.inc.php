@@ -1,6 +1,7 @@
 <?php
 
 $no_refresh = TRUE;
+$config['memcached']['enable'] = false;
 
 $link_array = array('page'    => 'device',
     'device'  => $device['device_id'],
@@ -35,6 +36,7 @@ else {
   }
 
   $panes['storage']  = 'Storage';
+  $panes['misc']     = 'Misc';
 
   print_optionbar_start();
 
