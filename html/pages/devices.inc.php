@@ -51,7 +51,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_'.$option) {
         echo("<span class='pagemenu-selected'>");
     }
-    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option, 'from' => $config['time']['day'], 'to' => $config['time']['now'])) . '">' . $text . '</a>');
+    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option, 'from' => '-24h', 'to' => 'now')) . '">' . $text . '</a>');
     if ($vars['format'] == 'graph_'.$option) {
         echo("</span>");
     }
@@ -91,13 +91,13 @@ list($format, $subformat) = explode("_", $vars['format'], 2);
 
 if($format == "graph") {
 
-    if (!is_numeric($vars['from'])) {
+    if (empty($vars['from'])) {
         $graph_array['from'] = $config['time']['day'];
     }
     else {
         $graph_array['from'] = $vars['from'];
     }
-    if (!is_numeric($vars['to'])) {
+    if (empty($vars['to'])) {
         $graph_array['to'] = $config['time']['now'];
     }
     else {

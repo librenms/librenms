@@ -99,8 +99,8 @@ $(document).ready(function() {
 });
 
 function submitCustomRange(frmdata) {
-    var reto = /to=([0-9])+/g;
-    var refrom = /from=([0-9])+/g;
+    var reto = /to=([0-9a-zA-Z\-])+/g;
+    var refrom = /from=([0-9a-zA-Z\-])+/g;
     var tsto = moment(frmdata.dtpickerto.value).unix();
     var tsfrom = moment(frmdata.dtpickerfrom.value).unix();
     frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
