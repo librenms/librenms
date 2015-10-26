@@ -55,9 +55,9 @@ if ($i) {
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
-    $rrd_options .= ' VDEF:95thin=inbits,95,PERCENT';
-    $rrd_options .= ' VDEF:95thout=outbits,95,PERCENT';
-    $rrd_options .= ' VDEF:d95thout=doutbits,5,PERCENT';
+    $rrd_options .= ' VDEF:95thin=inbits,95,PERCENTNAN';
+    $rrd_options .= ' VDEF:95thout=outbits,95,PERCENTNAN';
+    $rrd_options .= ' VDEF:d95thout=doutbits,5,PERCENTNAN';
 
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' CDEF:'.$in.'octetsX='.$in_thingX.$pluses;
@@ -66,9 +66,9 @@ if ($i) {
         $rrd_options .= ' CDEF:inbitsX=inoctetsX,8,*';
         $rrd_options .= ' CDEF:outbitsX=outoctetsX,8,*';
         $rrd_options .= ' CDEF:doutbitsX=doutoctetsX,8,*';
-        $rrd_options .= ' VDEF:95thinX=inbitsX,95,PERCENT';
-        $rrd_options .= ' VDEF:95thoutX=outbitsX,95,PERCENT';
-        $rrd_options .= ' VDEF:d95thoutX=doutbitsX,5,PERCENT';
+        $rrd_options .= ' VDEF:95thinX=inbitsX,95,PERCENTNAN';
+        $rrd_options .= ' VDEF:95thoutX=outbitsX,95,PERCENTNAN';
+        $rrd_options .= ' VDEF:d95thoutX=doutbitsX,5,PERCENTNAN';
     }
 
     if ($legend == 'no' || $legend == '1') {
