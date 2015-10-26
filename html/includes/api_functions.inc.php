@@ -925,7 +925,7 @@ function list_bills() {
         $param = array($bill_ref);
     }
     elseif (is_numeric($bill_id)) {
-        $sql   = '`bill_id` = ?';
+        $sql   = '`bills`.`bill_id` = ?';
         $param = array($bill_id);
     }
     else {
