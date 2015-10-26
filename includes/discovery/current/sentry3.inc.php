@@ -12,9 +12,7 @@ if ($device['os'] == 'sentry3') {
         //
         // Check for Infeeds
         $infeed_oids = snmp_walk($device, "infeedID.$towers.1", '-Osqn', 'Sentry3-MIB');
-        if ($debug) {
-            echo $infeed_oids."\n";
-        }
+        d_echo($infeed_oids."\n");
 
         $infeed_oids = trim($infeed_oids);
 

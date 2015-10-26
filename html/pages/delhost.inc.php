@@ -1,5 +1,3 @@
-<h1>Delete Host</h1>
-
 <?php
 
 if ($_SESSION['userlevel'] < 10) {
@@ -27,16 +25,18 @@ else {
             print_error("Are you sure you want to delete device " . $device['hostname'] . "?");
 ?>
 <br />
-<form name="form1" method="post" action="" class="form-horizontal" role="form">
-  <div class="form-group">
-    <div class="col-sm-4">
-    <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
-    <input type="hidden" name="confirm" value="1" />
-    <!--<input type="hidden" name="remove_rrd" value="<?php echo $_POST['remove_rrd']; ?>">-->
-      <button type="submit" class="btn btn-default">Confirm host deletion</button>
+<center>
+  <font color="red"></font><i class="fa fa-exclamation-triangle fa-3x"></i></font>
+  <br>
+  <form name="form1" method="post" action="" class="form-horizontal" role="form">
+    <div class="form-group">
+      <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
+      <input type="hidden" name="confirm" value="1" />
+      <!--<input type="hidden" name="remove_rrd" value="<?php echo $_POST['remove_rrd']; ?>">-->
+      <button type="submit" class="btn btn-danger">Confirm host deletion</button>
     </div>
-  </div>
-</form>
+  </form>
+</center>
 <?php
         }
         echo('
@@ -46,37 +46,39 @@ else {
     else {
 ?>
 
-<form name="form1" method="post" action="" class="form-horizontal" role="form">
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-7">
-<?php print_error("Warning, this will remove the device from being monitered!</p>
-                   <p>It will also remove historical data about this device such as <mark>Syslog</mark>, <mark>Eventlog</mark> and <mark>Alert log</mark> data.</p>");?>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="id" class="col-sm-2 control-label">Device:</label>
-    <div class="col-sm-7">
-      <select name="id" class="form-control" id="id">
+    <form name="form1" method="post" action="" class="form-horizontal" role="form">
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-7">
+          <div><h2>Delete Device</h2></div>
+            <div class="alert alert-danger" role="alert">
+                <center>
+                  <p>Warning, this will remove the device from being monitered!</p>
+                  <p>It will also remove historical data about this device such as <mark>Syslog</mark>, <mark>Eventlog</mark> and <mark>Alert log</mark> data.</p>
+                </center>
+              </div>
+              <div class="well">
+                <div class="form-group">
+                  <label for="id" class="col-sm-2 control-label">Device:</label>
+                  <div class="col-sm-10">
+                    <select name="id" class="form-control" id="id">
+                    <?php
+                    foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data) {
+                        echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
+                    }
 
-<?php
-
-foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $data) {
-    echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
-}
-
-?>
-      </select>
-    </div>
-  </div>
+                    ?>
+                    </select>
+                  </div>
+                </div>
+                <hr>
+                <input id="confirm" type="hidden" name="confirm" value="0" />
+                <center><button id="confirm_delete" type="submit" class="btn btn-default">Delete Device</button></center>
+              </div>
   <div class="form-group">
  <!-- <tr>
     <td>Remove RRDs (Data files): </td>
     <td><input type="checkbox" name="remove_rrd" value="yes"></td>
   </tr>-->
-   <div class="col-sm-offset-2 col-sm-8">
-     <input id="confirm" type="hidden" name="confirm" value="0" />
-     <button id="confirm_delete" type="submit" class="btn btn-default">Delete Device</button>
-  </div>
 </form>
 <?php
     }

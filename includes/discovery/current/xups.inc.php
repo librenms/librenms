@@ -5,9 +5,7 @@ if ($device['os'] == 'powerware') {
     echo 'XUPS-MIB ';
 
     $oids = snmp_walk($device, 'xupsBatCurrent', '-Osqn', 'XUPS-MIB');
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     foreach (explode("\n", $oids) as $data) {
@@ -28,9 +26,7 @@ if ($device['os'] == 'powerware') {
     }
 
     $oids = trim(snmp_walk($device, 'xupsOutputCurrent', '-OsqnU', 'XUPS-MIB'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {
@@ -49,9 +45,7 @@ if ($device['os'] == 'powerware') {
     }
 
     $oids = trim(snmp_walk($device, 'xupsInputCurrent', '-OsqnU', 'XUPS-MIB'));
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
     for ($i = 1; $i <= $numPhase; $i++) {

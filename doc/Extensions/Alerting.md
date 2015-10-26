@@ -17,6 +17,7 @@ Table of Content:
     - [PagerDuty](#transports-pagerduty)
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
+    - [Pushbullet](#transports-pushbullet)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -65,7 +66,7 @@ __Conditions__ can be any of:
 __Values__ can be Entities or any single-quoted data.  
 __Glues__ can be either `&&` for `AND` or `||` for `OR`.
 
-__Note__: The difference between `Equals` and `Matches` (and it's negation) is that `Equals` does a strict comparison and `Matches` allows the usage of the placeholder `@`. The placeholder `@` is comparable with `.*` in RegExp.  
+__Note__: The difference between `Equals` and `Matches` (and its negation) is that `Equals` does a strict comparison and `Matches` allows the usage of RegExp.  
 Arithmetics are allowed as well.
 
 ## <a name="rules-examples">Examples</a>
@@ -144,7 +145,7 @@ To include users that have `Global-Read` or `Administrator` permissions it is re
 ~
 ```php
 $config['alert']['globals'] = true; //Include Global-Read into alert-contacts
-$config['alert']['admins']  = true; //Include Adminstrators into alert-contacts
+$config['alert']['admins']  = true; //Include Administrators into alert-contacts
 ```
 ~~
 
@@ -360,9 +361,20 @@ $config['alert']['transports']['boxcar'][] = array(
 ```
 ~~
 
+## <a name="transports-pushbullet">Pushbullet</a>
+
+Enabling Pushbullet is a piece of cake.
+Get your Access Token from your Pushbullet's settings page and set it in your config like:
+
+~~
+```php
+$config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
+```
+~~
+
 # <a name="entities">Entities
 
-Entities as described earlier are based on the table and column names within the database, if you are ensure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
+Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
 
 ## <a name="entity-devices">Devices</a>
 

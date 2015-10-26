@@ -13,9 +13,7 @@ if ($device['os_group'] == 'cisco') {
         $cefs_db[$cef_id] = $ceftmp['cef_switching_id'];
     }
 
-    if ($debug) {
-        print_r($cefs);
-    }
+    d_echo($cefs);
 
     if (is_array($cefs)) {
         if (!is_array($entity_array)) {
@@ -54,9 +52,9 @@ if ($device['os_group'] == 'cisco') {
                     if (!is_file($filename)) {
                         rrdtool_create(
                             $filename,
-                            '--step 300 \
-                            DS:drop:DERIVE:600:0:1000000 \
-                            DS:punt:DERIVE:600:0:1000000 \
+                            '--step 300 
+                            DS:drop:DERIVE:600:0:1000000 
+                            DS:punt:DERIVE:600:0:1000000 
                             DS:hostpunt:DERIVE:600:0:1000000 '.$config['rrd_rra']
                         );
                     }

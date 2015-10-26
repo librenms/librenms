@@ -32,11 +32,11 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
     }
 
-    echo '<table style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
-    // include("includes/hostbox.inc.php");
-    require 'includes/device-header.inc.php';
-
+    echo '<div class="panel panel-default">';
+        echo '<table style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
+        require 'includes/device-header.inc.php';
     echo '</table>';
+    echo '</div>';
 
 
     if (device_permitted($device['device_id'])) {
@@ -313,11 +313,13 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         }
 
         if ($device_config_file) {
-            echo '<li class="'.$select['showconfig'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
-                <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
-                </a>
-                </li>';
+            if (dbFetchCell("SELECT COUNT(device_id) FROM devices_attribs WHERE device_id = ? AND attrib_type = 'override_Oxidized_disable' AND attrib_value='true'",array($device['device_id']) ) == '0') {
+                echo '<li class="'.$select['showconfig'].'">
+                    <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
+                    <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
+                    </a>
+                    </li>';
+           }
         }
 
         if ($config['nfsen_enable']) {
@@ -351,9 +353,17 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </li>';
         }
 
-        echo '<li class="'.$select['performance'].'">
-            <a href="'.generate_device_url($device, array('tab' => 'performance')).'">
-            <img src="images/16/chart_line.png" align="absmiddle" border="0" /> Performance
+        if (can_ping_device($attribs) === true) {
+            echo '<li class="'.$select['performance'].'">
+                <a href="'.generate_device_url($device, array('tab' => 'performance')).'">
+                <img src="images/16/chart_line.png" align="absmiddle" border="0" /> Performance
+                </a>
+                </li>';
+        }
+
+        echo '<li class="'.$select['notes'].'">
+            <a href="'.generate_device_url($device, array('tab' => 'notes')).'">
+            <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Notes
             </a>
             </li>';
 

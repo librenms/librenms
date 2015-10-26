@@ -12,6 +12,35 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+/**
+ * Compare $t with the value of $vars[$v], if that exists
+ * @param string $v Name of the var to test
+ * @param string $t Value to compare $vars[$v] to
+ * @return boolean true, if values are the same, false if $vars[$v] is unset or values differ
+ */
+function var_eq($v, $t) {
+    global $vars;
+    if (isset($vars[$v]) && $vars[$v] == $t) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Get the value of $vars[$v], if it exists
+ * @param string $v Name of the var to get
+ * @return string|boolean The value of $vars[$v] if it exists, false if it does not exist
+ */
+function var_get($v) {
+    global $vars;
+    if (isset($vars[$v])) {
+        return $vars[$v];
+    }
+
+    return false;
+}
+
 
 function data_uri($file, $mime) {
     $contents = file_get_contents($file);
@@ -152,8 +181,8 @@ function get_percentage_colours($percentage) {
 }//end get_percentage_colours()
 
 
-function generate_minigraph_image($device, $start, $end, $type, $legend='no', $width=275, $height=100, $sep='&amp;', $class='minigraph-image') {
-    return '<img class="'.$class.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend")).'">';
+function generate_minigraph_image($device, $start, $end, $type, $legend='no', $width=275, $height=100, $sep='&amp;', $class='minigraph-image',$absolute_size=0) {
+    return '<img class="'.$class.'" width="'.$width.'" height="'.$height.'" src="graph.php?'.implode($sep, array('device='.$device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")).'">';
 
 }//end generate_minigraph_image()
 
@@ -193,7 +222,7 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
     $url = generate_device_url($device, $vars);
 
     // beginning of overlib box contains large hostname followed by hardware & OS details
-    $contents = '<div><span class=list-large>'.$device['hostname'].'</span>';
+    $contents = '<div><span class="list-large">'.$device['hostname'].'</span>';
     if ($device['hardware']) {
         $contents .= ' - '.$device['hardware'];
     }
@@ -219,8 +248,8 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
     foreach ($graphs as $entry) {
         $graph         = $entry['graph'];
         $graphhead = $entry['text'];
-        $contents .= '<div class=overlib-box>';
-        $contents .= '<span class=overlib-title>'.$graphhead.'</span><br />';
+        $contents .= '<div class="overlib-box">';
+        $contents .= '<span class="overlib-title">'.$graphhead.'</span><br />';
         $contents .= generate_minigraph_image($device, $start, $end, $graph);
         $contents .= generate_minigraph_image($device, $config['time']['week'], $end, $graph);
         $contents .= '</div>';
@@ -250,6 +279,7 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
 function overlib_link($url, $text, $contents, $class) {
     global $config;
 
+    $contents = "<div style=\'background-color: #FFFFFF;\'>".$contents.'</div>';
     $contents = str_replace('"', "\'", $contents);
     $output   = '<a class="'.$class.'" href="'.$url.'"';
     if ($config['web_mouseover'] === false) {
@@ -553,7 +583,7 @@ function generate_port_link($port, $text=null, $type=null, $overlib=1, $single_g
 
     $content = '<div class=list-large>'.$port['hostname'].' - '.fixifName($port['label']).'</div>';
     if ($port['ifAlias']) {
-        $content .= $port['ifAlias'].'<br />';
+        $content .= escape_quotes($port['ifAlias']).'<br />';
     }
 
     $content              .= "<div style=\'width: 850px\'>";
@@ -1137,3 +1167,85 @@ function alert_details($details) {
 
 }//end alert_details()
 
+function dynamic_override_config($type, $name, $device) {
+    $attrib_val = get_dev_attrib($device,$name);
+    if ($attrib_val == 'true') {
+        $checked = 'checked';
+    }
+    else {
+        $checked = '';
+    }
+    if ($type == 'checkbox') {
+        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" data-size="small" '.$checked.'>';
+    }
+}//end dynamic_override_config()
+
+function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$items=array(),$transport='') {
+    $anchor = md5($title);
+    $output = '
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#'.$anchor.'">'.$title.'</a>
+    ';
+    if (!empty($transport)) {
+        $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="'.$transport.'" class="btn btn-primary btn-xs pull-right">Test transport</button>';
+    }
+    $output .= '
+        </h4>
+    </div>
+    <div id="'.$anchor.'" class="panel-collapse collapse">
+        <div class="panel-body">
+    ';
+
+    if (!empty($items)) {
+        foreach ($items as $item) {
+            $output .= '
+            <div class="form-group has-feedback">
+                <label for="'.$item['name'].'"" class="col-sm-4 control-label">'.$item['descr'].' </label>
+                <div data-toggle="tooltip" title="'.$config_groups[$item['name']]['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                <div class="col-sm-4">
+            ';
+            if ($item['type'] == 'checkbox') {
+                $output .= '<input id="'.$item['name'].'" type="checkbox" name="global-config-check" '.$config_groups[$item['name']]['config_checked'].' data-on-text="Yes" data-off-text="No" data-size="small" data-config_id="'.$config_groups[$item['name']]['config_id'].'">';
+            }
+            elseif ($item['type'] == 'text') {
+                $output .= '
+                <input id="'.$item['name'].'" class="form-control" type="text" name="global-config-input" value="'.$config_groups[$item['name']]['config_value'].'" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                ';
+            }
+            elseif ($item['type'] == 'select') {
+                $output .= '
+                <select id="'.$config_groups[$item['name']]['name'].'" class="form-control" name="global-config-select" data-config_id="'.$config_groups[$item['name']]['config_id'].'">
+                ';
+                if (!empty($item['options'])) {
+                    foreach ($item['options'] as $option) {
+                        $output .= '<option value="'.$option.'"';
+                        if ($option == $config_groups[$item['name']]['config_value']) {
+                            $output .= ' selected';
+                        }
+                        $output .= '>'.$option.'</option>';
+                    }
+                }
+                $output .='
+                </select>
+                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                ';
+            }
+            $output .= '
+                </div>
+            </div>
+            ';
+        }
+    }
+
+    if ($end_panel === true) {
+        $output .= '
+        </div>
+    </div>
+</div>
+        ';
+    }
+    return $output;
+}//end generate_dynamic_config_panel()

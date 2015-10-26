@@ -26,7 +26,6 @@ Contributors to LibreNMS:
 - Mickael Marchand  <mmarchand@corp.free.fr> (mmarchand)
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
-- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
 - Freddie Cash (fjwcash@gmail.com) (fjwcash)
 - Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
 - Vitali Kari <vitali.kari@gmail.com> (vitalisator) 
@@ -48,7 +47,21 @@ Contributors to LibreNMS:
 - Michael Newton <mnewton@pofp.com> (miken32)
 - Tom Ferguson <tom.ferguson.public@outlook.com> (Tawmu)
 - Jimmy Cleuren <jimmy.cleuren@gmail.com> (jimmycleuren)
-
+- Mark Schouten <mark@tuxis.nl> (tuxis-ie) 
+- Todd Eddy <vr@vrillusions.com> (vrillusions)
+- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
+- Sergiusz Paprzycki <serek@walcz.net> (spaprzycki)
+- Juho Vanhanen <juho@vanhanen.me> (juhovan)
+- Bart de Bruijn <bart_de_bruijn@yahoo.com> (bartdebruijn)
+- Christophe Martinet <martinet.christophe@gmail.com> (chrisgfx)
+- Nils Steinger <librenms@voidptr.de> (n-st)
+- Mark Nagel <mnagel@willingminds.com> (ciscoqid)
+- Sławomir Paszkiewicz <paszczus@pld-linux.org> (paszczus)
+- Frederik Mogensen <frederik@server-1.dk> (mogensen)
+- Matthew Scully <matt@mattz0r.me.uk> (mattz0r)
+- Xavier Beaudouin <kiwi@oav.net> (xbeaudouin)
+- Falk Stern <falk@fourecks.de> (fstern)
+- Donovan Bridoux <donovan.bridoux@gmail.com> (PandaWawawa)
+- Sebastian Neuner <sebastian@sneuner.org> (9er)
 
 [1]: http://observium.org/ "Observium web site"
-

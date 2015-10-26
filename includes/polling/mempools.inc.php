@@ -50,16 +50,7 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
         $mempool['state']['mempool_lowestfree'] = $mempool['lowestfree'];
     }
 
-    if ($config['memcached']['enable'] === true) {
-        if ($debug) {
-            print_r($mempool['state']);
-        }
-
-        $memcache->set('mempool-'.$mempool['mempool_id'].'-value', $mempool['state']);
-    }
-    else {
-        dbUpdate($mempool['state'], 'mempools', '`mempool_id` = ?', array($mempool['mempool_id']));
-    }
+    dbUpdate($mempool['state'], 'mempools', '`mempool_id` = ?', array($mempool['mempool_id']));
 
     echo "\n";
 }//end foreach

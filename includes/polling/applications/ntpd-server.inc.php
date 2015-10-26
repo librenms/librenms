@@ -16,20 +16,20 @@ list ($stratum, $offset, $frequency, $jitter, $noise, $stability, $uptime,
 if (!is_file($rrd_filename)) {
     rrdtool_create(
         $rrd_filename,
-        '--step 300 \
-        DS:stratum:GAUGE:600:-1000:1000 \
-        DS:offset:GAUGE:600:-1000:1000 \
-        DS:frequency:GAUGE:600:-1000:1000 \
-        DS:jitter:GAUGE:600:-1000:1000 \
-        DS:noise:GAUGE:600:-1000:1000 \
-        DS:stability:GAUGE:600:-1000:1000 \
-        DS:uptime:GAUGE:600:0:125000000000 \
-        DS:buffer_recv:GAUGE:600:0:100000 \
-        DS:buffer_free:GAUGE:600:0:100000 \
-        DS:buffer_used:GAUGE:600:0:100000 \
-        DS:packets_drop:DERIVE:600:0:125000000000 \
-        DS:packets_ignore:DERIVE:600:0:125000000000 \
-        DS:packets_recv:DERIVE:600:0:125000000000 \
+        '--step 300 
+        DS:stratum:GAUGE:600:-1000:1000 
+        DS:offset:GAUGE:600:-1000:1000 
+        DS:frequency:GAUGE:600:-1000:1000 
+        DS:jitter:GAUGE:600:-1000:1000 
+        DS:noise:GAUGE:600:-1000:1000 
+        DS:stability:GAUGE:600:-1000:1000 
+        DS:uptime:GAUGE:600:0:125000000000 
+        DS:buffer_recv:GAUGE:600:0:100000 
+        DS:buffer_free:GAUGE:600:0:100000 
+        DS:buffer_used:GAUGE:600:0:100000 
+        DS:packets_drop:DERIVE:600:0:125000000000 
+        DS:packets_ignore:DERIVE:600:0:125000000000 
+        DS:packets_recv:DERIVE:600:0:125000000000 
         DS:packets_sent:DERIVE:600:0:125000000000 '.$config['rrd_rra']
     );
 }

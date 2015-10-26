@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Detects which OS and if it is Linux then it will detect which Linux Distribution.
 
 OS=`uname -s`
@@ -9,10 +9,13 @@ if [ "${OS}" = "SunOS" ] ; then
   OS=Solaris
   ARCH=`uname -p`
   OSSTR="${OS} ${REV}(${ARCH} `uname -v`)"
+
 elif [ "${OS}" = "AIX" ] ; then
   OSSTR="${OS} `oslevel` (`oslevel -r`)"
+
 elif [ "${OS}" = "Linux" ] ; then
   KERNEL=`uname -r`
+
   if [ -f /etc/redhat-release ] ; then
     DIST=$(cat /etc/redhat-release | awk '{print $1}')
     if [ "${DIST}" = "CentOS" ]; then
@@ -27,26 +30,39 @@ elif [ "${OS}" = "Linux" ] ; then
 
     PSEUDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
     REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
-  elif [ -f /etc/SuSE-release ] ; then
-    DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
-    REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
+
   elif [ -f /etc/mandrake-release ] ; then
     DIST='Mandrake'
     PSEUDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
     REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
+
   elif [ -f /etc/debian_version ] ; then
     DIST="Debian `cat /etc/debian_version`"
     REV=""
+
   elif [ -f /etc/gentoo-release ] ; then
     DIST="Gentoo"
     REV=$(tr -d '[[:alpha:]]' </etc/gentoo-release | tr -d " ")
+
+  elif [ -f /etc/arch-release ] ; then
+    DIST="Arch Linux"
+    REV="" # Omit version since Arch Linux uses rolling releases
+    IGNORE_LSB=1 # /etc/lsb-release would overwrite $REV with "rolling"
+
+  elif [ -f /etc/os-release ] ; then
+    DIST=$(grep '^NAME=' /etc/os-release | cut -d= -f2- | tr -d '"')
+    REV=$(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2- | tr -d '"')
+
+  elif [ -f /etc/openwrt_version ] ; then
+    DIST="OpenWrt"
+    REV=$(cat /etc/openwrt_version)
+
+  elif [ -f /etc/pld-release ] ; then
+    DIST=$(cat /etc/pld-release)
+    REV=""
   fi
 
-  if [ -f /etc/UnitedLinux-release ] ; then
-    DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
-  fi
-
-  if [ -f /etc/lsb-release ] ; then
+  if [ -f /etc/lsb-release -a "${IGNORE_LSB}" != 1 ] ; then
     LSB_DIST="`cat /etc/lsb-release | grep DISTRIB_ID | cut -d "=" -f2`"
     LSB_REV="`cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d "=" -f2`"
     if [ "$LSB_DIST" != "" ] ; then
@@ -55,8 +71,13 @@ elif [ "${OS}" = "Linux" ] ; then
     fi
   fi
 
-#  OSSTR="${OS} ${DIST} ${REV}(${PSEUDONAME} ${KERNEL} ${MACH})"
-  OSSTR="${DIST} ${REV}"
+  if [ -n "${REV}" ]
+  then
+    OSSTR="${DIST} ${REV}"
+  else
+    OSSTR="${DIST}"
+  fi
+
 elif [ "${OS}" = "Darwin" ] ; then
   if [ -f /usr/bin/sw_vers ] ; then
     OSSTR=`/usr/bin/sw_vers|grep -v Build|sed 's/^.*:.//'| tr "\n" ' '`

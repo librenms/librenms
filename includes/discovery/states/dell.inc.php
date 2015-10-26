@@ -15,9 +15,7 @@
 if ($device['os'] == 'linux') {
     $oids     = snmp_walk($device, 'virtualDiskNumber', '-Oesqn', 'StorageManagement-MIB');
     $main_oid = '.1.3.6.1.4.1.674.10893.1.20.140.1.1.';
-    if ($debug) {
-        echo $oids."\n";
-    }
+    d_echo($oids."\n");
 
     $oids = trim($oids);
     if ($oids) {

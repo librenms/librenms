@@ -41,7 +41,7 @@ if (isset($_POST['create-default'])) {
         'severity'  => 'critical',
         'extra'     => '{"mute":false,"count":"1","delay":"300"}',
         'disabled'  => 0,
-        'name'      => 'BGP Session establised',
+        'name'      => 'BGP Session established',
     );
     $default_rules[] = array(
         'device_id' => '-1',
@@ -107,7 +107,7 @@ echo '<div class="table-responsive">
 
 echo '<td colspan="7">';
 if ($_SESSION['userlevel'] >= '10') {
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'">Create new alert rule</button>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
 }
 
 echo '</td>

@@ -23,7 +23,7 @@
 
 
 function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes) {
-    global $config, $debug;
+    global $config;
 
     $command = $config['rrdtool'].' -';
 
@@ -74,12 +74,8 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes) {
 
 
 function rrdtool_pipe_close($rrd_process, &$rrd_pipes) {
-    global $debug;
-
-    if ($debug) {
-        echo stream_get_contents($rrd_pipes[1]);
-        echo stream_get_contents($rrd_pipes[2]);
-    }
+    d_echo(stream_get_contents($rrd_pipes[1]));
+    d_echo(stream_get_contents($rrd_pipes[2]));
 
     fclose($rrd_pipes[0]);
     fclose($rrd_pipes[1]);
@@ -170,7 +166,7 @@ function rrdtool_graph($graph_file, $options) {
 function rrdtool($command, $filename, $options) {
     global $config, $debug, $rrd_pipes, $console_color;
 
-    if ($command != 'create' && $config['rrdcached']) {
+    if ($config['rrdcached'] && ($config['rrdtool_version'] >= 1.5 || $command != "create")) {
         if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
             $filename = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $filename);
             $filename = str_replace($config['rrd_dir'], './'.$config['rrdcached_dir'].'/', $filename);
@@ -195,7 +191,7 @@ function rrdtool($command, $filename, $options) {
         print $console_color->convert('RRD[%g'.$cmd.'%n] ');
     }
     else {
-        $tmp = stream_get_contents($rrd_pipes[1]).stream_get_contents($rrd_pipes[2]);
+        return array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
     }
 
 }
@@ -210,21 +206,14 @@ function rrdtool($command, $filename, $options) {
 
 
 function rrdtool_create($filename, $options) {
-    global $config, $debug, $console_color;
-
-    if ($config['norrd']) {
-        print $console_color->convert('[%gRRD Disabled%n] ', false);
+    global $config;
+    if( $config['rrdcached'] && $config['rrdtool_version'] >= 1.5 ) {
+        $chk = rrdtool('info', $filename, '');
+        if (!empty($chk[0])) {
+            return true;
+        }
     }
-    else {
-        $command = $config['rrdtool']." create $filename $options";
-    }
-
-    if ($debug) {
-        print $console_color->convert('RRD[%g'.$command.'%n] ');
-    }
-
-    return shell_exec($command);
-
+    return rrdtool('create', $filename,  str_replace(array("\r", "\n"), '', $options));
 }
 
 

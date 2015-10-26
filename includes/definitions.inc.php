@@ -30,6 +30,19 @@ else {
     $database_db = mysql_select_db($config['db_name'], $database_link);
 }
 
+if ($config['memcached']['enable'] === true) {
+    if (class_exists('Memcached')) {
+        $config['memcached']['ttl']      = 60;
+        $config['memcached']['resource'] = new Memcached();
+        $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
+    }
+    else {
+        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
+        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
+        $config['memcached']['enable'] = 0;
+    }
+}
+
 $clone = $config;
 foreach (dbFetchRows('select config_name,config_value from config') as $obj) {
     $clone = array_replace_recursive($clone, mergecnf($obj));
@@ -201,7 +214,7 @@ $config['os'][$os]['group'] = 'unix';
 $config['os'][$os]['text']  = 'FreeBSD';
 
 $os = 'pfsense';
-$config['os'][$os]['type']  = 'server';
+$config['os'][$os]['type']  = 'firewall';
 $config['os'][$os]['group'] = 'unix';
 $config['os'][$os]['text']  = 'pfSense';
 
@@ -413,6 +426,10 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['over'][3]['graph'] = 'device_ciscowlc_numaps';
+$config['os'][$os]['over'][3]['text']  = 'Number of APs';
+$config['os'][$os]['over'][4]['graph'] = 'device_ciscowlc_numclients';
+$config['os'][$os]['over'][4]['text']  = 'Number of Clients';
 $config['os'][$os]['icon']             = 'cisco';
 
 // Brocade NOS
@@ -536,6 +553,18 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+// Pulse Secure OS definition
+$os = 'pulse';
+$config['os'][$os]['text']             = 'Pulse Secure';
+$config['os'][$os]['type']             = 'firewall';
+$config['os'][$os]['icon']             = 'junos';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 $os = 'fortigate';
 $config['os'][$os]['text']             = 'Fortinet Fortigate';
 $config['os'][$os]['type']             = 'firewall';
@@ -633,6 +662,12 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'avaya';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
+$os = 'avaya-ipo';
+$config['os'][$os]['text']             = 'IP Office Firmware';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'avaya';
+
 
 $os = 'arista_eos';
 $config['os'][$os]['text']             = 'Arista EOS';
@@ -848,6 +883,10 @@ $config['os'][$os]['text']             = 'SonicWALL';
 $config['os'][$os]['type']             = 'firewall';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory';
 
 $os = 'zywall';
 $config['os'][$os]['text']             = 'ZyXEL ZyWALL';
@@ -1276,6 +1315,42 @@ $config['os'][$os]['icon']             = 'perle';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// MACOSX
+$os = 'macosx';
+$config['os'][$os]['text']             = 'Apple OS X';
+$config['os'][$os]['type']             = 'server';
+$config['os'][$os]['icon']             = 'generic';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// HP MSM 
+$os = 'hpmsm';
+$config['os'][$os]['text']             = 'HP MSM';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'hp';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// Riverbed
+$os = 'riverbed';
+$config['os'][$os]['text']             = 'Riverbed';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'riverbed';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// Appliances
+$os = 'fortios';
+$config['os'][$os]['text']             = 'FortiOS';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'fortios';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
@@ -1438,6 +1513,14 @@ $config['graph_types']['device']['screenos_sessions']['descr']     = 'Active Ses
 $config['graph_types']['device']['panos_sessions']['section']      = 'firewall';
 $config['graph_types']['device']['panos_sessions']['order']        = '0';
 $config['graph_types']['device']['panos_sessions']['descr']        = 'Active Sessions';
+
+//Pulse Secure Graphs
+$config['graph_types']['device']['pulse_users']['section']         = 'firewall';
+$config['graph_types']['device']['pulse_users']['order']           = '0';
+$config['graph_types']['device']['pulse_users']['descr']           = 'Active Users';
+$config['graph_types']['device']['pulse_sessions']['section']      = 'firewall';
+$config['graph_types']['device']['pulse_sessions']['order']        = '0';
+$config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
 
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';
@@ -1630,10 +1713,15 @@ if (isset($config['enable_printers']) && $config['enable_printers']) {
     $config['device_types'][$i]['icon'] = 'printer.png';
 }
 
+$i++;
+$config['device_types'][$i]['text'] = 'Appliance';
+$config['device_types'][$i]['type'] = 'appliance';
+$config['device_types'][$i]['icon'] = 'appliance.png';
+
 //
 // No changes below this line #
 //
-$config['version']              = '2014.master';
+$config['version']              = '2015.master';
 $config['project_name_version'] = $config['project_name'].' '.$config['version'];
 
 if (isset($config['rrdgraph_def_text'])) {
@@ -1658,21 +1746,6 @@ $config['mib_dir'] = $config['mibdir'];
 // If we're on SSL, let's properly detect it
 if (isset($_SERVER['HTTPS'])) {
     $config['base_url'] = preg_replace('/^http:/', 'https:', $config['base_url']);
-}
-
-if ($config['memcached']['enable'] === true) {
-    if (class_exists('Memcached')) {
-        $memcache = new Memcached();
-        $memcache->addServer($config['memcached']['host'], $config['memcached']['port']);
-        if ($debug) {
-            print_r($memcache->getStats());
-        }
-    }
-    else {
-        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
-        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
-        $config['memcached']['enable'] = 0;
-    }
 }
 
 // Set some times needed by loads of scripts (it's dynamic, so we do it here!)

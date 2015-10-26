@@ -683,7 +683,6 @@ table.simple {
   padding: 10px;
 }
 
-table { border-collapse: collapse; margin: 0px; background-color:#ffffff }
 form { margin: 0px; padding: 0px; }
 hr { border: 0px; height: 1px; background-color: #ccc; color: #ccc; }
 p { margin: 0px; padding: 0px; }
@@ -1664,7 +1663,6 @@ tr.search:nth-child(odd) {
 
 .gridster li {
     font-size: 1em;
-    font-weight: bold;
     text-align: center;
     line-height: 100%;
 }
@@ -1762,4 +1760,8 @@ tr.search:nth-child(odd) {
 
 .edit-storage-input {
     width: 100px;
+}
+
+label {
+    font-weight: normal;
 }
