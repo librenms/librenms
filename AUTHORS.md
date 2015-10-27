@@ -64,5 +64,6 @@ Contributors to LibreNMS:
 - Donovan Bridoux <donovan.bridoux@gmail.com> (PandaWawawa)
 - Sebastian Neuner <sebastian@sneuner.org> (9er)
 - Robert Zollner <wolfit_ro@yahoo.com> (Lupul)
+- Richard Kojedzinszky <krichy@cflinux.hu> (rkojedzinszky)
 
 [1]: http://observium.org/ "Observium web site"
