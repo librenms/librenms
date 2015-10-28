@@ -78,16 +78,16 @@ $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 
 if ($config['rrdgraph_real_95th']) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
-    $rrd_options .= ' VDEF:95thhigh=highbits,95,PERCENTNAN';
+    $rrd_options .= ' VDEF:95thhigh=highbits,95,PERCENT';
 }
 
 $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
 $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
 $rrd_options .= ' VDEF:tot=octets,TOTAL';
 
-$rrd_options .= ' VDEF:95thin=inbits,95,PERCENTNAN';
-$rrd_options .= ' VDEF:95thout=outbits,95,PERCENTNAN';
-$rrd_options .= ' VDEF:d95thout=doutbits,5,PERCENTNAN';
+$rrd_options .= ' VDEF:95thin=inbits,95,PERCENT';
+$rrd_options .= ' VDEF:95thout=outbits,95,PERCENT';
+$rrd_options .= ' VDEF:d95thout=doutbits,5,PERCENT';
 
 if ($format == 'octets' || $format == 'bytes') {
     $units  = 'Bps';
