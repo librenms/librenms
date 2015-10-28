@@ -488,6 +488,14 @@ $config['os'][$os]['icon']             = 'siklu';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Saf Wireless
+$os = 'saf';
+$config['os'][$os]['text']             = 'SAF Wireless';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'saf';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Supermicro Switch
 $os = 'supermicro-switch';
 $config['os'][$os]['group']  = 'supermicro';
