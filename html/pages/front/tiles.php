@@ -46,8 +46,9 @@ if (empty($data)) {
 $data        = serialize(json_encode($data));
 $dash_config = unserialize(stripslashes($data));
 $dashboards  = dbFetchRows("SELECT * FROM `dashboards` WHERE `user_id` = ? && `dashboard_id` != ? ORDER BY `dashboard_name`",array($_SESSION['user_id'],$vars['dashboard']['dashboard_id']));
-?>
 
+if (empty($vars['bare']) || $vars['bare'] == "no") {
+?>
 <div class="row">
   <div class="col-md-6">
     <div class="btn-group btn-lg">
@@ -187,6 +188,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
   </div>
   <hr>
 </div>
+<?php } //End Vars['bare'] If ?>
 <script src='https://www.google.com/jsapi'></script>
 <script src="js/jquery.gridster.min.js"></script>
 
