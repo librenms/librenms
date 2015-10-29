@@ -776,6 +776,14 @@ $config['os'][$os]['text'] = 'D-Link Access Point';
 $config['os'][$os]['type'] = 'wireless';
 $config['os'][$os]['icon'] = 'dlink';
 
+// TP-Link
+$os = 'tplink';
+$config['os'][$os]['text']             = 'TP-Link Switch';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'tplink';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 $os = 'axiscam';
 $config['os'][$os]['text'] = 'AXIS Network Camera';
 $config['os'][$os]['icon'] = 'axis';
