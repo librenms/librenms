@@ -22,7 +22,29 @@ function authenticate($username, $password) {
     if ($username && $ds) {
         // bind with sAMAccountName instead of full LDAP DN
         if (ldap_bind($ds, "{$username}@{$config['auth_ad_domain']}", $password)) {
-            return 1;
+            // group membership in one of the configured groups is required
+            if (isset($config['auth_ad_require_groupmembership']) &&
+                $config['auth_ad_require_groupmembership'] > 0) {
+                $search = ldap_search($ds, $config['auth_ad_base_dn'],
+                                      "(samaccountname={$username})", array('memberOf'));
+                $entries = ldap_get_entries($ds, $search);
+
+                $user_authenticated = 0; 
+                
+                foreach ($entries[0]['memberof'] as $entry) {
+                    $group_cn = get_cn($entry);
+                    if (isset($config['auth_ad_groups'][$group_cn]['level'])) {
+                        // user is in one of the defined groups
+                        $user_authenticated = 1;
+                    } 
+                }
+
+                return $user_authenticated;
+                
+            } else {
+                // group membership is not required and user is valid
+                return 1;
+            };
         } else {
             return 0;
         }
