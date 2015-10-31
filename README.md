@@ -1,6 +1,8 @@
 Introduction
 ------------
 
+[![Join the chat at https://gitter.im/librenms/librenms](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/librenms/librenms?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
 which includes support for a wide range of network hardware and operating
 systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
