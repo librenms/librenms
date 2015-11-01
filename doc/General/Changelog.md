@@ -3,14 +3,29 @@
 #### Bug fixes
   - Discovery / Polling:
     - Check file exists via rrdcached before creating new files on 1.5 (PR2041)
+    - Fix Riverbed discovery (PR2133)
+    - Fixes issue where snmp_get would not return the value 0 (PR2134)
+    - Fixed powerdns snmp checks (PR2176)
+    - De-dupe checks for hostname when adding hosts (PR2189)
   - WebUI:
     - Soft fail if PHP Pear not installed (PR2036)
     - Escape quotes for ifAlias in overlib calls (PR2072)
     - Fix table name for access points (PR2075)
     - Removed STACK text in graphs (PR2097)
     - Enable multiple ifDescr overrides to be done per device (PR2099)
+    - Removed ping + performance graphs and tab if skip ping check (PR2175)
+    - Fixed services -> Alerts menu link + page (PR2173)
+    - Fix percent bar also for quota bills (PR2198)
+    - Fix new Bill (PR2199)
+    - Change default solver to hierarchicalRepulsion in vis.js (PR2202)
+    - Fix: setting user port permissions fails (PR2203)
+    - Updated devices Graphs links to use non-static time references (PR2211)
+    - Removed ignored,deleted and disabled ports from query (PR2213)
   - API:
     - Fixed API call for alert states (PR2076)
+    - Fixed nginx rewrite for api (PR2112)
+    - Change on the add_edit_rule to modify a rule without modify the name (PR2159)
+    - Fixed list_bills function when using :bill_id (PR2212)
 
 #### Improvements
   - WebUI:
@@ -18,23 +33,46 @@
     - Added billing graphs to graphs widget (PR2027)
     - Lock widgets by default so they can't be moved (PR2042)
     - Moved Device Groups menu (PR2049)
+    - Show Config tab only if device isn't excluded from oxidized (PR2118)
+    - Simplify adding config options to WebUI (PR2120)
+    - Move red map markers to foreground (PR2127)
+    - Styled the two factor auth token prompt (PR2151)
+    - Update Font Awesome (PR2167)
+    - Allow user to influence when devices are grouped on world map (PR2170)
+    - Centralised the date selector for graphs for re-use (PR2183)
+    - Dont show dashboard settings if `/bare=yes/` (PR2364)
   - API:
     - Added unmute alert function to API (PR2082)
-  -  Added detection support for:
-    - Pulse Secure OS (PR2053)
   - Discovery / Polling:
     - Added additional support for some UPS' based on Multimatic cards (PR2046)
     - Improved WatchGuard OS detection (PR2048)
     - Treat Dell branded Wifi controllers as ArubaOS (PR2065)
     - Added discovery option for OS or Device type (PR2088)
     - Updated pfSense to firewall type (PR2096)
+    - Added ability to turn off icmp checks globally or per device (PR2131)
+    - Reformat check a bit to make it easier for adding additional oids in (PR2135)
+    - Updated to disable auto-discovery by ip (PR2182)
+    - Updated to use env in distro script (PR2204)
   - Added detection for:
+    - Pulse Secure OS (PR2053)
     - Riverbed Steelhead support (PR2107)
+    - OpenBSD sensors (PR2113)
+    - Additional comware detection (PR2162)
+    - Version from Synology MIB (PR2163)
+    - VCSA as VMWare (PR2185)
+    - SAF Lumina radios (PR2361)
+    - TP-Link detection (PR2362)
   - Documentation:
     - Improved RHEL/CentOS install docs (PR2043)
+    - Update Varnish Docs (PR2116, PR2126)
+    - Added passworded channels for the IRC-Bot (PR2122)
+    - Updated Two-Factor-Auth.md RE: Google Authenticator (PR2146)
   - General:
     - Added colour support to IRC bot (PR2059)
     - Fixed IRC bot reconnect if socket dies (PR2061)
+    - Updated default crons (PR2177)
+  - Reverts:
+    - "Removed what appears to be unecessary STACK text" (PR2128)
 
 ### September 2015
 
