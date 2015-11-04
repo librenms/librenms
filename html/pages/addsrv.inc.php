@@ -21,7 +21,7 @@ else {
     if ($handle = opendir($config['nagios_plugins'])) {
         while (false !== ($file = readdir($handle))) {
             if ($file != '.' && $file != '..' && !strstr($file, '.') && strstr($file, 'check_')) {
-                list(,$check_name) = explode('_',$file);
+                list(,$check_name) = explode('_',$file,2);
                 $servicesform .= "<option value='$check_name'>$check_name</option>";
             }
         }

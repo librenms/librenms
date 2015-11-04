@@ -47,6 +47,7 @@ echo "
         <input name='params' id='params' class='form-control input-sm'>
       </div>
       <div class='col-sm-5'>
+          This may be required based on the service check.
       </div>
     </div>
     <button type='submit' name='Submit' class='btn btn-success input-sm'>Add Service</button>
