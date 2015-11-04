@@ -163,23 +163,23 @@ function list_devices() {
     }
 
     if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order .= ' ASC';
+        $order = '`'.$order.'` ASC';
     }
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     }
     elseif ($type == 'ignored') {
-        $sql = "ignore='1' AND disabled='0'";
+        $sql = "`ignore`='1' AND `disabled`='0'";
     }
     elseif ($type == 'up') {
-        $sql = "status='1' AND ignore='0' AND disabled='0'";
+        $sql = "`status`='1' AND `ignore`='0' AND `disabled`='0'";
     }
     elseif ($type == 'down') {
-        $sql = "status='0' AND ignore='0' AND disabled='0'";
+        $sql = "`status`='0' AND `ignore`='0' AND `disabled`='0'";
     }
     elseif ($type == 'disabled') {
-        $sql = "disabled='1'";
+        $sql = "`disabled`='1'";
     }
     elseif ($type == 'mac') {
         $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_mac` ON `ports`.`port_id`=`ipv4_mac`.`port_id` ";
