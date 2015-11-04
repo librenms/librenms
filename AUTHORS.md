@@ -65,5 +65,6 @@ Contributors to LibreNMS:
 - Sebastian Neuner <sebastian@sneuner.org> (9er)
 - Robert Zollner <wolfit_ro@yahoo.com> (Lupul)
 - Richard Hartmann <richih@debian.org> (RichiH)
+- Robert Gornall <roblnm@khobbits.co.uk (KHobbits)
 
 [1]: http://observium.org/ "Observium web site"
