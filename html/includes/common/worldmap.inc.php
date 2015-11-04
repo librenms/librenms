@@ -152,6 +152,7 @@ marker.bindPopup(title);
         $temp_output .= 'map.addLayer(markers);
 map.scrollWheelZoom.disable();
 $(document).ready(function(){
+    $("#leaflet-map").css("height",($("#leaflet-map").parent().innerHeight()-55) + "px");
     $("#leaflet-map").on("click", function(event) {  
         map.scrollWheelZoom.enable();
     });
