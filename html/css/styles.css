@@ -1756,6 +1756,7 @@ tr.search:nth-child(odd) {
 
 #leaflet-map {
     height: 95%;
+    padding-bottom:25px;
 }
 
 .edit-storage-input {
