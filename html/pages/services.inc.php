@@ -8,7 +8,6 @@ echo "<span style='font-weight: bold;'>Services</span> &#187; ";
 
 $menu_options = array(
     'basic'   => 'Basic',
-    'details' => 'Details',
 );
 
 $sql_param = array();
@@ -68,7 +67,6 @@ echo '<div class="table-responsive">
     <tr>
         <th>Device</th>
         <th>Service</th>
-        <th>Status</th>
         <th>Changed</th>
         <th>Message</th>
     </tr>';
