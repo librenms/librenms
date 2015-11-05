@@ -196,6 +196,10 @@ else {
 $callback = urlencode($callback);
 
 $general_conf = array(
+    array('name'               => 'alert.disable',
+          'descr'              => 'Disable alerting',
+          'type'               => 'checkbox',
+    ),
     array('name'               => 'alert.admins',
           'descr'              => 'Issue alerts to admins',
           'type'               => 'checkbox',
