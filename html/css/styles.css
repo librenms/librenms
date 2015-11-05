@@ -1754,6 +1754,10 @@ tr.search:nth-child(odd) {
     top:30px;
 }
 
+#leaflet-map {
+    height: 600px;
+}
+
 .edit-storage-input {
     width: 100px;
 }
