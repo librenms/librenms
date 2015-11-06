@@ -9,7 +9,9 @@ Here we will provide configuration details for these modules.
 
 - LDAP: ldap
 
- HTTP Auth: http-auth
+- Active Directory: active_directory
+
+- HTTP Auth: http-auth
 
 #### User levels
 
@@ -99,3 +101,27 @@ $config['auth_ldap_groupmemberattr'] = "memberUid";
 ```
 
 Replace {id} with the unique ID provided by Jumpcloud.
+
+#### Active Directory Authentication
+
+Config option: `active_directory`
+
+This is similar to LDAP Authentication. Install __php_ldap__ for CentOS/RHEL or __php5-ldap__ for Debian/Ubuntu.
+
+If you have issues with secure LDAP try setting `$config['auth_ad_dont_check_certificates']` to `1`.
+
+##### Require actual membership of the configured groups
+
+If you set ```$config['auth_ad_require_groupmembership']``` to 1, the authenticated user has to be a member of the specific group. Otherwise all users can authenticate, but are limited to user level 0 and only have access to shared dashboards. 
+
+##### Sample configuration
+
+```
+$config['auth_ad_url'] = "ldaps://your-domain.controll.er";
+$config['auth_ad_dont_check_certificates'] = 1; // or 0
+$config['auth_ad_domain'] = "your-domain.com";
+$config['auth_ad_base_dn'] = "dc=your-domain,dc=com";
+$config['auth_ad_groups']['admin']['level'] = 10;
+$config['auth_ad_groups']['pfy']['level'] = 7;
+$config['auth_ad_require_groupmembership'] = 0;
+```
