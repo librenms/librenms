@@ -111,7 +111,7 @@ if ($_GET['previous'] == 'yes') {
     $rrd_options .= ' CDEF:doutbitsX=doutBX,8,*';
     $rrd_options .= ' VDEF:95thinX=inbitsX,95,PERCENT';
     $rrd_options .= ' VDEF:95thoutX=outbitsX,95,PERCENT';
-    $rrd_options .= ' VDEF:d95thoutX=doutbitsX,5,PERCENT';
+    $rrd_options .= ' CDEF:d95thoutXn=doutbitsX,-1,* VDEF:d95thoutXn95=d95thoutXn,95,PERCENT CDEF:d95thoutXn95n=doutbitsX,doutbitsX,-,d95thoutXn95,-1,*,+ VDEF:d95thoutX=d95thoutXn95n,FIRST';
 }
 
 if ($_GET['previous'] == 'yes') {
@@ -132,7 +132,7 @@ if (!$args['nototal']) {
     $rrd_options .= ' CDEF:doutbits=doutB,8,*';
     $rrd_options .= ' VDEF:95thin=inbits,95,PERCENT';
     $rrd_options .= ' VDEF:95thout=outbits,95,PERCENT';
-    $rrd_options .= ' VDEF:d95thout=doutbits,5,PERCENT';
+    $rrd_options .= ' CDEF:d95thoutn=doutbits,-1,* VDEF:d95thoutn95=d95thoutn,95,PERCENT CDEF:d95thoutn95n=doutbits,doutbits,-,d95thoutn95,-1,*,+ VDEF:d95thout=d95thoutn95n,FIRST';
     $rrd_options .= ' VDEF:totin=inB,TOTAL';
     $rrd_options .= ' VDEF:avein=inbits,AVERAGE';
     $rrd_options .= ' VDEF:totout=outB,TOTAL';
