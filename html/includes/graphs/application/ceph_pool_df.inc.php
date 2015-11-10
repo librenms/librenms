@@ -1,8 +1,6 @@
 <?php
 
 require 'includes/graphs/common.inc.php';
-require 'includes/graphs/application/ceph_common.inc.php';
-
 
 $ceph_pool_rrd = ceph_rrd('df');
 
