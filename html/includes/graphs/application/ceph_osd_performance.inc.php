@@ -1,7 +1,5 @@
 <?php
 
-require 'includes/graphs/application/ceph_common.inc.php';
-
 $ds_in  = 'apply_ms';
 $ds_out = 'commit_ms';
 
