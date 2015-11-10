@@ -127,7 +127,7 @@ function get_userid($username) {
     global $config, $ds;
 
     $attributes = array('objectsid');
-    $result = ldap_search($ds, $config['auth_ad_base_dn'],
+    $search = ldap_search($ds, $config['auth_ad_base_dn'],
                           "(samaccountname={$username})", $attributes);    
     $entries = ldap_get_entries($ds, $search);
 
@@ -148,6 +148,7 @@ function deluser($username) {
 function get_userlist() {
     global $config, $ds;
     $userlist = array();
+    $userhash = array();
 
     $ldap_groups = get_group_list();
 
