@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>gridster.js AMD Test Suite</title>
+
+  <link rel="stylesheet" type="text/css" href="../dist/jquery.gridster.css">
+
+  <link rel="stylesheet" href="../libs/qunit/qunit/qunit.css" media="screen">
+  <!-- Load requirejs which will load amd-main.js and start from there-->
+  <script data-main="amd-main.js" src="../libs/requirejs/require.js"></script>
+
+</head>
+<body>
+  <h1 id="qunit-header">gridster.js AMD Test Suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture">
+
+  <div class="wrapper">
+      <ul>
+        <li data-row="1" data-col="1" data-sizex="2" data-sizey="2"></li>
+        <li data-row="1" data-col="3" data-sizex="1" data-sizey="2"></li>
+        <li data-row="1" data-col="4" data-sizex="1" data-sizey="1"></li>
+        <li data-row="3" data-col="2" data-sizex="3" data-sizey="1"></li>
+
+        <li data-row="4" data-col="1" data-sizex="1" data-sizey="1"></li>
+        <li data-row="3" data-col="1" data-sizex="1" data-sizey="1"></li>
+        <li data-row="4" data-col="2" data-sizex="1" data-sizey="1"></li>
+        <li data-row="5" data-col="2" data-sizex="1" data-sizey="1"></li>
+        <li data-row="4" data-col="4" data-sizex="1" data-sizey="1"></li>
+
+        <li data-row="1" data-col="5" data-sizex="1" data-sizey="3"></li>
+
+
+        <li data-row="5" data-col="1" data-sizex="1" data-sizey="2"></li>
+        <li data-row="4" data-col="3" data-sizex="1" data-sizey="2"></li>
+        <li data-row="5" data-col="4" data-sizex="1" data-sizey="1"></li>
+        <li data-row="6" data-col="2" data-sizex="3" data-sizey="1"></li>
+
+        <li data-row="4" data-col="5" data-sizex="1" data-sizey="2"></li>
+        <li data-row="6" data-col="5" data-sizex="1" data-sizey="1"></li>
+
+        <li data-row="7" data-col="3" data-sizex="1" data-sizey="1"></li>
+
+      </ul>
+    </div>
+  </div>
+
+
+</body>
+</html>
