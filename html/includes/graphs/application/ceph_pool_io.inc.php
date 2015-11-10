@@ -1,7 +1,5 @@
 <?php
 
-require 'includes/graphs/application/ceph_common.inc.php';
-
 $ds_in  = 'rbytes';
 $in_text = 'Read';
 $ds_out = 'wrbytes';
