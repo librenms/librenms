@@ -203,5 +203,5 @@ print $console_color->convert(
         -f forces the device to be added by skipping the icmp and snmp check against the host.
 
     %rRemember to run discovery for the host afterwards.%n
-    '
+'
 );

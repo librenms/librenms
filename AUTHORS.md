@@ -60,5 +60,11 @@ Contributors to LibreNMS:
 - Frederik Mogensen <frederik@server-1.dk> (mogensen)
 - Matthew Scully <matt@mattz0r.me.uk> (mattz0r)
 - Xavier Beaudouin <kiwi@oav.net> (xbeaudouin)
-
+- Falk Stern <falk@fourecks.de> (fstern)
+- Donovan Bridoux <donovan.bridoux@gmail.com> (PandaWawawa)
+- Sebastian Neuner <sebastian@sneuner.org> (9er)
+- Robert Zollner <wolfit_ro@yahoo.com> (Lupul)
+- Richard Hartmann <richih@debian.org> (RichiH)
+- Robert Gornall <roblnm@khobbits.co.uk (KHobbits)
+- Rob Gormley <robert@gormley.me> (rgormley)
 [1]: http://observium.org/ "Observium web site"

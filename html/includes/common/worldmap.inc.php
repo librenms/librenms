@@ -46,7 +46,7 @@ if ($config['map']['engine'] == 'leaflet') {
     <div class="col-sm-4">
       <label for="init_zoom" class="control-label">Initial Zoom: </label>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
       <select class="form-control" name="init_zoom" id="select_zoom'.$unique_id.'">
         ';
         for ($i=0; $i<19; $i++) {
@@ -59,6 +59,14 @@ if ($config['map']['engine'] == 'leaflet') {
         }
         $temp_output .= '
       </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-4">
+      <label for="group_radius" class="control-label">Grouping radius: </label>
+    </div>
+    <div class="col-sm-4">
+      <input class="form-control" name="group_radius" id="input_radius_'.$unique_id.'" value="'.$widget_settings['group_radius'].'" placeholder="default 80">
     </div>
   </div>
   <div class="form-group">
@@ -87,13 +95,21 @@ if ($config['map']['engine'] == 'leaflet') {
             $init_lng = $config['leaflet']['default_lng'];
             $init_zoom = $config['leaflet']['default_zoom'];
         }
+        if (!empty($widget_settings['group_radius'])) {
+            $group_radius = $widget_settings['group_radius'];
+        }
+        else {
+            $group_radius = 80;
+        }
         $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.0f", $init_zoom);
         $temp_output .= 'var map = L.map(\'leaflet-map\').setView('.$map_init.');
 L.tileLayer(\'//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
     attribution: \'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors\'
 }).addTo(map);
 
-var markers = L.markerClusterGroup();
+var markers = L.markerClusterGroup({
+    maxClusterRadius: ' . $group_radius . ',
+  });
 var redMarker = L.AwesomeMarkers.icon({
     icon: \'server\',
     markerColor: \'red\', prefix: \'fa\', iconColor: \'white\'
@@ -123,11 +139,13 @@ var greenMarker = L.AwesomeMarkers.icon({
         }
         foreach (dbFetchRows($sql, array($_SESSION['user_id'])) as $map_devices) {
             $icon = 'greenMarker';
+            $z_offset = 0;
             if ($map_devices['status'] == 0) {
                 $icon = 'redMarker';
+                $z_offset = 10000;  // move marker to foreground
             }
             $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . "\"><img src=\"".getImageSrc($map_devices)."\" width=\"32\" height=\"32\" alt=\"\">".$map_devices['hostname']."</a>';
-var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: title, icon: $icon});
+var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng']."), {title: title, icon: $icon, zIndexOffset: $z_offset});
 marker.bindPopup(title);
     markers.addLayer(marker);\n";
         }
