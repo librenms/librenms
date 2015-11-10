@@ -45,7 +45,7 @@ function authenticate($username, $password) {
             else {
                 // group membership is not required and user is valid
                 return 1;
-            };
+            }
         }
         else {
             return 0;
