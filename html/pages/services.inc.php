@@ -8,7 +8,6 @@ echo "<span style='font-weight: bold;'>Services</span> &#187; ";
 
 $menu_options = array(
     'basic'   => 'Basic',
-    'details' => 'Details',
 );
 
 $sql_param = array();
@@ -16,16 +15,14 @@ if (isset($vars['state'])) {
     if ($vars['state'] == 'up') {
         $state = '1';
     }
-    else if ($vars['state'] == 'down') {
+    elseif ($vars['state'] == 'down') {
         $state = '0';
     }
 }
 
 if ($vars['state']) {
-    $where      .= ' AND service_status= ?';
+    $where      .= " AND service_status= ? AND service_disabled='0' AND `service_ignore`='0'";
     $sql_param[] = $state;
-    $where      .= " AND service_disabled='0' AND `service_ignore`='0'";
-    $sql_param[] = '';
 }
 
 if ($vars['disabled']) {
@@ -65,8 +62,14 @@ unset($sep);
 
 print_optionbar_end();
 
-echo '<table class="table table-condensed">';
-// echo("<tr class=interface-desc bgcolor='#e5e5e5'><td>Device</td><td>Service</td><td>Status</td><td>Changed</td><td>Checked</td><td>Message</td></tr>");
+echo '<div class="table-responsive">
+<table class="table table-condensed">
+    <tr>
+        <th>Device</th>
+        <th>Service</th>
+        <th>Changed</th>
+        <th>Message</th>
+    </tr>';
 if ($_SESSION['userlevel'] >= '5') {
     $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY D.hostname ORDER BY D.hostname';
     $host_par = array();
@@ -123,4 +126,5 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
     unset($samehost);
 }//end foreach
 
-echo '</table>';
+echo '</table>
+</div>';

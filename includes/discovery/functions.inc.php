@@ -34,6 +34,12 @@ function discover_new_device($hostname, $device='', $method='', $interface='') {
             return false;
         }
     }
+    else {
+        if ($config['discovery_by_ip'] === false) {
+            d_echo('Discovery by IP disabled, skipping ' . $dst_host);
+            return false;
+        }
+    }
 
     d_echo("ip lookup result: $ip\n");
 

@@ -48,7 +48,7 @@ require_once $config['install_dir'].'/includes/definitions.inc.php';
 require_once $config['install_dir'].'/includes/functions.php';
 require_once $config['install_dir'].'/includes/alerts.inc.php';
 
-if (!defined('TEST')) {
+if (!defined('TEST') && $config['alert']['disable'] != 'true') {
     echo 'Start: '.date('r')."\r\n";
     echo "RunFollowUp():\r\n";
     RunFollowUp();

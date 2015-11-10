@@ -113,57 +113,8 @@ else {
 
     echo("<hr />");
 
-    // datetime range picker
-?>
-    <script type="text/javascript">
-    function submitCustomRange(frmdata) {
-        var reto = /to=([0-9])+/g;
-        var refrom = /from=([0-9])+/g;
-        var tsto = moment(frmdata.dtpickerto.value).unix();
-        var tsfrom = moment(frmdata.dtpickerfrom.value).unix();
-        frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
-        frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
-        frmdata.action = frmdata.selfaction.value;
-        return true;
-    }
-    </script>
-<?php
-    echo("<center>
-        <form class='form-inline' id='customrange' action='test'>
-        <input type=hidden id='selfaction' value='" . $_SERVER['REQUEST_URI'] . "'>");
-    echo('
-        <div class="form-group">
-        <label for="dtpickerfrom">From</label>
-        <input type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' . $graph_array['from'] . '" data-date-format="YYYY-MM-DD HH:mm">
-        </div>
-        <div class="form-group">
-        <label for="dtpickerto">To</label>
-        <input type="text" class="form-control" id="dtpickerto" maxlength=16 value="' . $graph_array['to'] . '" data-date-format="YYYY-MM-DD HH:mm">
-        </div>
-        <input type="submit" class="btn btn-default" id="submit" value="Update" onclick="javascript:submitCustomRange(this.form);">
-        </form>
-        <script type="text/javascript">
-    $(function () {
-        var strfrom = new Date($("#dtpickerfrom").val()*1000);
-        $("#dtpickerfrom").val(strfrom.getFullYear()+"-"+
-            ("0"+(strfrom.getMonth()+1)).slice(-2)+"-"+
-            ("0"+strfrom.getDate()).slice(-2)+" "+
-            ("0"+strfrom.getHours()).slice(-2)+":"+
-            ("0"+strfrom.getMinutes()).slice(-2)
-        );
-        var strto = new Date($("#dtpickerto").val()*1000);
-        $("#dtpickerto").val(strto.getFullYear()+"-"+
-            ("0"+(strto.getMonth()+1)).slice(-2)+"-"+
-            ("0"+strto.getDate()).slice(-2)+" "+
-            ("0"+strto.getHours()).slice(-2)+":"+
-            ("0"+strto.getMinutes()).slice(-2)
-        );
-        $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
-        $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false});
-});
-    </script></center>
+    include_once 'includes/print-date-selector.inc.php';
 
-  ');
     echo ('<div style="padding-top: 5px";></div>');
     echo('<center>');
     if ($vars['legend'] == "no") {

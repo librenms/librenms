@@ -6,10 +6,9 @@ by ensuring:
 	$config['update'] = 0;
 
 is no longer commented out. If you would like to perform a manual update
-then you can do this by running the following commands:
+then you can do this by running the following command:
 
-	git pull --no-edit --quiet
-	php includes/sql-schema/update.php
+	./daily.sh
 
 This will update both the core LibreNMS files but also update the database
 structure if updates are available.

@@ -36,7 +36,7 @@ else {
 
         if ($vars['action'] == 'addifperm') {
             if (!dbFetchCell('SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?', array($vars['port_id'], $vars['user_id']))) {
-                dbInsert(array('port_id' => $vars['port_id'], 'user_id' => $vars['user_id']), 'ports_perms');
+                dbInsert(array('port_id' => $vars['port_id'], 'user_id' => $vars['user_id'], 'access_level' => 0), 'ports_perms');
             }
         }
 

@@ -163,23 +163,23 @@ function list_devices() {
     }
 
     if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order .= ' ASC';
+        $order = '`'.$order.'` ASC';
     }
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     }
     elseif ($type == 'ignored') {
-        $sql = "ignore='1' AND disabled='0'";
+        $sql = "`ignore`='1' AND `disabled`='0'";
     }
     elseif ($type == 'up') {
-        $sql = "status='1' AND ignore='0' AND disabled='0'";
+        $sql = "`status`='1' AND `ignore`='0' AND `disabled`='0'";
     }
     elseif ($type == 'down') {
-        $sql = "status='0' AND ignore='0' AND disabled='0'";
+        $sql = "`status`='0' AND `ignore`='0' AND `disabled`='0'";
     }
     elseif ($type == 'disabled') {
-        $sql = "disabled='1'";
+        $sql = "`disabled`='1'";
     }
     elseif ($type == 'mac') {
         $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_mac` ON `ports`.`port_id`=`ipv4_mac`.`port_id` ";
@@ -602,8 +602,8 @@ function list_alerts() {
     global $config;
     $app    = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
-    if (isset($_POST['state'])) {
-        $param = array(mres($_POST['state']));
+    if (isset($_GET['state'])) {
+        $param = array(mres($_GET['state']));
     }
     else {
         $param = array('1');
@@ -693,8 +693,15 @@ function add_edit_rule() {
     );
     $extra_json = json_encode($extra);
 
-    if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
-        $message = 'Name has already been used';
+    if(!isset($rule_id)) {
+        if (dbFetchCell('SELECT `name` FROM `alert_rules` WHERE `name`=?', array($name)) == $name) {
+            $message = 'Addition failed : Name has already been used';
+        }
+    }
+    else {
+        if(dbFetchCell("SELECT name FROM alert_rules WHERE name=? AND id !=? ", array($name, $rule_id)) == $name) {
+            $message = 'Edition failed : Name has already been used';
+        }
     }
 
     if (empty($message)) {
@@ -795,7 +802,39 @@ function ack_alert() {
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
+}
 
+function unmute_alert() {
+    global $config;
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $alert_id = mres($router['id']);
+    $status   = 'error';
+    $err_msg  = '';
+    $message  = '';
+    $code     = 500;
+    if (is_numeric($alert_id)) {
+        $status = 'ok';
+        $code   = 200;
+        if (dbUpdate(array('state' => 1), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
+            $message = 'Alert has been unmuted';
+        }
+        else {
+            $message = 'No alert by that ID';
+        }
+    }
+    else {
+        $err_msg = 'Invalid alert has been provided';
+    }
+
+    $output = array(
+        'status'  => $status,
+        'err-msg' => $err_msg,
+        'message' => $message,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
 }
 
 
@@ -856,7 +895,7 @@ function list_oxidized() {
     $app->response->headers->set('Content-Type', 'application/json');
 
     $devices = array();
-    foreach (dbFetchRows("SELECT hostname,os FROM `devices` WHERE `status`='1'") as $device) {
+    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL)") as $device) {
         $devices[] = $device;
     }
 
@@ -886,7 +925,7 @@ function list_bills() {
         $param = array($bill_ref);
     }
     elseif (is_numeric($bill_id)) {
-        $sql   = '`bill_id` = ?';
+        $sql   = '`bills`.`bill_id` = ?';
         $param = array($bill_id);
     }
     else {
