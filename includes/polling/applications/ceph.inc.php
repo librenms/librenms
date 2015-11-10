@@ -27,7 +27,8 @@ if (!empty($agent_data['app']['ceph'])) {
                 print "Ceph Pool: $pool, IOPS: $ops, Wr bytes: $wrbytes, R bytes: $rbytes\n";
                 rrdtool_update($ceph_rrd, array("ops" => $ops, "wrbytes" => $wrbytes, "rbytes" => $rbytes));
             }
-        } elseif ($section == "osdperformance") {
+        }
+        elseif ($section == "osdperformance") {
             foreach (explode("\n", $data) as $line) {
                 if (empty($line))
                     continue;
@@ -45,7 +46,8 @@ if (!empty($agent_data['app']['ceph'])) {
                 print "Ceph OSD: $osd, Apply: $apply, Commit: $commit\n";
                 rrdtool_update($ceph_rrd, array("apply_ms" => $apply, "commit_ms" => $commit));
             }
-        } elseif ($section == "df") {
+        }
+        elseif ($section == "df") {
             foreach (explode("\n", $data) as $line) {
                 if (empty($line))
                     continue;
