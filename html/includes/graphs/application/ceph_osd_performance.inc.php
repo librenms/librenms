@@ -1,14 +1,14 @@
 <?php
 
+require 'includes/graphs/application/ceph_common.inc.php';
+
 $ds_in  = 'apply_ms';
 $ds_out = 'commit_ms';
 
 $in_text = 'Apply';
 $out_text = 'Commit';
 
-$rrd = join('-', array('app', 'ceph', $vars['id'], 'osd', $vars['osd'])).'.rrd';
-
-$ceph_osd_rrd = join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
+$ceph_osd_rrd = ceph_rrd('osd');
 
 if (is_file($ceph_osd_rrd)) {
     $rrd_filename = $ceph_osd_rrd;

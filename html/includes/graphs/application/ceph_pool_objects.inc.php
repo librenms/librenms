@@ -3,10 +3,9 @@
 $scale_min = 0;
 
 require 'includes/graphs/common.inc.php';
+require 'includes/graphs/application/ceph_common.inc.php';
 
-$rrd = join('-', array('app', 'ceph', $vars['id'], 'df', $vars['pool'])).'.rrd';
-
-$ceph_pool_rrd = join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
+$ceph_pool_rrd = ceph_rrd('df');
 
 if (is_file($ceph_pool_rrd)) {
     $rrd_filename = $ceph_pool_rrd;
