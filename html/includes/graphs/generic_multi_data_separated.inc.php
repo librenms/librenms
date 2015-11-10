@@ -111,7 +111,7 @@ if (!$nototal) {
 
     $rrd_options .= ' VDEF:95thin=inbits,95,PERCENT';
     $rrd_options .= ' VDEF:95thout=outbits,95,PERCENT';
-    $rrd_options .= ' VDEF:d95thout=doutbits,5,PERCENT';
+    $rrd_options .= ' CDEF:d95thoutn=doutbits,-1,* VDEF:d95thoutn95=d95thoutn,95,PERCENT CDEF:d95thoutn95n=doutbits,doutbits,-,d95thoutn95,-1,*,+ VDEF:d95thout=d95thoutn95n,FIRST';
 
     $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
     $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
