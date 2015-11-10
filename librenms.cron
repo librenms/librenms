@@ -5,3 +5,4 @@
 */5  *    * * *   root    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 15   0    * * *   root    /opt/librenms/daily.sh >> /dev/null 2>&1
 *    *    * * *   root    /opt/librenms/alerts.php >> /dev/null 2>&1
+*/5  *    * * *   root    /opt/librenms/check-services.php >> /dev/null 2>&1

@@ -243,7 +243,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
 
     list($hostshort) = explode(".", $host);
     // Test Database Exists
-    if (dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($host)) == '0') {
+    if (host_exists($host) === false) {
         if ($config['addhost_alwayscheckip'] === TRUE) {
             $ip = gethostbyname($host);
         } else {
@@ -483,38 +483,44 @@ function isSNMPable($device) {
  *
  * @param string $hostname The hostname or IP address to send ping requests to.
  * @param int $address_family The address family (AF_INET for IPv4 or AF_INET6 for IPv6) to use. Defaults to IPv4. Will *not* be autodetected for IP addresses, so it has to be set to AF_INET6 when pinging an IPv6 address or an IPv6-only host.
- * @param int $device_id This parameter is currently ignored.
+ * @param array $attribs The device attributes
  *
  * @return bool TRUE if the host responded to at least one ping request, FALSE otherwise.
  */
-function isPingable($hostname, $address_family = AF_INET, $device_id = FALSE) {
+function isPingable($hostname, $address_family = AF_INET, $attribs = array()) {
     global $config;
 
-    $fping_params = '';
-    if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
-        $fping_params .= ' -r ' . $config['fping_options']['retries'];
-    }
-    if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
-        $fping_params .= ' -t ' . $config['fping_options']['timeout'];
-    }
-    if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
-        $fping_params .= ' -c ' . $config['fping_options']['count'];
-    }
-    if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
-        $fping_params .= ' -p ' . $config['fping_options']['millisec'];
-    }
     $response = array();
-    $status = fping($hostname,$fping_params,$address_family);
-    if ($status['loss'] == 100) {
-        $response['result'] = FALSE;
+    if (can_ping_device($attribs) === true) {
+        $fping_params = '';
+        if(is_numeric($config['fping_options']['retries']) || $config['fping_options']['retries'] > 1) {
+            $fping_params .= ' -r ' . $config['fping_options']['retries'];
+        }
+        if(is_numeric($config['fping_options']['timeout']) || $config['fping_options']['timeout'] > 1) {
+            $fping_params .= ' -t ' . $config['fping_options']['timeout'];
+        }
+        if(is_numeric($config['fping_options']['count']) || $config['fping_options']['count'] > 0) {
+            $fping_params .= ' -c ' . $config['fping_options']['count'];
+        }
+        if(is_numeric($config['fping_options']['millisec']) || $config['fping_options']['millisec'] > 0) {
+            $fping_params .= ' -p ' . $config['fping_options']['millisec'];
+        }
+        $status = fping($hostname,$fping_params,$address_family);
+        if ($status['loss'] == 100) {
+            $response['result'] = FALSE;
+        }
+        else {
+            $response['result'] = TRUE;
+        }
+        if (is_numeric($status['avg'])) {
+            $response['last_ping_timetaken'] = $status['avg'];
+        }
+        $response['db'] = $status;
     }
     else {
-        $response['result'] = TRUE;
+        $response['result'] = true;
+        $response['last_ping_timetaken'] = 0;
     }
-    if (is_numeric($status['avg'])) {
-        $response['last_ping_timetaken'] = $status['avg'];
-    }
-    $response['db'] = $status;
     return($response);
 }
 
@@ -577,13 +583,17 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
 
     if ($device['os']) {
 
-        $device_id = dbInsert($device, 'devices');
-
-        if ($device_id) {
-            return($device_id);
+        if (host_exists($host) === false) {
+            $device_id = dbInsert($device, 'devices');
+            if ($device_id) {
+                return($device_id);
+            }
+            else {
+                return false;
+            }
         }
         else {
-            return FALSE;
+            return false;
         }
     }
     else {
@@ -1248,5 +1258,23 @@ function snmpTransportToAddressFamily($transport) {
     }
     else {
         return AF_INET;
+    }
+}
+
+/**
+ * Checks if the $hostname provided exists in the DB already
+ *
+ * @param string $hostname The hostname to check for
+ *
+ * @return bool true if hostname already exists
+ *              false if hostname doesn't exist
+**/
+function host_exists($hostname) {
+    $count = dbFetchCell("SELECT COUNT(*) FROM `devices` WHERE `hostname` = ?", array($hostname));
+    if ($count > 0) {
+        return true;
+    }
+    else {
+        return false;
     }
 }

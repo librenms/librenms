@@ -758,3 +758,19 @@ function round_Nth($val = 0, $round_to) {
     }
 } // end round_Nth 
 
+/**
+ * Checks if config allows us to ping this device
+ * $attribs contains an array of all of this devices
+ * attributes
+ * @param array $attribs Device attributes
+ * @return bool
+**/
+function can_ping_device($attribs) {
+    global $config;
+    if ($config['icmp_check'] === true && $attribs['override_icmp_disable'] != "true") {
+        return true;
+    }
+    else {
+        return false;
+    }
+} // end can_ping_device

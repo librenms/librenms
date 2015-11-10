@@ -6,7 +6,7 @@ echo '<div class="container-fluid">
         <div class="panel panel-default panel-condensed">
           <div class="panel-heading">';
 echo '<a href="device/device='.$device['device_id'].'/tab=health/metric=mempool/">';
-echo "<img src='images/16/arrow_switch.png'> Catalyst 6k Crossbar</a>";
+echo "<img src='images/16/arrow_switch.png'> <strong>Catalyst 6k Crossbar</strong></a>";
 echo '          </div>
     <table class="table table-hover table-condensed table-striped">';
 

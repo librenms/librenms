@@ -31,8 +31,16 @@ foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
             include $checker_script;
         }
         else {
-            $status = '2';
-            $check  = "Error : Script not found ($checker_script)";
+            $cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+            $cmd .= " ".$service['service_param'];
+            $check = shell_exec($cmd);
+            list($check, $time) = split("\|", $check);
+            if(stristr($check, "ok -")) {
+                $status = 1;
+            }
+            else {
+                $status = 0;
+            }
         }
 
             $update = array();

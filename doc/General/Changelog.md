@@ -1,3 +1,79 @@
+### October 2015
+
+#### Bug fixes
+  - Discovery / Polling:
+    - Check file exists via rrdcached before creating new files on 1.5 (PR2041)
+    - Fix Riverbed discovery (PR2133)
+    - Fixes issue where snmp_get would not return the value 0 (PR2134)
+    - Fixed powerdns snmp checks (PR2176)
+    - De-dupe checks for hostname when adding hosts (PR2189)
+  - WebUI:
+    - Soft fail if PHP Pear not installed (PR2036)
+    - Escape quotes for ifAlias in overlib calls (PR2072)
+    - Fix table name for access points (PR2075)
+    - Removed STACK text in graphs (PR2097)
+    - Enable multiple ifDescr overrides to be done per device (PR2099)
+    - Removed ping + performance graphs and tab if skip ping check (PR2175)
+    - Fixed services -> Alerts menu link + page (PR2173)
+    - Fix percent bar also for quota bills (PR2198)
+    - Fix new Bill (PR2199)
+    - Change default solver to hierarchicalRepulsion in vis.js (PR2202)
+    - Fix: setting user port permissions fails (PR2203)
+    - Updated devices Graphs links to use non-static time references (PR2211)
+    - Removed ignored,deleted and disabled ports from query (PR2213)
+  - API:
+    - Fixed API call for alert states (PR2076)
+    - Fixed nginx rewrite for api (PR2112)
+    - Change on the add_edit_rule to modify a rule without modify the name (PR2159)
+    - Fixed list_bills function when using :bill_id (PR2212)
+
+#### Improvements
+  - WebUI:
+    - Updated Bootstrap to 3.3.5 (PR2015)
+    - Added billing graphs to graphs widget (PR2027)
+    - Lock widgets by default so they can't be moved (PR2042)
+    - Moved Device Groups menu (PR2049)
+    - Show Config tab only if device isn't excluded from oxidized (PR2118)
+    - Simplify adding config options to WebUI (PR2120)
+    - Move red map markers to foreground (PR2127)
+    - Styled the two factor auth token prompt (PR2151)
+    - Update Font Awesome (PR2167)
+    - Allow user to influence when devices are grouped on world map (PR2170)
+    - Centralised the date selector for graphs for re-use (PR2183)
+    - Dont show dashboard settings if `/bare=yes/` (PR2364)
+  - API:
+    - Added unmute alert function to API (PR2082)
+  - Discovery / Polling:
+    - Added additional support for some UPS' based on Multimatic cards (PR2046)
+    - Improved WatchGuard OS detection (PR2048)
+    - Treat Dell branded Wifi controllers as ArubaOS (PR2065)
+    - Added discovery option for OS or Device type (PR2088)
+    - Updated pfSense to firewall type (PR2096)
+    - Added ability to turn off icmp checks globally or per device (PR2131)
+    - Reformat check a bit to make it easier for adding additional oids in (PR2135)
+    - Updated to disable auto-discovery by ip (PR2182)
+    - Updated to use env in distro script (PR2204)
+  - Added detection for:
+    - Pulse Secure OS (PR2053)
+    - Riverbed Steelhead support (PR2107)
+    - OpenBSD sensors (PR2113)
+    - Additional comware detection (PR2162)
+    - Version from Synology MIB (PR2163)
+    - VCSA as VMWare (PR2185)
+    - SAF Lumina radios (PR2361)
+    - TP-Link detection (PR2362)
+  - Documentation:
+    - Improved RHEL/CentOS install docs (PR2043)
+    - Update Varnish Docs (PR2116, PR2126)
+    - Added passworded channels for the IRC-Bot (PR2122)
+    - Updated Two-Factor-Auth.md RE: Google Authenticator (PR2146)
+  - General:
+    - Added colour support to IRC bot (PR2059)
+    - Fixed IRC bot reconnect if socket dies (PR2061)
+    - Updated default crons (PR2177)
+  - Reverts:
+    - "Removed what appears to be unecessary STACK text" (PR2128)
+
 ### September 2015
 
 #### Bug fixes
@@ -8,13 +84,21 @@
   - WebUI:
     - Fix permissions for World-map widget (PR1866)
     - Clean up Gloabl / World Map name mixup (PR1874)
+    - Removed required flag for community when adding new hosts (PR1961)
+    - Stop duplicate devices showing in map (PR1963)
+    - Fix adduser bug storing users real name (PR1990)
+    - Stop alerts top-menu being clickable (PR1995)
   - Services:
     - Honour IP field for DNS checks (PR1933)
   - Discovery / Poller:
-    - Fix Huawei VRP os detection (PR1931)t
+    - Fix Huawei VRP os detection (PR1931)
+    - Set empty processor descr for *nix processors (PR1951)
+    - Ensure udp6/tcp6 snmp devices use fping6 (PR1959)
+    - Fix RRD creation parameters (PR2010)
   - General:
     - Remove 'sh' from cronjob (PR1818)
     - Remove MySQL Locks (PR1822,PR1826,PR1829,PR1836)
+    - Change DB config options to use single quotes to allow $ (PR1948)
 
 #### Improvements
   - WebUI:
@@ -22,27 +106,35 @@
     - Honour Mouseout/Mouseleave on map widget (PR1814)
     - Make syslog/eventlog responsive (PR1816)
     - Reformat Proxmox UI (PR1825,PR1827)
-    - Misc Changes (PR1828,PR1830,PR1875,PR1885,PR1886,PR1887,PR1891,PR1896,PR1901,PR1913)
+    - Misc Changes (PR1828,PR1830,PR1875,PR1885,PR1886,PR1887,PR1891,PR1896,PR1901,PR1913,PR1944)
     - Added support for Oxidized versioning (PR1842)
-    - Added graph widget + settings for widgets (PR1835,PR1861)
+    - Added graph widget + settings for widgets (PR1835,PR1861,PR1968)
     - Added Support for multiple dashboards (PR1869)
     - Added settings page for Worldmap widget (PR1872)
     - Added uptime to availability widget (PR1881)
     - Added top devices and ports widgets (PR1903)
     - Added support for saving notes for devices (PR1927)
+    - Added fullscreen mobile support (PR2022)
   - Added detection for:
     - FortiOS (PR1815)
     - HP MSM (PR1953)
   - Discovery / Poller:
     - Added Proxmox support (PR1789)
+    - Added CPU/Mem support for SonicWALL (PR1957)
+    - Updated distro script to support Arch Linux + fall back to lsb-release (PR1978)
   - Documentation:
     - Add varnish docs (PR1809)
-    - Added CentOS 7 RRCached docs (1893)
+    - Added CentOS 7 RRCached docs (PR1893)
+    - Improved description of fping options (PR1952)
+  - Alerting:
+    - Added RegEx support for alert rules and device groups (PR1998)
   - General:
     - Make installer more responsive (PR1832)
     - Update fping millisec option to 200 default (PR1833)
     - Reduced cleanup of device_perf (PR1837)
     - Added support for negative values in munin-plugins (PR1907)
+    - Added default librenms user to config for use in validate.php (PR1956)
+    - Added working memcache support (PR2007)
 
 ### August 2015
 
