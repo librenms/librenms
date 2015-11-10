@@ -1,5 +1,7 @@
 <?php
 
+require 'includes/graphs/application/ceph_common.inc.php';
+
 $ds_in  = 'rbytes';
 $in_text = 'Read';
 $ds_out = 'wrbytes';
@@ -7,9 +9,7 @@ $out_text = 'Write';
 
 $format = 'bytes';
 
-$rrd = join('-', array('app', 'ceph', $vars['id'], 'pool', $vars['pool'])).'.rrd';
-
-$ceph_pool_rrd = join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
+$ceph_pool_rrd = ceph_rrd('pool');
 
 if (is_file($ceph_pool_rrd)) {
     $rrd_filename = $ceph_pool_rrd;
