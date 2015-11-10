@@ -142,7 +142,7 @@ function get_userid($username) {
 }
 
 
-function deluser($username) {
+function deluser() {
     // not supported so return 0 
     return 0;
 }
