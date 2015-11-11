@@ -4,8 +4,9 @@
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-ntpdserver-'.$app['app_id'].'.rrd';
 $options      = '-O qv';
 $oid          = 'nsExtendOutputFull.10.110.116.112.100.115.101.114.118.101.114';
+$mib          = 'NET-SNMP-EXTEND-MIB';
 
-$ntpdserver = snmp_get($device, $oid, $options);
+$ntpdserver = snmp_get($device, $oid, $options, $mib);
 
 echo ' ntpd-server';
 
