@@ -774,3 +774,24 @@ function can_ping_device($attribs) {
         return false;
     }
 } // end can_ping_device
+
+/**
+ * Constructs the path to an RRD for the Ceph application
+ * @param string $gtype The type of rrd we're looking for
+ * @return string
+**/
+function ceph_rrd($gtype) {
+    global $device;
+    global $vars;
+    global $config;
+
+    if ($gtype == "osd") {
+        $var = $vars['osd'];
+    }
+    else {
+        $var = $vars['pool'];
+    }
+
+    $rrd = join('-', array('app', 'ceph', $vars['id'], $gtype, $var)).'.rrd';
+    return join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
+}
