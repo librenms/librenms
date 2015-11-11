@@ -41,33 +41,36 @@ function authenticate($username, $password) {
 
                 return $user_authenticated;
                 
-            } else {
+            }
+            else {
                 // group membership is not required and user is valid
                 return 1;
-            };
-        } else {
+            }
+        }
+        else {
             return 0;
         }
-    } else {
+    }
+    else {
         echo ldap_error($ds);
     }
 
     return 0;
 }
 
-function reauthenticate($sess_id, $token) {
+function reauthenticate() {
     // not supported so return 0
     return 0;
 }
 
 
-function passwordscanchange($username='') {
+function passwordscanchange() {
     // not supported so return 0
     return 0;
 }
 
 
-function changepassword($username, $newpassword) {
+function changepassword() {
     // not supported so return 0
     return 0;
 }
@@ -79,7 +82,7 @@ function auth_usermanagement() {
 }
 
 
-function adduser($username, $password, $level, $email='', $realname='', $can_modify_passwd='1') {
+function adduser() {
     // not supported so return 0
     return 0;
 }
@@ -127,7 +130,7 @@ function get_userid($username) {
     global $config, $ds;
 
     $attributes = array('objectsid');
-    $result = ldap_search($ds, $config['auth_ad_base_dn'],
+    $search = ldap_search($ds, $config['auth_ad_base_dn'],
                           "(samaccountname={$username})", $attributes);    
     $entries = ldap_get_entries($ds, $search);
 
@@ -139,7 +142,7 @@ function get_userid($username) {
 }
 
 
-function deluser($username) {
+function deluser() {
     // not supported so return 0 
     return 0;
 }
@@ -148,6 +151,7 @@ function deluser($username) {
 function get_userlist() {
     global $config, $ds;
     $userlist = array();
+    $userhash = array();
 
     $ldap_groups = get_group_list();
 
@@ -218,7 +222,8 @@ function get_fullname($username) {
     $entries = ldap_get_entries($ds, $result);
     if ($entries['count'] > 0) {
         $membername = $entries[0]['name'][0];
-    } else {
+    }
+    else {
         $membername = $username;
     }
 
@@ -262,7 +267,8 @@ function get_dn($samaccountname) {
     $entries = ldap_get_entries($ds, $result);
     if ($entries['count'] > 0) {
         return $entries[0]['dn'];
-    } else {
+    }
+    else {
         return '';
     }
 }
