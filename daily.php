@@ -37,6 +37,7 @@ The ' . $config['project_name'] . ' team.';
             echo 'Current size: '.($pool_size / 1024 / 1024).' MiB'.PHP_EOL;
             echo 'Minimum Required: '.($pool_used / 1024 / 1024).' MiB'.PHP_EOL;
             echo 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
+            echo 'Config proposal: "innodb_buffer_pool_size = '.pow(2,ceil(log(($pool_used / 1024 / 1024),2))).'M"'.PHP_EOL;
         }
         exit(2);
     }
