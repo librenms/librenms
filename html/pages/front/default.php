@@ -33,7 +33,7 @@ echo '<div class="status-boxes">';
 $count_boxes = 0;
 
 // Device down boxes
-if ($_SESSION['userlevel'] >= '10') {
+if (is_admin() === true || is_read() === true) {
     $sql = "SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0' LIMIT ".$config['front_page_down_box_limit'];
 }
 else {
@@ -50,7 +50,7 @@ foreach (dbFetchRows($sql) as $device) {
     ++$count_boxes;
 }
 
-if ($_SESSION['userlevel'] >= '10') {
+if (is_admin() === true || is_read() === true) {
     $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0' AND `D`.`status` = '1' LIMIT ".$config['front_page_down_box_limit'];
 }
 else {
@@ -79,7 +79,7 @@ if ($config['warn']['ifdown']) {
 /*
     FIXME service permissions? seem nonexisting now.. */
 // Service down boxes
-if ($_SESSION['userlevel'] >= '10') {
+if (is_admin() === true || is_read() === true) {
     $sql     = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0' AND `D`.`status` = '1' LIMIT ".$config['front_page_down_box_limit'];
     $param[] = '';
 }
@@ -101,7 +101,7 @@ foreach (dbFetchRows($sql, $param) as $service) {
 
 // BGP neighbour down boxes
 if (isset($config['enable_bgp']) && $config['enable_bgp']) {
-    if ($_SESSION['userlevel'] >= '10') {
+    if (is_admin() === true || is_read() === true) {
         $sql = "SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != '' AND B.device_id = D.device_id AND D.ignore = 0 AND `D`.`status` = '1' LIMIT ".$config['front_page_down_box_limit'];
     }
     else {
@@ -122,7 +122,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp']) {
 
 // Device rebooted boxes
 if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== false && $config['uptime_warning'] > 0) {
-    if ($_SESSION['userlevel'] >= '10') {
+    if (is_admin() === true || is_read() === true) {
         $sql = "SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime > 0 AND D.uptime < '".$config['uptime_warning']."' AND D.ignore = 0 LIMIT ".$config['front_page_down_box_limit'];
     }
     else {
@@ -204,7 +204,7 @@ if ($config['enable_syslog']) {
     echo '</div>';
 }
 else {
-    if ($_SESSION['userlevel'] >= '10') {
+    if (is_admin() === true || is_read() === true) {
         $query      = "SELECT *,DATE_FORMAT(datetime, '".$config['dateformat']['mysql']['compact']."') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
         $alertquery = 'SELECT devices.device_id,name,state,time_logged FROM alert_log LEFT JOIN devices ON alert_log.device_id=devices.device_id LEFT JOIN alert_rules ON alert_log.rule_id=alert_rules.id ORDER BY `time_logged` DESC LIMIT 0,15';
     }
