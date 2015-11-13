@@ -2,19 +2,18 @@
 
 // easier to rewrite for Active Directory than to bash it into existing LDAP implementation
 
+// disable certificate checking before connect if required
+if (isset($config['auth_ad_dont_check_certificates']) &&
+          $config['auth_ad_dont_check_certificates'] > 0) {
+    putenv('LDAPTLS_REQCERT=never');
+};
+
 $ds = @ldap_connect($config['auth_ad_url']);
 
 // disable referrals and force ldap version to 3
 
 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-
-// disable certificate checking if required
-
-if (isset($config['auth_ad_dont_check_certificates']) &&
-          $config['auth_ad_dont_check_certificates'] > 0) {
-    putenv('LDAPTLS_REQCERT=never');
-};
 
 function authenticate($username, $password) {
     global $config, $ds;
