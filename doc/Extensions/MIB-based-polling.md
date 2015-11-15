@@ -6,11 +6,11 @@ tested against a very limited set of devices (namely Ruckus ZD1000 wireless
 controllers, and `net-snmp` on Linux).  It may fail badly on other hardware.
 
 The approach taken is fairly simplistic and I claim no special expertise in
-understanding MIBs.  Most of my understanding of SNMP comes from reading
-net-snmp man pages, and reverse engineering the output of snmptranslate and
-snmpwalk and trying to make devices work with LibreNMS.  I may have made
-false assumptions and probably use wrong terminology in many places.  Feel
-free to offer corrections/suggestions via pull requests or email.
+understanding MIBs.  Most of my knowledge of SNMP comes from reading net-snmp
+man pages, and reverse engineering the output of snmptranslate and snmpwalk
+and trying to make devices work with LibreNMS.  I may have made false
+assumptions and probably use wrong terminology in many places.  Feel free to
+offer corrections/suggestions via pull requests or email.
 
 Paul Gear <paul@librenms.org>
 
