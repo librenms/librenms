@@ -802,7 +802,7 @@ function snmp_gen_auth(&$device) {
 
 
 /*
- * Translate the given MIB into a vaguely useful PHP array.  Each keyword becomes an array index.
+ * Translate the given MIB into a PHP array.  Each keyword becomes an array index.
  *
  * Example:
  * snmptranslate -Td -On -M mibs -m RUCKUS-ZD-SYSTEM-MIB RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta
