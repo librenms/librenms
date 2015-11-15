@@ -230,7 +230,8 @@ function rrdtool_create($filename, $options) {
  */
 
 
-function rrdtool_update($filename, $options) {
+function rrdtool_update($filename, $options)
+{
     $values = array();
     // Do some sanitisation on the data if passed as an array.
 
@@ -250,26 +251,25 @@ function rrdtool_update($filename, $options) {
     else {
         return 'Bad options passed to rrdtool_update';
     }
+} // rrdtool_update
 
-}
 
-
-function rrdtool_fetch($filename, $options) {
+function rrdtool_fetch($filename, $options)
+{
     return rrdtool('fetch', $filename, $options);
+} // rrdtool_fetch
 
-}
 
-
-function rrdtool_last($filename, $options) {
+function rrdtool_last($filename, $options)
+{
     return rrdtool('last', $filename, $options);
+} // rrdtool_last
 
-}
 
-
-function rrdtool_lastupdate($filename, $options){
+function rrdtool_lastupdate($filename, $options)
+{
     return rrdtool('lastupdate', $filename, $options);
-
-}
+} // rrdtool_lastupdate
 
 
 /**
@@ -280,8 +280,6 @@ function rrdtool_lastupdate($filename, $options){
  * @param string string to escape
  * @param integer if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
  */
-
-
 function rrdtool_escape($string, $maxlength=null){
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
@@ -308,7 +306,7 @@ function rrd_name($host, $extra, $exten = ".rrd") {
     global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
     return implode("/", array($config['rrd_dir'], $host, $filename.$exten));
-}
+} // rrd_name
 
 function rrdtool_tune($type, $filename, $max) {
     $fields = array();
@@ -335,7 +333,6 @@ function rrdtool_tune($type, $filename, $max) {
  * @param val Array of value definitions
  *
  */
-
 function rrd_create_update($device, $name, $def, $val, $step=300) {
     global $config;
     $rrd = rrd_name($device['hostname'], $name);
@@ -347,7 +344,6 @@ function rrd_create_update($device, $name, $def, $val, $step=300) {
     }
 
     rrdtool_update($rrd, $val);
-
 } // rrd_create_update
 
 
@@ -360,7 +356,6 @@ function rrd_file_exists($device, $name)
 {
     return is_file(rrd_name($device['hostname'], $name));
 } // rrd_file_exists
-
 
 
 /*

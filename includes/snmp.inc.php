@@ -816,8 +816,6 @@ function snmp_gen_auth(&$device) {
  *   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) ruckusRootMIB(25053) ruckusObjects(1) ruckusZD(2) ruckusZDSystemModule(1) ruckusZDSystemMIB(1) ruckusZDSystemObjects(1)
  *           ruckusZDSystemStats(15) 30 }
  */
-
-
 function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
     global $debug;
 
@@ -886,8 +884,7 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
     else {
         return null;
     }
-
-}//end snmp_mib_parse()
+} // snmp_mib_parse
 
 
 /*
@@ -923,19 +920,19 @@ function snmp_mib_walk($mib, $module, $mibdir=null)
 
     return $result;
 
-}//end snmp_mib_walk()
+} // snmp_mib_walk
 
 
 function quote_column($a)
 {
     return '`'.$a.'`';
-}
+} // quote_column
 
 
 function join_array($a, $b)
 {
     return quote_column($a).'='.$b;
-}
+} // join_array
 
 
 /*
@@ -970,7 +967,7 @@ function update_db_table($tablename, $columns, $numkeys, $rows)
         d_echo("Result: $result\n");
     }
     dbCommitTransaction();
-}
+} // update_db_table
 
 /*
  * Load the given MIB into the database.
@@ -989,7 +986,7 @@ function snmp_mib_load($mib, $module, $included_by, $mibdir = null)
     update_db_table('mibdefs', $columns, 3, $mibs);
     return count($mibs);
 
-}//end snmp_mib_load()
+} // snmp_mib_load
 
 
 /*
@@ -1028,7 +1025,7 @@ function snmp_translate($oid, $module, $mibdir = null)
         $matches[2],
     );
 
-}//end snmp_translate()
+} // snmp_translate
 
 
 /*
@@ -1068,7 +1065,7 @@ function oid_rrd_type($oid, $mibdef)
 
     return false;
 
-}//end oid_rrd_type()
+} // oid_rrd_type
 
 
 /*
@@ -1086,7 +1083,7 @@ function tag_graphs($mibname, $oids, $mibdef, &$graphs)
         }
     }
 
-}//end tag_graphs()
+} // tag_graphs
 
 
 /*
@@ -1121,9 +1118,8 @@ function update_mib_graph_types($mibname, $oids, $mibdef, $graphs)
                 dbInsert($graphdef, 'graph_types');
             }
         }
-    }//end foreach
-
-}//end update_mib_graph_types()
+    }
+} // update_mib_graph_types
 
 
 /*
@@ -1183,7 +1179,8 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
     // update database
     $columns = array('device_id', 'oid', 'module', 'mib', 'object_type', 'value', 'numvalue');
     update_db_table('device_oids', $columns, 2, $deviceoids);
-}//end save_mibs()
+} // save_mibs
+
 
 /*
  * @return an array of MIB objects matching $module, $name, keyed by object_type
@@ -1207,7 +1204,7 @@ function load_mibdefs($module, $name)
 
     d_print_r($result);
     return $result;
-}
+} // load_mibdefs
 
 /*
  * @return an array of MIB names and modules for $device from the database
@@ -1220,7 +1217,7 @@ function load_device_mibs($device)
         $result[$row['mib']] = $row['module'];
     }
     return $result;
-}
+} // load_device_mibs
 
 
 /*
@@ -1239,7 +1236,7 @@ function is_mib_poller_enabled($device)
     }
 
     return true;
-}
+} // is_mib_poller_enabled
 
 /*
  * Run MIB-based polling for $device.  Update $graphs with the results.
@@ -1261,7 +1258,7 @@ function poll_mibs($device, &$graphs)
         save_mibs($device, $name, $oids, load_mibdefs($module, $name), $graphs);
     }
     echo "\n";
-}//end poll_mibs()
+} // poll_mibs
 
 /*
  * Take a list of MIB name => module pairs.
@@ -1304,4 +1301,4 @@ function register_mibs($device, $mibs, $included_by)
     }
 
     echo "\n";
-}
+} // register_mibs
