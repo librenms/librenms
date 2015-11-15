@@ -580,6 +580,7 @@ function edit_service($service, $descr, $service_ip, $service_param = "", $servi
 
 }
 
+
 /*
  * convenience function - please use this instead of 'if ($debug) { echo ...; }'
  */
@@ -596,7 +597,8 @@ function d_echo($text, $no_debug_text = null) {
     elseif ($no_debug_text) {
         echo "$no_debug_text";
     }
-}
+} // d_echo
+
 
 /*
  * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
@@ -609,27 +611,8 @@ function d_print_r($var, $no_debug_text = null) {
     elseif ($no_debug_text) {
         echo "$no_debug_text";
     }
-}
+} // d_print_r
 
-/*
- * WARNING: DEPRECATED - used only by first release of MIB poller.
- * Shorten the name so it works as an RRD data source name (limited to 19 chars by default).
- * Substitute for $subst if necessary.
- * @return the shortened name
- */
-function name_shorten($name, $common = null, $subst = "mibval", $len = 19) {
-    if ($common !== null) {
-        // remove common from the beginning of the string, if present
-        if (strlen($name) > $len && strpos($name, $common) >= 0) {
-            $newname = str_replace($common, '', $name);
-            $name = $newname;
-        }
-    }
-    if (strlen($name) > $len) {
-        $name = $subst;
-    }
-    return $name;
-}
 
 /*
  * @return true if the given graph type is a dynamic MIB graph
@@ -637,7 +620,8 @@ function name_shorten($name, $common = null, $subst = "mibval", $len = 19) {
 function is_mib_graph($type, $subtype) {
     global $config;
     return $config['graph_types'][$type][$subtype]['section'] == 'mib';
-}
+} // is_mib_graph
+
 
 /*
  * @return true if client IP address is authorized to access graphs
@@ -660,7 +644,8 @@ function is_client_authorized($clientip) {
     }
 
     return false;
-}
+} // is_client_authorized
+
 
 /*
  * @return an array of all graph subtypes for the given type
@@ -692,7 +677,8 @@ function get_graph_subtypes($type) {
 
     sort($types);
     return $types;
-}
+} // get_graph_subtypes
+
 
 function get_smokeping_files($device) {
     global $config;
@@ -723,6 +709,7 @@ function get_smokeping_files($device) {
     return $smokeping_files;
 } // end get_smokeping_files
 
+
 function generate_smokeping_file($device,$file='') {
     global $config;
     if ($config['smokeping']['integration'] === true) {
@@ -731,7 +718,8 @@ function generate_smokeping_file($device,$file='') {
     else {
         return $config['smokeping']['dir'] . '/' . $file;
     }
-}
+} // generate_smokeping_file
+
 
 /*
  * @return rounded value to 10th/100th/1000th depending on input (valid: 10, 100, 1000)
@@ -748,6 +736,7 @@ function round_Nth($val = 0, $round_to) {
     }
 } // end round_Nth 
 
+
 /*
  * FIXME: Dummy implementation
  */
@@ -757,7 +746,8 @@ function count_mib_mempools($device)
         return 1;
     }
     return 0;
-}
+} // count_mib_mempools
+
 
 /*
  * FIXME: Dummy implementation
@@ -768,12 +758,14 @@ function count_mib_processors($device)
         return 1;
     }
     return 0;
-}
+} // count_mib_processors
+
 
 function count_mib_health($device)
 {
     return count_mib_mempools($device) + count_mib_processors($device);
-}
+} // count_mib_health
+
 
 /*
  * FIXME: Dummy implementation
@@ -790,7 +782,8 @@ function is_custom_graph($type, $subtype, $device)
         }
     }
     return false;
-}
+} // is_custom_graph
+
 
 /*
  * FIXME: Dummy implementation
@@ -803,7 +796,8 @@ function enable_os_graphs($os, &$graph_enable)
         $graph_enable[$graph['graph_section']][$graph['graph_subtype']] = "device_".$graph['graph_subtype'];
     }
     */
-}
+} // enable_os_graphs
+
 
 /*
  * For each os-based or global graph relevant to $device, set its section/graph entry in $graph_enable.
@@ -817,7 +811,8 @@ function enable_graphs($device, &$graph_enable)
     }
 
     enable_os_graphs($device['os'], $graph_enable);
-}
+} // enable_graphs
+
 
 //
 // maintain a simple cache of objects
@@ -827,7 +822,7 @@ function object_add_cache($section, $obj)
 {
     global $object_cache;
     $object_cache[$section][$obj] = true;
-}
+} // object_add_cache
 
 
 function object_is_cached($section, $obj)
@@ -839,7 +834,8 @@ function object_is_cached($section, $obj)
     else {
         return false;
     }
-}
+} // object_is_cached
+
 
 /**
  * Checks if config allows us to ping this device
@@ -858,6 +854,7 @@ function can_ping_device($attribs) {
     }
 } // end can_ping_device
 
+
 /*
  * @return true if the requested module type & name is globally enabled
  */
@@ -872,6 +869,7 @@ function is_module_enabled($type, $module)
     }
 } // is_module_enabled
 
+
 /*
  * @return true if every string in $arr begins with $str
  */
@@ -885,6 +883,7 @@ function begins_with($str, $arr)
     }
     return true;
 } // begins_with
+
 
 /*
  * @return the longest starting portion of $str that matches everything in $arr
@@ -901,6 +900,7 @@ function longest_matching_prefix($str, $arr)
     }
     return '';
 } // longest_matching_prefix
+
 
 /**
  * Constructs the path to an RRD for the Ceph application
@@ -921,7 +921,7 @@ function ceph_rrd($gtype) {
 
     $rrd = join('-', array('app', 'ceph', $vars['id'], $gtype, $var)).'.rrd';
     return join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
-}
+} // ceph_rrd
 
 /**
  * Parse location field for coordinates
