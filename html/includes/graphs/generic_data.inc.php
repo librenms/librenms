@@ -107,7 +107,7 @@ $rrd_options .= ' LINE:in'.$format."#608720:'In '";
 $rrd_options .= ' GPRINT:in'.$format.':LAST:%6.2lf%s';
 $rrd_options .= ' GPRINT:in'.$format.':AVERAGE:%6.2lf%s';
 $rrd_options .= ' GPRINT:in'.$format.'_max:MAX:%6.2lf%s';
-$rrd_options .= " GPRINT:95thin:%6.2lf%s\\\\n";
+$rrd_options .= " GPRINT:95thin:%6.2lf%s\\n";
 
 $rrd_options .= ' AREA:dout'.$format.'_max#E0E0FF:';
 $rrd_options .= ' AREA:dout'.$format.'#8080C0:';
@@ -116,7 +116,7 @@ $rrd_options .= ' LINE:dout'.$format."#606090:'Out'";
 $rrd_options .= ' GPRINT:out'.$format.':LAST:%6.2lf%s';
 $rrd_options .= ' GPRINT:out'.$format.':AVERAGE:%6.2lf%s';
 $rrd_options .= ' GPRINT:out'.$format.'_max:MAX:%6.2lf%s';
-$rrd_options .= " GPRINT:95thout:%6.2lf%s\\\\n";
+$rrd_options .= " GPRINT:95thout:%6.2lf%s\\n";
 
 if ($config['rrdgraph_real_95th']) {
     $rrd_options .= ' HRULE:95thhigh#FF0000:"Highest"';
@@ -125,7 +125,7 @@ if ($config['rrdgraph_real_95th']) {
 
 $rrd_options .= " GPRINT:tot:'Total %6.2lf%s'";
 $rrd_options .= " GPRINT:totin:'(In %6.2lf%s'";
-$rrd_options .= " GPRINT:totout:'Out %6.2lf%s)\\\\l'";
+$rrd_options .= " GPRINT:totout:'Out %6.2lf%s)\\l'";
 $rrd_options .= ' LINE1:95thin#aa0000';
 $rrd_options .= ' LINE1:d95thout#aa0000';
 

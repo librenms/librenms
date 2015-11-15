@@ -42,6 +42,6 @@ foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', array($device[
     $rrd_options .= " LINE1.25:$storage[storage_id]perc#".$colour.":'$descr'";
     $rrd_options .= " GPRINT:$storage[storage_id]size:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:$storage[storage_id]used:LAST:%6.2lf%sB";
-    $rrd_options .= " GPRINT:$storage[storage_id]perc:LAST:%5.2lf%%\\\\l";
+    $rrd_options .= " GPRINT:$storage[storage_id]perc:LAST:%5.2lf%%\\l";
     $iter++;
 }//end foreach
