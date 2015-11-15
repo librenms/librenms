@@ -632,17 +632,6 @@ function name_shorten($name, $common = null, $subst = "mibval", $len = 19) {
 }
 
 /*
- * @return the name of the rrd file for $host's $extra component
- * @param host Host name
- * @param extra Components of RRD filename - will be separated with "-"
- */
-function rrd_name($host, $extra, $exten = ".rrd") {
-    global $config;
-    $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
-    return implode("/", array($config['rrd_dir'], $host, $filename.$exten));
-}
-
-/*
  * @return true if the given graph type is a dynamic MIB graph
  */
 function is_mib_graph($type, $subtype) {

@@ -1154,6 +1154,16 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
             }
 
             $usedoids[$index][$obj] = $val;
+
+            // if there's a file from the previous version of MIB-based polling, rename it
+            if (rrd_file_exists($device, array($mibname, $mibdef[$obj]['object_type'], $index))
+            && !rrd_file_exists($device, array($mibname, $mibdef[$obj]['shortname'], $index))) {
+                rrd_file_rename($device,
+                    array($mibname, $mibdef[$obj]['object_type'], $index),
+                    array($mibname, $mibdef[$obj]['shortname'], $index));
+                // Note: polling proceeds regardless of rename result
+            }
+
             rrd_create_update(
                 $device,
                 array(
