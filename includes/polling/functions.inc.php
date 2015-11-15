@@ -395,31 +395,6 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 }//end poll_mib_def()
 
 
-/*
- * Please use this instead of creating & updating RRD files manually.
- * @param device Device object - only 'hostname' is used at present
- * @param name Array of rrdname components
- * @param def Array of data definitions
- * @param val Array of value definitions
- *
- */
-
-
-function rrd_create_update($device, $name, $def, $val, $step=300) {
-    global $config;
-    $rrd = rrd_name($device['hostname'], $name);
-
-    if (!is_file($rrd) && $def != null) {
-        // add the --step and the rra definitions to the array
-        $newdef = "--step $step ".implode(' ', $def).$config['rrd_rra'];
-        rrdtool_create($rrd, $newdef);
-    }
-
-    rrdtool_update($rrd, $val);
-
-}//end rrd_create_update()
-
-
 function get_main_serial($device) {
     if ($device['os_group'] == 'cisco') {
         $serial_output = snmp_get_multi($device, 'entPhysicalSerialNum.1 entPhysicalSerialNum.1001', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
