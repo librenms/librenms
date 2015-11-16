@@ -29,7 +29,7 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`datetime` LIKE '%$searchPhrase%' OR `E`.`message` LIKE '%$searchPhrase%' OR `E`.`type` LIKE '%$searchPhrase%')";
 }
 
-$count_sql = "SELECT COUNT(datetime) $sql";
+$count_sql = "SELECT COUNT(event_id) $sql";
 $total     = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;
