@@ -1,7 +1,6 @@
 <?php
 
 // easier to rewrite for Active Directory than to bash it into existing LDAP implementation
-// TODO: Add user in database if auth success and user doesn't already exist in db
 
 // disable certificate checking before connect if required
 if (isset($config['auth_ad_check_certificates']) &&
@@ -36,6 +35,7 @@ function authenticate($username, $password) {
                     if (isset($config['auth_ad_groups'][$group_cn]['level'])) {
                         // user is in one of the defined groups
                         $user_authenticated = 1;
+                        adduser($username);
                     } 
                 }
 
@@ -44,6 +44,7 @@ function authenticate($username, $password) {
             }
             else {
                 // group membership is not required and user is valid
+                adduser($username);
                 return 1;
             }
         }
@@ -82,11 +83,20 @@ function auth_usermanagement() {
 }
 
 
-function adduser() {
-    // not supported so return 0
-    return 0;
+function adduser($username) {
+    // Check to see if user is already added in the database
+    if (!user_exists_in_db($username)) {
+        return dbInsert(array('username' => $username, 'user_id' => get_userid($username), 'level' => "0", 'can_modify_passwd' => 0, 'twofactor' => 0), 'users');
+    }
+    else {
+        return false;
+    }
 }
 
+function user_exists_in_db($username) {
+    $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
+    return $return;
+}
 
 function user_exists($username) {
     global $config, $ds;
