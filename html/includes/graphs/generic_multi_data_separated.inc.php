@@ -45,9 +45,6 @@ foreach ($rrd_list as $rrd) {
     }
 
     $descr_out = rrdtool_escape($rrd['descr_out'], $descr_len).' Out';
-    $descr     = str_replace("'", '', $descr);
-    // FIXME does this mean ' should be filtered in rrdtool_escape? probably...
-    $descr_out = str_replace("'", '', $descr_out);
 
     $rrd_options .= ' DEF:'.$in.$i.'='.$rrd['filename'].':'.$ds_in.':AVERAGE ';
     $rrd_options .= ' DEF:'.$out.$i.'='.$rrd['filename'].':'.$ds_out.':AVERAGE ';
@@ -69,10 +66,10 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($i) {
-        $stack = 'STACK';
+        $stack = ':STACK';
     }
 
-    $rrd_options .= ' AREA:inB'.$i.'#'.$colour_in.":'".$descr."':$stack";
+    $rrd_options .= ' AREA:inB'.$i.'#'.$colour_in.":'".$descr."'$stack";
     $rrd_options .= ' GPRINT:inB'.$i.":LAST:%6.2lf%s$units";
     $rrd_options .= ' GPRINT:inB'.$i.":AVERAGE:%6.2lf%s$units";
     $rrd_options .= ' GPRINT:inB'.$i.":MAX:%6.2lf%s$units\l";
@@ -82,7 +79,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options  .= " 'HRULE:0#".$colour_out.':'.$descr_out."'";
-    $rrd_optionsb .= " 'AREA:outB".$i.'_neg#'.$colour_out."::$stack'";
+    $rrd_optionsb .= " 'AREA:outB".$i.'_neg#'.$colour_out.":$stack'";
     $rrd_options  .= ' GPRINT:outB'.$i.":LAST:%6.2lf%s$units";
     $rrd_options  .= ' GPRINT:outB'.$i.":AVERAGE:%6.2lf%s$units";
     $rrd_options  .= ' GPRINT:outB'.$i.":MAX:%6.2lf%s$units\l";
@@ -117,7 +114,7 @@ if (!$nototal) {
     $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
     $rrd_options .= ' VDEF:tot=octets,TOTAL';
 
-    // $rrd_options .= " AREA:totin#" . $colour_in . ":'" . $descr . "':$stack";
+    // $rrd_options .= " AREA:totin#" . $colour_in . ":'" . $descr . "'$stack";
     // $rrd_options .= " GPRINT:totin:LAST:%6.2lf%s$units";
     // $rrd_options .= " GPRINT:totin:AVERAGE:%6.2lf%s$units";
     // $rrd_options .= " GPRINT:totin:MAX:%6.2lf%s$units\l";

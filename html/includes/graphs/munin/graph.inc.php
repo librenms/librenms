@@ -50,7 +50,7 @@ foreach ($dbq as $ds) {
 
         $descr = rrdtool_escape($ds['ds_label'], $descr_len);
 
-        $cmd_graph .= ' '.$ds['ds_draw'].':'.$ds_name.'#'.$colour.':"'.$descr.'"';
+        $cmd_graph .= ' '.$ds['ds_draw'].':'.$ds_name.'#'.$colour.":'".$descr."'";
         $cmd_graph .= ' GPRINT:'.$ds_name.':LAST:"%6.2lf%s"';
         $cmd_graph .= ' GPRINT:'.$ds_name.':AVERAGE:"%6.2lf%s"';
         $cmd_graph .= ' GPRINT:'.$ds_name.':MAX:"%6.2lf%s\\n"';
