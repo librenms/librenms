@@ -12,7 +12,7 @@ else {
 }
 
 if ($nototal) {
-    $descrlen += '2';
+    $descr_len += '2';
     $unitlen  += '2';
 }
 
@@ -32,7 +32,7 @@ else {
 
 $unitlen = '10';
 if ($nototal) {
-    $descrlen += '2';
+    $descr_len += '2';
     $unitlen  += '2';
 }
 
@@ -81,7 +81,7 @@ foreach ($rrd_list as $i => $rrd) {
 
     // This this not the first entry?
     if ($i) {
-        $stack = 'STACK';
+        $stack = ':STACK';
     }
 
     // if we've been passed a multiplier we must make a CDEF based on it!
@@ -109,13 +109,13 @@ foreach ($rrd_list as $i => $rrd) {
         $t_defname = $g_defname;
     }
 
-    $rrd_options .= ' AREA:'.$g_defname.$i.'#'.$colour.":'".$descr."':$stack";
+    $rrd_options .= ' AREA:'.$g_defname.$i.'#'.$colour.":'".$descr."'$stack";
 
     $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%5.2lf%s GPRINT:'.$t_defname.$i.'min:MIN:%5.2lf%s';
     $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%5.2lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%5.2lf%s\\n'";
 
     if (!$nototal) {
-        $rrd_options .= ' GPRINT:tot'.$rrd['ds'].$i.':%6.2lf%s'.rrdtool_escape($total_units).'';
+        $rrd_options .= ' GPRINT:tot'.$rrd['ds'].$i.":%6.2lf%s'".rrdtool_escape($total_units)."'";
     }
 
     $rrd_options .= " COMMENT:'\\n'";
