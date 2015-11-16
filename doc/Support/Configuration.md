@@ -436,7 +436,7 @@ $config['auth_mechanism']           = "mysql";
 ```
 This is the authentication type to use for the WebUI. MySQL is the default and configured when following the installation 
 instructions. ldap and http-auth are also valid options. For instructions on the different authentication modules please 
-see [Authentication](http://doc.librenms.org/Extensions/Authentication/).
+see [Authentication](http://docs.librenms.org/Extensions/Authentication/).
 
 ```php
 $config['auth_remember']            = '30';
