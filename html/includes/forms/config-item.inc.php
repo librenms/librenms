@@ -30,10 +30,11 @@ $config_extra     = mres($_POST['config_extra']);
 $config_room_id   = mres($_POST['config_room_id']);
 $config_from      = mres($_POST['config_from']);
 $config_userkey   = mres($_POST['config_userkey']);
+$config_to        = mres($_POST['config_to']);
 $status           = 'error';
 $message          = 'Error with config';
 
-if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar') {
+if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar' || $action == 'remove-clickatell') {
     $config_id = mres($_POST['config_id']);
     if (empty($config_id)) {
         $message = 'No config id passed';
@@ -51,6 +52,9 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
             }
             elseif ($action == 'remove-boxcar') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.boxcar.$config_id.%'");
+            }
+            elseif ($action == 'remove-clickatell') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.clickatell.$config_id.%'");
             }
 
             $status  = 'ok';
@@ -148,6 +152,31 @@ else if ($action == 'add-boxcar') {
                 list($k,$v) = explode('=', $option, 2);
                 if (!empty($k) || !empty($v)) {
                     dbInsert(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Boxcar '.$v), 'config');
+                }
+            }
+        }
+        else {
+            $message = 'Could not create config item';
+        }
+    }
+}
+else if ($action == 'add-clickatell') {
+    if (empty($config_value)) {
+        $message = 'No Clickatell token provided';
+    }
+    elseif (empty($config_to)) {
+        $message = 'No mobile numbers provided';
+    }
+    else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.clickatell.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Clickatell Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.token'), 'config', 'config_id=?', array($config_id));
+            $status                   = 'ok';
+            $message                  = 'Config item created';
+            $mobiles                   = explode('\n', $config_to);
+            foreach ($mobiles as $mobile) {
+                if (!empty($mobile)) {
+                    dbInsert(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.to', 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Clickatell mobile'), 'config');
                 }
             }
         }
