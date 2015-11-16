@@ -1,6 +1,7 @@
 <?php
 
 // easier to rewrite for Active Directory than to bash it into existing LDAP implementation
+// TODO: Add user in database if auth success and user doesn't already exist in db
 
 // disable certificate checking before connect if required
 if (isset($config['auth_ad_check_certificates']) &&
