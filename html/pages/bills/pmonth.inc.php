@@ -60,7 +60,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_name`') as $bill) {
                 <td>$total_data</td>
                 <td>$rate_95th</td>
                 <td style=\"text-align: center;\">$overuse</td>
-                <td>".print_percentage_bar(250, 20, $perc, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</td>
+                <td>".print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</td>
                 </tr>';
 
             $i++;
