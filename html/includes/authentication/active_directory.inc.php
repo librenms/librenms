@@ -3,8 +3,8 @@
 // easier to rewrite for Active Directory than to bash it into existing LDAP implementation
 
 // disable certificate checking before connect if required
-if (isset($config['auth_ad_dont_check_certificates']) &&
-          $config['auth_ad_dont_check_certificates'] > 0) {
+if (isset($config['auth_ad_check_certificates']) &&
+          $config['auth_ad_check_certificates'] == 0) {
     putenv('LDAPTLS_REQCERT=never');
 };
 
