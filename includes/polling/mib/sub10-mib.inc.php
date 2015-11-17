@@ -12,25 +12,31 @@ $mib_oids = array(
     'sub10RadioLclRxPower' => array(
         '0',
         'sub10RadioLclRxPower',
-        'Transmit Power',
+        'Receive Power',
         'GAUGE',
     ),
     'sub10RadioLclVectErr' => array(
         '0',
         'sub10RadioLclVectErr',
-        'Transmit Power',
+        'Vector Error',
         'GAUGE',
     ),
     'sub10RadioLclLnkLoss' => array(
         '0',
         'sub10RadioLclLnkLoss',
-        'Transmit Power',
+        'Link Loss',
         'GAUGE',
     ),
     'sub10RadioLclAFER' => array(
         '0',
         'sub10RadioLclAFER',
-        'Transmit Power',
+        'Air Frame Error Rate',
+        'GAUGE',
+    ),
+    'sub10RadioLclDataRate' => array(
+        '0',
+        'sub10RadioLclDataRate',
+        'Data Rate on Airside interface',
         'GAUGE',
     ),
 );
@@ -41,6 +47,7 @@ $mib_graphs = array(
     'sub10_sub10RadioLclVectErr',
     'sub10_sub10RadioLclLnkLoss',
     'sub10_sub10RadioLclAFER',
+    'sub10RadioLclDataRate'
 );
 
 unset($graph, $oids, $oid);
