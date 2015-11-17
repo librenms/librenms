@@ -19,9 +19,6 @@ if (empty($hosts) && empty($ports)) {
 
 }
 
-echo "TEST $hosts and $ports\n";
-$debug=1;
-
 foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` WHERE `hostname` LIKE ?", array('%'.$hosts.'%')) as $device) {
     echo "Found hostname " . $device['hostname'].".......\n";
     foreach (dbFetchRows("SELECT `ifIndex`,`ifName`,`ifSpeed` FROM `ports` WHERE `ifName` LIKE ? AND `device_id` = ?", array('%'.$ports.'%',$device['device_id'])) as $port) {
