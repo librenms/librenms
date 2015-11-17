@@ -803,7 +803,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
                     </div>';
 $clickatells = get_config_like_name('alert.transports.clickatell.%.token');
 foreach ($clickatells as $clickatell) {
-    $to = get_config_like_name('alert.transports.clickatell.'.$clickatell['config_id'].'.to');
+    $to = get_config_like_name('alert.transports.clickatell.'.$clickatell['config_id'].'.to.');
     $new_extra = array();
     unset($upd_extra);
     foreach ($to as $number) {
@@ -871,7 +871,7 @@ foreach ($playsms as $item) {
     $playsms_user    = get_config_by_name('alert.transports.playsms.'.$item['config_id'].'.user');
     $playsms_token   = get_config_by_name('alert.transports.playsms.'.$item['config_id'].'.token');
     $playsms_from    = get_config_by_name('alert.transports.playsms.'.$item['config_id'].'.from');
-    $to              = get_config_like_name('alert.transports.playsms.'.$item['config_id'].'.%');
+    $to              = get_config_like_name('alert.transports.playsms.'.$item['config_id'].'.to.');
     $new_extra = array();
     unset($upd_extra);
     foreach ($to as $number) {
