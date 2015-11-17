@@ -78,7 +78,10 @@ if ($device['location']) {
     }
 }
 
-$loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device['location']));
+$loc = parse_location($device['location']);
+if (!is_array($loc)) {
+    $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device['location']));
+}
 if (is_array($loc)) {
     echo '<tr>
         <td>Lat / Lng</td>

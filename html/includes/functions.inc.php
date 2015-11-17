@@ -1249,3 +1249,4 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
     }
     return $output;
 }//end generate_dynamic_config_panel()
+
