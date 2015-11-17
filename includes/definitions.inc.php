@@ -1575,6 +1575,10 @@ $config['graph_types']['device']['sub10_sub10RadioLclAFER']['section'] = 'wirele
 $config['graph_types']['device']['sub10_sub10RadioLclAFER']['order'] = '4';
 $config['graph_types']['device']['sub10_sub10RadioLclAFER']['descr'] = 'Radio Air Frame Error Rate';
 
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['order'] = '4';
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['descr'] = 'Data Rate on the Airside interface';
+
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order']   = '0';
 $config['graph_types']['device']['wifi_clients']['descr']   = 'Wireless Clients';
