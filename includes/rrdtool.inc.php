@@ -166,7 +166,7 @@ function rrdtool_graph($graph_file, $options) {
 function rrdtool($command, $filename, $options) {
     global $config, $debug, $rrd_pipes, $console_color;
 
-    if ($config['rrdcached'] && ($config['rrdtool_version'] >= 1.5 || ($command != "create" && $command != 'tune'))) {
+    if ($config['rrdcached'] && ($config['rrdtool_version'] >= 1.5 || ($command != "create" && $command != "tune"))) {
         if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
             $filename = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $filename);
             $filename = str_replace($config['rrd_dir'], './'.$config['rrdcached_dir'].'/', $filename);
@@ -304,7 +304,7 @@ function rrdtool_tune($type, $filename, $max) {
         $fields = array(
 'INOCTETS','OUTOCTETS','INERRORS','OUTERRORS','INUCASTPKTS','OUTUCASTPKTS','INNUCASTPKTS','OUTNUCASTPKTS','INDISCARDS','OUTDISCARDS','INUNKNOWNPROTOS','INBROADCASTPKTS','OUTBROADCASTPKTS','INMULTICASTPKTS','OUTMULTICASTPKTS'
 );
-        $options = "--maxium " . implode(":$max --maximum ", $fields). ":$max";
+        $options = "--maximum " . implode(":$max --maximum ", $fields). ":$max";
         rrdtool('tune', $filename, $options);
     }
 }
