@@ -315,6 +315,7 @@ foreach ($ports as $port) {
         }
 
         // Update IF-MIB data
+        $tune_port = false;
         foreach ($data_oids as $oid) {
 
             if ($oid == 'ifAlias') {
@@ -334,6 +335,15 @@ foreach ($ports as $port) {
                 }
             }
             else if ($port[$oid] != $this_port[$oid]) {
+                $port_tune = get_dev_attrib($device, 'ifName_tune:'.$port['ifName']);
+                $device_tune = get_dev_attrib($device,'device_rrdtool_tune');
+                if ($port_tune == "true" ||
+                    ($device_tune == "true" && $port_tune != 'false') || 
+                    ($config['rrdtool']['tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
+                    if ($oid == 'ifSpeed') {
+                        $tune_port = true;
+                    }
+                }
                 $port['update'][$oid] = $this_port[$oid];
                 log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
@@ -477,6 +487,9 @@ foreach ($ports as $port) {
             'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
         );
 
+        if ($tune_port === true) {
+            rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
+        }
         rrdtool_update("$rrdfile", $fields);
         // End Update IF-MIB
         // Update PAgP
