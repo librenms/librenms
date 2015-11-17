@@ -173,74 +173,6 @@ $no_refresh = true;
 </div>
 <!-- End Boxcar Modal -->
 
-<!-- Clickatell Modal -->
-<div class="modal fade" id="new-config-clickatell" role="dialog" aria-hidden="true" title="Create new config item">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <form role="form" class="new_config_form">
-                    <div class="form-group">
-                        <span class="message"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="clickatell_value">Clickatell Token</label>
-                        <input type="text" class="form-control" name="clickatell_value" id="clickatell_value" placeholder="Enter the Clickatell Token">
-                    </div>
-                    <div class="form-group">
-                        <label for="clickatell_to">Clickatell Mobile numbers (specify one per line)</label>
-                        <textarea class="form-control" name="clickatell_to" id="clickatell_to" placeholder="Enter the mobile numbers"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-success" id="submit-clickatell">Add config</button>
-                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End Clickatell Modal -->
-
-<!-- PlaySMS Modal -->
-<div class="modal fade" id="new-config-playsms" role="dialog" aria-hidden="true" title="Create new config item">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <form role="form" class="new_config_form">
-                    <div class="form-group">
-                        <span class="message"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="playsms_value">PlaySMS URL</label>
-                        <input type="text" class="form-control" name="playsms_value" id="playsms_value" placeholder="Enter the PlaySMS URL">
-                    </div>
-                    <div class="form-group">
-                        <label for="playsms_user">PlaySMS User</label>
-                        <input type="text" class="form-control" name="playsms_user" id="playsms_user" placeholder="Enter the PlaySMS User">
-                    </div>
-                    <div class="form-group">
-                        <label for="playsms_token">PlaySMS Token</label>
-                        <input type="text" class="form-control" name="playsms_token" id="playsms_token" placeholder="Enter the PlaySMS Token">
-                    </div>
-                    <div class="form-group">
-                        <label for="playsms_from">PlaySMS From (Mobile #, Optional)</label>
-                        <input type="text" class="form-control" name="playsms_from" id="playsms_from" placeholder="Enter the PlaySMS From Mobile (optional)">
-                    </div>
-                    <div class="form-group">
-                        <label for="playsms_to">PlaySMS Mobile numbers (specify one per line)</label>
-                        <textarea class="form-control" name="playsms_to" id="playsms_to" placeholder="Enter the mobile numbers"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-success" id="submit-playsms">Add config</button>
-                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End PlaySMS Modal -->
-
 <?php
 if (isset($_GET['error'])) {
     print_error('We had issues connecting to your Pager Duty account, please try again');
@@ -787,7 +719,17 @@ echo '<div id="boxcar_appkey_template" class="hide">
                     </div>
                 </div>
             </div>
-        </div>
+        </div>';
+
+$clickatell   = get_config_by_name('alert.transports.clickatell.token');
+$mobiles      = get_config_like_name('alert.transports.clickatell.to.%');
+$new_mobiles = array();
+foreach ($mobiles as $mobile) {
+    $new_mobiles[] = $mobile['config_value'];
+}
+$upd_mobiles = implode(PHP_EOL, $new_mobiles);
+
+echo '
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
@@ -796,63 +738,34 @@ echo '<div id="boxcar_appkey_template" class="hide">
             </div>
             <div id="clickatell_transport_expand" class="panel-collapse collapse">
                 <div class="panel-body">
-                    <div class="form-group">
-                        <div class="col-sm-8">
-                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-clickatell">Add Clickatell config</button>
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_token" class="col-sm-4 control-label">Clickatell Token </label>
+                        <div class="col-sm-4">
+                            <input id="clickatell_token" class="form-control" type="text" name="global-config-input" value="'.$clickatell['config_value'].'" data-config_id="'.$clickatell['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                         </div>
-                    </div>';
-$clickatells = get_config_like_name('alert.transports.clickatell.%.token');
-foreach ($clickatells as $clickatell) {
-    $to = get_config_like_name('alert.transports.clickatell.'.$clickatell['config_id'].'.to.');
-    $new_extra = array();
-    unset($upd_extra);
-    foreach ($to as $number) {
-        $split_extra = explode('.', $number['config_name']);
-        if ($split_extra[4] != 'token') {
-            $new_extra[] = $number['config_value'];
-        }
-    }
-    $upd_extra = implode(PHP_EOL, $new_extra);
-    echo '<div id="'.$clickatell['config_id'].'">
-                        <div class="form-group has-feedback">
-                            <label for="clickatell_token" class="col-sm-4 control-label">Clickatell Token </label>
-                            <div class="col-sm-4">
-                                <input id="clickatell_token" class="form-control" type="text" name="global-config-input" value="'.$clickatell['config_value'].'" data-config_id="'.$clickatell['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="button" class="btn btn-danger del-clickatell-config" name="del-clickatell-call" data-config_id="'.$clickatell['config_id'].'"><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <div class="col-sm-offset-4 col-sm-4">
-                                <textarea class="form-control" name="global-config-textarea" id="clickatell_to" placeholder="Enter the config options" data-config_id="'.$clickatell['config_id'].'" data-type="clickatell">'.$upd_extra.'</textarea>
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                    </div>';
-}//end foreach
-
-echo '<div id="clickatell_token_template" class="hide">
-                        <div class="form-group has-feedback">
-                            <label for="clickatell_token" class="col-sm-4 control-label api-method">Clickatell Token </label>
-                            <div class="col-sm-4">
-                                <input id="clickatell_token" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="button" class="btn btn-danger del-clickatell-config" id="del-clickatell-call" name="del-clickatell-call" data-config_id=""><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <div class="col-sm-offset-4 col-sm-4">
-                                <textarea class="form-control" name="global-config-textarea" id="clickatell_to" placeholder="Enter the config options" data-config_id="" data-type="clickatell"></textarea>
-                            </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_to" class="col-sm-4 control-label">Mobile numbers</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" name="global-config-textarea" id="clickatell_to" placeholder="Enter the config options" data-config_id="'.$clickatell['config_id'].'" data-type="clickatell">'.$upd_mobiles.'</textarea>
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>';
+$playsms_url     = get_config_by_name('alert.transports.playsms.url');
+$playsms_user    = get_config_by_name('alert.transports.playsms.user');
+$playsms_token   = get_config_by_name('alert.transports.playsms.token');
+$playsms_from    = get_config_by_name('alert.transports.playsms.from');
+$mobiles         = get_config_like_name('alert.transports.playsms.to.%');
+$new_mobiles = array();
+foreach ($mobiles as $mobile) {
+    $new_mobiles[] = $mobile['config_value'];
+}
+$upd_mobiles = implode(PHP_EOL, $new_mobiles);
+echo '
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
@@ -861,105 +774,40 @@ echo '<div id="clickatell_token_template" class="hide">
             </div>
             <div id="playsms_transport_expand" class="panel-collapse collapse">
                 <div class="panel-body">
-                    <div class="form-group">
-                        <div class="col-sm-8">
-                            <button class="btn btn-success btn-xs" type="button" name="new_config" id="new_config_item" data-toggle="modal" data-target="#new-config-playsms">Add PlaySMS config</button>
-                        </div>
-                    </div>';
-$playsms = get_config_like_name('alert.transports.playsms.%.url');
-foreach ($playsms as $item) {
-    $playsms_user    = get_config_by_name('alert.transports.playsms.'.$item['config_id'].'.user');
-    $playsms_token   = get_config_by_name('alert.transports.playsms.'.$item['config_id'].'.token');
-    $playsms_from    = get_config_by_name('alert.transports.playsms.'.$item['config_id'].'.from');
-    $to              = get_config_like_name('alert.transports.playsms.'.$item['config_id'].'.to.');
-    $new_extra = array();
-    unset($upd_extra);
-    foreach ($to as $number) {
-        $split_extra = explode('.', $number['config_name']);
-        if ($split_extra[4] != 'url' && $split_extra[4] != 'user' && $split_extra[4] != 'token' && $split_extra[4] != 'from') {
-            $new_extra[] = $number['config_value'];
-        }
-    }
-    $upd_extra = implode(PHP_EOL, $new_extra);
-    echo '<div id="'.$item['config_id'].'">
-                        <div class="form-group has-feedback">
-                            <label for="playsms_url" class="col-sm-4 control-label">PlaySMS URL </label>
-                            <div class="col-sm-4">
-                                <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="'.$item['config_value'].'" data-config_id="'.$item['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="button" class="btn btn-danger del-playsms-config" name="del-playsms-call" data-config_id="'.$item['config_id'].'"><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <label for="playsms_user" class="col-sm-4 control-label">User</label>
-                            <div class="col-sm-4">
-                                <input id="playsms_user" class="form-control" type="text" name="global-config-input" value="'.$playsms_user['config_value'].'" data-config_id="'.$playsms_user['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <label for="playsms_token" class="col-sm-4 control-label">Token</label>
-                            <div class="col-sm-4">
-                                <input id="playsms_token" class="form-control" type="text" name="global-config-input" value="'.$playsms_token['config_value'].'" data-config_id="'.$playsms_token['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <label for="playsms_from" class="col-sm-4 control-label">From</label>
-                            <div class="col-sm-4">
-                                <input id="playsms_from" class="form-control" type="text" name="global-config-input" value="'.$playsms_from['config_value'].'" data-config_id="'.$playsms_from['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <div class="col-sm-offset-4 col-sm-4">
-                                <textarea class="form-control" name="global-config-textarea" id="clickatell_to" placeholder="Enter the config options" data-config_id="'.$item['config_id'].'" data-type="clickatell">'.$upd_extra.'</textarea>
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                    </div>';
-}//end foreach
-
-echo '<div id="playsms_template" class="hide">
-                        <div class="form-group has-feedback">
-                            <label for="playsms_url" class="col-sm-4 control-label api-method">PlaySMS URL </label>
-                            <div class="col-sm-4">
-                                <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="button" class="btn btn-danger del-playsms-config" id="del-playsms-call" name="del-playsms-call" data-config_id=""><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <label for="playsms_user" class="col-sm-4 control-label">User</label>
-                            <div class="col-sm-4">
-                                <input id="playsms_user" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <label for="playsms_token" class="col-sm-4 control-label">Token</label>
-                            <div class="col-sm-4">
-                                <input id="playsms_token" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <label for="playsms_from" class="col-sm-4 control-label">From</label>
-                            <div class="col-sm-4">
-                                <input id="playsms_from" class="form-control" type="text" name="global-config-input" value="" data-config_id="">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <div class="col-sm-offset-4 col-sm-4">
-                                <textarea class="form-control" name="global-config-textarea" id="playsms_to" placeholder="Enter the config options" data-config_id="" data-type="playsms"></textarea>
-                            </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_url" class="col-sm-4 control-label">PlaySMS URL </label>
+                        <div class="col-sm-4">
+                            <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_user" class="col-sm-4 control-label">User</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_user" class="form-control" type="text" name="global-config-input" value="'.$playsms_user['config_value'].'" data-config_id="'.$playsms_user['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_token" class="col-sm-4 control-label">Token</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_token" class="form-control" type="text" name="global-config-input" value="'.$playsms_token['config_value'].'" data-config_id="'.$playsms_token['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_from" class="col-sm-4 control-label">From</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_from" class="form-control" type="text" name="global-config-input" value="'.$playsms_from['config_value'].'" data-config_id="'.$playsms_from['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_to" class="col-sm-4 control-label">Mobiles</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" name="global-config-textarea" id="playsms_to" placeholder="Enter the config options" data-config_id="'.$playsms_url['config_id'].'" data-type="playsms">'.$upd_mobiles.'</textarea>
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
                 </div>
             </div>
         </div>
@@ -1198,87 +1046,6 @@ echo '<div id="playsms_template" class="hide">
         });
     });// End Add Boxcar config
 
-    // Add Clickatell config
-    itemIndex = 0;
-    $("button#submit-clickatell").click(function(){
-        var config_value = $('#clickatell_value').val();
-        var config_to = $('#clickatell_to').val();
-        $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: {type: "config-item", action: 'add-clickatell', config_group: "alerting", config_sub_group: "transports", config_to: config_to, config_value: config_value},
-            dataType: "json",
-            success: function(data){
-                if (data.status == 'ok') {
-                    itemIndex++;
-                    var $template = $('#clickatell_token_template'),
-                        $clone    = $template
-                            .clone()
-                            .removeClass('hide')
-                            .attr('id',data.config_id)
-                            .attr('clickatell-appkey-index', itemIndex)
-                            .insertBefore($template);
-                    $clone.find('[id="clickatell_token"]').attr('data-config_id',data.config_id);
-                    $clone.find('[id="del-clickatell-call"]').attr('data-config_id',data.config_id);
-                    $clone.find('[name="global-config-input"]').attr('value', config_value);
-                    $clone.find('[id="clickatell_to"]').val(config_to);
-                    $clone.find('[id="clickatell_to"]').attr('data-config_id',data.config_id);
-                    $("#new-config-clickatell").modal('hide');
-                } else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
-            },
-            error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
-            }
-        });
-    });// End Add Clickatell config
-
-    // Add PlaySMS config
-    itemIndex = 0;
-    $("button#submit-playsms").click(function(){
-        var config_value = $('#playsms_value').val();
-        var config_from = $('#playsms_from').val();
-        var config_user = $('#playsms_user').val();
-        var config_token = $('#playsms_token').val();
-        var config_to = $('#playsms_to').val();
-        $.ajax({
-            type: "POST",
-            url: "ajax_form.php",
-            data: {type: "config-item", action: 'add-playsms', config_group: "alerting", config_sub_group: "transports", config_to: config_to, config_value: config_value, config_from: config_from, config_user: config_user, config_token: config_token},
-            dataType: "json",
-            success: function(data){
-                if (data.status == 'ok') {
-                    itemIndex++;
-                    var $template = $('#playsms_template'),
-                        $clone    = $template
-                            .clone()
-                            .removeClass('hide')
-                            .attr('id',data.config_id)
-                            .attr('playsms-appkey-index', itemIndex)
-                            .insertBefore($template);
-                    $clone.find('[id="playsms_url"]').attr('data-config_id',data.config_id);
-                    $clone.find('[id="del-playsms-call"]').attr('data-config_id',data.config_id);
-                    $clone.find('[name="global-config-input"]').attr('value', config_value);
-                    $clone.find('[id="playsms_to"]').val(config_to);
-                    $clone.find('[id="playsms_to"]').attr('data-config_id',data.config_id);
-                    $clone.find('[id="playsms_from"]').val(config_from);
-                    $clone.find('[id="playsms_from"]').attr('data-config_id',data.config_id);
-                    $clone.find('[id="playsms_token"]').val(config_token);
-                    $clone.find('[id="playsms_token"]').attr('data-config_id',data.config_id);
-                    $clone.find('[id="playsms_user"]').val(config_user);
-                    $clone.find('[id="playsms_user"]').attr('data-config_id',data.config_id);
-                    $("#new-config-playsms").modal('hide');
-                } else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
-            },
-            error: function(){
-                $("#message").html('<div class="alert alert-info">Error creating config item</div>');
-            }
-        });
-    });// End Add PlaySMS config
-
     // Delete api config
     $(document).on('click', 'button[name="del-api-call"]', function(event) {
         var config_id = $(this).data('config_id');
@@ -1383,48 +1150,6 @@ echo '<div id="playsms_template" class="hide">
             }
         });
     });// End delete Boxcar config
-
-    // Delete Clickatell config
-    $(document).on('click', 'button[name="del-clickatell-call"]', function(event) {
-        var config_id = $(this).data('config_id');
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: "config-item", action: 'remove-clickatell', config_id: config_id},
-            dataType: "json",
-            success: function (data) {
-                if (data.status == 'ok') {
-                    $("#"+config_id).remove();
-                } else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
-            },
-            error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
-            }
-        });
-    });// End delete Clickatell config
-
-    // Delete PlaySMS config
-    $(document).on('click', 'button[name="del-playsms-call"]', function(event) {
-        var config_id = $(this).data('config_id');
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: "config-item", action: 'remove-playsms', config_id: config_id},
-            dataType: "json",
-            success: function (data) {
-                if (data.status == 'ok') {
-                    $("#"+config_id).remove();
-                } else {
-                    $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-                }
-            },
-            error: function () {
-                $("#message").html('<div class="alert alert-info">An error occurred.</div>');
-            }
-        });
-    });// End delete PlaySMS config
 
     $( 'select[name="global-config-select"]').change(function(event) {
         event.preventDefault();
