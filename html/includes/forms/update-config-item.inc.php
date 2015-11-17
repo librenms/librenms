@@ -27,6 +27,7 @@ if (!is_numeric($config_id)) {
 }
 elseif ($action == 'update-textarea') {
     $extras = explode(PHP_EOL, $_POST['config_value']);
+    $x=0;
     foreach ($extras as $option) {
         list($k,$v) = explode('=', $option, 2);
         if (!empty($k) || !empty($v)) {
@@ -43,10 +44,12 @@ elseif ($action == 'update-textarea') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Boxcar Transport'), 'config');
             }
             elseif ($config_type == 'clickatell') {
-                $db_id[] = dbInsert(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.to.', 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Clickatell Transport'), 'config');
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Clickatell Transport'), 'config');
+                $x++;
             }
             elseif ($config_type == 'playsms') {
-                $db_id[] = dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.to.', 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'PlaySMS Transport'), 'config');
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'PlaySMS Transport'), 'config');
+                $x++;
             }
         }
     }
