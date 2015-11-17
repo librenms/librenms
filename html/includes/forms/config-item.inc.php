@@ -179,9 +179,11 @@ else if ($action == 'add-clickatell') {
             $status                   = 'ok';
             $message                  = 'Config item created';
             $mobiles                   = explode('\n', $config_to);
+            $x=0;
             foreach ($mobiles as $mobile) {
                 if (!empty($mobile)) {
-                    dbInsert(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.to.', 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Clickatell mobile'), 'config');
+                    dbInsert(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.to.'.$x, 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Clickatell mobile'), 'config');
+                    $x++;
                 }
             }
         }
@@ -210,9 +212,11 @@ elseif ($action == 'add-playsms') {
             $status                   = 'ok';
             $message                  = 'Config item created';
             $mobiles                   = explode('\n', $config_to);
+            $x=0;
             foreach ($mobiles as $mobile) {
                 if (!empty($mobile)) {
-                    dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.to.', 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'PlaySMS mobile'), 'config');
+                    dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.to.'.$x, 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'PlaySMS mobile'), 'config');
+                    $x++;
                 }
             }
         }
