@@ -3,14 +3,22 @@
 if ($device['os_group'] == 'unix') {
     echo $config['project_name'].' UNIX Agent: ';
 
-    // FIXME - this should be in config and overridable in database
-    $agent_port = '6556';
+    $agent_port = get_dev_attrib($device,'override_Unixagent_port');
+    if (empty($agent_port)) {
+        $agent_port = $config['unix-agent']['port'];
+    }
+    if (empty($config['unix-agent']['connection-timeout'])) {
+        $config['unix-agent']['connection-timeout'] = $config['unix-agent-connection-time-out'];
+    }
+    if (empty($config['unix-agent']['read-timeout'])) {
+        $config['unix-agent']['read-timeout'] = $config['unix-agent-read-time-out'];
+    }
 
     $agent_start = utime();
-    $agent       = fsockopen($device['hostname'], $agent_port, $errno, $errstr, $config['unix-agent-connection-time-out']);
+    $agent       = fsockopen($device['hostname'], $agent_port, $errno, $errstr, $config['unix-agent']['connection-timeout']);
 
     // Set stream timeout (for timeouts during agent  fetch
-    stream_set_timeout($agent, $config['unix-agent-read-time-out']);
+    stream_set_timeout($agent, $config['unix-agent']['read-timeout']);
     $agentinfo = stream_get_meta_data($agent);
 
     if (!$agent) {
