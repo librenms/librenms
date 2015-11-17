@@ -14,6 +14,12 @@ echo '
             '.dynamic_override_config('checkbox','override_Oxidized_disable', $device).'
         </div>
     </div>
+    <div class="form-group">
+        <label for="unixagent" class="col-sm-2 control-label">Unix agent port</label>
+        <div class="col-sm-10">
+            '.dynamic_override_config('text','override_Unixagent_port', $device).'
+        </div>
+    </div>
 </form>
 ';
 
