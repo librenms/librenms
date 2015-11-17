@@ -94,7 +94,7 @@ function adduser($username) {
 }
 
 function user_exists_in_db($username) {
-    $return = @dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
+    $return = dbFetchCell('SELECT COUNT(*) FROM users WHERE username = ?', array($username), true);
     return $return;
 }
 
