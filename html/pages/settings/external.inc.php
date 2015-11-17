@@ -39,7 +39,7 @@ $rrdtool_conf = array(
            'descr'             => 'Path to rrdtool binary',
            'type'              => 'text',
     ),
-    array('name'               => 'rrdtool.tune',
+    array('name'               => 'rrdtool_tune',
           'descr'              => 'Tune all rrd port files to use max values',
           'type'               => 'checkbox',
     ),

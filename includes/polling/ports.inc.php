@@ -339,7 +339,7 @@ foreach ($ports as $port) {
                 $device_tune = get_dev_attrib($device,'override_rrdtool_tune');
                 if ($port_tune == "true" ||
                     ($device_tune == "true" && $port_tune != 'false') || 
-                    ($config['rrdtool']['tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
+                    ($config['rrdtool_tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
                     if ($oid == 'ifSpeed') {
                         $tune_port = true;
                     }
@@ -487,6 +487,7 @@ foreach ($ports as $port) {
             'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
         );
 
+	echo "TEST $tune_port END \n";
         if ($tune_port === true) {
             rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
         }
