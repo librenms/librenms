@@ -18,7 +18,7 @@ This will determine the default config option for `$config['alert']['tolerance_w
 If the sub-section you want to add the new config option already exists then update the relevant file within 
 `html/pages/settings/` otherwise you will need to create the new sub-section page. Here's an example of this:
 
-[Commit example](https://github.com/librenm/librenms/commit/c5998f9ee27acdac0c0f7d3092fc830c51ff684c)
+[Commit example](https://github.com/librenms/librenms/commit/c5998f9ee27acdac0c0f7d3092fc830c51ff684c)
 
 ```php
 <?php
