@@ -62,6 +62,21 @@ foreach ($menu_options as $option => $text) {
 
 <div style="float: right;">
 
+  <select name='type' id='type'
+    onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
+<?php
+    $type = 'device';
+    foreach (get_graph_subtypes($type) as $avail_type) {
+        echo("<option value='".generate_url($vars, array('format' => 'graph_'.$avail_type))."'");
+        if ('graph_'.$avail_type == $vars['format']) {
+            echo(" selected");
+        }
+        $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+        echo(">$display_type</option>");
+    }
+?>
+    </select>
+
 <?php
 
 if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {

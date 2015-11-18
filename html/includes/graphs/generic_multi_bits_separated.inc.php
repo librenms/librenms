@@ -49,9 +49,6 @@ foreach ($rrd_list as $rrd) {
         }
 
         $descr_out = rrdtool_escape($rrd['descr_out'], $descr_len).' Out';
-        $descr     = str_replace("'", '', $descr);
-        // FIXME does this mean ' should be filtered in rrdtool_escape? probably...
-        $descr_out = str_replace("'", '', $descr_out);
     }
 
     $rrd_options .= ' DEF:'.$in.$i.'='.$rrd['filename'].':'.$ds_in.':AVERAGE ';
@@ -68,10 +65,10 @@ foreach ($rrd_list as $rrd) {
     }
 
     if ($i) {
-        $stack = 'STACK';
+        $stack = ':STACK';
     }
 
-    $rrd_options .= ' AREA:inB'.$i.'#'.$colour_in.":'".$descr."':$stack";
+    $rrd_options .= ' AREA:inB'.$i.'#'.$colour_in.":'".$descr."'$stack";
     if (!$nodetails) {
         $rrd_options .= ' GPRINT:inB'.$i.":LAST:%6.2lf%s$units";
         $rrd_options .= ' GPRINT:inB'.$i.":AVERAGE:%6.2lf%s$units";
@@ -84,7 +81,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options  .= " 'HRULE:0#".$colour_out.':'.$descr_out."'";
-    $rrd_optionsb .= " 'AREA:outB".$i.'_neg#'.$colour_out."::$stack'";
+    $rrd_optionsb .= " 'AREA:outB".$i.'_neg#'.$colour_out.":$stack'";
 
     if (!$nodetails) {
         $rrd_options .= ' GPRINT:outB'.$i.":LAST:%6.2lf%s$units";
