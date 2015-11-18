@@ -9,8 +9,8 @@ rrdtool_pipe_open($rrd_process, $rrd_pipes);
 
 $options = getopt('h:p:');
 
-$hosts = $options['h'];
-$ports = $options['p'];
+$hosts = str_replace('*', '%', mres($options['h']));
+$ports = str_replace('*', '%', mres($options['p']));
 
 if (empty($hosts) && empty($ports)) {
 
