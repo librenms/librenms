@@ -36,7 +36,7 @@ if ($_POST['device']) {
 
     foreach ($enabled as $app) {
         if (!in_array($app, $app_in_db)) {
-            $updated += dbInsert(array('device_id' => $device['device_id'], 'app_type' => $app), 'applications');
+            $updated += dbInsert(array('device_id' => $device['device_id'], 'app_type' => $app, 'app_status' => '', 'app_instance' => ''), 'applications');
         }
     }
 

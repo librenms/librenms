@@ -1178,6 +1178,9 @@ function dynamic_override_config($type, $name, $device) {
     if ($type == 'checkbox') {
         return '<input type="checkbox" id="override_config" name="override_config" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" data-size="small" '.$checked.'>';
     }
+    elseif ($type == 'text') {
+        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="'.$name.'" data-device_id="'.$device['device_id'].'" value="'.$attrib_val.'">';
+    }
 }//end dynamic_override_config()
 
 function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$items=array(),$transport='') {
@@ -1249,4 +1252,9 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
     }
     return $output;
 }//end generate_dynamic_config_panel()
+
+function get_ripe_api_whois_data_json($ripe_parameter) {
+    $ripe_whois_url = 'https://stat.ripe.net/data/whois/data.json?resource=' . $ripe_parameter;
+    return json_decode(file_get_contents($ripe_whois_url) , true);
+}//end get_ripe_api_whois_data_json()
 

@@ -19,12 +19,28 @@ $oxidized_conf = array(
     ),
 );
 
+$unixagent_conf = array(
+    array('name'               => 'unix-agent.port',
+          'descr'              => 'Default unix-agent port',
+          'type'               => 'text',
+    ),
+    array('name'               => 'unix-agent.connection-timeout',
+          'descr'              => 'Connection timeout',
+          'type'               => 'text',
+    ),
+    array('name'               => 'unix-agent.read-timeout',
+          'descr'              => 'Read timeout',
+          'type'               => 'text',
+    ),
+);
+
 echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
 echo generate_dynamic_config_panel('Oxidized integration',true,$config_groups,$oxidized_conf);
+echo generate_dynamic_config_panel('Unix-agent integration',true,$config_groups,$unixagent_conf);
 
 echo '
     </form>
