@@ -122,6 +122,7 @@ $(document).ready(function() {
             }
         });
     });
+
 });
 
 function submitCustomRange(frmdata) {
@@ -134,4 +135,23 @@ function submitCustomRange(frmdata) {
     frmdata.action = frmdata.selfaction.value;
     return true;
 }
+
+$(document).on("click", '.collapse-neighbors', function(event)
+{
+    var caller = $(this);
+    var button = caller.find('.neighbors-button');
+    var list = caller.find('.neighbors-interface-list');
+    var continued = caller.find('.neighbors-list-continued');
+
+    if(button.hasClass("glyphicon-plus"))
+    {
+        button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
+    }else
+    {
+        button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
+    }
+   
+    list.toggle();
+    continued.toggle();
+});
 
