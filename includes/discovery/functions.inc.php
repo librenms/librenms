@@ -34,7 +34,8 @@ function discover_new_device($hostname, $device='', $method='', $interface='') {
             return false;
         }
     }
-    else {
+    elseif (filter_var($dst_host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === true || filter_var($dst_host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === true){
+        // gethostbyname returned a valid $ip, was $dst_host an IP?
         if ($config['discovery_by_ip'] === false) {
             d_echo('Discovery by IP disabled, skipping ' . $dst_host);
             return false;
