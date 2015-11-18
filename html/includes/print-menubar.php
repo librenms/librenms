@@ -75,6 +75,12 @@ if ($_SESSION['userlevel'] >= '10') {
            <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a></li>
            </ul>
           </li>
+          <li class="dropdown-submenu">
+           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-wrench fa-fw fa-lg"></i> Tools</a>
+           <ul class="dropdown-menu scrollable-menu">
+           <li><a href="<?php echo(generate_url(array('page'=>'ripenccapi'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> RIPE NCC API</a></li>
+           </ul>
+          </li>
             <li role="presentation" class="divider"></li>
             <li><a href="<?php echo(generate_url(array('page'=>'eventlog'))); ?>"><i class="fa fa-book fa-fw fa-lg"></i> Eventlog</a></li>
 <?php

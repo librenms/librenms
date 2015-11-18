@@ -11,7 +11,7 @@ else {
 }
 
 if ($nototal) {
-    $descrlen += '2';
+    $descr_len += '2';
     $unitlen  += '2';
 }
 
