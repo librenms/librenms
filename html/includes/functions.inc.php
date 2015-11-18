@@ -1249,3 +1249,9 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
     }
     return $output;
 }//end generate_dynamic_config_panel()
+
+function get_ripe_api_whois_data_json($ripe_parameter) {
+    $ripe_whois_url = 'https://stat.ripe.net/data/whois/data.json?resource=' . $ripe_parameter;
+    return json_decode(file_get_contents($ripe_whois_url) , true);
+}//end get_ripe_api_whois_data_json()
+
