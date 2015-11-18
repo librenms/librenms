@@ -487,7 +487,6 @@ foreach ($ports as $port) {
             'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
         );
 
-	echo "TEST $tune_port END \n";
         if ($tune_port === true) {
             rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
         }
