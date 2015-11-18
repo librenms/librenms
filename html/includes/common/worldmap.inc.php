@@ -74,10 +74,23 @@ if ($config['map']['engine'] == 'leaflet') {
             <label for="status" class="control-label">Show devices: </label>
         </div>
         <div class="col-sm-8">
-            <select class="form-control" name="status" id="status_'.$unique_id.'">
-                <option value="0,1">Up + Down</option>
-                <option value="1">Up</option>
-                <option value="0">Down</option>
+            <select class="form-control" name="status" id="status_'.$unique_id.'">';
+
+                $temp_output .= '<option value="0,1"';
+                if ($widget_settings['status'] == '0,1') {
+                    $temp_output .= ' selected';
+                }
+                $temp_output .= '>Up + Down</option>
+                <option value="1"';
+                if ($widget_settings['status'] == '1') {
+                    $temp_output .= ' selected';
+                }
+                $temp_output .= '>Up</option>
+                <option value="0"';
+                if ($widget_settings['status'] == '0') {
+                    $temp_output .= ' selected';
+                }
+                $temp_output .= '>Down</option>
             </select>
         </div>
     </div>
