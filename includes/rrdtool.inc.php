@@ -280,7 +280,8 @@ function rrdtool_lastupdate($filename, $options){
 
 function rrdtool_escape($string, $maxlength=null){
     $result = shorten_interface_type($string);
-    $result = str_replace('%', '%%', $result);
+    $result = str_replace("'", '', $result);            # remove quotes
+    $result = str_replace('%', '%%', $result);          # double percent signs
     if (is_numeric($maxlength)) {
         $extra  = substr_count($string, ':', 0, $maxlength);
         $result = substr(str_pad($result, $maxlength), 0, ($maxlength + $extra));
@@ -289,7 +290,7 @@ function rrdtool_escape($string, $maxlength=null){
         }
     }
 
-    $result = str_replace(':', '\:', $result);
+    $result = str_replace(':', '\:', $result);          # escape colons
     return $result.' ';
 
 }
