@@ -122,6 +122,8 @@ $(document).ready(function() {
             }
         });
     });
+
+    updateResolution();
 });
 
 function submitCustomRange(frmdata) {
@@ -135,8 +137,12 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
-
-$(function() {
-    $.post('ajax_setresolution.php', { width: $(window).width() , height:$(window).height() }, function(json) {
+function updateResolution()
+{
+     $.post('ajax_setresolution.php', { width: $(window).width() , height:$(window).height() }, function(json) {
     },'json');
-});
+}
+
+$(window).on('resize', function(){ updateResolution();});
+
+
