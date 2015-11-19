@@ -37,6 +37,17 @@ else {
     );
 }//end if
 
+if($_SESSION['screen_width'])
+{
+   $graph_array['width'] = $_SESSION['screen_width']/5.5;
+}
+
+if($_SESSION['screen_height'])
+{
+  $graph_array['height'] = $_SESSION['screen_height']/6;
+}
+
+
 $graph_array['to'] = $config['time']['now'];
 
 $graph_data = array();
