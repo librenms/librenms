@@ -39,12 +39,18 @@ else {
 
 if($_SESSION['screen_width'])
 {
-   $graph_array['width'] = $_SESSION['screen_width']/5.5;
+   if($_SESSION['screen_width'] >= 800)
+   {
+	   $graph_array['width'] = ($_SESSION['screen_width'] - 400 )/count($periods)+1;
+   }else
+   {
+	$graph_array['width'] = $_SESSION['screen_width'] - 155;
+   }
 }
 
 if($_SESSION['screen_height'])
 {
-  $graph_array['height'] = $_SESSION['screen_height']/6;
+  $graph_array['height'] = ($_SESSION['screen_height'] - 250)/4;
 }
 
 
