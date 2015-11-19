@@ -177,8 +177,7 @@ if ($_SESSION['userlevel'] >= '10') {
         </li>
 
 <?php
-// AD
-$config['show_services'] = true;
+
 if ($config['show_services']) {
 ?>
         <li class="dropdown">
