@@ -37,11 +37,13 @@ else {
     );
 }//end if
 
-if($_SESSION['screen_width']) {
-   if($_SESSION['screen_width'] > 800) {
+if($_SESSION['screen_width'])
+{
+   if($_SESSION['screen_width'] >= 800)
+   {
 	   $graph_array['width'] = ($_SESSION['screen_width'] - 400 )/count($periods)+1;
-   }
-   else {
+   }else
+   {
 	$graph_array['width'] = $_SESSION['screen_width'] - 155;
    }
 }
