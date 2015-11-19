@@ -719,6 +719,25 @@ echo '<div id="boxcar_appkey_template" class="hide">
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#victorops_transport_expand">VictorOps</a> <button name="test-alert" id="test-alert" type="button" data-transport="victorops" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="victorops_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="victorops" class="col-sm-4 control-label">Post URL </label>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.victorops.url']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div class="col-sm-4">
+                            <input id="victorops" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>';
 
 $clickatell   = get_config_by_name('alert.transports.clickatell.token');
