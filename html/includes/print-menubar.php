@@ -177,6 +177,8 @@ if ($_SESSION['userlevel'] >= '10') {
         </li>
 
 <?php
+// AD
+$config['show_services'] = true;
 if ($config['show_services']) {
 ?>
         <li class="dropdown">
@@ -451,7 +453,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 ?>
 
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm hidden-lg">Plugins</span></a>
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Plugins</span></a>
           <ul class="dropdown-menu">
 <?php
 Plugins::call('menu');
