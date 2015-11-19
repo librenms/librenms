@@ -47,6 +47,9 @@ function GenGroupSQL($pattern, $search='') {
         }
     }
 
+    $pattern = rtrim($pattern, '&&');
+    $pattern = rtrim($pattern, '||');
+
     $tables = array_keys(array_flip($tables));
     $x      = sizeof($tables);
     $i      = 0;
