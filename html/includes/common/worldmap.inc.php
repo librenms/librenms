@@ -150,18 +150,18 @@ var greenMarker = L.AwesomeMarkers.icon({
         // Checking user permissions
         if (is_admin() || is_read()) {
         // Admin or global read-only - show all devices
-            $sql = "SELECT DISTINCT(`device_id`),`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
+            $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
-                    WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
+                    WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                       AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
         }
         else {
         // Normal user - grab devices that user has permissions to
-            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`hostname`,`os`,`status`,`lat`,`lng`
+            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`hostname`,`os`,`status`,`lat`,`lng`
                     FROM `devices_perms`, `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
-                    WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
+                    WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                     AND `devices`.`device_id` = `devices_perms`.`device_id`
                     AND `devices_perms`.`user_id` = ? AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
@@ -170,6 +170,11 @@ var greenMarker = L.AwesomeMarkers.icon({
         foreach (dbFetchRows($sql, $param) as $map_devices) {
             $icon = 'greenMarker';
             $z_offset = 0;
+            $tmp_loc = parse_location($map_devices['location']);
+            if (!empty($tmp_loc['lat']) && !empty($tmp_loc['lng'])) {
+                $map_devices['lat'] = $tmp_loc['lat'];
+                $map_devices['lng'] = $tmp_loc['lng'];
+            }
             if ($map_devices['status'] == 0) {
                 $icon = 'redMarker';
                 $z_offset = 10000;  // move marker to foreground

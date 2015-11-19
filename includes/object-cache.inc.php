@@ -95,7 +95,10 @@ class ObjCache implements ArrayAccess {
                 return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
             }
             else {
-                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchCell($this->data[$obj]['query'], $this->data[$obj]['params']);
+                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], $this->data[$obj]['params']);
+                if (sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value']) == 1 && sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]) == 1) {
+                    $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = current($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]);
+                }
                 return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
             }
         }
