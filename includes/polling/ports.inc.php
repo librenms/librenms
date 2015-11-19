@@ -313,6 +313,7 @@ foreach ($ports as $port) {
             if ($oid == 'ifAlias') {
                 if (get_dev_attrib($device, 'ifName:'.$port['ifName'], 1)) {
                     $this_port['ifAlias'] = $port['ifAlias'];
+                    d_echo('ifAlias found on port!')
                 }
             }
             
@@ -321,7 +322,7 @@ foreach ($ports as $port) {
                 $this_port['ifAlias'] = $this_port['ifDescr'];
                 d_echo('Using ifDescr as ifAlias');
             }
-            
+
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
                 log_event($oid.': '.$port[$oid].' -> NULL', $device, 'interface', $port['port_id']);
