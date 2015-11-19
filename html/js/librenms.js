@@ -135,3 +135,8 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
+
+$(function() {
+    $.post('ajax_setresolution.php', { width: $(window).width() , height:$(window).height() }, function(json) {
+    },'json');
+});
