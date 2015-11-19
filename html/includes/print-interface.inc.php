@@ -36,8 +36,8 @@ else {
     $mac = '';
 }
 
-echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='".generate_port_url($port)."'\" style='cursor: pointer;'>
-    <td valign=top width=350>";
+echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
+    <td valign=top width=350 onclick=\"location.href='".generate_port_url($port)."'\">";
 echo '        <span class=list-large>
     '.generate_port_link($port, $port['ifIndex'].'. '.$port['label'])." $error_img $mac
     </span><br /><span class=interface-desc>".$port['ifAlias'].'</span>';
@@ -62,7 +62,7 @@ if ($port_details) {
 
 echo '</span>';
 
-echo '</td><td width=100>';
+echo "</td><td width=100 onclick=\"location.href='".generate_port_url($port)."'\" >";
 
 if ($port_details) {
     $port['graph_type'] = 'port_bits';
@@ -73,7 +73,7 @@ if ($port_details) {
     echo generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=".$port['port_id'].'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=100&amp;height=20&amp;legend=no&amp;bg='.str_replace('#', '', $row_colour)."'>");
 }
 
-echo '</td><td width=120>';
+echo "</td><td width=120 onclick=\"location.href='".generate_port_url($port)."'\" >";
 
 if ($port['ifOperStatus'] == 'up') {
     $port['in_rate']  = ($port['ifInOctets_rate'] * 8);
@@ -86,7 +86,7 @@ if ($port['ifOperStatus'] == 'up') {
         <img src='images/icons/arrow_pps_out.png' align=absmiddle> ".format_bi($port['ifOutUcastPkts_rate']).'pps</span>';
 }
 
-echo '</td><td width=75>';
+echo "</td><td width=75 onclick=\"location.href='".generate_port_url($port)."'\" >";
 if ($port['ifSpeed']) {
     echo '<span class=box-desc>'.humanspeed($port['ifSpeed']).'</span>';
 }
@@ -130,19 +130,19 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
 }//end if
 
 if ($port_adsl['adslLineCoding']) {
-    echo '</td><td width=150>';
+    echo "</td><td width=150 onclick=\"location.href='".generate_port_url($port)."'\" >";
     echo $port_adsl['adslLineCoding'].'/'.rewrite_adslLineType($port_adsl['adslLineType']);
     echo '<br />';
     echo 'Sync:'.formatRates($port_adsl['adslAtucChanCurrTxRate']).'/'.formatRates($port_adsl['adslAturChanCurrTxRate']);
     echo '<br />';
     echo 'Max:'.formatRates($port_adsl['adslAtucCurrAttainableRate']).'/'.formatRates($port_adsl['adslAturCurrAttainableRate']);
-    echo '</td><td width=150>';
+    echo "</td><td width=150 onclick=\"location.href='".generate_port_url($port)."'\" >";
     echo 'Atten:'.$port_adsl['adslAtucCurrAtn'].'dB/'.$port_adsl['adslAturCurrAtn'].'dB';
     echo '<br />';
     echo 'SNR:'.$port_adsl['adslAtucCurrSnrMgn'].'dB/'.$port_adsl['adslAturCurrSnrMgn'].'dB';
 }
 else {
-    echo '</td><td width=150>';
+    echo "</td><td width=150 onclick=\"location.href='".generate_port_url($port)."'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {
         echo '<span class=box-desc>'.fixiftype($port['ifType']).'</span>';
     }
@@ -158,7 +158,7 @@ else {
         echo '-';
     }
 
-    echo '</td><td width=150>';
+    echo "</td><td width=150 onclick=\"location.href='".generate_port_url($port)."'\" >";
     if ($port['ifPhysAddress'] && $port['ifPhysAddress'] != '') {
         echo '<span class=box-desc>'.formatMac($port['ifPhysAddress']).'</span>';
     }
@@ -176,13 +176,17 @@ else {
 }//end if
 
 echo '</td>';
-echo '<td width=375 valign=top class=interface-desc>';
+echo '<td width=375 valign=top class="interface-desc">';
+
+$neighborsCount=0;
+$nbLinks=0;
 if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', array($if_id)) as $link) {
         // echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generate_port_link($link, makeshortif($link['label'])) . " on " . generate_device_link($link, shorthost($link['hostname'])) . "</a><br />");
         // $br = "<br />";
         $int_links[$link['port_id']]      = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
+	$nbLinks++;
     }
 
     unset($br);
@@ -233,10 +237,23 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
         }//end foreach
     }//end if
 
+    if(count($int_links) > 3)
+    {
+       echo '<div class="collapse-neighbors"><span class="neighbors-button glyphicon glyphicon-plus" aria-hidden="true"></span>
+               <span class="neighbors-interface-list-firsts" style="display: inline;">';
+    }
+
+
     if ($port_details && $config['enable_port_relationship'] === true && port_permitted($int_link,$device['device_id'])) {
         foreach ($int_links as $int_link) {
+            $neighborsCount++;
+            if($neighborsCount == 4)
+	    {
+		echo '<span class="neighbors-list-continued" style="display: inline;"></br>[...]</span>';
+		echo '</span>';
+         	echo '<span class="neighbors-interface-list" style="display: none;">';
+            }
             $link_if = dbFetchRow('SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.port_id = ?', array($int_link));
-
             echo "$br";
 
             if ($int_links_phys[$int_link]) {
@@ -304,6 +321,10 @@ if ($port_details && $config['enable_port_relationship'] === true && port_permit
 
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
+if($nbLinks > 3)
+{
+echo '</span></div>';
+}
 echo '</td></tr>';
 
 // If we're showing graphs, generate the graph and print the img tags
