@@ -317,7 +317,7 @@ foreach ($ports as $port) {
                 }
             }
             // When devices do not provide ifAlias data, populate with ifDescr data if configured
-            if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) || $config['os'][$device['os']]['descr_to_alias'] == 1) {
+            else if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) || $config['os'][$device['os']]['descr_to_alias'] == 1) {
                 $this_port['ifAlias'] = $this_port['ifDescr'];
                 d_echo('Using ifDescr as ifAlias');
             }
