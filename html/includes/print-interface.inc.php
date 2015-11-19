@@ -247,7 +247,6 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
          	echo '<span class="neighbors-interface-list" style="display: none;">';
             }
             $link_if = dbFetchRow('SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.port_id = ?', array($int_link));
-	
             echo "$br";
 
             if ($int_links_phys[$int_link]) {
