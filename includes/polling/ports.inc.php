@@ -319,7 +319,6 @@ foreach ($ports as $port) {
             if ($oid == 'ifAlias') {
                 if (get_dev_attrib($device, 'ifName:'.$port['ifName'], 1)) {
                     $this_port['ifAlias'] = $port['ifAlias'];
-                    d_echo('ifAlias found on port!');
                 }
             }
 
