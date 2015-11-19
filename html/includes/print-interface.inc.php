@@ -179,7 +179,7 @@ echo '</td>';
 echo '<td width=375 valign=top class="interface-desc">';
 
 $neighborsCount=0;
-echo '<div class="collapse-neighbors"><span class="neighbors-button glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+echo '<div class="collapse-neighbors"><span class="neighbors-button glyphicon glyphicon-plus" aria-hidden="true"></span>
     <span class="neighbors-interface-list-firsts" style="display: inline;">';
 if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', array($if_id)) as $link) {
