@@ -179,13 +179,14 @@ echo '</td>';
 echo '<td width=375 valign=top class="interface-desc">';
 
 $neighborsCount=0;
-$displayPlus=0;
+$nbLinks=0;
 if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', array($if_id)) as $link) {
         // echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generate_port_link($link, makeshortif($link['label'])) . " on " . generate_device_link($link, shorthost($link['hostname'])) . "</a><br />");
         // $br = "<br />";
         $int_links[$link['port_id']]      = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
+	$nbLinks++;
     }
 
     unset($br);
@@ -193,11 +194,6 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
     if ($port_details && $config['enable_port_relationship'] === true) {
         // Show which other devices are on the same subnet as this interface
         foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `port_id` = ? AND `ipv4_address` NOT LIKE '127.%'", array($port['port_id'])) as $net) {
-            if($displayPlus == 0) {
-                $displayPlus=1;
-                echo '<div class="collapse-neighbors"><span class="neighbors-button glyphicon glyphicon-plus" aria-hidden="true"></span>
-                    <span class="neighbors-interface-list-firsts" style="display: inline;">';
-            }
             $ipv4_network_id = $net['ipv4_network_id'];
             $sql             = 'SELECT I.port_id FROM ipv4_addresses AS A, ports AS I, devices AS D
                 WHERE A.port_id = I.port_id
@@ -240,6 +236,13 @@ if (strpos($port['label'], 'oopback') === false && !$graph_type) {
             }
         }//end foreach
     }//end if
+
+    if(count($int_links) > 3)
+    {
+       echo '<div class="collapse-neighbors"><span class="neighbors-button glyphicon glyphicon-plus" aria-hidden="true"></span>
+               <span class="neighbors-interface-list-firsts" style="display: inline;">';
+    }
+
 
     if ($port_details && $config['enable_port_relationship'] === true && port_permitted($int_link,$device['device_id'])) {
         foreach ($int_links as $int_link) {
@@ -318,7 +321,7 @@ if ($port_details && $config['enable_port_relationship'] === true && port_permit
 
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
-if($displayPlus)
+if($nbLinks > 3)
 {
 echo '</span></div>';
 }
