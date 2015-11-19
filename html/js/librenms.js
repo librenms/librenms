@@ -123,6 +123,7 @@ $(document).ready(function() {
         });
     });
 
+    updateResolution();
 });
 
 function submitCustomRange(frmdata) {
@@ -165,5 +166,3 @@ $(document).on("click", '.collapse-neighbors', function(event)
     list.toggle();
     continued.toggle();
 });
-
-
