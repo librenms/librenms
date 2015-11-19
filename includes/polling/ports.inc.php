@@ -310,13 +310,18 @@ foreach ($ports as $port) {
 
         // Update IF-MIB data
         foreach ($data_oids as $oid) {
-
             if ($oid == 'ifAlias') {
                 if (get_dev_attrib($device, 'ifName:'.$port['ifName'], 1)) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 }
             }
-
+            
+            // When devices do not provide ifAlias data, populate with ifDescr data if configured
+            if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) || $config['os'][$device['os']]['descr_to_alias'] == 1) {
+                $this_port['ifAlias'] = $this_port['ifDescr'];
+                d_echo('Using ifDescr as ifAlias');
+            }
+            
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
                 log_event($oid.': '.$port[$oid].' -> NULL', $device, 'interface', $port['port_id']);
@@ -337,13 +342,8 @@ foreach ($ports as $port) {
                     echo $oid.' ';
                 }
             }
-        }//end foreach
 
-        // When devices do not provide ifAlias data, populate with ifDescr data if configured
-        if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) || $config['os'][$device['os']]['descr_to_alias'] == 1) {
-            $this_port['ifAlias'] = $this_port['ifDescr'];
-            d_echo('Using ifDescr as ifAlias');
-        }
+        }//end foreach
 
         // Parse description (usually ifAlias) if config option set
         if (isset($config['port_descr_parser']) && is_file($config['install_dir'].'/'.$config['port_descr_parser'])) {
