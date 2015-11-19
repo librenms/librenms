@@ -244,6 +244,10 @@ foreach ($ports as $port) {
             $this_port['ifDescr'] = $matches[1];
         }
 
+        if ($device['os'] == 'nos') {
+            $this_port['ifAlias'] = $this_port['ifName'];
+        }
+
         $polled_period = ($polled - $port['poll_time']);
 
         $port['update'] = array();
