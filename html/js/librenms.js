@@ -155,3 +155,7 @@ $(document).on("click", '.collapse-neighbors', function(event)
     continued.toggle();
 });
 
+$(function() {
+    $.post('ajax_setresolution.php', { width: $(window).width() , height:$(window).height() }, function(json) {
+    },'json');
+});
