@@ -313,10 +313,9 @@ foreach ($ports as $port) {
             if ($oid == 'ifAlias') {
                 if (get_dev_attrib($device, 'ifName:'.$port['ifName'], 1)) {
                     $this_port['ifAlias'] = $port['ifAlias'];
-                    d_echo('ifAlias found on port!')
+                    d_echo('ifAlias found on port!');
                 }
             }
-            
             // When devices do not provide ifAlias data, populate with ifDescr data if configured
             if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) || $config['os'][$device['os']]['descr_to_alias'] == 1) {
                 $this_port['ifAlias'] = $this_port['ifDescr'];
