@@ -47,7 +47,7 @@ else {
     <div class="collapse navbar-collapse" id="navHeaderCollapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons"></i> Overview</a>
+          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Overview</span></a>
           <ul class="dropdown-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
           <li class="dropdown-submenu">
@@ -113,7 +113,7 @@ if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
           </ul>
         </li>
         <li class="dropdown">
-          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"></i> Devices</a>
+          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Devices</span></a>
           <ul class="dropdown-menu">
             <li class="dropdown-submenu">
               <a href="devices/"><i class="fa fa-server fa-fw fa-lg"></i> All Devices</a>
@@ -187,7 +187,7 @@ if ($_SESSION['userlevel'] >= '10') {
 if ($config['show_services']) {
 ?>
         <li class="dropdown">
-          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"></i> Services</a>
+          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Services</span></a>
           <ul class="dropdown-menu">
             <li><a href="services/"><i class="fa fa-cogs fa-fw fa-lg"></i> All Services </a></li>
 
@@ -216,7 +216,7 @@ if ($_SESSION['userlevel'] >= '10') {
 
     <!-- PORTS -->
         <li class="dropdown">
-          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-link fa-fw fa-lg fa-nav-icons"></i> Ports</a>
+          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-link fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Ports</span></a>
           <ul class="dropdown-menu">
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
 
@@ -322,7 +322,7 @@ $menu_sensors = $used_sensors;
 ?>
 
         <li class="dropdown">
-          <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"></i> Health</a>
+          <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Health</span></a>
           <ul class="dropdown-menu">
             <li><a href="health/metric=mempool/"><i class="fa fa-gears fa-fw fa-lg"></i> Memory</a></li>
             <li><a href="health/metric=processor/"><i class="fa fa-desktop fa-fw fa-lg"></i> Processor</a></li>
@@ -373,7 +373,7 @@ $app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applica
 if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
 ?>
         <li class="dropdown">
-          <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"></i> Apps</a>
+          <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Apps</span></a>
           <ul class="dropdown-menu">
 <?php
 
@@ -411,7 +411,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 ?>
         <li class="dropdown">
-          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-arrows fa-fw fa-lg fa-nav-icons"></i> Routing</a>
+          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-arrows fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Routing</span></a>
           <ul class="dropdown-menu">
 <?php
     $separator = 0;
@@ -458,7 +458,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 ?>
 
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons"></i> <span class="hidden-md hidden-sm">Plugins</span></a>
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Plugins</span></a>
           <ul class="dropdown-menu">
 <?php
 Plugins::call('menu');

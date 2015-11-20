@@ -1765,3 +1765,6 @@ tr.search:nth-child(odd) {
 label {
     font-weight: normal;
 }
+.nav>li>a.dropdown-toggle {
+    padding: 15px 6px;
+}
