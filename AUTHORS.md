@@ -69,4 +69,6 @@ Contributors to LibreNMS:
 - Rob Gormley <robert@gormley.me> (rgormley)
 - Richard Kojedzinszky <krichy@nmdps.net> (rkojedzinszky)
 - Tony Murray <murraytony@gmail.com> (murrant)
+- Peter Lamperud <peter.lamperud@gmail.com> (vizay)
+- Louis Bailleul <louis.bailleul@gmail.com> (alucardfh)
 [1]: http://observium.org/ "Observium web site"
