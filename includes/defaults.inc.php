@@ -408,6 +408,8 @@ $config['network_map_vis_options'] = '{
 // Device page options
 $config['show_overview_tab'] = true;
 
+$config['cpu_details_overview'] = true; //By default show all cpus in the overview
+
 // The device overview page options
 $config['overview_show_sysDescr'] = true;
 
