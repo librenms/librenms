@@ -1,133 +1,120 @@
-NOTE: What follows is a very rough list of commands.  This works on a fresh install of CentOS 6.4 and CentOS 7.
+> NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (except for `mysql>` prompts commands) or temporarily become a user with root privileges with `sudo -s`.
 
-NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to all shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s`.
+> NOTE: These instructions assume a clean Centos 7.1 system, the instructions have been tested with a clean Centos 6.4 before and should also work.
 
-### On the DB Server ###
+### Requirements
 
-This host is where the MySQL database runs.  It could be the same machine as your network management server (this is the most common initial deployment scenario).
+These packages are required to run a LibreNMS server. Most common initial deployment scenario is to install the database on the same machine. 
 
-> ** Whilst we are working on ensuring LibreNMS is compatible with MySQL strict mode, for now, please disable this after mysql is installed.
+> NOTE : if you are **not** using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
-**CentOS 6**:
-You are free to choose between using MySQL or MariaDB:
-
-**MySQL**
 ```bash
-yum install net-snmp mysql-server mysql-client
-chkconfig mysqld on
-service mysqld start
+    yum install epel-release
+    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php-mcrypt fping git mariadb-server mariadb-client
+    pear install Net_IPv4-1.3.4
+    pear install Net_IPv6-1.2.2b2
 ```
 
-**MariaDB**
+> Centos 6 : 
+> - MariaDB and MySQL are supported (you only need one)
+> - cronie (Centos 7) has replaced vixie-cron (Centos 6), on most distro's a cron system has already been installed and this packages is purely reference
+
+### Database setup
+
+Setup the database to start at boot and log in using the command-line interface tool (mysql):
+
 ```bash
-yum install net-snmp mariadb-server mariadb-client
-chkconfig mariadb on
-service mariadb start
+    chkconfig mariadb on
+    service mariadb start
+    mysql_secure_installation
+    mysql -u root -p
 ```
+> Centos 6 : if you used MySQL, use `mysqld` instead of `mariadb`
 
-**CentOS 7**
-
-(NOTE: In CentOS 7 there is only mariadb in official repo)
-**MariaDB**
-```bash
-yum install net-snmp mariadb-server mariadb-client
-systemctl enable mariadb
-systemctl start mariadb
-```
-
-Now continue with the installation:
-
-**CentOS 6**
-```bash
-chkconfig snmpd on
-service snmpd start
-mysql_secure_installation
-mysql -uroot -p
-```
-
-**CentOS 7**
-```bash
-systemctl enable snmpd
-systemctl start snmpd
-mysql_secure_installation
-mysql -uroot -p
-```
-
-Enter the MySQL/MariaDB root password to enter the command-line interface.
-
-Create database.
-
+Create a database and allow privileges to user `librenms` (default user) and
+replace `<password>` with a strong password of your choice.
 ```sql
-CREATE DATABASE librenms;
-GRANT ALL PRIVILEGES ON librenms.*
-  TO 'librenms'@'<ip>'
-  IDENTIFIED BY '<password>'
-;
-FLUSH PRIVILEGES;
-exit
+    CREATE DATABASE librenms;
+    GRANT ALL PRIVILEGES ON librenms.*
+      TO 'librenms'@'localhost'
+      IDENTIFIED BY '<password>'
+    ;
+    FLUSH PRIVILEGES;
 ```
+> NOTE : Whilst we are working on ensuring LibreNMS is compatible with MySQL/MariaDB strict mode, for now, please disable this after MySQL/MariaDB is installed. See `/etc/my.conf.d/server.cnf` or `/etc/my.conf`.
 
-Replace `<ip>` above with the IP of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can just use `localhost` as the IP address.
+**If database server is different from LibreNMS server**
 
-If you are deploying a separate database server, you need to change the `bind-address`.  If your MySQL database resides on the same server as LibreNMS, you should skip this step.
+> NOTE : If your database resides on the same server as LibreNMS, you should skip this step. 
 
-    vim /etc/my.cnf
+Replace `localhost` above with the IP of the server running LibreNMS. Add the following lines below `[server]` in `/etc/my.cnf.d/server.cnf`, after changing `<ip>` to the IP address that your database server should listen on.
 
-Add the following line:
-
+```bash
     bind-address = <ip>
-
-Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
-
-If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
-
-    service mysqld restart
-
-### On the NMS ###
-
-Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4.  It also requires the EPEL repository.
-
-Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
-
-**CentOS 6**
+    port = 3306
+```
+Restart MySQL/MariaDB
 ```bash
-    yum install epel-release
-    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mysql ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils vixie-cron php-mcrypt fping git
-    pear install Net_IPv4-1.3.4
-    pear install Net_IPv6-1.2.2b2
+    service mariadb restart
 ```
 
-**CentOS 7**
+Then open port 3306 in your firewall. For example : 
+
 ```bash
-    yum install epel-release
-    yum install php php-cli php-gd php-mysql php-snmp php-pear php-curl httpd net-snmp graphviz graphviz-php mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php-mcrypt fping git
-    pear install Net_IPv4-1.3.4
-    pear install Net_IPv6-1.2.2b2
+    iptables -A INPUT -i eth0 -p tcp -m tcp --dport 3306 -j ACCEPT
 ```
 
-### Adding the librenms-user for Apache ###
+### Installation
+Installation of LibreNMS is done by cloning the master git repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
+
+> NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
+
+```bash
+    cd /opt
+    git clone https://github.com/librenms/librenms.git librenms
+    cd /opt/librenms
+```
+
+Now copy the config from the default and edit using a editor of your choice. (`vim`, `vi`, `nano`, ...)
+
+```bash
+    cp config.php.default config.php
+```
+
+Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
+
+Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
+
+Add the following line to the end of `config.php`, after checking where the location is of fping using `where fping`.
+
+```bash
+    $config['fping'] = "/usr/sbin/fping";
+```
+
+>NOTE : ** Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php ?>` blocks. Your graphs will break otherwise. **
+
+Now we need to create a new user and give him write permissions in a few directories. Create and chown the `rrd` directory and create the `logs` directory.
 ```bash
     useradd librenms -d /opt/librenms -M -r
+    mkdir /opt/librenms/rrd /opt/librenms/logs
+    chown -R librenms:librenms /opt/librenms
+    chmod 775 /opt/librenms/rrd
+```
+
+### Using Apache/Httpd
+Start Apache during boot : 
+```bash
+    chkconfig --levels 235 httpd on
+```
+Add the librenms-user to apache group: 
+```bash
     usermod -a -G librenms apache
 ```
-
-### Adding the librenms-user for Nginx ###
+Allow apache to write logs in our directory
 ```bash
-    useradd librenms -d /opt/librenms -M -r
-    usermod -a -G librenms nginx
+    chown apache:apache /opt/librenms/logs
 ```
-
-### Using HTTPd (Apache2) ###
-
-Set `httpd` to start on system boot.
-
-**CentOS 6**
-    chkconfig --levels 235 httpd on
-
-**CentOS 7**
-    systemctl enable httpd
-
-Next, add the following to `/etc/httpd/conf.d/librenms.conf`
+Next, add the following to the new file `/etc/httpd/conf.d/librenms.conf` after changing the value of `ServerName`
 
 ```apache
 <VirtualHost *:80>
@@ -143,35 +130,45 @@ Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 </VirtualHost>
 ```
 
-__Notes:__  
-If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`.  
-If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html)
+> NOTES : If you are running Apache 2.2.18 or higher then : 
+> - Change `AllowEncodedSlashes` to `NoDecode`
+> - Append `Require all granted` underneath `Options FollowSymLinks MultiViews`.
+> - If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to comment that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html)
+> - If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
-### Using Nginx and PHP-FPM ###
+After changing these, restart the httpd deamon :
+
+```bash
+    service httpd restart
+```
+
+### Using Nginx
+Add the librenms-user for nginx :
+```bash
+    usermod -a -G librenms nginx
+```
 
 Install necessary extra software and let it start on system boot.
 
-**CentOS 6**
 ```bash
     yum install nginx php-fpm
     chkconfig nginx on
     chkconfig php-fpm on
 ```
+Allow nginx to write logs in `/opt/librenms/logs`
 
-**CentOS 7**
-```bash
-    yum install nginx php-fpm
-    systemctl enable nginx
-    systemctl enable php-fpm
+```bash 
+    chown nginx:nginx /opt/librenms/logs
 ```
 
 Modify permissions and configuration for `php-fpm` to use nginx credentials.
 
+```bash
     mkdir /var/lib/php/session
     chown root:nginx /var/lib/php -R
     vim /etc/php-fpm.d/www.conf      # At line #12: Change `listen` to `/var/run/php5-fpm.sock`
                                     # At line #39-41: Change the `user` and `group` to `nginx`
-
+```
 Add configuration for `nginx` at `/etc/nginx/conf.d/librenms.conf` with the following content:
 
 ```nginx
@@ -199,75 +196,31 @@ server {
  }
 }
 ```
+> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
-### Cloning ###
-
-You can clone the repository via HTTPS or SSH.  In either case, you need to ensure the appropriate port (443 for HTTPS, 22 for SSH) is open in the outbound direction for your server.
-
+After these changes restart nginx
 ```bash
-    cd /opt
-    git clone https://github.com/librenms/librenms.git librenms
-    cd /opt/librenms
+    service nginx restart
 ```
 
-At this stage you can either launch the web installer by going to http://IP/install.php, follow the on-screen instructions then skip to the 'Web Interface' section further down. Alternatively if you want
-to continue the setup manually then just keep following these instructions.
+### Initialise the database
 
+Initiate the database with the following command from within `/opt/librenms`:
 ```bash
-    cp config.php.default config.php
-    vim config.php
-```
-
-NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
-
-Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
-
-Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
-
-Add the following line to the end of `config.php`:
-
-    $config['fping'] = "/usr/sbin/fping";
-
-** Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php?>` blocks. Your graphs will break otherwise. **
-
-### Initialise the database ###
-
-Initiate the follow database with the following command:
-
     php build-base.php
+```
 
 ### Create admin user ###
 
-Create the admin user - priv should be 10
-
-    php adduser.php <name> <pass> 10 <email>
-
-Substitute your desired username, password and email address--and leave the angled brackets off.
-
-### Web Interface ###
-
-To prepare the web interface (and adding devices shortly), you'll need to create and chown a directory as well as create an Apache vhost.
-
-First, create and chown the `rrd` directory and create the `logs` directory
-
+Create the admin user - priv should be 10 from within `/opt/librenms`:
 ```bash
-    mkdir rrd logs
-    chown -R librenms:librenms /opt/librenms
-    chmod 775 rrd
-
-    # For HTTPd (Apache):
-    chown apache:apache logs
-
-    # For Nginx:
-    chown nginx:nginx logs
+    php adduser.php <name> <pass> 10 <email>
 ```
+Substitute your desired `<name>`, `<password>` and `<email>` address--and leave the angled brackets off.
 
-> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
-
-**SELinux**
-> if you're using SELinux you need to allow web server user to write into logs directory.
-> semanage tool is a part of policycoreutils-python, so if don't have it, you can install it
-> **Please note that running LibreNMS with SELinux is still experimental and we cannot guarantee that everything will be working fine for now.**
+### SELinux
+If you're using SELinux you need to allow web server user to write into logs directory. semanage tool is a part of policycoreutils-python, so if don't have it, you can install it
+> NOTE: Running LibreNMS with SELinux is still experimental and we cannot guarantee that everything will be working fine for now.
 
 ```bash
     yum install policycoreutils-python
@@ -279,40 +232,34 @@ First, create and chown the `rrd` directory and create the `logs` directory
     restorecon -RFvv /opt/librenms/logs/
 ```
 
-Start the web-server:
+### Set up snmpd
 
-**CentOS 6**
+Since we installed snmpd we can now start polling from machines. If you have not yet done, configure snmpd. This is done in `/etc/snmp/snmpd.conf` by at least adding :
+```bash
+    rocommunity public 127.0.0.1
+```
+Change `127.0.0.1` to the IP of the libreNMS server for machines other than localhost.
 
-    # For HTTPd (Apache):
-    service httpd restart
+Now we can start the service and configure it to start at boot.
 
-    # For Nginx:
-    service nginx restart
+```bash
+    chkconfig snmpd on
+    service snmpd start
+```
 
-**CentOS 7**
-
-    # For HTTPd (Apache):
-    systemctl restart httpd
-
-    # For Nginx:
-    systemctl restart nginx
-
-### Add localhost ###
-
+### Manual add localhost
+Now we can add our first server to LibreNMS using :
+```bash
     php addhost.php localhost public v2c
-
+```
 This assumes you haven't made community changes--if you have, replace `public` with your community.  It also assumes SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
 
 Discover localhost:
-
+```bash
     php discovery.php -h all
-
+```
 ### Create cronjob ###
-
-The polling method used by LibreNMS is `poller-wrapper.py`, which was placed in the public domain by its author.  By default, the LibreNMS cronjob runs `poller-wrapper.py` with 16 threads.  The current LibreNMS recommendation is to use 4 threads per core.  The default if no thread count is `16 threads`.
-
-If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).
- Just add a number after `poller-wrapper.py`, as in the below example:
+LibreNMS uses Job Snijders' [poller-wrapper.py][1].  By default, the cron job runs `poller-wrapper.py` with 16 threads.  The current recommendation is to use 4 threads per core as a rule of thumb.  If the thread count needs to be changed, you can do so by editing the cron file (`/etc/cron.d/librenms`).  Just add a number after `poller-wrapper.py`, as in the example below:
 
     /opt/librenms/poller-wrapper.py 12 >> /dev/null 2>&1
 
@@ -339,3 +286,5 @@ If you don't see data after this, please refer to the [FAQ](http://docs.librenms
 That's it!  You now should be able to log in to http://librenms.example.com/.  Please note that we have not covered HTTPS setup in this example, so your LibreNMS install is not secure by default.  Please do not expose it to the public Internet unless you have configured HTTPS and taken appropriate web server hardening steps.
 
 It would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.
+
+[1]: https://github.com/Atrato/observium-poller-wrapper
