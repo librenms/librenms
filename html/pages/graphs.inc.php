@@ -111,6 +111,14 @@ else {
     $graph_array['height'] = "300";
     $graph_array['width']  = $graph_width;
 
+    if($_SESSION['screen_width']) {
+        $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/12));
+    }
+
+    if($_SESSION['screen_height']) {
+        $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/2));
+    }
+
     echo("<hr />");
 
     include_once 'includes/print-date-selector.inc.php';
