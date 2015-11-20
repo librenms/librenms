@@ -13,39 +13,52 @@ $pagetitle[] = 'RIPE NCC - API Tools';
 ?>
 <h3> RIPE NCC API Tools </h3>
 <hr>
-<h4> Whois </h4>
 <form class="form-horizontal" action="" method="post">
-<div class="input-group">
-  <input type="text" class="form-control" id="input-parameter" placeholder="IP, ASN etc.">
-  <span class="input-group-btn">
-  <button type="submit" name="btn-query" id="btn-query" class="btn btn-primary">Query</button>
-  </span>
-</div>
+    <div class="radio">
+        <label><input type="radio" id="data_radio" value="abuse-contact-finder">Abuse Contact Finder</label>
+    </div>
+    <div class="radio">
+        <label><input type="radio" id="data_radio" value="whois">Whois</label>
+    </div>
+    <div class="input-group">
+        <input type="text" class="form-control" id="input-parameter" placeholder="IP, ASN etc.">
+        <span class="input-group-btn">
+        <button type="submit" name="btn-query" id="btn-query" class="btn btn-primary">Query</button>
+        </span>
+    </div>
 </form>
 <br />
 <div id="ripe-output" style="font-family: Courier New; background-color: lightgray;"></div>
 <br />
 <script>
-$("[name='btn-query']").on('click', function(event) {
-    event.preventDefault();
-    var $this = $(this);
-    var parameter = $("#input-parameter").val();
-    $.ajax({
-        type: 'POST',
-        url: 'ajax_form.php',
-        data: { type: "query-ripenccapi", parameter: parameter},
-        dataType: "json",
-        success: function(data){
-            $('#ripe-output').empty();
-            if (data.output.data.records) {
-                 $.each(data.output.data.records[0], function (row,value) {
-                    $('#ripe-output').append(value['key'] + ' = ' + value['value'] +'<br />');
-                 });
+    $("[name='btn-query']").on('click', function(event) {
+        event.preventDefault();
+        var $this = $(this);
+        var data_param = $("#data_radio").val();
+        var query_param = $("#input-parameter").val();
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {
+                type: "query-ripenccapi",
+                data_param: data_param,
+                query_param: query_param
+            },
+            dataType: "json",
+            success: function(data) {
+                $('#ripe-output').empty();
+                if (data.output.data.records)
+                    $.each(data.output.data.records[0], function(row, value) {
+                        $('#ripe-output').append(value['key'] + ' = ' + value['value'] + '<br />');
+                    });
+                else if (data.output.data.anti_abuse_contacts.abuse_c)
+                    $.each(data.output.data.anti_abuse_contacts.abuse_c, function(row, value) {
+                        $('#ripe-output').append(value['description'] + ' = ' + value['email'] + '<br />');
+                    });
+            },
+            error: function() {
+                toastr.error('Error');
             }
-        },
-        error:function(){
-            toastr.error('Error');
-        }
+        });
     });
-});
 </script>
