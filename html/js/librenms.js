@@ -123,7 +123,6 @@ $(document).ready(function() {
         });
     });
 
-    updateResolution();
 });
 
 function submitCustomRange(frmdata) {
