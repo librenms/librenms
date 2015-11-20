@@ -130,19 +130,7 @@ if ($config['enable_inventory']) {
                 echo '+';
             }//end if
 
-	    // This entire if/else statement is no longer necessary as we fix $entPhysicalIndex at the start of the loop
-            //if ($device['os'] == 'junos') {
-                // $entPhysicalIndex appears as a numeric OID fragment
-                // (string), so convert it to an "integer" for the
-                // validation step below since it is stored in the DB as
-                // an integer. This should be fixed.
-                //list($first,$second)            = explode('.', $entPhysicalIndex);
-                //$entPhysicalIndexNoDots         = $first.$second;
-                //$valid[$entPhysicalIndexNoDots] = 1;
-            //}
-            //else {
-                $valid[$entPhysicalIndex] = 1;
-            //}
+            $valid[$entPhysicalIndex] = 1;
         }//end if
     }//end foreach
 }
