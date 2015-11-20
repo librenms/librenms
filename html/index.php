@@ -184,6 +184,10 @@ else {
 
 <?php
 
+if(empty($_SESSION['screen_width']) && empty($_SESSION['screen_height'])) {
+    echo "<script>updateResolution();</script>";
+}
+
 if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
     if ($_SESSION['authenticated']) {
         require 'includes/print-menubar.php';
