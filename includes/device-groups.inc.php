@@ -46,6 +46,7 @@ function GenGroupSQL($pattern, $search='') {
             $pattern  = str_replace($opt, $tmpp[0].'.'.$tmpp[1], $pattern);
         }
     }
+    $pattern = substr($pattern, 0, -3);
 
     $tables = array_keys(array_flip($tables));
     $x      = sizeof($tables);
