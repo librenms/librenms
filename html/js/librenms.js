@@ -157,7 +157,8 @@ $(document).on("click", '.collapse-neighbors', function(event)
 
     if(button.hasClass("glyphicon-plus")) {
         button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
-    }else {
+    }
+    else {
         button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
     }
    
