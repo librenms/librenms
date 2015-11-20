@@ -1,4 +1,4 @@
-<?php
+ <?php
 /*
  * LibreNMS
  *
@@ -12,11 +12,12 @@
 
 $status    = 'error';
 $message   = 'unknown error';
-$parameter = mres($_POST['parameter']);
-if (isset($parameter)) {
+$data_param = mres($_POST['data_param']);
+$query_param = mres($_POST['query_param']);
+if (isset($data_param) && isset($query_param)) {
     $status  = 'ok';
     $message = 'Queried';
-    $output = get_ripe_api_whois_data_json($parameter);
+    $output = get_ripe_api_whois_data_json($data_param, $query_param);
 }
 else {
     $status  = 'error';
@@ -25,6 +26,7 @@ else {
 die(json_encode(array(
      'status'       => $status,
      'message'      => $message,
-     'parameter'    => $parameter,
+     'data_param'    => $data_param,
+     'query_param'    => $query_param,
      'output'       => $output
 )));
