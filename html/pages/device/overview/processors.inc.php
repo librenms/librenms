@@ -93,6 +93,7 @@ if (count($processors)) {
         $totalPercent=$totalPercent/count($processors);
          echo '<tr>
              <td>'.overlib_link($link, $text_descr, $overlib_content).'</td>
+             <td>x'.count($processors).'</td>
              <td>'.overlib_link($link, print_percentage_bar(200, 20, $totalPercent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']), $overlib_content).'</td>
            </tr>';
 
