@@ -42,7 +42,7 @@ echo "<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this
 // Don't echo out ports ifIndex if it's a NOS device since their ifIndex is, for lack of better words....different
 if ($device['os'] == 'nos') {
     echo '        <span class=list-large>
-        '.generate_port_link($port, .$port['label'])." $error_img $mac
+        '.generate_port_link($port, $port['label'])." $error_img $mac
         </span><br /><span class=interface-desc>".$port['ifAlias'].'</span>';
 }
 else {
