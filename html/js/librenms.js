@@ -139,8 +139,12 @@ function submitCustomRange(frmdata) {
 
 function updateResolution()
 {
-     $.post('ajax_setresolution.php', { width: $(window).width() , height:$(window).height() }, function(json) {
-    },'json');
+    $.post(
+        'ajax_setresolution.php', 
+        {width: $(window).width(),height:$(window).height()},
+        function(json) {},
+        'json'
+    );
 }
 
 $(window).on('resize', function(){ updateResolution();});
@@ -152,11 +156,9 @@ $(document).on("click", '.collapse-neighbors', function(event)
     var list = caller.find('.neighbors-interface-list');
     var continued = caller.find('.neighbors-list-continued');
 
-    if(button.hasClass("glyphicon-plus"))
-    {
+    if(button.hasClass("glyphicon-plus")) {
         button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
-    }else
-    {
+    }else {
         button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
     }
    
