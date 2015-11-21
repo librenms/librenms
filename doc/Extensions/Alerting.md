@@ -18,6 +18,9 @@ Table of Content:
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
     - [Pushbullet](#transports-pushbullet)
+    - [Clickatell](#transports-clickatell)
+    - [PlaySMS](#transports-playsms)
+    - [VictorOps](#transports-victorops)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -369,6 +372,54 @@ Get your Access Token from your Pushbullet's settings page and set it in your co
 ~~
 ```php
 $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
+```
+~~
+
+## <a name="transports-clickatell">Clickatell</a>
+
+Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.  
+Please consult Clickatell's documentation regarding number formating.  
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['clickatell']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567890';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567891';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
+```
+~~
+
+## <a name="transports-playsms">PlaySMS</a>
+
+PlaySMS is an OpenSource SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.  
+Please consult PlaySMS's documentation regarding number formating.  
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['playsms']['url']   = 'https://localhost/index.php?app=ws';
+$config['alert']['transports']['playsms']['user']  = 'user1';
+$config['alert']['transports']['playsms']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['playsms']['from']  = '+1234567892'; //Optional
+$config['alert']['transports']['playsms']['to'][]  = '+1234567890';
+$config['alert']['transports']['playsms']['to'][]  = '+1234567891';
+```
+~~
+
+## <a name="transports-victorops">VictorOps</a>
+
+VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps account and go to:
+
+Settings -> Integrations -> REST Endpoint -> Enable Integration.
+
+The URL provided will have $routing_key at the end, you need to change this to something that is unique to the system sending the alerts such as librenms. I.e:
+
+`https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms`
+
+~~
+```php
+$config['alert']['transports']['victorops']['url'] = 'https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms';
 ```
 ~~
 
