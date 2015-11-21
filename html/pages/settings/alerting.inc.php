@@ -720,6 +720,116 @@ echo '<div id="boxcar_appkey_template" class="hide">
                 </div>
             </div>
         </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#victorops_transport_expand">VictorOps</a> <button name="test-alert" id="test-alert" type="button" data-transport="victorops" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="victorops_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="victorops" class="col-sm-4 control-label">Post URL </label>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.victorops.url']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div class="col-sm-4">
+                            <input id="victorops" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+$clickatell   = get_config_by_name('alert.transports.clickatell.token');
+$mobiles      = get_config_like_name('alert.transports.clickatell.to.%');
+$new_mobiles = array();
+foreach ($mobiles as $mobile) {
+    $new_mobiles[] = $mobile['config_value'];
+}
+$upd_mobiles = implode(PHP_EOL, $new_mobiles);
+
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#clickatell_transport_expand">Clickatell transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="clickatell" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="clickatell_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_token" class="col-sm-4 control-label">Clickatell Token </label>
+                        <div class="col-sm-4">
+                            <input id="clickatell_token" class="form-control" type="text" name="global-config-input" value="'.$clickatell['config_value'].'" data-config_id="'.$clickatell['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_to" class="col-sm-4 control-label">Mobile numbers</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" name="global-config-textarea" id="clickatell_to" placeholder="Enter the config options" data-config_id="'.$clickatell['config_id'].'" data-type="clickatell">'.$upd_mobiles.'</textarea>
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+$playsms_url     = get_config_by_name('alert.transports.playsms.url');
+$playsms_user    = get_config_by_name('alert.transports.playsms.user');
+$playsms_token   = get_config_by_name('alert.transports.playsms.token');
+$playsms_from    = get_config_by_name('alert.transports.playsms.from');
+$mobiles         = get_config_like_name('alert.transports.playsms.to.%');
+$new_mobiles = array();
+foreach ($mobiles as $mobile) {
+    $new_mobiles[] = $mobile['config_value'];
+}
+$upd_mobiles = implode(PHP_EOL, $new_mobiles);
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#playsms_transport_expand">PlaySMS transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="playsms" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="playsms_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="playsms_url" class="col-sm-4 control-label">PlaySMS URL </label>
+                        <div class="col-sm-4">
+                            <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_user" class="col-sm-4 control-label">User</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_user" class="form-control" type="text" name="global-config-input" value="'.$playsms_user['config_value'].'" data-config_id="'.$playsms_user['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_token" class="col-sm-4 control-label">Token</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_token" class="form-control" type="text" name="global-config-input" value="'.$playsms_token['config_value'].'" data-config_id="'.$playsms_token['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_from" class="col-sm-4 control-label">From</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_from" class="form-control" type="text" name="global-config-input" value="'.$playsms_from['config_value'].'" data-config_id="'.$playsms_from['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_to" class="col-sm-4 control-label">Mobiles</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" name="global-config-textarea" id="playsms_to" placeholder="Enter the config options" data-config_id="'.$playsms_url['config_id'].'" data-type="playsms">'.$upd_mobiles.'</textarea>
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 ';

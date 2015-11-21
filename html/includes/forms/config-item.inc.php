@@ -30,10 +30,13 @@ $config_extra     = mres($_POST['config_extra']);
 $config_room_id   = mres($_POST['config_room_id']);
 $config_from      = mres($_POST['config_from']);
 $config_userkey   = mres($_POST['config_userkey']);
+$config_user      = mres($_POST['config_user']);
+$config_to        = mres($_POST['config_to']);
+$config_token     = mres($_POST['config_token']);
 $status           = 'error';
 $message          = 'Error with config';
 
-if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar') {
+if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipchat' || $action == 'remove-pushover' || $action == 'remove-boxcar' || $action == 'remove-clickatell' || $action == 'remove-playsms') {
     $config_id = mres($_POST['config_id']);
     if (empty($config_id)) {
         $message = 'No config id passed';
@@ -51,6 +54,12 @@ if ($action == 'remove' || $action == 'remove-slack' || $action == 'remove-hipch
             }
             elseif ($action == 'remove-boxcar') {
                 dbDelete('config', "`config_name` LIKE 'alert.transports.boxcar.$config_id.%'");
+            }
+            elseif ($action == 'remove-clickatell') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.clickatell.$config_id.%'");
+            }
+            elseif ($action == 'remove-playsms') {
+                dbDelete('config', "`config_name` LIKE 'alert.transports.playsms.$config_id.%'");
             }
 
             $status  = 'ok';
@@ -148,6 +157,66 @@ else if ($action == 'add-boxcar') {
                 list($k,$v) = explode('=', $option, 2);
                 if (!empty($k) || !empty($v)) {
                     dbInsert(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Boxcar '.$v), 'config');
+                }
+            }
+        }
+        else {
+            $message = 'Could not create config item';
+        }
+    }
+}
+else if ($action == 'add-clickatell') {
+    if (empty($config_value)) {
+        $message = 'No Clickatell token provided';
+    }
+    elseif (empty($config_to)) {
+        $message = 'No mobile numbers provided';
+    }
+    else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.clickatell.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Clickatell Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.token'), 'config', 'config_id=?', array($config_id));
+            $status                   = 'ok';
+            $message                  = 'Config item created';
+            $mobiles                   = explode('\n', $config_to);
+            $x=0;
+            foreach ($mobiles as $mobile) {
+                if (!empty($mobile)) {
+                    dbInsert(array('config_name' => 'alert.transports.clickatell.'.$config_id.'.to.'.$x, 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'Clickatell mobile'), 'config');
+                    $x++;
+                }
+            }
+        }
+        else {
+            $message = 'Could not create config item';
+        }
+    }
+}
+elseif ($action == 'add-playsms') {
+    if (empty($config_value)) {
+        $message = 'No PlaySMS URL provided';
+    }
+    elseif (empty($config_user)) {
+        $message = 'No PlaySMS User provided';
+    }
+    elseif (empty($config_to)) {
+        $message = 'No mobile numbers provided';
+    }
+    else {
+        $config_id = dbInsert(array('config_name' => 'alert.transports.playsms.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'PlaySMS Transport'), 'config');
+        if ($config_id > 0) {
+            dbUpdate(array('config_name' => 'alert.transports.playsms.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
+            $additional_id['from']    = dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.from', 'config_value' => $config_from, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_from, 'config_descr' => 'PlaySMS From'), 'config');
+            $additional_id['user']    = dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.user', 'config_value' => $config_user, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_user, 'config_descr' => 'PlaySMS User'), 'config');
+            $additional_id['token']    = dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.token', 'config_value' => $config_token, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_token, 'config_descr' => 'PlaySMS Token'), 'config');
+            $status                   = 'ok';
+            $message                  = 'Config item created';
+            $mobiles                   = explode('\n', $config_to);
+            $x=0;
+            foreach ($mobiles as $mobile) {
+                if (!empty($mobile)) {
+                    dbInsert(array('config_name' => 'alert.transports.playsms.'.$config_id.'.to.'.$x, 'config_value' => $mobile, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $v, 'config_descr' => 'PlaySMS mobile'), 'config');
+                    $x++;
                 }
             }
         }

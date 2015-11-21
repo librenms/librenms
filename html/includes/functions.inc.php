@@ -1097,7 +1097,7 @@ function get_config_like_name($name) {
     $name  = array($name);
     $items = array();
     foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
-        $items[$config_item['config_name']] = $config_item;
+        $items[$config_item['config_id']] = $config_item;
     }
 
     return $items;
