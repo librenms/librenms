@@ -20,6 +20,7 @@ Table of Content:
     - [Pushbullet](#transports-pushbullet)
     - [Clickatell](#transports-clickatell)
     - [PlaySMS](#transports-playsms)
+    - [VictorOps](#transports-victorops)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -403,6 +404,22 @@ $config['alert']['transports']['playsms']['token'] = 'MYFANCYACCESSTOKEN';
 $config['alert']['transports']['playsms']['from']  = '+1234567892'; //Optional
 $config['alert']['transports']['playsms']['to'][]  = '+1234567890';
 $config['alert']['transports']['playsms']['to'][]  = '+1234567891';
+```
+~~
+
+## <a name="transports-victorops">VictorOps</a>
+
+VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps account and go to:
+
+Settings -> Integrations -> REST Endpoint -> Enable Integration.
+
+The URL provided will have $routing_key at the end, you need to change this to something that is unique to the system sending the alerts such as librenms. I.e:
+
+`https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms`
+
+~~
+```php
+$config['alert']['transports']['victorops']['url'] = 'https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms';
 ```
 ~~
 
