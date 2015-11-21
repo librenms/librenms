@@ -44,7 +44,7 @@ function auth_usermanagement() {
 }
 
 
-function adduser($username, $password, $level, $email='', $realname='', $can_modify_passwd='1') {
+function adduser($username, $password, $level, $email='', $realname='', $can_modify_passwd=1, $description='', $twofactor=0) {
     if (!user_exists($username)) {
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
