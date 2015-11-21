@@ -110,7 +110,7 @@ function adduser($username, $password, $level, $email='', $realname='', $can_mod
         }
         else {
             foreach (dbFetchRows('select notifications.* from notifications where not exists( select 1 from notifications_attribs where notifications.notifications_id = notifications_attribs.notifications_id and notifications_attribs.user_id = ?) order by notifications.notifications_id desc',array($userid)) as $notif) {
-                dbInsert(array('notifications_id'=>$notif['notification_id'],'user_id'=>$userid,'key'=>'read','value'=>1),'notifications_attribs');
+                dbInsert(array('notifications_id'=>$notif['notifications_id'],'user_id'=>$userid,'key'=>'read','value'=>1),'notifications_attribs');
             }
         }
         return $userid;

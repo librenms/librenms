@@ -127,7 +127,7 @@ $notifications = new ObjCache('notifications');
   <div class="well">
     <div class="row">
       <div class="col-md-12">
-        <h4 id="<?php echo $notif['notifications_id']; ?>"><?php echo $notif['title']; ?><button class="btn btn-primary fa fa-bell-o pull-right stick-notif" style="margin-top:-10px;"></button></h4>
+        <h4 id="<?php echo $notif['notifications_id']; ?>"><?php echo $notif['title']; echo ($_SESSION['userlevel'] == 10 ? '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>' : ''); ?>
       </div>
     </div>
     <div class="row">
@@ -175,6 +175,7 @@ $(function() {
   });
 
   $(document).on( "click", ".read-notif", function() {
+    $(this).attr("disabled", true);
     var notif = $(this).parent().parent().attr('id');
     $.ajax({
       type: 'POST',
@@ -190,6 +191,7 @@ $(function() {
           });
         }
         else {
+          $(this).attr("disabled", false);
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
         }
       }
