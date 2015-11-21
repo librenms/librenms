@@ -825,3 +825,6 @@ $config['summary_errors']                               = 0;
 
 // Default width of the availability map's tiles
 $config['availability-map-width']                       = 25;
+
+// Default notifications Feed
+$config['notifications']['LibreNMS']                    = 'http://www.librenms.org/notifications.rss';
