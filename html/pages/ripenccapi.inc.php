@@ -15,10 +15,10 @@ $pagetitle[] = 'RIPE NCC - API Tools';
 <hr>
 <form class="form-horizontal" action="" method="post">
     <div class="radio">
-        <label><input type="radio" id="data_radio" value="abuse-contact-finder">Abuse Contact Finder</label>
+        <label><input type="radio" name="data_radio" value="abuse-contact-finder">Abuse Contact Finder</label>
     </div>
     <div class="radio">
-        <label><input type="radio" id="data_radio" value="whois">Whois</label>
+        <label><input type="radio" name="data_radio" value="whois">Whois</label>
     </div>
     <div class="input-group">
         <input type="text" class="form-control" id="input-parameter" placeholder="IP, ASN etc.">
@@ -28,13 +28,13 @@ $pagetitle[] = 'RIPE NCC - API Tools';
     </div>
 </form>
 <br />
-<div id="ripe-output" style="font-family: Courier New; background-color: lightgray;"></div>
+<div id="ripe-output" class="alert alert-success" style="display: none;"></div>
 <br />
 <script>
     $("[name='btn-query']").on('click', function(event) {
         event.preventDefault();
         var $this = $(this);
-        var data_param = $("#data_radio").val();
+        var data_param = $('input[name=data_radio]:checked').val();
         var query_param = $("#input-parameter").val();
         $.ajax({
             type: 'POST',
@@ -47,6 +47,7 @@ $pagetitle[] = 'RIPE NCC - API Tools';
             dataType: "json",
             success: function(data) {
                 $('#ripe-output').empty();
+                $("#ripe-output").show();
                 if (data.output.data.records)
                     $.each(data.output.data.records[0], function(row, value) {
                         $('#ripe-output').append(value['key'] + ' = ' + value['value'] + '<br />');
