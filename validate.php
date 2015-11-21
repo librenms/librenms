@@ -93,6 +93,13 @@ if(strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
     print_warn('You have MySQL STRICT_TRANS_TABLES enabled, it is advisable to disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
 }
 
+// Test for MySQL InnoDB buffer size
+$innodb_buffer = innodb_buffer_check();
+if ($innodb_buffer['used'] > $innodb_buffer['size']) {
+    print_fail('Your Innodb buffer size is not big enough...');
+    echo warn_innodb_buffer($innodb_buffer);
+}
+
 // Test transports
 if ($config['alerts']['email']['enable'] === true) {
     print_warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');
