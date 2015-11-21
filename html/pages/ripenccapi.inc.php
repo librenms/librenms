@@ -20,6 +20,7 @@ $pagetitle[] = 'RIPE NCC - API Tools';
     <div class="radio">
         <label><input type="radio" name="data_radio" value="whois">Whois</label>
     </div>
+    <br />
     <div class="input-group">
         <input type="text" class="form-control" id="input-parameter" placeholder="IP, ASN etc.">
         <span class="input-group-btn">
