@@ -37,6 +37,9 @@ if ($config['enable_inventory']) {
             $entPhysicalIsFRU        = $entry['jnxFruType'];
             $entPhysicalAlias        = $entry['entPhysicalAlias'];
             $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
+            // fix for issue 1865, $entPhysicalIndex, as it contains a quad dotted number on newer Junipers
+            // using str_replace to remove all dots should fix this even if it changes in future
+	    $entPhysicalIndex = str_replace('.','',$entPhysicalIndex);
         }
         else {
             $entPhysicalDescr        = $entry['entPhysicalDescr'];
@@ -127,18 +130,7 @@ if ($config['enable_inventory']) {
                 echo '+';
             }//end if
 
-            if ($device['os'] == 'junos') {
-                // $entPhysicalIndex appears as a numeric OID fragment
-                // (string), so convert it to an "integer" for the
-                // validation step below since it is stored in the DB as
-                // an integer. This should be fixed.
-                list($first,$second)            = explode('.', $entPhysicalIndex);
-                $entPhysicalIndexNoDots         = $first.$second;
-                $valid[$entPhysicalIndexNoDots] = 1;
-            }
-            else {
-                $valid[$entPhysicalIndex] = 1;
-            }
+            $valid[$entPhysicalIndex] = 1;
         }//end if
     }//end foreach
 }

@@ -795,3 +795,15 @@ function ceph_rrd($gtype) {
     $rrd = join('-', array('app', 'ceph', $vars['id'], $gtype, $var)).'.rrd';
     return join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
 }
+
+/**
+ * Parse location field for coordinates
+ * @param string location The location field to look for coords in.
+ * @return array Containing the lat and lng coords
+**/
+function parse_location($location) {
+    preg_match('/(\[)([0-9\. ]+),[ ]*([0-9\. ]+)(\])/', $location, $tmp_loc);
+    if (!empty($tmp_loc[2]) && !empty($tmp_loc[3])) {
+        return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
+    }
+}//end parse_location()

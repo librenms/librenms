@@ -1097,7 +1097,7 @@ function get_config_like_name($name) {
     $name  = array($name);
     $items = array();
     foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
-        $items[$config_item['config_name']] = $config_item;
+        $items[$config_item['config_id']] = $config_item;
     }
 
     return $items;
@@ -1253,8 +1253,8 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
     return $output;
 }//end generate_dynamic_config_panel()
 
-function get_ripe_api_whois_data_json($ripe_parameter) {
-    $ripe_whois_url = 'https://stat.ripe.net/data/whois/data.json?resource=' . $ripe_parameter;
+function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param) {
+    $ripe_whois_url = 'https://stat.ripe.net/data/'. $ripe_data_param . '/data.json?resource=' . $ripe_query_param;
     return json_decode(file_get_contents($ripe_whois_url) , true);
 }//end get_ripe_api_whois_data_json()
 

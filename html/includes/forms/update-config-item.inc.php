@@ -25,22 +25,31 @@ $status = 'error';
 if (!is_numeric($config_id)) {
     $message = 'ERROR: No config item';
 }
-else if ($action == 'update-textarea') {
+elseif ($action == 'update-textarea') {
     $extras = explode(PHP_EOL, $_POST['config_value']);
+    $x=0;
     foreach ($extras as $option) {
         list($k,$v) = explode('=', $option, 2);
         if (!empty($k) || !empty($v)) {
             if ($config_type == 'slack') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.slack.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Slack Transport'), 'config');
             }
-            else if ($config_type == 'hipchat') {
+            elseif ($config_type == 'hipchat') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Hipchat Transport'), 'config');
             }
-            else if ($config_type == 'pushover') {
+            elseif ($config_type == 'pushover') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.pushover.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Pushover Transport'), 'config');
             }
             elseif ($config_type == 'boxcar') {
                 $db_id[] = dbInsert(array('config_name' => 'alert.transports.boxcar.'.$config_id.'.'.$k, 'config_value' => $v, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Boxcar Transport'), 'config');
+            }
+            elseif ($config_type == 'clickatell') {
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.clickatell.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'Clickatell Transport'), 'config');
+                $x++;
+            }
+            elseif ($config_type == 'playsms') {
+                $db_id[] = dbInsert(array('config_name' => 'alert.transports.playsms.to.'.$x, 'config_value' => $k, 'config_group' => 'alerting', 'config_sub_group' => 'transports', 'config_default' => $v, 'config_descr' => 'PlaySMS Transport'), 'config');
+                $x++;
             }
         }
     }
@@ -54,14 +63,20 @@ else if ($action == 'update-textarea') {
         if ($config_type == 'slack') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.slack.$config_id.%' AND `config_name` != 'alert.transports.slack.$config_id.url' AND `config_id` NOT IN ($db_inserts))");
         }
-        else if ($config_type == 'hipchat') {
+        elseif ($config_type == 'hipchat') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.hipchat.$config_id.%' AND (`config_name` != 'alert.transports.hipchat.$config_id.url' AND `config_name` != 'alert.transports.hipchat.$config_id.room_id' AND `config_name` != 'alert.transports.hipchat.$config_id.from') AND `config_id` NOT IN ($db_inserts))");
         }
-        else if ($config_type == 'pushover') {
+        elseif ($config_type == 'pushover') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.pushover.$config_id.%' AND (`config_name` != 'alert.transports.pushover.$config_id.appkey' AND `config_name` != 'alert.transports.pushover.$config_id.userkey') AND `config_id` NOT IN ($db_inserts))");
         }
-        else if ($config_type == 'boxcar') {
+        elseif ($config_type == 'boxcar') {
             dbDelete('config', "(`config_name` LIKE 'alert.transports.boxcar.$config_id.%' AND (`config_name` != 'alert.transports.boxcar.$config_id.access_token' AND `config_name` != 'alert.transports.boxcar.$config_id.userkey') AND `config_id` NOT IN ($db_inserts))");
+        }
+        elseif ($config_type == 'clickatell') {
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.clickatell.to.%' AND `config_id` NOT IN ($db_inserts))");
+        }
+        elseif ($config_type == 'playsms') {
+            dbDelete('config', "(`config_name` LIKE 'alert.transports.playsms.to.%' AND `config_id` NOT IN ($db_inserts))");
         }
     }
 
