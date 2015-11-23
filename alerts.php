@@ -314,6 +314,9 @@ function ExtTransports($obj) {
     $tmp = false;
     // To keep scrutinizer from naging because it doesnt understand eval
     foreach ($config['alert']['transports'] as $transport => $opts) {
+        if (is_array($opts)) {
+            $opts = array_filter($opts);
+        }
         if (($opts === true || !empty($opts)) && $opts != false && file_exists($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php')) {
             echo $transport.' => ';
             eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
