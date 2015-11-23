@@ -6,7 +6,12 @@ $options      = '-O qv';
 $mib          = 'NET-SNMP-EXTEND-MIB';
 $oid          = 'nsExtendOutputFull.8.112.111.119.101.114.100.110.115';
 
-$powerdns = snmp_get($device, $oid, $options, $mib);
+if ($agent_data['app']['powerdns']) {
+    $powerdns = $agent_data['app']['powerdns'];
+}
+else {
+    $powerdns = snmp_get($device, $oid, $options, $mib);
+}
 
 echo ' powerdns';
 
