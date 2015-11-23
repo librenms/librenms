@@ -1768,3 +1768,39 @@ label {
 .nav>li>a.dropdown-toggle {
     padding: 15px 6px;
 }
+
+@media only screen and (max-width: 480px) {
+    .thumbnail_graph_table b { font-size : 6px;}
+    .thumbnail_graph_table img {
+        max-width: 45px;
+        max-height: 50px;
+    }
+}
+
+@media only screen and (max-width: 720px) and (min-width: 481px) {
+    .thumbnail_graph_table b { font-size : 8px;}
+    .thumbnail_graph_table img {
+        max-width: 60px;
+        max-height: 55px;
+    }
+}
+
+
+@media only screen and (max-width: 800px) and (min-width: 721px) {
+    .thumbnail_graph_table b { font-size : 8px;}
+    .thumbnail_graph_table img {
+        max-width: 75px;
+        max-height: 60px;
+    }
+}
+
+@media only screen and (max-width: 1024px) and (min-width: 801px) {
+    .thumbnail_graph_table b { font-size : 9px;}
+    .thumbnail_graph_table img {
+        max-width: 105px;
+        max-height: 70px;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+}
