@@ -112,11 +112,21 @@ else {
     $graph_array['width']  = $graph_width;
 
     if($_SESSION['screen_width']) {
-        $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/12));
+        if($_SESSION['screen_width'] > 800) {
+            $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/10));
+        }
+        else {
+            $graph_array['width'] = ($_SESSION['screen_width'] - ($_SESSION['screen_width']/4));
+        }
     }
 
     if($_SESSION['screen_height']) {
-        $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/2));
+        if($_SESSION['screen_height'] > 960 ) { 
+            $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/2));
+        }
+        else {
+            $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5));
+        }
     }
 
     echo("<hr />");
