@@ -235,7 +235,7 @@ foreach ($port_stats as $ifIndex => $port) {
         if (!is_array($ports[$port['ifIndex']])) {
             $port_id                 = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
             if ($config['enable_extended_port_metrics']) {
-                dbInsert(array('port_id' => $ports[$ifIndex]['port_id']), 'ports_statistics');
+                dbInsert(array('port_id' => $port_id), 'ports_statistics');
             }
             $ports[$port['ifIndex']] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
             echo 'Adding: '.$port['ifName'].'('.$ifIndex.')('.$ports[$port['ifIndex']]['port_id'].')';
