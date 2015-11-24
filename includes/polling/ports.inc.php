@@ -53,8 +53,6 @@ $stat_oids_db = array(
 );
 
 $stat_oids_db_extended = array(
-    'ifInErrors',
-    'ifOutErrors',
     'ifInNUcastPkts',
     'ifOutNUcastPkts',
     'ifInDiscards',
