@@ -77,6 +77,7 @@ $config['memcached']['host']   = 'localhost';
 $config['memcached']['port']   = 11211;
 $config['memcached']['ttl']    = 240;
 
+$config['enable_extended_port_metrics'] = false;
 $config['slow_statistics'] = true;
 // THIS WILL CHANGE TO FALSE IN FUTURE
 // RRD Format Settings
