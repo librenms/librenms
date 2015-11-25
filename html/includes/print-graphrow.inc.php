@@ -46,8 +46,6 @@ if($_SESSION['screen_width']) {
    }
 }
 
-echo $graph_array['width'];
-
 if( $graph_array['width'] < 215) {
     $graph_array['width'] = 215;
 }
