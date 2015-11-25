@@ -528,6 +528,14 @@ $config['os'][$os]['bad_if'][]         = 'cpu';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
+//Quanta switches
+$os = 'quanta';
+$config['os'][$os]['text']             = 'Quanta';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'quanta';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 $os = 'netonix';
 $config['os'][$os]['text']             = 'Netonix';
 $config['os'][$os]['type']             = 'network';
