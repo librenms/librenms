@@ -39,22 +39,31 @@ else {
 
 if($_SESSION['screen_width']) {
    if($_SESSION['screen_width'] > 800) {
-	   $graph_array['width'] = ($_SESSION['screen_width'] - 430 )/count($periods)+1;
+	   $graph_array['width'] = round(($_SESSION['screen_width'] - 430 )/count($periods)+1,0);
    }
    else {
 	$graph_array['width'] = $_SESSION['screen_width'] - 155;
    }
 }
 
+echo $graph_array['width'];
+
+if( $graph_array['width'] < 215) {
+    $graph_array['width'] = 215;
+}
+
 if($_SESSION['screen_height']) {
     if($_SESSION['screen_width'] > 960) {
-        $graph_array['height'] = ($_SESSION['screen_height'] - 250)/5;
+        $graph_array['height'] = round(($_SESSION['screen_height'] - 250)/5,0);
     }
     else {
-        $graph_array['height'] = ($_SESSION['screen_height'] - 250)/2;
+        $graph_array['height'] = round(($_SESSION['screen_height'] - 250)/2,0);
     }
 }
 
+if($graph_array['height'] < 100 ) {
+    $graph_array['height'] = 100;
+}
 
 $graph_array['to'] = $config['time']['now'];
 
