@@ -32,5 +32,5 @@ $(document).ready(function(){
 function lazyload_done() {
     //Since RRD takes the width and height params for only the canvas, we must unset them 
     //from the final (larger) image to prevent the browser from resizing them.
-    $(this).removeAttr('width').removeAttr('height').removeClass('lazy');
+    $(this).removeAttr('height').removeClass('lazy');
 }

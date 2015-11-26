@@ -136,6 +136,40 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
+function updateResolution()
+{
+    $.post('ajax_setresolution.php', 
+        {
+            width: $(window).width(),
+            height:$(window).height()
+        },
+        function(data) {
+            location.reload();
+        },'json'
+    );
+}
+
+var rtime;
+var timeout = false;
+var delta = 300;
+
+$(window).on('resize', function(){
+    rtime = new Date();
+    if (timeout === false) {
+        timeout = true;
+        setTimeout(resizeend, delta);
+    }
+});
+
+function resizeend() {
+    if (new Date() - rtime < delta) {
+        setTimeout(resizeend, delta);
+    } else {
+        timeout = false;
+        updateResolution();
+    }  
+};
+
 $(document).on("click", '.collapse-neighbors', function(event)
 {
     var caller = $(this);
@@ -143,11 +177,10 @@ $(document).on("click", '.collapse-neighbors', function(event)
     var list = caller.find('.neighbors-interface-list');
     var continued = caller.find('.neighbors-list-continued');
 
-    if(button.hasClass("glyphicon-plus"))
-    {
+    if(button.hasClass("glyphicon-plus")) {
         button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
-    }else
-    {
+    }
+    else {
         button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
     }
    
