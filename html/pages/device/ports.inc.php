@@ -124,7 +124,7 @@ else {
 ?>
 <div style='margin: 0px;'><table class='table'>
   <tr>
-    <th width="350">Port</th>
+    <th width="350"><A href="<?php echo generate_url($vars, array('sort' => "port")); ?>">Port</a></th>
     <th width="100"></th>
     <th width="120"><a href="<?php echo generate_url($vars, array('sort' => "traffic")); ?>">Traffic</a></th>
     <th width="75">Speed</th>
@@ -148,7 +148,14 @@ else {
         $ports[$key]["ifOctets_rate"] = $port["ifInOctets_rate"] + $port["ifOutOctets_rate"];
     }
 
-    $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+    switch ($vars["sort"]) {
+      case 'traffic':
+        $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+        break;
+      default:
+        $ports = array_sort($ports, 'ifIndex', SORT_ASC);
+        break;
+    }
 
     foreach ($ports as $port) {
         include 'includes/print-interface.inc.php';
