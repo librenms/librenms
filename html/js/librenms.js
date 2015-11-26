@@ -138,15 +138,37 @@ function submitCustomRange(frmdata) {
 
 function updateResolution()
 {
-    $.post(
-        'ajax_setresolution.php', 
-        {width: $(window).width(),height:$(window).height()},
-        function(json) {},
-        'json'
+    $.post('ajax_setresolution.php', 
+        {
+            width: $(window).width(),
+            height:$(window).height()
+        },
+        function(data) {
+            location.reload();
+        },'json'
     );
 }
 
-$(window).on('resize', function(){ updateResolution();});
+var rtime;
+var timeout = false;
+var delta = 300;
+
+$(window).on('resize', function(){
+    rtime = new Date();
+    if (timeout === false) {
+        timeout = true;
+        setTimeout(resizeend, delta);
+    }
+});
+
+function resizeend() {
+    if (new Date() - rtime < delta) {
+        setTimeout(resizeend, delta);
+    } else {
+        timeout = false;
+        updateResolution();
+    }  
+};
 
 $(document).on("click", '.collapse-neighbors', function(event)
 {
