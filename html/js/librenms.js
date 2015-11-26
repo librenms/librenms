@@ -123,7 +123,6 @@ $(document).ready(function() {
         });
     });
 
-    updateResolution();
 });
 
 function submitCustomRange(frmdata) {
@@ -165,7 +164,8 @@ $(window).on('resize', function(){
 function resizeend() {
     if (new Date() - rtime < delta) {
         setTimeout(resizeend, delta);
-    } else {
+    } 
+    else {
         timeout = false;
         updateResolution();
     }  
