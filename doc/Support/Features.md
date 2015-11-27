@@ -1,7 +1,24 @@
-Here's a bref list of supported vendors, some might be missing.
-If you are unsure of whether your device is supported or not, feel free to ask us.
+### Features
+
+Here's a brief list of supported features, some might be missing.
+If you think something is missing, feel free to ask us.
+
+* Alerting
+* API
+* Auto Updating
+* Billing
+* Customizable Dashboards
+* Device Backup(Oxidized, RANCID)
+* Distributed Polling
+* Multiple Authentication Methods(MySQL, LDAP, Active Directory, HTTP)
+* Netflow,sFlow(NFSEN)
+* Service monitoring(Nagios Plugins)
+* Syslog(Integrated, Graylog)
+* Two factor support
 
 ### Vendors 
+Here's a brief list of supported vendors, some might be missing.
+If you are unsure of whether your device is supported or not, feel free to ask us.
 
 3Com
 Aerohive
@@ -52,6 +69,7 @@ Juniper
 Konica Minolta
 Kyocera
 Liebert
+LigoWave
 Linux
 Mellanox
 Meraki
@@ -79,6 +97,7 @@ Powercode
 Prestige
 Proxim
 Proxmox
+Quanta
 Radlan
 Raritan
 Redback
