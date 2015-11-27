@@ -1,3 +1,5 @@
+var oldH;
+var oldW;
 $(document).ready(function() {
     // Device override ajax calls
     $("[name='override_config']").bootstrapSwitch('offColor','danger');
@@ -123,6 +125,8 @@ $(document).ready(function() {
         });
     });
 
+    oldW=$(window).width();
+    oldH=$(window).height();
 });
 
 function submitCustomRange(frmdata) {
@@ -144,14 +148,13 @@ function updateResolution()
             height:$(window).height()
         },
         function(data) {
-            location.reload();
         },'json'
     );
 }
 
 var rtime;
 var timeout = false;
-var delta = 300;
+var delta = 500;
 
 $(window).on('resize', function(){
     rtime = new Date();
@@ -168,8 +171,25 @@ function resizeend() {
     else {
         timeout = false;
         updateResolution();
+        resizeGraphs();
     }  
 };
+
+function resizeGraphs() {
+    newH=$(window).height();
+    newW=$(window).width();
+
+    ratioW=newW/oldW;
+    ratioH=newH/oldH;
+
+    $('.graphs').each(function (){
+        var img = jQuery(this);
+        img.attr('width',img.width() * ratioW);
+    });
+    oldH=newH;
+    oldW=newW;
+}
+
 
 $(document).on("click", '.collapse-neighbors', function(event)
 {
