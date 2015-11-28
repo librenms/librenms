@@ -123,8 +123,19 @@ else {
     if ($vars['view'] == 'details') {
         $port_details = 1;
     }
+?>
+<div style='margin: 0px;'><table class='table'>
+  <tr>
+    <th width="350"><A href="<?php echo generate_url($vars, array('sort' => "port")); ?>">Port</a></th>
+    <th width="100"></th>
+    <th width="120"><a href="<?php echo generate_url($vars, array('sort' => "traffic")); ?>">Traffic</a></th>
+    <th width="75">Speed</th>
+    <th width="100">Media</th>
+    <th width="100">Mac Address</th>
+    <th width="375"></th>
+  </tr>
+<?php
 
-    echo "<div style='margin: 0px;'><table class='table'>";
     $i = '1';
 
     global $port_cache, $port_index_cache;
@@ -132,9 +143,20 @@ else {
     $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
     // As we've dragged the whole database, lets pre-populate our caches :)
     // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
-    foreach ($ports as $port) {
+
+    foreach ($ports as $key => $port) {
         $port_cache[$port['port_id']] = $port;
         $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
+        $ports[$key]["ifOctets_rate"] = $port["ifInOctets_rate"] + $port["ifOutOctets_rate"];
+    }
+
+    switch ($vars["sort"]) {
+      case 'traffic':
+        $ports = array_sort($ports, 'ifOctets_rate', SORT_DESC);
+        break;
+      default:
+        $ports = array_sort($ports, 'ifIndex', SORT_ASC);
+        break;
     }
 
     foreach ($ports as $port) {
