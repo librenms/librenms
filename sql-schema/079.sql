@@ -36,7 +36,6 @@ create table ports_statistics (
 	ifOutMulticastPkts_prev bigint(20) DEFAULT NULL,
 	ifOutMulticastPkts_delta bigint(20) DEFAULT NULL,
 	ifOutMulticastPkts_rate int(11) DEFAULT NULL,
-	PRIMARY KEY(port_id),
-	FOREIGN KEY(port_id) REFERENCES ports(port_id)
+	PRIMARY KEY(port_id)
 );
 
