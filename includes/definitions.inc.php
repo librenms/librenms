@@ -141,7 +141,7 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 
 $os = 'airos-af';
 $config['os'][$os]['text']             = 'Ubiquiti AirFiber';
-$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
