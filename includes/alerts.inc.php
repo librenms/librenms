@@ -123,8 +123,11 @@ function ResolveGlues($tables,$target,$x=0,$hist=array(),$last=array()) {
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"',array($table));
             if( sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target ) {
                 //Search for new candidates to expand
-                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table,0,-1).'_%" && TABLE_NAME != "'.$table.'"');
                 $ntables = array();
+                list($tmp) = explode('_',$glues[0]['COLUMN_NAME'],2);
+                $ntables[] = $tmp;
+                $ntables[] = $tmp.'s';
+                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table,0,-1).'_%" && TABLE_NAME != "'.$table.'"');
                 foreach( $tmp as $expand ) {
                     $ntables[] = $expand['TABLE_NAME'];
                 }
