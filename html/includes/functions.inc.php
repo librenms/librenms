@@ -476,7 +476,7 @@ function generate_lazy_graph_tag($args) {
         $urlargs[] = $key."=".urlencode($arg);
     }
 
-    return '<img class="lazy" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    return '<img class="lazy graphs" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
 
 }//end generate_lazy_graph_tag()
 
