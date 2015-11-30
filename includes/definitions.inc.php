@@ -1248,6 +1248,8 @@ $os = 'canopy';
 $config['os'][$os]['text'] = 'Cambium';
 $config['os'][$os]['type'] = 'wireless';
 $config['os'][$os]['icon'] = 'cambium';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 $os = 'datacom';
 $config['os'][$os]['text'] = 'Datacom';
