@@ -140,7 +140,7 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
-function updateResolution()
+function updateResolution(refresh)
 {
     $.post('ajax_setresolution.php', 
         {
@@ -148,6 +148,9 @@ function updateResolution()
             height:$(window).height()
         },
         function(data) {
+            if(refresh == true) {
+                location.reload();
+            }
         },'json'
     );
 }
@@ -155,6 +158,8 @@ function updateResolution()
 var rtime;
 var timeout = false;
 var delta = 500;
+var newH;
+var newW;
 
 $(window).on('resize', function(){
     rtime = new Date();
@@ -169,16 +174,22 @@ function resizeend() {
         setTimeout(resizeend, delta);
     } 
     else {
+        newH=$(window).height();
+        newW=$(window).width();
         timeout = false;
-        updateResolution();
-        resizeGraphs();
+        if(Math.abs(oldW - newW) >= 200)
+        {
+            refresh = true;
+        }
+        else {
+            refresh = false;
+            resizeGraphs();
+        }
+        updateResolution(refresh);
     }  
 };
 
 function resizeGraphs() {
-    newH=$(window).height();
-    newW=$(window).width();
-
     ratioW=newW/oldW;
     ratioH=newH/oldH;
 
