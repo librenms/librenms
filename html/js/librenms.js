@@ -22,6 +22,8 @@ function override_config(event, state, tmp_this) {
     });
 }
 
+var oldH;
+var oldW;
 $(document).ready(function() {
     // Device override ajax calls
     $("[name='override_config']").bootstrapSwitch('offColor','danger');
@@ -126,6 +128,9 @@ $(document).ready(function() {
             }
         });
     });
+
+    oldW=$(window).width();
+    oldH=$(window).height();
 });
 
 function submitCustomRange(frmdata) {
@@ -139,3 +144,82 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
+function updateResolution(refresh)
+{
+    $.post('ajax_setresolution.php', 
+        {
+            width: $(window).width(),
+            height:$(window).height()
+        },
+        function(data) {
+            if(refresh == true) {
+                location.reload();
+            }
+        },'json'
+    );
+}
+
+var rtime;
+var timeout = false;
+var delta = 500;
+var newH;
+var newW;
+
+$(window).on('resize', function(){
+    rtime = new Date();
+    if (timeout === false) {
+        timeout = true;
+        setTimeout(resizeend, delta);
+    }
+});
+
+function resizeend() {
+    if (new Date() - rtime < delta) {
+        setTimeout(resizeend, delta);
+    } 
+    else {
+        newH=$(window).height();
+        newW=$(window).width();
+        timeout = false;
+        if(Math.abs(oldW - newW) >= 200)
+        {
+            refresh = true;
+        }
+        else {
+            refresh = false;
+            resizeGraphs();
+        }
+        updateResolution(refresh);
+    }  
+};
+
+function resizeGraphs() {
+    ratioW=newW/oldW;
+    ratioH=newH/oldH;
+
+    $('.graphs').each(function (){
+        var img = jQuery(this);
+        img.attr('width',img.width() * ratioW);
+    });
+    oldH=newH;
+    oldW=newW;
+}
+
+
+$(document).on("click", '.collapse-neighbors', function(event)
+{
+    var caller = $(this);
+    var button = caller.find('.neighbors-button');
+    var list = caller.find('.neighbors-interface-list');
+    var continued = caller.find('.neighbors-list-continued');
+
+    if(button.hasClass("glyphicon-plus")) {
+        button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
+    }
+    else {
+        button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
+    }
+   
+    list.toggle();
+    continued.toggle();
+});

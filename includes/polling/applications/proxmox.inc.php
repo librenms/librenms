@@ -41,16 +41,16 @@ function proxmox_vm_exists($i, $c, &$pmxcache) {
 
 $pmxlines = explode("\n", $proxmox);
 
-if (count($pmxlines) > 2) {
-    $pmxcluster = array_shift($pmxlines);
+$pmxcluster = array_shift($pmxlines);
 
-    $pmxcdir = join('/', array($config['rrd_dir'],'proxmox',$pmxcluster));
-    if (!is_dir($pmxcdir)) {
-        mkdir($pmxcdir, 0775, true);
-    }
+$pmxcdir = join('/', array($config['rrd_dir'],'proxmox',$pmxcluster));
+if (!is_dir($pmxcdir)) {
+    mkdir($pmxcdir, 0775, true);
+}
 
-    dbUpdate(array('device_id' => $device['device_id'], 'app_type' => 'proxmox', 'app_instance' => $pmxcluster), 'applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], 'proxmox'));
+dbUpdate(array('device_id' => $device['device_id'], 'app_type' => 'proxmox', 'app_instance' => $pmxcluster), 'applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], 'proxmox'));
 
+if (count($pmxlines) > 0) {
     $pmxcache = [];
 
     foreach ($pmxlines as $vm) {

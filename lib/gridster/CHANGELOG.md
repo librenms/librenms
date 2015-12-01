@@ -1,3 +1,105 @@
+<a name="v0.6.10"></a>
+### v0.6.10 (2015-05-31)
+  * Add Ruby on Rails support 
+
+<a name="v0.6.9"></a>
+### v0.6.9 (2015-05-27)
+  * bug fixes for positions and overlap
+  * dist modified to support webpack deployements
+  * new 'sticky' layout option which allows widgets to be places absolutely into a position on the grid.
+
+<a name="v0.6.8"></a>
+### v0.6.8 (2015-04-28)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * responsive width now resizes based off wrapper not window ([e69c3e8f](http://github.com/dsmorse/gridster.js/commit/e69c3e8f64aa4557ef032e4d0d8185e83b1aed21))
+  * ensure coords instances are destroyed on widgets ([576b5ae3](http://github.com/dsmorse/gridster.js/commit/576b5ae3f0461b048d8ff9463509b860ffa8b194))
+  * `resize_widget` also accepts HTMLElements ([cda560f4](http://github.com/dsmorse/gridster.js/commit/cda560f4f3ca616d03d1e3230cd2ef4e69876d9c))
+  * changed "instanceof jQuery" to "instanceof $" ([c6226306](http://github.com/dsmorse/gridster.js/commit/c6226306c2ce9aa7d45d774d7de19088acba0c66))
+  * wrong addition solved in add_faux_rows/cols by adding parseInt ([d9471752](http://github.com/dsmorse/gridster.js/commit/d947175257d686801154a403016fd2ec7e6d40c2), closes [#426](http://github.com/dsmorse/gridster.js/issues/426), [#425](http://github.com/dsmorse/gridster.js/issues/425))
+  * preventing gridster from adding extra resize handles ([9d077da6](http://github.com/dsmorse/gridster.js/commit/9d077da676826606243c2552dc9997c492687203))
+  * destroy resize_api ([b1629326](http://github.com/dsmorse/gridster.js/commit/b16293268c6aa4be2ba0c8fb1b9806e590227606), closes [#473](http://github.com/dsmorse/gridster.js/issues/473))
+  * ensure widget dimensions and coords are always ints ([595a94f1](http://github.com/dsmorse/gridster.js/commit/595a94f1bdfaa4905ff51d9044e74105c81e6ff3))
+
+
+#### Features
+
+* **draggable:** autoscrolling ([d3f25f3f](http://github.com/dsmorse/gridster.js/commit/d3f25f3fbbcc738d8b3702d122533e64f37acd29))
+* **gridster:**
+  * add config to set custom show/hide widget methods ([7de5bbab](http://github.com/dsmorse/gridster.js/commit/7de5bbabc0a01e8188a56881782dc74d6bf111d3))
+  * browserify compatibility ([43148b87](http://github.com/dsmorse/gridster.js/commit/43148b87e523352a7f9d01479c6fed3e87f46ba0))
+  * Common.js support ([446852a2](http://github.com/dsmorse/gridster.js/commit/446852a260aab2e7caf772a62fbde8b518c38816), closes [#434](http://github.com/dsmorse/gridster.js/issues/434))
+* **gridster.css:** remove possible default pading ([2002c455](http://github.com/dsmorse/gridster.js/commit/2002c455957016cb441a317dbbb6e5f6662cb35a))
+
+<a name="v0.6.7"></a>
+### v0.6.7 (2015-04-16)
+
+<a name="v0.6.6"></a>
+### v0.6.6 (2015-04-08)
+
+<a name="v0.6.5"></a>
+### v0.6.5 (2015-04-06)
+
+
+#### Bug Fixes
+
+* **gridster:** fixed bugs in centering_widgets (widgets were getting smushed when being resized ([86053f8b](http://github.com/DecksterTeam/gridster.js/commit/86053f8be3d73a9db3d7eabc595324123dbcff13))
+
+<a name="v0.6.4"></a>
+### v0.6.4 (2015-03-19)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * added ability to center widgets in grid
+
+<a name="v0.6.3"></a>
+### v0.6.3 (2015-03-06)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * fixing resize limits when in fixed width mode feature(gridster): added fix_to_co ([6bb47dc1](http://github.com/DecksterTeam/gridster.js/commit/6bb47dc1ce36aef670b2acb7c244ec5f4ea440e0))
+
+<a name="v0.6.2"></a>
+### v0.6.2 (2015-02-23)
+
+
+#### Bug Fixes
+
+* **gridster:** forcing height of gridster container to auto when in collapsed mode ([749f37a5](http://github.com/DecksterTeam/gridster.js/commit/749f37a52074bd16362528f94ab28ec314379ee3))
+
+<a name="v0.6.1"></a>
+### v0.6.1 (2015-02-21)
+
+
+#### Bug Fixes
+
+* **gridster:**
+  * fixed expand_widget bug not expanding full width of window fix(gridster): user c ([dbc226d4](http://github.com/DecksterTeam/gridster.js/commit/dbc226d46c8224f753c07af6aff259785c60425f))
+  * fixing drag limit issues when using autogrow_cols ([afd83fea](http://github.com/DecksterTeam/gridster.js/commit/afd83fead8c719615ae01ef7b5d3863701ff2243))
+  * changed the way widgets were getting positioned so that margins are actually the ([a3913043](http://github.com/DecksterTeam/gridster.js/commit/a3913043579bae9f5ef28e34524ad7a8ae7dcafd))
+
+<a name="v0.6.0"></a>
+## v0.6.0 (2015-02-18)
+
+
+#### Bug Fixes
+
+* **gridster:** changed the way widgets were getting positioned so that margins are actually the ([a3913043](http://github.com/DecksterTeam/gridster.js/commit/a3913043579bae9f5ef28e34524ad7a8ae7dcafd))
+
+#### Features
+
+* **gridster:** make grid responsive ([a3913043](http://github.com/DecksterTeam/gridster.js/commit/a3913043579bae9f5ef28e34524ad7a8ae7dcafd))
+
+<a name="v0.5.7"></a>
+### v0.5.7 (2015-02-17)
+
 <a name="v0.5.6"></a>
 ### v0.5.6 (2014-09-25)
 
@@ -183,3 +285,60 @@
 * **gridster:** drag-and-drop widget resizing ([e1924053](http://github.com/ducksboard/gridster.js/commit/e19240532de0bad35ffe6e5fc63934819390adc5))
 * **utils:** add delay helper to utils ([faa6c5db](http://github.com/ducksboard/gridster.js/commit/faa6c5db0002feccf681e9f919ed583eef152773))
 
+dustmoo Modifications
+===========
+Changelog 2013-04-3
+
+Fork now handles standard behavior properly with swap allowing larger widgets to shift down.
+
+Changelog 2013-04-2
+
+Added Demo to Repository.
+
+Changelog 2013-02-27
+
+Added "Static widget support" Static Items default to the "static" class.
+
+You can customize this class by using the code below:
+
+    $.gridster({
+        static_class: 'custom_class',
+        draggable: {
+            items: ".gs_w:not(.custom_class)"
+        }
+    });
+
+I have also added functions creating a much more thourough check of whether the player can occupy the space you are moving it too.
+This version is much more reliable in swapping space with widgets.
+
+There are also new options for Maximum Rows and Maximum Columns:
+
+    $.gridster({
+        max_rows: map_rows,
+        max_cols: map_cols,
+        shift_larger_widgets_down: false
+    });
+
+Setting the maximum amount of rows only completely works if you disable shifting larger widgets down at the moment.
+
+
+Changelog 11-26-2012
+
+Reworked swapping functionality to better handle large to small widget handling.
+
+---
+
+Widgets of smaller or equal size to the dragged widget (player)
+will swap places with the original widget.
+
+This causes tiles to swap left and right as well as up and down.
+
+By default smaller players will shift larger widgets down.
+
+I have added an option to prevent this behavior:
+
+    $.gridster({
+        shift_larger_widgets_down: false
+    });
+
+By setting shift_larger_widgets_down to false, smaller widgets will not displace larger ones.
