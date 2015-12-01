@@ -33,7 +33,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
     }
 
     echo '<div class="panel panel-default">';
-        echo '<table style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
+        echo '<table class="device-header-table" style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
         require 'includes/device-header.inc.php';
     echo '</table>';
     echo '</div>';
