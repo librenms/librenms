@@ -166,7 +166,11 @@ function rrdtool_graph($graph_file, $options) {
 function rrdtool($command, $filename, $options) {
     global $config, $debug, $rrd_pipes, $console_color;
 
-    if ($config['rrdcached'] && ($config['rrdtool_version'] >= 1.5 || ($command != "create" && $command != "tune"))) {
+    if ($config['rrdcached'] &&
+        ($config['rrdtool_version'] >= 1.5.5 ||
+        ($config['rrdtool_version'] >= 1.5 && $command != "tune") ||
+        ($command != "create" && $command != "tune"))
+        ) {
         if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
             $filename = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $filename);
             $filename = str_replace($config['rrd_dir'], './'.$config['rrdcached_dir'].'/', $filename);
