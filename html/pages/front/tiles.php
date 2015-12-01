@@ -194,14 +194,10 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
 
 <span class="message" id="message"></span>
 
-<div class="row">
-    <div class="col-sm-12">
         <div class="gridster grid">
             <ul>
             </ul>
         </div>
-     </div>
-</div>
 
 <script type="text/javascript">
 
@@ -237,9 +233,12 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
         $('[data-toggle="tooltip"]').tooltip();
         dashboard_collapse();
         gridster = $(".gridster ul").gridster({
-            widget_base_dimensions: [100, 100],
+            widget_base_dimensions: ['auto', 100],
+            autogenerate_stylesheet: true,
             widget_margins: [5, 5],
             avoid_overlapped_widgets: true,
+            min_cols: 1,
+            max_cols: 20,
             draggable: {
                 handle: 'header, span',
                 stop: function(e, ui, $widget) {
@@ -263,6 +262,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                 };
             }
         }).data('gridster');
+        $('.gridster  ul').css({'width': $(window).width()});
 
         gridster.remove_all_widgets();
         gridster.disable();

@@ -1,6 +1,4 @@
-
 <form name="form1" action="" method="post" class="form-horizontal">
-  <link rel="stylesheet" href="<?php echo $config['base_url']; ?>/css/bootstrap.min.css">
   <script type="text/javascript">
     function showWarning(checked) {
       $('#warning').toggle();
@@ -12,22 +10,24 @@
     }
   </script>
   <input type="hidden" name="action" value="delete_bill">
-  <fieldset>
-    <legend>Delete Bill</legend>
-    <div class="control-group">
-      <label class="control-label" for="confirm"><strong>Confirm</strong></label>
-      <div class="controls">
-        <label class="checkbox">
-          <input type="checkbox" name="confirm" value="confirm" onchange="javascript: showWarning(this.checked);">
-          Yes, please delete this bill!
+  <h3>Delete Bill</h3>
+  <hr>
+  <div class="control-group">
+    <label class="control-label" for="confirm"><strong>Confirm</strong></label>
+    <div class="controls">
+      <div class="checkbox">
+        <label>
+        <input type="checkbox" name="confirm" value="confirm" onchange="javascript: showWarning(this.checked);">
+        Yes, please delete this bill!
         </label>
       </div>
     </div>
-    <div class="alert alert-message" id="warning" style="display: none;">
-      <h4 class="alert-heading"><i class="icon-warning-sign"></i> Warning!</h4>
-      Are you sure you want to delete his bill?
-    </div>
-  </fieldset>
+  </div>
+  <br>
+  <div class="alert alert-danger" id="warning" style="display: none;">
+    <h4 class="alert-heading"><i class="fa fa-exclamation-triangle"></i> Warning</h4>
+    You are about to delete this bill.
+  </div>
   <div class="form-actions">
     <button id="deleteBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="icon-trash icon-white"></i> <strong>Delete Bill</strong></button>
   </div>

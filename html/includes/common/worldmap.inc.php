@@ -30,7 +30,7 @@ if ($config['map']['engine'] == 'leaflet') {
     <div class="col-sm-4">
       <label for="init_lat" class="control-label">Initial Latitude: </label>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-8">
       <input class="form-control" name="init_lat" id="input_lat_'.$unique_id.'" value="'.$widget_settings['init_lat'].'" placeholder="ie. 51.4800 for Greenwich">
     </div>
   </div>
@@ -46,7 +46,7 @@ if ($config['map']['engine'] == 'leaflet') {
     <div class="col-sm-4">
       <label for="init_zoom" class="control-label">Initial Zoom: </label>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-8">
       <select class="form-control" name="init_zoom" id="select_zoom'.$unique_id.'">
         ';
         for ($i=0; $i<19; $i++) {
@@ -65,10 +65,35 @@ if ($config['map']['engine'] == 'leaflet') {
     <div class="col-sm-4">
       <label for="group_radius" class="control-label">Grouping radius: </label>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-8">
       <input class="form-control" name="group_radius" id="input_radius_'.$unique_id.'" value="'.$widget_settings['group_radius'].'" placeholder="default 80">
     </div>
   </div>
+    <div class="form-group">
+        <div class="col-sm-4">
+            <label for="status" class="control-label">Show devices: </label>
+        </div>
+        <div class="col-sm-8">
+            <select class="form-control" name="status" id="status_'.$unique_id.'">';
+
+                $temp_output .= '<option value="0,1"';
+                if ($widget_settings['status'] == '0,1') {
+                    $temp_output .= ' selected';
+                }
+                $temp_output .= '>Up + Down</option>
+                <option value="1"';
+                if ($widget_settings['status'] == '1') {
+                    $temp_output .= ' selected';
+                }
+                $temp_output .= '>Up</option>
+                <option value="0"';
+                if ($widget_settings['status'] == '0') {
+                    $temp_output .= ' selected';
+                }
+                $temp_output .= '>Down</option>
+            </select>
+        </div>
+    </div>
   <div class="form-group">
     <div class="col-sm-2">
       <button type="submit" class="btn btn-default">Set</button>
@@ -101,6 +126,9 @@ if ($config['map']['engine'] == 'leaflet') {
         else {
             $group_radius = 80;
         }
+        if (empty($widget_settings['status']) && $widget_settings['status'] != '0') {
+            $widget_settings['status'] = '0,1';
+        }
         $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.0f", $init_zoom);
         $temp_output .= 'var map = L.map(\'leaflet-map\').setView('.$map_init.');
 L.tileLayer(\'//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
@@ -122,24 +150,31 @@ var greenMarker = L.AwesomeMarkers.icon({
         // Checking user permissions
         if (is_admin() || is_read()) {
         // Admin or global read-only - show all devices
-            $sql = "SELECT DISTINCT(`device_id`),`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
+            $sql = "SELECT DISTINCT(`device_id`),`devices`.`location`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
-                    WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
+                    WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
+                      AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
         }
         else {
         // Normal user - grab devices that user has permissions to
-            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`hostname`,`os`,`status`,`lat`,`lng`
+            $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`devices`.`location`,`hostname`,`os`,`status`,`lat`,`lng`
                     FROM `devices_perms`, `devices`
                     LEFT JOIN `locations` ON `devices`.`location`=`locations`.`location`
-                    WHERE `disabled`=0 AND `ignore`=0 AND `lat` != '' AND `lng` != ''
+                    WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`devices`.`location` REGEXP '\[[0-9\.\, ]+\]'))
                     AND `devices`.`device_id` = `devices_perms`.`device_id`
-                    AND `devices_perms`.`user_id` = ?
+                    AND `devices_perms`.`user_id` = ? AND `status` IN (".$widget_settings['status'].")
                     ORDER BY `status` ASC, `hostname`";
+            $param[] = $_SESSION['user_id'];
         }
-        foreach (dbFetchRows($sql, array($_SESSION['user_id'])) as $map_devices) {
+        foreach (dbFetchRows($sql, $param) as $map_devices) {
             $icon = 'greenMarker';
             $z_offset = 0;
+            $tmp_loc = parse_location($map_devices['location']);
+            if (!empty($tmp_loc['lat']) && !empty($tmp_loc['lng'])) {
+                $map_devices['lat'] = $tmp_loc['lat'];
+                $map_devices['lng'] = $tmp_loc['lng'];
+            }
             if ($map_devices['status'] == 0) {
                 $icon = 'redMarker';
                 $z_offset = 10000;  // move marker to foreground

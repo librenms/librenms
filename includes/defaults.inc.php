@@ -408,6 +408,8 @@ $config['network_map_vis_options'] = '{
 // Device page options
 $config['show_overview_tab'] = true;
 
+$config['cpu_details_overview'] = false; //By default show only average cpu in device overview
+
 // The device overview page options
 $config['overview_show_sysDescr'] = true;
 
@@ -825,3 +827,6 @@ $config['summary_errors']                               = 0;
 
 // Default width of the availability map's tiles
 $config['availability-map-width']                       = 25;
+
+// Default notifications Feed
+$config['notifications']['LibreNMS']                    = 'http://www.librenms.org/notifications.rss';

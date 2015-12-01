@@ -98,13 +98,13 @@ if ($_SESSION['userlevel'] >= '7') {
             list($oid,$date,$version) = explode('|',mres($_POST['config']));
             $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group=&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
             if ($text == 'node not found') {
-                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.$device['os'].'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
+                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(is_array($node_info) ? $node_info['group'] : $device['os']).'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
             }
         }
         else {
             $text      = file_get_contents($config['oxidized']['url'].'/node/fetch/'.$device['hostname']);
             if ($text == 'node not found') {
-                $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.$device['os'].'/'.$device['hostname']);
+                $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(is_array($node_info) ? $node_info['group'] : $device['os']).'/'.$device['hostname']);
             }
         }
         if ($config['oxidized']['features']['versioning'] === true) {

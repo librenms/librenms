@@ -107,6 +107,17 @@ $config['os'][$os]['over'][1]['text']  = 'Processor Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_ucd_memory';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'infinity';
+$config['os'][$os]['text']             = 'LigoWave Infinity';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Ubiquiti
 $os = 'unifi';
 $config['os'][$os]['text']             = 'Ubiquiti UniFi';
@@ -514,6 +525,14 @@ $config['os'][$os]['text']             = 'Netgear ProSafe';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['bad_if'][]         = 'cpu';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
+//Quanta switches
+$os = 'quanta';
+$config['os'][$os]['text']             = 'Quanta';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'quanta';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
@@ -1229,6 +1248,8 @@ $os = 'canopy';
 $config['os'][$os]['text'] = 'Cambium';
 $config['os'][$os]['type'] = 'wireless';
 $config['os'][$os]['icon'] = 'cambium';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 $os = 'datacom';
 $config['os'][$os]['text'] = 'Datacom';
