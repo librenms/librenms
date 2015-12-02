@@ -262,6 +262,30 @@ foreach ($ports as $port) {
             $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
         }
 
+        if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
+            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', $airos_stats, 'UBNT-AirFIBER-MIB');
+            $this_port['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
+            $this_port['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
+            $this_port['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
+            $this_port['ifOutErrors'] = $airos_stats[1]['txErroredFrames'];
+            $this_port['ifInBroadcastPkts'] = $airos_stats[1]['rxValidBroadcastFrames'];
+            $this_port['ifOutBroadcastPkts'] = $airos_stats[1]['txValidBroadcastFrames'];
+            $this_port['ifInMulticastPkts'] = $airos_stats[1]['rxValidMulticastFrames'];
+            $this_port['ifOutMulticastPkts'] = $airos_stats[1]['txValidMulticastFrames'];
+            $this_port['ifInUcastPkts'] = $airos_stats[1]['rxValidUnicastFrames'];
+            $this_port['ifOutUcastPkts'] = $airos_stats[1]['txValidUnicastFrames'];
+            $ports['update']['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
+            $ports['update']['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
+            $ports['update']['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
+            $ports['update']['ifOutErrors'] = $airos_stats[1]['txErroredFrames'];
+            $ports['update']['ifInBroadcastPkts'] = $airos_stats[1]['rxValidBroadcastFrames'];
+            $ports['update']['ifOutBroadcastPkts'] = $airos_stats[1]['txValidBroadcastFrames'];
+            $ports['update']['ifInMulticastPkts'] = $airos_stats[1]['rxValidMulticastFrames'];
+            $ports['update']['ifOutMulticastPkts'] = $airos_stats[1]['txValidMulticastFrames'];
+            $ports['update']['ifInUcastPkts'] = $airos_stats[1]['rxValidUnicastFrames'];
+            $ports['update']['ifOutUcastPkts'] = $airos_stats[1]['txValidUnicastFrames'];
+        }
+
         // rewrite the ifPhysAddress
         if (strpos($this_port['ifPhysAddress'], ':')) {
             list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(':', $this_port['ifPhysAddress']);
