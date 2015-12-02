@@ -72,4 +72,5 @@ Contributors to LibreNMS:
 - Peter Lamperud <peter.lamperud@gmail.com> (vizay)
 - Louis Bailleul <louis.bailleul@gmail.com> (alucardfh)
 - Rick Hodger <rick@fuzzi.org.uk> (Tatermen)
+- Eldon Koyle <ekoyle@gmail.com> (ekoyle)
 [1]: http://observium.org/ "Observium web site"
