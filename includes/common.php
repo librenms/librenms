@@ -767,8 +767,54 @@ function count_mib_health($device)
 } // count_mib_health
 
 
+function get_mibval($device, $oid)
+{
+    $sql = 'SELECT * FROM `device_oids` WHERE `device_id` = ? AND `oid` = ?';
+    return dbFetchRow($sql, array($device['device_id'], $oid));
+} // get_mibval
+
+
 /*
- * FIXME: Dummy implementation
+ * FIXME: Dummy implementation - needs an abstraction for each device
+ */
+function get_mib_mempools($device)
+{
+    $mempools = array();
+    if ($device['os'] == 'ruckuswireless') {
+        $mempool = array();
+        $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.14.0');
+        $mempool['mempool_descr'] = $mibvals['object_type'];
+        $mempool['mempool_id'] = 0;
+        $mempool['mempool_total'] = 100;
+        $mempool['mempool_used'] = $mibvals['numvalue'];
+        $mempool['mempool_free'] = 100 - $mibvals['numvalue'];
+        $mempool['percentage'] = true;
+        $mempools[] = $mempool;
+    }
+    return $mempools;
+} // get_mib_mempools
+
+
+/*
+ * FIXME: Dummy implementation - needs an abstraction for each device
+ */
+function get_mib_processors($device)
+{
+    $processors = array();
+    if ($device['os'] == 'ruckuswireless') {
+        $proc = array();
+        $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.13.0');
+        $proc['processor_descr'] = $mibvals['object_type'];
+        $proc['processor_id'] = 0;
+        $proc['processor_usage'] = $mibvals['numvalue'];
+        $processors[] = $proc;
+    }
+    return $processors;
+} // get_mib_processors
+
+
+/*
+ * FIXME: Dummy implementation - needs an abstraction for each device
  * @return true if there is a custom graph defined for this type, subtype, and device
  */
 function is_custom_graph($type, $subtype, $device)
