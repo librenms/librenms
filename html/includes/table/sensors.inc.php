@@ -99,8 +99,8 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $response[] = array(
         'hostname'       => generate_device_link($sensor),
-        'sensor_descr'   => overlib_link($link, $sensor['sensor_descr'], $overlib_content),
-        'graph'          => overlib_link($link_graph, $sensor_minigraph, $overlib_content),
+        'sensor_descr'   => overlib_link($link, $sensor['sensor_descr'], $overlib_content, null),
+        'graph'          => overlib_link($link_graph, $sensor_minigraph, $overlib_content, null),
         'alert'          => $alert,
         'sensor_current' => $sensor['sensor_current'].$unit,
         'sensor_range'   => round($sensor['sensor_limit_low'], 2).$unit.' - '.round($sensor['sensor_limit'], 2).$unit,
