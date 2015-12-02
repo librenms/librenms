@@ -167,8 +167,8 @@ function rrdtool($command, $filename, $options) {
     global $config, $debug, $rrd_pipes, $console_color;
 
     if ($config['rrdcached'] &&
-        ($config['rrdtool_version'] >= 1.5.5 ||
-        ($config['rrdtool_version'] >= 1.5 && $command != "tune") ||
+        (version_compare($config['rrdtool_version'], '1.5.5', '>=') ||
+        (version_compare($config['rrdtool_version'], '1.5', '>=') && $command != "tune") ||
         ($command != "create" && $command != "tune"))
         ) {
         if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
