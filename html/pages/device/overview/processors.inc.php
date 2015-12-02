@@ -64,9 +64,18 @@ if (count($processors)) {
     if ($config['cpu_details_overview'] === false)
     {
 
+        if($_SESSION['screen_width']) {
+            if($_SESSION['screen_width'] > 970) {
+                $graph_array['width'] = round(($_SESSION['screen_width'] - 190 )/2,0);
+                $graph_array['height'] = round($graph_array['width'] /3);
+            }
+            else {
+                $graph_array['width'] = $_SESSION['screen_width'] - 110;
+                $graph_array['height'] = round($graph_array['width'] /3);
+            }
+        }
+
         //Generate average cpu graph
-        $graph_array['height'] = '100';
-        $graph_array['width']  = '485';
         $graph_array['device'] = $device['device_id'];
         $graph_array['type']   = 'device_processor';
         $graph = generate_lazy_graph_tag($graph_array);
@@ -78,7 +87,8 @@ if (count($processors)) {
         $link = generate_url($link_array);
 
         //Generate tooltip
-        $graph_array['width'] = '210';
+        $graph_array['width']=210;
+        $graph_array['height']=100;
         $overlib_content      = generate_overlib_content($graph_array, $device['hostname'].' - CPU usage');
 
         echo '<tr>
