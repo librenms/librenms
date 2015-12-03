@@ -186,6 +186,7 @@ server {
   try_files $uri $uri/ @librenms;
  }
  location ~ \.php {
+  fastcgi_param PATH_INFO $fastcgi_path_info;
   include fastcgi.conf;
   fastcgi_split_path_info ^(.+\.php)(/.+)$;
   fastcgi_pass unix:/var/run/php5-fpm.sock;
