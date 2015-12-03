@@ -68,7 +68,9 @@ if (count($pmxlines) > 0) {
                 DS:OUTOCTETS:DERIVE:600:0:12500000000 '.$config['rrd_rra']);
         }
 
-        rrdtool_update($rrd_filename, 'N:'.$vmpin.':'.$vmpout);
+        rrdtool_update($rrd_filename, array("INOCTETS" => $vmpin, "OUTOCTETS" => $vmpout));
+        print "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
+
         if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
             dbUpdate(array('device_id' => $device['device_id'], 'last_seen' => array('NOW()'), 'description' => $vmdesc), 'proxmox', '`vmid` = ? AND `cluster` = ?', array($vmid, $pmxcluster));
         }
@@ -84,10 +86,11 @@ if (count($pmxlines) > 0) {
         }
 
     }
-
-    unset($pmxlines);
-    unset($pmxcluster);
-    unset($pmxcdir);
-    unset($proxmox);
-    unset($pmxcache);
 }
+
+
+unset($pmxlines);
+unset($pmxcluster);
+unset($pmxcdir);
+unset($proxmox);
+unset($pmxcache);
