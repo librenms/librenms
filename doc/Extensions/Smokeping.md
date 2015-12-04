@@ -47,7 +47,7 @@ You should now see a new tab in your device page called ping.
 
 
 
-Install and integrate Smokeping [Debian/Ubuntu]
+### Install and integrate Smokeping [Debian/Ubuntu] ###
 
 > This guide assumes you have already <a href="http://docs.librenms.org/Installation/Installation-(Debian-Ubuntu)/">installed librenms</a>, and you installed apache2 in the process. Tested with Ubuntu 14.04 and Apache 2.4.
 
