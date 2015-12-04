@@ -34,9 +34,6 @@ Table of Content:
     - [Port](#macros-port)
     - [Time](#macros-time)
 - [Additional Options](#extra)
-   - [Max](#extra-max)
-   - [Delay](#extra-delay)
-   - [Interval](#extra-interval)
 
 
 # <a name="about">About</a>
@@ -639,16 +636,12 @@ Example: `%macros.packet_loss_15m` > 50
 
 # <a name="extra">Additional Options</a>
 
-Here are some of the other available options for an alert rule.
+Here are some of the other options available when adding an alerting rule:
 
-## <a name="extra-max">Max</a>
-
-The maximum number of alerts sent for the event.  `-1` means unlimited.
-
-## <a name="extra-delay">Delay</a>
-
-The amount of time to wait after a rule is matched before sending an alert.
-
-## <a name="extra-interval">Interval</a>
-
-The interval of time between alerts for an event until Max is reached.
+- Rule name: The name associated with the rule.
+- Severity: How "important" the rule is.
+- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
+- Delay: The amount of time to wait after a rule is matched before sending an alert.
+- Interval: The interval of time between alerts for an event until Max is reached.
+- Mute alerts: Disable sending alerts for this rule.
+- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
