@@ -33,10 +33,29 @@ if (is_numeric($sessions)) {
     $graphs['fortigate_sessions'] = true;
 }
 
+
+// Start Aggregate discovery for CPU/NPU drops 
+
+$droprrd = $config['rrd_dir'].'/'.$device['hostname'].'/fortigate_npu_drops.rrd';
+$num_cpu   = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgProcessorCount.0', '-Ovq');
+for($i = 1; $i <= $num_cpu; $i++) {
+       $cpurrd    = $config['rrd_dir'].'/'.$device['hostname'].'/processor-fortigate-fixed-'.$i.'.rrd';
+       $npu_drop = snmp_get($device, "FORTINET-FORTIGATE-MIB::fgProcessorPktDroppedCount.$i", '-Ovq');
+       $npu_total += $npu_drop; 
+       print "NPU: $npu_drop - DROPS: $npu_total\n";
+       if (!is_file($droprrd)) {
+           print "$cpurrd not found\n";
+           rrdtool_create($droprrd, ' --step 300 DS:DROP:GAUGE:600:-1:100 '.$config['rrd_rra']);
+       }
+}
+
+$fields = array( 'DROP' => $npu_total );
+rrdtool_update($cpurrd, $fields);
+$graphs['fortigate_npu_drops'] = true;
+
 // Start somewhat automated discovery for processors in the chassis
 
 $cpurrd    = $config['rrd_dir'].'/'.$device['hostname'].'/fortigate_cpu.rrd';
-$num_cpu   = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgProcessorCount.0', '-Ovq');
 #$cpu_usage = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0', '-Ovq');
 
 print "NUM CPU: $num_cpu\n";
