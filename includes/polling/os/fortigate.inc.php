@@ -43,7 +43,7 @@ print "NUM CPU: $num_cpu\n";
 
 // Fortigate have a pretty logical CPU index going on. It's predictable. 
 for($i = 1; $i <= $num_cpu; $i++) {
-       $cpurrd    = $config['rrd_dir'].'/'.$device['hostname'].'/fortigate_cpu_'.$i.'.rrd';
+       $cpurrd    = $config['rrd_dir'].'/'.$device['hostname'].'/processor-fortigate-fixed-'.$i.'.rrd';
        $cpu_usage = snmp_get($device, "FORTINET-FORTIGATE-MIB::fgProcessorUsage.$i", '-Ovq');
        $usage = trim ( str_replace(" %", "", $cpu_usage ) ) ;
        print "CPU: $num_cpu - USAGE: $usage\n";
@@ -54,5 +54,7 @@ for($i = 1; $i <= $num_cpu; $i++) {
        $fields = array( 'LOAD' => $usage );
        rrdtool_update($cpurrd, $fields);
 }
+
+$graphs['fortigate_cpu'] = true;
 
 
