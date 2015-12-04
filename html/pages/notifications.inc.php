@@ -103,7 +103,7 @@ $notifications = new ObjCache('notifications');
     <div class="row">
       <div class="col-md-12">
         <blockquote>
-          <p><?php echo $notif['body']; ?></p>
+          <p><?php echo preg_replace('/\\\n/','<br />', $notif['body']); ?></p>
           <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
@@ -133,7 +133,7 @@ $notifications = new ObjCache('notifications');
     <div class="row">
       <div class="col-md-12">
         <blockquote>
-          <p><?php echo $notif['body']; ?></p>
+          <p><?php echo preg_replace('/\\\n/','<br />', $notif['body']); ?></p>
           <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
