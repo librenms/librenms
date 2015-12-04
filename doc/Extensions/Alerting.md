@@ -33,6 +33,10 @@ Table of Content:
     - [Device](#macros-device)
     - [Port](#macros-port)
     - [Time](#macros-time)
+- [Additional Options](#extra)
+   - [Max](#extra-max)
+   - [Delay](#extra-delay)
+   - [Interval](#extra-interval)
 
 
 # <a name="about">About</a>
@@ -633,4 +637,18 @@ Description: Packet loss % value for the device within the last 15 minutes.
 
 Example: `%macros.packet_loss_15m` > 50
 
+# <a name="extra">Additional Options</a>
 
+Here are some of the other available options for an alert rule.
+
+## <a name="extra-max">Max</a>
+
+The maximum number of alerts sent for the event.  `-1` means unlimited.
+
+## <a name="extra-delay">Delay</a>
+
+The amount of time to wait after a rule is matched before sending an alert.
+
+## <a name="extra-interval">Interval</a>
+
+The interval of time between alerts for an event until Max is reached.
