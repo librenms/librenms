@@ -118,16 +118,24 @@ crontab -e
 ```
 
 Add the example cron below; it's set to run daily at 02:05
-`05 02 * * * root cd /opt/librenms/scripts && (echo "+ LibreNMS"; php ./gen_smokeping.php) > /etc/smokeping/config.d/librenms.conf && service smokeping reload >> /dev/null`
+
+```bash
+05 02 * * * root cd /opt/librenms/scripts && (echo "+ LibreNMS"; php ./gen_smokeping.php) > /etc/smokeping/config.d/librenms.conf && service smokeping reload >> /dev/null
+```
+
 Exit and save.
 
 Include `librenms.conf` in smokeping's config:
 ```bash
 nano /etc/smokeping/config
-```bash
+```
 
 Add the following line at the end:
-`@include /etc/smokeping/config.d/librenms.conf`
+
+```bash
+@include /etc/smokeping/config.d/librenms.conf
+```
+
 Exit and save.
 
 ### Configure LibreNMS ###
@@ -138,9 +146,12 @@ nano /opt/librenms/config.php
 
 Scroll to the bottom, and paste in the following:
 
-`$config['smokeping']['dir'] = '/var/lib/smokeping';
+```bash
+$config['smokeping']['dir'] = '/var/lib/smokeping';
 $config['smokeping']['integration'] = true;
-Exit and save.`
+```
+
+Exit and save.
 
 Run the following commands:
 ```bash
