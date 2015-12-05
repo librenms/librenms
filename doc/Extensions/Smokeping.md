@@ -161,10 +161,10 @@ service apache2 restart
 service smokeping restart
 ```
 
-Switch back to your regular user account
+Return to your normal user shell
 
 ```bash
-su librenms
+exit
 ```
 
 Done! You should be able to load the Smokeping web interface at `http://yourhost/cgi-bin/smokeping.cgi`
