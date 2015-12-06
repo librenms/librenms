@@ -580,7 +580,6 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
                 'processor_precision' => $precision,
             );
             dbUpdate($update_data, 'processors', '`device_id`=? AND `processor_index`=? AND `processor_type`=?', array($device['device_id'], $index, $type));
-            d_echo($query."\n");
         }//end if
         $valid[$type][$index] = 1;
     }//end if
@@ -635,7 +634,6 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision='1
             }
 
             dbUpdate($update_data, 'mempools', 'device_id=? AND mempool_index=? AND mempool_type=?', array($device['device_id'], $index, $type));
-            d_echo($query."\n");
         }//end if
         $valid[$type][$index] = 1;
     }//end if

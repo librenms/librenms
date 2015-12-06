@@ -29,17 +29,6 @@ $columns = array(
     'last_modified',
 );
 
-function search_phrase_column($c)
-{
-    global $searchPhrase;
-    return "$c LIKE '%$searchPhrase%'";
-}
-
-function quote_sql_word($c)
-{
-    return "`$c`";
-}
-
 
 // start of sql definition
 $sql = 'SELECT * FROM `mibdefs`';
