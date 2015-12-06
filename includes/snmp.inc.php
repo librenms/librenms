@@ -215,7 +215,7 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
 
 
 function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -251,7 +251,6 @@ function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
     }
 
     $data      = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     // echo("Caching: $oid\n");
     foreach (explode("\n", $data) as $entry) {
@@ -287,7 +286,7 @@ function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
 
 function snmp_cache_ifIndex($device) {
     // FIXME: this is not yet using our own snmp_*
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -318,7 +317,6 @@ function snmp_cache_ifIndex($device) {
     }
 
     $data      = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     $array = array();
     foreach (explode("\n", $data) as $entry) {
@@ -448,7 +446,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib=null, $mibdir=nul
 
 
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -485,7 +483,6 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib=0) {
 
     $data = trim(external_exec($cmd));
 
-    $device_id = $device['device_id'];
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value) = explode('=', $entry, 2);
         $oid              = trim($oid);
@@ -539,7 +536,6 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib=0) {
 
     $data = trim(external_exec($cmd));
 
-    $device_id = $device['device_id'];
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value) = explode('=', $entry, 2);
         $oid              = trim($oid);
@@ -562,7 +558,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib=0) {
 
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -598,7 +594,6 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib=0) {
     }
 
     $data      = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     foreach (explode("\n", $data) as $entry) {
         $entry                  = str_replace($oid.'.', '', $entry);
@@ -624,7 +619,7 @@ function snmp_cache_oid($oid, $device, $array, $mib=0) {
 
 
 function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -695,7 +690,6 @@ function snmp_cache_portIfIndex($device, $array) {
 
     $cmd      .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' portIfIndex';
     $output    = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     foreach (explode("\n", $output) as $entry) {
         $entry                    = str_replace('CISCO-STACK-MIB::portIfIndex.', '', $entry);
@@ -732,7 +726,6 @@ function snmp_cache_portName($device, $array) {
 
     $cmd      .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' portName';
     $output    = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
     // echo("Caching: portName\n");
     foreach (explode("\n", $output) as $entry) {
         $entry = str_replace('portName.', '', $entry);
@@ -817,8 +810,6 @@ function snmp_gen_auth(&$device) {
  *           ruckusZDSystemStats(15) 30 }
  */
 function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
-    global $debug;
-
     $fulloid  = explode('.', $oid);
     $lastpart = end($fulloid);
 

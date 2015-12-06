@@ -852,7 +852,7 @@ function enable_graphs($device, &$graph_enable)
 {
     // These are standard graphs we should have for all systems
     $graph_enable['poller']['poller_perf'] = 'device_poller_perf';
-    if (can_ping_device($attribs) === true) {
+    if (can_ping_device($device) === true) {
         $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
     }
 
@@ -875,7 +875,7 @@ function object_is_cached($section, $obj)
 {
     global $object_cache;
     if (array_key_exists($obj, $object_cache)) {
-        return $object_cache[$obj];
+        return $object_cache[$section][$obj];
     }
     else {
         return false;
@@ -946,6 +946,19 @@ function longest_matching_prefix($str, $arr)
     }
     return '';
 } // longest_matching_prefix
+
+
+function search_phrase_column($c)
+{
+    global $searchPhrase;
+    return "$c LIKE '%$searchPhrase%'";
+} // search_phrase_column
+
+
+function quote_sql_word($c)
+{
+    return "`$c`";
+} // quote_sql_word
 
 
 /**
