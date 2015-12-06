@@ -169,6 +169,8 @@ if ($_SESSION['userlevel'] >= '10') {
     }
     echo '
             <li role="presentation" class="divider"></li>
+            <li><a href='.generate_url(array('page'=>'mib_assoc')).'><i class="fa fa-file-text-o fa-fw fa-lg"></i> MIB associations</a></li>
+            <li role="presentation" class="divider"></li>
          ';
 
     if ($config['navbar']['manage_groups']['hide'] === 0) {
