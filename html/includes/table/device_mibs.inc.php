@@ -22,14 +22,25 @@ $columns = array(
     'last_modified',
 );
 
-$params = array(
-    $_POST['device_id'],
-);
-
-// start of sql definition
-$sql = 'SELECT * FROM `device_mibs`';
-
-$wheresql = ' WHERE `device_id` = ?';
+if (isset($_POST['device_id'])) {
+    // device_id supplied - get details for a single device
+    // used by device MIB page
+    $params = array(
+        $_POST['device_id'],
+    );
+    $sql = 'SELECT * FROM `device_mibs`';
+    $wheresql = ' WHERE `device_id` = ?';
+    $sortcolumns = 3;
+}
+else {
+    // device_id not supplied - get details for a all devices
+    // used by all device MIBs page
+    $params = array();
+    $sql = 'SELECT `d`.`hostname` as `hostname`, `dm`.* FROM `devices` `d`, `device_mibs` `dm`';
+    $wheresql = ' WHERE `d`.`device_id` = `dm`.`device_id`';
+    array_unshift($columns, 'hostname');
+    $sortcolumns = 4;
+}
 
 // all columns are searchable - search across them
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -45,9 +56,9 @@ if (empty($total)) {
     $total = 0;
 }
 
-// sort by first three columns by default
+// set up default sort
 if (!isset($sort) || empty($sort)) {
-    $sort = implode(', ', array_map("quote_sql_word", array_slice($columns, 0, 3)));
+    $sort = implode(', ', array_map("quote_sql_word", array_slice($columns, 0, $sortcolumns)));
 }
 $sql .= " ORDER BY $sort";
 
