@@ -333,7 +333,7 @@ foreach ($ports as $port) {
         echo 'VLAN == '.$this_port['ifVlan'];
 
 	// When devices do not provide ifAlias data, populate with ifDescr data if configured
-        if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) {
+        if ($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) {
             $this_port['ifAlias'] = $this_port['ifDescr'];
             d_echo('Using ifDescr as ifAlias');
         }
