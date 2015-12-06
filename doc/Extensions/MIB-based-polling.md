@@ -54,6 +54,8 @@ The components involved in MIB-based polling are:
     http://your.librenms.server/device/device=XXXX/tab=mib/
     All MIBs used by MIB-based polling may be viewed at:
     http://your.librenms.server/mibs/
+    All device associations created by MIB-based polling may be viewed at:
+    http://your.librenms.server/mib_assoc/ (Devices -> MIB associations)
 
   - In addition, all devices are checked for a MIB matching their sysObjectID.
     If there is a matching MIB available, it is automatically included.
