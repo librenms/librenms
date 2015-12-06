@@ -79,7 +79,7 @@
     - Added support for LigoWave Infinity AP's (PR2456)
   - Alerting:
     - Added ability to globally disable sending alerts (PR2385)
-    - Added support for Clickatell and PlaySMS (PR24104, PR2443)
+    - Added support for Clickatell, PlaySMS and VictorOps (PR24104, PR2443)
   - Documnetation:
     - Improved CentOS install docs (PR2462)
     - Improved Proxmox setup docs (PR2483)
