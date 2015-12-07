@@ -315,6 +315,7 @@ function device_by_id_cache($device_id, $refresh = '0') {
     }
     else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        $device['ip'] = inet6_ntop($device['ip']);
         $cache['devices']['id'][$device_id] = $device;
     }
     return $device;
