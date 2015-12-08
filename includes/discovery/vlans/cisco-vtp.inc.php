@@ -12,17 +12,21 @@ if ($device['os_group'] == 'cisco') {
 
         foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
             echo 'VTP Domain  '.$vtpdomain_id.' '.$vtpdomain['managementDomainName'].' ';
+	    $db_to_insert = array();
             foreach ($vlans[$vtpdomain_id] as $vlan_id => $vlan) {
                 echo " $vlan_id";
                 if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
                     echo '.';
                 }
                 else {
+		    array_push($db_to_insert(array('device_id' => $device['device_id'], 'vlan_domain' => $vtpdomain_id, 'vlan_vlan' => $vlan_id, 'vlan_name' => $vlan['vtpVlanName'], 'vlan_type' => $vlan['vtpVlanType'])));
                     dbInsert(array('device_id' => $device['device_id'], 'vlan_domain' => $vtpdomain_id, 'vlan_vlan' => $vlan_id, 'vlan_name' => $vlan['vtpVlanName'], 'vlan_type' => $vlan['vtpVlanType']), 'vlans');
                     echo '+';
                 }
                 $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
             }
+	    echo 'Inserting VTP Domain vlans into database. ';
+            dbBulkInsert($db_to_insert, 'vlans');
         }
     }
     echo "\n";

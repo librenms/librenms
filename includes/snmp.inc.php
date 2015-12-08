@@ -161,6 +161,7 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
     if ($options) {
         $cmd .= " $options ";
     }
+    $cmd .= ' -Cr50 ';
 
     if ($mib) {
         $cmd .= " -m $mib";

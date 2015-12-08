@@ -18,6 +18,12 @@ if ($config['enable_inventory']) {
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
     }
 
+    $entity_db_array = dbFetchRows('SELECT entPhysicalIndex,entPhysical_id FROM `entPhysical` WHERE device_id = ?', array($device['device_id']));
+    $entity_db_map = array();
+    foreach ($entity_db_array as $entry) {
+        $entity_db_map[$entry['entPhysicalIndex']] = $entry['entPhysical_id'];
+    }  
+    $delayed_insert = array();
     foreach ($entity_array as $entPhysicalIndex => $entry) {
         if ($device['os'] == 'junos') {
             // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
@@ -76,9 +82,11 @@ if ($config['enable_inventory']) {
         }
 
         // FIXME - dbFacile
+	// attempt to fix database roundtrip issue by Gregg
         if ($entPhysicalDescr || $entPhysicalName) {
-            $entPhysical_id = dbFetchCell('SELECT entPhysical_id FROM `entPhysical` WHERE device_id = ? AND entPhysicalIndex = ?', array($device['device_id'], $entPhysicalIndex));
-
+            //$entPhysical_id = dbFetchCell('SELECT entPhysical_id FROM `entPhysical` WHERE device_id = ? AND entPhysicalIndex = ?', array($device['device_id'], $entPhysicalIndex));
+            $entPhysical_id = $entity_db_map[$entPhysicalIndex];
+/*
             if ($entPhysical_id) {
                 $update_data = array(
                     'entPhysicalIndex'        => $entPhysicalIndex,
@@ -124,15 +132,54 @@ if ($config['enable_inventory']) {
 
                 if (!empty($ifIndex)) {
                     $insert_data['ifIndex'] = $ifIndex;
-                }
+                } else {
+		    $insert_data['ifIndex'] = null;
+		}
 
-                dbInsert($insert_data, 'entPhysical');
+                array_push($delayed_insert, $insert_data);
+                //dbInsert($insert_data, 'entPhysical');
                 echo '+';
             }//end if
+*/
 
+	    $data = array(
+                    'entPhysical_id'	      => $entPhysical_id,
+                    'device_id'               => $device['device_id'],
+                    'entPhysicalIndex'        => $entPhysicalIndex,
+                    'entPhysicalDescr'        => $entPhysicalDescr,
+                    'entPhysicalClass'        => $entPhysicalClass,
+                    'entPhysicalName'         => $entPhysicalName,
+                    'entPhysicalModelName'    => $entPhysicalModelName,
+                    'entPhysicalSerialNum'    => $entPhysicalSerialNum,
+                    'entPhysicalContainedIn'  => $entPhysicalContainedIn,
+                    'entPhysicalMfgName'      => $entPhysicalMfgName,
+                    'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
+                    'entPhysicalVendorType'   => $entPhysicalVendorType,
+                    'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
+                    'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
+                    'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
+                    'entPhysicalIsFRU'        => $entPhysicalIsFRU,
+                    'entPhysicalAlias'        => $entPhysicalAlias,
+                    'entPhysicalAssetID'      => $entPhysicalAssetID,
+                );
+            if (!empty($ifIndex)) {
+                $data['ifIndex'] = $ifIndex;
+            } else {
+		$data['ifIndex'] = null;
+            }
+	    if ($entPhysical_id) {
+            	echo '.';
+	    } else {
+		echo '+';
+	    }
+            array_push($delayed_insert, $data);
             $valid[$entPhysicalIndex] = 1;
+
         }//end if
     }//end foreach
+    if(!dbBulkInsertUpdate($delayed_insert, 'entPhysical')) {
+	trigger_error('dbBulkInsert - Error in query: ' . mysql_error(), E_USER_WARNING);
+    }
 }
 else {
     echo 'Disabled!';

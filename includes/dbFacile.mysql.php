@@ -107,6 +107,67 @@ function dbInsert($data, $table) {
 
 }//end dbInsert()
 
+/*
+ * Passed an array and a table name, it attempts to insert the data into the table, if primary key exists function will update the row.
+ * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
+ * Check for boolean false to determine whether insert failed
+ * */
+function dbBulkInsertUpdate($data, $table) {
+    global $db_stats;
+    // the following block swaps the parameters if they were given in the wrong order.
+    // it allows the method to work for those that would rather it (or expect it to)
+    // follow closer with SQL convention:
+    // insert into the TABLE this DATA
+    if (is_string($data) && is_array($table)) {
+        $tmp   = $data;
+        $data  = $table;
+        $table = $tmp;
+    }
+    if (count($data) === 0) {
+        return false;
+    }
+    if (count($data[0]) === 0) {
+        return false;
+    }
+
+    $sql = 'INSERT INTO `'.$table.'` (`'.implode('`,`', array_keys($data[0])).'`)  VALUES ';
+    $values ='';
+
+    $update_keys = '';
+    $keys = array();
+
+    foreach ($data as $row) {
+        if ($values != '') {
+            $values .= ',';
+        }
+        $rowvalues='';
+        foreach ($row as $key => $value) {
+	    if (!in_array($key, $keys)) {
+		array_push($keys, $key);	
+	    }
+            if ($rowvalues != '') {
+                $rowvalues .= ',';
+            }
+            $rowvalues .= "'".mres($value)."'";
+        }
+        $values .= "(".$rowvalues.")\n";
+    }
+    foreach($keys as $key) {
+	$update_keys .= "`$key`=VALUES(`$key`),";
+    }
+    $update_keys = ' ON DUPLICATE KEY UPDATE ' . trim($update_keys, ',') . ' ';
+
+    $time_start = microtime(true);
+    $result = dbQuery($sql.$values.$update_keys);
+
+    logfile($fullSql);
+    $time_end                = microtime(true);
+    $db_stats['insert_sec'] += number_format(($time_end - $time_start), 8);
+    $db_stats['insert']++;
+
+    return $result;
+}// end dbBulkInsertUpdate()
+
 
 /*
  * Passed an array and a table name, it attempts to insert the data into the table.
@@ -147,13 +208,13 @@ function dbBulkInsert($data, $table) {
             }
             $rowvalues .= "'".mres($value)."'";
         }
-        $values .= "(".$rowvalues.")";
+        $values .= "(".$rowvalues.")\n";
     }
 
     $time_start = microtime(true);
     $result = dbQuery($sql.$values);
 
-    // logfile($fullSql);
+    logfile($fullSql);
     $time_end                = microtime(true);
     $db_stats['insert_sec'] += number_format(($time_end - $time_start), 8);
     $db_stats['insert']++;
