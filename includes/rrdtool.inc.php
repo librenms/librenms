@@ -307,8 +307,8 @@ function rrdtool_tune($type, $filename, $max) {
         $max = $max / 8;
         $fields = array(
 'INOCTETS','OUTOCTETS','INERRORS','OUTERRORS','INUCASTPKTS','OUTUCASTPKTS','INNUCASTPKTS','OUTNUCASTPKTS','INDISCARDS','OUTDISCARDS','INUNKNOWNPROTOS','INBROADCASTPKTS','OUTBROADCASTPKTS','INMULTICASTPKTS','OUTMULTICASTPKTS'
-);
-        $options = "--maximum " . implode(":$max --maximum ", $fields). ":$max";
-        rrdtool('tune', $filename, $options);
+        );
     }
+    $options = "--maximum " . implode(":$max --maximum ", $fields). ":$max";
+    rrdtool('tune', $filename, $options);
 }
