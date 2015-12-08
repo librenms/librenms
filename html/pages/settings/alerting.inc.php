@@ -91,11 +91,7 @@ $no_refresh = true;
                         <input type="text" class="form-control" name="hipchat_value" id="hipchat_value" placeholder="Enter the Hipchat API url">
                     </div>
                     <div class="form-group">
-                        <label for="new_room_id">Room ID</label>
-                        <input type="text" class="form-control" name="new_room_id" id="new_room_id" placeholder="Enter the room ID">
-                    </div>
-                    <div class="form-group">
-                        <label for="new_from">From</label>
+                        <label for="new_from">From <i>(Optional)</i></label>
                         <input type="text" class="form-control" name="new_from" id="new_from" placeholder="Enter the from details">
                     </div>
                     <div class="form-group">
@@ -476,11 +472,10 @@ foreach ($hipchat_urls as $hipchat_url) {
     unset($upd_hipchat_extra);
     $new_hipchat_extra = array();
     $hipchat_extras    = get_config_like_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.%');
-    $hipchat_room_id   = get_config_by_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.room_id');
     $hipchat_from      = get_config_by_name('alert.transports.hipchat.'.$hipchat_url['config_id'].'.from');
     foreach ($hipchat_extras as $extra) {
         $split_extra = explode('.', $extra['config_name']);
-        if ($split_extra[4] != 'url' && $split_extra[4] != 'room_id' && $split_extra[4] != 'from') {
+        if ($split_extra[4] != 'url' && $split_extra[4] != 'from') {
             $new_hipchat_extra[] = $split_extra[4].'='.$extra['config_value'];
         }
     }
@@ -495,13 +490,6 @@ foreach ($hipchat_urls as $hipchat_url) {
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="btn btn-danger del-hipchat-config" name="del-hipchat-call" data-config_id="'.$hipchat_url['config_id'].'"><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="form-group has-feedback">
-                            <label for="hipchat_room_id" class="col-sm-4 control-label">Room ID</label>
-                            <div class="col-sm-4">
-                                <input id="hipchat_room_id" class="form-control" type="text" name="global-config-input" value="'.$hipchat_room_id['config_value'].'" data-config_id="'.$hipchat_room_id['config_id'].'">
-                                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                             </div>
                         </div>
                         <div class="form-group has-feedback">
