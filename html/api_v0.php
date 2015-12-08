@@ -42,6 +42,7 @@ $app->group(
                         // api/v0/devices/$hostname
                         $app->get('/:hostname', 'authToken', 'get_device')->name('get_device');
                         // api/v0/devices/$hostname
+                        $app->patch('/:hostname', 'authToken', 'update_device')->name('update_device_field');
                         $app->get('/:hostname/vlans', 'authToken', 'get_vlans')->name('get_vlans');
                         // api/v0/devices/$hostname/vlans
                         $app->get('/:hostname/graphs', 'authToken', 'get_graphs')->name('get_graphs');
