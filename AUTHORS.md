@@ -73,4 +73,5 @@ Contributors to LibreNMS:
 - Louis Bailleul <louis.bailleul@gmail.com> (alucardfh)
 - Rick Hodger <rick@fuzzi.org.uk> (Tatermen)
 - Eldon Koyle <ekoyle@gmail.com> (ekoyle)
+- Jonathan Bailey <jcbailey@code0.net> (jcbailey2)
 [1]: http://observium.org/ "Observium web site"
