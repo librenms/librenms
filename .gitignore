@@ -11,3 +11,6 @@ nbproject
 .ircbot.alert
 .metadata_never_index
 *.swp
+.bash_history
+.viminfo
+
