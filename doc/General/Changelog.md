@@ -1,3 +1,96 @@
+### December 2015
+
+#### Bug fixes
+  - WebUI:
+    - Fixed regex for negative lat/lng coords (PR2524)
+    - Fixed map page looping due to device connected to itself (PR2545)
+    - Fixed PATH_INFO for nginx (PR2551)
+  - Discovery / Polling:
+    - Pointed snmp calls for Huawei to correct MIB folder (PR2541)
+  - Alerting:
+    - Fix glue-expansion for alerts (PR2522)
+  - Documentation:
+    - Removed duplicate mysql-client install from Debian/Ubuntu install docs (PR2543)
+
+#### Improvements
+  - WebUI:
+    - Converted sensors page to use bootgrid (PR2531)
+  - Discovery / Polling
+    - Added traffic bits as default for Cambium devices (PR2525)
+    - Overwrite eth0 port data from UniFi MIBs for AirFibre devices (PR2544)
+  - API:
+    - Added ability to filter devices by type and os for Oxidized API call (PR2539)
+  - Documentation:
+    - Improved alerting docs explaining more options (PR2560)
+  - Added detection for:
+    - Updated Netonix switch MIBs (PR2523)
+    - Updated Fotinet MIBs (PR2529, PR2534)
+
+### November 2015
+
+#### Bug fixes
+  - WebUI:
+    - getRates should return in and out average rates (PR2375)
+    - Fix 95th percent lines in negative range (PR2405)
+    - Fix percentage bar for billing pages (PR2419)
+    - Use HC counters first in realtime graphs (PR2420)
+    - Fix netcmd.php URI for sub dir installations (PR2428)
+    - Fixed Oxidized fetch config with groups (PR2501)
+    - Fixed background colour to white for some graphs (PR2516)
+  - API:
+    - Added missing quotes for MySQL queries (PR2382)
+  - Discovery / Polling:
+    - Specified MIB used when polling ntpd-server (PR2418)
+    - Added missing fields when inserting data into applications table (PR2445)
+    - Fix auto-discovery failing (PR2457)
+    - Juniper hardware inventory fix (PR2466)
+    - Fix discovery of Cisco PIX running PixOS 8.0 (PR2480)
+    - Fix bug in Proxmox support if only one VM was detected (PR2490, PR2547)
+  - Alerting:
+    - Strip && and || from query for device-groups (PR2476)
+    - Fix transports being triggered when empty keys set (PR2491)
+  Misc:
+    - Updated device_traffic_descr config to stop graphs failing (PR2386)
+
+#### Improvements
+  - WebUI:
+    - Status column now sortable for /devices/ (PR2397)
+    - Update Gridster library to be responsive (PR2414)
+    - Improved rrdtool 1.4/1.5 compatibility (PR2430)
+    - Use event_id in query for Eventlog (PR2437)
+    - Add graph selector to devices overview (PR2438)
+    - Improved Navbar for varying screen sizes (PR2450)
+    - Added RIPE NCC API support for lookups (PR2455, PR2474)
+    - Improved ports page for device with large number of neighbours (PR2460)
+    - Merged all CPU graphs into one on overview page (PR2470)
+    - Added support for sortting by traffic on device port page (PR2508)
+    - Added support for dynamic graph sizes based on browser size (PR2510)
+    - Made device location clickable in device header (PR2515)
+    - Visual improvements to bills page (PR2519)
+  - Discovery / Polling:
+    - Updated Cisco SB discovery (PR2396)
+    - Added Ceph support via Applications (PR2412)
+    - Added support for per device unix-agent port (PR2439)
+    - Added ability to select up/down devices on worldmap (PR2441)
+    - Allow powerdns app to be set for Unix Agent (PR2489)
+    - Added SLES detection to distro script (PR2502)
+  - Added detection for:
+    - Added CPU + Memory usage for Ubiquiti UniFi (PR2421)
+    - Added support for LigoWave Infinity AP's (PR2456)
+  - Alerting:
+    - Added ability to globally disable sending alerts (PR2385)
+    - Added support for Clickatell, PlaySMS and VictorOps (PR24104, PR2443)
+  - Documnetation:
+    - Improved CentOS install docs (PR2462)
+    - Improved Proxmox setup docs (PR2483)
+  - Misc:
+    - Provide InnoDB config for buffer size issues (PR2401)
+    - Added AD Authentication support (PR2411, PR2425, PR2432, PR2434)
+    - Added Features document (PR2436, PR2511, PR2513)
+    - Centralised innodb buffer check and added to validate (PR2482)
+    - Updated and improved daily.sh (PR2487)
+
+
 ### October 2015
 
 #### Bug fixes

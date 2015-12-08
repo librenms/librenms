@@ -476,7 +476,7 @@ function generate_lazy_graph_tag($args) {
         $urlargs[] = $key."=".urlencode($arg);
     }
 
-    return '<img class="lazy" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    return '<img class="lazy graphs" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
 
 }//end generate_lazy_graph_tag()
 
@@ -1189,7 +1189,7 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#'.$anchor.'">'.$title.'</a>
+            <a data-toggle="collapse" data-parent="#accordion" href="#'.$anchor.'"><i class="fa fa-caret-down"></i> '.$title.'</a>
     ';
     if (!empty($transport)) {
         $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="'.$transport.'" class="btn btn-primary btn-xs pull-right">Test transport</button>';

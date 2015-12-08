@@ -890,12 +890,14 @@ function get_inventory() {
 
 
 function list_oxidized() {
-    // return details of a single device
+    global $config;
     $app = \Slim\Slim::getInstance();
     $app->response->headers->set('Content-Type', 'application/json');
 
     $devices = array();
-    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL)") as $device) {
+    $device_types = "'".implode("','", $config['oxidized']['ignore_types'])."'";
+    $device_os    = "'".implode("','", $config['oxidized']['ignore_os'])."'";
+    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os))") as $device) {
         $devices[] = $device;
     }
 

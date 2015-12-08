@@ -35,7 +35,17 @@ The ' . $config['project_name'] . ' team.';
         exit(2);
     }
     else {
-        exit((int) $config['update']);
+        if ($config['update']) {
+            if ($config['update_channel'] == 'master') {
+                exit(1);
+            }
+            elseif ($config['update_channel'] == 'release') {
+                exit(3);
+            }
+        }
+        else {
+            exit(0);
+        }
     }
 }
 

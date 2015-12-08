@@ -33,6 +33,7 @@ Table of Content:
     - [Device](#macros-device)
     - [Port](#macros-port)
     - [Time](#macros-time)
+- [Additional Options](#extra)
 
 
 # <a name="about">About</a>
@@ -633,4 +634,14 @@ Description: Packet loss % value for the device within the last 15 minutes.
 
 Example: `%macros.packet_loss_15m` > 50
 
+# <a name="extra">Additional Options</a>
 
+Here are some of the other options available when adding an alerting rule:
+
+- Rule name: The name associated with the rule.
+- Severity: How "important" the rule is.
+- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
+- Delay: The amount of time to wait after a rule is matched before sending an alert.
+- Interval: The interval of time between alerts for an event until Max is reached.
+- Mute alerts: Disable sending alerts for this rule.
+- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).

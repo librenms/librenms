@@ -59,35 +59,28 @@ function GenSQL($rule) {
     $join = "";
     while( $i < $x ) {
         if( isset($tables[$i+1]) ) {
-            if( dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?',array($tables[$i+1],'device_id')) == 1 ) {
-                //Found valid glue in definition.
-                $join .= $tables[$i].".device_id = ".$tables[$i+1].".device_id && ";
+            $gtmp = ResolveGlues(array($tables[$i+1]),'device_id');
+            if( $gtmp === false ) {
+                //Cannot resolve glue-chain. Rule is invalid.
+                return false;
             }
-            else {
-                //No valid glue, Resolve a glue-chain.
-                $gtmp = ResolveGlues(array($tables[$i+1]),'device_id');
-                if( $gtmp === false ) {
-                    //Cannot resolve glue-chain. Rule is invalid.
-                    return false;
+            $last = "";
+            $qry = "";
+            foreach( $gtmp as $glue ) {
+                if( empty($last) ) {
+                    list($tmp,$last) = explode('.',$glue);
+                    $qry .= $glue.' = ';
                 }
-                $last = "";
-                $qry = "";
-                foreach( $gtmp as $glue ) {
-                    if( empty($last) ) {
-                        list($tmp,$last) = explode('.',$glue);
-                        $qry .= $glue.' = ';
-                    }
-                    else {
-                        list($tmp,$new) = explode('.',$glue);
-                        $qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
-                        $last = $new;
-                    }
-                    if( !in_array($tmp, $tables) ) {
-                        $tables[] = $tmp;
-                    }
+                else {
+                    list($tmp,$new) = explode('.',$glue);
+                    $qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
+                    $last = $new;
                 }
-                $join .= "( ".$qry.$tables[0].".device_id ) && ";
+                if( !in_array($tmp, $tables) ) {
+                    $tables[] = $tmp;
+                }
             }
+            $join .= "( ".$qry.$tables[0].".device_id ) && ";
         }
         $i++;
     }
@@ -123,8 +116,11 @@ function ResolveGlues($tables,$target,$x=0,$hist=array(),$last=array()) {
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"',array($table));
             if( sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target ) {
                 //Search for new candidates to expand
-                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table,0,-1).'_%" && TABLE_NAME != "'.$table.'"');
                 $ntables = array();
+                list($tmp) = explode('_',$glues[0]['COLUMN_NAME'],2);
+                $ntables[] = $tmp;
+                $ntables[] = $tmp.'s';
+                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table,0,-1).'_%" && TABLE_NAME != "'.$table.'"');
                 foreach( $tmp as $expand ) {
                     $ntables[] = $expand['TABLE_NAME'];
                 }
