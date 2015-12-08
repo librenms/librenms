@@ -74,4 +74,5 @@ Contributors to LibreNMS:
 - Rick Hodger <rick@fuzzi.org.uk> (Tatermen)
 - Eldon Koyle <ekoyle@gmail.com> (ekoyle)
 - Jonathan Bailey <jcbailey@code0.net> (jcbailey2)
+- Ruairi Carroll <ruairi.carroll@gmail.com> (rucarrol) 
 [1]: http://observium.org/ "Observium web site"
