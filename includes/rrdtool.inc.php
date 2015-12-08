@@ -300,6 +300,7 @@ function rrdtool_escape($string, $maxlength=null){
 }
 
 function rrdtool_tune($type, $filename, $max) {
+    $fields = array();
     if ($type === 'port') {
         if ($max < 10000000) {
             return false;
@@ -309,6 +310,8 @@ function rrdtool_tune($type, $filename, $max) {
 'INOCTETS','OUTOCTETS','INERRORS','OUTERRORS','INUCASTPKTS','OUTUCASTPKTS','INNUCASTPKTS','OUTNUCASTPKTS','INDISCARDS','OUTDISCARDS','INUNKNOWNPROTOS','INBROADCASTPKTS','OUTBROADCASTPKTS','INMULTICASTPKTS','OUTMULTICASTPKTS'
         );
     }
-    $options = "--maximum " . implode(":$max --maximum ", $fields). ":$max";
-    rrdtool('tune', $filename, $options);
+    if (count($fields) > 0) {
+        $options = "--maximum " . implode(":$max --maximum ", $fields). ":$max";
+        rrdtool('tune', $filename, $options);
+    }
 }
