@@ -984,7 +984,6 @@ function update_device() {
     $app = \Slim\Slim::getInstance();
     $router = $app->router()->getCurrentRoute()->getParams();
     $status   = 'error';
-    $message  = '';
     $code     = 500;
     $hostname = $router['hostname'];
     // use hostname as device_id if it's all digits
