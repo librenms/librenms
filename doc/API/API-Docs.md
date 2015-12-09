@@ -18,6 +18,7 @@
         - [`list_devices`](#api-route-10)
         - [`add_device`](#api-route-11)
         - [`list_oxidized`](#api-route-21)
+        - [`update_device_field`](#api-route-update_device_field)
     - [`routing`](#api-routing)
         - [`list_bgp`](#api-route-1)
     - [`switching`](#api-switching)
@@ -458,6 +459,33 @@ Output:
     {
         "hostname": "otherserver",
         "os": "linux"
+    }
+]
+```
+
+### <a name="api-route-update_device_field">Function: `update_device_field`</a> [`top`](#top)
+
+Update devices field in the database.
+
+Route: /api/v0/devices/:hostname
+
+Input (JSON):
+
+  - field: The column name within the database
+  - data: The data to update the column with
+
+Examples:
+```curl
+curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost 
+```
+
+Output:
+
+```text
+[
+    {
+        "status": "ok",
+        "message": "Device notes has been updated"
     }
 ]
 ```
