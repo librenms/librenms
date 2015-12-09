@@ -132,7 +132,6 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$rulei       = 1;
 $count_query = 'SELECT COUNT(id)';
 $full_query  = 'SELECT *';
 $sql         = '';
@@ -142,7 +141,7 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     $param = array($device['device_id']);
 }
 
-$query       = " FROM alert_rules $sql ORDER BY device_id,id";
+$query       = " FROM alert_rules $sql ORDER BY id ASC";
 $count_query = $count_query.$query;
 $count       = dbFetchCell($count_query, $param);
 if (!isset($_POST['page_number']) && $_POST['page_number'] < 1) {
@@ -199,7 +198,7 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
         $popover_msg = 'Device specific rule';
     }
     echo "<tr class='".$extra."' id='row_".$rule['id']."'>";
-    echo '<td><i>#'.((int) $rulei++).'</i></td>';
+    echo '<td><i>#'.((int) $rule['id']).'</i></td>';
     echo '<td>'.$rule['name'].'</td>';
     echo "<td class='col-sm-4'>";
     if ($rule_extra['invert'] === true) {
