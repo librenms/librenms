@@ -178,6 +178,11 @@ $config['web_mouseover']      = TRUE;
 You can disable the mouseover popover for mini graphs by setting this to FALSE.
 
 ```php
+$config['enable_lazy_load'] = true;
+```
+You can disable image lazy loading by setting this to false.
+
+```php
 $config['show_overview_tab'] = TRUE;
 ```
 Enable or disable the overview tabe for a device.
