@@ -17,9 +17,9 @@ if (!empty($agent_data['app']['ceph'])) {
                 if (!is_file($ceph_rrd)) {
                     rrdtool_create(
                         $ceph_rrd,
-                        '--step 300 \
-                        DS:ops:GAUGE:600:0:U \
-                        DS:wrbytes:GAUGE:600:0:U \
+                        '--step 300
+                        DS:ops:GAUGE:600:0:U
+                        DS:wrbytes:GAUGE:600:0:U
                         DS:rbytes:GAUGE:600:0:U '.$config['rrd_rra']
                     );
                 }
@@ -37,8 +37,8 @@ if (!empty($agent_data['app']['ceph'])) {
                 if (!is_file($ceph_rrd)) {
                     rrdtool_create(
                         $ceph_rrd,
-                        '--step 300 \
-                        DS:apply_ms:GAUGE:600:0:U \
+                        '--step 300
+                        DS:apply_ms:GAUGE:600:0:U
                         DS:commit_ms:GAUGE:600:0:U '.$config['rrd_rra']
                     );
                 }
@@ -56,9 +56,9 @@ if (!empty($agent_data['app']['ceph'])) {
                 if (!is_file($ceph_rrd)) {
                     rrdtool_create(
                         $ceph_rrd,
-                        '--step 300 \
-                        DS:avail:GAUGE:600:0:U \
-                        DS:used:GAUGE:600:0:U \
+                        '--step 300
+                        DS:avail:GAUGE:600:0:U
+                        DS:used:GAUGE:600:0:U
                         DS:objects:GAUGE:600:0:U '.$config['rrd_rra']
                     );
                 }
