@@ -461,6 +461,7 @@ function generate_graph_tag($args) {
 }//end generate_graph_tag()
 
 function generate_lazy_graph_tag($args) {
+    global $config;
     $urlargs = array();
     $w = 0;
     $h = 0;
@@ -476,7 +477,12 @@ function generate_lazy_graph_tag($args) {
         $urlargs[] = $key."=".urlencode($arg);
     }
 
-    return '<img class="lazy graphs" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    if ($config['enable_lazy_load'] === true) {
+        return '<img class="lazy graphs" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    }
+    else {
+        return '<img class="graphs" width="'.$w.'" height="'.$h.'" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    }
 
 }//end generate_lazy_graph_tag()
 
