@@ -1770,6 +1770,19 @@ label {
     padding: 15px 6px;
 }
 
+.badge-navbar-user{
+   background:red;
+   border-radius: 40%;
+   font-size: 60%;
+   height: auto;
+   margin: 0;
+   padding:5px;
+   position:absolute;
+   right:-4px;
+   top:5px;
+   width: auto;
+  }
+
 @media only screen and (max-width: 480px) {
     .thumbnail_graph_table b { font-size : 6px;}
     .thumbnail_graph_table img {

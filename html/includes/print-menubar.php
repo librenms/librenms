@@ -488,10 +488,27 @@ if(is_file("includes/print-menubar-custom.inc.php")) {
          </div>
      </form>
     <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
 <?php
-$notifications = new ObjCache('notifications');
-echo '       <li><a href="notifications/"><span class="badge count-notif">'.($notifications['sticky_count']+$notifications['count']).'</span></a></li>';
+
+    $notifications = new ObjCache('notifications');
+    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons"></i><span class="badge badge-navbar-user">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
 ?>
+        <ul class="dropdown-menu">
+          <li role="presentation" class="dropdown-header"> Settings</li>
+          <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
+          <li role="presentation" class="dropdown-header"> Notifications</li>
+          <li><a href="notifications/"><i class="fa fa-envelope-o fa-fw fa-lg"></i> Notifications</a></li>
+          <li role="presentation" class="divider"></li>
+<?php 
+
+if ($_SESSION['authenticated']) {
+    echo('
+           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg"></i> Logout</a></li>');
+}
+?>
+         </ul>
+       </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
         <ul class="dropdown-menu">
@@ -502,7 +519,6 @@ if ($_SESSION['userlevel'] >= '10') {
 }
 
 ?>
-          <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
           <li role="presentation" class="divider"></li>
           <li role="presentation" class="dropdown-header"> Users</li>
 
@@ -550,8 +566,7 @@ if ($_SESSION['authenticated']) {
                <ul class="dropdown-menu scrollable-menu">
                    <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
                </ul>
-           </li>
-           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg"></i> Logout</a></li>');
+           </li>');
 }
 ?>
 
