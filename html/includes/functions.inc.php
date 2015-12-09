@@ -461,6 +461,7 @@ function generate_graph_tag($args) {
 }//end generate_graph_tag()
 
 function generate_lazy_graph_tag($args) {
+    global $config;
     $urlargs = array();
     $w = 0;
     $h = 0;
