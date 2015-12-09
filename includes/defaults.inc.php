@@ -127,6 +127,7 @@ $config['page_title_prefix'] = '';
 $config['page_title_suffix'] = $config['project_name'];
 $config['timestamp_format']  = 'd-m-Y H:i:s';
 $config['page_gen']          = 0;
+$config['enable_lazy_load']  = true;
 // display MySqL & PHP stats in footer?
 $config['login_message'] = 'Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.';
 $config['public_status'] = false;
