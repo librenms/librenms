@@ -94,14 +94,13 @@ else if ($action == 'add-slack') {
     }
 }
 else if ($action == 'add-hipchat') {
-    if (empty($config_value) || empty($config_room_id) || empty($config_from)) {
-        $message = 'No hipchat url, room id or from provided';
+    if (empty($config_value)) {
+        $message = 'No hipchat url provided';
     }
     else {
         $config_id = dbInsert(array('config_name' => 'alert.transports.hipchat.', 'config_value' => $config_value, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_value, 'config_descr' => 'Hipchat Transport'), 'config');
         if ($config_id > 0) {
             dbUpdate(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.url'), 'config', 'config_id=?', array($config_id));
-            $additional_id['room_id'] = dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.room_id', 'config_value' => $config_room_id, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_room_id, 'config_descr' => 'Hipchat URL'), 'config');
             $additional_id['from']    = dbInsert(array('config_name' => 'alert.transports.hipchat.'.$config_id.'.from', 'config_value' => $config_from, 'config_group' => $config_group, 'config_sub_group' => $config_sub_group, 'config_default' => $config_from, 'config_descr' => 'Hipchat From'), 'config');
             $status                   = 'ok';
             $message                  = 'Config item created';

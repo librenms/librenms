@@ -1,4 +1,4 @@
-/* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>, Tyler Christiansen <code@tylerc.me>
+/* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>, Tyler Christiansen <code@tylerc.me>, Jonathan Bailey <jcbailey@code0.net>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -15,7 +15,7 @@
 /*
  * API Transport
  * @author Tyler Christiansen <code@tylerc.me>
- * @copyright 2014 Daniel Preussker, Tyler Christiansen, LibreNMS
+ * @copyright 2014 Daniel Preussker, Jonathan Bailey, Tyler Christiansen, LibreNMS
  * @license GPL
  * @package LibreNMS
  * @subpackage Alerts
@@ -29,11 +29,10 @@ foreach($opts as $option) {
     $curl = curl_init();
     $data = array(
         "message" => $obj["msg"],
-        "room_id" => $option["room_id"],
         "from" => $option["from"],
-        "color" => $option["color"],
-        "notify" => $option["notify"],
-        "message_format" => $option["message_format"]
+        "color" => isset($option["color"]) ? $option["color"] : "yellow",
+        "notify" => isset($option["notify"]) ? $option["notify"] : "true",
+        "message_format" => isset($option["message_format"]) ? $option["message_format"] : "text"
     );
     // Sane default of making the message color green if the message indicates
     // that the alert recovered.
@@ -43,11 +42,12 @@ foreach($opts as $option) {
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
     $ret = curl_exec($curl);
 
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    if($code != 200) {
+    if($code < 200 || $code > 299) {
         var_dump("API '$url' returned Error");
         var_dump("Params: " . $message);
         var_dump("Return: " . $ret);
