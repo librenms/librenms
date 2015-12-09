@@ -422,7 +422,7 @@ foreach ($ports as $port) {
 
         // End parse ifAlias
         // Update IF-MIB metrics
-        $_stat_oids = $stat_oids_db + $stat_oids_db_extended;
+        $_stat_oids = array_merge($stat_oids_db, $stat_oids_db_extended);
         foreach ($_stat_oids as $oid) {
             $port_update = 'update';
             $extended_metric = !in_array($oid, $stat_oids_db, true);
