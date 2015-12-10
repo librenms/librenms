@@ -224,7 +224,7 @@ foreach ($port_stats as $ifIndex => $port) {
         }
     }
     else {
-        if ($ports[$port['ifIndex']]['deleted'] != '1') {
+        if ($ports[$ifIndex]['port_id'] != '' && $ports[$port['ifIndex']]['deleted'] != '1') {
             dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($ports[$ifIndex]['port_id']));
             $ports[$ifIndex]['deleted'] = '1';
         }
@@ -234,6 +234,7 @@ foreach ($port_stats as $ifIndex => $port) {
 // End New interface detection
 echo "\n";
 // Loop ports in the DB and update where necessary
+$delayed_update = array();
 foreach ($ports as $port) {
     echo 'Port '.$port['ifDescr'].'('.$port['ifIndex'].') ';
     if ($port_stats[$port['ifIndex']] && $port['disabled'] != '1') {
@@ -558,8 +559,10 @@ foreach ($ports as $port) {
 
         // Update Database
         if (count($port['update'])) {
-            $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port['port_id']));
-            d_echo("$updated updated");
+            //$updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port['port_id']));
+	    $port['update']['port_id'] = $port['port_id'];
+            array_push($delayed_update, $port['update']);
+            //d_echo("$updated updated");
         }
 
         // End Update Database
@@ -580,6 +583,8 @@ foreach ($ports as $port) {
     // Clear Per-Port Variables Here
     unset($this_port);
 }//end foreach
+// do delayed database update to save on mysql roundtrips
+dbBulkInsertUpdate($delayed_update, 'ports');
 
 // Clear Variables Here
 unset($port_stats);
