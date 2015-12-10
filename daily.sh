@@ -23,8 +23,9 @@ arg="$1"
 status_run() {
     printf "%-50s" "$1"
     echo "$1" >> logs/daily.log
-    bash -c "$2" &>> logs/daily.log
+    tmp=$(bash -c "$2" 2>&1)
     ex=$?
+    echo "$tmp" >> logs/daily.log
     echo "Returned: $ex" >> logs/daily.log
     [ $ex -eq 0 ] && echo -e ' \033[0;32mOK\033[0m' || echo -e ' \033[0;31mFAIL\033[0m'
     return $ex
