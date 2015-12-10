@@ -275,7 +275,7 @@ if ($_SESSION['userlevel'] >= '5') {
     }
     foreach ($config['custom_descr'] as $custom_type) {
         if (!empty($custom_type)) {
-            echo '          <li><a href="iftype/type=' . strtolower($custom_type) . '"><i class="fa fa-connectdevelop fa-fw fa-lg"></i> ' . ucfirst($custom_type) . '</a></li>';
+            echo '          <li><a href="iftype/type=' . urlencode(strtolower($custom_type)) . '"><i class="fa fa-connectdevelop fa-fw fa-lg"></i> ' . ucfirst($custom_type) . '</a></li>';
             $ifbreak = 1;
         }
     }
