@@ -51,6 +51,19 @@ $stat_oids_db = array(
     'ifInUcastPkts',
     'ifOutUcastPkts',
 );
+
+$stat_oids_db_extended = array(
+    'ifInNUcastPkts',
+    'ifOutNUcastPkts',
+    'ifInDiscards',
+    'ifOutDiscards',
+    'ifInUnknownProtos',
+    'ifInBroadcastPkts',
+    'ifOutBroadcastPkts',
+    'ifInMulticastPkts',
+    'ifOutMulticastPkts',
+);
+
 // From above for DB
 $etherlike_oids = array(
     'dot3StatsAlignmentErrors',
@@ -203,7 +216,9 @@ d_echo($port_stats);
 // FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
 // -- i can make it a function, so that you don't know what it's doing.
 // -- $ports = adamasMagicFunction($ports_db); ?
-$ports_db = dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($device['device_id']));
+// select * doesn't do what we want if multiple tables have the same column name -- last one wins :/
+$ports_db = dbFetchRows('SELECT *, `ports_statistics`.`port_id` AS `ports_statistics_port_id`, `ports`.`port_id` AS `port_id` FROM `ports` LEFT OUTER JOIN `ports_statistics` ON `ports`.`port_id` = `ports_statistics`.`port_id` WHERE `ports`.`device_id` = ?', array($device['device_id']));
+
 foreach ($ports_db as $port) {
     $ports[$port['ifIndex']] = $port;
 }
@@ -214,6 +229,7 @@ foreach ($port_stats as $ifIndex => $port) {
         echo 'valid';
         if (!is_array($ports[$port['ifIndex']])) {
             $port_id                 = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
+            dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port['ifIndex']] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
             echo 'Adding: '.$port['ifName'].'('.$ifIndex.')('.$ports[$port['ifIndex']]['port_id'].')';
             // print_r($ports);
@@ -221,6 +237,10 @@ foreach ($port_stats as $ifIndex => $port) {
         else if ($ports[$ifIndex]['deleted'] == '1') {
             dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($ports[$ifIndex]['port_id']));
             $ports[$ifIndex]['deleted'] = '0';
+        }
+        if ($ports[$ifIndex]['ports_statistics_port_id'] === null) {
+            // in case the port was created before we created the table
+            dbInsert(array('port_id' => $ports[$ifIndex]['port_id']), 'ports_statistics');
         }
     }
     else {
@@ -247,6 +267,7 @@ foreach ($ports as $port) {
         $polled_period = ($polled - $port['poll_time']);
 
         $port['update'] = array();
+        $port['update_extended'] = array();
         $port['state']  = array();
 
         if ($config['slow_statistics'] == true) {
@@ -411,10 +432,17 @@ foreach ($ports as $port) {
 
         // End parse ifAlias
         // Update IF-MIB metrics
-        foreach ($stat_oids_db as $oid) {
+        $_stat_oids = array_merge($stat_oids_db, $stat_oids_db_extended);
+        foreach ($_stat_oids as $oid) {
+            $port_update = 'update';
+            $extended_metric = !in_array($oid, $stat_oids_db, true);
+            if ($extended_metric) {
+                $port_update = 'update_extended';
+            }
+
             if ($config['slow_statistics'] == true) {
-                $port['update'][$oid]         = $this_port[$oid];
-                $port['update'][$oid.'_prev'] = $port[$oid];
+                $port[$port_update][$oid]         = $this_port[$oid];
+                $port[$port_update][$oid.'_prev'] = $port[$oid];
             }
 
             $oid_prev = $oid.'_prev';
@@ -430,8 +458,8 @@ foreach ($ports as $port) {
                 $port['stats'][$oid.'_diff'] = $oid_diff;
 
                 if ($config['slow_statistics'] == true) {
-                    $port['update'][$oid.'_rate']  = $oid_rate;
-                    $port['update'][$oid.'_delta'] = $oid_diff;
+                    $port[$port_update][$oid.'_rate']  = $oid_rate;
+                    $port[$port_update][$oid.'_delta'] = $oid_diff;
                 }
 
                 d_echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n");
@@ -559,6 +587,8 @@ foreach ($ports as $port) {
         // Update Database
         if (count($port['update'])) {
             $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port['port_id']));
+            // do we want to do something else with this?
+            $updated += dbUpdate($port['update_extended'], 'ports_statistics', '`port_id` = ?', array($port['port_id']));
             d_echo("$updated updated");
         }
 
