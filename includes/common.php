@@ -955,12 +955,6 @@ function search_phrase_column($c)
 } // search_phrase_column
 
 
-function quote_sql_word($c)
-{
-    return "`$c`";
-} // quote_sql_word
-
-
 /**
  * Constructs the path to an RRD for the Ceph application
  * @param string $gtype The type of rrd we're looking for

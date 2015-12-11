@@ -37,7 +37,7 @@ $wheresql = ' WHERE `device_id` = ?';
 
 // all columns are searchable - search across them
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $searchsql = implode(' OR ', array_map("search_phrase_column", array_map("quote_sql_word", $columns)));
+    $searchsql = implode(' OR ', array_map("search_phrase_column", array_map("mres", $columns)));
     $wheresql .= " AND ( $searchsql )";
 }
 $sql .= $wheresql;
@@ -51,7 +51,7 @@ if (empty($total)) {
 
 // sort by first three columns by default
 if (!isset($sort) || empty($sort)) {
-    $sort = implode(', ', array_map("quote_sql_word", array_slice($columns, 0, 3)));
+    $sort = implode(', ', array_map("mres", array_slice($columns, 0, 3)));
 }
 $sql .= " ORDER BY $sort";
 
