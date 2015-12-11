@@ -1,0 +1,689 @@
+F5-EM-MIB DEFINITIONS ::= BEGIN
+--================================================================
+-- F5-EM-MIB 
+--     A private enterprise MIB for F5 enterprise management 
+--     systems.
+--     VERSION: PRODUCT_VERSION
+--================================================================
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, Opaque, enterprises, Counter32, Counter64
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, MacAddress,  DisplayString, DateAndTime
+        FROM SNMPv2-TC 
+
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+
+    InetAddress, InetAddressType
+      FROM INET-ADDRESS-MIB
+
+    bigipCompliances, bigipGroups, LongDisplayString, f5
+      FROM F5-BIGIP-COMMON-MIB;
+
+--================================================================
+enterpriseManagement MODULE-IDENTITY
+    LAST-UPDATED "201202072039Z" -- Tue Feb 07 20:39:15 UTC 2012
+    ORGANIZATION "F5 Networks, Inc."
+    CONTACT-INFO
+         "postal: F5 Networks, Inc. 
+	 	  401 Elliott Ave. West 
+                  Seattle, WA 98119
+          phone:  (206) 272-5555
+          email:  support@f5.com"
+
+    DESCRIPTION
+        "Top-level infrastructure of the F5 enterprise MIB tree." 
+    ::= { f5 3 }
+
+--================================================================
+
+-- enterpriseManagement
+emDevices               OBJECT IDENTIFIER ::= { enterpriseManagement 1 }
+emDeviceGroups          OBJECT IDENTIFIER ::= { enterpriseManagement 2 }
+emImages                OBJECT IDENTIFIER ::= { enterpriseManagement 3 }
+emArchives              OBJECT IDENTIFIER ::= { enterpriseManagement 4 }
+emGlobals               OBJECT IDENTIFIER ::= { enterpriseManagement 5 }
+emAlert                 OBJECT IDENTIFIER ::= { enterpriseManagement 6 }
+emAlerts                OBJECT IDENTIFIER ::= { emAlert 0 }
+emAlertObjects          OBJECT IDENTIFIER ::= { emAlert 1 }
+emAlertConfigObjects    OBJECT IDENTIFIER ::= { emAlerts 0 }
+
+--emDevices
+emDeviceList            OBJECT IDENTIFIER ::= { emDevices 1 }
+
+--==================================================================
+-- emDevices
+--==================================================================
+
+--emDeviceList
+deviceNumber OBJECT-TYPE 
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of device entries in the table."
+	::= { emDeviceList 1 } 
+
+deviceEntryTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF DeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table of device."
+	::= { emDeviceList 2 } 
+
+deviceEntry OBJECT-TYPE
+	SYNTAX  DeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the deviceEntry Table"
+	INDEX {
+		deviceName
+	}
+	::= { deviceEntryTable 1 } 
+
+DeviceEntry ::= 
+	SEQUENCE {
+        	deviceName                               DisplayString,
+        	deviceAddressType                        InetAddressType,
+        	deviceAddress                            InetAddress
+	}
+
+deviceName OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The name of the device."
+	::= { deviceEntry 1 } 
+
+deviceAddressType OBJECT-TYPE 
+	SYNTAX InetAddressType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of IP address of the device."
+	::= { deviceEntry 2 } 
+
+deviceAddress OBJECT-TYPE 
+	SYNTAX InetAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IP address of the device."
+	::= { deviceEntry 3 } 
+
+--==================================================================
+-- emDevicGroups
+--==================================================================
+groupNumber OBJECT-TYPE 
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of group entries in the table."
+	::= { emDeviceGroups 1 } 
+
+groupEntryTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF GroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table of groups."
+	::= { emDeviceGroups 2 } 
+
+groupEntry OBJECT-TYPE
+	SYNTAX  GroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the groupEntry Table"
+	INDEX {
+		groupName
+	}
+	::= { groupEntryTable 1 } 
+
+GroupEntry ::= 
+	SEQUENCE {
+        	groupName                               DisplayString,
+        	groupDescription                        DisplayString
+	}
+
+groupName OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A name for a group of managed devices."
+	::= { groupEntry 1 } 
+
+groupDescription OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A description of a group of managed devices."
+	::= { groupEntry 2 } 
+
+--==================================================================
+-- emImages
+--==================================================================
+imageNumber OBJECT-TYPE 
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of image entries in the table."
+	::= { emImages 1 } 
+
+imageEntryTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF ImageEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table of images."
+	::= { emImages 2 } 
+
+imageEntry OBJECT-TYPE
+	SYNTAX  ImageEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Columns in the imageEntry Table"
+	INDEX {
+		imageVersion
+	}
+	::= { imageEntryTable 1 } 
+
+ImageEntry ::= 
+	SEQUENCE {
+        	imageVersion                               DisplayString,
+        	imageDescription                           DisplayString
+	}
+
+imageVersion OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The software version, including build number and hotfixes."
+	::= { imageEntry 1 } 
+
+imageDescription OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Further details about the contents of an iso image."
+	::= { imageEntry 2 } 
+
+--==================================================================
+-- emArchives
+--==================================================================
+archiveNumber OBJECT-TYPE 
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The number of archive entries in the table."
+	::= { emArchives 1 } 
+
+archiveEntryTable OBJECT-TYPE 
+	SYNTAX SEQUENCE OF ArchiveEntry
+	MAX-ACCESS not-accessible
+	STATUS obsolete
+	DESCRIPTION
+		"The table of archives."
+	::= { emArchives 2 } 
+
+archiveEntry OBJECT-TYPE
+	SYNTAX  ArchiveEntry
+	MAX-ACCESS not-accessible
+	STATUS obsolete
+	DESCRIPTION
+		"Columns in the archiveEntry Table"
+	INDEX {
+		archiveSourceDevice
+	}
+	::= { archiveEntryTable 1 } 
+
+
+ArchiveEntry ::= 
+	SEQUENCE {
+        	archiveSourceDevice                          DisplayString,
+        	archiveProduct                               DisplayString,
+        	archiveVersion                               DisplayString,
+        	archiveTimeStamp                             DateAndTime,
+        	archiveFilename                              DisplayString,
+        	archiveDescription                           DisplayString
+	}
+
+
+archiveSourceDevice OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The name of the device from which the archive came."
+	::= { archiveEntry 1 } 
+
+archiveProduct OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The type of software running on the device from which the
+archive came."
+	::= { archiveEntry 2 } 
+
+archiveVersion OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The software version, including build number, of the device
+from which the archive came."
+	::= { archiveEntry 3 } 
+
+archiveTimeStamp OBJECT-TYPE 
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The date and time that the archive was created."
+	::= { archiveEntry 4 } 
+
+archiveFilename OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The name of the file, not including path, of the device archive."
+	::= { archiveEntry 5 } 
+
+archiveDescription OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"User supplied details regarding the archive."
+	::= { archiveEntry 6 } 
+
+
+--==================================================================
+-- emGlobals
+--==================================================================
+emMaxConcurrentUpdates OBJECT-TYPE 
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The maximum number of simultaneous updates."
+	::= { emGlobals 1 } 
+
+emRefreshInterval OBJECT-TYPE 
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"The interval between device status updates."
+	::= { emGlobals 2 } 
+
+emVersion OBJECT-TYPE 
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Version of the EM software."
+	::= { emGlobals 3 } 
+
+
+--================================================================
+-- emAlertObjects
+--
+emAlertObjMsg OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The additional information about the related alert."
+        ::= { emAlertObjects 1 }
+
+--==================================================================
+-- emNotifications
+--==================================================================
+
+emDeviceUnreachable        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"An managed device is unreachable."
+	::= { emAlerts 1 }
+
+emSoftwareInstallComplete        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"Software installation has completed."
+	::= { emAlerts 2 }
+
+emSoftwareInstallFailed        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"Software installation has failed."
+	::= { emAlerts 3 }
+
+emDeviceClockSkew        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A device clock is out of sync with EM."
+	::= { emAlerts 4 }
+
+emDiskUsage        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A disk partition is exceeding configured usage limits."
+	::= { emAlerts 5 }
+
+emMemoryUsage        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"The system memory is exceeding configured usage limits."
+	::= { emAlerts 6 }
+
+emHotfixInstallComplete        NOTIFICATION-TYPE
+       OBJECTS {
+                 emAlertObjMsg
+         }
+       STATUS      current
+       DESCRIPTION 
+               "A hotfix has been installed on a managed device."
+       ::= { emAlerts 7 }
+
+emHotfixInstallFailed        NOTIFICATION-TYPE
+       OBJECTS {
+                 emAlertObjMsg
+         }
+       STATUS      current
+       DESCRIPTION 
+               "A hotfix installation has failed."
+       ::= { emAlerts 8 }
+
+emCpuUsage        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"The cpu is exceeding configured usage limits."
+	::= { emAlerts 9 }
+
+emCertificateExpiration        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A device certificate will expire soon."
+	::= { emAlerts 10 }
+
+emScheduledArchiveFailed        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A scheduled configuration archive failed."
+	::= { emAlerts 11 }
+
+emDeviceActiveMode        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A device changed from non-ACTIVE to ACTIVE state."
+	::= { emAlerts 12 }
+
+emDeviceStandbyMode        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A device changed from non-STANDBY to STANDBY state."
+	::= { emAlerts 13 }
+
+emDeviceConfigSync        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A device's configuration is out of sync with its peer."
+	::= { emAlerts 14 }
+
+emRaidDriveFailureDetected        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"The system RAID drive failure has been detected."
+	::= { emAlerts 15 }
+
+
+emRaidDriveRebuildComplete        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"The system RAID drive rebuild is complete."
+	::= { emAlerts 16 }
+
+--emFirmwareInstallComplete        NOTIFICATION-TYPE
+--	OBJECTS {
+--                emAlertObjMsg
+--        }
+--	STATUS      current
+--	DESCRIPTION 
+--		"A firmware has been installed on a managed device."
+--	::= { emAlerts 17 }
+
+--emFirmwareInstallFailed        NOTIFICATION-TYPE
+--	OBJECTS {
+--                emAlertObjMsg
+--        }
+--	STATUS      current
+--	DESCRIPTION 
+--		"A firmware installation has failed."
+--	::= { emAlerts 18 }
+
+emHaSyncFailed        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"EM HA Sync has failed."
+	::= { emAlerts 19 }
+
+emASMSigInstallComplete        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"ASM signature has been installed on a managed device."
+	::= { emAlerts 20 }
+
+emASMSigInstallFailed        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"ASM signature installation has failed."
+	::= { emAlerts 21 }
+
+emASMSigUpdateAvailable        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"ASM signature update is available."
+	::= { emAlerts 22 }
+
+emASMSigUpdateFailed        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"ASM signature update failed."
+	::= { emAlerts 23 }
+
+
+emPerformanceStorageDays        NOTIFICATION-TYPE
+        OBJECTS {
+                emAlertObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Performance storage capacity is about to fall below configured number of days."
+        ::= { emAlerts 25 }
+
+
+emPerformanceStorageCap        NOTIFICATION-TYPE
+        OBJECTS {
+                emAlertObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Performance storage capacity is lower than the amount of space reserved."
+        ::= { emAlerts 26 }
+
+
+emPerformanceThreshold        NOTIFICATION-TYPE
+        OBJECTS {
+                emAlertObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Threshold has been violated for a performance-data object."
+        ::= { emAlerts 27 }
+
+
+emSchedBackupFailed        NOTIFICATION-TYPE
+        OBJECTS {
+                emAlertObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Scheduled performance data backup has failed."
+        ::= { emAlerts 28 }
+
+emStatsCollectionRateCap        NOTIFICATION-TYPE
+        OBJECTS {
+                emAlertObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+                "Performance-monitoring data collection rate exceeds recommended limit"
+        ::= { emAlerts 29 }
+
+emDeviceOfflineMode        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A device changed from non-OFFLINE to OFFLINE state."
+	::= { emAlerts 30 }
+
+emDeviceForcedOfflineMode        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"A device changed from non-FORCED OFFLINE to FORCED OFFLINE state."
+	::= { emAlerts 31 }
+
+emServiceContractExpiry        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"Device service contract will expire soon."
+	::= { emAlerts 32 }
+
+emStatsDBConnectivityLost        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"Statistics database connectivity is lost."
+	::= { emAlerts 33 }
+
+emGatherServiceContractFailure        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"Gathering service contract end date failed."
+	::= { emAlerts 34 }
+
+emDeviceImpaired        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"An managed device is impaired."
+	::= { emAlerts 35 }
+
+emStatsDBConnectivityRestored        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      current
+	DESCRIPTION 
+		"Statistics database connectivity is restored."
+	::= { emAlerts 36 }
+
+emDeviceConfigSettingChanged        NOTIFICATION-TYPE
+	OBJECTS {
+                emAlertObjMsg
+        }
+	STATUS      obsolete
+	DESCRIPTION 
+		"A configuration has been changed on a device."
+	::= { emAlertConfigObjects 1 }
+
+END
