@@ -492,7 +492,11 @@ if(is_file("includes/print-menubar-custom.inc.php")) {
 <?php
 
     $notifications = new ObjCache('notifications');
-    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons"></i><span class="badge badge-navbar-user">'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
+    $style = '';
+    if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
+        $style = 'style="background-color:grey; color:white;"';
+    }
+    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons"></i><span class="badge badge-navbar-user" '.$style.'>'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
 ?>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
@@ -510,7 +514,7 @@ if ($_SESSION['authenticated']) {
          </ul>
        </li>
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
+        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
 <?php
