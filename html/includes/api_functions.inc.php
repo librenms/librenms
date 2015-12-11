@@ -997,7 +997,7 @@ function update_device() {
         $message = 'Device field is not allowed to be updated';
     }
     else {
-        if (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id))) {
+        if (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
             $status = 'ok';
             $message = 'Device ' . mres($data['field']) . ' field has been updated';
             $code = 200;
