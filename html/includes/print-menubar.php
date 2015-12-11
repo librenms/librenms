@@ -490,7 +490,6 @@ if(is_file("includes/print-menubar-custom.inc.php")) {
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
 <?php
-
     $notifications = new ObjCache('notifications');
     $style = '';
     if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
@@ -501,8 +500,10 @@ if(is_file("includes/print-menubar-custom.inc.php")) {
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
           <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
-          <li role="presentation" class="dropdown-header"> Notifications</li>
-          <li><a href="notifications/"><i class="fa fa-envelope-o fa-fw fa-lg"></i> Notifications</a></li>
+<?php
+    $notifications = new ObjCache('notifications');
+    echo ('<li><a href="notifications/"><span class="badge count-notif">'.($notifications['sticky_count']+$notifications['count']).'</span> Notifications</a></li>');
+?>
           <li role="presentation" class="divider"></li>
 <?php 
 
