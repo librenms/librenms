@@ -1054,6 +1054,7 @@ function get_devices_by_group() {
     $router   = $app->router()->getCurrentRoute()->getParams();
     $status   = 'error';
     $code     = 404;
+    $count    = 0;
     $name = urldecode($router['name']);
     $devices = array();
     if (empty($name)) {
