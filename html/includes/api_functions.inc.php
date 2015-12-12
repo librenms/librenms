@@ -1048,3 +1048,38 @@ function get_device_groups() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 }
+
+function get_devices_by_group() {
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $status   = 'error';
+    $code     = 404;
+    $name = urldecode($router['name']);
+    $devices = array();
+    if (empty($name)) {
+        $message = 'No device group name provided';
+    }
+    else {
+        $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?",array($name));
+        $devices = GetDevicesFromGroup($group_id);
+        $count = count($devices);
+        if (empty($devices)) {
+            $message = 'No devices found in group ' . $name;
+        }
+        else {
+            $message = "Found $count in group $name";
+            $code = 200;
+        }
+    }
+    $output = array(
+        'status'  => $status,
+        'message' => $message,
+        'count'   => $count,
+        'devices' => $devices,
+    );
+
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+
+}
