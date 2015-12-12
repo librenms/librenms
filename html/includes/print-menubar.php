@@ -488,12 +488,34 @@ if(is_file("includes/print-menubar-custom.inc.php")) {
          </div>
      </form>
     <ul class="nav navbar-nav navbar-right">
-<?php
-$notifications = new ObjCache('notifications');
-echo '       <li><a href="notifications/"><span class="badge count-notif">'.($notifications['sticky_count']+$notifications['count']).'</span></a></li>';
-?>
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
+<?php
+    $notifications = new ObjCache('notifications');
+    $style = '';
+    if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
+        $style = 'style="background-color:grey; color:white;"';
+    }
+    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons"></i><span class="badge badge-navbar-user" '.$style.'>'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
+?>
+        <ul class="dropdown-menu">
+          <li role="presentation" class="dropdown-header"> Settings</li>
+          <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
+<?php
+    $notifications = new ObjCache('notifications');
+    echo ('<li><a href="notifications/"><span class="badge count-notif">'.($notifications['sticky_count']+$notifications['count']).'</span> Notifications</a></li>');
+?>
+          <li role="presentation" class="divider"></li>
+<?php 
+
+if ($_SESSION['authenticated']) {
+    echo('
+           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg"></i> Logout</a></li>');
+}
+?>
+         </ul>
+       </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
 <?php
@@ -502,7 +524,6 @@ if ($_SESSION['userlevel'] >= '10') {
 }
 
 ?>
-          <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
           <li role="presentation" class="divider"></li>
           <li role="presentation" class="dropdown-header"> Users</li>
 
@@ -550,8 +571,7 @@ if ($_SESSION['authenticated']) {
                <ul class="dropdown-menu scrollable-menu">
                    <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
                </ul>
-           </li>
-           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg"></i> Logout</a></li>');
+           </li>');
 }
 ?>
 
