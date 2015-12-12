@@ -62,6 +62,12 @@ $app->group(
                 // api/v0/devices
                 $app->post('/devices', 'authToken', 'add_device')->name('add_device');
                 // api/v0/devices (json data needs to be passed)
+                $app->group(
+                    '/devicegroups',
+                    function () use ($app) {
+                        $app->get('/:name', 'authToken', 'get_devices_by_group')->name('get_devices_by_group');
+                    }
+                );
                 $app->get('/devicegroups', 'authToken', 'get_device_groups')->name('get_devicegroups');
                 $app->group(
                     '/portgroups',
