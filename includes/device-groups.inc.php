@@ -99,7 +99,6 @@ function GetDeviceGroups() {
 
 }//end GetDeviceGroups()
 
-
 /**
  * Get all groups of Device
  * @param integer $device Device-ID
@@ -110,6 +109,23 @@ function GetGroupsFromDevice($device) {
     foreach (GetDeviceGroups() as $group) {
         if (dbFetchCell(GenGroupSQL($group['pattern'], 'device_id=?').' LIMIT 1', array($device)) == $device) {
             $ret[] = $group['id'];
+        }
+    }
+
+    return $ret;
+
+}//end GetGroupsFromDevice()
+
+/**
+ * Get all groups of Device
+ * @param integer $device Device-ID
+ * @return array
+ */
+function GetFullGroupsFromDevice($device) {
+    $ret = array();
+    foreach (GetDeviceGroups() as $group) {
+        if (dbFetchCell(GenGroupSQL($group['pattern'], 'device_id=?').' LIMIT 1', array($device)) == $device) {
+            $ret[] = $group;
         }
     }
 
