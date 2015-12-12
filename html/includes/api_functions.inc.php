@@ -13,7 +13,7 @@
  */
 
 require_once '../includes/functions.php';
-
+require_once '../includes/device-groups.inc.php';
 
 function authToken(\Slim\Route $route) {
     $app   = \Slim\Slim::getInstance();
@@ -1009,6 +1009,40 @@ function update_device() {
     $output = array(
         'status'  => $status,
         'message' => $message,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function get_device_groups() {
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $status   = 'error';
+    $code     = 404;
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $groups = GetFullGroupsFromDevice($device_id);
+    }
+    else {
+        $groups = GetDeviceGroups();
+    }
+    if (empty($groups)) {
+        $message = 'No device groups found';
+    }
+    else {
+        $status = 'ok';
+        $code = 200;
+        $message = 'Found ' . count($groups) . ' device groups';
+    }
+
+    $output = array(
+        'status'  => $status,
+        'message' => $message,
+        'count'   => count($groups),
+        'groups'  => $groups,
     );
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');

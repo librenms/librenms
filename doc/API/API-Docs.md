@@ -19,6 +19,9 @@
         - [`add_device`](#api-route-11)
         - [`list_oxidized`](#api-route-21)
         - [`update_device_field`](#api-route-update_device_field)
+        - [`get_device_groups`](#api-route-get_device_groups)
+    - [`devicegroups`](#api-devicegroups)
+        - [`get_devicegroups`](#api-route-get_devicegroups)
     - [`routing`](#api-routing)
         - [`list_bgp`](#api-route-1)
     - [`switching`](#api-switching)
@@ -486,6 +489,76 @@ Output:
     {
         "status": "ok",
         "message": "Device notes has been updated"
+    }
+]
+```
+
+### <a name="api-route-get_device_groups">Function `get_device_groups`</a> [`top`](#top)
+
+List the device groups that a device is matched on.
+
+Route: /api/v0/devices/:hostname/groups
+
+Input (JSON):
+
+  -
+
+Examples:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/groups
+```
+
+Output:
+```text
+[
+    {
+        "status": "ok",
+        "message": "Found 1 device groups",
+        "count": 1,
+        "groups": [
+        {
+            "id": "1",
+            "name": "Testing",
+            "desc": "Testing",
+            "pattern": "%devices.status = \"1\" &&"
+        }
+        ]
+    }
+]
+```
+
+## <a name="api-devicegroups">`Device Groups`</a> [`top`](#top)
+
+### <a name="api-route-get_devicegroups">Function `get_devicegroups`</a> [`top`](#top)
+
+List all device groups.
+
+Route: /api/v0/devicegroups
+
+Input (JSON):
+
+  -
+
+Examples:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups
+```
+
+Output:
+```text
+[
+    {
+        "status": "ok",
+        "message": "Found 1 device groups",
+        "count": 1,
+        "groups": [
+        {
+            "id": "1",
+            "name": "Testing",
+            "desc": "Testing",
+            "pattern": "%devices.status = \"1\" &&"
+        }
+        ]
     }
 ]
 ```
