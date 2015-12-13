@@ -151,7 +151,7 @@ if ($device['os'] == 'pbn' && $config['autodiscovery']['xdp'] === true) {
                     if (!$remote_device_id && $remote_mac_address) {
                         $remote_device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE ifPhysAddress = ? AND `deleted` = ?', array($remote_mac_address, '0'));
                         if ($remote_device_id) {
-                            $remote_device_hostname = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', $remote_device_id);
+                            $remote_device_hostname = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = ?', array($remote_device_id));
                         }    
                         if ($remote_device_hostname['hostname']) {
                             $lldp['lldpRemSysName'] = $remote_device_hostname['hostname'];
