@@ -1024,7 +1024,7 @@ function get_device_groups() {
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $groups = GetFullGroupsFromDevice($device_id);
+        $groups = GetGroupsFromDevice($device_id,1);
     }
     else {
         $groups = GetDeviceGroups();
