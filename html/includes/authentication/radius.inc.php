@@ -16,7 +16,6 @@ function authenticate($username, $password) {
         }
         $rad = $radius->AccessRequest($username,$password);
         if($rad === true) {
-            $user_authenticated = 1;
             adduser($username);
             return 1;
         }
@@ -52,7 +51,9 @@ function auth_usermanagement() {
 function adduser($username, $password, $level=1, $email='', $realname='', $can_modify_passwd=0, $description='', $twofactor=0) {
     // Check to see if user is already added in the database
     if (!user_exists($username)) {
-        $userid = dbInsert(array('username' => $username, 'realname' => '', 'email' => '', 'descr' => '', 'level' => $level, 'can_modify_passwd' => 0, 'twofactor' => 0), 'users');
+        $hasher    = new PasswordHash(8, false);
+        $encrypted = $hasher->HashPassword($password);
+        $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor), 'users');
         if ($userid == false) {
             return false;
         }
@@ -83,7 +84,7 @@ function get_userid($username) {
 }
 
 
-function deluser() {
+function deluser($username) {
     dbDelete('bill_perms', '`user_name` =  ?', array($username));
     dbDelete('devices_perms', '`user_name` =  ?', array($username));
     dbDelete('ports_perms', '`user_name` =  ?', array($username));
