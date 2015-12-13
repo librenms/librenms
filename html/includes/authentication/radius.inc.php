@@ -49,7 +49,7 @@ function auth_usermanagement() {
 }
 
 
-function adduser($username, $password, $level=0, $email='', $realname='', $can_modify_passwd=0, $description='', $twofactor=0) {
+function adduser($username, $password, $level=1, $email='', $realname='', $can_modify_passwd=0, $description='', $twofactor=0) {
     // Check to see if user is already added in the database
     if (!user_exists($username)) {
         $userid = dbInsert(array('username' => $username, 'realname' => '', 'email' => '', 'descr' => '', 'level' => $level, 'can_modify_passwd' => 0, 'twofactor' => 0), 'users');
