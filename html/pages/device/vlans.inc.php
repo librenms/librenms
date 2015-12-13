@@ -77,13 +77,19 @@ print_optionbar_end();
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
 
 $i = '1';
+if(empty($vars['vrf-lite'])){
+    $vlansTmp=dbFetchRows("SELECT * FROM `vlans` V WHERE `device_id` = ? ORDER BY 'vlan_vlan'", array($device['device_id']));
+}
+else{
+    $vlansTmp=dbFetchRows("SELECT V.* FROM `vlans` V join ports_vlans PV on PV.vlan=V.vlan_vlan and PV.device_id=V.device_id join ports I on I.port_id=PV.port_id join vrf_lite_cisco VR on PV.device_id=VR.device_id join ipv4_addresses I4A on I4A.context_name=VR.context_name and I.port_id=I4A.port_id and I.device_id=VR.device_id AND V.device_id=I.device_id where V.device_id = ? and VR.vrf_name = ?", array($device['device_id'],$vars['vrf-lite']));
+}
 
-foreach (dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ? ORDER BY 'vlan_vlan'", array($device['device_id'])) as $vlan) {
+foreach ($vlansTmp as $vlan) {
     include 'includes/print-vlan.inc.php';
 
     $i++;
 }
-
+unset($vlansTmp);
 echo '</table>';
 
 $pagetitle[] = 'VLANs';
