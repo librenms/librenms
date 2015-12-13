@@ -31,43 +31,54 @@ echo('
     <div class="col-md-12">
       &nbsp;
     </div>
-  </div>
-  <div class="row">
+  </div>');
+ 
+if(empty($vars['vrf-lite'])){
+    include("overview/eventlog.inc.php");
+    include("overview/syslog.inc.php");
+}
+
+echo ('<div class="row">
     <div class="col-md-6">
 ');
 require 'includes/dev-overview-data.inc.php';
 Plugins::call('device_overview_container',array($device));
 
 require 'overview/ports.inc.php';
+include("overview/vrf_lite_cisco.inc.php");
+
 echo('
     </div>
     <div class="col-md-6">
 ');
-// Right Pane
-require 'overview/processors.inc.php';
-require 'overview/mempools.inc.php';
-require 'overview/storage.inc.php';
 
-if(is_array($entity_state['group']['c6kxbar'])) {
-    require 'overview/c6kxbar.inc.php';
+//add vrf_lite_cisco to the view
+if(empty($vars['vrf-lite'])){
+    // Right Pane
+    require 'overview/processors.inc.php';
+    require 'overview/mempools.inc.php';
+    require 'overview/storage.inc.php';
+
+    if(is_array($entity_state['group']['c6kxbar'])) {
+        require 'overview/c6kxbar.inc.php';
+    }
+
+    require 'overview/toner.inc.php';
+    require 'overview/sensors/charge.inc.php';
+    require 'overview/sensors/temperatures.inc.php';
+    require 'overview/sensors/humidity.inc.php';
+    require 'overview/sensors/fanspeeds.inc.php';
+    require 'overview/sensors/dbm.inc.php';
+    require 'overview/sensors/voltages.inc.php';
+    require 'overview/sensors/current.inc.php';
+    require 'overview/sensors/power.inc.php';
+    require 'overview/sensors/frequencies.inc.php';
+    require 'overview/sensors/load.inc.php';
+    require 'overview/sensors/state.inc.php';
+    require 'overview/eventlog.inc.php';
+    require 'overview/services.inc.php';
+    require 'overview/syslog.inc.php';
 }
-
-require 'overview/toner.inc.php';
-require 'overview/sensors/charge.inc.php';
-require 'overview/sensors/temperatures.inc.php';
-require 'overview/sensors/humidity.inc.php';
-require 'overview/sensors/fanspeeds.inc.php';
-require 'overview/sensors/dbm.inc.php';
-require 'overview/sensors/voltages.inc.php';
-require 'overview/sensors/current.inc.php';
-require 'overview/sensors/power.inc.php';
-require 'overview/sensors/frequencies.inc.php';
-require 'overview/sensors/load.inc.php';
-require 'overview/sensors/state.inc.php';
-require 'overview/eventlog.inc.php';
-require 'overview/services.inc.php';
-require 'overview/syslog.inc.php';
-
 echo('</div></div></div>');
 
 #require 'overview/current.inc.php");

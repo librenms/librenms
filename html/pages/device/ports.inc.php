@@ -33,21 +33,28 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'")) {
     $menu_options['adsl'] = 'ADSL';
 }
 
+$urlTmp=array('view'=>'');
+
+if(!empty($vars['vrf-lite'])){
+ $urlTmp= array_merge($urlTmp,array('vrf-lite'=>$vars['vrf-lite']));
+}
+
 $sep = '';
 foreach ($menu_options as $option => $text) {
+    $urlTmp['view']=$option;
     echo $sep;
     if ($vars['view'] == $option) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $link_array, array('view' => $option));
+    echo generate_link($text, $link_array, $urlTmp);
     if ($vars['view'] == $option) {
         echo '</span>';
     }
 
     $sep = ' | ';
 }
-
+unset($urlTmp);
 unset($sep);
 
 echo ' | Graphs: ';
@@ -60,13 +67,20 @@ $graph_types = array(
     'etherlike' => 'Etherlike',
 );
 
+$urlTmp=array('view'=>'graphs','graph'=>$type);
+if(!empty($vars['vrf-lite'])){
+    $urlTmp= array_merge($urlTmp,array('vrf-lite'=>$vars['vrf-lite']));
+}
+
 foreach ($graph_types as $type => $descr) {
     echo "$type_sep";
+    $urlTmp['view']='graphs';
+    $urlTmp['graph']=$type; 
     if ($vars['graph'] == $type && $vars['view'] == 'graphs') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($descr, $link_array, array('view' => 'graphs', 'graph' => $type));
+    echo generate_link($descr, $link_array, $urlTmp);
     if ($vars['graph'] == $type && $vars['view'] == 'graphs') {
         echo '</span>';
     }
@@ -75,8 +89,8 @@ foreach ($graph_types as $type => $descr) {
     if ($vars['graph'] == $type && $vars['view'] == 'minigraphs') {
         echo "<span class='pagemenu-selected'>";
     }
-
-    echo generate_link('Mini', $link_array, array('view' => 'minigraphs', 'graph' => $type));
+    $urlTmp['view']='minigraphs';
+    echo generate_link('Mini', $link_array, $urlTmp);
     if ($vars['graph'] == $type && $vars['view'] == 'minigraphs') {
         echo '</span>';
     }
@@ -99,7 +113,13 @@ if ($vars['view'] == 'minigraphs') {
     unset($seperator);
 
     // FIXME - FIX THIS. UGLY.
-    foreach (dbFetchRows('select * from ports WHERE device_id = ? ORDER BY ifIndex', array($device['device_id'])) as $port) {
+    $portsTmp = array();
+    if(!empty($vars['vrf-lite'])){
+        $portsTmp = dbFetchRows("SELECT I.*, I4A.*, VR.vrf_name, VR.intance_name FROM `ports` I LEFT OUTER JOIN ipv4_addresses I4A on I4A.port_id=I.port_id LEFT OUTER JOIN vrf_lite_cisco VR on VR.context_name=I4A.context_name and VR.device_id=I.device_id where VR.vrf_name=? AND I.device_id=? ORDER BY I.ifIndex ASC", array($device['device_id'],$vars['vrf-lite'],$device['device_id']));
+    }else{
+        $portsTmp = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIndex` ASC", array($device['device_id']));
+    }
+    foreach ($portsTmp as $port) {
         echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
             <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>
             <a href="'.generate_port_url($port)."\" onmouseover=\"return overlib('\
@@ -140,11 +160,16 @@ else {
 
     global $port_cache, $port_index_cache;
 
+     if(!empty($vars['vrf-lite'])){
+        $portsTmp = dbFetchRows("SELECT I.*, I4A.*, VR.vrf_name, VR.intance_name FROM `ports` I join ipv4_addresses I4A on I4A.port_id=I.port_id join vrf_lite_cisco VR on VR.context_name=I4A.context_name and VR.device_id=I.device_id where I.deleted = '0' AND I.device_id = ? AND VR.vrf_name = ? group by I.ifIndex ORDER BY I.ifIndex ASC ", array($device['device_id'],$vars['vrf-lite']));
+    }else{
+        $portsTmp = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
+    }
     $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' ORDER BY `ifIndex` ASC", array($device['device_id']));
     // As we've dragged the whole database, lets pre-populate our caches :)
     // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
 
-    foreach ($ports as $key => $port) {
+    foreach ($portsTmp as $key => $port) {
         $port_cache[$port['port_id']] = $port;
         $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
         $ports[$key]["ifOctets_rate"] = $port["ifInOctets_rate"] + $port["ifOutOctets_rate"];
@@ -159,12 +184,12 @@ else {
         break;
     }
 
-    foreach ($ports as $port) {
+    foreach ($portsTmp as $port) {
         include 'includes/print-interface.inc.php';
         $i++;
     }
 
     echo '</table></div>';
 }//end if
-
+unset($portsTmp);
 $pagetitle[] = 'Ports';
