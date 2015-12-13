@@ -406,8 +406,9 @@ $routing_count['bgp']  = dbFetchCell("SELECT COUNT(bgpPeer_id) from `bgpPeers` L
 $routing_count['ospf'] = dbFetchCell("SELECT COUNT(ospf_instance_id) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled'");
 $routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_switching`");
 $routing_count['vrf']  = dbFetchCell("SELECT COUNT(vrf_id) from `vrfs`");
+$routing_count['route'] = dbFetchCell("SELECT COUNT(ipRouteDest) from `route`");
 
-if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']) > "0") {
+if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']+$routing_count['route']) > "0") {
 
 ?>
         <li class="dropdown">
@@ -415,12 +416,15 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
           <ul class="dropdown-menu">
 <?php
     $separator = 0;
-
+	
     if ($_SESSION['userlevel'] >= '5' && $routing_count['vrf']) {
         echo('            <li><a href="routing/protocol=vrf/"><i class="fa fa-arrows-alt fa-fw fa-lg"></i> VRFs</a></li>');
         $separator++;
     }
-
+    if ($_SESSION['userlevel'] >= '5' && $routing_count['route']){
+            echo('            <li><a href="routing/protocol=route/"><i class="fa fa-exchange fa-fw fa-lg"></i> Routes</a></li>');
+            $separator++;
+        }
     if ($_SESSION['userlevel'] >= '5' && $routing_count['ospf']) {
         if ($separator) {
             echo('            <li role="presentation" class="divider"></li>');
