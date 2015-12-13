@@ -290,6 +290,16 @@ function device_by_id_cache($device_id, $refresh = '0') {
     }
     else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        
+        //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
+        $vrfs_lite_cisco=dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
+        $device['vrf_lite_cisco']=array();
+        if(!empty($vrfs_lite_cisco)){
+            foreach ($vrfs_lite_cisco as $vrf){
+                $device['vrf_lite_cisco'][$vrf['context_name']]=$vrf;
+            }
+        }
+		
         $cache['devices']['id'][$device_id] = $device;
     }
     return $device;
@@ -802,7 +812,7 @@ function ceph_rrd($gtype) {
  * @return array Containing the lat and lng coords
 **/
 function parse_location($location) {
-    preg_match('/(\[)(-?[0-9\. ]+),[ ]*(-?[0-9\. ]+)(\])/', $location, $tmp_loc);
+    preg_match('/(\[)([0-9\. ]+),[ ]*([0-9\. ]+)(\])/', $location, $tmp_loc);
     if (!empty($tmp_loc[2]) && !empty($tmp_loc[3])) {
         return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
     }
