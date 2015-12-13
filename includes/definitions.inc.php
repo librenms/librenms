@@ -1063,6 +1063,7 @@ $config['os'][$os]['icon']             = 'comet';
 $config['os'][$os]['over'][0]['graph'] = 'device_temperature';
 $config['os'][$os]['over'][0]['text']  = 'temperature';
 
+    //printer
 $os = 'dell-laser';
 $config['os'][$os]['group']            = 'printer';
 $config['os'][$os]['text']             = 'Dell Laser';
@@ -1150,6 +1151,13 @@ $config['os'][$os]['over'][0]['text']  = 'Toner';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['type']             = 'printer';
 
+$os ='samsungprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Samsung Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+    
 $os = '3com';
 $config['os'][$os]['text']             = '3Com';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
