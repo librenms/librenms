@@ -137,6 +137,17 @@ L.tileLayer(\'//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\', {
 
 var markers = L.markerClusterGroup({
     maxClusterRadius: ' . $group_radius . ',
+    iconCreateFunction: function (cluster) {
+        var markers = cluster.getAllChildMarkers();
+        var n = 0;
+        newClass = "greenCluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i].options.icon.options.markerColor == "red") {
+                newClass = "redCluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+            }
+        }
+        return L.divIcon({ html: cluster.getChildCount(), className: newClass, iconSize: L.point(40, 40) });
+    },
   });
 var redMarker = L.AwesomeMarkers.icon({
     icon: \'server\',
