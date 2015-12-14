@@ -50,9 +50,13 @@ function auth_usermanagement() {
 
 function adduser($username, $password, $level=1, $email='', $realname='', $can_modify_passwd=0, $description='', $twofactor=0) {
     // Check to see if user is already added in the database
+    global $config;
     if (!user_exists($username)) {
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
+        if ($config['radius']['default_level'] > 0) {
+            $level = $config['radius']['default_level'];
+        }
         $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor), 'users');
         if ($userid == false) {
             return false;
