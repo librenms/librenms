@@ -222,21 +222,16 @@ if (!defined('MBTTF_DIR')) {
     }
 }
 
-//
-// Check minimum PHP version
-//
+/*
+ * Check minimum PHP version
+ * @author f0o <f0o@devilcode.org>
+ * @copyright 2015 f0o, LibreNMS
+ * @license GPL
+ * @package LibreNMS
+ * @subpackage Billing
+ */
 function CheckPHPVersion($aMinVersion) {
-    list($majorC, $minorC, $editC) = preg_split('/[\/.-]/', PHP_VERSION);
-    list($majorR, $minorR, $editR) = preg_split('/[\/.-]/', $aMinVersion);
-
-    if ($majorC != $majorR) return false;
-    if ($majorC < $majorR) return false;
-    // same major - check minor
-    if ($minorC > $minorR) return true;
-    if ($minorC < $minorR) return false;
-    // and same minor
-    if ($editC  >= $editR)  return true;
-    return true;
+    return version_compare(PHP_VERSION, $aMinVersion, '>=');
 }
 
 //
