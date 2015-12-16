@@ -2,7 +2,7 @@
 
 echo 'Doing Nortel/Avaya ERS ';
 
-$sysObjectID = snmp_get($device, 'sysObjectID.0', '-Oqvn');
+$sysObjectID = $poll_device['sysObjectID'];
 
 // Try multiple ways of getting firmware version
 $version = snmp_get($device, 'SNMPv2-SMI::enterprises.2272.1.1.7.0', '-Oqvn');
@@ -17,7 +17,7 @@ if ($version == '') {
 }
 
 // Get hardware details
-$sysDescr = snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Oqvn');
+$sysDescr = $poll_device['sysDescr'];
 
 $details = explode('  ', $sysDescr);
 $details = str_replace('ERS-', 'Ethernet Routing Switch ', $details);
