@@ -12,7 +12,7 @@
 
 $version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
 $hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
+$hostname = trim($poll_device['sysName'],'"');
 
 $usersrrd  = $config['rrd_dir'].'/'.$device['hostname'].'/pulse_users.rrd';
 $users = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
