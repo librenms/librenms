@@ -110,6 +110,7 @@ $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $os = 'infinity';
 $config['os'][$os]['text']             = 'LigoWave Infinity';
 $config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'ligowave';
 $config['os'][$os]['nobulk']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
