@@ -109,6 +109,7 @@ $mapping = array(
 );
 
 $values = array();
+unset($fields);
 foreach ($mapping as $k => $v) {
     $fields[$k] = isset($map[$v]) ? $map[$v] : (-1);
 }
