@@ -44,34 +44,37 @@ function influxdb_connect() {
 
 function influx_update($device,$measurement,$tags=array(),$fields) {
     global $influxdb,$config,$console_color;
-    $tmp_fields = array();
-    $tmp_tags['hostname'] = $device['hostname'];
-    foreach ($tags as $k => $v) {
-        $tmp_tags[$k] = $v;
-    }
-    foreach ($fields as $k => $v) {
-        $tmp_fields[$k] = force_influx_data('f',$v);
-    }
+    if ($influxdb !== false) {
+    echo "AHHHH $influxdb\n";
+        $tmp_fields = array();
+        $tmp_tags['hostname'] = $device['hostname'];
+        foreach ($tags as $k => $v) {
+            $tmp_tags[$k] = $v;
+        }
+        foreach ($fields as $k => $v) {
+            $tmp_fields[$k] = force_influx_data('f',$v);
+        }
         
-    d_echo("\nInfluxDB data:\n");
-    d_echo($measurement);
-    d_echo($tmp_tags);
-    d_echo($tmp_fields);
-    d_echo("\nEND\n");
+        d_echo("\nInfluxDB data:\n");
+        d_echo($measurement);
+        d_echo($tmp_tags);
+        d_echo($tmp_fields);
+        d_echo("\nEND\n");
 
-    if ($config['noinfluxdb'] !== true) {
-        $points = array(
-            new InfluxDB\Point(
-                $measurement,
-                null, // the measurement value
-                $tmp_tags,
-                $tmp_fields // optional additional fields
-            )
-        );
-        $result = $influxdb->writePoints($points);
-    }
-    else {
-        print $console_color->convert('[%gInfluxDB Disabled%n] ', false);
+        if ($config['noinfluxdb'] !== true) {
+            $points = array(
+                new InfluxDB\Point(
+                    $measurement,
+                    null, // the measurement value
+                    $tmp_tags,
+                    $tmp_fields // optional additional fields
+                )
+            );
+            $result = $influxdb->writePoints($points);
+        }
+        else {
+            print $console_color->convert('[%gInfluxDB Disabled%n] ', false);
+        }//end if
     }//end if
 }// end influx_update
 
