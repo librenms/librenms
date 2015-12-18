@@ -105,8 +105,11 @@ if (isset($options['f'])) {
     $config['noinfluxdb'] = true;
 }
 
-if ($config['noinfluxdb'] !== true) {
+if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
     $influxdb = influxdb_connect();
+}
+else {
+    $influxdb = false;
 }
 
 rrdtool_pipe_open($rrd_process, $rrd_pipes);
