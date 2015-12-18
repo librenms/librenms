@@ -34,6 +34,7 @@ function influxdb_connect() {
     }
     else {
         echo 'InfluxDB support enabled but no valid transport details provided';
+        return false;
     }
 
     $db = \InfluxDB\Client::fromDSN($influxdb_conn.'://'.$influxdb_url);
