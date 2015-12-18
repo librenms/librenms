@@ -33,6 +33,13 @@ if (is_array($hrstorage_array)) {
                 break;
         }
 
+        if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
+            $old_rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('storage-hrstorage-'.safename($descr).'.rrd');
+            $new_rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('mempool-hrstorage-'.$storage['hrStorageIndex'].'.rrd');
+            rename($old_rrdfile, $new_rrdfile);
+            $deny = 1;
+        }
+
         foreach ($config['ignore_mount'] as $bi) {
             if ($bi == $descr) {
                 $deny = 1;
