@@ -23,6 +23,7 @@ LibreNMS 3rd party acknowledgements
   - Tag Manager (http://soliantconsulting.github.io/tagmanager/): MIT
   - TW Sack (https://code.google.com/p/tw-sack/): GPLv3
   - Gridster (http://gridster.net/): MIT
+  - Pure PHP radius class (http://developer.sysco.ch/php/): GPLv3
 
 #### 3rd Party GPLv3 Non-compliant
 
