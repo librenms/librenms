@@ -1770,10 +1770,6 @@ if (isset($config['rrdgraph_def_text'])) {
     $config['rrd_opts_array']    = explode(' ', trim($config['rrdgraph_def_text']));
 }
 
-if (!isset($config['log_file'])) {
-    $config['log_file'] = $config['log_dir'].'/'.$config['project_id'].'.log';
-}
-
 if (isset($config['cdp_autocreate'])) {
     $config['dp_autocreate'] = $config['cdp_autocreate'];
 }
@@ -1842,7 +1838,7 @@ if (!isset($config['log_dir'])) {
 }
 
 if (!isset($config['log_file'])) {
-    $config['log_dir'].'/'.$config['project_id'].'.log';
+    $config['log_file'] = $config['log_dir'].'/'.$config['project_id'].'.log';
 }
 
 if (!isset($config['plugin_dir'])) {
