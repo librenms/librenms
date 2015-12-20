@@ -207,7 +207,7 @@ function IsMaintenance( $device ) {
         $where .= " || alert_schedule_items.target = ?";
         $params[] = 'g'.$group;
     }
-    return dbFetchCell('SELECT DISTINCT(alert_schedule.schedule_id) FROM alert_schedule LEFT JOIN alert_schedule_items ON alert_schedule.schedule_id=alert_schedule_items.schedule_id WHERE ( alert_schedule_items.target = ?'.$where.' ) && NOW() BETWEEN alert_schedule.start AND alert_schedule.end LIMIT 1',$params);
+    return dbFetchCell('SELECT alert_schedule.schedule_id FROM alert_schedule LEFT JOIN alert_schedule_items ON alert_schedule.schedule_id=alert_schedule_items.schedule_id WHERE ( alert_schedule_items.target = ?'.$where.' ) && NOW() BETWEEN alert_schedule.start AND alert_schedule.end LIMIT 1',$params);
 }
 
 /**
