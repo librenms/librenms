@@ -1834,3 +1834,24 @@ label {
 
 @media only screen and (min-width: 1024px) {
 }
+
+.redCluster {
+    background-color: rgba(255,0,0);
+    background-color: rgba(255,0,0,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
+.greenCluster {
+    background-color: rgba(0,255,0);
+    background-color: rgba(0,255,0,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: black;
+    border-color:transparent;
+}
