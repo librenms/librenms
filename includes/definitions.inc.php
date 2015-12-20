@@ -1380,6 +1380,14 @@ $config['os'][$os]['icon']             = 'riverbed';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Ligowave LigoOS
+$os = 'ligoos';
+$config['os'][$os]['text']             = 'LigoWave LigoOS';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'ligowave';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Appliances
 $os = 'fortios';
 $config['os'][$os]['text']             = 'FortiOS';
