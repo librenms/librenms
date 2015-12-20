@@ -316,6 +316,7 @@ Input:
  - to: This is the date you would like the graph to end - See http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html for more information.
  - width: The graph width, defaults to 1075.
  - height: The graph height, defaults to 300.
+ - ifDescr: If this is set to true then we will use ifDescr to lookup the port instead of ifName. Pass the ifDescr value you want to search as you would ifName.
 
 Example:
 ```curl
