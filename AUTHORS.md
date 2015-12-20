@@ -75,4 +75,5 @@ Contributors to LibreNMS:
 - Eldon Koyle <ekoyle@gmail.com> (ekoyle)
 - Jonathan Bailey <jcbailey@code0.net> (jcbailey2)
 - Ruairi Carroll <ruairi.carroll@gmail.com> (rucarrol) 
+- Maxim Tsyplakov <maxim.tsyplakov@gmail.com> (tsypa)
 [1]: http://observium.org/ "Observium web site"
