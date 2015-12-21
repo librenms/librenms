@@ -232,7 +232,7 @@ if (is_array($ports)) {
         echo '          '.$portbtn."\n";
         echo "        </div>\n";
         echo "        <div class=\"btn-group\">\n";
-        echo '          <a class="btn btn-danger btn-mini" href="javascript:;" onclick="document.forms[\'delete'.$port['port_id']."\].submit();\" style=\"color: #fff;\"><i class=\"icon-minus-sign icon-white\"></i> <strong>Remove Interface</strong></a>\n";
+        echo '          <a class="btn btn-danger btn-mini" href="javascript:;" onclick="document.forms[\'delete'.$port['port_id']."'].submit();\" style=\"color: #fff;\"><i class=\"icon-minus-sign icon-white\"></i> <strong>Remove Interface</strong></a>\n";
         echo "        </div>\n";
         echo "      </div>\n";
     }//end foreach
