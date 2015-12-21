@@ -62,7 +62,7 @@ function get_graph_by_port_hostname() {
         $vars['to'] = $_GET['to'];
     }
 
-    if (!empty($vars['ifDescr']) == true) {
+    if ($_GET['ifDescr'] == true) {
         $port = 'ifDescr';
     }
     else {
