@@ -281,17 +281,25 @@ Please see the [API-Docs](http://docs.librenms.org/API/API-Docs/#api-route-25) f
 
 ## <a name="alert">Alerting</a>
 
-A default alerting rule exists that will raise an alert for any component which has a status of 0.
-This can be disabled:
- 
-- Globally - by removing the 'Component Alert' alerting rule.
-- Locally - by setting the ignore field of an individual component to 1. 
+It is intended that discovery/poller modules will detect the status of a component during the polling cycle.
+If you are creating a poller module which can detect a fault condition simply set STATUS to 0 and ERROR to a message that indicates the problem.
+
+
+To actually raise an alert, the user will need to create an alert rule. To assist with this several Alerting Macro's have been created:
+
+- ```%macro.component_alert``` - A component that is not disabled or ignored and in alert state.
+- ```%macro.component_normal``` - A component that is not disabled or ignored and NOT in alert state.
+
+To raise alerts for components, the following rules could be created:
+
+- ```%macros.component_alert = "1"``` - To alert on all components
+- ```%macros.component_alert = "1" && %component.type = "<Type of Component>"``` - To alert on all components of a particular type.
+
+If there is a particular component you would like excluded from alerting, simply set the ignore field to 1.
 
 The data that is written to each alert when it is raised is in the following format:
 
 `COMPONENT_TYPE - LABEL - ERROR`
-
-if you are creating a poller module which can detect a fault condition simply set STATUS to 0 and ERROR to a message that indicates the problem.
 
 # <a name="examples">Example Code</a>
 
