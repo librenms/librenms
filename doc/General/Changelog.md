@@ -5,26 +5,59 @@
     - Fixed regex for negative lat/lng coords (PR2524)
     - Fixed map page looping due to device connected to itself (PR2545)
     - Fixed PATH_INFO for nginx (PR2551)
+    - urlencode the custom port types (PR2597)
+    - Stop non-admin users from being able to get to settings pages (PR2627)
+    - Fix JpGraph php version compare (PR2631)
   - Discovery / Polling:
     - Pointed snmp calls for Huawei to correct MIB folder (PR2541)
+    - Fixed Ceph unix-agent support. (PR2588)
+    - Moved memory graphs from storage to memory polling (PR2616)
+    - Mask alert_log mysql output when debug is enabled to stop console crashes (PR2618)
+    - Stop Quanta devices being detected as Ubiquiti (PR2632)
+    - Fix MySQL unix-agent graphs (PR2645)
+    - Added MTA-MIB and NETWORK-SERVICES-MIB to stop warnings printed in poller debug (PR2653)
+  - Services:
+    - Fix SSL check for PHP 7 (PR2647)
   - Alerting:
     - Fix glue-expansion for alerts (PR2522)
+    - Fix HipChat transport (PR2586)
   - Documentation:
     - Removed duplicate mysql-client install from Debian/Ubuntu install docs (PR2543)
+  - Misc:
+    - Update daily.sh to ignore issues writing to log file (PR2595)
 
 #### Improvements
   - WebUI:
     - Converted sensors page to use bootgrid (PR2531)
+    - Added new widgets for dashboard. Notes (PR2582), Generic image (PR2617)
+    - Added config option to disable lazy loading of images (PR2589)
+    - Visual update to Navbar. (PR2593)
+    - Update alert rules to show actual alert rule ID (PR2603)
+    - Initial support added for per user default dashboard (PR2620)
+    - Updated Worldmap to show clusters in red if one device is down (PR2621)
   - Discovery / Polling
     - Added traffic bits as default for Cambium devices (PR2525)
     - Overwrite eth0 port data from UniFi MIBs for AirFibre devices (PR2544)
+    - Added lastupdate column to sensors table for use with alerts (PR2590,PR2592)
+    - Updated auto discovery via lldp to check for devices that use mac address in lldpRemPortId (PR2591)
+    - Updated auto discovery via lldp with absent lldpRemSysName (PR2619)
   - API:
     - Added ability to filter devices by type and os for Oxidized API call (PR2539)
+    - Added ability to update device information (PR2585)
+    - Added support for returning device groups (PR2611)
+    - Added ability to select port graphs based on ifDescr (PR2648)
   - Documentation:
     - Improved alerting docs explaining more options (PR2560)
+    - Added Docs for Ubuntu/Debian Smokeping integration (PR2610)
   - Added detection for:
     - Updated Netonix switch MIBs (PR2523)
     - Updated Fotinet MIBs (PR2529, PR2534)
+    - Cisco SG500 (PR2609)
+    - Updated processor support for Fortigate (PR2613)
+  - Misc:
+    - Updated validation to check for php extension and classes required (PR2602)
+    - Added Radius Authentication support (PR2615)
+    - Removed distinct() from alerts query to use indexes (PR2649)
 
 ### November 2015
 

@@ -31,6 +31,10 @@ if (is_array($storage_array)) {
             break;
         }
 
+        if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
+            $deny = 0;
+        }
+
         if ($device['os'] == 'routeros' && $descr == 'main memory') {
             $deny = 0;
         }
