@@ -31,7 +31,7 @@
  * @param string $search  What to searchid for
  * @return string
  */
-function GenGroupSQL($pattern, $search='') {
+function GenGroupSQL($pattern, $search='',$extra=0) {
     $pattern = RunGroupMacros($pattern);
     if ($pattern === false) {
        return false;
@@ -66,7 +66,11 @@ function GenGroupSQL($pattern, $search='') {
         $search .= ' &&';
     }
 
-    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id) FROM '.implode(',', $tables).' WHERE '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
+    $sql_extra = '';
+    if ($extra === 1) {
+        $sql_extra = ",`devices`.*";
+    }
+    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
     return $sql;
 
 }//end GenGroupSQL()
@@ -99,17 +103,21 @@ function GetDeviceGroups() {
 
 }//end GetDeviceGroups()
 
-
 /**
  * Get all groups of Device
  * @param integer $device Device-ID
  * @return array
  */
-function GetGroupsFromDevice($device) {
+function GetGroupsFromDevice($device,$extra=0) {
     $ret = array();
     foreach (GetDeviceGroups() as $group) {
-        if (dbFetchCell(GenGroupSQL($group['pattern'], 'device_id=?').' LIMIT 1', array($device)) == $device) {
-            $ret[] = $group['id'];
+        if (dbFetchCell(GenGroupSQL($group['pattern'], 'device_id=?',$extra).' LIMIT 1', array($device)) == $device) {
+            if ($extra === 0) {
+                $ret[] = $group['id'];
+            }
+            else {
+                $ret[] = $group;
+            }
         }
     }
 

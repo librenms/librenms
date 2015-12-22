@@ -13,6 +13,8 @@ Here we will provide configuration details for these modules.
 
 - HTTP Auth: http-auth
 
+- Radius: radius
+
 #### User levels
 
 - 1: Normal User. You will need to assign device / port permissions for users at this level.
@@ -124,4 +126,20 @@ $config['auth_ad_base_dn'] = "dc=your-domain,dc=com";
 $config['auth_ad_groups']['admin']['level'] = 10;
 $config['auth_ad_groups']['pfy']['level'] = 7;
 $config['auth_ad_require_groupmembership'] = 0;
+```
+
+#### Radius Authentication
+
+Please note that a mysql user is created for each user the logs in successfully. User level 1 is assigned to those accounts so you will then need to assign the relevant permissions unless you set `$config['radius']['userlevel']` to be something other than 1.
+
+> Cleanup of old accounts is done using the authlog. You will need to set the cleanup date for when old accounts will be purged which will happen AUTOMATICALLY.
+> Please ensure that you set the $config['authlog_purge'] value to be greater than $config['radius']['users_purge'] otherwise old users won't be removed.
+
+```php
+$config['radius']['hostname']   = 'localhost';
+$config['radius']['port']       = '1812';
+$config['radius']['secret']     = 'testing123';
+$config['radius']['timeout']    = 3;
+$config['radius']['users_purge'] = 14;//Purge users who haven't logged in for 14 days.
+$config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user. 
 ```
