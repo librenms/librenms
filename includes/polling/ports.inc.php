@@ -486,7 +486,7 @@ foreach ($ports as $port) {
         $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
-        $tags = array('ifName' => $this_port['ifName'], 'ifSpeed' => $this_port['ifSpeed'], 'port_descr_type' => $this_port['port_descr_type']);
+        $tags = array('ifName' => '"'.$this_port['ifName'].'"', 'ifSpeed' => '"'.$this_port['ifSpeed'].'"', 'port_descr_type' => '"'.$this_port['port_descr_type'].'"');
         influx_update($device,'ports',$tags,$fields);
 
         // End Update IF-MIB
