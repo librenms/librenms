@@ -48,6 +48,10 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
         $tmp_fields = array();
         $tmp_tags['hostname'] = $device['hostname'];
         foreach ($tags as $k => $v) {
+            $v = preg_replace(array('/ /','/,/','/=/'),array('\ ','\,','\='), $v);
+            if (empty($v)) {
+                $v = '_blank_';
+            }
             $tmp_tags[$k] = $v;
         }
         foreach ($fields as $k => $v) {
