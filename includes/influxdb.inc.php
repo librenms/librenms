@@ -45,7 +45,6 @@ function influxdb_connect() {
 function influx_update($device,$measurement,$tags=array(),$fields) {
     global $influxdb,$config,$console_color;
     if ($influxdb !== false) {
-    echo "AHHHH $influxdb\n";
         $tmp_fields = array();
         $tmp_tags['hostname'] = $device['hostname'];
         foreach ($tags as $k => $v) {
