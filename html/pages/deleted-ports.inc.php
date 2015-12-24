@@ -19,8 +19,8 @@ else if ($vars['purge']) {
     echo '<div class=infobox>Deleted '.generate_device_link($interface).' - '.generate_port_link($interface).'</div>';
 }
 
-echo '<table cellpadding=5 cellspacing=0 border=0 width=100%>';
-echo "<tr><td></td><td></td><td></td><td><a href='deleted-ports/purge=all/'><img src='images/16/cross.png' align=absmiddle></img> Purge All</a></td></tr>";
+echo '<table class="table table-hover table-condensed">';
+echo "<tr><td>Device</td><td>Port</td><td></td><td><a href='deleted-ports/purge=all/'><i class='fa fa-times'></i> Purge All</a></td></tr>";
 
 foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id",array(),true) as $interface) {
     $interface = ifLabel($interface, $interface);
@@ -29,7 +29,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` AS P, `devices` as D WHERE P.`delete
         echo '<td width=250>'.generate_device_link($interface).'</td>';
         echo '<td width=250>'.generate_port_link($interface).'</td>';
         echo '<td></td>';
-        echo "<td width=100><a href='deleted-ports/purge=".$interface['port_id']."/'><img src='images/16/cross.png' align=absmiddle></img> Purge</a></td>";
+        echo "<td width=100><a href='deleted-ports/purge=".$interface['port_id']."/'><i class='fa fa-times'></i> Purge</a></td>";
     }
 }
 
