@@ -26,6 +26,11 @@ if (is_numeric($_POST['device_id'])) {
     $param[] = $_POST['device_id'];
 }
 
+if (is_numeric($_POST['port_id'])) {
+    $sql    .= ' AND P.port_id = ?';
+    $param[] = $_POST['port_id'];
+}
+
 $count_sql = "SELECT COUNT(`M`.`port_id`) $sql";
 
 $total = dbFetchCell($count_sql, $param);
