@@ -76,7 +76,7 @@ if ($_POST['addbill'] == 'yes') {
         $message       .= $message_break.'Port '.mres($_POST['port']).' added!';
         $message_break .= '<br />';
     }
-}//end if
+}
 
 $pagetitle[] = 'Billing';
 
@@ -130,10 +130,10 @@ else if ($vars['view'] == 'add') {
         $devicebtn = str_replace('list-device', 'btn', generate_device_link($port));
         $portbtn   = str_replace('interface-upup', 'btn', generate_port_link($port));
         $portalias = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
-        $devicebtn = str_replace('">'.$port['hostname'], '" style="color: #000;"><i class="icon-asterisk"></i> '.$port['hostname'], $devicebtn);
+        $devicebtn = str_replace('">'.$port['hostname'], '" style="color: #000;"><i class="fa fa-asterisk"></i> '.$port['hostname'], $devicebtn);
         $devicebtn = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $devicebtn);
         $devicebtn = str_replace("<div>',;", "</div></div>',", $devicebtn);
-        $portbtn   = str_replace('">'.strtolower($port['ifName']), '" style="color: #000;"><i class="icon-random"></i> '.$port['ifName'].''.$portalias, $portbtn);
+        $portbtn   = str_replace('">'.strtolower($port['ifName']), '" style="color: #000;"><i class="fa fa-random"></i> '.$port['ifName'].''.$portalias, $portbtn);
         $portbtn   = str_replace("overlib('", "overlib('<div style=\'border: 5px solid #e5e5e5; background: #fff; padding: 10px;\'>", $portbtn);
         $portbtn   = str_replace("<div>',;", "</div></div>',", $portbtn);
         echo "  <fieldset>\n";
@@ -148,7 +148,7 @@ else if ($vars['view'] == 'add') {
         echo "      </div>\n";
         echo "    </div>\n";
         echo "  </fieldset>\n";
-    }//end if
+    }
 ?>
 
 <div class="form-group">
@@ -240,7 +240,7 @@ else if ($vars['view'] == 'add') {
   <div class="col-sm-6">
   </div>
 </div>
-<button type="submit" class="btn btn-default"><i class="icon-ok-sign icon-white"></i> <strong>Add Bill</strong></button>
+<button type="submit" class="btn btn-success"><i class="fa fa-check"></i> <strong>Add Bill</strong></button>
 </form>
 
 <?php
@@ -266,7 +266,6 @@ else {
             $day_data = getDates($bill['bill_day']);
             $datefrom = $day_data['0'];
             $dateto   = $day_data['1'];
-            // $rate_data    = getRates($bill['bill_id'],$datefrom,$dateto);
             $rate_data    = $bill;
             $rate_95th    = $rate_data['rate_95th'];
             $dir_95th     = $rate_data['dir_95th'];
@@ -316,10 +315,8 @@ else {
                 ";
 
             $i++;
-        } //end if
-    }//end foreach
-
+        }
+    }
+    
     echo '</table>';
-}//end if
-
-// echo("</td></tr></table>");
+}
