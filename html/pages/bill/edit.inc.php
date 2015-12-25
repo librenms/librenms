@@ -295,5 +295,5 @@
       <select class="form-control input-sm" id="port_id" name="port_id"></select>
     </div>
   </div>
-  <button type="submit" class="btn btn-primary" name="Submit" value=" Add " /><i class="fa fa-plus"></i> <strong>Add Interface</strong></button>
+  <button type="submit" class="btn btn-primary" name="Submit" value=" Add " /><i class="fa fa-plus"></i> <strong>Add Port</strong></button>
 </form>
