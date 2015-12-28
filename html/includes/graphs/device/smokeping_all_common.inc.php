@@ -10,7 +10,7 @@ require 'includes/graphs/common.inc.php';
 require 'smokeping_common.inc.php';
 
 $i         = 0;
-$pings     = 20;
+$pings     = $config['smokeping']['pings'];
 $iter      = 0;
 $colourset = 'mixed';
 
