@@ -313,7 +313,7 @@ foreach ($ports as $port) {
             $this_port['ifPhysAddress']              = zeropad($a_a).zeropad($a_b).zeropad($a_c).zeropad($a_d).zeropad($a_e).zeropad($a_f);
         }
 
-        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts'])) {
+        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']) && $device['os'] !== 'ciscosb') {
             echo 'HC ';
             $this_port['ifInBroadcastPkts']  = $this_port['ifHCInBroadcastPkts'];
             $this_port['ifOutBroadcastPkts'] = $this_port['ifHCOutBroadcastPkts'];
