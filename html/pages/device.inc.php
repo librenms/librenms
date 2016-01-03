@@ -229,6 +229,14 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </a>
               </li>');
 
+        if (@dbFetchCell("SELECT COUNT(stp_id) FROM stp WHERE device_id = '".$device['device_id']."'") > '0') {
+            echo '<li class="'.$select['stp'].'">
+                <a href="'.generate_device_url($device, array('tab' => 'stp')).'">
+                <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> STP
+                </a>
+                </li>';
+        }
+
         if (@dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0') {
             echo '<li class="'.$select['packages'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'packages')).'">
