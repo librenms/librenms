@@ -29,7 +29,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fortinet MODULE-IDENTITY
-    LAST-UPDATED "200905200000Z"
+    LAST-UPDATED "201404100000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -37,7 +37,28 @@ fortinet MODULE-IDENTITY
          email: support@fortinet.com
          http://www.fortinet.com
         "
-    DESCRIPTION 
+    DESCRIPTION
+        "Registered FortiVoiceMib OID"
+    REVISION    "201404100000Z"
+    DESCRIPTION
+        "Registered FortiADCMib OID"
+    REVISION    "201403220000Z"
+    DESCRIPTION
+        "Added fan failure and AMC bypass traps"
+    REVISION    "201205090000Z"
+    DESCRIPTION
+        "Registered FortiDDoSMib OID"
+    REVISION    "201204230000Z"
+    DESCRIPTION
+        "Registered FortiDNSMib OID"
+    REVISION    "201112230000Z"
+    DESCRIPTION
+        "Registered FortiCacheMib OID"
+    REVISION    "201104250000Z"
+    DESCRIPTION
+        "Supporting portuguese language"
+    REVISION    "201005140000Z"
+    DESCRIPTION
         "Registered FortiScanMib OID"
     REVISION    "200905200000Z"
     DESCRIPTION 
@@ -85,6 +106,7 @@ FnLanguage ::= TEXTUAL-CONVENTION
         spanish (5),
         traditionalChinese (6),
         french (7),
+        portuguese (8),
         undefined (255)
     }
 
@@ -137,6 +159,11 @@ fnCoreMib OBJECT IDENTIFIER ::= { fortinet 100 }
 -- fnFortiSwitchMib   OBJECT IDENTIFIER ::= { fortinet 106 }
 -- fnFortiWebMib      OBJECT IDENTIFIER ::= { fortinet 107 }
 -- fnFortiScanMib     OBJECT IDENTIFIER ::= { fortinet 108 }
+-- fnFortiCacheMib    OBJECT IDENTIFIER ::= { fortinet 109 }
+-- fnFortiDNSMib      OBJECT IDENTIFIER ::= { fortinet 110 }
+-- fnFortiDDoSMib     OBJECT IDENTIFIER ::= { fortinet 111 }
+-- fnFortiADCMib      OBJECT IDENTIFIER ::= { fortinet 112 }
+-- fnFortiVoiceMib    OBJECT IDENTIFIER ::= { fortinet 113 }
 --
 
 --
@@ -315,6 +342,22 @@ fnTrapPowerSupplyFailure NOTIFICATION-TYPE
         for specifications."
     ::= { fnTrapsPrefix 106 }
 
+fnTrapAmcIfBypassMode NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "An AMC interface entered bypass mode. Available on models with an AMC
+        expansion slot. Used with the ASM-CX4 and ASM-FX2 cards."
+    ::= { fnTrapsPrefix 107 }
+
+fnTrapFanFailure NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "A fan failure has been detected. Not all devices have fan sensors.
+        See manual for specifications."
+    ::= { fnTrapsPrefix 108 }
+
 fnTrapIpChange NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, ifIndex }
     STATUS      current
@@ -360,6 +403,7 @@ fnTrapsComplianceGroup NOTIFICATION-GROUP
     NOTIFICATIONS { fnTrapCpuThreshold, fnTrapMemThreshold, 
                   fnTrapLogDiskThreshold, fnTrapTempHigh, 
                   fnTrapVoltageOutOfRange, fnTrapPowerSupplyFailure, 
+                  fnTrapAmcIfBypassMode, fnTrapFanFailure,
                   fnTrapIpChange, fnTrapTest }
     STATUS      current
     DESCRIPTION 

@@ -24,6 +24,9 @@ else if ($service[service_status] == '2') {
 $message = trim($service['service_message']);
 $message = str_replace("\n", '<br />', $message);
 
+$desc = trim($service['service_desc']);
+$desc = str_replace("\n", '<br />', $desc);
+
 $since = (time() - $service['service_changed']);
 $since = formatUptime($since);
 
@@ -42,11 +45,11 @@ $popup .= "</div><img src=\'graph.php?id=".$service['service_id'].'&amp;type=ser
 $popup .= "', RIGHT".$config['overlib_defaults'].');" onmouseout="return nd();"';
 
 echo "
-       <tr style=\"background-color: $bg; padding: 5px;\">";
+       <tr>";
 
 if ($device_id) {
     if (!$samehost) {
-        echo "<td valign=top width=250><span style='font-weight:bold;'>".generate_device_link($device).'</span></td>';
+        echo "<td>".generate_device_link($device).'</span></td>';
     }
     else {
         echo '<td></td>';
@@ -54,15 +57,17 @@ if ($device_id) {
 }
 
 echo "
-         <td valign=top class=list-bold>
+         <td>
            $status
          </td>
-         <td valign=top><a $popup><img src='$mini_url'></a></td>
-         <td valign=top width=175>
+         <td>
            $since
          </td>
-         <td valign=top>
+         <td>
            <span class=box-desc>$message</span>
+         </td>
+         <td>
+           <span class=box-desc>$desc</span>
          </td>
        </tr>";
 

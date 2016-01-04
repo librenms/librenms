@@ -1,7 +1,11 @@
+[![Build Status](https://travis-ci.org/dsmorse/gridster.js.svg)](http://travis-ci.org/dsmorse/gridster.js)
+[![GitHub version](https://badge.fury.io/gh/dsmorse%2Fgridster.js.svg)](http://dsmorse.github.io/gridster.js/)
+[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+[![Gem Version](https://badge.fury.io/rb/gridster.js-rails.svg)](https://rubygems.org/gems/gridster.js-rails)
+[![Bower version](https://badge.fury.io/bo/gridster-js.svg)](http://bower.io/search/?q=gridster-js)
+
 Gridster.js
 ===========
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ducksboard/gridster.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 Gridster is a jQuery plugin that makes building intuitive draggable
 layouts from elements spanning multiple columns. You can even
@@ -9,27 +13,46 @@ dynamically add and remove elements from the grid.
 
 More at [http://gridster.net/](http://gridster.net/).
 
-[Releases](https://github.com/ducksboard/gridster.js/releases)
+### Live Preview at: [http://dsmorse.github.io/gridster.js/](http://dsmorse.github.io/gridster.js/)
 
-[CHANGELOG](https://github.com/ducksboard/gridster.js/blob/master/CHANGELOG.md)
+[Releases](https://github.com/dsmorse/gridster.js/releases)
 
-Gridster is maintained by Ducksboard occasionally but not actively.
-@dustmoo and @pushmatrix have also write permissions as Gridster maintainers
-they are. Thank you guys!
+[CHANGELOG](https://github.com/dsmorse/gridster.js/blob/master/CHANGELOG.md)
+
+Gridster was created by Ducksboard but they have basiclly abondoned the project
+and even those who had write permissions to the repo are not merging pull requests.
 
 ## Forks
 
-Mr @dustmoo (maintainer of Gridster) has his own fork of gridster.js
-with some new interesting features like widget-swapping and static widgets.
+As of result of the inactivity over the last year in the [Ducksboard](https://github.com/ducksboard/gridster.js) repository, [@dsmorse](https://github.com/dsmorse/gridster.js) has created a fork
+for current support.  He will GLADLY accept pull requests, and will be working to merge existing
+Pull Requests from Ducksboard repo.
 
-Can be found here: [dustmoo/gridster.js](https://github.com/dustmoo/gridster.js)
+## Ruby on Rails integration
 
-@dustmoo is working in his spare time to merge all these changes into
-ducksboard/gridster.js
+This artifact is published to [rubygems.org](https://rubygems.org/gems/gridster.js-rails) to be consumed by ruby on rails applications.
 
-If anyone would like to help @dustmoo improve his fork and reconcile
-it with the main library he would be happy for the help.
+Include gridster.js-rails in Gemfile;
 
+``` ruby
+gem 'gridster.js-rails'
+```
+
+and run bundle install.
+
+### Configuration
+
+Add this line to app/assets/stylesheets/application.css
+
+``` css
+ *= require jquery.gridster
+```
+
+Add this line to app/assets/javascripts/application.js
+
+``` javascript
+//= require jquery.gridster
+```
 
 ## Contributing to this project
 

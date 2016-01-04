@@ -53,14 +53,14 @@ else {
 foreach ($rrd_list as $rrd) {
     $colours = (isset($rrd['colour']) ? $rrd['colour'] : 'default');
     $strlen  = ((strlen($rrd['descr']) < $descr_len) ? ($descr_len - strlen($rrd['descr'])) : '0');
-    $descr   = (isset($rrd['descr']) ? rrdtool_escape($rrd['descr'], ($desc_len + $strlen)) : 'Unkown');
+    $descr   = (isset($rrd['descr']) ? rrdtool_escape($rrd['descr'], ($desc_len + $strlen)) : 'Unknown');
     for ($z = 0; $z < $strlen;
     $z++) {
         $descr .= ' ';
     }
 
     if ($i) {
-        $stack = 'STACK';
+        $stack = ':STACK';
     }
 
     $colour       = $config['graph_colours'][$colours][$x];
@@ -68,7 +68,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' DEF:peak'.$x.'='.$rrd['filename'].':peak:MAX';
     $rrd_options .= ' DEF:unique'.$x.'='.$rrd['filename'].':unique:AVERAGE';
     $rrd_options .= ' VDEF:avg'.$x.'=cur'.$x.',AVERAGE';
-    $rrd_options .= ' AREA:cur'.$x.'#'.$colour.':"'.$descr."\":$stack";
+    $rrd_options .= ' AREA:cur'.$x.'#'.$colour.":'".$descr."'$stack";
     $rrd_options .= ' GPRINT:cur'.$x.':LAST:"%6.2lf"';
     $rrd_options .= ' GPRINT:unique'.$x.':LAST:"%6.2lf%s"';
     $rrd_options .= ' GPRINT:avg'.$x.':"%6.2lf"';
@@ -97,7 +97,7 @@ if (!$nototal) {
     $rrd_options .= ' CDEF:totunique=unique0'.$totunique;
     $rrd_options .= ' CDEF:totpeak=peak0'.$totpeak;
     $rrd_options .= ' VDEF:totavg=totcur,AVERAGE';
-    $rrd_options .= ' LINE2:totcur#'.$colour.':"'.$descr.'"';
+    $rrd_options .= ' LINE2:totcur#'.$colour.":'".$descr."'";
     $rrd_options .= ' GPRINT:totcur:LAST:"%6.2lf"';
     $rrd_options .= ' GPRINT:totunique:LAST:"%6.2lf%s"';
     $rrd_options .= ' GPRINT:totavg:"%6.2lf"';

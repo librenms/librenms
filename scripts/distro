@@ -60,6 +60,10 @@ elif [ "${OS}" = "Linux" ] ; then
   elif [ -f /etc/pld-release ] ; then
     DIST=$(cat /etc/pld-release)
     REV=""
+
+  elif [ -f /etc/SuSE-release ] ; then
+    DIST=$(echo SLES $(grep VERSION /etc/SuSE-release | cut -d = -f 2 | tr -d " "))
+    REV=$(echo SP$(grep PATCHLEVEL /etc/SuSE-release | cut -d = -f 2 | tr -d " "))
   fi
 
   if [ -f /etc/lsb-release -a "${IGNORE_LSB}" != 1 ] ; then

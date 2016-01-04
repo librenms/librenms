@@ -9,7 +9,11 @@ Here we will provide configuration details for these modules.
 
 - LDAP: ldap
 
- HTTP Auth: http-auth
+- Active Directory: active_directory
+
+- HTTP Auth: http-auth
+
+- Radius: radius
 
 #### User levels
 
@@ -99,3 +103,43 @@ $config['auth_ldap_groupmemberattr'] = "memberUid";
 ```
 
 Replace {id} with the unique ID provided by Jumpcloud.
+
+#### Active Directory Authentication
+
+Config option: `active_directory`
+
+This is similar to LDAP Authentication. Install __php_ldap__ for CentOS/RHEL or __php5-ldap__ for Debian/Ubuntu.
+
+If you have issues with secure LDAP try setting `$config['auth_ad_check_certificates']` to `0`.
+
+##### Require actual membership of the configured groups
+
+If you set ```$config['auth_ad_require_groupmembership']``` to 1, the authenticated user has to be a member of the specific group. Otherwise all users can authenticate, but are limited to user level 0 and only have access to shared dashboards. 
+
+##### Sample configuration
+
+```
+$config['auth_ad_url'] = "ldaps://your-domain.controll.er";
+$config['auth_ad_check_certificates'] = 1; // or 0
+$config['auth_ad_domain'] = "your-domain.com";
+$config['auth_ad_base_dn'] = "dc=your-domain,dc=com";
+$config['auth_ad_groups']['admin']['level'] = 10;
+$config['auth_ad_groups']['pfy']['level'] = 7;
+$config['auth_ad_require_groupmembership'] = 0;
+```
+
+#### Radius Authentication
+
+Please note that a mysql user is created for each user the logs in successfully. User level 1 is assigned to those accounts so you will then need to assign the relevant permissions unless you set `$config['radius']['userlevel']` to be something other than 1.
+
+> Cleanup of old accounts is done using the authlog. You will need to set the cleanup date for when old accounts will be purged which will happen AUTOMATICALLY.
+> Please ensure that you set the $config['authlog_purge'] value to be greater than $config['radius']['users_purge'] otherwise old users won't be removed.
+
+```php
+$config['radius']['hostname']   = 'localhost';
+$config['radius']['port']       = '1812';
+$config['radius']['secret']     = 'testing123';
+$config['radius']['timeout']    = 3;
+$config['radius']['users_purge'] = 14;//Purge users who haven't logged in for 14 days.
+$config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user. 
+```

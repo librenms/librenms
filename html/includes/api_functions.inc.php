@@ -13,7 +13,7 @@
  */
 
 require_once '../includes/functions.php';
-
+require_once '../includes/device-groups.inc.php';
 
 function authToken(\Slim\Route $route) {
     $app   = \Slim\Slim::getInstance();
@@ -62,10 +62,17 @@ function get_graph_by_port_hostname() {
         $vars['to'] = $_GET['to'];
     }
 
+    if ($_GET['ifDescr'] == true) {
+        $port = 'ifDescr';
+    }
+    else {
+        $port = 'ifName';
+    }
+
     $vars['width']  = $_GET['width'] ?: 1075;
     $vars['height'] = $_GET['height'] ?: 300;
     $auth           = '1';
-    $vars['id']     = dbFetchCell('SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`ifName`=?', array($hostname, $vars['port']));
+    $vars['id']     = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`hostname`=? AND `P`.`$port`=?", array($hostname, $vars['port']));
     $app->response->headers->set('Content-Type', 'image/png');
     include 'includes/graphs/graph.inc.php';
 
@@ -163,23 +170,23 @@ function list_devices() {
     }
 
     if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order .= ' ASC';
+        $order = '`'.$order.'` ASC';
     }
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
     }
     elseif ($type == 'ignored') {
-        $sql = "ignore='1' AND disabled='0'";
+        $sql = "`ignore`='1' AND `disabled`='0'";
     }
     elseif ($type == 'up') {
-        $sql = "status='1' AND ignore='0' AND disabled='0'";
+        $sql = "`status`='1' AND `ignore`='0' AND `disabled`='0'";
     }
     elseif ($type == 'down') {
-        $sql = "status='0' AND ignore='0' AND disabled='0'";
+        $sql = "`status`='0' AND `ignore`='0' AND `disabled`='0'";
     }
     elseif ($type == 'disabled') {
-        $sql = "disabled='1'";
+        $sql = "`disabled`='1'";
     }
     elseif ($type == 'mac') {
         $join = " LEFT JOIN `ports` ON `devices`.`device_id`=`ports`.`device_id` LEFT JOIN `ipv4_mac` ON `ports`.`port_id`=`ipv4_mac`.`port_id` ";
@@ -890,12 +897,14 @@ function get_inventory() {
 
 
 function list_oxidized() {
-    // return details of a single device
+    global $config;
     $app = \Slim\Slim::getInstance();
     $app->response->headers->set('Content-Type', 'application/json');
 
     $devices = array();
-    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL)") as $device) {
+    $device_types = "'".implode("','", $config['oxidized']['ignore_types'])."'";
+    $device_os    = "'".implode("','", $config['oxidized']['ignore_os'])."'";
+    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os))") as $device) {
         $devices[] = $device;
     }
 
@@ -925,7 +934,7 @@ function list_bills() {
         $param = array($bill_ref);
     }
     elseif (is_numeric($bill_id)) {
-        $sql   = '`bill_id` = ?';
+        $sql   = '`bills`.`bill_id` = ?';
         $param = array($bill_id);
     }
     else {
@@ -975,4 +984,110 @@ function list_bills() {
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
+}
+
+function update_device() {
+    global $config;
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $status   = 'error';
+    $code     = 500;
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $data = json_decode(file_get_contents('php://input'), true);
+    $bad_fields = array('id','hostname');
+    if (empty($data['field'])) {
+        $message = 'Device field to patch has not been supplied';
+    }
+    elseif (in_array($data['field'], $bad_fields)) {
+        $message = 'Device field is not allowed to be updated';
+    }
+    else {
+        if (dbUpdate(array(mres($data['field']) => mres($data['data'])), 'devices', '`device_id`=?', array($device_id)) >= 0) {
+            $status = 'ok';
+            $message = 'Device ' . mres($data['field']) . ' field has been updated';
+            $code = 200;
+        }
+        else {
+            $message = 'Device ' . mres($data['field']) . ' field failed to be updated';
+        }
+    }
+    $output = array(
+        'status'  => $status,
+        'message' => $message,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function get_device_groups() {
+    $app = \Slim\Slim::getInstance();
+    $router = $app->router()->getCurrentRoute()->getParams();
+    $status   = 'error';
+    $code     = 404;
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $groups = GetGroupsFromDevice($device_id,1);
+    }
+    else {
+        $groups = GetDeviceGroups();
+    }
+    if (empty($groups)) {
+        $message = 'No device groups found';
+    }
+    else {
+        $status = 'ok';
+        $code = 200;
+        $message = 'Found ' . count($groups) . ' device groups';
+    }
+
+    $output = array(
+        'status'  => $status,
+        'message' => $message,
+        'count'   => count($groups),
+        'groups'  => $groups,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+function get_devices_by_group() {
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $status   = 'error';
+    $code     = 404;
+    $count    = 0;
+    $name = urldecode($router['name']);
+    $devices = array();
+    if (empty($name)) {
+        $message = 'No device group name provided';
+    }
+    else {
+        $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?",array($name));
+        $devices = GetDevicesFromGroup($group_id);
+        $count = count($devices);
+        if (empty($devices)) {
+            $message = 'No devices found in group ' . $name;
+        }
+        else {
+            $message = "Found $count in group $name";
+            $code = 200;
+        }
+    }
+    $output = array(
+        'status'  => $status,
+        'message' => $message,
+        'count'   => $count,
+        'devices' => $devices,
+    );
+
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+
 }

@@ -3,7 +3,7 @@
 Services within LibreNMS provides the ability to use Nagios plugins to perform additional monitoring outside of SNMP.
 
 These services are tied into an existing device so you need at least one device that supports SNMP to be able to add it 
-to LibreNMS - localhot is a good one.
+to LibreNMS - localhost is a good one.
 
 ## Setup
 

@@ -2,30 +2,17 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>gridster.js Test Suite</title>
-  <!-- Load local jQuery, removing access to $ (use jQuery, not $). -->
-  <script src="../libs/jquery/jquery.js"></script>
-  <script>jQuery.noConflict()</script>
-
-
-  <script type="text/javascript" src="../libs/jquery/jquery.js"></script>
-
-  <script src="../dist/jquery.gridster.min.js" type="text/javascript" charset="utf-8"></script>
+  <title>gridster.js AMD Test Suite</title>
 
   <link rel="stylesheet" type="text/css" href="../dist/jquery.gridster.css">
 
-
-  <!-- Load local QUnit (grunt requires v1.0.0 or newer). -->
-  <link rel="stylesheet" href="../libs/qunit/qunit.css" media="screen">
-
-  <script src="../libs/qunit/qunit.js"></script>
-  <!-- Load local lib and tests. -->
-  <script src="../src/jquery.gridster.js"></script>
-  <script src="jquery.gridster_test.js"></script>
+  <link rel="stylesheet" href="../libs/qunit/qunit/qunit.css" media="screen">
+  <!-- Load requirejs which will load amd-main.js and start from there-->
+  <script data-main="amd-main.js" src="../libs/requirejs/require.js"></script>
 
 </head>
 <body>
-  <h1 id="qunit-header">gridster.js Test Suite</h1>
+  <h1 id="qunit-header">gridster.js AMD Test Suite</h1>
   <h2 id="qunit-banner"></h2>
   <div id="qunit-testrunner-toolbar"></div>
   <h2 id="qunit-userAgent"></h2>

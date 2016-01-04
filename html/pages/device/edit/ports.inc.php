@@ -5,7 +5,7 @@
     <input type='hidden' name='ignoreport' value='yes'>
     <input type='hidden' name='type' value='update-ports'>
     <input type='hidden' name='device' value='<?php echo $device['device_id'];?>'>
-    <div class='table-responsibe'>
+    <div class='table-responsive'>
     <table id='edit-ports' class='table table-striped'>
         <thead>
             <tr>
@@ -15,6 +15,7 @@
                 <th data-column-id='ifOperStatus'>Oper</th>
                 <th data-column-id='disabled' data-sortable='false'>Disable</th>
                 <th data-column-id='ignore' data-sortable='false'>Ignore</th>
+                <th data-column-id='port_tune' data-sortable='false' data-searchable='false'>RRD Tune</th>
                 <th data-column-id='ifAlias'>Description</th>
             </tr>
         </thead>
@@ -23,6 +24,7 @@
 </form>
 <script>
 
+//$("[name='override_config']").bootstrapSwitch('offColor','danger');
     $(document).on('blur', "[name='if-alias']", function (){
         var $this = $(this);
         var descr = $this.val();
@@ -153,5 +155,10 @@
             };
         },
         url: "ajax_table.php"
+    }).on("loaded.rs.jquery.bootgrid", function() {
+        $("[name='override_config']").bootstrapSwitch('offColor','danger');
+        $('input[name="override_config"]').on('switchChange.bootstrapSwitch',  function(event, state) {
+            override_config(event,state,$(this));
+        });
     });
 </script>

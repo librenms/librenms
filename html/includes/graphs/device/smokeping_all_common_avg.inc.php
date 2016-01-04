@@ -37,6 +37,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
     $colour = $config['graph_colours'][$colourset][$iter];
     $iter++;
 
+    // FIXME: $descr unused? -- PDG 2015-11-14
     $descr = rrdtool_escape($source, $descr_len);
 
     $filename = generate_smokeping_file($device,$filename);

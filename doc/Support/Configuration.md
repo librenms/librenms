@@ -178,6 +178,11 @@ $config['web_mouseover']      = TRUE;
 You can disable the mouseover popover for mini graphs by setting this to FALSE.
 
 ```php
+$config['enable_lazy_load'] = true;
+```
+You can disable image lazy loading by setting this to false.
+
+```php
 $config['show_overview_tab'] = TRUE;
 ```
 Enable or disable the overview tabe for a device.
@@ -260,6 +265,12 @@ $config['autodiscovery']['nets-exclude'][] = "224.0.0.0/4";
 $config['autodiscovery']['nets-exclude'][] = "240.0.0.0/4";
 ```
 Arrays of subnets to exclude in auto discovery mode.
+
+```php
+$config['discovery_by_ip'] = true;
+```
+Enable auto discovery by IP. By default we only discover based on hostnames but manually adding by IP is allowed.
+Please note this could lead to duplicate devices being added based on IP, Hostname or sysName.
 
 #### Email configuration
 
@@ -430,7 +441,7 @@ $config['auth_mechanism']           = "mysql";
 ```
 This is the authentication type to use for the WebUI. MySQL is the default and configured when following the installation 
 instructions. ldap and http-auth are also valid options. For instructions on the different authentication modules please 
-see [Authentication](http://doc.librenms.org/Extensions/Authentication/).
+see [Authentication](http://docs.librenms.org/Extensions/Authentication/).
 
 ```php
 $config['auth_remember']            = '30';

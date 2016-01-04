@@ -54,17 +54,22 @@ foreach (dbFetchRows($sql, $param) as $port) {
     $isportbad = ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
     $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
     $outofsync = $dowecare ? " class='red'" : '';
+    $checked = '';
+    if (get_dev_attrib($device_id, 'ifName_tune:'.$port['ifName']) == "true") {
+        $checked = 'checked';
+    }
 
     $response[] = array(
-        'ifIndex' => $port['ifIndex'],
-        'ifName' => $port['label'],
-        'ifAdminStatus' => $port['ifAdminStatus'],
-        'ifOperStatus' => '<span name="operstatus_'.$port['port_id'].'"'.$outofsync.'>'.$port['ifOperStatus'].'</span>',
-        'disabled' => '<input type="checkbox" class="disable-check" name="disabled_'.$port['port_id'].'"'.($port['disabled'] ? 'checked' : '').'>
-                       <input type="hidden" name="olddis_'.$port['port_id'].'" value="'.($port['disabled'] ? 1 : 0).'"">',
-        'ignore' => '<input type="checkbox" class="ignore-check" name="ignore_'.$port['port_id'].'"'.($port['ignore'] ? 'checked' : '').'>
-                     <input type="hidden" name="oldign_'.$port['port_id'].'" value="'.($port['ignore'] ? 1 : 0).'"">',
-        'ifAlias' => '<div class="form-group"><input class="form-control input-sm" id="if-alias" name="if-alias" data-device_id="'.$port['device_id'].'" data-port_id="'.$port['port_id'].'" data-ifName="'.$port['ifName'].'" value="'.$port['ifAlias'].'"><span class="glyphicon form-control-feedback" aria-hidden="true"></span></div>'
+        'ifIndex'          => $port['ifIndex'],
+        'ifName'           => $port['label'],
+        'ifAdminStatus'    => $port['ifAdminStatus'],
+        'ifOperStatus'     => '<span name="operstatus_'.$port['port_id'].'"'.$outofsync.'>'.$port['ifOperStatus'].'</span>',
+        'disabled'         => '<input type="checkbox" class="disable-check" name="disabled_'.$port['port_id'].'"'.($port['disabled'] ? 'checked' : '').'>
+                               <input type="hidden" name="olddis_'.$port['port_id'].'" value="'.($port['disabled'] ? 1 : 0).'"">',
+        'ignore'           => '<input type="checkbox" class="ignore-check" name="ignore_'.$port['port_id'].'"'.($port['ignore'] ? 'checked' : '').'>
+                               <input type="hidden" name="oldign_'.$port['port_id'].'" value="'.($port['ignore'] ? 1 : 0).'"">',
+        'port_tune'        => '<input type="checkbox" id="override_config" name="override_config" data-attrib="ifName_tune:'.$port['ifName'].'" data-device_id="'.$port['device_id'].'" data-size="small" '.$checked.'>',
+        'ifAlias'          => '<div class="form-group"><input class="form-control input-sm" id="if-alias" name="if-alias" data-device_id="'.$port['device_id'].'" data-port_id="'.$port['port_id'].'" data-ifName="'.$port['ifName'].'" value="'.$port['ifAlias'].'"><span class="glyphicon form-control-feedback" aria-hidden="true"></span></div>',
     );
 
 }//end foreach
