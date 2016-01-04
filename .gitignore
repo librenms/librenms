@@ -11,3 +11,11 @@ nbproject
 .ircbot.alert
 .metadata_never_index
 *.swp
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+Thumbs.db
