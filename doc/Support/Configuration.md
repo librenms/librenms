@@ -360,7 +360,7 @@ $config['smokeping']['dir']             = "/var/lib/smokeping/";
 Set the smokeping directory location.
 
 ```php
-$config['smokeping']['pings']           = 10;
+$config['smokeping']['pings']           = 20;
 ```
 Should be equal to "pings" in your smokeping config.  On Debian/Ubuntu, this is set in `/etc/smokeping/config.d/Database`.
 
