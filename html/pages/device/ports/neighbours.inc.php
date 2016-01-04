@@ -1,16 +1,29 @@
 <?php
 
-echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
+$tableNeighbours=array('Local Port','Remote Port','Remote Device','Protocol');
+if(!empty($device['vrf_lite_cisco'])){
+    $tableNeighbours= array_merge($tableNeighbours,array('VRF','Intance'));
+}
+
+echo('<table border="0" cellspacing="0" cellpadding="'.count($tableNeighbours).'" width="100%">');
+echo('<tr>');
+foreach ($tableNeighbours as $neighbour) {
+    echo "<th>$neighbour</th>";
+}
+echo '</tr>';
+unset($tableNeighbours);
 
 $i = '1';
 
-echo '<tr><th>Local Port</th>
-          <th>Remote Port</th>
-          <th>Remote Device</th>
-          <th>Protocol</th>
-      </tr>';
+if(!empty($vars['vrf-lite'])){
+    $neighboursTmp=dbFetchRows("SELECT L.*, I.*, I4.context_name FROM links AS L join ports AS I on I.port_id = L.local_port_id JOIN ipv4_addresses I4 on I4.port_id=I.port_id join vrf_lite_cisco VR on VR.context_name=I4.context_name and VR.device_id=I.device_id WHERE I.device_id = ? and VR.vrf_name= ? group by L.id ", array($device['device_id'],$vars['vrf-lite']));
+}
+else{
+    $neighboursTmp=dbFetchRows("SELECT L.*, I.*, I4.context_name FROM links AS L, ports AS I LEFT OUTER JOIN ipv4_addresses I4 on I4.port_id=I.port_id WHERE I.device_id = ? AND I.port_id = L.local_port_id", array($device['device_id']));
+}
 
-foreach (dbFetchRows('SELECT * FROM links AS L, ports AS I WHERE I.device_id = ? AND I.port_id = L.local_port_id', array($device['device_id'])) as $neighbour) {
+
+foreach ($neighboursTmp as $neighbour) {
     if ($bg_colour == $list_colour_b) {
         $bg_colour = $list_colour_a;
     }
@@ -34,8 +47,25 @@ foreach (dbFetchRows('SELECT * FROM links AS L, ports AS I WHERE I.device_id = ?
     }
 
     echo '<td>'.strtoupper($neighbour['protocol']).'</td>';
+    if(!empty($device['vrf_lite_cisco'])){
+        if(!empty($neighbour['context_name'])){
+            if( key_exists($neighbour['context_name'], $device['vrf_lite_cisco'])){
+            echo '<td>'.$device['vrf_lite_cisco'][$neighbour['context_name']]['vrf_name'].'</td>';
+            echo '<td>'.$device['vrf_lite_cisco'][$neighbour['context_name']]['intance_name'].'</td>';
+            }
+            else{
+                echo '<td>ERROR VRF</td>';
+                echo '<td>ERROR VRF</td>';
+            }
+        }
+        else{
+            echo '<td></td>';
+            echo '<td></td>';
+        }
+    }
     echo '</tr>';
     $i++;
 }//end foreach
+unset($neighboursTmp);
 
 echo '</table>';

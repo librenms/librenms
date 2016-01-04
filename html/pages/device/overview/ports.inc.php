@@ -45,14 +45,23 @@ if ($ports['total']) {
           <td colspan="4">';
 
     $ifsep = '';
-
-    foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1'", array($device['device_id'])) as $data) {
+    
+    $dataTmp = array();
+    if(empty(!$vars['vrf-lite'])){
+        $dataTmp = dbFetchRows("SELECT I.* FROM ports I LEFT OUTER JOIN ipv4_addresses I4 on I4.port_id=I.port_id LEFT OUTER JOIN vrf_lite_cisco VR on I4.context_name=VR.context_name and VR.device_id=I.device_id where I.deleted != '1' AND VR.device_id = ? AND VR.vrf_name= ? group by I.ifName order by I.ifName asc", array($device['device_id'],$vars['vrf-lite'])); 
+    }
+    else{
+        $dataTmp = dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' ORDER BY `ifName` ASC", array($device['device_id']));
+    }
+        
+    foreach ($dataTmp as $data) {
         $data     = ifNameDescr($data);
         $data = array_merge($data, $device);
         echo "$ifsep".generate_port_link($data, makeshortif(strtolower($data['label'])));
         $ifsep = ', ';
     }
-
+    unset($dataTmp);
+    
     unset($ifsep);
     echo '  </td>';
     echo '</tr>';

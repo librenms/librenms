@@ -16,6 +16,7 @@ $type_text['bgp']  = 'BGP';
 $type_text['cef']  = 'CEF';
 $type_text['ospf'] = 'OSPF';
 $type_text['vrf']  = 'VRFs';
+$type_text['route'] = 'Route';
 
 print_optionbar_start();
 
@@ -36,7 +37,7 @@ foreach ($routing_count as $type => $value) {
     }
 
     if ($routing_count[$type]) {
-        echo generate_link($type_text[$type].' ('.$routing_count[$type].')', array('page' => 'routing', 'protocol' => $type));
+        echo generate_link($type_text[$type].' ('.$routing_count[$type].')', array('page'=> 'routing', 'protocol' => $type));
         $sep = ' | ';
     }
 
@@ -53,6 +54,7 @@ switch ($vars['protocol']) {
     case 'vrf':
     case 'cef':
     case 'ospf':
+    case 'route': 
         include 'pages/routing/'.$vars['protocol'].'.inc.php';
     break;
 

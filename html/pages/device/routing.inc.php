@@ -20,6 +20,7 @@ $type_text['bgp']  = 'BGP';
 $type_text['cef']  = 'CEF';
 $type_text['ospf'] = 'OSPF';
 $type_text['vrf']  = 'VRFs';
+$type_text['route'] = 'Route';
 
 print_optionbar_start();
 
@@ -28,6 +29,10 @@ $pagetitle[] = 'Routing';
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
 unset($sep);
+$urlTmp=array('proto'=>'');
+if(!empty($vars['vrf-lite'])){
+    $urlTmp= array_merge($urlTmp,array('vrf-lite'=>$vars['vrf-lite']));
+}
 foreach ($routing_tabs as $type) {
     if (!$vars['proto']) {
         $vars['proto'] = $type;
@@ -38,15 +43,15 @@ foreach ($routing_tabs as $type) {
     if ($vars['proto'] == $type) {
         echo '<span class="pagemenu-selected">';
     }
-
-    echo generate_link($type_text[$type].' ('.$device_routing_count[$type].')', $link_array, array('proto' => $type));
+    $urlTmp['proto']=$type;
+    echo generate_link($type_text[$type].' ('.$device_routing_count[$type].')', $link_array, $urlTmp);
     if ($vars['proto'] == $type) {
         echo '</span>';
     }
 
     $sep = ' | ';
 }
-
+unset($urlTmp);
 print_optionbar_end();
 
 if (is_file('pages/device/routing/'.mres($vars['proto']).'.inc.php')) {

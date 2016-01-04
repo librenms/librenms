@@ -2,6 +2,9 @@
 
 if ($config['enable_bgp']) {
     foreach (dbFetchRows('SELECT * FROM bgpPeers WHERE device_id = ?', array($device['device_id'])) as $peer) {
+        //add context if exist  
+        $device['context_name']= $peer['context_name'];
+        
         // Poll BGP Peer
         $peer2 = false;
         echo 'Checking BGP peer '.$peer['bgpPeerIdentifier'].' ';
@@ -325,5 +328,7 @@ if ($config['enable_bgp']) {
             } //end foreach
         } //end if
         echo "\n";
-    } //end foreach
-} //end if
+        unset($device['context_name']);
+	} // End While loop on peers
+} //End check for BGP support
+

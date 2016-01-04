@@ -33,24 +33,32 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
     }
 
     echo '<div class="panel panel-default">';
-        echo '<table class="device-header-table" style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
+        echo '<table style="margin: 0px 7px 7px 7px;" cellspacing="0" class="devicetable" width="99%">';
         require 'includes/device-header.inc.php';
     echo '</table>';
     echo '</div>';
 
-
+    $urlTmp=array('tab'=>'');
+	if(!empty($vars['vrf-lite'])){
+        $urlTmp= array_merge($urlTmp, array('vrf-lite' => $vars['vrf-lite']));
+	}
+	
     if (device_permitted($device['device_id'])) {
         echo '<ul class="nav nav-tabs">';
 
         if ($config['show_overview_tab']) {
+            $urlTmp['tab']='overview';
+
             echo '
                 <li class="'.$select['overview'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'overview')).'">
+                <a href="'.generate_device_url($device, $urlTmp).'">
                 <img src="images/16/server_lightning.png" align="absmiddle" border="0"> Overview
                 </a>
                 </li>';
         }
 
+
+    if(empty($vars['vrf-lite'])){
         echo '<li class="'.$select['graphs'].'">
             <a href="'.generate_device_url($device, array('tab' => 'graphs')).'">
             <img src="images/16/server_chart.png" align="absmiddle" border="0"> Graphs
@@ -58,6 +66,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             </li>';
 
         $health = (dbFetchCell("SELECT COUNT(*) FROM storage WHERE device_id = '".$device['device_id']."'") + dbFetchCell("SELECT COUNT(sensor_id) FROM sensors WHERE device_id = '".$device['device_id']."'") + dbFetchCell("SELECT COUNT(*) FROM mempools WHERE device_id = '".$device['device_id']."'") + dbFetchCell("SELECT COUNT(*) FROM processors WHERE device_id = '".$device['device_id']."'"));
+
 
         if ($health) {
             echo '<li class="'.$select['health'].'">
@@ -98,14 +107,21 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </a>
                 </li>';
         }
+    }
 
         if (@dbFetchCell("SELECT COUNT(port_id) FROM ports WHERE device_id = '".$device['device_id']."'") > '0') {
+            $urlTmp['tab']='ports';
+
+
             echo '<li class="'.$select['ports'].$select['port'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'ports')).'">
+                <a href="'.generate_device_url($device, $urlTmp).'">
                 <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
                 </a>
                 </li>';
         }
+
+
+    if(empty($vars['vrf-lite'])){
 
         if (@dbFetchCell("SELECT COUNT(sla_id) FROM slas WHERE device_id = '".$device['device_id']."'") > '0') {
             echo '<li class="'.$select['slas'].$select['sla'].'">
@@ -132,15 +148,21 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </a>
                 </li>';
         }
+    }
+
+
 
         if (@dbFetchCell("SELECT COUNT(vlan_id) FROM vlans WHERE device_id = '".$device['device_id']."'") > '0') {
+            $urlTmp['tab']='vlans';
+
             echo '<li class="'.$select['vlans'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'vlans')).'">
+                <a href="'.generate_device_url($device, $urlTmp).'">
                 <img src="images/16/vlans.png" align="absmiddle" border="0" /> VLANs
                 </a>
                 </li>';
         }
 
+    if(empty($vars['vrf-lite'])){
         if (@dbFetchCell("SELECT COUNT(id) FROM vminfo WHERE device_id = '".$device['device_id']."'") > '0') {
             echo '<li class="'.$select['vm'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'vm')).'">
@@ -174,7 +196,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </a>
                 </li>';
         }
-
+    }
         // $routing_tabs is used in device/routing/ to build the tabs menu. we built it here to save some queries
         $device_routing_count['loadbalancer_rservers'] = dbFetchCell('SELECT COUNT(*) FROM `loadbalancer_rservers` WHERE `device_id` = ?', array($device['device_id']));
         if ($device_routing_count['loadbalancer_rservers']) {
@@ -186,7 +208,27 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             $routing_tabs[] = 'ipsec_tunnels';
         }
 
-        $device_routing_count['bgp'] = dbFetchCell('SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ?', array($device['device_id']));
+    if(empty($vars['vrf-lite'])){
+        $device_routing_count['bgp'] = dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ?", array($device['device_id']));
+
+        $device_routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled' AND `device_id` = ?", array($device['device_id']));
+        
+    }
+    else{ 
+        $device_routing_count['bgp'] = dbFetchCell('SELECT COUNT(*) FROM `bgpPeers` join `vrf_lite_cisco` ON `vrf_lite_cisco`.`device_id` = `bgpPeers`.`device_id` AND `bgpPeers`.`context_name` = `vrf_lite_cisco`.`context_name` WHERE `bgpPeers`.`device_id` = ? AND `vrf_lite_cisco`.`vrf_name` = ?', array($device['device_id'], $vars['vrf-lite']));
+        
+        $device_routing_count['ospf'] = dbFetchCell('SELECT COUNT(*) FROM `ospf_instances` JOIN `vrf_lite_cisco` ON `vrf_lite_cisco`.`device_id` = `ospf_instances`.`device_id` AND `ospf_instances`.`context_name` = `vrf_lite_cisco`.`context_name` WHERE `ospf_instances`.`ospfAdminStat` = ? AND `ospf_instances`.`device_id` = ? AND `vrf_lite_cisco`.`vrf_name` = ?', array('enabled', $device['device_id'], $vars['vrf-lite']));
+  
+    }
+
+
+
+
+
+
+
+
+
         if ($device_routing_count['bgp']) {
             $routing_tabs[] = 'bgp';
         }
@@ -195,6 +237,9 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         if ($device_routing_count['ospf']) {
             $routing_tabs[] = 'ospf';
         }
+
+
+
 
         $device_routing_count['cef'] = dbFetchCell('SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ?', array($device['device_id']));
         if ($device_routing_count['cef']) {
@@ -207,13 +252,22 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         }
 
         if (is_array($routing_tabs)) {
+            $urlTmp['tab']='routing';
+
+
             echo '<li class="'.$select['routing'].'">
-                <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
+                <a href="'.generate_device_url($device, $urlTmp).'">
                 <img src="images/16/arrow_branch.png" align="absmiddle" border="0" /> Routing
                 </a>
                 </li>';
         }
 
+
+
+
+
+
+    if(empty($vars['vrf-lite'])){
         $device_pw_count = @dbFetchCell('SELECT COUNT(*) FROM `pseudowires` WHERE `device_id` = ?', array($device['device_id']));
         if ($device_pw_count) {
             echo '<li class="'.$select['pseudowires'].'">
@@ -222,12 +276,24 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </a>
                 </li>';
         }
+    }
 
+
+
+
+
+        $urlTmp['tab']='map';
         echo('<li class="' . $select['map'] . '">
-                <a href="'.generate_device_url($device, array('tab' => 'map')).'">
+                <a href="'.generate_device_url($device, $urlTmp).'">
                   <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map
                 </a>
               </li>');
+
+
+
+
+
+
 
         if (@dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0') {
             echo '<li class="'.$select['packages'].'">
@@ -361,11 +427,13 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </li>';
         }
 
+
         echo '<li class="'.$select['notes'].'">
             <a href="'.generate_device_url($device, array('tab' => 'notes')).'">
             <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Notes
             </a>
             </li>';
+
 
 
         echo '<li style="float: right;"><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"></a></li>
@@ -380,8 +448,14 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </li>';
         }
 
+
+
+
         echo '</ul>';
     }//end if
+
+
+
 
     if (device_permitted($device['device_id']) || $check_device == $vars['device']) {
         echo '<div class="tabcontent">';
