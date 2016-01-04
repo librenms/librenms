@@ -3,9 +3,9 @@
 // Huawei VRP Processors
 if ($device['os'] == 'vrp') {
     echo 'Huawei VRP ';
-    $processors_array = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', $processors_array, 'HUAWEI-ENTITY-EXTENT-MIB', '+'.$config['install_dir'].'/mibs');
-    $processors_array = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $processors_array, 'HUAWEI-ENTITY-EXTENT-MIB', '+'.$config['install_dir'].'/mibs');
-    $processors_array = snmpwalk_cache_multi_oid($device, 'hwEntityBomEnDesc', $processors_array, 'HUAWEI-ENTITY-EXTENT-MIB', '+'.$config['install_dir'].'/mibs');
+    $processors_array = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', $processors_array, 'HUAWEI-ENTITY-EXTENT-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/huawei');
+    $processors_array = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $processors_array, 'HUAWEI-ENTITY-EXTENT-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/huawei');
+    $processors_array = snmpwalk_cache_multi_oid($device, 'hwEntityBomEnDesc', $processors_array, 'HUAWEI-ENTITY-EXTENT-MIB', $config['mib_dir'].':'.$config['mib_dir'].'/huawei');
     d_echo($processors_array);
 
     if (is_array($processors_array)) {

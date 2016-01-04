@@ -1,7 +1,5 @@
 <?php
-
 echo '<tr class="list">';
-
 echo '<td class="list">';
 
 if (getidbyname($vm['vmwVmDisplayName'])) {
@@ -12,7 +10,13 @@ else {
 }
 
 echo '</td>';
-echo '<td class="list">'.$vm['vmwVmState'].'</td>';
+
+if ($vm['vmwVmState'] == 'powered off') {
+    echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-default">OFF</span></td>';
+}
+else {
+    echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-success">ON</span></td>';
+}
 
 if ($vm['vmwVmGuestOS'] == 'E: tools not installed') {
     echo '<td class="box-desc">Unknown (VMware Tools not installed)</td>';

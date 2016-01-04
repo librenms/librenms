@@ -107,6 +107,18 @@ $config['os'][$os]['over'][1]['text']  = 'Processor Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_ucd_memory';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'infinity';
+$config['os'][$os]['text']             = 'LigoWave Infinity';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'ligowave';
+$config['os'][$os]['nobulk']           = 1;
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Ubiquiti
 $os = 'unifi';
 $config['os'][$os]['text']             = 'Ubiquiti UniFi';
@@ -114,7 +126,11 @@ $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'ubiquiti';
 $config['os'][$os]['nobulk']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 $os = 'airos';
 $config['os'][$os]['text']             = 'Ubiquiti AirOS';
@@ -437,7 +453,6 @@ $os = 'nos';
 $config['os'][$os]['text']             = 'Brocade NOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
-$config['os'][$os]['descr_to_alias']   = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
@@ -488,6 +503,14 @@ $config['os'][$os]['icon']             = 'siklu';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Saf Wireless
+$os = 'saf';
+$config['os'][$os]['text']             = 'SAF Wireless';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'saf';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Supermicro Switch
 $os = 'supermicro-switch';
 $config['os'][$os]['group']  = 'supermicro';
@@ -502,6 +525,14 @@ $config['os'][$os]['text']             = 'Netgear ProSafe';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['bad_if'][]         = 'cpu';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
+//Quanta switches
+$os = 'quanta';
+$config['os'][$os]['text']             = 'Quanta';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'quanta';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
@@ -776,6 +807,14 @@ $config['os'][$os]['text'] = 'D-Link Access Point';
 $config['os'][$os]['type'] = 'wireless';
 $config['os'][$os]['icon'] = 'dlink';
 
+// TP-Link
+$os = 'tplink';
+$config['os'][$os]['text']             = 'TP-Link Switch';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'tplink';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 $os = 'axiscam';
 $config['os'][$os]['text'] = 'AXIS Network Camera';
 $config['os'][$os]['icon'] = 'axis';
@@ -1024,6 +1063,7 @@ $config['os'][$os]['icon']             = 'comet';
 $config['os'][$os]['over'][0]['graph'] = 'device_temperature';
 $config['os'][$os]['over'][0]['text']  = 'temperature';
 
+    //printer
 $os = 'dell-laser';
 $config['os'][$os]['group']            = 'printer';
 $config['os'][$os]['text']             = 'Dell Laser';
@@ -1111,6 +1151,13 @@ $config['os'][$os]['over'][0]['text']  = 'Toner';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['type']             = 'printer';
 
+$os ='samsungprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Samsung Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+    
 $os = '3com';
 $config['os'][$os]['text']             = '3Com';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
@@ -1209,6 +1256,8 @@ $os = 'canopy';
 $config['os'][$os]['text'] = 'Cambium';
 $config['os'][$os]['type'] = 'wireless';
 $config['os'][$os]['icon'] = 'cambium';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 $os = 'datacom';
 $config['os'][$os]['text'] = 'Datacom';
@@ -1237,6 +1286,10 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifXmcbc']          = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'pbn';
 
 // Enterasys
@@ -1336,6 +1389,14 @@ $os = 'riverbed';
 $config['os'][$os]['text']             = 'Riverbed';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'riverbed';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// Ligowave LigoOS
+$os = 'ligoos';
+$config['os'][$os]['text']             = 'LigoWave LigoOS';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'ligowave';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
@@ -1729,10 +1790,6 @@ if (isset($config['rrdgraph_def_text'])) {
     $config['rrd_opts_array']    = explode(' ', trim($config['rrdgraph_def_text']));
 }
 
-if (!isset($config['log_file'])) {
-    $config['log_file'] = $config['log_dir'].'/'.$config['project_id'].'.log';
-}
-
 if (isset($config['cdp_autocreate'])) {
     $config['dp_autocreate'] = $config['cdp_autocreate'];
 }
@@ -1801,7 +1858,7 @@ if (!isset($config['log_dir'])) {
 }
 
 if (!isset($config['log_file'])) {
-    $config['log_dir'].'/'.$config['project_id'].'.log';
+    $config['log_file'] = $config['log_dir'].'/'.$config['project_id'].'.log';
 }
 
 if (!isset($config['plugin_dir'])) {

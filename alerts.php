@@ -48,7 +48,7 @@ require_once $config['install_dir'].'/includes/definitions.inc.php';
 require_once $config['install_dir'].'/includes/functions.php';
 require_once $config['install_dir'].'/includes/alerts.inc.php';
 
-if (!defined('TEST')) {
+if (!defined('TEST') && $config['alert']['disable'] != 'true') {
     echo 'Start: '.date('r')."\r\n";
     echo "RunFollowUp():\r\n";
     RunFollowUp();
@@ -314,6 +314,9 @@ function ExtTransports($obj) {
     $tmp = false;
     // To keep scrutinizer from naging because it doesnt understand eval
     foreach ($config['alert']['transports'] as $transport => $opts) {
+        if (is_array($opts)) {
+            $opts = array_filter($opts);
+        }
         if (($opts === true || !empty($opts)) && $opts != false && file_exists($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php')) {
             echo $transport.' => ';
             eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');

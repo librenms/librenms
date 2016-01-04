@@ -11,7 +11,7 @@ else {
 }
 
 if ($nototal) {
-    $descrlen += '2';
+    $descr_len += '2';
     $unitlen  += '2';
 }
 
@@ -57,16 +57,16 @@ foreach ($rrd_list as $rrd) {
 
     if ($rrd['invert']) {
         $rrd_options  .= ' CDEF:'.$id.'i='.$id.',-1,*';
-        $rrd_optionsc .= ' AREA:'.$id.'i#'.$colour.":'$descr':".$cstack;
+        $rrd_optionsc .= ' AREA:'.$id.'i#'.$colour.":'$descr'".$cstack;
         $rrd_optionsc .= ' GPRINT:'.$id.':LAST:%5.1lf%s GPRINT:'.$id.'min:MIN:%5.1lf%s';
         $rrd_optionsc .= ' GPRINT:'.$id.'max:MAX:%5.1lf%s GPRINT:'.$id.":AVERAGE:'%5.1lf%s\\n'";
-        $cstack        = 'STACK';
+        $cstack        = ':STACK';
     }
     else {
-        $rrd_optionsb .= ' AREA:'.$id.'#'.$colour.":'$descr':".$bstack;
+        $rrd_optionsb .= ' AREA:'.$id.'#'.$colour.":'$descr'".$bstack;
         $rrd_optionsb .= ' GPRINT:'.$id.':LAST:%5.1lf%s GPRINT:'.$id.'min:MIN:%5.1lf%s';
         $rrd_optionsb .= ' GPRINT:'.$id.'max:MAX:%5.1lf%s GPRINT:'.$id.":AVERAGE:'%5.1lf%s\\n'";
-        $bstack        = 'STACK';
+        $bstack        = ':STACK';
     }
 
     $i++;

@@ -73,7 +73,7 @@ $rrd_options .= " 'COMMENT: \\n'";
 
 $rrd_options .= " 'LINE1:usedreal#d0b080:'";
 
-$rrd_options .= " 'AREA:shared#afeced::'";
+$rrd_options .= " 'AREA:shared#afeced:'";
 $rrd_options .= " 'AREA:buffered#cc0000::STACK'";
 $rrd_options .= " 'AREA:cached#ffaa66::STACK'";
 

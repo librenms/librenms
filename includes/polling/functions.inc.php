@@ -122,7 +122,7 @@ function poll_sensor($device, $class, $unit) {
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
 
-        dbUpdate(array('sensor_current' => $sensor_value), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
+        dbUpdate(array('sensor_current' => $sensor_value, 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
     }//end foreach
 
 }//end poll_sensor()
@@ -462,7 +462,10 @@ function location_to_latlng($device) {
     if (!empty($device_location)) {
         $new_device_location = preg_replace("/ /","+",$device_location);
         // We have a location string for the device.
-        $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device_location));
+        $loc = parse_location($device_location);
+        if (!is_array($loc)) {
+            $loc = dbFetchRow("SELECT `lat`,`lng` FROM `locations` WHERE `location`=? LIMIT 1", array($device_location));
+        }
         if (is_array($loc) === false) {
             // Grab data from which ever Geocode service we use.
             switch ($config['geoloc']['engine']) {

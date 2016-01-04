@@ -1,0 +1,103 @@
+{
+    // http://www.jshint.com/docs/
+    // Based on node-jshint@2.x.x
+
+    // ENFORCING OPTIONS
+    // These options tell JSHint to be more strict towards your code. Use them if
+    // you want to allow only a safe subset of JavaScript—very useful when your
+    // codebase is shared with a big number of developers with different skill
+    // levels.
+
+    "bitwise":        true,   //prohibits the use of bitwise operators such as ^ (XOR), | (OR) and others
+    "camelcase":      false,  //force all variable names to use either camelCase style or UPPER_CASE with underscores
+    "curly":          true,   //requires you to always put curly braces around blocks in loops and conditionals
+    "eqeqeq":         true,   //prohibits the use of == and != in favor of === and !==
+    "es3":            false,  //tells JSHint that your code needs to adhere to ECMAScript 3 specification
+    "forin":          false,   //requires all `for in` loops to filter object's items with `hasOwnProperty()`
+    "immed":          true,   //prohibits the use of immediate function invocations without wrapping them in parentheses
+    "indent":         2,      //enforces specific tab width
+    "latedef":        true,   //prohibits the use of a variable before it was defined
+    "newcap":         true,   //requires you to capitalize names of constructor functions
+    "noarg":          true,   //prohibits the use of `arguments.caller` and `arguments.callee`
+    "noempty":        true,   //warns when you have an empty block in your code
+    "nonew":          true,   //prohibits the use of constructor functions for side-effects
+    "plusplus":       false,  //prohibits the use of unary increment and decrement operators
+    "quotmark":       true,   //enforces the consistency of quotation marks used throughout your code
+    "undef":          true,   //prohibits the use of explicitly undeclared variables
+    "unused":         "vars", //warns when you define and never use your variables
+    "strict":         true,   //requires all functions to run in ECMAScript 5's strict mode
+    "trailing":       true,   //makes it an error to leave a trailing whitespace in your code
+    "maxparams":      false,  //set the max number of formal parameters allowed per function
+    "maxdepth":       6,      //control how nested do you want your blocks to be
+    "maxstatements":  false,  //set the max number of statements allowed per function
+    "maxcomplexity":  false,  //control cyclomatic complexity throughout your code
+
+    // RELAXING OPTIONS
+    // These options allow you to suppress certain types of warnings. Use them
+    // only if you are absolutely positive that you know what you are doing.
+
+    "asi":            false,  //suppresses warnings about missing semicolons
+    "boss":           false,  //suppresses warnings about the use of assignments in cases where comparisons are expected
+    "debug":          false,  //suppresses warnings about the debugger statements in your code
+    "eqnull":         false,  //suppresses warnings about == null comparisons
+    "esnext":         false,  //your code uses ES.next specific features such as const
+    "evil":           false,  //suppresses warnings about the use of eval
+    "expr":           true,   //suppresses warnings about the use of expressions where normally you would expect to see assignments or function calls
+    "funcscope":      false,  //suppresses warnings about declaring variables inside of control structures while accessing them later from the outside
+    "globalstrict":   false,  //suppresses warnings about the use of global strict mode
+    "iterator":       false,  //suppresses warnings about the `__iterator__` property
+    "lastsemic":      false,  //suppresses warnings about missing semicolons, but only when the semicolon is omitted for the last statement in a one-line block
+    "laxbreak":       false,  //suppresses most of the warnings about possibly unsafe line breakings in your code
+    "laxcomma":       false,  //suppresses warnings about comma-first coding style
+    "loopfunc":       false,  //suppresses warnings about functions inside of loops
+    "moz":            false,  //tells JSHint that your code uses Mozilla JavaScript extensions
+    "multistr":       false,  //suppresses warnings about multi-line strings
+    "proto":          false,  //suppresses warnings about the `__proto__` property
+    "scripturl":      false,  //suppresses warnings about the use of script-targeted URLs—such as `javascript:...`
+    "smarttabs":      false,  //suppresses warnings about mixed tabs and spaces when the latter are used for alignmnent only
+    "shadow":         false,  //suppresses warnings about variable shadowing
+    "sub":            false,  //suppresses warnings about using `[]` notation when it can be expressed in dot notation
+    "supernew":       false,  //suppresses warnings about "weird" constructions like `new function () { ... }` and `new Object;`
+    "validthis":      false,  //suppresses warnings about possible strict violations when the code is running in strict mode and you use `this` in a non-constructor function
+
+    // ENVIRONMENTS
+    // These options pre-define global variables that are exposed by popular
+    // JavaScript libraries and runtime environments—such as browser or node.js.
+    // Essentially they are shortcuts for explicit declarations like
+    // /*global $:false, jQuery:false */
+
+    "browser":        true,   //defines globals exposed by modern browsers
+    "couch":          false,  //defines globals exposed by CouchDB
+    "devel":          true,   //defines globals that are usually used for logging poor-man's debugging: `console`, `alert`, etc.
+    "dojo":           false,  //defines globals exposed by the Dojo Toolkit
+    "jquery":         true,   //defines globals exposed by the jQuery JavaScript library
+    "mootools":       false,  //defines globals exposed by the MooTools JavaScript framework
+    "node":           true,   //defines globals available when your code is running inside of the Node runtime environment
+    "nonstandard":    false,  //defines non-standard but widely adopted globals such as `escape` and `unescape`
+    "phantom":        false,  //defines globals available when your core is running inside of the PhantomJS runtime environment
+    "qunit":          true,  //defines globals available when your core is running inside of the Qqunit runtime environment
+    "prototypejs":    false,  //defines globals exposed by the Prototype JavaScript framework
+    "rhino":          false,  //defines globals available when your code is running inside of the Rhino runtime environment
+    "worker":         true,   //defines globals available when your code is running inside of a Web Worker
+    "wsh":            false,  //defines globals available when your code is running as a script for the Windows Script Host
+    "yui":            false,  //defines globals exposed by the YUI JavaScript framework
+
+    "globals": {
+        "define":       false,
+        "throttle":     false,
+        "delay":        false,
+        "debounce":     false,
+      "jQuery": true,
+      "require": false,
+      "Gridster": false
+    },
+
+    // LEGACY
+    // These options are legacy from JSLint. Aside from bug fixes they will not
+    // be improved in any way and might be removed at any point.
+
+    "nomen":          false,  //disallows the use of dangling `_` in variables
+    "onevar":         false,  //allows only one `var` statement per function
+    "passfail":       false,  //makes JSHint stop on the first error or warning
+    "white":          false   //make JSHint check your source code against Douglas Crockford's JavaScript coding style
+}

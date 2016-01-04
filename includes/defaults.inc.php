@@ -127,6 +127,7 @@ $config['page_title_prefix'] = '';
 $config['page_title_suffix'] = $config['project_name'];
 $config['timestamp_format']  = 'd-m-Y H:i:s';
 $config['page_gen']          = 0;
+$config['enable_lazy_load']  = true;
 // display MySqL & PHP stats in footer?
 $config['login_message'] = 'Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.';
 $config['public_status'] = false;
@@ -215,6 +216,8 @@ $config['autodiscovery']['nets-exclude'][] = '127.0.0.0/8';
 $config['autodiscovery']['nets-exclude'][] = '169.254.0.0/16';
 $config['autodiscovery']['nets-exclude'][] = '224.0.0.0/4';
 $config['autodiscovery']['nets-exclude'][] = '240.0.0.0/4';
+// Autodiscover by IP
+$config['discovery_by_ip'] = false;// Set to true if you want to enable auto discovery by IP.
 
 $config['alerts']['email']['enable'] = false;
 // Enable email alerts
@@ -406,6 +409,8 @@ $config['network_map_vis_options'] = '{
 // Device page options
 $config['show_overview_tab'] = true;
 
+$config['cpu_details_overview'] = false; //By default show only average cpu in device overview
+
 // The device overview page options
 $config['overview_show_sysDescr'] = true;
 
@@ -529,7 +534,6 @@ $config['device_traffic_iftype'][] = '/ppp/';
 $config['device_traffic_descr'][] = '/loopback/';
 $config['device_traffic_descr'][] = '/vlan/';
 $config['device_traffic_descr'][] = '/tunnel/';
-$config['device_traffic_descr'][] = '/:\d+/';
 $config['device_traffic_descr'][] = '/bond/';
 $config['device_traffic_descr'][] = '/null/';
 $config['device_traffic_descr'][] = '/dummy/';
@@ -824,3 +828,9 @@ $config['summary_errors']                               = 0;
 
 // Default width of the availability map's tiles
 $config['availability-map-width']                       = 25;
+
+// Default notifications Feed
+$config['notifications']['LibreNMS']                    = 'http://www.librenms.org/notifications.rss';
+
+// Update channel (Can be 'master' or 'release')
+$config['update_channel']                               = 'master';

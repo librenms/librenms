@@ -13,7 +13,7 @@ netonixSwitch MODULE-IDENTITY
      DESCRIPTION "The MIB Module for Netonix Switches."
      REVISION "9803231700Z"
      DESCRIPTION "The MIB Module for Netonix Switches."
-    ::= { enterprises 99999 }
+    ::= { enterprises 46242 }
 
 netonixSwitchGroup OBJECT-GROUP
     OBJECTS { firmwareVersion,
@@ -21,7 +21,8 @@ netonixSwitchGroup OBJECT-GROUP
 	tempDescription,
 	temp,
 	voltageDescription,
-	voltage
+	voltage,
+	poeStatus
     }
     STATUS  current
     DESCRIPTION "A collection of objects providing basic instrumentation and control of an SNMPv2 entity."
@@ -83,6 +84,40 @@ fanSpeed OBJECT-TYPE
     STATUS	current
     DESCRIPTION "Integer reference number (row number) for the fan mib."
     ::= { fanEntry 2 }
+
+poeStatusTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF PoEStatus
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "PoE Status per port."
+    ::= { netonixSwitch 5 }
+
+poeStatusEntry OBJECT-TYPE
+    SYNTAX     PoeStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "An entry containing poe status."
+    INDEX      { poeStatusIndex }
+    ::= { poeStatusTable  1 }
+
+PoEStatusEntry ::= SEQUENCE {
+    poeStatusIndex		Integer32,
+    poeStatus		DisplayString
+}
+
+poeStatusIndex OBJECT-TYPE
+    SYNTAX	Integer32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Integer reference number (row number) for the poe status."
+    ::= { poeStatusEntry 1 }
+
+poeStatus OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION "poe status."
+    ::= { poeStatusEntry 2 }
 
 tempTable OBJECT-TYPE
     SYNTAX	SEQUENCE OF TempEntry

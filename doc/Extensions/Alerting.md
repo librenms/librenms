@@ -18,6 +18,9 @@ Table of Content:
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
     - [Pushbullet](#transports-pushbullet)
+    - [Clickatell](#transports-clickatell)
+    - [PlaySMS](#transports-playsms)
+    - [VictorOps](#transports-victorops)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -30,6 +33,7 @@ Table of Content:
     - [Device](#macros-device)
     - [Port](#macros-port)
     - [Time](#macros-time)
+- [Additional Options](#extra)
 
 
 # <a name="about">About</a>
@@ -372,6 +376,54 @@ $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 ```
 ~~
 
+## <a name="transports-clickatell">Clickatell</a>
+
+Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.  
+Please consult Clickatell's documentation regarding number formating.  
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['clickatell']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567890';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567891';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
+```
+~~
+
+## <a name="transports-playsms">PlaySMS</a>
+
+PlaySMS is an OpenSource SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.  
+Please consult PlaySMS's documentation regarding number formating.  
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['playsms']['url']   = 'https://localhost/index.php?app=ws';
+$config['alert']['transports']['playsms']['user']  = 'user1';
+$config['alert']['transports']['playsms']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['playsms']['from']  = '+1234567892'; //Optional
+$config['alert']['transports']['playsms']['to'][]  = '+1234567890';
+$config['alert']['transports']['playsms']['to'][]  = '+1234567891';
+```
+~~
+
+## <a name="transports-victorops">VictorOps</a>
+
+VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps account and go to:
+
+Settings -> Integrations -> REST Endpoint -> Enable Integration.
+
+The URL provided will have $routing_key at the end, you need to change this to something that is unique to the system sending the alerts such as librenms. I.e:
+
+`https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms`
+
+~~
+```php
+$config['alert']['transports']['victorops']['url'] = 'https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms';
+```
+~~
+
 # <a name="entities">Entities
 
 Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
@@ -582,4 +634,14 @@ Description: Packet loss % value for the device within the last 15 minutes.
 
 Example: `%macros.packet_loss_15m` > 50
 
+# <a name="extra">Additional Options</a>
 
+Here are some of the other options available when adding an alerting rule:
+
+- Rule name: The name associated with the rule.
+- Severity: How "important" the rule is.
+- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
+- Delay: The amount of time to wait after a rule is matched before sending an alert.
+- Interval: The interval of time between alerts for an event until Max is reached.
+- Mute alerts: Disable sending alerts for this rule.
+- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).
