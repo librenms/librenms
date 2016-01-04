@@ -77,4 +77,5 @@ Contributors to LibreNMS:
 - Ruairi Carroll <ruairi.carroll@gmail.com> (rucarrol)
 - Maxim Tsyplakov <maxim.tsyplakov@gmail.com> (tsypa)
 - D. Britz <github@wrind.de> (flatterlight)
+- Tobias Herrmann <tobias@fiveninedigital.ch> (Mightea)
 [1]: http://observium.org/ "Observium web site"
