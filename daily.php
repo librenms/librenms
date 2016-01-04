@@ -13,10 +13,8 @@ require 'includes/functions.php';
 $options = getopt('f:');
 
 if ($options['f'] === 'update') {
-    $pool_size = dbFetchCell('SELECT @@innodb_buffer_pool_size');
-    // The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
-    $pool_used = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
-    if ($pool_used > $pool_size) {
+    $innodb_buffer = innodb_buffer_check();
+    if ($innodb_buffer['used'] > $innodb_buffer['size']) {
         if (!empty($config['alert']['default_mail'])) {
             $subject = $config['project_name'] . ' auto-update action required';
             $message = '
@@ -26,22 +24,28 @@ We have just tried to update your installation but it looks like the InnoDB buff
 
 Because of this we have stopped the auto-update running to ensure your system is ok.
 
-You currently have a configured innodb_buffer_pool_size of ' . $pool_size / 1024 / 1024 . ' MiB but is currently using ' . $pool_used / 1024 / 1024 . ' MiB
+You currently have a configured innodb_buffer_pool_size of ' . $innodb_buffer['size'] / 1024 / 1024 . ' MiB but is currently using ' . $innodb_buffer['used'] / 1024 / 1024 . ' MiB
 
 Take a look at https://dev.mysql.com/doc/refman/5.6/en/innodb-buffer-pool.html for further details.
 
 The ' . $config['project_name'] . ' team.';
             send_mail($config['alert']['default_mail'],$subject,$message,$html=false);
-        } else {
-            echo 'InnoDB Buffersize too small.'.PHP_EOL;
-            echo 'Current size: '.($pool_size / 1024 / 1024).' MiB'.PHP_EOL;
-            echo 'Minimum Required: '.($pool_used / 1024 / 1024).' MiB'.PHP_EOL;
-            echo 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
         }
+        echo warn_innodb_buffer($innodb_buffer);
         exit(2);
     }
     else {
-        exit((int) $config['update']);
+        if ($config['update']) {
+            if ($config['update_channel'] == 'master') {
+                exit(1);
+            }
+            elseif ($config['update_channel'] == 'release') {
+                exit(3);
+            }
+        }
+        else {
+            exit(0);
+        }
     }
 }
 
@@ -99,6 +103,26 @@ if ($options['f'] === 'device_perf') {
     if (is_numeric($config['device_perf_purge'])) {
         if (dbDelete('device_perf', 'timestamp < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))', array($config['device_perf_purge']))) {
             echo 'Device performance times cleared for entries over '.$config['device_perf_purge']." days\n";
+        }
+    }
+}
+
+if ($options['f'] === 'notifications') {
+    include_once 'notifications.php';
+}
+
+if ($options['f'] === 'purgeusers') {
+    $purge = 0;
+    if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
+        $purge = $config['radius']['users_purge'];
+    }
+    if ($purge > 0) {
+        foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
+            $users[] = $user['user'];
+        }
+        $del_users = '"'.implode('","',$users).'"';
+        if (dbDelete('users', "username NOT IN ($del_users)",array($del_users))) {
+            echo "Removed users that haven't logged in for $purge days";
         }
     }
 }

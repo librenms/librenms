@@ -51,7 +51,7 @@ foreach ($menu_options as $option => $text) {
     if ($vars['format'] == 'graph_'.$option) {
         echo("<span class='pagemenu-selected'>");
     }
-    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option, 'from' => $config['time']['day'], 'to' => $config['time']['now'])) . '">' . $text . '</a>');
+    echo('<a href="' . generate_url($vars, array('format' => 'graph_'.$option, 'from' => '-24h', 'to' => 'now')) . '">' . $text . '</a>');
     if ($vars['format'] == 'graph_'.$option) {
         echo("</span>");
     }
@@ -61,6 +61,21 @@ foreach ($menu_options as $option => $text) {
 ?>
 
 <div style="float: right;">
+
+  <select name='type' id='type'
+    onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
+<?php
+    $type = 'device';
+    foreach (get_graph_subtypes($type) as $avail_type) {
+        echo("<option value='".generate_url($vars, array('format' => 'graph_'.$avail_type))."'");
+        if ('graph_'.$avail_type == $vars['format']) {
+            echo(" selected");
+        }
+        $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+        echo(">$display_type</option>");
+    }
+?>
+    </select>
 
 <?php
 
@@ -91,13 +106,13 @@ list($format, $subformat) = explode("_", $vars['format'], 2);
 
 if($format == "graph") {
 
-    if (!is_numeric($vars['from'])) {
+    if (empty($vars['from'])) {
         $graph_array['from'] = $config['time']['day'];
     }
     else {
         $graph_array['from'] = $vars['from'];
     }
-    if (!is_numeric($vars['to'])) {
+    if (empty($vars['to'])) {
         $graph_array['to'] = $config['time']['now'];
     }
     else {
@@ -252,7 +267,7 @@ else {
         <table id="devices" class="table table-condensed table-hover">
             <thead>
                 <tr>
-                    <th data-column-id="status" data-sortable="false" data-searchable="false" data-formatter="status">Status</th>
+                    <th data-column-id="status" data-searchable="false" data-formatter="status">Status</th>
                     <th data-column-id="icon" data-sortable="false" data-searchable="false">Vendor</th>
                     <th data-column-id="hostname" data-order="asc">Device</th>
                     <th data-column-id="ports" data-sortable="false" data-searchable="false"></th>

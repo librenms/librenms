@@ -26,6 +26,9 @@ if (isset($_POST['service']) && is_numeric($_POST['service'])) {
       <div class='col-sm-5'>
         <input name='params' id='params' value='".$service['service_param']."' class='form-control input-sm'>
       </div>
+      <div class='col-sm-5'>
+          This may be required based on the service check.
+      </div>
     </div>
     <button type='submit' id='confirm-editsrv' name='confirm-editsrv' value='yes' class='btn btn-primary input-sm'>Edit Service</button>
   </div>

@@ -8,7 +8,6 @@ echo "<span style='font-weight: bold;'>Services</span> &#187; ";
 
 $menu_options = array(
     'basic'   => 'Basic',
-    'details' => 'Details',
 );
 
 $sql_param = array();
@@ -68,9 +67,9 @@ echo '<div class="table-responsive">
     <tr>
         <th>Device</th>
         <th>Service</th>
-        <th>Status</th>
         <th>Changed</th>
         <th>Message</th>
+        <th>Description</th>
     </tr>';
 if ($_SESSION['userlevel'] >= '5') {
     $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY D.hostname ORDER BY D.hostname';

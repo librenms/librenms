@@ -51,6 +51,19 @@ $stat_oids_db = array(
     'ifInUcastPkts',
     'ifOutUcastPkts',
 );
+
+$stat_oids_db_extended = array(
+    'ifInNUcastPkts',
+    'ifOutNUcastPkts',
+    'ifInDiscards',
+    'ifOutDiscards',
+    'ifInUnknownProtos',
+    'ifInBroadcastPkts',
+    'ifOutBroadcastPkts',
+    'ifInMulticastPkts',
+    'ifOutMulticastPkts',
+);
+
 // From above for DB
 $etherlike_oids = array(
     'dot3StatsAlignmentErrors',
@@ -203,7 +216,9 @@ d_echo($port_stats);
 // FIXME -- this stuff is a little messy, looping the array to make an array just seems wrong. :>
 // -- i can make it a function, so that you don't know what it's doing.
 // -- $ports = adamasMagicFunction($ports_db); ?
-$ports_db = dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ?', array($device['device_id']));
+// select * doesn't do what we want if multiple tables have the same column name -- last one wins :/
+$ports_db = dbFetchRows('SELECT *, `ports_statistics`.`port_id` AS `ports_statistics_port_id`, `ports`.`port_id` AS `port_id` FROM `ports` LEFT OUTER JOIN `ports_statistics` ON `ports`.`port_id` = `ports_statistics`.`port_id` WHERE `ports`.`device_id` = ?', array($device['device_id']));
+
 foreach ($ports_db as $port) {
     $ports[$port['ifIndex']] = $port;
 }
@@ -214,6 +229,7 @@ foreach ($port_stats as $ifIndex => $port) {
         echo 'valid';
         if (!is_array($ports[$port['ifIndex']])) {
             $port_id                 = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
+            dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port['ifIndex']] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
             echo 'Adding: '.$port['ifName'].'('.$ifIndex.')('.$ports[$port['ifIndex']]['port_id'].')';
             // print_r($ports);
@@ -221,6 +237,10 @@ foreach ($port_stats as $ifIndex => $port) {
         else if ($ports[$ifIndex]['deleted'] == '1') {
             dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($ports[$ifIndex]['port_id']));
             $ports[$ifIndex]['deleted'] = '0';
+        }
+        if ($ports[$ifIndex]['ports_statistics_port_id'] === null) {
+            // in case the port was created before we created the table
+            dbInsert(array('port_id' => $ports[$ifIndex]['port_id']), 'ports_statistics');
         }
     }
     else {
@@ -247,6 +267,7 @@ foreach ($ports as $port) {
         $polled_period = ($polled - $port['poll_time']);
 
         $port['update'] = array();
+        $port['update_extended'] = array();
         $port['state']  = array();
 
         if ($config['slow_statistics'] == true) {
@@ -262,13 +283,37 @@ foreach ($ports as $port) {
             $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
         }
 
+        if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
+            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', $airos_stats, 'UBNT-AirFIBER-MIB');
+            $this_port['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
+            $this_port['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
+            $this_port['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
+            $this_port['ifOutErrors'] = $airos_stats[1]['txErroredFrames'];
+            $this_port['ifInBroadcastPkts'] = $airos_stats[1]['rxValidBroadcastFrames'];
+            $this_port['ifOutBroadcastPkts'] = $airos_stats[1]['txValidBroadcastFrames'];
+            $this_port['ifInMulticastPkts'] = $airos_stats[1]['rxValidMulticastFrames'];
+            $this_port['ifOutMulticastPkts'] = $airos_stats[1]['txValidMulticastFrames'];
+            $this_port['ifInUcastPkts'] = $airos_stats[1]['rxValidUnicastFrames'];
+            $this_port['ifOutUcastPkts'] = $airos_stats[1]['txValidUnicastFrames'];
+            $ports['update']['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
+            $ports['update']['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
+            $ports['update']['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
+            $ports['update']['ifOutErrors'] = $airos_stats[1]['txErroredFrames'];
+            $ports['update']['ifInBroadcastPkts'] = $airos_stats[1]['rxValidBroadcastFrames'];
+            $ports['update']['ifOutBroadcastPkts'] = $airos_stats[1]['txValidBroadcastFrames'];
+            $ports['update']['ifInMulticastPkts'] = $airos_stats[1]['rxValidMulticastFrames'];
+            $ports['update']['ifOutMulticastPkts'] = $airos_stats[1]['txValidMulticastFrames'];
+            $ports['update']['ifInUcastPkts'] = $airos_stats[1]['rxValidUnicastFrames'];
+            $ports['update']['ifOutUcastPkts'] = $airos_stats[1]['txValidUnicastFrames'];
+        }
+
         // rewrite the ifPhysAddress
         if (strpos($this_port['ifPhysAddress'], ':')) {
             list($a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(':', $this_port['ifPhysAddress']);
             $this_port['ifPhysAddress']              = zeropad($a_a).zeropad($a_b).zeropad($a_c).zeropad($a_d).zeropad($a_e).zeropad($a_f);
         }
 
-        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts'])) {
+        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']) && $device['os'] !== 'ciscosb') {
             echo 'HC ';
             $this_port['ifInBroadcastPkts']  = $this_port['ifHCInBroadcastPkts'];
             $this_port['ifOutBroadcastPkts'] = $this_port['ifHCOutBroadcastPkts'];
@@ -309,12 +354,13 @@ foreach ($ports as $port) {
         echo 'VLAN == '.$this_port['ifVlan'];
 
 	// When devices do not provide ifAlias data, populate with ifDescr data if configured
-        if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) || $config['os'][$device['os']]['descr_to_alias'] == 1) {
+        if ($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) {
             $this_port['ifAlias'] = $this_port['ifDescr'];
             d_echo('Using ifDescr as ifAlias');
         }
 
         // Update IF-MIB data
+        $tune_port = false;
         foreach ($data_oids as $oid) {
 
             if ($oid == 'ifAlias') {
@@ -334,6 +380,15 @@ foreach ($ports as $port) {
                 }
             }
             else if ($port[$oid] != $this_port[$oid]) {
+                $port_tune = get_dev_attrib($device, 'ifName_tune:'.$port['ifName']);
+                $device_tune = get_dev_attrib($device,'override_rrdtool_tune');
+                if ($port_tune == "true" ||
+                    ($device_tune == "true" && $port_tune != 'false') || 
+                    ($config['rrdtool_tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
+                    if ($oid == 'ifSpeed') {
+                        $tune_port = true;
+                    }
+                }
                 $port['update'][$oid] = $this_port[$oid];
                 log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
@@ -377,10 +432,17 @@ foreach ($ports as $port) {
 
         // End parse ifAlias
         // Update IF-MIB metrics
-        foreach ($stat_oids_db as $oid) {
+        $_stat_oids = array_merge($stat_oids_db, $stat_oids_db_extended);
+        foreach ($_stat_oids as $oid) {
+            $port_update = 'update';
+            $extended_metric = !in_array($oid, $stat_oids_db, true);
+            if ($extended_metric) {
+                $port_update = 'update_extended';
+            }
+
             if ($config['slow_statistics'] == true) {
-                $port['update'][$oid]         = $this_port[$oid];
-                $port['update'][$oid.'_prev'] = $port[$oid];
+                $port[$port_update][$oid]         = $this_port[$oid];
+                $port[$port_update][$oid.'_prev'] = $port[$oid];
             }
 
             $oid_prev = $oid.'_prev';
@@ -396,8 +458,8 @@ foreach ($ports as $port) {
                 $port['stats'][$oid.'_diff'] = $oid_diff;
 
                 if ($config['slow_statistics'] == true) {
-                    $port['update'][$oid.'_rate']  = $oid_rate;
-                    $port['update'][$oid.'_delta'] = $oid_diff;
+                    $port[$port_update][$oid.'_rate']  = $oid_rate;
+                    $port[$port_update][$oid.'_delta'] = $oid_diff;
                 }
 
                 d_echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n");
@@ -477,6 +539,9 @@ foreach ($ports as $port) {
             'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
         );
 
+        if ($tune_port === true) {
+            rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
+        }
         rrdtool_update("$rrdfile", $fields);
 
         $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
@@ -533,6 +598,8 @@ foreach ($ports as $port) {
         // Update Database
         if (count($port['update'])) {
             $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port['port_id']));
+            // do we want to do something else with this?
+            $updated += dbUpdate($port['update_extended'], 'ports_statistics', '`port_id` = ?', array($port['port_id']));
             d_echo("$updated updated");
         }
 

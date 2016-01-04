@@ -52,12 +52,39 @@ else {
     print_fail('Syntax error in config.php');
 }
 
+// Check we are running this as the root user
+$username = getenv('USERNAME') ?: getenv('USER');//http://php.net/manual/en/function.get-current-user.php
+if ($username !== 'root') {
+    print_fail("You need to run this script as root");
+}
+
 // load config.php now
 require_once 'includes/defaults.inc.php';
 require_once 'config.php';
 require_once 'includes/definitions.inc.php';
 require_once 'includes/functions.php';
 require_once $config['install_dir'].'/includes/alerts.inc.php';
+
+// Check php modules we use to make sure they are loaded
+$extensions = array('pcre','curl','session','snmp','mcrypt');
+foreach ($extensions as $extension) {
+    if (extension_loaded($extension) === false) {
+        $missing_extensions[] = $extension;
+    }
+}
+if (!empty($missing_extensions)) {
+    print_fail("We couldn't find the following php extensions, please ensure they are installed:");
+    foreach ($missing_extensions as $extension) {
+        echo "$extension\n";
+    }
+}
+
+if (class_exists('Net_IPv4') === false) {
+    print_fail("It doesn't look like Net_IPv4 is installed");
+}
+if (class_exists('Net_IPv6') === false) {
+    print_fail("It doesn't look like Net_IPv6 is installed");
+}
 
 // Let's test the user configured if we have it
 if (isset($config['user'])) {
@@ -77,6 +104,9 @@ if (isset($config['user'])) {
         }
     }
 }
+else {
+    print_warn('You don\'t have $config["user"] set, this most likely needs to be set to librenms');
+}
 
 // Run test on MySQL
 $test_db = @mysqli_connect($config['db_host'], $config['db_user'], $config['db_pass'], $config['db_name']);
@@ -91,6 +121,13 @@ else {
 $strict_mode = dbFetchCell("SELECT @@global.sql_mode");
 if(strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
     print_warn('You have MySQL STRICT_TRANS_TABLES enabled, it is advisable to disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
+}
+
+// Test for MySQL InnoDB buffer size
+$innodb_buffer = innodb_buffer_check();
+if ($innodb_buffer['used'] > $innodb_buffer['size']) {
+    print_fail('Your Innodb buffer size is not big enough...');
+    echo warn_innodb_buffer($innodb_buffer);
 }
 
 // Test transports

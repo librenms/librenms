@@ -12,11 +12,13 @@
  *
  */
 
-if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") ) {
-    $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'].$_SERVER['PHP_SELF'],"",$_SERVER['ORIG_SCRIPT_FILENAME']);
-}
-else {
-    $_SERVER['PATH_INFO'] = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '');
+if (empty($_SERVER['PATH_INFO'])) {
+    if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") ) {
+        $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'].$_SERVER['PHP_SELF'],"",$_SERVER['ORIG_SCRIPT_FILENAME']);
+    }
+    else {
+        $_SERVER['PATH_INFO'] = !empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '';
+    }
 }
 
 function logErrors($errno, $errstr, $errfile, $errline) {
@@ -163,8 +165,14 @@ else {
   <script src="js/jquery.bootgrid.min.js"></script>
   <script src="js/handlebars.min.js"></script>
   <script src="js/pace.min.js"></script>
+    <?php
+        if ($config['enable_lazy_load'] === true) {
+    ?>
   <script src="js/jquery.lazyload.min.js"></script>
   <script src="js/lazyload.js"></script>
+    <?php
+        }
+    ?>
   <script src="js/librenms.js"></script>
   <script type="text/javascript">
 
@@ -183,6 +191,10 @@ else {
 <body>
 
 <?php
+
+if(empty($_SESSION['screen_width']) && empty($_SESSION['screen_height'])) {
+    echo "<script>updateResolution();</script>";
+}
 
 if ((isset($vars['bare']) && $vars['bare'] != "yes") || !isset($vars['bare'])) {
     if ($_SESSION['authenticated']) {

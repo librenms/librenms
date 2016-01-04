@@ -132,10 +132,10 @@ foreach ($list as $items) {
     if (!in_array($items['local_device_id'],$tmp_ids)) {
         $tmp_devices[] = array('id'=>$items['local_device_id'],'label'=>$items['local_hostname'],'title'=>generate_device_link($local_device,'',array(),'','','',0),'shape'=>'box');
     }
+    array_push($tmp_ids,$items['local_device_id']);
     if (!in_array($items['remote_device_id'],$tmp_ids)) {
         $tmp_devices[] = array('id'=>$items['remote_device_id'],'label'=>$items['remote_hostname'],'title'=>generate_device_link($remote_device,'',array(),'','','',0),'shape'=>'box');
     }
-    array_push($tmp_ids,$items['local_device_id']);
     array_push($tmp_ids,$items['remote_device_id']);
     $speed = $items['local_ifspeed']/1000/1000;
     if ($speed == 100) {
@@ -218,7 +218,7 @@ echo $edges;
     var network = new vis.Network(container, data, options);
     network.on('click', function (properties) {
         if (properties.nodes > 0) {
-            window.location.href = "/device/device="+properties.nodes+"/tab=map/"
+            window.location.href = "device/device="+properties.nodes+"/tab=map/"
         }
     });
 </script>

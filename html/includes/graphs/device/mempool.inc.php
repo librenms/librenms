@@ -46,7 +46,7 @@ foreach (dbFetchRows('SELECT * FROM `mempools` where `device_id` = ?', array($de
         $rrd_optionsb .= " LINE1:mempooltotal$i#".$colour.":'".$descr."' ";
         $rrd_optionsb .= " GPRINT:mempooltotal$i:MIN:%3.0lf%%";
         $rrd_optionsb .= " GPRINT:mempooltotal$i:LAST:%3.0lf%%";
-        $rrd_optionsb .= " GPRINT:mempooltotal$i:MAX:%3.0lf%%\\\l ";
+        $rrd_optionsb .= " GPRINT:mempooltotal$i:MAX:%3.0lf%%\\l ";
         $iter++;
         $i++;
     }

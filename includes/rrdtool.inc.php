@@ -166,7 +166,11 @@ function rrdtool_graph($graph_file, $options) {
 function rrdtool($command, $filename, $options) {
     global $config, $debug, $rrd_pipes, $console_color;
 
-    if ($config['rrdcached'] && ($config['rrdtool_version'] >= 1.5 || $command != "create")) {
+    if ($config['rrdcached'] &&
+        (version_compare($config['rrdtool_version'], '1.5.5', '>=') ||
+        (version_compare($config['rrdtool_version'], '1.5', '>=') && $command != "tune") ||
+        ($command != "create" && $command != "tune"))
+        ) {
         if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
             $filename = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $filename);
             $filename = str_replace($config['rrd_dir'], './'.$config['rrdcached_dir'].'/', $filename);
@@ -280,7 +284,8 @@ function rrdtool_lastupdate($filename, $options){
 
 function rrdtool_escape($string, $maxlength=null){
     $result = shorten_interface_type($string);
-    $result = str_replace('%', '%%', $result);
+    $result = str_replace("'", '', $result);            # remove quotes
+    $result = str_replace('%', '%%', $result);          # double percent signs
     if (is_numeric($maxlength)) {
         $extra  = substr_count($string, ':', 0, $maxlength);
         $result = substr(str_pad($result, $maxlength), 0, ($maxlength + $extra));
@@ -289,7 +294,24 @@ function rrdtool_escape($string, $maxlength=null){
         }
     }
 
-    $result = str_replace(':', '\:', $result);
+    $result = str_replace(':', '\:', $result);          # escape colons
     return $result.' ';
 
+}
+
+function rrdtool_tune($type, $filename, $max) {
+    $fields = array();
+    if ($type === 'port') {
+        if ($max < 10000000) {
+            return false;
+        }
+        $max = $max / 8;
+        $fields = array(
+'INOCTETS','OUTOCTETS','INERRORS','OUTERRORS','INUCASTPKTS','OUTUCASTPKTS','INNUCASTPKTS','OUTNUCASTPKTS','INDISCARDS','OUTDISCARDS','INUNKNOWNPROTOS','INBROADCASTPKTS','OUTBROADCASTPKTS','INMULTICASTPKTS','OUTMULTICASTPKTS'
+        );
+    }
+    if (count($fields) > 0) {
+        $options = "--maximum " . implode(":$max --maximum ", $fields). ":$max";
+        rrdtool('tune', $filename, $options);
+    }
 }
