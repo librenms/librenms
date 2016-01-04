@@ -13,10 +13,11 @@
 $status    = 'error';
 $message   = 'unknown error';
 
-$port_id = mres($_POST['port_id']);
-$notes = mres($_POST['notes']);
+$device_id = mres($_POST['device_id']);
+$port_id_notes = mres($_POST['port_id_notes']);
+$attrib_value = mres($_POST['notes']);
 
-if (isset($notes) && (dbUpdate(array('notes' => $notes), 'ports', 'port_id = ?', array($port_id)))) {
+if (isset($attrib_value) && set_dev_attrib(array('device_id' => $device_id), $port_id_notes, $attrib_value)) {
     $status  = 'ok';
     $message = 'Updated';
 }
@@ -27,6 +28,8 @@ else {
 die(json_encode(array(
     'status'       => $status,
     'message'      => $message,
-    'notes'        => $notes,
-    'port_id'    => $port_id
+    'attrib_type'  => $port_id_notes,
+    'attrib_value' => $attrib_value,
+    'device_id'    => $device_id
+
 )));
