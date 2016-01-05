@@ -1,6 +1,5 @@
 <?php
 
-// Dear Tobias. You write in Perl, this makes me hate you forever.
 // This is my translation of Smokeping's graphing.
 // Thanks to Bill Fenner for Perl->Human translation:>
 $scale_min   = 0;
@@ -10,7 +9,7 @@ require 'includes/graphs/common.inc.php';
 require 'smokeping_common.inc.php';
 
 $i         = 0;
-$pings     = 20;
+$pings     = $config['smokeping']['pings'];
 $iter      = 0;
 $colourset = 'mixed';
 
