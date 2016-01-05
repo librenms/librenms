@@ -15,6 +15,7 @@ if (!$_SESSION['authenticated']) {
 
 $device = array();
 $ports  = array();
+$bgp    = array();
 
 if (isset($_REQUEST['search'])) {
     $search = mres($_REQUEST['search']);
