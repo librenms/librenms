@@ -1,3 +1,19 @@
+### January 2016
+
+#### Bug fixes
+  - Discovery / Polling:
+    - Ignore HC Broadcast and Multicast counters for Cisco SB (PR2552)
+
+#### Improvements
+  - WebUI:
+    - Converted arp pages to use bootgrid (PR2669)
+    - Updated VMWare listing page (PR2684)
+  - Added detection for:
+    - Added support for Samsung printers (PR2680)
+    - Added support for Canon printers (PR2687)
+  - Misc:
+    - Added option to specify Smokeping ping value (PR2676)
+
 ### December 2015
 
 #### Bug fixes
@@ -35,6 +51,7 @@
     - Update alert rules to show actual alert rule ID (PR2603)
     - Initial support added for per user default dashboard (PR2620)
     - Updated Worldmap to show clusters in red if one device is down (PR2621)
+    - Cleaned up Billing pages (PR2671)
   - Discovery / Polling
     - Added traffic bits as default for Cambium devices (PR2525)
     - Overwrite eth0 port data from UniFi MIBs for AirFibre devices (PR2544)
@@ -54,6 +71,7 @@
     - Updated Fotinet MIBs (PR2529, PR2534)
     - Cisco SG500 (PR2609)
     - Updated processor support for Fortigate (PR2613)
+    - Added CPU / Memory support for PBN (PR2672)
   - Misc:
     - Updated validation to check for php extension and classes required (PR2602)
     - Added Radius Authentication support (PR2615)
@@ -70,6 +88,7 @@
     - Fix netcmd.php URI for sub dir installations (PR2428)
     - Fixed Oxidized fetch config with groups (PR2501)
     - Fixed background colour to white for some graphs (PR2516)
+    - Added missing Service description on services page (PR2679)
   - API:
     - Added missing quotes for MySQL queries (PR2382)
   - Discovery / Polling:
