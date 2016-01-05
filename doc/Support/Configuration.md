@@ -360,6 +360,13 @@ $config['smokeping']['dir']             = "/var/lib/smokeping/";
 Set the smokeping directory location.
 
 ```php
+$config['smokeping']['pings']           = 20;
+```
+Should be equal to "pings" in your smokeping config.  On Debian/Ubuntu, this is set in `/etc/smokeping/config.d/Database`.
+
+You can also set it to less than the value of "pings" in your smokeping config if you don't want LibreNMS to graph all of the ping data.
+
+```php
 $config['nfsen_enable'] = 0;
 $config['nfsen_split_char']   = "_";
 $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
