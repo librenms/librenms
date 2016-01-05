@@ -30,6 +30,7 @@ Now configure LibreNMS (make sure you point dir to your smokeping data directory
 
 ```php
 $config['smokeping']['dir'] = '/opt/smokeping/data';
+$config['smokeping']['pings'] = 20;		// should be equal to "pings" in your smokeping config
 $config['smokeping']['integration'] = true;
 ```
 
@@ -39,6 +40,7 @@ This is quite simple, just point your dir at the smokeping data directory - plea
 
 ```php
 $config['smokeping']['dir'] = '/opt/smokeping/data';
+$config['smokeping']['pings'] = 20;		// should be equal to "pings" in your smokeping config
 $config['own_hostname']
 ```
 
@@ -148,6 +150,7 @@ Scroll to the bottom, and paste in the following:
 
 ```bash
 $config['smokeping']['dir'] = '/var/lib/smokeping';
+$config['smokeping']['pings'] = 20;		// should be equal to "pings" in your smokeping config
 $config['smokeping']['integration'] = true;
 ```
 
