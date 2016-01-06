@@ -50,6 +50,9 @@ if ($device['os'] == 'ios') {
 
         rrdtool_update($rrd, $fields);
 
+        $tags = array('index' => $index, 'subindex' => $subindex);
+        influx_update($device,'c6kxbar',$tags,$fields);
+
     }//end foreach
 
     // print_r($entPhysical_state);

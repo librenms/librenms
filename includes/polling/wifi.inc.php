@@ -85,6 +85,9 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
 
         rrdtool_update($wificlientsrrd, $fields);
 
+        $tags = array('radio' => '1');
+        influx_update($device,'wificlients',$tags,$fields);
+
         $graphs['wifi_clients'] = true;
     }
 
@@ -104,6 +107,10 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         );
 
         rrdtool_update($wificlientsrrd, $fields);
+
+        $tags = array('radio' => '2');
+        influx_update($device,'wificlients',$tags,$fields);
+
 
         $graphs['wifi_clients'] = true;
     }

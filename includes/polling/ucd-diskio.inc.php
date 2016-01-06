@@ -40,6 +40,10 @@ if (count($diskio_data)) {
         );
 
         rrdtool_update($rrd, $fields);
+
+        $tags = array('descr' => $diskio['diskio_descr']);
+        influx_update($device,'ucd_diskio',$tags,$fields);
+
     }//end foreach
 
     echo "\n";

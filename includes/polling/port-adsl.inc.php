@@ -168,5 +168,8 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding'])) {
 
     rrdtool_update($rrdfile, $fields);
 
+    $tags = array('ifName' => $port['ifName']);
+    influx_update($device,'adsl',$tags,$fields);
+
     echo 'ADSL ('.$this_port['adslLineCoding'].'/'.formatRates($this_port['adslAtucChanCurrTxRate']).'/'.formatRates($this_port['adslAturChanCurrTxRate']).')';
 }//end if

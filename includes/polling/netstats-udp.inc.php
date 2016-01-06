@@ -43,6 +43,10 @@ if ($device['os'] != 'Snom') {
         }
 
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array();
+        influx_update($device,'netstats-udp',$tags,$fields);
+
         $graphs['netstat_udp'] = true;
     }
 }//end if
