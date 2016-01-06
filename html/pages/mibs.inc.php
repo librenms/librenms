@@ -12,6 +12,8 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+if (is_module_enabled('poller', 'mib')) {
 ?>
 
 <h4><i class="fa fa-file-text-o"></i> All MIB definitions</h4>
@@ -52,3 +54,8 @@
         }
     });
 </script>
+<?php
+}
+else {
+    print_mib_poller_disabled();
+}
