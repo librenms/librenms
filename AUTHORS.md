@@ -1,7 +1,4 @@
-LibreNMS is a fork of [Observium][1].  Observium was written by:
-- Adam Armstrong
-- Tom Laermans
-- various others as indicated in the file contents and commit logs
+LibreNMS is a fork of [Observium][1].
 
 LibreNMS core team:
 - Paul Gear <paul@librenms.org> (paulgear)
@@ -82,3 +79,8 @@ LibreNMS contributors:
 - Tobias Herrmann <tobias@fiveninedigital.ch> (Mightea)
 
 [1]: http://observium.org/ "Observium web site"
+Observium was written by:
+- Adam Armstrong
+- Tom Laermans
+- various others as indicated in the file contents and commit logs
+
