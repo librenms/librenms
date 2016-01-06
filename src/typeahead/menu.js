@@ -103,6 +103,7 @@ var Menu = (function() {
 
       onSelectableClick = _.bind(this._onSelectableClick, this);
       this.$node.on('click.tt', this.selectors.selectable, onSelectableClick);
+      this.$node.on('mouseover', this.selectors.selectable, function(){ that.setCursor($(this)) });
 
       _.each(this.datasets, function(dataset) {
         dataset
@@ -121,6 +122,7 @@ var Menu = (function() {
     },
 
     open: function open() {
+      this.$node.scrollTop(0);
       this.$node.addClass(this.classes.open);
     },
 
