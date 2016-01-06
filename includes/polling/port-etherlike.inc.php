@@ -33,5 +33,8 @@ if ($port_stats[$port['ifIndex']] &&
 
     rrdtool_update($rrdfile, $fields);
 
+    $tags = array('ifName' => $port['ifName']);
+    influx_update($device,'dot3',$tags,$fields);
+
     echo 'EtherLike ';
 }

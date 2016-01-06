@@ -62,5 +62,9 @@ foreach (dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` =
     );
 
     rrdtool_update($slarrd, $fields);
+
+    $tags = array('sla_nr' => $sla['sla_nr']);
+    influx_update($device,'sla',$tags,$fields);
+
     echo "\n";
 }//end foreach

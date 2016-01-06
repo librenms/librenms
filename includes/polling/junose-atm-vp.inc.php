@@ -62,6 +62,9 @@ if (count($vp_rows)) {
 
         rrdtool_update($rrd, $fields);
 
+        $tags = array('ifIndex' => $vp['ifIndex'], 'vp_id' => $vp['vp_id']);
+        influx_update($device,'atm-vp',$tags,$fields);
+
     }//end foreach
 
     echo "\n";

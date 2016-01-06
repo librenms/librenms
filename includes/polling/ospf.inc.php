@@ -378,6 +378,9 @@ $fields = array(
 );
 $ret        = rrdtool_update("$filename", $fields);
 
+$tags = array();
+influx_update($device,'ospf-statistics',$tags,$fields);
+
 unset($ospf_ports_db);
 unset($ospf_ports_poll);
 

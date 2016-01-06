@@ -92,6 +92,9 @@ if ($device['os_group'] == 'cisco') {
 
                     $ret = rrdtool_update("$filename", $fields);
 
+                    $tags = array('entity' => $entity, 'afi' => $afi, 'index' => $path);
+                    influx_update($device,'cefswitching',$tags,$fields);
+
                     echo "\n";
                 }//end foreach
             }//end foreach
