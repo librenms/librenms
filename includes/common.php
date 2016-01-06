@@ -738,6 +738,25 @@ function round_Nth($val = 0, $round_to) {
 
 
 /*
+ * @return true if this device should be polled with MIB-based discovery
+ */
+function is_mib_poller_enabled($device)
+{
+    if (!is_module_enabled('poller', 'mib')) {
+        d_echo("MIB polling module disabled globally.\n");
+        return false;
+    }
+
+    if (!is_dev_attrib_enabled($device, 'poll_mib')) {
+        d_echo('MIB module disabled for '.$device['hostname']."\n");
+        return false;
+    }
+
+    return true;
+} // is_mib_poller_enabled
+
+
+/*
  * FIXME: Dummy implementation
  */
 function count_mib_mempools($device)
