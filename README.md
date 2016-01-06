@@ -29,7 +29,7 @@ Participating
 -------------
 
 You can participate in the project by:
-- Talking to us on [IRC][4] or [Twitter][3].
+- Talking to us on IRC ([##librenms on Freenode][4]) or [Twitter][3].
 - Joining the [librenms-project][1] mailing list.
 - Improving the [documentation][5].
 - Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
