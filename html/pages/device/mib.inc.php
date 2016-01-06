@@ -16,6 +16,7 @@
 if (!isset($vars['section'])) {
     $vars['section'] = "mib";
 }
+if (is_module_enabled('poller', 'mib')) {
 ?>
 
 <h4><i class="fa fa-file-text-o"></i> Device MIB associations</h4>
@@ -86,3 +87,8 @@ if (!isset($vars['section'])) {
         }
     });
 </script>
+<?php
+}
+else {
+    print_mib_poller_disabled();
+}

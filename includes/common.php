@@ -742,7 +742,7 @@ function round_Nth($val = 0, $round_to) {
  */
 function count_mib_mempools($device)
 {
-    if ($device['os'] == 'ruckuswireless') {
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
         return 1;
     }
     return 0;
@@ -754,7 +754,7 @@ function count_mib_mempools($device)
  */
 function count_mib_processors($device)
 {
-    if ($device['os'] == 'ruckuswireless') {
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
         return 1;
     }
     return 0;
@@ -780,7 +780,7 @@ function get_mibval($device, $oid)
 function get_mib_mempools($device)
 {
     $mempools = array();
-    if ($device['os'] == 'ruckuswireless') {
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
         $mempool = array();
         $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.14.0');
         $mempool['mempool_descr'] = $mibvals['object_type'];
@@ -801,7 +801,7 @@ function get_mib_mempools($device)
 function get_mib_processors($device)
 {
     $processors = array();
-    if ($device['os'] == 'ruckuswireless') {
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
         $proc = array();
         $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.13.0');
         $proc['processor_descr'] = $mibvals['object_type'];
@@ -819,7 +819,7 @@ function get_mib_processors($device)
  */
 function is_custom_graph($type, $subtype, $device)
 {
-    if ($device['os'] == 'ruckuswireless' && $type == 'device') {
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless' && $type == 'device') {
         switch ($subtype) {
         case 'cpumem':
         case 'mempool':
@@ -953,6 +953,14 @@ function search_phrase_column($c)
     global $searchPhrase;
     return "$c LIKE '%$searchPhrase%'";
 } // search_phrase_column
+
+
+function print_mib_poller_disabled() {
+    echo '<h4>MIB polling is not enabled</h4>
+<p>
+Set <tt>$config[\'poller_modules\'][\'mib\'] = 1;</tt> in <tt>config.php</tt> to enable.
+</p>';
+} // print_mib_poller_disabled
 
 
 /**
