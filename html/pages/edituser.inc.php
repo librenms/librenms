@@ -384,7 +384,7 @@ if (passwordscanchange($users_details['username'])) {
            <div class='col-sm-4'><select class='form-control' name='dashboard'>";
     $defdash = dbFetchCell("SELECT dashboard FROM users WHERE user_id = ?",array($vars['user_id']));
     foreach(dbFetchRows("SELECT dashboards.*,users.username FROM `dashboards` INNER JOIN `users` ON users.user_id = dashboards.user_id WHERE (dashboards.access > 0 && dashboards.user_id != ?) || dashboards.user_id = ?",array($vars['user_id'],$vars['user_id'])) as $dash) {
-        echo "<option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['dashboard_name']."</option>";
+        echo "<option value='".$dash['dashboard_id']."'".($defdash == $dash['dashboard_id'] ? ' selected' : '').">".$dash['username'].':'.$dash['dashboard_name']."</option>";
     }
     echo "</select>
            </div>
