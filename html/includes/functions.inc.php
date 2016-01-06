@@ -485,10 +485,10 @@ function generate_lazy_graph_tag($args) {
     }
 
     if ($config['enable_lazy_load'] === true) {
-        return '<img class="lazy graphs" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
     }
     else {
-        return '<img class="graphs" width="'.$w.'" height="'.$h.'" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+        return '<img class="img-responsive" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
     }
 
 }//end generate_lazy_graph_tag()
