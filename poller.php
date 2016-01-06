@@ -23,7 +23,15 @@ require 'includes/alerts.inc.php';
 
 $poller_start = utime();
 echo $config['project_name_version']." Poller\n";
-echo get_last_commit()."\n";
+$versions = version_info(false);
+echo "Version info:\n";
+$cur_sha = $versions['local_sha'];
+echo "Commit SHA: $cur_sha\n";
+echo "DB Schema: ".$versions['db_schema']."\n";
+echo "PHP: ".$versions['php_ver']."\n";
+echo "MySQL: ".$versions['mysql_ver']."\n";
+echo "RRDTool: ".$versions['rrdtool_ver']."\n";
+echo "SNMP: ".$versions['netsnmp_ver']."\n";
 
 $options = getopt('h:m:i:n:r::d::a::');
 
