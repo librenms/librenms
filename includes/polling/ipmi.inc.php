@@ -49,6 +49,9 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
         rrdtool_update($rrd_file, $fields);
 
+        $tags = array('sensor_class' => $sensor['sensor_class'], 'sensor_type' => $sensor['sensor_type'], 'sensor_descr' => $sensor['sensor_descr'], 'sensor_index' => $sensor['sensor_index']);
+        influx_update($device,'ipmi',$tags,$fields);
+
         // FIXME warnings in event & mail not done here yet!
         dbUpdate(array('sensor_current' => $sensor, 'lastupdate' => array('NOW()')), 'sensors', 'poller_type = ? AND sensor_class = ? AND sensor_id = ?', array('ipmi', $ipmisensors['sensor_class'], $ipmisensors['sensor_id']));
     }

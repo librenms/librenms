@@ -41,6 +41,9 @@ if ($device['os_group'] == "cisco") {
 
         rrdtool_update ($rrd_filename, $fields);
 
+        $tags = array();
+        influx_update($device,'cisco-iospri',$tags,$fields);
+
         $graphs['cisco-iospri'] = TRUE;
         echo (" Cisco IOS PRI ");
     }

@@ -543,6 +543,17 @@ foreach ($ports as $port) {
             rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
         }
         rrdtool_update("$rrdfile", $fields);
+
+        $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
+        $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
+        $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
+        $fields['ifOutErrors_rate'] = $port['ifOutErrors_rate'];
+        $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
+        $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
+
+        $tags = array('ifName' => $port['ifName'], 'port_descr_type' => $port['port_descr_type']);
+        influx_update($device,'ports',$tags,$fields);
+
         // End Update IF-MIB
         // Update PAgP
         if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {

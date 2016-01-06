@@ -61,6 +61,9 @@ if ($device['os_group'] == 'cisco') {
 
         rrdtool_update($rrd_filename, $fields);
 
+        $tags = array();
+        influx_update($device,'cras_sessions',$tags,$fields);
+
         $graphs['cras_sessions'] = true;
         echo ' CRAS Sessions';
     }
