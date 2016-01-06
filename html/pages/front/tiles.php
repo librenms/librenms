@@ -37,7 +37,7 @@ if (!empty($vars['dashboard'])) {
 }
 if (empty($vars['dashboard'])) {
     if ($default_dash != 0) {
-        $vars['dashboard'] = dbFetchRow('select * from dashboards where dashboard_id = ?',array($default_dash));
+        $vars['dashboard'] = dbFetchRow('select dashboards.*,users.username from dashboards inner join users on dashboards.user_id = users.user_id where dashboards.dashboard_id = ?',array($default_dash));
     }
     else {
         $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
