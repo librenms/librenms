@@ -315,6 +315,17 @@ $config['graph_colours']['purples'] = array(
 );
 $config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
+// Colour values from http://www.sapdesignguild.org/goodies/diagram_guidelines/color_palettes.html
+$config['graph_colours']['manycolours'] = array(
+    "FFF8A3", "FAE16B", "F8D753", "F3C01C", "F0B400",   // yellows
+    "A9CC8F", "82B16A", "5C9746", "3D8128", "1E6C0B",   // greens
+    "B2C8D9", "779DBF", "3E75A7", "205F9A", "00488C",   // blues
+    "BEA37A", "907A52", "7A653E", "63522B", "3D3000",   // browns
+    "F3AA79", "EB8953", "E1662A", "DC5313", "D84000",   // oranges
+    "B5B5A9", "8B8D82", "74796F", "5D645A", "434C43",   // greys
+    "E6A4A5", "D6707B", "C4384F", "BC1C39", "B30023",   // pinks
+);
+
 // Map colors
 $config['network_map_legend'] = array(
     '0'   => '#aeaeae',
