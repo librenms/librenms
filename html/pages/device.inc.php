@@ -371,7 +371,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             </a>
             </li>';
 
-        if (device_permitted($device['device_id'])) {
+        if (device_permitted($device['device_id']) && is_mib_poller_enabled($device)) {
             echo '<li class="'.$select['mib'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'mib')).'">
                 <i class="fa fa-file-text-o"></i> MIB
