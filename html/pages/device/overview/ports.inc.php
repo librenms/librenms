@@ -10,8 +10,19 @@ if ($ports['total']) {
             </div>
             <table class="table table-hover table-condensed table-striped">';
 
-    $graph_array['height'] = '100';
-    $graph_array['width']  = '485';
+    if($_SESSION['screen_width']) {
+        if($_SESSION['screen_width'] > 970) {
+            $graph_array['width'] = round(($_SESSION['screen_width'] - 390 )/2,0);
+            $graph_array['height'] = round($graph_array['width'] /3);
+            $graph_array['lazy_w'] = $graph_array['width'] + 80;
+        }
+        else {
+            $graph_array['width'] = $_SESSION['screen_width'] - 190;
+            $graph_array['height'] = round($graph_array['width'] /3);
+            $graph_array['lazy_w'] = $graph_array['width'] + 80;
+        }
+    }
+
     $graph_array['to']     = $config['time']['now'];
     $graph_array['device'] = $device['device_id'];
     $graph_array['type']   = 'device_bits';
@@ -19,6 +30,9 @@ if ($ports['total']) {
     $graph_array['legend'] = 'no';
     $graph = generate_lazy_graph_tag($graph_array);
 
+    #Generate tooltip
+    $graph_array['width'] = 210;
+    $graph_array['height'] = 100;
     $link_array         = $graph_array;
     $link_array['page'] = 'graphs';
     unset($link_array['height'], $link_array['width']);

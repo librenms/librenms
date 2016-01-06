@@ -473,8 +473,15 @@ function generate_lazy_graph_tag($args) {
             case 'height':
                 $h = $arg;
                 break;
+            case 'lazy_w':
+                $lazy_w = $arg;
+                break;
         }
         $urlargs[] = $key."=".urlencode($arg);
+    }
+
+    if(isset($lazy_w)) {
+        $w=$lazy_w;
     }
 
     if ($config['enable_lazy_load'] === true) {
