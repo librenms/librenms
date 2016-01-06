@@ -807,3 +807,29 @@ function parse_location($location) {
         return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
     }
 }//end parse_location()
+
+/**
+ * Returns version info
+ * @return array
+**/
+function version_info($remote=true) {
+    global $config;
+    $output = array();
+    if ($remote === true && $config['update_channel'] == 'master') {
+        $api = curl_init();
+        set_curl_proxy($api);
+        curl_setopt($api, CURLOPT_USERAGENT,'LibreNMS');
+        curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
+        curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
+        $output['github'] = json_decode(curl_exec($api),true);
+    }
+    $output['local_sha']   = chop(`git rev-parse HEAD`);
+    $output['db_schema']   = dbFetchCell('SELECT version FROM dbSchema');
+    $output['php_ver']     = phpversion();
+    $output['mysql_ver']   = dbFetchCell('SELECT version()');
+    $output['rrdtool_ver'] = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
+    $output['netsnmp_ver'] = shell_exec($config['snmpget'].' --version 2>&1');
+
+    return $output;
+
+}//end version_info()
