@@ -13,6 +13,7 @@
  * the source code distribution for details.
  */
 
+if (is_module_enabled('poller', 'mib')) {
 ?>
 
 <h4>MIB associations for all devices</h4>
@@ -47,3 +48,8 @@
         }
     });
 </script>
+<?php
+}
+else {
+    print_mib_poller_disabled();
+}
