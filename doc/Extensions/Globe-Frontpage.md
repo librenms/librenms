@@ -2,9 +2,9 @@
 
 LibreNMS comes with a configurable geochart based frontpage to visualize where your gear is located geographically.
 
-### Expiremental map
+### Experimentall map
 
-An new expiremental map is available, this requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database. To enable this please set the following config:
+An new experimental map is available, this requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database. To enable this please set the following config:
 
 ```php
 $config['front_page']       = "pages/front/map.php";
