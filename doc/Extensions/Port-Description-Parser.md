@@ -1,6 +1,6 @@
 # Configuring interface descriptions for parsing.
 
-LibreNMS includes the ability to parse your interface descriptions for set information to diplay and segement in the WebUI.
+LibreNMS includes the ability to parse your interface descriptions for set information to diplay and segment in the WebUI.
 
 The following information is used from interface descriptions:
 
