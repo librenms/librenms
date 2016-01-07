@@ -1212,24 +1212,6 @@ function load_device_mibs($device)
 
 
 /*
- * @return true if this device should be polled with MIB-based discovery
- */
-function is_mib_poller_enabled($device)
-{
-    if (!is_module_enabled('poller', 'mib')) {
-        d_echo("MIB polling module disabled globally.\n");
-        return false;
-    }
-
-    if (!is_dev_attrib_enabled($device, 'poll_mib')) {
-        d_echo('MIB module disabled for '.$device['hostname']."\n");
-        return false;
-    }
-
-    return true;
-} // is_mib_poller_enabled
-
-/*
  * Run MIB-based polling for $device.  Update $graphs with the results.
  */
 function poll_mibs($device, &$graphs)
