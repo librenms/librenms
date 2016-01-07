@@ -1,7 +1,7 @@
 # Graylog integration
 
 We have simple integration for Graylog, you will be able to view any logs from within LibreNMS that have been parsed by the syslog input from within 
-Graylog itself. This includes logs from devices which aren't in LibreNMS still, you can also see logs for a sepcific device under the logs section 
+Graylog itself. This includes logs from devices which aren't in LibreNMS still, you can also see logs for a specific device under the logs section 
 for the device.
 
 Graylog itself isn't included within LibreNMS, you will need to install this separately either on the same infrastructure as LibreNMS or as a totally 

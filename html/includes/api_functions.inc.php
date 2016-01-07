@@ -791,7 +791,7 @@ function ack_alert() {
         $status = 'ok';
         $code   = 200;
         if (dbUpdate(array('state' => 2), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
-            $message = 'Alert has been ackgnowledged';
+            $message = 'Alert has been acknowledged';
         }
         else {
             $message = 'No alert by that ID';
