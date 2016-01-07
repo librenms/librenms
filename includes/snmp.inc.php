@@ -1044,9 +1044,6 @@ function oid_rrd_type($oid, $mibdef)
         return false;
 
     case 'Counter32':
-        // FIXME
-        return false;
-
     case 'Counter64':
         return 'COUNTER:600:0:U';
 

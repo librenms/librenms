@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
+if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware' || $device['os'] == 'nos') {
     echo 'Ironware Dynamic: ';
 
     $percent = snmp_get($device, 'snAgGblDynMemUtil.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
