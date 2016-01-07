@@ -46,7 +46,7 @@ We would recommend that you run some form of php caching application such as PHP
 The MySQL server should be contactable from this layer on port 3306 unless it's changed.
 
 ####Database Server
-MySQL - At the moment this is the only databse server that is supported, work is being done to ensure MySQL Strict mode is also supported but this should be considered to be incomplete still.
+MySQL - At the moment this is the only database server that is supported, work is being done to ensure MySQL Strict mode is also supported but this should be considered to be incomplete still.
 
 The pollers, web and API layers should all be able to access the database server directly. It would be possible to configure MySQL multi master but that is outside the scope of this document.
 
@@ -63,7 +63,7 @@ $config['rrdtool_version'] = 1.5;
 ```
 
 ####Memcache
-Memcache is required for the distributed pollers to be able to register to a central location and record what devices are polled. Memcache can run from any of the kit so long as it is accessable by all pollers.
+Memcache is required for the distributed pollers to be able to register to a central location and record what devices are polled. Memcache can run from any of the kit so long as it is accessible by all pollers.
 
 ####Pollers
 Pollers can be installed and run from anywhere, the only requirements are:
@@ -78,7 +78,7 @@ This will provide the ability to have a single poller behind a NAT firewall moni
 
 Another benefit to this is that you can provide N+x pollers, i.e if you know that you require three pollers to process all devices within 300 seconds then adding a 4th poller will mean that should any one single poller fail then the remaining three will complete polling in time. You could also use this to take a poller out of service for maintenance, i.e OS updates and software updates.
 
-It is exctremely advisable to either run a central recursive dns server such as pdns-recursor and have all of your pollers use this or install a recursive dns server on each poller - the volume of DNS requests on large installs can be significant.
+It is extremely advisable to either run a central recursive dns server such as pdns-recursor and have all of your pollers use this or install a recursive dns server on each poller - the volume of DNS requests on large installs can be significant.
 
 ####Discovery
 It's not necessary to run discovery services on all pollers. In fact, you should only run one discovery process per poller group. Designate a single poller to run discovery (or a seperate server if required).
