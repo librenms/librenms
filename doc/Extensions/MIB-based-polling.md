@@ -34,7 +34,7 @@ enabling MIB-based polling on my test Ruckus ZD1000 wireless controller with
 one (1) AP and one (1) user on that AP resulted in a 5 MB increase in RRD
 space usage for that device.  Each RRD file is around 125 KB in size (on
 x64-64 systems) and is pre-allocated, so after the first discovery and poller
-run of each devicewith MIB-based polling enabled, disk space should be stable.
+run of each device with MIB-based polling enabled, disk space should be stable.
 However, monitoring disk usage is your responsibility.  (The good news: you
 can do this with LibreNMS. :-)
 
