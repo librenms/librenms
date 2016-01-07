@@ -10,7 +10,7 @@ Table of Content:
 # <a name="about">About</a>
 
 Over the last couple of years, the primary attack vector for internet accounts has been static passwords.  
-Therefore static passwords are no longer suffient to protect unauthorized access to accounts.  
+Therefore static passwords are no longer sufficient to protect unauthorized access to accounts.  
 Two Factor Authentication adds a variable part in authentication procedures.  
 A user is now required to supply a changing 6-digit passcode in addition to it's password to obtain access to the account.
 
@@ -33,8 +33,8 @@ RFC4226 suggests a resynchronization attempt in case the passcode mismatches, pr
 
 ## <a name="hotp">Counterbased One-Time-Password (TOTP)</a>
 
-This type uses an internal counter that needs to be in-synch with the server's counter to successfully authenticate the passcodes.  
-The main advantage over timebased OTP is the attacker doesnt only need to know the Secretkey but also the server's Counter in order to create valid passcodes.  
+This type uses an internal counter that needs to be in sync with the server's counter to successfully authenticate the passcodes.  
+The main advantage over timebased OTP is the attacker doesn't only need to know the Secretkey but also the server's Counter in order to create valid passcodes.  
 RFC4226 suggests a resynchronization attempt in case the passcode mismatches, providing the attacker a range of upto +4 increments from the actual counter to create passcodes.
 
 # <a name="config">Configuration</a>
@@ -44,7 +44,7 @@ Enable Two-Factor:
 $config['twofactor'] = true;
 ```
 
-Set throttle-time (in secconds):
+Set throttle-time (in seconds):
 ```php
 $config['twofactor_lock'] = 300;
 ```
@@ -57,12 +57,12 @@ Create a Two-Factor key:
 - Go to 'My Settings' (/preferences/)
 - Choose TwoFactor type
 - Click on 'Generate TwoFactor Secret Key'
-- If your browser didnt reload, reload manually
+- If your browser didn't reload, reload manually
 - Scan provided QR or click on 'Manual' to see the Key
 
 ## <a name="usage-google">Google Authenticator</a>
 
-Installation guides for Google Authneticator can be found [here](https://support.google.com/accounts/answer/1066447?hl=en).
+Installation guides for Google Authenticator can be found [here](https://support.google.com/accounts/answer/1066447?hl=en).
 
 Usage:
 - Create a key like described above
