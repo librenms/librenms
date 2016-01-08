@@ -215,7 +215,10 @@ function poll_device($device, $options) {
             foreach ($config['poller_modules'] as $module => $module_status) {
                 if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
                     // TODO per-module polling stats
+                    $module_start = microtime(true);
                     include 'includes/polling/'.$module.'.inc.php';
+                    $module_time = microtime(true) - $module_start;
+                    echo "Runtime for polling module '$module': $module_time\n";
                 }
                 else if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                     echo "Module [ $module ] disabled on host.\n";
