@@ -72,7 +72,7 @@ $config['memcached']['ttl'] = $config['time']['now']+300;
 
 Plugins::start();
 
-$runtime_start = utime();
+$runtime_start = microtime(true);
 
 ob_start();
 
@@ -263,7 +263,7 @@ else {
 </div>
 <?php
 
-$runtime_end = utime();
+$runtime_end = microtime(true);
 $runtime = $runtime_end - $runtime_start;
 $gentime = substr($runtime, 0, 5);
 
