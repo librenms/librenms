@@ -12,15 +12,7 @@
  */
 
 
-function utime() {
-    $time = explode(' ', microtime());
-    $usec = (double) $time[0];
-    $sec  = (double) $time[1];
-    return ($sec + $usec);
-
-}
-
-$start = utime();
+$start = microtime(true);
 
 require_once 'Net/IPv4.php';
 
@@ -54,7 +46,7 @@ require 'includes/graphs/graph.inc.php';
 
 $console_color = new Console_Color2();
 
-$end = utime();
+$end = microtime(true);
 $run = ($end - $start);
 
 
