@@ -26,7 +26,7 @@ LibreNMS contributors:
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
 - Freddie Cash <fjwcash@gmail.com> (fjwcash)
-- Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
+- Thom Seddon <thom@seddonmedia.co.uk> (thomseddon) 
 - Vitali Kari <vitali.kari@gmail.com> (vitalisator)
 - James Campbell <neokjames@gmail.com> (neokjames)
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
