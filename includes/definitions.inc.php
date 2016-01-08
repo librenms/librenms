@@ -511,6 +511,14 @@ $config['os'][$os]['icon']             = 'saf';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Sub10
+$os = 'sub10';
+$config['os'][$os]['text']             = 'Sub10 Systems';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'sub10';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Supermicro Switch
 $os = 'supermicro-switch';
 $config['os'][$os]['group']  = 'supermicro';
@@ -1545,6 +1553,31 @@ $config['graph_types']['device']['siklu_rfinterfaceOctets']['descr'] = 'Traffic'
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['section'] = 'wireless';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['order'] = '6';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['descr'] = 'Other Octets';
+
+// Sub10 support
+$config['graph_types']['device']['sub10_sub10RadioLclTxPower']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclTxPower']['order'] = '0';
+$config['graph_types']['device']['sub10_sub10RadioLclTxPower']['descr'] = 'Radio Transmit Power';
+
+$config['graph_types']['device']['sub10_sub10RadioLclRxPower']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclRxPower']['order'] = '1';
+$config['graph_types']['device']['sub10_sub10RadioLclRxPower']['descr'] = 'Radio Receive Power';
+
+$config['graph_types']['device']['sub10_sub10RadioLclVectErr']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclVectErr']['order'] = '3';
+$config['graph_types']['device']['sub10_sub10RadioLclVectErr']['descr'] = 'Radio Vector Error';
+
+$config['graph_types']['device']['sub10_sub10RadioLclLnkLoss']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclLnkLoss']['order'] = '3';
+$config['graph_types']['device']['sub10_sub10RadioLclLnkLoss']['descr'] = 'Radio Link Loss';
+
+$config['graph_types']['device']['sub10_sub10RadioLclAFER']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclAFER']['order'] = '4';
+$config['graph_types']['device']['sub10_sub10RadioLclAFER']['descr'] = 'Radio Air Frame Error Rate';
+
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['order'] = '4';
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['descr'] = 'Data Rate on the Airside interface';
 
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order']   = '0';
