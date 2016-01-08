@@ -120,9 +120,9 @@ function discover_device($device, $options=null) {
     else {
         foreach ($config['discovery_modules'] as $module => $module_status) {
             if ($attribs['discover_'.$module] || ( $module_status && !isset($attribs['discover_'.$module]))) {
-                $module_start = utime();
+                $module_start = microtime(true);
                 include 'includes/discovery/'.$module.'.inc.php';
-                $module_time = utime() - $module_start;
+                $module_time = microtime(true) - $module_start;
                 echo "Runtime for discovery module '$module': $module_time\n";
             }
             else if (isset($attribs['discover_'.$module]) && $attribs['discover_'.$module] == '0') {
