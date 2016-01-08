@@ -529,13 +529,6 @@ function is_odd($number) {
     return $number & 1; // 0 = even, 1 = odd
 }
 
-function utime() {
-    $time = explode(" ", microtime());
-    $usec = (double)$time[0];
-    $sec = (double)$time[1];
-    return $sec + $usec;
-}
-
 function getpollergroup($poller_group='0') {
     //Is poller group an integer
     if (is_int($poller_group) || ctype_digit($poller_group)) {
