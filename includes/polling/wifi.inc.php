@@ -18,6 +18,11 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         include 'includes/polling/mib/siklu-mib.inc.php';
     }
 
+    if ($device['os'] == 'sub10') {
+        echo "It is Sub10\n";
+        include 'includes/polling/mib/sub10-mib.inc.php';
+    }
+
     // # GENERIC FRAMEWORK, FILLING VARIABLES
     if ($device['os'] == 'airport') {
         echo 'Checking Airport Wireless clients... ';
