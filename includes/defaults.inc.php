@@ -640,6 +640,8 @@ $config['libvirt_protocols'] = array(
     'qemu+ssh',
     'xen+ssh',
 );
+// Use different username for libvirt over SSH
+$config['libvirt_username'] = null;
 // Mechanisms used, add or remove if not using this on any of your machines.
 // Hardcoded ASN descriptions
 $config['astext'][65332] = 'Cymru FullBogon Feed';
