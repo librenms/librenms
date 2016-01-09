@@ -488,6 +488,7 @@ This array can be used to filter out syslog messages that you don't want to be s
 ```php
 $config['enable_libvirt'] = 1;
 $config['libvirt_protocols']    = array("qemu+ssh","xen+ssh");
+$config['libvirt_username'] = 'root';
 ```
 Enable this to switch on support for libvirt along with `libvirt_protocols`
 to indicate how you connect to libvirt.  You also need to:
