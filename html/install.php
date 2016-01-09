@@ -231,7 +231,7 @@ if($stage == 0) {
         <td>pear</td>
         <td>$ext_loaded</td>");
     if($ext_loaded == 'no') {
-        echo("<td>apt-get install php5-$extension / yum install php-$extension</td>");
+        echo("<td>apt-get install php-pear / yum install php-pear</td>");
     }
     else {
         echo("<td></td>");
