@@ -947,7 +947,7 @@ $config['os'][$os]['text'] = 'ZyXEL Prestige';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'zyxel';
 
-$os = 'zyxeles';
+$os = 'zynos';
 $config['os'][$os]['text'] = 'ZyXEL Ethernet Switch';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'zyxel';
