@@ -44,6 +44,7 @@ $override_sysContact_bool   = get_dev_attrib($device, 'override_sysContact_bool'
 $override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string');
 $disable_notify             = get_dev_attrib($device, 'disable_notify');
 ?>
+<h3>Alert settings</h3>
 
 <div class="row">
     <div class="col-md-12">
@@ -51,7 +52,7 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
     </div>
 </div>
 
-<h3>Alert settings</h3>
+
 
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
   <input type="hidden" name="editing" value="yes">
