@@ -18,7 +18,7 @@ foreach ($procs as $proc) {
 
 $unit_text = 'Load %';
 
-$units       = '%';
+$units       = '';
 $total_units = '%';
 $colours     = 'mixed';
 

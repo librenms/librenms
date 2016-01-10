@@ -22,7 +22,8 @@
  */
 
 
-function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes) {
+function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
+{
     global $config;
 
     $command = $config['rrdtool'].' -';
@@ -73,7 +74,8 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes) {
  */
 
 
-function rrdtool_pipe_close($rrd_process, &$rrd_pipes) {
+function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
+{
     d_echo(stream_get_contents($rrd_pipes[1]));
     d_echo(stream_get_contents($rrd_pipes[2]));
 
@@ -100,7 +102,8 @@ function rrdtool_pipe_close($rrd_process, &$rrd_pipes) {
  */
 
 
-function rrdtool_graph($graph_file, $options) {
+function rrdtool_graph($graph_file, $options)
+{
     global $config, $debug;
 
     rrdtool_pipe_open($rrd_process, $rrd_pipes);
@@ -163,7 +166,8 @@ function rrdtool_graph($graph_file, $options) {
  */
 
 
-function rrdtool($command, $filename, $options) {
+function rrdtool($command, $filename, $options)
+{
     global $config, $debug, $rrd_pipes, $console_color;
 
     if ($config['rrdcached'] &&
@@ -209,7 +213,8 @@ function rrdtool($command, $filename, $options) {
  */
 
 
-function rrdtool_create($filename, $options) {
+function rrdtool_create($filename, $options)
+{
     global $config;
     if( $config['rrdcached'] && $config['rrdtool_version'] >= 1.5 ) {
         $chk = rrdtool('info', $filename, '');
@@ -230,7 +235,8 @@ function rrdtool_create($filename, $options) {
  */
 
 
-function rrdtool_update($filename, $options) {
+function rrdtool_update($filename, $options)
+{
     $values = array();
     // Do some sanitisation on the data if passed as an array.
 
@@ -250,26 +256,25 @@ function rrdtool_update($filename, $options) {
     else {
         return 'Bad options passed to rrdtool_update';
     }
+} // rrdtool_update
 
-}
 
-
-function rrdtool_fetch($filename, $options) {
+function rrdtool_fetch($filename, $options)
+{
     return rrdtool('fetch', $filename, $options);
+} // rrdtool_fetch
 
-}
 
-
-function rrdtool_last($filename, $options) {
+function rrdtool_last($filename, $options)
+{
     return rrdtool('last', $filename, $options);
+} // rrdtool_last
 
-}
 
-
-function rrdtool_lastupdate($filename, $options){
+function rrdtool_lastupdate($filename, $options)
+{
     return rrdtool('lastupdate', $filename, $options);
-
-}
+} // rrdtool_lastupdate
 
 
 /**
@@ -280,8 +285,6 @@ function rrdtool_lastupdate($filename, $options){
  * @param string string to escape
  * @param integer if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
  */
-
-
 function rrdtool_escape($string, $maxlength=null){
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
@@ -296,8 +299,20 @@ function rrdtool_escape($string, $maxlength=null){
 
     $result = str_replace(':', '\:', $result);          # escape colons
     return $result.' ';
+} // rrdtool_escape
 
-}
+
+/*
+ * @return the name of the rrd file for $host's $extra component
+ * @param host Host name
+ * @param extra Components of RRD filename - will be separated with "-"
+ */
+function rrd_name($host, $extra, $exten = ".rrd")
+{
+    global $config;
+    $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
+    return implode("/", array($config['rrd_dir'], $host, $filename.$exten));
+} // rrd_name
 
 function rrdtool_tune($type, $filename, $max) {
     $fields = array();
@@ -314,4 +329,51 @@ function rrdtool_tune($type, $filename, $max) {
         $options = "--maximum " . implode(":$max --maximum ", $fields). ":$max";
         rrdtool('tune', $filename, $options);
     }
-}
+} // rrdtool_tune
+
+/*
+ * Please use this instead of creating & updating RRD files manually.
+ * @param device Device object - only 'hostname' is used at present
+ * @param name Array of rrdname components
+ * @param def Array of data definitions
+ * @param val Array of value definitions
+ *
+ */
+function rrd_create_update($device, $name, $def, $val, $step=300)
+{
+    global $config;
+    $rrd = rrd_name($device['hostname'], $name);
+
+    if (!is_file($rrd) && $def != null) {
+        // add the --step and the rra definitions to the array
+        $newdef = "--step $step ".implode(' ', $def).$config['rrd_rra'];
+        rrdtool_create($rrd, $newdef);
+    }
+
+    rrdtool_update($rrd, $val);
+} // rrd_create_update
+
+
+/*
+ * @return bool indicating existence of RRD file
+ * @param device Device object as used with rrd_create_update()
+ * @param name RRD name array as used with rrd_create_update() and rrd_name()
+ */
+function rrd_file_exists($device, $name)
+{
+    return is_file(rrd_name($device['hostname'], $name));
+} // rrd_file_exists
+
+
+/*
+ * @return bool indicating rename success or failure
+ * @param device Device object as used with rrd_create_update()
+ * @param oldname RRD name array as used with rrd_create_update() and rrd_name()
+ * @param newname RRD name array as used with rrd_create_update() and rrd_name()
+ */
+function rrd_file_rename($device, $oldname, $newname)
+{
+    $oldrrd = rrd_name($device['hostname'], $oldname);
+    $newrrd = rrd_name($device['hostname'], $newname);
+    return rename($oldrrd, $newrrd);
+} // rrd_file_rename

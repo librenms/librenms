@@ -17,7 +17,7 @@ For this a small `bash` script is supplied in `scripts/` called `ifAlias`.
 This requires a little bit of setup on the monitored Server (Not the server running librenms!):
 
 *   Add `ifAlias` from `/opt/librenms/scripts/` or download it from [here](#source) to the Server and make
-    it executeable `chmod +x /path/to/ifAlias`
+    it executable `chmod +x /path/to/ifAlias`
 *   Add to `snmpd.conf` something like:
     ``pass .1.3.6.1.2.1.31.1.1.1.18 /path/to/ifAlias``
 *   Restart your `net-snmpd`
@@ -50,6 +50,6 @@ See [examples](#examples) for formats.
 # eth2: Peering: Peering Exchange
 ```
 
-# <a name="source">Sourcecode</a>:
+# <a name="source">Source code</a>:
 
 * https://github.com/librenms/librenms/blob/master/scripts/ifAlias

@@ -30,7 +30,9 @@ if (is_numeric($sessions)) {
 
     rrdtool_update($sessrrd, $fields);
 
+    $tags = array();
+    influx_update($device,'fortigate_sessions',$tags,$fields);
+
     $graphs['fortigate_sessions'] = true;
 }
-
 

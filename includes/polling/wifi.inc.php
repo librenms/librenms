@@ -18,6 +18,11 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         include 'includes/polling/mib/siklu-mib.inc.php';
     }
 
+    if ($device['os'] == 'sub10') {
+        echo "It is Sub10\n";
+        include 'includes/polling/mib/sub10-mib.inc.php';
+    }
+
     // # GENERIC FRAMEWORK, FILLING VARIABLES
     if ($device['os'] == 'airport') {
         echo 'Checking Airport Wireless clients... ';
@@ -85,6 +90,9 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
 
         rrdtool_update($wificlientsrrd, $fields);
 
+        $tags = array('radio' => '1');
+        influx_update($device,'wificlients',$tags,$fields);
+
         $graphs['wifi_clients'] = true;
     }
 
@@ -104,6 +112,10 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         );
 
         rrdtool_update($wificlientsrrd, $fields);
+
+        $tags = array('radio' => '2');
+        influx_update($device,'wificlients',$tags,$fields);
+
 
         $graphs['wifi_clients'] = true;
     }

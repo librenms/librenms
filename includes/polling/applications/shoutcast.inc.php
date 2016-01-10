@@ -54,5 +54,8 @@ foreach ($servers as $item => $server) {
 
         rrdtool_update($rrdfile, $fields);
 
+        $tags = array('name' => 'shoutcast', 'app_id' => $app['app_id'], 'host' => $host, 'port' => $port);
+        influx_update($device,'app',$tags,$fields);
+
     }//end if
 }//end foreach

@@ -110,6 +110,14 @@ if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> IPv6 Search</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> MAC Search</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> ARP Tables</a></li>
+<?php
+if (is_module_enabled('poller', 'mib')) {
+?>
+            <li role="presentation" class="divider"></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'mibs'))); ?>"><i class="fa fa-file-text-o fa-fw fa-lg"></i> MIB definitions</a></li>
+<?php
+}
+?>
           </ul>
         </li>
         <li class="dropdown">
@@ -166,8 +174,13 @@ if ($_SESSION['userlevel'] >= '10') {
             ');
     }
     echo '
+            <li role="presentation" class="divider"></li>';
+    if (is_module_enabled('poller', 'mib')) {
+        echo '
+            <li><a href='.generate_url(array('page'=>'mib_assoc')).'><i class="fa fa-file-text-o fa-fw fa-lg"></i> MIB associations</a></li>
             <li role="presentation" class="divider"></li>
          ';
+    }
 
     if ($config['navbar']['manage_groups']['hide'] === 0) {
         echo '<li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>';
