@@ -19,7 +19,7 @@ $config['oxidized']['features']['versioning'] = true;
 ```
 
 Oxidized supports various ways to utilise credentials to login to devices, you can specify global username/password within Oxidized, Group level username/password or per device.
-We currently support senting groups back to Oxidized so that you can then define group credentials within Oxidized. To enable this support please switch on 'Enable the return of groups to Oxidize':
+We currently support sending groups back to Oxidized so that you can then define group credentials within Oxidized. To enable this support please switch on 'Enable the return of groups to Oxidized':
 
 ```php
 $config['oxidized']['group_support'] = true;
