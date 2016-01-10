@@ -54,7 +54,7 @@ if (!$os) {
 }
 ```
 
-Here is the file location for polling the new OS within a vendor MIB or a standart one:
+Here is the file location for polling the new OS within a vendor MIB or a standard one:
 
 ```bash
 includes/polling/os/pulse.inc.php
@@ -73,7 +73,7 @@ Quick explanation and examples :
 
 ```bash
 snmpwalk -v2c -c public -m SNMPv2-MIB -M mibs
-//will give the overall OIDs that can be retrieve with this Standart MIB. OID on the left side and the result on the right side
+//will give the overall OIDs that can be retrieve with this standard MIB. OID on the left side and the result on the right side
 //Then we have just to pick the wanted OID and do a check
 
 snmpget -v2c -c public -OUsb -m SNMPv2-MIB -M /opt/librenms/mibs -t 30 HOSTNAME SNMPv2-SMI::mib-2.1.1.0
@@ -118,7 +118,7 @@ At first we copy the MIB file into the default directory:
 
 We are now ready to look at inside the file and find the OID we want to use. _For this documentation we'll use Pulse Secure devices._
 
-Then we can test it with the snmpget command (hostname must be reachabled):
+Then we can test it with the snmpget command (hostname must be reachable):
 
 ```bash
 //for example the OID iveCpuUtil.0:
@@ -324,7 +324,7 @@ if (is_numeric($sessions)) {
 ```
 We finish in the declaration of the two graph types in the database:
 
-We can do that within a file to share our work and contribute in the developpement of LibreNMS. :-)
+We can do that within a file to share our work and contribute in the development of LibreNMS. :-)
 
 ```bash
 sql-schema/xxx.sql

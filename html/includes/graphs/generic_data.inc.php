@@ -123,9 +123,9 @@ if ($config['rrdgraph_real_95th']) {
     $rrd_options .= " GPRINT:95thhigh:\"%30.2lf%s\\n\"";
 }
 
-$rrd_options .= " GPRINT:tot:'Total %6.2lf%s'";
-$rrd_options .= " GPRINT:totin:'(In %6.2lf%s'";
-$rrd_options .= " GPRINT:totout:'Out %6.2lf%s)\\l'";
+$rrd_options .= " GPRINT:tot:'Total %6.2lf%sB'";
+$rrd_options .= " GPRINT:totin:'(In %6.2lf%sB'";
+$rrd_options .= " GPRINT:totout:'Out %6.2lf%sB)\\l'";
 $rrd_options .= ' LINE1:95thin#aa0000';
 $rrd_options .= ' LINE1:d95thout#aa0000';
 

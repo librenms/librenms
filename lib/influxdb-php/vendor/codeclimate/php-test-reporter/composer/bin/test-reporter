@@ -1,0 +1,33 @@
+#!/usr/bin/env php
+<?php
+
+$files = array(
+    __DIR__ . '/../../vendor/autoload.php',
+    __DIR__ . '/../../../../autoload.php'
+);
+
+foreach ($files as $file) {
+    if (file_exists($file)) {
+        include_once $file;
+
+        define('PHP_TEST_REPORTER_COMPOSER_INSTALL', $file);
+
+        break;
+    }
+}
+
+if (!defined('PHP_TEST_REPORTER_COMPOSER_INSTALL')) {
+    die(
+        'You need to set up the project dependencies using the following commands:' . PHP_EOL .
+        'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
+        'php composer.phar install' . PHP_EOL
+    );
+}
+
+use CodeClimate\Bundle\TestReporterBundle\Version;
+use CodeClimate\Bundle\TestReporterBundle\Console\Application;
+
+$rootDir = realpath(dirname(PHP_TEST_REPORTER_COMPOSER_INSTALL) . '/..');
+
+$app = new Application($rootDir, 'Code Climate PHP Test Reporter', Version::VERSION);
+$app->run();
