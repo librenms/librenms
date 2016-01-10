@@ -44,9 +44,6 @@ if (strstr(`php -ln config.php`, 'No syntax errors detected')) {
     else if ($last_lines[1] == '?>') {
         print_warn("It looks like you have ?> at the end of config.php, it's suggested you remove this");
     }
-    else {
-        print_ok('config.php tested ok');
-    }
 }
 else {
     print_fail('Syntax error in config.php');
@@ -63,7 +60,24 @@ require_once 'includes/defaults.inc.php';
 require_once 'config.php';
 require_once 'includes/definitions.inc.php';
 require_once 'includes/functions.php';
+require_once 'includes/common.php';
 require_once $config['install_dir'].'/includes/alerts.inc.php';
+
+$versions = version_info();
+echo "Version info:\n";
+$cur_sha = $versions['local_sha'];
+if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
+    print_warn("Your install is out of date: $cur_sha");
+}
+else {
+    echo "Commit SHA: $cur_sha\n";
+}
+echo "DB Schema: ".$versions['db_schema']."\n";
+echo "PHP: ".$versions['php_ver']."\n";
+echo "MySQL: ".$versions['mysql_ver']."\n";
+echo "RRDTool: ".$versions['rrdtool_ver']."\n";
+echo "SNMP: ".$versions['netsnmp_ver']."\n";
+
 
 // Check php modules we use to make sure they are loaded
 $extensions = array('pcre','curl','session','snmp','mcrypt');
