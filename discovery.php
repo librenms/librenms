@@ -20,7 +20,7 @@ require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 require 'includes/discovery/functions.inc.php';
 
-$start         = utime();
+$start         = microtime(true);
 $runtime_stats = array();
 $sqlparams     = array();
 $options       = getopt('h:m:i:n:d::a::q',array('os:','type:'));
@@ -129,7 +129,7 @@ foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $whe
     discover_device($device, $options);
 }
 
-$end      = utime();
+$end      = microtime(true);
 $run      = ($end - $start);
 $proctime = substr($run, 0, 5);
 
