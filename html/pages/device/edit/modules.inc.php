@@ -1,3 +1,4 @@
+<h3> Modules </h3>
 <div class="row">
   <div class="col-sm-6">
     <strong>Poller Modules</strong>
