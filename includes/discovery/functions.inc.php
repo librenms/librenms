@@ -89,7 +89,7 @@ function discover_device($device, $options=null) {
     // Reset $valid array
     $attribs = get_dev_attribs($device['device_id']);
 
-    $device_start = utime();
+    $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'].' '.$device['device_id'].' '.$device['os'].' ';
 
@@ -146,7 +146,7 @@ function discover_device($device, $options=null) {
         }
     }
 
-    $device_end  = utime();
+    $device_end  = microtime(true);
     $device_run  = ($device_end - $device_start);
     $device_time = substr($device_run, 0, 5);
 

@@ -21,7 +21,7 @@ require 'includes/functions.php';
 require 'includes/polling/functions.inc.php';
 require 'includes/alerts.inc.php';
 
-$poller_start = utime();
+$poller_start = microtime(true);
 echo $config['project_name_version']." Poller\n";
 $versions = version_info(false);
 echo "Version info:\n";
@@ -136,7 +136,7 @@ foreach (dbFetch($query) as $device) {
     $polled_devices++;
 }
 
-$poller_end  = utime();
+$poller_end  = microtime(true);
 $poller_run  = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
