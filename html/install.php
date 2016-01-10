@@ -15,8 +15,13 @@ if(file_exists('../config.php') && $stage != "6") {
 }
 
 // List of php modules we expect to see
-$modules = array('gd','mysql','snmp','mcrypt');
-
+// $version_id = $major_version * 10000 + $minor_version * 100 + $release_version;
+if (PHP_VERSION_ID < 70000) {
+    $modules = array('gd','mysql','snmp','mcrypt');
+}
+else {
+    $modules = array('gd','mysqli','snmp','mcrypt');
+}
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
 $dbpass = @$_POST['dbpass'] ?: '';
@@ -231,7 +236,7 @@ if($stage == 0) {
         <td>pear</td>
         <td>$ext_loaded</td>");
     if($ext_loaded == 'no') {
-        echo("<td>apt-get install php5-$extension / yum install php-$extension</td>");
+        echo("<td>apt-get install php-pear / yum install php-pear</td>");
     }
     else {
         echo("<td></td>");

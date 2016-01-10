@@ -77,6 +77,11 @@ if (is_numeric($uptime)) {
 
     rrdtool_update($uptime_rrd, $fields);
 
+    $measurement = 'uptime';
+    $tags = array();
+
+    influx_update($device,$measurement,$tags,$fields);
+
     $graphs['uptime'] = true;
 
     echo 'Uptime: '.formatUptime($uptime)."\n";
