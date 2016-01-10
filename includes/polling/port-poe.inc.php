@@ -66,5 +66,8 @@ if ($port_stats[$port['ifIndex']]
 
     $ret = rrdtool_update("$rrdfile", $fields);
 
+    $tags = array('ifName' => $port['ifName']);
+    influx_update($device,'poe',$tags,$fields);
+
     echo 'PoE ';
 }//end if

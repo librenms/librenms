@@ -79,12 +79,12 @@ __Installation__:
   _Note_: In case you get `Makefile:9: *** missing separator.  Stop.`, compile manually using:  
     * With IPv6: `gcc -Wall -O2 -fstack-protector -DWITH_IPV6 -o tinystats tinystats.c`  
     * Without IPv6: `gcc -Wall -O2 -fstack-protector -o tinystats tinystats.c`  
-3. Install into prefered path, like `/usr/bin/`.
+3. Install into preferred path, like `/usr/bin/`.
 
 __Configuration__:
 
 _Note_: In this part we assume that you use DJB's [Daemontools](http://cr.yp.to/daemontools.html) to start/stop tinydns.  
-And that your tinydns-instance is located in `/service/dns`, adjust this path if necesary.
+And that your tinydns-instance is located in `/service/dns`, adjust this path if necessary.
 
 1. Replace your _log_'s `run` file, typically located in `/service/dns/log/run` with:  
   ```
@@ -95,7 +95,7 @@ And that your tinydns-instance is located in `/service/dns`, adjust this path if
 2. Create tinystats directory and chown:  
   `mkdir /service/dns/log/main/tinystats && chown dnslog:nofiles /service/dns/log/main/tinystats`
 3. Restart TinyDNS and Daemontools: `/etc/init.d/svscan restart`  
-   _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesnt rehook the logging and I'm forced to restart it entirely.
+   _Note_: Some say `svc -t /service/dns` is enough, on my install (Gentoo) it doesn't rehook the logging and I'm forced to restart it entirely.
 
 ### MySQL
 

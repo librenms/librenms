@@ -43,10 +43,3 @@ $ruckuscountry = first_oid_match($device, $ruckuscountries);
 if (isset($ruckuscountry) && $ruckuscountry != '') {
     $version .= " ($ruckuscountry)";
 }
-
-$ruckus_mibs = array(
-    'ruckusZDSystemStats' => 'RUCKUS-ZD-SYSTEM-MIB',
-    'ruckusZDWLANTable'   => 'RUCKUS-ZD-WLAN-MIB',
-    'ruckusZDWLANAPTable' => 'RUCKUS-ZD-WLAN-MIB',
-);
-poll_mibs($ruckus_mibs, $device, $graphs);

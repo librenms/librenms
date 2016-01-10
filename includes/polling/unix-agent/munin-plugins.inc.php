@@ -111,6 +111,9 @@ if (!empty($agent_data['munin'])) {
 
                 rrdtool_update($filename, $fields);
 
+                $tags = array('plugin' => $plugin_type);
+                influx_update($device,'munin-plugins',$tags,$fields);
+
                 if (empty($ds_list[$ds_uniq])) {
                     $insert = array(
                         'mplug_id'    => $mplug_id,

@@ -109,6 +109,7 @@ $mapping = array(
 );
 
 $values = array();
+unset($fields);
 foreach ($mapping as $k => $v) {
     $fields[$k] = isset($map[$v]) ? $map[$v] : (-1);
 }
@@ -203,6 +204,9 @@ if (!is_file($mysql_rrd)) {
 
 rrdtool_update($mysql_rrd, $fields);
 
+$tags = array('name' => 'mysql', 'app_id' => $app['app_id']);
+influx_update($device,'app',$tags,$fields);
+
 // Process state statistics
 $mysql_status_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-mysql-'.$app['app_id'].'-status.rrd';
 
@@ -240,3 +244,7 @@ if (!is_file($mysql_status_rrd)) {
 }
 
 rrdtool_update($mysql_status_rrd, $fields);
+
+$tags = array('name' => 'mysql', 'app_id' => $app['app_id'], 'status' => true);
+influx_update($device,'app',$tags,$fields);
+

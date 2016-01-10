@@ -62,6 +62,10 @@ foreach ($serverfarm_array as $index => $vserver) {
             rrdtool_create($rrd_file, $rrd_create);
         }
         rrdtool_update($rrd_file, $fields);
+
+        $tags = array('classmap_id' => $classmap_id);
+        influx_update($device,'vservers',$tags,$fields);
+
     }
 }//end foreach
 

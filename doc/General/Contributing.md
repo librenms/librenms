@@ -102,7 +102,7 @@ General Guidelines
   web chat](http://webchat.freenode.net/) and follow the prompts to chat
   via the web client.
 
-- Ensure you read the Code Guidelines documention and understand the code
+- Ensure you read the Code Guidelines documentation and understand the code
   style that should be adhered to [6].
 
 
