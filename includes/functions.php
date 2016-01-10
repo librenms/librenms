@@ -1237,10 +1237,6 @@ function force_influx_data($type,$data) {
     }
 }// end force_influx_data
 
-function get_last_commit() {
-    return `git log -n 1|head -n1`;
-}//end get_last_commit
-
 /**
  * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
  * transport specifier (like "udp", "udp6", etc.).
