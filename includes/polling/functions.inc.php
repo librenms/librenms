@@ -135,7 +135,7 @@ function poll_device($device, $options) {
 
     $status = 0;
     unset($array);
-    $device_start = utime();
+    $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'].' '.$device['device_id'].' '.$device['os'].' ';
     if ($config['os'][$device['os']]['group']) {
@@ -253,7 +253,7 @@ function poll_device($device, $options) {
             }
         }//end if
 
-        $device_end  = utime();
+        $device_end  = microtime(true);
         $device_run  = ($device_end - $device_start);
         $device_time = substr($device_run, 0, 5);
 
