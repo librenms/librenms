@@ -1,3 +1,4 @@
+<h3> Applications </h3>
 <?php
 
 // Load our list of available applications
