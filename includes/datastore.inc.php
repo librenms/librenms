@@ -32,7 +32,7 @@ function rrd_array_filter($arr)
         if (strpos($k, 'rrd_') === 0) {
             continue;
         }
-        $result[$t] = $v;
+        $result[$k] = $v;
     }
     return $result;
 } // rrd_array_filter
