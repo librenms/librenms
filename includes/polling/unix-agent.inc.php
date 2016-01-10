@@ -41,19 +41,14 @@ if ($device['os_group'] == 'unix') {
 
     if (!empty($agent_raw)) {
         echo 'execution time: '.$agent_time.'ms';
-        $agent_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/agent.rrd';
-        if (!is_file($agent_rrd)) {
-            rrdtool_create($agent_rrd, 'DS:time:GAUGE:600:0:U '.$config['rrd_rra']);
-        }
 
+        $tags = array(
+            'rrd_def' => 'DS:time:GAUGE:600:0:U',
+        );
         $fields = array(
             'time' => $agent_time,
         );
- 
-        rrdtool_update($agent_rrd, $fields);
-
-        $tags = array();
-        influx_update($device,'agent',$tags,$fields);
+        data_update($device, 'agent', $tags, $fields);
 
         $graphs['agent'] = true;
 
