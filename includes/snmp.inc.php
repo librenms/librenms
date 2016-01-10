@@ -1148,8 +1148,13 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
             rrd_file_rename($device, $old, $new);
 
             $tags = array(
-                'rrd_def' => array("DS:mibval:$type"),
-                'rrd_name' => $new,
+                'rrd_def'       => array("DS:mibval:$type"),
+                'rrd_name'      => $new,
+                'index'         => $index,
+                'oid'           => $mibdef[$obj]['oid'],
+                'module'        => $mibdef[$obj]['module'],
+                'mib'           => $mibdef[$obj]['mib'],
+                'object_type'   => $obj,
             );
             data_update($device, 'mibval', $tags, $val);
         }
