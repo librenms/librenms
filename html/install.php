@@ -15,8 +15,13 @@ if(file_exists('../config.php') && $stage != "6") {
 }
 
 // List of php modules we expect to see
-$modules = array('gd','mysql','snmp','mcrypt');
-
+// $version_id = $major_version * 10000 + $minor_version * 100 + $release_version;
+if (PHP_VERSION_ID < 70000) {
+    $modules = array('gd','mysql','snmp','mcrypt');
+}
+else {
+    $modules = array('gd','mysqli','snmp','mcrypt');
+}
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
 $dbpass = @$_POST['dbpass'] ?: '';
