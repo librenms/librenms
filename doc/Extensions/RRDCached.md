@@ -10,7 +10,7 @@ $config['rrdtool_version'] = 1.5;
 ```
 
 ### RRDCached installation CentOS 6
-This example is based on a fresh LibreNMS install, on a minimimal CentOS 6 installation.
+This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
 In this example, we'll use the Repoforge repository.
 
 ```ssh

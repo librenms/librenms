@@ -16,8 +16,13 @@
  * Code for Gridster.sort_by_row_and_col_asc(serialization) call is from http://gridster.net/demos/grid-from-serialize.html
  */
 
-$no_refresh = true;
-if (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?',array($_SESSION['user_id'])) == 0) {
+$no_refresh   = true;
+$default_dash = 0;
+if (($tmp = dbFetchCell('SELECT dashboard FROM users WHERE user_id=?',array($_SESSION['user_id']))) != 0) {
+    $default_dash = $tmp;
+}
+else if (dbFetchCell('SELECT dashboard_id FROM dashboards WHERE user_id=?',array($_SESSION['user_id'])) == 0) {
+    $tmp = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']),'dashboards');
     $vars['dashboard'] = dbInsert(array('dashboard_name'=>'Default','user_id'=>$_SESSION['user_id']),'dashboards');
     if (dbFetchCell('select 1 from users_widgets where user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0)) == 1) {
         dbUpdate(array('dashboard_id'=>$vars['dashboard']),'users_widgets','user_id = ? && dashboard_id = ?',array($_SESSION['user_id'],0));
@@ -31,7 +36,12 @@ if (!empty($vars['dashboard'])) {
     }
 }
 if (empty($vars['dashboard'])) {
-    $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
+    if ($default_dash != 0) {
+        $vars['dashboard'] = dbFetchRow('select dashboards.*,users.username from dashboards inner join users on dashboards.user_id = users.user_id where dashboards.dashboard_id = ?',array($default_dash));
+    }
+    else {
+        $vars['dashboard'] = dbFetchRow('select * from dashboards where user_id = ? order by dashboard_id limit 1',array($_SESSION['user_id']));
+    }
     if (isset($orig)) {
         $msg_box[] = array('type' => 'error', 'message' => 'Dashboard <code>#'.$orig.'</code> does not exist! Loaded <code>'.$vars['dashboard']['dashboard_name'].'</code> instead.','title' => 'Requested Dashboard Not Found!');
     }

@@ -313,7 +313,7 @@ foreach ($ports as $port) {
             $this_port['ifPhysAddress']              = zeropad($a_a).zeropad($a_b).zeropad($a_c).zeropad($a_d).zeropad($a_e).zeropad($a_f);
         }
 
-        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts'])) {
+        if (is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts']) && $device['os'] !== 'ciscosb') {
             echo 'HC ';
             $this_port['ifInBroadcastPkts']  = $this_port['ifHCInBroadcastPkts'];
             $this_port['ifOutBroadcastPkts'] = $this_port['ifHCOutBroadcastPkts'];
@@ -354,7 +354,7 @@ foreach ($ports as $port) {
         echo 'VLAN == '.$this_port['ifVlan'];
 
 	// When devices do not provide ifAlias data, populate with ifDescr data if configured
-        if (($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) || $config['os'][$device['os']]['descr_to_alias'] == 1) {
+        if ($this_port['ifAlias'] == '' || $this_port['ifAlias'] == NULL) {
             $this_port['ifAlias'] = $this_port['ifDescr'];
             d_echo('Using ifDescr as ifAlias');
         }
@@ -543,6 +543,17 @@ foreach ($ports as $port) {
             rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
         }
         rrdtool_update("$rrdfile", $fields);
+
+        $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
+        $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
+        $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
+        $fields['ifOutErrors_rate'] = $port['ifOutErrors_rate'];
+        $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
+        $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
+
+        $tags = array('ifName' => $port['ifName'], 'port_descr_type' => $port['port_descr_type']);
+        influx_update($device,'ports',$tags,$fields);
+
         // End Update IF-MIB
         // Update PAgP
         if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {

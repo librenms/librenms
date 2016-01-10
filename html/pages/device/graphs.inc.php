@@ -22,11 +22,7 @@ foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY g
     }
 }
 
-// These are standard graphs we should have for all systems
-$graph_enable['poller']['poller_perf'] = 'device_poller_perf';
-if (can_ping_device($attribs) === true) {
-    $graph_enable['poller']['ping_perf']   = 'device_ping_perf';
-}
+enable_graphs($device, $graph_enable);
 
 $sep = '';
 foreach ($graph_enable as $section => $nothing) {
@@ -56,7 +52,6 @@ print_optionbar_end();
 
 $graph_enable = $graph_enable[$vars['group']];
 
-// foreach ($config['graph_types']['device'] as $graph => $entry)
 foreach ($graph_enable as $graph => $entry) {
     $graph_array = array();
     if ($graph_enable[$graph]) {

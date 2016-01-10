@@ -49,6 +49,13 @@ if ($device['serial']) {
       </tr>';
 }
 
+if ($device['sysObjectID']) {
+    echo '<tr>
+        <td>Object ID</td>
+        <td>'.$device['sysObjectID'].'</td>
+      </tr>';
+}
+
 if ($device['sysContact']) {
     echo '<tr>
         <td>Contact</td>';

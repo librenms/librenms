@@ -11,7 +11,7 @@ if ($foo == 5) {
 ```
 
 ### Line length
-Try to keep the length of a line to about 75-85 characters. This isn't essential but does enable compatbility for all screen sizes but above all enables reading of code easier.
+Try to keep the length of a line to about 75-85 characters. This isn't essential but does enable compatibility for all screen sizes but above all enables reading of code easier.
 
 ### Control structures
 A space should be used both before and after the parenthesis and also surrounding the condition operator.
