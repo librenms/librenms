@@ -28,7 +28,7 @@ if (!$_SESSION['authenticated']) {
 $type = mres($_POST['type']);
 
 if ($type == 'placeholder') {
-    $output = "<span style='text-align:left;'><br><h3>Click on Edit-Dashboard to add Widgets</h3><br><h4><strong>Remember:</strong> You can only move & rezise widgets when you're in <strong>Edit-Mode</strong>.</h4><span>";
+    $output = "<span style='text-align:left;'><br><h3>Click on the Edit Dashboard button (next to the list of dashboards) to add widgets</h3><br><h4><strong>Remember:</strong> You can only move & resize widgets when you're in <strong>Edit Mode</strong>.</h4><span>";
     $status = 'ok';
     $title = 'Placeholder';
 }
