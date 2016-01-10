@@ -33,7 +33,7 @@ echo "MySQL: ".$versions['mysql_ver']."\n";
 echo "RRDTool: ".$versions['rrdtool_ver']."\n";
 echo "SNMP: ".$versions['netsnmp_ver']."\n";
 
-$options = getopt('h:m:i:n:r::d::a::');
+$options = getopt('h:m:i:n:r::d::a::f::');
 
 if ($options['h'] == 'odd') {
     $options['n'] = '1';
@@ -81,6 +81,7 @@ if (!$where) {
     echo "                                             Instances start at 0. 0-3 for -n 4\n\n";
     echo "Debugging and testing options:\n";
     echo "-r                                           Do not create or update RRDs\n";
+    echo "-f                                           Do not insert data into InfluxDB\n";
     echo "-d                                           Enable debugging output\n";
     echo "-m                                           Specify module(s) to be run\n";
     echo "\n";
@@ -106,6 +107,17 @@ else {
 
 if (isset($options['r'])) {
     $config['norrd'] = true;
+}
+
+if (isset($options['f'])) {
+    $config['noinfluxdb'] = true;
+}
+
+if ($config['noinfluxdb'] !== true && $config['influxdb']['enable'] === true) {
+    $influxdb = influxdb_connect();
+}
+else {
+    $influxdb = false;
 }
 
 rrdtool_pipe_open($rrd_process, $rrd_pipes);

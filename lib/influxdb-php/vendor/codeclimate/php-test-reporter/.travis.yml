@@ -1,0 +1,12 @@
+language: php
+php:
+  - 5.5
+env:
+  global:
+    secure: Yc+Xohkr/iEUU7FCQuSLXAE9ywNW9g6CfrM1Ki0Hl+fS15F3AXT7dFY8EyCJ4dP1/oI0dBmwrGWrltXV0XWIjGV1Ms3tefCgQpBBAqwT+hImzVP3RbpZW8Iyo2d0VgiDemQF1LWYD/pKu6d8WljTnv5D77NIMdEJjQ0uzeTLWdw=
+install: composer install --dev
+before_script:
+  - git config --global user.email "travis-ci@codeclimate.com"
+  - git config --global user.name "Travis CI"
+after_script:
+  - php composer/bin/test-reporter

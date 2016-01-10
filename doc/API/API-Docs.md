@@ -771,7 +771,7 @@ Output:
 {
  "status": "ok",
  "err-msg": "",
- "message": "Alert has been ackgnowledged"
+ "message": "Alert has been acknowledged"
 }
 ```
 

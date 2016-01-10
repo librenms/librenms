@@ -37,6 +37,9 @@ if ($device['os_group'] == "cisco") {
 
         rrdtool_update ($rrd_filename, $fields);
 
+        $tags = array();
+        influx_update($device,'cisco-iosdsp',$tags,$fields);
+
         $graphs['cisco-iosdsp'] = TRUE;
         echo (" Cisco IOS DSP ");
     }
