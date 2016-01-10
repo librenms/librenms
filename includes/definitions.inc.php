@@ -1415,6 +1415,14 @@ $config['os'][$os]['icon']             = 'ligowave';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
++// HWGroup Poseidon
+ +$os = 'Poseidon';
+ +$config['os'][$os]['text']             = 'Poseidon';
+ +$config['os'][$os]['type']             = 'environment';
+ +$config['os'][$os]['icon']             = 'generic';
+ +$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+ +$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Appliances
 $os = 'fortios';
 $config['os'][$os]['text']             = 'FortiOS';
