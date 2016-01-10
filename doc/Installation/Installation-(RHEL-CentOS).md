@@ -127,6 +127,15 @@ Set `httpd` to start on system boot.
 **CentOS 7**
     systemctl enable httpd
 
+You need to configure snmpd appropriately if you have not already done so.  An absolute minimal config for snmpd is:
+
+    rocommunity public 127.0.0.1
+
+Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd restart` will activate this config.
+
+In `/etc/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
+examples are: "America/New York", "Australia/Brisbane", "Etc/UTC". Please also ensure that allow_url_fopen is enabled.
+
 Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 
 ```apache
