@@ -542,7 +542,9 @@ elseif($stage == "6") {
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-        <div class="alert alert-success">Thank you for setting up LibreNMS, you can now click <a href="/">here to login to your new install.</a></div>
+        <div class="alert alert-success">Thank you for setting up LibreNMS.<br />
+        It would be great if you would consider contributing to our statistics, you can do this on the <a href="about/">/about/</a> page and check the box under Statistics.<br />
+        You can now click <a href="/">here to login to your new install.</a></div>
       </div>
       <div class="col-md-3">
       </div>
