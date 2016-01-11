@@ -185,7 +185,7 @@ You can disable image lazy loading by setting this to false.
 ```php
 $config['show_overview_tab'] = TRUE;
 ```
-Enable or disable the overview tabe for a device.
+Enable or disable the overview tab for a device.
 
 ```php
 $config['overview_show_sysDescr'] = TRUE;
