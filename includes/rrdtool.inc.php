@@ -348,8 +348,9 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
 
     $rrd = rrd_name($device['hostname'], $rrd_name);
     if (!is_file($rrd) && $tags['rrd_def']) {
-        // add the --step and the rra definitions to the array
-        $newdef = "--step $step ".implode(' ', $tags['rrd_def']).$config['rrd_rra'];
+        $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
+        // add the --step and the rra definitions to the command
+        $newdef = "--step $step ".implode(' ', $rrd_def).$config['rrd_rra'];
         rrdtool_create($rrd, $newdef);
     }
 
