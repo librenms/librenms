@@ -14,14 +14,11 @@ if ($config['enable_printers']) {
         $tonerperc = round((snmp_get($device, $toner['toner_oid'], '-OUqnv') / $toner['toner_capacity'] * 100));
         echo $tonerperc." %\n";
 
-        $old = array('toner', $toner['toner_descr']);
-        $new = array('toner', $toner['toner_index']);
-        rrd_file_rename($device, $old, $new);
-
         $tags = array(
-            'rrd_def'  => 'DS:toner:GAUGE:600:0:20000',
-            'rrd_name' => $new,
-            'index'    => $toner['toner_index'],
+            'rrd_def'     => 'DS:toner:GAUGE:600:0:20000',
+            'rrd_name'    => array('toner', $toner['toner_index']),
+            'rrd_oldname' => array('toner', $toner['toner_descr']),
+            'index'       => $toner['toner_index'],
         );
         data_update($device, 'toner', $tags, $tonerperc);
 
