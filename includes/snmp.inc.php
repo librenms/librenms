@@ -1142,14 +1142,10 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
 
             $usedoids[$index][$obj] = $val;
 
-            // if there's a file from the previous version of MIB-based polling, rename it
-            $old = array($mibname, $mibdef[$obj]['object_type'], $index);
-            $new = array($mibname, $mibdef[$obj]['shortname'], $index);
-            rrd_file_rename($device, $old, $new);
-
             $tags = array(
                 'rrd_def'       => array("DS:mibval:$type"),
-                'rrd_name'      => $new,
+                'rrd_name'      => array($mibname, $mibdef[$obj]['shortname'], $index),
+                'rrd_oldname'   => array($mibname, $mibdef[$obj]['object_type'], $index),
                 'index'         => $index,
                 'oid'           => $mibdef[$obj]['oid'],
                 'module'        => $mibdef[$obj]['module'],

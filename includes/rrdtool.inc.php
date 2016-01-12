@@ -341,6 +341,10 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
 
     $rrd_name = $tags['rrd_name'] ? $tags['rrd_name'] : $measurement;
     $step = $tags['rrd_step'] ? $tags['rrd_step'] : 300;
+    $oldname = $tags['rrd_oldname'];
+    if (isset($oldname) && !empty($oldname)) {
+        rrd_file_rename($device, $oldname, $rrd_name);
+    }
 
     $rrd = rrd_name($device['hostname'], $rrd_name);
     if (!is_file($rrd) && $tags['rrd_def']) {
