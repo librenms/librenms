@@ -109,6 +109,9 @@ function poll_sensor($device, $class, $unit) {
 
         rrdtool_update($rrd_file, $fields);
 
+        $tags = array('sensor_class' => $sensor['sensor_class'], 'sensor_type' => $sensor['sensor_type'], 'sensor_descr' => $sensor['sensor_descr'], 'sensor_index' => $sensor['sensor_index']);
+        influx_update($device,'sensor',$tags,$fields);
+
         // FIXME also warn when crossing WARN level!!
         if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value <= $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
@@ -132,7 +135,7 @@ function poll_device($device, $options) {
 
     $status = 0;
     unset($array);
-    $device_start = utime();
+    $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'].' '.$device['device_id'].' '.$device['os'].' ';
     if ($config['os'][$device['os']]['group']) {
@@ -212,7 +215,10 @@ function poll_device($device, $options) {
             foreach ($config['poller_modules'] as $module => $module_status) {
                 if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
                     // TODO per-module polling stats
+                    $module_start = microtime(true);
                     include 'includes/polling/'.$module.'.inc.php';
+                    $module_time = microtime(true) - $module_start;
+                    echo "Runtime for polling module '$module': $module_time\n";
                 }
                 else if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                     echo "Module [ $module ] disabled on host.\n";
@@ -247,7 +253,7 @@ function poll_device($device, $options) {
             }
         }//end if
 
-        $device_end  = utime();
+        $device_end  = microtime(true);
         $device_run  = ($device_end - $device_start);
         $device_time = substr($device_run, 0, 5);
 
@@ -263,6 +269,10 @@ function poll_device($device, $options) {
                 'poller' => $device_time,
             );
             rrdtool_update($poller_rrd, $fields);
+
+            $tags = array();
+            influx_update($device,'poller-perf',$tags,$fields);
+
         }
 
         // Ping response rrd
@@ -282,6 +292,11 @@ function poll_device($device, $options) {
 
             $update_array['last_ping']             = array('NOW()');
             $update_array['last_ping_timetaken']   = $ping_time;
+
+            rrdtool_update($ping_rrd, $fields);
+
+            $tags = array();
+            influx_update($device,'ping-perf',$tags,$fields);
 
         }
 
@@ -318,10 +333,12 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
         list($mib,) = explode(':', $mib_name_table, 2);
         // $mib_dirs = mib_dirs($mib_subdir);
         $rrd_file = strtolower(safename($mib)).'.rrd';
+        $influx_name = strtolower(safename($mib));
     }
     else {
         list($mib,$file) = explode(':', $mib_name_table, 2);
         $rrd_file        = strtolower(safename($file)).'.rrd';
+        $influx_name = strtolower(safename($file));
     }
 
     $rrdcreate = '--step 300 ';
@@ -369,8 +386,12 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     $fields = array();
     foreach ($oidglist as $fulloid) {
         list($splitoid, $splitindex) = explode('.', $fulloid, 2);
-        if (is_numeric($snmpdata[$splitindex][$splitoid])) {
-            $fields[$oidnamelist[$oid_count]] = $snmpdata[$splitindex][$splitoid];
+        $val = $snmpdata[$splitindex][$splitoid];
+        if (is_numeric($val)) {
+            $fields[$oidnamelist[$oid_count]] = $val;
+        }
+        elseif (preg_match("/^\"(.*)\"$/", $val, $number) && is_numeric($number[1])) {
+            $fields[$oidnamelist[$oid_count]] = $number[1];
         }
         else {
             $fields[$oidnamelist[$oid_count]] = 'U';
@@ -386,6 +407,9 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 
     rrdtool_update($rrdfilename, $fields);
 
+    $tags = array();
+    influx_update($device,$influx_name,$tags,$fields);
+
     foreach ($mib_graphs as $graphtoenable) {
         $graphs[$graphtoenable] = true;
     }
@@ -393,31 +417,6 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     return true;
 
 }//end poll_mib_def()
-
-
-/*
- * Please use this instead of creating & updating RRD files manually.
- * @param device Device object - only 'hostname' is used at present
- * @param name Array of rrdname components
- * @param def Array of data definitions
- * @param val Array of value definitions
- *
- */
-
-
-function rrd_create_update($device, $name, $def, $val, $step=300) {
-    global $config;
-    $rrd = rrd_name($device['hostname'], $name);
-
-    if (!is_file($rrd) && $def != null) {
-        // add the --step and the rra definitions to the array
-        $newdef = "--step $step ".implode(' ', $def).$config['rrd_rra'];
-        rrdtool_create($rrd, $newdef);
-    }
-
-    rrdtool_update($rrd, $val);
-
-}//end rrd_create_update()
 
 
 function get_main_serial($device) {

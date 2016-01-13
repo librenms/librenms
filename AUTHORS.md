@@ -1,17 +1,16 @@
-LibreNMS is a fork of [Observium][1].  Observium was written by:
-- Adam Armstrong
-- Tom Laermans
-- various others as indicated in the file contents and commit logs
+LibreNMS is a fork of [Observium][1].
 
-Contributors to LibreNMS:
+LibreNMS core team:
 - Paul Gear <paul@librenms.org> (paulgear)
 - Neil Lathwood <neil@librenms.org> (laf)
 - Daniel Preussker <f0o@librenms.org> (f0o)
+- Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
+- Mike Rostermund <mike@kollegienet.dk> (SaaldjorMike)
+
+LibreNMS contributors:
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
 - Toni Cunyat <elbuit@gmail.com> (elbuit)
 - Tuomas Riihimäki <tuomari@iudex.fi> (tuomari)
-- Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
-- Mike Rostermund <mike@kollegienet.dk> (SaaldjorMike)
 - Nicolas Armando <nicearma@yahoo.com> (nicearma)
 - Micah Chasteen <mjchasteen@gmail.com> (mchasteen)
 - Kevin Fleshman <fleshmank@hotmail.com> (KFleshman)
@@ -26,13 +25,13 @@ Contributors to LibreNMS:
 - Mickael Marchand  <mmarchand@corp.free.fr> (mmarchand)
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
-- Freddie Cash (fjwcash@gmail.com) (fjwcash)
-- Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
-- Vitali Kari <vitali.kari@gmail.com> (vitalisator) 
+- Freddie Cash <fjwcash@gmail.com> (fjwcash)
+- Thom Seddon <thom@seddonmedia.co.uk> (thomseddon) 
+- Vitali Kari <vitali.kari@gmail.com> (vitalisator)
 - James Campbell <neokjames@gmail.com> (neokjames)
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
 - Christian Marg <marg@rz.tu-clausthal.de> (einhirn)
-- Louis Rossouw <lrossouw@gmail.com> (spinza) 
+- Louis Rossouw <lrossouw@gmail.com> (spinza)
 - Clint Armstrong <clint@clintarmstrong.net> (clinta)
 - Tony Ditchfield  <tony.ditchfield@gmail.com> (arnoldthebat)
 - Travis Hegner <travis.hegner@gmail.com> (travishegner)
@@ -47,9 +46,9 @@ Contributors to LibreNMS:
 - Michael Newton <mnewton@pofp.com> (miken32)
 - Tom Ferguson <tom.ferguson.public@outlook.com> (Tawmu)
 - Jimmy Cleuren <jimmy.cleuren@gmail.com> (jimmycleuren)
-- Mark Schouten <mark@tuxis.nl> (tuxis-ie) 
+- Mark Schouten <mark@tuxis.nl> (tuxis-ie)
 - Todd Eddy <vr@vrillusions.com> (vrillusions)
-- Arjit Chaudhary (arjit.c@gmail.com) (arjitc)
+- Arjit Chaudhary <arjit.c@gmail.com> (arjitc)
 - Sergiusz Paprzycki <serek@walcz.net> (spaprzycki)
 - Juho Vanhanen <juho@vanhanen.me> (juhovan)
 - Bart de Bruijn <bart_de_bruijn@yahoo.com> (bartdebruijn)
@@ -65,7 +64,7 @@ Contributors to LibreNMS:
 - Sebastian Neuner <sebastian@sneuner.org> (9er)
 - Robert Zollner <wolfit_ro@yahoo.com> (Lupul)
 - Richard Hartmann <richih@debian.org> (RichiH)
-- Robert Gornall <roblnm@khobbits.co.uk (KHobbits)
+- Robert Gornall <roblnm@khobbits.co.uk> (KHobbits)
 - Rob Gormley <robert@gormley.me> (rgormley)
 - Richard Kojedzinszky <krichy@nmdps.net> (rkojedzinszky)
 - Tony Murray <murraytony@gmail.com> (murrant)
@@ -74,6 +73,15 @@ Contributors to LibreNMS:
 - Rick Hodger <rick@fuzzi.org.uk> (Tatermen)
 - Eldon Koyle <ekoyle@gmail.com> (ekoyle)
 - Jonathan Bailey <jcbailey@code0.net> (jcbailey2)
-- Ruairi Carroll <ruairi.carroll@gmail.com> (rucarrol) 
+- Ruairi Carroll <ruairi.carroll@gmail.com> (rucarrol)
 - Maxim Tsyplakov <maxim.tsyplakov@gmail.com> (tsypa)
+- D. Britz <github@wrind.de> (flatterlight)
+- Tobias Herrmann <tobias@fiveninedigital.ch> (Mightea)
+- Nicolas Guillaumin <nicolas+github@guillaumin.me> (nguillaumin)
+
 [1]: http://observium.org/ "Observium web site"
+Observium was written by:
+- Adam Armstrong
+- Tom Laermans
+- various others as indicated in the file contents and commit logs
+

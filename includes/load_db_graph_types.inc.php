@@ -14,9 +14,14 @@
 
 // load graph types from the database
 foreach (dbFetchRows('select * from graph_types') as $graph) {
-    // remove leading 'graph_' from column names
     foreach ($graph as $k => $v) {
-        $key     = strpos($k, 'graph_') == 0 ? str_replace('graph_', '', $k) : $k;
+        if (strpos($k, 'graph_') == 0) {
+            // remove leading 'graph_' from column name
+            $key = str_replace('graph_', '', $k);
+        }
+        else {
+            $key = $k;
+        }
         $g[$key] = $v;
     }
 

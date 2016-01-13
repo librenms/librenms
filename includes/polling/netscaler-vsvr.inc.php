@@ -123,6 +123,9 @@ if ($device['os'] == 'netscaler') {
 
             rrdtool_update($rrd_file, $fields);
 
+            $tags = array('vsvrName' => $vsvr['vsvrName']);
+            influx_update($device,'netscaler-vsvr',$tags,$fields);
+
             echo "\n";
         }//end if
     }//end foreach

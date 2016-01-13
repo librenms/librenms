@@ -37,6 +37,6 @@
     Are you sure you want to reset all <strong>MySQL</strong> and/or <strong>RRD</strong> data for all interface on this bill?
   </div>
   <div class="form-actions">
-    <button id="resetBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="icon-refresh icon-white"></i> <strong>Reset Bill</strong></button>
+    <button id="resetBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="fa fa-refresh"></i> <strong>Reset Bill</strong></button>
   </div>
 </form>

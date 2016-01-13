@@ -185,7 +185,7 @@ You can disable image lazy loading by setting this to false.
 ```php
 $config['show_overview_tab'] = TRUE;
 ```
-Enable or disable the overview tabe for a device.
+Enable or disable the overview tab for a device.
 
 ```php
 $config['overview_show_sysDescr'] = TRUE;
@@ -358,6 +358,13 @@ Specify the location of the collectd unix socket. Using a socket allows the coll
 $config['smokeping']['dir']             = "/var/lib/smokeping/";
 ```
 Set the smokeping directory location.
+
+```php
+$config['smokeping']['pings']           = 20;
+```
+Should be equal to "pings" in your smokeping config.  On Debian/Ubuntu, this is set in `/etc/smokeping/config.d/Database`.
+
+You can also set it to less than the value of "pings" in your smokeping config if you don't want LibreNMS to graph all of the ping data.
 
 ```php
 $config['nfsen_enable'] = 0;

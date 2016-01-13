@@ -24,6 +24,9 @@ else if ($service[service_status] == '2') {
 $message = trim($service['service_message']);
 $message = str_replace("\n", '<br />', $message);
 
+$desc = trim($service['service_desc']);
+$desc = str_replace("\n", '<br />', $desc);
+
 $since = (time() - $service['service_changed']);
 $since = formatUptime($since);
 
@@ -62,6 +65,9 @@ echo "
          </td>
          <td>
            <span class=box-desc>$message</span>
+         </td>
+         <td>
+           <span class=box-desc>$desc</span>
          </td>
        </tr>";
 

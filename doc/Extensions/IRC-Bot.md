@@ -45,7 +45,7 @@ Command | Description
 `.join <channel>` | Joins `<channel>` if user has admin-level.
 `.listdevices` | Lists the hostnames of all known devices.
 `.log [<N>]` | Prints `N` lines or last line of the eventlog.
-`.port <hostname> <ifname>` | Prints Port-related informations from `ifname` on given `hostname`.
+`.port <hostname> <ifname>` | Prints Port-related information from `ifname` on given `hostname`.
 `.quit` | Disconnect from IRC and exit.
 `.reload` | Reload configuration.
 `.status <type>` | Prints status informations for given `type`. Type can be `devices`, `services`, `ports`. Shorthands are: `dev`,`srv`,`prt`
@@ -105,10 +105,10 @@ Or using a single string using `,` as delimiter between various channels:
 # <a name="extensions">Extensions?!</a>
 
 The bot is coded in a unified way.
-This makes writing extensions by far less painfull.
+This makes writing extensions by far less painful.
 Simply add your `command` to the `$config['irc_external']` directive and create a file called `includes/ircbot/command.inc.php` containing your code.
 The string behind the call of `.command` is passed as `$params`.
-The user who requested something is accessable via `$this->user`.
+The user who requested something is accessible via `$this->user`.
 Send your reply/ies via `$this->respond($string)`.
 
 A more detailed documentation of the functions and variables available for extensions can be found at [IRC-Bot Extensions](IRC-Bot-Extensions);

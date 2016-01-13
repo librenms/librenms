@@ -145,14 +145,15 @@ echo "
 
     <h3>LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system.</h3>
 <?php
+$versions = version_info();
 $project_name    = $config['project_name'];
 $project_version = $config['version'];
 $apache_version  = str_replace('Apache/', '', $_SERVER['SERVER_SOFTWARE']);
-$php_version     = phpversion();
-$mysql_version   = dbFetchCell('SELECT version()');
-$netsnmp_version = shell_exec($config['snmpget'].' --version 2>&1');
-$rrdtool_version = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
-$schema_version  = dbFetchCell('SELECT version FROM dbSchema');
+$php_version     = $versions['php_ver'];
+$mysql_version   = $versions['mysql_ver'];
+$netsnmp_version = $versions['netsnmp_ver'];
+$rrdtool_version = $versions['rrdtool_ver'];
+$schema_version  = $versions['db_schema'];
 $version         = `git rev-parse --short HEAD`;
 
 

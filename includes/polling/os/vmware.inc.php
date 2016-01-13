@@ -28,6 +28,7 @@ echo 'VMware VM: ';
  */
 
 $db_info_list = dbFetchRows('SELECT id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState FROM vminfo WHERE device_id = ?', array($device['device_id']));
+$current_vminfo = snmpwalk_cache_multi_oid($device, 'vmwVmTable', array(), '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', '+'.$config['mib_dir'].'/vmware:'.$config['mib_dir']);
 
 foreach ($db_info_list as $db_info) {
     /*
@@ -43,11 +44,11 @@ foreach ($db_info_list as $db_info) {
 
     $vm_info = array();
 
-    $vm_info['vmwVmDisplayName'] = snmp_get($device, 'VMWARE-VMINFO-MIB::vmwVmDisplayName.'.$db_info['vmwVmVMID'], '-Osqnv', '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', '+'.$config['install_dir'].'/mibs/vmware:'.$config['mibdir']);
-    $vm_info['vmwVmGuestOS']     = snmp_get($device, 'VMWARE-VMINFO-MIB::vmwVmGuestOS.'.$db_info['vmwVmVMID'], '-Osqnv', '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', '+'.$config['install_dir'].'/mibs/vmware:'.$config['mibdir']);
-    $vm_info['vmwVmMemSize']     = snmp_get($device, 'VMWARE-VMINFO-MIB::vmwVmMemSize.'.$db_info['vmwVmVMID'], '-Osqnv', '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', '+'.$config['install_dir'].'/mibs/vmware:'.$config['mibdir']);
-    $vm_info['vmwVmState']       = snmp_get($device, 'VMWARE-VMINFO-MIB::vmwVmState.'.$db_info['vmwVmVMID'], '-Osqnv', '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', '+'.$config['install_dir'].'/mibs/vmware:'.$config['mibdir']);
-    $vm_info['vmwVmCpus']        = snmp_get($device, 'VMWARE-VMINFO-MIB::vmwVmCpus.'.$db_info['vmwVmVMID'], '-Osqnv', '+VMWARE-ROOT-MIB:VMWARE-VMINFO-MIB', '+'.$config['install_dir'].'/mibs/vmware:'.$config['mibdir']);
+    $vm_info['vmwVmDisplayName'] = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmDisplayName'];
+    $vm_info['vmwVmGuestOS']     = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmGuestOS'];
+    $vm_info['vmwVmMemSize']     = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmMemSize'];
+    $vm_info['vmwVmState']       = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmState'];
+    $vm_info['vmwVmCpus']        = $current_vminfo[$db_info['vmwVmVMID']]['vmwVmCpus'];
 
     /*
      * VMware does not return an INTEGER but a STRING of the vmwVmMemSize. This bug

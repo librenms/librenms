@@ -104,7 +104,7 @@ Placeholders:
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
 - Alert-ID: `%id`
 - Unique-ID: `%uid`
-- Faults, Only available on alert (`%state != 0`), must be iterated in a foreach (`{foreach %faults}`). Holds all available information about the Fault, accessable in the format `%value.Column`, for example: `%value.ifDescr`. Special field `%value.string` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.
+- Faults, Only available on alert (`%state != 0`), must be iterated in a foreach (`{foreach %faults}`). Holds all available information about the Fault, accessible in the format `%value.Column`, for example: `%value.ifDescr`. Special field `%value.string` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.
 - State: `%state`
 - Severity: `%severity`
 - Rule: `%rule`
@@ -379,7 +379,7 @@ $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 ## <a name="transports-clickatell">Clickatell</a>
 
 Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.  
-Please consult Clickatell's documentation regarding number formating.  
+Please consult Clickatell's documentation regarding number formatting.
 Here an example using 3 numbers, any amount of numbers is supported:
 
 ~~

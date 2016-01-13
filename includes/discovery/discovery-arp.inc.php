@@ -60,12 +60,12 @@ foreach (dbFetchRows($sql, array($deviceid)) as $entry) {
     }
 
     // Attempt discovery of each IP only once per run.
-    if (arp_discovery_is_cached($ip)) {
+    if (object_is_cached('arp_discovery', $ip)) {
         echo '.';
         continue;
     }
 
-    arp_discovery_add_cache($ip);
+    object_add_cache('arp_discovery', $ip);
 
     $name = gethostbyaddr($ip);
     echo '+';

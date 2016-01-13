@@ -12,18 +12,33 @@ if (is_admin() === false && is_read() === false) {
 
 $sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where ";
 
-if (isset($_POST['searchby']) && $_POST['searchby'] == 'ip') {
-    $sql    .= ' AND `ipv4_address` LIKE ?';
-    $param[] = '%'.trim($_POST['address']).'%';
-}
-else if (isset($_POST['searchby']) && $_POST['searchby'] == 'mac') {
-    $sql    .= ' AND `mac_address` LIKE ?';
-    $param[] = '%'.str_replace(array(':', ' ', '-', '.', '0x'), '', mres($_POST['address'])).'%';
-}
-
 if (is_numeric($_POST['device_id'])) {
     $sql    .= ' AND P.device_id = ?';
     $param[] = $_POST['device_id'];
+}
+
+if (is_numeric($_POST['port_id'])) {
+    $sql    .= ' AND P.port_id = ?';
+    $param[] = $_POST['port_id'];
+}
+
+if (isset($_POST['searchPhrase']) && !empty($_POST['searchPhrase'])) {
+    $ip_search = '%'.mres(trim($_POST['searchPhrase'])).'%';
+    $mac_search = '%'.str_replace(array(':', ' ', '-', '.', '0x'), '', mres($_POST['searchPhrase'])).'%';
+
+    if (isset($_POST['searchby']) && $_POST['searchby'] == 'ip') {
+        $sql    .= ' AND `ipv4_address` LIKE ?';
+        $param[] = $ip_search;
+    }
+    else if (isset($_POST['searchby']) && $_POST['searchby'] == 'mac') {
+        $sql    .= ' AND `mac_address` LIKE ?';
+        $param[] = $mac_search;
+    }
+    else {
+        $sql .= ' AND (`ipv4_address` LIKE ? OR `mac_address` LIKE ?)';
+        $param[] = $ip_search;
+        $param[] = $mac_search;
+    }
 }
 
 $count_sql = "SELECT COUNT(`M`.`port_id`) $sql";

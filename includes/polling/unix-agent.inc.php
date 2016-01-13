@@ -14,7 +14,7 @@ if ($device['os_group'] == 'unix') {
         $config['unix-agent']['read-timeout'] = $config['unix-agent-read-time-out'];
     }
 
-    $agent_start = utime();
+    $agent_start = microtime(true);
     $agent       = fsockopen($device['hostname'], $agent_port, $errno, $errstr, $config['unix-agent']['connection-timeout']);
 
     // Set stream timeout (for timeouts during agent  fetch
@@ -36,7 +36,7 @@ if ($device['os_group'] == 'unix') {
         }
     }
 
-    $agent_end  = utime();
+    $agent_end  = microtime(true);
     $agent_time = round(($agent_end - $agent_start) * 1000);
 
     if (!empty($agent_raw)) {
@@ -51,6 +51,10 @@ if ($device['os_group'] == 'unix') {
         );
  
         rrdtool_update($agent_rrd, $fields);
+
+        $tags = array();
+        influx_update($device,'agent',$tags,$fields);
+
         $graphs['agent'] = true;
 
         foreach (explode('<<<', $agent_raw) as $section) {
