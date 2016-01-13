@@ -69,17 +69,21 @@ class component {
         $COUNT = 0;
         if (isset($options['filter'])) {
             $COUNT++;
+            $validFields = array('device_id','type','id','label','status','disabled','ignore','error');
             $SQL .= " ( ";
             foreach ($options['filter'] as $field => $array) {
-                if ($array[0] == 'LIKE') {
-                    $SQL .= "`".$field."` LIKE ? AND ";
-                    $array[1] = "%".$array[1]."%";
+                // Only add valid fields to the query
+                if (in_array($field,$validFields)) {
+                    if ($array[0] == 'LIKE') {
+                        $SQL .= "`".$field."` LIKE ? AND ";
+                        $array[1] = "%".$array[1]."%";
+                    }
+                    else {
+                        // Equals operator is the default
+                        $SQL .= "`".$field."` = ? AND ";
+                    }
+                    array_push($PARAM,$array[1]);
                 }
-                else {
-                    // Equals operator is the default
-                    $SQL .= "`".$field."` = ? AND ";
-                }
-                array_push($PARAM,$array[1]);
             }
             // Strip the last " AND " before closing the bracket.
             $SQL = substr($SQL,0,-5)." )";
