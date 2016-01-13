@@ -117,6 +117,9 @@ if ($ipSystemStats) {
 
         rrdtool_update($rrdfile, $fields);
 
+        $tags = array('af' => $af);
+        influx_update($device,'ipSystemStats',$tags,$fields);
+
         unset($fields, $rrd_create);
 
         // FIXME per-AF?

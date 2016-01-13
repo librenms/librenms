@@ -55,4 +55,8 @@ if (!empty($agent_data['app']['tinydns']) && $app['app_id'] > 0) {
     }//end if
 
     rrdtool_update($rrd_filename, 'N:'.$agent_data['app']['tinydns']);
+
+    $tags = array('name' => 'tinydns', 'app_id' => $app['app_id']);
+    influx_update($device,'app',$tags,$fields);
+
 }//end if

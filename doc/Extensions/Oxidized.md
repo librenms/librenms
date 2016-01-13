@@ -18,6 +18,27 @@ We also support config versioning within Oxidized, this will allow you to see th
 $config['oxidized']['features']['versioning'] = true;
 ```
 
+Oxidized supports various ways to utilise credentials to login to devices, you can specify global username/password within Oxidized, Group level username/password or per device.
+We currently support sending groups back to Oxidized so that you can then define group credentials within Oxidized. To enable this support please switch on 'Enable the return of groups to Oxidized':
+
+```php
+$config['oxidized']['group_support'] = true;
+```
+
+You can set a default group that devices will fall back to with:
+
+```php
+$config['oxidized']['default_group'] = 'default';
+```
+
+To return a group to Oxidized you can do this by matching a regex for either hostname or location. The order is hostname is matched first, if nothing is found then location is attempted. 
+The first match found will be used. To match on the device hostnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
+
+```php
+$config['oxidized']['group']['hostname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
+$config['oxidized']['group']['location'][] = array('regex' => '/london/', 'group' => 'london-switches');
+```
+
 ### Feeding Oxidized
 
 Oxidized has support for feeding devices into it via an API call, support for Oxidized has been added to the LibreNMS API. A sample config for Oxidized is provided below.

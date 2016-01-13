@@ -57,7 +57,11 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             </a>
             </li>';
 
-        $health = (dbFetchCell("SELECT COUNT(*) FROM storage WHERE device_id = '".$device['device_id']."'") + dbFetchCell("SELECT COUNT(sensor_id) FROM sensors WHERE device_id = '".$device['device_id']."'") + dbFetchCell("SELECT COUNT(*) FROM mempools WHERE device_id = '".$device['device_id']."'") + dbFetchCell("SELECT COUNT(*) FROM processors WHERE device_id = '".$device['device_id']."'"));
+        $health =  dbFetchCell("SELECT COUNT(*) FROM storage WHERE device_id = '" . $device['device_id'] . "'") +
+                   dbFetchCell("SELECT COUNT(sensor_id) FROM sensors WHERE device_id = '" . $device['device_id'] . "'") +
+                   dbFetchCell("SELECT COUNT(*) FROM mempools WHERE device_id = '" . $device['device_id'] . "'") +
+                   dbFetchCell("SELECT COUNT(*) FROM processors WHERE device_id = '" . $device['device_id'] . "'") +
+                   count_mib_health($device);
 
         if ($health) {
             echo '<li class="'.$select['health'].'">
@@ -229,6 +233,14 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </a>
               </li>');
 
+        if (@dbFetchCell("SELECT 1 FROM stp WHERE device_id = '".$device['device_id']."'")) {
+            echo '<li class="'.$select['stp'].'">
+                <a href="'.generate_device_url($device, array('tab' => 'stp')).'">
+                <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> STP
+                </a>
+                </li>';
+        }
+
         if (@dbFetchCell("SELECT COUNT(*) FROM `packages` WHERE device_id = '".$device['device_id']."'") > '0') {
             echo '<li class="'.$select['packages'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'packages')).'">
@@ -366,6 +378,14 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Notes
             </a>
             </li>';
+
+        if (device_permitted($device['device_id']) && is_mib_poller_enabled($device)) {
+            echo '<li class="'.$select['mib'].'">
+                <a href="'.generate_device_url($device, array('tab' => 'mib')).'">
+                <i class="fa fa-file-text-o"></i> MIB
+                </a>
+                </li>';
+        }
 
 
         echo '<li style="float: right;"><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"></a></li>

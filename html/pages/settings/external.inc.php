@@ -17,6 +17,14 @@ $oxidized_conf = array(
           'descr'              => 'Enable config versioning access',
           'type'               => 'checkbox',
     ),
+    array('name'               => 'oxidized.group_support',
+          'descr'              => 'Enable the return of groups to Oxidized',
+          'type'               => 'checkbox',
+    ),
+    array('name'               => 'oxidized.default_group',
+          'descr'              => 'Set the default group returned',
+          'type'               => 'text',
+    ),
 );
 
 $unixagent_conf = array(

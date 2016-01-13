@@ -73,6 +73,7 @@ $menu_options['realtime'] = 'Real time';
 // FIXME CONDITIONAL
 $menu_options['arp']    = 'ARP Table';
 $menu_options['events'] = 'Eventlog';
+$menu_options['notes'] = 'Notes';
 
 if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = '".$port['port_id']."'")) {
     $menu_options['adsl'] = 'ADSL';

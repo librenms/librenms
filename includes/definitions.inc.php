@@ -511,6 +511,14 @@ $config['os'][$os]['icon']             = 'saf';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Sub10
+$os = 'sub10';
+$config['os'][$os]['text']             = 'Sub10 Systems';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'sub10';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
 // Supermicro Switch
 $os = 'supermicro-switch';
 $config['os'][$os]['group']  = 'supermicro';
@@ -939,7 +947,7 @@ $config['os'][$os]['text'] = 'ZyXEL Prestige';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'zyxel';
 
-$os = 'zyxeles';
+$os = 'zynos';
 $config['os'][$os]['text'] = 'ZyXEL Ethernet Switch';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'zyxel';
@@ -1063,6 +1071,7 @@ $config['os'][$os]['icon']             = 'comet';
 $config['os'][$os]['over'][0]['graph'] = 'device_temperature';
 $config['os'][$os]['over'][0]['text']  = 'temperature';
 
+    //printer
 $os = 'dell-laser';
 $config['os'][$os]['group']            = 'printer';
 $config['os'][$os]['text']             = 'Dell Laser';
@@ -1149,6 +1158,20 @@ $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['type']             = 'printer';
+
+$os ='samsungprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Samsung Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+
+$os ='canonprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Canon Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
 
 $os = '3com';
 $config['os'][$os]['text']             = '3Com';
@@ -1278,6 +1301,10 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['ifXmcbc']          = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'pbn';
 
 // Enterasys
@@ -1385,6 +1412,14 @@ $os = 'ligoos';
 $config['os'][$os]['text']             = 'LigoWave LigoOS';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'ligowave';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// HWGroup Poseidon
+$os = 'poseidon';
+$config['os'][$os]['text']             = 'Poseidon';
+$config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['icon']             = 'generic';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
@@ -1526,6 +1561,31 @@ $config['graph_types']['device']['siklu_rfinterfaceOctets']['descr'] = 'Traffic'
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['section'] = 'wireless';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['order'] = '6';
 $config['graph_types']['device']['siklu_rfinterfaceOtherOctets']['descr'] = 'Other Octets';
+
+// Sub10 support
+$config['graph_types']['device']['sub10_sub10RadioLclTxPower']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclTxPower']['order'] = '0';
+$config['graph_types']['device']['sub10_sub10RadioLclTxPower']['descr'] = 'Radio Transmit Power';
+
+$config['graph_types']['device']['sub10_sub10RadioLclRxPower']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclRxPower']['order'] = '1';
+$config['graph_types']['device']['sub10_sub10RadioLclRxPower']['descr'] = 'Radio Receive Power';
+
+$config['graph_types']['device']['sub10_sub10RadioLclVectErr']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclVectErr']['order'] = '3';
+$config['graph_types']['device']['sub10_sub10RadioLclVectErr']['descr'] = 'Radio Vector Error';
+
+$config['graph_types']['device']['sub10_sub10RadioLclLnkLoss']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclLnkLoss']['order'] = '3';
+$config['graph_types']['device']['sub10_sub10RadioLclLnkLoss']['descr'] = 'Radio Link Loss';
+
+$config['graph_types']['device']['sub10_sub10RadioLclAFER']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclAFER']['order'] = '4';
+$config['graph_types']['device']['sub10_sub10RadioLclAFER']['descr'] = 'Radio Air Frame Error Rate';
+
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['section'] = 'wireless';
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['order'] = '4';
+$config['graph_types']['device']['sub10_sub10RadioLclDataRate']['descr'] = 'Data Rate on the Airside interface';
 
 $config['graph_types']['device']['wifi_clients']['section'] = 'wireless';
 $config['graph_types']['device']['wifi_clients']['order']   = '0';

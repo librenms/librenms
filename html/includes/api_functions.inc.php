@@ -831,7 +831,7 @@ function ack_alert() {
         $status = 'ok';
         $code   = 200;
         if (dbUpdate(array('state' => 2), 'alerts', '`id` = ? LIMIT 1', array($alert_id))) {
-            $message = 'Alert has been ackgnowledged';
+            $message = 'Alert has been acknowledged';
         }
         else {
             $message = 'No alert by that ID';
@@ -944,7 +944,27 @@ function list_oxidized() {
     $devices = array();
     $device_types = "'".implode("','", $config['oxidized']['ignore_types'])."'";
     $device_os    = "'".implode("','", $config['oxidized']['ignore_os'])."'";
-    foreach (dbFetchRows("SELECT hostname,os FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `status`='1' AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os))") as $device) {
+    foreach (dbFetchRows("SELECT hostname,os,location FROM `devices` LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os))") as $device) {
+        if ($config['oxidized']['group_support'] == "true") {
+            foreach ($config['oxidized']['group']['hostname'] as $host_group) {
+                if (preg_match($host_group['regex'].'i', $device['hostname'])) {
+                    $device['group'] = $host_group['group'];
+                    break;
+                }
+            }
+            if (empty($device['group'])) {
+                foreach ($config['oxidized']['group']['location'] as $host_group) {
+                    if (preg_match($host_group['regex'].'i', $device['location'])) {
+                        $device['group'] = $host_group['group'];
+                        break;
+                    }
+                }
+            }
+            if (empty($device['group']) && !empty($config['oxidized']['default_group'])) {
+                $device['group'] = $config['oxidized']['default_group'];
+            }
+        }
+        unset($device['location']);
         $devices[] = $device;
     }
 

@@ -15,8 +15,13 @@ if(file_exists('../config.php') && $stage != "6") {
 }
 
 // List of php modules we expect to see
-$modules = array('gd','mysql','snmp','mcrypt');
-
+// $version_id = $major_version * 10000 + $minor_version * 100 + $release_version;
+if (PHP_VERSION_ID < 70000) {
+    $modules = array('gd','mysql','snmp','mcrypt');
+}
+else {
+    $modules = array('gd','mysqli','snmp','mcrypt');
+}
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
 $dbpass = @$_POST['dbpass'] ?: '';
@@ -231,7 +236,7 @@ if($stage == 0) {
         <td>pear</td>
         <td>$ext_loaded</td>");
     if($ext_loaded == 'no') {
-        echo("<td>apt-get install php5-$extension / yum install php-$extension</td>");
+        echo("<td>apt-get install php-pear / yum install php-pear</td>");
     }
     else {
         echo("<td></td>");
@@ -537,7 +542,9 @@ elseif($stage == "6") {
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-        <div class="alert alert-success">Thank you for setting up LibreNMS, you can now click <a href="/">here to login to your new install.</a></div>
+        <div class="alert alert-success">Thank you for setting up LibreNMS.<br />
+        It would be great if you would consider contributing to our statistics, you can do this on the <a href="about/">/about/</a> page and check the box under Statistics.<br />
+        You can now click <a href="/">here to login to your new install.</a></div>
       </div>
       <div class="col-md-3">
       </div>

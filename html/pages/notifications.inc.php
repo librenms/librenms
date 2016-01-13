@@ -75,7 +75,7 @@ $notifications = new ObjCache('notifications');
       <div class="col-md-12">
         <blockquote>
           <p><?php echo $notif['body']; ?></p>
-          <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
+          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
@@ -104,7 +104,7 @@ $notifications = new ObjCache('notifications');
       <div class="col-md-12">
         <blockquote>
           <p><?php echo preg_replace('/\\\n/','<br />', $notif['body']); ?></p>
-          <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
+          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
@@ -112,7 +112,7 @@ $notifications = new ObjCache('notifications');
 <?php    } ?>
   <div class="row">
     <div class="col-md-12">
-      <h3><a class="btn btn-default" href="/notifications/archive">Show Archive</a></h3>
+      <h3><a class="btn btn-default" href="notifications/archive">Show Archive</a></h3>
     </div>
   </div>
 </div>
@@ -134,7 +134,7 @@ $notifications = new ObjCache('notifications');
       <div class="col-md-12">
         <blockquote>
           <p><?php echo preg_replace('/\\\n/','<br />', $notif['body']); ?></p>
-          <footer>Source: <code><?php echo $notif['source']; ?></code></footer>
+          <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
     </div>
@@ -164,7 +164,7 @@ $(function() {
       success: function (data) {
         if( data.status == "ok" ) {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-          window.location.href="/notifications";
+          window.location.href="notifications";
         }
         else {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -208,7 +208,7 @@ $(function() {
       success: function (data) {
         if( data.status == "ok" ) {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-          window.location.href="/notifications";
+          window.location.href="notifications";
         }
         else {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
@@ -227,7 +227,7 @@ $(function() {
       success: function (data) {
         if( data.status == "ok" ) {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
-          window.location.href="/notifications";
+          window.location.href="notifications";
         }
         else {
           $("#message").html('<div class="alert alert-info">' + data.message + '</div>');
