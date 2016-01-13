@@ -519,29 +519,15 @@ function get_components() {
 
     // Do some filtering if the user requests.
     $options = array();
-    if (isset($_GET['type'])) {
-        // set a type = filter
-        $options['filter']['type'] = array('=',$_GET['type']);
-    }
-    if (isset($_GET['id'])) {
-        // set a id = filter
-        $options['filter']['id'] = array('=',$_GET['id']);
-    }
+    // We need to specify the label as this is a LIKE query
     if (isset($_GET['label'])) {
         // set a label like filter
         $options['filter']['label'] = array('LIKE',$_GET['label']);
+        unset ($_GET['label']);
     }
-    if (isset($_GET['status'])) {
-        // set a status = filter
-        $options['filter']['status'] = array('=',$_GET['status']);
-    }
-    if (isset($_GET['disabled'])) {
-        // set a disabled = filter
-        $options['filter']['disabled'] = array('=',$_GET['disabled']);
-    }
-    if (isset($_GET['ignore'])) {
-        // set a ignore = filter
-        $options['filter']['ignore'] = array('=',$_GET['ignore']);
+    // Add the rest of the options with an equals query
+    foreach ($_GET as $k) {
+        $options['filter'][$k] = array('=',$_GET[$k]);
     }
 
     // use hostname as device_id if it's all digits
