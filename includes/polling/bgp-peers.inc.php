@@ -160,6 +160,9 @@ if ($config['enable_bgp']) {
         );
         rrdtool_update("$peerrrd", $fields);
 
+        $tags = array('bgpPeerIdentifier' => $peer['bgpPeerIdentifier']);
+        influx_update($device,'bgp',$tags,$fields);
+
         $peer['update']['bgpPeerState']              = $bgpPeerState;
         $peer['update']['bgpPeerAdminStatus']        = $bgpPeerAdminStatus;
         $peer['update']['bgpPeerFsmEstablishedTime'] = $bgpPeerFsmEstablishedTime;
@@ -321,6 +324,9 @@ if ($config['enable_bgp']) {
                     'WithdrawnPrefixes'   => $cbgpPeerWithdrawnPrefixes,
                 );
                 rrdtool_update("$cbgp_rrd", $fields);
+
+                $tags = array('bgpPeerIdentifier' => $peer['bgpPeerIdentifier'], 'afi' => $afi, 'safi' => $safi);
+                influx_update($device,'cbgp',$tags,$fields);
 
             } //end foreach
         } //end if

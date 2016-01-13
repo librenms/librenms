@@ -44,6 +44,10 @@ if ($device['os_group'] == 'cisco' && $device['os'] == 'asa' && $device['type'] 
         );
 
         rrdtool_update($rrd_filename, $fields);
+
+        $tags = array();
+        influx_update($device,'asa_conns',$tags,$fields);
+
         $graphs['asa_conns'] = true;
         echo ' ASA Connections';
     }

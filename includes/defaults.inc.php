@@ -106,6 +106,7 @@ if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
 
 $config['project_home']   = 'http://www.librenms.org/';
 $config['project_issues'] = 'https://github.com/librenms/librenms/issues';
+$config['github_api']   = 'https://api.github.com/repos/librenms/librenms/';
 $config['site_style']     = 'light';
 // Options are dark or light
 $config['stylesheet']   = 'css/styles.css';
@@ -315,6 +316,17 @@ $config['graph_colours']['purples'] = array(
 );
 $config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
+// Colour values from http://www.sapdesignguild.org/goodies/diagram_guidelines/color_palettes.html
+$config['graph_colours']['manycolours'] = array(
+    "FFF8A3", "FAE16B", "F8D753", "F3C01C", "F0B400",   // yellows
+    "A9CC8F", "82B16A", "5C9746", "3D8128", "1E6C0B",   // greens
+    "B2C8D9", "779DBF", "3E75A7", "205F9A", "00488C",   // blues
+    "BEA37A", "907A52", "7A653E", "63522B", "3D3000",   // browns
+    "F3AA79", "EB8953", "E1662A", "DC5313", "D84000",   // oranges
+    "B5B5A9", "8B8D82", "74796F", "5D645A", "434C43",   // greys
+    "E6A4A5", "D6707B", "C4384F", "BC1C39", "B30023",   // pinks
+);
+
 // Map colors
 $config['network_map_legend'] = array(
     '0'   => '#aeaeae',
@@ -458,6 +470,7 @@ $config['rancid_ignorecomments'] = 0;
 // Ignore lines starting with #
 // $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 // $config['smokeping']['dir']             = "/var/lib/smokeping/";
+$config['smokeping']['pings']             = 20;
 // $config['oxidized']['enabled']         = FALSE;//Set to TRUE
 // $config['oxidized']['url']             = 'http://127.0.0.1:8888';// Set the Oxidized rest URL
 // NFSen RRD dir.
@@ -695,6 +708,7 @@ $config['poller_modules']['applications']                = 1;
 $config['poller_modules']['cisco-asa-firewall']          = 1;
 $config['poller_modules']['mib'] = 0;
 $config['poller_modules']['cisco-voice']                 = 1;
+$config['poller_modules']['stp']                         = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -726,6 +740,7 @@ $config['discovery_modules']['toner']          = 1;
 $config['discovery_modules']['ucd-diskio']     = 1;
 $config['discovery_modules']['services']       = 1;
 $config['discovery_modules']['charge']         = 1;
+$config['discovery_modules']['stp']            = 1;
 
 $config['modules_compat']['rfc1628']['liebert']    = 1;
 $config['modules_compat']['rfc1628']['netmanplus'] = 1;

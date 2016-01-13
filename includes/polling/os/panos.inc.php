@@ -19,5 +19,8 @@ if (is_numeric($sessions)) {
 
     rrdtool_update($sessrrd, $fields);
 
+    $tags = array();
+    influx_update($device,'panos-sessions',$tags,$fields);
+
     $graphs['panos_sessions'] = true;
 }

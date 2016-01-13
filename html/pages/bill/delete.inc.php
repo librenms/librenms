@@ -29,6 +29,6 @@
     You are about to delete this bill.
   </div>
   <div class="form-actions">
-    <button id="deleteBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="icon-trash icon-white"></i> <strong>Delete Bill</strong></button>
+    <button id="deleteBtn" type="submit" class="btn btn-danger" disabled="disabled"><i class="fa fa-trash"></i> <strong>Delete Bill</strong></button>
   </div>
 </form>

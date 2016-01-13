@@ -580,6 +580,7 @@ function edit_service($service, $descr, $service_ip, $service_param = "", $servi
 
 }
 
+
 /*
  * convenience function - please use this instead of 'if ($debug) { echo ...; }'
  */
@@ -596,7 +597,8 @@ function d_echo($text, $no_debug_text = null) {
     elseif ($no_debug_text) {
         echo "$no_debug_text";
     }
-}
+} // d_echo
+
 
 /*
  * convenience function - please use this instead of 'if ($debug) { print_r ...; }'
@@ -609,37 +611,8 @@ function d_print_r($var, $no_debug_text = null) {
     elseif ($no_debug_text) {
         echo "$no_debug_text";
     }
-}
+} // d_print_r
 
-/*
- * Shorten the name so it works as an RRD data source name (limited to 19 chars by default).
- * Substitute for $subst if necessary.
- * @return the shortened name
- */
-function name_shorten($name, $common = null, $subst = "mibval", $len = 19) {
-    if ($common !== null) {
-        // remove common from the beginning of the string, if present
-        if (strlen($name) > $len && strpos($name, $common) >= 0) {
-            $newname = str_replace($common, '', $name);
-            $name = $newname;
-        }
-    }
-    if (strlen($name) > $len) {
-        $name = $subst;
-    }
-    return $name;
-}
-
-/*
- * @return the name of the rrd file for $host's $extra component
- * @param host Host name
- * @param extra Components of RRD filename - will be separated with "-"
- */
-function rrd_name($host, $extra, $exten = ".rrd") {
-    global $config;
-    $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
-    return implode("/", array($config['rrd_dir'], $host, $filename.$exten));
-}
 
 /*
  * @return true if the given graph type is a dynamic MIB graph
@@ -647,7 +620,8 @@ function rrd_name($host, $extra, $exten = ".rrd") {
 function is_mib_graph($type, $subtype) {
     global $config;
     return $config['graph_types'][$type][$subtype]['section'] == 'mib';
-}
+} // is_mib_graph
+
 
 /*
  * @return true if client IP address is authorized to access graphs
@@ -670,7 +644,8 @@ function is_client_authorized($clientip) {
     }
 
     return false;
-}
+} // is_client_authorized
+
 
 /*
  * @return an array of all graph subtypes for the given type
@@ -702,7 +677,8 @@ function get_graph_subtypes($type) {
 
     sort($types);
     return $types;
-}
+} // get_graph_subtypes
+
 
 function get_smokeping_files($device) {
     global $config;
@@ -733,6 +709,7 @@ function get_smokeping_files($device) {
     return $smokeping_files;
 } // end get_smokeping_files
 
+
 function generate_smokeping_file($device,$file='') {
     global $config;
     if ($config['smokeping']['integration'] === true) {
@@ -741,7 +718,8 @@ function generate_smokeping_file($device,$file='') {
     else {
         return $config['smokeping']['dir'] . '/' . $file;
     }
-}
+} // generate_smokeping_file
+
 
 /*
  * @return rounded value to 10th/100th/1000th depending on input (valid: 10, 100, 1000)
@@ -757,6 +735,172 @@ function round_Nth($val = 0, $round_to) {
         return $ret;
     }
 } // end round_Nth 
+
+
+/*
+ * @return true if this device should be polled with MIB-based discovery
+ */
+function is_mib_poller_enabled($device)
+{
+    if (!is_module_enabled('poller', 'mib')) {
+        d_echo("MIB polling module disabled globally.\n");
+        return false;
+    }
+
+    if (!is_dev_attrib_enabled($device, 'poll_mib')) {
+        d_echo('MIB module disabled for '.$device['hostname']."\n");
+        return false;
+    }
+
+    return true;
+} // is_mib_poller_enabled
+
+
+/*
+ * FIXME: Dummy implementation
+ */
+function count_mib_mempools($device)
+{
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
+        return 1;
+    }
+    return 0;
+} // count_mib_mempools
+
+
+/*
+ * FIXME: Dummy implementation
+ */
+function count_mib_processors($device)
+{
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
+        return 1;
+    }
+    return 0;
+} // count_mib_processors
+
+
+function count_mib_health($device)
+{
+    return count_mib_mempools($device) + count_mib_processors($device);
+} // count_mib_health
+
+
+function get_mibval($device, $oid)
+{
+    $sql = 'SELECT * FROM `device_oids` WHERE `device_id` = ? AND `oid` = ?';
+    return dbFetchRow($sql, array($device['device_id'], $oid));
+} // get_mibval
+
+
+/*
+ * FIXME: Dummy implementation - needs an abstraction for each device
+ */
+function get_mib_mempools($device)
+{
+    $mempools = array();
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
+        $mempool = array();
+        $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.14.0');
+        $mempool['mempool_descr'] = $mibvals['object_type'];
+        $mempool['mempool_id'] = 0;
+        $mempool['mempool_total'] = 100;
+        $mempool['mempool_used'] = $mibvals['numvalue'];
+        $mempool['mempool_free'] = 100 - $mibvals['numvalue'];
+        $mempool['percentage'] = true;
+        $mempools[] = $mempool;
+    }
+    return $mempools;
+} // get_mib_mempools
+
+
+/*
+ * FIXME: Dummy implementation - needs an abstraction for each device
+ */
+function get_mib_processors($device)
+{
+    $processors = array();
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
+        $proc = array();
+        $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.13.0');
+        $proc['processor_descr'] = $mibvals['object_type'];
+        $proc['processor_id'] = 0;
+        $proc['processor_usage'] = $mibvals['numvalue'];
+        $processors[] = $proc;
+    }
+    return $processors;
+} // get_mib_processors
+
+
+/*
+ * FIXME: Dummy implementation - needs an abstraction for each device
+ * @return true if there is a custom graph defined for this type, subtype, and device
+ */
+function is_custom_graph($type, $subtype, $device)
+{
+    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless' && $type == 'device') {
+        switch ($subtype) {
+        case 'cpumem':
+        case 'mempool':
+        case 'processor':
+            return true;
+        }
+    }
+    return false;
+} // is_custom_graph
+
+
+/*
+ * FIXME: Dummy implementation
+ * Set section/graph entries in $graph_enable for graphs specific to $os.
+ */
+function enable_os_graphs($os, &$graph_enable)
+{
+    /*
+    foreach (dbFetchRows("SELECT * FROM graph_conditions WHERE graph_type = 'device' AND condition_name = 'os' AND condition_value = ?", array($os)) as $graph) {
+        $graph_enable[$graph['graph_section']][$graph['graph_subtype']] = "device_".$graph['graph_subtype'];
+    }
+    */
+} // enable_os_graphs
+
+
+/*
+ * For each os-based or global graph relevant to $device, set its section/graph entry in $graph_enable.
+ */
+function enable_graphs($device, &$graph_enable)
+{
+    // These are standard graphs we should have for all systems
+    $graph_enable['poller']['poller_perf'] = 'device_poller_perf';
+    if (can_ping_device($device) === true) {
+        $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
+    }
+
+    enable_os_graphs($device['os'], $graph_enable);
+} // enable_graphs
+
+
+//
+// maintain a simple cache of objects
+//
+
+function object_add_cache($section, $obj)
+{
+    global $object_cache;
+    $object_cache[$section][$obj] = true;
+} // object_add_cache
+
+
+function object_is_cached($section, $obj)
+{
+    global $object_cache;
+    if (array_key_exists($obj, $object_cache)) {
+        return $object_cache[$section][$obj];
+    }
+    else {
+        return false;
+    }
+} // object_is_cached
+
 
 /**
  * Checks if config allows us to ping this device
@@ -774,6 +918,69 @@ function can_ping_device($attribs) {
         return false;
     }
 } // end can_ping_device
+
+
+/*
+ * @return true if the requested module type & name is globally enabled
+ */
+function is_module_enabled($type, $module)
+{
+    global $config;
+    if (isset($config[$type.'_modules'][$module])) {
+        return $config[$type.'_modules'][$module] == 1;
+    }
+    else {
+        return false;
+    }
+} // is_module_enabled
+
+
+/*
+ * @return true if every string in $arr begins with $str
+ */
+function begins_with($str, $arr)
+{
+    foreach ($arr as $s) {
+        $pos = strpos($s, $str);
+        if ($pos === false || $pos > 0) {
+            return false;
+        }
+    }
+    return true;
+} // begins_with
+
+
+/*
+ * @return the longest starting portion of $str that matches everything in $arr
+ */
+function longest_matching_prefix($str, $arr)
+{
+    $len = strlen($str);
+    while ($len > 0) {
+        $prefix = substr($str, 0, $len);
+        if (begins_with($prefix, $arr)) {
+            return $prefix;
+        }
+        $len -= 1;
+    }
+    return '';
+} // longest_matching_prefix
+
+
+function search_phrase_column($c)
+{
+    global $searchPhrase;
+    return "$c LIKE '%$searchPhrase%'";
+} // search_phrase_column
+
+
+function print_mib_poller_disabled() {
+    echo '<h4>MIB polling is not enabled</h4>
+<p>
+Set <tt>$config[\'poller_modules\'][\'mib\'] = 1;</tt> in <tt>config.php</tt> to enable.
+</p>';
+} // print_mib_poller_disabled
+
 
 /**
  * Constructs the path to an RRD for the Ceph application
@@ -794,7 +1001,7 @@ function ceph_rrd($gtype) {
 
     $rrd = join('-', array('app', 'ceph', $vars['id'], $gtype, $var)).'.rrd';
     return join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
-}
+} // ceph_rrd
 
 /**
  * Parse location field for coordinates
@@ -807,3 +1014,29 @@ function parse_location($location) {
         return array('lat' => $tmp_loc[2], 'lng' => $tmp_loc[3]);
     }
 }//end parse_location()
+
+/**
+ * Returns version info
+ * @return array
+**/
+function version_info($remote=true) {
+    global $config;
+    $output = array();
+    if ($remote === true && $config['update_channel'] == 'master') {
+        $api = curl_init();
+        set_curl_proxy($api);
+        curl_setopt($api, CURLOPT_USERAGENT,'LibreNMS');
+        curl_setopt($api, CURLOPT_URL, $config['github_api'].'commits/master');
+        curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
+        $output['github'] = json_decode(curl_exec($api),true);
+    }
+    $output['local_sha']   = chop(`git rev-parse HEAD`);
+    $output['db_schema']   = dbFetchCell('SELECT version FROM dbSchema');
+    $output['php_ver']     = phpversion();
+    $output['mysql_ver']   = dbFetchCell('SELECT version()');
+    $output['rrdtool_ver'] = implode(' ', array_slice(explode(' ', shell_exec($config['rrdtool'].' --version |head -n1')), 1, 1));
+    $output['netsnmp_ver'] = shell_exec($config['snmpget'].' --version 2>&1');
+
+    return $output;
+
+}//end version_info()

@@ -22,6 +22,7 @@ include_once($config['install_dir'] . "/includes/dbFacile.php");
 
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
+include_once($config['install_dir'] . "/includes/influxdb.inc.php");
 include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
@@ -526,13 +527,6 @@ function isPingable($hostname, $address_family = AF_INET, $attribs = array()) {
 
 function is_odd($number) {
     return $number & 1; // 0 = even, 1 = odd
-}
-
-function utime() {
-    $time = explode(" ", microtime());
-    $usec = (double)$time[0];
-    $sec = (double)$time[1];
-    return $sec + $usec;
 }
 
 function getpollergroup($poller_group='0') {
@@ -1230,9 +1224,11 @@ function function_check($function) {
     return function_exists($function);
 }
 
-function get_last_commit() {
-    return `git log -n 1|head -n1`;
-}//end get_last_commit
+function force_influx_data($type,$data) {
+    if ($type == 'f' || $type == 'float') {
+        return(sprintf("%.1f",$data));
+    }
+}// end force_influx_data
 
 /**
  * Try to determine the address family (IPv4 or IPv6) associated with an SNMP

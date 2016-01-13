@@ -10,7 +10,12 @@ require 'config.php';
 require_once 'includes/definitions.inc.php';
 require 'includes/functions.php';
 
-$options = getopt('f:');
+$options = getopt('f:d');
+
+if (isset($options['d'])) {
+    echo "DEBUG\n";
+    $debug = true;
+}
 
 if ($options['f'] === 'update') {
     $innodb_buffer = innodb_buffer_check();
@@ -101,7 +106,7 @@ if ($options['f'] === 'callback') {
 
 if ($options['f'] === 'device_perf') {
     if (is_numeric($config['device_perf_purge'])) {
-        if (dbDelete('device_perf', 'timestamp < UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL ? DAY))', array($config['device_perf_purge']))) {
+        if (dbDelete('device_perf', 'timestamp < DATE_SUB(NOW(),INTERVAL ? DAY)', array($config['device_perf_purge']))) {
             echo 'Device performance times cleared for entries over '.$config['device_perf_purge']." days\n";
         }
     }
