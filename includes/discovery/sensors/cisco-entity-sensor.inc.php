@@ -52,11 +52,10 @@ if ($device['os_group'] == 'cisco') {
             if ($entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index)) {
                 $entPhysicalIndex = $index;
                 if ($entity_array[$index]['entPhysicalName'] || $device['os'] == 'iosxr') {
-                    $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalName']).' - '.rewrite_entity_descr($entity_array[$index]['entPhysicalDescr']);
+                    $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalName']);
                 }
                 else {
-                    $descr = $entity_array[$index]['entPhysicalDescr'];
-                    $descr = rewrite_entity_descr($descr);
+                    $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalDescr']);
                 }
 
                 // Set description based on measured entity if it exists
