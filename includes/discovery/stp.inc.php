@@ -112,7 +112,72 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
         log_event('STP removed', $device, 'stp');
         echo '-';
     }
+
+    // STP port related stuff
+    foreach ($stp_raw as $port => $value){
+        if ($port) { // $stp_raw[0] ist not port related so we skip this one
+            $stp_port = array(
+                'priority'              => $stp_raw[$port]['dot1dStpPortPriority'],
+                'state'                 => $stp_raw[$port]['dot1dStpPortState'],
+                'enable'                => $stp_raw[$port]['dot1dStpPortEnable'],
+                'pathCost'              => $stp_raw[$port]['dot1dStpPortPathCost'],
+                'designatedCost'        => $stp_raw[$port]['dot1dStpPortDesignatedCost'],
+                'designatedPort'        => $stp_raw[$port]['dot1dStpPortDesignatedPort'],
+                'forwardTransitions'    => $stp_raw[$port]['dot1dStpPortForwardTransitions']
+            );
+            
+            // set device binding
+            $stp_port['device_id'] = $device['device_id'];
+            
+            // set port binding
+            $stp_port['port_id'] = dbFetchCell('SELECT port_id FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', array($device['device_id'], $stp_raw[$port]['dot1dStpPort']));
+            
+            $dr = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedRoot']));
+            $dr = substr($dr, -12); //remove first two octets
+            $stp_port['designatedRoot'] = $dr;
+            
+            $db = str_replace(array(' ', ':', '-'), '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedBridge']));
+            $db = substr($db, -12); //remove first two octets
+            $stp_port['designatedBridge'] = $db;
+
+            if ($device['os'] == 'pbn') {
+                // It seems that PBN guys don't care about ieee 802.1d :-(
+                // So try to find the right port with some crazy conversations
+                $dp_value = dechex($stp_port['priority']);
+                $dp_value = $dp_value.'00';
+                $dp_value = hexdec($dp_value);
+                if ($stp_raw[$port]['dot1dStpPortDesignatedPort']) {
+                    $dp = $stp_raw[$port]['dot1dStpPortDesignatedPort'] - $dp_value;
+                    $stp_port['designatedPort'] = $dp;
+                }
+            }
+            else {
+                // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
+                $dp = substr($stp_raw[$port]['dot1dStpPortDesignatedPort'], -2); //discard the first octet (priority part)
+                $stp_port['designatedPort'] = hexdec($dp);
+            }
+            
+            d_echo($stp_port);
+
+            // Write to db
+            if (!dbFetchCell('SELECT 1 FROM `ports_stp` WHERE `device_id` = ? AND `port_id` = ?', array($device['device_id'], $stp_port['port_id']))) {
+                dbInsert($stp_port,'ports_stp');
+                echo '+';
+            }
+        }
+    }
+
+    // Delete STP ports from db if absent in SNMP query     
+    $stp_port_db = dbFetchRows('SELECT * FROM `ports_stp` WHERE `device_id` = ?', array($device['device_id']));
+    //d_echo($stp_port_db);
+    foreach($stp_port_db as $port => $value){
+        $if_index = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', array($device['device_id'], $value['port_id']));
+        if ($if_index != $stp_raw[$if_index]['dot1dStpPort']){
+            dbDelete('ports_stp', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $value['port_id']));
+            echo '-';
+        }
+    }
 }
 
-unset($stp_raw, $stp, $stp_db);
+unset($stp_raw, $stp, $stp_db, $stp_port, $stp_port_db);
 echo "\n";
