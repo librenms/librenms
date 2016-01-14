@@ -43,6 +43,12 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         echo (($wificlients1 + 0).' clients on dot11Radio0, '.($wificlients2 + 0)." clients on dot11Radio1\n");
     }
 
+    if ($device['os'] == 'hpmsm') {
+        echo 'Checking HP MSM Wireless clients... ';
+        $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.8744.5.25.1.7.2.0', '-OUqnv');
+        echo $wificlients1." clients\n";
+    }
+
     // MikroTik RouterOS
     if ($device['os'] == 'routeros') {
         // Check inventory for wireless card in device. Valid types be here:
