@@ -17,7 +17,7 @@ unset($poll_device);
 $snmpoids = "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysDescr.0 sysObjectID.0 snmpEngineTime.0 hrSystemUptime.0";
 
 if ($device['snmpver'] == 'v1') {
-	$snmpoids = "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysDescr.0 sysObjectID.0";
+    $snmpoids = "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysDescr.0 sysObjectID.0";
 }
 
 $snmpdata    = snmp_get_multi($device, $snmpoids, '-OQnUs', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
