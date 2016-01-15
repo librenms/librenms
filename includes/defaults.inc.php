@@ -473,6 +473,7 @@ $config['rancid_ignorecomments'] = 0;
 $config['smokeping']['pings']             = 20;
 // $config['oxidized']['enabled']         = FALSE;//Set to TRUE
 // $config['oxidized']['url']             = 'http://127.0.0.1:8888';// Set the Oxidized rest URL
+// $config['oxidized']['reload_nodes'] = FALSE;//Set to TRUE, check documentation
 // NFSen RRD dir.
 $config['nfsen_enable'] = 0;
 // $config['nfsen_split_char']   = "_";
@@ -675,7 +676,6 @@ $config['warn']['ifdown'] = true;
 // List of poller modules. Need to be in the array to be
 // considered for execution.
 $config['poller_modules']['unix-agent']    = 0;
-$config['poller_modules']['system']        = 1;
 $config['poller_modules']['os']            = 1;
 $config['poller_modules']['ipmi']          = 1;
 $config['poller_modules']['sensors']       = 1;

@@ -1040,22 +1040,19 @@ function oid_rrd_type($oid, $mibdef)
 
     case 'INTEGER':
     case 'Integer32':
-        // FIXME
-        return false;
+        return 'GAUGE:600:U:U';
 
     case 'Counter32':
-        // FIXME
-        return false;
-
     case 'Counter64':
         return 'COUNTER:600:0:U';
 
+    case 'Gauge32':
     case 'Unsigned32':
-        return 'GAUGE:600:U:U';
+        return 'GAUGE:600:0:U';
+
     }
 
     return false;
-
 } // oid_rrd_type
 
 
@@ -1124,7 +1121,7 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
     foreach ($oids as $index => $array) {
         foreach ($array as $obj => $val) {
             // build up the device_oid row for saving into the database
-            $numvalue = preg_match('/^\d+$/', $val) ? $val : null;
+            $numvalue = is_numeric($val) ? $val + 0 : 0;
             $deviceoids[] = array(
                 'device_id'     => $device['device_id'],
                 'oid'           => $mibdef[$obj]['oid'].".".$index,
@@ -1190,7 +1187,12 @@ function load_mibdefs($module, $name)
     // add shortname to each element
     $prefix = longest_matching_prefix($name, $object_types);
     foreach ($result as $mib => $m) {
-        $result[$mib]['shortname'] = str_replace($prefix, '', $m['object_type']);
+        if (strlen($prefix) > 2) {
+            $result[$mib]['shortname'] = preg_replace("/^$prefix/", '', $m['object_type'], 1);
+        }
+        else {
+            $result[$mib]['shortname'] = $m['object_type'];
+        }
     }
 
     d_print_r($result);

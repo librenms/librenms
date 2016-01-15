@@ -9,18 +9,23 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
 
     $ssh_ok = 0;
 
+    $userHostname = $device['hostname'];
+    if (isset($config['libvirt_username'])) {
+        $userHostname = $config['libvirt_username'].'@'.$userHostname;
+    }
+
     foreach ($config['libvirt_protocols'] as $method) {
         if (strstr($method, 'qemu')) {
-            $uri = $method.'://'.$device['hostname'].'/system';
+            $uri = $method.'://'.$userHostname.'/system';
         }
         else {
-            $uri = $method.'://'.$device['hostname'];
+            $uri = $method.'://'.$userHostname;
         }
 
         if (strstr($method, 'ssh') && !$ssh_ok) {
             // Check if we are using SSH if we can log in without password - without blocking the discovery
             // Also automatically add the host key so discovery doesn't block on the yes/no question, and run echo so we don't get stuck in a remote shell ;-)
-            exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" '.$device['hostname'].' echo -e', $out, $ret);
+            exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" '.$userHostname.' echo -e', $out, $ret);
             if ($ret != 255) {
                 $ssh_ok = 1;
             }

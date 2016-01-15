@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-$version  = snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Ovq');
+$version  = $poll_device['sysDescr'];
 $version  = explode(' ', $version)[2];
 $hardware = snmp_get($device, 'IEEE802dot11-MIB::dot11manufacturerProductName.5', '-Ovq');
