@@ -160,6 +160,7 @@ class component {
         $id = dbInsert($DATA, 'component');
 
         // Create a default component array based on what was inserted.
+        $ARRAY = array();
         $ARRAY[$id] = $DATA;
         unset ($ARRAY[$id]['device_id']);     // This doesn't belong here.
         return $ARRAY;
@@ -224,7 +225,7 @@ class component {
                 if (!isset($OLD[$device_id][$COMPONENT][$ATTR])) {
                     // We have a newly added attribute, need to insert into the DB
                     $DATA = array('component'=>$COMPONENT, 'attribute'=>$ATTR, 'value'=>$VALUE);
-                    $id = dbInsert($DATA, 'component_prefs');
+                    dbInsert($DATA, 'component_prefs');
 
                     // Log the addition to the Eventlog.
                     log_event ("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', $COMPONENT);
@@ -247,7 +248,7 @@ class component {
                 dbDelete('component_prefs', "`component` = ? AND `attribute` = ?",array($COMPONENT,$KEY));
 
                 // Log the addition to the Eventlog.
-                log_event ("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was deleted.", $COMPONENT);
+                log_event ("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", $COMPONENT);
             }
 
         }
