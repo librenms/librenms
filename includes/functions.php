@@ -580,6 +580,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         if (host_exists($host) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
+                oxidized_reload_nodes();
                 return($device_id);
             }
             else {
@@ -1301,4 +1302,21 @@ function warn_innodb_buffer($innodb_buffer) {
     $output .= 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
     $output .= 'Config proposal: "innodb_buffer_pool_size = '.pow(2,ceil(log(($innodb_buffer['used'] / 1024 / 1024),2))).'M"'.PHP_EOL;
     return $output;
+}
+
+function oxidized_reload_nodes() {
+
+    global $config;
+
+    if ($config['oxidized']['enabled'] === TRUE && $config['oxidized']['reload_nodes'] === TRUE && isset($config['oxidized']['url'])) {
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload';
+        $ch = curl_init($oxidized_reload_url);
+
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_exec($ch);
+        curl_close($ch);
+    }
 }
