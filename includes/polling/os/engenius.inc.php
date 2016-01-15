@@ -14,10 +14,10 @@ $serial = trim(snmp_get($device, "1.3.6.1.4.1.14125.100.1.7.0", "-OQv"),'" ');
 # There doesn't seem to be a real hardware identification.. sysName will have to do?
 $hw_response = snmp_get($device, "1.3.6.1.4.1.14125.100.1.6.0", "-OQv");
 if(!empty($hw_response)) {
-    $hardware = str_replace("EnGenius ","",snmp_get($device,"sysName.0", "-OQv")) . " v" . trim(snmp_get($device, "1.3.6.1.4.1.14125.100.1.6.0", "-OQv"),'" .');
+    $hardware = str_replace("EnGenius ","",$poll_device['sysName']) . " v" . trim(snmp_get($device, "1.3.6.1.4.1.14125.100.1.6.0", "-OQv"),'" .');
 }
 else {
-    $hardware = snmp_get($device,"sysName.0", "-OQv") . trim(snmp_get($device, "1.3.6.1.4.1.14125.3.1.1.5.0", "-OQv"),'" .');
+    $hardware = $poll_device['sysName'] . trim(snmp_get($device, "1.3.6.1.4.1.14125.3.1.1.5.0", "-OQv"),'" .');
 }
 
 $mode = snmp_get($device, "1.3.6.1.4.1.14125.100.1.4.0", "-OQv");
