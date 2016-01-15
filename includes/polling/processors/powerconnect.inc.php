@@ -1,5 +1,5 @@
 <?php
-$sysObjectId = snmp_get($device, 'SNMPv2-MIB::sysObjectID.0', '-Ovqn');
+$sysObjectId = $poll_device['sysObjectID'];
 switch ($sysObjectId) {
 case '.1.3.6.1.4.1.674.10895.3031':
     /*

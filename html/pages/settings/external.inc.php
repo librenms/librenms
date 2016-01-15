@@ -25,6 +25,10 @@ $oxidized_conf = array(
           'descr'              => 'Set the default group returned',
           'type'               => 'text',
     ),
+    array('name'               => 'oxidized.reload_nodes',
+          'descr'              => 'Reload Oxidized nodes list, each time a device is added',
+          'type'               => 'checkbox',
+    ),
 );
 
 $unixagent_conf = array(
