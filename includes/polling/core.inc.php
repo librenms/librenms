@@ -14,7 +14,7 @@
 
 unset($poll_device);
 
-$snmpdata    = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysDescr.0 sysObjectID.0 snmpEngineTime.0 hrSystemUptime.0', '-OQnUs', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+$snmpdata    = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysDescr.0 sysObjectID.0', '-OQnUs', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 $poll_device = $snmpdata[0];
 $poll_device['sysName']     = strtolower($poll_device['sysName']);
 
@@ -25,8 +25,10 @@ if (!empty($agent_data['uptime'])) {
 }
 
 if (empty($uptime)) {
-    $snmp_uptime = (integer) $poll_device['snmpEngineTime'];
-    $hrSystemUptime = $poll_device['hrSystemUptime'];
+    $snmp_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUs', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+    $uptime_data = $snmp_data[0];
+    $snmp_uptime = (integer) $uptime_data['snmpEngineTime'];
+    $hrSystemUptime = $uptime_data['hrSystemUptime'];
     if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, 'No') && ($device['os'] != 'windows')) {
         echo 'Using hrSystemUptime ('.$hrSystemUptime.")\n";
         $agent_uptime = $uptime;
