@@ -81,6 +81,12 @@ Alert when:
 - Any port changes: `%ports.ifOperStatus != 'up'`
 - Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
 - Any storage gets fuller than the 'warning': `%storage.storage_perc >= %storage_perc_warn`
+- If device is a server and the used storage is above the warning level, but ignore /boot partitions: `%storage.storage_perc > %storage.storage_perc_warn && %devices.type = "server" && %storage.storage_descr !~ "/boot"`
+- VMware LAG is not using "Source ip address hash" load balancing: `%devices.os = "vmware" && %ports.ifType = "ieee8023adLag" && %ports.ifDescr !~ "Link Aggregation @, load balancing algorithm: Source ip address hash"`
+- Syslog, authentication failure during the last 5m: `%syslog.timestamp >= %macros.past_5m && %syslog.msg ~ "@authentication failure@"`
+- High memory usage: `%macros.device_up = "1" && %mempools.mempool_perc >= "90" && %mempools.mempool_descr = "Virtual@"`
+- High CPU usage(per core usage, not overall): `%macros.device_up = "1" && %processors.processor_usage >= "90"`
+- High port usage, where description is not client & ifType is not softwareLoopback: `%macros.port_usage_perc >= "80" && %port.port_descr_type != "client" && %ports.ifType != "softwareLoopback"`
 
 # <a name="templates">Templates</a>
 
