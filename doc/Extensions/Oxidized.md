@@ -48,6 +48,7 @@ You will need to configure default credentials for your devices, LibreNMS doesn'
           map:
             name: hostname
             model: os
+            group: group
           headers:
             X-Auth-Token: '01582bf94c03104ecb7953dsadsadwed'
 ```
@@ -62,7 +63,7 @@ $config['oxidized']['group']['hostname'][] = array('regex' => '/^lon-sw/', 'grou
 $config['oxidized']['group']['location'][] = array('regex' => '/london/', 'group' => 'london-switches');
 ```
 
-If you need to, you can specify credentials for groups by using the following in your oxidized config:
+If you need to, you can specify credentials for groups by using the following in your Oxidized config:
 
 ```bash
 groups:
