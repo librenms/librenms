@@ -76,3 +76,4 @@ foreach ($periods as $period) {
         echo "</div>";
     }
 }
+unset($graph_array);
