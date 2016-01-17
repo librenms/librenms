@@ -471,9 +471,9 @@ $config['rancid_ignorecomments'] = 0;
 // $config['collectd_dir']                 = '/var/lib/collectd/rrd';
 // $config['smokeping']['dir']             = "/var/lib/smokeping/";
 $config['smokeping']['pings']             = 20;
-$config['oxidized']['enabled']         = FALSE;//Set to TRUE
+// $config['oxidized']['enabled']         = FALSE;//Set to TRUE
 // $config['oxidized']['url']             = 'http://127.0.0.1:8888';// Set the Oxidized rest URL
-$config['oxidized']['reload_nodes'] = FALSE;//Set to TRUE, check documentation
+// $config['oxidized']['reload_nodes'] = FALSE;//Set to TRUE, check documentation
 // NFSen RRD dir.
 $config['nfsen_enable'] = 0;
 // $config['nfsen_split_char']   = "_";
