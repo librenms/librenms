@@ -580,11 +580,10 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         if (host_exists($host) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
-                return($device_id);
-                
                 if ($config['oxidized']['enabled'] === TRUE && $config['oxidized']['reload_nodes'] === TRUE && isset($config['oxidized']['url'])) {
-                    oxidized_reload_nodes();
+                    $oxidized_reload_response = oxidized_reload_nodes();
                 }
+                return($device_id . $oxidized_reload_response);
             }
             else {
                 return false;
@@ -1308,6 +1307,7 @@ function warn_innodb_buffer($innodb_buffer) {
 }
 
 function oxidized_reload_nodes() {
+
     global $config;
 
     $oxidized_reload_url = $config['oxidized']['url'] . '/reload';
@@ -1322,10 +1322,12 @@ function oxidized_reload_nodes() {
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     if($httpcode == 200) {
-        echo "Success: Oxidized node list reloaded";
+        $oxidized_response = " - Oxidized node list reloaded";
+        return $oxidized_response;
     }
     else {
-        echo "Error: Oxidized node list was not reloaded";
+        $oxidized_response = " - Oxidized node list was not reloaded";
+        return $oxidized_response;
     }
     curl_close($ch);
 }
