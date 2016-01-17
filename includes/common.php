@@ -1040,3 +1040,17 @@ function version_info($remote=true) {
     return $output;
 
 }//end version_info()
+
+/**
+* Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
+* @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
+* @return string Empty if not valid.
+*/
+// Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
+function inet6_ntop($ip) {
+    $l = strlen($ip);
+    if ($l == 4 or $l == 16) {
+        return inet_ntop(pack('A' . $l, $ip));
+    }
+    return '';
+}
