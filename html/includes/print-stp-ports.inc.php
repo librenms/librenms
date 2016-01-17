@@ -1,31 +1,23 @@
 <?php
-echo "<div style='margin: 0px;'><table class='table'>";
+echo "<div class='table-responsive'>";
+echo "<table id='port-stp' class='table table-condensed table-hover table-striped'>";
+echo '<thead>';
 echo '<tr>
-          <th><a href="'.generate_url($vars, array('sort' => "port")).'">Port</a></th>
-          <th>Priority</th>
-          <th>State</th>
-          <th>Enable</th>
-          <th>Path cost</th>
-          <th>Designated root</th>
-          <th>Designated cost</th>
-          <th>Designated bridge</th>
-          <th>Designated port</th>
-          <th><a href="'.generate_url($vars, array('sort' => "transitions")).'">Fwd trasitions</a></th>
+          <th data-column-id="port">Port</th>
+          <th data-column-id="priority">Priority</th>
+          <th data-column-id="state">State</th>
+          <th data-column-id="enable">Enable</th>
+          <th data-column-id="pathCost">Path cost</th>
+          <th data-column-id="designatedRoot">Designated root</th>
+          <th data-column-id="designatedCost">Designated cost</th>
+          <th data-column-id="designatedBridge">Designated bridge</th>
+          <th data-column-id="designatedPort">Designated port</th>
+          <th data-column-id="forwardTransitions">Fwd trasitions</th>
       </tr>';
+echo '</thead>';
+echo '<tbody>';
 
-switch ($vars["sort"]) {
-  case 'transitions':
-    $sort = "ps.forwardTransitions DESC";
-    break;
-  default:
-    $sort = "ps.port_id ASC";
-    break;
-}
-$i='1';
-
-// FIXME Table sorting don't working, why?
-//echo "$sort";
-foreach (dbFetchRows("SELECT `ps`.*, `p`.* FROM `ports_stp` `ps` JOIN `ports` `p` ON `ps`.`port_id`=`p`.`port_id` WHERE `ps`.`device_id` = ? ORDER BY ?", array($device['device_id'], $sort)) as $stp_ports_db) {
+foreach (dbFetchRows("SELECT `ps`.*, `p`.* FROM `ports_stp` `ps` JOIN `ports` `p` ON `ps`.`port_id`=`p`.`port_id` WHERE `ps`.`device_id` = ?", array($device['device_id'])) as $stp_ports_db) {
 
     $bridge_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedBridge']));
     $root_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedRoot']));
@@ -36,25 +28,37 @@ foreach (dbFetchRows("SELECT `ps`.*, `p`.* FROM `ports_stp` `ps` JOIN `ports` `p
         $stp_ports_db['state'],
         $stp_ports_db['enable'],
         $stp_ports_db['pathCost'],
-        //$stp_ports_db['designatedRoot'],
         generate_device_link($root_device, $root_device['hostname'])."<br>".$stp_ports_db['designatedRoot'],
         $stp_ports_db['designatedCost'],
         generate_device_link($bridge_device, $bridge_device['hostname'])."<br>".$stp_ports_db['designatedBridge'],
         $stp_ports_db['designatedPort'],
         $stp_ports_db['forwardTransitions']
     ];
-    $i++;
-    if (!is_integer($i / 2)) {
-            $row_colour = $list_colour_b;
-    }
-    else {
-            $row_colour = $list_colour_a;
-    }
-    echo "<tr style='background-color: $row_colour;'>";
-
+    
+    echo "<tr>";
     foreach ($stp_ports as $value) {
        echo "<td>$value</td>";
     }
-
     echo '</tr>';
 }
+echo '</tbody>';
+echo '</table>';
+echo '</div>';
+// FIXME make table with links and searcheable
+// 
+?>
+
+<script>
+//$("#port-stp").bootgrid();
+/*
+$("#port-stp").bootgrid( {
+    ajax: true,
+    post: function () {
+        return {
+            id: "port-stp"
+        };
+    },
+    url: "ajax_table.php"
+});
+*/
+</script>
