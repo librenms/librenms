@@ -10,7 +10,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
     $ssh_ok = 0;
 
     $userHostname = $device['hostname'];
-    if (!is_null($config['libvirt_username'])) {
+    if (isset($config['libvirt_username'])) {
         $userHostname = $config['libvirt_username'].'@'.$userHostname;
     }
 
