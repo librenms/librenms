@@ -1189,8 +1189,10 @@ function load_mibdefs($module, $name)
 
     // add shortname to each element
     $prefix = longest_matching_prefix($name, $object_types);
-    foreach ($result as $mib => $m) {
-        $result[$mib]['shortname'] = str_replace($prefix, '', $m['object_type']);
+    if (strlen($prefix) > 2) {
+        foreach ($result as $mib => $m) {
+            $result[$mib]['shortname'] = preg_replace("/^$prefix/", '', $m['object_type'], 1);
+        }
     }
 
     d_print_r($result);
