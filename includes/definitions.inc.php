@@ -1435,6 +1435,20 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+// Lenovo EMC (NAS)
+$os = 'lenovoemc';
+$config['os'][$os]['type']             = 'storage';
+$config['os'][$os]['group']            = 'unix';
+$config['os'][$os]['text']             = 'Linux';
+$config['os'][$os]['ifXmcbc']          = 1;
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['over'][0]['graph'] = 'device_processor';
+$config['os'][$os]['over'][0]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][1]['graph'] = 'device_ucd_memory';
+$config['os'][$os]['over'][1]['text']  = 'Memory Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_storage';
+$config['os'][$os]['over'][2]['text']  = 'Storage Usage';
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
