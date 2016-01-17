@@ -772,11 +772,11 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
-// $config['os'][$os]['over'][2]['graph']  = "device_mempool";
-// $config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
 $os = 'powervault';
-$config['os'][$os]['text'] = 'Dell PowerVault';
-$config['os'][$os]['icon'] = 'dell';
+$config['os'][$os]['text']             = 'Dell PowerVault';
+$config['os'][$os]['icon']             = 'dell';
+$config['os'][$os]['type']             = 'storage';
 
 $os = 'equallogic';
 $config['os'][$os]['text']             = 'Dell EqualLogic';
