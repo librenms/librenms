@@ -69,8 +69,9 @@ The components involved in MIB-based polling are:
 
   - During discovery, relevant MIBs are parsed using `snmptranslate`, and the
     data returned is used to populate a database which guides the poller in
-    what to store.  At the moment, only OIDs with Unsigned32 and Counter64
-    data types are parsed.
+    what to store.  At the moment, only OIDs of INTEGER, Integer32, Gauge32,
+    Unsigned32, Counter32, and Counter64 data types are parsed, and negative
+    values are untested.
 
   - Devices may be excluded from MIB polling by changing the setting in the
     device edit screen:
