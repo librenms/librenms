@@ -649,9 +649,9 @@ function is_client_authorized($clientip) {
 
 /*
  * @return an array of all graph subtypes for the given type
- * FIXME not all of these are going to be valid
  */
-function get_graph_subtypes($type) {
+function get_graph_subtypes($type, $device = null)
+{
     global $config;
 
     $types = array();
@@ -669,7 +669,7 @@ function get_graph_subtypes($type) {
     // find the MIB subtypes
     foreach ($config['graph_types'] as $type => $unused1) {
         foreach ($config['graph_types'][$type] as $subtype => $unused2) {
-            if (is_mib_graph($type, $subtype)) {
+            if (is_mib_graph($type, $subtype)  &&  $device != null  &&  is_device_graph($device, $subtype)) {
                 $types[] = $subtype;
             }
         }
@@ -678,6 +678,13 @@ function get_graph_subtypes($type) {
     sort($types);
     return $types;
 } // get_graph_subtypes
+
+
+function is_device_graph($device, $subtype)
+{
+    $query = 'SELECT COUNT(*) FROM `device_graphs` WHERE `device_id` = ? AND `graph` = ?';
+    return dbFetchCell($query, array($device['device_id'], $subtype)) > 0;
+} // is_device_graph
 
 
 function get_smokeping_files($device) {
