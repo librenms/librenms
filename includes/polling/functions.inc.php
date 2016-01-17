@@ -138,6 +138,14 @@ function poll_device($device, $options) {
     $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'].' '.$device['device_id'].' '.$device['os'].' ';
+    $ip = dnslookup($device);
+
+    if (!empty($ip) && $ip != inet6_ntop($device['ip'])) {
+        log_event('Device IP changed to '.$ip, $device, 'system');
+        $db_ip = inet_pton($ip);
+        dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
+    }
+
     if ($config['os'][$device['os']]['group']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
         echo '('.$device['os_group'].')';
