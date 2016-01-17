@@ -745,7 +745,7 @@ function snmp_cache_portName($device, $array) {
 
 
 function snmp_gen_auth(&$device) {
-    global $debug;
+    global $debug, $vdebug;
 
     $cmd = '';
 
@@ -781,11 +781,11 @@ function snmp_gen_auth(&$device) {
     }
     else {
         if ($debug) {
-            print 'DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (wtf have you done ?)\n";
+            print 'DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (shouldn't be possible to get here)\n";
         }
     }//end if
 
-    if ($debug) {
+    if ($vdebug) {
         print "DEBUG: SNMP Auth options = $cmd\n";
     }
 
