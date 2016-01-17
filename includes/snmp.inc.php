@@ -1040,19 +1040,22 @@ function oid_rrd_type($oid, $mibdef)
 
     case 'INTEGER':
     case 'Integer32':
-        return 'GAUGE:600:U:U';
+        // FIXME
+        return false;
 
     case 'Counter32':
+        // FIXME
+        return false;
+
     case 'Counter64':
         return 'COUNTER:600:0:U';
 
-    case 'Gauge32':
     case 'Unsigned32':
-        return 'GAUGE:600:0:U';
-
+        return 'GAUGE:600:U:U';
     }
 
     return false;
+
 } // oid_rrd_type
 
 
@@ -1121,7 +1124,7 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
     foreach ($oids as $index => $array) {
         foreach ($array as $obj => $val) {
             // build up the device_oid row for saving into the database
-            $numvalue = is_numeric($val) ? $val + 0 : 0;
+            $numvalue = preg_match('/^\d+$/', $val) ? $val : null;
             $deviceoids[] = array(
                 'device_id'     => $device['device_id'],
                 'oid'           => $mibdef[$obj]['oid'].".".$index,
