@@ -54,7 +54,7 @@ You will need to configure default credentials for your devices, LibreNMS doesn'
 ```
 
 LibreNMS is able to reload the Oxidized list of nodes, each time a device is added to LibreNMS.
-To do so, add the following to your config.php.
+To do so, edit the option in Global Settings>External Settings>Oxidized Integration or add the following to your config.php.
 
 ```php
 $config['oxidized']['reload_nodes'] = TRUE;
