@@ -121,6 +121,9 @@ if ($options['f'] === 'purgeusers') {
     if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
         $purge = $config['radius']['users_purge'];
     }
+    if (is_numeric($config['active_directory']['users_purge']) && $config['auth_mechanism'] === 'active_directory') {
+        $purge = $config['active_directory']['users_purge'];
+    }
     if ($purge > 0) {
         foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
             $users[] = $user['user'];
