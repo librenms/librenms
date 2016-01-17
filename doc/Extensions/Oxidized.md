@@ -53,6 +53,14 @@ You will need to configure default credentials for your devices, LibreNMS doesn'
             X-Auth-Token: '01582bf94c03104ecb7953dsadsadwed'
 ```
 
+LibreNMS is able to reload the Oxidized list of nodes, each time a device is added to LibreNMS.
+To do so, add the following to your config.php.
+
+```php
+$config['oxidized']['reload_nodes'] = TRUE;
+
+```
+
 ### Using Groups
 
 To return a group to Oxidized you can do this by matching a regex for either hostname or location. The order is hostname is matched first, if nothing is found then location is attempted.
