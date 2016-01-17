@@ -580,10 +580,8 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         if (host_exists($host) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
-                if ($config['oxidized']['enabled'] === TRUE && $config['oxidized']['reload_nodes'] === TRUE && isset($config['oxidized']['url'])) {
-                    $oxidized_reload_response = oxidized_reload_nodes();
-                }
-                return($device_id . $oxidized_reload_response);
+                oxidized_reload_nodes();
+                return($device_id);
             }
             else {
                 return false;
@@ -1310,24 +1308,18 @@ function oxidized_reload_nodes() {
 
     global $config;
 
-    $oxidized_reload_url = $config['oxidized']['url'] . '/reload';
-    $ch = curl_init($oxidized_reload_url);
+    if ($config['oxidized']['enabled'] === TRUE && $config['oxidized']['reload_nodes'] === TRUE && isset($config['oxidized']['url'])) {
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload';
+        $ch = curl_init($oxidized_reload_url);
 
-    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
 
-    $response = curl_exec($ch);
-    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $response = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-    if($httpcode == 200) {
-        $oxidized_response = " - Oxidized node list reloaded";
-        return $oxidized_response;
+        curl_close($ch);
     }
-    else {
-        $oxidized_response = " - Oxidized node list was not reloaded";
-        return $oxidized_response;
-    }
-    curl_close($ch);
 }
