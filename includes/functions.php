@@ -1331,6 +1331,9 @@ function oxidized_reload_nodes() {
  *
 **/
 function dnslookup($device,$type=false) {
+    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == truee) {
+        return '';
+    }
     if (empty($type)) {
         // We are going to use the transport to work out the record type
         if ($device['transport'] == 'udp6' || $device['transport'] == 'tcp6') {
