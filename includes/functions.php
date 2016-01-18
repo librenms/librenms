@@ -22,6 +22,7 @@ include_once($config['install_dir'] . "/includes/dbFacile.php");
 
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
+include_once($config['install_dir'] . "/includes/influxdb.inc.php");
 include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
@@ -528,13 +529,6 @@ function is_odd($number) {
     return $number & 1; // 0 = even, 1 = odd
 }
 
-function utime() {
-    $time = explode(" ", microtime());
-    $usec = (double)$time[0];
-    $sec = (double)$time[1];
-    return $sec + $usec;
-}
-
 function getpollergroup($poller_group='0') {
     //Is poller group an integer
     if (is_int($poller_group) || ctype_digit($poller_group)) {
@@ -586,6 +580,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         if (host_exists($host) === false) {
             $device_id = dbInsert($device, 'devices');
             if ($device_id) {
+                oxidized_reload_nodes();
                 return($device_id);
             }
             else {
@@ -1230,9 +1225,11 @@ function function_check($function) {
     return function_exists($function);
 }
 
-function get_last_commit() {
-    return `git log -n 1|head -n1`;
-}//end get_last_commit
+function force_influx_data($type,$data) {
+    if ($type == 'f' || $type == 'float') {
+        return(sprintf("%.1f",$data));
+    }
+}// end force_influx_data
 
 /**
  * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
@@ -1276,5 +1273,50 @@ function host_exists($hostname) {
     }
     else {
         return false;
+    }
+}
+
+/**
+ * Check the innodb buffer size
+ *
+ * @return array including the current set size and the currently used buffer
+**/
+function innodb_buffer_check() {
+    $pool['size'] = dbFetchCell('SELECT @@innodb_buffer_pool_size');
+    // The following query is from the excellent mysqltuner.pl by Major Hayden https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
+    $pool['used'] = dbFetchCell('SELECT SUM(DATA_LENGTH+INDEX_LENGTH) FROM information_schema.TABLES WHERE TABLE_SCHEMA NOT IN ("information_schema", "performance_schema", "mysql") AND ENGINE = "InnoDB" GROUP BY ENGINE ORDER BY ENGINE ASC');
+    return $pool;
+}
+
+/**
+ * Print warning about InnoDB buffer size
+ *
+ * @param array $innodb_buffer An array that contains the used and current size
+ *
+ * @return string $output
+**/
+function warn_innodb_buffer($innodb_buffer) {
+    $output  = 'InnoDB Buffersize too small.'.PHP_EOL;
+    $output .= 'Current size: '.($innodb_buffer['size'] / 1024 / 1024).' MiB'.PHP_EOL;
+    $output .= 'Minimum Required: '.($innodb_buffer['used'] / 1024 / 1024).' MiB'.PHP_EOL;
+    $output .= 'To ensure integrity, we\'re not going to pull any updates until the buffersize has been adjusted.'.PHP_EOL;
+    $output .= 'Config proposal: "innodb_buffer_pool_size = '.pow(2,ceil(log(($innodb_buffer['used'] / 1024 / 1024),2))).'M"'.PHP_EOL;
+    return $output;
+}
+
+function oxidized_reload_nodes() {
+
+    global $config;
+
+    if ($config['oxidized']['enabled'] === TRUE && $config['oxidized']['reload_nodes'] === TRUE && isset($config['oxidized']['url'])) {
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload';
+        $ch = curl_init($oxidized_reload_url);
+
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_exec($ch);
+        curl_close($ch);
     }
 }

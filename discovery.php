@@ -20,14 +20,22 @@ require 'includes/definitions.inc.php';
 require 'includes/functions.php';
 require 'includes/discovery/functions.inc.php';
 
-$start         = utime();
+$start         = microtime(true);
 $runtime_stats = array();
 $sqlparams     = array();
 $options       = getopt('h:m:i:n:d::a::q',array('os:','type:'));
 
 if (!isset($options['q'])) {
     echo $config['project_name_version']." Discovery\n";
-    echo get_last_commit()."\n";
+    $versions = version_info(false);
+    echo "Version info:\n";
+    $cur_sha = $versions['local_sha'];
+    echo "Commit SHA: $cur_sha\n";
+    echo "DB Schema: ".$versions['db_schema']."\n";
+    echo "PHP: ".$versions['php_ver']."\n";
+    echo "MySQL: ".$versions['mysql_ver']."\n";
+    echo "RRDTool: ".$versions['rrdtool_ver']."\n";
+    echo "SNMP: ".$versions['netsnmp_ver']."\n";
 }
 
 if (isset($options['h'])) {
@@ -121,7 +129,7 @@ foreach (dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $whe
     discover_device($device, $options);
 }
 
-$end      = utime();
+$end      = microtime(true);
 $run      = ($end - $start);
 $proctime = substr($run, 0, 5);
 

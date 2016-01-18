@@ -18,6 +18,9 @@ Table of Content:
     - [Pushover](#transports-pushover)
     - [Boxcar](#transports-boxcar)
     - [Pushbullet](#transports-pushbullet)
+    - [Clickatell](#transports-clickatell)
+    - [PlaySMS](#transports-playsms)
+    - [VictorOps](#transports-victorops)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -30,6 +33,7 @@ Table of Content:
     - [Device](#macros-device)
     - [Port](#macros-port)
     - [Time](#macros-time)
+- [Additional Options](#extra)
 
 
 # <a name="about">About</a>
@@ -77,6 +81,12 @@ Alert when:
 - Any port changes: `%ports.ifOperStatus != 'up'`
 - Root-directory gets too full: `%storage.storage_descr = '/' && %storage.storage_perc >= '75'`
 - Any storage gets fuller than the 'warning': `%storage.storage_perc >= %storage_perc_warn`
+- If device is a server and the used storage is above the warning level, but ignore /boot partitions: `%storage.storage_perc > %storage.storage_perc_warn && %devices.type = "server" && %storage.storage_descr !~ "/boot"`
+- VMware LAG is not using "Source ip address hash" load balancing: `%devices.os = "vmware" && %ports.ifType = "ieee8023adLag" && %ports.ifDescr !~ "Link Aggregation @, load balancing algorithm: Source ip address hash"`
+- Syslog, authentication failure during the last 5m: `%syslog.timestamp >= %macros.past_5m && %syslog.msg ~ "@authentication failure@"`
+- High memory usage: `%macros.device_up = "1" && %mempools.mempool_perc >= "90" && %mempools.mempool_descr = "Virtual@"`
+- High CPU usage(per core usage, not overall): `%macros.device_up = "1" && %processors.processor_usage >= "90"`
+- High port usage, where description is not client & ifType is not softwareLoopback: `%macros.port_usage_perc >= "80" && %port.port_descr_type != "client" && %ports.ifType != "softwareLoopback"`
 
 # <a name="templates">Templates</a>
 
@@ -100,7 +110,7 @@ Placeholders:
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
 - Alert-ID: `%id`
 - Unique-ID: `%uid`
-- Faults, Only available on alert (`%state != 0`), must be iterated in a foreach (`{foreach %faults}`). Holds all available information about the Fault, accessable in the format `%value.Column`, for example: `%value.ifDescr`. Special field `%value.string` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.
+- Faults, Only available on alert (`%state != 0`), must be iterated in a foreach (`{foreach %faults}`). Holds all available information about the Fault, accessible in the format `%value.Column`, for example: `%value.ifDescr`. Special field `%value.string` has most Identification-information (IDs, Names, Descrs) as single string, this is the equivalent of the default used.
 - State: `%state`
 - Severity: `%severity`
 - Rule: `%rule`
@@ -372,6 +382,54 @@ $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 ```
 ~~
 
+## <a name="transports-clickatell">Clickatell</a>
+
+Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.  
+Please consult Clickatell's documentation regarding number formatting.
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['clickatell']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567890';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567891';
+$config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
+```
+~~
+
+## <a name="transports-playsms">PlaySMS</a>
+
+PlaySMS is an OpenSource SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.  
+Please consult PlaySMS's documentation regarding number formating.  
+Here an example using 3 numbers, any amount of numbers is supported:
+
+~~
+```php
+$config['alert']['transports']['playsms']['url']   = 'https://localhost/index.php?app=ws';
+$config['alert']['transports']['playsms']['user']  = 'user1';
+$config['alert']['transports']['playsms']['token'] = 'MYFANCYACCESSTOKEN';
+$config['alert']['transports']['playsms']['from']  = '+1234567892'; //Optional
+$config['alert']['transports']['playsms']['to'][]  = '+1234567890';
+$config['alert']['transports']['playsms']['to'][]  = '+1234567891';
+```
+~~
+
+## <a name="transports-victorops">VictorOps</a>
+
+VictorOps provide a webHook url to make integration extremely simple. To get the URL required login to your VictorOps account and go to:
+
+Settings -> Integrations -> REST Endpoint -> Enable Integration.
+
+The URL provided will have $routing_key at the end, you need to change this to something that is unique to the system sending the alerts such as librenms. I.e:
+
+`https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms`
+
+~~
+```php
+$config['alert']['transports']['victorops']['url'] = 'https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms';
+```
+~~
+
 # <a name="entities">Entities
 
 Entities as described earlier are based on the table and column names within the database, if you are unsure of what the entity is you want then have a browse around inside MySQL using `show tables` and `desc <tablename>`.
@@ -582,4 +640,14 @@ Description: Packet loss % value for the device within the last 15 minutes.
 
 Example: `%macros.packet_loss_15m` > 50
 
+# <a name="extra">Additional Options</a>
 
+Here are some of the other options available when adding an alerting rule:
+
+- Rule name: The name associated with the rule.
+- Severity: How "important" the rule is.
+- Max alerts: The maximum number of alerts sent for the event.  `-1` means unlimited.
+- Delay: The amount of time to wait after a rule is matched before sending an alert.
+- Interval: The interval of time between alerts for an event until Max is reached.
+- Mute alerts: Disable sending alerts for this rule.
+- Invert match: Invert the matching rule (ie. alert on items that _don't_ match the rule).

@@ -178,9 +178,14 @@ $config['web_mouseover']      = TRUE;
 You can disable the mouseover popover for mini graphs by setting this to FALSE.
 
 ```php
+$config['enable_lazy_load'] = true;
+```
+You can disable image lazy loading by setting this to false.
+
+```php
 $config['show_overview_tab'] = TRUE;
 ```
-Enable or disable the overview tabe for a device.
+Enable or disable the overview tab for a device.
 
 ```php
 $config['overview_show_sysDescr'] = TRUE;
@@ -355,6 +360,13 @@ $config['smokeping']['dir']             = "/var/lib/smokeping/";
 Set the smokeping directory location.
 
 ```php
+$config['smokeping']['pings']           = 20;
+```
+Should be equal to "pings" in your smokeping config.  On Debian/Ubuntu, this is set in `/etc/smokeping/config.d/Database`.
+
+You can also set it to less than the value of "pings" in your smokeping config if you don't want LibreNMS to graph all of the ping data.
+
+```php
 $config['nfsen_enable'] = 0;
 $config['nfsen_split_char']   = "_";
 $config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
@@ -476,6 +488,7 @@ This array can be used to filter out syslog messages that you don't want to be s
 ```php
 $config['enable_libvirt'] = 1;
 $config['libvirt_protocols']    = array("qemu+ssh","xen+ssh");
+$config['libvirt_username'] = 'root';
 ```
 Enable this to switch on support for libvirt along with `libvirt_protocols`
 to indicate how you connect to libvirt.  You also need to:

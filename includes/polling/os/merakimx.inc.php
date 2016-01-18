@@ -11,5 +11,5 @@
  */
 
 if (empty($hardware)) {
-    $hardware = snmp_get($device, 'sysDescr.0', '-Osqv', 'SNMPv2-MIB');
+    $hardware = $poll_device['sysDescr'];
 }

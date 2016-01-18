@@ -1,4 +1,19 @@
 <?php
+/*
+ * LibreNMS - SNMP Functions
+ *
+ * Original Observium code by: Adam Armstrong, Tom Laermans
+ * Copyright (c) 2010-2012 Adam Armstrong.
+ *
+ * Additions for LibreNMS by Paul Gear
+ * Copyright (c) 2014-2015 Gear Consulting Pty Ltd <http://libertysys.com.au/>
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
 
 function string_to_oid($string) {
     $oid = strlen($string);
@@ -200,7 +215,7 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
 
 
 function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -236,7 +251,6 @@ function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
     }
 
     $data      = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     // echo("Caching: $oid\n");
     foreach (explode("\n", $data) as $entry) {
@@ -272,7 +286,7 @@ function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
 
 function snmp_cache_ifIndex($device) {
     // FIXME: this is not yet using our own snmp_*
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -303,7 +317,6 @@ function snmp_cache_ifIndex($device) {
     }
 
     $data      = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     $array = array();
     foreach (explode("\n", $data) as $entry) {
@@ -433,7 +446,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib=null, $mibdir=nul
 
 
 function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -470,7 +483,6 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib=0) {
 
     $data = trim(external_exec($cmd));
 
-    $device_id = $device['device_id'];
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value) = explode('=', $entry, 2);
         $oid              = trim($oid);
@@ -524,7 +536,6 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib=0) {
 
     $data = trim(external_exec($cmd));
 
-    $device_id = $device['device_id'];
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value) = explode('=', $entry, 2);
         $oid              = trim($oid);
@@ -547,7 +558,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib=0) {
 
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -583,7 +594,6 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib=0) {
     }
 
     $data      = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     foreach (explode("\n", $data) as $entry) {
         $entry                  = str_replace($oid.'.', '', $entry);
@@ -609,7 +619,7 @@ function snmp_cache_oid($oid, $device, $array, $mib=0) {
 
 
 function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
-    global $config;
+    global $config, $debug;
 
     $timeout = prep_snmp_setting($device, 'timeout');
     $retries = prep_snmp_setting($device, 'retries');
@@ -680,7 +690,6 @@ function snmp_cache_portIfIndex($device, $array) {
 
     $cmd      .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' portIfIndex';
     $output    = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
 
     foreach (explode("\n", $output) as $entry) {
         $entry                    = str_replace('CISCO-STACK-MIB::portIfIndex.', '', $entry);
@@ -717,7 +726,6 @@ function snmp_cache_portName($device, $array) {
 
     $cmd      .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' portName';
     $output    = trim(external_exec($cmd));
-    $device_id = $device['device_id'];
     // echo("Caching: portName\n");
     foreach (explode("\n", $output) as $entry) {
         $entry = str_replace('portName.', '', $entry);
@@ -787,7 +795,7 @@ function snmp_gen_auth(&$device) {
 
 
 /*
- * Translate the given MIB into a vaguely useful PHP array.  Each keyword becomes an array index.
+ * Translate the given MIB into a PHP array.  Each keyword becomes an array index.
  *
  * Example:
  * snmptranslate -Td -On -M mibs -m RUCKUS-ZD-SYSTEM-MIB RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta
@@ -801,11 +809,7 @@ function snmp_gen_auth(&$device) {
  *   ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) ruckusRootMIB(25053) ruckusObjects(1) ruckusZD(2) ruckusZDSystemModule(1) ruckusZDSystemMIB(1) ruckusZDSystemObjects(1)
  *           ruckusZDSystemStats(15) 30 }
  */
-
-
 function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
-    global $debug;
-
     $fulloid  = explode('.', $oid);
     $lastpart = end($fulloid);
 
@@ -827,8 +831,6 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
         // then the name of the object type
         if ($f[1] && $f[1] == 'OBJECT-TYPE') {
             $result['object_type'] = $f[0];
-            $result['shortname']   = str_replace($mib, '', $f[0]);
-            $result['dsname']      = name_shorten($f[0], $mib);
             continue;
         }
 
@@ -873,8 +875,7 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
     else {
         return null;
     }
-
-}//end snmp_mib_parse()
+} // snmp_mib_parse
 
 
 /*
@@ -891,7 +892,8 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
  */
 
 
-function snmp_mib_walk($mib, $module, $mibdir=null) {
+function snmp_mib_walk($mib, $module, $mibdir=null)
+{
     $cmd    = 'snmptranslate -Ts';
     $cmd   .= mibdir($mibdir);
     $cmd   .= ' -m '.$module;
@@ -909,24 +911,73 @@ function snmp_mib_walk($mib, $module, $mibdir=null) {
 
     return $result;
 
-}//end snmp_mib_walk()
+} // snmp_mib_walk
+
+
+function quote_column($a)
+{
+    return '`'.$a.'`';
+} // quote_column
+
+
+function join_array($a, $b)
+{
+    return quote_column($a).'='.$b;
+} // join_array
 
 
 /*
- * @return an array containing all of the mib objects, keyed by object-type;
- * returns an empty array if something goes wrong.
+ * Update the given table in the database with the given row & column data.
+ * @param tablename The table to update
+ * @param columns   An array of column names
+ * @param numkeys   The number of columns which are in the primary key of the table; these primary keys must be first in the list of columns
+ * @param rows      Row data to insert, an array of arrays with column names as the second-level keys
  */
+function update_db_table($tablename, $columns, $numkeys, $rows)
+{
+    dbBeginTransaction();
+    foreach ($rows as $nothing => $obj) {
+        // create a parameter list based on the columns
+        $params = array();
+        foreach ($columns as $column) {
+            $params[] = $obj[$column];
+        }
+        $column_placeholders = array_fill(0, count($columns), '?');
 
+        // build the "ON DUPLICATE KEY" part
+        $non_key_columns = array_slice($columns, $numkeys);
+        $non_key_placeholders = array_slice($column_placeholders, $numkeys);
+        $update_definitions = array_map("join_array", $non_key_columns, $non_key_placeholders);
+        $non_key_params = array_slice($params, $numkeys);
 
-function snmp_mib_load($mib, $module, $mibdir=null) {
+        $sql = 'INSERT INTO `' . $tablename . '` (' .
+            implode(',', array_map("quote_column", $columns)) .
+            ') VALUES (' . implode(',', $column_placeholders) .
+            ') ON DUPLICATE KEY UPDATE ' . implode(',', $update_definitions);
+        $result = dbQuery($sql, array_merge($params, $non_key_params));
+        d_echo("Result: $result\n");
+    }
+    dbCommitTransaction();
+} // update_db_table
+
+/*
+ * Load the given MIB into the database.
+ * @return count of objects loaded
+ */
+function snmp_mib_load($mib, $module, $included_by, $mibdir = null)
+{
     $mibs = array();
     foreach (snmp_mib_walk($mib, $module, $mibdir) as $obj) {
         $mibs[$obj['object_type']] = $obj;
+        $mibs[$obj['object_type']]['included_by'] = $included_by;
     }
+    d_print_r($mibs);
+    // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
+    $columns = array('module', 'mib', 'object_type', 'oid', 'syntax', 'description', 'max_access', 'status', 'included_by');
+    update_db_table('mibdefs', $columns, 3, $mibs);
+    return count($mibs);
 
-    return $mibs;
-
-}//end snmp_mib_load()
+} // snmp_mib_load
 
 
 /*
@@ -936,9 +987,8 @@ function snmp_mib_load($mib, $module, $mibdir=null) {
  * snmptranslate -m all -M mibs .1.3.6.1.4.1.8072.3.2.10 2>/dev/null
  * NET-SNMP-TC::linux
  */
-
-
-function snmp_translate($oid, $module, $mibdir=null) {
+function snmp_translate($oid, $module, $mibdir = null)
+{
     if ($module !== 'all') {
         $oid = "$module::$oid";
     }
@@ -966,16 +1016,15 @@ function snmp_translate($oid, $module, $mibdir=null) {
         $matches[2],
     );
 
-}//end snmp_translate()
+} // snmp_translate
 
 
 /*
  * check if the type of the oid is a numeric type, and if so,
  * @return the name of RRD type that is best suited to saving it
  */
-
-
-function oid_rrd_type($oid, $mibdef) {
+function oid_rrd_type($oid, $mibdef)
+{
     if (!isset($mibdef[$oid])) {
         return false;
     }
@@ -986,20 +1035,25 @@ function oid_rrd_type($oid, $mibdef) {
         return false;
 
     case 'TimeTicks':
-        // Need to find a way to flag that this should be parsed
-        // return 'COUNTER';
+        // FIXME
         return false;
 
+    case 'INTEGER':
+    case 'Integer32':
+        return 'GAUGE:600:U:U';
+
+    case 'Counter32':
     case 'Counter64':
         return 'COUNTER:600:0:U';
 
+    case 'Gauge32':
     case 'Unsigned32':
-        return 'GAUGE:600:U:U';
+        return 'GAUGE:600:0:U';
+
     }
 
     return false;
-
-}//end oid_rrd_type()
+} // oid_rrd_type
 
 
 /*
@@ -1008,9 +1062,8 @@ function oid_rrd_type($oid, $mibdef) {
  * Update the database with graph definitions as needed.
  * We don't include the index in the graph name - that is handled at display time.
  */
-
-
-function tag_graphs($mibname, $oids, $mibdef, &$graphs) {
+function tag_graphs($mibname, $oids, $mibdef, &$graphs)
+{
     foreach ($oids as $index => $array) {
         foreach ($array as $oid => $val) {
             $graphname          = $mibname.'-'.$mibdef[$oid]['shortname'];
@@ -1018,15 +1071,14 @@ function tag_graphs($mibname, $oids, $mibdef, &$graphs) {
         }
     }
 
-}//end tag_graphs()
+} // tag_graphs
 
 
 /*
  * Ensure a graph_type definition exists in the database for the entities in this MIB
  */
-
-
-function update_mib_graph_types($mibname, $oids, $mibdef, $graphs) {
+function update_mib_graph_types($mibname, $oids, $mibdef, $graphs)
+{
     $seengraphs = array();
 
     // Get the list of graphs currently in the database
@@ -1054,35 +1106,57 @@ function update_mib_graph_types($mibname, $oids, $mibdef, $graphs) {
                 dbInsert($graphdef, 'graph_types');
             }
         }
-    }//end foreach
-
-}//end update_mib_graph_types()
+    }
+} // update_mib_graph_types
 
 
 /*
  * Save all of the measurable oids for the device in their own RRDs.
+ * Save the current value of all the oids in the database.
  */
-
-
-function save_mibs($device, $mibname, $oids, $mibdef, &$graphs) {
+function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
+{
     $usedoids = array();
+    $deviceoids = array();
     foreach ($oids as $index => $array) {
-        foreach ($array as $oid => $val) {
-            $type = oid_rrd_type($oid, $mibdef);
+        foreach ($array as $obj => $val) {
+            // build up the device_oid row for saving into the database
+            $numvalue = is_numeric($val) ? $val + 0 : 0;
+            $deviceoids[] = array(
+                'device_id'     => $device['device_id'],
+                'oid'           => $mibdef[$obj]['oid'].".".$index,
+                'module'        => $mibdef[$obj]['module'],
+                'mib'           => $mibdef[$obj]['mib'],
+                'object_type'   => $obj,
+                'value'         => $val,
+                'numvalue'      => $numvalue,
+            );
+
+            $type = oid_rrd_type($obj, $mibdef);
             if ($type === false) {
                 continue;
             }
 
-            $usedoids[$index][$oid] = $val;
+            $usedoids[$index][$obj] = $val;
+
+            // if there's a file from the previous version of MIB-based polling, rename it
+            if (rrd_file_exists($device, array($mibname, $mibdef[$obj]['object_type'], $index))
+            && !rrd_file_exists($device, array($mibname, $mibdef[$obj]['shortname'], $index))) {
+                rrd_file_rename($device,
+                    array($mibname, $mibdef[$obj]['object_type'], $index),
+                    array($mibname, $mibdef[$obj]['shortname'], $index));
+                // Note: polling proceeds regardless of rename result
+            }
+
             rrd_create_update(
                 $device,
                 array(
                     $mibname,
-                    $mibdef[$oid]['shortname'],
+                    $mibdef[$obj]['shortname'],
                     $index,
                 ),
-                array('DS:'.$mibdef[$oid]['dsname'].":$type"),
-                array($mibdef[$oid]['dsname'] => $val)
+                array("DS:mibval:$type"),
+                array("mibval" => $val)
             );
         }
     }
@@ -1090,43 +1164,116 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs) {
     tag_graphs($mibname, $usedoids, $mibdef, $graphs);
     update_mib_graph_types($mibname, $usedoids, $mibdef, $graphs);
 
-}//end save_mibs()
+    // update database
+    $columns = array('device_id', 'oid', 'module', 'mib', 'object_type', 'value', 'numvalue');
+    update_db_table('device_oids', $columns, 2, $deviceoids);
+} // save_mibs
 
 
 /*
- * Take a list of MIB name => module pairs.
- * Validate MIBs and poll based on the results.
+ * @return an array of MIB objects matching $module, $name, keyed by object_type
  */
+function load_mibdefs($module, $name)
+{
+    $params = array($module, $name);
+    $result = array();
+    $object_types = array();
+    foreach (dbFetchRows("SELECT * FROM `mibdefs` WHERE `module` = ? AND `mib` = ?", $params) as $row) {
+        $mib = $row['object_type'];
+        $object_types[] = $mib;
+        $result[$mib] = $row;
+    }
+
+    // add shortname to each element
+    $prefix = longest_matching_prefix($name, $object_types);
+    foreach ($result as $mib => $m) {
+        if (strlen($prefix) > 2) {
+            $result[$mib]['shortname'] = preg_replace("/^$prefix/", '', $m['object_type'], 1);
+        }
+        else {
+            $result[$mib]['shortname'] = $m['object_type'];
+        }
+    }
+
+    d_print_r($result);
+    return $result;
+} // load_mibdefs
+
+/*
+ * @return an array of MIB names and modules for $device from the database
+ */
+function load_device_mibs($device)
+{
+    $params = array($device['device_id']);
+    $result = array();
+    foreach (dbFetchRows("SELECT `mib`, `module` FROM device_mibs WHERE device_id = ?", $params) as $row) {
+        $result[$row['mib']] = $row['module'];
+    }
+    return $result;
+} // load_device_mibs
 
 
-function poll_mibs($list, $device, &$graphs) {
-    if (!is_dev_attrib_enabled($device, 'poll_mib')) {
-        d_echo('MIB module disabled for '.$device['hostname']."\n");
+/*
+ * Run MIB-based polling for $device.  Update $graphs with the results.
+ */
+function poll_mibs($device, &$graphs)
+{
+    if (!is_mib_poller_enabled($device)) {
         return;
     }
 
-    $mibdefs = array();
-    echo 'MIB-based polling:';
+    echo 'MIB: polling ';
     d_echo("\n");
 
-    foreach ($list as $name => $module) {
+    foreach (load_device_mibs($device) as $name => $module) {
+        echo "$name ";
+        d_echo("\n");
+        $oids = snmpwalk_cache_oid($device, $name, array(), $module, null, "-OQUsb");
+        d_print_r($oids);
+        save_mibs($device, $name, $oids, load_mibdefs($module, $name), $graphs);
+    }
+    echo "\n";
+} // poll_mibs
+
+/*
+ * Take a list of MIB name => module pairs.
+ * Validate MIBs and store the device->mib mapping in the database.
+ * See includes/discovery/os/ruckuswireless.inc.php for an example of usage.
+ */
+function register_mibs($device, $mibs, $included_by)
+{
+    if (!is_mib_poller_enabled($device)) {
+        return;
+    }
+
+    echo "MIB: registering\n";
+
+    foreach ($mibs as $name => $module) {
         $translated = snmp_translate($name, $module);
         if ($translated) {
-            echo " $module::$name";
-            d_echo("\n");
-            $mod           = $translated[0];
-            $nam           = $translated[1];
-            $mibdefs[$nam] = snmp_mib_load($nam, $mod);
-            $oids          = snmpwalk_cache_oid($device, $nam, array(), $mod, null, '-OQUsb');
-            d_print_r($oids);
-            save_mibs($device, $nam, $oids, $mibdefs[$nam], $graphs);
+            $mod = $translated[0];
+            $nam = $translated[1];
+            echo "     $mod::$nam\n";
+            if (snmp_mib_load($nam, $mod, $included_by) > 0) {
+                // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
+                $columns = array('device_id', 'module', 'mib', 'included_by');
+                $rows = array();
+                $rows[] = array(
+                    'device_id'   => $device['device_id'],
+                    'module'      => $mod,
+                    'mib'         => $nam,
+                    'included_by' => $included_by,
+                );
+                update_db_table('device_mibs', $columns, 3, $rows);
+            }
+            else {
+                echo("MIB: Could not load definition for $mod::$nam\n");
+            }
         }
         else {
-            d_echo("MIB: no match for $module::$name\n");
+            echo("MIB: Could not find $module::$name\n");
         }
     }
 
-    d_echo('Done MIB-based polling');
     echo "\n";
-
-}//end poll_mibs()
+} // register_mibs

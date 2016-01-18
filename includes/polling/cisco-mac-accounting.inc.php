@@ -81,6 +81,9 @@ if ($device['os_group'] == 'cisco') {
             );
             rrdtool_update($rrdfile, $fields);
 
+            $tags = array('ifIndex' => $acc['ifIndex'], 'mac' => $acc['mac']);
+            influx_update($device,'cip',$tags,$fields);
+
             if ($acc['update']) {
                 // Do Updates
                 dbUpdate($acc['update'], 'mac_accounting', '`ma_id` = ?', array($acc['ma_id']));

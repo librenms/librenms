@@ -9,7 +9,7 @@ if( !empty($service['service_ip']) ) {
 $cmd .= " ".$service['service_param'];
 
 $check = shell_exec($cmd);
-list($check, $time) = split("\|", $check);
+list($check, $time) = explode("\|", $check);
 
 if(strstr($check, "SSL_CERT OK")) {
   $status = '1';

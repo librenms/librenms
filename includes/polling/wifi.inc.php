@@ -18,6 +18,11 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         include 'includes/polling/mib/siklu-mib.inc.php';
     }
 
+    if ($device['os'] == 'sub10') {
+        echo "It is Sub10\n";
+        include 'includes/polling/mib/sub10-mib.inc.php';
+    }
+
     // # GENERIC FRAMEWORK, FILLING VARIABLES
     if ($device['os'] == 'airport') {
         echo 'Checking Airport Wireless clients... ';
@@ -36,6 +41,12 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         $wificlients2 = snmp_get($device, 'cDot11ActiveWirelessClients.2', '-OUqnv', 'CISCO-DOT11-ASSOCIATION-MIB');
 
         echo (($wificlients1 + 0).' clients on dot11Radio0, '.($wificlients2 + 0)." clients on dot11Radio1\n");
+    }
+
+    if ($device['os'] == 'hpmsm') {
+        echo 'Checking HP MSM Wireless clients... ';
+        $wificlients1 = snmp_get($device, '.1.3.6.1.4.1.8744.5.25.1.7.2.0', '-OUqnv');
+        echo $wificlients1." clients\n";
     }
 
     // MikroTik RouterOS
@@ -85,6 +96,9 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
 
         rrdtool_update($wificlientsrrd, $fields);
 
+        $tags = array('radio' => '1');
+        influx_update($device,'wificlients',$tags,$fields);
+
         $graphs['wifi_clients'] = true;
     }
 
@@ -104,6 +118,10 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         );
 
         rrdtool_update($wificlientsrrd, $fields);
+
+        $tags = array('radio' => '2');
+        influx_update($device,'wificlients',$tags,$fields);
+
 
         $graphs['wifi_clients'] = true;
     }

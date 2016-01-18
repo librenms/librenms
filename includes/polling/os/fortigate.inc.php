@@ -30,24 +30,9 @@ if (is_numeric($sessions)) {
 
     rrdtool_update($sessrrd, $fields);
 
+    $tags = array();
+    influx_update($device,'fortigate_sessions',$tags,$fields);
+
     $graphs['fortigate_sessions'] = true;
 }
 
-$cpurrd    = $config['rrd_dir'].'/'.$device['hostname'].'/fortigate_cpu.rrd';
-$cpu_usage = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0', '-Ovq');
-
-if (is_numeric($cpu_usage)) {
-    if (!is_file($cpurrd)) {
-        rrdtool_create($cpurrd, ' --step 300 DS:LOAD:GAUGE:600:-1:100 '.$config['rrd_rra']);
-    }
-
-    echo "CPU: $cpu_usage%\n";
-
-    $fields = array(
-        'LOAD' => $cpu_usage,
-    );
-
-    rrdtool_update($cpurrd, $fields);
-
-    $graphs['fortigate_cpu'] = true;
-}

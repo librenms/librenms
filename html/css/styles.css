@@ -1765,3 +1765,93 @@ tr.search:nth-child(odd) {
 label {
     font-weight: normal;
 }
+
+.nav>li>a.dropdown-toggle {
+    padding: 15px 6px;
+}
+
+.badge-navbar-user{
+   background:red;
+   border-radius: 40%;
+   font-size: 65%;
+   height: auto;
+   margin: 0;
+   padding:5px;
+   position:absolute;
+   right:-3px;
+   top:5px;
+   width: auto;
+  }
+
+@media only screen and (max-width: 480px) {
+    .thumbnail_graph_table b { font-size : 6px;}
+    .thumbnail_graph_table img {
+        max-width: 45px;
+        max-height: 50px;
+    }
+    .device-header-table .device_icon img {
+       max-width: 20px;
+       max-height: 20px;
+    }
+    .device-header-table img {
+       max-width: 115px;
+       max-height: 40px;
+    }
+    .device-header-table {font-size : 8px;}
+    .device-header-table a {font-size : 11px;}
+}
+
+@media only screen and (max-width: 768px) and (min-width: 481px) {
+    .thumbnail_graph_table b { font-size : 8px;}
+    .thumbnail_graph_table img {
+        max-width: 60px;
+        max-height: 55px;
+    }
+    .device-header-table img {
+       max-width: 150px;
+       max-height: 50px;
+    }
+    .device-header-table {font-size : 10px;}
+    .device-header-table a {font-size : 17px;}
+}
+
+
+@media only screen and (max-width: 800px) and (min-width: 721px) {
+    .thumbnail_graph_table b { font-size : 8px;}
+    .thumbnail_graph_table img {
+        max-width: 75px;
+        max-height: 60px;
+    }
+}
+
+@media only screen and (max-width: 1024px) and (min-width: 801px) {
+    .thumbnail_graph_table b { font-size : 9px;}
+    .thumbnail_graph_table img {
+        max-width: 105px;
+        max-height: 70px;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+}
+
+.redCluster {
+    background-color: rgba(255,0,0);
+    background-color: rgba(255,0,0,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
+.greenCluster {
+    background-color: rgba(0,255,0);
+    background-color: rgba(0,255,0,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: black;
+    border-color:transparent;
+}

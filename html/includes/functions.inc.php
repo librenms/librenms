@@ -461,6 +461,7 @@ function generate_graph_tag($args) {
 }//end generate_graph_tag()
 
 function generate_lazy_graph_tag($args) {
+    global $config;
     $urlargs = array();
     $w = 0;
     $h = 0;
@@ -472,11 +473,23 @@ function generate_lazy_graph_tag($args) {
             case 'height':
                 $h = $arg;
                 break;
+            case 'lazy_w':
+                $lazy_w = $arg;
+                break;
         }
         $urlargs[] = $key."=".urlencode($arg);
     }
 
-    return '<img class="lazy" width="'.$w.'" height="'.$h.'" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    if(isset($lazy_w)) {
+        $w=$lazy_w;
+    }
+
+    if ($config['enable_lazy_load'] === true) {
+        return '<img class="lazy img-responsive" data-original="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    }
+    else {
+        return '<img class="img-responsive" src="graph.php?' . implode('&amp;',$urlargs).'" border="0" />';
+    }
 
 }//end generate_lazy_graph_tag()
 
@@ -1097,7 +1110,7 @@ function get_config_like_name($name) {
     $name  = array($name);
     $items = array();
     foreach (dbFetchRows("SELECT * FROM `config` WHERE `config_name` LIKE '%?%'", array($name)) as $config_item) {
-        $items[$config_item['config_name']] = $config_item;
+        $items[$config_item['config_id']] = $config_item;
     }
 
     return $items;
@@ -1189,7 +1202,7 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" href="#'.$anchor.'">'.$title.'</a>
+            <a data-toggle="collapse" data-parent="#accordion" href="#'.$anchor.'"><i class="fa fa-caret-down"></i> '.$title.'</a>
     ';
     if (!empty($transport)) {
         $output .= '<button name="test-alert" id="test-alert" type="button" data-transport="'.$transport.'" class="btn btn-primary btn-xs pull-right">Test transport</button>';
@@ -1253,8 +1266,8 @@ function generate_dynamic_config_panel($title,$end_panel=true,$config_groups,$it
     return $output;
 }//end generate_dynamic_config_panel()
 
-function get_ripe_api_whois_data_json($ripe_parameter) {
-    $ripe_whois_url = 'https://stat.ripe.net/data/whois/data.json?resource=' . $ripe_parameter;
+function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param) {
+    $ripe_whois_url = 'https://stat.ripe.net/data/'. $ripe_data_param . '/data.json?resource=' . $ripe_query_param;
     return json_decode(file_get_contents($ripe_whois_url) , true);
 }//end get_ripe_api_whois_data_json()
 

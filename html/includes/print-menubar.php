@@ -47,7 +47,7 @@ else {
     <div class="collapse navbar-collapse" id="navHeaderCollapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons"></i> Overview</a>
+          <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Overview</span></a>
           <ul class="dropdown-menu">
             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
           <li class="dropdown-submenu">
@@ -110,10 +110,18 @@ if ( dbFetchCell("SELECT 1 from `packages` LIMIT 1") ) {
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'ipv6'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> IPv6 Search</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'mac'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> MAC Search</a></li>
             <li><a href="<?php echo(generate_url(array('page'=>'search','search'=>'arp'))); ?>"><i class="fa fa-search fa-fw fa-lg"></i> ARP Tables</a></li>
+<?php
+if (is_module_enabled('poller', 'mib')) {
+?>
+            <li role="presentation" class="divider"></li>
+            <li><a href="<?php echo(generate_url(array('page'=>'mibs'))); ?>"><i class="fa fa-file-text-o fa-fw fa-lg"></i> MIB definitions</a></li>
+<?php
+}
+?>
           </ul>
         </li>
         <li class="dropdown">
-          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons"></i> Devices</a>
+          <a href="devices/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Devices</span></a>
           <ul class="dropdown-menu">
             <li class="dropdown-submenu">
               <a href="devices/"><i class="fa fa-server fa-fw fa-lg"></i> All Devices</a>
@@ -166,8 +174,13 @@ if ($_SESSION['userlevel'] >= '10') {
             ');
     }
     echo '
+            <li role="presentation" class="divider"></li>';
+    if (is_module_enabled('poller', 'mib')) {
+        echo '
+            <li><a href='.generate_url(array('page'=>'mib_assoc')).'><i class="fa fa-file-text-o fa-fw fa-lg"></i> MIB associations</a></li>
             <li role="presentation" class="divider"></li>
          ';
+    }
 
     if ($config['navbar']['manage_groups']['hide'] === 0) {
         echo '<li><a href="'.generate_url(array('page'=>'device-groups')).'"><i class="fa fa-th fa-fw fa-lg"></i> Manage Groups</a></li>';
@@ -187,7 +200,7 @@ if ($_SESSION['userlevel'] >= '10') {
 if ($config['show_services']) {
 ?>
         <li class="dropdown">
-          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"></i> Services</a>
+          <a href="services/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Services</span></a>
           <ul class="dropdown-menu">
             <li><a href="services/"><i class="fa fa-cogs fa-fw fa-lg"></i> All Services </a></li>
 
@@ -216,7 +229,7 @@ if ($_SESSION['userlevel'] >= '10') {
 
     <!-- PORTS -->
         <li class="dropdown">
-          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-link fa-fw fa-lg fa-nav-icons"></i> Ports</a>
+          <a href="ports/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-link fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Ports</span></a>
           <ul class="dropdown-menu">
             <li><a href="ports/"><i class="fa fa-link fa-fw fa-lg"></i> All Ports</a></li>
 
@@ -275,7 +288,7 @@ if ($_SESSION['userlevel'] >= '5') {
     }
     foreach ($config['custom_descr'] as $custom_type) {
         if (!empty($custom_type)) {
-            echo '          <li><a href="iftype/type=' . strtolower($custom_type) . '"><i class="fa fa-connectdevelop fa-fw fa-lg"></i> ' . ucfirst($custom_type) . '</a></li>';
+            echo '          <li><a href="iftype/type=' . urlencode(strtolower($custom_type)) . '"><i class="fa fa-connectdevelop fa-fw fa-lg"></i> ' . ucfirst($custom_type) . '</a></li>';
             $ifbreak = 1;
         }
     }
@@ -322,7 +335,7 @@ $menu_sensors = $used_sensors;
 ?>
 
         <li class="dropdown">
-          <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"></i> Health</a>
+          <a href="health/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Health</span></a>
           <ul class="dropdown-menu">
             <li><a href="health/metric=mempool/"><i class="fa fa-gears fa-fw fa-lg"></i> Memory</a></li>
             <li><a href="health/metric=processor/"><i class="fa fa-desktop fa-fw fa-lg"></i> Processor</a></li>
@@ -373,7 +386,7 @@ $app_list = dbFetchRows("SELECT DISTINCT(`app_type`) AS `app_type` FROM `applica
 if ($_SESSION['userlevel'] >= '5' && count($app_list) > "0") {
 ?>
         <li class="dropdown">
-          <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"></i> Apps</a>
+          <a href="apps/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Apps</span></a>
           <ul class="dropdown-menu">
 <?php
 
@@ -411,7 +424,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 
 ?>
         <li class="dropdown">
-          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-arrows fa-fw fa-lg fa-nav-icons"></i> Routing</a>
+          <a href="routing/" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-arrows fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Routing</span></a>
           <ul class="dropdown-menu">
 <?php
     $separator = 0;
@@ -458,7 +471,7 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
 ?>
 
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons"></i> <span class="hidden-md hidden-sm">Plugins</span></a>
+          <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-plug fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Plugins</span></a>
           <ul class="dropdown-menu">
 <?php
 Plugins::call('menu');
@@ -489,7 +502,33 @@ if(is_file("includes/print-menubar-custom.inc.php")) {
      </form>
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
+<?php
+    $notifications = new ObjCache('notifications');
+    $style = '';
+    if (empty($notifications['count']) && empty($notifications['sticky_count'])) {
+        $style = 'style="background-color:grey; color:white;"';
+    }
+    echo('<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons"></i><span class="badge badge-navbar-user" '.$style.'>'.($notifications['sticky_count']+$notifications['count']).'</span></a>');
+?>
+        <ul class="dropdown-menu">
+          <li role="presentation" class="dropdown-header"> Settings</li>
+          <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
+<?php
+    $notifications = new ObjCache('notifications');
+    echo ('<li><a href="notifications/"><span class="badge count-notif">'.($notifications['sticky_count']+$notifications['count']).'</span> Notifications</a></li>');
+?>
+          <li role="presentation" class="divider"></li>
+<?php 
+
+if ($_SESSION['authenticated']) {
+    echo('
+           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg"></i> Logout</a></li>');
+}
+?>
+         </ul>
+       </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons"></i></a>
         <ul class="dropdown-menu">
           <li role="presentation" class="dropdown-header"> Settings</li>
 <?php
@@ -498,7 +537,6 @@ if ($_SESSION['userlevel'] >= '10') {
 }
 
 ?>
-          <li><a href="preferences/"><i class="fa fa-cog fa-fw fa-lg"></i> My Settings</a></li>
           <li role="presentation" class="divider"></li>
           <li role="presentation" class="dropdown-header"> Users</li>
 
@@ -546,8 +584,7 @@ if ($_SESSION['authenticated']) {
                <ul class="dropdown-menu scrollable-menu">
                    <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
                </ul>
-           </li>
-           <li><a href="logout/"><i class="fa fa-sign-out fa-fw fa-lg"></i> Logout</a></li>');
+           </li>');
 }
 ?>
 

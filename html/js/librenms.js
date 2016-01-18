@@ -1,28 +1,34 @@
+function override_config(event, state, tmp_this) {
+    event.preventDefault();
+    var $this = tmp_this;
+    var attrib = $this.data('attrib');
+    var device_id = $this.data('device_id');
+    $.ajax({
+        type: 'POST',
+        url: 'ajax_form.php',
+        data: { type: 'override-config', device_id: device_id, attrib: attrib, state: state },
+        dataType: 'json',
+        success: function(data) {
+            if (data.status == 'ok') {
+                toastr.success(data.message);
+            }
+            else {
+                toastr.error(data.message);
+            }
+        },
+        error: function() {
+            toastr.error('Could not set this override');
+        }
+    });
+}
+
+var oldH;
+var oldW;
 $(document).ready(function() {
     // Device override ajax calls
     $("[name='override_config']").bootstrapSwitch('offColor','danger');
     $('input[name="override_config"]').on('switchChange.bootstrapSwitch',  function(event, state) {
-        event.preventDefault();
-        var $this = $(this);
-        var attrib = $this.data('attrib');
-        var device_id = $this.data('device_id');
-        $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: { type: 'override-config', device_id: device_id, attrib: attrib, state: state },
-            dataType: 'json',
-            success: function(data) {
-                if (data.status == 'ok') {
-                    toastr.success(data.message);
-                }
-                else {
-                    toastr.error(data.message);
-                }
-            },
-            error: function() {
-                toastr.error('Could not set this override');
-            }
-        });
+        override_config(event,state,$(this));
     });
 
     // Device override for text inputs
@@ -123,6 +129,8 @@ $(document).ready(function() {
         });
     });
 
+    oldW=$(window).width();
+    oldH=$(window).height();
 });
 
 function submitCustomRange(frmdata) {
@@ -136,6 +144,68 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
+function updateResolution(refresh)
+{
+    $.post('ajax_setresolution.php', 
+        {
+            width: $(window).width(),
+            height:$(window).height()
+        },
+        function(data) {
+            if(refresh == true) {
+                location.reload();
+            }
+        },'json'
+    );
+}
+
+var rtime;
+var timeout = false;
+var delta = 500;
+var newH;
+var newW;
+
+$(window).on('resize', function(){
+    rtime = new Date();
+    if (timeout === false) {
+        timeout = true;
+        setTimeout(resizeend, delta);
+    }
+});
+
+function resizeend() {
+    if (new Date() - rtime < delta) {
+        setTimeout(resizeend, delta);
+    } 
+    else {
+        newH=$(window).height();
+        newW=$(window).width();
+        timeout = false;
+        if(Math.abs(oldW - newW) >= 200)
+        {
+            refresh = true;
+        }
+        else {
+            refresh = false;
+            resizeGraphs();
+        }
+        updateResolution(refresh);
+    }  
+};
+
+function resizeGraphs() {
+    ratioW=newW/oldW;
+    ratioH=newH/oldH;
+
+    $('.graphs').each(function (){
+        var img = jQuery(this);
+        img.attr('width',img.width() * ratioW);
+    });
+    oldH=newH;
+    oldW=newW;
+}
+
+
 $(document).on("click", '.collapse-neighbors', function(event)
 {
     var caller = $(this);
@@ -143,15 +213,13 @@ $(document).on("click", '.collapse-neighbors', function(event)
     var list = caller.find('.neighbors-interface-list');
     var continued = caller.find('.neighbors-list-continued');
 
-    if(button.hasClass("glyphicon-plus"))
-    {
+    if(button.hasClass("glyphicon-plus")) {
         button.addClass('glyphicon-minus').removeClass('glyphicon-plus');
-    }else
-    {
+    }
+    else {
         button.addClass('glyphicon-plus').removeClass('glyphicon-minus');
     }
    
     list.toggle();
     continued.toggle();
 });
-

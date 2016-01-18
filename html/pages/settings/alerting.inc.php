@@ -291,7 +291,7 @@ echo '
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#api_transport_expand">API transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="api" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#api_transport_expand"><i class="fa fa-caret-down"></i> API transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="api" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="api_transport_expand" class="panel-collapse collapse">
@@ -333,7 +333,7 @@ foreach ($api_urls as $api_url) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#pagerduty_transport_expand">Pagerduty transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="pagerduty" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pagerduty_transport_expand"><i class="fa fa-caret-down"></i> Pagerduty transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="pagerduty" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="pagerduty_transport_expand" class="panel-collapse collapse">
@@ -358,7 +358,7 @@ else {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#nagios_transport_expand">Nagios compatible transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="nagios" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#nagios_transport_expand"><i class="fa fa-caret-down"></i> Nagios compatible transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="nagios" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="nagios_transport_expand" class="panel-collapse collapse">
@@ -377,7 +377,7 @@ else {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#irc_transport_expand">IRC transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="irc" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#irc_transport_expand"><i class="fa fa-caret-down"></i> IRC transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="irc" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="irc_transport_expand" class="panel-collapse collapse">
@@ -395,7 +395,7 @@ else {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#slack_transport_expand">Slack transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="slack" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#slack_transport_expand"><i class="fa fa-caret-down"></i> Slack transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="slack" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="slack_transport_expand" class="panel-collapse collapse">
@@ -461,7 +461,7 @@ foreach ($slack_urls as $slack_url) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#hipchat_transport_expand">Hipchat transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="hipchat" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#hipchat_transport_expand"><i class="fa fa-caret-down"></i> Hipchat transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="hipchat" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="hipchat_transport_expand" class="panel-collapse collapse">
@@ -557,7 +557,7 @@ foreach ($hipchat_urls as $hipchat_url) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#pushover_transport_expand">Pushover transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="pushover" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pushover_transport_expand"><i class="fa fa-caret-down"></i> Pushover transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="pushover" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="pushover_transport_expand" class="panel-collapse collapse">
@@ -638,7 +638,7 @@ echo '<div id="pushover_appkey_template" class="hide">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#boxcar_transport_expand">Boxcar transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="boxcar" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#boxcar_transport_expand"><i class="fa fa-caret-down"></i> Boxcar transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="boxcar" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="boxcar_transport_expand" class="panel-collapse collapse">
@@ -704,7 +704,7 @@ echo '<div id="boxcar_appkey_template" class="hide">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#pushbullet_transport_expand">Pushbullet</a> <button name="test-alert" id="test-alert" type="button" data-transport="pushbullet" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#pushbullet_transport_expand"><i class="fa fa-caret-down"></i> Pushbullet</a> <button name="test-alert" id="test-alert" type="button" data-transport="pushbullet" class="btn btn-primary btn-xs pull-right">Test transport</button>
                 </h4>
             </div>
             <div id="pushbullet_transport_expand" class="panel-collapse collapse">
@@ -717,6 +717,116 @@ echo '<div id="boxcar_appkey_template" class="hide">
                             <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#victorops_transport_expand"><i class="fa fa-caret-down"></i> VictorOps</a> <button name="test-alert" id="test-alert" type="button" data-transport="victorops" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="victorops_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="victorops" class="col-sm-4 control-label">Post URL </label>
+                        <div data-toggle="tooltip" title="'.$config_groups['alert.transports.victorops.url']['config_descr'].'" class="toolTip glyphicon glyphicon-question-sign"></div>
+                        <div class="col-sm-4">
+                            <input id="victorops" class="form-control" type="text" name="global-config-input" value="'.$config_groups['alert.transports.victorops.url']['config_value'].'" data-config_id="'.$config_groups['alert.transports.victorops.url']['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+$clickatell   = get_config_by_name('alert.transports.clickatell.token');
+$mobiles      = get_config_like_name('alert.transports.clickatell.to.%');
+$new_mobiles = array();
+foreach ($mobiles as $mobile) {
+    $new_mobiles[] = $mobile['config_value'];
+}
+$upd_mobiles = implode(PHP_EOL, $new_mobiles);
+
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#clickatell_transport_expand"><i class="fa fa-caret-down"></i> Clickatell transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="clickatell" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="clickatell_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_token" class="col-sm-4 control-label">Clickatell Token </label>
+                        <div class="col-sm-4">
+                            <input id="clickatell_token" class="form-control" type="text" name="global-config-input" value="'.$clickatell['config_value'].'" data-config_id="'.$clickatell['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_to" class="col-sm-4 control-label">Mobile numbers</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" name="global-config-textarea" id="clickatell_to" placeholder="Enter the config options" data-config_id="'.$clickatell['config_id'].'" data-type="clickatell">'.$upd_mobiles.'</textarea>
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+$playsms_url     = get_config_by_name('alert.transports.playsms.url');
+$playsms_user    = get_config_by_name('alert.transports.playsms.user');
+$playsms_token   = get_config_by_name('alert.transports.playsms.token');
+$playsms_from    = get_config_by_name('alert.transports.playsms.from');
+$mobiles         = get_config_like_name('alert.transports.playsms.to.%');
+$new_mobiles = array();
+foreach ($mobiles as $mobile) {
+    $new_mobiles[] = $mobile['config_value'];
+}
+$upd_mobiles = implode(PHP_EOL, $new_mobiles);
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#playsms_transport_expand"><i class="fa fa-caret-down"></i> PlaySMS transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="playsms" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="playsms_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="playsms_url" class="col-sm-4 control-label">PlaySMS URL </label>
+                        <div class="col-sm-4">
+                            <input id="playsms_url" class="form-control" type="text" name="global-config-input" value="'.$playsms_url['config_value'].'" data-config_id="'.$playsms_url['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_user" class="col-sm-4 control-label">User</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_user" class="form-control" type="text" name="global-config-input" value="'.$playsms_user['config_value'].'" data-config_id="'.$playsms_user['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_token" class="col-sm-4 control-label">Token</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_token" class="form-control" type="text" name="global-config-input" value="'.$playsms_token['config_value'].'" data-config_id="'.$playsms_token['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="playsms_from" class="col-sm-4 control-label">From</label>
+                        <div class="col-sm-4">
+                            <input id="playsms_from" class="form-control" type="text" name="global-config-input" value="'.$playsms_from['config_value'].'" data-config_id="'.$playsms_from['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="clickatell_to" class="col-sm-4 control-label">Mobiles</label>
+                        <div class="col-sm-4">
+                            <textarea class="form-control" name="global-config-textarea" id="playsms_to" placeholder="Enter the config options" data-config_id="'.$playsms_url['config_id'].'" data-type="playsms">'.$upd_mobiles.'</textarea>
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
                 </div>
             </div>
         </div>

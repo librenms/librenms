@@ -12,6 +12,7 @@
  - [How do I debug the discovery process?](#faq11)
  - [How do I debug the poller process?](#faq12)
  - [Why do I get a lot apache or rrdtool zombies in my process list?](#faq14)
+ - [Why do I see traffic spikes in my graphs?](#faq15)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -93,6 +94,13 @@ Please see the [Poller Support](http://docs.librenms.org/Support/Poller Support)
 
 If this is related to your web service for LibreNMS then this has been tracked down to an issue within php which the developers aren't fixing. We have implemented a work around which means you 
 shouldn't be seeing this. If you are, please report this in [issue 443](https://github.com/librenms/librenms/issues/443).
+
+#### <a name="faq15"> Why do I see traffic spikes in my graphs?</a>
+
+This occurs either when a counter resets or the device sends back bogus data making it look like a counter reset. We have enabled support for setting a maximum value for rrd files for ports. 
+Before this all rrd files were set to 100G max values, now you can enable support to limit this to the actual port speed.
+
+rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (scripts/tune_port.php).
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 

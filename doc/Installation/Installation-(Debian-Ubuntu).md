@@ -57,7 +57,7 @@ This host is where the web server and SNMP poller run.  It could be the same mac
 
 Install the required software:
 
-    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear php5-curl snmp graphviz php5-mcrypt php5-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd mysql-client php-net-ipv4 php-net-ipv6 rrdtool git
+    apt-get install libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-snmp php-pear php5-curl snmp graphviz php5-mcrypt php5-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
 
 The packages listed above are an all-inclusive list of packages that were necessary on a clean install of Ubuntu 12.04/14.04.
 
@@ -69,6 +69,7 @@ Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd resta
 
 In `/etc/php5/apache2/php.ini` and `/etc/php5/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
 examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
+Please also ensure that allow_url_fopen is enabled.
 
 ### Adding the librenms-user ###
 

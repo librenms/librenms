@@ -39,7 +39,6 @@ disable it for one device then you can do this within the WebUI -> Settings -> M
 
 ```php
 $config['poller_modules']['unix-agent']                   = 0;
-$config['poller_modules']['system']                       = 1;
 $config['poller_modules']['os']                           = 1;
 $config['poller_modules']['ipmi']                         = 1;
 $config['poller_modules']['sensors']                      = 1;

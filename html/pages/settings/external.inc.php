@@ -17,6 +17,18 @@ $oxidized_conf = array(
           'descr'              => 'Enable config versioning access',
           'type'               => 'checkbox',
     ),
+    array('name'               => 'oxidized.group_support',
+          'descr'              => 'Enable the return of groups to Oxidized',
+          'type'               => 'checkbox',
+    ),
+    array('name'               => 'oxidized.default_group',
+          'descr'              => 'Set the default group returned',
+          'type'               => 'text',
+    ),
+    array('name'               => 'oxidized.reload_nodes',
+          'descr'              => 'Reload Oxidized nodes list, each time a device is added',
+          'type'               => 'checkbox',
+    ),
 );
 
 $unixagent_conf = array(
@@ -34,6 +46,17 @@ $unixagent_conf = array(
     ),
 );
 
+$rrdtool_conf = array(
+    array('name'               => 'rrdtool',
+           'descr'             => 'Path to rrdtool binary',
+           'type'              => 'text',
+    ),
+    array('name'               => 'rrdtool_tune',
+          'descr'              => 'Tune all rrd port files to use max values',
+          'type'               => 'checkbox',
+    ),
+);
+
 echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
@@ -41,6 +64,7 @@ echo '
 
 echo generate_dynamic_config_panel('Oxidized integration',true,$config_groups,$oxidized_conf);
 echo generate_dynamic_config_panel('Unix-agent integration',true,$config_groups,$unixagent_conf);
+echo generate_dynamic_config_panel('RRDTool Setup',true,$config_groups,$rrdtool_conf);
 
 echo '
     </form>
