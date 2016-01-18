@@ -1,4 +1,4 @@
-RNING ##
+## WARNING ##
 
 MIB-based polling is experimental.  It might overload your LibreNMS server,
 destroy your data, set your routers on fire, and kick your cat.  It has been
