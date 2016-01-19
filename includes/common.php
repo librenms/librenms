@@ -743,7 +743,6 @@ function round_Nth($val = 0, $round_to) {
 function is_mib_poller_enabled($device)
 {
     if (!is_module_enabled('poller', 'mib')) {
-        d_echo("MIB polling module disabled globally.\n");
         return false;
     }
 
