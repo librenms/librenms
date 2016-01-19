@@ -2,7 +2,7 @@
 echo 'Load: ';
 
 // Include all discovery modules
-$include_dir = 'includes/discovery/load';
+$include_dir = 'includes/discovery/sensors/load';
 require 'includes/include-dir.inc.php';
 
 d_echo($valid['sensor']['load']);

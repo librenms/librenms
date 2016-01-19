@@ -3,7 +3,7 @@
 echo 'Humidity : ';
 
 // Include all discovery modules
-$include_dir = 'includes/discovery/humidity';
+$include_dir = 'includes/discovery/sensors/humidity';
 require 'includes/include-dir.inc.php';
 
 d_echo($valid['sensor']['humidity']);

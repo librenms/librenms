@@ -3,7 +3,7 @@
 echo 'Temperatures: ';
 
 // Include all discovery modules
-$include_dir = 'includes/discovery/temperatures';
+$include_dir = 'includes/discovery/sensors/temperatures';
 require 'includes/include-dir.inc.php';
 
 d_echo($valid['sensor']['temperature']);
