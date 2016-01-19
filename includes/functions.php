@@ -1320,3 +1320,34 @@ function oxidized_reload_nodes() {
         curl_close($ch);
     }
 }
+
+/**
+ * Perform DNS lookup
+ *
+ * @param array $device Device array from database
+ * @param string $type The type of record to lookup
+ *
+ * @return string ip
+ *
+**/
+function dnslookup($device,$type=false,$return=false) {
+    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == truee) {
+        return '';
+    }
+    if (empty($type)) {
+        // We are going to use the transport to work out the record type
+        if ($device['transport'] == 'udp6' || $device['transport'] == 'tcp6') {
+            $type = DNS_AAAA;
+            $return = 'ipv6';
+        }
+        else {
+            $type = DNS_A;
+            $return = 'ip';
+        }
+    }
+    if (empty($return)) {
+        return '';
+    }
+    $record = dns_get_record($device['hostname'],$type);
+    return $record[0][$return];
+}//end dnslookup
