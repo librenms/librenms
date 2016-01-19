@@ -46,7 +46,7 @@ function mibdir($mibdir) {
 }//end mibdir()
 
 
-function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=null) {
+function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=null, $array=array()) {
     global $debug,$config,$runtime_stats,$mibs_loaded;
 
     // populate timeout & retries values from configuration
@@ -82,7 +82,6 @@ function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=nul
 
     $data = trim(external_exec($cmd));
     $runtime_stats['snmpget']++;
-    $array = array();
     foreach (explode("\n", $data) as $entry) {
         list($oid,$value)  = explode('=', $entry, 2);
         $oid               = trim($oid);
@@ -96,7 +95,6 @@ function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=nul
     return $array;
 
 }//end snmp_get_multi()
-
 
 function snmp_get($device, $oid, $options=null, $mib=null, $mibdir=null) {
     global $debug,$config,$runtime_stats,$mibs_loaded;
