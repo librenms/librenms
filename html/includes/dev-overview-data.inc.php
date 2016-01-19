@@ -30,6 +30,13 @@ echo '<tr>
         <td>'.$device['sysName'].' </td>
       </tr>';
 
+if ($ip = inet6_ntop($device['ip'])) {
+    echo '<tr>
+             <td>Resolved IP</td>
+             <td>'.$ip.'</td>
+         </tr>';
+}
+
 if ($device['hardware']) {
     echo '<tr>
         <td>Hardware</td>
