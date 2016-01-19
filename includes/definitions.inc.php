@@ -1440,11 +1440,26 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+<<<<<<< HEAD
 $os = 'nios';
 $config['os'][$os]['text']             = 'Infoblox';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'infoblox';
 
+=======
+// Lenovo EMC (NAS)
+$os = 'lenovoemc';
+$config['os'][$os]['type']             = 'storage';
+$config['os'][$os]['group']            = 'storage';
+$config['os'][$os]['text']             = 'LenovoEMC';
+$config['os'][$os]['icon']             = 'lenovo';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+>>>>>>> ded1fa3e73bcd99f03259cc449e8cd816664a158
 
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
