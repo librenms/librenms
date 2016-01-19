@@ -4,7 +4,3 @@ if (!$os || $os === 'linux') {
         $os = 'nios';
     }
 }
-
-
-
-
