@@ -83,12 +83,12 @@ function auth_usermanagement() {
 }
 
 
-function adduser($username) {
+function adduser($username,$password, $level=0, $email='', $realname='', $can_modify_passwd=0, $description='', $twofactor=0) {
     // Check to see if user is already added in the database
     if (!user_exists_in_db($username)) {
         $hasher    = new PasswordHash(8, false);
         $encrypted = $hasher->HashPassword($password);
-        $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => 0, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor, 'user_id' => get_userid($username)), 'users');
+        $userid = dbInsert(array('username' => $username, 'password' => $encrypted, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor, 'user_id' => get_userid($username)), 'users');
         if ($userid == false) {
             return false;
         }
