@@ -16,7 +16,17 @@ if ($_SESSION['userlevel'] >= '7') {
 
             if (is_file($configs.$device['hostname'])) {
                 $file = $configs.$device['hostname'];
-            }
+            } 
+            elseif (is_file($configs.strtok($device['hostname'], '.'))) { // Strip domain
+                $file = $configs.strtok($device['hostname'], '.');
+            } 
+            else {
+                if (!empty($config['mydomain'])) { // Try with domain name if set
+                    if (is_file($configs.$device['hostname'].'.'.$config['mydomain'])) {
+                        $file = $configs.$device['hostname'].'.'.$config['mydomain'];
+                    }
+                }
+            } // end if
         }
 
         echo '<div style="clear: both;">';
