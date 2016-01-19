@@ -1,8 +1,8 @@
 <?php
 
-$serial   = trim(snmp_get($device, "ibSerialNumber.0", "-OQv", "IB-PLATFORMONE-MIB");
-$version  = trim(snmp_get($device, "ibNiosVersion.0", "-OQv", "IB-PLATFORMONE-MIB");
-$hardware = trim(snmp_get($device, "ibHardwareType.0", "-OQv", "IB-PLATFORMONE-MIB");
+$serial   = trim(snmp_get($device, "ibSerialNumber.0", "-OQv", "IB-PLATFORMONE-MIB"));
+$version  = trim(snmp_get($device, "ibNiosVersion.0", "-OQv", "IB-PLATFORMONE-MIB"));
+$hardware = trim(snmp_get($device, "ibHardwareType.0", "-OQv", "IB-PLATFORMONE-MIB"));
 
 ##############
 # Create ddns update rrd
@@ -10,17 +10,13 @@ $hardware = trim(snmp_get($device, "ibHardwareType.0", "-OQv", "IB-PLATFORMONE-M
 $rrdfile  = $config['rrd_dir'].'/'.$device['hostname'].'/ib_dns_dyn_updates.rrd';
 
 $mibs = '+IB-DNSONE-MIB';
-$oids = '
-    IB-DNSONE-MIB::ibDDNSUpdateSuccess.0 
-    IB-DNSONE-MIB::ibDDNSUpdateFailure.0 
-    IB-DNSONE-MIB::ibDDNSUpdatePrerequisiteReject.0 
-    IB-DNSONE-MIB::ibDDNSUpdateReject.0';
+$oids = 
+    'IB-DNSONE-MIB::ibDDNSUpdateSuccess.0 ' .
+    'IB-DNSONE-MIB::ibDDNSUpdateFailure.0 ' .
+    'IB-DNSONE-MIB::ibDDNSUpdatePrerequisiteReject.0 ' .
+    'IB-DNSONE-MIB::ibDDNSUpdateReject.0';
 
-$data = snmp_get_multi(
-    $device,
-    $oids,
-    '-OQUs', 
-    $mibs);
+$data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $ds1 = $data[0]['ibDDNSUpdateSuccess'];
 $ds2 = $data[0]['ibDDNSUpdateFailure'];
@@ -54,15 +50,11 @@ $graphs['ib_dns_dyn_updates'] = true;
 $rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/ib_dns_performance.rrd';
 
 $mibs = '+IB-PLATFORMONE-MIB';
-$oids = '
-    IB-PLATFORMONE-MIB::ibNetworkMonitorDNSNonAAT1AvgLatency.0 
-    IB-PLATFORMONE-MIB::ibNetworkMonitorDNSAAT1AvgLatency.0';
+$oids =
+    'IB-PLATFORMONE-MIB::ibNetworkMonitorDNSNonAAT1AvgLatency.0 ' .
+    'IB-PLATFORMONE-MIB::ibNetworkMonitorDNSAAT1AvgLatency.0';
 
-$data = snmp_get_multi(
-    $device,
-    $oids,
-    '-OQUs', 
-    $mibs);
+$data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $ds1   = $data[0]['ibNetworkMonitorDNSAAT1AvgLatency'];
 $ds2   = $data[0]['ibNetworkMonitorDNSNonAAT1AvgLatency'];
@@ -88,17 +80,13 @@ $graphs['ib_dns_performance'] = true;
 $rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/ib_dns_request_return_codes.rrd';
 
 $mibs = '+IB-DNSONE-MIB';
-$oids = '
-    IB-DNSONE-MIB::ibBindZoneFailure.\"summary\" 
-    IB-DNSONE-MIB::ibBindZoneNxDomain.\"summary\" 
-    IB-DNSONE-MIB::ibBindZoneNxRRset.\"summary\" 
-    IB-DNSONE-MIB::ibBindZoneSuccess.\"summary\"';
+$oids = 
+    'IB-DNSONE-MIB::ibBindZoneFailure.\"summary\" ' .
+    'IB-DNSONE-MIB::ibBindZoneNxDomain.\"summary\" ' .
+    'IB-DNSONE-MIB::ibBindZoneNxRRset.\"summary\" ' . 
+    'IB-DNSONE-MIB::ibBindZoneSuccess.\"summary\"';
 
-$data = snmp_get_multi(
-    $device,
-    $oids,
-    '-OQUs', 
-    $mibs);
+$data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $ds1 = $data['"summary"']['ibBindZoneSuccess'];
 $ds2 = $data['"summary"']['ibBindZoneFailure'];
@@ -132,22 +120,18 @@ $graphs['ib_dns_request_return_codes'] = true;
 $rrdfile  = $config['rrd_dir'].'/'.$device['hostname'].'/ib_dhcp_messages.rrd';
 
 $mibs = '+IB-DHCPONE-MIB';
-$oids = '
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfAcks.0 
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfDeclines.0 
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfDiscovers.0 
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfInforms.0 
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfNacks.0 
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfOffers.0  
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfOthers.0 
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfReleases.0 
-    IB-DHCPONE-MIB::ibDhcpTotalNoOfRequests.0';
+$oids = 
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfAcks.0 ' . 
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfDeclines.0 ' .
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfDiscovers.0 ' .
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfInforms.0 ' .
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfNacks.0 ' .
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfOffers.0 ' .
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfOthers.0 ' .
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfReleases.0 ' .
+    'IB-DHCPONE-MIB::ibDhcpTotalNoOfRequests.0';
 
-$data = snmp_get_multi(
-    $device,
-    $oids,
-    '-OQUs', 
-    $mibs);
+$data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
 $ds1 = $data[0]['ibDhcpTotalNoOfAcks'];
 $ds2 = $data[0]['ibDhcpTotalNoOfDeclines'];
@@ -187,5 +171,4 @@ $fields = array(
 
 rrdtool_update($rrdfile, $fields);
 $graphs['ib_dhcp_messages'] = true;
-
 
