@@ -1165,6 +1165,16 @@ function alert_details($details) {
             $fallback      = false;
         }
 
+        if ($tmp_alerts['type'] && $tmp_alerts['label']) {
+            if ($tmp_alerts['error'] == "") {
+                $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].';&nbsp;';
+            }
+            else {
+                $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].' - '.$tmp_alerts['error'].';&nbsp;';
+            }
+            $fallback      = false;
+        }
+
         if ($fallback === true) {
             foreach ($tmp_alerts as $k => $v) {
                 if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
