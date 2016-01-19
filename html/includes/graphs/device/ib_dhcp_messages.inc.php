@@ -33,7 +33,8 @@ foreach ($stats as $stat => $color) {
     # Set up area graphing with stacking
     if ( $i == "0" ) {
         $rrd_options .= " 'AREA:cdef".$stat . $color.":".ucfirst($stat)."'";
-    } else {
+    } 
+    else {
         $rrd_options .= " 'AREA:cdef".$stat . $color.":".ucfirst($stat).":STACK'";
     }
 
