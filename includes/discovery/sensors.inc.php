@@ -25,4 +25,4 @@ require 'includes/discovery/sensors/power.inc.php';
 require 'includes/discovery/sensors/fanspeeds.inc.php';
 require 'includes/discovery/sensors/charge.inc.php';
 require 'includes/discovery/sensors/load.inc.php';
-require 'includes/discovery/states.inc.php';
+require 'includes/discovery/sensors/states.inc.php';
