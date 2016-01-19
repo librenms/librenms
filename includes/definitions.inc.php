@@ -1440,6 +1440,11 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'nios';
+$config['os'][$os]['text']             = 'Infoblox';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'infoblox';
+
 // Lenovo EMC (NAS)
 $os = 'lenovoemc';
 $config['os'][$os]['type']             = 'storage';
@@ -1648,6 +1653,20 @@ $config['graph_types']['device']['pulse_users']['descr']           = 'Active Use
 $config['graph_types']['device']['pulse_sessions']['section']      = 'firewall';
 $config['graph_types']['device']['pulse_sessions']['order']        = '0';
 $config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
+
+// Infoblox dns/dhcp Graphs
+$config['graph_types']['device']['ib_dns_dyn_updates']['section']             = 'dns';
+$config['graph_types']['device']['ib_dns_dyn_updates']['order']               = '0';
+$config['graph_types']['device']['ib_dns_dyn_updates']['descr']               = 'DNS dynamic updates';
+$config['graph_types']['device']['ib_dns_request_return_codes']['section']    = 'dns';
+$config['graph_types']['device']['ib_dns_request_return_codes']['order']      = '0';
+$config['graph_types']['device']['ib_dns_request_return_codes']['descr']      = 'DNS request return codes';
+$config['graph_types']['device']['ib_dns_performance']['section']             = 'dns';
+$config['graph_types']['device']['ib_dns_performance']['order']               = '0';
+$config['graph_types']['device']['ib_dns_performance']['descr']               = 'DNS performance';
+$config['graph_types']['device']['ib_dhcp_messages']['section']               = 'dhcp';
+$config['graph_types']['device']['ib_dhcp_messages']['order']                 = '0';
+$config['graph_types']['device']['ib_dhcp_messages']['descr']                 = 'DHCP messages';
 
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';
