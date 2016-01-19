@@ -14,7 +14,7 @@
 
 echo 'States: ';
 
-$include_dir = 'includes/discovery/states';
+$include_dir = 'includes/discovery/sensors/states';
 require 'includes/include-dir.inc.php';
 
 d_echo($valid['sensor']['states']);
