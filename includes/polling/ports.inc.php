@@ -184,27 +184,6 @@ if ($device['os_group'] == 'cisco') {
 }
 else {
     $port_stats = snmpwalk_cache_oid($device, 'dot1qPortVlanTable', $port_stats, 'Q-BRIDGE-MIB');
-
-    $vlan_ports       = snmpwalk_cache_twopart_oid($device, 'dot1qVlanCurrentEgressPorts', $vlan_stats, 'Q-BRIDGE-MIB');
-    $vlan_ifindex_map = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', $vlan_stats, 'Q-BRIDGE-MIB');
-
-    foreach ($vlan_ports as $instance) {
-        foreach (array_keys($instance) as $vlan_id) {
-            $parts  = explode(' ', $instance[$vlan_id]['dot1qVlanCurrentEgressPorts']);
-            $binary = '';
-            foreach ($parts as $part) {
-                $binary .= zeropad(decbin($part), 8);
-            }
-
-            for ($i = 0; $i < strlen($binary); $i++) {
-                if ($binary[$i]) {
-                    $ifindex = $i;
-                    // FIXME $vlan_ifindex_map[$i]
-                    $q_bridge_mib[$ifindex][] = $vlan_id;
-                }
-            }
-        }
-    }
 }//end if
 
 $polled = time();
