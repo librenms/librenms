@@ -1054,3 +1054,19 @@ function inet6_ntop($ip) {
     }
     return '';
 }
+
+/**
+ * Convert IP to use sysName
+ * @param array device
+ * @param string ip address
+ * @return string
+**/
+function ip_to_sysname($device,$ip) {
+    global $config;
+    if ($config['force_ip_to_sysname'] === true) {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
+            $ip = $device['sysName'];
+        }
+    }
+    return $ip;
+}//end ip_to_sysname

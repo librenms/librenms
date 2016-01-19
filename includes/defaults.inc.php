@@ -779,6 +779,7 @@ $config['dateformat']['mysql']['time']    = '%H:%i:%s';
 
 $config['enable_clear_discovery'] = 1;
 // Set this to 0 if you want to disable the web option to rediscover devices
+$config['force_ip_to_sysname']    = false;// Set to true if you want to use sysName in place of IPs
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
 $config['enable_footer'] = 1;
