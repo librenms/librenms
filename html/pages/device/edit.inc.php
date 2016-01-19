@@ -38,6 +38,8 @@ else {
   $panes['storage']  = 'Storage';
   $panes['misc']     = 'Misc';
 
+  $panes['component'] = 'Components';
+
   print_optionbar_start();
 
   unset($sep);
