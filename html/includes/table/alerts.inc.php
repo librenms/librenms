@@ -2,8 +2,45 @@
 
 $where = 1;
 
+$alert_states = array(
+    // divined from librenms/alerts.php
+    'recovered' => 0,
+    'alerted' => 1,
+    'acknowledged' => 2,
+    'worse' => 3,
+    'better' => 4
+);
+
+$alert_severities = array(
+    // alert_rules.status is enum('ok','warning','critical')
+    'ok' => 1,
+    'warning' => 2,
+    'critical' => 3
+);
+
 if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`='.$_POST['device_id'];
+}
+
+if (is_numeric($_POST['acknowledged'])) {
+    // I assume that if we are searching for acknowleged/not, we aren't interested in recovered
+    $where .= " AND `alerts`.`state`".($_POST['acknowledged'] ? "=" : "!=").$alert_states['acknowledged'];
+}
+
+if (is_numeric($_POST['state'])) {
+    $where .= " AND `alerts`.`state`=".$_POST['state'];
+}
+
+if (isset($_POST['min_severity'])) {
+    if (is_numeric($_POST['min_severity'])) {
+        $min_severity_id = $_POST['min_severity'];
+    }
+    else if (!empty($_POST['min_severity'])) {
+        $min_severity_id = $alert_severities[$_POST['min_severity']];
+    }
+    if (isset($min_severity_id)) {
+        $where .= " AND `alert_rules`.`severity` >= ".$min_severity_id;
+    }
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -18,7 +55,7 @@ if (is_admin() === false && is_read() === false) {
     $param[] = $_SESSION['user_id'];
 }
 
-$sql .= "  RIGHT JOIN alert_rules ON alerts.rule_id=alert_rules.id WHERE $where AND `state` IN (1,2,3,4) $sql_search";
+$sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where AND `alerts`.`state`!=".$alert_states['recovered']." $sql_search";
 
 $count_sql = "SELECT COUNT(`alerts`.`id`) $sql";
 $total     = dbFetchCell($count_sql, $param);
