@@ -3,7 +3,7 @@
 echo 'Voltages: ';
 
 // Include all discovery modules
-$include_dir = 'includes/discovery/voltages';
+$include_dir = 'includes/discovery/sensors/voltages';
 require 'includes/include-dir.inc.php';
 
 d_echo($valid['sensor']['voltage']);
