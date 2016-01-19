@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'ironware' || $device['os_group'] == 'ironware') {
+if ($device['os'] == 'ironware' || $device['os_group'] == 'ironware' || $device['os'] == 'nos') {
     echo 'IronWare : ';
     $processors_array = snmpwalk_cache_triple_oid($device, 'snAgentCpuUtilEntry', $processors_array, 'FOUNDRY-SN-AGENT-MIB');
     d_echo($processors_array);

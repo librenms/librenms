@@ -50,6 +50,9 @@ if (!$os) {
                 $os = 'airos-af';
             }
         }
+	else if (trim(snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'UBNT-AirFIBER-MIB')) != '') {
+		$os = 'pktj';
+	}
         else {
             // Check for Synology DSM
             $hrSystemInitialLoadParameters = trim(snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv'));
