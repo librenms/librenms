@@ -1,6 +1,97 @@
 <?php
 
-$common_output[] = '
+/* FIXME: is there a central place we can put this? */
+
+$alert_states = array(
+    // divined from librenms/alerts.php
+    'recovered' => 0,
+    'alerted' => 1,
+    'acknowledged' => 2,
+    'worse' => 3,
+    'better' => 4
+);
+
+$alert_severities = array(
+    // alert_rules.status is enum('ok','warning','critical')
+    'ok' => 1,
+    'warning' => 2,
+    'critical' => 3
+);
+
+//if( defined('show_settings') || empty($widget_settings) ) {
+if(defined('show_settings')) {
+    $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
+    $current_severity     = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
+    $current_state        = isset($widget_settings['state']) ? $widget_settings['state'] : '';
+
+    $common_output[] = '
+<form class="form" onsubmit="widget_settings(this); return false;">
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="acknowledged" class="control-label">Show acknowledged alerts: </label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="acknowledged">';
+
+    $common_output[] = '<option value=""'.($current_acknowledged == '' ? ' selected' : ' ').'>not filtered</option>';
+    $common_output[] = '<option value="1"'.($current_acknowledged == '1' ? ' selected' : ' ').'>show only acknowledged</option>';
+    $common_output[] = '<option value="0"'.($current_acknowledged == '0' ? ' selected' : ' ').'>hide acknowledged</option>';
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="min_severity" class="control-label">Minimum displayed severity:</label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="min_severity">
+        <option value="">any severity</option>';
+
+    foreach ($alert_severities as $name => $val) {
+        $common_output[] = "<option value=\"$val\"".($current_severity == $name || $current_severity == $val ? ' selected' : '').">$name or higher</option>";
+    }
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="state" class="control-label">State:</label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="state">';
+    $common_output[] = '<option value=""'.($current_state == '' ? ' selected' : '').'>any state</option>';
+
+    foreach ($alert_states as $name => $val) {
+        $common_output[] = "<option value=\"$val\"".($current_state == $name || (is_numeric($current_state) && $current_state == $val) ? ' selected' : '').">$name</option>";
+    }
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-default">Set</button>
+    </div>
+  </div>
+</form>
+';
+}
+else {
+    $device_id    = $device['device_id'];
+    $acknowledged = $widget_settings['acknowledged'];
+    $state        = $widget_settings['state'];
+    $min_severity = $widget_settings['min_severity'];
+
+    $common_output[] = "<!-- ".print_r($widget_settings, TRUE)." -->";
+    $common_output[] = "<!-- ".print_r($acknowledged, TRUE)." -->";
+
+
+    $common_output[] = '
 <div class="row">
     <div class="col-sm-12">
         <span id="message"></span>
@@ -28,8 +119,21 @@ var alerts_grid = $("#alerts").bootgrid({
     {
         return {
             id: "alerts",
+';
+
+    if (is_numeric($acknowledged)) {
+        $common_output[]="acknowledged: '$acknowledged',\n";
+    }
+    if (isset($state) && $state != '') {
+        $common_output[]="state: '$state',\n";
+    }
+    if (isset($min_severity) && $min_severity != '') {
+        $common_output[]="min_severity: '$min_severity',\n";
+    }
+
+    $common_output[]='
             device_id: \'' . $device['device_id'] .'\'
-        };
+        }
     },
     url: "ajax_table.php",
     formatters: {
@@ -85,5 +189,5 @@ var alerts_grid = $("#alerts").bootgrid({
     });
 });
 </script>';
-
+}
 
