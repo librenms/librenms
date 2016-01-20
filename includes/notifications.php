@@ -22,8 +22,8 @@
  * @subpackage Notifications
  */
 
-require_once 'includes/defaults.inc.php';
-require_once 'config.php';
+require_once $config['install_dir'].'/includes/defaults.inc.php';
+require_once $config['install_dir'].'/config.php';
 require_once $config['install_dir'].'/includes/definitions.inc.php';
 require_once $config['install_dir'].'/includes/functions.php';
 

@@ -847,6 +847,7 @@ $config['availability-map-width']                       = 25;
 
 // Default notifications Feed
 $config['notifications']['LibreNMS']                    = 'http://www.librenms.org/notifications.rss';
+$config['notifications']['local']                       = 'misc/notifications.rss';
 
 // Update channel (Can be 'master' or 'release')
 $config['update_channel']                               = 'master';
