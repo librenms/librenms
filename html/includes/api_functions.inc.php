@@ -209,6 +209,7 @@ function list_devices() {
     }
     $devices = array();
     foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
+        $device['ip'] = inet6_ntop($device['ip']);
         $devices[] = $device;
     }
 
