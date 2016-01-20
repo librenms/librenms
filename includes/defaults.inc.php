@@ -438,6 +438,8 @@ $config['enable_pseudowires'] = 1;
 // Enable Pseudowires
 $config['enable_vrfs'] = 1;
 // Enable VRFs
+$config['enable_vrf_lite_cisco'] = 1;
+// Enable VRF lite cisco
 $config['enable_printers'] = 0;
 // Enable Printer support
 $config['enable_sla'] = 0;
@@ -734,6 +736,7 @@ $config['discovery_modules']['vlans']                = 1;
 $config['discovery_modules']['cisco-mac-accounting'] = 1;
 $config['discovery_modules']['cisco-pw']             = 1;
 $config['discovery_modules']['cisco-vrf']            = 1;
+$config['discovery_modules']['cisco-vrf-lite'] 		 = 1;
 // $config['discovery_modules']['cisco-cef']                 = 1;
 $config['discovery_modules']['cisco-sla']      = 1;
 $config['discovery_modules']['vmware-vminfo']  = 1;
