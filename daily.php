@@ -101,7 +101,7 @@ if ($options['f'] === 'perf_times') {
 }
 
 if ($options['f'] === 'callback') {
-    include_once 'callback.php';
+    include_once 'includes/callback.php';
 }
 
 if ($options['f'] === 'device_perf') {
@@ -113,7 +113,7 @@ if ($options['f'] === 'device_perf') {
 }
 
 if ($options['f'] === 'notifications') {
-    include_once 'notifications.php';
+    include_once 'includes/notifications.php';
 }
 
 if ($options['f'] === 'purgeusers') {
