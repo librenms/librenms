@@ -16,4 +16,3 @@ ALTER TABLE ospf_nbrs       DROP INDEX device_id, ADD UNIQUE KEY `device_id` (`d
 ALTER TABLE ospf_ports      ADD `context_name` varchar(128)  CHARACTER SET utf8 collate utf8_general_ci ;
 ALTER TABLE ospf_ports DROP INDEX device_id, ADD UNIQUE KEY `device_id` (`device_id`,`ospf_port_id`,`context_name`);
 ALTER TABLE `vlans` CHANGE COLUMN `vlan_name` `vlan_name` VARCHAR(64) DEFAULT NULL;
-
