@@ -83,10 +83,10 @@ function auth_usermanagement() {
 }
 
 
-function adduser($username) {
+function adduser($username, $level=0, $email='', $realname='', $can_modify_passwd=0, $description='', $twofactor=0) {
     // Check to see if user is already added in the database
     if (!user_exists_in_db($username)) {
-        $userid = dbInsert(array('username' => $username, 'user_id' => get_userid($username), 'level' => "0", 'can_modify_passwd' => 0, 'twofactor' => 0), 'users');
+        $userid = dbInsert(array('username' => $username, 'realname' => $realname, 'email' => $email, 'descr' => $description, 'level' => $level, 'can_modify_passwd' => $can_modify_passwd, 'twofactor' => $twofactor, 'user_id' => get_userid($username)), 'users');
         if ($userid == false) {
             return false;
         }
@@ -161,9 +161,13 @@ function get_userid($username) {
 }
 
 
-function deluser() {
-    // not supported so return 0 
-    return 0;
+function deluser($username) {
+    dbDelete('bill_perms', '`user_name` =  ?', array($username));
+    dbDelete('devices_perms', '`user_name` =  ?', array($username));
+    dbDelete('ports_perms', '`user_name` =  ?', array($username));
+    dbDelete('users_prefs', '`user_name` =  ?', array($username));
+    dbDelete('users', '`user_name` =  ?', array($username));
+    return dbDelete('users', '`username` =  ?', array($username));
 }
 
 
@@ -221,14 +225,12 @@ function can_update_users() {
 
 function get_user($user_id) {
     // not supported so return 0
-    return 0;
+    return dbFetchRow('SELECT * FROM `users` WHERE `user_id` = ?', array($user_id), true);
 }
 
 
 function update_user($user_id, $realname, $level, $can_modify_passwd, $email) {
-    // not supported so return 0 
-    return 0;
-
+    dbUpdate(array('realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'email' => $email), 'users', '`user_id` = ?', array($user_id));
 }
 
 
