@@ -73,8 +73,9 @@ If you are deploying a separate database server, you need to change the `bind-ad
 
     vim /etc/my.cnf
 
-Add the following line:
+Add the following lines:
 
+    innodb_file_per_table=1
     bind-address = <ip>
 
 Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
