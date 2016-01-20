@@ -70,7 +70,6 @@ foreach ($vrfs_lite_cisco as $vrf) {
                                 'ipv4_address' => $ip,
                                 'context_name' => $device['context_name'],
                                );
-
                 dbInsert($insert_data, 'ipv4_mac');
             }//end if
         }//end if
