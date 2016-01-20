@@ -1,0 +1,450 @@
+-- *****************************************************************
+-- CISCO-BRIDGE-DOMAIN-MIB.my : Cisco Bridge Domain MIB
+--   
+-- Oct 2007, Madhavi Dokku
+--   
+-- Copyright (c) 2007 by Cisco Systems, Inc.
+--   
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-BRIDGE-DOMAIN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    RowStatus,
+    StorageType
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoBridgeDomainMIB MODULE-IDENTITY
+    LAST-UPDATED    "200712290000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-ethermibs@cisco.com"
+    DESCRIPTION
+        "A bridge domain is one of the means by which it is possible
+        to define a broadcast domain on a bridging device. It is an 
+            alternative to 802.1D bridge-groups and to 802.1Q VLAN 
+        bridging.
+
+        Bridge domain is the service specification, and specifies the 
+        broadcast domain number on which this frame of this particular
+        service instance must be made available on. The physical and 
+        virtual interfaces that can comprise a bridge domain are 
+        heterogeneous in nature comprising Ethernet service instances,
+        WAN Virtual Circuit for ATM or Frame Relay and VFIs. However,
+        the frame encapsulations for all interface types are
+        essentially Ethernet. 
+
+        Without bridge-domains, VLANs would have to be globally unique
+        per device and one would only be restricted to the theoretical  
+             maximum of 4095 VLANs for single tagged traffic. However
+        with        the introduction of bridge-domains, one can
+        associate a service        instance with a bridge-domain and all
+        service instances in the        same bridge-domain form a
+        broadcast domain. Bridge-domain ID        determines the
+        broadcast domain and the VLAN id is merely used        to match
+        and map traffic. With bridge domain feature configured       
+        VLAN IDs would be unique per interface only and not globally.   
+            Thus bridge domains make VLAN ids have only local
+        significance        per port
+
+
+        Differences between Bridge Domains and 802.1AD Bridges:
+        =======================================================
+        1. Scope of the VLAN technology which uses 802.1 AD is global to
+        the box.
+        But in case of Bridge domain, the scope of vlan is local to
+        interface
+
+        2. Switchport 802.1AD restricts the number of broadcast domain  
+            on a box to 4095.
+        However, with Bridge domains, we can have up to 16k broadcast   
+               domain.
+
+        3. Under a single Bridge domain service instance, there can be  
+                flexible service mapping criterion.(i.e match based on
+        outer vlan, outer cos, inner vlan, inner cos and payload
+        ethertype).
+        Whereas in case of switch port 802.1AD/dot1q this is not
+        supported.
+
+        Similarities between Bridge Domains and 802.1AD Bridges:
+        =======================================================
+
+        1. Both use the same MAC address lookup for forwarding.
+
+        2. Both work with protocols like STP, DTP etc.
+
+        3. Both of them classify 'ports' in a system into Bridges/Bridge
+                  Domains.
+
+        Ethernet service instance is the instantiation of an Ethernet 
+        virtual circuit on a given port on a given router. In other 
+        words, an Ethernet service instance is an object that holds 
+        information about the layer 2 service that is being offered
+        on a given port of a given router as part of a given Ethernet
+        virtual circuit. Bridge domains feature is currently supported
+        on ethernet service instances only and can be later extented
+        to other interfaces like ATM and Frame Relay.
+
+        This MIB helps the network management personnel to find out the 
+        details of various broadcast domains configured in the network.
+
+        Definition of terms and acronyms:
+
+        ATM: Asynchronous Transfer mode
+
+        BD: Bridge Domain
+
+        C-mac: Customer MAC
+
+        EVC: Ethernet Virtual Circuit
+
+        FR: Frame Relay
+
+        SH: Split Horizon
+
+        VFI: Virtual Forwarding Instance 
+
+        VLAN: Virtual Local Area Network
+
+        WAN: Wide Area Network"
+    REVISION        "200712290000Z"
+    DESCRIPTION
+        "Modified the MIB description with details on similarities and
+        differences between Bridge Domains and 802.1AD Bridges."
+    REVISION        "200712040000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 642 }
+
+
+ciscoBdMIBNotifications  OBJECT IDENTIFIER
+    ::= { ciscoBridgeDomainMIB 0 }
+
+ciscoBdMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoBridgeDomainMIB 1 }
+
+ciscoBdMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoBridgeDomainMIB 2 }
+
+cbdSystemInfo  OBJECT IDENTIFIER
+    ::= { ciscoBdMIBObjects 1 }
+
+cbdMemberInfo  OBJECT IDENTIFIER
+    ::= { ciscoBdMIBObjects 2 }
+
+
+-- Textual Conventions
+
+CbdType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Defines the different types of bridge domain members:
+
+        'other': none of the following
+
+            'ether': Ethernet Service Instance
+
+        'atmVc': ATM Virtual connection
+
+        'frVc': Frame Relay Virtual Connection"
+    SYNTAX          INTEGER  {
+                        other(1),
+                        ether(2),
+                        atmVc(3),
+                        frVc(4)
+                    }
+
+cbdMembersConfigured OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of bridge domain
+        members configured on this bridge domain." 
+    ::= { cbdSystemInfo 1 }
+-- Member Info Table
+
+cbdMemberInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CbdMemberInfoEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides the bridge domain member attributes
+        of the members currently configured for each bridge
+        domain."
+    ::= { cbdMemberInfo 1 }
+
+cbdMemberInfoEntry OBJECT-TYPE
+    SYNTAX          CbdMemberInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row in cbdMemberInfoTable. This is indexed
+        by ifIndex and cbdSIIndex. Each row is created when a bridge
+        domain member is configured under a service instance."
+    INDEX           {
+                        ifIndex,
+                        cbdSIIndex
+                    } 
+    ::= { cbdMemberInfoTable 1 }
+
+CbdMemberInfoEntry ::= SEQUENCE {
+        cbdSIIndex               Unsigned32,
+        cbdMemberType            CbdType,
+        cbdMemberOperState       INTEGER ,
+        cbdMemberAdminState      INTEGER ,
+        cbdMemberSplitHorizon    TruthValue,
+        cbdMemberSplitHorizonNum Unsigned32,
+        cbdMemberStorageType     StorageType,
+        cbdMemberStatus          RowStatus,
+        cbdMembercMac            TruthValue
+}
+
+cbdSIIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295 )
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates an arbitary index that uniquely
+        identifies the Service Instance to which this bridge domain
+        member belongs to." 
+    ::= { cbdMemberInfoEntry 1 }
+
+cbdMemberType OBJECT-TYPE
+    SYNTAX          CbdType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the type of the bridge domain member
+        like ATM VC, Frame Relay VC, or Ethernet service."
+    DEFVAL          { other } 
+    ::= { cbdMemberInfoEntry 2 }
+
+cbdMemberOperState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        up(2),
+                        down(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the operational state of the bridge
+        domain Member. Operational state of the Bridge domain member
+        is same as the operational state of the underlying service
+        instance. Bridge domain members are configured under service
+        instances and multiple service instances can be attached to a  
+        single physical interface defining various kinds of services.
+        Bridge domain members have many to one relationship with
+        interface
+        Indexes. When ifOperStatus of the underlying interface is down,
+        the state of cbdMemberOperState should be down. When
+        ifOperStatus
+        of the underlying interface is up, cbdMemberOperState can be
+        either up or down based on the state of underlying service
+        instance.
+
+        'unknown': the bridge domain member is an unknown state.
+
+        'up': the bridge domain member is fully operational and 
+        able to bridge the traffic. This means that both the  
+        physical interface and the underlying service instance
+        are administratively up. 
+
+        'down': the Bridge Domain member is down and not
+        capable of bridging. This state means either the underlying 
+        service instance is down or the interface is down." 
+    ::= { cbdMemberInfoEntry 3 }
+
+cbdMemberAdminState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        up(2),
+                        down(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the administrative state of the
+        bridge domain Member.  Admin state of the Bridge domain member
+        is same as the admin state of the underlying service instance.
+        Bridge domain members are configured under service instances 
+        and multiple service instances can be attached to a single
+        physical interface defining various kinds of services. Bridge
+        Domain members have many to one relationship with interface
+        Indexes. When ifAdminStatus of the unerlying interface is down
+        the state of cbdMemberAdminState should be down. When ifOperStatus
+        of the underlying interface is up cbdMemberAdminState can be 
+        either up or down based on the state of underlying service
+        instance.
+
+        'unknown': the bridge domain member is in unknown 
+        administrative state.
+
+        'up': the Bridge Domain member is administratively up. This 
+        means that both the physical interface and the underlying service
+        instance are administratively up. 
+
+        'admindown': the Bridge Domain member is down as it is 
+        administratively configured to be down and is not 
+        capable of bridging. This means that either the underlying 
+        service instance is configured as administratively down or
+        the physical interface is configured as administratively
+        down." 
+    ::= { cbdMemberInfoEntry 4 }
+
+cbdMemberSplitHorizon OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether split horizon is
+        configured on this bridge domain member." 
+    ::= { cbdMemberInfoEntry 5 }
+
+cbdMemberSplitHorizonNum OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the split horizon number if
+        configured on the bridge domain member. Split horizon
+        is used to avoid sending traffic between interfaces. 
+        Frames are not forwarded to the members belonging to the
+        same split horizon group."
+    DEFVAL          { 0 } 
+    ::= { cbdMemberInfoEntry 6 }
+
+cbdMemberStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the storage type of this conceptual
+        row.  This object can only have a value 'nonVolatile'.  Other 
+        values are not applicable for this conceptual row and are 
+        not supported."
+    DEFVAL          { nonVolatile } 
+    ::= { cbdMemberInfoEntry 7 }
+
+cbdMemberStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object enables the SNMP agent to create, modify,
+        and delete rows in the cbdMemberInfoTable."
+    DEFVAL          { active } 
+    ::= { cbdMemberInfoEntry 8 }
+
+cbdMembercMac OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates if cmac is configured on this
+        bridge domain member. Cmac denotes if this bridge domain is
+        configured as a customer domain." 
+    ::= { cbdMemberInfoEntry 9 }
+ 
+
+-- Notifications
+
+ciscoBdNotificationPrefix  OBJECT IDENTIFIER
+    ::= { ciscoBdMIBNotifications 0 }
+
+-- Conformance
+
+ciscoBdMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoBdMIBConformance 1 }
+
+ciscoBdMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoBdMIBConformance 2 }
+
+
+ciscoBdMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the CISCO-BRIDGE-DOMAIN-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cbdSystemInfoGroup,
+                        cbdMemberInfoGroup
+                    }
+    ::= { ciscoBdMIBCompliances 1 }
+
+-- Units of Conformance
+
+cbdSystemInfoGroup OBJECT-GROUP
+    OBJECTS         { cbdMembersConfigured }
+    STATUS          current
+    DESCRIPTION
+        "This group contain information about bridge domain."
+    ::= { ciscoBdMIBGroups 1 }
+
+cbdMemberInfoGroup OBJECT-GROUP
+    OBJECTS         {
+                        cbdMemberType,
+                        cbdMemberOperState,
+                        cbdMemberAdminState,
+                        cbdMemberSplitHorizon,
+                        cbdMemberSplitHorizonNum,
+                        cbdMemberStorageType,
+                        cbdMemberStatus,
+                        cbdMembercMac
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contain information related to bridge domain
+        members."
+    ::= { ciscoBdMIBGroups 2 }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
