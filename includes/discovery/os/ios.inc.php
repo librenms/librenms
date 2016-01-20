@@ -22,10 +22,12 @@ if (empty($os)) {
         $os = 'iosxr';
     }
 
-    $extra_mibs = array(
-        "ciscoAAASessionMIB" => "CISCO-AAA-SESSION-MIB",
-    );
-    register_mibs($device, $extra_mibs, "includes/discovery/os/ios.inc.php");
+    if (!empty($os)) {
+        $extra_mibs = array(
+            "ciscoAAASessionMIB" => "CISCO-AAA-SESSION-MIB",
+        );
+        register_mibs($device, $extra_mibs, "includes/discovery/os/ios.inc.php");
+    }
 }
 
 // Fallback case
