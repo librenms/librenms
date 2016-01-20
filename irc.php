@@ -645,8 +645,8 @@ class ircbot {
             return $this->respond('Error: Permission denied.');
         }
 
-        $bps_in  = formatRates($port['ifInOctets_rate']);
-        $bps_out = formatRates($port['ifOutOctets_rate']);
+        $bps_in  = formatRates($port['ifInOctets_rate'] * 8);
+        $bps_out = formatRates($port['ifOutOctets_rate'] * 8);
         $pps_in  = format_bi($port['ifInUcastPkts_rate']);
         $pps_out = format_bi($port['ifOutUcastPkts_rate']);
         return $this->respond($port['ifAdminStatus'].'/'.$port['ifOperStatus'].' '.$bps_in.' > bps > '.$bps_out.' | '.$pps_in.'pps > PPS > '.$pps_out.'pps');
