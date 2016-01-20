@@ -640,7 +640,7 @@ class ircbot {
         }
 
         $device = dbFetchRow('SELECT * FROM `devices` WHERE `hostname` = ?', array($hostname));
-        $port   = dbFetchRow('SELECT * FROM `ports` WHERE `ifName` = ? OR `ifDescr` = ? AND device_id = ?', array($ifname, $ifname, $device['device_id']));
+        $port   = dbFetchRow('SELECT * FROM `ports` WHERE (`ifName` = ? OR `ifDescr` = ?) AND device_id = ?', array($ifname, $ifname, $device['device_id']));
         if ($this->user['level'] < 5 && !in_array($port['port_id'], $this->user['ports']) && !in_array($device['device_id'], $this->user['devices'])) {
             return $this->respond('Error: Permission denied.');
         }
