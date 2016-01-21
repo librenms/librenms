@@ -87,6 +87,12 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '".$port['
     $menu_options['vlans'] = 'VLANs';
 }
 
+// Are there any CBQoS rrd's for this ifIndex?
+$cbqos = glob($config['rrd_dir'].'/'.$device['hostname'].'/port-'.$port['ifIndex'].'-cbqos-*.rrd');
+if (!empty($cbqos)) {
+    $menu_options['cbqos'] = 'CBQoS';
+}
+
 $sep = '';
 foreach ($menu_options as $option => $text) {
     echo $sep;
