@@ -236,6 +236,7 @@ function delete_device($id) {
     }
 
     $ret .= "Removed device $host\n";
+    log_event("Device $host has been removed", 0, 'system');
     return $ret;
 }
 
@@ -691,7 +692,7 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL) {
         $device = device_by_id_cache($device);
     }
 
-    $insert = array('host' => ($device['device_id'] ? $device['device_id'] : "NULL"),
+    $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
         'datetime' => array("NOW()"),
