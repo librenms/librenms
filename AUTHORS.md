@@ -80,6 +80,7 @@ LibreNMS contributors:
 - Nicolas Guillaumin <nicolas+github@guillaumin.me> (nguillaumin)
 - Jurrian van Iersel <jurrian@vaniersel.net> (jviersel)
 - Adam Winberg <adam.winberg@gmail.com> (wiad)
+- Maximilian Wilhelm <max@rfc2324.org> (BarbarossaTM)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
