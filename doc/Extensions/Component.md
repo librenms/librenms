@@ -307,11 +307,11 @@ To see an example of how the component module can used, please see the following
 
 - Cisco CBQoS
     - includes/discovery/cisco-cbqos.inc.php
-    - includes/poller/cisco-cbqos.inc.php
+    - includes/polling/cisco-cbqos.inc.php
     - html/includes/graphs/device/cbqos_traffic.inc.php
 - Cisco OTV
     - includes/discovery/cisco-otv.inc.php
-    - includes/poller/applications/cisco-otv.inc.php
+    - includes/polling/cisco-otv.inc.php
     - html/includes/graphs/device/cisco-otv-mac.inc.php
-    - html/pages/device/apps/cisco-otv.inc.php
+    - html/pages/routing/cisco-otv.inc.php
 
