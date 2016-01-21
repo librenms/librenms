@@ -711,6 +711,7 @@ $config['poller_modules']['cisco-asa-firewall']          = 1;
 $config['poller_modules']['mib'] = 0;
 $config['poller_modules']['cisco-voice']                 = 1;
 $config['poller_modules']['stp']                         = 1;
+$config['poller_modules']['cisco-otv']                   = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -743,6 +744,7 @@ $config['discovery_modules']['ucd-diskio']     = 1;
 $config['discovery_modules']['services']       = 1;
 $config['discovery_modules']['charge']         = 1;
 $config['discovery_modules']['stp']            = 1;
+$config['discovery_modules']['cisco-otv']      = 1;
 
 $config['modules_compat']['rfc1628']['liebert']    = 1;
 $config['modules_compat']['rfc1628']['netmanplus'] = 1;
