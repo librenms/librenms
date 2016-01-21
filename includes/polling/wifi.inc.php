@@ -78,51 +78,23 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         echo (($wificlients1 + 0).' clients on wireless connector, ');
     }
 
-    // # RRD Filling Code
     if (isset($wificlients1) && $wificlients1 != '') {
-        $wificlientsrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('wificlients-radio1.rrd');
-
-        if (!is_file($wificlientsrrd)) {
-            rrdtool_create(
-                $wificlientsrrd,
-                '--step 300 
-                DS:wificlients:GAUGE:600:-273:1000 '.$config['rrd_rra']
-            );
-        }
-
-        $fields = array(
-            'wificlients' => $wificlients1,
+        $tags = array(
+            'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
+            'rrd_name'  => array('wificlients', 'radio1'),
+            'radio'     => 1,
         );
-
-        rrdtool_update($wificlientsrrd, $fields);
-
-        $tags = array('radio' => '1');
-        influx_update($device,'wificlients',$tags,$fields);
-
+        data_update($device, 'wificlients', $tags, $wificlients1);
         $graphs['wifi_clients'] = true;
     }
 
     if (isset($wificlients2) && $wificlients2 != '') {
-        $wificlientsrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('wificlients-radio2.rrd');
-
-        if (!is_file($wificlientsrrd)) {
-            rrdtool_create(
-                $wificlientsrrd,
-                '--step 300 
-                DS:wificlients:GAUGE:600:-273:1000 '.$config['rrd_rra']
-            );
-        }
-
-        $fields = array(
-            'wificlients' => $wificlients2,
+        $tags = array(
+            'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
+            'rrd_name'  => array('wificlients', 'radio2'),
+            'radio'     => 2,
         );
-
-        rrdtool_update($wificlientsrrd, $fields);
-
-        $tags = array('radio' => '2');
-        influx_update($device,'wificlients',$tags,$fields);
-
-
+        data_update($device, 'wificlients', $tags, $wificlients2);
         $graphs['wifi_clients'] = true;
     }
 

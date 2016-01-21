@@ -21,8 +21,7 @@ include_once("Net/IPv6.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
 
 include_once($config['install_dir'] . "/includes/common.php");
-include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
-include_once($config['install_dir'] . "/includes/influxdb.inc.php");
+include_once($config['install_dir'] . "/includes/datastore.inc.php");
 include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
