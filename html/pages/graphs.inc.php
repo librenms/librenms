@@ -64,7 +64,7 @@ else {
     onchange="window.open(this.options[this.selectedIndex].value,'_top')" >
 <?php
 
-    foreach (get_graph_subtypes($type) as $avail_type) {
+    foreach (get_graph_subtypes($type, $device) as $avail_type) {
         echo("<option value='".generate_url($vars, array('type' => $type."_".$avail_type, 'page' => "graphs"))."'");
         if ($avail_type == $subtype) {
             echo(" selected");
