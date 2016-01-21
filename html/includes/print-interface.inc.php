@@ -338,10 +338,10 @@ echo '</td></tr>';
 
 // If we're showing graphs, generate the graph and print the img tags
 if ($graph_type == 'etherlike') {
-    $graph_file = $config['rrd_dir'].'/'.$device['hostname'].'/port-'.safename($port['ifIndex']).'-dot3.rrd';
+    $graph_file = get_port_rrdfile_path ($device['hostname'], $if_id, 'dot3');
 }
 else {
-    $graph_file = $config['rrd_dir'].'/'.$device['hostname'].'/port-'.safename($port['ifIndex']).'.rrd';
+    $graph_file = get_port_rrdfile_path ($device['hostname'], $if_id);
 }
 
 if ($graph_type && is_file($graph_file)) {
