@@ -12,32 +12,15 @@ if ($config['enable_printers']) {
         }
 
         $tonerperc = round((snmp_get($device, $toner['toner_oid'], '-OUqnv') / $toner['toner_capacity'] * 100));
-
-        $old_tonerrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('toner-'.$toner['toner_descr'].'.rrd');
-        $tonerrrd     = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('toner-'.$toner['toner_index'].'.rrd');
-
-        if (!is_file($tonerrrd) && is_file($old_tonerrrd)) {
-            rename($old_tonerrrd, $tonerrrd);
-        }
-
-        if (!is_file($tonerrrd)) {
-            rrdtool_create(
-                $tonerrrd,
-                '--step 300 
-                DS:toner:GAUGE:600:0:20000 '.$config['rrd_rra']
-            );
-        }
-
         echo $tonerperc." %\n";
 
-        $fields = array(
-            'toner' => $tonerperc,
+        $tags = array(
+            'rrd_def'     => 'DS:toner:GAUGE:600:0:20000',
+            'rrd_name'    => array('toner', $toner['toner_index']),
+            'rrd_oldname' => array('toner', $toner['toner_descr']),
+            'index'       => $toner['toner_index'],
         );
-
-        rrdtool_update($tonerrrd, $fields);
-
-        $tags = array('index' => $toner['toner_index']);
-        influx_update($device,'toner',$tags,$fields);
+        data_update($device, 'toner', $tags, $tonerperc);
 
         // FIXME should report for toner out... :)
         // Log toner swap
