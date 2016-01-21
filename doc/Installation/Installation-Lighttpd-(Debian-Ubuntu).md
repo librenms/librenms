@@ -127,7 +127,7 @@ Next, add the following to `/etc/lighttpd/librenms.conf`
        "^/([a-z|0-9\-]+)/(.+)/(.+)/(.+)/" => "/?page=$1&$2&$3&$4",
        "^/([a-z|0-9\-]+)/(.+)/(.+)/" => "/?page=$1&$2&$3",
        "^/([a-z|0-9\-]+)/(.+)/" => "/?page=$1&$2",
-       "^/([a-z|0-9]+)/$" => "/?page=$1"
+       "^/([a-z|0-9\-]+)/$" => "/?page=$1"
      )
 
 Next, add the following to `/etc/lighttpd/lighttpd.conf`
