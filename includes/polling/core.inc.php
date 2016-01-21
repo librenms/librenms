@@ -67,22 +67,10 @@ if (is_numeric($uptime)) {
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
     }
 
-    $uptime_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/uptime.rrd';
-
-    if (!is_file($uptime_rrd)) {
-        rrdtool_create($uptime_rrd, 'DS:uptime:GAUGE:600:0:U '.$config['rrd_rra']);
-    }
-
-    $fields = array(
-        'uptime' => $uptime,
+    $tags = array(
+        'rrd_def' => 'DS:uptime:GAUGE:600:0:U',
     );
-
-    rrdtool_update($uptime_rrd, $fields);
-
-    $measurement = 'uptime';
-    $tags = array();
-
-    influx_update($device,$measurement,$tags,$fields);
+    data_update($device, 'uptime', $tags, $uptime);
 
     $graphs['uptime'] = true;
 
