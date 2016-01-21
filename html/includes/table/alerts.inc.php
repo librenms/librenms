@@ -1,5 +1,7 @@
 <?php
 
+require_once $config['install_dir'].'/includes/device-groups.inc.php';
+
 $where = 1;
 
 $alert_states = array(
@@ -18,6 +20,8 @@ $alert_severities = array(
     'critical' => 3
 );
 
+$show_recovered = FALSE;
+
 if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`='.$_POST['device_id'];
 }
@@ -29,6 +33,9 @@ if (is_numeric($_POST['acknowledged'])) {
 
 if (is_numeric($_POST['state'])) {
     $where .= " AND `alerts`.`state`=".$_POST['state'];
+    if ($_POST['state'] == $alert_states['recovered']) {
+        $show_recovered = TRUE;
+    }
 }
 
 if (isset($_POST['min_severity'])) {
@@ -43,8 +50,23 @@ if (isset($_POST['min_severity'])) {
     }
 }
 
+if (is_numeric($_POST['group'])) {
+    $group_pattern = dbFetchCell('SELECT `pattern` FROM `device_groups` WHERE id = '.$_POST['group']);
+    $group_pattern = rtrim($group_pattern, '&&');
+    $group_pattern = rtrim($group_pattern, '||');
+
+    $device_id_sql = GenGroupSQL($group_pattern);
+    if ($device_id_sql) {
+        $where .= " AND devices.device_id IN ($device_id_sql)";
+    }
+}
+
+if (!$show_recovered) {
+    $where .= " AND `alerts`.`state`!=".$alert_states['recovered'];
+}
+
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql_search .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%')";
+    $where .= " AND (`timestamp` LIKE '%$searchPhrase%' OR `rule` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%' OR `hostname` LIKE '%$searchPhrase%')";
 }
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
@@ -55,7 +77,7 @@ if (is_admin() === false && is_read() === false) {
     $param[] = $_SESSION['user_id'];
 }
 
-$sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where AND `alerts`.`state`!=".$alert_states['recovered']." $sql_search";
+$sql .= "  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE $where";
 
 $count_sql = "SELECT COUNT(`alerts`.`id`) $sql";
 $total     = dbFetchCell($count_sql, $param);
