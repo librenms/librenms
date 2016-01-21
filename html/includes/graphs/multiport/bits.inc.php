@@ -8,9 +8,10 @@ foreach (explode(',', $vars['id']) as $ifid) {
         $ifid             = str_replace('!', '', $ifid);
     }
 
-    $int = dbFetchRow('SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
-    if (is_file($config['rrd_dir'].'/'.$int['hostname'].'/port-'.safename($int['ifIndex'].'.rrd'))) {
-        $rrd_filenames[$i] = $config['rrd_dir'].'/'.$int['hostname'].'/port-'.safename($int['ifIndex'].'.rrd');
+    $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', array($ifid));
+    $rrd_file = get_port_rrdfile_path ($int['hostname'], $ifid);
+    if (is_file($rrd_file)) {
+        $rrd_filenames[$i] = $rrd_file;
         $i++;
     }
 }
