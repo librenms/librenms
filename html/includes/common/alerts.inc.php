@@ -1,5 +1,7 @@
 <?php
 
+require_once $config['install_dir'].'/includes/device-groups.inc.php';
+
 /* FIXME: is there a central place we can put this? */
 
 $alert_states = array(
@@ -23,6 +25,7 @@ if(defined('show_settings')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
     $current_severity     = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state        = isset($widget_settings['state']) ? $widget_settings['state'] : '';
+    $current_group        = isset($widget_settings['group']) ? $widget_settings['group'] : '';
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
@@ -73,6 +76,25 @@ if(defined('show_settings')) {
       </select>
     </div>
   </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="group" class="control-label">Device Group:</label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="group">';
+    $common_output[] = '<option value=""'.($current_group == '' ? ' selected' : '').'>any group</option>';
+
+    $device_groups = GetDeviceGroups();
+    $common_output[] = "<!-- ".print_r($device_groups, true)." -->";
+    foreach ($device_groups as $group) {
+        $group_id = $group['id'];
+        $common_output[] = "<option value=\"$group_id\"".(is_numeric($current_group) && $current_group == $group_id ? ' selected' : '').">".$group['name']." - ".$group['description']."</option>";
+    }
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+
   <div class="form-group">
     <div class="col-sm-12">
       <button type="submit" class="btn btn-default">Set</button>
@@ -86,6 +108,7 @@ else {
     $acknowledged = $widget_settings['acknowledged'];
     $state        = $widget_settings['state'];
     $min_severity = $widget_settings['min_severity'];
+    $group        = $widget_settings['group'];
 
     $common_output[] = "<!-- ".print_r($widget_settings, TRUE)." -->";
     $common_output[] = "<!-- ".print_r($acknowledged, TRUE)." -->";
@@ -129,6 +152,10 @@ var alerts_grid = $("#alerts").bootgrid({
     }
     if (isset($min_severity) && $min_severity != '') {
         $common_output[]="min_severity: '$min_severity',\n";
+    }
+
+    if (is_numeric($group)) {
+        $common_output[]="group: '$group',\n";
     }
 
     $common_output[]='
