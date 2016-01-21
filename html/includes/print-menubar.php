@@ -420,7 +420,13 @@ $routing_count['ospf'] = dbFetchCell("SELECT COUNT(ospf_instance_id) FROM `ospf_
 $routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_switching`");
 $routing_count['vrf']  = dbFetchCell("SELECT COUNT(vrf_id) from `vrfs`");
 
-if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']) > "0") {
+require_once "../includes/component.php";
+$COMPONENT = new component();
+$options['type'] = 'Cisco-OTV';
+$OTV = $COMPONENT->getComponents(null,$options);
+$routing_count['cisco-otv'] = count($OTV);
+
+if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']+$routing_count['cisco-otv']) > "0") {
 
 ?>
         <li class="dropdown">
@@ -440,6 +446,16 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
             $separator = 0;
         }
         echo('<li><a href="routing/protocol=ospf/"><i class="fa fa-circle-o-notch fa-rotate-180 fa-fw fa-lg"></i> OSPF Devices </a></li>');
+        $separator++;
+    }
+
+    // Cisco OTV Links
+    if ($_SESSION['userlevel'] >= '5' && $routing_count['cisco-otv']) {
+        if ($separator) {
+            echo('            <li role="presentation" class="divider"></li>');
+            $separator = 0;
+        }
+        echo('<li><a href="routing/protocol=cisco-otv/"><i class="fa fa-exchange fa-fw fa-lg"></i> Cisco OTV </a></li>');
         $separator++;
     }
 
