@@ -104,6 +104,24 @@ $config['auth_ldap_groupmemberattr'] = "memberUid";
 
 Replace {id} with the unique ID provided by Jumpcloud.
 
+#### HTTP Authentication / LDAP Authorization
+
+Config option: `ldap-authorization`
+
+This module is a combination of ___http-auth___ and ___ldap___
+
+LibreNMS will expect the user to have authenticated via your webservice already (e.g. using Kerberos Authentication in Apache) but will use LDAP to determine and assign the userlevel of a user.
+The userlevel will be calculated by using LDAP group membership information as the ___ldap___ module does.
+
+The configuration is the same as for the ___ldap___ module with one extra option: auth_ldap_cache_ttl.
+This option allows to control how long user information (user_exists, userid, userlevel) are cached within the PHP Session.
+The default value is 300 seconds.
+To disabled this caching (highly discourage) set this option to 0.
+
+```php
+$config['auth_ldap_cache_ttl'] = 300;
+```
+
 #### Active Directory Authentication
 
 Config option: `active_directory`
