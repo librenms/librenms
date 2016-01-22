@@ -110,9 +110,44 @@ else {
     $min_severity = $widget_settings['min_severity'];
     $group        = $widget_settings['group'];
 
-    $common_output[] = "<!-- ".print_r($widget_settings, TRUE)." -->";
-    $common_output[] = "<!-- ".print_r($acknowledged, TRUE)." -->";
+    $title = "Alerts";
 
+    // state can be 0 or '', be sure they are treated differently
+    if (is_numeric($state)) {
+        $state_name = array_search($state, $alert_states);
+        $title = "$title ($state_name)";
+    }
+    elseif ($state) {
+        $title = "$title ($state)";
+    }
+
+    if (is_numeric($acknowledged)) {
+        if ($acknowledged == '0') {
+            $title = "Unacknowledged $title";
+        }
+        elseif ($acknowledged == '1') {
+            $title = "Acknowledged $title";
+        }
+    }
+
+    if (is_numeric($group)) {
+        $group_row = dbFetchRow("SELECT * FROM device_groups WHERE id = ?", array($group));
+        if ($group_row) {
+            $title = "$title for ".$group_row['name'];
+        }
+    }
+
+    if ($min_severity) {
+        $sev_name = $min_severity;
+        if (is_numeric($min_severity)) {
+            $sev_name = array_search($min_severity, $alert_severities);
+            $title = "$title >=$sev_name";
+        }
+    }
+
+    $widget_settings['title'] = $title;
+
+    $group        = $widget_settings['group'];
 
     $common_output[] = '
 <div class="row">
