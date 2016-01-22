@@ -47,7 +47,7 @@ Enter the following commands:
 
     cd /opt/librenms
     git pull
-    php discover.php -h all
+    php discovery.php -h all
     php poller.php -h all
 
 You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
