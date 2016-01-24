@@ -112,7 +112,7 @@ $notifications = new ObjCache('notifications');
 <?php    } ?>
   <div class="row">
     <div class="col-md-12">
-      <h3><a class="btn btn-default" href="notifications/archive">Show Archive</a></h3>
+      <h3><a class="btn btn-default" href="notifications/archive/">Show Archive</a></h3>
     </div>
   </div>
 </div>
