@@ -1,1 +1,1 @@
-DROP TABLE `vmware_vminfo`;
+DROP TABLE IF EXISTS `vmware_vminfo`;
