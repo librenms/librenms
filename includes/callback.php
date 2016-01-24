@@ -59,7 +59,7 @@ if ($enabled == 1) {
         'toner'           => 'SELECT COUNT(`toner_id`) AS `total`,`toner_type` FROM `toner` GROUP BY `toner_type`',
         'vlans'           => 'SELECT COUNT(`vlan_id`) AS `total`,`vlan_type` FROM `vlans` GROUP BY `vlan_type`',
         'vminfo'          => 'SELECT COUNT(`id`) AS `total`,`vm_type` FROM `vminfo` GROUP BY `vm_type`',
-        'vmware'          => 'SELECT COUNT(`id`) AS `total` FROM `vmware_vminfo`',
+        'vmware'          => 'SELECT COUNT(`id`) AS `total` FROM `vminfo`',
         'vrfs'            => 'SELECT COUNT(`vrf_id`) AS `total` FROM `vrfs`',
         'mysql_version'   => 'SELECT 1 AS `total`, @@version AS `version`',
     );
