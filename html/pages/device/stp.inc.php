@@ -46,7 +46,8 @@ if ($vars['view'] == 'basic') {
 }    
 
 if ($vars['view'] == 'ports') {
-    include 'includes/print-stp-ports.inc.php';
+    include 'includes/common/stp-ports.inc.php';
+    echo implode('',$common_output);
 }
 
 echo '</table>';
