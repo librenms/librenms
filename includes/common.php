@@ -876,7 +876,8 @@ function enable_os_graphs($os, &$graph_enable)
 function enable_graphs($device, &$graph_enable)
 {
     // These are standard graphs we should have for all systems
-    $graph_enable['poller']['poller_perf'] = 'device_poller_perf';
+    $graph_enable['poller']['poller_perf']         = 'device_poller_perf';
+    $graph_enable['poller']['poller_modules_perf'] = 'device_poller_modules_perf';
     if (can_ping_device($device) === true) {
         $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
     }
