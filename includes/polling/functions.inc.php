@@ -230,6 +230,14 @@ function poll_device($device, $options) {
                     include 'includes/polling/'.$module.'.inc.php';
                     $module_time = microtime(true) - $module_start;
                     echo "Runtime for polling module '$module': $module_time\n";
+
+                    $tags = array(
+                        'rrd_def' => 'DS:'.$module.':GAUGE:600:0:U',
+                    );
+                    $fields = array(
+                        $module => $module_time,
+                    );
+                    data_update($device, 'poller-'.$module.'-perf', $tags, $fields);
                 }
                 else if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                     echo "Module [ $module ] disabled on host.\n";
