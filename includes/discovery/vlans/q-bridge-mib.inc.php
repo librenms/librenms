@@ -4,7 +4,7 @@ echo 'Q-BRIDGE-MIB VLANs : ';
 
 $vlanversion = snmp_get($device, 'dot1qVlanVersionNumber.0', '-Oqv', 'Q-BRIDGE-MIB');
 
-if ($vlanversion == 'version1') {
+if ($vlanversion == 'version1' || $vlanversion == '2' ) {
     echo "VLAN $vlanversion ";
 
     $vtpdomain_id = '1';
