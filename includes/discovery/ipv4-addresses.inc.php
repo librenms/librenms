@@ -5,7 +5,6 @@ if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 }
 else {  
-
     $vrfs_lite_cisco = array(array('context_name'=>null));
 }
 foreach ($vrfs_lite_cisco as $vrf) {
