@@ -104,8 +104,7 @@ if (class_exists('Net_IPv6') === false) {
 if (isset($config['user'])) {
     $tmp_user = $config['user'];
     $tmp_dir = $config['install_dir'];
-    $tmp_log = $config['log_dir'];
-    $find_result = rtrim(`find $tmp_dir \! -user $tmp_user -not -path $tmp_log`);
+    $find_result = rtrim(`find $tmp_dir \! -user $tmp_user`);
     if (!empty($find_result)) {
         // This isn't just the log directory, let's print the list to the user
         $files = explode(PHP_EOL, $find_result);
