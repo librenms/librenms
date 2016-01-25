@@ -50,7 +50,7 @@ if (is_array($oids)) {
                 $descr = rewrite_entity_descr($descr);
             }
 
-            $thisisnotbullshit = true;
+            $thisisnotbullshit = check_entity_sensor($descr, $device);
 
             $type = $entitysensor[$entry['entPhySensorType']];
 
