@@ -53,7 +53,7 @@ if (isset($_POST['create-default'])) {
     );
     $default_rules[] = array(
         'device_id' => '-1',
-        'rule'      => '%macros.port_usage_perc >= "80" && %macros.port_up = 1',
+        'rule'      => '%macros.port_usage_perc >= "80" && %macros.port_up = "1" && %macros.port = "1"',
         'severity'  => 'critical',
         'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
         'disabled'  => 0,
