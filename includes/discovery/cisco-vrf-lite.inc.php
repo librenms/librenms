@@ -24,10 +24,8 @@ if ($config['enable_vrf_lite_cisco']) {
 
     // For the moment only will be cisco and the version 3
     if ($device['os_group'] == "cisco" && $device['snmpver'] == 'v3') {
-
         echo ("VRF lite cisco : \n");
         $mib = "SNMP-COMMUNITY-MIB";
-
         $mib = "CISCO-CONTEXT-MAPPING-MIB";
         //-Osq because if i put the n the oid from the first command is not the same of this one
         $listVrf = snmp_walk($device, "cContextMappingVrfName", "-Osq -Ln", $mib, NULL);
@@ -35,10 +33,8 @@ if ($config['enable_vrf_lite_cisco']) {
         $listVrf = str_replace('"', "", $listVrf);
         $listVrf = trim($listVrf);
 
-        if ($debug) {
-            echo ("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
-            echo ("\n[DEBUG List Vrf only name]\n$listVrf\n[/DEBUG]\n");
-        }
+        d_echo("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
+        d_echo("\n[DEBUG List Vrf only name]\n$listVrf\n[/DEBUG]\n");
 
         $tableVrf;
         foreach (explode("\n", $listVrf) as $lineVrf) {
@@ -48,20 +44,16 @@ if ($config['enable_vrf_lite_cisco']) {
                 $tableVrf[$tmpVrf[0]]['vrf_name'] = $tmpVrf[1];
             }
         }
-
         unset($listVrf);
-
+        
         $listIntance = snmp_walk($device, "cContextMappingProtoInstName", "-Osq -Ln", $mib, NULL);
         $listIntance = str_replace("cContextMappingProtoInstName.", "", $listIntance);
         $listIntance = str_replace('"', "", $listIntance);
         $listIntance = trim($listIntance);
-
-        if ($debug) {
-            echo ("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
-            echo ("\n[DEBUG]\n List Intance only names\n$listIntance\n[/DEBUG]\n");
-        }
-
-
+        
+        d_echo ("\n[DEBUG]\nUsing $mib\n[/DEBUG]\n");
+        d_echo ("\n[DEBUG]\n List Intance only names\n$listIntance\n[/DEBUG]\n");
+        
         foreach (explode("\n", $listIntance) as $lineIntance) {
             $tmpIntance = explode(" ", $lineIntance, 2);
             //the $tmpIntance[0] will be the context and $tmpIntance[1] the intance
@@ -70,14 +62,9 @@ if ($config['enable_vrf_lite_cisco']) {
             }
         }
         unset($listIntance);
-     
 
         foreach ($tableVrf as $context => $vrf) {
-
-
-
             if ($debug) {
-
                 echo ("\n[DEBUG]\nRelation:t" . $context . "t" . $vrf['intance'] . "t" . $vrf['vrf'] . "\n[/DEBUG]\n");
             }
 
@@ -86,9 +73,7 @@ if ($config['enable_vrf_lite_cisco']) {
                 $context
             ));
             if (!empty($tmpVrf)) {
-
                 $ids[$tmpVrf['vrf_lite_cisco_id']] = $tmpVrf['vrf_lite_cisco_id'];
-                
                 $vrfUpdate=array();
                 
                 foreach ($vrfUpdate as $key => $value) {
@@ -102,25 +87,21 @@ if ($config['enable_vrf_lite_cisco']) {
                     ));
                 }
             } else {
-
                 $id = dbInsert(array(
                     'device_id' => $device ['device_id'],
                     'context_name' => $context,
                     'intance_name' => $vrf['intance_name'],
                     'vrf_name' => $vrf['vrf_name']
                         ), 'vrf_lite_cisco');
-
                 $ids[$id] = $id;
             }
         }
-        
         unset($tableVrf);
     }
 
     //get all vrf_lite_cisco, this will used where the value depend of the context, be careful with the order that you call this module, if the module is disabled the context search will not work 
     $tmpVrfC = dbFetchRows("SELECT * FROM vrf_lite_cisco WHERE device_id = ? ", array(
         $device ['device_id']));
-
     $device['vrf_lite_cisco'] = $tmpVrfC;
 
     //Delete all vrf that chaged
@@ -129,14 +110,10 @@ if ($config['enable_vrf_lite_cisco']) {
     }
     if (!empty($ids)) {
         foreach ($ids as $id) {
-
-            dbDelete('vrf_lite_cisco', 'vrf_lite_cisco_id = ? ', array(
-                $id));
+            dbDelete('vrf_lite_cisco', 'vrf_lite_cisco_id = ? ', array($id));
         }
     }
-
-
     unset($ids);
     unset($tmpVrfC);
 } // enable_vrf_lite_cisco
-?>
+
