@@ -107,7 +107,6 @@ First, create and chown the `rrd` directory and create the `logs` directory:
 
     mkdir rrd logs
     chown -R librenms:librenms /opt/librenms
-    chown www-data:www-data logs
     chmod 775 rrd
 
 > NOTE: If you're not running Ubuntu or Debian, you will need to change `www-data` to the user and group which run the Apache web server.
