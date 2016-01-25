@@ -7,9 +7,10 @@ echo 'ARP Table : ';
 if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0) ){
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 }
-else{
+else  {
     $vrfs_lite_cisco = array(array('context_name'=>null));
 }
+
 foreach ($vrfs_lite_cisco as $vrf) {
     $device['context_name']=$vrf['context_name'];
     
@@ -60,7 +61,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 dbUpdate(array('mac_address' => $clean_mac), 'ipv4_mac', 'port_id=? AND ipv4_address=? AND `context_name`= ?', array($interface['port_id'], $ip, $device['context_name']));
                 echo '.';
             }
-            else if (isset($interface['port_id'])) {
+            elseif (isset($interface['port_id'])) {
                 echo '+';
                 // echo("Add MAC $mac\n");
                 $insert_data = array(
