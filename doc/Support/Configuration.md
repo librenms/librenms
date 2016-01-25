@@ -406,6 +406,17 @@ Entries defined in `rewrite_if` are being replaced completely.
 Entries defined in `rewrite_if_regexp` only replace the match.
 Matches are compared case-insensitive.
 
+#### Entity sensors to be ignored
+
+Some devices register bogus sensors as they are returned via SNMP but either don't exist or just don't return data.
+This allows you to ignore those based on the descr field in the database. You can either ignore globally or on a per 
+os basis.
+
+```php
+$config['bad_entity_sensor_regex'][] = '/Physical id [0-9]+/';
+$config['os']['cisco']['bad_entity_sensor_regex'] = '/Physical id [0-9]+/';
+```
+
 #### Storage configuration
 
 ```php
