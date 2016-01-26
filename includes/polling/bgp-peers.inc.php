@@ -172,7 +172,7 @@ if ($config['enable_bgp']) {
 
         dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
 
-        if ($device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'edgeos') {
+        if ($device['os_group'] == 'cisco' || $device['os'] == 'junos') {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
             $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
             foreach ($peer_afis as $peer_afi) {
