@@ -853,3 +853,6 @@ $config['notifications']['local']                       = 'misc/notifications.rs
 
 // Update channel (Can be 'master' or 'release')
 $config['update_channel']                               = 'master';
+
+// Default port association mode
+$config['default_port_association_mode'] = 'ifIndex';
