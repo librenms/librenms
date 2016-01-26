@@ -13,15 +13,15 @@
 
 if ($device['os_group'] == 'cisco') {
 
-    $MODULE = 'Cisco-CBQOS';
-    echo $MODULE.': ';
+    $module = 'Cisco-CBQOS';
+    echo $module.': ';
 
     require_once 'includes/component.php';
-    $COMPONENT = new component();
-    $COMPONENTS = $COMPONENT->getComponents($device['device_id'],array('type'=>$MODULE));
+    $component = new component();
+    $components = $component->getComponents($device['device_id'],array('type'=>$module));
 
     // We only care about our device id.
-    $COMPONENTS = $COMPONENTS[$device['device_id']];
+    $components = $components[$device['device_id']];
 
 
     // Begin our master array, all other values will be processed into this array.
@@ -49,68 +49,68 @@ if ($device['os_group'] == 'cisco') {
         foreach ($tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.2'] as $spid => $array) {
 
             foreach ($array as $spobj => $index) {
-                $RESULT = array();
+                $result = array();
 
                 // Produce a unique reproducible index for this entry.
-                $RESULT['UID'] = hash('crc32', $spid."-".$spobj);
+                $result['UID'] = hash('crc32', $spid."-".$spobj);
 
                 // Now that we have a valid identifiers, lets add some more data
-                $RESULT['sp-id'] = $spid;
-                $RESULT['sp-obj'] = $spobj;
+                $result['sp-id'] = $spid;
+                $result['sp-obj'] = $spobj;
 
                 // Add the Type, Policy-map, Class-map, etc.
                 $type = $tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.3'][$spid][$spobj];
-                $RESULT['qos-type'] = $type;
+                $result['qos-type'] = $type;
 
                 // Add the Parent, this lets us work out our hierarchy for display later.
-                $RESULT['parent'] = $tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.4'][$spid][$spobj];
-                $RESULT['direction'] = $tblcbQosServicePolicy['1.3.6.1.4.1.9.9.166.1.1.1.1.3'][$spid];
-                $RESULT['ifindex'] = $tblcbQosServicePolicy['1.3.6.1.4.1.9.9.166.1.1.1.1.4'][$spid];
+                $result['parent'] = $tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.4'][$spid][$spobj];
+                $result['direction'] = $tblcbQosServicePolicy['1.3.6.1.4.1.9.9.166.1.1.1.1.3'][$spid];
+                $result['ifindex'] = $tblcbQosServicePolicy['1.3.6.1.4.1.9.9.166.1.1.1.1.4'][$spid];
 
                 // Gather different data depending on the type.
                 switch ($type) {
                     case 1:
                         // Policy-map, get data from that table.
                         d_echo("\nIndex: ".$index."\n");
-                        d_echo("    UID: ".$RESULT['UID']."\n");
-                        d_echo("    SPID.SPOBJ: ".$RESULT['sp-id'].".".$RESULT['sp-obj']."\n");
-                        d_echo("    If-Index: ".$RESULT['ifindex']."\n");
+                        d_echo("    UID: ".$result['UID']."\n");
+                        d_echo("    SPID.SPOBJ: ".$result['sp-id'].".".$result['sp-obj']."\n");
+                        d_echo("    If-Index: ".$result['ifindex']."\n");
                         d_echo("    Type: 1 - Policy-Map\n");
-                        $RESULT['label'] = $tblcbQosPolicyMapCfg['1.3.6.1.4.1.9.9.166.1.6.1.1.1'][$index];
+                        $result['label'] = $tblcbQosPolicyMapCfg['1.3.6.1.4.1.9.9.166.1.6.1.1.1'][$index];
                         if ($tblcbQosPolicyMapCfg['1.3.6.1.4.1.9.9.166.1.6.1.1.2'][$index] != "") {
-                            $RESULT['label'] .= " - ".$tblcbQosPolicyMapCfg['1.3.6.1.4.1.9.9.166.1.6.1.1.2'][$index];
+                            $result['label'] .= " - ".$tblcbQosPolicyMapCfg['1.3.6.1.4.1.9.9.166.1.6.1.1.2'][$index];
                         }
-                        d_echo("    Label: ".$RESULT['label']."\n");
+                        d_echo("    Label: ".$result['label']."\n");
                         break;
                     case 2:
                         // Class-map, get data from that table.
                         d_echo("\nIndex: ".$index."\n");
-                        d_echo("    UID: ".$RESULT['UID']."\n");
-                        d_echo("    SPID.SPOBJ: ".$RESULT['sp-id'].".".$RESULT['sp-obj']."\n");
-                        d_echo("    If-Index: ".$RESULT['ifindex']."\n");
+                        d_echo("    UID: ".$result['UID']."\n");
+                        d_echo("    SPID.SPOBJ: ".$result['sp-id'].".".$result['sp-obj']."\n");
+                        d_echo("    If-Index: ".$result['ifindex']."\n");
                         d_echo("    Type: 2 - Class-Map\n");
-                        $RESULT['label'] = $tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.1'][$index];
+                        $result['label'] = $tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.1'][$index];
                         if($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.2'][$index] != "") {
-                            $RESULT['label'] .= " - ".$tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.2'][$index];
+                            $result['label'] .= " - ".$tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.2'][$index];
                         }
-                        d_echo("    Label: ".$RESULT['label']."\n");
+                        d_echo("    Label: ".$result['label']."\n");
                         if ($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.3'][$index] == 2) {
-                            $RESULT['map-type'] = 'Match-All';
+                            $result['map-type'] = 'Match-All';
                         }
                         elseif ($tblcbQosClassMapCfg['1.3.6.1.4.1.9.9.166.1.7.1.1.3'][$index] == 3) {
-                            $RESULT['map-type'] = 'Match-Any';
+                            $result['map-type'] = 'Match-Any';
                         }
                         else {
-                            $RESULT['map-type'] = 'None';
+                            $result['map-type'] = 'None';
                         }
 
                         // Find a child, this will be a type 3
-                        foreach ($tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.4'][$spid] as $ID => $VALUE) {
-                            if ($VALUE == $RESULT['sp-obj']) {
+                        foreach ($tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.4'][$spid] as $id => $value) {
+                            if ($value == $result['sp-obj']) {
                                 // We have our child, import the match
-                                if ($tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.3'][$spid][$ID] == 3) {
-                                    $RESULT['match'] = $RESULT['map-type'].": ".$tblcbQosMatchStmtCfg['1.3.6.1.4.1.9.9.166.1.8.1.1.1'][$tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.2'][$spid][$ID]];
-                                    d_echo("    Match: ".$RESULT['match']."\n");
+                                if ($tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.3'][$spid][$id] == 3) {
+                                    $result['match'] = $result['map-type'].": ".$tblcbQosMatchStmtCfg['1.3.6.1.4.1.9.9.166.1.8.1.1.1'][$tblcbQosObjects['1.3.6.1.4.1.9.9.166.1.5.1.1.2'][$spid][$id]];
+                                    d_echo("    Match: ".$result['match']."\n");
                                 }
                             }
                         }
@@ -119,7 +119,7 @@ if ($device['os_group'] == 'cisco') {
                         continue 2;
                 }
 
-                $tblCBQOS[] = $RESULT;
+                $tblCBQOS[] = $result;
             }
         }
 
@@ -130,25 +130,25 @@ if ($device['os_group'] == 'cisco') {
          * Let's loop over the SNMP data to see if we need to ADD or UPDATE any components.
          */
         foreach ($tblCBQOS as $key => $array) {
-            $COMPONENT_KEY = false;
+            $component_key = false;
 
             // Loop over our components to determine if the component exists, or we need to add it.
-            foreach ($COMPONENTS as $COMPID => $CHILD) {
-                if ($CHILD['UID'] === $array['UID']) {
-                    $COMPONENT_KEY = $COMPID;
+        foreach ($components as $compid => $child) {
+                if ($child['UID'] === $array['UID']) {
+                    $component_key = $compid;
                 }
             }
 
-            if (!$COMPONENT_KEY) {
+            if (!$component_key) {
                 // The component doesn't exist, we need to ADD it - ADD.
-                $NEW_COMPONENT = $COMPONENT->createComponent($device['device_id'],$MODULE);
-                $COMPONENT_KEY = key($NEW_COMPONENT);
-                $COMPONENTS[$COMPONENT_KEY] = array_merge($NEW_COMPONENT[$COMPONENT_KEY], $array);
+                $new_component = $component->createComponent($device['device_id'],$module);
+                $component_key = key($new_component);
+                $components[$component_key] = array_merge($new_component[$component_key], $array);
                 echo "+";
             }
             else {
                 // The component does exist, merge the details in - UPDATE.
-                $COMPONENTS[$COMPONENT_KEY] = array_merge($COMPONENTS[$COMPONENT_KEY], $array);
+                $components[$component_key] = array_merge($components[$component_key], $array);
                 echo ".";
             }
 
@@ -157,26 +157,26 @@ if ($device['os_group'] == 'cisco') {
         /*
          * Loop over the Component data to see if we need to DELETE any components.
          */
-        foreach ($COMPONENTS as $key => $array) {
+        foreach ($components as $key => $array) {
             // Guilty until proven innocent
-            $FOUND = false;
+            $found = false;
 
             foreach ($tblCBQOS as $k => $v) {
                 if ($array['UID'] == $v['UID']) {
                     // Yay, we found it...
-                    $FOUND = true;
+                    $found = true;
                 }
             }
 
-            if ($FOUND === false) {
+            if ($found === false) {
                 // The component has not been found. we should delete it.
                 echo "-";
-                $COMPONENT->deleteComponent($key);
+                $component->deleteComponent($key);
             }
         }
 
         // Write the Components back to the DB.
-        $COMPONENT->setComponentPrefs($device['device_id'],$COMPONENTS);
+        $component->setComponentPrefs($device['device_id'],$components);
         echo "\n";
 
     } // End if not error
