@@ -49,3 +49,6 @@ $config['poller-wrapper']['alerter'] = FALSE;
 
 # Uncomment to submit callback stats via proxy
 #$config['callback_proxy'] = "hostname:port";
+
+# Set default port association mode for new devices (default: ifIndex)
+#$config['default_port_association_mode'] = 'ifIndex';
