@@ -28,6 +28,8 @@
 require_once 'includes/defaults.inc.php';
 require_once 'config.php';
 
+$options = getopt('d::');
+
 $lock = false;
 if (file_exists($config['install_dir'].'/.alerts.lock')) {
     $pids = explode("\n", trim(`ps -e | grep php | awk '{print $1}'`));
@@ -47,6 +49,22 @@ else {
 require_once $config['install_dir'].'/includes/definitions.inc.php';
 require_once $config['install_dir'].'/includes/functions.php';
 require_once $config['install_dir'].'/includes/alerts.inc.php';
+
+if (isset($options['d'])) {
+    echo "DEBUG!\n";
+    $debug = true;
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    ini_set('log_errors', 1);
+    ini_set('error_reporting', 1);
+}
+else {
+    $debug = false;
+    // ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    ini_set('log_errors', 0);
+    // ini_set('error_reporting', 0);
+}
 
 if (!defined('TEST') && $config['alert']['disable'] != 'true') {
     echo 'Start: '.date('r')."\r\n";

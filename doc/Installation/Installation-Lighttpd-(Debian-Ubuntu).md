@@ -108,7 +108,6 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
     chown -R librenms:librenms /opt/librenms
-    chown www-data:www-data logs
     chmod 775 rrd
 
 > NOTE: If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.

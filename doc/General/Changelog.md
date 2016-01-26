@@ -3,16 +3,58 @@
 #### Bug fixes
   - Discovery / Polling:
     - Ignore HC Broadcast and Multicast counters for Cisco SB (PR2552)
+    - Fix Cisco temperature discovery (PR2765)
+  - WebUI:
+    - Fix ajax_search.php returning null instead of [] (PR2695)
+    - Fix notification links (PR2721)
+    - Fix wrong suggestion to install PEAR in Web installer (PR2727)
+    - Fixed mysqli support for Web installer (PR2730)
+  - Misc:
+    - Fix deleting device_perf entries (PR2755)
+    - Fix for schema updates to device table when poller is running (PR2825)
 
 #### Improvements
   - WebUI:
     - Converted arp pages to use bootgrid (PR2669)
     - Updated VMWare listing page (PR2684)
+    - Updated typeahead.js (PR2698)
+    - Added ability to set notes for ports (PR2688)
+    - Use browser width to scale CPU and Bandwidth graphs (PR2537, PR2633)
+    - Removed onClick from ports list (PR2744)
+    - Added support for showing sysName when hostname is IP (PR2796)
+    - Updated rancid support for different hostnames (PR2807)
+    - Added combined HTTP Auth and LDAP Auth authentication module (PR2835)
+    - Added ability to filter alerts using widgets (PR2834)
+  - Discovery / Polling:
+    - Print runtime info per poller/discovery modules (PR2713)
+    - Improved polling/discovery vmware module performance (PR2696)
+    - Added STP/RSTP support (PR2690)
+    - Moved system poller module to core module (PR2637)
+    - Added lookup of IP for devices with hostname (PR2798)
+    - Centralised sensors module file structure (PR2794)
+    - Graph poller module run times (PR2849)
+    - Updated vlan support using IEEE8021-Q-BRIDGE-MIB (PR2851)
   - Added detection for:
     - Added support for Samsung printers (PR2680)
     - Added support for Canon printers (PR2687)
+    - Added support for Sub10 support (PR2469)
+    - Added support for Zyxel GS range (PR2729)
+    - Added support for HWGroup Poseidon (PR2742)
+    - Added support for Samsung SCX printers (PR2760)
+    - Added additional support for HP MSM (PR2766, PR2768)
+    - Added additional support for Cisco ASA and RouterOS (PR2784)
+    - Added support for Lenovo EMC Nas (PR2795)
+    - Added support for Infoblox (PR2801)
+  - API:
+    - Added support for Oxidized groups (PR2745)
   - Misc:
     - Added option to specify Smokeping ping value (PR2676)
+    - Added backend support for InfluxDB (PR2208)
+    - Alpha2 release of MIB Polling released (PR2536, PR2763)
+    - Centralised version info (PR2697)
+    - Added username support for libvirt over SSH (PR2728)
+    - Added Oxidized reload call when adding device (PR2792)
+    - Added components system to centralize data in MySQL (PR2623)
 
 ### December 2015
 

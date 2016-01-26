@@ -33,9 +33,25 @@ function format_number_short($number, $sf) {
 }
 
 function external_exec($command) {
-    d_echo($command."\n");
+    global $debug,$vdebug;
+    if ($debug && !$vdebug) {
+        $debug_command = preg_replace('/-c [\S]+/','-c COMMUNITY',$command);
+        $debug_command = preg_replace('/(udp|udp6|tcp|tcp6):(.*):([\d]+)/','\1:HOSTNAME:\3',$debug_command);
+        d_echo($debug_command);
+    }
+    elseif ($vdebug) {
+        d_echo($command."\n");
+    }
+
     $output = shell_exec($command);
-    d_echo($output."\n");
+
+    if ($debug && !$vdebug) {
+        $debug_output = preg_replace('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/', '*', $output);
+        d_echo("$debug_output\n");
+    }
+    elseif ($vdebug) {
+        d_echo($output."\n");
+    }
 
     return $output;
 }
