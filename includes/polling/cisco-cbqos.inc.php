@@ -13,31 +13,31 @@
 
 if ($device['os_group'] == "cisco") {
 
-    $MODULE = 'Cisco-CBQOS';
+    $module = 'Cisco-CBQOS';
 
     require_once 'includes/component.php';
-    $COMPONENT = new component();
-    $options['filter']['type'] = array('=',$MODULE);
+    $component = new component();
+    $options['filter']['type'] = array('=',$module);
     $options['filter']['disabled'] = array('=',0);
     $options['filter']['ignore'] = array('=',0);
-    $COMPONENTS = $COMPONENT->getComponents($device['device_id'],$options);
+    $components = $component->getComponents($device['device_id'],$options);
 
     // We only care about our device id.
-    $COMPONENTS = $COMPONENTS[$device['device_id']];
+    $components = $components[$device['device_id']];
 
     // Only collect SNMP data if we have enabled components
-    if (count($COMPONENTS > 0)) {
+    if (count($components > 0)) {
         // Let's gather the stats..
         $tblcbQosClassMapStats = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.166.1.15.1.1', 2);
 
         // Loop through the components and extract the data.
-        foreach ($COMPONENTS as $KEY => $ARRAY) {
-            $TYPE = $ARRAY['qos-type'];
+        foreach ($components as $key => $array) {
+            $type = $array['qos-type'];
 
             // Get data from the class table.
-            if ($TYPE == 2) {
-                // Let's make sure the RRD is setup for this class.
-                $filename = "port-".$ARRAY['ifindex']."-cbqos-".$ARRAY['sp-id']."-".$ARRAY['sp-obj'].".rrd";
+            if ($type == 2) {
+                // Let's make sure the rrd is setup for this class.
+                $filename = "port-".$array['ifindex']."-cbqos-".$array['sp-id']."-".$array['sp-obj'].".rrd";
                 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
 
                 if (!file_exists ($rrd_filename)) {
@@ -45,28 +45,28 @@ if ($device['os_group'] == "cisco") {
                 }
 
                 // Let's print some debugging info.
-                d_echo("\n\nComponent: ".$KEY."\n");
-                d_echo("    Class-Map: ".$ARRAY['label']."\n");
-                d_echo("    SPID.SPOBJ: ".$ARRAY['sp-id'].".".$ARRAY['sp-obj']."\n");
-                d_echo("    PostBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.10.".$ARRAY['sp-id'].".".$ARRAY['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$ARRAY['sp-id']][$ARRAY['sp-obj']]."\n");
-                d_echo("    BufferDrops: 1.3.6.1.4.1.9.9.166.1.15.1.1.21.".$ARRAY['sp-id'].".".$ARRAY['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$ARRAY['sp-id']][$ARRAY['sp-obj']]."\n");
-                d_echo("    QOSDrops:    1.3.6.1.4.1.9.9.166.1.15.1.1.17.".$ARRAY['sp-id'].".".$ARRAY['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$ARRAY['sp-id']][$ARRAY['sp-obj']]."\n");
+                d_echo("\n\nComponent: ".$key."\n");
+                d_echo("    Class-Map: ".$array['label']."\n");
+                d_echo("    SPID.SPOBJ: ".$array['sp-id'].".".$array['sp-obj']."\n");
+                d_echo("    PostBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.10.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$array['sp-id']][$array['sp-obj']]."\n");
+                d_echo("    BufferDrops: 1.3.6.1.4.1.9.9.166.1.15.1.1.21.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$array['sp-id']][$array['sp-obj']]."\n");
+                d_echo("    QOSDrops:    1.3.6.1.4.1.9.9.166.1.15.1.1.17.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$array['sp-id']][$array['sp-obj']]."\n");
 
-                $RRD['postbytes'] = $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$ARRAY['sp-id']][$ARRAY['sp-obj']];
-                $RRD['bufferdrops'] = $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$ARRAY['sp-id']][$ARRAY['sp-obj']];
-                $RRD['qosdrops'] = $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$ARRAY['sp-id']][$ARRAY['sp-obj']];
+                $rrd['postbytes'] = $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$array['sp-id']][$array['sp-obj']];
+                $rrd['bufferdrops'] = $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$array['sp-id']][$array['sp-obj']];
+                $rrd['qosdrops'] = $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$array['sp-id']][$array['sp-obj']];
 
-                // Update RRD
-                rrdtool_update ($rrd_filename, $RRD);
+                // Update rrd
+                rrdtool_update ($rrd_filename, $rrd);
 
                 // Clean-up after yourself!
                 unset($filename, $rrd_filename);
             }
         } // End foreach components
 
-        echo $MODULE." ";
+        echo $module." ";
     } // end if count components
 
     // Clean-up after yourself!
-    unset($TYPE, $COMPONENTS, $COMPONENT, $options, $MODULE);
+unset($type, $components, $component, $options, $module);
 }
