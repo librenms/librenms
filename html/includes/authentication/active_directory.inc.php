@@ -18,9 +18,9 @@ ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
 function authenticate($username, $password) {
     global $config, $ds;
 
-    if ($username && $ds) {
+    if ($ds) {
         // bind with sAMAccountName instead of full LDAP DN
-        if (ldap_bind($ds, "{$username}@{$config['auth_ad_domain']}", $password)) {
+        if ($username && ldap_bind($ds, "{$username}@{$config['auth_ad_domain']}", $password)) {
             // group membership in one of the configured groups is required
             if (isset($config['auth_ad_require_groupmembership']) &&
                 $config['auth_ad_require_groupmembership'] > 0) {
