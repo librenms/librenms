@@ -225,19 +225,27 @@ function poll_device($device, $options) {
         else {
             foreach ($config['poller_modules'] as $module => $module_status) {
                 if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
-                    // TODO per-module polling stats
                     $module_start = microtime(true);
                     include 'includes/polling/'.$module.'.inc.php';
                     $module_time = microtime(true) - $module_start;
                     echo "Runtime for polling module '$module': $module_time\n";
 
+                    // save per-module poller stats
                     $tags = array(
-                        'rrd_def' => 'DS:'.$module.':GAUGE:600:0:U',
+                        'module'      => $module,
+                        'rrd_def'     => 'DS:poller:GAUGE:600:0:U',
+                        'rrd_name'    => array('poller-perf', $module),
                     );
                     $fields = array(
-                        $module => $module_time,
+                        'poller' => $module_time,
                     );
-                    data_update($device, 'poller-'.$module.'-perf', $tags, $fields);
+                    data_update($device, 'poller-perf', $tags, $fields);
+
+                    // remove old rrd
+                    $oldrrd = rrd_name($device['hostname'], array('poller', $module, 'perf'));
+                    if (is_file($oldrrd)) {
+                        unlink($oldrrd);
+                    }
                 }
                 else if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                     echo "Module [ $module ] disabled on host.\n";
@@ -280,6 +288,7 @@ function poll_device($device, $options) {
         if (!empty($device_time)) {
             $tags = array(
                 'rrd_def' => 'DS:poller:GAUGE:600:0:U',
+                'module'  => 'ALL',
             );
             $fields = array(
                 'poller' => $device_time,
