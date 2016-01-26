@@ -1,14 +1,14 @@
 <?php
 
-echo 'Q-BRIDGE-MIB VLANs : ';
+echo 'IEEE8021-Q-BRIDGE-MIB VLANs : ';
 
-$vlanversion = snmp_get($device, 'dot1qVlanVersionNumber.0', '-Oqv', 'Q-BRIDGE-MIB');
+$vlanversion = snmp_get($device, 'dot1qVlanVersionNumber.0', '-Oqv', 'IEEE8021-Q-BRIDGE-MIB');
 
-if ($vlanversion == 'version1') {
+if ($vlanversion == 'version1' || $vlanversion == '2' ) {
     echo "VLAN $vlanversion ";
 
     $vtpdomain_id = '1';
-    $vlans        = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', array(), 'Q-BRIDGE-MIB');
+    $vlans        = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', array(), 'IEEE8021-Q-BRIDGE-MIB');
 
     foreach ($vlans as $vlan_id => $vlan) {
         echo " $vlan_id";
