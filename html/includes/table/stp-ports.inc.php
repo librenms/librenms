@@ -1,8 +1,10 @@
 <?php
 
-$param[] = $device['device_id'];
+$device_id = mres($_POST['device_id']);
 
-$sql = " `FROM `ports_stp` `ps` JOIN `ports` `p` ON `ps`.`port_id`=`p`.`port_id` WHERE `ps`.`device_id` = ?";
+$param[] = $device_id;
+
+$sql = " FROM `ports_stp` `ps` JOIN `ports` `p` ON `ps`.`port_id`=`p`.`port_id` WHERE `ps`.`device_id` = ?";
 
 $count_sql = "SELECT COUNT(ports_stp_id) $sql";
 $total     = dbFetchCell($count_sql, $param);
@@ -11,7 +13,7 @@ if (empty($total)) {
 }
 
 if (!isset($sort) || empty($sort)) {
-        $sort = 'port_id DESC';
+        $sort = 'ps.port_id DESC';
 }
 
 $sql .= " ORDER BY $sort";
@@ -27,7 +29,8 @@ if ($rowCount != -1) {
 
 $sql = "SELECT `ps`.*, `p`.* $sql";
 
-foreach (dbFetchRows($sql, array($device['device_id'])) as $stp_ports_db) {
+logfile($sql);
+foreach (dbFetchRows($sql, array($device_id)) as $stp_ports_db) {
 
     $bridge_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedBridge']));
     $root_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedRoot']));
