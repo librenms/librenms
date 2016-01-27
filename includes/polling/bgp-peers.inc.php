@@ -1,6 +1,10 @@
 <?php
 
 if ($config['enable_bgp']) {
+    if ($device['os'] != 'junos') {    
+        $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB', $config['mibdir']);
+    }
+    
     foreach (dbFetchRows('SELECT * FROM bgpPeers WHERE device_id = ?', array($device['device_id'])) as $peer) {
         // Poll BGP Peer
         $peer2 = false;
@@ -10,7 +14,6 @@ if ($config['enable_bgp']) {
             if (!strstr($peer['bgpPeerIdentifier'], ':') || $device['os'] != 'junos') {
                 // v4 BGP4 MIB
                 // FIXME - needs moved to function
-                $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB', $config['mibdir']);
                 if (count($peer_data_check) > 0) {
                     $peer2 = true;
                 }
