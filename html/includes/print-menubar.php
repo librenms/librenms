@@ -421,10 +421,10 @@ $routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_s
 $routing_count['vrf']  = dbFetchCell("SELECT COUNT(vrf_id) from `vrfs`");
 
 require_once "../includes/component.php";
-$COMPONENT = new component();
+$component = new component();
 $options['type'] = 'Cisco-OTV';
-$OTV = $COMPONENT->getComponents(null,$options);
-$routing_count['cisco-otv'] = count($OTV);
+$otv = $component->getComponents(null,$options);
+$routing_count['cisco-otv'] = count($otv);
 
 if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']+$routing_count['cisco-otv']) > "0") {
 
