@@ -33,7 +33,7 @@ else {
   <input type=hidden name='delsrv' value='yes'>
   <div class='well well-lg'>
     <div class='form-group'>
-      <label for='service' class='col-sm-2 control-label'>Device - Service - Description (if populated)</label>
+      <label for='service' class='col-sm-2 control-label'>Device - Service - Description</label>
       <div class='col-sm-5'>
         <select name='service' id='service' class='form-control input-sm'>
           $servicesform
