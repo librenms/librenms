@@ -1,12 +1,12 @@
 <?php
 
 require_once "../includes/component.php";
-$COMPONENT = new component();
+$component = new component();
 $options = array();
 $options['filter']['ignore'] = array('=',0);
 $options['type'] = 'Cisco-OTV';
-$COMPONENTS = $COMPONENT->getComponents($device['device_id'],$options);
-$COMPONENTS = $COMPONENTS[$device['device_id']];
+$components = $component->getComponents($device['device_id'],$options);
+$components = $components[$device['device_id']];
 
 global $config;
 ?>
@@ -17,32 +17,32 @@ global $config;
     <div class="panel list-group">
 <?php
 // Loop over each component, pulling out the Overlays.
-foreach ($COMPONENTS as $OID => $OVERLAY) {
-    if ($OVERLAY['otvtype'] == 'overlay') {
-        if ($OVERLAY['status'] == 1) {
-            $OVERLAY_STATUS = "<span class='green pull-right'>Normal</span>";
-            $GLI = "";
+foreach ($components as $oid => $overlay) {
+    if ($overlay['otvtype'] == 'overlay') {
+        if ($overlay['status'] == 1) {
+            $overlay_status = "<span class='green pull-right'>Normal</span>";
+            $gli = "";
         }
         else {
-            $OVERLAY_STATUS = "<span class='pull-right'>".$OVERLAY['error']." - <span class='red'>Alert</span></span>";
-            $GLI = "list-group-item-danger";
+            $overlay_status = "<span class='pull-right'>".$overlay['error']." - <span class='red'>Alert</span></span>";
+            $gli = "list-group-item-danger";
         }
 ?>
-        <a class="list-group-item <?=$GLI?>" data-toggle="collapse" data-target="#<?=$OVERLAY['index']?>" data-parent="#overlays"><?=$OVERLAY['label']?> - <?=$OVERLAY['transport']?> <?=$OVERLAY_STATUS?></a>
-        <div id="<?=$OVERLAY['index']?>" class="sublinks collapse">
+        <a class="list-group-item <?=$gli?>" data-toggle="collapse" data-target="#<?=$overlay['index']?>" data-parent="#overlays"><?=$overlay['label']?> - <?=$overlay['transport']?> <?=$overlay_status?></a>
+        <div id="<?=$overlay['index']?>" class="sublinks collapse">
 <?php
-        foreach ($COMPONENTS as $AID => $ADJACENCY) {
-            if (($ADJACENCY['otvtype'] == 'adjacency') && ($ADJACENCY['index'] == $OVERLAY['index'])) {
-                if ($ADJACENCY['status'] == 1) {
-                    $ADJ_STATUS = "<span class='green pull-right'>Normal</span>";
-                    $GLI = "";
+        foreach ($components as $aid => $adjacency) {
+            if (($adjacency['otvtype'] == 'adjacency') && ($adjacency['index'] == $overlay['index'])) {
+                if ($adjacency['status'] == 1) {
+                    $adj_status = "<span class='green pull-right'>Normal</span>";
+                    $gli = "";
                 }
                 else {
-                    $ADJ_STATUS = "<span class='pull-right'>".$ADJACENCY['error']." - <span class='red'>Alert</span></span>";
-                    $GLI = "list-group-item-danger";
+                    $adj_status = "<span class='pull-right'>".$adjacency['error']." - <span class='red'>Alert</span></span>";
+                    $gli = "list-group-item-danger";
                 }
 ?>
-            <a class="list-group-item <?=$GLI?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?=$ADJACENCY['label']?> - <?=$ADJACENCY['endpoint']?> <?=$ADJ_STATUS?></a>
+            <a class="list-group-item <?=$gli?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?=$adjacency['label']?> - <?=$adjacency['endpoint']?> <?=$adj_status?></a>
 <?php
             }
         }

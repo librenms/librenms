@@ -14,59 +14,62 @@
 if ($device['os_group'] == "cisco") {
 
     // Define some error messages
-    $ERROR_VPN[0] = "Other";
-    $ERROR_VPN[1] = "Configuration changed";
-    $ERROR_VPN[2] = "Control Group information is unavailable";
-    $ERROR_VPN[3] = "Data Group range information is unavailable";
-    $ERROR_VPN[4] = "Join or Source interface information is unavailable";
-    $ERROR_VPN[5] = "VPN name is unavailable";
-    $ERROR_VPN[6] = "IP address is missing for Join Interface";
-    $ERROR_VPN[7] = "Join Interface is down";
-    $ERROR_VPN[8] = "Overlay is administratively shutdown";
-    $ERROR_VPN[9] = "Overlay is in delete hold down phase";
-    $ERROR_VPN[10] = "VPN is reinitializing";
-    $ERROR_VPN[11] = "Site ID information is unavailable";
-    $ERROR_VPN[12] = "Site ID mismatch has occurred";
-    $ERROR_VPN[13] = "IP address is missing for Source Interface";
-    $ERROR_VPN[14] = "Source interface is down";
-    $ERROR_VPN[15] = "Changing site identifier";
-    $ERROR_VPN[16] = "Changing control group";
-    $ERROR_VPN[17] = "Device ID information is unavailable";
-    $ERROR_VPN[18] = "Changing device ID";
-    $ERROR_VPN[19] = "Cleanup in progress";
+    $error_vpn = array();
+    $error_vpn[0] = "Other";
+    $error_vpn[1] = "Configuration changed";
+    $error_vpn[2] = "Control Group information is unavailable";
+    $error_vpn[3] = "Data Group range information is unavailable";
+    $error_vpn[4] = "Join or Source interface information is unavailable";
+    $error_vpn[5] = "VPN name is unavailable";
+    $error_vpn[6] = "IP address is missing for Join Interface";
+    $error_vpn[7] = "Join Interface is down";
+    $error_vpn[8] = "Overlay is administratively shutdown";
+    $error_vpn[9] = "Overlay is in delete hold down phase";
+    $error_vpn[10] = "VPN is reinitializing";
+    $error_vpn[11] = "Site ID information is unavailable";
+    $error_vpn[12] = "Site ID mismatch has occurred";
+    $error_vpn[13] = "IP address is missing for Source Interface";
+    $error_vpn[14] = "Source interface is down";
+    $error_vpn[15] = "Changing site identifier";
+    $error_vpn[16] = "Changing control group";
+    $error_vpn[17] = "Device ID information is unavailable";
+    $error_vpn[18] = "Changing device ID";
+    $error_vpn[19] = "Cleanup in progress";
 
-    $ERROR_AED[0] = "Other";
-    $ERROR_AED[1] = "Overlay is Down";
-    $ERROR_AED[2] = "Site ID is not configured";
-    $ERROR_AED[3] = "Site ID mismatch";
-    $ERROR_AED[4] = "Version mismatch";
-    $ERROR_AED[5] = "Site VLAN is Down";
-    $ERROR_AED[6] = "No extended VLAN is operationally up";
-    $ERROR_AED[7] = "No Overlay Adjacency is up";
-    $ERROR_AED[8] = "LSPDB sync incomplete";
-    $ERROR_AED[9] = "Overlay state down event in progress";
-    $ERROR_AED[10] = "ISIS control group sync pending";
+    $error_aed = array();
+    $error_aed[0] = "Other";
+    $error_aed[1] = "Overlay is Down";
+    $error_aed[2] = "Site ID is not configured";
+    $error_aed[3] = "Site ID mismatch";
+    $error_aed[4] = "Version mismatch";
+    $error_aed[5] = "Site VLAN is Down";
+    $error_aed[6] = "No extended VLAN is operationally up";
+    $error_aed[7] = "No Overlay Adjacency is up";
+    $error_aed[8] = "LSPDB sync incomplete";
+    $error_aed[9] = "Overlay state down event in progress";
+    $error_aed[10] = "ISIS control group sync pending";
 
-    $ERROR_OVERLAY[1] = "active";
-    $ERROR_OVERLAY[2] = "notInService";
-    $ERROR_OVERLAY[3] = "notReady";
-    $ERROR_OVERLAY[4] = "createAndGo";
-    $ERROR_OVERLAY[5] = "createAndWait";
-    $ERROR_OVERLAY[6] = "destroy";
+    $error_overlay = array();
+    $error_overlay[1] = "active";
+    $error_overlay[2] = "notInService";
+    $error_overlay[3] = "notReady";
+    $error_overlay[4] = "createAndGo";
+    $error_overlay[5] = "createAndWait";
+    $error_overlay[6] = "destroy";
 
-    $MODULE = 'Cisco-OTV';
+    $module = 'Cisco-OTV';
 
     require_once 'includes/component.php';
-    $COMPONENT = new component();
-    $options['filter']['type'] = array('=',$MODULE);
+    $component = new component();
+    $options['filter']['type'] = array('=',$module);
     $options['filter']['disabled'] = array('=',0);
-    $COMPONENTS = $COMPONENT->getComponents($device['device_id'],$options);
+    $components = $component->getComponents($device['device_id'],$options);
 
     // We only care about our device id.
-    $COMPONENTS = $COMPONENTS[$device['device_id']];
+    $components = $components[$device['device_id']];
 
     // Only collect SNMP data if we have enabled components
-    if (count($COMPONENTS > 0)) {
+    if (count($components > 0)) {
         // Let's gather the stats..
         $tblOverlayEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.810.1.2.1.1');
         $tblAdjacencyDatabaseEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.810.1.3.1.1', 0);
@@ -74,89 +77,89 @@ if ($device['os_group'] == "cisco") {
         $tblVlanEdgeDevIsAed = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.810.1.2.2.1.6', 2);
 
         // Let's create an array of each remote OTV endpoint and the count of MAC addresses that are reachable via.
-        $COUNT_MAC = array();
+        $count_mac = array();
         foreach ($tblRouteNextHopAddr as $k => $v) {
-            $COUNT_MAC[$v]++;
+            $count_mac[$v]++;
         }
 
         // Loop through the components and extract the data.
-        foreach ($COMPONENTS as $KEY => &$ARRAY) {
+        foreach ($components as $key => &$array) {
 
-            if ($ARRAY['otvtype'] == 'overlay') {
+            if ($array['otvtype'] == 'overlay') {
                 // Let's check the varius status' of the overlay
                 $message = false;
-                $vpn_state = $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.3'][$ARRAY['index']];
+                $vpn_state = $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.3'][$array['index']];
                 if ($vpn_state != 2) {
-                    $message .= "VPN Down: ".$ERROR_VPN[$tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.4'][$ARRAY['index']]];
+                    $message .= "VPN Down: ".$error_vpn[$tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.4'][$array['index']]];
                 }
-                $aed_state = $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.13'][$ARRAY['index']];
+                $aed_state = $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.13'][$array['index']];
                 if ($aed_state == 2) {
-                    $message .= "AED Down: ".$ERROR_AED[$tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.14'][$ARRAY['index']]];
+                    $message .= "AED Down: ".$error_aed[$tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.14'][$array['index']]];
                 }
-                $overlay_state = $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.23'][$ARRAY['index']];
+                $overlay_state = $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.23'][$array['index']];
                 if ($overlay_state == 2) {
-                    $message .= "Overlay Down: ".$ERROR_OVERLAY[$tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.24'][$ARRAY['index']]];
+                    $message .= "Overlay Down: ".$error_overlay[$tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.24'][$array['index']]];
                 }
 
                 // If we have set a message, we have an error, activate alert.
                 if ($message !== false) {
-                    $ARRAY['error'] = $message;
-                    $ARRAY['status'] = 0;
+                    $array['error'] = $message;
+                    $array['status'] = 0;
                 }
                 else {
-                    $ARRAY['error'] = "";
-                    $ARRAY['status'] = 1;
+                    $array['error'] = "";
+                    $array['status'] = 1;
                 }
 
                 // Time to graph the count of the active VLAN's on this overlay.
-                $COUNT_VLAN = 0;
-                foreach ($tblVlanEdgeDevIsAed['1.3.6.1.4.1.9.9.810.1.2.2.1.6'][$ARRAY['index']] as $v) {
+                $count_vlan = 0;
+                foreach ($tblVlanEdgeDevIsAed['1.3.6.1.4.1.9.9.810.1.2.2.1.6'][$array['index']] as $v) {
                     if ($v == 1) {
-                        $COUNT_VLAN++;
+                        $count_vlan++;
                     }
                 }
 
-                $filename = "cisco-otv-".$ARRAY['label']."-vlan.rrd";
+                $filename = "cisco-otv-".$array['label']."-vlan.rrd";
                 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
 
                 if (!file_exists ($rrd_filename)) {
                     rrdtool_create ($rrd_filename, " DS:count:GAUGE:600:0:U" . $config['rrd_rra']);
                 }
-                $RRD['count'] = $COUNT_VLAN;
+                $rrd['count'] = $count_vlan;
 
                 // Update RRD
-                rrdtool_update ($rrd_filename, $RRD);
+                rrdtool_update ($rrd_filename, $rrd);
 
             }
-            elseif ($ARRAY['otvtype'] == 'adjacency') {
-                $ARRAY['uptime'] = $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.'.$ARRAY['index'].'.1.4.'.$ARRAY['endpoint']];
+            elseif ($array['otvtype'] == 'adjacency') {
+                $array['uptime'] = $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.'.$array['index'].'.1.4.'.$array['endpoint']];
                 $message = false;
-                if ($tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.5.'.$ARRAY['index'].'.1.4.'.$ARRAY['endpoint']] != 1) {
+                if ($tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.5.'.$array['index'].'.1.4.'.$array['endpoint']] != 1) {
                     $message .= "Adjacency is Down\n";
                 }
-                if ($tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.'.$ARRAY['index'].'.1.4.'.$ARRAY['endpoint']] < $ARRAY['uptime']) {
+                if ($tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.'.$array['index'].'.1.4.'.$array['endpoint']] < $array['uptime']) {
                     $message .= "Adjacency has been reset\n";
                 }
 
                 // If we have set a message, we have an error, activate alert.
                 if ($message !== false) {
-                    $ARRAY['error'] = $message;
-                    $ARRAY['status'] = 0;
+                    $array['error'] = $message;
+                    $array['status'] = 0;
                 }
                 else {
-                    $ARRAY['error'] = "";
-                    $ARRAY['status'] = 1;
+                    $array['error'] = "";
+                    $array['status'] = 1;
                 }
             }
-            elseif ($ARRAY['otvtype'] == 'endpoint') {
-                if (isset($COUNT_MAC[$ARRAY['endpoint']])) {
-                    $RRD['count'] = $COUNT_MAC[$ARRAY['endpoint']];
+            elseif ($array['otvtype'] == 'endpoint') {
+                if (isset($count_mac[$array['endpoint']])) {
+                    $rrd['count'] = $count_mac[$array['endpoint']];
                 }
                 else {
-                    $RRD['count'] = "0";
+                    $rrd['count'] = "0";
                 }
 
-                $filename = "cisco-otv-".$ARRAY['endpoint']."-mac.rrd";
+                $filename = "cisco-otv-".$array['endpoint']."-mac.rrd";
                 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
 
                 if (!file_exists ($rrd_filename)) {
@@ -164,18 +167,18 @@ if ($device['os_group'] == "cisco") {
                 }
 
                 // Update RRD
-                rrdtool_update ($rrd_filename, $RRD);
+                rrdtool_update ($rrd_filename, $rrd);
 
             } // End If
 
         } // End foreach components
 
         // Write the Components back to the DB.
-        $COMPONENT->setComponentPrefs($device['device_id'],$COMPONENTS);
+        $component->setComponentPrefs($device['device_id'],$components);
 
-        echo $MODULE." ";
+        echo $module." ";
     } // end if count components
 
     // Clean-up after yourself!
-    unset($COMPONENTS, $COMPONENT, $MODULE);
+    unset($components, $component, $module);
 }
