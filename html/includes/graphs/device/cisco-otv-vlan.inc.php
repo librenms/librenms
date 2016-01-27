@@ -12,44 +12,44 @@
  */
 
 require_once "../includes/component.php";
-$COMPONENT = new component();
+$component = new component();
 $options['filter']['type'] = array('=','Cisco-OTV');
-$COMPONENTS = $COMPONENT->getComponents($device['device_id'],$options);
+$components = $component->getComponents($device['device_id'],$options);
 
 // We only care about our device id.
-$COMPONENTS = $COMPONENTS[$device['device_id']];
+$components = $components[$device['device_id']];
 
 include "includes/graphs/common.inc.php";
 $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'VLANs               Now     Min    Max\\n'";
 $rrd_additions = "";
 
-$COUNT = 0;
-foreach ($COMPONENTS as $ID => $ARRAY) {
-    if ($ARRAY['otvtype'] == 'overlay') {
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("cisco-otv-".$ARRAY['label']."-vlan.rrd");
+$count = 0;
+foreach ($components as $id => $array) {
+    if ($array['otvtype'] == 'overlay') {
+        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("cisco-otv-".$array['label']."-vlan.rrd");
 
         if (file_exists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
-            $STACK = "";
-            if ($COUNT != 0) {
-                $STACK = ":STACK ";
+            $stack = "";
+            if ($count != 0) {
+                $stack = ":STACK ";
             }
 
             // Grab a color from the array.
-            if ( isset($config['graph_colours']['mixed'][$COUNT]) ) {
-                $COLOR = $config['graph_colours']['mixed'][$COUNT];
+            if ( isset($config['graph_colours']['mixed'][$count]) ) {
+                $color = $config['graph_colours']['mixed'][$count];
             }
             else {
-                $COLOR = $config['graph_colours']['oranges'][$COUNT-7];
+                $color = $config['graph_colours']['oranges'][$count-7];
             }
 
-            $rrd_additions .= " DEF:DS" . $COUNT . "=" . $rrd_filename . ":count:AVERAGE ";
-            $rrd_additions .= " AREA:DS" . $COUNT . "#" . $COLOR . ":'" . str_pad(substr($COMPONENTS[$ID]['label'],0,15),15) . "'" . $STACK;
-            $rrd_additions .= " GPRINT:DS" . $COUNT . ":LAST:%4.0lf%s ";
-            $rrd_additions .= " GPRINT:DS" . $COUNT . ":MIN:%4.0lf%s ";
-            $rrd_additions .= " GPRINT:DS" . $COUNT . ":MAX:%4.0lf%s\\\l ";
-            $COUNT++;
+            $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":count:AVERAGE ";
+            $rrd_additions .= " AREA:DS" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['label'],0,15),15) . "'" . $stack;
+            $rrd_additions .= " GPRINT:DS" . $count . ":LAST:%4.0lf%s ";
+            $rrd_additions .= " GPRINT:DS" . $count . ":MIN:%4.0lf%s ";
+            $rrd_additions .= " GPRINT:DS" . $count . ":MAX:%4.0lf%s\\\l ";
+            $count++;
         }
     }
 }
