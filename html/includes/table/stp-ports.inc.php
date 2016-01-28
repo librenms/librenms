@@ -1,5 +1,6 @@
 <?php
 
+logfile(print_r($_POST, true));
 $device_id = mres($_POST['device_id']);
 
 $param[] = $device_id;
@@ -13,10 +14,10 @@ if (empty($total)) {
 }
 
 if (!isset($sort) || empty($sort)) {
-        $sort = 'ps.port_id DESC';
+        $sort = 'port_id DESC';
 }
 
-$sql .= " ORDER BY $sort";
+$sql .= " ORDER BY ps.$sort";
 
 if (isset($current)) {
         $limit_low  = (($current * $rowCount) - ($rowCount));
@@ -36,7 +37,7 @@ foreach (dbFetchRows($sql, array($device_id)) as $stp_ports_db) {
     $root_device = dbFetchRow("SELECT `devices`.*, `stp`.`device_id`, `stp`.`bridgeAddress` FROM `devices` JOIN `stp` ON `devices`.`device_id`=`stp`.`device_id` WHERE `stp`.`bridgeAddress` = ?", array($stp_ports_db['designatedRoot']));
 
     $response[] = array (
-        'port'               => generate_port_link($stp_ports_db, $stp_ports_db['ifName'])."<br>".$stp_ports_db['ifAlias'],
+        'port_id'            => generate_port_link($stp_ports_db, $stp_ports_db['ifName'])."<br>".$stp_ports_db['ifAlias'],
         'priority'           => $stp_ports_db['priority'],
         'state'              => $stp_ports_db['state'],
         'enable'             => $stp_ports_db['enable'],

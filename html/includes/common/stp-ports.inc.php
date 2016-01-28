@@ -5,7 +5,7 @@ $common_output[] = '
     <table id="stp-ports" class="table table-condensed table-hover">
         <thead>
             <tr>
-                <th data-column-id="port">Port</th>
+                <th data-column-id="port_id">Port</th>
                 <th data-column-id="priority">Priority</th>
                 <th data-column-id="state">State</th>
                 <th data-column-id="enable">Enable</th>
