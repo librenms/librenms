@@ -124,6 +124,15 @@ if ($device['os_group'] == 'cisco') {
                 $result['status'] = 1;
             }
 
+            // Let's log some debugging
+            d_echo("\n\nOverlay: ".$result['label']."\n");
+            d_echo("    Index: ".$result['index']."\n");
+            d_echo("    UID: ".$result['UID']."\n");
+            d_echo("    Transport: ".$result['transport']."\n");
+            d_echo("    Type: ".$result['otvtype']."\n");
+            d_echo("    Status: ".$result['status']."\n");
+            d_echo("    Message: ".$result['error']."\n");
+
             // Add the result to the parent array.
             $tblOTV[] = $result;
         }
@@ -162,6 +171,14 @@ if ($device['os_group'] == 'cisco') {
                 }
             }
 
+            // Let's log some debugging
+            d_echo("\n\nAdjacency: ".$result['label']."\n");
+            d_echo("    Endpoint: ".$result['endpoint']."\n");
+            d_echo("    Index: ".$result['index']."\n");
+            d_echo("    UID: ".$result['UID']."\n");
+            d_echo("    Status: ".$result['status']."\n");
+            d_echo("    Message: ".$result['error']."\n");
+
             // Add the result to the parent array.
             $tblOTV[] = $result;
         }
@@ -172,6 +189,11 @@ if ($device['os_group'] == 'cisco') {
             $result['otvtype'] = 'endpoint';
             $result['endpoint'] = $k;
             $result['UID'] = $result['otvtype']."-".$k;
+
+            // Let's log some debugging
+            d_echo("\n\nEndpoint: ".$result['label']."\n");
+            d_echo("    UID: ".$result['UID']."\n");
+            d_echo("    Type: ".$result['otvtype']."\n");
 
             // Add the result to the parent array.
             $tblOTV[] = $result;
