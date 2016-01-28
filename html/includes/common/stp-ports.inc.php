@@ -2,7 +2,7 @@
 
 $common_output[] = '
 <div class="table-responsive">
-    <table id="stp-ports" class="table table-condensed table-hover table-striped">
+    <table id="stp-ports" class="table table-condensed table-hover">
         <thead>
             <tr>
                 <th data-column-id="port">Port</th>
@@ -14,16 +14,17 @@ $common_output[] = '
                 <th data-column-id="designatedCost">Designated cost</th>
                 <th data-column-id="designatedBridge">Designated bridge</th>
                 <th data-column-id="designatedPort">Designated port</th>
-                <th data-column-id="forwardTransitions">Fwd trasitions</th>
+                <th data-column-id="forwardTransitions">Forward transitions</th>
             </tr>
         </thead>
-    <table>
+    </table>
 </div>
 
 <script>
 
 var grid = $("#stp-ports").bootgrid( { 
     ajax: true,
+    templates: {search: ""},
     post: function () 
     {
         return {
