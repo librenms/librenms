@@ -81,12 +81,14 @@ if ($device['os_group'] == "cisco") {
         foreach ($tblRouteNextHopAddr as $k => $v) {
             $count_mac[$v]++;
         }
+        // Let's log some debugging
+        d_echo("\n\nMAC Addresses: ".print_r($count_mac,TRUE));
 
         // Loop through the components and extract the data.
         foreach ($components as $key => &$array) {
 
             if ($array['otvtype'] == 'overlay') {
-                // Let's check the varius status' of the overlay
+                // Let's check the various status' of the overlay
                 $message = false;
                 $vpn_state = $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.3'][$array['index']];
                 if ($vpn_state != 2) {
@@ -119,6 +121,14 @@ if ($device['os_group'] == "cisco") {
                     }
                 }
 
+                // Let's log some debugging
+                d_echo("\n\nOverlay Component: ".$key."\n");
+                d_echo("    Label: ".$array['label']."\n");
+                d_echo("    Index: ".$array['index']."\n");
+                d_echo("    Status: ".$array['status']."\n");
+                d_echo("    Message: ".$array['error']."\n");
+                d_echo("    VLAN Count: ".$count_vlan."\n");
+
                 $filename = "cisco-otv-".$array['label']."-vlan.rrd";
                 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
 
@@ -150,6 +160,13 @@ if ($device['os_group'] == "cisco") {
                     $array['error'] = "";
                     $array['status'] = 1;
                 }
+
+                // Let's log some debugging
+                d_echo("\n\nAdjacency Component: ".$key."\n");
+                d_echo("    Label: ".$array['label']."\n");
+                d_echo("    Index: ".$array['index']."\n");
+                d_echo("    Status: ".$array['status']."\n");
+                d_echo("    Message: ".$array['error']."\n");
             }
             elseif ($array['otvtype'] == 'endpoint') {
                 if (isset($count_mac[$array['endpoint']])) {
@@ -158,6 +175,11 @@ if ($device['os_group'] == "cisco") {
                 else {
                     $rrd['count'] = "0";
                 }
+
+                // Let's log some debugging
+                d_echo("\n\nEndpoint Component: ".$key."\n");
+                d_echo("    Label: ".$array['label']."\n");
+                d_echo("    MAC Count: ".$rrd['count']."\n");
 
                 $filename = "cisco-otv-".$array['endpoint']."-mac.rrd";
                 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
