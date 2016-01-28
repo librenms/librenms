@@ -15,7 +15,7 @@ if (!$vars['view']) {
 }
 
 $menu_options['basic'] = 'Basic';
-// $menu_options['details'] = 'Details';
+$menu_options['ports'] = 'Ports';
 $sep = '';
 foreach ($menu_options as $option => $text) {
     echo $sep;
@@ -35,16 +35,13 @@ unset($sep);
 
 print_optionbar_end();
 
-echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
-
-$i = '1';
-
-foreach (dbFetchRows("SELECT * FROM `stp` WHERE `device_id` = ? ORDER BY 'stp_id'", array($device['device_id'])) as $stp) {
+if ($vars['view'] == 'basic') {
     include 'includes/print-stp.inc.php';
+}    
 
-    $i++;
+if ($vars['view'] == 'ports') {
+    include 'includes/common/stp-ports.inc.php';
+    echo implode('',$common_output);
 }
-
-echo '</table>';
 
 $pagetitle[] = 'STP';
