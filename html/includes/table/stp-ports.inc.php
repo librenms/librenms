@@ -6,7 +6,7 @@ $param[] = $device_id;
 
 $sql = " FROM `ports_stp` `ps` JOIN `ports` `p` ON `ps`.`port_id`=`p`.`port_id` WHERE `ps`.`device_id` = ?";
 
-$count_sql = "SELECT COUNT(ports_stp_id) $sql";
+$count_sql = "SELECT COUNT(*) $sql";
 $total     = dbFetchCell($count_sql, $param);
 if (empty($total)) {
         $total = 0;

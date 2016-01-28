@@ -35,21 +35,13 @@ unset($sep);
 
 print_optionbar_end();
 
-echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
-
 if ($vars['view'] == 'basic') {
-    //$i = '1';
-    foreach (dbFetchRows("SELECT * FROM `stp` WHERE `device_id` = ? ORDER BY 'stp_id'", array($device['device_id'])) as $stp) {
     include 'includes/print-stp.inc.php';
-    //    $i++;
-    }
 }    
 
 if ($vars['view'] == 'ports') {
     include 'includes/common/stp-ports.inc.php';
     echo implode('',$common_output);
 }
-
-echo '</table>';
 
 $pagetitle[] = 'STP';
