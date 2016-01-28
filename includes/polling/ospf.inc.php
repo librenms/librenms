@@ -1,13 +1,10 @@
 <?php
 
 echo 'OSPF: ';
-echo 'Processes: ';
-
 $ospf_instance_count  = 0;
 $ospf_port_count      = 0;
 $ospf_area_count      = 0;
 $ospf_neighbour_count = 0;
-
 
 $ospf_oids_db = array(
     'ospfRouterId',
@@ -76,19 +73,21 @@ $ospf_nbr_oids_db  = array(
     'ospfNbrHelloSuppressed',
 );
 
-
+$ospf_nbr_oids_rrd = array();
+$ospf_nbr_oids     = array_merge($ospf_nbr_oids_db, $ospf_nbr_oids_rrd);
 
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-} else {
+} 
+else {
     $vrfs_lite_cisco = array(array('context_name' => null));
 }
 
 foreach ($vrfs_lite_cisco as $vrf_lite) {
-
     $device['context_name'] = $vrf_lite['context_name'];
 
-
+    echo 'Processes: ';
+    
     // Build array of existing entries
     foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ? AND `context_name` = ?', array($device['device_id'], $device['context_name'])) as $entry) {
         $ospf_instances_db[$entry['ospf_instance_id']][$entry['context_name']] = $entry;
@@ -101,8 +100,8 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
         if (empty($ospf_instances_db[$ospf_instance_id][$device['context_name']])) {
             dbInsert(array('device_id' => $device['device_id'], 'ospf_instance_id' => $ospf_instance_id, 'context_name' => $device['context_name']), 'ospf_instances');
             echo '+';
-            $ospf_instances_db[$entry['ospf_instance_id']][$device['context_name']] = dbFetchRow('SELECT * FROM `ospf_instances` WHERE `device_id` = ? AND `ospf_instance_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_instance_id, $device['context_name']));
-            $ospf_instances_db[$entry['ospf_instance_id']][$entry['context_name']] = $entry;
+            $entry = dbFetchRow('SELECT * FROM `ospf_instances` WHERE `device_id` = ? AND `ospf_instance_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_instance_id, $device['context_name']));
+            $ospf_instances_db[$ospf_instance_id][$device['context_name']] = $entry;
         }
     }
 
@@ -129,7 +128,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
                 }
 
                 if ($ospf_instance_update) {
-                    dbUpdate($ospf_instance_update, 'ospf_instances', '`device_id` = ? AND `ospf_instance_id` = ? AND `context_name`=?', array($device['device_id'], $ospf_instance_id, $device['context_name']));
+                    dbUpdate($ospf_instance_update, 'ospf_instances', '`device_id` = ? AND `ospf_instance_id` = ? AND `context_name`=? ', array($device['device_id'], $ospf_instance_id, $device['context_name']));
                     echo 'U';
                     unset($ospf_instance_update);
                 }
@@ -148,12 +147,10 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     unset($ospf_instances_poll);
     unset($ospf_instances_db);
 
-
-
     echo ' Areas: ';
 
     // Build array of existing entries
-    foreach (dbFetchRows('SELECT * FROM `ospf_areas` WHERE `device_id` = ? AND `context_name`=?', array($device['device_id'], $device['context_name'])) as $entry) {
+    foreach (dbFetchRows('SELECT * FROM `ospf_areas` WHERE `device_id` = ? AND `context_name`= ?', array($device['device_id'], $device['context_name'])) as $entry) {
         $ospf_areas_db[$entry['ospfAreaId']][$entry['context_name']] = $entry;
     }
 
@@ -162,7 +159,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
     foreach ($ospf_areas_poll as $ospf_area_id => $ospf_area) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
-        if (!isset($ospf_areas_db[$ospf_area_id][$entry['context_name']])) {
+        if (empty($ospf_areas_db[$ospf_area_id][$device['context_name']])) {
             dbInsert(array('device_id' => $device['device_id'], 'ospfAreaId' => $ospf_area_id, 'context_name' => $device['context_name']), 'ospf_areas');
             echo '+';
             $entry = dbFetchRows('SELECT * FROM `ospf_areas` WHERE `device_id` = ? AND `ospfAreaId` = ? AND `context_name` = ?', array($device['device_id'], $ospf_area_id, $device['context_name']));
@@ -180,12 +177,12 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
     // Loop array of entries and update
     if (is_array($ospf_areas_db)) {
-        foreach ($ospf_areas_db as $$ospf_area_id => $ospf_area_db) {
+        foreach ($ospf_areas_db as $ospf_area_id => $ospf_area_db) {
             if (is_array($ospf_areas_poll[$ospf_area_id])) {
                 $ospf_area_poll = $ospf_areas_poll[$ospf_area_id];
                 foreach ($ospf_area_oids as $oid) {
                     // Loop the OIDs
-                    if ($ospf_area_db[$entry['context_name']][$oid] != $ospf_area_poll[$oid]) {
+                    if ($ospf_area_db[$device['context_name']][$oid] != $ospf_area_poll[$oid]) {
                         // If data has changed, build a query
                         $ospf_area_update[$oid] = $ospf_area_poll[$oid];
                         // log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['port_id']); // FIXME
@@ -229,10 +226,10 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
     foreach ($ospf_ports_poll as $ospf_port_id => $ospf_port) {
         // If the entry doesn't already exist in the prebuilt array, insert into the database and put into the array
-        if (!isset($ospf_ports_db[$ospf_port_id][$device['context_name']])) {
+        if (empty($ospf_ports_db[$ospf_port_id][$device['context_name']])) {
             dbInsert(array('device_id' => $device['device_id'], 'ospf_port_id' => $ospf_port_id, 'context_name' => $device['context_name']), 'ospf_ports');
             echo '+';
-            $ospf_ports_db[$entry['ospf_port_id']][$device['context_name']] = dbFetchRow('SELECT * FROM `ospf_ports` WHERE `device_id` = ? AND `ospf_port_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_port_id, $device['context_name']));
+            $ospf_ports_db[$ospf_port_id][$device['context_name']] = dbFetchRow('SELECT * FROM `ospf_ports` WHERE `device_id` = ? AND `ospf_port_id` = ? AND `context_name` = ?', array($device['device_id'], $ospf_port_id, $device['context_name']));
         }
     }
 
@@ -301,8 +298,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 // OSPF-MIB::ospfNbrHelloSuppressed.172.22.203.98.0 false
     echo ' Neighbours: ';
 
-    $ospf_nbr_oids_rrd = array();
-    $ospf_nbr_oids     = array_merge($ospf_nbr_oids_db, $ospf_nbr_oids_rrd);
+    
 
     // Build array of existing entries
     foreach (dbFetchRows('SELECT * FROM `ospf_nbrs` WHERE `device_id` = ? AND `context_name` = ?', array($device['device_id'], $device['context_name'])) as $nbr_entry) {
@@ -333,10 +329,10 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     // Loop array of entries and update
     if (is_array($ospf_nbrs_db)) {
         foreach ($ospf_nbrs_db as $ospf_nbr_id => $ospf_nbr_db) {
-            if (is_array($ospf_nbrs_poll[$ospf_nbr_db['ospf_nbr_id']])) {
-                $ospf_nbr_poll = $ospf_nbrs_poll[$ospf_nbr_db['ospf_nbr_id']];
+            if (is_array($ospf_nbrs_poll[$ospf_nbr_id])) {
+                $ospf_nbr_poll = $ospf_nbrs_poll[$ospf_nbr_id];
 
-                $ospf_nbr_poll['port_id'] = @dbFetchCell('SELECT A.`port_id` FROM ipv4_addresses AS A, nbrs AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND I.device_id = ? AND A.context_name = ?', array($ospf_nbr_poll['ospfNbrIpAddr'], $device['device_id'], $device['context_name']));
+                $ospf_nbr_poll['port_id'] = @dbFetchCell('SELECT A.`port_id` FROM ipv4_addresses AS A, ospf_nbrs AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND I.device_id = ? AND A.context_name = ?', array($ospf_nbr_poll['ospfNbrIpAddr'], $device['device_id'], $device['context_name']));
 
                 if ($ospf_nbr_db[$device['context_name']]['port_id'] != $ospf_nbr_poll['port_id']) {
                     if (!empty($ospf_nbr_poll['port_id'])) {
@@ -379,6 +375,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     }//end if
     unset($ospf_nbrs_db);
     unset($ospf_nbrs_poll);
+    echo "\n";
 }
 unset($device['context_name']);
 unset($vrfs_lite_cisco);
@@ -406,8 +403,5 @@ $ret        = rrdtool_update("$filename", $fields);
 
 $tags = array();
 influx_update($device,'ospf-statistics',$tags,$fields);
-
-unset($ospf_ports_db);
-unset($ospf_ports_poll);
 
 echo "\n";
