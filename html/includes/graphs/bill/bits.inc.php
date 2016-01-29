@@ -4,8 +4,9 @@
 $i = 0;
 
 foreach ($ports as $port) {
-    if (is_file($config['rrd_dir'].'/'.$port['hostname'].'/port-'.safename($port['ifIndex'].'.rrd'))) {
-        $rrd_list[$i]['filename'] = $config['rrd_dir'].'/'.$port['hostname'].'/port-'.safename($port['ifIndex'].'.rrd');
+    $rrd_file = get_port_rrdfile_path ($port['hostname'], $port['port_id']);
+    if (is_file($rrd_file)) {
+        $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr']    = $port['ifDescr'];
         $i++;
     }
