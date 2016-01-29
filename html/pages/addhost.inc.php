@@ -65,7 +65,8 @@ if ($_POST['hostname']) {
             $force_add = 0;
         }
 
-        $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add);
+        $port_assoc_mode = $_POST['port_assoc_mode'];
+        $result = addHost($hostname, $snmpver, $port, $transport, 0, $poller_group, $force_add, $port_assoc_mode);
         if ($result) {
             print_message("Device added ($result)");
         }
@@ -119,6 +120,24 @@ foreach ($config['snmp']['transports'] as $transport) {
     }
 
     echo '>'.$transport.'</option>';
+}
+?>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="port_association_mode" class="col-sm-3 control-label">Port Association Mode</label>
+      <div class="col-sm-3">
+        <select name="port_assoc_mode" id="port_assoc_mode" class="form-control input-sm">
+<?php
+
+
+foreach (get_port_assoc_modes() as $mode) {
+    $selected = "";
+    if ($mode == $config['default_port_association_mode'])
+        $selected = "selected";
+
+    echo "          <option value=\"$mode\" $selected>$mode</option>\n";
 }
 ?>
         </select>

@@ -24,8 +24,7 @@ foreach (dbFetchRows("SELECT `device_id`,`hostname` FROM `devices` WHERE `hostna
     echo "Found hostname " . $device['hostname'].".......\n";
     foreach (dbFetchRows("SELECT `ifIndex`,`ifName`,`ifSpeed` FROM `ports` WHERE `ifName` LIKE ? AND `device_id` = ?", array('%'.$ports.'%',$device['device_id'])) as $port) {
         echo "Tuning port " . $port['ifName'].".......\n";
-        $host_rrd = $config['rrd_dir'].'/'.$device['hostname'];
-        $rrdfile = $host_rrd.'/port-'.safename($port['ifIndex'].'.rrd');
+        $rrdfile = get_port_rrdfile_path ($device['hostname'], $port['port_id']);
         rrdtool_tune('port',$rrdfile,$port['ifSpeed']);
     }
 }
