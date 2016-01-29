@@ -1,5 +1,7 @@
 <?php
 
+require_once $config['install_dir'].'/includes/alerts.inc.php';
+
 $no_refresh = true;
 
 ?>
@@ -161,20 +163,21 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
     $extra = '';
     if (sizeof($sub) == 1) {
         $sub = $sub[0];
-        if ((int) $sub['state'] === 0) {
+        if ((int) $sub['state'] === AlertState::RECOVERED) {
             $ico = 'ok';
             $col = 'success';
         }
-        else if ((int) $sub['state'] === 1) {
+        else if ((int) $sub['state'] === AlertState::ALERTED) {
             $ico   = 'remove';
             $col   = 'danger';
             $extra = 'danger';
         }
-        else if ((int) $sub['state'] === 2) {
+        else if ((int) $sub['state'] === AlertState::ACKNOWLEDGED) {
             $ico   = 'time';
             $col   = 'default';
             $extra = 'warning';
         }
+        /* FIXME: worse/better? */
     }
 
     $alert_checked = '';

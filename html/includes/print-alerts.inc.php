@@ -1,5 +1,7 @@
 <?php
 
+require_once $config['install_dir'].'/includes/alerts.inc.php';
+
 $hostname    = gethostbyid($alert_entry['device_id']);
 $alert_state = $alert_entry['state'];
 
@@ -18,27 +20,27 @@ if (!isset($alert_entry['device'])) {
 echo '<td>'.htmlspecialchars($alert_entry['name']).'</td>';
 
 if ($alert_state != '') {
-    if ($alert_state == '0') {
+    if ($alert_state == AlertState::RECOVERED) {
         $glyph_icon  = 'ok';
         $glyph_color = 'green';
         $text        = 'Ok';
     }
-    else if ($alert_state == '1') {
+    else if ($alert_state == AlertState::ALERTED) {
         $glyph_icon  = 'remove';
         $glyph_color = 'red';
         $text        = 'Alert';
     }
-    else if ($alert_state == '2') {
+    else if ($alert_state == AlertState::ACKNOWLEDGED) {
         $glyph_icon  = 'info-sign';
         $glyph_color = 'lightgrey';
         $text        = 'Ack';
     }
-    else if ($alert_state == '3') {
+    else if ($alert_state == AlertState::WORSE) {
         $glyph_icon  = 'arrow-down';
         $glyph_color = 'orange';
         $text        = 'Worse';
     }
-    else if ($alert_state == '4') {
+    else if ($alert_state == AlertState::BETTER) {
         $glyph_icon  = 'arrow-up';
         $glyph_color = 'khaki';
         $text        = 'Better';
