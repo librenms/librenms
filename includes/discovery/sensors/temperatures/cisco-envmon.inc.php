@@ -15,8 +15,10 @@ if ($device['os_group'] == 'cisco') {
     if (is_array($temp)) {
         $cur_oid = '.1.3.6.1.4.1.9.9.13.1.3.1.3.';
         foreach ($temp as $index => $entry) {
-            $descr = ucwords($temp[$index]['ciscoEnvMonTemperatureStatusDescr']);
-            discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid.$index, $index, 'cisco', $descr, '1', '1', null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], null, $temp[$index]['ciscoEnvMonTemperatureStatusValue'], 'snmp', $index);
+            if ($temp[$index]['ciscoEnvMonTemperatureState'] != 'notPresent') {
+                $descr = ucwords($temp[$index]['ciscoEnvMonTemperatureStatusDescr']);
+                discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid.$index, $index, 'cisco', $descr, '1', '1', null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], null, $temp[$index]['ciscoEnvMonTemperatureStatusValue'], 'snmp', $index);
+            }
         }
     }
 }
