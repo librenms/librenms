@@ -1197,7 +1197,7 @@ function get_port_assoc_mode_name ($port_assoc_mode_id, $no_cache = false) {
  */
 function get_ports_mapped ($device_id, $with_statistics = false) {
     $ports = array();
-    $maps = (
+    $maps = array(
         'ifIndex' => array(),
         'ifName'  => array(),
         'ifDescr' => array(),
