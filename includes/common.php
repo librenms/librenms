@@ -1196,12 +1196,12 @@ function get_port_assoc_mode_name ($port_assoc_mode_id, $no_cache = false) {
  * @return array
  */
 function get_ports_mapped ($device_id, $with_statistics = false) {
-    $ports = [];
-    $maps = [
-        'ifIndex' => [],
-        'ifName'  => [],
-        'ifDescr' => [],
-    ];
+    $ports = array();
+    $maps = (
+        'ifIndex' => array(),
+        'ifName'  => array(),
+        'ifDescr' => array(),
+    );
 
     /* Query all information available for ports for this device ... */
     $query = 'SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY port_id';
@@ -1222,10 +1222,10 @@ function get_ports_mapped ($device_id, $with_statistics = false) {
         $maps['ifDescr'][$port['ifDescr']] = $port['port_id'];
     }
 
-    return [
+    return array(
         'ports' => $ports,
         'maps'  => $maps,
-    ];
+    );
 }
 
 /**
