@@ -1,6 +1,6 @@
 # Configuring interface descriptions for parsing.
 
-LibreNMS includes the ability to parse your interface descriptions for set information to diplay and segment in the WebUI.
+LibreNMS includes the ability to parse your interface descriptions for set information to display and segment in the WebUI.
 
 The following information is used from interface descriptions:
 
@@ -57,7 +57,7 @@ description Cust: Customer A (This customer is gold)
 []
 
 i.e:
-description Cust: Customer A [100Mbs]
+description Cust: Customer A [100Mbps]
 
 You can use any of these additional options like:
 
@@ -66,10 +66,10 @@ description Cust: Customer A {ID4321} [1Gbps]
 
 This information is then held within the ports table within the database, as an example:
 
-description Core: Nas bond [1Gbps]
+description Core: NAS bond [1Gbps]
 ```sh
 port_descr_type: core
-port_descr_descr: Nas bond
+port_descr_descr: NAS bond
 port_descr_circuit: NULL
 port_descr_speed: 1Gbps
 port_descr_notes: NULL

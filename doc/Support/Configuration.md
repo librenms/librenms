@@ -7,7 +7,7 @@ If you would like to alter any of these then please add your config option to `c
 ```php
 $config['install_dir'] = "/opt/librenms";
 ```
-Set the installation directory (defaults to /opt/librenms), if you clone the github branch to another location ensure you alter this.
+Set the installation directory (defaults to /opt/librenms), if you clone the GitHub branch to another location ensure you alter this.
 
 ```php
 $config['temp_dir'] = "/tmp";
@@ -214,7 +214,7 @@ $config['gui']['network-map']['style'] = 'old';
 
 #### Add host settings
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
-If host is added by hostname this check is not performed.  If the setting is true hostnames are resovled and the check is also performed.  This helps prevents accidental duplicate hosts.
+If host is added by hostname this check is not performed.  If the setting is true hostnames are resolved and the check is also performed.  This helps prevents accidental duplicate hosts.
 ```php
 $config['addhost_alwayscheckip']   = FALSE; #TRUE - check for duplicate ips even when adding host by name.
                                             #FALSE- only check when adding host by ip.

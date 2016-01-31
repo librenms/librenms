@@ -1,5 +1,5 @@
 # Proxmox graphing
-It is possible to create graphs of the Proxmox **VMs** that run on your monitored machines. Currently, only trafficgraphs are created. One for each interface on each VM. Possibly, IO grahps will be added later on.
+It is possible to create graphs of the Proxmox **VMs** that run on your monitored machines. Currently, only traffic graphs are created. One for each interface on each VM. Possibly, IO graphs will be added later on.
 
 The ultimate goal is to be able to create traffic bills for VMs, no matter on which physical machine that VM runs.
 
