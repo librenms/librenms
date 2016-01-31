@@ -11,7 +11,7 @@ $config['memcached']['port']    = 11211;
 ```
 
 By default values are kept for 4 Minutes inside the memcached, you can adjust this retention time by modifying the `$config['memcached']['ttl']` value to any desired amount of seconds.
-It's strongly discouraged to set this above `300` (5 Minutes) to avoid interferences with the polling, discovery and alerting processes.
+It's strongly discouraged to set this above `300` (5 Minutes) to avoid interference with the polling, discovery and alerting processes.
 
 If you use the Distributed Poller, you can point this to the same memcached instance. However a local memcached will perform better in any case.
 

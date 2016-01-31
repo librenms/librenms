@@ -9,7 +9,7 @@ To enable this you can do so in three ways!
  - For the actual device, Edit Device -> Misc
  - For each port, Edit Device -> Port Settings
 
-Now when a port interface speed changes (this can happen because of a physical change or just because the device has mis-reported) the max value is set. If you don't want to wait until
+Now when a port interface speed changes (this can happen because of a physical change or just because the device has misreported) the max value is set. If you don't want to wait until
 a port speed changes then you can run the included script:
 
 script/tune_port.php -h <hostname> -p <ifName>

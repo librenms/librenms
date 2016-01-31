@@ -130,7 +130,7 @@ $config['poller_modules']['mib']                          = 0;
 
 `netscaler-vsvr`: Netscaler support.
 
-`aruba-controller`: Arube wireless controller support.
+`aruba-controller`: Aruba wireless controller support.
 
 `entity-physical`: Module to pick up the devices hardware support.
 

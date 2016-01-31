@@ -6,7 +6,7 @@ the users interest that a consistent well thought out Web UI is available.
 ### Responsiveness
 
 The Web UI is designed to be mobile friendly and for the most part is and works well. It's worth spending sometime to
-read through the [Boostrap website](http://getbootstrap.com/css/#grid) to learn more about how to keep things responsive.
+read through the [Bootstrap website](http://getbootstrap.com/css/#grid) to learn more about how to keep things responsive.
 
 ### Navigation bar
 
