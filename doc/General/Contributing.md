@@ -5,7 +5,7 @@ required to sign over their rights to any other party.
 Contributor Agreement
 ---------------------
 
-By contributing code to LibreNMS (whether by a github pull request, or by
+By contributing code to LibreNMS (whether by a GitHub pull request, or by
 any other means), you assert that:
 
 - You have the rights to include the code, either as its original author,
@@ -29,9 +29,9 @@ any other means), you assert that:
   systems.
 
 
-To agree with these assertions, please submit a Github pull request against
+To agree with these assertions, please submit a GitHub pull request against
 [AUTHORS.md][5], adding or altering a **single line** *containing your name,
-email address, and Github user id* in the file (so that it can be matched to
+email address, and GitHub user id* in the file (so that it can be matched to
 your commits), and stating in the *commit log* (not the pull request text):
 ```
 	I agree to the conditions of the Contributor Agreement

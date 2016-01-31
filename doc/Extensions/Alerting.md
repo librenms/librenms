@@ -399,8 +399,8 @@ $config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
 
 ## <a name="transports-playsms">PlaySMS</a>
 
-PlaySMS is an OpenSource SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.
-Please consult PlaySMS's documentation regarding number formating.
+PlaySMS is an open source SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.
+Please consult PlaySMS's documentation regarding number formatting.
 Here an example using 3 numbers, any amount of numbers is supported:
 
 ~~
@@ -529,7 +529,7 @@ And in the Rule:
 This Example-macro is a Boolean-macro, it applies a form of filter to the set of results defined by the rule.
 All macros that are not unary should return Boolean.
 
-You can only apply _Equal_ or _Not-Equal_ Operations on Bollean-macros where `True` is represented by `"1"` and `False` by `"0"`.
+You can only apply _Equal_ or _Not-Equal_ Operations on Boolean-macros where `True` is represented by `"1"` and `False` by `"0"`.
 
 
 ## <a name="macros-device">Device</a> (Boolean)
