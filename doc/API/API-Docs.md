@@ -112,7 +112,7 @@ Route: /api/v0/devices/:hostname
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -146,7 +146,7 @@ Route: /api/v0/devices/:hostname
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -179,7 +179,7 @@ Route: /api/v0/devices/:hostname/graphs
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -511,8 +511,8 @@ Route: /api/v0/oxidized
 
 Input (JSON):
 
- - 
- 
+ -
+
 Examples:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized
@@ -548,7 +548,7 @@ Input (JSON):
 
 Examples:
 ```curl
-curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost 
+curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
 ```
 
 Output:
@@ -751,7 +751,7 @@ Route: /api/v0/devices/:hostname/vlans
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -787,7 +787,7 @@ Route: /api/v0/alerts/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -824,7 +824,7 @@ Route: /api/v0/alerts/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -913,7 +913,7 @@ Route: /api/v0/rules/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -950,7 +950,7 @@ Route: /api/v0/rules/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -972,11 +972,11 @@ List the alert rules.
 
 Route: /api/v0/rules
 
- - 
+ -
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -1008,7 +1008,7 @@ Add a new alert rule.
 
 Route: /api/v0/rules
 
- - 
+ -
 
 Input (JSON):
 
@@ -1017,7 +1017,7 @@ Input (JSON):
  - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
  - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
  - count: This is how many polling runs before an alert will trigger and the frequency.
- - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one. 
+ - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one.
  - mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).
  - invert: This would invert the rules check.
  - name: This is the name of the rule and is mandatory.
@@ -1043,7 +1043,7 @@ Edit an existing alert rule
 
 Route: /api/v0/rules
 
- - 
+ -
 
 Input (JSON):
 
@@ -1053,7 +1053,7 @@ Input (JSON):
  - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
  - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
  - count: This is how many polling runs before an alert will trigger and the frequency.
- - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one. 
+ - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one.
  - mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).
  - invert: This would invert the rules check.
  - name: This is the name of the rule and is mandatory.

@@ -2,7 +2,7 @@
 
 Services within LibreNMS provides the ability to use Nagios plugins to perform additional monitoring outside of SNMP.
 
-These services are tied into an existing device so you need at least one device that supports SNMP to be able to add it 
+These services are tied into an existing device so you need at least one device that supports SNMP to be able to add it
 to LibreNMS - localhost is a good one.
 
 ## Setup
@@ -29,7 +29,7 @@ Finally, you now need to add check-services.php to the current cron file (/etc/c
 
 Now you can add services via the main Services link in the navbar, or via the Services link within the device page.
 
-> **Please note that at present the service checks will only return the status and the response from the check 
+> **Please note that at present the service checks will only return the status and the response from the check
 no graphs will be generated. **
 
 ## Supported checks

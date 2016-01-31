@@ -2,7 +2,7 @@
 
 This document will explain how to setup RRDCached for LibreNMS.
 
-> If you are using rrdtool / rrdcached version 1.5 or above then this now supports creating rrd files over rrdcached. To 
+> If you are using rrdtool / rrdcached version 1.5 or above then this now supports creating rrd files over rrdcached. To
 enable this set the following config:
 
 ```php
@@ -21,7 +21,7 @@ vi /etc/yum.repos.d/rpmforge.repo
 
 ```ssh
 yum update rrdtool
-vi /etc/yum.repos.d/rpmforge.repo 
+vi /etc/yum.repos.d/rpmforge.repo
 ```
 - Disable the [rpmforge] and [rpmforge-extras] repos again
 
