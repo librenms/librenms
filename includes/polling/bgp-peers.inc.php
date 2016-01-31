@@ -142,10 +142,10 @@ if ($config['enable_bgp']) {
 
         $peerrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('bgp-'.$peer['bgpPeerIdentifier'].'.rrd');
         if (!is_file($peerrrd)) {
-            $create_rrd = 'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000 
-                DS:bgpPeerInUpdates:COUNTER:600:U:100000000000 
-                DS:bgpPeerOutTotal:COUNTER:600:U:100000000000 
-                DS:bgpPeerInTotal:COUNTER:600:U:100000000000 
+            $create_rrd = 'DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000
+                DS:bgpPeerInUpdates:COUNTER:600:U:100000000000
+                DS:bgpPeerOutTotal:COUNTER:600:U:100000000000
+                DS:bgpPeerInTotal:COUNTER:600:U:100000000000
                 DS:bgpPeerEstablished:GAUGE:600:0:U '.$config['rrd_rra'];
 
             rrdtool_create($peerrrd, $create_rrd);
@@ -254,45 +254,6 @@ if ($config['enable_bgp']) {
                     list($cbgpPeerAcceptedPrefixes,$cbgpPeerDeniedPrefixes,$cbgpPeerPrefixAdminLimit,$cbgpPeerPrefixThreshold,$cbgpPeerPrefixClearThreshold,$cbgpPeerAdvertisedPrefixes,$cbgpPeerSuppressedPrefixes,$cbgpPeerWithdrawnPrefixes) = explode("\n", $cbgp_data);
                 }//end if
 
-                if ($device['os'] == 'junos') {
-                    // Missing: cbgpPeerAdminLimit cbgpPeerPrefixThreshold cbgpPeerPrefixClearThreshold cbgpPeerSuppressedPrefixes cbgpPeerWithdrawnPrefixes
-                    $safis['unicast']   = 1;
-                    $safis['multicast'] = 2;
-
-                    if (!isset($peerIndexes)) {
-                        $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
-                        foreach ($j_bgp as $index => $entry) {
-                            switch ($entry['jnxBgpM2PeerRemoteAddrType']) {
-                                case 'ipv4':
-                                    $ip                 = long2ip(hexdec($entry['jnxBgpM2PeerRemoteAddr']));
-                                    $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
-                                    break;
-
-                                case 'ipv6':
-                                    $ip6                 = trim(str_replace(' ', '', $entry['jnxBgpM2PeerRemoteAddr']), '"');
-                                    $ip6                 = substr($ip6, 0, 4).':'.substr($ip6, 4, 4).':'.substr($ip6, 8, 4).':'.substr($ip6, 12, 4).':'.substr($ip6, 16, 4).':'.substr($ip6, 20, 4).':'.substr($ip6, 24, 4).':'.substr($ip6, 28, 4);
-                                    $ip6                 = Net_IPv6::compress($ip6);
-                                    $j_peerIndexes[$ip6] = $entry['jnxBgpM2PeerIndex'];
-                                    break;
-
-                                default:
-                                    echo "PANIC: Don't know RemoteAddrType ".$entry['jnxBgpM2PeerRemoteAddrType']."!\n";
-                                    break;
-                            }
-                        }
-                    }//end if
-
-                    $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
-
-                    $cbgpPeerAcceptedPrefixes   = $j_prefixes[$j_peerIndexes[$peer['bgpPeerIdentifier']].".$afi.".$safis[$safi]]['jnxBgpM2PrefixInPrefixesAccepted'];
-                    $cbgpPeerDeniedPrefixes     = $j_prefixes[$j_peerIndexes[$peer['bgpPeerIdentifier']].".$afi.".$safis[$safi]]['jnxBgpM2PrefixInPrefixesRejected'];
-                    $cbgpPeerAdvertisedPrefixes = $j_prefixes[$j_peerIndexes[$peer['bgpPeerIdentifier']].".$afi.".$safis[$safi]]['jnxBgpM2PrefixOutPrefixes'];
-
-                    unset($j_prefixes);
-                    unset($j_bgp);
-                    unset($j_peerIndexes);
-                }//end if
-
                 // FIXME THESE FIELDS DO NOT EXIST IN THE DATABASE!
                 $update = 'UPDATE bgpPeers_cbgp SET';
                 $peer['c_update']['AcceptedPrefixes']     = $cbgpPeerAcceptedPrefixes;
@@ -304,14 +265,28 @@ if ($config['enable_bgp']) {
                 $peer['c_update']['SuppressedPrefixes']   = $cbgpPeerSuppressedPrefixes;
                 $peer['c_update']['WithdrawnPrefixes']    = $cbgpPeerWithdrawnPrefixes;
 
+
+                $oids = array(
+                    'AcceptedPrefixes',
+                    'DeniedPrefixes',
+                    'AdvertisedPrefixes',
+                    'SuppressedPrefixes',
+                    'WithdrawnPrefixes',
+                );
+
+                foreach ($oids as $oid) {
+                    $peer['c_update'][$oid.'_delta'] = $peer['c_update'][$oid] - $peer_afi[$oid];
+                    $peer['c_update'][$oid.'_prev'] = $peer_afi[$oid];
+                }
+
                 dbUpdate($peer['c_update'], 'bgpPeers_cbgp', '`device_id` = ? AND bgpPeerIdentifier = ? AND afi = ? AND safi = ?', array($device['device_id'], $peer['bgpPeerIdentifier'], $afi, $safi));
 
                 $cbgp_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cbgp-'.$peer['bgpPeerIdentifier'].".$afi.$safi.rrd");
                 if (!is_file($cbgp_rrd)) {
-                    $rrd_create = 'DS:AcceptedPrefixes:GAUGE:600:U:100000000000 
-                        DS:DeniedPrefixes:GAUGE:600:U:100000000000 
-                        DS:AdvertisedPrefixes:GAUGE:600:U:100000000000 
-                        DS:SuppressedPrefixes:GAUGE:600:U:100000000000 
+                    $rrd_create = 'DS:AcceptedPrefixes:GAUGE:600:U:100000000000
+                        DS:DeniedPrefixes:GAUGE:600:U:100000000000
+                        DS:AdvertisedPrefixes:GAUGE:600:U:100000000000
+                        DS:SuppressedPrefixes:GAUGE:600:U:100000000000
                         DS:WithdrawnPrefixes:GAUGE:600:U:100000000000 '.$config['rrd_rra'];
                     rrdtool_create($cbgp_rrd, $rrd_create);
                 }
