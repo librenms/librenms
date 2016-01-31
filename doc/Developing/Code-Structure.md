@@ -14,7 +14,7 @@ This is the main file which all links within LibreNMS are parsed through. It loa
 ### html/css
 All used css files are located here. Apart from legacy files, anything in here is now a symlink.
 ### html/forms
-This folder contains all of the files that are dynamically included from an ajax call to html/ajax_form.php. 
+This folder contains all of the files that are dynamically included from an ajax call to html/ajax_form.php.
 ### html/includes
 This is where the majority of the website core files are located. These tend to be files that contain functions or often used code segments that can be included where needed rather than duplicating code.
 ### html/includes/api_functions.inc.php
