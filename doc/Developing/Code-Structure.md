@@ -41,7 +41,7 @@ All the discovery and polling code. The format is usually quite similar between 
 This is for all of the libraries used by LibreNMS. If you are including a 3rd party module, you would add the files in here either via git subtree if it's hosted on GitHub or just by copying the folder. Please ensure you maintain any copyright notices. You will then need to either reference the files in this folder directly from where you need them or alternatively as is the case with css and js libraries then symlink the needed files.
 
 ### logs/
-Usually contains your web servers logs but can also contrain poller logs and other items,
+Usually contains your web servers logs but can also contain poller logs and other items,
 
 ### mibs/
 Here is where all of the mibs are located, traditionally this has meant having all mibs in one directory but for certain vendors this has changed and these are now located in sub folders.

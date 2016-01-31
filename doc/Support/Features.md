@@ -74,7 +74,7 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Mellanox
 * Meraki
 * MGE
-* Mikrotic
+* Mikrotik
 * MRVLD
 * Multimatic
 * NetApp

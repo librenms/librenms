@@ -209,7 +209,7 @@ sub vcl_backend_response {
     # that match the file extensions that are between the quotes, and cache the files for 24 hours.
     # This assumes you update LibreNMS once a day, otherwise restart Varnish to clear cache.
     # Second function 'if (bereq.url ~ "^/' removes the Pragma no-cache statements and sets the age
-    # of how long the client brower will cache the matching urls.
+    # of how long the client browser will cache the matching urls.
     # LibreNMS graphs are updated every 300 seconds, 'max-age=300' is set to match this behavior.
     # We could cache these URLs in Varnish but it would add to the complexity of the config.
 

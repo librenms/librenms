@@ -327,8 +327,8 @@ Create the cronjob
 
 ### Daily Updates ###
 
-LibreNMS performs daily updates by default.  At 00:15 system time every day, a `git pull --no-edit --quiet` is performed.  You can override this default by edit
-ing your `config.php` file.  Remove the comment (the `#` mark) on the line:
+LibreNMS performs daily updates by default.  At 00:15 system time every day, a `git pull --no-edit --quiet` is performed.  You can override this default by editing
+your `config.php` file.  Remove the comment (the `#` mark) on the line:
 
     #$config['update'] = 0;
 
