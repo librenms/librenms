@@ -9,30 +9,30 @@ This document will explain how to use discovery.php to debug issues or manually 
    -h even                                      Poll even numbered devices (same as -i 2 -n 1)
    -h all                                       Poll all devices
    -h new                                       Poll all devices that have not had a discovery run before
-   
+
    -i <instances> -n <number>                   Poll as instance <number> of <instances>
                                                 Instances start at 0. 0-3 for -n 4
-   
-   
+
+
    Debugging and testing options:
    -d                                           Enable debugging output
    -m                                           Specify single module to be run
 ```
 
-`-h` Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and 
-even. all will run discovery against all devices whilst 
+`-h` Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and
+even. all will run discovery against all devices whilst
 new will poll only those devices that have recently been added or have been selected for rediscovery.
 
 `-i` This can be used to stagger the discovery process.
 
-`-d` Enables debugging output (verbose output) so that you can see what is happening during a discovery run. This includes 
+`-d` Enables debugging output (verbose output) so that you can see what is happening during a discovery run. This includes
 things like rrd updates, SQL queries and response from snmp.
 
 `-m` This enables you to specify the module you want to run for discovery.
 
 #### Discovery config
 
-These are the default discovery config items. You can globally disable a module by setting it to 0. If you just want to 
+These are the default discovery config items. You can globally disable a module by setting it to 0. If you just want to
 disable it for one device then you can do this within the WebUI -> Settings -> Modules.
 
 ```php
@@ -135,7 +135,7 @@ Here are some examples of running discovery from within your install directory.
 
 #### Debugging
 
-To provide debugging output you will need to run the discovery process with the `-d` flag. You can do this either against 
+To provide debugging output you will need to run the discovery process with the `-d` flag. You can do this either against
 all modules, single or multiple modules:
 
 All Modules
@@ -153,7 +153,7 @@ Multiple Modules
 ./discovery.php -h localhost -m ports,entity-physical -d
 ```
 
-It is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details 
+It is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details
 amongst other items including port descriptions.
 
 The output will contain:
@@ -181,5 +181,5 @@ Usage: ./snmp-scan.php -r <CIDR_Range> [-d] [-l] [-h]
                     Example: 192.168.0.0/24
   -d                Enable Debug
   -l                Show Legend
-  -h                Print this text                            
+  -h                Print this text
 ```

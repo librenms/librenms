@@ -41,7 +41,7 @@ Function( (Type) $Variable [= Default] [,...] ) | Returns | Description
 
 ### <a name="glob.attr">Attributes</a>
 Attribute | Type | Description
---- | --- | --- 
+--- | --- | ---
 `$params` | `String` | Contains all arguments that are passed to the `.command`.
 `$this->chan` | `Array` | Channels that are configured.
 `$this->commands` | `Array` | Contains accessible `commands`.
