@@ -16,7 +16,7 @@ If you think something is missing, feel free to ask us.
 * Traffic Billing (Quota, 95th Percentile)
 * Two Factor Authentication
 
-### Vendors 
+### Vendors
 Here's a brief list of supported vendors, some might be missing.
 If you are unsure of whether your device is supported or not, feel free to ask us.
 

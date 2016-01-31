@@ -623,7 +623,7 @@
   - Enable alerting on tables with relative / indirect glues (PR932)
   - Added bills support in rulesuggest and alert system (PR934)
   - Added detection for Sentry Smart CDU (PR938)
-  - Added basic detection for Netgear devices (PR942)  
+  - Added basic detection for Netgear devices (PR942)
   - addhost.php now uses distributed_poller_group config if set (PR944)
   - Added port rewrite function (PR946)
   - Added basic detection for Ubiquiti Edgeswitch (PR947)
@@ -921,7 +921,7 @@
  - Fixed layout issue for ports list (PR286)
  - Removed session regeneration (PR287)
  - Updated edit button on edit user screen (PR288)
-  
+
 ####Improvements
  - Added email field for add user form (PR278)
  - V0 of API release (PR282)
@@ -1043,7 +1043,7 @@
 ###Nov 2013
 
 ####Bug fixes
- - Updates to fix arp discovery 
+ - Updates to fix arp discovery
 
 ####Improvements
  - Added poller-wrapper (f8debf4)

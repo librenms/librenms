@@ -9,7 +9,7 @@ The following information is used from interface descriptions:
  - Notes
  - Speed
 
-When setting the description, you use the type followed directly with : and then the information on that port. Some examples based on 
+When setting the description, you use the type followed directly with : and then the information on that port. Some examples based on
 configuring a Cisco 2960 interface
 
 #### Customer port

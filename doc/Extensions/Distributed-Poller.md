@@ -7,13 +7,13 @@ Devices can also be groupped together into a `poller_group` to pin these devices
 
 ~~All pollers need to share their RRD-folder, for example via NFS or a combination of NFS and rrdcached.~~
 
-> This is no longer a strict requirement with the use of rrdtool 1.5 and above. If you are NOT running 1.5 then you will still 
+> This is no longer a strict requirement with the use of rrdtool 1.5 and above. If you are NOT running 1.5 then you will still
 need to share the RRD-folder.
 
 It is also required that all pollers can access the central memcached to communicate with eachother.
 
-In order to enable distributed polling, set `$config['distributed_poller'] = true` and your memcached details into `$config['distributed_poller_memcached_host']` and `$config['distributed_poller_memcached_port']`.  
-By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`.  
+In order to enable distributed polling, set `$config['distributed_poller'] = true` and your memcached details into `$config['distributed_poller_memcached_host']` and `$config['distributed_poller_memcached_port']`.
+By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`.
 Usually the poller's name is equal to the machine's hostname, if you want to change it set `$config['distributed_poller_name']`.
 One can also specify a comma seperated string of poller groups in $config['distributed_poller_group'].  The poller will then poll devices from any of the groups listed.  If new devices get added from the poller they will be assigned to the first poller group in the list unless the group is specified when adding the device.
 
@@ -55,7 +55,7 @@ Central storage should be provided so all RRD files can be read from and written
 
 For this example, we are running RRDCached to allow all pollers and web/api servers to read/write to the rrd iles ~~with the rrd directory also exported by NFS for simple access and maintenance.~~
 
-Sharing rrd files via something like NFS is no longer required if you run rrdtool 1.5 or greater. If you don't - please share your rrd folder as before. If you run rrdtool 
+Sharing rrd files via something like NFS is no longer required if you run rrdtool 1.5 or greater. If you don't - please share your rrd folder as before. If you run rrdtool
 1.5 or greater then add this config to your pollers:
 
 ```php

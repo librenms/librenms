@@ -4,7 +4,7 @@ You can integrate LibreNMS with [Oxidized](https://github.com/ytti/oxidized-web)
 
 ### Config viewing
 
-This is a straight forward use of Oxidized, it relies on you having a working Oxidized setup which is already taking config snapshots for your devices. 
+This is a straight forward use of Oxidized, it relies on you having a working Oxidized setup which is already taking config snapshots for your devices.
 When you have that, you only need the following config to enable the display of device configs within the device page itself:
 
 ```php
