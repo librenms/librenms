@@ -24,8 +24,9 @@ foreach ($devices as $device) {
             }
         }
 
-        if (is_file($config['rrd_dir'].'/'.$device['hostname'].'/port-'.safename($int['ifIndex'].'.rrd')) && $ignore != 1) {
-            $rrd_filename              = $config['rrd_dir'].'/'.$device['hostname'].'/port-'.safename($int['ifIndex'].'.rrd');
+        $rrd_file = get_port_rrdfile_path ($device['hostname'], $int['port_id']);
+        if (is_file($rrd_file) && $ignore != 1) {
+            $rrd_filename              = $rrd_file; // FIXME: Can this be unified without side-effects?
             $rrd_list[$i]['filename']  = $rrd_filename;
             $rrd_list[$i]['descr']     = $port['label'];
             $rrd_list[$i]['descr_in']  = $device['hostname'];

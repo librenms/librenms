@@ -48,7 +48,7 @@ Command | Description
 `.port <hostname> <ifname>` | Prints Port-related information from `ifname` on given `hostname`.
 `.quit` | Disconnect from IRC and exit.
 `.reload` | Reload configuration.
-`.status <type>` | Prints status informations for given `type`. Type can be `devices`, `services`, `ports`. Shorthands are: `dev`,`srv`,`prt`
+`.status <type>` | Prints status information for given `type`. Type can be `devices`, `services`, `ports`. Shorthands are: `dev`,`srv`,`prt`
 `.version` | Prints `$this->config['project_name_version']`.
 
 ( __/!\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)

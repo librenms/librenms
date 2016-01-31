@@ -41,7 +41,7 @@ Function( (Type) $Variable [= Default] [,...] ) | Returns | Description
 
 ### <a name="glob.attr">Attributes</a>
 Attribute | Type | Description
---- | --- | --- 
+--- | --- | ---
 `$params` | `String` | Contains all arguments that are passed to the `.command`.
 `$this->chan` | `Array` | Channels that are configured.
 `$this->commands` | `Array` | Contains accessible `commands`.
@@ -51,7 +51,7 @@ Attribute | Type | Description
 `$this->external` | `Array` | Contains loaded extra `commands`.
 `$this->nick` | `String` | Bot's `nick` on the IRC.
 `$this->pass` | `String` | IRC-Server's passphrase.
-`$this->port` | `Int` | IRC-Sever's port-number.
+`$this->port` | `Int` | IRC-Server's port-number.
 `$this->server` | `String` | IRC-Server's hostname.
 `$this->ssl` | `Boolean` | SSL-Flag.
 `$this->tick` | `Int` | Interval to check buffers in microseconds.

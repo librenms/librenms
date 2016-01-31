@@ -1,6 +1,6 @@
 # Authentication modules
 
-LibreNMS supports multiple authentication modules along with [Two Factor Auth](http://docs.librenms.org/Extensions/Two-Factor-Auth/). 
+LibreNMS supports multiple authentication modules along with [Two Factor Auth](http://docs.librenms.org/Extensions/Two-Factor-Auth/).
 Here we will provide configuration details for these modules.
 
 #### Available authentication modules
@@ -50,9 +50,9 @@ $config['db_name'] = "DBNAME";
 
 Config option: `http-auth`
 
-LibreNMS will expect the user to have authenticated via your webservice already. At this stage it will need to assign a 
+LibreNMS will expect the user to have authenticated via your webservice already. At this stage it will need to assign a
 userlevel for that user which is done in one of two ways:
- 
+
 - A user exists in MySQL still where the usernames match up.
 
 - A global guest user (which still needs to be added into MySQL:
@@ -67,7 +67,7 @@ Config option: `ldap`
 
 This one is a little more complicated :)
 
-First of all, install ___php-ldap___ forCentOS/RHEL or ___php5-ldap___ for Ubuntu/Debian.
+First of all, install ___php-ldap___ for CentOS/RHEL or ___php5-ldap___ for Ubuntu/Debian.
 
 ```php
 $config['auth_ldap_version'] = 3; # v2 or v3
@@ -132,7 +132,7 @@ If you have issues with secure LDAP try setting `$config['auth_ad_check_certific
 
 ##### Require actual membership of the configured groups
 
-If you set ```$config['auth_ad_require_groupmembership']``` to 1, the authenticated user has to be a member of the specific group. Otherwise all users can authenticate, but are limited to user level 0 and only have access to shared dashboards. 
+If you set ```$config['auth_ad_require_groupmembership']``` to 1, the authenticated user has to be a member of the specific group. Otherwise all users can authenticate, but are limited to user level 0 and only have access to shared dashboards.
 
 > Cleanup of old accounts is done using the authlog. You will need to set the cleanup date for when old accounts will be purged which will happen AUTOMATICALLY.
 > Please ensure that you set the $config['authlog_purge'] value to be greater than $config['active_directory]['users_purge'] otherwise old users won't be removed.
@@ -163,5 +163,5 @@ $config['radius']['port']       = '1812';
 $config['radius']['secret']     = 'testing123';
 $config['radius']['timeout']    = 3;
 $config['radius']['users_purge'] = 14;//Purge users who haven't logged in for 14 days.
-$config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user. 
+$config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user.
 ```
