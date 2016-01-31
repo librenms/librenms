@@ -28,11 +28,11 @@ LibreNMS ships with the following software components:
 
 - Code for UBNT Devices
   Mark Gibbons <mgibbons@oemcomp.com>
-  Initial code base submited via PR721
+  Initial code base submitted via PR721
 
 - Jquery LazyLoad
   http://www.appelsiini.net/projects/lazyload
-  Mika Tuupola <tuupola@appelsiini.net> (@tuupola on github)
+  Mika Tuupola <tuupola@appelsiini.net> (@tuupola on GitHub)
   MIT License
 
 - influxdb-php

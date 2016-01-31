@@ -53,7 +53,7 @@ Now you have two configured remotes:
 As you become more familiar you may find a better workflow that fits your needs, until then this should be a safe
 workflow for you to follow.
 
-Before you start work on a new branch / feature. Make sure you are upto date.
+Before you start work on a new branch / feature. Make sure you are up to date.
 ```bash
 cd /opt/librenms
 git checkout master

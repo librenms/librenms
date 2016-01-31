@@ -45,7 +45,7 @@ service rrdcached start
 $config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
 ```
 ### RRDCached installation CentOS 7
-This example is based on a fresh LibreNMS install, on a minimimal CentOS 7.x installation.
+This example is based on a fresh LibreNMS install, on a minimal CentOS 7.x installation.
 We'll use the epel-release and setup a RRDCached as a service.
 It is recommended that you monitor your LibreNMS server with LibreNMS so you can view the disk I/O usage delta.
 See [Installation (RHEL CentOS)][1] for localhost monitoring.
