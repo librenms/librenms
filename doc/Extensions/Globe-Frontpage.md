@@ -31,7 +31,7 @@ $config['leaflet']['default_zoom']                       = 8;
 
 
 ### Jquery-Mapael config
-Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of 
+Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of
 this is:
 
 ```php

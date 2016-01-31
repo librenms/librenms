@@ -1,6 +1,6 @@
 # Smokeping integration
 
-We currently have two ways to use Smokeping with LibreNMS, the first is using the included script generator to generate the config for Smokeping. The 
+We currently have two ways to use Smokeping with LibreNMS, the first is using the included script generator to generate the config for Smokeping. The
 second is to utilise an existing Smokeping setup.
 
 ### Included Smokeping script
@@ -11,7 +11,7 @@ To use this, please add something similar to your smokeping config file:
 @include /opt/smokeping/etc/librenms.conf
 ```
 
-Then you need to generate the config file (maybe even add a cron to schedule this in and reload smokeping). We've assumed a few locations for smokeping, the config file you want 
+Then you need to generate the config file (maybe even add a cron to schedule this in and reload smokeping). We've assumed a few locations for smokeping, the config file you want
 to call it and where LibreNMS is:
 
 ```bash

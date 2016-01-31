@@ -239,12 +239,20 @@ function delete_device($id) {
     return $ret;
 }
 
-function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0') {
+function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
     global $config;
 
     list($hostshort) = explode(".", $host);
     // Test Database Exists
     if (host_exists($host) === false) {
+        // Valid port assoc mode
+        if (! is_valid_port_assoc_mode ($port_assoc_mode)) {
+            if ($quiet == 0) {
+                print_error ("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join (', ', get_port_assoc_modes ()));
+                return 0;
+            }
+        }
+
         if ($config['addhost_alwayscheckip'] === TRUE) {
             $ip = gethostbyname($host);
         } else {
@@ -257,15 +265,15 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 if (empty($snmpver)) {
                     // Try SNMPv2c
                     $snmpver = 'v2c';
-                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
+                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
                     if (!$ret) {
                         //Try SNMPv3
                         $snmpver = 'v3';
-                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
+                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
                         if (!$ret) {
                             // Try SNMPv1
                             $snmpver = 'v1';
-                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
+                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
                         }
                         else {
                             return $ret;
@@ -279,12 +287,12 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 if ($snmpver === "v3") {
                     // Try each set of parameters from config
                     foreach ($config['snmp']['v3'] as $v3) {
-                        $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3);
+                        $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3, $port_assoc_mode);
                         if($quiet == '0') { print_message("Trying v3 parameters " . $v3['authname'] . "/" .  $v3['authlevel'] . " ... "); }
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) or ($snmphost == $host || $hostshort = $host)) {
-                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group);
+                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode);
                                 return $device_id;
                             }
                             else {
@@ -303,14 +311,14 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 elseif ($snmpver === "v2c" or $snmpver === "v1") {
                     // try each community from config
                     foreach ($config['snmp']['community'] as $community) {
-                        $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL);
+                        $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL, $port_assoc_mode);
                         if($quiet == '0') {
                             print_message("Trying community $community ...");
                         }
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
-                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group);
+                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $port_assoc_mode);
                                 return $device_id;
                             }
                             else {
@@ -382,11 +390,17 @@ next;
     }
 }
 
-function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3) {
+function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3, $port_assoc_mode = 'ifIndex') {
     $device = array();
     $device['hostname'] = $host;
     $device['port'] = $port;
     $device['transport'] = $transport;
+
+    /* Get port_assoc_mode id if neccessary
+     * We can work with names of IDs here */
+    if (! is_int ($port_assoc_mode))
+        $port_assoc_mode = get_port_assoc_mode_id ($port_assoc_mode);
+    $device['port_association_mode'] = $port_assoc_mode;
 
     $device['snmpver'] = $snmpver;
     if ($snmpver === "v2c" or $snmpver === "v1") {
@@ -554,7 +568,7 @@ function getpollergroup($poller_group='0') {
     }
 }
 
-function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0') {
+function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0', $port_assoc_mode = 'ifIndex') {
     global $config;
     $host = trim(strtolower($host));
 
@@ -569,6 +583,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'snmpver' => $snmpver,
         'poller_group' => $poller_group,
         'status_reason' => '',
+        'port_association_mode' => $port_assoc_mode,
     );
 
     $device = array_merge($device, $v3);

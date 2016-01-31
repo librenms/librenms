@@ -94,7 +94,7 @@ if ($if_list) {
 
         echo '<br />';
 
-        if (file_exists($config['rrd_dir'].'/'.$port['hostname'].'/port-'.$port['ifIndex'].'.rrd')) {
+        if (file_exists(get_port_rrdfile_path ($port['hostname'], $port['port_id']))) {
             $graph_type = 'port_bits';
 
             include 'includes/print-interface-graphs.inc.php';
