@@ -38,7 +38,7 @@ Table of Content:
 
 # <a name="about">About</a>
 
-LibreNMS includes a highly customizable alerting system.  
+LibreNMS includes a highly customizable alerting system.
 The system requires a set of user-defined rules to evaluate the situation of each device, port, service or any other entity.
 
 > You can configure all options for alerting and transports via the WebUI, config options in this document are crossed out but left for reference.
@@ -47,15 +47,15 @@ This document only covers the usage of it. See the [DEVELOPMENT.md](https://gith
 
 # <a name="rules">Rules</a>
 
-Rules are defined using a logical language.  
-The GUI provides a simple way of creating basic as well as complex Rules in a self-describing manner.  
+Rules are defined using a logical language.
+The GUI provides a simple way of creating basic as well as complex Rules in a self-describing manner.
 More complex rules can be written manually.
 
 ## <a name="rules-syntax">Syntax</a>
 
-Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.  
-Rules can contain braces and __Glues__.  
-__Entities__ are provided as `%`-Noted pair of Table and Field. For Example: `%ports.ifOperStatus`.  
+Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
+Rules can contain braces and __Glues__.
+__Entities__ are provided as `%`-Noted pair of Table and Field. For Example: `%ports.ifOperStatus`.
 __Conditions__ can be any of:
 
 - Equals `=`
@@ -67,10 +67,10 @@ __Conditions__ can be any of:
 - Smaller `<`
 - Smaller or Equal `<=`
 
-__Values__ can be Entities or any single-quoted data.  
+__Values__ can be Entities or any single-quoted data.
 __Glues__ can be either `&&` for `AND` or `||` for `OR`.
 
-__Note__: The difference between `Equals` and `Matches` (and its negation) is that `Equals` does a strict comparison and `Matches` allows the usage of RegExp.  
+__Note__: The difference between `Equals` and `Matches` (and its negation) is that `Equals` does a strict comparison and `Matches` allows the usage of RegExp.
 Arithmetics are allowed as well.
 
 ## <a name="rules-examples">Examples</a>
@@ -90,17 +90,17 @@ Alert when:
 
 # <a name="templates">Templates</a>
 
-Templates can be assigned to a single or a group of rules.  
-They can contain any kind of text.  
-The template-parser understands `if` and `foreach` controls and replaces certain placeholders with information gathered about the alert.  
+Templates can be assigned to a single or a group of rules.
+They can contain any kind of text.
+The template-parser understands `if` and `foreach` controls and replaces certain placeholders with information gathered about the alert.
 
 ## <a name="templates-syntax">Syntax</a>
 
 Controls:
 
-- if-else (Else can be omitted):  
+- if-else (Else can be omitted):
 `{if %placeholder == 'value'}Some Text{else}Other Text{/if}`
-- foreach-loop:  
+- foreach-loop:
 `{foreach %placeholder}Key: %key<br/>Value: %value{/foreach}`
 
 Placeholders:
@@ -123,7 +123,7 @@ Templates can be matched against several rules.
 
 ## <a name="templates-examples">Examples</a>
 
-Default Template:  
+Default Template:
 ```text
 %title\r\n
 Severity: %severity\r\n
@@ -138,13 +138,13 @@ Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 
 # <a name="transports">Transports</a>
 
-Transports are located within `$config['install_dir']/includes/alerts/transports.*.php` and defined as well as configured via ~~`$config['alert']['transports']['Example'] = 'Some Options'`~~.  
+Transports are located within `$config['install_dir']/includes/alerts/transports.*.php` and defined as well as configured via ~~`$config['alert']['transports']['Example'] = 'Some Options'`~~.
 
-Contacts will be gathered automatically and passed to the configured transports.  
+Contacts will be gathered automatically and passed to the configured transports.
 By default the Contacts will be only gathered when the alert triggers and will ignore future changes in contacts for the incident. If you want contacts to be re-gathered before each dispatch, please set ~~`$config['alert']['fixed-contacts'] = false;`~~ in your config.php.
 
-The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS-User that has at least `read`-permissions on the entity that is to be alerted.  
-At the moment LibreNMS only supports Port or Device permissions.  
+The contacts will always include the `SysContact` defined in the Device's SNMP configuration and also every LibreNMS-User that has at least `read`-permissions on the entity that is to be alerted.
+At the moment LibreNMS only supports Port or Device permissions.
 You can exclude the `SysContact` by setting:
 ~~
 ```php
@@ -170,7 +170,7 @@ $config['alert']['transports']['mail'] = true;
 ```
 ~~
 
-The E-Mail transports uses the same email-configuration like the rest of LibreNMS.  
+The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
 As a small reminder, here is it's configuration directives including defaults:
 ~~
 ```php
@@ -195,13 +195,13 @@ $config['alert']['default_mail']           = '';                   //Default ema
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
-API transports definitions are a bit more complex than the E-Mail configuration.  
-The basis for configuration is ~~`$config['alert']['transports']['api'][METHOD]`~~ where `METHOD` can be `get`,`post` or `put`.  
-This basis has to contain an array with URLs of each API to call.  
-The URL can have the same placeholders as defined in the [Template-Syntax](#templates-syntax).  
-If the `METHOD` is `get`, all placeholders will be URL-Encoded.  
-The API transport uses cURL to call the APIs, therefore you might need to install `php5-curl` or similar in order to make it work.  
-__Note__: it is highly recommended to define own [Templates](#templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.  
+API transports definitions are a bit more complex than the E-Mail configuration.
+The basis for configuration is ~~`$config['alert']['transports']['api'][METHOD]`~~ where `METHOD` can be `get`,`post` or `put`.
+This basis has to contain an array with URLs of each API to call.
+The URL can have the same placeholders as defined in the [Template-Syntax](#templates-syntax).
+If the `METHOD` is `get`, all placeholders will be URL-Encoded.
+The API transport uses cURL to call the APIs, therefore you might need to install `php5-curl` or similar in order to make it work.
+__Note__: it is highly recommended to define own [Templates](#templates) when you want to use the API transport. The default template might exceed URL-length for GET requests and therefore cause all sorts of errors.
 
 Example:
 ~~
@@ -214,7 +214,7 @@ $config['alert']['transports']['api']['get'][] = "https://api.thirdparti.es/issu
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
-The nagios transport will feed a FIFO at the defined location with the same format that nagios would.  
+The nagios transport will feed a FIFO at the defined location with the same format that nagios would.
 This allows you to use other Alerting-Systems to work with LibreNMS, for example [Flapjack](http://flapjack.io).
 ~~
 ```php
@@ -226,7 +226,7 @@ $config['alert']['transports']['nagios'] = "/path/to/my.fifo"; //Flapjack expect
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
-The IRC transports only works together with the LibreNMS IRC-Bot.  
+The IRC transports only works together with the LibreNMS IRC-Bot.
 Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/librenms/librenms/blob/master/doc/Extensions/IRC-Bot.md).
 ~~
 ```php
@@ -349,7 +349,7 @@ $config['alert']['transports']['pushover'][] = array(
 
 ## <a name="transports-boxcar">Boxcar</a>
 
-Enabling Boxcar support is super easy. 
+Enabling Boxcar support is super easy.
 Copy your access token from the Boxcar app or from the Boxcar.io website and setup the transport in your config.php like:
 
 ~~
@@ -384,7 +384,7 @@ $config['alert']['transports']['pushbullet'] = 'MYFANCYACCESSTOKEN';
 
 ## <a name="transports-clickatell">Clickatell</a>
 
-Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.  
+Clickatell provides a REST-API requiring an Authorization-Token and at least one Cellphone number.
 Please consult Clickatell's documentation regarding number formatting.
 Here an example using 3 numbers, any amount of numbers is supported:
 
@@ -399,8 +399,8 @@ $config['alert']['transports']['clickatell']['to'][]  = '+1234567892';
 
 ## <a name="transports-playsms">PlaySMS</a>
 
-PlaySMS is an OpenSource SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.  
-Please consult PlaySMS's documentation regarding number formating.  
+PlaySMS is an OpenSource SMS-Gateway that can be used via their HTTP-API using a Username and WebService-Token.
+Please consult PlaySMS's documentation regarding number formating.
 Here an example using 3 numbers, any amount of numbers is supported:
 
 ~~
