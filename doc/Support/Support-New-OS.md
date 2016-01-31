@@ -69,7 +69,7 @@ $hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSES
 $hostname = trim(snmp_get($device, "sysName.0", "-OQv", "SNMPv2-MIB"),'"');
 ```
 
-Quick explanation and examples : 
+Quick explanation and examples :
 
 ```bash
 snmpwalk -v2c -c public -m SNMPv2-MIB -M mibs

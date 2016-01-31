@@ -118,7 +118,7 @@ $ARRAY = $COMPONENT->getComponents($DEVICE_ID,$OPTIONS);
                 [status] => 0
                 [ignore] => 1
                 [disabled] => 1
-                [error] => 
+                [error] =>
             ),
             [Y2] => Array
             (
@@ -129,7 +129,7 @@ $ARRAY = $COMPONENT->getComponents($DEVICE_ID,$OPTIONS);
                 [status] => 0
                 [ignore] => 1
                 [disabled] => 0
-                [error] => 
+                [error] =>
             ),
         )
     )
@@ -155,7 +155,7 @@ Where:
 
 
 There are 2 filtering shortcuts:
- 
+
 $DEVICE_ID is a synonym for:
 
 ```php
@@ -201,11 +201,11 @@ This will return a new, empty array with a component ID and Type set, all other 
         [1] => Array
         (
             [type] => TESTING
-            [label] => 
+            [label] =>
             [status] => 1
             [ignore] => 0
             [disabled] => 0
-            [error] => 
+            [error] =>
         )
     )
 
