@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/port-'.safename($port['ifIndex'].'-adsl.rrd');
+$rrd_filename = get_port_rrdfile_path ($device['hostname'], $port['port_id'], 'adsl');
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr']    = 'Downstream';
