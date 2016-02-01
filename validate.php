@@ -271,36 +271,42 @@ foreach ($modules as $module) {
         break;
     case 'rrdcheck':
 
-        $directory = new RecursiveDirectoryIterator($config['rrd_dir']);
-        $filter = new RRDReursiveFilterIterator($directory);
-        $iterator = new RecursiveIteratorIterator($filter);
-        $total = iterator_count($iterator);
-        $iterator->rewind();
+        // Loop through the rrd_dir
+        $rrd_directory = new RecursiveDirectoryIterator($config['rrd_dir']);
+        // Filter out any non rrd files
+        $rrd_directory_filter = new RRDRecursiveFilterIterator($rrd_directory);
+        $rrd_iterator = new RecursiveIteratorIterator($rrd_directory_filter);
+        $rrd_total = iterator_count($rrd_iterator);
+        $rrd_iterator->rewind(); // Rewind iterator in case iterator_count left iterator in unknown state
 
-        echo 'Scanning '.$total.' rrd files...'.PHP_EOL;
+        echo "\nScanning ".$rrd_total." rrd files in ".$config['rrd_dir']."...\n";
 
-        $count = 0;
+        // Count loops so we can push status to the user
+        $loopcount = 0;
         $screenpad = 0;
 
-        foreach ($iterator as $filename => $file) {
+        foreach ($rrd_iterator as $filename => $file) {
 
-                $testResult = rrdtest($filename, $output, $error);
+                $rrd_test_result = rrdtest($filename, $output, $error);
 
-                $count++;
-                if (($count % 100) == 0 ) {
-                        echo "\033[".$screenpad.'D';
-                        $echo = 'Status: '.$count.'/'.$total;
-                        echo $echo;
-                        $screenpad = strlen($echo);
+                $loopcount++;
+                if (($loopcount % 50) == 0 ) {
+                        //This lets us update the previous status update without spamming in most consoles
+                        echo "\033[".$screenpad."D";
+                        $test_status = 'Status: '.$loopcount.'/'.$rrd_total;
+                        echo $test_status;
+                        $screenpad = strlen($test_status);
                 }
 
-                if ($testResult > 0)  {
-                        echo "\033[".$screenpad.'D';
-                        echo PHP_EOL.'Error parsing "'.$filename.'" '.$error.PHP_EOL;
+                // A non zero result means there was some kind of error
+                if ($rrd_test_result > 0)  {
+                        echo "\033[".$screenpad."D";
+                        print_fail('Error parsing "'.$filename.'" RRD '.trim($error));
                         $screenpad = 0;
                 }
-
         }
+        echo "\033[".$screenpad."D";
+        echo "Status: ".$loopcount."/".$rrd_total." - Complete\n";
 
         break;
     }//end switch
