@@ -1373,7 +1373,7 @@ function dnslookup($device,$type=false,$return=false) {
  *
 **/
 
-class RRDReursiveFilterIterator extends \RecursiveFilterIterator {
+class RRDRecursiveFilterIterator extends \RecursiveFilterIterator {
     public function accept() {
         $filename = $this->current()->getFilename();
         if ($filename[0] === '.') {
@@ -1402,6 +1402,7 @@ class RRDReursiveFilterIterator extends \RecursiveFilterIterator {
 **/
 
 function rrdtest($path, &$stdOutput, &$stdError) {
+    global $config;
     //rrdtool info <escaped rrd path>
     $command = $config['rrdtool'].' info '.escapeshellarg($path);
     $process = proc_open(
