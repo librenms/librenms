@@ -24,6 +24,7 @@ if (isset($options['h'])) {
         -m Any sub modules you want to run, comma separated:
           - mail: this will test your email settings  (uses default_mail option even if default_only is not set).
           - dist-poller: this will test for the install running as a distributed poller.
+          - rrdcheck: this will check to see if your rrd files are corrupt
 
         Example: ./validate.php -m mail.
 
@@ -267,6 +268,40 @@ foreach ($modules as $module) {
                 }
             }
         }
+        break;
+    case 'rrdcheck':
+
+        $directory = new RecursiveDirectoryIterator($config['rrd_dir']);
+        $filter = new RRDReursiveFilterIterator($directory);
+        $iterator = new RecursiveIteratorIterator($filter);
+        $total = iterator_count($iterator);
+        $iterator->rewind();
+
+        echo 'Scanning '.$total.' rrd files...'.PHP_EOL;
+
+        $count = 0;
+        $screenpad = 0;
+
+        foreach ($iterator as $filename => $file) {
+
+                $testResult = rrdtest($filename, $output, $error);
+
+                $count++;
+                if (($count % 100) == 0 ) {
+                        echo "\033[".$screenpad.'D';
+                        $echo = 'Status: '.$count.'/'.$total;
+                        echo $echo;
+                        $screenpad = strlen($echo);
+                }
+
+                if ($testResult > 0)  {
+                        echo "\033[".$screenpad.'D';
+                        echo PHP_EOL.'Error parsing "'.$filename.'" '.$error.PHP_EOL;
+                        $screenpad = 0;
+                }
+
+        }
+
         break;
     }//end switch
 }//end foreach
