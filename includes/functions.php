@@ -1371,9 +1371,12 @@ function dnslookup($device,$type=false,$return=false) {
 /**
  * Reursive Filter Iterator to iterate directories and locate .rrd files.
  *
+ * @method boolean isDir()
+ *
 **/
 
 class RRDRecursiveFilterIterator extends \RecursiveFilterIterator {
+
     public function accept() {
         $filename = $this->current()->getFilename();
         if ($filename[0] === '.') {
