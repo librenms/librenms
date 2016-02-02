@@ -39,11 +39,11 @@
 // adslAturPerfESs.1 = 0 seconds
 // adslAturPerfValidIntervals.1 = 0
 // adslAturPerfInvalidIntervals.1 = 0
-if (isset($port_stats[$port['ifIndex']]['adslLineCoding'])) {
+if (isset($port_stats[$port_id]['adslLineCoding'])) {
     // Check to make sure Port data is cached.
-    $this_port = &$port_stats[$port['ifIndex']];
+    $this_port = &$port_stats[$port_id];
 
-    $rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('port-'.$port['ifIndex'].'-adsl.rrd');
+    $rrdfile = get_port_rrdfile_path ($device['hostname'], $port_id, 'adsl');
 
     $rrd_create  = ' --step 300';
     $rrd_create .= ' DS:AtucCurrSnrMgn:GAUGE:600:0:635';
@@ -130,8 +130,8 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding'])) {
         $this_port[$oid] = ($this_port[$oid] / 10);
     }
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?', array($port['port_id'])) == '0') {
-        dbInsert(array('port_id' => $port['port_id']), 'ports_adsl');
+    if (dbFetchCell('SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?', array($port_id)) == '0') {
+        dbInsert(array('port_id' => $port_id), 'ports_adsl');
     }
 
     $port['adsl_update'] = array('port_adsl_updated' => array('NOW()'));
@@ -141,7 +141,7 @@ if (isset($port_stats[$port['ifIndex']]['adslLineCoding'])) {
         $port['adsl_update'][$oid] = $data;
     }
 
-    dbUpdate($port['adsl_update'], 'ports_adsl', '`port_id` = ?', array($port['port_id']));
+    dbUpdate($port['adsl_update'], 'ports_adsl', '`port_id` = ?', array($port_id));
 
     if ($this_port['adslAtucCurrSnrMgn'] > '1280') {
         $this_port['adslAtucCurrSnrMgn'] = 'U';
