@@ -17,6 +17,8 @@ foreach ($graphs as $key => $text) {
 
     if ($key == "ceph_poolstats") {
         foreach (glob($rrddir."/app-ceph-".$app['app_id']."-pool-*") as $rrd_filename) {
+            $graph_array['to']     = $config['time']['now'];
+            $graph_array['id']     = $app['app_id'];
             if (preg_match("/.*-pool-(.+)\.rrd$/", $rrd_filename, $pools)) {
                 $pool = $pools[1];
                 echo '<h3>'.$pool.' Reads/Writes</h3>';
@@ -39,6 +41,8 @@ foreach ($graphs as $key => $text) {
     }
     elseif ($key == "ceph_osdperf") {
         foreach (glob($rrddir."/app-ceph-".$app['app_id']."-osd-*") as $rrd_filename) {
+            $graph_array['to']     = $config['time']['now'];
+            $graph_array['id']     = $app['app_id'];
             if (preg_match("/.*-osd-(.+)\.rrd$/", $rrd_filename, $osds)) {
                 $osd = $osds[1];
                 echo '<h3>'.$osd.' Latency</h3>';
@@ -57,6 +61,8 @@ foreach ($graphs as $key => $text) {
                 $pool = $pools[1];
                 if ($pool == "c") {
                     echo '<h3>Cluster Usage</h3>';
+                    $graph_array['to']     = $config['time']['now'];
+                    $graph_array['id']     = $app['app_id'];
                     $graph_array['type']   = 'application_ceph_pool_df';
                     $graph_array['pool']   = $pool;
 
@@ -66,6 +72,8 @@ foreach ($graphs as $key => $text) {
                 }
                 else {
                     echo '<h3>'.$pool.' Usage</h3>';
+                    $graph_array['to']     = $config['time']['now'];
+                    $graph_array['id']     = $app['app_id'];
                     $graph_array['type']   = 'application_ceph_pool_df';
                     $graph_array['pool']   = $pool;
 
@@ -74,6 +82,8 @@ foreach ($graphs as $key => $text) {
                     echo '</td></tr>';
 
                     echo '<h3>'.$pool.' Objects</h3>';
+                    $graph_array['to']     = $config['time']['now'];
+                    $graph_array['id']     = $app['app_id'];
                     $graph_array['type']   = 'application_ceph_pool_objects';
                     $graph_array['pool']   = $pool;
     
