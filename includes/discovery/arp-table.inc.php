@@ -47,10 +47,10 @@ foreach ($vrfs_lite_cisco as $vrf) {
             $port_id = $interface['port_id'];
             $mac_table[$port_id][$clean_mac] = 1;
 
-            if (dbFetchCell('SELECT COUNT(*) from ipv4_mac WHERE port_id = ? AND ipv4_address = ? AND `context_name`= ?', array($interface['port_id'], $ip, $device['context_name']))) {
+            if (dbFetchCell('SELECT COUNT(*) from ipv4_mac WHERE port_id = ? AND ipv4_address = ?', array($interface['port_id'], $ip))) {
                 // Commented below, no longer needed but leaving for reference.
                 // $sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE port_id = '".$interface['port_id']."' AND ipv4_address = '$ip'";
-                $old_mac = dbFetchCell('SELECT mac_address from ipv4_mac WHERE ipv4_address=? AND port_id=? AND `context_name`= ?', array($ip, $interface['port_id']), $device['context_name']);
+                $old_mac = dbFetchCell('SELECT mac_address from ipv4_mac WHERE ipv4_address=?', array($ip, $interface['port_id']));
 
                 if ($clean_mac != $old_mac && $clean_mac != '' && $old_mac != '') {
                     d_echo("Changed mac address for $ip from $old_mac to $clean_mac\n");
@@ -58,7 +58,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                     log_event("MAC change: $ip : ".mac_clean_to_readable($old_mac).' -> '.mac_clean_to_readable($clean_mac), $device, 'interface', $interface['port_id']);
                 }
 
-                dbUpdate(array('mac_address' => $clean_mac), 'ipv4_mac', 'port_id=? AND ipv4_address=? AND `context_name`= ?', array($interface['port_id'], $ip, $device['context_name']));
+                dbUpdate(array('mac_address' => $clean_mac, 'context_name' => $device['context_name']), 'ipv4_mac', 'port_id=? AND ipv4_address=?', array($interface['port_id'], $ip));
                 echo '.';
             }
             elseif (isset($interface['port_id'])) {
@@ -75,12 +75,12 @@ foreach ($vrfs_lite_cisco as $vrf) {
         }//end if
     }//end foreach
 
-    $sql = "SELECT * from ipv4_mac AS M, ports as I WHERE M.port_id = I.port_id and I.device_id = ' AND `context_name`= ?".$device['device_id']." AND M.context_name='". $device['context_name'] ."'";
+    $sql = "SELECT * from ipv4_mac AS M, ports as I WHERE M.port_id = I.port_id and I.device_id = '".$device['device_id']."'";
     foreach (dbFetchRows($sql) as $entry) {
         $entry_mac = $entry['mac_address'];
         $entry_if  = $entry['port_id'];
         if (!$mac_table[$entry_if][$entry_mac]) {
-            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ? AND `context_name`= ?', array($entry_if, $entry_mac, $device['context_name']));
+            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address` = ?', array($entry_if, $entry_mac));
             d_echo("Removing MAC $entry_mac from interface ".$interface['ifName']);
 
             echo '-';
