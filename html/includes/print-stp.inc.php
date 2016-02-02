@@ -1,5 +1,6 @@
 <?php
 
+echo '<table class="table table-condensed table-striped table-hover">';
 $stp_raw = dbFetchRow('SELECT * FROM `stp` WHERE `device_id` = ?', array($device['device_id']));
 $stp = array (
     'Root bridge'                 => ($stp_raw['rootBridge'] == 1) ? 'Yes' : 'No',
@@ -22,8 +23,9 @@ $stp = array (
 foreach (array_keys($stp) as $key) {
     echo "
       <tr>
-        <td width=280 class=list-large>$key</td>
-        <td class=box-desc>$stp[$key]</td>
+        <td>$key</td>
+        <td>$stp[$key]</td>
       </tr>
     ";
 }
+echo '</table>';

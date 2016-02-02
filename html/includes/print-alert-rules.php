@@ -53,7 +53,7 @@ if (isset($_POST['create-default'])) {
     );
     $default_rules[] = array(
         'device_id' => '-1',
-        'rule'      => '%macros.port_usage_perc >= "80"',
+        'rule'      => '%macros.port_usage_perc >= "80" && %macros.port_up = "1" && %macros.port = "1"',
         'severity'  => 'critical',
         'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
         'disabled'  => 0,
@@ -61,7 +61,7 @@ if (isset($_POST['create-default'])) {
     );
     $default_rules[] = array(
         'device_id' => '-1',
-        'rule'      => '%sensors.sensor_current > %sensors.sensor_limit',
+        'rule'      => '%sensors.sensor_current > %sensors.sensor_limit && %sensors.sensor_alert = "1"',
         'severity'  => 'critical',
         'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
         'disabled'  => 0,
@@ -69,7 +69,7 @@ if (isset($_POST['create-default'])) {
     );
     $default_rules[] = array(
         'device_id' => '-1',
-        'rule'      => '%sensors.sensor_current < %sensors.sensor_limit_low',
+        'rule'      => '%sensors.sensor_current < %sensors.sensor_limit_low && %sensors.sensor_alert = "1"',
         'severity'  => 'critical',
         'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
         'disabled'  => 0,
