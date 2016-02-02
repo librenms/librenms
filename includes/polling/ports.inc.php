@@ -410,6 +410,9 @@ foreach ($ports as $port) {
                     }
                 }
                 $port['update'][$oid] = $this_port[$oid];
+                if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
+                    $port['update'][$oid.'_prev'] = $port[$oid];
+                }
                 log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
                     d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ');
