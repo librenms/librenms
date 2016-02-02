@@ -10,8 +10,8 @@ if (!is_array($config['customers_descr'])) {
 $descr_type = "'".implode("', '", $config['customers_descr'])."'";
 
 foreach (dbFetchRows('SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_type` IN (?) AND `port_descr_descr` = ? AND D.device_id = I.device_id', array(array($descr_type), $vars['id'])) as $port) {
-    if (is_file($config['rrd_dir'].'/'.$port['hostname'].'/port-'.safename($port['ifIndex'].'.rrd'))) {
-        $rrd_filename              = $config['rrd_dir'].'/'.$port['hostname'].'/port-'.safename($port['ifIndex'].'.rrd');
+    $rrd_filename = get_port_rrdfile_path ($port['hostname'], $port['port_id']); // FIXME: Unification OK?
+    if (is_file($rrd_filename)) {
         $rrd_list[$i]['filename']  = $rrd_filename;
         $rrd_list[$i]['descr']     = $port['hostname'].'-'.$port['ifDescr'];
         $rrd_list[$i]['descr_in']  = shorthost($port['hostname']);
@@ -20,7 +20,6 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_des
     }
 }
 
-// echo($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd"));
 $units       = 'bps';
 $total_units = 'B';
 $colours_in  = 'greens';

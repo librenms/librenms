@@ -153,8 +153,8 @@ Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 </VirtualHost>
 ```
 
-__Notes:__  
-If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`.  
+__Notes:__
+If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`.
 If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html)
 
 ### Using Nginx and PHP-FPM ###
@@ -327,8 +327,8 @@ Create the cronjob
 
 ### Daily Updates ###
 
-LibreNMS performs daily updates by default.  At 00:15 system time every day, a `git pull --no-edit --quiet` is performed.  You can override this default by edit
-ing your `config.php` file.  Remove the comment (the `#` mark) on the line:
+LibreNMS performs daily updates by default.  At 00:15 system time every day, a `git pull --no-edit --quiet` is performed.  You can override this default by editing
+your `config.php` file.  Remove the comment (the `#` mark) on the line:
 
     #$config['update'] = 0;
 
