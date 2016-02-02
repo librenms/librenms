@@ -1424,6 +1424,7 @@ function rrdtest($path, &$stdOutput, &$stdError) {
 
     $status = proc_get_status($process);
     while($status['running']) {
+        usleep(2000); // Sleep 2000 microseconds or 2 milliseconds
         $status = proc_get_status($process);
     }
 
