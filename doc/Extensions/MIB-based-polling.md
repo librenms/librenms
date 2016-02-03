@@ -177,29 +177,6 @@ register_mibs($device, $f5_mibs, "includes/discovery/os/f5.inc.php");
 
 The important thing is the array $f5_mibs where you define which parts (ltmVirtualServStatEntry) of the MIB (F5-BIGIP-LOCAL-MIB) you are going to add. The registering is also important, otherwise poller cannot make use of the MIB.
 
-### Poller
-
-Next step is to add the MIBs to the poller.
-
-#### Example
-`/opt/librenms/includes/polling/os/f5.inc.php`
- 
-```
-<?php
-$version = trim(snmp_get($device, '.1.3.6.1.4.1.3375.2.1.4.2.0', '-OQv', '', ''), '"');
-
-### MIB definition as an array 
-$f5_mibs = array(
-                "ltmVirtualServStatEntry" => "F5-BIGIP-LOCAL-MIB",
-);
-
-### Poll those MIBs
-poll_mibs($f5_mibs, $device, $graphs);
-```
-
-You define the MIBs which you want to poll here and start the actual polling with `poll_mibs()`.
-
-
 ## TODO ##
 
 What's not included in MIB-based polling at present?  These may be present in
