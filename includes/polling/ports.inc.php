@@ -280,9 +280,15 @@ foreach ($port_stats as $ifIndex => $port) {
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
         }
 
-        // Assure stable mapping
-        $port_stats[$ifIndex]['port_id'] = $port_id;
+        /** Assure stable bidirectional port mapping between DB and polled data
+          *
+          * Store the *current* ifIndex in the port info array containing all port information
+          * fetched from the database, as this is the only means we have to map ports_stats we
+          * just polled from the device to a port in $ports. All code below an includeed below
+          * will and has to map a port using it's ifIndex.
+          */
         $ports[$port_id]['ifIndex'] = $ifIndex;
+        $port_stats[$ifIndex]['port_id'] = $port_id;
     }
 
     // Port vanished (mark as deleted)
@@ -299,11 +305,12 @@ echo "\n";
 // Loop ports in the DB and update where necessary
 foreach ($ports as $port) {
     $port_id = $port['port_id'];
+    $ifIndex = $port['ifIndex'];
 
-    echo 'Port ' . $port['ifName'] . ': ' . $port['ifDescr'] . '(' . $port['ifIndex'] . ') ';
-    if ($port_stats[$port['ifIndex']] && $port['disabled'] != '1') {
+    echo 'Port ' . $port['ifName'] . ': ' . $port['ifDescr'] . '(' . $ifIndex . ') ';
+    if ($port_stats[$ifIndex] && $port['disabled'] != '1') {
         // Check to make sure Port data is cached.
-        $this_port = &$port_stats[$port['ifIndex']];
+        $this_port = &$port_stats[$ifIndex];
 
         if ($device['os'] == 'vmware' && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
             $this_port['ifDescr'] = $matches[1];

@@ -39,9 +39,9 @@
 // adslAturPerfESs.1 = 0 seconds
 // adslAturPerfValidIntervals.1 = 0
 // adslAturPerfInvalidIntervals.1 = 0
-if (isset($port_stats[$port_id]['adslLineCoding'])) {
+if (isset($port_stats[$ifIndex]['adslLineCoding'])) {
     // Check to make sure Port data is cached.
-    $this_port = &$port_stats[$port_id];
+    $this_port = &$port_stats[$ifIndex];
 
     $rrdfile = get_port_rrdfile_path ($device['hostname'], $port_id, 'adsl');
 
