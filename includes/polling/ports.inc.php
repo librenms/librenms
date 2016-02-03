@@ -224,6 +224,7 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 }
 
 
+$ports_found = array ();
 // New interface detection
 foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
@@ -289,6 +290,9 @@ foreach ($port_stats as $ifIndex => $port) {
           */
         $ports[$port_id]['ifIndex'] = $ifIndex;
         $port_stats[$ifIndex]['port_id'] = $port_id;
+
+	/* Build a list of all ports, identified by their port_id, found within this poller run. */
+	$ports_found[] = $port_id;
     }
 
     // Port vanished (mark as deleted)
@@ -307,8 +311,28 @@ foreach ($ports as $port) {
     $port_id = $port['port_id'];
     $ifIndex = $port['ifIndex'];
 
-    echo 'Port ' . $port['ifName'] . ': ' . $port['ifDescr'] . '(' . $ifIndex . ') ';
-    if ($port_stats[$ifIndex] && $port['disabled'] != '1') {
+    $port_info_string = 'Port ' . $port['ifName'] . ': ' . $port['ifDescr'] . " ($ifIndex / #$port_id) ";
+
+    /* We don't care for disabled ports, go on */
+    if ($port['disabled'] == 1) {
+        echo "$port_info_string disabled.\n";
+        continue;
+    }
+
+    /**
+     * If this port did not show up in $port_stats before it has been deleted
+     * since the last poller run. Mark it deleted in the database and go on.
+     */
+    if (! in_array ($port_id, $ports_found)) {
+        if ($port['deleted'] != '1') {
+            dbUpdate(array('deleted' => '1'), 'ports', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
+            echo "$port_info_string deleted.\n";
+        }
+        continue;
+    }
+
+    echo $port_info_string;
+    if ($port_stats[$ifIndex]) {
         // Check to make sure Port data is cached.
         $this_port = &$port_stats[$ifIndex];
 
@@ -654,19 +678,8 @@ foreach ($ports as $port) {
             $updated += dbUpdate($port['update_extended'], 'ports_statistics', '`port_id` = ?', array($port_id));
             d_echo("$updated updated");
         }
-
         // End Update Database
     }
-    else if ($port['disabled'] != '1') {
-        echo 'Port Deleted';
-        // Port missing from SNMP cache.
-        if ($port['deleted'] != '1') {
-            dbUpdate(array('deleted' => '1'), 'ports', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
-        }
-    }
-    else {
-        echo 'Port Disabled.';
-    }//end if
 
     echo "\n";
 
@@ -676,3 +689,4 @@ foreach ($ports as $port) {
 
 // Clear Variables Here
 unset($port_stats);
+unset($ports_found);
