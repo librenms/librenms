@@ -1,11 +1,6 @@
 <?php
 
-if ($port_stats[$ifIndex] &&
-    $port['ifType'] == 'ethernetCsmacd' &&
-    isset($port_stats[$ifIndex]['dot3StatsIndex'])) {
-    // Check to make sure Port data is cached.
-    $this_port = &$port_stats[$ifIndex];
-
+if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
     // TODO: remove legacy check?
     $old_rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('etherlike-'.$port['ifIndex'].'.rrd');
     $rrd_file    = get_port_rrdfile_path ($device['hostname'], $port_id, 'dot3');

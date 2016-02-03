@@ -35,12 +35,7 @@ $peth_oids = array(
     'pethMainPseConsumptionPower',
 );
 
-if ($port_stats[$ifIndex]
-    && $port['ifType'] == 'ethernetCsmacd'
-    && isset($port_stats[$ifIndex]['dot3StatsIndex'])) {
-    // Check to make sure Port data is cached.
-    $this_port = &$port_stats[$ifIndex];
-
+if ($this_port['dot3StatsIndex'] && $port['ifType'] == 'ethernetCsmacd') {
     $rrdfile = get_port_rrdfile_path ($device['hostname'], $port_id, 'poe');
     if (!file_exists($rrdfile)) {
         $rrd_create .= $config['rrd_rra'];
