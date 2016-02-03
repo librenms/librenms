@@ -145,6 +145,8 @@ graph.
     LibreNMS in the RRD files or the database tables `device_oids`
 
 ## Configuration
+### Main Configuration
+In `/opt/librenms/config.php` add `$config['poller_modules']['mib'] = 1;`
 
 ### Discovery
 
