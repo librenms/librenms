@@ -144,6 +144,59 @@ graph.
     can follow the above process, then use the resultant data collected by
     LibreNMS in the RRD files or the database tables `device_oids`
 
+## Configuration
+
+### Discovery
+
+You need to add your desired MIBs to `/opt/librenms/mibs` folder. Afterwards you need to register your MIBs to the discovery function. 
+
+#### Example
+`/opt/librenms/includes/discovery/os/f5.inc.php`
+
+```
+<?php
+if (!$os || $os === 'linux') {
+    $f5_sys_parent = '1.3.6.1.4.1.3375.2.1';
+    if (strpos($sysObjectId, $f5_sys_parent)) {
+        $os = 'f5';
+   }
+
+}
+
+### MIB definition as an array 
+$f5_mibs = array(
+                "ltmVirtualServStatEntry" => "F5-BIGIP-LOCAL-MIB",
+        );
+
+### Actual registering of the MIB
+register_mibs($device, $f5_mibs, "includes/discovery/os/f5.inc.php");
+
+```
+
+The important thing is the array $f5_mibs where you define which parts (ltmVirtualServStatEntry) of the MIB (F5-BIGIP-LOCAL-MIB) you are going to add. The registering is also important, otherwise poller cannot make use of the MIB.
+
+### Poller
+
+Next step is to add the MIBs to the poller.
+
+#### Example
+`/opt/librenms/includes/polling/os/f5.inc.php`
+ 
+```
+<?php
+$version = trim(snmp_get($device, '.1.3.6.1.4.1.3375.2.1.4.2.0', '-OQv', '', ''), '"');
+
+### MIB definition as an array 
+$f5_mibs = array(
+                "ltmVirtualServStatEntry" => "F5-BIGIP-LOCAL-MIB",
+);
+
+### Poll those MIBs
+poll_mibs($f5_mibs, $device, $graphs);
+```
+
+You define the MIBs which you want to poll here and start the actual polling with `poll_mibs()`.
+
 
 ## TODO ##
 
