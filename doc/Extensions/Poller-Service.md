@@ -33,9 +33,9 @@ If you are running MariaDB 10.2 or newer, you can tell poller-service to use a s
 
 ## Service Installation
 ### Upstart
-An upstart configuration file can be found in `scripts/librenms-poller-service.conf`. To install run `ln -s /opt/librenms/scripts/librenms-poller-service.conf /etc/init/librenms-poller-service.conf`. The service will start on boot and can be started manually by running `start librenms-poller-service`. If you receive an error that the service does not exist, run `initctl reload-configuration`. The service is configured to run as the user `librenms` and will fail if that user does not exist.
+An upstart configuration file can be found in `scripts/librenms-poller-service.conf`. To install run `cp /opt/librenms/scripts/librenms-poller-service.conf /etc/init/librenms-poller-service.conf`. The service will start on boot and can be started manually by running `start librenms-poller-service`. If you receive an error that the service does not exist, run `initctl reload-configuration`. The service is configured to run as the user `librenms` and will fail if that user does not exist.
 ### LSB
-An LSB init script can be found in `scripts/librenms-poller-service.init`. To install run `ln -s /opt/librenms/scripts/librenms-poller-service.init /etc/init.d/librenms-poller-service && update-rc.d librenms-poller-service defaults`.
+An LSB init script can be found in `scripts/librenms-poller-service.init`. To install run `cp /opt/librenms/scripts/librenms-poller-service.init /etc/init.d/librenms-poller-service && update-rc.d librenms-poller-service defaults`.
 ### systemd
-A systemd unit file can be found in `scripts/librenms-poller-service.init`. To install run `ln -s /opt/librenms/scripts/librenms-poller-service.service /etc/systemd/system/librenms-poller-service.service && systemctl enable librenms-poller-service.service`.
+A systemd unit file can be found in `scripts/librenms-poller-service.init`. To install run `cp /opt/librenms/scripts/librenms-poller-service.service /etc/systemd/system/librenms-poller-service.service && systemctl enable librenms-poller-service.service`.
 
