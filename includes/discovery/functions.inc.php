@@ -710,3 +710,31 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     }//end if
 
 }//end discover_process_ipv6()
+
+/*
+ * Check entity sensors to be excluded
+ * 
+ * @param string value to check
+ * @param array device
+ *
+ * @return bool true if sensor is valid
+ *              false if sensor is invalid
+*/
+function check_entity_sensor($string, $device) {
+    global $config;
+    $valid  = true;
+    $string = strtolower($string);
+    if (is_array($config['bad_entity_sensor_regex'])) {
+        $fringe = $config['bad_entity_sensor_regex'];
+        if (is_array($config['os'][$device['os']]['bad_entity_sensor_regex'])) {
+            $fringe = array_merge($config['bad_entity_sensor_regex'],$config['os'][$device['os']]['bad_entity_sensor_regex']);
+        }
+        foreach ($fringe as $bad) {
+            if (preg_match($bad . "i", $string)) {
+                $valid = false;
+                d_echo("Ignored entity sensor: $bad : $string");
+            }
+        }
+    }
+    return $valid;
+}
