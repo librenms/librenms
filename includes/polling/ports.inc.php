@@ -238,6 +238,31 @@ foreach ($port_stats as $ifIndex => $port) {
 
         // Port newly discovered?
         if (! $ports[$port_id]) {
+            /**
+              * When using the ifName or ifDescr as means to map discovered ports to
+              * known ports in the DB (think of port association mode) it's possible
+              * that we're facing the problem that the ifName or ifDescr polled from
+              * the device is unset or an empty string (like when querying some ubnt
+              * devices...). If this happends we have no way to map this port to any
+              * port found in the database. As reported this situation may occur for
+              * the time of one poll and might resolve automagically before the next
+              * poller run happens. Without this special case this would lead to new
+              * ports added to the database each time this situation occurs. To give
+              * the user the choice between »a lot of new ports« and »some poll runs
+              * are missed but ports stay stable« the 'ignore_unmapable_port' option
+              * has been added to configure this behaviour. To skip the port in this
+              * loop is sufficient as the next loop is looping only over ports found
+              * in the database and "maps back". As we did not add a new port to the
+              * DB here, there's no port to be mapped to.
+              *
+              * I'm using the in_array() check here, as I'm not sure if an "ifIndex"
+              * can be legally set to 0, which would yield True when checking if the
+              * value is empty().
+              */
+            if ($config['ignore_unmapable_port'] === True and in_array ($port[$port_association_mode], array ('', Null))) {
+                continue;
+            }
+
             $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
