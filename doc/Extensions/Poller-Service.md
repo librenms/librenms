@@ -32,6 +32,10 @@ Because locks are not replicated in Multi-Master MySQL configurations, if you ar
 If you are running MariaDB 10.2 or newer, you can tell poller-service to use a single mysql connection for managing locks by setting `$config['poller_service_single_connection']` to `true`. *DO NOT* configure this for any version of MariaDB less than 10.2 or any version of MySQL.
 
 ## Service Installation
-An upstart configuration `poller-service.conf` is provided. To install run `ln -s /opt/librenms/poller-service.conf /etc/init/poller-service.conf`. The service will start on boot and can be started manually by running `start poller-service`. If you receive an error that the service does not exist, run `initctl reload-configuration`. The service is configured to run as the user `librenms` and will fail if that user does not exist.
+### Upstart
+An upstart configuration file can be found in `scripts/librenms-poller-service.conf`. To install run `ln -s /opt/librenms/scripts/librenms-poller-service.conf /etc/init/librenms-poller-service.conf`. The service will start on boot and can be started manually by running `start librenms-poller-service`. If you receive an error that the service does not exist, run `initctl reload-configuration`. The service is configured to run as the user `librenms` and will fail if that user does not exist.
+### LSB
+An LSB init script can be found in `scripts/librenms-poller-service.init`. To install run `ln -s /opt/librenms/scripts/librenms-poller-service.init /etc/init.d/librenms-poller-service && update-rc.d librenms-poller-service defaults`.
+### systemd
+A systemd unit file can be found in `scripts/librenms-poller-service.init`. To install run `ln -s /opt/librenms/scripts/librenms-poller-service.service /etc/systemd/system/librenms-poller-service.service && systemctl enable librenms-poller-service.service`.
 
-An LSB init script `poller-service.init` is also provided. To install run `ln -s /opt/librenms/poller-service.init /etc/init.d/poller-service && update-rc.d poller-service defaults`.
