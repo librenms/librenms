@@ -256,20 +256,12 @@ else {
             unset($peername);
         }
 
-        // display overlib graphs
-        $graph_type      = 'bgp_updates';
-        $local_daily_url = 'graph.php?id='.$peer['bgpPeer_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=500&amp;height=150&&afi=ipv4&safi=unicast';
         if (filter_var($peer['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
             $peer_ip = Net_IPv6::compress($peer['bgpLocalAddr']);
         }
         else {
             $peer_ip = $peer['bgpLocalAddr'];
         }
-
-        $localaddresslink = "<span class=list-large><a href='device/device=".$peer['device_id']."/tab=routing/proto=bgp/' onmouseover=\"return overlib('<div style=\'background-color: #ffffff;\'><img src=\'$local_daily_url\'></div>', LEFT".$config['overlib_defaults'].');" onmouseout="return nd();">'.$peer_ip.'</a></span>';
-
-        $graph_type     = 'bgp_updates';
-        $peer_daily_url = 'graph.php?id='.$peer['bgpPeer_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=500&amp;height=150';
         if (filter_var($peer['bgpPeerIdentifier'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
             $peer_ident = Net_IPv6::compress($peer['bgpPeerIdentifier']);
         }
@@ -277,7 +269,29 @@ else {
             $peer_ident = $peer['bgpPeerIdentifier'];
         }
 
-        $peeraddresslink = "<span class=list-large><a href='device/device=".$peer['device_id']."/tab=routing/proto=bgp/' onmouseover=\"return overlib('<div style=\'background-color: #ffffff;\'><img src=\'$peer_daily_url\'></div>', LEFT".$config['overlib_defaults'].');" onmouseout="return nd();">'.$peer_ident.'</a></span>';
+        // display overlib graphs
+        $graph_array                = array();
+        $graph_array['type']        = 'bgp_updates';
+        $graph_array['id']          = $peer['bgpPeer_id'];
+        $graph_array['to']          = $config['time']['now'];
+        $graph_array['from']        = $config['time']['day'];
+        $graph_array['height']      = '110';
+        $graph_array['width']       = $width;
+
+        // Peer Address
+        $graph_array_zoom           = $graph_array;
+        $graph_array_zoom['height'] = '150';
+        $graph_array_zoom['width']  = '500';
+        $overlib_link = "device/device=".$peer['device_id']."/tab=routing/proto=bgp/";
+        $peeraddresslink = "<span class=list-large>".overlib_link($overlib_link, $peer_ident, generate_graph_tag($graph_array_zoom), NULL)."</span>";
+
+        // Local Address
+        $graph_array['afi']         = 'ipv4';
+        $graph_array['safi']        = 'unicast';
+        $graph_array_zoom['afi']    = 'ipv4';
+        $graph_array_zoom['safi']    = 'unicast';
+        $overlib_link = "device/device=".$peer['device_id']."/tab=routing/proto=bgp/";
+        $localaddresslink = "<span class=list-large>".overlib_link($overlib_link, $peer_ip, generate_graph_tag($graph_array_zoom), NULL)."</span>";
 
         echo '<tr class="bgp"'.($peer['alert'] ? ' bordercolor="#cc0000"' : '').($peer['disabled'] ? ' bordercolor="#cccccc"' : '').'>';
 
