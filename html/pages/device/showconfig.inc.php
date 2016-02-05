@@ -106,19 +106,13 @@ if ($_SESSION['userlevel'] >= '7') {
         $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$device['hostname'].'?format=json'), true);
         if ($config['oxidized']['features']['versioning'] === true && isset($_POST['config'])) {
             list($oid,$date,$version) = explode('|',mres($_POST['config']));
-            $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group=&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
-            if ($text == 'node not found') {
-                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(is_array($node_info) ? $node_info['group'] : $device['os']).'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
-            }
+            $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
         }
         else {
-            $text      = file_get_contents($config['oxidized']['url'].'/node/fetch/'.$device['hostname']);
-            if ($text == 'node not found') {
-                $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(is_array($node_info) ? $node_info['group'] : $device['os']).'/'.$device['hostname']);
-            }
+            $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$device['hostname']);
         }
         if ($config['oxidized']['features']['versioning'] === true) {
-            $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.$device['hostname'].'&format=json'), true);
+            $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$device['hostname'].'&format=json'), true);
         }
 
         if (is_array($node_info) || is_array($config_versions)) {
