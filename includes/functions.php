@@ -895,7 +895,7 @@ function is_port_valid($port, $device) {
                 }
             }
         }
-        if (empty($port['ifDescr'])) {
+        if (empty($port['ifDescr']) && !$device['os'] == "calix") {
             $valid = 0;
         }
         if ($device['os'] == "catos" && strstr($if, "vlan")) {
