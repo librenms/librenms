@@ -19,7 +19,7 @@ $bgp    = array();
 
 if (isset($_REQUEST['search'])) {
     $search = mres($_REQUEST['search']);
-
+    header('Content-type: application/json');
     if (strlen($search) > 0) {
         $found = 0;
 
