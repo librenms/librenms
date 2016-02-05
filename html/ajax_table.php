@@ -36,6 +36,7 @@ $response     = array();
 
 if (isset($id)) {
     if (file_exists("includes/table/$id.inc.php")) {
+        header('Content-type: application/json');
         include_once "includes/table/$id.inc.php";
     }
 }
