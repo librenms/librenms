@@ -62,7 +62,7 @@ function levsort($base, $obj) {
 
 }
 
-
+header('Content-type: application/json');
 $obj     = array(array('name' => 'Error: No suggestions found.'));
 $term    = array();
 $current = false;
