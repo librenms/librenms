@@ -324,7 +324,8 @@ function device_by_id_cache($device_id, $refresh = '0') {
 				$device['vrf_lite_cisco'][$vrf['context_name']] = $vrf;
 			}
 		}
-		
+
+        $device['ip'] = inet6_ntop($device['ip']);
         $cache['devices']['id'][$device_id] = $device;
     }
     return $device;

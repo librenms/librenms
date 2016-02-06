@@ -17,9 +17,9 @@ foreach ($graphs as $key => $text) {
 
     if ($key == "ceph_poolstats") {
         foreach (glob($rrddir."/app-ceph-".$app['app_id']."-pool-*") as $rrd_filename) {
-            $graph_array['to']     = $config['time']['now'];
-            $graph_array['id']     = $app['app_id'];
             if (preg_match("/.*-pool-(.+)\.rrd$/", $rrd_filename, $pools)) {
+                $graph_array['to']     = $config['time']['now'];
+                $graph_array['id']     = $app['app_id'];
                 $pool = $pools[1];
                 echo '<h3>'.$pool.' Reads/Writes</h3>';
                 $graph_array['type']   = 'application_ceph_pool_io';
@@ -29,6 +29,8 @@ foreach ($graphs as $key => $text) {
                 include 'includes/print-graphrow.inc.php';
                 echo '</td></tr>';
 
+                $graph_array['to']     = $config['time']['now'];
+                $graph_array['id']     = $app['app_id'];
                 echo '<h3>'.$pool.' IOPS</h3>';
                 $graph_array['type']   = 'application_ceph_pool_iops';
                 $graph_array['pool']   = $pool;
