@@ -200,10 +200,21 @@ foreach (dbFetchRows('SELECT * FROM `bgpPeers` WHERE `device_id` = ? ORDER BY `b
         $peer['bgpPeerIdentifier'] = Net_IPv6::compress($peer['bgpPeerIdentifier']);
     }
 
+    // display overlib graphs
+    $graph_array                = array();
+    $graph_array['type']        = 'bgp_updates';
+    $graph_array['id']          = $peer['bgpPeer_id'];
+    $graph_array['to']          = $config['time']['now'];
+    $graph_array['from']        = $config['time']['day'];
+    $graph_array['height']      = '110';
+    $graph_array['width']       = $width;
 
-    $graph_type      = 'bgp_updates';
-    $peer_daily_url  = 'graph.php?id='.$peer['bgpPeer_id'].'&amp;type='.$graph_type.'&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'].'&amp;width=500&amp;height=150';
-    $peeraddresslink = "<span class=list-large><a onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].');" onmouseout="return nd();">'.$peer['bgpPeerIdentifier'].'</a></span>';
+    // Peer Address
+    $graph_array_zoom           = $graph_array;
+    $graph_array_zoom['height'] = '150';
+    $graph_array_zoom['width']  = '500';
+    $overlib_link = "device/device=".$peer['device_id']."/tab=routing/proto=bgp/";
+    $peeraddresslink = "<span class=list-large>".overlib_link(NULL, $peer['bgpPeerIdentifier'], generate_graph_tag($graph_array_zoom), NULL)."</span>";
 
     echo '<tr bgcolor="'.$bg_colour.'"'.($peer['alert'] ? ' bordercolor="#cc0000"' : '').($peer['disabled'] ? ' bordercolor="#cccccc"' : '').'>
         ';

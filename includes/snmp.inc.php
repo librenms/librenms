@@ -782,8 +782,8 @@ function snmp_gen_auth(&$device) {
         }
     }
     else if ($device['snmpver'] === 'v2c' or $device['snmpver'] === 'v1') {
-        $cmd  = ' -'.$device['snmpver'];
-        $cmd .= ' -c '.$device['community'];
+        $cmd  = " -".$device['snmpver'];
+        $cmd .= " -c '".$device['community']."'";
     }
     else {
         if ($debug) {
