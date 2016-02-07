@@ -1,3 +1,34 @@
+### February 2016
+
+#### Bug fixes
+  - Discovery / Polling:
+    - Quote snmp v2c community (PR2927)
+    - For entity-sensor, changed variable name again (PR2948)
+    - Fix some issues with/introduced by port association mode configuration (PR2923)
+  - WebUI:
+    - Fix ceph graps (PR2909, PR2942)
+    - BGP Overlib (PR2915)
+    - Added `application/json` headers where json is returned (PR2936)
+    - Stop realtime graph page from auto refreshing (PR2939)
+    - Updated parsing of alert rules to allow `|` (PR2917)
+  - Misc:
+    - Updated `device_by_id_cache()` to convert IP column (PR2940)
+  - Documentation:
+    - Removed devloping doc as none of the info is current (PR2911)
+
+#### Improvements
+  - Discovery / Polling:
+    - Added ability to ignore device sensors from entity mib (PR2862)
+    - Added `ifOperStatus_prev` and `ifAdminStatus_prev` values to db (PR2912)
+  - Added detection for:
+    - Dell Networking N2048 (PR2949)
+  - Misc:
+    - Added check for rrd vadility (PR2908)
+    - Add systemd unit file for the python poller service (PR2913)
+  - Documentation:
+    -  Added description of AD configuration options (PR2910)
+    -  Add description to mibbases polling (PR2919)
+
 ### January 2016
 
 #### Bug fixes
