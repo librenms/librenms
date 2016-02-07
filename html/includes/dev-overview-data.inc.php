@@ -30,7 +30,7 @@ echo '<tr>
         <td>'.$device['sysName'].' </td>
       </tr>';
 
-if ($ip = inet6_ntop($device['ip'])) {
+if (!empty($device['ip'])) {
     echo '<tr>
              <td>Resolved IP</td>
              <td>'.$ip.'</td>
