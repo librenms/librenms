@@ -1249,7 +1249,7 @@ function get_port_id ($ports_mapped, $port, $port_association_mode) {
     */
     $maps  = $ports_mapped['maps'];
 
-    if (in_array ($port_association_mode, array ('ifIndex', 'ifName', 'ifDescr'))) {
+    if (in_array ($port_association_mode, array ('ifIndex', 'ifName', 'ifDescr', 'ifAlias'))) {
         $port_id = $maps[$port_association_mode][$port[$port_association_mode]];
     }
 
