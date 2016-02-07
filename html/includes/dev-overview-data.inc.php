@@ -33,7 +33,7 @@ echo '<tr>
 if (!empty($device['ip'])) {
     echo '<tr>
              <td>Resolved IP</td>
-             <td>'.$ip.'</td>
+             <td>'.$device['ip'].'</td>
          </tr>';
 }
 
