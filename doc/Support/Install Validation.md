@@ -17,7 +17,9 @@ So, to try and help with some of the general issues people come across we've put
 
 Optionally you can also pass -m and a module name for that to be tested. Current modules are:
 
- - mail. This will validate your mail transport configuration.
+ - mail - This will validate your mail transport configuration.
+ - dist-poller - This will test your distributed poller configuration.
+ - rrdcheck - This will test your rrd files to see if they are unreadable or corrupted (source of broken graphs).
 
 Output, this is color coded to try and make things a little easier:
 
