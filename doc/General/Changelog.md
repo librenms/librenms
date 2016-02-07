@@ -11,6 +11,7 @@
     - Added `application/json` headers where json is returned (PR2936)
     - Stop realtime graph page from auto refreshing (PR2939)
     - Updated parsing of alert rules to allow `|` (PR2917)
+    - Fix IP Display (PR2951)
   - Misc:
     - Updated `device_by_id_cache()` to convert IP column (PR2940)
   - Documentation:
