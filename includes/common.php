@@ -315,6 +315,7 @@ function device_by_id_cache($device_id, $refresh = '0') {
     }
     else {
         $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = ?", array($device_id));
+        $device['ip'] = inet6_ntop($device['ip']);
         $cache['devices']['id'][$device_id] = $device;
     }
     return $device;
@@ -1248,7 +1249,7 @@ function get_port_id ($ports_mapped, $port, $port_association_mode) {
     */
     $maps  = $ports_mapped['maps'];
 
-    if (in_array ($port_association_mode, array ('ifIndex', 'ifName', 'ifDescr'))) {
+    if (in_array ($port_association_mode, array ('ifIndex', 'ifName', 'ifDescr', 'ifAlias'))) {
         $port_id = $maps[$port_association_mode][$port[$port_association_mode]];
     }
 
