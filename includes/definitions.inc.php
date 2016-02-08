@@ -315,6 +315,7 @@ $config['os'][$os]['over'][0]['text']  = 'Traffic';
 $os = 'calix';
 $config['os'][$os]['text']             = 'Calix E7';
 $config['os'][$os]['type']             = 'network';
+$config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['icon']             = 'calix';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
