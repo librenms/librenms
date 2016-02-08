@@ -50,7 +50,7 @@ if (is_array($oids)) {
                 $descr = rewrite_entity_descr($descr);
             }
 
-            $valid = check_entity_sensor($descr, $device);
+            $valid_sensor = check_entity_sensor($descr, $device);
 
             $type = $entitysensor[$entry['entPhySensorType']];
 
@@ -103,16 +103,16 @@ if (is_array($oids)) {
 
             if ($type == 'temperature') {
                 if ($current > '200') {
-                    $valid = false;
+                    $valid_sensor = false;
                 } $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
 
             // echo($descr . "|" . $index . "|" .$current . "|" . $multiplier . "|" . $divisor ."|" . $entry['entPhySensorScale'] . "|" . $entry['entPhySensorPrecision'] . "\n");
             if ($current == '-127') {
-                $valid = false;
+                $valid_sensor = false;
             }
 
-            if ($valid && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", array($device['device_id'], $type, $index)) == '0') {
+            if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", array($device['device_id'], $type, $index)) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
                 discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, null, null, null, null, $current);
             }

@@ -55,5 +55,5 @@ $response = array(
                   'html' => $output,
                   'title' => $title,
                  );
-
+header('Content-type: application/json');
 echo _json_encode($response);
