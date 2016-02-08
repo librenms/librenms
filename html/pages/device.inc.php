@@ -388,7 +388,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         }
 
 
-        echo '<div class="dropdown" style="float: right;">
+        echo '<div class="dropdown pull-right">
               <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog"></i>
               <span class="caret"></span></button>
               <ul class="dropdown-menu">
