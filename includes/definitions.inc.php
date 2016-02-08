@@ -320,8 +320,6 @@ $config['os'][$os]['empty_ifdescr']    = 1;
 $config['os'][$os]['icon']             = 'calix';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
-$config['os'][$os]['over'][1]['graph'] = 'device_processor';
-$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 
 // Cisco OSes
 $os = 'ios';
