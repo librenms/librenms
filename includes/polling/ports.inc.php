@@ -224,6 +224,7 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 }
 
 
+$ports_found = array ();
 // New interface detection
 foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
@@ -238,6 +239,31 @@ foreach ($port_stats as $ifIndex => $port) {
 
         // Port newly discovered?
         if (! $ports[$port_id]) {
+            /**
+              * When using the ifName or ifDescr as means to map discovered ports to
+              * known ports in the DB (think of port association mode) it's possible
+              * that we're facing the problem that the ifName or ifDescr polled from
+              * the device is unset or an empty string (like when querying some ubnt
+              * devices...). If this happends we have no way to map this port to any
+              * port found in the database. As reported this situation may occur for
+              * the time of one poll and might resolve automagically before the next
+              * poller run happens. Without this special case this would lead to new
+              * ports added to the database each time this situation occurs. To give
+              * the user the choice between »a lot of new ports« and »some poll runs
+              * are missed but ports stay stable« the 'ignore_unmapable_port' option
+              * has been added to configure this behaviour. To skip the port in this
+              * loop is sufficient as the next loop is looping only over ports found
+              * in the database and "maps back". As we did not add a new port to the
+              * DB here, there's no port to be mapped to.
+              *
+              * I'm using the in_array() check here, as I'm not sure if an "ifIndex"
+              * can be legally set to 0, which would yield True when checking if the
+              * value is empty().
+              */
+            if ($config['ignore_unmapable_port'] === True and in_array ($port[$port_association_mode], array ('', Null))) {
+                continue;
+            }
+
             $port_id         = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifName' => $ifName), 'ports');
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
@@ -255,9 +281,18 @@ foreach ($port_stats as $ifIndex => $port) {
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
         }
 
-        // Assure stable mapping
-        $port_stats[$ifIndex]['port_id'] = $port_id;
+        /** Assure stable bidirectional port mapping between DB and polled data
+          *
+          * Store the *current* ifIndex in the port info array containing all port information
+          * fetched from the database, as this is the only means we have to map ports_stats we
+          * just polled from the device to a port in $ports. All code below an includeed below
+          * will and has to map a port using it's ifIndex.
+          */
         $ports[$port_id]['ifIndex'] = $ifIndex;
+        $port_stats[$ifIndex]['port_id'] = $port_id;
+
+	/* Build a list of all ports, identified by their port_id, found within this poller run. */
+	$ports_found[] = $port_id;
     }
 
     // Port vanished (mark as deleted)
@@ -274,11 +309,32 @@ echo "\n";
 // Loop ports in the DB and update where necessary
 foreach ($ports as $port) {
     $port_id = $port['port_id'];
+    $ifIndex = $port['ifIndex'];
 
-    echo 'Port ' . $port['ifName'] . ': ' . $port['ifDescr'] . '(' . $port['ifIndex'] . ') ';
-    if ($port_stats[$port['ifIndex']] && $port['disabled'] != '1') {
+    $port_info_string = 'Port ' . $port['ifName'] . ': ' . $port['ifDescr'] . " ($ifIndex / #$port_id) ";
+
+    /* We don't care for disabled ports, go on */
+    if ($port['disabled'] == 1) {
+        echo "$port_info_string disabled.\n";
+        continue;
+    }
+
+    /**
+     * If this port did not show up in $port_stats before it has been deleted
+     * since the last poller run. Mark it deleted in the database and go on.
+     */
+    if (! in_array ($port_id, $ports_found)) {
+        if ($port['deleted'] != '1') {
+            dbUpdate(array('deleted' => '1'), 'ports', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
+            echo "$port_info_string deleted.\n";
+        }
+        continue;
+    }
+
+    echo $port_info_string;
+    if ($port_stats[$ifIndex]) {
         // Check to make sure Port data is cached.
-        $this_port = &$port_stats[$port['ifIndex']];
+        $this_port = &$port_stats[$ifIndex];
 
         if ($device['os'] == 'vmware' && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
             $this_port['ifDescr'] = $matches[1];
@@ -410,6 +466,9 @@ foreach ($ports as $port) {
                     }
                 }
                 $port['update'][$oid] = $this_port[$oid];
+                if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
+                    $port['update'][$oid.'_prev'] = $port[$oid];
+                }
                 log_event($oid.': '.$port[$oid].' -> '.$this_port[$oid], $device, 'interface', $port['port_id']);
                 if ($debug) {
                     d_echo($oid.': '.$port[$oid].' -> '.$this_port[$oid].' ');
@@ -622,19 +681,8 @@ foreach ($ports as $port) {
             $updated += dbUpdate($port['update_extended'], 'ports_statistics', '`port_id` = ?', array($port_id));
             d_echo("$updated updated");
         }
-
         // End Update Database
     }
-    else if ($port['disabled'] != '1') {
-        echo 'Port Deleted';
-        // Port missing from SNMP cache.
-        if ($port['deleted'] != '1') {
-            dbUpdate(array('deleted' => '1'), 'ports', '`device_id` = ? AND `port_id` = ?', array($device['device_id'], $port_id));
-        }
-    }
-    else {
-        echo 'Port Disabled.';
-    }//end if
 
     echo "\n";
 
@@ -644,3 +692,4 @@ foreach ($ports as $port) {
 
 // Clear Variables Here
 unset($port_stats);
+unset($ports_found);
