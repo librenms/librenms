@@ -861,3 +861,7 @@ $config['default_port_association_mode'] = 'ifIndex';
 // Ignore ports which can't be mapped using a devices port_association_mode
 // See include/polling/ports.inc.php for a lenghty explanation.
 $config['ignore_unmapable_port'] = False;
+
+// Default Global Search result limit
+$config['global_search_result_limit']                   = 8;
+
