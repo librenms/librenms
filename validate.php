@@ -24,6 +24,7 @@ if (isset($options['h'])) {
         -m Any sub modules you want to run, comma separated:
           - mail: this will test your email settings  (uses default_mail option even if default_only is not set).
           - dist-poller: this will test for the install running as a distributed poller.
+          - rrdcheck: this will check to see if your rrd files are corrupt
 
         Example: ./validate.php -m mail.
 
@@ -267,6 +268,46 @@ foreach ($modules as $module) {
                 }
             }
         }
+        break;
+    case 'rrdcheck':
+
+        // Loop through the rrd_dir
+        $rrd_directory = new RecursiveDirectoryIterator($config['rrd_dir']);
+        // Filter out any non rrd files
+        $rrd_directory_filter = new RRDRecursiveFilterIterator($rrd_directory);
+        $rrd_iterator = new RecursiveIteratorIterator($rrd_directory_filter);
+        $rrd_total = iterator_count($rrd_iterator);
+        $rrd_iterator->rewind(); // Rewind iterator in case iterator_count left iterator in unknown state
+
+        echo "\nScanning ".$rrd_total." rrd files in ".$config['rrd_dir']."...\n";
+
+        // Count loops so we can push status to the user
+        $loopcount = 0;
+        $screenpad = 0;
+
+        foreach ($rrd_iterator as $filename => $file) {
+
+                $rrd_test_result = rrdtest($filename, $output, $error);
+
+                $loopcount++;
+                if (($loopcount % 50) == 0 ) {
+                        //This lets us update the previous status update without spamming in most consoles
+                        echo "\033[".$screenpad."D";
+                        $test_status = 'Status: '.$loopcount.'/'.$rrd_total;
+                        echo $test_status;
+                        $screenpad = strlen($test_status);
+                }
+
+                // A non zero result means there was some kind of error
+                if ($rrd_test_result > 0)  {
+                        echo "\033[".$screenpad."D";
+                        print_fail('Error parsing "'.$filename.'" RRD '.trim($error));
+                        $screenpad = 0;
+                }
+        }
+        echo "\033[".$screenpad."D";
+        echo "Status: ".$loopcount."/".$rrd_total." - Complete\n";
+
         break;
     }//end switch
 }//end foreach
