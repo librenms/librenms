@@ -1,5 +1,5 @@
 ### BEGIN INIT INFO
-# Provides:          poller-service
+# Provides:          librenms-poller-service
 # Required-Start:    networking
 # Required-Stop:     networking
 # Default-Start:     2 3 4 5
@@ -11,13 +11,13 @@
 
 . /lib/lsb/init-functions
 
-NAME=poller-service
+NAME=librenms-poller-service
 
 DAEMON=/opt/librenms/poller-service.py
 
 USER=librenms
 
-PIDFILE=/var/run/poller-service.pid
+PIDFILE=/var/run/librenms-poller-service.pid
 
 test -x $DAEMON || exit 5
 

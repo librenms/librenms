@@ -1366,3 +1366,70 @@ function dnslookup($device,$type=false,$return=false) {
     $record = dns_get_record($device['hostname'],$type);
     return $record[0][$return];
 }//end dnslookup
+
+
+/**
+ * Reursive Filter Iterator to iterate directories and locate .rrd files.
+ *
+ * @method boolean isDir()
+ *
+**/
+
+class RRDRecursiveFilterIterator extends \RecursiveFilterIterator {
+
+    public function accept() {
+        $filename = $this->current()->getFilename();
+        if ($filename[0] === '.') {
+            // Ignore hidden files and directories
+            return false;
+        }
+        if ($this->isDir()) {
+            // We want to search into directories
+            return true;
+        }
+        // Matches files with .rrd in the filename.
+        // We are only searching rrd folder, but there could be other files and we don't want to cause a stink.
+        return strpos($filename, '.rrd') !== false;
+    }
+}
+
+/**
+ * Run rrdtool info on a file path
+ *
+ * @param string $path Path to pass to rrdtool info
+ * @param string $stdOutput Variable to recieve the output of STDOUT
+ * @param string $stdError Variable to recieve the output of STDERR
+ *
+ * @return int exit code
+ *
+**/
+
+function rrdtest($path, &$stdOutput, &$stdError) {
+    global $config;
+    //rrdtool info <escaped rrd path>
+    $command = $config['rrdtool'].' info '.escapeshellarg($path);
+    $process = proc_open(
+        $command,
+        array (
+            0 => array('pipe', 'r'),
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'w'),
+        ),
+        $pipes
+    );
+
+    if (!is_resource($process)) {
+        throw new \RuntimeException('Could not create a valid process');
+    }
+
+    $status = proc_get_status($process);
+    while($status['running']) {
+        usleep(2000); // Sleep 2000 microseconds or 2 milliseconds
+        $status = proc_get_status($process);
+    }
+
+    $stdOutput = stream_get_contents($pipes[1]);
+    $stdError  = stream_get_contents($pipes[2]);
+    proc_close($process);
+    return $status['exitcode'];
+}
