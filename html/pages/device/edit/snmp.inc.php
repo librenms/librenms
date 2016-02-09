@@ -17,6 +17,7 @@ if ($_POST['editing']) {
             'authalgo'   => mres($_POST['authalgo']),
             'cryptopass' => mres($_POST['cryptopass']),
             'cryptoalgo' => mres($_POST['cryptoalgo']),
+            'context_name' => mres($_POST['context_name']),
         );
 
         // FIXME needs better feedback
@@ -196,6 +197,12 @@ echo "        </select>
     <option value='AES'>AES</option>
     <option value='DES' ".($device['cryptoalgo'] === 'DES' ? 'selected' : '').">DES</option>
     </select>
+    </div>
+    </div>
+    <div class='form-group'>
+    <label for='context_name' class='col-sm-2 control-label'>Context Name</label>
+    <div class='col-sm-4'>
+    <input type='text' id='context_name' name='context_name' class='form-control' value='".$device['context_name']."'>
     </div>
     </div>
     </div>";

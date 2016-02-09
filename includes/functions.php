@@ -420,6 +420,7 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
         $device['authalgo']   = $v3['authalgo'];
         $device['cryptopass'] = $v3['cryptopass'];
         $device['cryptoalgo'] = $v3['cryptoalgo'];
+        $device['context_name'] = $v3['context_name'];
     }
 
     return $device;

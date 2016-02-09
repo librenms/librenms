@@ -46,6 +46,7 @@ if ($_POST['hostname']) {
                    'authalgo'   => mres($_POST['authalgo']),
                    'cryptopass' => mres($_POST['cryptopass']),
                    'cryptoalgo' => mres($_POST['cryptoalgo']),
+                   'context_name' => mres($_POST['context_name']),
                   );
 
             array_push($config['snmp']['v3'], $v3);
@@ -206,6 +207,12 @@ foreach (get_port_assoc_modes() as $mode) {
             <option value="AES" selected>AES</option>
             <option value="DES">DES</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label for="context_name" class="col-sm-3 control-label">Context Name</label>
+          <div class="col-sm-9">
+            <input type="text" name="context_name" id="context_name" placeholder="Context Name" class="form-control input-sm">
+          </div>
         </div>
       </div>
     </div>
