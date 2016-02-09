@@ -12,7 +12,7 @@ if (count($sensors)) {
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     foreach ($sensors as $sensor) {
-        if (empty($sensor['sensor_current'])) {
+        if (!isset($sensor['sensor_current'])) {
             $sensor['sensor_current'] = 'NaN';
         }
 
