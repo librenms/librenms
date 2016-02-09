@@ -9,6 +9,7 @@ function rewrite_location($location) {
         foreach ($config['location_map_regex'] as $reg => $val) {
             if (preg_match($reg, $location)) {
                 $location = $val;
+                continue;
             }
         }
     }
