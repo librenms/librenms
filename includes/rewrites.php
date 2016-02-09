@@ -5,6 +5,15 @@ function rewrite_location($location) {
     // FIXME -- also check the database for rewrites?
     global $config, $debug;
 
+    if (is_array($config['location_map_regex'])) {
+        foreach ($config['location_map_regex'] as $reg => $val) {
+            if (preg_match($reg, $location)) {
+                $location = $val;
+                continue;
+            }
+        }
+    }
+    
     if (isset($config['location_map'][$location])) {
         $location = $config['location_map'][$location];
     }
