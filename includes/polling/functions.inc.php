@@ -83,7 +83,7 @@ function poll_sensor($device, $class, $unit) {
             $sensor_value = 0;
         }
 
-        if ($sensor['sensor_divisor']) {
+        if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
             $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
         }
 
