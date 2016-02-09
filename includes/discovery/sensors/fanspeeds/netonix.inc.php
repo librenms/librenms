@@ -10,7 +10,7 @@ if ($device['os'] == 'netonix') {
                 $descr   = $index;
                 $oid     = '.1.3.6.1.4.1.46242.2.1.2.'.$index;
                 $current = $entry['fanSpeed'];
-                discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, $device['os'], $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, $device['os'], $descr, '1', '1', '0', '0', null, null, $current);
             }
         }
     }
