@@ -311,6 +311,16 @@ $config['os'][$os]['icon']             = 'barracuda';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// Calix
+$os = 'calix';
+$config['os'][$os]['text']             = 'Calix E7';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['empty_ifdescr']    = 1;
+$config['os'][$os]['icon']             = 'calix';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 // Cisco OSes
 $os = 'ios';
 $config['os'][$os]['group']            = 'cisco';

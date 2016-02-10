@@ -194,11 +194,11 @@ echo "        </select>
     <div class='col-sm-4'>
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
     <option value='AES'>AES</option>
-    <option value='DES' ".($device['cryptoalgo'] === 'DES' ? 'selected' : '').'>DES</option>
+    <option value='DES' ".($device['cryptoalgo'] === 'DES' ? 'selected' : '').">DES</option>
     </select>
     </div>
     </div>
-    </div>';
+    </div>";
 
 if ($config['distributed_poller'] === true) {
     echo '
