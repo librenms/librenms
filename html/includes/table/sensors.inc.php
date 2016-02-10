@@ -47,7 +47,7 @@ if ($rowCount != -1) {
 $sql = "SELECT * $sql";
 
 foreach (dbFetchRows($sql, $param) as $sensor) {
-    if (empty($sensor['sensor_current'])) {
+    if (!isset($sensor['sensor_current'])) {
         $sensor['sensor_current'] = 'NaN';
     }
     else {
