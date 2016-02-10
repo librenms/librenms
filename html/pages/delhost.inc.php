@@ -12,16 +12,16 @@ if ($_SESSION['userlevel'] == 11) {
 }
 else {
 
-    if (is_numeric($_REQUEST['id'])) {
+    if (is_numeric($vars['id'])) {
         echo('
             <div class="row">
             <div class="col-sm-offset-2 col-sm-7">
             ');
-        if ($_REQUEST['confirm']) {
-            print_message(nl2br(delete_device(mres($_REQUEST['id'])))."\n");
+        if ($vars['confirm']) {
+            print_message(nl2br(delete_device(mres($vars['id'])))."\n");
         }
         else {
-            $device = device_by_id_cache($_REQUEST['id']);
+            $device = device_by_id_cache($vars['id']);
             print_error("Are you sure you want to delete device " . $device['hostname'] . "?");
 ?>
 <br />
@@ -30,9 +30,9 @@ else {
   <br>
   <form name="form1" method="post" action="" class="form-horizontal" role="form">
     <div class="form-group">
-      <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
+      <input type="hidden" name="id" value="<?php echo $vars['id'] ?>" />
       <input type="hidden" name="confirm" value="1" />
-      <!--<input type="hidden" name="remove_rrd" value="<?php echo $_POST['remove_rrd']; ?>">-->
+      <!--<input type="hidden" name="remove_rrd" value="<?php echo $vars['remove_rrd']; ?>">-->
       <button type="submit" class="btn btn-danger">Confirm host deletion</button>
     </div>
   </form>

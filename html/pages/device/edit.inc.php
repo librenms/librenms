@@ -58,7 +58,7 @@ else {
 
     echo(generate_link($text,$link_array,array('section'=>$type)));
 
-#    echo("<a href='device/".$device['device_id']."/edit/" . $type . ($_GET['optd'] ? "/" . $_GET['optd'] : ''). "/'> " . $text ."</a>");
+#    echo("<a href='device/".$device['device_id']."/edit/" . $type . ($vars['optd'] ? "/" . $vars['optd'] : ''). "/'> " . $text ."</a>");
     if ($vars['section'] == $type) {
         echo("</span>");
     }
