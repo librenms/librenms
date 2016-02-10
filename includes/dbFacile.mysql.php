@@ -266,7 +266,6 @@ function dbFetchRows($sql, $parameters=array(), $nocache=false) {
         if ($config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512',$sql.'|'.serialize($parameters)),$rows,$config['memcached']['ttl']);
         }
-        array_walk_recursive($rows,'sanitize_array');
         return $rows;
     }
 
@@ -334,7 +333,6 @@ function dbFetchRow($sql=null, $parameters=array(), $nocache=false) {
         if ($config['memcached']['enable'] && $nocache === false) {
             $config['memcached']['resource']->set(hash('sha512',$sql.'|'.serialize($parameters)),$row,$config['memcached']['ttl']);
         }
-        array_walk_recursive($row,'sanitize_array');
         return $row;
     }
     else {
