@@ -136,6 +136,7 @@ if (is_admin()) {
                 if ($version > 0) { // if we know the version doesn't exist, don't even try to fetch it
                     $previous_text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
                     if (!empty($previous_text)) {
+                        $previous_version = array('oid'=>$oid, 'date'=>$date, 'version'=>$version);
                         $text = xdiff_string_diff($text, $previous_text); // requires pecl xdiff
                     }
                 } else {
@@ -182,10 +183,18 @@ if (is_admin()) {
                 foreach ($config_versions as $version) {
                     echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'" ';
                     if ($current_version['oid'] == $version['oid']) {
-                        echo 'selected>*';
+                        if (is_array($previous_version)) {
+                            echo 'selected>+';
+                        }
+                        else {
+                            echo 'selected>*';
+                        }
+                    }
+                    else if ($previous_version['oid'] == $version['oid']) {
+                        echo '>&nbsp;-';
                     }
                     else {
-                        echo '>';
+                        echo '>&nbsp;&nbsp;';
                     }
                     echo $i.' :: '.$version['date'].'</option>';
                     $i--;
@@ -219,11 +228,11 @@ if (is_admin()) {
     }//end if
 
     if (!empty($text)) {
-//        if (!empty($previous_text)) {
+        if (is_array($previous_version)) {
             $language = 'diff';
-//        } else {
-//            $language = 'ios';
-//        }
+        } else {
+            $language = 'ios';
+        }
         $geshi = new GeSHi($text, $language);
 //        $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
