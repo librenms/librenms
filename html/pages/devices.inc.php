@@ -466,7 +466,7 @@ var grid = $("#devices").bootgrid({
         return {
             id: "devices",
             format: '<?php echo mres($vars['format']); ?>',
-            hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
+            hostname: '<?php echo mres($vars['hostname']); ?>',
             os: '<?php echo mres($vars['os']); ?>',
             version: '<?php echo mres($vars['version']); ?>',
             hardware: '<?php echo mres($vars['hardware']); ?>',
