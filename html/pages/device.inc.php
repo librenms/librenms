@@ -210,6 +210,16 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             $routing_tabs[] = 'vrf';
         }
 
+        require_once "../includes/component.php";
+        $component = new component();
+        $options['type'] = 'Cisco-OTV';
+        $options['filter']['device_id'] = array('=',$device['device_id']);
+        $otv = $component->getComponents(null,$options);
+        $device_routing_count['cisco-otv'] = count($otv);
+        if ($device_routing_count['cisco-otv'] > 0) {
+            $routing_tabs[] = 'cisco-otv';
+        }
+
         if (is_array($routing_tabs)) {
             echo '<li class="'.$select['routing'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
