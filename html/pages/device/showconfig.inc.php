@@ -3,7 +3,7 @@
 require 'includes/geshi/geshi.php';
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
-if ($_SESSION['userlevel'] >= '7') {
+if (is_admin()) {
     if (!is_array($config['rancid_configs'])) {
         $config['rancid_configs'] = array($config['rancid_configs']);
     }
@@ -104,18 +104,50 @@ if ($_SESSION['userlevel'] >= '7') {
     }
     else if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
         $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$device['hostname'].'?format=json'), true);
-        if ($config['oxidized']['features']['versioning'] === true && isset($_POST['config'])) {
-            list($oid,$date,$version) = explode('|',mres($_POST['config']));
-            $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
-        }
-        else {
-            $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$device['hostname']);
-        }
-        if ($config['oxidized']['features']['versioning'] === true) {
+
+        if ($config['oxidized']['features']['versioning'] === true) { // fetch a list of versions
             $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$device['hostname'].'&format=json'), true);
         }
+        if (is_array($config_versions)) {
+            $config_total = count($config_versions);
+        }
 
-        if (is_array($node_info) || is_array($config_versions)) {
+        if ($config_total > 1) {
+            if (isset($_POST['config'])) {  // versioning with selected version
+                list($oid,$date,$version) = explode('|',mres($_POST['config']));
+                $current_version = array('oid'=>$oid, 'date'=>$date, 'version'=>$version);
+            }
+            else { // no version selected
+                $current_version = array('oid'=>$config_versions[0]['oid'], 'date'=>$current_version[0]['date'], 'version'=>$config_total);
+            }
+
+            // fetch current_version
+            $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$current_version['oid'].'&date='.urlencode($current_version['date']).'&num='.$current_version['version'].'&format=text');
+
+            if (isset($_POST['diff']) && isset($_POST['prevconfig'])) { // diff requested
+                list($oid,$date,$version) = explode('|',mres($_POST['prevconfig']));
+                if ($current_version['oid'] == $oid) { // the same version is selected, assume the previous revision
+                    $key = array_search($oid, array_column($config_versions, 'oid')) + 1;  // >=PHP 5.5.0
+                    $oid = $config_versions[$key]['oid'];
+                    $date = $config_versions[$key]['date'];
+                    $version = $config_total - $key;
+                }
+
+                if ($version > 0) { // if we know the version doesn't exist, don't even try to fetch it
+                    $previous_text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$oid.'&date='.urlencode($date).'&num='.$version.'&format=text');
+                    if (!empty($previous_text)) {
+                        $text = xdiff_string_diff($text, $previous_text); // requires pecl xdiff
+                    }
+                } else {
+                    print_error('No previous version, please select a different version.');
+                }
+            }
+        }
+        else {  // just fetch the only version
+            $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$device['hostname']);
+        }
+
+        if (is_array($node_info) || $config_total > 1) {
             echo '<br />
                 <div class="row">
             ';
@@ -136,7 +168,7 @@ if ($_SESSION['userlevel'] >= '7') {
                 ';
             }
 
-            if (is_array($config_versions)) {
+            if ($config_total > 1) {
                 echo '
                     <div class="col-sm-8">
                         <form class="form-horizontal" action="" method="post">
@@ -144,13 +176,19 @@ if ($_SESSION['userlevel'] >= '7') {
                                 <label for="config" class="col-sm-2 control-label">Config version</label>
                                 <div class="col-sm-6">
                                     <select id="config" name="config" class="form-control">
-                                        <option value="">Select version</option>
                 ';
 
-                $config_total = count($config_versions);
+                $i = $config_total;
                 foreach ($config_versions as $version) {
-                    echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'">'.$config_total.' :: '.$version['date'].' - '.$version['message'].'</option>';
-                    $config_total--;
+                    echo '<option value="'.$version['oid'].'|'.$version['date'].'|'.$config_total.'" ';
+                    if ($current_version['oid'] == $version['oid']) {
+                        echo 'selected>*';
+                    }
+                    else {
+                        echo '>';
+                    }
+                    echo $i.' :: '.$version['date'].'</option>';
+                    $i--;
                 }
 
                 echo '
@@ -159,7 +197,11 @@ if ($_SESSION['userlevel'] >= '7') {
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-offset-2 col-sm-6">
-                                      <button type="submit" class="btn btn-primary btn-sm">Show version</button>
+                                      <input type="hidden" name="prevconfig" value="';
+                echo implode('|',$current_version);
+                echo '">
+                                      <button type="submit" class="btn btn-primary btn-sm" name="show">Show version</button>
+                                      <button type="submit" class="btn btn-primary btn-sm" name="diff">Show diff</button>
                                 </div>
                             </div>
                         </form>
@@ -177,9 +219,13 @@ if ($_SESSION['userlevel'] >= '7') {
     }//end if
 
     if (!empty($text)) {
-        $language = 'ios';
-        $geshi    = new GeSHi($text, $language);
-        $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
+//        if (!empty($previous_text)) {
+            $language = 'diff';
+//        } else {
+//            $language = 'ios';
+//        }
+        $geshi = new GeSHi($text, $language);
+//        $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
         // $geshi->set_line_style('color: #999999');
         echo $geshi->parse_code();
