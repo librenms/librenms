@@ -682,7 +682,6 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
         $valid_address = $full_address . '-' . $port_id;
         $valid['ipv6'][$valid_address] = 1;
     }//end if
-}
 
 }//end discover_process_ipv6()
 
