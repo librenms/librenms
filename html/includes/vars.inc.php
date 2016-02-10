@@ -7,7 +7,7 @@ foreach ($_GET as $key => $get_var) {
             $value = 'yes';
         }
 
-        $vars[$name] = $value;
+        $vars[$name] = htmlentities($value);
     }
 }
 
@@ -23,7 +23,7 @@ else {
 foreach ($segments as $pos => $segment) {
     $segment = urldecode($segment);
     if ($pos == '0') {
-        $vars['page'] = $segment;
+        $vars['page'] =htmlentities( $segment);
     }
     else {
         list($name, $value) = explode('=', $segment);
@@ -31,15 +31,15 @@ foreach ($segments as $pos => $segment) {
             $vars[$name] = yes;
         }
         else {
-            $vars[$name] = $value;
+            $vars[$name] = htmlentities($value);
         }
     }
 }
 
 foreach ($_GET as $name => $value) {
-    $vars[$name] = $value;
+    $vars[$name] = htmlentities($value);
 }
 
 foreach ($_POST as $name => $value) {
-    $vars[$name] = $value;
+    $vars[$name] = htmlentities($value);
 }
