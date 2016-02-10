@@ -1255,3 +1255,16 @@ function get_port_id ($ports_mapped, $port, $port_association_mode) {
 
     return $port_id;
 }
+
+/**
+ * Sanitize
+ * @param mixed $item Reference to Item
+ * @param mixed $key Key
+ * @return void
+ */
+function sanitize_array(&$item, $key) {
+    $tmp = htmlspecialchars($item);
+    if( !empty($tmp) ){
+        $item = $tmp;
+    }
+}
