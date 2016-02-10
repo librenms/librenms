@@ -13,8 +13,8 @@
  */
 
 if ($_SESSION['userlevel'] >= '10') {
-if (empty($_POST['token'])) {
-    $_POST['token'] = bin2hex(openssl_random_pseudo_bytes(16));
+if (empty($vars['token'])) {
+    $vars['token'] = bin2hex(openssl_random_pseudo_bytes(16));
 }
 
 ?>
@@ -65,7 +65,7 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
             <div class="form-group">
               <label for="token" class="col-sm-2 control-label">Token: </label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="token" name="token" value="<?php echo $_POST['token']; ?>" readonly>
+                <input type="text" class="form-control" id="token" name="token" value="<?php echo $vars['token']; ?>" readonly>
               </div>
               <div class="col-sm-2">
               </div>
@@ -73,7 +73,7 @@ foreach (dbFetchRows("SELECT user_id,username FROM `users` WHERE `level` >= '10'
             <div class="form-group">
               <label for="description" class="col-sm-2 control-label">Descr: </label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="description" name="description" value="<?php echo $_POST['description']; ?>">
+                <input type="text" class="form-control" id="description" name="description" value="<?php echo $vars['description']; ?>">
               </div>
             </div>
         </div>

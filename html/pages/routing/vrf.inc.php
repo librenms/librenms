@@ -1,84 +1,84 @@
 <?php
 
 if ($_SESSION['userlevel'] >= '5') {
-    if (!isset($_GET['optb'])) {
-        $_GET['optb'] = 'all';
+    if (!isset($vars['optb'])) {
+        $vars['optb'] = 'all';
     }
 
-    if (!isset($_GET['optc'])) {
-        $_GET['optc'] = 'basic';
+    if (!isset($vars['optc'])) {
+        $vars['optc'] = 'basic';
     }
 
     print_optionbar_start();
 
     echo '<span style="font-weight: bold;">VRF</span> &#187; ';
 
-    if ($_GET['opta'] == 'vrf' && $_GET['optb'] == 'all') {
+    if ($vars['opta'] == 'vrf' && $vars['optb'] == 'all') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="routing/vrf/all/'.$_GET['optc'].'/">All</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optb'] == 'all') {
+    echo '<a href="routing/vrf/all/'.$vars['optc'].'/">All</a>';
+    if ($vars['opta'] == 'vrf' && $vars['optb'] == 'all') {
         echo '</span>';
     }
 
     echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'basic') {
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'basic') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/basic/">Basic</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'basic') {
+    echo '<a href="routing/vrf/'.$vars['optb'].'/basic/">Basic</a>';
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'basic') {
         echo '</span>';
     }
 
     echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'details') {
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'details') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/details/">Details</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'details') {
+    echo '<a href="routing/vrf/'.$vars['optb'].'/details/">Details</a>';
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'details') {
         echo '</span>';
     }
 
     echo ' | Graphs: ( ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'bits') {
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'bits') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/bits/">Bits</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'bits') {
+    echo '<a href="routing/vrf/'.$vars['optb'].'/bits/">Bits</a>';
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'bits') {
         echo '</span>';
     }
 
     echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'upkts') {
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'upkts') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/upkts/">Packets</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'upkts') {
+    echo '<a href="routing/vrf/'.$vars['optb'].'/upkts/">Packets</a>';
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'upkts') {
         echo '</span>';
     }
 
     echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'nupkts') {
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'nupkts') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/nupkts/">NU Packets</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'nupkts') {
+    echo '<a href="routing/vrf/'.$vars['optb'].'/nupkts/">NU Packets</a>';
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'nupkts') {
         echo '</span>';
     }
 
     echo ' | ';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'errors') {
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'errors') {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo '<a href="routing/vrf/'.$_GET['optb'].'/errors/">Errors</a>';
-    if ($_GET['opta'] == 'vrf' && $_GET['optc'] == 'errors') {
+    echo '<a href="routing/vrf/'.$vars['optb'].'/errors/">Errors</a>';
+    if ($vars['opta'] == 'vrf' && $vars['optc'] == 'errors') {
         echo '</span>';
     }
 
@@ -86,7 +86,7 @@ if ($_SESSION['userlevel'] >= '5') {
 
     print_optionbar_end();
 
-    if ($_GET['optb'] == 'all') {
+    if ($vars['optb'] == 'all') {
         // Pre-Cache in arrays
         // That's heavier on RAM, but much faster on CPU (1:40)
         // Specifying the fields reduces a lot the RAM used (1:4) .
@@ -123,7 +123,7 @@ if ($_SESSION['userlevel'] >= '5') {
             }
 
             echo "<tr valign=top bgcolor='$bg_colour'>";
-            echo "<td width=240><a class=list-large href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$_GET['optc']."/'>".$vrf['vrf_name'].'</a><br /><span class=box-desc>'.$vrf['mplsVpnVrfDescription'].'</span></td>';
+            echo "<td width=240><a class=list-large href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$vars['optc']."/'>".$vrf['vrf_name'].'</a><br /><span class=box-desc>'.$vrf['mplsVpnVrfDescription'].'</span></td>';
             echo '<td width=100 class=box-desc>'.$vrf['mplsVpnVrfRouteDistinguisher'].'</td>';
             // echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
@@ -158,7 +158,7 @@ if ($_SESSION['userlevel'] >= '5') {
                 foreach ($ports[$device['vrf_id']][$device['device_id']] as $port) {
                     $port = array_merge($device, $port);
 
-                    switch ($_GET['optc']) {
+                    switch ($vars['optc']) {
                         case 'bits':
                         case 'upkts':
                         case 'nupkts':
@@ -168,7 +168,7 @@ if ($_SESSION['userlevel'] >= '5') {
                             $port['from']       = $config['time']['day'];
                             $port['to']         = $config['time']['now'];
                             $port['bg']         = '#'.$bg;
-                            $port['graph_type'] = 'port_'.$_GET['optc'];
+                            $port['graph_type'] = 'port_'.$vars['optc'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
                             text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
                                 <div style='font-weight: bold;'>".makeshortif($port['ifDescr']).'</div>';
@@ -196,9 +196,9 @@ if ($_SESSION['userlevel'] >= '5') {
     }
     else {
         echo "<div style='background: $list_colour_a; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
-        $vrf = dbFetchRow('SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = ?', array($_GET['optb']));
+        $vrf = dbFetchRow('SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = ?', array($vars['optb']));
         echo "<tr valign=top bgcolor='$bg_colour'>";
-        echo "<td width=200 class=list-large><a href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$_GET['optc']."/'>".$vrf['vrf_name'].'</a></td>';
+        echo "<td width=200 class=list-large><a href='routing/vrf/".$vrf['mplsVpnVrfRouteDistinguisher'].'/'.$vars['optc']."/'>".$vrf['vrf_name'].'</a></td>';
         echo '<td width=100 class=box-desc>'.$vrf['mplsVpnVrfRouteDistinguisher'].'</td>';
         echo '<td width=200 class=box-desc>'.$vrf['mplsVpnVrfDescription'].'</td>';
         echo '</table></div>';
