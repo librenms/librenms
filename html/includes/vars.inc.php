@@ -23,7 +23,7 @@ else {
 foreach ($segments as $pos => $segment) {
     $segment = urldecode($segment);
     if ($pos == '0') {
-        $vars['page'] =htmlentities( $segment);
+        $vars['page'] = htmlentities($segment);
     }
     else {
         list($name, $value) = explode('=', $segment);
