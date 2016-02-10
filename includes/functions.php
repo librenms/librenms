@@ -895,7 +895,7 @@ function is_port_valid($port, $device) {
                 }
             }
         }
-        if (empty($port['ifDescr'])) {
+        if (empty($port['ifDescr']) && !$config['os'][$device['os']]['empty_ifdescr']) {
             $valid = 0;
         }
         if ($device['os'] == "catos" && strstr($if, "vlan")) {
@@ -1324,7 +1324,7 @@ function oxidized_reload_nodes() {
     global $config;
 
     if ($config['oxidized']['enabled'] === TRUE && $config['oxidized']['reload_nodes'] === TRUE && isset($config['oxidized']['url'])) {
-        $oxidized_reload_url = $config['oxidized']['url'] . '/reload';
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload?format=json';
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
