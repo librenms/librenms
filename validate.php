@@ -79,7 +79,6 @@ echo "MySQL: ".$versions['mysql_ver']."\n";
 echo "RRDTool: ".$versions['rrdtool_ver']."\n";
 echo "SNMP: ".$versions['netsnmp_ver']."\n";
 
-
 // Check php modules we use to make sure they are loaded
 $extensions = array('pcre','curl','session','snmp','mcrypt');
 foreach ($extensions as $extension) {
@@ -161,6 +160,10 @@ if (!$config['rrdcached']) {
     }
 }
 
+if (isset($config['rrdcached'])) {
+    check_rrdcached();
+}
+
 // Disk space and permission checks
 if (substr(sprintf('%o', fileperms($config['temp_dir'])), -3) != 777) {
     print_warn('Your tmp directory ('.$config['temp_dir'].") is not set to 777 so graphs most likely won't be generated");
@@ -176,13 +179,25 @@ if ($space_check < 1) {
 }
 
 // Check programs
-$bins = array('fping');
+$bins = array('fping','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
 foreach ($bins as $bin) {
     if (!is_file($config[$bin])) {
         print_fail("$bin location is incorrect or bin not installed");
     }
-    else {
-        print_ok("$bin has been found");
+}
+
+$disabled_functions = explode(',', ini_get('disable_functions'));
+$required_functions = array('exec','passthru','shell_exec','escapeshellarg','escapeshellcmd','proc_close','proc_open','popen');
+foreach ($required_functions as $function) {
+    if (in_array($function, $disabled_functions)) {
+        print_fail("$function is disabled in php.ini");
+    }
+}
+
+if (!function_exists('openssl_random_pseudo_bytes')) {
+    print_warn("openssl_random_pseudo_bytes is not being used for user password hashing. This is a recommended function (https://secure.php.net/openssl_random_pseudo_bytes)");
+    if (!is_readable('/dev/urandom')) {
+        print_warn("It also looks like we can't use /dev/urandom for user password hashing. We will fall back to generating our own hash - be warned");
     }
 }
 
@@ -257,15 +272,7 @@ foreach ($modules as $module) {
                 print_fail('You have not configured $config[\'rrd_dir\']');
             }
             else {
-                list($host,$port) = explode(':',$config['rrdcached']);
-                $connection = @fsockopen($host, $port);
-                if (is_resource($connection)) {
-                    fclose($connection);
-                    print_ok('Connection to rrdcached is ok');
-                }
-                else {
-                    print_fail('Cannot connect to rrdcached instance');
-                }
+                check_rrdcached();
             }
         }
         break;
@@ -317,17 +324,34 @@ foreach ($modules as $module) {
 
 function print_ok($msg) {
     echo "[OK]      $msg\n";
-
 }//end print_ok()
 
 
 function print_fail($msg) {
     echo "[FAIL]    $msg\n";
-
 }//end print_fail()
 
 
 function print_warn($msg) {
     echo "[WARN]    $msg\n";
-
 }//end print_warn()
+
+function check_rrdcached() {
+    global $config;
+    list($host,$port) = explode(':',$config['rrdcached']);
+    if ($host == 'unix') {
+        // Using socket, check that file exists
+        if (!file_exists($port)) {
+            print_fail("$port doesn't appear to exist, rrdcached test failed");
+        }
+    }
+    else {
+        $connection = @fsockopen($host, $port);
+        if (is_resource($connection)) {
+            fclose($connection);
+        }
+        else {
+            print_fail('Cannot connect to rrdcached instance');
+        }
+    }
+}//end check_rrdcached
