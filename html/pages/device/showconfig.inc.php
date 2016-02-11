@@ -127,10 +127,15 @@ if (is_admin()) {
             if (isset($_POST['diff']) && isset($_POST['prevconfig'])) { // diff requested
                 list($oid,$date,$version) = explode('|',mres($_POST['prevconfig']));
                 if ($current_version['oid'] == $oid) { // the same version is selected, assume the previous revision
-                    $key = array_search($oid, array_column($config_versions, 'oid')) + 1;  // >=PHP 5.5.0
-                    $oid = $config_versions[$key]['oid'];
-                    $date = $config_versions[$key]['date'];
-                    $version = $config_total - $key;
+                    foreach ($config_versions as $key => $version) {
+                        if ($version['oid'] == $current_version['oid']) {
+                            $prev_key = $key + 1;
+                            $oid = $config_versions[$prev_key]['oid'];
+                            $date = $config_versions[$prev_key]['date'];
+                            $version = $config_total - $prev_key;
+                            break;
+                        }
+                    }
                 }
 
                 if ($version > 0) { // if we know the version doesn't exist, don't even try to fetch it
