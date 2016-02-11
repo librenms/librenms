@@ -73,7 +73,7 @@ Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd resta
 
 In `/etc/php5/apache2/php.ini` and `/etc/php5/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
 examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
-Please also ensure that allow_url_fopen is enabled.
+Please also ensure that `allow_url_fopen` is enabled. Other functions needed for LibreNMS include `exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen`.
 
 ### Adding the librenms-user ###
 
