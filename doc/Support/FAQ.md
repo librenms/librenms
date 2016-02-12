@@ -73,6 +73,8 @@ If the page you are trying to load has a substantial amount of data in it then i
 
 This is usually due to there being blank spaces outside of the `<?php ?>` php tags within config.php. Remove these and retry.
 It's also worth removing the final `?>` at the end of config.php as this is not required.
+Another reason why it might not be working is if you disabled functions needed by LibreNMS, which include `allow_url_fopen`
+and `exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen`.
 
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
