@@ -149,7 +149,7 @@ if (is_admin()) {
                 if (!empty($node_info['group'])) {
                     $url .= $node_info['group'];
                 }
-                $url .= '&oid='.$previous_config['oid'].'&date='.urlencode($previous_config['date']).'&num='.$previous_config['version'].'&oid2='.$current_config['oid'].'&format=text';
+                $url .= '&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&oid2='.$previous_config['oid'].'&format=text';
 
                 $text = file_get_contents($url); // fetch diff
             } else {
