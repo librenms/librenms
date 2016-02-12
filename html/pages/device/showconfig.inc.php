@@ -108,6 +108,8 @@ if (is_admin()) {
         if ($config['oxidized']['features']['versioning'] === true) { // fetch a list of versions
             $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $device['hostname']).'&format=json'), true);
         }
+
+        $config_total = 1;
         if (is_array($config_versions)) {
             $config_total = count($config_versions);
         }
