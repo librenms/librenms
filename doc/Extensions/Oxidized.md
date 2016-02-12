@@ -13,6 +13,9 @@ $config['oxidized']['url']             = 'http://127.0.0.1:8888';
 ```
 
 LibreNMS supports config versioning if Oxidized does.  This is known to work with the git output module.
+```php
+$config['oxidized']['features']['versioning'] = true;
+```
 
 Oxidized supports various ways to utilise credentials to login to devices, you can specify global username/password within Oxidized, Group level username/password or per device.
 LibreNMS currently supports sending groups back to Oxidized so that you can then define group credentials within Oxidized. To enable this support please switch on 'Enable the return of groups to Oxidized':

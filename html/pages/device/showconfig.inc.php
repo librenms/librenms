@@ -105,8 +105,9 @@ if (is_admin()) {
     else if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
         // fetch info about the node and then a list of versions for that node
         $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$device['hostname'].'?format=json'), true);
-        $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $device['hostname']).'&format=json'), true);
-
+        if ($config['oxidized']['features']['versioning'] === true) { // fetch a list of versions
+            $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $device['hostname']).'&format=json'), true);
+        }
         if (is_array($config_versions)) {
             $config_total = count($config_versions);
         }
