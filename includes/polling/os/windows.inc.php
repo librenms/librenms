@@ -28,7 +28,7 @@ if (strstr($poll_device['sysDescr'], 'Intel64')) {
     $hardware = 'Intel x64';
 }
 
-if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.1') {
+if ($poll_device['sysObjectID'] == 'enterprises.311.1.1.3.1.1') {
     if (strstr($poll_device['sysDescr'], 'Build Number: 1057')) {
         $version = 'NT 3.51 Workstation';
     }
@@ -79,6 +79,10 @@ if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.1') {
 
     if (strstr($poll_device['sysDescr'], 'Build 9600')) {
         $version = '8.1 SP1 (NT 6.2)';
+    }
+
+    if (strstr($poll_device['sysDescr'], 'Version 6.3 (Build 10')) {
+        $version = '10 (NT 6.3)';
     }
 
 }
