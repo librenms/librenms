@@ -16,7 +16,7 @@ if (!$_SESSION['authenticated']) {
 $device = array();
 $ports  = array();
 $bgp    = array();
-$limit  = $config['global_search_result_limit'];
+$limit  = $config['webui']['global_search_result_limit'];
 
 if (isset($_REQUEST['search'])) {
     $search = mres($_REQUEST['search']);
