@@ -314,7 +314,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </li>';
         }
 
-        if ($_SESSION['userlevel'] >= '7') {
+        if (is_admin()) {
             if (!is_array($config['rancid_configs'])) {
                 $config['rancid_configs'] = array($config['rancid_configs']);
             }
@@ -405,7 +405,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 <li><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"> Launch</a></li>
                 <li><a href="ssh://'.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"> SSH</a></li>
                  <li><a href="telnet://'.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"> Telnet</a></li>';
-              if ($_SESSION['userlevel'] >= '7') {
+              if (is_admin()) {
                 echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
                 <img src="images/16/wrench.png" align="absmiddle" border="0" />
