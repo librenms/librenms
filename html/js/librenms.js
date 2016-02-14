@@ -223,24 +223,3 @@ $(document).on("click", '.collapse-neighbors', function(event)
     list.toggle();
     continued.toggle();
 });
-
-
-$(document).ready(function() {
-    var lines = 'on';
-    $("#linenumbers").button().click(function() {
-        if (lines == 'on') {
-            $($('.config').find('ol').get().reverse()).each(function(){
-                $(this).replaceWith($('<ul>'+$(this).html()+'</ul>'))
-                lines = 'off';
-                $('#linenumbers').val('Show line numbers');
-            });
-        }
-        else {
-            $($('.config').find('ul').get().reverse()).each(function(){
-                $(this).replaceWith($('<ol>'+$(this).html()+'</ol>'));
-                lines = 'on';
-                $('#linenumbers').val('Hide line numbers');
-            });
-        }
-    });
-});

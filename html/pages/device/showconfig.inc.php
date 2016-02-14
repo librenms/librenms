@@ -253,10 +253,7 @@ if (is_admin()) {
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
         // $geshi->set_line_style('color: #999999');
-        echo '<div class="config">';
-        echo '<input id="linenumbers" class="btn btn-primary" type="submit" value="Hide line numbers"/>';
         echo $geshi->parse_code();
-        echo '</div>';
     }
 }//end if
 
