@@ -85,6 +85,7 @@ LibreNMS contributors:
 - John Wells <john.wells@greatworx.com> (jbwiv)
 - Henoc Khouilla <henoc.khouilla@gmail.com> (henocKA)
 - Paul Blasquez <pblasquez@gmail.com> (pblasquez)
+- Paul Heinrichs <pdheinrichs@gmail.com> (pheinrichs)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
