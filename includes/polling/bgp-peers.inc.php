@@ -13,7 +13,7 @@ if ($config['enable_bgp']) {
         foreach ($peers as $peer) {
             //add context if exist
             $device['context_name']= $peer['context_name'];
-            
+
             // Poll BGP Peer
             $peer2 = false;
             echo 'Checking BGP peer '.$peer['bgpPeerIdentifier'].' ';
@@ -72,14 +72,14 @@ if ($config['enable_bgp']) {
                         }
                     }
                     else {
-                        // $peer_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -m BGP4-MIB -OUvq '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' '; 
+                        // $peer_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -m BGP4-MIB -OUvq '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' ';
                         $oids = "bgpPeerState." . $peer['bgpPeerIdentifier'] . " bgpPeerAdminStatus." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerOutUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerInTotalMessages." . $peer['bgpPeerIdentifier'] . " ";
                         $oids .= "bgpPeerOutTotalMessages." . $peer['bgpPeerIdentifier'] . " bgpPeerFsmEstablishedTime." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdateElapsedTime." . $peer['bgpPeerIdentifier'] . " ";
                         $oids .= "bgpPeerLocalAddr." . $peer['bgpPeerIdentifier'] . "";
                         $peer_data=snmp_get_multi($device,$oids,'-OUQs','BGP4-MIB');
                         $peer_data=  array_pop($peer_data);
                         if($debug){
-                            var_dump($peer_data);  
+                            var_dump($peer_data);
                         }
                     }//end if
                     $bgpPeerState=  !empty($peer_data['bgpPeerState'])?$peer_data['bgpPeerState']:'';
@@ -104,7 +104,7 @@ if ($config['enable_bgp']) {
                         // FIXME - needs moved to function
                         //$peer_cmd  = $config['snmpwalk'].' -M '.$config['mibdir'].'/junos -m BGP4-V2-MIB-JUNIPER -OUnq -'.$device['snmpver'].' '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
 
-                        foreach (explode("\n",snmp_get($device,'jnxBgpM2PeerStatus.0.ipv6"','-OUnq','BGP4-V2-MIB-JUNIPER',$config['mibdir'] . "/junos")) as $oid){
+                        foreach (explode("\n",snmp_walk($device,'jnxBgpM2PeerStatus.0.ipv6','-OUnq','BGP4-V2-MIB-JUNIPER',$config['mibdir'] . "/junos")) as $oid){
                             list($peer_oid) = explode(' ', $oid);
                             $peer_id    = explode('.', $peer_oid);
                             $junos_v6[implode('.', array_slice($peer_id, 35))] = implode('.', array_slice($peer_id, 18));
@@ -121,7 +121,7 @@ if ($config['enable_bgp']) {
                     $oids .= " jnxBgpM2PeerFsmEstablishedTime.0.ipv6." . $junos_v6[$peer_ip];
                     $oids .= " jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6." . $junos_v6[$peer_ip];
                     $oids .= " jnxBgpM2PeerLocalAddr.0.ipv6." . $junos_v6[$peer_ip];
-                    //$peer_cmd .= '|grep -v "No Such Instance"'; WHAT TO DO WITH THIS??,USE TO SEE -Ln?? 
+                    //$peer_cmd .= '|grep -v "No Such Instance"'; WHAT TO DO WITH THIS??,USE TO SEE -Ln??
                     $peer_data=snmp_get_multi($device,$oids,'-OUQs -Ln','BGP4-V2-MIB-JUNIPER',$config['mibdir'] . "/junos");
                     $peer_data=  array_pop($peer_data);
                     if($debug){
@@ -275,9 +275,9 @@ if ($config['enable_bgp']) {
                             $oids .= " cbgpPeerAdvertisedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
                             $oids .= " cbgpPeerSuppressedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
                             $oids .= " cbgpPeerWithdrawnPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-                            
+
                             d_echo("$oids\n");
-                            
+
                             $cbgp_data=  snmp_get_multi($device,$oids,'-OUQs ','CISCO-BGP4-MIB');
                             $cbgp_data=  array_pop($cbgp_data);
                             d_echo("$cbgp_data\n");
