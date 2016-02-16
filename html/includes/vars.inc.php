@@ -43,3 +43,6 @@ foreach ($_GET as $name => $value) {
 foreach ($_POST as $name => $value) {
     $vars[$name] = $value;
 }
+
+array_walk_recursive($vars,'sanitize_array');
+reset($vars);

@@ -77,7 +77,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'time_logged' => $alertlog['humandate'],
         'details'     => '<a class="glyphicon glyphicon-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.($rulei).'" data-parent="#alerts"></a>',
         'hostname'    => '<div class="incident">'.generate_device_link($dev, shorthost($dev['hostname'])).'<div id="incident'.($rulei).'" class="collapse">'.$fault_detail.'</div></div>',
-        'alert'       => htmlspecialchars($alertlog['alert']),
+        'alert'       => $alertlog['alert'],
         'status'      => "<b><span class='glyphicon glyphicon-".$glyph_icon."' style='color:".$glyph_color."'></span> $text</b>",
     );
 }//end foreach
