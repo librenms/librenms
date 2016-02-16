@@ -53,7 +53,7 @@ else {
     foreach(dbFetchRows($sql, $param) as $device) {
         if ($device['status'] == '1') {
             $btn_type = 'btn-success';
-            if ($device['uptime'] < $config['uptime_warning']) {
+            if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
                 $btn_type = 'btn-warning';
                 $c++;
             }
