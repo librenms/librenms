@@ -81,10 +81,10 @@ var grid = $("#syslog").bootgrid({
     {
         return {
             id: "syslog",
-            device: '<?php echo htmlspecialchars($vars['device']); ?>',
-            program: '<?php echo htmlspecialchars($vars['program']); ?>',
-            to: '<?php echo htmlspecialchars($vars['to']); ?>',
-            from: '<?php echo htmlspecialchars($vars['from']); ?>',
+            device: '<?php echo $vars['device']; ?>',
+            program: '<?php echo $vars['program']; ?>',
+            to: '<?php echo $vars['to']; ?>',
+            from: '<?php echo $vars['from']; ?>',
         };
     },
     url: "ajax_table.php"
