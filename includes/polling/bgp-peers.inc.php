@@ -104,40 +104,32 @@ if ($config['enable_bgp']) {
                         // FIXME - needs moved to function
                         //$peer_cmd  = $config['snmpwalk'].' -M '.$config['mibdir'].'/junos -m BGP4-V2-MIB-JUNIPER -OUnq -'.$device['snmpver'].' '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
 
-                        foreach (explode("\n",snmp_walk($device,'jnxBgpM2PeerStatus.0.ipv6','-OUnq','BGP4-V2-MIB-JUNIPER',$config['mibdir'] . "/junos")) as $oid){
+                        $peer_cmd  = $config['snmpwalk'].' -M '.$config['mibdir'].'/junos -m BGP4-V2-MIB-JUNIPER -OUnq -'.$device['snmpver'].' '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'];
+                        $peer_cmd .= ' jnxBgpM2PeerStatus.0.ipv6';
+                        foreach (explode("\n", trim(`$peer_cmd`)) as $oid) {
                             list($peer_oid) = explode(' ', $oid);
                             $peer_id    = explode('.', $peer_oid);
                             $junos_v6[implode('.', array_slice($peer_id, 35))] = implode('.', array_slice($peer_id, 18));
                         }
                     }
 
-                    // FIXME - move to function (and clean up, wtf?)
-                    $oids = " jnxBgpM2PeerState.0.ipv6." . $junos_v6[$peer_ip];
-                    $oids .= " jnxBgpM2PeerStatus.0.ipv6." . $junos_v6[$peer_ip]; # Should be jnxBgpM2CfgPeerAdminStatus but doesn't seem to be implemented?
-                    $oids .= " jnxBgpM2PeerInUpdates.0.ipv6." . $junos_v6[$peer_ip];
-                    $oids .= " jnxBgpM2PeerOutUpdates.0.ipv6." . $junos_v6[$peer_ip];
-                    $oids .= " jnxBgpM2PeerInTotalMessages.0.ipv6." . $junos_v6[$peer_ip];
-                    $oids .= " jnxBgpM2PeerOutTotalMessages.0.ipv6." . $junos_v6[$peer_ip];
-                    $oids .= " jnxBgpM2PeerFsmEstablishedTime.0.ipv6." . $junos_v6[$peer_ip];
-                    $oids .= " jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6." . $junos_v6[$peer_ip];
-                    $oids .= " jnxBgpM2PeerLocalAddr.0.ipv6." . $junos_v6[$peer_ip];
-                    //$peer_cmd .= '|grep -v "No Such Instance"'; WHAT TO DO WITH THIS??,USE TO SEE -Ln??
-                    $peer_data=snmp_get_multi($device,$oids,'-OUQs -Ln','BGP4-V2-MIB-JUNIPER',$config['mibdir'] . "/junos");
-                    $peer_data=  array_pop($peer_data);
-                    if($debug){
-                      var_dump($peer_data);
-                    }
-                    $bgpPeerState=  !empty($peer_data['bgpPeerState'])?$peer_data['bgpPeerState']:'';
-                    $bgpPeerAdminStatus=  !empty($peer_data['bgpPeerAdminStatus'])?$peer_data['bgpPeerAdminStatus']:'';
-                    $bgpPeerInUpdates=  !empty($peer_data['bgpPeerInUpdates'])?$peer_data['bgpPeerInUpdates']:'';
-                    $bgpPeerOutUpdates=  !empty($peer_data['bgpPeerOutUpdates'])?$peer_data['bgpPeerOutUpdates']:'';
-                    $bgpPeerInTotalMessages=  !empty($peer_data['bgpPeerInTotalMessages'])?$peer_data['bgpPeerInTotalMessages']:'';
-                    $bgpPeerOutTotalMessages=  !empty($peer_data['bgpPeerOutTotalMessages'])?$peer_data['bgpPeerOutTotalMessages']:'';
-                    $bgpPeerFsmEstablishedTime=  !empty($peer_data['bgpPeerFsmEstablishedTime'])?$peer_data['bgpPeerFsmEstablishedTime']:'';
-                    $bgpPeerInUpdateElapsedTime=  !empty($peer_data['bgpPeerInUpdateElapsedTime'])?$peer_data['bgpPeerInUpdateElapsedTime']:'';
-                    $bgpLocalAddr=  !empty($peer_data['bgpPeerLocalAddr'])?$peer_data['bgpPeerLocalAddr']:'';
-
-                    unset($peer_data);
+                    $peer_cmd  = $config['snmpget'].' -M '.$config['mibdir'].'/junos -m BGP4-V2-MIB-JUNIPER -OUvq '.snmp_gen_auth($device);
+                    $peer_cmd .= ' -M"'.$config['install_dir'].'/mibs/junos"';
+                    $peer_cmd .= ' '.$device['hostname'].':'.$device['port'];
+                    $peer_cmd .= ' jnxBgpM2PeerState.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= ' jnxBgpM2PeerStatus.0.ipv6.'.$junos_v6[$peer_ip];
+                    // Should be jnxBgpM2CfgPeerAdminStatus but doesn't seem to be implemented?
+                    $peer_cmd .= ' jnxBgpM2PeerInUpdates.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= ' jnxBgpM2PeerOutUpdates.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= ' jnxBgpM2PeerInTotalMessages.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= ' jnxBgpM2PeerOutTotalMessages.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= ' jnxBgpM2PeerFsmEstablishedTime.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= ' jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= ' jnxBgpM2PeerLocalAddr.0.ipv6.'.$junos_v6[$peer_ip];
+                    $peer_cmd .= '|grep -v "No Such Instance"';
+                    d_echo("\n$peer_cmd\n");
+                    $peer_data = trim(`$peer_cmd`);
+                    list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
 
                     d_echo("State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n");
 
