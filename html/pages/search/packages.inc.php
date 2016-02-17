@@ -28,23 +28,23 @@ print_optionbar_start(28);
 <form method="post" action="" class="form-inline" role="form">
     <div class="form-group">
         <label for="package">Package</label>
-        <input type="text" name="package" id="package" size=20 value="<?php echo($vars['package']); ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="package" id="package" size=20 value="<?php echo($_POST['package']); ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <div class="form-group">
         <label for="version">Version</label>
-        <input type="text" name="version" id="version" size=20 value="<?php echo($vars['version']); ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="version" id="version" size=20 value="<?php echo($_POST['version']); ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <div class="form-group">
         <label for="version">Arch</label>
-        <input type="text" name="arch" id="arch" size=20 value="<?php echo($vars['arch']); ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="arch" id="arch" size=20 value="<?php echo($_POST['arch']); ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <button type="submit" class="btn btn-default input-sm">Search</button>
 </form>
 <?php
 print_optionbar_end();
 
-if(isset($vars['results_amount']) && $vars['results_amount'] > 0) {
-    $results = $vars['results'];
+if(isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
+    $results = $_POST['results'];
 }
 else {
     $results = 50;
@@ -81,15 +81,15 @@ if (is_admin() === FALSE && is_read() === FALSE) {
     $param[] = $_SESSION['user_id'];
 }
 
-$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($vars['package'])."%' $sql_where GROUP BY packages.name";
+$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";
 
 $where = '';
 $ver = "";
 $opt = "";
 
-if( !empty($vars['arch']) ) {
+if( !empty($_POST['arch']) ) {
     $where  .= ' AND packages.arch = ?';
-    $param[] = mres($vars['arch']);
+    $param[] = mres($_POST['arch']);
 }
 
 if( is_numeric($_REQUEST['device_id']) ) {
@@ -102,11 +102,11 @@ $count_query .= $query." ) sub";
 $query .= $where." ORDER BY packages.name, packages.arch, packages.version";
 $count = dbFetchCell($count_query,$param);
 
-if( !isset($vars['page_number']) && $vars['page_number'] < 1 ) {
+if( !isset($_POST['page_number']) && $_POST['page_number'] < 1 ) {
     $page_number = 1;
 }
 else {
-    $page_number = $vars['page_number'];
+    $page_number = $_POST['page_number'];
 }
 
 $start = ($page_number - 1) * $results;
@@ -134,8 +134,8 @@ foreach( dbFetchRows($full_query, $param) as $entry ) {
     }
 }
 
-if( !empty($vars['version']) ) {
-    list($opt, $ver) = explode(" ",$vars['version']);
+if( !empty($_POST['version']) ) {
+    list($opt, $ver) = explode(" ",$_POST['version']);
 }
 
 foreach( $ordered as $name=>$entry ) {
@@ -178,9 +178,9 @@ if( (int) ($count / $results) > 0 && $count != $results ) {
     </table>
     <input type="hidden" name="page_number" id="page_number" value="<?php echo $page_number; ?>">
     <input type="hidden" name="results_amount" id="results_amount" value="<?php echo $results; ?>">
-    <input type="hidden" name="package" id="results_packages" value="<?php echo $vars['package']; ?>">
-    <input type="hidden" name="version" id="results_version" value="<?php echo $vars['version']; ?>">
-    <input type="hidden" name="arch" id="results_arch" value="<?php echo $vars['arch']; ?>">
+    <input type="hidden" name="package" id="results_packages" value="<?php echo $_POST['package']; ?>">
+    <input type="hidden" name="version" id="results_version" value="<?php echo $_POST['version']; ?>">
+    <input type="hidden" name="arch" id="results_arch" value="<?php echo $_POST['arch']; ?>">
 </form>
 <script type="text/javascript">
     function updateResults(results) {

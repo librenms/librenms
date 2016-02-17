@@ -73,7 +73,7 @@ if ($_POST['searchby'] == 'ip') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"'.$vars['searchPhrase'].'"+';
+echo '"'.$_POST['searchPhrase'].'"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Address\" />"+
@@ -86,9 +86,9 @@ echo '"'.$vars['searchPhrase'].'"+';
     {
         return {
             id: "arp-search",
-            device_id: '<?php echo $vars['device_id']; ?>',
-            searchby: '<?php echo $vars['searchby']; ?>',
-            searchPhrase: '<?php echo $vars['searchPhrase']; ?>'
+            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
+            searchby: '<?php echo mres($_POST['searchby']); ?>',
+            searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
         };
     },
     url: "ajax_table.php"
