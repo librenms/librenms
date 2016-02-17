@@ -176,6 +176,7 @@ function rrdtool($command, $filename, $options)
         ($command != "create" && $command != "tune"))
         ) {
         if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
+            $local_cmd = "$command $filename $options";
             $filename = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $filename);
             $filename = str_replace($config['rrd_dir'], './'.$config['rrdcached_dir'].'/', $filename);
         }
@@ -190,6 +191,7 @@ function rrdtool($command, $filename, $options)
         print $console_color->convert('[%rRRD Disabled%n]');
     }
     else {
+        if (!empty($local_cmd)) { fwrite($rrd_pipes[0], $local_cmd."\n"); }
         fwrite($rrd_pipes[0], $cmd."\n");
     }
 
