@@ -72,28 +72,15 @@ if ($config['enable_bgp']) {
                         }
                     }
                     else {
-                        // $peer_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -m BGP4-MIB -OUvq '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' ';
-                        $oids = "bgpPeerState." . $peer['bgpPeerIdentifier'] . " bgpPeerAdminStatus." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerOutUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerInTotalMessages." . $peer['bgpPeerIdentifier'] . " ";
-                        $oids .= "bgpPeerOutTotalMessages." . $peer['bgpPeerIdentifier'] . " bgpPeerFsmEstablishedTime." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdateElapsedTime." . $peer['bgpPeerIdentifier'] . " ";
-                        $oids .= "bgpPeerLocalAddr." . $peer['bgpPeerIdentifier'] . "";
-                        $peer_data=snmp_get_multi($device,$oids,'-OUQs','BGP4-MIB');
-                        $peer_data=  array_pop($peer_data);
-                        if($debug){
-                            var_dump($peer_data);
-                        }
+                        $peer_cmd  = $config['snmpget'].' -M '.$config['mibdir'].' -m BGP4-MIB -OUvq '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' ';
+                        $peer_cmd .= 'bgpPeerState.'.$peer['bgpPeerIdentifier'].' bgpPeerAdminStatus.'.$peer['bgpPeerIdentifier'].' bgpPeerInUpdates.'.$peer['bgpPeerIdentifier'].' bgpPeerOutUpdates.'.$peer['bgpPeerIdentifier'].' bgpPeerInTotalMessages.'.$peer['bgpPeerIdentifier'].' ';
+                        $peer_cmd .= 'bgpPeerOutTotalMessages.'.$peer['bgpPeerIdentifier'].' bgpPeerFsmEstablishedTime.'.$peer['bgpPeerIdentifier'].' bgpPeerInUpdateElapsedTime.'.$peer['bgpPeerIdentifier'].' ';
+                        $peer_cmd .= 'bgpPeerLocalAddr.'.$peer['bgpPeerIdentifier'].'';
+                        $peer_data = trim(`$peer_cmd`);
                     }//end if
-                    $bgpPeerState=  !empty($peer_data['bgpPeerState'])?$peer_data['bgpPeerState']:'';
-                    $bgpPeerAdminStatus=  !empty($peer_data['bgpPeerAdminStatus'])?$peer_data['bgpPeerAdminStatus']:'';
-                    $bgpPeerInUpdates=  !empty($peer_data['bgpPeerInUpdates'])?$peer_data['bgpPeerInUpdates']:'';
-                    $bgpPeerOutUpdates=  !empty($peer_data['bgpPeerOutUpdates'])?$peer_data['bgpPeerOutUpdates']:'';
-                    $bgpPeerInTotalMessages=  !empty($peer_data['bgpPeerInTotalMessages'])?$peer_data['bgpPeerInTotalMessages']:'';
-                    $bgpPeerOutTotalMessages=  !empty($peer_data['bgpPeerOutTotalMessages'])?$peer_data['bgpPeerOutTotalMessages']:'';
-                    $bgpPeerFsmEstablishedTime=  !empty($peer_data['bgpPeerFsmEstablishedTime'])?$peer_data['bgpPeerFsmEstablishedTime']:'';
-                    $bgpPeerInUpdateElapsedTime=  !empty($peer_data['bgpPeerInUpdateElapsedTime'])?$peer_data['bgpPeerInUpdateElapsedTime']:'';
-                    $bgpLocalAddr=  !empty($peer_data['bgpPeerLocalAddr'])?$peer_data['bgpPeerLocalAddr']:'';
-                    //list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
+                    d_echo($peer_data);
+                    list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
                     $bgpLocalAddr = str_replace('"', '', str_replace(' ', '', $bgpLocalAddr));
-                    unset($peer_data);
                 }
                 else if ($device['os'] == 'junos') {
                     // v6 for JunOS via Juniper MIB
