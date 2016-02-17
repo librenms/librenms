@@ -182,7 +182,7 @@ function RunFollowUp() {
         }
 
         $alert['details'] = json_decode(gzuncompress($alert['details']), true);
-        $rextra           = json_decode(htmlspecialchars_decode($alert['extra']), true);
+        $rextra           = json_decode($alert['extra'], true);
         if ($rextra['invert']) {
             continue;
         }
@@ -237,7 +237,7 @@ function RunAlerts() {
         $noiss            = false;
         $noacc            = false;
         $updet            = false;
-        $rextra           = json_decode(htmlspecialchars_decode($alert['extra']), true);
+        $rextra           = json_decode($alert['extra'], true);
         $chk              = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', array($alert['device_id'], $alert['rule_id']));
         if ($chk['alerted'] == $alert['state']) {
             $noiss = true;

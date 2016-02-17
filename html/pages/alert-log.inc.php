@@ -51,7 +51,7 @@ foreach (get_all_devices() as $hostname) {
     $device_id = getidbyname($hostname);
     if (device_permitted($device_id)) {
         echo '"<option value=\"'.$device_id.'\""+';
-        if (getidbyname($hostname) == $vars['device_id']) {
+        if (getidbyname($hostname) == $_POST['device_id']) {
             echo '" selected "+';
         }
 
@@ -69,7 +69,7 @@ foreach (get_all_devices() as $hostname) {
     {
         return {
             id: "alertlog",
-            device_id: '<?php echo $vars['device_id']; ?>'
+            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>'
         };
     },
     url: "ajax_table.php"
@@ -81,7 +81,7 @@ foreach (get_all_devices() as $hostname) {
     max = high - low;
     search = $('.search-field').val();
 
-    $(".pdf-export").html("<a href='pdf.php?report=alert-log&device_id=<?php echo $vars['device_id']; ?>&string="+search+"&results="+max+"&start="+low+"'><img src='images/16/pdf.png' width='16' height='16' alt='Export to pdf'> Export to pdf</a>");
+    $(".pdf-export").html("<a href='pdf.php?report=alert-log&device_id=<?php echo $_POST['device_id']; ?>&string="+search+"&results="+max+"&start="+low+"'><img src='images/16/pdf.png' width='16' height='16' alt='Export to pdf'> Export to pdf</a>");
 
     grid.find(".incident-toggle").each( function() {
       $(this).parent().addClass('incident-toggle-td');

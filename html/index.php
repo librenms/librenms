@@ -214,6 +214,14 @@ else {
     <div class="col-md-12">
 <?php
 
+// To help debug the new URLs :)
+if (isset($devel) || isset($vars['devel'])) {
+    echo("<pre>");
+    print_r($_GET);
+    print_r($vars);
+    echo("</pre>");
+}
+
 if ($_SESSION['authenticated']) {
     // Authenticated. Print a page.
     if (isset($vars['page']) && !strstr("..", $vars['page']) &&  is_file("pages/" . $vars['page'] . ".inc.php")) {
