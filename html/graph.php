@@ -40,8 +40,9 @@ require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
 require_once 'includes/functions.inc.php';
 require_once '../includes/rrdtool.inc.php';
-require_once 'includes/authenticate.inc.php';
-
+if($config['allow_unauth_graphs'] == 0) {
+  require_once 'includes/authenticate.inc.php';
+}
 require 'includes/graphs/graph.inc.php';
 
 $console_color = new Console_Color2();
