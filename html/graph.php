@@ -40,7 +40,7 @@ require_once '../includes/dbFacile.php';
 require_once '../includes/rewrites.php';
 require_once 'includes/functions.inc.php';
 require_once '../includes/rrdtool.inc.php';
-if($config['allow_unauth_graphs'] == 0) {
+if($config['allow_unauth_graphs'] != true) {
   require_once 'includes/authenticate.inc.php';
 }
 require 'includes/graphs/graph.inc.php';
