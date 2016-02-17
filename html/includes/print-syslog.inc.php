@@ -8,10 +8,10 @@ if (device_permitted($entry['device_id'])) {
     if ($vars['page'] != 'device') {
         $syslog_output .= '<td>'.$entry['date'].'</td>
                         <td><strong>'.generate_device_link($entry).'</strong></td>
-                        <td><strong>'.$entry['program'].' : </strong> '.$entry['msg'].'</td>';
+                        <td><strong>'.$entry['program'].' : </strong> '.htmlspecialchars($entry['msg']).'</td>';
     }
     else {
-        $syslog_output .= '<td><i>'.$entry['date'].'</i>&nbsp;&nbsp;&nbsp;<strong>'.$entry['program'].'</strong>&nbsp;&nbsp;&nbsp;'.$entry['msg'].'</td>';
+        $syslog_output .= '<td><i>'.$entry['date'].'</i>&nbsp;&nbsp;&nbsp;<strong>'.$entry['program'].'</strong>&nbsp;&nbsp;&nbsp;'.htmlspecialchars($entry['msg']).'</td>';
     }
 
     $syslog_output .= '</tr>';
