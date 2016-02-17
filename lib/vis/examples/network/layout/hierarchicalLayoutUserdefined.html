@@ -79,11 +79,7 @@
 
     var options = {
         edges: {
-            smooth: {
-                type:'cubicBezier',
-                forceDirection: (directionInput.value == "UD" || directionInput.value == "DU") ? 'vertical' : 'horizontal',
-                roundness: 0.4
-            }
+            smooth: true
         },
         layout: {
             hierarchical:{
