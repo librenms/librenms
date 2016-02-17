@@ -568,7 +568,7 @@ $config['irc_alert']      = false;
 $config['irc_alert_utf8'] = false;
 
 // Authentication
-$config['allow_unauth_graphs'] = 0;
+$config['allow_unauth_graphs'] = false;
 // Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array();
 // Allow graphs to be viewed without authorisation from certain IP ranges
