@@ -5,6 +5,15 @@ function rewrite_location($location) {
     // FIXME -- also check the database for rewrites?
     global $config, $debug;
 
+    if (is_array($config['location_map_regex'])) {
+        foreach ($config['location_map_regex'] as $reg => $val) {
+            if (preg_match($reg, $location)) {
+                $location = $val;
+                break;
+            }
+        }
+    }
+    
     if (isset($config['location_map'][$location])) {
         $location = $config['location_map'][$location];
     }
@@ -322,6 +331,7 @@ $rewrite_fortinet_hardware = array(
     '.1.3.6.1.4.1.12356.1688'        => 'FortiMail 2000A',
     '.1.3.6.1.4.1.12356.103.1.1000'  => 'FortiManager 100',
     '.1.3.6.1.4.1.12356.103.1.20000' => 'FortiManager 2000XL',
+    '.1.3.6.1.4.1.12356.103.1.3004'  => 'FortiManager 300D',
     '.1.3.6.1.4.1.12356.103.1.30000' => 'FortiManager 3000',
     '.1.3.6.1.4.1.12356.103.1.30002' => 'FortiManager 3000B',
     '.1.3.6.1.4.1.12356.103.1.4000'  => 'FortiManager 400',
