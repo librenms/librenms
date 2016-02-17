@@ -148,6 +148,7 @@ else {
     $widget_settings['title'] = $title;
 
     $group        = $widget_settings['group'];
+    $widget_id    = (int)$_POST['id'];
 
     $common_output[] = '
 <div class="row">
@@ -156,7 +157,7 @@ else {
     </div>
 </div>
 <div class="table-responsive">
-    <table id="alerts" class="table table-hover table-condensed alerts">
+    <table id="alerts_'.$widget_id.'" class="table table-hover table-condensed alerts">
         <thead>
             <tr>
                 <th data-column-id="status" data-formatter="status" data-sortable="false">Status</th>
@@ -171,7 +172,7 @@ else {
     </table>
 </div>
 <script>
-var alerts_grid = $("#alerts").bootgrid({
+var alerts_grid = $("#alerts_'.$widget_id.'").bootgrid({
     ajax: true,
     post: function ()
     {
