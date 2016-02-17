@@ -25,6 +25,6 @@ if ($entry['type'] == 'interface') {
     $entry['link'] = '<b>'.generate_port_link(getifbyid($entry['reference'])).'</b>';
 }
 
-  echo $entry['link'].' '.$entry['message'].'</td>
+  echo $entry['link'].' '.htmlspecialchars($entry['message']).'</td>
   <td></td>
 </tr>';
