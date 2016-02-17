@@ -78,6 +78,7 @@ if ($config['enable_bgp']) {
                         $peer_cmd .= 'bgpPeerLocalAddr.'.$peer['bgpPeerIdentifier'].'';
                         $peer_data = trim(`$peer_cmd`);
                     }//end if
+                    d_echo($peer_data);
                     $bgpPeerState=  !empty($peer_data['bgpPeerState'])?$peer_data['bgpPeerState']:'';
                     $bgpPeerAdminStatus=  !empty($peer_data['bgpPeerAdminStatus'])?$peer_data['bgpPeerAdminStatus']:'';
                     $bgpPeerInUpdates=  !empty($peer_data['bgpPeerInUpdates'])?$peer_data['bgpPeerInUpdates']:'';
