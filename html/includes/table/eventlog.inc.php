@@ -66,7 +66,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
         'datetime' => $eventlog['humandate'],
         'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
         'type'     => $type,
-        'message'  => htmlspecialchars($eventlog['message']),
+        'message'  => $eventlog['message'],
     );
 }
 
