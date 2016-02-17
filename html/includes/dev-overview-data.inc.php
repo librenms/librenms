@@ -68,14 +68,14 @@ if ($device['sysContact']) {
         <td>Contact</td>';
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
         echo '
-        <td>'.get_dev_attrib($device, 'override_sysContact_string').'</td>
+        <td>'.htmlspecialchars(get_dev_attrib($device, 'override_sysContact_string')).'</td>
       </tr>
       <tr>
         <td>SNMP Contact</td>';
     }
 
     echo '
-        <td>'.$device['sysContact'].'</td>
+        <td>'.htmlspecialchars($device['sysContact']).'</td>
       </tr>';
 }
 

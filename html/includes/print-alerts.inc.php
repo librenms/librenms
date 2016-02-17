@@ -15,7 +15,7 @@ if (!isset($alert_entry['device'])) {
         </td>';
 }
 
-echo '<td>'.$alert_entry['name'].'</td>';
+echo '<td>'.htmlspecialchars($alert_entry['name']).'</td>';
 
 if ($alert_state != '') {
     if ($alert_state == '0') {

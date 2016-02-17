@@ -66,7 +66,7 @@ foreach (dbFetchRows($full_query, $param) as $alert_entry) {
         $data[] = array(
             $alert_entry['time_logged'],
             $hostname,
-            $alert_entry['name'],
+            htmlspecialchars($alert_entry['name']),
             $text,
         );
     }//end if

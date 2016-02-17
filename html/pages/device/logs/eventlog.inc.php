@@ -2,7 +2,7 @@
 <form method="post" action="">
   <div class="row">
     <div class="col-md-4">
-      <input type="text" name="string" placeholder="Search" class="form-control" id="string" value="<?php echo $vars['string']; ?>" required/>
+      <input type="text" name="string" placeholder="Search" class="form-control" id="string" value="<?php echo $_POST['string']; ?>" required/>
     </div>
     <div class="col-md-4">
         <select name="type" class="form-control" id="type">
