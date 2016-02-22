@@ -18,6 +18,10 @@ if (isset($options['d'])) {
 }
 
 if ($options['f'] === 'update') {
+    if (!$config['update']) {
+        exit(0);
+    }
+
     $innodb_buffer = innodb_buffer_check();
     if ($innodb_buffer['used'] > $innodb_buffer['size']) {
         if (!empty($config['alert']['default_mail'])) {
@@ -39,19 +43,14 @@ The ' . $config['project_name'] . ' team.';
         echo warn_innodb_buffer($innodb_buffer);
         exit(2);
     }
-    else {
-        if ($config['update']) {
-            if ($config['update_channel'] == 'master') {
-                exit(1);
-            }
-            elseif ($config['update_channel'] == 'release') {
-                exit(3);
-            }
-        }
-        else {
-            exit(0);
-        }
+
+    if ($config['update_channel'] == 'master') {
+        exit(1);
     }
+    elseif ($config['update_channel'] == 'release') {
+        exit(3);
+    }
+    exit(0);
 }
 
 if ($options['f'] === 'syslog') {
