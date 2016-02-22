@@ -33,7 +33,11 @@ status_run() {
 
 if [ -z "$arg" ]; then
     up=$(php daily.php -f update >&2; echo $?)
-    if [ "$up" -eq 1 ]; then
+    if [ "$up" -eq 0 ]; then
+        # Updates are disabled.
+        status_run 'Cleaning up DB' "$0 cleanup"
+        exit $?
+    elif [ "$up" -eq 1 ]; then
         # Update to Master-Branch
         status_run 'Updating to latest codebase' 'git pull --quiet'
     elif [ "$up" -eq 3 ]; then
