@@ -70,6 +70,7 @@ echo '<div class="table-responsive">
         <th>Changed</th>
         <th>Message</th>
         <th>Description</th>
+        <th>Last Check</th>
     </tr>';
 if ($_SESSION['userlevel'] >= '5') {
     $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY D.hostname ORDER BY D.hostname';
