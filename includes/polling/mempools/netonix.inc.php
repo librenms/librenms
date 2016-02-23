@@ -12,8 +12,8 @@
    */
 
 if ($device['os'] == 'netonix') {
-    $total = snmp_get($device, "UCD-SNMP-MIB::memTotalReal.0", "-OvQU");
-    $free = snmp_get($device, "UCD-SNMP-MIB::memAvailReal.0", "-OvQU");
+    $total = snmp_get($device, "UCD-SNMP-MIB::memTotalReal.0", "-OvQU") * 1024;
+    $free = snmp_get($device, "UCD-SNMP-MIB::memAvailReal.0", "-OvQU") * 1024;
 
     $mempool['total'] = $total;
     $mempool['free']  = $free;
