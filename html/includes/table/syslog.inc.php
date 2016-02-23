@@ -66,7 +66,7 @@ foreach (dbFetchRows($sql, $param) as $syslog) {
         'timestamp' => $syslog['date'],
         'device_id' => generate_device_link($dev, shorthost($dev['hostname'])),
         'program'   => $syslog['program'],
-        'msg'       => $syslog['msg'],
+        'msg'       => htmlspecialchars($syslog['msg']),
     );
 }
 

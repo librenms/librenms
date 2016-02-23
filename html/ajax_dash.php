@@ -39,7 +39,7 @@ elseif (is_file('includes/common/'.$type.'.inc.php')) {
     $title             = ucfirst($type);
     $unique_id         = str_replace(array("-","."),"_",uniqid($type,true));
     $widget_id         = mres($_POST['id']);
-    $widget_settings   = json_decode(htmlspecialchars_decode(dbFetchCell('select settings from users_widgets where user_widget_id = ?',array($widget_id))),true);
+    $widget_settings   = json_decode(dbFetchCell('select settings from users_widgets where user_widget_id = ?',array($widget_id)),true);
     $widget_dimensions = $_POST['dimensions'];
     if( !empty($_POST['settings']) ) {
         define('show_settings',true);

@@ -28,7 +28,7 @@ foreach ($sections as $type => $texttype) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    // echo('<a href="search/' . $type . ($vars['optb'] ? '/' . $vars['optb'] : ''). '/">' . $texttype .'</a>');
+    // echo('<a href="search/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $texttype .'</a>');
     echo generate_link($texttype, array('page' => 'search', 'search' => $type));
 
     if ($vars['search'] == $type) {

@@ -31,5 +31,5 @@ else {
 
 echo '<td>'.$entry['link'].'</td>';
 
-echo '<td>'.$entry['message'].'</td>
+echo '<td>'.htmlspecialchars($entry['message']).'</td>
 </tr>';

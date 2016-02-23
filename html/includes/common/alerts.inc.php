@@ -156,7 +156,7 @@ else {
     </div>
 </div>
 <div class="table-responsive">
-    <table id="alerts" class="table table-hover table-condensed alerts">
+    <table id="alerts_'.$unique_id.'" class="table table-hover table-condensed alerts">
         <thead>
             <tr>
                 <th data-column-id="status" data-formatter="status" data-sortable="false">Status</th>
@@ -171,7 +171,7 @@ else {
     </table>
 </div>
 <script>
-var alerts_grid = $("#alerts").bootgrid({
+var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     ajax: true,
     post: function ()
     {
