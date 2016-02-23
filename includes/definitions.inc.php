@@ -486,7 +486,7 @@ $config['os'][$os]['icon']             = 'brocade';
 // Brocade/Foundry ServerIron
 $os = 'serveriron';
 $config['os'][$os]['text']             = 'Brocade ServerIron';
-$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['type']             = 'loadbalancer';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
