@@ -17,6 +17,6 @@ if ($device['os'] == 'netonix') {
     $free = str_replace('"', "", snmp_get($device, 'UCD-SNMP-MIB::memTotalFree.0', '-OvQU'));
 
     if (is_numeric($free)) {
-        discover_mempool($valid_mempool, $device, 0, 'netonix', 'Memory', '1');
+        discover_mempool($valid_mempool, $device, 0, 'netonix', 'Memory', '1024');
     }
 }
