@@ -31,7 +31,6 @@ include_once($config['install_dir'].'/html/includes/authentication/'.$config['au
  * @return string|boolean
  */
 function GenSQL($rule) {
-    $rule = htmlspecialchars_decode($rule);
     $rule = RunMacros($rule);
     if( empty($rule) ) {
         //Cannot resolve Macros due to recursion. Rule is invalid.

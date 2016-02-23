@@ -93,7 +93,7 @@
     <h3>Options</h3>
     <p>The options for the nodes have to be contained in an object titled 'nodes'. All of these options can be supplied per node as well. Obviously, 'id' should not be defined globally but per node. Options defined
         in the global nodes object, are applied to all nodes. If a node has options of its own, those will be used instead of the global options.</p>
-    <p><b><i>When you have given a node an option, you will override the global option for that property. If you then set that option to <code>null</code>,
+    <p><b><i>When you have given a node an option, you will override the global option for that property, and also the group option for that property if the node is in a group. If you then set that option to <code>null</code>,
         it will revert back to the default value.</i></b>
     </p>
     <p>Click on the full options or shorthand options to show how these options are supposed to be used.</p>
@@ -108,7 +108,7 @@
 var options = {
   nodes:{
     borderWidth: 1,
-    borderWidthSelected: undefined,
+    borderWidthSelected: 2,
     brokenImage:undefined,
     color: {
       border: '#2B7CE9',
@@ -171,14 +171,17 @@ var options = {
     },
     shadow:{
       enabled: false,
+      color: 'rgba(0,0,0,0.5)',
       size:10,
       x:5,
       y:5
     },
     shape: 'ellipse',
     shapeProperties: {
-      borderDashes: false, // only for shapes with a border
-      borderRadius: 6 // only for box shape
+      borderDashes: false, // only for borders
+      borderRadius: 6,     // only for box shape
+      useImageSize: false,  // only for image and circularImage shapes
+      useBorderWithImage: false  // only for image shape
     }
     size: 25,
     title: undefined,
@@ -224,8 +227,8 @@ network.setOptions(options);
         <tr>
             <td>borderWidthSelected</td>
             <td>Number</td>
-            <td><code>undefined</code></td>
-            <td>The width of the border of the node when it is selected. When undefined, the borderWidth is used</td>
+            <td><code>2</code></td>
+            <td>The width of the border of the node when it is selected. When undefined, the borderWidth * 2 is used.</td>
         </tr>
         <tr>
             <td>brokenImage</td>
@@ -374,7 +377,9 @@ network.setOptions(options);
             <td>group</td>
             <td>String</td>
             <td><code>undefined</code></td>
-            <td>When not <code>undefined</code>, the</td>
+            <td>When not <code>undefined</code>, the node will belong to the defined group. Styling information of
+                that group will apply to this node. Node specific styling overrides group styling. 
+            </td>
         </tr>
         <tr>
             <td>hidden</td>
@@ -582,6 +587,12 @@ mySize = minSize + diff * scale;
             </td>
         </tr>
         <tr parent="shadow" class="hidden">
+            <td class="indent">shadow.color</td>
+            <td>String</td>
+            <td><code>'rgba(0,0,0,0.5)'</code></td>
+            <td>The color size of the shadow as a string. Supported formats are 'rgb(255,255,255)', 'rgba(255,255,255,1)' and '#FFFFFF'.</td>
+        </tr>
+        <tr parent="shadow" class="hidden">
             <td class="indent">shadow.size</td>
             <td>Number</td>
             <td><code>10</code></td>
@@ -640,6 +651,15 @@ mySize = minSize + diff * scale;
             <td><code>false</code></td>
             <td>This property only applies to the <code>image</code> and <code>circularImage</code> shapes. When false, the size option is used, when true, the size of the image is used. <br><i><b>Important</b>:
                 if this is set to true, the image cannot be scaled with the value option!</i>
+            </td>
+        </tr>
+        <tr parent="shapeProperties" class="hidden">
+            <td class="indent">shapeProperties.useBorderWithImage</td>
+            <td>Boolean</td>
+            <td><code>false</code></td>
+            <td>This property only applies to the <code>image</code> shape.
+                When true, the color object is used. A rectangle with the background color is
+                drawn behind it and it has a border. This means all border options are taken into account.
             </td>
         </tr>
         <tr>

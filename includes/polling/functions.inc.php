@@ -204,7 +204,7 @@ function poll_device($device, $options) {
 
         dbUpdate(array('status' => $status, 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
 
-        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
+        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'));
     }
 
     if ($status == '1') {
