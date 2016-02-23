@@ -87,9 +87,14 @@ if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '".$port['
     $menu_options['vlans'] = 'VLANs';
 }
 
-// Are there any CBQoS rrd's for this ifIndex?
-$cbqos = glob($config['rrd_dir'].'/'.$device['hostname'].'/port-'.$port['ifIndex'].'-cbqos-*.rrd');
-if (!empty($cbqos)) {
+// Are there any CBQoS components for this device?
+require_once "../includes/component.php";
+$component = new component();
+$options = array();         // Re-init array in case it has been declared previously.
+$options['filter']['type'] = array('=','Cisco-CBQOS');
+$components = $component->getComponents($device['device_id'],$options);
+$components = $components[$device['device_id']];        // We only care about our device id.
+if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
