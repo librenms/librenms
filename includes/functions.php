@@ -21,8 +21,7 @@ include_once("Net/IPv6.php");
 include_once($config['install_dir'] . "/includes/dbFacile.php");
 
 include_once($config['install_dir'] . "/includes/common.php");
-include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
-include_once($config['install_dir'] . "/includes/influxdb.inc.php");
+include_once($config['install_dir'] . "/includes/datastore.inc.php");
 include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
@@ -236,15 +235,24 @@ function delete_device($id) {
     }
 
     $ret .= "Removed device $host\n";
+    log_event("Device $host has been removed", 0, 'system');
     return $ret;
 }
 
-function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0') {
+function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0', $poller_group = '0', $force_add = '0', $port_assoc_mode = 'ifIndex') {
     global $config;
 
     list($hostshort) = explode(".", $host);
     // Test Database Exists
     if (host_exists($host) === false) {
+        // Valid port assoc mode
+        if (! is_valid_port_assoc_mode ($port_assoc_mode)) {
+            if ($quiet == 0) {
+                print_error ("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join (', ', get_port_assoc_modes ()));
+                return 0;
+            }
+        }
+
         if ($config['addhost_alwayscheckip'] === TRUE) {
             $ip = gethostbyname($host);
         } else {
@@ -257,15 +265,15 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 if (empty($snmpver)) {
                     // Try SNMPv2c
                     $snmpver = 'v2c';
-                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
+                    $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
                     if (!$ret) {
                         //Try SNMPv3
                         $snmpver = 'v3';
-                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
+                        $ret = addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
                         if (!$ret) {
                             // Try SNMPv1
                             $snmpver = 'v1';
-                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add);
+                            return addHost($host, $snmpver, $port, $transport, $quiet, $poller_group, $force_add, $port_assoc_mode);
                         }
                         else {
                             return $ret;
@@ -279,12 +287,12 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 if ($snmpver === "v3") {
                     // Try each set of parameters from config
                     foreach ($config['snmp']['v3'] as $v3) {
-                        $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3);
+                        $device = deviceArray($host, NULL, $snmpver, $port, $transport, $v3, $port_assoc_mode);
                         if($quiet == '0') { print_message("Trying v3 parameters " . $v3['authname'] . "/" .  $v3['authlevel'] . " ... "); }
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) or ($snmphost == $host || $hostshort = $host)) {
-                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group);
+                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode);
                                 return $device_id;
                             }
                             else {
@@ -303,14 +311,14 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                 elseif ($snmpver === "v2c" or $snmpver === "v1") {
                     // try each community from config
                     foreach ($config['snmp']['community'] as $community) {
-                        $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL);
+                        $device = deviceArray($host, $community, $snmpver, $port, $transport, NULL, $port_assoc_mode);
                         if($quiet == '0') {
                             print_message("Trying community $community ...");
                         }
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
-                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group);
+                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $port_assoc_mode);
                                 return $device_id;
                             }
                             else {
@@ -382,11 +390,17 @@ next;
     }
 }
 
-function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3) {
+function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3, $port_assoc_mode = 'ifIndex') {
     $device = array();
     $device['hostname'] = $host;
     $device['port'] = $port;
     $device['transport'] = $transport;
+
+    /* Get port_assoc_mode id if neccessary
+     * We can work with names of IDs here */
+    if (! is_int ($port_assoc_mode))
+        $port_assoc_mode = get_port_assoc_mode_id ($port_assoc_mode);
+    $device['port_association_mode'] = $port_assoc_mode;
 
     $device['snmpver'] = $snmpver;
     if ($snmpver === "v2c" or $snmpver === "v1") {
@@ -554,7 +568,7 @@ function getpollergroup($poller_group='0') {
     }
 }
 
-function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0') {
+function createHost($host, $community = NULL, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $poller_group='0', $port_assoc_mode = 'ifIndex') {
     global $config;
     $host = trim(strtolower($host));
 
@@ -569,6 +583,7 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
         'snmpver' => $snmpver,
         'poller_group' => $poller_group,
         'status_reason' => '',
+        'port_association_mode' => $port_assoc_mode,
     );
 
     $device = array_merge($device, $v3);
@@ -691,7 +706,7 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL) {
         $device = device_by_id_cache($device);
     }
 
-    $insert = array('host' => ($device['device_id'] ? $device['device_id'] : "NULL"),
+    $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
         'datetime' => array("NOW()"),
@@ -880,7 +895,7 @@ function is_port_valid($port, $device) {
                 }
             }
         }
-        if (empty($port['ifDescr'])) {
+        if (empty($port['ifDescr']) && !$config['os'][$device['os']]['empty_ifdescr']) {
             $valid = 0;
         }
         if ($device['os'] == "catos" && strstr($if, "vlan")) {
@@ -1309,7 +1324,7 @@ function oxidized_reload_nodes() {
     global $config;
 
     if ($config['oxidized']['enabled'] === TRUE && $config['oxidized']['reload_nodes'] === TRUE && isset($config['oxidized']['url'])) {
-        $oxidized_reload_url = $config['oxidized']['url'] . '/reload';
+        $oxidized_reload_url = $config['oxidized']['url'] . '/reload?format=json';
         $ch = curl_init($oxidized_reload_url);
 
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -1319,4 +1334,102 @@ function oxidized_reload_nodes() {
         curl_exec($ch);
         curl_close($ch);
     }
+}
+
+/**
+ * Perform DNS lookup
+ *
+ * @param array $device Device array from database
+ * @param string $type The type of record to lookup
+ *
+ * @return string ip
+ *
+**/
+function dnslookup($device,$type=false,$return=false) {
+    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == truee) {
+        return '';
+    }
+    if (empty($type)) {
+        // We are going to use the transport to work out the record type
+        if ($device['transport'] == 'udp6' || $device['transport'] == 'tcp6') {
+            $type = DNS_AAAA;
+            $return = 'ipv6';
+        }
+        else {
+            $type = DNS_A;
+            $return = 'ip';
+        }
+    }
+    if (empty($return)) {
+        return '';
+    }
+    $record = dns_get_record($device['hostname'],$type);
+    return $record[0][$return];
+}//end dnslookup
+
+
+/**
+ * Reursive Filter Iterator to iterate directories and locate .rrd files.
+ *
+ * @method boolean isDir()
+ *
+**/
+
+class RRDRecursiveFilterIterator extends \RecursiveFilterIterator {
+
+    public function accept() {
+        $filename = $this->current()->getFilename();
+        if ($filename[0] === '.') {
+            // Ignore hidden files and directories
+            return false;
+        }
+        if ($this->isDir()) {
+            // We want to search into directories
+            return true;
+        }
+        // Matches files with .rrd in the filename.
+        // We are only searching rrd folder, but there could be other files and we don't want to cause a stink.
+        return strpos($filename, '.rrd') !== false;
+    }
+}
+
+/**
+ * Run rrdtool info on a file path
+ *
+ * @param string $path Path to pass to rrdtool info
+ * @param string $stdOutput Variable to recieve the output of STDOUT
+ * @param string $stdError Variable to recieve the output of STDERR
+ *
+ * @return int exit code
+ *
+**/
+
+function rrdtest($path, &$stdOutput, &$stdError) {
+    global $config;
+    //rrdtool info <escaped rrd path>
+    $command = $config['rrdtool'].' info '.escapeshellarg($path);
+    $process = proc_open(
+        $command,
+        array (
+            0 => array('pipe', 'r'),
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'w'),
+        ),
+        $pipes
+    );
+
+    if (!is_resource($process)) {
+        throw new \RuntimeException('Could not create a valid process');
+    }
+
+    $status = proc_get_status($process);
+    while($status['running']) {
+        usleep(2000); // Sleep 2000 microseconds or 2 milliseconds
+        $status = proc_get_status($process);
+    }
+
+    $stdOutput = stream_get_contents($pipes[1]);
+    $stdError  = stream_get_contents($pipes[2]);
+    proc_close($process);
+    return $status['exitcode'];
 }

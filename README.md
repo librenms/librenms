@@ -43,12 +43,9 @@ You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
 image is supplied and has been tested with [VirtualBox][8].
 
 Download the [VirtualBox / VMWare image][11] and open it then log in with credentials provided. 
-Enter the following commands:
+Enter the following command:
 
-    cd /opt/librenms
-    git pull
-    php discover.php -h all
-    php poller.php -h all
+    ./daily.sh
 
 You'll then need to find out the IP of your VM (`ifconfig | grep add`) and
 create a DNS entry for `librenms.example.com` to point to that IP.  You can

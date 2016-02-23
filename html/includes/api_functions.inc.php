@@ -13,6 +13,7 @@
  */
 
 require_once '../includes/functions.php';
+require_once '../includes/component.php';
 require_once '../includes/device-groups.inc.php';
 
 function authToken(\Slim\Route $route) {
@@ -208,6 +209,7 @@ function list_devices() {
     }
     $devices = array();
     foreach (dbFetchRows("SELECT * FROM `devices` $join WHERE $sql ORDER by $order", $param) as $device) {
+        $device['ip'] = inet6_ntop($device['ip']);
         $devices[] = $device;
     }
 
@@ -504,6 +506,45 @@ function get_graph_by_portgroup() {
     $app->response->headers->set('Content-Type', 'image/png');
     include 'includes/graphs/graph.inc.php';
 
+}
+
+
+function get_components() {
+    global $config;
+    $code     = 200;
+    $status   = 'ok';
+    $message  = '';
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+
+    // Do some filtering if the user requests.
+    $options = array();
+    // We need to specify the label as this is a LIKE query
+    if (isset($_GET['label'])) {
+        // set a label like filter
+        $options['filter']['label'] = array('LIKE',$_GET['label']);
+        unset ($_GET['label']);
+    }
+    // Add the rest of the options with an equals query
+    foreach ($_GET as $k) {
+        $options['filter'][$k] = array('=',$_GET[$k]);
+    }
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $COMPONENT = new component();
+    $components = $COMPONENT->getComponents($device_id,$options);
+
+    $output       = array(
+        'status'  => "$status",
+        'err-msg' => $message,
+        'count'   => count($components[$device_id]),
+        'components'  => $components[$device_id],
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
 }
 
 

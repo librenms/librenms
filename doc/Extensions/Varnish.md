@@ -11,7 +11,7 @@ Varnish is caching software that sits logically between an HTTP client and an HT
 
 ### CentOS 7 Varnish Installation ###
 
-In this example we will assume your Apache 2.4.X HTTP server is working and 
+In this example we will assume your Apache 2.4.X HTTP server is working and
 configured to process HTTP requests on port 80.  If not, please see
 [Using HTTPd Apache2](http://librenms.readthedocs.org/Installation/Installation-(RHEL-CentOS)/#using-httpd-apache2)
 
@@ -30,7 +30,7 @@ By default Varnish listens for HTTP requests on port 6081.
 - Temporarily add a firewalld rule for testing Varnish.
 
 ```bash
-firewall-cmd --zone=public --add-port=6081/tcp   
+firewall-cmd --zone=public --add-port=6081/tcp
 ```
 
 #### Test Varnish ####
@@ -127,16 +127,16 @@ Edit librenms.conf and modify the Apache Virtual Host listening port.
 
 - Modify:`<VirtualHost *:80>` to: `<VirtualHost *:8080>`
 ```bash
-vim /etc/httpd/conf.d/librenms.conf 
+vim /etc/httpd/conf.d/librenms.conf
 ```
 
 Varnish can not share a port with Apache. Change the Apache listening port to 8080.
 
 - Modify:`Listen 80` to:`Listen 8080`
-```bash 
+```bash
 vim /etc/httpd/conf/httpd.conf
 ```
- 
+
 - Create the librenms.vcl
 ```bash
 cd /etc/varnish
@@ -205,11 +205,11 @@ sub vcl_backend_response {
     # 'sub vcl_backend_response' is the same function as 'sub vcl_fetch' in Varnish 3, however,
     # the syntax is slightly different
     # This function happens after we read the response headers from the backend (Apache).
-    # First function 'if (bereq.url ~ "\' removes cookies from the Apache HTTP responses    
+    # First function 'if (bereq.url ~ "\' removes cookies from the Apache HTTP responses
     # that match the file extensions that are between the quotes, and cache the files for 24 hours.
     # This assumes you update LibreNMS once a day, otherwise restart Varnish to clear cache.
     # Second function 'if (bereq.url ~ "^/' removes the Pragma no-cache statements and sets the age
-    # of how long the client brower will cache the matching urls.
+    # of how long the client browser will cache the matching urls.
     # LibreNMS graphs are updated every 300 seconds, 'max-age=300' is set to match this behavior.
     # We could cache these URLs in Varnish but it would add to the complexity of the config.
 

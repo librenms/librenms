@@ -21,7 +21,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS P, `devices` AS D WHERE D.device_
         }
     }
 
-    $rrd_filename = $config['rrd_dir'].'/'.$port['hostname'].'/port-'.safename($port['ifIndex'].'.rrd');
+    $rrd_filename = get_port_rrdfile_path ($port['hostname'], $port['port_id']);
     if (!$ignore && $i < 1100 && is_file($rrd_filename)) {
         $rrd_filenames[]          = $rrd_filename;
         $rrd_list[$i]['filename'] = $rrd_filename;

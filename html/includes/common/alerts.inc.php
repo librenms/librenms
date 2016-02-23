@@ -1,13 +1,162 @@
 <?php
 
-$common_output[] = '
+require_once $config['install_dir'].'/includes/device-groups.inc.php';
+
+/* FIXME: is there a central place we can put this? */
+
+$alert_states = array(
+    // divined from librenms/alerts.php
+    'recovered' => 0,
+    'alerted' => 1,
+    'acknowledged' => 2,
+    'worse' => 3,
+    'better' => 4
+);
+
+$alert_severities = array(
+    // alert_rules.status is enum('ok','warning','critical')
+    'ok' => 1,
+    'warning' => 2,
+    'critical' => 3
+);
+
+//if( defined('show_settings') || empty($widget_settings) ) {
+if(defined('show_settings')) {
+    $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
+    $current_severity     = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
+    $current_state        = isset($widget_settings['state']) ? $widget_settings['state'] : '';
+    $current_group        = isset($widget_settings['group']) ? $widget_settings['group'] : '';
+
+    $common_output[] = '
+<form class="form" onsubmit="widget_settings(this); return false;">
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="acknowledged" class="control-label">Show acknowledged alerts: </label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="acknowledged">';
+
+    $common_output[] = '<option value=""'.($current_acknowledged == '' ? ' selected' : ' ').'>not filtered</option>';
+    $common_output[] = '<option value="1"'.($current_acknowledged == '1' ? ' selected' : ' ').'>show only acknowledged</option>';
+    $common_output[] = '<option value="0"'.($current_acknowledged == '0' ? ' selected' : ' ').'>hide acknowledged</option>';
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="min_severity" class="control-label">Minimum displayed severity:</label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="min_severity">
+        <option value="">any severity</option>';
+
+    foreach ($alert_severities as $name => $val) {
+        $common_output[] = "<option value=\"$val\"".($current_severity == $name || $current_severity == $val ? ' selected' : '').">$name or higher</option>";
+    }
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="state" class="control-label">State:</label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="state">';
+    $common_output[] = '<option value=""'.($current_state == '' ? ' selected' : '').'>any state</option>';
+
+    foreach ($alert_states as $name => $val) {
+        $common_output[] = "<option value=\"$val\"".($current_state == $name || (is_numeric($current_state) && $current_state == $val) ? ' selected' : '').">$name</option>";
+    }
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="group" class="control-label">Device Group:</label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="group">';
+    $common_output[] = '<option value=""'.($current_group == '' ? ' selected' : '').'>any group</option>';
+
+    $device_groups = GetDeviceGroups();
+    $common_output[] = "<!-- ".print_r($device_groups, true)." -->";
+    foreach ($device_groups as $group) {
+        $group_id = $group['id'];
+        $common_output[] = "<option value=\"$group_id\"".(is_numeric($current_group) && $current_group == $group_id ? ' selected' : '').">".$group['name']." - ".$group['description']."</option>";
+    }
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-default">Set</button>
+    </div>
+  </div>
+</form>
+';
+}
+else {
+    $device_id    = $device['device_id'];
+    $acknowledged = $widget_settings['acknowledged'];
+    $state        = $widget_settings['state'];
+    $min_severity = $widget_settings['min_severity'];
+    $group        = $widget_settings['group'];
+
+    $title = "Alerts";
+
+    // state can be 0 or '', be sure they are treated differently
+    if (is_numeric($state)) {
+        $state_name = array_search($state, $alert_states);
+        $title = "$title ($state_name)";
+    }
+    elseif ($state) {
+        $title = "$title ($state)";
+    }
+
+    if (is_numeric($acknowledged)) {
+        if ($acknowledged == '0') {
+            $title = "Unacknowledged $title";
+        }
+        elseif ($acknowledged == '1') {
+            $title = "Acknowledged $title";
+        }
+    }
+
+    if (is_numeric($group)) {
+        $group_row = dbFetchRow("SELECT * FROM device_groups WHERE id = ?", array($group));
+        if ($group_row) {
+            $title = "$title for ".$group_row['name'];
+        }
+    }
+
+    if ($min_severity) {
+        $sev_name = $min_severity;
+        if (is_numeric($min_severity)) {
+            $sev_name = array_search($min_severity, $alert_severities);
+            $title = "$title >=$sev_name";
+        }
+    }
+
+    $widget_settings['title'] = $title;
+
+    $group        = $widget_settings['group'];
+
+    $common_output[] = '
 <div class="row">
     <div class="col-sm-12">
         <span id="message"></span>
     </div>
 </div>
 <div class="table-responsive">
-    <table id="alerts" class="table table-hover table-condensed alerts">
+    <table id="alerts_'.$unique_id.'" class="table table-hover table-condensed alerts">
         <thead>
             <tr>
                 <th data-column-id="status" data-formatter="status" data-sortable="false">Status</th>
@@ -22,14 +171,31 @@ $common_output[] = '
     </table>
 </div>
 <script>
-var alerts_grid = $("#alerts").bootgrid({
+var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     ajax: true,
     post: function ()
     {
         return {
             id: "alerts",
+';
+
+    if (is_numeric($acknowledged)) {
+        $common_output[]="acknowledged: '$acknowledged',\n";
+    }
+    if (isset($state) && $state != '') {
+        $common_output[]="state: '$state',\n";
+    }
+    if (isset($min_severity) && $min_severity != '') {
+        $common_output[]="min_severity: '$min_severity',\n";
+    }
+
+    if (is_numeric($group)) {
+        $common_output[]="group: '$group',\n";
+    }
+
+    $common_output[]='
             device_id: \'' . $device['device_id'] .'\'
-        };
+        }
     },
     url: "ajax_table.php",
     formatters: {
@@ -85,5 +251,5 @@ var alerts_grid = $("#alerts").bootgrid({
     });
 });
 </script>';
-
+}
 

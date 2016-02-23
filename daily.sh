@@ -42,7 +42,7 @@ if [ -z "$arg" ]; then
     fi
 
     cnf=$(echo $(grep '\[.distributed_poller.\]' config.php | egrep -v -e '^//' -e '^#' | cut -d = -f 2 | sed 's/;//g'))
-    cnd=${cnf,,}
+    cnf=${cnf,,}
     if [ -z "$cnf" ] || [ "$cnf" == "0" ] || [ "$cnf" == "false" ]; then
         # Call ourself again in case above pull changed or added something to daily.sh
         $0 post-pull

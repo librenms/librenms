@@ -55,7 +55,8 @@ foreach (dbFetchRows($sql, $param) as $port) {
     $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
     $outofsync = $dowecare ? " class='red'" : '';
     $checked = '';
-    if (get_dev_attrib($device_id, 'ifName_tune:'.$port['ifName']) == "true") {
+    $device['device_id'] = $device_id;
+    if (get_dev_attrib($device, 'ifName_tune:'.$port['ifName']) == "true") {
         $checked = 'checked';
     }
 

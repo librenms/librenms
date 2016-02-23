@@ -13,6 +13,7 @@
         - [`get_graphs`](#api-route-5)
         - [`get_graph_generic_by_hostname`](#api-route-6)
         - [`get_port_graphs`](#api-route-7)
+        - [`get_components`](#api-route-25)
         - [`get_port_stats_by_port_hostname`](#api-route-8)
         - [`get_graph_by_port_hostname`](#api-route-9)
         - [`list_devices`](#api-route-10)
@@ -111,7 +112,7 @@ Route: /api/v0/devices/:hostname
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -145,7 +146,7 @@ Route: /api/v0/devices/:hostname
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -178,7 +179,7 @@ Route: /api/v0/devices/:hostname/graphs
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -268,6 +269,70 @@ Output:
             "ifName": "eth1"
         }
     ]
+}
+```
+
+### <a name="api-route-25">Function: `get_components`</a> [`top`](#top)
+
+Get a list of components for a particular device.
+
+Route: /api/v0/devices/:hostname/components
+
+- hostname can be either the device hostname or id
+
+Input:
+
+ - type: Filter the result by type (Equals).
+ - id: Filter the result by id (Equals).
+ - label: Filter the result by label (Contains).
+ - status: Filter the result by status (Equals).
+ - disabled: Filter the result by disabled (Equals).
+ - ignore: Filter the result by ignore (Equals).
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components
+```
+
+Output:
+
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 3,
+    "components": {
+        "2": {
+            "TestAttribute-1": "Value1",
+            "TestAttribute-2": "Value2",
+            "TestAttribute-3": "Value3",
+            "type": "TestComponent-1",
+            "label": "This is a really cool blue component",
+            "status": "1",
+            "ignore": "0",
+            "disabled": "0"
+        },
+        "20": {
+            "TestAttribute-1": "Value4",
+            "TestAttribute-2": "Value5",
+            "TestAttribute-3": "Value6",
+            "type": "TestComponent-1",
+            "label": "This is a really cool red component",
+            "status": "1",
+            "ignore": "0",
+            "disabled": "0"
+        },
+        "27": {
+            "TestAttribute-1": "Value7",
+            "TestAttribute-2": "Value8",
+            "TestAttribute-3": "Value9",
+            "type": "TestComponent-2",
+            "label": "This is a really cool yellow widget",
+            "status": "1",
+            "ignore": "0",
+            "disabled": "0"
+        }
+    }
 }
 ```
 
@@ -446,8 +511,8 @@ Route: /api/v0/oxidized
 
 Input (JSON):
 
- - 
- 
+ -
+
 Examples:
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized
@@ -483,7 +548,7 @@ Input (JSON):
 
 Examples:
 ```curl
-curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost 
+curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
 ```
 
 Output:
@@ -686,7 +751,7 @@ Route: /api/v0/devices/:hostname/vlans
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -722,7 +787,7 @@ Route: /api/v0/alerts/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -759,7 +824,7 @@ Route: /api/v0/alerts/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -848,7 +913,7 @@ Route: /api/v0/rules/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -885,7 +950,7 @@ Route: /api/v0/rules/:id
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -907,11 +972,11 @@ List the alert rules.
 
 Route: /api/v0/rules
 
- - 
+ -
 
 Input:
 
- - 
+ -
 
 Example:
 ```curl
@@ -943,7 +1008,7 @@ Add a new alert rule.
 
 Route: /api/v0/rules
 
- - 
+ -
 
 Input (JSON):
 
@@ -952,7 +1017,7 @@ Input (JSON):
  - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
  - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
  - count: This is how many polling runs before an alert will trigger and the frequency.
- - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one. 
+ - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one.
  - mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).
  - invert: This would invert the rules check.
  - name: This is the name of the rule and is mandatory.
@@ -978,7 +1043,7 @@ Edit an existing alert rule
 
 Route: /api/v0/rules
 
- - 
+ -
 
 Input (JSON):
 
@@ -988,7 +1053,7 @@ Input (JSON):
  - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
  - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
  - count: This is how many polling runs before an alert will trigger and the frequency.
- - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one. 
+ - delay: Delay is when to start alerting and how frequently. The value is stored in seconds but you can specify minutes, hours or days by doing 5 m, 5 h, 5 d for each one.
  - mute: If mute is enabled then an alert will never be sent but will show up in the Web UI (true or false).
  - invert: This would invert the rules check.
  - name: This is the name of the rule and is mandatory.

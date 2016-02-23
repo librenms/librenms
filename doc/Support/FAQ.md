@@ -71,8 +71,10 @@ If the page you are trying to load has a substantial amount of data in it then i
 
 #### <a name="faq10"> Why do I not see any graphs?</a>
 
-This is usually due to there being blank spaces outside of the `<?php ?>` php tags within config.php. Remove these and retry. 
-It's also worth removing the final `?>` at the end of config.php as this is not required. 
+This is usually due to there being blank spaces outside of the `<?php ?>` php tags within config.php. Remove these and retry.
+It's also worth removing the final `?>` at the end of config.php as this is not required.
+Another reason why it might not be working is if you disabled functions needed by LibreNMS, which include `allow_url_fopen`
+and `exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen`.
 
 #### <a name="faq7"> How do I debug pages not loading correctly?</a>
 
@@ -92,12 +94,12 @@ Please see the [Poller Support](http://docs.librenms.org/Support/Poller Support)
 
 #### <a name="faq14"> Why do I get a lot apache or rrdtool zombies in my process list?</a>
 
-If this is related to your web service for LibreNMS then this has been tracked down to an issue within php which the developers aren't fixing. We have implemented a work around which means you 
+If this is related to your web service for LibreNMS then this has been tracked down to an issue within php which the developers aren't fixing. We have implemented a work around which means you
 shouldn't be seeing this. If you are, please report this in [issue 443](https://github.com/librenms/librenms/issues/443).
 
 #### <a name="faq15"> Why do I see traffic spikes in my graphs?</a>
 
-This occurs either when a counter resets or the device sends back bogus data making it look like a counter reset. We have enabled support for setting a maximum value for rrd files for ports. 
+This occurs either when a counter resets or the device sends back bogus data making it look like a counter reset. We have enabled support for setting a maximum value for rrd files for ports.
 Before this all rrd files were set to 100G max values, now you can enable support to limit this to the actual port speed.
 
 rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (scripts/tune_port.php).
@@ -136,7 +138,7 @@ Thanks for asking, sometimes it's not quite so obvious and everyone can contribu
 
 #### <a name="faq13"> How can I test another users branch?</a>
 
-LibreNMS can and is developed by anyone, this means someone may be working on a new feature or support for a device that you want. 
+LibreNMS can and is developed by anyone, this means someone may be working on a new feature or support for a device that you want.
 It can be helpful for others to test these new features, using Git, this is made easy.
 
 ```bash
@@ -151,7 +153,7 @@ git status
 If you see `nothing to commit, working directory clean` then let's go for it :)
 
 Let's say that you want to test a users (f0o) new development branch (issue-1337) then you can do the following:
- 
+
 ```bash
 git remote add f0o https://github.com/librenms/librenms.git
 git remote update f0o

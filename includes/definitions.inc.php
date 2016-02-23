@@ -311,6 +311,23 @@ $config['os'][$os]['icon']             = 'barracuda';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+$os = 'barracudaspamfirewall';
+$config['os'][$os]['text']             = 'Barracuda Spam Firewall';
+$config['os'][$os]['type']             = 'firewall';
+$config['os'][$os]['icon']             = 'barracuda';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// Calix
+$os = 'calix';
+$config['os'][$os]['text']             = 'Calix E7';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['empty_ifdescr']    = 1;
+$config['os'][$os]['icon']             = 'calix';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 // Cisco OSes
 $os = 'ios';
 $config['os'][$os]['group']            = 'cisco';
@@ -1178,6 +1195,14 @@ $config['os'][$os]['type']             = 'printer';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
+$os ='lexmarkprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Lexmark Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['icon']             = 'lexmark';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+
 $os = '3com';
 $config['os'][$os]['text']             = '3Com';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
@@ -1428,6 +1453,14 @@ $config['os'][$os]['icon']             = 'generic';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// EATON PDU
+$os = 'eatonpdu';
+$config['os'][$os]['text']             = 'Eaton PDU';
+$config['os'][$os]['type']             = 'power';
+$config['os'][$os]['icon']             = 'eaton';
+$config['os'][$os]['over'][0]['graph'] = 'device_current';
+$config['os'][$os]['over'][0]['text']  = 'Current';
+
 // Appliances
 $os = 'fortios';
 $config['os'][$os]['text']             = 'FortiOS';
@@ -1435,6 +1468,24 @@ $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'fortios';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'nios';
+$config['os'][$os]['text']             = 'Infoblox';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'infoblox';
+
+// Lenovo EMC (NAS)
+$os = 'lenovoemc';
+$config['os'][$os]['type']             = 'storage';
+$config['os'][$os]['group']            = 'storage';
+$config['os'][$os]['text']             = 'LenovoEMC';
+$config['os'][$os]['icon']             = 'lenovo';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
@@ -1636,6 +1687,20 @@ $config['graph_types']['device']['pulse_sessions']['section']      = 'firewall';
 $config['graph_types']['device']['pulse_sessions']['order']        = '0';
 $config['graph_types']['device']['pulse_sessions']['descr']        = 'Active Sessions';
 
+// Infoblox dns/dhcp Graphs
+$config['graph_types']['device']['ib_dns_dyn_updates']['section']             = 'dns';
+$config['graph_types']['device']['ib_dns_dyn_updates']['order']               = '0';
+$config['graph_types']['device']['ib_dns_dyn_updates']['descr']               = 'DNS dynamic updates';
+$config['graph_types']['device']['ib_dns_request_return_codes']['section']    = 'dns';
+$config['graph_types']['device']['ib_dns_request_return_codes']['order']      = '0';
+$config['graph_types']['device']['ib_dns_request_return_codes']['descr']      = 'DNS request return codes';
+$config['graph_types']['device']['ib_dns_performance']['section']             = 'dns';
+$config['graph_types']['device']['ib_dns_performance']['order']               = '0';
+$config['graph_types']['device']['ib_dns_performance']['descr']               = 'DNS performance';
+$config['graph_types']['device']['ib_dhcp_messages']['section']               = 'dhcp';
+$config['graph_types']['device']['ib_dhcp_messages']['order']                 = '0';
+$config['graph_types']['device']['ib_dhcp_messages']['descr']                 = 'DHCP messages';
+
 $config['graph_types']['device']['bits']['section']               = 'netstats';
 $config['graph_types']['device']['bits']['order']                 = '0';
 $config['graph_types']['device']['bits']['descr']                 = 'Total Traffic';
@@ -1735,6 +1800,9 @@ $config['graph_types']['device']['poller_perf']['descr']      = 'Poller Time';
 $config['graph_types']['device']['ping_perf']['section']      = 'poller';
 $config['graph_types']['device']['ping_perf']['order']        = '0';
 $config['graph_types']['device']['ping_perf']['descr']        = 'Ping Response';
+$config['graph_types']['device']['poller_modules_perf']['section']    = 'poller';
+$config['graph_types']['device']['poller_modules_perf']['order']      = '0';
+$config['graph_types']['device']['poller_modules_perf']['descr']      = 'Poller Modules Performance';
 
 $config['graph_types']['device']['vpdn_sessions_l2tp']['section'] = 'vpdn';
 $config['graph_types']['device']['vpdn_sessions_l2tp']['order']   = '0';

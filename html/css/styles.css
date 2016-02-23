@@ -1847,7 +1847,7 @@ label {
 
 .greenCluster {
     background-color: rgba(0,255,0);
-    background-color: rgba(0,255,0,0.7);
+    background-color: rgba(110, 204, 57, 0.6);
     text-align: center;
     width: 25px !important;
     height: 25px !important;

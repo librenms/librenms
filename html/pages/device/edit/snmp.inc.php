@@ -9,6 +9,7 @@ if ($_POST['editing']) {
         $timeout      = mres($_POST['timeout']);
         $retries      = mres($_POST['retries']);
         $poller_group = mres($_POST['poller_group']);
+        $port_assoc_mode = mres($_POST['port_assoc_mode']);
         $v3           = array(
             'authlevel'  => mres($_POST['authlevel']),
             'authname'   => mres($_POST['authname']),
@@ -25,6 +26,7 @@ if ($_POST['editing']) {
             'port'         => $port,
             'transport'    => $transport,
             'poller_group' => $poller_group,
+            'port_association_mode' => $port_assoc_mode,
         );
 
         if ($_POST['timeout']) {
@@ -43,7 +45,7 @@ if ($_POST['editing']) {
 
         $update = array_merge($update, $v3);
 
-        $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3);
+        $device_tmp = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
         if (isSNMPable($device_tmp)) {
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
 
@@ -116,6 +118,25 @@ echo "      </select>
     <input id='retries' name='retries' class='form-control input-sm' value='".($device['timeout'] ? $device['retries'] : '')."' placeholder='retries' />
     </div>
     </div>
+    <div class='form-group'>
+      <label for='port_assoc_mode' class='col-sm-2 control-label'>Port Association Mode</label>
+      <div class='col-sm-1'>
+        <select name='port_assoc_mode' id='port_assoc_mode' class='form-control input-sm'>
+";
+
+foreach (get_port_assoc_modes() as $pam) {
+    $pam_id = get_port_assoc_mode_id ($pam);
+    echo "           <option value='$pam_id'";
+
+    if ($pam_id == $device['port_association_mode'])
+        echo " selected='selected'";
+
+    echo ">$pam</option>\n";
+}
+
+echo "        </select>
+      </div>
+    </div>
     <div id='snmpv1_2'>
     <div class='form-group'>
     <label class='col-sm-3 control-label text-left'><h4><strong>SNMPv1/v2c Configuration</strong></h4></label>
@@ -173,11 +194,11 @@ echo "      </select>
     <div class='col-sm-4'>
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
     <option value='AES'>AES</option>
-    <option value='DES' ".($device['cryptoalgo'] === 'DES' ? 'selected' : '').'>DES</option>
+    <option value='DES' ".($device['cryptoalgo'] === 'DES' ? 'selected' : '').">DES</option>
     </select>
     </div>
     </div>
-    </div>';
+    </div>";
 
 if ($config['distributed_poller'] === true) {
     echo '

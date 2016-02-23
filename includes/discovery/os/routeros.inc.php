@@ -20,8 +20,10 @@ if (!$os) {
     }
 
     // poll Cisco AAA MIB
-    $extra_mibs = array(
-        "ciscoAAASessionMIB" => "CISCO-AAA-SESSION-MIB",
-    );
-    register_mibs($device, $extra_mibs, "includes/discovery/os/routeros.inc.php");
+    if (!empty($os)) {
+        $extra_mibs = array(
+            "ciscoAAASessionMIB" => "CISCO-AAA-SESSION-MIB",
+        );
+        register_mibs($device, $extra_mibs, "includes/discovery/os/routeros.inc.php");
+    }
 }

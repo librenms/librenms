@@ -2,7 +2,7 @@
 
 LibreNMS comes with a configurable geochart based frontpage to visualize where your gear is located geographically.
 
-### Experimentall map
+### Experimental map
 
 An new experimental map is available, this requires you to have properly formatted addresses in sysLocation or sysLocation override. As part of the standard poller these addresses will be Geocoded by Google and stored in the database. To enable this please set the following config:
 
@@ -31,7 +31,7 @@ $config['leaflet']['default_zoom']                       = 8;
 
 
 ### Jquery-Mapael config
-Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of 
+Further custom options are available to load different maps of the world, set default coordinates of where the map will zoom and the zoom level by default. An example of
 this is:
 
 ```php

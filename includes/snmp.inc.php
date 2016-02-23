@@ -745,13 +745,19 @@ function snmp_cache_portName($device, $array) {
 
 
 function snmp_gen_auth(&$device) {
-    global $debug;
+    global $debug, $vdebug;
 
     $cmd = '';
 
     if ($device['snmpver'] === 'v3') {
+	
         $cmd = " -v3 -n '' -l '".$device['authlevel']."'";
-
+		
+		//add context if exist context
+		if(key_exists('context_name', $device)){
+			$cmd = " -v3 -n '".$device['context_name']."' -l '".$device['authlevel']."'";
+		}
+		
         if ($device['authlevel'] === 'noAuthNoPriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
             // FIXME: There are two other places this is set - why are they ignored here?
@@ -776,16 +782,16 @@ function snmp_gen_auth(&$device) {
         }
     }
     else if ($device['snmpver'] === 'v2c' or $device['snmpver'] === 'v1') {
-        $cmd  = ' -'.$device['snmpver'];
-        $cmd .= ' -c '.$device['community'];
+        $cmd  = " -".$device['snmpver'];
+        $cmd .= " -c '".$device['community']."'";
     }
     else {
         if ($debug) {
-            print 'DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (wtf have you done ?)\n";
+            print 'DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (shouldn't be possible to get here)\n";
         }
     }//end if
 
-    if ($debug) {
+    if ($vdebug) {
         print "DEBUG: SNMP Auth options = $cmd\n";
     }
 
@@ -1139,25 +1145,17 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
 
             $usedoids[$index][$obj] = $val;
 
-            // if there's a file from the previous version of MIB-based polling, rename it
-            if (rrd_file_exists($device, array($mibname, $mibdef[$obj]['object_type'], $index))
-            && !rrd_file_exists($device, array($mibname, $mibdef[$obj]['shortname'], $index))) {
-                rrd_file_rename($device,
-                    array($mibname, $mibdef[$obj]['object_type'], $index),
-                    array($mibname, $mibdef[$obj]['shortname'], $index));
-                // Note: polling proceeds regardless of rename result
-            }
-
-            rrd_create_update(
-                $device,
-                array(
-                    $mibname,
-                    $mibdef[$obj]['shortname'],
-                    $index,
-                ),
-                array("DS:mibval:$type"),
-                array("mibval" => $val)
+            $tags = array(
+                'rrd_def'       => array("DS:mibval:$type"),
+                'rrd_name'      => array($mibname, $mibdef[$obj]['shortname'], $index),
+                'rrd_oldname'   => array($mibname, $mibdef[$obj]['object_type'], $index),
+                'index'         => $index,
+                'oid'           => $mibdef[$obj]['oid'],
+                'module'        => $mibdef[$obj]['module'],
+                'mib'           => $mibdef[$obj]['mib'],
+                'object_type'   => $obj,
             );
+            data_update($device, 'mibval', $tags, $val);
         }
     }
 
@@ -1276,4 +1274,70 @@ function register_mibs($device, $mibs, $included_by)
     }
 
     echo "\n";
+
 } // register_mibs
+
+/**
+ * SNMPWalk_array_num - performs a numeric SNMPWalk and returns an array containing $count indexes
+ * One Index:
+ *  From: 1.3.6.1.4.1.9.9.166.1.15.1.1.27.18.655360 = 0
+ *  To: $array['1.3.6.1.4.1.9.9.166.1.15.1.1.27.18']['655360'] = 0
+ * Two Indexes:
+ *  From: 1.3.6.1.4.1.9.9.166.1.15.1.1.27.18.655360 = 0
+ *  To: $array['1.3.6.1.4.1.9.9.166.1.15.1.1.27']['18']['655360'] = 0
+ * And so on...
+ * Think snmpwalk_cache_*_oid but for numeric data.
+ *
+ * Why is this useful?
+ * Some SNMP data contains a single index (eg. ifIndex in IF-MIB) and some is dual indexed
+ * (eg. PolicyIndex/ObjectsIndex in CISCO-CLASS-BASED-QOS-MIB).
+ * The resulting array allows us to easily access the top level index we want and iterate over the data from there.
+ *
+ * @param $device
+ * @param $OID
+ * @param int $indexes
+ * @internal param $string
+ * @return array
+ */
+function snmpwalk_array_num($device,$oid,$indexes=1) {
+    $array = array();
+    $string = snmp_walk($device, $oid, '-Osqn');
+
+    if ( $string === false) {
+        // False means: No Such Object.
+        return false;
+    }
+    if ($string == "") {
+        // Empty means SNMP timeout or some such.
+        return null;
+    }
+
+    // Let's turn the string into something we can work with.
+    foreach (explode("\n", $string) as $line) {
+        if ($line[0] == '.') {
+            // strip the leading . if it exists.
+            $line = substr($line,1);
+        }
+        list($key, $value) = explode(' ', $line, 2);
+        $prop_id = explode('.', $key);
+        $value = trim($value);
+
+        // if we have requested more levels that exist, set to the max.
+        if ($indexes > count($prop_id)) {
+            $indexes = count($prop_id)-1;
+        }
+
+        for ($i=0;$i<$indexes;$i++) {
+            // Pop the index off.
+            $index = array_pop($prop_id);
+            $value = array($index => $value);
+        }
+
+        // Rebuild our key
+        $key = implode('.',$prop_id);
+
+        // Add the entry to the master array
+        $array = array_replace_recursive($array,array($key => $value));
+    }
+    return $array;
+}

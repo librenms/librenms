@@ -73,8 +73,9 @@ If you are deploying a separate database server, you need to change the `bind-ad
 
     vim /etc/my.cnf
 
-Add the following line:
+Add the following lines:
 
+    innodb_file_per_table=1
     bind-address = <ip>
 
 Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
@@ -134,7 +135,8 @@ You need to configure snmpd appropriately if you have not already done so.  An a
 Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd restart` will activate this config.
 
 In `/etc/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
-examples are: "America/New York", "Australia/Brisbane", "Etc/UTC". Please also ensure that allow_url_fopen is enabled.
+examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
+Please also ensure that `allow_url_fopen` is enabled. Other functions needed for LibreNMS include `exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen`.
 
 Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 
@@ -152,8 +154,8 @@ Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 </VirtualHost>
 ```
 
-__Notes:__  
-If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`.  
+__Notes:__
+If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`.
 If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html)
 
 ### Using Nginx and PHP-FPM ###
@@ -264,12 +266,6 @@ First, create and chown the `rrd` directory and create the `logs` directory
     mkdir rrd logs
     chown -R librenms:librenms /opt/librenms
     chmod 775 rrd
-
-    # For HTTPd (Apache):
-    chown apache:apache logs
-
-    # For Nginx:
-    chown nginx:nginx logs
 ```
 
 > If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
@@ -332,8 +328,8 @@ Create the cronjob
 
 ### Daily Updates ###
 
-LibreNMS performs daily updates by default.  At 00:15 system time every day, a `git pull --no-edit --quiet` is performed.  You can override this default by edit
-ing your `config.php` file.  Remove the comment (the `#` mark) on the line:
+LibreNMS performs daily updates by default.  At 00:15 system time every day, a `git pull --no-edit --quiet` is performed.  You can override this default by editing
+your `config.php` file.  Remove the comment (the `#` mark) on the line:
 
     #$config['update'] = 0;
 

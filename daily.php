@@ -101,7 +101,7 @@ if ($options['f'] === 'perf_times') {
 }
 
 if ($options['f'] === 'callback') {
-    include_once 'callback.php';
+    include_once 'includes/callback.php';
 }
 
 if ($options['f'] === 'device_perf') {
@@ -113,13 +113,16 @@ if ($options['f'] === 'device_perf') {
 }
 
 if ($options['f'] === 'notifications') {
-    include_once 'notifications.php';
+    include_once 'includes/notifications.php';
 }
 
 if ($options['f'] === 'purgeusers') {
     $purge = 0;
     if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
         $purge = $config['radius']['users_purge'];
+    }
+    if (is_numeric($config['active_directory']['users_purge']) && $config['auth_mechanism'] === 'active_directory') {
+        $purge = $config['active_directory']['users_purge'];
     }
     if ($purge > 0) {
         foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {

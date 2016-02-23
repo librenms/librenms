@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+ <title>LibreNMS Notifications</title>
+ <description>RSS feed for notifications to LibreNMS users</description>
+ <link>http://www.librenms.org/</link>
+ <lastBuildDate>Tue, 19 Jan 2016 12:00:00 +0000</lastBuildDate>
+ <pubDate>Tue, 19 Jan 2016 12:00:00 +0000</pubDate>
+ <ttl>1800</ttl>
+ <item>
+  <title>Hello World!</title>
+  <description>This is the first notification. We will post these whenever an upcoming major change is about to happen.</description>
+  <pubDate>Tue, 19 Jan 2016 12:00:00 +0000</pubDate>
+ </item>
+</channel>
+</rss>

@@ -331,49 +331,55 @@ function rrdtool_tune($type, $filename, $max) {
     }
 } // rrdtool_tune
 
+
 /*
- * Please use this instead of creating & updating RRD files manually.
- * @param device Device object - only 'hostname' is used at present
- * @param name Array of rrdname components
- * @param def Array of data definitions
- * @param val Array of value definitions
- *
+ * rrdtool backend implementation of data_update
  */
-function rrd_create_update($device, $name, $def, $val, $step=300)
+function rrdtool_data_update($device, $measurement, $tags, $fields)
 {
     global $config;
-    $rrd = rrd_name($device['hostname'], $name);
 
-    if (!is_file($rrd) && $def != null) {
-        // add the --step and the rra definitions to the array
-        $newdef = "--step $step ".implode(' ', $def).$config['rrd_rra'];
+    $rrd_name = $tags['rrd_name'] ? $tags['rrd_name'] : $measurement;
+    $step = $tags['rrd_step'] ? $tags['rrd_step'] : 300;
+    $oldname = $tags['rrd_oldname'];
+    if (isset($oldname) && !empty($oldname)) {
+        rrd_file_rename($device, $oldname, $rrd_name);
+    }
+
+    $rrd = rrd_name($device['hostname'], $rrd_name);
+    if (!is_file($rrd) && $tags['rrd_def']) {
+        $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
+        // add the --step and the rra definitions to the command
+        $newdef = "--step $step ".implode(' ', $rrd_def).$config['rrd_rra'];
         rrdtool_create($rrd, $newdef);
     }
 
-    rrdtool_update($rrd, $val);
-} // rrd_create_update
-
-
-/*
- * @return bool indicating existence of RRD file
- * @param device Device object as used with rrd_create_update()
- * @param name RRD name array as used with rrd_create_update() and rrd_name()
- */
-function rrd_file_exists($device, $name)
-{
-    return is_file(rrd_name($device['hostname'], $name));
-} // rrd_file_exists
+    rrdtool_update($rrd, $fields);
+} // rrdtool_data_update
 
 
 /*
  * @return bool indicating rename success or failure
- * @param device Device object as used with rrd_create_update()
- * @param oldname RRD name array as used with rrd_create_update() and rrd_name()
- * @param newname RRD name array as used with rrd_create_update() and rrd_name()
+ * @param device Device object
+ * @param oldname RRD name array as used with rrd_name()
+ * @param newname RRD name array as used with rrd_name()
  */
 function rrd_file_rename($device, $oldname, $newname)
 {
     $oldrrd = rrd_name($device['hostname'], $oldname);
     $newrrd = rrd_name($device['hostname'], $newname);
-    return rename($oldrrd, $newrrd);
+    if (is_file($oldrrd) && !is_file($newrrd)) {
+        if (rename($oldrrd, $newrrd)) {
+            log_event("Renamed $oldrrd to $newrrd", $device, "poller");
+            return true;
+        }
+        else {
+            log_event("Failed to rename $oldrrd to $newrrd", $device, "poller");
+            return false;
+        }
+    }
+    else {
+        // we don't need to rename the file
+        return true;
+    }
 } // rrd_file_rename

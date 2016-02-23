@@ -42,6 +42,10 @@ If you are deploying a separate database server, you need to change the `bind-ad
 
     vim /etc/mysql/my.cnf
 
+Within the [mysqld] section please add:
+
+    innodb_file_per_table=1
+
 Find the line: `bind-address = 127.0.0.1`
 
 Change `127.0.0.1` to the IP address that your MySQL server should listen on.  Restart MySQL:
@@ -54,7 +58,7 @@ If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
 
 Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of Debian 7.
 
-    apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear php5-curl snmp graphviz mysql-server mysql-client rrdtool sendmail fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
+    apt-get install lighttpd php5-cli php5-mysql php5-gd php5-snmp php5-cgi php-pear php5-curl snmp graphviz rrdtool sendmail fping imagemagick whois mtr-tiny nmap ipmitool php5-mcrypt php5-json python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git
 
 ### Adding the librenms-user ###
 
@@ -104,7 +108,6 @@ First, create and chown the `rrd` directory and create the `logs` directory
 
     mkdir rrd logs
     chown -R librenms:librenms /opt/librenms
-    chown www-data:www-data logs
     chmod 775 rrd
 
 > NOTE: If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
@@ -123,7 +126,7 @@ Next, add the following to `/etc/lighttpd/librenms.conf`
        "^/([a-z|0-9\-]+)/(.+)/(.+)/(.+)/" => "/?page=$1&$2&$3&$4",
        "^/([a-z|0-9\-]+)/(.+)/(.+)/" => "/?page=$1&$2&$3",
        "^/([a-z|0-9\-]+)/(.+)/" => "/?page=$1&$2",
-       "^/([a-z|0-9]+)/$" => "/?page=$1"
+       "^/([a-z|0-9\-]+)/$" => "/?page=$1"
      )
 
 Next, add the following to `/etc/lighttpd/lighttpd.conf`

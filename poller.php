@@ -33,7 +33,7 @@ echo "MySQL: ".$versions['mysql_ver']."\n";
 echo "RRDTool: ".$versions['rrdtool_ver']."\n";
 echo "SNMP: ".$versions['netsnmp_ver']."\n";
 
-$options = getopt('h:m:i:n:r::d::a::f::');
+$options = getopt('h:m:i:n:r::d::v::a::f::');
 
 if ($options['h'] == 'odd') {
     $options['n'] = '1';
@@ -83,14 +83,18 @@ if (!$where) {
     echo "-r                                           Do not create or update RRDs\n";
     echo "-f                                           Do not insert data into InfluxDB\n";
     echo "-d                                           Enable debugging output\n";
+    echo "-d                                           Enable verbose debugging output\n";
     echo "-m                                           Specify module(s) to be run\n";
     echo "\n";
     echo "No polling type specified!\n";
     exit;
 }
 
-if (isset($options['d'])) {
+if (isset($options['d']) || isset($options['v'])) {
     echo "DEBUG!\n";
+    if (isset($options['v'])) {
+        $vdebug = true;
+    }
     $debug = true;
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);

@@ -23,7 +23,7 @@ require 'includes/discovery/functions.inc.php';
 $start         = microtime(true);
 $runtime_stats = array();
 $sqlparams     = array();
-$options       = getopt('h:m:i:n:d::a::q',array('os:','type:'));
+$options       = getopt('h:m:i:n:d::v::a::q',array('os:','type:'));
 
 if (!isset($options['q'])) {
     echo $config['project_name_version']." Discovery\n";
@@ -82,8 +82,11 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $doing = $options['n'].'/'.$options['i'];
 }
 
-if (isset($options['d'])) {
+if (isset($options['d']) || isset($options['v'])) {
     echo "DEBUG!\n";
+    if (isset($options['v'])) {
+        $vdebug = true;
+    }
     $debug = true;
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
@@ -111,6 +114,7 @@ if (!$where) {
     echo "\n";
     echo "Debugging and testing options:\n";
     echo "-d                                           Enable debugging output\n";
+    echo "-v                                           Enable verbose debugging output\n";
     echo "-m                                           Specify single module to be run\n";
     echo "\n";
     echo "Invalid arguments!\n";

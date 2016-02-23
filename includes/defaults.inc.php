@@ -438,6 +438,8 @@ $config['enable_pseudowires'] = 1;
 // Enable Pseudowires
 $config['enable_vrfs'] = 1;
 // Enable VRFs
+$config['enable_vrf_lite_cisco'] = 1;
+// Enable VRF lite cisco
 $config['enable_printers'] = 0;
 // Enable Printer support
 $config['enable_sla'] = 0;
@@ -566,7 +568,7 @@ $config['irc_alert']      = false;
 $config['irc_alert_utf8'] = false;
 
 // Authentication
-$config['allow_unauth_graphs'] = 0;
+$config['allow_unauth_graphs'] = false;
 // Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array();
 // Allow graphs to be viewed without authorisation from certain IP ranges
@@ -590,6 +592,8 @@ $config['auth_ldap_groups']['pfy']['level']     = 7;
 $config['auth_ldap_groups']['support']['level'] = 1;
 $config['auth_ldap_groupmemberattr']            = 'memberUid';
 $config['auth_ldap_emailattr']                  = 'mail';
+$config['auth_ldap_cache_ttl'] = 300;
+// How long in seconds should ldap* module cache user information in $_SESSION
 
 // Sensors
 $config['allow_entity_sensor']['amperes']     = 1;
@@ -708,7 +712,9 @@ $config['poller_modules']['applications']                = 1;
 $config['poller_modules']['cisco-asa-firewall']          = 1;
 $config['poller_modules']['mib'] = 0;
 $config['poller_modules']['cisco-voice']                 = 1;
+$config['poller_modules']['cisco-cbqos']                 = 1;
 $config['poller_modules']['stp']                         = 1;
+$config['poller_modules']['cisco-otv']                   = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -718,6 +724,7 @@ $config['discovery_modules']['ports-stack']          = 1;
 $config['discovery_modules']['entity-physical']      = 1;
 $config['discovery_modules']['processors']           = 1;
 $config['discovery_modules']['mempools']             = 1;
+$config['discovery_modules']['cisco-vrf-lite']       = 1;
 $config['discovery_modules']['ipv4-addresses']       = 1;
 $config['discovery_modules']['ipv6-addresses']       = 1;
 $config['discovery_modules']['sensors']              = 1;
@@ -732,7 +739,7 @@ $config['discovery_modules']['vlans']                = 1;
 $config['discovery_modules']['cisco-mac-accounting'] = 1;
 $config['discovery_modules']['cisco-pw']             = 1;
 $config['discovery_modules']['cisco-vrf']            = 1;
-// $config['discovery_modules']['cisco-cef']                 = 1;
+//$config['discovery_modules']['cisco-cef']            = 1;
 $config['discovery_modules']['cisco-sla']      = 1;
 $config['discovery_modules']['vmware-vminfo']  = 1;
 $config['discovery_modules']['libvirt-vminfo'] = 1;
@@ -740,7 +747,9 @@ $config['discovery_modules']['toner']          = 1;
 $config['discovery_modules']['ucd-diskio']     = 1;
 $config['discovery_modules']['services']       = 1;
 $config['discovery_modules']['charge']         = 1;
+$config['discovery_modules']['cisco-cbqos']    = 0;
 $config['discovery_modules']['stp']            = 1;
+$config['discovery_modules']['cisco-otv']      = 1;
 
 $config['modules_compat']['rfc1628']['liebert']    = 1;
 $config['modules_compat']['rfc1628']['netmanplus'] = 1;
@@ -779,6 +788,7 @@ $config['dateformat']['mysql']['time']    = '%H:%i:%s';
 
 $config['enable_clear_discovery'] = 1;
 // Set this to 0 if you want to disable the web option to rediscover devices
+$config['force_ip_to_sysname']    = false;// Set to true if you want to use sysName in place of IPs
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
 $config['enable_footer'] = 1;
@@ -846,6 +856,13 @@ $config['availability-map-width']                       = 25;
 
 // Default notifications Feed
 $config['notifications']['LibreNMS']                    = 'http://www.librenms.org/notifications.rss';
+$config['notifications']['local']                       = 'misc/notifications.rss';
 
 // Update channel (Can be 'master' or 'release')
 $config['update_channel']                               = 'master';
+
+// Default port association mode
+$config['default_port_association_mode'] = 'ifIndex';
+// Ignore ports which can't be mapped using a devices port_association_mode
+// See include/polling/ports.inc.php for a lenghty explanation.
+$config['ignore_unmapable_port'] = False;

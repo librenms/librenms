@@ -209,6 +209,8 @@ function generate_device_link($device, $text=null, $vars=array(), $start=0, $end
         $text = $device['hostname'];
     }
 
+    $text = ip_to_sysname($device,$text);
+
     if (isset($config['os'][$device['os']]['over'])) {
         $graphs = $config['os'][$device['os']]['over'];
     }
@@ -1160,6 +1162,16 @@ function alert_details($details) {
 
         if ($tmp_alerts['port_id']) {
             $fault_detail .= generate_port_link($tmp_alerts).';&nbsp;';
+            $fallback      = false;
+        }
+
+        if ($tmp_alerts['type'] && $tmp_alerts['label']) {
+            if ($tmp_alerts['error'] == "") {
+                $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].';&nbsp;';
+            }
+            else {
+                $fault_detail .= ' '.$tmp_alerts['type'].' - '.$tmp_alerts['label'].' - '.$tmp_alerts['error'].';&nbsp;';
+            }
             $fallback      = false;
         }
 
