@@ -11,6 +11,12 @@
    * the source code distribution for details.
    */
 
-$version = snmp_get($device, 'firmwareVersion.0', '-OQv', 'NETONIX-SWITCH-MIB', $config['mibdir'].':'.$config['mibdir'].'/netonix');
-$version = str_replace('.n.........', '', $version); // version display bug in 1.3.9
-$hardware = $poll_device['sysDescr'];
+if ($device['os'] == 'netonix') {
+    $total = snmp_get($device, "UCD-SNMP-MIB::memTotalReal.0", "-OvQU");
+    $free = snmp_get($device, "UCD-SNMP-MIB::memAvailReal.0", "-OvQU");
+
+    $mempool['total'] = $total;
+    $mempool['free']  = $free;
+    $mempool['used']  = $total - $free;
+
+}
