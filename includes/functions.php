@@ -153,33 +153,41 @@ function getImage($device) {
 }
 
 function getImageSrc($device) {
+    // is base_url needed?
+    return '/images/os/' . getImageName($device) . '.png';
+}
+
+function getImageName($device, $use_database=true) {
     global $config;
 
     $device['os'] = strtolower($device['os']);
 
-    if (!empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
-        $image = $config['base_url'] . '/images/os/' . $device['icon'] . '.png';
+    // fetch from the database
+    if ($use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+        return $device['icon'];
     }
-    elseif (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
-        $image = $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png';
-    }
-    else {
-        if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
-            $image = $config['base_url'] . '/images/os/' . $device['os'] . '.png';
-        }
-        if ($device['os'] == "linux") {
-            $features = strtolower(trim($device['features']));
-            list($distro) = explode(" ", $features);
-            if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
-                $image = $config['base_url'] . '/images/os/' . $distro . '.png';
-            }
-        }
-        if (empty($image)) {
-            $image = $config['base_url'] . '/images/os/generic.png';
+
+    // linux specific handling, distro icons
+    if ($device['os'] == "linux") {
+        $features = strtolower(trim($device['features']));
+        list($distro) = explode(" ", $features);
+        if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
+            return $distro;
         }
     }
 
-    return $image;
+    // use the icon from os config
+    if (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
+        return $config['os'][$device['os']]['icon'];
+    }
+
+    // guess the icon has the same name as the os
+    if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
+        return $device['os'];
+    }
+
+    // fallback to the generic icon
+    return 'generic';
 }
 
 function renamehost($id, $new, $source = 'console') {
