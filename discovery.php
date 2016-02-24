@@ -125,7 +125,7 @@ require 'includes/sql-schema/update.php';
 
 $discovered_devices = 0;
 
-if ($config['distributed_poller'] === true) {
+if (!empty($config['distributed_poller_group'])) {
     $where .= ' AND poller_group IN('.$config['distributed_poller_group'].')';
 }
 
