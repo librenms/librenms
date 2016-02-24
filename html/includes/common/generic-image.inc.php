@@ -41,6 +41,14 @@ if( defined('show_settings') || empty($widget_settings) ) {
       <input type="text" class="form-control input_'.$unique_id.'" name="image_url" placeholder="Image URL" value="'.htmlspecialchars($widget_settings['image_url']).'">
     </div>
   </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'">
+    <div class="col-sm-2">
+      <label for="image_url" class="control-label">Target URL: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'" name="target_url" placeholder="Target URL" value="'.htmlspecialchars($widget_settings['target_url']).'">
+    </div>
+  </div>
   <div class="form-group">
     <div class="col-sm-2">
       <button type="submit" class="btn btn-default">Set</button>
@@ -50,5 +58,5 @@ if( defined('show_settings') || empty($widget_settings) ) {
 }
 else {
     $widget_settings['title'] = $widget_settings['image_title'];
-    $common_output[]          = '<img class="minigraph-image" width="'.$widget_dimensions['x'].'" height="'.$widget_dimensions['y'].'" src="'.$widget_settings['image_url'].'"/>';
+    $common_output[]          = '<a target="_blank" href="'.$widget_settings['target_url'].'"><img class="minigraph-image" width="'.$widget_dimensions['x'].'" height="'.$widget_dimensions['y'].'" src="'.$widget_settings['image_url'].'"/></a>';
 }
