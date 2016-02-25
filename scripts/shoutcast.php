@@ -63,7 +63,7 @@
 		$servers		= file($config);
 		$data			= array();
 		foreach ($servers as $item=>$server) {
-		    list($host, $port)	= split(":", $server, 2);
+		    list($host, $port)	= explode(":", $server, 2);
 		    array_push($data, get_data(trim($host), trim($port)));
 		}
 		return $data;

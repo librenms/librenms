@@ -2,7 +2,7 @@
 
 $check = shell_exec($config['nagios_plugins'] . "/check_spop -H ".$service['hostname']);
 
-list($check, $time) = split("\|", $check);
+list($check, $time) = explode("|", $check);
 
 if(strstr($check, "SPOP OK")) {
   $status = '1';
