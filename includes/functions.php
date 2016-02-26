@@ -582,6 +582,11 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
 
     $poller_group=getpollergroup($poller_group);
 
+    /* Get port_assoc_mode id if neccessary
+     * We can work with names of IDs here */
+    if (! is_int ($port_assoc_mode))
+        $port_assoc_mode = get_port_assoc_mode_id ($port_assoc_mode);
+
     $device = array('hostname' => $host,
         'sysName' => $host,
         'community' => $community,
