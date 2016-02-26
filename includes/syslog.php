@@ -53,38 +53,16 @@ function process_syslog($entry, $update) {
 
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
             $matches = array();
-            // if (preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)) {
-            // $entry['msg'] = $matches['msg'];
-            // $entry['program'] = $matches['program'];
-            // }
-            // unset($matches);
-            if (strstr($entry['msg'], '%')) {
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
-                list(,$entry['msg']) = explode(': %', $entry['msg']);
-                $entry['msg']      = '%'.$entry['msg'];
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
-            }
-            else {
-                $entry['msg'] = preg_replace('/^.*[0-9]:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^[0-9][0-9]\ [A-Z]{3}:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^(.+?):\ /', '\\1||', $entry['msg']);
+            /* Split the following examples, or fallback to leaving everything in msg
+             * %LINK-3-UPDOWN: Interface GigabitEthernet0/2, changed state to up
+             * %SYS-5-MOD_OK:Module 1 is online
+             */
+            if (preg_match('/^%([A-Z\d\-_]+): ?(.+)/', $entry['msg'], $matches)) {
+               $entry['program'] = $matches[1];
+               $entry['msg'] = $matches[2];
             }
 
-            $entry['msg'] = preg_replace('/^.+\.[0-9]{3}:/', '', $entry['msg']);
-            $entry['msg'] = preg_replace('/^.+-Traceback=/', 'Traceback||', $entry['msg']);
-
-            list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            $entry['msg'] = preg_replace('/^[0-9]+:/', '', $entry['msg']);
-
-            if (!$entry['program']) {
-                $entry['msg'] = preg_replace('/^([0-9A-Z\-]+?):\ /', '\\1||', $entry['msg']);
-                list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            }
-
-            if (!$entry['msg']) {
-                $entry['msg'] = $entry['program'];
-                unset($entry['program']);
-            }
+            unset($matches);
         }
         else if ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
             // Cisco WAP200 and similar
