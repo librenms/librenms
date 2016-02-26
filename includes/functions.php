@@ -1446,3 +1446,34 @@ function rrdtest($path, &$stdOutput, &$stdError) {
     proc_close($process);
     return $status['exitcode'];
 }
+
+function create_state_index($state_name) {
+    $insert = array('state_name' => $state_name);
+    return dbInsert($insert, 'state_indexes');
+}
+
+function create_sensor_to_state_index($device, $state_name, $index)
+{
+    $sensor_entry = dbFetchRow('SELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', array(
+        'state',
+        $device['device_id'],
+        $state_name,
+        $index
+    ));
+    $state_indexes_entry = dbFetchRow('SELECT state_index_id FROM `state_indexes` WHERE `state_name` = ?', array(
+        $state_name
+    ));
+    if (!empty($sensor_entry['sensor_id']) && !empty($state_indexes_entry['state_index_id'])) {
+        $insert = array(
+            'sensor_id' => $sensor_entry['sensor_id'],
+            'state_index_id' => $state_indexes_entry['state_index_id'],
+        );
+        foreach($insert as $key => $val_check) {
+            if (!isset($val_check)) {
+                unset($insert[$key]);
+            }
+        }
+
+        $inserted = dbInsert($insert, 'sensors_to_state_indexes');
+    }
+}
