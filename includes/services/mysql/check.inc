@@ -5,7 +5,7 @@ if ($service['service_param']) { $dbname = $service['service_param']; } else { $
 
 $check = shell_exec($config['nagios_plugins'] . "/check_mysql -H ".$service['hostname']." ".$dbname);
 
-list($check, $time) = split("\|", $check);
+list($check, $time) = explode("|", $check);
 
 if(strstr($check, "Uptime:") || strstr($check, "MySQL OK")) {
   $status = '1';
