@@ -86,7 +86,7 @@ elseif ($update_message) {
     <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
-            <input id="descr" name="descr" value="<?php echo($device['purpose']); ?>" class="form-control">
+            <textarea id="descr" name="descr" class="form-control"><?php echo($device['purpose']); ?></textarea>
         </div>
     </div>
     <div class="form-group">
