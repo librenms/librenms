@@ -283,7 +283,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                         return $ret;
                     }
                 }
-
+                $db_ip = inet_pton($ip);
                 if ($snmpver === "v3") {
                     // Try each set of parameters from config
                     foreach ($config['snmp']['v3'] as $v3) {
@@ -292,7 +292,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) or ($snmphost == $host || $hostshort = $host)) {
-                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $device['port_association_mode'], $ip);
+                                $device_id = createHost ($host, NULL, $snmpver, $port, $transport, $v3, $poller_group, $device['port_association_mode'], $db_ip);
                                 return $device_id;
                             }
                             else {
@@ -318,7 +318,7 @@ function addHost($host, $snmpver, $port = '161', $transport = 'udp', $quiet = '0
                         if ($force_add == 1 || isSNMPable($device)) {
                             $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
                             if (empty($snmphost) || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
-                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $device['port_association_mode'], $ip);
+                                $device_id = createHost ($host, $community, $snmpver, $port, $transport,array(),$poller_group, $device['port_association_mode'], $db_ip);
                                 return $device_id;
                             }
                             else {
