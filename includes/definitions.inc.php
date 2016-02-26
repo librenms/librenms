@@ -1016,6 +1016,13 @@ $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 
+$os = 'avtech';
+$config['os'][$os]['text']             = 'Avtech Environment Sensor';
+$config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['icon']             = 'avtech';
+$config['os'][$os]['over'][0]['graph'] = 'device_temperature';
+$config['os'][$os]['over'][0]['text']  = 'Temperature';
+
 $os = 'netbotz';
 $config['os'][$os]['text']             = 'Netbotz Environment sensor';
 $config['os'][$os]['type']             = 'environment';
