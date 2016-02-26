@@ -1474,6 +1474,6 @@ function create_sensor_to_state_index($device, $state_name, $index)
             }
         }
 
-        $inserted = dbInsert($insert, 'sensors_to_state_indexes');
+        dbInsert($insert, 'sensors_to_state_indexes');
     }
 }
