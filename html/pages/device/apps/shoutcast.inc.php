@@ -42,7 +42,7 @@ if (isset($total) && $total === true) {
 foreach ($files as $id => $file) {
     $hostname          = eregi_replace('app-shoutcast-'.$app['app_id'].'-', '', $file);
     $hostname          = eregi_replace('.rrd', '', $hostname);
-    list($host, $port) = split('_', $hostname, 2);
+    list($host, $port) = explode('_', $hostname, 2);
     $graphs            = array(
         'shoutcast_bits'  => 'Traffic Statistics - '.$host.' (Port: '.$port.')',
         'shoutcast_stats' => 'Shoutcast Statistics - '.$host.' (Port: '.$port.')',

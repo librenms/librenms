@@ -15,7 +15,7 @@ foreach ($servers as $item => $server) {
 
     if (!empty($server)) {
         $data              = explode(';', $server);
-        list($host, $port) = split(':', $data['0'], 2);
+        list($host, $port) = explode(':', $data['0'], 2);
         $bitrate           = $data['1'];
         $traf_in           = $data['2'];
         $traf_out          = $data['3'];
