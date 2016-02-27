@@ -53,7 +53,8 @@ if ($device['os_group'] == 'cisco') {
 
             foreach ($temp as $index => $entry) {
                 //Discover Sensors
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $temp[$index][$tablevalue[3]], '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
+                $descr = ucwords($temp[$index][$tablevalue[3]]);
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);
