@@ -1448,8 +1448,10 @@ function rrdtest($path, &$stdOutput, &$stdError) {
 }
 
 function create_state_index($state_name) {
-    $insert = array('state_name' => $state_name);
-    return dbInsert($insert, 'state_indexes');
+    if (dbFetchRow('SELECT * FROM state_indexes WHERE state_name = ?', array($state_name)) === false) {
+        $insert = array('state_name' => $state_name);
+        return dbInsert($insert, 'state_indexes');
+    }
 }
 
 function create_sensor_to_state_index($device, $state_name, $index)
