@@ -3,7 +3,7 @@
 $sensors = dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND device_id = ? ORDER BY `poller_type`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
 
 if ($sensor_class == 'state') {
-    $sensors = dbFetchRows('SELECT * FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `poller_type`, `sensor_descr` ', array($sensor_class, $device['device_id']));
+    $sensors = dbFetchRows('SELECT * FROM `sensors` LEFT JOIN `sensors_to_state_indexes` ON sensors_to_state_indexes.sensor_id = sensors.sensor_id LEFT JOIN state_indexes ON state_indexes.state_index_id = sensors_to_state_indexes.state_index_id WHERE `sensor_class` = ? AND device_id = ? ORDER BY `poller_type`, `sensor_oid`, `sensor_index`', array($sensor_class, $device['device_id']));
 }
 
 if (count($sensors)) {
