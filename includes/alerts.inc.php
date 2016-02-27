@@ -232,7 +232,9 @@ function RunRules($device) {
         $chk = dbFetchRow("SELECT state FROM alerts WHERE rule_id = ? && device_id = ? ORDER BY id DESC LIMIT 1", array($rule['id'], $device));
         $sql = GenSQL($rule['rule']);
         $qry = dbFetchRows($sql,array($device));
-        $qry[0]['ip'] = inet6_ntop($qry[0]['ip']);
+        if (isset($qry[0]['ip'])) {
+            $qry[0]['ip'] = inet6_ntop($qry[0]['ip']);
+        }
         $s = sizeof($qry);
         if( $s == 0 && $inv === false ) {
             $doalert = false;
