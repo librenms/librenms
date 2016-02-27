@@ -122,7 +122,11 @@ function poll_sensor($device, $class, $unit) {
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
 
-        dbUpdate(array('sensor_current' => $sensor_value, 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
+        if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
+            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
+        }
+
+        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
     }//end foreach
 
 }//end poll_sensor()
