@@ -24,13 +24,12 @@ if ($device['os_group'] == 'cisco') {
         $cur_oid = $tablevalue[1];
 
         if (is_array($temp)) {
-
             //Create State Index
             $state_name = $tablevalue[2];
             $state_index_id = create_state_index($state_name);
 
             //Create State Translation
-            if ($state_index_id) {
+            if ($state_index_id !== null) {
                 $states = array(
                      array($state_index_id,'normal',0,1,0) ,
                      array($state_index_id,'warning',0,2,1) ,
