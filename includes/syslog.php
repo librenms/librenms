@@ -52,17 +52,26 @@ function process_syslog($entry, $update) {
         $os = get_cache($entry['host'], 'os');
 
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
-            $matches = array();
-            /* Split the following examples, or fallback to leaving everything in msg
-             * %LINK-3-UPDOWN: Interface GigabitEthernet0/2, changed state to up
-             * %SYS-5-MOD_OK:Module 1 is online
-             */
-            if (preg_match('/^%([A-Z\d\-_]+): ?(.+)/', $entry['msg'], $matches)) {
-               $entry['program'] = $matches[1];
-               $entry['msg'] = $matches[2];
+            // multipart message
+            if(strpos($entry['msg'], ':') !== false) {
+                /* Split the following examples
+                 * %CARD-SEVERITY-MSG:SLOT %FACILITY-SEVERITY-MNEMONIC: Message-text
+                 * %FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text
+                 */
+                $matches = array();
+                if(preg_match('/^%?(?<program>[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?): ?(?<msg>.*)/', $entry['msg'], $matches)) {
+                    $entry['program'] = $matches['program'];
+                    $entry['msg'] = $matches['msg'];
+                }
+                unset($matches);
             }
-
-            unset($matches);
+            else {
+                // if this looks like a program (no groups of 2 or more lowercase letters), move it to program
+                if (preg_match('/[^(a-z)]{2,}/', $entry['msg'])) {
+                    $entry['program'] = $entry['msg'];
+                    unset($entry['msg']);
+               }
+            }
         }
         else if ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
             // Cisco WAP200 and similar
