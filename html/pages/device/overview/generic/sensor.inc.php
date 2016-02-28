@@ -78,16 +78,16 @@ if (count($sensors)) {
                     break;
             }
             echo '<tr>
-                <td>'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
-                <td>'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
-                <td>'.overlib_link($link, '<span '.$state_style.'>'.$state_translation['0']['state_descr'].'</span>', $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, '<span '.$state_style.'>'.$state_translation['0']['state_descr'].'</span>', $overlib_content, $sensor_class).'</td>
                 </tr>';
         }
         else {
             echo '<tr>
-                <td>'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
-                <td>'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
-                <td>'.overlib_link($link, '<span '.($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '').'>'.$sensor['sensor_current'].$sensor_unit.'</span>', $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, shorten_interface_type($sensor['sensor_descr']), $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, $sensor_minigraph, $overlib_content, $sensor_class).'</td>
+                <td class="col-md-4">'.overlib_link($link, '<span '.($sensor['sensor_current'] < $sensor['sensor_limit_low'] || $sensor['sensor_current'] > $sensor['sensor_limit'] ? "style='color: red'" : '').'>'.$sensor['sensor_current'].$sensor_unit.'</span>', $overlib_content, $sensor_class).'</td>
                 </tr>';
         }
     }//end foreach
