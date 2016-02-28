@@ -1,5 +1,7 @@
 <?php
 
+header('Content-type: text/plain');
+
 // FUA
 
 if(is_admin() === false) {
