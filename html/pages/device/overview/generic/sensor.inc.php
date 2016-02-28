@@ -62,7 +62,7 @@ if (count($sensors)) {
         $sensor['sensor_descr'] = truncate($sensor['sensor_descr'], 48, '');
         if (!empty($state_translation['0']['state_descr'])) {
             $state_style="";
-            switch ($state_translation['state_generic_value']) {
+            switch ($state_translation['0']['state_generic_value']) {
                 case 0: // OK
                     $state_style="class='label label-success'";
                     break;
