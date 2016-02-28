@@ -17,7 +17,7 @@ if ($device['os'] == "drac") {
     $main_oid = ".1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.";
     d_echo($oids."\n");
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo "Dell iDRAC";
         foreach (explode("\n", $oids) as $data) {
             list($oid,) = explode(" ", $data, 2);

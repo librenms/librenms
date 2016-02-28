@@ -4,7 +4,7 @@ if ($device['os'] == 'sentry3') {
     $oids = snmp_walk($device, 'infeedVoltage', '-OsqnU', 'Sentry3-MIB');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Sentry3-MIB ';
     }
 

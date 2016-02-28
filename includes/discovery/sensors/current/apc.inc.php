@@ -8,11 +8,11 @@ if ($device['os'] == 'apc') {
         $oids = snmp_walk($device, 'rPDULoadPhaseConfigIndex', '-OsqnU', 'PowerNet-MIB');
     }
 
-    if ($oids) {
+    if ($oids !== false) {
         d_echo($oids."\n");
 
         $oids = trim($oids);
-        if ($oids) {
+        if ($oids !== false) {
             echo 'APC PowerNet-MIB Phase ';
         }
 
@@ -60,7 +60,7 @@ if ($device['os'] == 'apc') {
     // v2 firmware- first bank is total, v3 firmware, 3rd bank is total
     $oids = snmp_walk($device, 'rPDULoadStatusIndex', '-OsqnU', 'PowerNet-MIB');
     // should work with firmware v2 and v3
-    if ($oids) {
+    if ($oids !== false) {
         echo 'APC PowerNet-MIB Banks ';
         d_echo($oids."\n");
 
@@ -126,7 +126,7 @@ if ($device['os'] == 'apc') {
 
     // Per Outlet Power Bar
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.26.9.4.3.1.1', '-t 30 -OsqnU', 'PowerNet-MIB');
-    if ($oids) {
+    if ($oids !== false) {
         echo 'APC PowerNet-MIB Outlets ';
         d_echo($oids."\n");
 
@@ -171,12 +171,12 @@ if ($device['os'] == 'apc') {
 
     // ATS
     $oids = snmp_walk($device, 'atsConfigPhaseTableIndex', '-OsqnU', 'PowerNet-MIB');
-    if ($oids) {
+    if ($oids !== false) {
         $type = 'apc';
         d_echo($oids."\n");
 
         $oids = trim($oids);
-        if ($oids) {
+        if ($oids !== false) {
             echo 'APC PowerNet-MIB ATS ';
         }
 
@@ -234,7 +234,7 @@ if ($device['os'] == 'apc') {
             d_echo($oids."\n");
 
             $oids = trim($oids);
-            if ($oids) {
+            if ($oids !== false) {
                 echo $item['type'].' '.$item['mib'].' UPS';
             }
 

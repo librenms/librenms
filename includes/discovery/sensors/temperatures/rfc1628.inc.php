@@ -5,7 +5,7 @@ if (isset($config['modules_compat']['rfc1628'][$device['os']]) && $config['modul
     d_echo($oids."\n");
 
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'RFC1628 Battery Temperature ';
     }
 

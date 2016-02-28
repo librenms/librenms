@@ -18,7 +18,7 @@ if ($device['os'] == 'linux') {
     d_echo($oids."\n");
 
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Dell ';
         foreach (explode("\n", $oids) as $data) {
             list($oid,)    = explode(' ', $data, 2);

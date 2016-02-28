@@ -4,7 +4,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.2.2.2.0', '-OsqnU', '');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo 'APC UPS Internal ';
         list($oid,$current) = explode(' ', $oids);
         $precision          = 1;
@@ -54,7 +54,7 @@ if ($device['os'] == 'apc') {
     // InRow Chiller.
     // A silly check to find out if it's the right hardware.
     $oids = snmp_get($device, 'airIRRCGroupSetpointsCoolMetric.0', '-OsqnU', 'PowerNet-MIB');
-    if ($oids) {
+    if ($oids !== false) {
         echo 'APC InRow Chiller ';
         $temps = array();
         $temps['airIRRCUnitStatusRackInletTempMetric']            = 'Rack Inlet';

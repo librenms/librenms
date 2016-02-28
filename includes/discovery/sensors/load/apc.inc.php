@@ -33,7 +33,7 @@ if ($device['os'] == 'apc') {
             d_echo($oids);
 
             $oids = trim($oids);
-            if ($oids) {
+            if ($oids !== false) {
                 echo $item['type'].' '.$item['mib'].' UPS';
             }
 

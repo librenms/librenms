@@ -5,7 +5,7 @@ if ($device['os'] == 'akcp' || $device['os'] == 'minkelsrms') {
     d_echo($oids."\n");
 
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'AKCP ';
     }
 
