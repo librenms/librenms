@@ -147,12 +147,12 @@ function interface_errors($rrd_file, $period = '-1d') {
 }
 
 function getImage($device) {
-    global $config;
-
     return '<img src="' . getImageSrc($device) . '" />';
 }
 
 function getImageSrc($device) {
+    global $config;
+
     return $config['base_url'] . '/images/os/' . getImageName($device) . '.png';
 }
 
