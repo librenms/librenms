@@ -147,14 +147,13 @@ function interface_errors($rrd_file, $period = '-1d') {
 }
 
 function getImage($device) {
-    global $config;
-
     return '<img src="' . getImageSrc($device) . '" />';
 }
 
 function getImageSrc($device) {
-    // is base_url needed?
-    return '/images/os/' . getImageName($device) . '.png';
+    global $config;
+
+    return $config['base_url'] . '/images/os/' . getImageName($device) . '.png';
 }
 
 function getImageName($device, $use_database=true) {
