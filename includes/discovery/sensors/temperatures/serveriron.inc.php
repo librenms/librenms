@@ -1,7 +1,7 @@
 <?php
 
 if ($device['os'] == 'serveriron') {
-    echo(" FOUNDRY-SN-AGENT-MIB ");
+    echo(" FOUNDRY-SN-AGENT-MIB");
 
     // Chassis temperature (default)
     $high_limit		= 110;
@@ -11,15 +11,15 @@ if ($device['os'] == 'serveriron') {
     $oid      = "1.3.6.1.4.1.1991.1.1.1.1.18.0"; // snChasActualTemperature
     $warn_oid = "1.3.6.1.4.1.1991.1.1.1.1.19.0"; // snChasWarningTemperature
     $high_oid = "1.3.6.1.4.1.1991.1.1.1.1.20.0"; // snChasShutdownTemperature
-    $value    = snmp_get($device, $oid, '-Oqv', 'FOUNDRY-SN-AGENT-MIB');
+    $value    = snmp_get($device, $oid, '-Oqv');
 
 
-    $value_warn = snmp_get($device, $warn_oid, '-Oqv', 'FOUNDRY-SN-AGENT-MIB');
+    $value_warn = snmp_get($device, $warn_oid, '-Oqv');
     if (is_numeric($value_warn)) {
 	$high_warn_limit = ($value_warn / 2);
     }
 
-    $value_high = snmp_get($device, $high_oid, '-Oqv', 'FOUNDRY-SN-AGENT-MIB');
+    $value_high = snmp_get($device, $high_oid, '-Oqv');
     if (is_numeric($value_high)) {
 	$high_limit = ($value_high / 2);
     }
