@@ -153,6 +153,14 @@ then restart Lighttpd:
 
     service lighttpd restart
 
+### Validate your install ###
+
+Run validate.php as root in the librenms directory
+
+    php validate.php
+
+This will check your install to verify it is set up correctly.
+
 ### Add localhost ###
 
     php addhost.php localhost public v2c
