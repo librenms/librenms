@@ -390,6 +390,10 @@ function FormatAlertTpl($obj) {
             $pos = $x;
             $for = true;
         }
+        else if ($buff == '{calc') {
+            $pos  = $x;
+            $calc = true;
+        }
 
         if ($pos != -1 && $msg[$x] == '}') {
             $orig = $buff;
@@ -409,6 +413,14 @@ function FormatAlertTpl($obj) {
                 $native = array(
                     '"; foreach( ',
                     ' as $key=>$value) { $ret .= "',
+                );
+            }
+            else if ($calc) {
+                $calc   = false;
+                $o      = 5;
+                $native = array(
+                    '"; $ret .= (float) (0+(',
+                    ')); $ret .= "',
                 );
             }
             else {
