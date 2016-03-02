@@ -195,10 +195,12 @@ function RunFollowUp() {
         if ($n > $o) {
             $ret  .= ' Worsens';
             $state = 3;
+            $alert['details']['diff'] = array_diff($chk,$alert['details']['rule']);
         }
         else if ($n < $o) {
             $ret  .= ' Betters';
             $state = 4;
+            $alert['details']['diff'] = array_diff($alert['details']['rule'],$chk);
         }
 
         if ($state > 0 && $n > 0) {
@@ -484,6 +486,10 @@ function DescribeAlert($alert) {
                     $obj['faults'][$i]['string'] .= $k.' => '.$v.'; ';
                 }
             }
+        }
+        $obj['elapsed'] = TimeFormat(time() - strtotime($alert['time_logged']));
+        if( !empty($extra['diff']) ) {
+            $obj['diff'] = $extra['diff'];
         }
     }
     else if ($alert['state'] == 0) {
