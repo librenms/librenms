@@ -27,6 +27,13 @@ rrdtool_pipe_open($rrd_process, $rrd_pipes);
 $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
 
+// Wait for schema update, as running during update can break update
+$dbVersion = dbFetchCell('SELECT version FROM dbSchema');
+if ($dbVersion < 107) {
+    logfile("BILLING: Cannot continue until dbSchema update to >= 107 is complete");
+    exit(1);
+}
+
 foreach (dbFetchRows('SELECT * FROM `bills`') as $bill_data) {
     echo 'Bill : '.$bill_data['bill_name']."\n";
 
