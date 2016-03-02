@@ -74,6 +74,7 @@ else
             php daily.php -f callback
             php daily.php -f device_perf
             php daily.php -f purgeusers
+            php daily.php -f bill_data
         ;;
         submodules)
             # Init+Update our submodules
