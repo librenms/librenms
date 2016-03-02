@@ -26,15 +26,22 @@ foreach( $opts as $method=>$apis ) {
     foreach( $apis as $api ) {
         //		var_dump($api); //FIXME: propper debuging
         list($host, $api) = explode("?",$api,2);
+        $datas=array();
+        foreach (explode ("&",$api) as $fields) {
+            $field = explode ("=",$fields);
+            $datas[$field[0]] = $field[1];
+        }
+        $json_datas = json_encode($datas);
         foreach( $obj as $k=>$v ) {
-            $api = str_replace("%".$k,$method == "get" ? urlencode($v) : $v, $api);
+            $json_datas = str_replace("%".$k, $v, $json_datas);
         }
         //		var_dump($api); //FIXME: propper debuging
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, ($method == "get" ? $host."?".$api : $host) );
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, strtoupper($method));
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $api);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $json_datas);
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if( $code != 200 ) {
