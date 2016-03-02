@@ -97,7 +97,7 @@ function getLastPortCounter($port_id) {
 
 function getLastMeasurement($bill_id) {
     $return = array();
-    $row    = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1", array($port_id));
+    $row    = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1", array($bill_id));
     if (!is_null($row)) {
         $return[delta]     = $row['delta'];
         $return[delta_in]  = $row['delta_in'];
@@ -108,9 +108,7 @@ function getLastMeasurement($bill_id) {
     else {
         $return[state] = 'failed';
     }
-
     return ($return);
-
 }//end getLastMeasurement()
 
 
