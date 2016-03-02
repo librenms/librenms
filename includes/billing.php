@@ -79,27 +79,25 @@ function getValue($host, $port, $id, $inout) {
 
 }//end getValue()
 
-
-function getLastPortCounter($port_id, $inout) {
+function getLastPortCounter($port_id) {
     $return = array();
-    $row    = dbFetchRow('SELECT counter,delta FROM `port_'.mres($inout)."_measurements` WHERE `port_id`='".mres($port_id)."' ORDER BY timestamp DESC LIMIT 1");
+    $row    = dbFetchRow("SELECT in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ?", array($port_id));
     if (!is_null($row)) {
-        $return[counter] = $row['counter'];
-        $return[delta]   = $row['delta'];
-        $return[state]   = 'ok';
+        $return[in_counter]  = $row['in_counter'];
+        $return[in_delta]    = $row['in_delta'];
+        $return[out_counter] = $row['out_counter'];
+        $return[out_delta]   = $row['out_delta'];
+        $return[state]       = 'ok';
+    } else {
+        $return[state]       = 'failed';
     }
-    else {
-        $return[state] = 'failed';
-    }
-
-    return ($return);
-
+    return $return;
 }//end getLastPortCounter()
 
 
 function getLastMeasurement($bill_id) {
     $return = array();
-    $row    = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id='".mres($bill_id)."' ORDER BY timestamp DESC LIMIT 1");
+    $row    = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1", array($port_id));
     if (!is_null($row)) {
         $return[delta]     = $row['delta'];
         $return[delta_in]  = $row['delta_in'];
