@@ -52,38 +52,25 @@ function process_syslog($entry, $update) {
         $os = get_cache($entry['host'], 'os');
 
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
-            $matches = array();
-            // if (preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)) {
-            // $entry['msg'] = $matches['msg'];
-            // $entry['program'] = $matches['program'];
-            // }
-            // unset($matches);
-            if (strstr($entry['msg'], '%')) {
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
-                list(,$entry['msg']) = explode(': %', $entry['msg']);
-                $entry['msg']      = '%'.$entry['msg'];
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
+            // multipart message
+            if(strpos($entry['msg'], ':') !== false) {
+                /* Split the following examples
+                 * %CARD-SEVERITY-MSG:SLOT %FACILITY-SEVERITY-MNEMONIC: Message-text
+                 * %FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text
+                 */
+                $matches = array();
+                if(preg_match('/^(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?): ?(?<msg>.*)/', $entry['msg'], $matches)) {
+                    $entry['program'] = $matches['program'];
+                    $entry['msg'] = $matches['msg'];
+                }
+                unset($matches);
             }
             else {
-                $entry['msg'] = preg_replace('/^.*[0-9]:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^[0-9][0-9]\ [A-Z]{3}:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^(.+?):\ /', '\\1||', $entry['msg']);
-            }
-
-            $entry['msg'] = preg_replace('/^.+\.[0-9]{3}:/', '', $entry['msg']);
-            $entry['msg'] = preg_replace('/^.+-Traceback=/', 'Traceback||', $entry['msg']);
-
-            list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            $entry['msg'] = preg_replace('/^[0-9]+:/', '', $entry['msg']);
-
-            if (!$entry['program']) {
-                $entry['msg'] = preg_replace('/^([0-9A-Z\-]+?):\ /', '\\1||', $entry['msg']);
-                list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            }
-
-            if (!$entry['msg']) {
-                $entry['msg'] = $entry['program'];
-                unset($entry['program']);
+                // if this looks like a program (no groups of 2 or more lowercase letters), move it to program
+                if (!preg_match('/[(a-z)]{2,}/', $entry['msg'])) {
+                    $entry['program'] = $entry['msg'];
+                    unset($entry['msg']);
+               }
             }
         }
         else if ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
