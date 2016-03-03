@@ -27,7 +27,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
     {
         // populate fake $dev_cache and $config
         global $config, $dev_cache;
-        $dev_cache['1.1.1.1'] = ['device_id' => 1, 'os' => 'ios', 'version' => 1];;
+        $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'ios', 'version' => 1);
         $config = array();
         $config['syslog_filter'] = array();
 
@@ -37,45 +37,45 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         // ---- IOS ----
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||%CARD-SEVERITY-MSG:SLOT %FACILITY-SEVERITY-MNEMONIC: Message-text||",
-            ['device_id'=>1, 'program'=>'%CARD-SEVERITY-MSG:SLOT %FACILITY-SEVERITY-MNEMONIC', 'msg'=>'Message-text']
+            array('device_id'=>1, 'program'=>'%CARD-SEVERITY-MSG:SLOT %FACILITY-SEVERITY-MNEMONIC', 'msg'=>'Message-text')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||%FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text||",
-            ['device_id'=>1, 'program'=>'%FACILITY-SUBFACILITY-SEVERITY-MNEMONIC', 'msg'=>'Message-text']
+            array('device_id'=>1, 'program'=>'%FACILITY-SUBFACILITY-SEVERITY-MNEMONIC', 'msg'=>'Message-text')
         );
 
         // ---- CatOS ----
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||%IP-3-UDP_SOCKOVFL:UDP socket overflow||",
-            ['device_id'=>1, 'program'=>'%IP-3-UDP_SOCKOVFL', 'msg'=>'UDP socket overflow']
+            array('device_id'=>1, 'program'=>'%IP-3-UDP_SOCKOVFL', 'msg'=>'UDP socket overflow')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||DTP-1-ILGLCFG: Illegal config (on, isl--on,dot1q) on Port [mod/port]||",
-            ['device_id'=>1, 'program'=>'DTP-1-ILGLCFG', 'msg'=>'Illegal config (on, isl--on,dot1q) on Port [mod/port]']
+            array('device_id'=>1, 'program'=>'DTP-1-ILGLCFG', 'msg'=>'Illegal config (on, isl--on,dot1q) on Port [mod/port]')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||Cannot enable text mode config if ACL config is cleared from nvram||",
-            ['device_id'=>1, 'program'=>'', 'msg'=>'Cannot enable text mode config if ACL config is cleared from nvram']
+            array('device_id'=>1, 'program'=>'', 'msg'=>'Cannot enable text mode config if ACL config is cleared from nvram')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||%PAGP-5-PORTFROMSTP / %PAGP-5-PORTTOSTP||",
-            ['device_id'=>1, 'program'=>'%PAGP-5-PORTFROMSTP / %PAGP-5-PORTTOSTP']
+            array('device_id'=>1, 'program'=>'%PAGP-5-PORTFROMSTP / %PAGP-5-PORTTOSTP')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||%SYS-3-EOBC_CHANNELREINIT||",
-            ['device_id'=>1, 'program'=>'%SYS-3-EOBC_CHANNELREINIT']
+            array('device_id'=>1, 'program'=>'%SYS-3-EOBC_CHANNELREINIT')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||%SYS-4-MODHPRESET:||",
-            ['device_id'=>1, 'program'=>'%SYS-4-MODHPRESET', 'msg'=>'']
+            array('device_id'=>1, 'program'=>'%SYS-4-MODHPRESET', 'msg'=>'')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||InbandPingProcessFailure:Module x not responding over inband||",
-            ['device_id'=>1, 'program'=>'INBANDPINGPROCESSFAILURE', 'msg'=>'Module x not responding over inband']
+            array('device_id'=>1, 'program'=>'INBANDPINGPROCESSFAILURE', 'msg'=>'Module x not responding over inband')
         );
         $testdata[] = $this->createData(
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||RxSBIF_SEQ_NUM_ERROR:slot=x||",
-            ['device_id'=>1, 'program'=>'RXSBIF_SEQ_NUM_ERROR', 'msg'=>'slot=x']
+            array('device_id'=>1, 'program'=>'RXSBIF_SEQ_NUM_ERROR', 'msg'=>'slot=x')
         );
 
 
