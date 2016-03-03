@@ -43,7 +43,7 @@ if ($device['os'] == 'ironware') {
                 //Discover Sensors
                 $descr = $temp[$index]['snChasPwrSupplyDescription'];
                 if (empty($descr)) {
-                    $descr = "Power Supply" . $index;
+                    $descr = "Power Supply " . $index;
                 }
                 discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index]['snChasPwrSupplyOperStatus'], 'snmp', $index);
 
