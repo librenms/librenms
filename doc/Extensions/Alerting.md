@@ -116,6 +116,7 @@ Placeholders:
 - Rule: `%rule`
 - Rule-Name: `%name`
 - Timestamp: `%timestamp`
+- Transport name: `%transport`
 - Contacts, must be iterated in a foreach, `%key` holds email and `%value` holds name: `%contacts`
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining own templates for your rules to include more specific information.
@@ -134,6 +135,11 @@ Rule: {if %name}%name{else}%rule{/if}\r\n
 {if %faults}Faults:\r\n
 {foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
+```
+
+Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
+```text
+{if %transport == 'mail'}<a href='https://my.librenms.install/device/device=%hostname/'>%hostname</a>{else}%hostname{/if}
 ```
 
 # <a name="transports">Transports</a>
