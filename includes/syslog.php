@@ -67,7 +67,7 @@ function process_syslog($entry, $update) {
             }
             else {
                 // if this looks like a program (no groups of 2 or more lowercase letters), move it to program
-                if (preg_match('/[^(a-z)]{2,}/', $entry['msg'])) {
+                if (!preg_match('/[(a-z)]{2,}/', $entry['msg'])) {
                     $entry['program'] = $entry['msg'];
                     unset($entry['msg']);
                }
