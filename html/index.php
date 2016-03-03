@@ -19,7 +19,7 @@ if (empty($_SERVER['PATH_INFO'])) {
     else {
         $_SERVER['PATH_INFO'] = !empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '';
     }
-}   
+}
 
 function logErrors($errno, $errstr, $errfile, $errline) {
     global $php_debug;
