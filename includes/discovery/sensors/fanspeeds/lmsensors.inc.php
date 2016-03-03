@@ -1,7 +1,7 @@
 <?php
 
 // LMSensors Fanspeeds
-if ($device['os'] == 'linux') {
+if ($device['os'] == 'linux' || $device['os'] == 'pktj') {
     $oids = snmp_walk($device, 'lmFanSensorsDevice', '-OsqnU', 'LM-SENSORS-MIB');
     d_echo($oids."\n");
 
