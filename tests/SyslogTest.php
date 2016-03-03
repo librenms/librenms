@@ -1,4 +1,3 @@
-
 <?php
 include "includes/syslog.php";
 
@@ -29,7 +28,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         // populate fake $dev_cache and $config
         global $config, $dev_cache;
         $dev_cache['1.1.1.1'] = ['device_id' => 1, 'os' => 'ios', 'version' => 1];;
-        $confg = array();
+        $config = array();
         $config['syslog_filter'] = array();
 
         // populate test data
