@@ -21,7 +21,7 @@ if ($device['os'] == 'junos') {
         $state_index_id = create_state_index($state_name);
 
         //Create State Translation
-        if ($state_index_id) {
+        if ($state_index_id !== null) {
             $states = array(
                  array($state_index_id,'unknown',0,1,3) ,
                  array($state_index_id,'empty',0,2,3) ,
