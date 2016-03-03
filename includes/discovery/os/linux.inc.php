@@ -50,6 +50,20 @@ if (!$os) {
                 $os = 'airos-af';
             }
         }
+        else if (trim(snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB')) != '') {
+            $os = 'pktj';
+            $pktj_mibs = array (
+               "rxCounter"       => "GANDI-MIB",  // RX Packets
+               "txCounter"       => "GANDI-MIB",  // TX Packets
+               "dropCounter"     => "GANDI-MIB",  // Dropped counters
+               "acldropCounter"  => "GANDI-MIB",  // ACL Dropped counter
+               "ratedropCounter" => "GANDI-MIB",  // Rate Dropped counter
+               "KNIrxCounter"    => "GANDI-MIB",  // KNI RX counter
+               "KNItxCounter"    => "GANDI-MIB",  // KNI TX counter
+               "KNIdropCounter"  => "GANDI-MIB",  // KNI DROP counter
+            );
+            register_mibs($device, $pktj_mibs, "include/discovery/os/linux.inc.php");
+        }
         else {
             // Check for Synology DSM
             $hrSystemInitialLoadParameters = trim(snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv'));
