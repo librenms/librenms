@@ -59,7 +59,7 @@ function process_syslog($entry, $update) {
                  * %FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text
                  */
                 $matches = array();
-                if(preg_match('/^%?(?<program>[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?): ?(?<msg>.*)/', $entry['msg'], $matches)) {
+                if(preg_match('/^(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?): ?(?<msg>.*)/', $entry['msg'], $matches)) {
                     $entry['program'] = $matches['program'];
                     $entry['msg'] = $matches['msg'];
                 }
