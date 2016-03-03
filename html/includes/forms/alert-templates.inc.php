@@ -1,4 +1,6 @@
 <?php
+
+header('Content-type: text/plain');
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

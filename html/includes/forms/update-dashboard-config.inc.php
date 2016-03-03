@@ -1,5 +1,5 @@
 <?php
-
+header('Content-type: application/json');
 $status  = 'error';
 $message = 'Error updating user dashboard config';
 
