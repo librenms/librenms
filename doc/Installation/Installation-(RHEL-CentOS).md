@@ -78,15 +78,20 @@ Add the following lines:
     innodb_file_per_table=1
     bind-address = <ip>
 
-Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
-
+Change `<ip>` to the IP address that your MySQL server should listen on.
 If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
 
+Restart MySQL/MariaDB:
+
     service mysqld restart
+    
+or
+
+    service mariadb restart
 
 ### On the NMS ###
 
-Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4.  It also requires the EPEL repository.
+Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4 or 7.  It also requires the EPEL repository. Net_IPv6 is required even if your network environment does not support IPv6.
 
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
@@ -122,19 +127,19 @@ Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardle
 
 Set `httpd` to start on system boot.
 
-**CentOS 6**
+**CentOS 6: **
     chkconfig --levels 235 httpd on
 
-**CentOS 7**
+**CentOS 7: **
     systemctl enable httpd
 
 You need to configure snmpd appropriately if you have not already done so.  An absolute minimal config for snmpd is:
 
     rocommunity public 127.0.0.1
 
-Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd restart` will activate this config.
+Adding the above line to `/etc/snmp/snmpd.conf` (or backing up the default replacing it entirely) and running `service snmpd restart` will activate this config.
 
-In `/etc/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
+In `/etc/php.ini`, ensure `date.timezone` is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
 examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 Please also ensure that `allow_url_fopen` is enabled. Other functions needed for LibreNMS include `exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen`.
 
@@ -155,12 +160,26 @@ Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 ```
 
 __Notes:__
-If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`.
+If you are running Apache 2.2.18 or higher (true if centos 7) you will want to change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`, as shown below:
+```apache
+<VirtualHost *:80>
+  DocumentRoot /opt/librenms/html/
+  ServerName  librenms.example.com
+  CustomLog /opt/librenms/logs/access_log combined
+  ErrorLog /opt/librenms/logs/error_log
+  AllowEncodedSlashes NoDecode
+  <Directory "/opt/librenms/html/">
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+    Require all granted
+  </Directory>
+</VirtualHost>
+```
 If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html)
 
 ### Using Nginx and PHP-FPM ###
 
-Install necessary extra software and let it start on system boot.
+If you choose to run Nginx, you will need to install necessary extra software and let it start on system boot.
 
 **CentOS 6**
 ```bash
@@ -221,44 +240,11 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
 ```
-
-At this stage you can either launch the web installer by going to http://IP/install.php, follow the on-screen instructions then skip to the 'Web Interface' section further down. Alternatively if you want
-to continue the setup manually then just keep following these instructions.
-
-```bash
-    cp config.php.default config.php
-    vim config.php
-```
-
 NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
-
-Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
-
-Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
-
-Add the following line to the end of `config.php`:
-
-    $config['fping'] = "/usr/sbin/fping";
-
-** Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php?>` blocks. Your graphs will break otherwise. **
-
-### Initialise the database ###
-
-Initiate the follow database with the following command:
-
-    php build-base.php
-
-### Create admin user ###
-
-Create the admin user - priv should be 10
-
-    php adduser.php <name> <pass> 10 <email>
-
-Substitute your desired username, password and email address--and leave the angled brackets off.
 
 ### Web Interface ###
 
-To prepare the web interface (and adding devices shortly), you'll need to create and chown a directory as well as create an Apache vhost.
+To prepare the web interface, you'll need to create and chown a directory as well as create an Apache vhost.
 
 First, create and chown the `rrd` directory and create the `logs` directory
 
@@ -308,9 +294,48 @@ Start the web-server:
     # For Nginx:
     systemctl restart nginx
 
-### Validate your install ###
+### Web Installer ###
 
-Run validate.php as root in the librenms directory
+At this stage you can launch the web installer by going to `http://IP/install.php` and follow the on-screen instructions. Alternatively if you want to continue the setup manually then perform the manual install steps. If you cannot reach the installer, stop here and solve that problem before proceeding. Aftewards, Add the following line to the end of `config.php`:
+
+    $config['fping'] = "/usr/sbin/fping";
+
+### Manual Install ###
+
+You may skip this section if the web installer succedded.
+
+```bash
+    cp config.php.default config.php
+    vim config.php
+```
+
+Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as previously configured.
+
+Change the value of `$config['snmp']['community']` from `public` to whatever your default read-only SNMP community is.  If you have multiple existing communities in your environment, set it to the most common.
+
+Add the following line to the end of `config.php`:
+
+    $config['fping'] = "/usr/sbin/fping";
+
+Important: Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php?>` blocks. Your graphs will break otherwise.
+
+** Initialise the database **
+
+Initiate the follow database with the following command:
+
+    php build-base.php
+
+** Create admin user **
+
+Create the admin user - priv should be 10
+
+    php adduser.php <name> <pass> 10 <email>
+
+Substitute your desired username, password and email address--and leave the angled brackets off.
+
+
+### Validate your install ###
+After performing the manual install or web install, be sure to run validate.php as root in the librenms directory:
 
     php validate.php
 
@@ -320,7 +345,7 @@ This will check your install to verify it is set up correctly.
 
     php addhost.php localhost public v2c
 
-This assumes you haven't made community changes--if you have, replace `public` with your community.  It also assumes SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
+Replace `public` to match what you set in `/etc/snmp/snmpd.conf`.  This command also assumes you are using SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
 
 Discover localhost:
 
