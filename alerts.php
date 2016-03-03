@@ -360,13 +360,25 @@ function ExtTransports($obj) {
 
 
 /**
+ * Escape certain characters in template string
+ * @param string $tpl Template
+ * @return string
+ */
+function TplEscape($tpl) {
+    // theoretically like addslashes(), but don't escape single quote (') and do escape $
+    // FIXME: is there still a way to break out of the double-quoted string, maybe with a unicode char?
+    return preg_replace('(["\\\\$\\0])','\\0',$tpl);
+}
+
+
+/**
  * Format Alert
  * @param array  $obj Alert-Array
  * @return string
  */
 function FormatAlertTpl($obj) {
     $tpl    = $obj["template"];
-    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), addslashes($tpl)).'";';
+    $msg    = '$ret .= "'.str_replace(array('{else}', '{/if}', '{/foreach}'), array('"; } else { $ret .= "', '"; } $ret .= "', '"; } $ret .= "'), TplEscape($tpl)).'";';
     $parsed = $msg;
     $s      = strlen($msg);
     $x      = $pos = -1;
