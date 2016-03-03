@@ -27,7 +27,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
     public function testCiscoSyslog()
     {
         // populate fake $dev_cache and $config
-	global $config, $dev_cache;
+        global $config, $dev_cache;
         $dev_cache['1.1.1.1'] = ['device_id' => 1, 'os' => 'ios', 'version' => 1];;
         $confg = array();
         $config['syslog_filter'] = array();
