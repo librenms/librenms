@@ -90,7 +90,7 @@ function process_syslog($entry, $update) {
                 $entry['program'] = 'OpenVPN';
             } //end if
             // POP3(username): Disconnected: Logged out top=0/0, retr=0/0, del=0/1, size=2802
-            else if ($entry['facility'] == 'mail' and preg_match('#^(((pop3|imap)\-login)|((POP3|IMAP)\(.*\))):', $entry['msg'])) {
+            else if ($entry['facility'] == 'mail' and preg_match('#^(((pop3|imap)\-login)|((POP3|IMAP)\(.*\))):#', $entry['msg'])) {
                 $entry['program'] = 'Dovecot';
             } // pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
             // pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
