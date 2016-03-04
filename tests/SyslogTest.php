@@ -98,11 +98,11 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
 
         // ---- PAM ----
         $testdata[] = $this->createData(
-            "1.1.1.1||auth||info||info||0e||2016-02-28 00:23:34||pam_unix(cron:session): session opened for user librenms by (uid=0)||CRON",
+            "1.1.1.1||authpriv||info||info||56||2016-02-28 00:23:34||pam_unix(cron:session): session opened for user librenms by (uid=0)||CRON",
             array('device_id'=>1, 'program'=>'PAM_UNIX(CRON:SESSION)', 'msg'=>'session opened for user librenms by (uid=0)')
         );
         $testdata[] = $this->createData(
-            "1.1.1.1||auth||info||info||0e||2016-02-28 00:23:34||pam_unix(sudo:session): session opened for user librenms by root (uid=0)||sudo",
+            "1.1.1.1||authpriv||info||info||55||2016-02-28 00:23:34||pam_unix(sudo:session): session opened for user librenms by root (uid=0)||sudo",
             array('device_id'=>1, 'program'=>'PAM_UNIX(SUDO:SESSION)', 'msg'=>'session opened for user librenms by root (uid=0)')
         );
         $testdata[] = $this->createData(
@@ -116,11 +116,11 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
 
         // ---- Postfix ----
         $testdata[] = $this->createData(
-            "1.1.1.1||mail||info||info||0e||2016-02-28 00:23:34||5C62E329EF: to=<admin@example.com>, relay=mail.example.com[127.0.0.1]:25, delay=0.11, delays=0.04/0.01/0/0.06, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 5362E6A670E)||postfix/smtp",
+            "1.1.1.1||mail||info||info||16||2016-02-28 00:23:34||5C62E329EF: to=<admin@example.com>, relay=mail.example.com[127.0.0.1]:25, delay=0.11, delays=0.04/0.01/0/0.06, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 5362E6A670E)||postfix/smtp",
             array('device_id'=>1, 'program'=>'POSTFIX/SMTP', 'msg'=>'5C62E329EF: to=<admin@example.com>, relay=mail.example.com[127.0.0.1]:25, delay=0.11, delays=0.04/0.01/0/0.06, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 5362E6A670E)')
         );
         $testdata[] = $this->createData(
-            "1.1.1.1||mail||info||info||0e||2016-02-28 00:23:34||D7256400EF: from=<librenms@librenms.example.com>, size=882, nrcpt=1 (queue active)||postfix/qmgr",
+            "1.1.1.1||mail||info||info||16||2016-02-28 00:23:34||D7256400EF: from=<librenms@librenms.example.com>, size=882, nrcpt=1 (queue active)||postfix/qmgr",
             array('device_id'=>1, 'program'=>'POSTFIX/QMGR', 'msg'=>'D7256400EF: from=<librenms@librenms.example.com>, size=882, nrcpt=1 (queue active)')
         );
 
@@ -132,8 +132,12 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
 
         // ---- Other ----
         $testdata[] = $this->createData(
-            "1.1.1.1||syslog||info||info||0e||2016-02-28 00:23:34||(librenms) CMD (   /opt/librenms/alerts.php >> /var/log/librenms_alert.log 2>&1)||CRON",
+            "1.1.1.1||cron||info||info||4e||2016-02-28 00:23:34||(librenms) CMD (   /opt/librenms/alerts.php >> /var/log/librenms_alert.log 2>&1)||CRON",
             array('device_id'=>1, 'program'=>'CRON', 'msg'=>'(librenms) CMD (   /opt/librenms/alerts.php >> /var/log/librenms_alert.log 2>&1)')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||authpriv||notice||notice||55||2016-02-28 00:23:34||    root : TTY=pts/1 ; PWD=/opt/librenms ; USER=librenms ; COMMAND=/usr/bin/git status||sudo",
+            array('device_id'=>1, 'program'=>'SUDO', 'msg'=>'root : TTY=pts/1 ; PWD=/opt/librenms ; USER=librenms ; COMMAND=/usr/bin/git status')
         );
 
 
