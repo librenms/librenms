@@ -449,7 +449,7 @@ function DescribeAlert($alert) {
     }
     if ($alert['state'] >= 1) {
         if (!empty($tpl['title'])) {
-	    $obj['title'] = $tpl['title'];
+            $obj['title'] = $tpl['title'];
         }
         else {
             $obj['title'] = 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
@@ -481,10 +481,10 @@ function DescribeAlert($alert) {
         }
 
         $extra          = json_decode(gzuncompress($id['details']), true);
-	if (!empty($tpl['title_rec'])) {
-	    $obj['title'] = $tpl['title_rec'];
-	}
-	else {
+        if (!empty($tpl['title_rec'])) {
+            $obj['title'] = $tpl['title_rec'];
+        }
+        else {
             $obj['title']   = 'Device '.$device['hostname'].' recovered from '.($alert['name'] ? $alert['name'] : $alert['rule']);
         }
         $obj['elapsed'] = TimeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
