@@ -83,7 +83,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         foreach($testdata as $data) {
             $res = process_syslog($data['input'], 0);
             $this->assertEquals($data['result'], $res);
-	}
+        }
     }
 }
 
