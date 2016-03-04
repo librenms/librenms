@@ -372,7 +372,7 @@ function FormatAlertTpl($obj) {
     $s      = strlen($msg);
     $x      = $pos = -1;
     $buff   = '';
-    $if     = $for = false;
+    $if     = $for = $calc = false;
     while (++$x < $s) {
         if ($msg[$x] == '{' && $buff == '') {
             $buff .= $msg[$x];
