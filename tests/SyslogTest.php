@@ -97,7 +97,6 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         $testdata = array();
 
         // ---- PAM ----
-        //list($entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']) = explode("||", trim($line));
         $testdata[] = $this->createData(
             "1.1.1.1||auth||info||info||0e||2016-02-28 00:23:34||pam_unix(cron:session): session opened for user librenms by (uid=0)||CRON",
             array('device_id'=>1, 'program'=>'PAM_UNIX(CRON:SESSION)', 'msg'=>'session opened for user librenms by (uid=0)')
@@ -127,7 +126,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
 
         // ---- No program ----
         $testdata[] = $this->createData(
-            "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||some random message",
+            "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||some random message||",
             array('device_id'=>1, 'program'=>'USER', 'msg'=>'some random message')
         );
 
@@ -136,8 +135,9 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             "1.1.1.1||syslog||info||info||0e||2016-02-28 00:23:34||(librenms) CMD (   /opt/librenms/alerts.php >> /var/log/librenms_alert.log 2>&1)||CRON",
             array('device_id'=>1, 'program'=>'CRON', 'msg'=>'(librenms) CMD (   /opt/librenms/alerts.php >> /var/log/librenms_alert.log 2>&1)')
         );
-        // run tests
 
+
+        // run tests
         foreach($testdata as $data) {
             $res = process_syslog($data['input'], 0);
             $this->assertEquals($data['result'], $res);
