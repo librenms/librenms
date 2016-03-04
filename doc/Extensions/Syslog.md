@@ -87,7 +87,7 @@ $config['enable_syslog'] = 1;
 
 If you prefer rsyslog, here are some hints on how to get it working.
 
-Add the following to your rsyslog config somewhere (could be in the file below, could be in rsyslog.conf if you are using remote logs for something else on this host)
+Add the following to your rsyslog config somewhere (could be at the top of the file in the step below, could be in `rsyslog.conf` if you are using remote logs for something else on this host)
 
 ```ssh
 # Listen for syslog messages on UDP:514
@@ -95,7 +95,7 @@ $ModLoad imudp
 $UDPServerRun 514
 ```
 
-Create a file called /etc/rsyslog.d/30-librenms.conf containing something like:
+Create a file called something like `/etc/rsyslog.d/30-librenms.conf` containing:
 
 ```ssh
 # Feed syslog messages to librenms
@@ -112,9 +112,9 @@ $template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogsever
 
 Ancient versions of rsyslog may require different syntax.
 
-If your rsyslog server is recieving messages relayed by another syslog server, you may try replacing '%fromhost%' with '%hostname%', since fromhost is the host the message was received from, not the host that generated the message.  The fromhost property is preferred as it can help with devices that send incorrect hostnames in syslog messages.
+If your rsyslog server is recieving messages relayed by another syslog server, you may try replacing `%fromhost%` with `%hostname%`, since `fromhost` is the host the message was received from, not the host that generated the message.  The `fromhost` property is preferred as it avoids problems caused by devices sending incorrect hostnames in syslog messages.
 
-Add the following to your LibreNMS config.php file to enable the Syslog extension:
+Add the following to your LibreNMS `config.php` file to enable the Syslog extension:
 
 ```ssh
 $config['enable_syslog'] = 1;
