@@ -4,6 +4,8 @@ This document will explain how to send syslog data to LibreNMS.
 
 ### Syslog server installation
 
+#### syslog-ng
+
 For Debian / Ubuntu:
 ```ssh
 apt-get install syslog-ng
@@ -74,6 +76,43 @@ Next start syslog-ng:
 ```ssh
 service syslog-ng restart
 ```
+
+Add the following to your LibreNMS config.php file to enable the Syslog extension:
+
+```ssh
+$config['enable_syslog'] = 1;
+```
+
+#### rsyslog
+
+If you prefer rsyslog, here are some hints on how to get it working.
+
+Add the following to your rsyslog config somewhere (could be in the file below, could be in rsyslog.conf if you are using remote logs for something else on this host)
+
+```ssh
+# Listen for syslog messages on UDP:514
+$ModLoad imudp
+$UDPServerRun 514
+```
+
+Create a file called /etc/rsyslog.d/30-librenms.conf containing something like:
+
+```ssh
+# Feed syslog messages to librenms
+$ModLoad omprog
+
+$template librenms,"%fromhost%||%syslogfacility%||%syslogpriority%||%syslogseverity%||%syslogtag%||%$year%-%$month%-%$day% %timereported:8:25%||%msg%||%programname%\n"
+
+:inputname, isequal, "imudp" action(type="omprog"
+                                    binary="/opt/librenms/syslog.php"
+                                    template="librenms")
+& stop
+
+```
+
+Ancient versions of rsyslog may require different syntax.
+
+If your rsyslog server is recieving messages relayed by another syslog server, you may try replacing '%fromhost%' with '%hostname%', since fromhost is the host the message was received from, not the host that generated the message.  The fromhost property is preferred as it can help with devices that send incorrect hostnames in syslog messages.
 
 Add the following to your LibreNMS config.php file to enable the Syslog extension:
 
