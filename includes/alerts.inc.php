@@ -265,7 +265,7 @@ function RunRules($device) {
                 }
             }
         }
-       else {
+        else {
             if( $chk['state'] === "0" ) {
                 echo " NOCHG ";
             }
