@@ -147,39 +147,46 @@ function interface_errors($rrd_file, $period = '-1d') {
 }
 
 function getImage($device) {
-    global $config;
-
     return '<img src="' . getImageSrc($device) . '" />';
 }
 
 function getImageSrc($device) {
     global $config;
 
+    return $config['base_url'] . '/images/os/' . getImageName($device) . '.png';
+}
+
+function getImageName($device, $use_database=true) {
+    global $config;
+
     $device['os'] = strtolower($device['os']);
 
-    if (!empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
-        $image = $config['base_url'] . '/images/os/' . $device['icon'] . '.png';
+    // fetch from the database
+    if ($use_database && !empty($device['icon']) && file_exists($config['html_dir'] . "/images/os/" . $device['icon'] . ".png")) {
+        return $device['icon'];
     }
-    elseif (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
-        $image = $config['base_url'] . '/images/os/' . $config['os'][$device['os']]['icon'] . '.png';
-    }
-    else {
-        if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
-            $image = $config['base_url'] . '/images/os/' . $device['os'] . '.png';
-        }
-        if ($device['os'] == "linux") {
-            $features = strtolower(trim($device['features']));
-            list($distro) = explode(" ", $features);
-            if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
-                $image = $config['base_url'] . '/images/os/' . $distro . '.png';
-            }
-        }
-        if (empty($image)) {
-            $image = $config['base_url'] . '/images/os/generic.png';
+
+    // linux specific handling, distro icons
+    if ($device['os'] == "linux") {
+        $features = strtolower(trim($device['features']));
+        list($distro) = explode(" ", $features);
+        if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")) {
+            return $distro;
         }
     }
 
-    return $image;
+    // use the icon from os config
+    if (!empty($config['os'][$device['os']]['icon']) && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$device['os']]['icon'] . ".png")) {
+        return $config['os'][$device['os']]['icon'];
+    }
+
+    // guess the icon has the same name as the os
+    if (file_exists($config['html_dir'] . '/images/os/' . $device['os'] . '.png')) {
+        return $device['os'];
+    }
+
+    // fallback to the generic icon
+    return 'generic';
 }
 
 function renamehost($id, $new, $source = 'console') {
@@ -573,6 +580,11 @@ function createHost($host, $community = NULL, $snmpver, $port = 161, $transport 
     $host = trim(strtolower($host));
 
     $poller_group=getpollergroup($poller_group);
+
+    /* Get port_assoc_mode id if neccessary
+     * We can work with names of IDs here */
+    if (! is_int ($port_assoc_mode))
+        $port_assoc_mode = get_port_assoc_mode_id ($port_assoc_mode);
 
     $device = array('hostname' => $host,
         'sysName' => $host,
@@ -1432,4 +1444,37 @@ function rrdtest($path, &$stdOutput, &$stdError) {
     $stdError  = stream_get_contents($pipes[2]);
     proc_close($process);
     return $status['exitcode'];
+}
+
+function create_state_index($state_name) {
+    if (dbFetchRow('SELECT * FROM state_indexes WHERE state_name = ?', array($state_name)) === false) {
+        $insert = array('state_name' => $state_name);
+        return dbInsert($insert, 'state_indexes');
+    }
+}
+
+function create_sensor_to_state_index($device, $state_name, $index)
+{
+    $sensor_entry = dbFetchRow('SELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', array(
+        'state',
+        $device['device_id'],
+        $state_name,
+        $index
+    ));
+    $state_indexes_entry = dbFetchRow('SELECT state_index_id FROM `state_indexes` WHERE `state_name` = ?', array(
+        $state_name
+    ));
+    if (!empty($sensor_entry['sensor_id']) && !empty($state_indexes_entry['state_index_id'])) {
+        $insert = array(
+            'sensor_id' => $sensor_entry['sensor_id'],
+            'state_index_id' => $state_indexes_entry['state_index_id'],
+        );
+        foreach($insert as $key => $val_check) {
+            if (!isset($val_check)) {
+                unset($insert[$key]);
+            }
+        }
+
+        dbInsert($insert, 'sensors_to_state_indexes');
+    }
 }
