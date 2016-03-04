@@ -2,7 +2,7 @@
 
 $check = shell_exec($config['nagios_plugins'] . "/check_ssh -H ".$service['hostname']." ".$service['service_param']);
 
-list($check, $time) = split("\|", $check);
+list($check, $time) = explode("|", $check);
 
 if(strstr($check, "SSH OK")) {
   $status = '1';

@@ -122,7 +122,11 @@ function poll_sensor($device, $class, $unit) {
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
 
-        dbUpdate(array('sensor_current' => $sensor_value, 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
+        if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
+            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
+        }
+
+        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
     }//end foreach
 
 }//end poll_sensor()
@@ -204,7 +208,7 @@ function poll_device($device, $options) {
 
         dbUpdate(array('status' => $status, 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
 
-        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
+        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'));
     }
 
     if ($status == '1') {
