@@ -72,6 +72,7 @@ LibreNMS contributors:
 - Louis Bailleul <louis.bailleul@gmail.com> (alucardfh)
 - Rick Hodger <rick@fuzzi.org.uk> (Tatermen)
 - Eldon Koyle <ekoyle@gmail.com> (ekoyle)
+- Jay McEntire <jay.mcentire@gmail.com> (jmacul2)
 - Jonathan Bailey <jcbailey@code0.net> (jcbailey2)
 - Ruairi Carroll <ruairi.carroll@gmail.com> (rucarrol)
 - Maxim Tsyplakov <maxim.tsyplakov@gmail.com> (tsypa)
