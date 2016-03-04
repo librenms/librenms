@@ -59,7 +59,7 @@ function CollectData($bill_id) {
         if ($last_data['state'] == 'ok') {
             $port_data['last_in_measurement'] = $last_data[counter];
             $port_data['last_in_delta']       = $last_data[delta];
-            if ($port_data['in_measurement'] > $port_data['last_in_measurement']) {
+            if ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
                 $port_data['in_delta'] = ($port_data['in_measurement'] - $port_data['last_in_measurement']);
             }
             else {
@@ -76,7 +76,7 @@ function CollectData($bill_id) {
         if ($last_data[state] == 'ok') {
             $port_data['last_out_measurement'] = $last_data[counter];
             $port_data['last_out_delta']       = $last_data[delta];
-            if ($port_data['out_measurement'] > $port_data['last_out_measurement']) {
+            if ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
                 $port_data['out_delta'] = ($port_data['out_measurement'] - $port_data['last_out_measurement']);
             }
             else {

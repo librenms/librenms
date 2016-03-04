@@ -483,6 +483,19 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'brocade';
 
+// Brocade/Foundry ServerIron
+$os = 'serveriron';
+$config['os'][$os]['text']             = 'Brocade ServerIron';
+$config['os'][$os]['type']             = 'loadbalancer';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['icon']             = 'brocade';
+
 // Cisco Small Business
 $os = 'ciscosb';
 $config['os'][$os]['group']            = 'cisco';
@@ -1016,6 +1029,13 @@ $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 
+$os = 'avtech';
+$config['os'][$os]['text']             = 'Avtech Environment Sensor';
+$config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['icon']             = 'avtech';
+$config['os'][$os]['over'][0]['graph'] = 'device_temperature';
+$config['os'][$os]['over'][0]['text']  = 'Temperature';
+
 $os = 'netbotz';
 $config['os'][$os]['text']             = 'Netbotz Environment sensor';
 $config['os'][$os]['type']             = 'environment';
@@ -1290,6 +1310,12 @@ $config['os'][$os]['text']  = 'Synology DSM';
 $config['os'][$os]['group'] = 'unix';
 $config['os'][$os]['type']  = 'storage';
 $config['os'][$os]['icon']  = 'synology';
+$config['os'][$os]['over'][0]['graph'] = 'device_processor';
+$config['os'][$os]['over'][0]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][1]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][1]['text']  = 'Memory Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_storage';
+$config['os'][$os]['over'][2]['text']  = 'Storage Usage';
 
 $os = 'hikvision';
 $config['os'][$os]['text'] = 'Hikvision';

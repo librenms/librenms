@@ -86,6 +86,9 @@ LibreNMS contributors:
 - Henoc Khouilla <henoc.khouilla@gmail.com> (henocKA)
 - Paul Blasquez <pblasquez@gmail.com> (pblasquez)
 - Paul Heinrichs <pdheinrichs@gmail.com> (pheinrichs)
+- Georges Dick <georges.dick@gmail.com> (GeorgesDick)
+- Richard Lawley <richard@richardlawley.com> (richardlawley)
+- Marco Di Cerbo <marco@dottoremoe.com> (marcodc)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
@@ -93,3 +96,4 @@ Observium was written by:
 - Tom Laermans
 - various others as indicated in the file contents and commit logs
 
+ 

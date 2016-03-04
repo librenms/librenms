@@ -6,7 +6,7 @@ if ($service['service_ip'])    { $resolver = $service['service_ip'];    } else {
 
 $check = shell_exec($config['nagios_plugins'] . "/check_dns -H ".$nsquery." -s ".$resolver);
 
-list($check, $time) = split("\|", $check);
+list($check, $time) = explode("|", $check);
 
 if(strstr($check, "DNS OK: ")) {
   $status = '1';

@@ -34,7 +34,7 @@ foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
             $cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
             $cmd .= " ".$service['service_param'];
             $check = shell_exec($cmd);
-            list($check, $time) = split("\|", $check);
+            list($check, $time) = explode("|", $check);
             if(stristr($check, "ok -")) {
                 $status = 1;
             }

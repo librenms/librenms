@@ -285,6 +285,11 @@ First, create and chown the `rrd` directory and create the `logs` directory
     restorecon -RFvv /opt/librenms/logs/
 ```
 
+Set selinux to allow httpd to sendmail
+```bash
+    setsebool -P httpd_can_sendmail=1
+```
+
 Start the web-server:
 
 **CentOS 6**
@@ -302,6 +307,14 @@ Start the web-server:
 
     # For Nginx:
     systemctl restart nginx
+
+### Validate your install ###
+
+Run validate.php as root in the librenms directory
+
+    php validate.php
+
+This will check your install to verify it is set up correctly.
 
 ### Add localhost ###
 
