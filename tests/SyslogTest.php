@@ -85,5 +85,67 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($data['result'], $res);
         }
     }
+    public function testLinuxSyslog()
+    {
+        // populate fake $dev_cache and $config
+        global $config, $dev_cache;
+        $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'linux', 'version' => 1);
+        $config = array();
+        $config['syslog_filter'] = array();
+
+        // populate test data
+        $testdata = array();
+
+        // ---- PAM ----
+        $testdata[] = $this->createData(
+            "1.1.1.1||authpriv||info||info||56||2016-02-28 00:23:34||pam_unix(cron:session): session opened for user librenms by (uid=0)||CRON",
+            array('device_id'=>1, 'program'=>'PAM_UNIX(CRON:SESSION)', 'msg'=>'session opened for user librenms by (uid=0)')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||authpriv||info||info||55||2016-02-28 00:23:34||pam_unix(sudo:session): session opened for user librenms by root (uid=0)||sudo",
+            array('device_id'=>1, 'program'=>'PAM_UNIX(SUDO:SESSION)', 'msg'=>'session opened for user librenms by root (uid=0)')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||auth||info||info||0e||2016-02-28 00:23:34||pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231||sshd",
+            array('device_id'=>1, 'program'=>'PAM_KRB5(SSHD:AUTH)', 'msg'=>'authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||auth||info||info||0e||2016-02-28 00:23:34||pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231||sshd",
+            array('device_id'=>1, 'program'=>'PAM_KRB5[SSHD:AUTH]', 'msg'=>'authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231')
+        );
+
+        // ---- Postfix ----
+        $testdata[] = $this->createData(
+            "1.1.1.1||mail||info||info||16||2016-02-28 00:23:34||5C62E329EF: to=<admin@example.com>, relay=mail.example.com[127.0.0.1]:25, delay=0.11, delays=0.04/0.01/0/0.06, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 5362E6A670E)||postfix/smtp",
+            array('device_id'=>1, 'program'=>'POSTFIX/SMTP', 'msg'=>'5C62E329EF: to=<admin@example.com>, relay=mail.example.com[127.0.0.1]:25, delay=0.11, delays=0.04/0.01/0/0.06, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 5362E6A670E)')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||mail||info||info||16||2016-02-28 00:23:34||D7256400EF: from=<librenms@librenms.example.com>, size=882, nrcpt=1 (queue active)||postfix/qmgr",
+            array('device_id'=>1, 'program'=>'POSTFIX/QMGR', 'msg'=>'D7256400EF: from=<librenms@librenms.example.com>, size=882, nrcpt=1 (queue active)')
+        );
+
+        // ---- No program ----
+        $testdata[] = $this->createData(
+            "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||some random message||",
+            array('device_id'=>1, 'program'=>'USER', 'msg'=>'some random message')
+        );
+
+        // ---- Other ----
+        $testdata[] = $this->createData(
+            "1.1.1.1||cron||info||info||4e||2016-02-28 00:23:34||(librenms) CMD (   /opt/librenms/alerts.php >> /var/log/librenms_alert.log 2>&1)||CRON",
+            array('device_id'=>1, 'program'=>'CRON', 'msg'=>'(librenms) CMD (   /opt/librenms/alerts.php >> /var/log/librenms_alert.log 2>&1)')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||authpriv||notice||notice||55||2016-02-28 00:23:34||    root : TTY=pts/1 ; PWD=/opt/librenms ; USER=librenms ; COMMAND=/usr/bin/git status||sudo",
+            array('device_id'=>1, 'program'=>'SUDO', 'msg'=>'    root : TTY=pts/1 ; PWD=/opt/librenms ; USER=librenms ; COMMAND=/usr/bin/git status')
+        );
+
+
+        // run tests
+        foreach($testdata as $data) {
+            $res = process_syslog($data['input'], 0);
+            $this->assertEquals($data['result'], $res);
+        }
+    }
 }
 
