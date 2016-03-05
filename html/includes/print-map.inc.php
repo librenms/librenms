@@ -41,11 +41,9 @@ $devices = array();
 
 $where = "";
 if (is_numeric($vars['group'])) {
-    $group = dbFetchRows('SELECT `pattern`, `name`, `description` FROM `device_groups` WHERE id = '.$vars['group']);
-    $group_pattern = rtrim($group['pattern'], '&&');
+    $group_pattern = dbFetchCell('SELECT `pattern` FROM `device_groups` WHERE id = '.$vars['group']);
+    $group_pattern = rtrim($group_pattern, '&&');
     $group_pattern = rtrim($group_pattern, '||');
-    $group_name = $group['name'];
-    $group_description = $group['group_descriptio'];
 
     $device_id_sql = GenGroupSQL($group_pattern);
     if ($device_id_sql) {
@@ -248,5 +246,4 @@ else {
 
 }
 
-if (is_numeric($vars['group'])) {
 $pagetitle[] = "Map";
