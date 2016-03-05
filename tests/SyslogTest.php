@@ -137,7 +137,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
         );
         $testdata[] = $this->createData(
             "1.1.1.1||authpriv||notice||notice||55||2016-02-28 00:23:34||    root : TTY=pts/1 ; PWD=/opt/librenms ; USER=librenms ; COMMAND=/usr/bin/git status||sudo",
-            array('device_id'=>1, 'program'=>'SUDO', 'msg'=>'    root : TTY=pts/1 ; PWD=/opt/librenms ; USER=librenms ; COMMAND=/usr/bin/git status')
+            array('device_id'=>1, 'program'=>'SUDO', 'msg'=>'root : TTY=pts/1 ; PWD=/opt/librenms ; USER=librenms ; COMMAND=/usr/bin/git status')
         );
 
 

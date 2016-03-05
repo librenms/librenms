@@ -124,6 +124,7 @@ function process_syslog($entry, $update) {
         }
 
         $entry['program'] = strtoupper($entry['program']);
+        $entry = array_map('trim', $entry);
 
         if ($update) {
             dbInsert(
