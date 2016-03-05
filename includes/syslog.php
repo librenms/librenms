@@ -107,6 +107,15 @@ function process_syslog($entry, $update) {
             }
 
             unset($matches);
+        }
+        else if ($os == 'procurve') {
+            $matches = array();
+            if (preg_match('/^(?P<program>[A-Za-z]+): {2}(?P<msg>.*)/', $entry['msg'], $matches)) {
+                $entry['msg']     = $matches['msg']. " [". $entry['program']. "]";
+                $entry['program'] = $matches['program'];
+            }
+            unset($matches);
+
         }//end if
 
         if (!isset($entry['program'])) {

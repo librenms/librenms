@@ -147,5 +147,51 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($data['result'], $res);
         }
     }
+    public function testProcurveSyslog()
+    {
+        // populate fake $dev_cache and $config
+        global $config, $dev_cache;
+        $dev_cache['1.1.1.1'] = array('device_id' => 1, 'os' => 'procurve', 'version' => 1);
+        $config = array();
+        $config['syslog_filter'] = array();
+
+        // populate test data
+        $testdata = array();
+
+        // ---- 2900/2910/3800/5400 ----
+        $testdata[] = $this->createData(
+            "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||chassis:  Slot A Ready||00422",
+            array('device_id'=>1, 'program'=>'CHASSIS', 'msg'=>'Slot A Ready [00422]')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||ports:  port 21 is now on-line||00076",
+            array('device_id'=>1, 'program'=>'PORTS', 'msg'=>'port 21 is now on-line [00076]')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||ports:  port 21 is now off-line||00077",
+            array('device_id'=>1, 'program'=>'PORTS', 'msg'=>'port 21 is now off-line [00077]')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||user||warning||warning||0c||2016-02-28 00:23:34||FFI:  port 21-High collision or drop rate. See help.||00331",
+            array('device_id'=>1, 'program'=>'FFI', 'msg'=>'port 21-High collision or drop rate. See help. [00331]')
+        );
+
+        // ---- 2610 ----
+        $testdata[] = $this->createData(
+            "1.1.1.1||user||warning||warning||0c||2016-02-28 00:23:34||port 21-Excessive undersized/giant packets. See help.||FFI",
+            array('device_id'=>1, 'program'=>'FFI', 'msg'=>'port 21-Excessive undersized/giant packets. See help.')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||updated time by -4 seconds||SNTP",
+            array('device_id'=>1, 'program'=>'SNTP', 'msg'=>'updated time by -4 seconds')
+        );
+
+
+        // run tests
+        foreach($testdata as $data) {
+            $res = process_syslog($data['input'], 0);
+            $this->assertEquals($data['result'], $res);
+        }
+    }
 }
 
