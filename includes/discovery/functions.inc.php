@@ -713,3 +713,95 @@ function check_entity_sensor($string, $device) {
     return $valid;
 }
 
+
+/**
+ * Helper function to improve readability
+ * Can't use mib based polling, because the snmp implentation and mibs are terrible
+ *
+ * @param (device) array - device array
+ * @param (sensor) array(id, oid, type, descr, descr_oid, min, max, divisor)
+ */
+function avtech_add_sensor($device, $sensor) {
+    global $valid;
+
+    // set the id, must be unique
+    if ($sensor['id']) {
+        $id = $sensor['id'];
+    }
+    else {
+        d_echo('Error: No id set for this sensor' . "\n");
+        return false;
+    }
+    d_echo('Sensor id: ' . $id . "\n");
+
+
+    // set the sensor oid
+    if ($sensor['oid']) {
+        $oid = $sensor['oid'];
+    }
+    else {
+        d_echo('Error: No oid set for this sensor' . "\n");
+        return false;
+    }
+    d_echo('Sensor oid: ' . $oid . "\n");
+
+    // get the sensor value
+    $value = snmp_get($device, $oid, '-OvQ');
+    // if the sensor doesn't exist abort
+    if ($value === false || $value == 0) {  //issue unfortunately non-existant sensors return 0
+        d_echo('Error: sensor returned no data, skipping' . "\n");
+        return false;
+    }
+    d_echo('Sensor value: ' . $value . "\n");
+
+    // get the type
+    $type = $device['type'] ? $device['type'] : 'temperature';
+    d_echo('Sensor type: ' . $type . "\n");
+
+
+    // set the description
+    if ($sensor['descr_oid']) {
+        $descr = snmp_get($device, $sensor['descr_oid'], '-OvQ');
+    }
+    elseif ($sensor['descr']) {
+        $descr = $sensor['descr'];
+    }
+    else {
+        d_echo('Error: No description set for this sensor' . "\n");
+        return false;
+    }
+    d_echo('Sensor description: ' . $descr . "\n");
+
+    // set divisor
+    if ($sensor['divisor']) {
+        $divisor = $sensor['divisor'];
+    }
+    else {
+        $divisor = 100;
+    }
+    d_echo('Sensor divisor: ' . $divisor . "\n");
+
+
+    // set min for alarm
+    if ($sensor['min_oid']) {
+        $min = snmp_get($device, $sensor['min_oid'], '-OvQ') / $divisor;
+    }
+    else {
+        $min = null;
+    }
+    d_echo('Sensor alarm min: ' . $min . "\n");
+
+    // set max for alarm
+    if ($sensor['max_oid']) {
+        $max = snmp_get($device, $sensor['max_oid'], '-OvQ') / $divisor;
+    }
+    else {
+        $max = null;
+    }
+    d_echo('Sensor alarm max: ' . $max . "\n");
+
+    // add the sensor
+    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $device['os'], $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
+    return true;
+}
+
