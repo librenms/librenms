@@ -1855,3 +1855,12 @@ label {
     color: black;
     border-color:transparent;
 }
+
+#overDiv {
+    z-index: 1200 !important;
+    border: solid 1px #ccc;
+    background-color: white;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.5);
+}
