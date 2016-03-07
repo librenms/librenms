@@ -50,7 +50,7 @@ if (!$os) {
                 $os = 'airos-af';
             }
         }
-        else if (trim(snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB')) != '') {
+        else if (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false) {
             $os = 'pktj';
             $pktj_mibs = array (
                "rxCounter"       => "GANDI-MIB",  // RX Packets
