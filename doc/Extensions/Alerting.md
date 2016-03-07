@@ -99,7 +99,7 @@ The template-parser understands `if` and `foreach` controls and replaces certain
 Controls:
 
 - if-else (Else can be omitted):
-`{if %placeholder == 'value'}Some Text{else}Other Text{/if}`
+`{if %placeholder == value}Some Text{else}Other Text{/if}`
 - foreach-loop:
 `{foreach %placeholder}Key: %key<br/>Value: %value{/foreach}`
 
@@ -139,7 +139,7 @@ Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
-{if %transport == 'mail'}<a href='https://my.librenms.install/device/device=%hostname/'>%hostname</a>{else}%hostname{/if}
+{if %transport == mail}<a href='https://my.librenms.install/device/device=%hostname/'>%hostname</a>{else}%hostname{/if}
 ```
 
 # <a name="transports">Transports</a>
