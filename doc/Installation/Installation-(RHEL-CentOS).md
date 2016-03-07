@@ -26,8 +26,8 @@ service mariadb start
 ```
 
 **CentOS 7**
-
 (NOTE: In CentOS 7 there is only mariadb in official repo)
+
 **MariaDB**
 ```bash
 yum install net-snmp mariadb-server mariadb-client
@@ -67,26 +67,34 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-Replace `<ip>` above with the IP of the server running LibreNMS.  If your database is on the same server as LibreNMS, you can just use `localhost` as the IP address.
+Replace `<ip>` above with the IP of the server running LibreNMS.  If your database is on the same server as LibreNMS, use `localhost` as the IP address.
 
-If you are deploying a separate database server, you need to change the `bind-address`.  If your MySQL database resides on the same server as LibreNMS, you should skip this step.
+Edit the mysql/mariadb configuration file:
+```bash
+vim /etc/my.cnf
+```
 
-    vim /etc/my.cnf
-
-Add the following lines:
+Add the following line:
 
     innodb_file_per_table=1
-    bind-address = <ip>
 
-Change `<ip>` to the IP address that your MySQL server should listen on.  Restart MySQL:
+If you are deploying a separate database server, you also need to specify the `bind-address`.  If your MySQL database resides on the same server as LibreNMS, you should skip this step.
+
+    bind-address = <ip>
 
 If you see a line that starts `sql-mode` then change this to `sql-mode=""`.
 
+Save, and restart MySQL/MariaDB to apply your changes:
+
     service mysqld restart
+
+or
+
+    service mariadb restart
 
 ### On the NMS ###
 
-Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4.  It also requires the EPEL repository.
+Install necessary software.  The packages listed below are an all-inclusive list of packages that were necessary on a clean install of CentOS 6.4 or 7.  It also requires the EPEL repository. Net_IPv6 is required even if your network environment does not support IPv6.
 
 Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardless of of `nginx`'s (or any other web-server's) presence.
 
@@ -105,6 +113,13 @@ Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardle
     pear install Net_IPv4-1.3.4
     pear install Net_IPv6-1.2.2b2
 ```
+### Configure SNMPD on localhost ###
+Edit `/etc/snmp/snmpd.conf` to enable self-polling.  An absolute minimal config for snmpd is:
+
+    rocommunity public 127.0.0.1
+
+You may either edit the default configuration file to your liking, or backup the default config file and replace it entirely with your own. To apply your changes, run `service snmpd restart` for Centos 6, or `systemctl restart snmpd` for Centos 7 (w/ systemd). If you have deployed a separate database server, you will likely want to configure snmpd on that host as well.
+
 
 ### Adding the librenms-user for Apache ###
 ```bash
@@ -122,24 +137,23 @@ Note if not using HTTPd (Apache): RHEL requires `httpd` to be installed regardle
 
 Set `httpd` to start on system boot.
 
-**CentOS 6**
-    chkconfig --levels 235 httpd on
+**CentOS 6: **
+```bash
+chkconfig --levels 235 httpd on
+```
 
-**CentOS 7**
-    systemctl enable httpd
+**CentOS 7 (with Systemd): **
+```bash
+systemctl enable httpd
+```
 
-You need to configure snmpd appropriately if you have not already done so.  An absolute minimal config for snmpd is:
-
-    rocommunity public 127.0.0.1
-
-Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd restart` will activate this config.
-
-In `/etc/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
+In `/etc/php.ini`, ensure `date.timezone` is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
 examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 Please also ensure that `allow_url_fopen` is enabled. Other functions needed for LibreNMS include `exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen`.
 
 Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 
+If you are running Apache below version 2.2.18:
 ```apache
 <VirtualHost *:80>
   DocumentRoot /opt/librenms/html/
@@ -154,13 +168,30 @@ Next, add the following to `/etc/httpd/conf.d/librenms.conf`
 </VirtualHost>
 ```
 
-__Notes:__
-If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes` to `NoDecode` and append `Require all granted` underneath `Options FollowSymLinks MultiViews`.
-If the file `/etc/httpd/conf.d/welcome.conf` exists, you might want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html)
+
+If you are running Apache 2.2.18 or higher (current version in Centos 7 official repo):
+```apache
+<VirtualHost *:80>
+  DocumentRoot /opt/librenms/html/
+  ServerName  librenms.example.com
+  CustomLog /opt/librenms/logs/access_log combined
+  ErrorLog /opt/librenms/logs/error_log
+  AllowEncodedSlashes NoDecode
+  <Directory "/opt/librenms/html/">
+    AllowOverride All
+    Options FollowSymLinks MultiViews
+    Require all granted
+  </Directory>
+</VirtualHost>
+```
+If the file `/etc/httpd/conf.d/welcome.conf` exists, you will want to remove that as well unless you're familiar with [Name-based Virtual Hosts](https://httpd.apache.org/docs/2.2/vhosts/name-based.html). 
+```bash
+rn /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
+```
 
 ### Using Nginx and PHP-FPM ###
 
-Install necessary extra software and let it start on system boot.
+If you choose to run Nginx, you will need to install necessary extra software and let it start on system boot.
 
 **CentOS 6**
 ```bash
@@ -221,44 +252,11 @@ You can clone the repository via HTTPS or SSH.  In either case, you need to ensu
     git clone https://github.com/librenms/librenms.git librenms
     cd /opt/librenms
 ```
-
-At this stage you can either launch the web installer by going to http://IP/install.php, follow the on-screen instructions then skip to the 'Web Interface' section further down. Alternatively if you want
-to continue the setup manually then just keep following these instructions.
-
-```bash
-    cp config.php.default config.php
-    vim config.php
-```
-
 NOTE: The recommended method of cloning a git repository is HTTPS.  If you would like to clone via SSH instead, use the command `git clone git@github.com:librenms/librenms.git librenms` instead.
 
-Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as setup above.
+### Prepare the Web Interface ###
 
-Change the value of `$config['snmp']['community']` from `public` to whatever your read-only SNMP community is.  If you have multiple communities, set it to the most common.
-
-Add the following line to the end of `config.php`:
-
-    $config['fping'] = "/usr/sbin/fping";
-
-** Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php?>` blocks. Your graphs will break otherwise. **
-
-### Initialise the database ###
-
-Initiate the follow database with the following command:
-
-    php build-base.php
-
-### Create admin user ###
-
-Create the admin user - priv should be 10
-
-    php adduser.php <name> <pass> 10 <email>
-
-Substitute your desired username, password and email address--and leave the angled brackets off.
-
-### Web Interface ###
-
-To prepare the web interface (and adding devices shortly), you'll need to create and chown a directory as well as create an Apache vhost.
+To prepare the web interface, you'll need to create and chown a directory as well as create an Apache vhost.
 
 First, create and chown the `rrd` directory and create the `logs` directory
 
@@ -268,10 +266,10 @@ First, create and chown the `rrd` directory and create the `logs` directory
     chmod 775 rrd
 ```
 
-> If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
+If you're planing on running rrdcached, make sure that the path is also chmod'ed to 775 and chown'ed to librenms:librenms.
 
 **SELinux**
-> if you're using SELinux you need to allow web server user to write into logs directory.
+> if you're using SELinux (in Centos 7 this is the defualt) you need to allow web server user to write into logs directory.
 > semanage tool is a part of policycoreutils-python, so if don't have it, you can install it
 > **Please note that running LibreNMS with SELinux is still experimental and we cannot guarantee that everything will be working fine for now.**
 
@@ -290,7 +288,7 @@ Set selinux to allow httpd to sendmail
     setsebool -P httpd_can_sendmail=1
 ```
 
-Start the web-server:
+### Start the web-server: ###
 
 **CentOS 6**
 
@@ -308,9 +306,48 @@ Start the web-server:
     # For Nginx:
     systemctl restart nginx
 
-### Validate your install ###
+### Web Installer ###
 
-Run validate.php as root in the librenms directory
+At this stage you can launch the web installer by going to `http://IP/install.php` and follow the on-screen instructions. Alternatively if you want to continue the setup manually then perform the manual install steps. If you cannot reach the installer, stop here and solve that problem before proceeding. Afterwards, Add the following line to the end of `config.php`:
+
+    $config['fping'] = "/usr/sbin/fping";
+
+### Manual Install ###
+
+You may skip this section if the web installer succeeded.
+
+```bash
+    cp config.php.default config.php
+    vi config.php
+```
+
+Change the values to the right of the equal sign for lines beginning with `$config[db_]` to match your database information as previously configured.
+
+Change the value of `$config['snmp']['community']` from `public` to whatever your default read-only SNMP community is.  If you have multiple existing communities in your environment, set it to the most common.
+
+Add the following line to the end of `config.php`:
+
+    $config['fping'] = "/usr/sbin/fping";
+
+Important: Be sure you have no characters (including whitespace like: newlines, spaces, tabs, etc) outside of the `<?php?>` blocks. Your graphs will break otherwise and there will be no error messages to indicate otherwise!
+
+**Initialize the database**
+
+Initiate the follow database with the following command:
+
+    php build-base.php
+
+**Create admin user**
+
+Create the admin user - priv should be 10
+
+    php adduser.php <name> <pass> 10 <email>
+
+Substitute your desired username, password and email address--and leave the angled brackets off.
+
+
+### Validate your install ###
+After performing the manual install or web install, be sure to run validate.php as root in the librenms directory:
 
     php validate.php
 
@@ -320,7 +357,7 @@ This will check your install to verify it is set up correctly.
 
     php addhost.php localhost public v2c
 
-This assumes you haven't made community changes--if you have, replace `public` with your community.  It also assumes SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
+Replace `public` to match what you set in `/etc/snmp/snmpd.conf`.  This command also assumes you are using SNMP v2c.  If you're using v3, there are additional steps (NOTE: instructions for SNMPv3 to come).
 
 Discover localhost:
 
