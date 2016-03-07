@@ -84,7 +84,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options  .= " COMMENT:'\\n'";
-    $rrd_optionsb .= ' AREA:outbits'.$i.'_neg#'.$colour_out."$stack";
+    $rrd_optionsb .= ' AREA:outbits'.$i.'_neg#'.$colour_out.":$stack";
     $rrd_options  .= ' HRULE:999999999999999#'.$colour_out.":'".str_pad('', 10)."Out'";
     $rrd_options  .= ' GPRINT:outbits'.$i.':LAST:%6.2lf%s';
     $rrd_options  .= ' GPRINT:outbits'.$i.':AVERAGE:%6.2lf%s';
