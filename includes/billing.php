@@ -88,7 +88,8 @@ function getLastPortCounter($port_id) {
         $return[out_counter] = $row['out_counter'];
         $return[out_delta]   = $row['out_delta'];
         $return[state]       = 'ok';
-    } else {
+    } 
+    else {
         $return[state]       = 'failed';
     }
     return $return;
