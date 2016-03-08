@@ -139,7 +139,7 @@ if(strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
 // Test for MySQL InnoDB buffer size
 $innodb_buffer = innodb_buffer_check();
 if ($innodb_buffer['used'] > $innodb_buffer['size']) {
-    print_fail('Your Innodb buffer size is not big enough...');
+    print_warn("Your Innodb buffer is full, consider increasing it's size");
     echo warn_innodb_buffer($innodb_buffer);
 }
 
