@@ -154,7 +154,11 @@ else {
             <td><?php echo $used ?></td>
             <td style="text-align: center;"><?php echo $overuse ?></td>
             <td><?php echo print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right'])?></td>
-            <td><a href='<?php echo generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit')) ?>'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
+            <td>
+                <?php if ($_SESSION['userlevel'] >= 10) { ?>
+                <a href='<?php echo generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit')) ?>'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a>
+                <?php } ?>
+            </td>
         </tr>
 <?php   }
     }?>
