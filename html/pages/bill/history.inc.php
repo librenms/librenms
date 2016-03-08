@@ -13,7 +13,7 @@ $img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
 echo $img['his'];
 
 
-function showDetails($bill_id, $imgtype, $from, $to, $bittype='Quota') {
+function showDetails($bill_id, $imgtype, $bill_hist_id, $bittype='Quota') {
     if ($imgtype == 'bitrate') {
         $res = '<img src="billing-graph.php?bill_id='.$bill_id;
         if ($bittype == 'Quota') {
@@ -30,7 +30,7 @@ function showDetails($bill_id, $imgtype, $from, $to, $bittype='Quota') {
     // $res .= "&amp;type=".$type;
     $res .= '&amp;type='.$imgtype;
     $res .= '&amp;x=1190&amp;y=250';
-    $res .= '&amp;from='.$from.'&amp;to='.$to;
+    $res .= '&amp;bill_hist_id='.$bill_hist_id;
     $res .= '" style="margin: 15px 5px 25px 5px;" />';
     return $res;
 
@@ -108,9 +108,9 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
             </tr>';
 
         if ($vars['detail'] == $history['bill_hist_id'] || $vars['detail'] == 'all') {
-            $img['bitrate'] = showDetails($bill_id, 'bitrate', strtotime($datefrom), strtotime($dateto), $type);
-            $img['bw_day']  = showDetails($bill_id, 'day', strtotime($datefrom), strtotime($dateto));
-            $img['bw_hour'] = showDetails($bill_id, 'hour', strtotime($datefrom), strtotime($dateto));
+            $img['bitrate'] = showDetails($bill_id, 'bitrate', $history['bill_hist_id'], $type);
+            $img['bw_day']  = showDetails($bill_id, 'day', $history['bill_hist_id']);
+            $img['bw_hour'] = showDetails($bill_id, 'hour', $history['bill_hist_id']);
             echo '
                 <tr style="background: #fff; border-top: 1px solid '.$row_colour.'; border-bottom: 1px solid #ccc;">
                     <td colspan="11">
