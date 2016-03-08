@@ -1,6 +1,7 @@
 <?php
 
 $where = '';
+$param = array();
 
 if (!empty($_POST['searchPhrase'])) {
     $where .= 'S.msg LIKE "%'.mres($_POST['searchPhrase']).'%" AND ';
