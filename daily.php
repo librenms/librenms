@@ -22,28 +22,6 @@ if ($options['f'] === 'update') {
         exit(0);
     }
 
-    $innodb_buffer = innodb_buffer_check();
-    if ($innodb_buffer['used'] > $innodb_buffer['size']) {
-        if (!empty($config['alert']['default_mail'])) {
-            $subject = $config['project_name'] . ' auto-update action required';
-            $message = '
-Hi,
-
-We have just tried to update your installation but it looks like the InnoDB buffer size is too low.
-
-Because of this we have stopped the auto-update running to ensure your system is ok.
-
-You currently have a configured innodb_buffer_pool_size of ' . $innodb_buffer['size'] / 1024 / 1024 . ' MiB but is currently using ' . $innodb_buffer['used'] / 1024 / 1024 . ' MiB
-
-Take a look at https://dev.mysql.com/doc/refman/5.6/en/innodb-buffer-pool.html for further details.
-
-The ' . $config['project_name'] . ' team.';
-            send_mail($config['alert']['default_mail'],$subject,$message,$html=false);
-        }
-        echo warn_innodb_buffer($innodb_buffer);
-        exit(2);
-    }
-
     if ($config['update_channel'] == 'master') {
         exit(1);
     }
