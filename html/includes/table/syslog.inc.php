@@ -29,7 +29,7 @@ if (!empty($_POST['to'])) {
 
 if ($_SESSION['userlevel'] >= '5') {
     $sql  = 'FROM syslog AS S';
-    $sql .= ' WHERE '.$where;
+    $sql .= ' WHERE '.$where . '1';
 }
 else {
     $sql   = 'FROM syslog AS S, devices_perms AS P ';
@@ -77,5 +77,6 @@ $output = array(
     'rowCount' => $rowCount,
     'rows'     => $response,
     'total'    => $total,
+'sql' => $sql,
 );
 echo _json_encode($output);
