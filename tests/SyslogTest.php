@@ -43,6 +43,14 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             "1.1.1.1||user||info||info||0e||2016-02-28 00:23:34||%FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text||",
             array('device_id'=>1, 'program'=>'%FACILITY-SUBFACILITY-SEVERITY-MNEMONIC', 'msg'=>'Message-text')
         );
+        $testdata[] = $this->createData(
+            "1.1.1.1||local7||info||info||be||2016-03-09 03:58:25||Mar 9 11:58:24.145 UTC: %SEC-6-IPACCESSLOGS: list MNGMNT denied 120.62.186.12 1 packet ||]",
+            array('device_id'=>1, 'program'=>'%SEC-6-IPACCESSLOGS', 'msg'=>'list MNGMNT denied 120.62.186.12 1 packet')
+        );
+        $testdata[] = $this->createData(
+            "1.1.1.1||local7||info||info||be||2016-04-27 021:12:28||Apr 27 21:12:28: %SYS-5-CONFIG_I: Configured from console by vty0||",
+            array('device_id'=>1, 'program'=>'%SYS-5-CONFIG_I', 'msg'=>'Configured from console by vty0')
+        );
 
         // ---- CatOS ----
         $testdata[] = $this->createData(
