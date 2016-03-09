@@ -70,7 +70,7 @@ echo "
            <span class='box-desc'>$desc</span>
          </td>
          <td>
-           <span class='box-desc'>".date('r',$service['service_checked'])."</span>
+           <span class='box-desc'>$checked</span>
          </td>
        </tr>";
 
