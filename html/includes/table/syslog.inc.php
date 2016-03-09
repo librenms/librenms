@@ -1,40 +1,40 @@
 <?php
 
-$where = '';
+$where = '1';
 $param = array();
 
 if (!empty($_POST['searchPhrase'])) {
-    $where .= 'S.msg LIKE "%'.mres($_POST['searchPhrase']).'%" AND ';
+    $where .= ' AND S.msg LIKE "%'.mres($_POST['searchPhrase']).'%"';
 }
 
 if ($_POST['program']) {
-    $where  .= 'S.program = ? AND ';
+    $where  .= ' AND S.program = ?';
     $param[] = $_POST['program'];
 }
 
 if (is_numeric($_POST['device'])) {
-    $where  .= ' S.device_id = ? AND ';
+    $where  .= ' AND S.device_id = ?';
     $param[] = $_POST['device'];
 }
 
 if (!empty($_POST['from'])) {
-    $where  .= 'timestamp >= ? AND ';
+    $where  .= ' AND timestamp >= ?';
     $param[] = $_POST['from'];
 }
 
 if (!empty($_POST['to'])) {
-    $where  .= 'timestamp <= ? AND ';
+    $where  .= ' AND timestamp <= ?';
     $param[] = $_POST['to'];
 }
 
 if ($_SESSION['userlevel'] >= '5') {
     $sql  = 'FROM syslog AS S';
-    $sql .= ' WHERE '.$where . '1';
+    $sql .= ' WHERE '.$where;
 }
 else {
     $sql   = 'FROM syslog AS S, devices_perms AS P ';
     $sql  .= 'WHERE S.device_id = P.device_id AND P.user_id = ? AND ';
-    $sql  .= $where . "1";
+    $sql  .= $where;
     $param = array_merge(array($_SESSION['user_id']), $param);
 }
 
@@ -61,7 +61,6 @@ if ($rowCount != -1) {
 
 $sql = "SELECT S.*, DATE_FORMAT(timestamp, '".$config['dateformat']['mysql']['compact']."') AS date $sql";
 
-
 foreach (dbFetchRows($sql, $param) as $syslog) {
     $dev        = device_by_id_cache($syslog['device_id']);
     $response[] = array(
@@ -77,6 +76,5 @@ $output = array(
     'rowCount' => $rowCount,
     'rows'     => $response,
     'total'    => $total,
-'sql' => $sql,
 );
 echo _json_encode($output);
