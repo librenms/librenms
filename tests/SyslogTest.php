@@ -25,11 +25,11 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Test an input line with the modified fields
-     *
-     * @param string $inputline The line from the syslog daemon including the ||'s
-     * @param array $modified of the modified fields, most likely containging the keys program and msg
-     */
+    * Test an input line with the modified fields
+    *
+    * @param string $inputline The line from the syslog daemon including the ||'s
+    * @param array $modified of the modified fields, most likely containging the keys program and msg
+    */
     private function checkSyslog($inputline, $modified) {
             $data = $this->createData($inputline, $modified);
             $res = process_syslog($data['input'], 0);
