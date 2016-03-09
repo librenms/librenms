@@ -60,92 +60,67 @@ if (bill_permitted($bill_id)) {
         AND D.device_id = P.device_id',
         array($bill_id)
     );
-
-    echo '<font face="Verdana, Arial, Sans-Serif"><h2>
-        Bill : '.$bill_data['bill_name'].'</h2>';
-
-    print_optionbar_start();
-
-    echo "<span style='font-weight: bold;'>Bill</span> &#187; ";
-
+    
     if (!$vars['view']) {
         $vars['view'] = 'quick';
     }
+    
+    function print_port_list() {
+        global $ports;
+?>      <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Billed Ports</h3>
+            </div>
+            <div class="list-group">
+            <?php
+            // Collected Earlier
+            foreach ($ports as $port) {
+                $portalias = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
+?>
+                <div class="list-group-item">
+                    <?php echo generate_port_link($port, $port['ifName'] . $portalias) ?> on <?php echo generate_device_link($port) ?>
+                </div>
+<?php       }
+            ?>        
+            </div>
+        </div>
+<?php    
+    }//end print_port_list
+    
+?>
 
-    if ($vars['view'] == 'quick') {
-        echo "<span class='pagemenu-selected'>";
+    <h2><?php   echo "Bill: ${bill_data['bill_name']}"; ?></h2>
+    
+<?php
+    print_optionbar_start();
+    echo "<strong>Bill</strong> &raquo; ";
+    $menu_options = array(
+        'quick' => 'Quick Graphs',
+        'accurate' => 'Accurate Graphs',
+        'transfer' => 'Transfer Graphs',
+        'history' => 'Historical Graphs'
+    );
+    if($_SESSION['userlevel'] >= '10') 
+    {
+        $menu_options['edit'] = 'Edit';
+        $menu_options['delete'] = 'Delete';
+        $menu_options['reset'] = 'Reset';
     }
-
-    echo '<a href="'.generate_url($vars, array('view' => 'quick')).'">Quick Graphs</a>';
-    if ($vars['view'] == 'quick') {
-        echo '</span>';
-    }
-
-    echo ' | ';
-
-    if ($vars['view'] == 'accurate') {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<a href="'.generate_url($vars, array('view' => 'accurate')).'">Accurate Graphs</a>';
-    if ($vars['view'] == 'accurate') {
-        echo '</span>';
-    }
-
-    echo ' | ';
-
-    if ($vars['view'] == 'transfer') {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<A href="'.generate_url($vars, array('view' => 'transfer')).'">Transfer Graphs</a>';
-    if ($vars['view'] == 'transfer') {
-        echo '</span>';
-    }
-
-    echo ' | ';
-
-    if ($vars['view'] == 'history') {
-        echo "<span class='pagemenu-selected'>";
-    }
-
-    echo '<A href="'.generate_url($vars, array('view' => 'history')).'">Historical Usage</a>';
-    if ($vars['view'] == 'history') {
-        echo '</span>';
-    }
-
-    if ($_SESSION['userlevel'] >= '10') {
-        echo ' | ';
-        if ($vars['view'] == 'edit') {
+    $sep = '';
+    foreach ($menu_options as $option => $text) {
+        echo $sep;
+        if ($vars['view'] == $option) {
             echo "<span class='pagemenu-selected'>";
         }
 
-        echo '<A href="'.generate_url($vars, array('view' => 'edit')).'">Edit</a>';
-        if ($vars['view'] == 'edit') {
+        echo generate_link($text, $vars, array('view' => $option));
+        if ($vars['view'] == $option) {
             echo '</span>';
         }
 
-        echo ' | ';
-        if ($vars['view'] == 'delete') {
-            echo "<span class='pagemenu-selected'>";
-        }
-
-        echo '<A href="'.generate_url($vars, array('view' => 'delete')).'">Delete</a>';
-        if ($vars['view'] == 'delete') {
-            echo '</span>';
-        }
-
-        echo ' | ';
-        if ($vars['view'] == 'reset') {
-            echo "<span class='pagemenu-selected'>";
-        }
-
-        echo '<A href="'.generate_url($vars, array('view' => 'reset')).'">Reset</a>';
-        if ($vars['view'] == 'reset') {
-            echo '</span>';
-        }
-    }//end if
-
+        $sep = ' | ';
+    }
+    
     echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><img align=absmiddle src="images/16/arrow_left.png"> Back to Bills</a></div>';
 
     print_optionbar_end();
@@ -166,59 +141,71 @@ if (bill_permitted($bill_id)) {
         include 'pages/bill/transfer.inc.php';
     }
     else if ($vars['view'] == 'quick' || $vars['view'] == 'accurate') {
-        echo '<h3>Billed Ports</h3>';
+?>
 
-        // Collected Earlier
-        foreach ($ports as $port) {
-            echo generate_port_link($port).' on '.generate_device_link($port).'<br />';
-        }
+<?php   if ($bill_data['bill_type'] == 'quota') { ?>
+    <h3>Quota Bill</h3>
+<?php   }
+        else if ($bill_data['bill_type'] == 'cdr') {  ?>
+    <h3>
+        CDR / 95th Bill
+    </h3>
+<?php   } ?>
+<strong>Billing Period from <?php echo $fromtext ?> to <?php echo $totext ?></strong>
+<br /><br />
 
-        echo '<h3>Bill Summary</h3>';
-
-        if ($bill_data['bill_type'] == 'quota') {
+<div class="row">
+    <div class="col-lg-6 col-lg-push-6">
+        <?php print_port_list() ?>
+    </div>
+    <div class="col-lg-6 col-lg-pull-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Bill Summary
+            </h3>
+        </div>
+        <table class="table">
+        <tr>
+<?php   if ($bill_data['bill_type'] == 'quota') {
             // The Customer is billed based on a pre-paid quota with overage in xB
-            echo '<h4>Quota Bill</h4>';
-
             $percent    = round((($total_data) / $bill_data['bill_quota'] * 100), 2);
             $unit       = 'MB';
             $total_data = round($total_data, 2);
-            echo 'Billing Period from '.$fromtext.' to '.$totext;
-            echo '<br />Transferred '.format_bytes_billing($total_data).' of '.format_bytes_billing($bill_data['bill_quota']).' ('.$percent.'%)';
-            echo '<br />Average rate '.formatRates($rate_average);
-
             $background = get_percentage_colours($percent);
-
-            echo '<p>'.print_percentage_bar(350, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</p>';
-
             $type = '&amp;ave=yes';
+?>
+        <td>
+            <?php echo format_bytes_billing($total_data) ?> of <?php echo format_bytes_billing($bill_data['bill_quota']).' ('.$percent.'%)' ?>
+            - Average rate <?php echo formatRates($rate_average) ?>
+        </td>
+        <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']) ?></td>
+<?php
         }
         else if ($bill_data['bill_type'] == 'cdr') {
             // The customer is billed based on a CDR with 95th%ile overage
-            echo '<h4>CDR / 95th Bill</h4>';
-
             $unit      = 'kbps';
             $cdr       = $bill_data['bill_cdr'];
             $rate_95th = round($rate_95th, 2);
-
             $percent = round((($rate_95th) / $cdr * 100), 2);
-
             $type = '&amp;95th=yes';
+?>
+        <td>
+            <?php echo format_si($rate_95th) ?> of <?php echo format_si($cdr).'bps ('.$percent.'%)' ?> (95th%ile)
+        </td>
+        <td style="width: 210px;">
+            <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']) ?>
+        </td>
 
-            echo '<strong>'.$fromtext.' to '.$totext.'</strong>
-                <br />Measured '.format_si($rate_95th).'bps of '.format_si($cdr).'bps ('.$percent.'%) @ 95th %ile';
+<?php   }//end if
+?>
+        </tr>
+        </table>
+    </div>
+    </div>
+    </div>
 
-            $background = get_percentage_colours($percent);
-
-            echo '<p>'.print_percentage_bar(350, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</p>';
-
-            // echo("<p>Billing Period : " . $fromtext . " to " . $totext . "<br />
-            // " . $paidrate_text . " <br />
-            // " . $total_data . "MB transfered in the current billing cycle. <br />
-            // " . $rate_average . "Kbps Average during the current billing cycle. </p>
-            // <font face=\"Trebuchet MS, Verdana, Arial, Sans-Serif\" color=" . $bill_color . "><B>" . $rate_95th . "Kbps @ 95th Percentile.</b> (" . $dir_95th . ") (" . $bill_text . ")</font>
-            // </td><td><img src=\"images/billing-key.png\"></td></tr></table>
-            // <br />");
-        }//end if
+<?php
 
         $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
         $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
@@ -227,25 +214,21 @@ if (bill_permitted($bill_id)) {
         if ($vars['view'] == 'accurate') {
             $bi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
-            // $bi .= "&amp;x=800&amp;y=250";
             $bi .= '&amp;x=1190&amp;y=250';
             $bi .= "$type'>";
 
             $li  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
-            // $li .= "&amp;x=800&amp;y=250";
             $li .= '&amp;x=1190&amp;y=250';
             $li .= "$type'>";
 
             $di  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $di .= '&amp;from='.$config['time']['day'].'&amp;to='.$config['time']['now'];
-            // $di .= "&amp;x=800&amp;y=250";
             $di .= '&amp;x=1190&amp;y=250';
             $di .= "$type'>";
 
             $mi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
-            // $mi .= "&amp;x=800&amp;y=250";
             $mi .= '&amp;x=1190&amp;y=250';
             $mi .= "$type'>";
         }
@@ -267,52 +250,31 @@ if (bill_permitted($bill_id)) {
             $mi .= "&amp;width=1000&amp;height=200&amp;total=1'>";
         }//end if
 
-        if ($null) {
-            echo "
-                <script type='text/javascript' src='js/calendarDateInput.js'>
-  </script>
+?>
+    <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Billing View</h3>
+    </div>
+    <?php echo $bi ?>
+    </div>
+    
+    <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">24 Hour View</h3>
+    </div>
+    <?php echo $di ?>
+    </div>
 
-  <FORM action='/' method='get'>
-    <INPUT type='hidden' name='bill' value='".$_GET['bill']."'>
-    <INPUT type='hidden' name='code' value='".$_GET['code']."'>
-    <INPUT type='hidden' name='page' value='bills'>
-    <INPUT type='hidden' name='custom' value='yes'>
-
-    From:
-    <script>DateInput('fromdate', true, 'YYYYMMDD')</script>
-
-    To:
-    <script>DateInput('todate', true, 'YYYYMMDD')</script>
-    <INPUT type='submit' value='Generate Graph'>
-
-  </FORM>
-
-  ";
-        }//end if
-
-        if ($_GET['all']) {
-            $ai  = '<img src="billing-graph.php?bill_id='.$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-            $ai .= '&amp;from=0&amp;to='.$rightnow;
-            $ai .= '&amp;x=715&amp;y=250';
-            $ai .= '&amp;count=60">';
-            echo "<h3>Entire Data View</h3>$ai";
-        }
-        else if ($_GET['custom']) {
-            $cg  = '<img src="billing-graph.php?bill_id='.$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-            $cg .= '&amp;from='.$_GET['fromdate'].'000000&amp;to='.$_GET['todate'].'235959';
-            $cg .= '&amp;x=715&amp;y=250';
-            $cg .= '&amp;count=60">';
-            echo "<h3>Custom Graph</h3>$cg";
-        }
-        else {
-            echo "<h3>Billing View</h3>$bi";
-            // echo("<h3>Previous Bill View</h3>$li");
-            echo "<h3>24 Hour View</h3>$di";
-            echo "<h3>Monthly View</h3>$mi";
-            // echo("<br /><a href=\"rate.php?" . $_SERVER['QUERY_STRING'] . "&amp;all=yes\">Graph All Data (SLOW)</a>");
-        }//end if
+    <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Monthly View</h3>
+    </div>
+    <?php echo $mi ?>
+    </div>    
+<?php
     } //end if
 }
 else {
     include 'includes/error-no-perm.inc.php';
 }//end if
+?>

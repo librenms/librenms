@@ -43,9 +43,10 @@ function get_notifications() {
             $feed = parse_atom($feed);
         }
         array_walk($feed,function(&$items,$key,$url) { $items['source'] = $url; },$url);
-        $obj = array_reverse(array_merge($obj,$feed));
+        $obj = array_merge($obj,$feed);
         echo '('.sizeof($obj).')'.PHP_EOL;
     }
+    $obj = array_sort($obj, 'datetime');
     return $obj;
 }
 
@@ -76,7 +77,12 @@ function parse_rss($feed) {
         $feed['channel']['item'] = array( $feed['channel']['item'] );
     }
     foreach ($feed['channel']['item'] as $item) {
-        $obj[] = array('title'=>$item['title'],'body'=>$item['description'],'checksum'=>hash('sha512',$item['title'].$item['description']));
+        $obj[] = array(
+            'title'=>$item['title'],
+            'body'=>$item['description'],
+            'checksum'=>hash('sha512',$item['title'].$item['description']),
+            'datetime'=>strftime('%F', strtotime($item['pubDate']))
+            );
     }
     return $obj;
 }
@@ -92,7 +98,12 @@ function parse_atom($feed) {
         $feed['entry'] = array( $feed['entry'] );
     }
     foreach ($feed['entry'] as $item) {
-        $obj[] = array('title'=>$item['title'],'body'=>$item['content'],'checksum'=>hash('sha512',$item['title'].$item['content']));
+        $obj[] = array(
+            'title'=>$item['title'],
+            'body'=>$item['content'],
+            'checksum'=>hash('sha512',$item['title'].$item['content']),
+            'datetime'=>strftime('%F', strtotime($item['updated']))
+            );
     }
     return $obj;
 }
