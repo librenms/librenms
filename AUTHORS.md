@@ -90,6 +90,7 @@ LibreNMS contributors:
 - Georges Dick <georges.dick@gmail.com> (GeorgesDick)
 - Richard Lawley <richard@richardlawley.com> (richardlawley)
 - Marco Di Cerbo <marco@dottoremoe.com> (marcodc)
+- David Bell <me@geordish.org> (geordish)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
