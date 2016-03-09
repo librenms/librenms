@@ -725,7 +725,7 @@ function avtech_add_sensor($device, $sensor) {
     global $valid;
 
     // set the id, must be unique
-    if ($sensor['id']) {
+    if (isset($sensor['id'])) {
         $id = $sensor['id'];
     }
     else {
@@ -755,13 +755,13 @@ function avtech_add_sensor($device, $sensor) {
     d_echo('Sensor value: ' . $value . "\n");
 
     // get the type
-    $type = $device['type'] ? $device['type'] : 'temperature';
+    $type = $sensor['type'] ? $sensor['type'] : 'temperature';
     d_echo('Sensor type: ' . $type . "\n");
 
 
     // set the description
     if ($sensor['descr_oid']) {
-        $descr = snmp_get($device, $sensor['descr_oid'], '-OvQ');
+        $descr = trim(snmp_get($device, $sensor['descr_oid'], '-OvQ'), '"');
     }
     elseif ($sensor['descr']) {
         $descr = $sensor['descr'];

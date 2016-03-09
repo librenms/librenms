@@ -195,10 +195,12 @@ function RunFollowUp() {
         if ($n > $o) {
             $ret  .= ' Worsens';
             $state = 3;
+            $alert['details']['diff'] = array_diff($chk,$alert['details']['rule']);
         }
-        else if ($n < $o) {
+        elseif ($n < $o) {
             $ret  .= ' Betters';
             $state = 4;
+            $alert['details']['diff'] = array_diff($alert['details']['rule'],$chk);
         }
 
         if ($state > 0 && $n > 0) {
@@ -370,15 +372,15 @@ function FormatAlertTpl($obj) {
     $s      = strlen($msg);
     $x      = $pos = -1;
     $buff   = '';
-    $if     = $for = false;
+    $if     = $for = $calc = false;
     while (++$x < $s) {
         if ($msg[$x] == '{' && $buff == '') {
             $buff .= $msg[$x];
         }
-        else if ($buff == '{ ') {
+        elseif ($buff == '{ ') {
             $buff = '';
         }
-        else if ($buff != '') {
+        elseif ($buff != '') {
             $buff .= $msg[$x];
         }
 
@@ -386,9 +388,13 @@ function FormatAlertTpl($obj) {
             $pos = $x;
             $if  = true;
         }
-        else if ($buff == '{foreach') {
+        elseif ($buff == '{foreach') {
             $pos = $x;
             $for = true;
+        }
+        elseif ($buff == '{calc') {
+            $pos  = $x;
+            $calc = true;
         }
 
         if ($pos != -1 && $msg[$x] == '}') {
@@ -403,12 +409,20 @@ function FormatAlertTpl($obj) {
                     ' ) { $ret .= "',
                 );
             }
-            else if ($for) {
+            elseif ($for) {
                 $for    = false;
                 $o      = 8;
                 $native = array(
                     '"; foreach( ',
                     ' as $key=>$value) { $ret .= "',
+                );
+            }
+            elseif ($calc) {
+                $calc   = false;
+                $o      = 5;
+                $native = array(
+                    '"; $ret .= (float) (0+(',
+                    ')); $ret .= "',
                 );
             }
             else {
@@ -457,10 +471,10 @@ function DescribeAlert($alert) {
         if ($alert['state'] == 2) {
             $obj['title'] .= ' got acknowledged';
         }
-        else if ($alert['state'] == 3) {
+        elseif ($alert['state'] == 3) {
             $obj['title'] .= ' got worse';
         }
-        else if ($alert['state'] == 4) {
+        elseif ($alert['state'] == 4) {
             $obj['title'] .= ' got better';
         }
 
@@ -473,8 +487,12 @@ function DescribeAlert($alert) {
                 }
             }
         }
+        $obj['elapsed'] = TimeFormat(time() - strtotime($alert['time_logged']));
+        if( !empty($extra['diff']) ) {
+            $obj['diff'] = $extra['diff'];
+        }
     }
-    else if ($alert['state'] == 0) {
+    elseif ($alert['state'] == 0) {
         $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != 2 && alert_log.state != 0 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id'], $alert['id']));
         if (empty($id['id'])) {
             return false;
