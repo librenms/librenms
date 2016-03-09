@@ -43,7 +43,7 @@ function get_notifications() {
             $feed = parse_atom($feed);
         }
         array_walk($feed,function(&$items,$key,$url) { $items['source'] = $url; },$url);
-        $obj = array_reverse(array_merge($obj,$feed));
+        $obj = array_merge($obj,$feed);
         echo '('.sizeof($obj).')'.PHP_EOL;
     }
     $obj = array_sort($obj, 'datetime');
