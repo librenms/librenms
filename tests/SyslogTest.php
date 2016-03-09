@@ -61,6 +61,10 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             "1.1.1.1||local7||info||info||be||2016-04-27 021:12:28||Apr 27 21:12:28: %SYS-5-CONFIG_I: Configured from console by vty0||",
             array('device_id'=>1, 'program'=>'%SYS-5-CONFIG_I', 'msg'=>'Configured from console by vty0')
         );
+        $this->checkSyslog(
+            "1.1.1.1||local7||info||info||be||2016-04-27 021:12:28||Mar 8 20:14:08.762: %FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text||000956",
+            array('device_id'=>1, 'program'=>'%FACILITY-SUBFACILITY-SEVERITY-MNEMONIC', 'msg'=>'Message-text')
+        );
 
 
         // ---- CatOS ----
