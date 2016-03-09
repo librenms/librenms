@@ -954,6 +954,14 @@ function list_oxidized() {
                 }
             }
             if (empty($device['group'])) {
+                foreach ($config['oxidized']['group']['os'] as $host_group) {
+                    if ($host_group['match'] === $device['os']) {
+                        $device['group'] = $host_group['group'];
+                        break;
+                    }
+                }
+            }
+            if (empty($device['group'])) {
                 foreach ($config['oxidized']['group']['location'] as $host_group) {
                     if (preg_match($host_group['regex'].'i', $device['location'])) {
                         $device['group'] = $host_group['group'];
