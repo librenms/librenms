@@ -4,23 +4,19 @@
 
 ?>
 
-<form method='post' action='' class="form-inline" role="form">
-  <fieldset class="form-group" disabled title="Search is currently broken">
+<form method='get' action='' class="form-inline" role="form">
+  <fieldset class="form-group">
     Bills
-    <input type="text" name="hostname" id="hostname" class="form-control input-sm" value="<?php echo $_POST['hostname']; ?>" />
-    <select name='os' id='os' class="form-control input-sm">
+    <input type="text" name="search" id="search" class="form-control input-sm" value="<?php echo $_GET['search']; ?>" />
+    <select name='bill_type' id='bill_type' class="form-control input-sm">
       <option value=''>All Types</option>
-      <option value=''>CDR</option>
-      <option value=''>95th</option>
-      <option value=''>Quota</option>
+      <option value='cdr' <?php if ($_GET['bill_type'] === 'cdr') { echo 'selected'; } ?>>CDR</option>
+      <option value='quota' <?php if ($_GET['bill_type'] === 'quota') { echo 'selected'; } ?>>Quota</option>
     </select>
-    <select name='hardware' id='hardware' class="form-control input-sm">
+    <select name='state' id='state' class="form-control input-sm">
       <option value=''>All States</option>
-      <option value=''>Under Quota</option>
-      <option value=''>Over Quota</option>
-    </select>
-    <select name='location' id='location' class="form-control input-sm">
-      <option value=''>All Customers</option>
+      <option value='under' <?php if ($_GET['state'] === 'under') { echo 'selected'; } ?>>Under Quota</option>
+      <option value='over' <?php if ($_GET['state'] === 'over') { echo 'selected'; } ?>>Over Quota</option>
     </select>
     <button type="submit" class="btn btn-default input-sm">Search</button>
   </fieldset>
@@ -30,7 +26,6 @@ if ($vars['view'] == 'history') {
     echo '<a class="btn btn-default btn-sm" href="bills/"><i class="fa fa-clock-o"></i> Current Billing Period</a>';
 }
 else {
-    // FIXME - generate_url
     echo '<a class="btn btn-default btn-sm" href="bills/view=history/"><i class="fa fa-history"></i> Previous Billing Period</a>';
 }
 
