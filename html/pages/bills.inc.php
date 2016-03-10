@@ -108,7 +108,32 @@ else {
     </thead>
     <tbody>
 <?php
-    foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_name`') as $bill) {
+    $wheres = array();
+    $params = array();
+
+    if (!empty($_GET['search'])) {
+        $wheres[] = 'bills.bill_name LIKE ?';
+        $params[] = '%'.$_GET['search'].'%';
+    }
+    if (!empty($_GET['bill_type'])) {
+        $wheres[] = 'bill_type = ?';
+        $params[] = $_GET['bill_type'];
+    }
+    if ($_GET['state'] === 'under') {
+        $wheres[] = "((bill_type = 'cdr' AND rate_95th <= bill_cdr) OR (bill_type = 'quota' AND total_data <= bill_quota))";
+    } else if ($_GET['state'] === 'over') {
+        $wheres[] = "((bill_type = 'cdr' AND rate_95th > bill_cdr) OR (bill_type = 'quota' AND total_data > bill_quota))";
+    }
+        
+    $query = 'SELECT *
+    FROM `bills`
+    ';
+    if (sizeof($wheres) > 0) {
+        $query .= 'WHERE ' . implode(' AND ', $wheres) . "\n";
+    }
+    $query .= 'ORDER BY bills.bill_name';
+
+    foreach (dbFetchRows($query, $params) as $bill) {
         if (bill_permitted($bill['bill_id'])) {
             unset($class);
             $day_data = getDates($bill['bill_day']);
