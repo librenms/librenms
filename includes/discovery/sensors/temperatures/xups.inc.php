@@ -8,7 +8,7 @@ if ($device['os'] == 'powerware') {
     d_echo($oids."\n");
 
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Powerware Ambient Temperature ';
     }
 

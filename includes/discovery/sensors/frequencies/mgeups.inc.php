@@ -15,7 +15,7 @@ if ($device['os'] == 'mgeups') {
         }
 
         $current = snmp_get($device, $freq_oid, '-Oqv');
-        if (!$current) {
+        if (!$current === false) {
             $freq_oid .= '.0';
             $current   = snmp_get($device, $freq_oid, '-Oqv');
         }
@@ -39,7 +39,7 @@ if ($device['os'] == 'mgeups') {
         }
 
         $current = snmp_get($device, $freq_oid, '-Oqv');
-        if (!$current) {
+        if (!$current === false) {
             $freq_oid .= '.0';
             $current   = snmp_get($device, $freq_oid, '-Oqv');
         }

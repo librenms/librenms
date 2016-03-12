@@ -8,7 +8,7 @@ if ($device['os_group'] == 'unix') {
 
     $oids = shell_exec($cmd);
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Observer-Style ';
     }
 

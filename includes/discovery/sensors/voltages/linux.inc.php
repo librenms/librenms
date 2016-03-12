@@ -5,7 +5,7 @@ if ($device['os'] == 'linux' || $device['os'] == 'pktj') {
     $oids = snmp_walk($device, 'lmVoltSensorsDevice', '-OsqnU', 'LM-SENSORS-MIB');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo 'LM-SENSORS ';
     }
 

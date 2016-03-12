@@ -7,7 +7,7 @@ if ($device['os'] == 'sentry3') {
     d_echo($oids."\n");
 
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'ServerTech Sentry ';
     }
 

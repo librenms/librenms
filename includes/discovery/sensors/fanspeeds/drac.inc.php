@@ -5,7 +5,7 @@ if ($device['os'] == 'drac') {
     d_echo($oids."\n");
 
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Dell iDRAC';
     }
 

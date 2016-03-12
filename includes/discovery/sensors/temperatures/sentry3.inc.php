@@ -7,7 +7,7 @@ if ($device['os'] == 'sentry3') {
     $oids       = trim($oids);
     $divisor    = '10';
     $multiplier = '1';
-    if ($oids) {
+    if ($oids !== false) {
         echo 'ServerTech Sentry3 Temperature ';
     }
 

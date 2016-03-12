@@ -4,7 +4,7 @@ if ($device['os'] == 'linux') {
     // Supermicro sensors
     $oids = snmp_walk($device, '1.3.6.1.4.1.10876.2.1.1.1.1.3', '-Osqn', 'SUPERMICRO-HEALTH-MIB');
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Supermicro ';
     }
 

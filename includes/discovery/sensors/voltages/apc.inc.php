@@ -5,7 +5,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.8.5.3.3.1.3', '-OsqnU', '');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo 'APC In ';
     }
 
@@ -27,7 +27,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.8.5.4.3.1.3', '-OsqnU', '');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo ' APC Out ';
     }
 
@@ -52,7 +52,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.3.2.1.0', '-OsqnU', '');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo ' APC In ';
         list($oid,$current) = explode(' ', $oids);
         $divisor            = 1;
@@ -66,7 +66,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_get($device, '1.3.6.1.4.1.318.1.1.1.4.2.1.0', '-OsqnU', '');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo ' APC Out ';
         list($oid,$current) = explode(' ', $oids);
         $divisor            = 1;
@@ -82,7 +82,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, 'rPDUIdentDeviceLinetoLineVoltage.0', '-OsqnU', 'PowerNet-MIB');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo ' Voltage In ';
         list($oid,$current) = explode(' ', $oids);
         $divisor            = 1;
@@ -96,7 +96,7 @@ if ($device['os'] == 'apc') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.318.1.1.26.6.3.1.6', '-OsqnU', 'PowerNet-MIB');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo ' Voltage In ';
         list($oid,$current) = explode(' ', $oids);
         $divisor            = 1;

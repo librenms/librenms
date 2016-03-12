@@ -5,7 +5,7 @@ if ($device['os'] == "netapp") {
     $oids = snmp_walk($device, $main_oid.'.25', "-Osqn");
     d_echo($oids."\n");
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo "NetApp ";
         foreach (explode("\n", $oids) as $data) {
             list($oid,$descr) = explode(" ", $data,2);

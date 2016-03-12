@@ -15,7 +15,7 @@ if ($device['os'] == 'mgeups') {
         }
 
         $current = snmp_get($device, $volt_oid, '-Oqv');
-        if (!$current) {
+        if (!$current === false) {
             $volt_oid .= '.0';
             $current   = snmp_get($device, $volt_oid, '-Oqv');
         }
@@ -40,7 +40,7 @@ if ($device['os'] == 'mgeups') {
         }
 
         $current = snmp_get($device, $volt_oid, '-Oqv');
-        if (!$current) {
+        if (!$current === false) {
             $volt_oid .= '.0';
             $current   = snmp_get($device, $volt_oid, '-Oqv');
         }

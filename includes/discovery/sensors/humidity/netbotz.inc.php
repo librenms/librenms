@@ -5,7 +5,7 @@ if ($device['os'] == 'netbotz') {
     d_echo($oids."\n");
 
     $oids = trim($oids);
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Netbotz ';
         foreach (explode("\n", $oids) as $data) {
             list($oid,$descr) = explode(' ', $data, 2);

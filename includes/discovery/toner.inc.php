@@ -13,7 +13,7 @@ if ($config['enable_printers']) {
 
         d_echo($oids."\n");
 
-        if ($oids) {
+        if ($oids !== false) {
             echo 'Jetdirect ';
         }
 

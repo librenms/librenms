@@ -5,7 +5,7 @@ if ($device['os'] == 'areca') {
     $oids = snmp_walk($device, '1.3.6.1.4.1.18928.1.2.2.1.8.1.2', '-OsqnU', '');
     d_echo($oids."\n");
 
-    if ($oids) {
+    if ($oids !== false) {
         echo 'Areca ';
     }
 
