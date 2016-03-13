@@ -1,9 +1,10 @@
 <?php
 
+$no_refresh = true;
 $pagetitle[] = 'Previous Billing Period';
-$i           = 0;
 
-echo '<table class="table table-condensed">
+echo '<table class="table table-condensed table-striped">
+    <thead>
     <tr>
     <th>Billing name</th>
     <th>Type</th>
@@ -14,58 +15,84 @@ echo '<table class="table table-condensed">
     <th>95 percentile</th>
     <th>Overusage</th>
     <th></th>
-    </tr>';
+    </tr>
+    </thead>
+    <tbody>';
+    
+$wheres = array();
+$params = array();
 
-foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_name`') as $bill) {
+if (!empty($_GET['search'])) {
+    $wheres[] = 'bills.bill_name LIKE ?';
+    $params[] = '%'.$_GET['search'].'%';
+}
+if (!empty($_GET['bill_type'])) {
+    $wheres[] = 'bill_history.bill_type = ?';
+    $params[] = $_GET['bill_type'];
+}
+if ($_GET['state'] === 'under') {
+    $wheres[] = 'bill_history.bill_overuse = 0';
+} else if ($_GET['state'] === 'over') {
+    $wheres[] = 'bill_history.bill_overuse > 0';
+}
+    
+$query = 'SELECT bills.bill_name, bill_history.*
+FROM `bills`
+    INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
+    INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
+';
+if (sizeof($wheres) > 0) {
+    $query .= 'WHERE ' . implode(' AND ', $wheres) . "\n";
+}
+$query .= 'ORDER BY bills.bill_name';
+
+foreach (dbFetchRows($query, $params) as $bill) {
     if (bill_permitted($bill['bill_id'])) {
-        $day_data = getDates($bill['bill_day']);
-        $datefrom = $day_data['2'];
-        $dateto   = $day_data['3'];
-        foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? AND `bill_datefrom` = ? ORDER BY `bill_datefrom` LIMIT 1', array($bill['bill_id'], $datefrom, $dateto)) as $history) {
-            unset($class);
-            $type       = $history['bill_type'];
-            $percent    = $history['bill_percent'];
-            $dir_95th   = $history['dir_95th'];
-            $rate_95th  = format_si($history['rate_95th']).'bps';
-            $total_data = format_bytes_billing($history['traf_total']);
+        $datefrom = $bill['bill_datefrom'];
+        $dateto   = $bill['bill_dateto'];
 
-            $background = get_percentage_colours($percent);
-            $row_colour = ((!is_integer($i / 2)) ? $list_colour_a : $list_colour_b);
+        unset($class);
+        $type       = $bill['bill_type'];
+        $percent    = $bill['bill_percent'];
+        $dir_95th   = $bill['dir_95th'];
+        $rate_95th  = format_si($bill['rate_95th']).'bps';
+        $total_data = format_bytes_billing($bill['traf_total']);
 
-            if ($type == 'CDR') {
-                $allowed = format_si($history['bill_allowed']).'bps';
-                $used    = format_si($history['rate_95th']).'bps';
-                $in      = format_si($history['rate_95th_in']).'bps';
-                $out     = format_si($history['rate_95th_out']).'bps';
-                $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$background['left'].'; font-weight: bold;">'.format_si($history['bill_overuse']).'bps</span>');
-            }
-            else if ($type == 'Quota') {
-                $allowed = format_bytes_billing($history['bill_allowed']);
-                $used    = format_bytes_billing($history['total_data']);
-                $in      = format_bytes_billing($history['traf_in']);
-                $out     = format_bytes_billing($history['traf_out']);
-                $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$background['left'].'; font-weight: bold;">'.format_bytes_billing($history['bill_overuse']).'</span>');
-            }
+        $background = get_percentage_colours($percent);
 
-            $total_data = (($type == 'Quota') ? '<b>'.$total_data.'</b>' : $total_data);
-            $rate_95th  = (($type == 'CDR') ? '<b>'.$rate_95th.'</b>' : $rate_95th);
+        if ($type == 'CDR') {
+            $allowed = format_si($bill['bill_allowed']).'bps';
+            $used    = format_si($bill['rate_95th']).'bps';
+            $in      = format_si($bill['rate_95th_in']).'bps';
+            $out     = format_si($bill['rate_95th_out']).'bps';
+            $overuse = (($bill['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$background['left'].'; font-weight: bold;">'.format_si($bill['bill_overuse']).'bps</span>');
+        }
+        else if ($type == 'Quota') {
+            $allowed = format_bytes_billing($bill['bill_allowed']);
+            $used    = format_bytes_billing($bill['total_data']);
+            $in      = format_bytes_billing($bill['traf_in']);
+            $out     = format_bytes_billing($bill['traf_out']);
+            $overuse = (($bill['bill_overuse'] <= 0) ? '-' : '<span style="color: #'.$background['left'].'; font-weight: bold;">'.format_bytes_billing($bill['bill_overuse']).'</span>');
+        }
 
-            echo "
-                <tr style=\"background: $row_colour;\">
-                <td><a href=\"".generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'history', detail => $history['bill_hist_id'])).'"><span style="font-weight: bold;" class="interface">'.$bill['bill_name'].'</a></span><br />from '.strftime('%x', strtotime($datefrom)).' to '.strftime('%x', strtotime($dateto))."</td>
-                <td>$type</td>
-                <td>$allowed</td>
-                <td>$in</td>
-                <td>$out</td>
-                <td>$total_data</td>
-                <td>$rate_95th</td>
-                <td style=\"text-align: center;\">$overuse</td>
-                <td>".print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</td>
-                </tr>';
+        $total_data = (($type == 'Quota') ? '<b>'.$total_data.'</b>' : $total_data);
+        $rate_95th  = (($type == 'CDR') ? '<b>'.$rate_95th.'</b>' : $rate_95th);
 
-            $i++;
-        } //end foreach
+        echo "
+            <tr>
+            <td><a href=\"".generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'history', detail => $bill['bill_hist_id'])).'"><span style="font-weight: bold;" class="interface">'.$bill['bill_name'].'</a></span><br />from '.strftime('%x', strtotime($datefrom)).' to '.strftime('%x', strtotime($dateto))."</td>
+            <td>$type</td>
+            <td>$allowed</td>
+            <td>$in</td>
+            <td>$out</td>
+            <td>$total_data</td>
+            <td>$rate_95th</td>
+            <td style=\"text-align: center;\">$overuse</td>
+            <td>".print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']).'</td>
+            </tr>';
+
     }//end if
 }//end foreach
 
-echo '</table>';
+echo '</tbody>
+</table>';
