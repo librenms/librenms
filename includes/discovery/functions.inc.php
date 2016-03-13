@@ -392,10 +392,14 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp') {
         foreach ($entries as $entry) {
             $index = $entry['sensor_index'];
             $type = $entry['sensor_type'];
+            $class = $entry['sensor_class'];
             d_echo($index . ' -> ' . $type . "\n");
 
             if (!$valid[$class][$type][$index]) {
                 echo '-';
+                if ($class == 'state') {
+                    dbDelete('sensors_to_state_indexes', '`sensor_id` =  ?', array($entry['sensor_id']));
+                }
                 dbDelete('sensors', '`sensor_id` =  ?', array($entry['sensor_id']));
                 log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', $sensor_id);
             }
