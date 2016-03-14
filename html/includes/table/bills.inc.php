@@ -37,7 +37,7 @@ if (!empty($_POST['state'])) {
 }
  
 if ($prev) {
-    $select = "SELECT bills.bill_name, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
+    $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
     $query = 'FROM `bills`
         INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
         INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
@@ -92,13 +92,13 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $rate_average = $bill['rate_average'];
     $url          = generate_url(array('page' => 'bill', 'bill_id' => $bill['bill_id']));
     $used95th     = format_si($bill['rate_95th']).'bps';
+    $notes        = $bill['bill_notes'];
     
     if ($prev) {
         $percent = $bill['bill_percent'];
         $overuse = $bill['bill_overuse'];
     } 
     else {
-        
     }
 
     if (strtolower($bill['bill_type']) == 'cdr') {
