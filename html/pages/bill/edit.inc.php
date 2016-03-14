@@ -150,16 +150,7 @@
                         <?php
                           $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
                           foreach ($devices as $device) {
-                              unset($done);
-                              foreach ($access_list as $ac) {
-                                  if ($ac == $device['device_id']) {
-                                      $done = 1;
-                                  }
-                              }
-                          
-                              if (!$done) {
-                                  echo "          <option value='".$device['device_id']."'>".$device['hostname']."</option>\n";
-                              }
+                              echo "<option value='${device['device_id']}'>${device['hostname']}</option>\n";
                           }
                           
                           ?>

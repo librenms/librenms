@@ -11,8 +11,16 @@
  * the source code distribution for details.
  */
 if(is_admin() !== false) {
+    
+    require 'includes/javascript-interfacepicker.inc.php';
+    
+    $port_device_id = -1;
     if (is_numeric($vars['port'])) {
         $port = dbFetchRow('SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['port']));
+        $bill_data['bill_name']     = $port['port_descr_descr'];
+        $bill_data['bill_ref']      = $port['port_descr_circuit'];
+        $bill_data['bill_notes']    = $port['port_descr_speed'];
+        $port_device_id             = $port['device_id'];
     }
 ?>
 
@@ -27,34 +35,50 @@ if(is_admin() !== false) {
             <form method="post" role="form" action="bills/" class="form-horizontal alerts-form">
                 <input type="hidden" name="addbill" value="yes" />
 
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="device">Device</label>
+                    <div class="col-sm-8">
+                        <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
+                            <option value=''>Select a device</option>
+                            <?php
+                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
+                              foreach ($devices as $device) {
+                                  $selected = $device['device_id'] == $port_device_id ? " selected" : "";
+                                  echo "<option value='${device['device_id']}' $selected>${device['hostname']}</option>\n";
+                              }
+                              ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label" for="port_id">Port</label>
+                    <div class="col-sm-8">
+                        <select class="form-control input-sm" id="port_id" name="port_id">
+                        <?php if (is_array($port)) {
+                            // Need to pre-populate port as we've got a port pre-selected
+                            foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', array($port_device_id)) as $interface) {
+                                $interface  = ifNameDescr($interface);
+                                $string = $interface['label'].' - '.$interface['ifAlias'];
+                                $selected = $interface['port_id'] === $port['port_id'] ? " selected" : "";
+                                echo "<option value='${interface['port_id']}' $selected>$string</option>\n";
+                            }
+                        }   ?>
+                        </select>
+                    </div>
+                </div>                
+                
 <?php
-    if (is_array($port)) {
-        $portalias = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
-?>
-    <div class="well">
-        <input type="hidden" name="port" value="<?php echo $port['port_id'] ?>" />
-        <p>
-            <?php echo generate_device_link($port) ?>
-            <i class="fa fa-random"></i>
-            <?php echo generate_port_link($port, $port['ifName'] . $portalias) ?>
-        </p>
-    </div>
-<?php
-        $bill_data['bill_name'] = $port['port_descr_descr'];
-        $bill_data['bill_ref'] = $port['port_descr_circuit'];
-        $bill_data['bill_notes'] = $port['port_descr_speed'];
-    }
 
     $bill_data['bill_type'] = 'cdr';
     $quota = array('select_gb' => ' selected');
     $cdr = array('select_mbps' => ' selected');
     include 'pages/bill/addoreditbill.inc.php';
 ?>
-    <div class="form-group">
-      <div class="col-sm-offset-4 col-sm-4">
-        <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Add Bill</button>
-      </div>
-    </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-4 col-sm-4">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Add Bill</button>
+                  </div>
+                </div>
 
             </form>
         </div>
