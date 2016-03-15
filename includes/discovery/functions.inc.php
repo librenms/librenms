@@ -93,7 +93,8 @@ function discover_device($device, $options = null) {
         $device['os'] = getHostOS($device);
         if ($device['os'] != 'generic') {
             echo "\nDevice os was updated to " . $device['os'] . '!';
-            dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
+            $device['icon'] = getImageName($device, false);
+            dbUpdate(array('os' => $device['os'], 'icon' => $device['icon']), 'devices', 'device_id=?', array($device['device_id']));
         }
     }
 
