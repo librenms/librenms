@@ -24,7 +24,15 @@ $iter = '0';
 
 rrdtool_pipe_open($rrd_process, $rrd_pipes);
 
+$poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
+
+// Wait for schema update, as running during update can break update
+$dbVersion = dbFetchCell('SELECT version FROM dbSchema');
+if ($dbVersion < 107) {
+    logfile("BILLING: Cannot continue until dbSchema update to >= 107 is complete");
+    exit(1);
+}
 
 foreach (dbFetchRows('SELECT * FROM `bills`') as $bill_data) {
     echo 'Bill : '.$bill_data['bill_name']."\n";
@@ -43,39 +51,35 @@ foreach (dbFetchRows('SELECT * FROM `bills`') as $bill_data) {
 
 function CollectData($bill_id) {
     $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id', array($bill_id));
-    print_r($port_list);
+
     $now = dbFetchCell('SELECT NOW()');
+    $delta = 0;
+    $in_delta = 0;
+    $out_delta = 0;
     foreach ($port_list as $port_data) {
         $port_id = $port_data['port_id'];
         $host    = $port_data['hostname'];
         $port    = $port_data['port'];
 
-        echo "\nPolling ".$port_data['ifDescr'].' on '.$port_data['hostname']."\n";
+        echo "  Polling ${port_data['ifName']} (${port_data['ifDescr']}) on ${port_data['hostname']}\n";
 
         $port_data['in_measurement']  = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
         $port_data['out_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');
 
-        $last_data = getLastPortCounter($port_id, in);
-        if ($last_data['state'] == 'ok') {
-            $port_data['last_in_measurement'] = $last_data[counter];
-            $port_data['last_in_delta']       = $last_data[delta];
+        $last_counters = getLastPortCounter($port_id);
+        if ($last_counters['state'] == 'ok') {
+            $port_data['last_in_measurement']  = $last_counters[in_counter];
+            $port_data['last_in_delta']        = $last_counters[in_delta];
+            $port_data['last_out_measurement'] = $last_counters[out_counter];
+            $port_data['last_out_delta']       = $last_counters[out_delta];
+
             if ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
                 $port_data['in_delta'] = ($port_data['in_measurement'] - $port_data['last_in_measurement']);
             }
             else {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
-        }
-        else {
-            $port_data['in_delta'] = '0';
-        }
-
-        dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_data['in_measurement'], 'delta' => $port_data['in_delta']), 'port_in_measurements');
-
-        $last_data = getLastPortCounter($port_id, out);
-        if ($last_data[state] == 'ok') {
-            $port_data['last_out_measurement'] = $last_data[counter];
-            $port_data['last_out_delta']       = $last_data[delta];
+            
             if ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
                 $port_data['out_delta'] = ($port_data['out_measurement'] - $port_data['last_out_measurement']);
             }
@@ -84,10 +88,15 @@ function CollectData($bill_id) {
             }
         }
         else {
+            $port_data['in_delta'] = '0';
             $port_data['out_delta'] = '0';
         }
-
-        dbInsert(array('port_id' => $port_id, 'timestamp' => $now, 'counter' => $port_data['out_measurement'], 'delta' => $port_data['out_delta']), 'port_out_measurements');
+        
+        $fields = array('timestamp' => $now, 'in_counter' => $port_data['in_measurement'], 'out_counter' => $port_data['out_measurement'], 'in_delta' => $port_data['in_delta'], 'out_delta' => $port_data['out_delta']);
+        if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "'") == 0) {
+            $fields['port_id'] = $port_id;
+            dbInsert($fields, 'bill_port_counters');
+        }
 
         $delta     = ($delta + $port_data['in_delta'] + $port_data['out_delta']);
         $in_delta  = ($in_delta + $port_data['in_delta']);
@@ -129,5 +138,15 @@ function CollectData($bill_id) {
 if ($argv[1]) {
     CollectData($argv[1]);
 }
+
+$poller_end  = microtime(true);
+$poller_run  = ($poller_end - $poller_start);
+$poller_time = substr($poller_run, 0, 5);
+
+dbInsert(array('type' => 'pollbill', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => 0, 'poller' => $config['distributed_poller_name'] ), 'perf_times');
+if ($poller_time > 300) {
+    logfile("BILLING: polling took longer than 5 minutes ($poller_time seconds)!");
+}
+echo "\nCompleted in $poller_time sec\n";
 
 rrdtool_pipe_close($rrd_process, $rrd_pipes);

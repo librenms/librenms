@@ -4,8 +4,8 @@
  <title>LibreNMS Notifications</title>
  <description>RSS feed for notifications to LibreNMS users</description>
  <link>http://www.librenms.org/</link>
- <lastBuildDate>Tue, 19 Jan 2016 12:00:00 +0000</lastBuildDate>
- <pubDate>Tue, 19 Jan 2016 12:00:00 +0000</pubDate>
+ <lastBuildDate>Mon, 07 Mar 2016 12:00:00 +0000</lastBuildDate>
+ <pubDate>Mon, 07 Mar 2016 12:00:00 +0000</pubDate>
  <ttl>1800</ttl>
  <item>
   <title>Hello World!</title>
@@ -16,6 +16,13 @@
   <title>Cisco syslog parsing changes</title>
   <description>We have overhauled the Cisco syslog parsing.  Please monitor your syslog entries from Cisco IOS, IOSXR, and CatOS devices.  If you notice any issues please open a new issue on GitHub and include the original syslog message.</description>
   <pubDate>Thu, 03 Mar 2016 12:00:00 +0000</pubDate>
+ </item>
+ <item>
+   <title>Billing Data Changes</title>
+   <description>We have updated the method for storing billing data, removing a lot of information stored in 
+   the database which was not used.  Please check that your billing data is updating as expected, and 
+   if you notice any problems open an issue on GitHub.</description>
+   <pubDate>Mon, 07 Mar 2016 12:00:00 +0000</pubDate>
  </item>
 </channel>
 </rss>
