@@ -16,12 +16,12 @@ if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-$service_id = $_POST['service_id'];
-$type = mres($_POST['stype']);
-$desc = mres($_POST['desc']);
-$ip = mres($_POST['ip']);
-$param = mres($_POST['param']);
-$device_id = mres($_POST['device_id']);
+$service_id = $vars['service_id'];
+$type = mres($vars['stype']);
+$desc = mres($vars['desc']);
+$ip = mres($vars['ip']);
+$param = mres($vars['param']);
+$device_id = mres($vars['device_id']);
 
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
