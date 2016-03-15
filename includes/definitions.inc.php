@@ -1538,6 +1538,14 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+// Deliberant WiFi
+$os = 'deliberant';
+$config['os'][$os]['text']             = 'Deliberant';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'deliberant';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
