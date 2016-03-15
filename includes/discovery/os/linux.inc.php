@@ -64,7 +64,7 @@ if (!$os) {
             );
             register_mibs($device, $pktj_mibs, "include/discovery/os/linux.inc.php");
         }
-        else if (stristr($sysObjectId, 'cumulusMib') || strstr($sysObjectId, '.1.3.6.1.4.1.40310')) {
+        elseif (stristr($sysObjectId, 'cumulusMib') || strstr($sysObjectId, '.1.3.6.1.4.1.40310')) {
             $os = 'cumulus';
         }
         else {
