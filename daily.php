@@ -93,6 +93,27 @@ if ($options['f'] === 'notifications') {
     include_once 'includes/notifications.php';
 }
 
+if ($options['f'] === 'bill_data') {
+    if (is_numeric($config['billing_data_purge']) && $config['billing_data_purge'] > 0) {
+        # Deletes data older than XX months before the start of the last complete billing period
+        $months = $config['billing_data_purge'];
+        echo "Deleting billing data more than $months month before the last completed billing cycle\n";
+        $sql = "DELETE bill_data
+                FROM bill_data
+                    INNER JOIN (SELECT bill_id, 
+                        SUBDATE(
+                            SUBDATE(
+                                ADDDATE(
+                                    subdate(curdate(), (day(curdate())-1)),             # Start of this month
+                                    bill_day - 1),                                      # Billing anniversary
+                                INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
+                            INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
+                FROM bills) q
+                ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
+        dbQuery($sql, array($months));
+    }
+}
+
 if ($options['f'] === 'purgeusers') {
     $purge = 0;
     if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
