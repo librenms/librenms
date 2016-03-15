@@ -16,7 +16,7 @@ if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
-$service_id = $_POST['service_id'];
+$service_id = $vars['service_id'];
 
 if (is_numeric($service_id) && $service_id > 0) {
     $service = service_get(null, $service_id);
