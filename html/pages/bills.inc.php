@@ -75,8 +75,8 @@ if ($_POST['addbill'] == 'yes') {
 
     $bill_id = dbInsert($insert, 'bills');
 
-    if (is_numeric($bill_id) && is_numeric($_POST['port'])) {
-        dbInsert(array('bill_id' => $bill_id, 'port_id' => $_POST['port']), 'bill_ports');
+    if (is_numeric($bill_id) && is_numeric($_POST['port_id'])) {
+        dbInsert(array('bill_id' => $bill_id, 'port_id' => $_POST['port_id']), 'bill_ports');
     }
     
     header('Location: /' . generate_url(array('page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit')));
