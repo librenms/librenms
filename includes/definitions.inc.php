@@ -1236,6 +1236,14 @@ $config['os'][$os]['icon']             = 'lexmark';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
+$os ='developprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Develop Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['icon']             = 'develop';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+
 $os = '3com';
 $config['os'][$os]['text']             = '3Com';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
