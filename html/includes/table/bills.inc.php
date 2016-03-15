@@ -83,9 +83,15 @@ if ($rowCount != -1) {
 }
 
 foreach (dbFetchRows($sql, $param) as $bill) {
-    $day_data     = getDates($bill['bill_day']);
-    $datefrom     = $day_data['0'];
-    $dateto       = $day_data['1'];
+    if ($prev) {
+        $datefrom = $bill['bill_datefrom'];
+        $dateto   = $bill['bill_dateto'];
+    }
+    else {
+        $day_data = getDates($bill['bill_day']);
+        $datefrom = $day_data['0'];
+        $dateto   = $day_data['1'];
+    }
     $rate_95th    = format_si($bill['rate_95th']) . 'bps';
     $dir_95th     = $bill['dir_95th'];
     $total_data   = format_bytes_billing($bill['total_data']);
