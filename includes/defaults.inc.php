@@ -715,6 +715,7 @@ $config['poller_modules']['cisco-voice']                 = 1;
 $config['poller_modules']['cisco-cbqos']                 = 1;
 $config['poller_modules']['stp']                         = 1;
 $config['poller_modules']['cisco-otv']                   = 1;
+$config['poller_modules']['services']                    = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
