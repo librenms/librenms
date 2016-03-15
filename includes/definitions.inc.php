@@ -1540,7 +1540,7 @@ $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 // Deliberant WiFi
 $os = 'deliberant';
-$config['os'][$os]['text']             = 'Deliberant';
+$config['os'][$os]['text']             = 'Deliberant OS';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'deliberant';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
