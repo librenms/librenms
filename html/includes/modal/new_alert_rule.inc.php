@@ -255,9 +255,10 @@ $('#suggest').typeahead({
   async: true,
   displayKey: 'name',
   valueKey: name,
-    templates: {
-        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
-    }
+  templates: {
+      suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+  },
+  limit: 20
 });
 
 var map_devices = new Bloodhound({

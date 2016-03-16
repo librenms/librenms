@@ -4,48 +4,35 @@
 
 ?>
 
-<form method='post' action='' class="form-inline" role="form">
-  <div class="form-group">
+<form method='get' action='' class="form-inline" role="form">
+  <fieldset class="form-group">
     Bills
-  </div>
-  <div class="form-group">
-    <input type="text" name="hostname" id="hostname" class="form-control input-sm" value="<?php echo $_POST['hostname']; ?>" />
-  </div>
-  <div class="form-group">
-    <select name='os' id='os' class="form-control input-sm">
+    <input type="text" name="search" id="search" class="form-control input-sm" value="<?php echo $_GET['search']; ?>" />
+    <select name='bill_type' id='bill_type' class="form-control input-sm">
       <option value=''>All Types</option>
-      <option value=''>CDR</option>
-      <option value=''>95th</option>
-      <option value=''>Quota</option>
+      <option value='cdr' <?php if ($_GET['bill_type'] === 'cdr') { echo 'selected'; } ?>>CDR</option>
+      <option value='quota' <?php if ($_GET['bill_type'] === 'quota') { echo 'selected'; } ?>>Quota</option>
     </select>
-  </div>
-  <div class="form-group">
-    <select name='hardware' id='hardware' class="form-control input-sm">
+    <select name='state' id='state' class="form-control input-sm">
       <option value=''>All States</option>
-      <option value=''>Under Quota</option>
-      <option value=''>Over Quota</option>
+      <option value='under' <?php if ($_GET['state'] === 'under') { echo 'selected'; } ?>>Under Quota</option>
+      <option value='over' <?php if ($_GET['state'] === 'over') { echo 'selected'; } ?>>Over Quota</option>
     </select>
-  </div>
-  <div class="form-group">
-    <select name='location' id='location' class="form-control input-sm">
-      <option value=''>All Customers</option>
-    </select>
-  </div>
-  <button type="submit" class="btn btn-default input-sm">Search</button>
-  <div class="form-group">
+    <button type="submit" class="btn btn-default input-sm">Search</button>
+  </fieldset>
+  <div class="form-group pull-right">
 <?php
 if ($vars['view'] == 'history') {
-    echo '<a href="bills/"><img src="images/16/clock.png" align=absmiddle alt="Current Billing Period"> Current Billing Period</a>';
+    echo '<a class="btn btn-default btn-sm" href="bills/"><i class="fa fa-clock-o"></i> Current Billing Period</a>';
 }
 else {
-    // FIXME - generate_url
-    echo '<a href="bills/view=history/"><img src="images/16/clock_red.png" align=absmiddle alt="Previous Billing Period"> Previous Billing Period</a>';
+    echo '<a class="btn btn-default btn-sm" href="bills/view=history/"><i class="fa fa-history"></i> Previous Billing Period</a>';
 }
 
 ?>
-  </div>
-  <div class="form-group">
-    <a href='bills/view=add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
+<?php if ($_SESSION['userlevel'] >= 10) {  ?>
+    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-bill"><i class="fa fa-plus"></i> Create Bill</button>
+<?php } ?>
   </div>
 </form>
 

@@ -189,7 +189,9 @@ function can_update_users() {
 
 
 function get_user($user_id) {
-    // not supported
+    foreach (get_userlist() as $users) {
+         if ($users['user_id'] === $user_id) return $users['username'];
+    }
     return 0;
 
 }

@@ -9,11 +9,20 @@ $img['his']  = '<img src="bandwidth-graph.php?bill_id='.$bill_id;
 $img['his'] .= '&amp;type=historical';
 $img['his'] .= '&amp;x=1190&amp;y=250';
 $img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
+?>
 
-echo $img['his'];
+<h3>Historical Usage</h3>
 
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Monthly Usage</h3>
+    </div>
+    <?php echo $img['his'] ?>
+</div>
 
-function showDetails($bill_id, $imgtype, $from, $to, $bittype='Quota') {
+<?php 
+
+function showDetails($bill_id, $imgtype, $bill_hist_id, $bittype='Quota') {
     if ($imgtype == 'bitrate') {
         $res = '<img src="billing-graph.php?bill_id='.$bill_id;
         if ($bittype == 'Quota') {
@@ -30,7 +39,7 @@ function showDetails($bill_id, $imgtype, $from, $to, $bittype='Quota') {
     // $res .= "&amp;type=".$type;
     $res .= '&amp;type='.$imgtype;
     $res .= '&amp;x=1190&amp;y=250';
-    $res .= '&amp;from='.$from.'&amp;to='.$to;
+    $res .= '&amp;bill_hist_id='.$bill_hist_id;
     $res .= '" style="margin: 15px 5px 25px 5px;" />';
     return $res;
 
@@ -40,21 +49,24 @@ function showDetails($bill_id, $imgtype, $from, $to, $bittype='Quota') {
 // $url        = generate_url($vars, array('detail' => 'yes'));
 $url = $PHP_SELF.'/bill/'.$bill_id.'/history/detail=all/';
 
-echo '<table class="table">
+echo '<table class="table table-striped">
+    <thead>
     <tr style="font-weight: bold; ">
-        <td width="7"></td>
-        <td width="250">Period</td>
-        <td>Type</td>
-        <td>Allowed</td>
-        <td>Inbound</td>
-        <td>Outbound</td>
-        <td>Total</td>
-        <td>95th %ile</td>
-        <td style="text-align: center;">Overusage</td>
-        <td colspan="2" style="text-align: right;"><a href="'.generate_url($vars, array('detail' => 'all')).'">
+        <th width="7"></th>
+        <th width="250">Period</th>
+        <th>Type</th>
+        <th>Allowed</th>
+        <th>Inbound</th>
+        <th>Outbound</th>
+        <th>Total</th>
+        <th>95th %ile</th>
+        <th style="text-align: center;">Overusage</th>
+        <th colspan="2" style="text-align: right;"><a href="'.generate_url($vars, array('detail' => 'all')).'">
             <img src="images/16/chart_curve.png" border="0" align="absmiddle" alt="Show details" title="Show details" /> Show all details</a>
-        </td>
-    </tr>';
+        </th>
+    </tr>
+    </thead>
+    <tbody>';
 
 foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 24', array($bill_id)) as $history) {
     if (bill_permitted($history['bill_id'])) {
@@ -68,7 +80,6 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         $total_data = format_number($history['traf_total'], $config['billing']['base']);
 
         $background = get_percentage_colours($percent);
-        $row_colour = ((!is_integer($i / 2)) ? $list_colour_a : $list_colour_b);
 
         if ($type == 'CDR') {
             $allowed = formatRates($history['bill_allowed']);
@@ -91,7 +102,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         $url = generate_url($vars, array('detail' => $history['bill_hist_id']));
 
         echo '
-            <tr style="background: '.$row_colour.';">
+            <tr>
                 <td></td>
                 <td><span style="font-weight: bold;" class="interface">'.strftime('%Y-%m-%d', strtotime($datefrom)).' to '.strftime('%Y-%m-%d', strtotime($dateto))."</span></td>
                 <td>$type</td>
@@ -108,9 +119,9 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
             </tr>';
 
         if ($vars['detail'] == $history['bill_hist_id'] || $vars['detail'] == 'all') {
-            $img['bitrate'] = showDetails($bill_id, 'bitrate', strtotime($datefrom), strtotime($dateto), $type);
-            $img['bw_day']  = showDetails($bill_id, 'day', strtotime($datefrom), strtotime($dateto));
-            $img['bw_hour'] = showDetails($bill_id, 'hour', strtotime($datefrom), strtotime($dateto));
+            $img['bitrate'] = showDetails($bill_id, 'bitrate', $history['bill_hist_id'], $type);
+            $img['bw_day']  = showDetails($bill_id, 'day', $history['bill_hist_id']);
+            $img['bw_hour'] = showDetails($bill_id, 'hour', $history['bill_hist_id']);
             echo '
                 <tr style="background: #fff; border-top: 1px solid '.$row_colour.'; border-bottom: 1px solid #ccc;">
                     <td colspan="11">
@@ -123,9 +134,8 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
                     </td>
                 </tr>';
         }
-
-        $i++;
     } //end if
 }//end foreach
 
-echo '</table>';
+echo '</tbody>
+</table>';

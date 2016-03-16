@@ -48,13 +48,9 @@ foreach (dbFetchRows('SELECT * FROM `devices` AS D, `services` AS S WHERE S.devi
         if ($service_status != $status) {
             $update['service_changed'] = time();
         }
-        else {
-            unset($updated);
-        }
-
-            $update = array_merge(array('service_status' => $status, 'service_message' => $check, 'service_checked' => time()), $update);
-            dbUpdate($update, 'services', '`service_id` = ?', array($service['service_id']));
-            unset($update);
+        $update = array_merge(array('service_status' => $status, 'service_message' => $check, 'service_checked' => time()), $update);
+        dbUpdate($update, 'services', '`service_id` = ?', array($service['service_id']));
+        unset($update);
     }
     else {
         $status = '0';
