@@ -755,6 +755,8 @@ $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'avaya';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 
 $os = 'avaya-ipo';
 $config['os'][$os]['text']             = 'IP Office Firmware';
