@@ -139,8 +139,11 @@ Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
 ```text
-{if %transport == mail}<a href='https://my.librenms.install/device/device=%hostname/'>%hostname</a>{else}%hostname{/if}
+{if %transport == mail}<a href="https://my.librenms.install/device/device=%hostname/">%hostname</a>{else}%hostname{/if}
 ```
+
+Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped (replaced with `\'`) in the output and should therefore be avoided.
+
 
 # <a name="transports">Transports</a>
 
