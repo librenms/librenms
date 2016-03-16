@@ -86,6 +86,7 @@
     - Updated visjs to 4.14.0 (PR3031)
     - Updated apps layout to use panels (PR3117)
   - Discovery / Polling:
+    - Added VRF Lite support (PR2820)
     - Added ability to ignore device sensors from entity mib (PR2862)
     - Added `ifOperStatus_prev` and `ifAdminStatus_prev` values to db (PR2912)
     - Improved bgpPolling efficiency (PR2967)
