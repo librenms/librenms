@@ -749,6 +749,13 @@ $config['os'][$os]['icon']             = 'avaya';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
+$os = 'avaya-vsp';
+$config['os'][$os]['text']             = 'VSP Firmware';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'avaya';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+
 $os = 'avaya-ipo';
 $config['os'][$os]['text']             = 'IP Office Firmware';
 $config['os'][$os]['type']             = 'network';
