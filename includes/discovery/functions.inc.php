@@ -392,10 +392,14 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp') {
         foreach ($entries as $entry) {
             $index = $entry['sensor_index'];
             $type = $entry['sensor_type'];
+            $class = $entry['sensor_class'];
             d_echo($index . ' -> ' . $type . "\n");
 
             if (!$valid[$class][$type][$index]) {
                 echo '-';
+                if ($class == 'state') {
+                    dbDelete('sensors_to_state_indexes', '`sensor_id` =  ?', array($entry['sensor_id']));
+                }
                 dbDelete('sensors', '`sensor_id` =  ?', array($entry['sensor_id']));
                 log_event('Sensor Deleted: ' . $entry['sensor_class'] . ' ' . $entry['sensor_type'] . ' ' . $entry['sensor_index'] . ' ' . $entry['sensor_descr'], $device, 'sensor', $sensor_id);
             }
@@ -725,7 +729,7 @@ function avtech_add_sensor($device, $sensor) {
     global $valid;
 
     // set the id, must be unique
-    if ($sensor['id']) {
+    if (isset($sensor['id'])) {
         $id = $sensor['id'];
     }
     else {
@@ -755,13 +759,13 @@ function avtech_add_sensor($device, $sensor) {
     d_echo('Sensor value: ' . $value . "\n");
 
     // get the type
-    $type = $device['type'] ? $device['type'] : 'temperature';
+    $type = $sensor['type'] ? $sensor['type'] : 'temperature';
     d_echo('Sensor type: ' . $type . "\n");
 
 
     // set the description
     if ($sensor['descr_oid']) {
-        $descr = snmp_get($device, $sensor['descr_oid'], '-OvQ');
+        $descr = trim(snmp_get($device, $sensor['descr_oid'], '-OvQ'), '"');
     }
     elseif ($sensor['descr']) {
         $descr = $sensor['descr'];

@@ -54,12 +54,11 @@ function process_syslog($entry, $update) {
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
             // multipart message
             if(strpos($entry['msg'], ':') !== false) {
-                /* Split the following examples
-                 * %CARD-SEVERITY-MSG:SLOT %FACILITY-SEVERITY-MNEMONIC: Message-text
-                 * %FACILITY-SUBFACILITY-SEVERITY-MNEMONIC: Message-text
-                 */
                 $matches = array();
-                if(preg_match('/^(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?): ?(?<msg>.*)/', $entry['msg'], $matches)) {
+                $timestamp_prefix = '([A-Z][a-z]{2} \d\d? \d\d:\d\d:\d\d(.\d\d\d)?( [A-Z]{3})?: )?';
+                $program_match = '(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?)';
+                $message_match = '(?<msg>.*)';
+                if(preg_match('/^' . $timestamp_prefix . $program_match . ': ?' . $message_match . '/', $entry['msg'], $matches)) {
                     $entry['program'] = $matches['program'];
                     $entry['msg'] = $matches['msg'];
                 }

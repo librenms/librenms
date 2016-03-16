@@ -178,6 +178,7 @@ $config['email_backend']                   = 'mail';               // Mail backe
 $config['email_from']                      = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
 $config['email_user']                      = $config['project_id'];
 $config['email_sendmail_path']             = '/usr/sbin/sendmail'; // The location of the sendmail program.
+$config['email_html']                      = FALSE;                // Whether to send HTML email as opposed to plaintext
 $config['email_smtp_host']                 = 'localhost';          // Outgoing SMTP server name.
 $config['email_smtp_port']                 = 25;                   // The port to connect.
 $config['email_smtp_timeout']              = 10;                   // SMTP connection timeout in seconds.
