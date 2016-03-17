@@ -43,7 +43,7 @@ if (strstr(`php -ln config.php`, 'No syntax errors detected')) {
         print_fail('config.php contains a new line at the end, please remove any whitespace at the end of the file and also remove ?>');
     }
     else if ($last_lines[1] == '?>') {
-        print_warn("It looks like you have ?> at the end of config.php, it's suggested you remove this");
+        print_warn("It looks like you have ?> at the end of config.php, it is suggested you remove this");
     }
 }
 else {
@@ -139,7 +139,7 @@ if(strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
 // Test for MySQL InnoDB buffer size
 $innodb_buffer = innodb_buffer_check();
 if ($innodb_buffer['used'] > $innodb_buffer['size']) {
-    print_warn("Your Innodb buffer is full, consider increasing it's size");
+    print_warn("Your Innodb buffer is full, consider increasing its size");
     echo warn_innodb_buffer($innodb_buffer);
 }
 
@@ -213,24 +213,26 @@ foreach ($modules as $module) {
                 $run_test = 0;
             }
             else if ($config['email_backend'] == 'sendmail') {
-                if (empty($config['email_sendmail_path']) || !file_exists($config['email_sendmail_path'])) {
-                    print_fail("You have selected sendmail but not configured email_sendmail_path or it's not valid");
+                if (empty($config['email_sendmail_path'])) {
+                    print_fail("You have selected sendmail but not configured email_sendmail_path");
+                    $run_test = 0;
+                }
+                elseif (!file_exists($config['email_sendmail_path'])) {
+                    print_fail("The configured email_sendmail_path is not valid");
                     $run_test = 0;
                 }
             }
             else if ($config['email_backend'] == 'smtp') {
                 if (empty($config['email_smtp_host'])) {
-                    print_fail('You have selected smtp but not configured an smtp host');
+                    print_fail('You have selected SMTP but not configured an SMTP host');
                     $run_test = 0;
                 }
-
                 if (empty($config['email_smtp_port'])) {
-                    print_fail('You have selected smtp but not configured an smtp port');
+                    print_fail('You have selected SMTP but not configured an SMTP port');
                     $run_test = 0;
                 }
-
                 if (($config['email_smtp_auth'] === true) && (empty($config['email_smtp_username']) || empty($config['email_smtp_password']))) {
-                    print_fail('You have selected smtp but not configured a username or password');
+                    print_fail('You have selected SMTP auth but have not configured both username and password');
                     $run_test = 0;
                 }
             }//end if
