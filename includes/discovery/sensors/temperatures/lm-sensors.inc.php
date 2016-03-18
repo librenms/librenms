@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'linux' || $device['os'] == 'pktj') {
+if ($device['os'] == 'linux' || $device['os'] == 'pktj' || $device['os'] == 'cumulus') {
     $oids = snmp_walk($device, 'lmTempSensorsDevice', '-Osqn', 'LM-SENSORS-MIB');
     d_echo($oids."\n");
 
