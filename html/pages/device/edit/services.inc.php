@@ -5,7 +5,7 @@ if (is_admin() === true || is_read() === true) {
         if ($_SESSION['userlevel'] >= '10') {
             $updated = '1';
 
-            $service_id = service_add($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
+            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
             if ($service_id) {
                 $message       .= $message_break.'Service added ('.$service_id.')!';
                 $message_break .= '<br />';

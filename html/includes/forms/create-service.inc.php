@@ -26,7 +26,7 @@ $device_id = mres($vars['device_id']);
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
     $update = array('service_desc' => $desc, 'service_ip' => $ip, 'service_param' => $param);
-    if (service_edit($update, $service_id)) {
+    if (edit_service($update, $service_id)) {
         $status = array('status' =>0, 'message' => 'Modified Service: <i>'.$service_id.': '.$type.'</i>');
     }
     else {
@@ -35,7 +35,7 @@ if (is_numeric($service_id) && $service_id > 0) {
 }
 else {
     // Need to add.
-    $service_id = service_add($device_id, $type, $desc, $ip, $param);
+    $service_id = add_service($device_id, $type, $desc, $ip, $param);
     if ($service_id == false) {
         $status = array('status' =>1, 'message' => 'ERROR: Failed to add Service: <i>'.$type.'</i>');
     }
