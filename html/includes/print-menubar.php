@@ -3,7 +3,7 @@ require $config['install_dir'].'/includes/object-cache.inc.php';
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
-$service_status = service_status();
+$service_status = get_service_status();
 $if_alerts      = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
 if ($_SESSION['userlevel'] >= 5) {

@@ -7,7 +7,7 @@ $ports['up']       = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id =
 $ports['down']     = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up'", array($device['device_id']));
 $ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifAdminStatus` = 'down'", array($device['device_id']));
 
-$services = service_status($device['device_id']);
+$services = get_service_status($device['device_id']);
 $services['total'] = array_sum($services);
 
 if ($services[0]) {

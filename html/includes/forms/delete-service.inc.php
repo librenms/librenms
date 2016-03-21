@@ -19,7 +19,7 @@ else {
         $status = array('status' =>1, 'message' => 'No Service has been selected');
     }
     else {
-        if (service_delete($vars['service_id'])) {
+        if (delete_service($vars['service_id'])) {
             $status = array('status' =>0, 'message' => 'Service: <i>'.$vars['service_id'].', has been deleted.</i>');
         }
         else {
