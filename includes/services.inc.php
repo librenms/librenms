@@ -1,6 +1,6 @@
 <?php
 
-function service_status($device = null) {
+function get_service_status($device = null) {
     $sql_query = "SELECT service_status, count(service_status) as count FROM services WHERE";
     $sql_param = array();
     $add = 0;
@@ -33,7 +33,7 @@ function service_status($device = null) {
     return $service_count;
 }
 
-function service_add($device, $type, $desc, $ip='localhost', $param = "", $ignore = 0) {
+function add_service($device, $type, $desc, $ip='localhost', $param = "", $ignore = 0) {
 
     if (!is_array($device)) {
         $device = device_by_id_cache($device);
@@ -83,7 +83,7 @@ function service_get($device = null, $service = null) {
     return $services;
 }
 
-function service_edit($update=array(), $service=null) {
+function edit_service($update=array(), $service=null) {
     if (!is_numeric($service)) {
         return false;
     }
@@ -91,7 +91,7 @@ function service_edit($update=array(), $service=null) {
     return dbUpdate($update, 'services', '`service_id`=?', array($service));
 }
 
-function service_delete($service=null) {
+function delete_service($service=null) {
     if (!is_numeric($service)) {
         return false;
     }
@@ -99,17 +99,17 @@ function service_delete($service=null) {
     return dbDelete('services', '`service_id` =  ?', array($service));
 }
 
-function service_discover($device, $service) {
+function discover_service($device, $service) {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
-        service_add($device, $service, "(Auto discovered) $service");
+        add_service($device, $service, "(Auto discovered) $service");
         log_event('Autodiscovered service: type '.mres($service), $device, 'service');
         echo '+';
     }
     echo "$service ";
 }
 
-function service_poll($service) {
-    global $config, $device;
+function poll_service($service) {
+    global $config;
     $update = array();
     $old_status = $service['service_status'];
 
@@ -128,7 +128,7 @@ function service_poll($service) {
     // Some debugging
     d_echo("\nNagios Service - ".$service['service_id']."\n");
     d_echo("Request:  ".$check_cmd."\n");
-    list($status, $msg, $perf) = service_check($check_cmd);
+    list($status, $msg, $perf) = check_service($check_cmd);
     d_echo("Response: ".$msg."\n");
 
     // TODO: Use proper Nagios service status. 0=Ok,1=Warning,2=Critical,Else=Unknown
@@ -154,7 +154,7 @@ function service_poll($service) {
     if (count($perf) > 0) {
         // Yes, We have perf data.
         $filename = "services-".$service['service_id'].".rrd";
-        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
+        $rrd_filename = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename ($filename);
 
         // Set the DS in the DB if it is blank.
         $DS = array();
@@ -198,13 +198,13 @@ function service_poll($service) {
     }
 
     if (count($update) > 0) {
-        service_edit($update,$service['service_id']);
+        edit_service($update,$service['service_id']);
     }
 
     return true;
 }
 
-function service_check($command) {
+function check_service($command) {
     // This array is used to test for valid UOM's to be used for graphing.
     // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200
     // Note: This array must be decend from 2 char to 1 char so that the search works correctly.

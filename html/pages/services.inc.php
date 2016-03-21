@@ -4,6 +4,9 @@ $pagetitle[] = 'Services';
 
 print_optionbar_start();
 
+require_once 'includes/modal/new_service.inc.php';
+require_once 'includes/modal/delete_service.inc.php';
+
 echo "<span style='font-weight: bold;'>Services</span> &#187; ";
 
 $menu_options = array(
@@ -86,15 +89,16 @@ if (isset($state)) {
 }
 
 ?>
-<div class="row col-sm-12" id="nagios-services">
-    <table class="table table-hover table-condensed table-striped">
-        <tr>
-            <th>Device</th>
-            <th>Service</th>
-            <th>Changed</th>
-            <th>Message</th>
-            <th>Description</th>
-        </tr>
+<div class="row col-sm-12"><span id="message"></span></div>
+<table class="table table-hover table-condensed table-striped">
+    <tr>
+        <th>Device</th>
+        <th>Service</th>
+        <th>Changed</th>
+        <th>Message</th>
+        <th>Description</th>
+        <th>&nbsp;</th>
+    </tr>
 <?php
 if ($_SESSION['userlevel'] >= '5') {
     $host_sql = 'SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY D.hostname ORDER BY D.hostname';
@@ -109,7 +113,7 @@ $shift = 1;
 foreach (dbFetchRows($host_sql, $host_par) as $device) {
     $device_id       = $device['device_id'];
     $device_hostname = $device['hostname'];
-    $devlink = generate_device_link($device);
+    $devlink = generate_device_link($device,null,array('tab' => 'services'));
     if ($shift == 1) {
         array_unshift($sql_param, $device_id);
         $shift = 0;
@@ -129,18 +133,21 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
             $status = "<span class='grey'><b>".$service['service_type']."</b></span>";
         }
 ?>
-        <tr>
-            <td><?=$devlink?></td>
-            <td><?=$status?></td>
-            <td><?=formatUptime(time() - $service['service_changed'])?></td>
-            <td><span class='box-desc'><?=nl2br(trim($service['service_message']))?></span></td>
-            <td><span class='box-desc'><?=nl2br(trim($service['service_desc']))?></span></td>
-        </tr>
+    <tr id="row_<?=$service['service_id']?>">
+        <td><?=$devlink?></td>
+        <td><?=$status?></td>
+        <td><?=formatUptime(time() - $service['service_changed'])?></td>
+        <td><span class='box-desc'><?=nl2br(trim($service['service_message']))?></span></td>
+        <td><span class='box-desc'><?=nl2br(trim($service['service_desc']))?></span></td>
+        <td>
+            <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?=$service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
+            <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?=$service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
+        </td>
+    </tr>
 <?php
     }//end foreach
 
     unset($samehost);
 }//end foreach
 ?>
-    </table>
-</div>
+</table>
