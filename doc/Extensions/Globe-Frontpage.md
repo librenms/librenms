@@ -12,7 +12,7 @@ $config['geoloc']['latlng'] = true;
 $config['geoloc']['engine'] = "google";//Only one available at present
 ```
 
-Location resolution happens as follows (iff `$config['geoloc']['latlng'] == true;`):
+Location resolution happens as follows (when `$config['geoloc']['latlng'] == true;`):
  1. if `device['location']` contains `[lat, lng]` (note the square brackets), that is used
  1. if there is a location overide in the `locations` table where `locations.location == device['location']`, that is used
   * currently, no web UI
