@@ -12,6 +12,12 @@ $config['geoloc']['latlng'] = true;
 $config['geoloc']['engine'] = "google";//Only one available at present
 ```
 
+Location resolution happens as follows (when `$config['geoloc']['latlng'] == true;`):
+ 1. if `device['location']` contains `[lat, lng]` (note the square brackets), that is used
+ 1. if there is a location overide in the `locations` table where `locations.location == device['location']`, that is used
+  * currently, no web UI
+ 1. attempt to resolve lat, lng using `$config['geoloc']['engine']`
+
 We have two current mapping engines available:
 
 - Leaflet (default)
