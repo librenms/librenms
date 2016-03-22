@@ -1,24 +1,9 @@
 <?php
 
 require_once $config['install_dir'].'/includes/device-groups.inc.php';
+require_once $config['install_dir'].'/includes/alerts.inc.php';
 
 $where = 1;
-
-$alert_states = array(
-    // divined from librenms/alerts.php
-    'recovered' => 0,
-    'alerted' => 1,
-    'acknowledged' => 2,
-    'worse' => 3,
-    'better' => 4
-);
-
-$alert_severities = array(
-    // alert_rules.status is enum('ok','warning','critical')
-    'ok' => 1,
-    'warning' => 2,
-    'critical' => 3
-);
 
 $show_recovered = FALSE;
 
@@ -28,12 +13,12 @@ if (is_numeric($_POST['device_id']) && $_POST['device_id'] > 0) {
 
 if (is_numeric($_POST['acknowledged'])) {
     // I assume that if we are searching for acknowleged/not, we aren't interested in recovered
-    $where .= " AND `alerts`.`state`".($_POST['acknowledged'] ? "=" : "!=").$alert_states['acknowledged'];
+    $where .= " AND `alerts`.`state`".($_POST['acknowledged'] ? "=" : "!=").AlertState::ACKNOWLEDGED;
 }
 
 if (is_numeric($_POST['state'])) {
     $where .= " AND `alerts`.`state`=".$_POST['state'];
-    if ($_POST['state'] == $alert_states['recovered']) {
+    if ($_POST['state'] === (string)AlertState::RECOVERED) {
         $show_recovered = TRUE;
     }
 }
@@ -43,7 +28,7 @@ if (isset($_POST['min_severity'])) {
         $min_severity_id = $_POST['min_severity'];
     }
     else if (!empty($_POST['min_severity'])) {
-        $min_severity_id = $alert_severities[$_POST['min_severity']];
+        $min_severity_id = array_search($_POST['min_severity'], $alert_severities);
     }
     if (isset($min_severity_id)) {
         $where .= " AND `alert_rules`.`severity` >= ".$min_severity_id;
@@ -62,7 +47,7 @@ if (is_numeric($_POST['group'])) {
 }
 
 if (!$show_recovered) {
-    $where .= " AND `alerts`.`state`!=".$alert_states['recovered'];
+    $where .= " AND `alerts`.`state`!=".AlertState::RECOVERED;
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -112,25 +97,25 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $col   = 'green';
     $extra = '';
     $msg   = '';
-    if ((int) $alert['state'] === 0) {
+    if ((int) $alert['state'] === AlertState::RECOVERED) {
         $ico   = 'ok';
         $col   = 'green';
         $extra = 'success';
         $msg   = 'ok';
     }
-    else if ((int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
+    else if ((int) $alert['state'] === AlertState::ALERTED || (int) $alert['state'] === AlertState::WORSE || (int) $alert['state'] === AlertState::BETTER) {
         $ico   = 'volume-up';
         $col   = 'red';
         $extra = 'danger';
         $msg   = 'alert';
-        if ((int) $alert['state'] === 3) {
+        if ((int) $alert['state'] === AlertState::WORSE) {
             $msg = 'worse';
         }
-        else if ((int) $alert['state'] === 4) {
+        else if ((int) $alert['state'] === AlertState::BETTER) {
             $msg = 'better';
         }
     }
-    else if ((int) $alert['state'] === 2) {
+    else if ((int) $alert['state'] === AlertState::ACKNOWLEDGED) {
         $ico   = 'volume-off';
         $col   = '#800080';
         $extra = 'warning';
@@ -151,7 +136,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $ack_ico = 'volume-up';
     $ack_col = 'success';
-    if ($alert['state'] == 2) {
+    if ($alert['state'] == AlertState::ACKNOWLEDGED) {
         $ack_ico = 'volume-off';
         $ack_col = 'danger';
     }

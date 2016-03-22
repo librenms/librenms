@@ -1,26 +1,8 @@
 <?php
 
 require_once $config['install_dir'].'/includes/device-groups.inc.php';
+require_once $config['install_dir'].'/includes/alerts.inc.php';
 
-/* FIXME: is there a central place we can put this? */
-
-$alert_states = array(
-    // divined from librenms/alerts.php
-    'recovered' => 0,
-    'alerted' => 1,
-    'acknowledged' => 2,
-    'worse' => 3,
-    'better' => 4
-);
-
-$alert_severities = array(
-    // alert_rules.status is enum('ok','warning','critical')
-    'ok' => 1,
-    'warning' => 2,
-    'critical' => 3
-);
-
-//if( defined('show_settings') || empty($widget_settings) ) {
 if(defined('show_settings')) {
     $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
     $current_severity     = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';

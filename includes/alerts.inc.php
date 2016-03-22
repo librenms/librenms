@@ -26,6 +26,40 @@ include_once($config['install_dir'].'/includes/device-groups.inc.php');
 include_once($config['install_dir'].'/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php');
 
 /**
+ * Some constants
+ */
+
+class AlertState {
+    const RECOVERED = 0;
+    const ALERTED = 1;
+    const ACKNOWLEDGED = 2;
+    const WORSE = 3;
+    const BETTER = 4;
+}
+
+class AlertSeverity{
+    const OK = 1;
+    const WARNING = 2;
+    const CRITICAL = 3;
+}
+
+$alert_states = array(
+    // divined from librenms/alerts.php
+    'recovered' => AlertState::RECOVERED,
+    'alerted' => AlertState::ALERTED,
+    'acknowledged' => AlertState::ACKNOWLEDGED,
+    'worse' => AlertState::WORSE,
+    'better' => AlertState::BETTER
+);
+
+$alert_severities = array(
+    // alert_rules.status is enum('ok','warning','critical')
+    'ok' => AlertSeverity::OK,
+    'warning' => AlertSeverity::WARNING,
+    'critical' => AlertSeverity::CRITICAL
+);
+
+/**
  * Generate SQL from Rule
  * @param string $rule Rule to generate SQL for
  * @return string|boolean
@@ -249,30 +283,32 @@ function RunRules($device) {
             $doalert = false;
         }
         if( $doalert ) {
-            if( $chk['state'] === "2" ) {
+            if( $chk['state'] === (string)AlertState::ACKNOWLEDGED ) {
                 echo " SKIP  ";
             }
-            elseif( $chk['state'] >= "1" ) {
+            elseif( $chk['state'] !== (string)AlertState::RECOVERED ) {
                 echo " NOCHG ";
             }
             else {
                 $extra = gzcompress(json_encode(array('contacts' => GetContacts($qry), 'rule'=>$qry)),9);
-                if( dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra),'alert_log') ) {
-                    if( !dbUpdate(array('state' => 1, 'open' => 1),'alerts','device_id = ? && rule_id = ?', array($device,$rule['id'])) ) {
-                        dbInsert(array('state' => 1, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0),'alerts');
+                if( dbInsert(array('state' => AlertState::ALERTED, 'device_id' => $device, 'rule_id' => $rule['id'], 'details' => $extra),'alert_log') ) {
+                    $r = dbUpdate(array('state' => AlertState::ALERTED, 'open' => 1),'alerts','device_id = ? && rule_id = ?', array($device,$rule['id']));
+                    if ( !$r ) {
+                        dbInsert(array('state' => AlertState::ALERTED, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0),'alerts');
                     }
                     echo " ALERT ";
                 }
             }
         }
         else {
-            if( $chk['state'] === "0" ) {
+            if( $chk['state'] === (string)AlertState::RECOVERED ) {
                 echo " NOCHG ";
             }
             else {
-                if( dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id']),'alert_log') ){
-                    if( !dbUpdate(array('state' => 0, 'open' => 1),'alerts','device_id = ? && rule_id = ?', array($device,$rule['id'])) ) {
-                        dbInsert(array('state' => 0, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0),'alerts');
+                if( dbInsert(array('state' =>  AlertState::RECOVERED, 'device_id' => $device, 'rule_id' => $rule['id']),'alert_log') ){
+                    $r = dbUpdate(array('state' =>  AlertState::RECOVERED, 'open' => 1),'alerts','device_id = ? && rule_id = ?', array($device,$rule['id']));
+                    if( !$r ) {
+                        dbInsert(array('state' =>  AlertState::RECOVERED, 'device_id' => $device, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0),'alerts');
                     }
                     echo " OK    ";
                 }

@@ -1,5 +1,7 @@
 <?php
 
+require_once $config['install_dir'].'/includes/alerts.inc.php';
+
 $pdf->AddPage('L');
 $where = '1';
 
@@ -41,24 +43,24 @@ foreach (dbFetchRows($full_query, $param) as $alert_entry) {
     $hostname    = gethostbyid(mres($alert_entry['device_id']));
     $alert_state = $alert_entry['state'];
 
-    if ($alert_state != '') {
-        if ($alert_state == '0') {
+    if ($alert_state != '') { // FIXME: would is_numeric($alert_state) be more appropriate here?
+        if ($alert_state == AlertState::RECOVERED) {
             $glyph_color = 'green';
             $text        = 'Ok';
         }
-        else if ($alert_state == '1') {
+        else if ($alert_state == AlertState::ALERTED) {
             $glyph_color = 'red';
             $text        = 'Alert';
         }
-        else if ($alert_state == '2') {
+        else if ($alert_state == AlertState::ACKNOWLEDGED) {
             $glyph_color = 'lightgrey';
             $text        = 'Ack';
         }
-        else if ($alert_state == '3') {
+        else if ($alert_state == AlertState::WORSE) {
             $glyph_color = 'orange';
             $text        = 'Worse';
         }
-        else if ($alert_state == '4') {
+        else if ($alert_state == AlertState::BETTER) {
             $glyph_color = 'khaki';
             $text        = 'Better';
         }
