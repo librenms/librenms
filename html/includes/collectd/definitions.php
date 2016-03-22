@@ -1371,6 +1371,18 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:temp_avg:AVERAGE:%4.1lf',
 		'GPRINT:temp_max:MAX:%4.1lf',
 		'GPRINT:temp_avg:LAST:%4.1lf\l');
+	$GraphDefs['signal'] = array(
+ 		'DEF:signal_avg={file}:value:AVERAGE',
+ 		'DEF:signal_min={file}:value:MIN',
+ 		'DEF:signal_max={file}:value:MAX',
+ 		'CDEF:average=signal_avg,0.2,*,PREV,UN,signal_avg,PREV,IF,0.8,*,+',
+ 		"AREA:signal_max#$HalfRed",
+ 		"AREA:signal_min#$Canvas",
+ 		"LINE1:signal_avg#$FullRed:Signal",
+ 		'GPRINT:signal_min:MIN:%4.1lf',
+ 		'GPRINT:signal_avg:AVERAGE:%4.1lf',
+ 		'GPRINT:signal_max:MAX:%4.1lf',
+ 		'GPRINT:signal_avg:LAST:%4.1lf\l');
 	$GraphDefs['timeleft'] = array(
 		#'-v', 'Minutes',
 		'DEF:avg={file}:timeleft:AVERAGE',
