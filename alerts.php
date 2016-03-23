@@ -345,13 +345,17 @@ function ExtTransports($obj) {
             $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
             $prefix[3] = &$prefix[0];
             $prefix[4] = &$prefix[0];
-            if ($tmp) {
+            if ($tmp === true) {
                 echo 'OK';
                 log_event('Issued '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             }
-            else {
+            elseif ($tmp === false) {
                 echo 'ERROR';
                 log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
+            }
+            else {
+                echo 'ERROR: '.$tmp."\r\n";
+                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."' Error: ".$tmp, $obj['device_id']);
             }
         }
 

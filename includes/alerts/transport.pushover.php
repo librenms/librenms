@@ -86,7 +86,7 @@ foreach( $opts as $api ) {
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if( $code != 200 ) {
         var_dump("Pushover returned error"); //FIXME: proper debugging
-        return false;
+        return 'HTTP Status code '.$code;
     }
 }
 return true;
