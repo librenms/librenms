@@ -48,6 +48,6 @@ $ret = curl_exec($curl);
 $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 if( $code != 200 ) {
     var_dump("PagerDuty returned Error, retry later"); //FIXME: propper debuging
-    return false;
+    return 'HTTP Status code '.$code;
 }
 return true;
