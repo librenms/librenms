@@ -9,28 +9,6 @@ if ($device['os'] == 'cambium') {
 		$oid  = 'receivePower.0';
 		$divisor = 10;
 	}
-	else if (strstr($cambium_type, 'BHUL450')) {
-		$masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-		if ($masterSlaveMode == "timingMaster") {
-			$oid = 'lastPowerLevel.2';
-			$mib = 'WHISP-APS-MIB';
-		}
-		else {
-			$oid = 'radioDbmInt.0';
-			$mib = 'WHISP-SM-MIB';
-		}
-	}
-	else if (strstr($cambium_type, 'BHUL') || strstr($cambium_type, 'BH')) {
-		$masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-		if ($masterSlaveMode == "timingMaster") {
-			$oid = 'lastPowerLevel.2';
-			$mib = 'WHISP-APS-MIB';
-		}
-		else {
-			$oid  = '1.3.6.1.4.1.161.19.3.2.2.21.0';
-    		$mib = 'WHISP-BOX-MIBV2-MIB';
-		}
-	}
 	else if (strstr($cambium_type, 'PTP250')) {
 		$oid  = 'receivePower.0';
     	$mib = 'CAMBIUM-PTP250-MIB';

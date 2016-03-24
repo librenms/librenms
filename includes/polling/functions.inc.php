@@ -20,8 +20,8 @@ function poll_sensor($device, $class, $unit) {
                 if ($device['os'] == 'netapp') {
                     include 'includes/polling/temperatures/netapp.inc.php';
                 }
-                else if ($device['os'] == 'cambium') {
-                    include 'includes/polling/temperatures/cambium.inc.php';
+                else if ($device['os'] == 'canopy') {
+                    include 'includes/polling/temperatures/canopy.inc.php';
                 }
                 else {
                     // Try 5 times to get a valid temp reading
