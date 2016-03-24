@@ -13,26 +13,8 @@ $is_epmp = snmp_get($device, 'sysObjectID.0', '-Oqv', '');
 if (strstr($cambium_type, 'Cambium PTP 50650')) {
 		$mib = ':CAMBIUM-PTP650-MIB';
 	}
-else if (strstr($cambium_type, 'BHUL450-DES') || stristr($cambium_type, 'BHUL450-AES')) {
-	$masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-	if ($masterSlaveMode == "timingMaster") {
-   		$mib = ':WHISP-APS-MIB';
-   	}
-   	else {
-   		$mib = ':WHISP-SM-MIB';
-   	}
-}
 else if (strstr($cambium_type, 'PTP250')) {
    	$mib = ':CAMBIUM-PTP250-MIB';
-}
-else if (strstr($cambium_type, 'BHUL') || stristr($cambium_type, 'BH')) {
-   	$masterSlaveMode = snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
-	if ($masterSlaveMode == "timingMaster") {
-   		$mib = ':WHISP-APS-MIB';
-   	}
-   	else {
-   		$mib = ':WHISP-BOX-MIBV2-MIB';
-   	}
 }
 else if (strstr($is_epmp, '.17713.21')) {
 	$epmp_ap = snmp_get($device, 'wirelessInterfaceMode.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
