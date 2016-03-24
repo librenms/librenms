@@ -1,3 +1,5 @@
+<?php
+
 echo 'Doing Nortel/Avaya VSP ';
 
 $sysObjectID = $poll_device['sysObjectID'];
