@@ -19,12 +19,6 @@ if (!$os) {
     else if (preg_match('/^Cambium/', $sysDescr)) {
         $os = 'cambium';
     }
-    else if (preg_match('/^CANOPY/', $sysDescr)) {
-        $os = 'cambium';
-    }
-    else if (preg_match('/^CMM/', $sysDescr)) {
-        $os = 'cambium';
-    }
     else if (strstr($sysObjectId, '.1.3.6.1.4.1.17713.21')) {
         $os = 'cambium';
     }
