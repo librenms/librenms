@@ -34,7 +34,7 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         // FIXME Also interesting to poll? dhcpNumber.0 for number of active dhcp leases
     }
 
-    if ($device['os'] == 'ios' and substr($device['hardware'], 0, 4) == 'AIR-') {
+    if ($device['os'] == 'ios' and substr($device['hardware'], 0, 4) == 'AIR-' || ($device['os'] == 'ios' && strpos($device['hardware'], 'ciscoAIR') !== false)) {
         echo 'Checking Aironet Wireless clients... ';
 
         $wificlients1 = snmp_get($device, 'cDot11ActiveWirelessClients.1', '-OUqnv', 'CISCO-DOT11-ASSOCIATION-MIB');
