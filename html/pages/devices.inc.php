@@ -283,7 +283,7 @@ else {
 <script>
 
     searchbar = "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<div class=\"col-sm-11 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
                 "<span class=\"pull-left\"><div class=\"form-group\">"+
                 "<input type=\"text\" name=\"hostname\" id=\"hostname\" value=\"<?php echo($vars['hostname']); ?>\" class=\"form-control input-sm\" placeholder=\"Hostname\"/>"+
                 "</div>"+
@@ -441,7 +441,7 @@ else {
                       "<a href=\"<?php echo(generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']))); ?>\" title=\"Reset critera to default.\" >&nbsp;Reset</a>"+
                       "</div>"+
                       "</form></span></div>"+
-                      "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+                      "<div class=\"col-sm-1 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
 
 <?php
     if (isset($vars['searchbar']) && $vars['searchbar'] == "hide") {

@@ -27,7 +27,7 @@ var grid = $("#inventory").bootgrid({
     ajax: true,
     templates: {
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
-                "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<div class=\"col-sm-10 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"string\" id=\"string\" value=\"<?php echo $_POST['string']; ?>\" placeholder=\"Description\" class=\"form-control input-sm\" />"+
                 "</div>"+
@@ -79,7 +79,7 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
                  "</div>"+
                  "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
                  "</form></span></div>"+
-                 "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+                 "<div class=\"col-sm-2 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
     },
     post: function ()
     {
