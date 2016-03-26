@@ -48,14 +48,14 @@ else {
       <ul class="nav navbar-nav">
         <li class="dropdown">
           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Overview</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
-          <li class="dropdown-submenu">
-            <a><i class="fa fa-exclamation-circle fa-fw fa-lg"> </i> Alerts</a>
-            <ul class="dropdown-menu scrollable-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
+          <ul class="dropdown-menu multi-level" role="menu">
+             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
+             <li class="dropdown-submenu">
+                <a><i class="fa fa-exclamation-circle fa-fw fa-lg"> </i> Alerts</a>
+                <ul class="dropdown-menu scrollable-menu">
+                    <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
@@ -70,9 +70,24 @@ if ($_SESSION['userlevel'] >= '10') {
           </li>
           <li class="dropdown-submenu">
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Maps</a>
-           <ul class="dropdown-menu scrollable-menu">
-           <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
-           <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a></li>
+           <ul class="dropdown-menu">
+                <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
+               <li>
+                    <a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a>
+               </li>
+                <?php
+
+                    require_once '../includes/device-groups.inc.php';
+                    $devices_groups = GetDeviceGroups();
+                    if (count($devices_groups) > 0 ){
+                        echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">';
+                        foreach( $devices_groups as $group ) {
+                            echo '<li><a href="'.generate_url(array('page'=>'map','group'=>$group['id'])).'" alt="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
+                        }
+                        unset($group);
+                        echo '</ul></li>';
+                    }
+                ?>
            </ul>
           </li>
           <li class="dropdown-submenu">
@@ -145,8 +160,6 @@ foreach (dbFetchRows($sql,$param) as $devtype) {
 
         echo ('</ul>
              </li>');
-            require_once '../includes/device-groups.inc.php';
-            $devices_groups = GetDeviceGroups();
             if (count($devices_groups) > 0 ){
                 echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups</a><ul class="dropdown-menu scrollable-menu">';
                 foreach( $devices_groups as $group ) {
@@ -420,7 +433,13 @@ $routing_count['ospf'] = dbFetchCell("SELECT COUNT(ospf_instance_id) FROM `ospf_
 $routing_count['cef']  = dbFetchCell("SELECT COUNT(cef_switching_id) from `cef_switching`");
 $routing_count['vrf']  = dbFetchCell("SELECT COUNT(vrf_id) from `vrfs`");
 
-if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']) > "0") {
+require_once "../includes/component.php";
+$component = new component();
+$options['type'] = 'Cisco-OTV';
+$otv = $component->getComponents(null,$options);
+$routing_count['cisco-otv'] = count($otv);
+
+if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf']+$routing_count['cef']+$routing_count['vrf']+$routing_count['cisco-otv']) > "0") {
 
 ?>
         <li class="dropdown">
@@ -440,6 +459,16 @@ if ($_SESSION['userlevel'] >= '5' && ($routing_count['bgp']+$routing_count['ospf
             $separator = 0;
         }
         echo('<li><a href="routing/protocol=ospf/"><i class="fa fa-circle-o-notch fa-rotate-180 fa-fw fa-lg"></i> OSPF Devices </a></li>');
+        $separator++;
+    }
+
+    // Cisco OTV Links
+    if ($_SESSION['userlevel'] >= '5' && $routing_count['cisco-otv']) {
+        if ($separator) {
+            echo('            <li role="presentation" class="divider"></li>');
+            $separator = 0;
+        }
+        echo('<li><a href="routing/protocol=cisco-otv/"><i class="fa fa-exchange fa-fw fa-lg"></i> Cisco OTV </a></li>');
         $separator++;
     }
 

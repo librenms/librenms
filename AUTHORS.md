@@ -6,6 +6,7 @@ LibreNMS core team:
 - Daniel Preussker <f0o@librenms.org> (f0o)
 - Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
 - Mike Rostermund <mike@kollegienet.dk> (SaaldjorMike)
+- Tony Murray <tonym@librenms.org> (murrant)
 
 LibreNMS contributors:
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
@@ -67,11 +68,11 @@ LibreNMS contributors:
 - Robert Gornall <roblnm@khobbits.co.uk> (KHobbits)
 - Rob Gormley <robert@gormley.me> (rgormley)
 - Richard Kojedzinszky <krichy@nmdps.net> (rkojedzinszky)
-- Tony Murray <murraytony@gmail.com> (murrant)
 - Peter Lamperud <peter.lamperud@gmail.com> (vizay)
 - Louis Bailleul <louis.bailleul@gmail.com> (alucardfh)
 - Rick Hodger <rick@fuzzi.org.uk> (Tatermen)
 - Eldon Koyle <ekoyle@gmail.com> (ekoyle)
+- Jay McEntire <jay.mcentire@gmail.com> (jmacul2)
 - Jonathan Bailey <jcbailey@code0.net> (jcbailey2)
 - Ruairi Carroll <ruairi.carroll@gmail.com> (rucarrol)
 - Maxim Tsyplakov <maxim.tsyplakov@gmail.com> (tsypa)
@@ -83,6 +84,14 @@ LibreNMS contributors:
 - Maximilian Wilhelm <max@rfc2324.org> (BarbarossaTM)
 - Jameson Finney <jameson.finney@gmail.com> (JamesonFinney)
 - John Wells <john.wells@greatworx.com> (jbwiv)
+- Henoc Khouilla <henoc.khouilla@gmail.com> (henocKA)
+- Paul Blasquez <pblasquez@gmail.com> (pblasquez)
+- Paul Heinrichs <pdheinrichs@gmail.com> (pheinrichs)
+- Georges Dick <georges.dick@gmail.com> (GeorgesDick)
+- Richard Lawley <richard@richardlawley.com> (richardlawley)
+- Marco Di Cerbo <marco@dottoremoe.com> (marcodc)
+- David Bell <me@geordish.org> (geordish)
+- Ibrahim Tachijian <barhom@netsat.se> (barhom)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
@@ -90,3 +99,4 @@ Observium was written by:
 - Tom Laermans
 - various others as indicated in the file contents and commit logs
 
+ 

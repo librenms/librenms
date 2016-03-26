@@ -64,10 +64,13 @@ echo "
            $since
          </td>
          <td>
-           <span class=box-desc>$message</span>
+           <span class='box-desc'>$message</span>
          </td>
          <td>
-           <span class=box-desc>$desc</span>
+           <span class='box-desc'>$desc</span>
+         </td>
+         <td>
+           <span class='box-desc'>$checked</span>
          </td>
        </tr>";
 

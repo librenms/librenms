@@ -18,40 +18,17 @@ if (isset($options['d'])) {
 }
 
 if ($options['f'] === 'update') {
-    $innodb_buffer = innodb_buffer_check();
-    if ($innodb_buffer['used'] > $innodb_buffer['size']) {
-        if (!empty($config['alert']['default_mail'])) {
-            $subject = $config['project_name'] . ' auto-update action required';
-            $message = '
-Hi,
-
-We have just tried to update your installation but it looks like the InnoDB buffer size is too low.
-
-Because of this we have stopped the auto-update running to ensure your system is ok.
-
-You currently have a configured innodb_buffer_pool_size of ' . $innodb_buffer['size'] / 1024 / 1024 . ' MiB but is currently using ' . $innodb_buffer['used'] / 1024 / 1024 . ' MiB
-
-Take a look at https://dev.mysql.com/doc/refman/5.6/en/innodb-buffer-pool.html for further details.
-
-The ' . $config['project_name'] . ' team.';
-            send_mail($config['alert']['default_mail'],$subject,$message,$html=false);
-        }
-        echo warn_innodb_buffer($innodb_buffer);
-        exit(2);
+    if (!$config['update']) {
+        exit(0);
     }
-    else {
-        if ($config['update']) {
-            if ($config['update_channel'] == 'master') {
-                exit(1);
-            }
-            elseif ($config['update_channel'] == 'release') {
-                exit(3);
-            }
-        }
-        else {
-            exit(0);
-        }
+
+    if ($config['update_channel'] == 'master') {
+        exit(1);
     }
+    elseif ($config['update_channel'] == 'release') {
+        exit(3);
+    }
+    exit(0);
 }
 
 if ($options['f'] === 'syslog') {
@@ -114,6 +91,27 @@ if ($options['f'] === 'device_perf') {
 
 if ($options['f'] === 'notifications') {
     include_once 'includes/notifications.php';
+}
+
+if ($options['f'] === 'bill_data') {
+    if (is_numeric($config['billing_data_purge']) && $config['billing_data_purge'] > 0) {
+        # Deletes data older than XX months before the start of the last complete billing period
+        $months = $config['billing_data_purge'];
+        echo "Deleting billing data more than $months month before the last completed billing cycle\n";
+        $sql = "DELETE bill_data
+                FROM bill_data
+                    INNER JOIN (SELECT bill_id, 
+                        SUBDATE(
+                            SUBDATE(
+                                ADDDATE(
+                                    subdate(curdate(), (day(curdate())-1)),             # Start of this month
+                                    bill_day - 1),                                      # Billing anniversary
+                                INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
+                            INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
+                FROM bills) q
+                ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
+        dbQuery($sql, array($months));
+    }
 }
 
 if ($options['f'] === 'purgeusers') {

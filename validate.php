@@ -43,7 +43,7 @@ if (strstr(`php -ln config.php`, 'No syntax errors detected')) {
         print_fail('config.php contains a new line at the end, please remove any whitespace at the end of the file and also remove ?>');
     }
     else if ($last_lines[1] == '?>') {
-        print_warn("It looks like you have ?> at the end of config.php, it's suggested you remove this");
+        print_warn("It looks like you have ?> at the end of config.php, it is suggested you remove this");
     }
 }
 else {
@@ -78,7 +78,6 @@ echo "PHP: ".$versions['php_ver']."\n";
 echo "MySQL: ".$versions['mysql_ver']."\n";
 echo "RRDTool: ".$versions['rrdtool_ver']."\n";
 echo "SNMP: ".$versions['netsnmp_ver']."\n";
-
 
 // Check php modules we use to make sure they are loaded
 $extensions = array('pcre','curl','session','snmp','mcrypt');
@@ -140,7 +139,7 @@ if(strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
 // Test for MySQL InnoDB buffer size
 $innodb_buffer = innodb_buffer_check();
 if ($innodb_buffer['used'] > $innodb_buffer['size']) {
-    print_fail('Your Innodb buffer size is not big enough...');
+    print_warn("Your Innodb buffer is full, consider increasing its size");
     echo warn_innodb_buffer($innodb_buffer);
 }
 
@@ -161,6 +160,10 @@ if (!$config['rrdcached']) {
     }
 }
 
+if (isset($config['rrdcached'])) {
+    check_rrdcached();
+}
+
 // Disk space and permission checks
 if (substr(sprintf('%o', fileperms($config['temp_dir'])), -3) != 777) {
     print_warn('Your tmp directory ('.$config['temp_dir'].") is not set to 777 so graphs most likely won't be generated");
@@ -176,13 +179,25 @@ if ($space_check < 1) {
 }
 
 // Check programs
-$bins = array('fping');
+$bins = array('fping','rrdtool','snmpwalk','snmpget','snmpbulkwalk');
 foreach ($bins as $bin) {
     if (!is_file($config[$bin])) {
         print_fail("$bin location is incorrect or bin not installed");
     }
-    else {
-        print_ok("$bin has been found");
+}
+
+$disabled_functions = explode(',', ini_get('disable_functions'));
+$required_functions = array('exec','passthru','shell_exec','escapeshellarg','escapeshellcmd','proc_close','proc_open','popen');
+foreach ($required_functions as $function) {
+    if (in_array($function, $disabled_functions)) {
+        print_fail("$function is disabled in php.ini");
+    }
+}
+
+if (!function_exists('openssl_random_pseudo_bytes')) {
+    print_warn("openssl_random_pseudo_bytes is not being used for user password hashing. This is a recommended function (https://secure.php.net/openssl_random_pseudo_bytes)");
+    if (!is_readable('/dev/urandom')) {
+        print_warn("It also looks like we can't use /dev/urandom for user password hashing. We will fall back to generating our own hash - be warned");
     }
 }
 
@@ -198,24 +213,26 @@ foreach ($modules as $module) {
                 $run_test = 0;
             }
             else if ($config['email_backend'] == 'sendmail') {
-                if (empty($config['email_sendmail_path']) || !file_exists($config['email_sendmail_path'])) {
-                    print_fail("You have selected sendmail but not configured email_sendmail_path or it's not valid");
+                if (empty($config['email_sendmail_path'])) {
+                    print_fail("You have selected sendmail but not configured email_sendmail_path");
+                    $run_test = 0;
+                }
+                elseif (!file_exists($config['email_sendmail_path'])) {
+                    print_fail("The configured email_sendmail_path is not valid");
                     $run_test = 0;
                 }
             }
             else if ($config['email_backend'] == 'smtp') {
                 if (empty($config['email_smtp_host'])) {
-                    print_fail('You have selected smtp but not configured an smtp host');
+                    print_fail('You have selected SMTP but not configured an SMTP host');
                     $run_test = 0;
                 }
-
                 if (empty($config['email_smtp_port'])) {
-                    print_fail('You have selected smtp but not configured an smtp port');
+                    print_fail('You have selected SMTP but not configured an SMTP port');
                     $run_test = 0;
                 }
-
                 if (($config['email_smtp_auth'] === true) && (empty($config['email_smtp_username']) || empty($config['email_smtp_password']))) {
-                    print_fail('You have selected smtp but not configured a username or password');
+                    print_fail('You have selected SMTP auth but have not configured both username and password');
                     $run_test = 0;
                 }
             }//end if
@@ -257,15 +274,7 @@ foreach ($modules as $module) {
                 print_fail('You have not configured $config[\'rrd_dir\']');
             }
             else {
-                list($host,$port) = explode(':',$config['rrdcached']);
-                $connection = @fsockopen($host, $port);
-                if (is_resource($connection)) {
-                    fclose($connection);
-                    print_ok('Connection to rrdcached is ok');
-                }
-                else {
-                    print_fail('Cannot connect to rrdcached instance');
-                }
+                check_rrdcached();
             }
         }
         break;
@@ -317,17 +326,34 @@ foreach ($modules as $module) {
 
 function print_ok($msg) {
     echo "[OK]      $msg\n";
-
 }//end print_ok()
 
 
 function print_fail($msg) {
     echo "[FAIL]    $msg\n";
-
 }//end print_fail()
 
 
 function print_warn($msg) {
     echo "[WARN]    $msg\n";
-
 }//end print_warn()
+
+function check_rrdcached() {
+    global $config;
+    list($host,$port) = explode(':',$config['rrdcached']);
+    if ($host == 'unix') {
+        // Using socket, check that file exists
+        if (!file_exists($port)) {
+            print_fail("$port doesn't appear to exist, rrdcached test failed");
+        }
+    }
+    else {
+        $connection = @fsockopen($host, $port);
+        if (is_resource($connection)) {
+            fclose($connection);
+        }
+        else {
+            print_fail('Cannot connect to rrdcached instance');
+        }
+    }
+}//end check_rrdcached

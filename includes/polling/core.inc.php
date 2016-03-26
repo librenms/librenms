@@ -14,7 +14,7 @@
 
 unset($poll_device);
 
-$snmpdata    = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysDescr.0 sysObjectID.0', '-OQnUs', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+$snmpdata    = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 sysDescr.0 sysObjectID.0', '-OQnUst', 'SNMPv2-MIB:HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
 $poll_device = $snmpdata[0];
 $poll_device['sysName']     = strtolower($poll_device['sysName']);
 
@@ -25,35 +25,20 @@ if (!empty($agent_data['uptime'])) {
 }
 
 if (empty($uptime)) {
-    $snmp_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUs', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
+    $snmp_data = snmp_get_multi($device, 'snmpEngineTime.0 hrSystemUptime.0', '-OQnUst', 'HOST-RESOURCES-MIB:SNMP-FRAMEWORK-MIB');
     $uptime_data = $snmp_data[0];
     $snmp_uptime = (integer) $uptime_data['snmpEngineTime'];
     $hrSystemUptime = $uptime_data['hrSystemUptime'];
     if (!empty($hrSystemUptime) && !strpos($hrSystemUptime, 'No') && ($device['os'] != 'windows')) {
-        echo 'Using hrSystemUptime ('.$hrSystemUptime.")\n";
-        $agent_uptime = $uptime;
         // Move uptime into agent_uptime
-        // HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
-        $hrSystemUptime                  = str_replace('(', '', $hrSystemUptime);
-        $hrSystemUptime                  = str_replace(')', '', $hrSystemUptime);
-        list($days,$hours, $mins, $secs) = explode(':', $hrSystemUptime);
-        list($secs, $microsecs)          = explode('.', $secs);
-        $hours  = ($hours + ($days * 24));
-        $mins   = ($mins + ($hours * 60));
-        $secs   = ($secs + ($mins * 60));
-        $uptime = $secs;
+        $agent_uptime = $uptime;
+
+        $uptime = floor($hrSystemUptime / 100);
+        echo 'Using hrSystemUptime ('.$uptime."s)\n";
     }
     else {
-        echo 'Using SNMP Agent Uptime ('.$poll_device['sysUpTime'].")\n";
-        // SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
-        $poll_device['sysUpTime']         = str_replace('(', '', $poll_device['sysUpTime']);
-        $poll_device['sysUpTime']         = str_replace(')', '', $poll_device['sysUpTime']);
-        list($days, $hours, $mins, $secs) = explode(':', $poll_device['sysUpTime']);
-        list($secs, $microsecs)           = explode('.', $secs);
-        $hours  = ($hours + ($days * 24));
-        $mins   = ($mins + ($hours * 60));
-        $secs   = ($secs + ($mins * 60));
-        $uptime = $secs;
+        $uptime = floor($poll_device['sysUpTime'] / 100);
+        echo 'Using SNMP Agent Uptime ('.$uptime."s)\n";
     }//end if
 }//end if
 
@@ -85,7 +70,7 @@ $poll_device['sysLocation'] = str_replace('"', '', $poll_device['sysLocation']);
 $poll_device['sysLocation'] = trim($poll_device['sysLocation'], '\\');
 
 // Rewrite sysLocation if there is a mapping array (database too?)
-if (!empty($poll_device['sysLocation']) && is_array($config['location_map'])) {
+if (!empty($poll_device['sysLocation']) && (is_array($config['location_map']) || is_array($config['location_map_regex']))) {
     $poll_device['sysLocation'] = rewrite_location($poll_device['sysLocation']);
 }
 

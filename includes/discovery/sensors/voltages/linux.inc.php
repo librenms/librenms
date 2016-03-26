@@ -1,7 +1,7 @@
 <?php
 
 // LMSensors Voltages
-if ($device['os'] == 'linux') {
+if ($device['os'] == 'linux' || $device['os'] == 'pktj' || $device['os'] == 'cumulus') {
     $oids = snmp_walk($device, 'lmVoltSensorsDevice', '-OsqnU', 'LM-SENSORS-MIB');
     d_echo($oids."\n");
 

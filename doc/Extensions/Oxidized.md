@@ -12,14 +12,13 @@ $config['oxidized']['enabled']         = TRUE;
 $config['oxidized']['url']             = 'http://127.0.0.1:8888';
 ```
 
-We also support config versioning within Oxidized, this will allow you to see the old configs stored.
-
+LibreNMS supports config versioning if Oxidized does.  This is known to work with the git output module.
 ```php
 $config['oxidized']['features']['versioning'] = true;
 ```
 
 Oxidized supports various ways to utilise credentials to login to devices, you can specify global username/password within Oxidized, Group level username/password or per device.
-We currently support sending groups back to Oxidized so that you can then define group credentials within Oxidized. To enable this support please switch on 'Enable the return of groups to Oxidized':
+LibreNMS currently supports sending groups back to Oxidized so that you can then define group credentials within Oxidized. To enable this support please switch on 'Enable the return of groups to Oxidized':
 
 ```php
 $config['oxidized']['group_support'] = true;
@@ -35,7 +34,7 @@ $config['oxidized']['default_group'] = 'default';
 
 Oxidized has support for feeding devices into it via an API call, support for Oxidized has been added to the LibreNMS API. A sample config for Oxidized is provided below.
 
-You will need to configure default credentials for your devices, LibreNMS doesn't provide login credentials at this time.
+You will need to configure default credentials for your devices in the Oxidized config, LibreNMS doesn't provide login credentials at this time.
 
 ```bash
       source:
@@ -61,14 +60,20 @@ $config['oxidized']['reload_nodes'] = TRUE;
 
 ```
 
-### Using Groups
+#### Using Groups
 
-To return a group to Oxidized you can do this by matching a regex for either hostname or location. The order is hostname is matched first, if nothing is found then location is attempted.
+To return a group to Oxidized you can do this by matching a regex for either hostname, os or location. The order is hostname is matched first, if nothing is found then os is tried and then location is attempted.
 The first match found will be used. To match on the device hostnames that contain 'lon-sw' or if the location contains 'London' then you would place the following within config.php:
 
 ```php
 $config['oxidized']['group']['hostname'][] = array('regex' => '/^lon-sw/', 'group' => 'london-switches');
 $config['oxidized']['group']['location'][] = array('regex' => '/london/', 'group' => 'london-switches');
+```
+
+To match on a device os of edgeos then please use the following:
+
+```php
+$config['oxidized']['group']['os'][] = array('match' => 'edgeos', 'group' => 'wireless');
 ```
 
 If you need to, you can specify credentials for groups by using the following in your Oxidized config:
@@ -80,7 +85,7 @@ groups:
     password: <password>
 ```
 
-### Miscellaneous
+#### Miscellaneous
 
 If you have devices which you do not wish to appear in Oxidized then you can edit those devices in Device -> Edit -> Misc and enable "Exclude from Oxidized?"
 

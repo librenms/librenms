@@ -21,7 +21,12 @@ if (is_numeric($users)) {
     if (!is_file($usersrrd)) {
         rrdtool_create($usersrrd, ' DS:users:GAUGE:600:0:U'.$config['rrd_rra']);
     }
-    rrdtool_update($usersrrd, "N:$users");
+
+    $fields = array(
+        'users' => $users,
+    );
+
+    rrdtool_update($usersrrd, $fields);
     $graphs['pulse_users'] = true;
 }
 
@@ -32,6 +37,11 @@ if (is_numeric($sessions)) {
     if (!is_file($sessrrd)) {
         rrdtool_create($sessrrd, ' DS:sessions:GAUGE:600:0:U '.$config['rrd_rra']);
     }
-    rrdtool_update($sessrrd, "N:$sessions");
+
+    $fields = array(
+        'sessions' => $sessions,
+    );
+
+    rrdtool_update($sessrrd, $fields);
     $graphs['pulse_sessions'] = true;
 }

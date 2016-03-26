@@ -210,6 +210,16 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             $routing_tabs[] = 'vrf';
         }
 
+        require_once "../includes/component.php";
+        $component = new component();
+        $options['type'] = 'Cisco-OTV';
+        $options['filter']['device_id'] = array('=',$device['device_id']);
+        $otv = $component->getComponents(null,$options);
+        $device_routing_count['cisco-otv'] = count($otv);
+        if ($device_routing_count['cisco-otv'] > 0) {
+            $routing_tabs[] = 'cisco-otv';
+        }
+
         if (is_array($routing_tabs)) {
             echo '<li class="'.$select['routing'].'">
                 <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
@@ -304,7 +314,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 </li>';
         }
 
-        if ($_SESSION['userlevel'] >= '7') {
+        if (is_admin()) {
             if (!is_array($config['rancid_configs'])) {
                 $config['rancid_configs'] = array($config['rancid_configs']);
             }
@@ -388,19 +398,25 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
         }
 
 
-        echo '<li style="float: right;"><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"></a></li>
-            <li style="float: right;"><a href="ssh://'.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"></a></li>
-            <li style="float: right;"><a href="telnet://'.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"></a></li>';
-
-        if ($_SESSION['userlevel'] >= '7') {
-            echo '<li class="'.$select['edit'].'" style="float: right;">
+        echo '<div class="dropdown pull-right">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-cog"></i>
+              <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li><a href="https://'.$device['hostname'].'"><img src="images/16/http.png" alt="https" title="Launch browser to https://'.$device['hostname'].'" border="0" width="16" height="16" target="_blank"> Launch</a></li>
+                <li><a href="ssh://'.$device['hostname'].'"><img src="images/16/ssh.png" alt="ssh" title="SSH to '.$device['hostname'].'" border="0" width="16" height="16"> SSH</a></li>
+                 <li><a href="telnet://'.$device['hostname'].'"><img src="images/16/telnet.png" alt="telnet" title="Telnet to '.$device['hostname'].'" border="0" width="16" height="16"> Telnet</a></li>';
+              if (is_admin()) {
+                echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
                 <img src="images/16/wrench.png" align="absmiddle" border="0" />
+                 Edit
                 </a>
                 </li>';
-        }
-
+                }
+              echo '</ul>
+            </div>';
         echo '</ul>';
+        
     }//end if
 
     if (device_permitted($device['device_id']) || $check_device == $vars['device']) {

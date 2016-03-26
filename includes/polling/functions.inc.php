@@ -83,7 +83,7 @@ function poll_sensor($device, $class, $unit) {
             $sensor_value = 0;
         }
 
-        if ($sensor['sensor_divisor']) {
+        if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
             $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
         }
 
@@ -122,7 +122,11 @@ function poll_sensor($device, $class, $unit) {
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
 
-        dbUpdate(array('sensor_current' => $sensor_value, 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class, $sensor['sensor_id']));
+        if ($sensor['sensor_class'] == 'state' && $sensor['sensor_current'] != $sensor_value) {
+            log_event($class . ' sensor has changed from ' . $sensor['sensor_current'] . ' to ' . $sensor_value, $device, $class, $sensor['sensor_id']);
+        }
+
+        dbUpdate(array('sensor_current' => $sensor_value, 'sensor_prev' => $sensor['sensor_current'], 'lastupdate' => array('NOW()')), 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', array($class,$sensor['sensor_id']));
     }//end foreach
 
 }//end poll_sensor()
@@ -203,9 +207,8 @@ function poll_device($device, $options) {
         $poll_separator = ', ';
 
         dbUpdate(array('status' => $status, 'status_reason' => $response['status_reason']), 'devices', 'device_id=?', array($device['device_id']));
-        dbInsert(array('importance' => '0', 'device_id' => $device['device_id'], 'message' => 'Device is '.($status == '1' ? 'up' : 'down')), 'alerts');
 
-        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
+        log_event('Device status changed to '.($status == '1' ? 'Up' : 'Down'). ' from ' . $response['status_reason'] . ' check.', $device, ($status == '1' ? 'up' : 'down'));
     }
 
     if ($status == '1') {

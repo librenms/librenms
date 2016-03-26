@@ -379,10 +379,15 @@ NFSen integration support.
 
 #### Location mapping
 
+Exact Matching:
 ```php
 $config['location_map']['Under the Sink'] = "Under The Sink, The Office, London, UK";
 ```
-The above is an example, this will rewrite basic snmp locations so you don't need to configure full location within snmp.
+Regex Matching:
+```php
+$config['location_map_regex']['/Sink/'] = "Under The Sink, The Office, London, UK";
+```
+The above are examples, these will rewrite device snmp locations so you don't need to configure full location within snmp.
 
 #### Interfaces to be ignored
 

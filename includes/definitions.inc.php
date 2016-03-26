@@ -228,6 +228,30 @@ $config['os'][$os]['over'][1]['text']  = 'Processor Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'pktj';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['group']            = 'unix';
+$config['os'][$os]['text']             = 'Gandi Packet Journey';
+$config['os'][$os]['icon']             = 'gandi';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'cumulus';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['group']            = 'unix';
+$config['os'][$os]['text']             = 'Cumulus Linux';
+$config['os'][$os]['icon']             = 'cumulus';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Other Unix-based OSes here please.
 $os = 'freebsd';
 $config['os'][$os]['type']  = 'server';
@@ -310,6 +334,23 @@ $config['os'][$os]['type']             = 'loadbalancer';
 $config['os'][$os]['icon']             = 'barracuda';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+$os = 'barracudaspamfirewall';
+$config['os'][$os]['text']             = 'Barracuda Spam Firewall';
+$config['os'][$os]['type']             = 'firewall';
+$config['os'][$os]['icon']             = 'barracuda';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// Calix
+$os = 'calix';
+$config['os'][$os]['text']             = 'Calix E7';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['empty_ifdescr']    = 1;
+$config['os'][$os]['icon']             = 'calix';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 // Cisco OSes
 $os = 'ios';
@@ -466,6 +507,19 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'brocade';
 
+// Brocade/Foundry ServerIron
+$os = 'serveriron';
+$config['os'][$os]['text']             = 'Brocade ServerIron';
+$config['os'][$os]['type']             = 'loadbalancer';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['icon']             = 'brocade';
+
 // Cisco Small Business
 $os = 'ciscosb';
 $config['os'][$os]['group']            = 'cisco';
@@ -596,6 +650,13 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'juniperex2500os';
+$config['os'][$os]['text']             = 'Juniper EX2500';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'junos';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 // Pulse Secure OS definition
 $os = 'pulse';
@@ -999,6 +1060,13 @@ $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 
+$os = 'avtech';
+$config['os'][$os]['text']             = 'Avtech Environment Sensor';
+$config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['icon']             = 'avtech';
+$config['os'][$os]['over'][0]['graph'] = 'device_temperature';
+$config['os'][$os]['over'][0]['text']  = 'Temperature';
+
 $os = 'netbotz';
 $config['os'][$os]['text']             = 'Netbotz Environment sensor';
 $config['os'][$os]['type']             = 'environment';
@@ -1175,6 +1243,7 @@ $os ='canonprinter';
 $config['os'][$os]['group']            = 'printer';
 $config['os'][$os]['text']             = 'Canon Printer';
 $config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['icon']             = 'canon';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
@@ -1183,6 +1252,14 @@ $config['os'][$os]['group']            = 'printer';
 $config['os'][$os]['text']             = 'Lexmark Printer';
 $config['os'][$os]['type']             = 'printer';
 $config['os'][$os]['icon']             = 'lexmark';
+$config['os'][$os]['over'][0]['graph'] = 'device_toner';
+$config['os'][$os]['over'][0]['text']  = 'Toner';
+
+$os ='developprinter';
+$config['os'][$os]['group']            = 'printer';
+$config['os'][$os]['text']             = 'Develop Printer';
+$config['os'][$os]['type']             = 'printer';
+$config['os'][$os]['icon']             = 'develop';
 $config['os'][$os]['over'][0]['graph'] = 'device_toner';
 $config['os'][$os]['over'][0]['text']  = 'Toner';
 
@@ -1273,6 +1350,12 @@ $config['os'][$os]['text']  = 'Synology DSM';
 $config['os'][$os]['group'] = 'unix';
 $config['os'][$os]['type']  = 'storage';
 $config['os'][$os]['icon']  = 'synology';
+$config['os'][$os]['over'][0]['graph'] = 'device_processor';
+$config['os'][$os]['over'][0]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][1]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][1]['text']  = 'Memory Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_storage';
+$config['os'][$os]['over'][2]['text']  = 'Storage Usage';
 
 $os = 'hikvision';
 $config['os'][$os]['text'] = 'Hikvision';
@@ -1473,6 +1556,14 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+// Deliberant WiFi
+$os = 'deliberant';
+$config['os'][$os]['text']             = 'Deliberant OS';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'deliberant';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';

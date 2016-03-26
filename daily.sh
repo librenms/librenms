@@ -33,7 +33,10 @@ status_run() {
 
 if [ -z "$arg" ]; then
     up=$(php daily.php -f update >&2; echo $?)
-    if [ "$up" -eq 1 ]; then
+    if [ "$up" -eq 0 ]; then
+        $0 no-code-update
+        exit
+    elif [ "$up" -eq 1 ]; then
         # Update to Master-Branch
         status_run 'Updating to latest codebase' 'git pull --quiet'
     elif [ "$up" -eq 3 ]; then
@@ -49,6 +52,12 @@ if [ -z "$arg" ]; then
     fi
 else
     case $arg in
+        no-code-update)
+            # Updates of the code are disabled, just check for schema updates
+            # and clean up the db.
+            status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
+            status_run 'Cleaning up DB' "$0 cleanup"
+        ;;
         post-pull)
             # List all tasks to do after pull in the order of execution
             status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
@@ -65,6 +74,7 @@ else
             php daily.php -f callback
             php daily.php -f device_perf
             php daily.php -f purgeusers
+            php daily.php -f bill_data
         ;;
         submodules)
             # Init+Update our submodules

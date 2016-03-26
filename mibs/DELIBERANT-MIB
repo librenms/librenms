@@ -1,0 +1,36 @@
+--
+--  Deliberant 802.11 Central Configuration Module
+--
+
+DELIBERANT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+deliberant MODULE-IDENTITY
+    LAST-UPDATED    "200809050000Z"
+    ORGANIZATION    "Deliberant"
+    CONTACT-INFO    "
+        Deliberant Customer Support
+        E-mail: support@deliberant.com"
+    DESCRIPTION
+        "Deliberant central configuration module."
+    REVISION    "200809050000Z"
+    DESCRIPTION
+        "First revision."
+    ::= { enterprises 32761 }
+
+-- subtree for product specific MIBs
+dlbProducts        OBJECT IDENTIFIER ::= { deliberant 1 }
+
+-- subtree for administrative information about product
+dlbAdmin           OBJECT IDENTIFIER ::= { deliberant 2 }
+
+-- subtree for management objects
+dlbMgmt            OBJECT IDENTIFIER ::= { deliberant 3 }
+
+-- subtree for experiments
+dlbExperimental    OBJECT IDENTIFIER ::= { deliberant 7 }
+END
+

@@ -79,32 +79,27 @@ function getValue($host, $port, $id, $inout) {
 
 }//end getValue()
 
-
-function getLastPortCounter($port_id, $inout) {
+function getLastPortCounter($port_id) {
     $return = array();
-    $rows   = dbFetchCell('SELECT count(counter) from `port_'.mres($inout)."_measurements` WHERE `port_id`='".mres($port_id)."'");
-
-    if ($rows > 0) {
-        $row             = dbFetchRow('SELECT counter,delta FROM `port_'.mres($inout)."_measurements` WHERE `port_id`='".mres($port_id)."' ORDER BY timestamp DESC");
-        $return[counter] = $row['counter'];
-        $return[delta]   = $row['delta'];
-        $return[state]   = 'ok';
-    }
+    $row    = dbFetchRow("SELECT in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ?", array($port_id));
+    if (!is_null($row)) {
+        $return[in_counter]  = $row['in_counter'];
+        $return[in_delta]    = $row['in_delta'];
+        $return[out_counter] = $row['out_counter'];
+        $return[out_delta]   = $row['out_delta'];
+        $return[state]       = 'ok';
+    } 
     else {
-        $return[state] = 'failed';
+        $return[state]       = 'failed';
     }
-
-    return ($return);
-
+    return $return;
 }//end getLastPortCounter()
 
 
 function getLastMeasurement($bill_id) {
     $return = array();
-    $rows   = dbFetchCell("SELECT count(delta) from bill_data WHERE bill_id='".mres($bill_id)."'");
-
-    if ($rows > 0) {
-        $row               = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id='".mres($bill_id)."' ORDER BY timestamp DESC");
+    $row    = dbFetchRow("SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1", array($bill_id));
+    if (!is_null($row)) {
         $return[delta]     = $row['delta'];
         $return[delta_in]  = $row['delta_in'];
         $return[delta_out] = $row['delta_out'];
@@ -114,9 +109,7 @@ function getLastMeasurement($bill_id) {
     else {
         $return[state] = 'failed';
     }
-
     return ($return);
-
 }//end getLastMeasurement()
 
 
