@@ -74,13 +74,13 @@ print_optionbar_end();
 $sql_param = array();
 if (isset($vars['state'])) {
     if ($vars['state'] == 'ok') {
-        $state = '1';
-    }
-    elseif ($vars['state'] == 'critical') {
         $state = '0';
     }
-    elseif ($vars['state'] == 'warning') {
+    elseif ($vars['state'] == 'critical') {
         $state = '2';
+    }
+    elseif ($vars['state'] == 'warning') {
+        $state = '1';
     }
 }
 if (isset($state)) {
@@ -123,10 +123,10 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
     }
 
     foreach (dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where", $sql_param) as $service) {
-        if ($service['service_status'] == '0') {
+        if ($service['service_status'] == '2') {
             $status = "<span class='red'><b>".$service['service_type']."</b></span>";
         }
-        else if ($service['service_status'] == '1') {
+        else if ($service['service_status'] == '0') {
             $status = "<span class='green'><b>".$service['service_type']."</b></span>";
         }
         else {
