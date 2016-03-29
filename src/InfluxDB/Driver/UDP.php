@@ -59,6 +59,14 @@ class UDP implements DriverInterface
     }
 
     /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
      * Send the data
      *
      * @param $data
