@@ -1,5 +1,5 @@
-# Created by .gitignore support plugin (hsz.mobi)
-
+.vagrant
+.DS_Store
 vendor/
 .idea
 build/
