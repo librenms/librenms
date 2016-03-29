@@ -27,3 +27,4 @@ require 'includes/discovery/sensors/charge.inc.php';
 require 'includes/discovery/sensors/load.inc.php';
 require 'includes/discovery/sensors/states.inc.php';
 require 'includes/discovery/sensors/dbm.inc.php';
+require 'includes/discovery/sensors/signal.inc.php';
