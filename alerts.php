@@ -340,8 +340,13 @@ function ExtTransports($obj) {
             $msg        = FormatAlertTpl($obj);
             $obj['msg'] = $msg;
             echo $transport.' => ';
-            eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
-            $tmp = $tmp($obj,$opts);
+            if ($transport == "canopsis") {
+                $tmp = eval ('global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false;');
+            }
+            else {
+                eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
+                $tmp = $tmp($obj,$opts);
+            }
             $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
             $prefix[3] = &$prefix[0];
             $prefix[4] = &$prefix[0];
