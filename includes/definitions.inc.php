@@ -240,6 +240,18 @@ $config['os'][$os]['over'][1]['text']  = 'Processor Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'cumulus';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['group']            = 'unix';
+$config['os'][$os]['text']             = 'Cumulus Linux';
+$config['os'][$os]['icon']             = 'cumulus';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Other Unix-based OSes here please.
 $os = 'freebsd';
 $config['os'][$os]['type']  = 'server';
@@ -638,6 +650,13 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+$os = 'juniperex2500os';
+$config['os'][$os]['text']             = 'Juniper EX2500';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'junos';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 // Pulse Secure OS definition
 $os = 'pulse';
@@ -1537,6 +1556,14 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
+// Deliberant WiFi
+$os = 'deliberant';
+$config['os'][$os]['text']             = 'Deliberant OS';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'deliberant';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';

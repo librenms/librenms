@@ -42,6 +42,6 @@ if( $code > 201 ) {
     if( $debug ) {
         var_dump($ret);
     }
-    return false;
+    return 'HTTP Status code '.$code;
 }
 return true;

@@ -121,8 +121,6 @@ function IssueAlert($alert) {
     $obj = DescribeAlert($alert);
     if (is_array($obj)) {
         echo 'Issuing Alert-UID #'.$alert['id'].'/'.$alert['state'].': ';
-        $msg        = FormatAlertTpl($obj);
-        $obj['msg'] = $msg;
         if (!empty($config['alert']['transports'])) {
             ExtTransports($obj);
         }
@@ -338,19 +336,26 @@ function ExtTransports($obj) {
             $opts = array_filter($opts);
         }
         if (($opts === true || !empty($opts)) && $opts != false && file_exists($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php')) {
+            $obj['transport'] = $transport;
+            $msg        = FormatAlertTpl($obj);
+            $obj['msg'] = $msg;
             echo $transport.' => ';
             eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
             $tmp = $tmp($obj,$opts);
             $prefix = array( 0=>"recovery", 1=>$obj['severity']." alert", 2=>"acknowledgment" );
             $prefix[3] = &$prefix[0];
             $prefix[4] = &$prefix[0];
-            if ($tmp) {
+            if ($tmp === true) {
                 echo 'OK';
                 log_event('Issued '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
             }
-            else {
+            elseif ($tmp === false) {
                 echo 'ERROR';
                 log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."'", $obj['device_id']);
+            }
+            else {
+                echo 'ERROR: '.$tmp."\r\n";
+                log_event('Could not issue '.$prefix[$obj['state']]." for rule '".$obj['name']."' to transport '".$transport."' Error: ".$tmp, $obj['device_id']);
             }
         }
 

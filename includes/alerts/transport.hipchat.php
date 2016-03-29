@@ -28,6 +28,10 @@ foreach($opts as $option) {
     }
     $curl = curl_init();
 
+    if (empty($obj["msg"])) {
+        return "Empty Message";
+    }
+
     if (empty($option["message_format"])) {
         $option["message_format"] = 'text';
     }
@@ -60,7 +64,7 @@ foreach($opts as $option) {
         var_dump("API '$url' returned Error");
         var_dump("Params: " . $message);
         var_dump("Return: " . $ret);
-        return false;
+        return 'HTTP Status code '.$code;
     }
 }
 return true;
