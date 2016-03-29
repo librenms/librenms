@@ -99,7 +99,7 @@ The template-parser understands `if` and `foreach` controls and replaces certain
 Controls:
 
 - if-else (Else can be omitted):
-`{if %placeholder == 'value'}Some Text{else}Other Text{/if}`
+`{if %placeholder == value}Some Text{else}Other Text{/if}`
 - foreach-loop:
 `{foreach %placeholder}Key: %key<br/>Value: %value{/foreach}`
 
@@ -116,6 +116,7 @@ Placeholders:
 - Rule: `%rule`
 - Rule-Name: `%name`
 - Timestamp: `%timestamp`
+- Transport name: `%transport`
 - Contacts, must be iterated in a foreach, `%key` holds email and `%value` holds name: `%contacts`
 
 The Default Template is a 'one-size-fit-all'. We highly recommend defining own templates for your rules to include more specific information.
@@ -135,6 +136,14 @@ Rule: {if %name}%name{else}%rule{/if}\r\n
 {foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
+
+Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
+```text
+{if %transport == mail}<a href="https://my.librenms.install/device/device=%hostname/">%hostname</a>{else}%hostname{/if}
+```
+
+Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped (replaced with `\'`) in the output and should therefore be avoided.
+
 
 # <a name="transports">Transports</a>
 
@@ -178,6 +187,7 @@ $config['email_backend']                   = 'mail';               // Mail backe
 $config['email_from']                      = NULL;                 // Mail from. Default: "ProjectName" <projectid@`hostname`>
 $config['email_user']                      = $config['project_id'];
 $config['email_sendmail_path']             = '/usr/sbin/sendmail'; // The location of the sendmail program.
+$config['email_html']                      = FALSE;                // Whether to send HTML email as opposed to plaintext
 $config['email_smtp_host']                 = 'localhost';          // Outgoing SMTP server name.
 $config['email_smtp_port']                 = 25;                   // The port to connect.
 $config['email_smtp_timeout']              = 10;                   // SMTP connection timeout in seconds.

@@ -6,6 +6,7 @@ LibreNMS core team:
 - Daniel Preussker <f0o@librenms.org> (f0o)
 - Søren Friis Rosiak <sorenrosiak@gmail.com> (rosiak)
 - Mike Rostermund <mike@kollegienet.dk> (SaaldjorMike)
+- Tony Murray <tonym@librenms.org> (murrant)
 
 LibreNMS contributors:
 - Bohdan Sanders <git@bohdans.com> (bohdan-s)
@@ -67,7 +68,6 @@ LibreNMS contributors:
 - Robert Gornall <roblnm@khobbits.co.uk> (KHobbits)
 - Rob Gormley <robert@gormley.me> (rgormley)
 - Richard Kojedzinszky <krichy@nmdps.net> (rkojedzinszky)
-- Tony Murray <murraytony@gmail.com> (murrant)
 - Peter Lamperud <peter.lamperud@gmail.com> (vizay)
 - Louis Bailleul <louis.bailleul@gmail.com> (alucardfh)
 - Rick Hodger <rick@fuzzi.org.uk> (Tatermen)
