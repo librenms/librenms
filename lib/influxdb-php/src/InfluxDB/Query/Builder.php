@@ -61,6 +61,16 @@ class Builder
     protected $limitClause = '';
 
     /**
+     * @var array
+     */
+    protected $groupBy;
+
+    /**
+     * @var array
+     */
+    protected $orderBy;
+
+    /**
      * @param Database $db
      */
     public function __construct(Database $db)
@@ -178,6 +188,18 @@ class Builder
         return $this;
     }
 
+    public function groupBy($field = 'type') {
+        $this->groupBy[] = $field;
+
+        return $this;
+    }
+
+    public function orderBy($field = 'type', $order = 'ASC') {
+        $this->orderBy[] = "$field $order";
+
+        return $this;
+    }
+
     /**
      * Set's the time range to select data from
      *
@@ -244,7 +266,7 @@ class Builder
      */
     protected function parseQuery()
     {
-        $query = sprintf("SELECT %s FROM %s", $this->selection, $this->metric);
+        $query = sprintf('SELECT %s FROM "%s"', $this->selection, $this->metric);
 
         if (! $this->metric) {
             throw new \InvalidArgumentException('No metric provided to from()');
@@ -260,6 +282,14 @@ class Builder
             $clause = $this->where[$i];
             $query .= ' ' . $selection . ' ' . $clause;
 
+        }
+
+        if (!empty($this->groupBy)) {
+            $query .= ' GROUP BY ' . implode(',', $this->groupBy);
+        }
+
+        if (!empty($this->orderBy)) {
+            $query .= ' ORDER BY ' . implode(',', $this->orderBy);
         }
 
         if ($this->limitClause) {
