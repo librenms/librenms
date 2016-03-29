@@ -1,3 +1,4 @@
+<h4>Bill Information</h4>
 <div class="form-group">
   <label for="bill_name" class="col-sm-4 control-label">Description</label>
   <div class="col-sm-8">

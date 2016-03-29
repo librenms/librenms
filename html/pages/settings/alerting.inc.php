@@ -248,6 +248,10 @@ $mail_conf = array(
           'descr'              => 'From email address',
           'type'               => 'text',
     ),
+    array('name'               => 'email_html',
+          'descr'              => 'Use HTML emails',
+          'type'               => 'checkbox',
+    ),
     array('name'               => 'email_sendmail_path',
           'descr'              => 'Sendmail path',
           'type'               => 'text',
@@ -854,7 +858,7 @@ echo '
         var transport = $this.data("transport");
         $.ajax({
             type: 'POST',
-            url: '/ajax_form.php',
+            url: 'ajax_form.php',
             data: { type: "test-transport", transport: transport },
             dataType: "json",
             success: function(data){
