@@ -51,13 +51,13 @@ if (count($services) > '0') {
 <?php
     foreach ($services as $service) {
         $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
-        if ($service['service_status'] == 1) {
+        if ($service['service_status'] == 0) {
             $status = "<span class='green'>Ok</span>";
         }
-        elseif ($service['service_status'] == 2) {
+        elseif ($service['service_status'] == 1) {
             $status = "<span class='red'>Warning</span>";
         }
-        elseif ($service['service_status'] == 0) {
+        elseif ($service['service_status'] == 2) {
             $status = "<span class='red'>Critical</span>";
         }
         else {

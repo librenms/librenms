@@ -128,27 +128,8 @@ function poll_service($service) {
     // Some debugging
     d_echo("\nNagios Service - ".$service['service_id']."\n");
     d_echo("Request:  ".$check_cmd."\n");
-    list($status, $msg, $perf) = check_service($check_cmd);
+    list($new_status, $msg, $perf) = check_service($check_cmd);
     d_echo("Response: ".$msg."\n");
-
-    // TODO: Use proper Nagios service status. 0=Ok,1=Warning,2=Critical,Else=Unknown
-    // Not now because we dont want to break existing alerting rules.
-    if ($status == 0) {
-        // Nagios 0 = Libre 1 - Ok
-        $new_status = 1;
-    }
-    elseif ($status == 1) {
-        // Nagios 1 = Libre 2 - Warning
-        $new_status = 2;
-    }
-    elseif ($status == 2) {
-        // Nagios 2 = Libre 0 - Critical
-        $new_status = 0;
-    }
-    else {
-        // Unknown
-        $new_status = 2;
-    }
 
     // If we have performance data we will store it.
     if (count($perf) > 0) {
