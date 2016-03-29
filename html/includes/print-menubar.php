@@ -219,13 +219,13 @@ if ($config['show_services']) {
 
 <?php
 
-if (($service_status[0] > 0) || ($service_status[2] > 0)) {
+if (($service_status[1] > 0) || ($service_status[2] > 0)) {
     echo '            <li role="presentation" class="divider"></li>';
-    if ($service_status[2] > 0) {
-        echo '            <li><a href="services/state=warning/"><i class="fa fa-bell-o fa-col-warning fa-fw fa-lg"></i> Warning ('.$service_status[2].')</a></li>';
+    if ($service_status[1] > 0) {
+        echo '            <li><a href="services/state=warning/"><i class="fa fa-bell-o fa-col-warning fa-fw fa-lg"></i> Warning ('.$service_status[1].')</a></li>';
     }
-    if ($service_status[0] > 0) {
-        echo '            <li><a href="services/state=critical/"><i class="fa fa-bell-o fa-col-danger fa-fw fa-lg"></i> Critical ('.$service_status[0].')</a></li>';
+    if ($service_status[2] > 0) {
+        echo '            <li><a href="services/state=critical/"><i class="fa fa-bell-o fa-col-danger fa-fw fa-lg"></i> Critical ('.$service_status[2].')</a></li>';
     }
 }
 

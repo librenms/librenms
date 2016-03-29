@@ -22,17 +22,24 @@ $config['nagios_plugins']   = "/usr/lib/nagios/plugins";
 
 This will point LibreNMS at the location of the nagios plugins - please ensure that any plugins you use are set to executable.
 
+Finally, you now need to add check-services.php to the current cron file (/etc/cron.d/librenms typically) like:
+```bash
+*/5 * * * * librenms /opt/librenms/check-services.php >> /dev/null 2>&1
+```
+
 Now you can add services via the main Services link in the navbar, or via the 'Add Service' link within the device, services page.
 
 ## Performance data
 
-By default, the poller module will collect all performance data that the check script returns and display each datasource on a separate graph.
+By default, the check-services script will collect all performance data that the Nagios script returns and display each datasource on a separate graph.
 However for some modules it would be better if some of this information was consolidated on a single graph.
 An example is the ICMP check. This check returns: Round Trip Average (rta), Round Trip Min (rtmin) and Round Trip Max (rtmax).
 These have been combined onto a single graph.
 
-If you find a check script that would benefit from having some datasources graphed together, please log an issue on GitHub with the debug information from the poller, and let us know which DS's should go together. Example below:
+If you find a check script that would benefit from having some datasources graphed together, please log an issue on GitHub with the debug information from the script, and let us know which DS's should go together. Example below:
 
+    ./check-services.php -d
+    -- snip --
     Nagios Service - 26
     Request:  /usr/lib/nagios/plugins/check_icmp localhost
     Perf Data - DS: rta, Value: 0.016, UOM: ms
@@ -48,3 +55,16 @@ If you find a check script that would benefit from having some datasources graph
     }
     OK u:0.00 s:0.00 r:40.67
     RRD[update /opt/librenms/rrd/localhost/services-26.rrd N:0.016:0:0.044:0.009]
+    -- snip --
+
+## Alerting
+
+Services uses the Nagios Alerting scheme where:
+
+	0 = Ok,
+	1 = Warning,
+	2 = Critical,
+
+To create an alerting rule to alert on service=critical, your alerting rule would look like:
+
+    %services.service_status = "2"
