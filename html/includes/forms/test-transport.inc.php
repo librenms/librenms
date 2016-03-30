@@ -43,13 +43,8 @@ $status = 'error';
 if (file_exists($config['install_dir']."/includes/alerts/transport.".$transport.".php")) {
     $opts = $config['alert']['transports'][$transport];
     if ($opts) {
-        if ($transport == "canopsis") {
-            $tmp = eval ('global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false;');
-        }
-        else {
-            eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
-            $tmp = $tmp($obj,$opts);
-        }
+        eval('$tmp = function($obj,$opts) { global $config; '.file_get_contents($config['install_dir'].'/includes/alerts/transport.'.$transport.'.php').' return false; };');
+        $tmp = $tmp($obj,$opts);
         if ($tmp) {
             $status = 'ok';
         }
