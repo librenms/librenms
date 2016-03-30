@@ -50,7 +50,9 @@ $app->group(
                         $app->get('/:hostname/ports', 'authToken', 'get_port_graphs')->name('get_port_graphs');
                         // api/v0/devices/$hostname/ports
                         $app->get('/:hostname/components', 'authToken', 'get_components')->name('get_components');
-                        // api/v0/devices/$hostname/components
+                        $app->post('/:hostname/components/:type', 'authToken', 'add_components')->name('add_components');
+                        $app->put('/:hostname/components', 'authToken', 'edit_components')->name('edit_components');
+                        $app->delete('/:hostname/components/:component', 'authToken', 'delete_components')->name('delete_components');
                         $app->get('/:hostname/groups', 'authToken', 'get_device_groups')->name('get_device_groups');
                         $app->get('/:hostname/:type', 'authToken', 'get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
                         // api/v0/devices/$hostname/$type
