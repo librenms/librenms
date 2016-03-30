@@ -1,0 +1,25 @@
+{
+  "results":[
+    {
+      "series":[
+        {
+          "name":"databases",
+          "columns":[
+            "name"
+          ],
+          "values":[
+            [
+              "test"
+            ],
+            [
+              "test1"
+            ],
+            [
+              "test2"
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
