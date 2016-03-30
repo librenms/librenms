@@ -30,17 +30,17 @@ switch ($obj['severity'])
         default: $state = 3;
 }
 $msg_body = array(
-    "timestamp"     => time(),
-    "connector"     => "librenms",
+    "timestamp"         => time(),
+    "connector"         => "librenms",
     "connector_name"    => "LibreNMS1",
     "event_type"        => "check",
     "source_type"       => "resource",
-    "component"     => $obj['hostname'],
-    "resource"      => $obj['device_id'],
-    "state"         => $state,
+    "component"	        => $obj['hostname'],
+    "resource"	        => $obj['faults'][1]['storage_descr'],
+    "state"	        => $state,
     "state_type"        => 1,
-    "output"        => $obj['msg'],
-    "display_name"      =>"librenms_test"
+    "output"	        => $obj['msg'],
+    "display_name"      => "librenms"
 );
 $msg_raw = json_encode($msg_body);
 
