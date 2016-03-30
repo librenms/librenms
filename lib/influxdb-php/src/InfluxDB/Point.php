@@ -14,22 +14,22 @@ class Point
     /**
      * @var string
      */
-    private $measurement;
+    protected $measurement;
 
     /**
      * @var array
      */
-    private $tags = [];
+    protected $tags = [];
 
     /**
      * @var array
      */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * @var string
      */
-    private $timestamp;
+    protected $timestamp;
 
     /**
      * The timestamp is optional. If you do not specify a timestamp the server’s
@@ -55,11 +55,13 @@ class Point
 
         $this->measurement = (string) $measurement;
         $this->tags = $tags;
-        $this->fields = $additionalFields;
+        $fields = $additionalFields;
 
-        if ($value) {
-            $this->fields['value'] = $value;
+        if ($value !== null) {
+            $fields['value'] = $value;
         }
+
+        $this->setFields($fields);
 
         if ($timestamp && !$this->isValidTimeStamp($timestamp)) {
             throw new DatabaseException(sprintf('%s is not a valid timestamp', $timestamp));
@@ -80,16 +82,126 @@ class Point
         $string = $this->measurement;
 
         if (count($this->tags) > 0) {
-            $string .=  ',' . $this->arrayToString($this->tags);
+            $string .=  ',' . $this->arrayToString($this->escapeCharacters($this->tags));
         }
 
-        $string .= ' ' . $this->arrayToString($this->fields);
+        $string .= ' ' . $this->arrayToString($this->escapeCharacters($this->fields));
 
         if ($this->timestamp) {
             $string .= ' '.$this->timestamp;
         }
 
         return $string;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMeasurement()
+    {
+        return $this->measurement;
+    }
+
+    /**
+     * @param string $measurement
+     */
+    public function setMeasurement($measurement)
+    {
+        $this->measurement = $measurement;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param array $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param array $fields
+     */
+    public function setFields($fields)
+    {
+        foreach ($fields as &$field) {
+            if (is_integer($field)) {
+                $field = sprintf('%di', $field);
+            } elseif (is_string($field)) {
+                $field = sprintf("\"%s\"", $field);
+            } elseif (is_bool($field)) {
+                $field = ($field ? "true" : "false");
+            }
+        }
+
+        $this->fields = $fields;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
+
+    /**
+     * @param string $timestamp
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->timestamp = $timestamp;
+    }
+
+    /**
+     * Escapes invalid characters in both the array key and array value
+     *
+     * @param array $arr
+     * @return array
+     */
+    private function escapeCharacters(array $arr)
+    {
+        $returnArr = [];
+
+        foreach ($arr as $key => $value) {
+            $returnArr[$this->addSlashes($key)] = $this->addSlashes($value);
+        }
+
+        return $returnArr;
+    }
+
+    /**
+     * Returns strings with space, comma, or equals sign characters backslashed per Influx write protocol syntax
+     *
+     * @param string $value
+     * @return string
+     */
+    private function addSlashes($value)
+    {
+        return str_replace([
+            ' ',
+            ',',
+            '='
+        ],[
+            '\ ',
+            '\,',
+            '\='
+        ], $value);
     }
 
     /**
@@ -113,14 +225,26 @@ class Point
      */
     private function isValidTimeStamp($timestamp)
     {
-        if ((int) $timestamp === $timestamp) {
+
+        // if the code is run on a 32bit system, loosely check if the timestamp is a valid numeric
+        if (PHP_INT_SIZE == 4 && is_numeric($timestamp)) {
             return true;
         }
 
-        if ($timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX) {
-            return true;
+        if (!is_numeric($timestamp)) {
+            return false;
         }
 
-        return false;
+        if (intval($timestamp) != $timestamp) {
+            return false;
+        }
+
+        if (!($timestamp <= PHP_INT_MAX && $timestamp >= ~PHP_INT_MAX)) {
+            return false;
+        }
+
+        return true;
+
+
     }
 }
