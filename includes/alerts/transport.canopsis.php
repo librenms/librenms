@@ -1,6 +1,4 @@
-require_once "/usr/share/php/PhpAmqpLib/autoload.php";
-use PhpAmqpLib\Connection\AMQPConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+require_once "./lib/PhpAmqpLib/autoload.php";
 
 // Configurations
 $host = $opts["host"];
@@ -11,7 +9,7 @@ $vhost = $opts["vhost"];
 $exchange = "canopsis.events";
 
 // Connection
-$conn = new AMQPConnection($host, $port, $user, $pass, $vhost);
+$conn = new PhpAmqpLib\Connection\AMQPConnection($host, $port, $user, $pass, $vhost);
 $ch = $conn->channel();
 
 // Declare exchange (if not exist)
@@ -51,7 +49,7 @@ else
     $msg_rk = $msg_body['connector'].".".$msg_body['connector_name'].".".$msg_body['event_type'].".".$msg_body['source_type'].".".$msg_body['component'];
 
 // Publish Event
-$msg = new AMQPMessage($msg_raw, array('content_type' => 'application/json', 'delivery_mode' => 2));
+$msg = new PhpAmqpLib\Message\AMQPMessage($msg_raw, array('content_type' => 'application/json', 'delivery_mode' => 2));
 $ch->basic_publish($msg, $exchange, $msg_rk);
 
 // Close connection
