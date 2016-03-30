@@ -90,6 +90,14 @@ class ResultSet
     }
 
     /**
+     * @return mixed
+     */
+    public function getColumns()
+    {
+        return $this->getSeries()[0]['columns'];
+    }
+
+    /**
      * @param  array $serie
      * @return array
      */
