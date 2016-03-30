@@ -1,0 +1,339 @@
+    -- ***************************************************************************
+-- ***************************************************************************
+--
+-- File         : fod.mib
+-- Description  : MIB definitions for IBM Features On Demand Activation Key 
+--                functions.
+-- By           : IBM
+-- Version      : 1.2
+-- Date         : March 30, 2011
+--
+--
+-- Copyright (c) 2010-11 IBM  All Rights Reserved.
+--
+-- 
+-- Contains MIB description for: 
+--   This MIB is to be used to provide configuration support of IBM Features 
+--   on Demand features.
+-- ***************************************************************************
+-- ***************************************************************************
+-- ***************************************************************************
+-- Revisions: 
+-- ***************************************************************************
+IBM-FEATURE-ACTIVATION-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, 
+            enterprises, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI             --RFC2578
+            MODULE-COMPLIANCE, OBJECT-GROUP, 
+            NOTIFICATION-GROUP
+                FROM SNMPv2-CONF            --RFC2580
+            DateAndTime, DisplayString
+                FROM SNMPv2-TC;             --RFC2579
+            
+ibmFeatureActivationMIB MODULE-IDENTITY
+
+    LAST-UPDATED "201103300733Z"      --30 March 2011 07:33 GMT
+    ORGANIZATION "International Business Machines Corp."
+    CONTACT-INFO
+        "Fred Bower
+
+        International Business Machines Corporation
+        Systems and Technology Group System x Development
+        Research Triangle Park, NC, USA
+
+        E-mail: bowerf@us.ibm.com"
+    DESCRIPTION 
+        "This module provides a simple interface for 
+        IBM Features On Demnad Activation Key functions."
+    -- Revision History
+    REVISION    "201103300733Z"           --30 March 2011
+    DESCRIPTION
+            "Updated data types and added traps for status
+             change notification.  Clarified return codes
+             from events."
+    REVISION    "201102021949Z"           --2 February 2011
+    DESCRIPTION
+            "Added support for SFTP protocol file transfers."
+    REVISION    "201012081833Z"           --8 December 2010
+    DESCRIPTION
+            "Initial Revision."
+    ::= { ibmArchitecture 31 }
+
+    -- IBM enterprise group  
+    ibm         OBJECT IDENTIFIER ::=   { enterprises 2 }
+
+    -- IBM architecture group
+    ibmArchitecture      OBJECT IDENTIFIER ::=   { ibm 5 }
+
+    -- Features on Demand Objects
+    ibmFodNotifications OBJECT IDENTIFIER ::= {ibmFeatureActivationMIB 0 }
+    ibmFodObjects OBJECT IDENTIFIER ::=  { ibmFeatureActivationMIB 1 }
+    ibmFodConformance OBJECT IDENTIFIER ::= { ibmFeatureActivationMIB 2 }
+
+    -- ***********************************************************************
+    --  Activation Key Install/Update
+    -- ***********************************************************************
+    -- Feature activation keys can be installed (to activate), uninstalled
+    -- (to deactivate), exported (for backup purposes), and inventoried.
+    -- The action desired is set via the ibmFodAction object (which is never
+    -- read).  The required sub-objects and their use is listed here as well
+    -- as in the DESCRIPTION comments for each of the fields for user
+    -- understanding.
+    -- Action: installActivationKey
+    -- Requires: ibmFodFileUri
+    -- Process: Installer sets the ibmFodFileUri field to indicate where to 
+    -- retrieve activation key file from, then sets the ibmFodAction to
+    -- installActivationKey.
+    -- Result: Activation key is transferred from URI to the target device,
+    -- validated, and result is available for reading via ibmFodStatus.  An
+    -- alert should also be issued if the key actually changes device state.
+    -- That is, if the key is successfully validated and stored and function
+    -- is either queued for activation after a reboot or is activated, an
+    -- alert should be generated with the updated key status information.
+    --
+    -- Action: inventoryInstalledActivationKeys
+    -- Requires: ibmFodFileUri
+    -- Process: Administrator sets ibmFodFileUri field to indicate where to
+    -- place file with results of inventory of device, then sets ibmFodAction
+    -- to inventoryInstalledActivationKeys.  
+    -- Result: Activation key inventory is transferred to URI from target
+    -- device and result is available for reading from ibmFodStatus.  
+    -- Inventory file format is comma-separated with fields ordered as 
+    -- follows:
+    -- 
+    -- <Index>,<Status>,<Feature Descriptor Type Description (text)>,
+    -- <Constraint Descriptor Type Description (text)>:<Constraint Descriptor
+    -- Type Optional Information (text)> 0..n
+    -- 
+    -- The 0..n notation is to indicate that there may be zero or more
+    -- constraints for any given activation key.  New records start with a
+    -- newline character after the last constraint.  If a constraint does not
+    -- have optional information text, the colon separator is omitted and a 
+    -- comma denotes the start of the next constraint descriptor type 
+    -- description.  This activity should not result in any alerts, as it 
+    -- does not alter activation key state on the device.
+    -- 
+    -- Action: uninstallActivationKey
+    -- Requires: ibmFodIndex
+    -- Process: Administrator sets ibmFodIndex with value from inventory
+    -- report process, above, then sets ibmFodAction to 
+    -- uninstallActivationKey.
+    -- Result: Activation key is uninstalled and result of action is placed
+    -- in ibmFodStatus for reading.  An alert should also be issued if the 
+    -- action changes device state.  That is, if there is a key at the
+    -- designated index and it is uninstalled, the device key state will
+    -- change, thus triggering an alert with the updated device information.
+    --
+    -- Action: exportActivationKey
+    -- Requires: ibmFodIndex, ibmFodFileUri
+    -- Process: Administrator sets ibmFodIndex with value from inventory 
+    -- report process, above, then sets ibmFodFileUri to the desired location
+    -- for the exported key file to be placed, then sets ibmFodAction to
+    -- exportActivationKey.
+    -- Result: Activation key file is exported to designated URI location
+    -- provided that the index supplied maps to an existing key.  Status of
+    -- the command is placed in ibmFodStatus for reading.  No alert will be
+    -- issued from this activity, as it does not affect activation key state
+    -- on the device.  
+    --
+    ibmFodAction  OBJECT-TYPE
+                  SYNTAX  INTEGER {
+                    installActivationKey(1),
+                    uninstallActivationKey(2),
+                    exportActivationKey(3),
+                    inventoryInstalledActivationKeys(4)
+                  }
+                  MAX-ACCESS  read-write
+                  STATUS  current
+                  DESCRIPTION
+                  "Target action for activation method.
+                    1 - Install Activation Key
+                    2 - Uninstall Activation Key
+                    3 - Export Activation Key
+                    4 - Inventory Installed Activation Keys"
+                  DEFVAL { 4 }
+                  ::= { ibmFodObjects 1 }
+
+    ibmFodIndex OBJECT-TYPE
+                  SYNTAX INTEGER (1..255)
+                  MAX-ACCESS read-write
+                  STATUS current
+                  DESCRIPTION
+                  "Activation key index to uninstall or export.
+                  This is only required for uninstall and export actions.
+                  This is also used to identify the key associated with alerts."
+                  ::= { ibmFodObjects 2 }
+                  
+    ibmFodFileUri   OBJECT-TYPE
+                  SYNTAX  OCTET STRING(SIZE(0..1024))
+                  MAX-ACCESS  read-write
+                  STATUS  current
+                  DESCRIPTION
+                  "URI of where key file resides for install and 
+                  where it should be placed for export or inventory.  
+                  This is not used for uninstall action."
+                  ::= { ibmFodObjects 3 }
+
+    ibmFodStatus  OBJECT-TYPE
+                  SYNTAX INTEGER { 
+                    success(1),
+                    rebootRequired(2),
+                    versionMismatch(3),
+                    corruptKeyFile(4),
+                    invalideKeyFileTarget(5),
+                    keyFileNotPresent(6),
+                    communicationFailure(7),
+                    keyStoreFull(8),
+                    ftpServerFull(9),
+                    userAuthenticationFailed(10),
+                    invalidIndex(11),
+                    protocolNotSupported(12),
+                    preRequisiteKeyActionRequired(13),
+                    actionIncompleteDeviceBusy(14),
+                    fileAlreadyExists(15),
+                    permissionProblem(16)
+                  }
+                  MAX-ACCESS  read-only
+                  STATUS  current
+                  DESCRIPTION
+                  "Return status of the last firmware activation method
+                  initiated through SNMP method.
+                  Valid return codes are:
+                  Code   Action(s)   Meaning
+                   1     1,2,3,4     Success
+                   2     1,2         Reboot Required
+                   3     1           Firmware Version/Update Issue
+                   4     1           Key Corrupt
+                   5     1           Key Not Valid for Device
+                   6     1,2,4       Key File Not Found
+                   7     1,3,4       Failure to Communicate with File Server
+                   8     1           Key Storage Full
+                   9     3,4         TFTP/SFTP Server Storage Full
+                   10    1,3,4       SFTP User/Password Authentication Failed
+                   11    2,3         Invalid Index
+                   12    1,3,4       Protocol Specified in URI Not Supported
+                   13    1,2         Pre-Requisite Key Action Required
+                   14    1,2,3,4     Action Still In Process/Busy
+                   15    3,4         File Already Exists on Server
+                   16    3,4         Permission Problem with Specified URI User"
+                  ::= { ibmFodObjects 4 }
+
+    ibmFodKeyChangeTime OBJECT-TYPE
+                  SYNTAX DateAndTime
+                  MAX-ACCESS accessible-for-notify
+                  STATUS current
+                  DESCRIPTION
+                  "The date and time of the event described in
+                  this notification of activated function status change."
+                  ::= { ibmFodObjects 5 }
+
+    ibmFodKeyOldStatus OBJECT-TYPE
+                  SYNTAX INTEGER {
+                    noPreviousStatus (1),
+                    keyValid (2),
+                    keyInvalid (3),
+                    keyValidElsewhere (4),
+                    keyFeatureActive (5),
+                    keyFeatureRequiresHostReboot (6),
+                    keyFeatureRequiresBMCReboot (7),
+                    keyExpired (8),
+                    keyUseLimitExceeded (9),
+                    keyInProcessOfValidation (10)
+                  }
+                  MAX-ACCESS accessible-for-notify
+                  STATUS current
+                  DESCRIPTION
+                  "The prior status of the activation key associated
+                  with this status change."
+                  ::= { ibmFodObjects 6 }
+
+    ibmFodKeyNewStatus OBJECT-TYPE
+                  SYNTAX INTEGER {
+                    keyRemoved (1),
+                    keyValid (2),
+                    keyInvalid (3),
+                    keyValidElsewhere (4),
+                    keyFeatureActive (5),
+                    keyFeatureRequiresHostReboot (6),
+                    keyFeatureRequiresBMCReboot (7),
+                    keyExpired (8),
+                    keyUseLimitExceeded (9),
+                    keyInProcessOfValidation (10),
+                    keyReplaced (11)
+                  }
+                  MAX-ACCESS accessible-for-notify
+                  STATUS current
+                  DESCRIPTION
+                  "The new status of the activation key associated
+                  with this status change."
+                  ::= { ibmFodObjects 7 }
+
+   ibmFodKeyUpdateData OBJECT-TYPE
+                  SYNTAX DisplayString
+                  MAX-ACCESS accessible-for-notify
+                  STATUS current
+                  DESCRIPTION
+                  "String containing constraint data.  This is only used
+                  for ibmFodNewStatus value of keyReplaced (10).  Otherwise,
+                  this string should be NULL."
+                  ::= { ibmFodObjects 8 }
+
+    -- Notifications
+    ibmFodActivationChangeAlert NOTIFICATION-TYPE
+                  OBJECTS { 
+                     ibmFodIndex,
+                     ibmFodKeyChangeTime,
+                     ibmFodKeyOldStatus,
+                     ibmFodKeyNewStatus,
+                     ibmFodKeyUpdateData
+                  }
+                  STATUS current
+                  DESCRIPTION
+                  "This is an SNMP notification of a change to an existing
+                  feature activation on an endpoint.  Data in the 
+                  notification payload describes the change."
+                  ::= { ibmFodNotifications 1 }
+
+    -- Conformance Information
+    -- Compliance Statements
+    ibmFeatureActivationCompliances OBJECT IDENTIFIER ::= { ibmFodConformance 1 }
+    ibmFeatureActivationGroups OBJECT IDENTIFIER ::= { ibmFodConformance 2 }
+
+    ibmFeatureActivationCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for the IBM-FEATURE-ACTIVATION-MIB."
+        MODULE --This module
+        MANDATORY-GROUPS { ibmFeatureActivationBaseGroup,
+                           ibmFeatureActivationNotifGroup }
+        ::= { ibmFeatureActivationCompliances 1 }
+
+    -- MIB Groupings
+    ibmFeatureActivationBaseGroup OBJECT-GROUP
+        OBJECTS {
+            ibmFodAction,
+            ibmFodIndex,
+            ibmFodFileUri,
+            ibmFodStatus,
+            ibmFodKeyChangeTime,
+            ibmFodKeyOldStatus,
+            ibmFodKeyNewStatus,
+            ibmFodKeyUpdateData
+        }
+        STATUS current
+        DESCRIPTION
+            "The group of mandatory objects for all implementations
+            to be compliant."
+        ::= { ibmFeatureActivationGroups 1 }
+
+    ibmFeatureActivationNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { ibmFodActivationChangeAlert }
+        STATUS current
+        DESCRIPTION
+            "The notification group required for compliance in alert
+            semantics for feature activation implementations."
+        ::= { ibmFeatureActivationGroups 2 }
+
+END
