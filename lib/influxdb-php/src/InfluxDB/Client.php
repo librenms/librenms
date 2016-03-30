@@ -88,6 +88,14 @@ class Client
      */
     protected $driver;
 
+
+    /**
+     * Stores the last query that ran
+     *
+     * @var null
+     */
+    public static $lastQuery = null;
+
     /**
      * @param string $host
      * @param int    $port
@@ -103,7 +111,7 @@ class Client
         $username = '',
         $password = '',
         $ssl = false,
-        $verifySSL = true,
+        $verifySSL = false,
         $timeout = 0
     ) {
         $this->host = (string) $host;
@@ -183,12 +191,42 @@ class Client
         $driver->setParameters($parameters);
 
         try {
+            // store the last query sent
+            static::$lastQuery = $query;
+
             // perform the query and return the resultset
             return $driver->query();
 
         } catch (DriverException $e) {
             throw new Exception('Query has failed', $e->getCode(), $e);
         }
+    }
+
+    /**
+     * Write data
+     *
+     * @param array           $parameters
+     * @param string          $payload
+     *
+     * @return bool
+     */
+    public function write(array $parameters, $payload)
+    {
+        // retrive the driver
+        $driver = $this->getDriver();
+
+        // add authentication to the driver if needed
+        if (!empty($this->username) && !empty($this->password)) {
+            $parameters += ['auth' => [$this->username, $this->password]];
+        }
+
+        // set the given parameters
+        $driver->setParameters($parameters);
+
+        // send the points to influxDB
+        $driver->write(implode("\n", $payload));
+
+        return $driver->isSuccess();
     }
 
     /**
@@ -209,9 +247,9 @@ class Client
      */
     public function listUsers()
     {
-        $result = $this->query(null, 'SHOW USERS')->getPoints();
+        $result = $this->query(null, 'SHOW USERS')->getColumns();
 
-        return $this->pointsToArray($result);
+        return (array) $result;
     }
 
     /**
@@ -304,6 +342,16 @@ class Client
     public function getHost()
     {
         return $this->host;
+    }
+
+    /**
+     * Returns the last executed query
+     *
+     * @return null|string
+     */
+    public function getLastQuery()
+    {
+        return static::$lastQuery;
     }
 
     /**
