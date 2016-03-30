@@ -40,7 +40,6 @@ $msg_body = array(
     "state"         => $state,
     "state_type"        => 1,
     "output"        => $obj['msg'],
-    "long_output"        => $obj['msg'],
     "display_name"      =>"librenms_test"
 );
 $msg_raw = json_encode($msg_body);
@@ -50,9 +49,6 @@ if ($msg_body['source_type'] == "resource")
     $msg_rk = $msg_rk . "." . $msg_body['resource'];
 else
     $msg_rk = $msg_body['connector'].".".$msg_body['connector_name'].".".$msg_body['event_type'].".".$msg_body['source_type'].".".$msg_body['component'];
-
-#echo "JSON Event:  " . $msg_raw . "\n";
-#echo "Routing-key: " . $msg_rk . "\n";
 
 // Publish Event
 $msg = new AMQPMessage($msg_raw, array('content_type' => 'application/json', 'delivery_mode' => 2));
