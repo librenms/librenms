@@ -92,6 +92,7 @@ LibreNMS contributors:
 - Marco Di Cerbo <marco@dottoremoe.com> (marcodc)
 - David Bell <me@geordish.org> (geordish)
 - Ibrahim Tachijian <barhom@netsat.se> (barhom)
+- Guillaume Coeugnet <aliasprotect-git@yahoo.fr> (gcoeugnet)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
