@@ -14,6 +14,9 @@
         - [`get_graph_generic_by_hostname`](#api-route-6)
         - [`get_port_graphs`](#api-route-7)
         - [`get_components`](#api-route-25)
+        - [`add_components`](#api-route-26)
+        - [`edit_components`](#api-route-27)
+        - [`delete_components`](#api-route-28)
         - [`get_port_stats_by_port_hostname`](#api-route-8)
         - [`get_graph_by_port_hostname`](#api-route-9)
         - [`list_devices`](#api-route-10)
@@ -333,6 +336,88 @@ Output:
             "disabled": "0"
         }
     }
+}
+```
+
+### <a name="api-route-26">Function: `add_components`</a> [`top`](#top)
+
+Create a new component of a type on a particular device.
+
+Route: /api/v0/devices/:hostname/components/:type
+
+- hostname can be either the device hostname or id
+- type is the type of component to add
+
+Example:
+```curl
+curl -X POST -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components/APITEST
+```
+
+Output:
+
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1,
+    "components": {
+        "4459": {
+            "type": "APITEST",
+            "label": "",
+            "status": 1,
+            "ignore": 0,
+            "disabled": 0,
+            "error": ""
+        }
+    }
+}
+```
+
+### <a name="api-route-27">Function: `edit_components`</a> [`top`](#top)
+
+Edit an existing component on a particular device.
+
+Route: /api/v0/devices/:hostname/components
+
+- hostname can be either the device hostname or id
+
+In this example we set the label and add a new field: TestField:
+```curl
+curl -X PUT -d '{"4459": {"type": "APITEST","label": "This is a test label","status": 1,"ignore": 0,"disabled": 0,"error": "","TestField": "TestData"}}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components
+```
+
+Output:
+
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1
+}
+```
+
+Just take the JSON array from add_components or edit_components, edit as you wish and submit it back to edit_components.
+
+### <a name="api-route-28">Function: `delete_components`</a> [`top`](#top)
+
+Delete an existing component on a particular device.
+
+Route: /api/v0/devices/:hostname/components/:component
+
+- hostname can be either the device hostname or id
+- component is the component ID to be deleted.
+
+Example:
+```curl
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components/4459
+```
+
+Output:
+
+```text
+{
+    "status": "ok",
+    "err-msg": ""
 }
 ```
 
