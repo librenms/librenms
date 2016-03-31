@@ -171,20 +171,6 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
         unset($rrd_filename,$visible,$tracked);
     }
 }
-//PTP Equipment
-    $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/canopy-generic-450-powerlevel.rrd";
-    $lastLevel = str_replace('"',"",snmp_get($device, "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
-    if (is_numeric($lastLevel)) {
-        if (!is_file($rrd_filename)) {
-            rrdtool_create($rrd_filename, " --step 300 DS:last:GAUGE:600:-100:0".$config['rrd_rra']); 
-        }
-        $fields = array(
-            'last' => $lastLevel,
-        );
-        rrdtool_update($rrd_filename, $fields);
-        $graphs['canopy_generic_450_powerlevel'] = TRUE;
-        unset($lastLevel);
-    }
     
 if (strstr($version, 'AP') == false) {
     $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/canopy-generic-450-linkRadioDbm.rrd";
@@ -203,6 +189,20 @@ if (strstr($version, 'AP') == false) {
         unset($rrd_filename,$horizontal,$horizontal);
     }
 
+    $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/canopy-generic-450-powerlevel.rrd";
+    $lastLevel = str_replace('"',"",snmp_get($device, "lastPowerLevel.2", "-Ovqn", "WHISP-APS-MIB"));
+    if (is_numeric($lastLevel)) {
+        if (!is_file($rrd_filename)) {
+            rrdtool_create($rrd_filename, " --step 300 DS:last:GAUGE:600:-100:0".$config['rrd_rra']); 
+        }
+        $fields = array(
+            'last' => $lastLevel,
+        );
+        rrdtool_update($rrd_filename, $fields);
+        $graphs['canopy_generic_450_powerlevel'] = TRUE;
+        unset($lastLevel);
+    }
+    
     $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/canopy-generic-450-ptpSNR.rrd";
     $horizontal = str_replace('"',"",snmp_get($device, "signalToNoiseRatioHorizontal.2", "-Ovqn", "WHISP-APS-MIB"));
     $vertical = str_replace('"',"",snmp_get($device, "signalToNoiseRatioVertical.2", "-Ovqn", "WHISP-APS-MIB"));
