@@ -21,5 +21,4 @@ if (file_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:entryAccess:LAST:%0.2lf%s\\\l  ';
     $rrd_options .= " LINE2:authFailure#FF0000:'Auth Failure       ' ";
     $rrd_options .= ' GPRINT:authFailure:LAST:%0.2lf%s\\\l  ';
-
 }
