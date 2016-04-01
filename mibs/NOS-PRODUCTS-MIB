@@ -1,0 +1,42 @@
+    NOS-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+      IMPORTS
+        MODULE-IDENTITY
+          FROM SNMPv2-SMI
+        nos 
+          FROM Brocade-REG-MIB;
+
+      nosProducts MODULE-IDENTITY
+        LAST-UPDATED "0110101500Z"
+        ORGANIZATION "Brocade Communications Systems, Inc.,"
+        CONTACT-INFO "Customer Support Group
+                Brocade Communications Systems,
+                120 Holger Way,
+                San Jose, CA 95134 U.S.A."
+
+        DESCRIPTION "A MIB module that represents Brocade 
+					 NOS products."
+        ::= { nos 1 }
+
+      bcsiRegistration  OBJECT IDENTIFIER ::= { nosProducts 1 }
+
+    -- OID Registration point for Chassis Types
+      bcsiChassisTypes  OBJECT IDENTIFIER ::= { bcsiRegistration 1 }
+
+    -- OID Registration for Card Types
+      bcsiCardTypes     OBJECT IDENTIFIER ::= { bcsiRegistration 2 }
+
+    -- Pizzaboxes
+      vdx6720P24     OBJECT IDENTIFIER ::= { bcsiChassisTypes 1  }
+
+      vdx6720P60     OBJECT IDENTIFIER ::= { bcsiChassisTypes 2  }
+
+      vdx6730P32    OBJECT IDENTIFIER ::= { bcsiChassisTypes 3  }
+
+      vdx6730P76    OBJECT IDENTIFIER ::= { bcsiChassisTypes 4  }
+
+      vdx6710P54     OBJECT IDENTIFIER ::= { bcsiChassisTypes 5  }
+	  
+	  vdx6746           OBJECT IDENTIFIER ::= { bcsiChassisTypes 112}
+
+
+    END
