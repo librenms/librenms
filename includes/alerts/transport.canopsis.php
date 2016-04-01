@@ -1,8 +1,8 @@
-require_once "./lib/PhpAmqpLib/autoload.php";
+require_once $config['install_dir']."/lib/PhpAmqpLib/autoload.php";
 
 // Configurations
 $host = $opts["host"];
-$port = 5672;
+$port = $opts["port"];
 $user = $opts["user"];
 $pass = $opts["passwd"];
 $vhost = $opts["vhost"];

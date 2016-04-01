@@ -840,6 +840,7 @@ echo '
             </div>
         </div>';
 $canopsis_host   = get_config_by_name('alert.transports.canopsis.host');
+$canopsis_port   = get_config_by_name('alert.transports.canopsis.port');
 $canopsis_user   = get_config_by_name('alert.transports.canopsis.user');
 $canopsis_passwd = get_config_by_name('alert.transports.canopsis.passwd');
 $canopsis_vhost  = get_config_by_name('alert.transports.canopsis.vhost');
@@ -856,6 +857,13 @@ echo '
                         <label for="canopsis_host" class="col-sm-4 control-label">Canopsis Hostname </label>
                         <div class="col-sm-4">
                             <input id="canopsis_host" class="form-control" type="text" name="global-config-input" value="'.$canopsis_host['config_value'].'" data-config_id="'.$canopsis_host['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="canopsis_port" class="col-sm-4 control-label">Canopsis Port number </label>
+                        <div class="col-sm-4">
+                            <input id="canopsis_port" class="form-control" type="text" name="global-config-input" value="'.$canopsis_port['config_value'].'" data-config_id="'.$canopsis_port['config_id'].'">
                             <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                         </div>
                     </div>
