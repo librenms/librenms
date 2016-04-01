@@ -840,7 +840,7 @@ echo '
             </div>
         </div>';
 $canopsis_host   = get_config_by_name('alert.transports.canopsis.host');
-$canopsis_port  = get_config_by_name('alert.transports.canopsis.port');
+$canopsis_port   = get_config_by_name('alert.transports.canopsis.port');
 $canopsis_user   = get_config_by_name('alert.transports.canopsis.user');
 $canopsis_passwd = get_config_by_name('alert.transports.canopsis.passwd');
 $canopsis_vhost  = get_config_by_name('alert.transports.canopsis.vhost');
