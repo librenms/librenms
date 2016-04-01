@@ -1,0 +1,242 @@
+-- *********************************************************************
+-- BROCADE-PRODUCTS-MIB.mib: Brocade Products MIB.
+--
+-- Dec 2014, Prabhu Sundaram
+--
+-- Copyright (c) 2012 by Brocade Communications Systems, Inc.
+-- All rights reserved.
+--
+-- *********************************************************************
+
+BROCADE-MAPS-MIB DEFINITIONS ::= BEGIN
+
+			 IMPORTS
+			 Integer32, OBJECT-IDENTITY, OBJECT-TYPE,
+			 MODULE-IDENTITY, NOTIFICATION-TYPE 
+			 FROM SNMPv2-SMI
+			 
+			 bcsiModules
+			 FROM Brocade-REG-MIB
+
+			 swVfId
+			 FROM SYSTEM-MIB;
+
+             maps MODULE-IDENTITY
+             LAST-UPDATED "201304221330Z" -- April 22, 2013 1:30pm
+             ORGANIZATION "Brocade Communications Systems, Inc.,"
+             CONTACT-INFO "Customer Support Group
+                        Brocade Communications Systems,
+                        120 Holger Way,
+                        San Jose, CA 95134 U.S.A
+                        Tel: +1-408-392-6061
+                        Fax: +1-408-392-6656
+                        Email: support@Brocade.COM
+                        WEB: www.brocade.com"
+
+             DESCRIPTION     "The MIB module is for Brocade's Monitoring and
+								Alerting Policy Suite[MAPS] feature."
+		REVISION	"201303011400Z" -- March 01, 2013 02:00pm
+		DESCRIPTION "added db category"
+		REVISION	"201304221330Z" -- April 22, 2013 01:30pm
+		DESCRIPTION "Updated mapsConfigObjectGroupType syntax values"
+		REVISION	"201501131400Z" -- January 13, 2015 02:00pm
+		DESCRIPTION "modified SW-MIB from IMPORTS to SYSTEM-MIB"
+		REVISION	"201501131400Z" -- June 10, 2015 02:00pm
+		DESCRIPTION "Updated mapsConfigObjectGroupType enum value"
+             ::=        { bcsiModules 4 }     
+            
+    mapsTraps OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION     "The OID represents the MAPS Trap."
+    ::= { maps 0 }          
+    
+    mapsConfig OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION     "The OID represents the MAPS Config params."
+    ::= { maps 1 }     
+    
+    mapsConfigRuleName OBJECT-TYPE
+    SYNTAX            OCTET STRING (SIZE (64))
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "It indicates the rule name which associates a condition 
+    					with actions that need to be triggered 
+    					when the specified condition is evaluated to true."
+    ::= { mapsConfig 1 }     
+    
+    mapsConfigCondition OBJECT-TYPE
+    SYNTAX            OCTET STRING (SIZE (64))
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "It indicates the condition defined in the rule. 
+					It includes the counter, time base and threshold 
+					value with the logical operation (eg: >, <, >= etc) that 
+					needs to be evaluated. Eg: (CRC/MIN > 10)"
+    ::= { mapsConfig 2 }     
+    
+    mapsConfigNumOfMS            OBJECT-TYPE
+    SYNTAX             Integer32
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION     "It indicates the number of monitoring system entries 
+					in the notifications"
+    ::= { mapsConfig 3 }
+
+    mapsConfigMsName OBJECT-TYPE
+    SYNTAX            OCTET STRING (SIZE (16))
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "This is monitoring system name like CRC, ITW, PS, FAN."   
+    ::= { mapsConfig 4 }
+    
+  	mapsConfigObjectGroupType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+    			unknown  (1),
+    			ps (2),
+    			fan  (3),
+    			port (4),
+    			ve-port-cir (5),
+    			ts (6),
+    			slot (7),
+    			gbic (8),
+    			flash (9),
+    			rule (10),
+				switch (11),
+				chassis (12),
+				cpu (13),
+				wwn (14),
+				flow (15),
+				eth-port (16)
+    		}
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "It indicates the object group type like circuit, PS, FAN."   
+    ::= { mapsConfig 5 }
+    
+  	mapsConfigObjectKeyType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+    			int32  (1),
+    			uint32 (2),
+    			float  (3),
+    			string (4)
+    		}	
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "It indicates the object key type. The main purpose of this
+ 				object to help NMS applications to interpret the data easily.
+				Eg: If the mapsConfigObjectGroupType is port then the key type 
+				is an integer and key value is the port number." 
+    ::= { mapsConfig 6 }
+  
+    mapsConfigObjectKeyValue     OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE (64))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "It indicates the object key value. Incase of integer this field
+					keeps as 1, 2, 3, 4, etc., and for string it keeps 
+					flowname1, flowname2, etc., Eg: if Group type is port,
+					then the object key value is the port number."
+    ::= { mapsConfig 7 }
+     
+  	mapsConfigValueType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+    			int32  (1),
+    			uint32 (2),
+    			float  (3),
+    			string (4)
+    		}	
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "It indicates the value type which could be integer, float
+					or string. The main purpose of this object to help 
+	   				NMS applications to interpret the data easily."   
+    ::= { mapsConfig 8 }
+     
+    mapsConfigCurrentValue        OBJECT-TYPE
+    SYNTAX             OCTET STRING (SIZE (64))
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION     "It indicates the actual value of the monitoring
+						system."
+    ::= { mapsConfig 9 }
+
+    mapsConfigTimeBase        OBJECT-TYPE
+    SYNTAX             OCTET STRING (SIZE (16))
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION     "The time period across which the change 
+    					in a counter is to be monitored"
+    ::= { mapsConfig 10 }
+   
+    mapsConfigSeverityLevel      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                   critical      (1),
+                   error         (2),
+                   warning       (3),
+                   informational (4),
+                   debug         (5)
+                 }
+    MAX-ACCESS          read-only
+    STATUS          current
+    DESCRIPTION     "It indicates the severity level of the
+       					condition triggered"
+    ::= { mapsConfig 11 }
+        
+    mapsConfigMsList		       OBJECT-TYPE
+    SYNTAX             OCTET STRING (SIZE (128))
+    MAX-ACCESS         read-only
+    STATUS             current
+        DESCRIPTION     "It indicates the list of the monitoring systems. The
+    				format is <msname>,<value-type>,<current-value>,<time-base>
+       				   ::<msName>,<value-type>,<current-value>,<time-base>::."
+    ::= { mapsConfig 12 }
+	
+	mapsConfigAction 				OBJECT-TYPE
+	SYNTAX 			   Integer32
+	MAX-ACCESS         read-only
+    STATUS             current
+        DESCRIPTION    "It indicates the actions(bitmask value) that need 
+						to be triggered when the specified condition 
+						evaluated to be true. Action bitmask value mapping are 
+							none				(0),
+							raslog				(1),
+							snmp				(2),
+							port-fence			(8),
+							email				(16),
+							switchstatus-down	(64),
+							switchstatus-marginal (128),
+							switchstatus-healthy (256),
+							switchpolicy		(512),
+							sfp-marginal		(1024)
+				Ex: mapsConfigAction value 3 represents both raslog and snmp action"
+    ::= { mapsConfig 13 }
+	
+
+    mapsDbCategory     OBJECT-TYPE
+    SYNTAX             OCTET STRING (SIZE (24))
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION     	"indicates db category name"
+    ::= { mapsConfig 14 }
+						 
+    mapsTrapAM	NOTIFICATION-TYPE        
+    OBJECTS     {            
+                mapsConfigRuleName, 
+                mapsConfigObjectGroupType,
+				mapsConfigObjectKeyType,
+                mapsConfigObjectKeyValue,
+                mapsConfigNumOfMS,
+                mapsConfigMsList,
+                mapsConfigSeverityLevel,          
+				mapsConfigCondition,
+				mapsConfigAction,
+				swVfId,
+		mapsDbCategory
+                }
+    STATUS current
+    DESCRIPTION     "Trap to be send for MAPS threshold events."
+    ::= { mapsTraps 1 }        
+     
+					 
+	        
+END
