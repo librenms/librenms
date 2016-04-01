@@ -29,6 +29,9 @@ function influxdb_connect() {
     if ($config['influxdb']['transport'] == 'http') {
         $influxdb_conn = 'influxdb';
     }
+    elseif ($config['influxdb']['transport'] == 'https') {
+        $influxdb_conn = 'https+influxdb';
+    }
     elseif ($config['influxdb']['transport'] == 'udp') {
         $influxdb_conn = 'udp+influxdb';
     }
@@ -37,7 +40,7 @@ function influxdb_connect() {
         return false;
     }
 
-    $db = \InfluxDB\Client::fromDSN($influxdb_conn.'://'.$influxdb_url);
+    $db = \InfluxDB\Client::fromDSN($influxdb_conn.'://'.$influxdb_url, $config['influxdb']['timeout'], $config['influxdb']['verifySSL']);
     return($db);
 
 }// end influxdb_connect
