@@ -21,15 +21,17 @@ RRD will continue to function as normal so LibreNMS itself should continue to fu
 ### Configuration
 ```php
 $config['influxdb']['enable'] = true;
-$config['influxdb']['transport'] = 'http';
+$config['influxdb']['transport'] = 'http'; # Default, other options: https, udp
 $config['influxdb']['host'] = '127.0.0.1';
 $config['influxdb']['port'] = '8086';
 $config['influxdb']['db'] = 'librenms';
 $config['influxdb']['username'] = 'admin';
 $config['influxdb']['password'] = 'admin';
+$config['influxdb']['timeout'] = 0; # Optional
+$config['influxdb']['verifySSL'] = false; # Optional
 ```
 
-UDP is a supported transport and no credentials are needed if you don't use InfluxDB authentication.
+No credentials are needed if you don't use InfluxDB authentication.
 
 The same data then stored within rrd will be sent to InfluxDB and recorded. You can then create graphs within Grafana
 to display the information you need.
