@@ -19,7 +19,7 @@ if (file_exists($rrdfilename)) {
     $rrd_options .= ' GPRINT:visible:LAST:%0.2lf%s ';
     $rrd_options .= ' GPRINT:visible:MIN:%0.2lf%s ';
     $rrd_options .= ' GPRINT:visible:MAX:%0.2lf%s\\\l ';
-    $rrd_options .= " LINE2:tracked#cc9900:'Tracked       ' ";
+    $rrd_options .= " AREA:tracked#00B200:'Tracked       ' ";
     $rrd_options .= ' GPRINT:tracked:LAST:%0.2lf%s ';
     $rrd_options .= ' GPRINT:tracked:MIN:%0.2lf%s ';
     $rrd_options .= ' GPRINT:tracked:MAX:%0.2lf%s\\\l ';
