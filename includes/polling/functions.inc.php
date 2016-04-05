@@ -293,7 +293,7 @@ function poll_device($device, $options) {
 
         $device_end  = microtime(true);
         $device_run  = ($device_end - $device_start);
-        $device_time = substr($device_run, 0, 5);
+        $device_time = floatval(substr($device_run, 0, 5));
 
         // Poller performance
         if (!empty($device_time)) {
