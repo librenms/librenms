@@ -112,7 +112,7 @@ function poll_sensor($device, $class, $unit) {
         echo "$sensor_value $unit\n";
 
         $fields = array(
-            'sensor' => $sensor_value,
+            'sensor' => floatval($sensor_value),
         );
 
         rrdtool_update($rrd_file, $fields);
