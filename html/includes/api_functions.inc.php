@@ -726,10 +726,15 @@ function get_port_stack() {
     $app      = \Slim\Slim::getInstance();
     $router   = $app->router()->getCurrentRoute()->getParams();
     $hostname = $router['hostname'];
-
     // use hostname as device_id if it's all digits
     $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high` ASC", array($device_id));
+
+    if (isset($_GET['valid_mappings'])) {
+        $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high` ASC", array($device_id));
+    } else {
+        $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high` ASC", array($device_id));
+    }
+
     $total_mappings = count($mappings);
     $output         = array(
         'status'  => 'ok',
