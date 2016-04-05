@@ -6,11 +6,11 @@ if ($device['os'] == 'canopy') {
         d_echo($oids."\n");
 
         if (!empty($oids)) {
-            echo 'Cambium Temperature ';
+            echo 'Canopy Temperature ';
         }
 
         $divisor = 1;
-        $type    = 'cambium';
+        $type    = 'canopy';
         if (!empty($oids)) {
             list(,$current) = explode(' ', $oids);
             $index          = $oid;
