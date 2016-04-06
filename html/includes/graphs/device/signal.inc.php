@@ -2,6 +2,6 @@
  
  $class     = 'signal';
  $unit      = 'dBm';
- $unit_long = '';
+ $unit_long = 'dBm';
  
  require 'includes/graphs/device/sensor.inc.php';
