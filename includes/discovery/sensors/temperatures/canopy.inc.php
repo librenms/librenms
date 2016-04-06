@@ -15,7 +15,6 @@ if ($device['os'] == 'canopy') {
             list(,$current) = explode(' ', $oids);
             $index          = $oid;
             $descr          = 'System Temp';
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', -30, null, null, 50, $current);
         }
-    
 }
