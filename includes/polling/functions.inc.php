@@ -313,7 +313,7 @@ function poll_device($device, $options) {
                 'rrd_def' => 'DS:ping:GAUGE:600:0:65535',
             );
             $fields = array(
-                'ping' => $ping_time,
+                'ping' => floatval($ping_time),
             );
 
             $update_array['last_ping']             = array('NOW()');
