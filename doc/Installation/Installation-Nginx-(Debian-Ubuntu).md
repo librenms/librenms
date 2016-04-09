@@ -140,6 +140,7 @@ server {
  }
 }
 ```
+
 On at least Ubuntu 14.04 (and possibly other distributions and versions as well), mcrypt is not enabled on install.  Run the following to enable it:
 
     php5enmod mcrypt
