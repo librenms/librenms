@@ -4,20 +4,50 @@
   - WebUI:
     - Skip authentication check in graph.php if unauth graphs is enabled (PR3019)
     - Stop double escaping notes for devices (PR3149)
+    - Corrected aggregate graph on smokeping page (PR3177)
+    - Fix non-admin syslog queries (PR3191)
+    - Fix services SQL (PR3205)
   - Discovery / Polling:
     - Revert arp discovery to pre-vrf lite support (PR3126)
+    - Fix IOS-XR DBM sensors (PR3291)
+  - Alerting:
+    - Fix alert failure response from transports (PR3283)
   - Misc:
     - Fix data in bills if counters doesn't change (PR3132)
     - Improve performance of billing poller (PR3129)
+    - Fix API tokens when using LDAP auth (PR3178)
+    - Import notifications with original datetime (PR3200)
+    - Add sysName for top-interfaces widget (PR3201)
+    - Fix Cisco syslog parsing when logging timestamp enabled (PR3203)
 
 #### Improvements
   - WebUI:
     - Added ability to show device group specific maps (PR3018)
+    - Updated Billing UI (PR3194, PR3195, PR3216, PR3239, PR3240)
+    - Added Juniper
+    - Added config option for HTML emails in mail transport (PR3221)
   - Discovery / Polling:
     - Added Juniper state support (PR3121)
     - Added Ironware state support (PR3160)
+    - Check sysObjectID before detecting ILO temp sensors (PR3204)
+    - Improved Avtech support (PR3207)
+    - Improved Dell NOS detection (PR3213)
+    - Added Juniper alarm state monitoring (PR3226)
+    - Updated Drac state support (PR3228)
+    - Improved serial # detection for Brocade Ironware devices (PR3292)
+  - Added detection for:
+    - Develop Ineo printers (PR3224)
+    - Cumulus Linux (PR3237)
+    - Deliberant WiFi (PR3246)
+    - Juniper EX2500 (PR3254)
+    - Cambium devices (PR3279)
+  - Alerting:
+    - Added Canopsis alerting transport (PR3299)
   - Misc:
     - Improved syslog support (PR3171, PR3172, PR3173)
+    - Added Nginx install docs for Debian/Ubuntu (PR3301)
+    - Updated InfluxDB php module (PR3302)
+    - Updated Component API (PR3304)
 
 ### February 2016
 
