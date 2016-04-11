@@ -112,6 +112,7 @@ function poll_service($service) {
     global $config;
     $update = array();
     $old_status = $service['service_status'];
+    $check_cmd = "";
 
     // if we have a script for this check, use it.
     $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service['service_type']).'.inc.php';
@@ -120,7 +121,7 @@ function poll_service($service) {
     }
 
     // If we do not have a cmd from the check script, build one.
-    if (!isset($check_cmd)) {
+    if ($check_cmd == "") {
         $check_cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
         $check_cmd .= " " . $service['service_param'];
     }
