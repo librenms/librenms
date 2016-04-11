@@ -535,8 +535,8 @@ function get_components() {
         unset ($_GET['label']);
     }
     // Add the rest of the options with an equals query
-    foreach ($_GET as $k) {
-        $options['filter'][$k] = array('=',$_GET[$k]);
+    foreach ($_GET as $k => $v) {
+        $options['filter'][$k] = array('=',$v);
     }
 
     // use hostname as device_id if it's all digits
@@ -550,6 +550,100 @@ function get_components() {
         'count'   => count($components[$device_id]),
         'components'  => $components[$device_id],
     );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+
+function add_components() {
+    global $config;
+    $code     = 200;
+    $status   = 'ok';
+    $message  = '';
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $ctype = $router['type'];
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $COMPONENT = new component();
+    $component = $COMPONENT->createComponent($device_id,$ctype);
+
+    $output       = array(
+        'status'  => "$status",
+        'err-msg' => $message,
+        'count'   => count($component),
+        'components'  => $component,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+
+function edit_components() {
+    global $config;
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $COMPONENT = new component();
+
+    if ($COMPONENT->setComponentPrefs($device_id,$data)) {
+        // Edit Success.
+        $code     = 200;
+        $status   = 'ok';
+        $message  = '';
+    }
+    else {
+        // Edit Failure.
+        $code     = 500;
+        $status   = 'error';
+        $message  = 'Components could not be edited.';
+    }
+
+    $output       = array(
+        'status'  => "$status",
+        'err-msg' => $message,
+        'count'   => count($data),
+    );
+
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
+
+
+function delete_components() {
+    global $config;
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $cid = $router['component'];
+
+    $COMPONENT = new component();
+    if ($COMPONENT->deleteComponent($cid)) {
+        // Edit Success.
+        $code     = 200;
+        $status   = 'ok';
+        $message  = '';
+    }
+    else {
+        // Edit Failure.
+        $code     = 500;
+        $status   = 'error';
+        $message  = 'Components could not be deleted.';
+    }
+
+    $output       = array(
+        'status'  => "$status",
+        'err-msg' => $message,
+    );
+
     $app->response->setStatus($code);
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
@@ -625,6 +719,32 @@ function get_port_graphs() {
     $app->response->headers->set('Content-Type', 'application/json');
     echo _json_encode($output);
 
+}
+
+function get_port_stack() {
+    global $config;
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id      = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    if (isset($_GET['valid_mappings'])) {
+        $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high` ASC", array($device_id));
+    } else {
+        $mappings       = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high` ASC", array($device_id));
+    }
+
+    $total_mappings = count($mappings);
+    $output         = array(
+        'status'  => 'ok',
+        'err-msg' => '',
+        'count'   => $total_mappings,
+        'mappings'   => $mappings,
+    );
+    $app->response->setStatus('200');
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
 }
 
 function list_alert_rules() {

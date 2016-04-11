@@ -21,6 +21,7 @@ Table of Content:
     - [Clickatell](#transports-clickatell)
     - [PlaySMS](#transports-playsms)
     - [VictorOps](#transports-victorops)
+    - [Canopsis](#transports-canopsis)
 - [Entities](#entities)
     - [Devices](#entity-devices)
     - [BGP Peers](#entity-bgppeers)
@@ -439,6 +440,28 @@ The URL provided will have $routing_key at the end, you need to change this to s
 $config['alert']['transports']['victorops']['url'] = 'https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms';
 ```
 ~~
+
+## <a name="transports-canopsis">Canopsis</a>
+
+Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis which are then converted to canopsis events. To configure the transport, go to:
+
+Global Settings -> Alerting Settings -> Canopsis Transport.
+
+You will need to fill this paramaters :
+
+~~
+```php
+$config['alert']['transports']['canopsis']['host'] = 'www.xxx.yyy.zzz';
+$config['alert']['transports']['canopsis']['port'] = '5672';
+$config['alert']['transports']['canopsis']['user'] = 'admin';
+$config['alert']['transports']['canopsis']['passwd'] = 'my_password';
+$config['alert']['transports']['canopsis']['vhost'] = 'canopsis';
+```
+~~
+
+For more information about canopsis and its events, take a look here :
+ http://www.canopsis.org/
+ http://www.canopsis.org/wp-content/themes/canopsis/doc/sakura/user-guide/event-spec.html
 
 # <a name="entities">Entities
 

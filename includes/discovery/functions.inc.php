@@ -336,6 +336,10 @@ function sensor_low_limit($class, $current) {
         case 'power':
             $limit = null;
             break;
+
+        case 'signal':
+            $limit = -80;
+            break;
     }//end switch
 
     return $limit;
@@ -377,6 +381,10 @@ function sensor_limit($class, $current) {
 
         case 'power':
             $limit = ($current * 1.50);
+            break;
+
+        case 'signal';
+            $limit = -30;
             break;
     }//end switch
 

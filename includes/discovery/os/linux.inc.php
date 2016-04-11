@@ -4,6 +4,7 @@ if (!$os) {
     $skip_oids = array(
         '.1.3.6.1.4.1.674.10892.2',
         '.1.3.6.1.4.1.17163.1.1',
+        '.1.3.6.1.4.1.17713.21'
     );
     if (preg_match('/^Linux/', $sysDescr) && !in_array($sysObjectId, $skip_oids)) {
         $os = 'linux';
