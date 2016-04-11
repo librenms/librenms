@@ -1,0 +1,246 @@
+--
+-- Copyright (c) 2004-2009, Infoblox, Inc
+-- All rights reserved.
+                                                                                                
+IB-DNSONE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, enterprises, 
+   Counter64          FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION FROM SNMPv2-TC
+   ibDNSOne, IbString FROM IB-SMI-MIB;
+
+ibDnsModule MODULE-IDENTITY
+    LAST-UPDATED "201003230000Z"  --  Mar 23, 2010
+    ORGANIZATION "Infoblox"
+    CONTACT-INFO "Please See IB-SMI-MIB."
+    DESCRIPTION "This file defines the Infoblox DNS One MIB."
+
+    REVISION  "201003230000Z"  --  Mar 23, 2010
+    DESCRIPTION   "Fixed smilint errors"
+
+    REVISION  "200506090000Z"  --  Jun 09, 2005
+    DESCRIPTION   "DNS views"
+
+    REVISION  "200501100000Z"  --  Jan 10, 2005
+    DESCRIPTION   "Added copyright"
+                                                                                                
+    REVISION  "200405210000Z"  --  May 21, 2004
+    DESCRIPTION   "Creation of the MIB file"
+
+    ::= { ibDNSOne 1 }
+
+-- DNSOne Statistics Definitions
+
+ibZoneStatisticsTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbZoneStatisticsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of named ZONE statistics."
+   ::= { ibDnsModule 1 }
+
+ibZoneStatisticsEntry OBJECT-TYPE
+   SYNTAX        IbZoneStatisticsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row of the ibZoneStatisticsEntry containing
+                 info about a particular zone in the default view."
+   INDEX         { ibBindZoneName }
+   ::= { ibZoneStatisticsTable 1}
+
+IbZoneStatisticsEntry ::=
+   SEQUENCE {
+      ibBindZoneName             IbString,
+      ibBindZoneSuccess          Counter64,
+      ibBindZoneReferral         Counter64,
+      ibBindZoneNxRRset          Counter64,
+      ibBindZoneNxDomain         Counter64,
+      ibBindZoneRecursion        Counter64,
+      ibBindZoneFailure          Counter64
+   }
+
+ibBindZoneName OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "DNS Zone name. The first one is global summary statistics.
+                  Index name for global statistics is 'summary'. All zones
+                  live in the default view."
+   ::= { ibZoneStatisticsEntry 1 }
+
+ibBindZoneSuccess OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of Successful responses since DNS process started."
+   ::= { ibZoneStatisticsEntry 2 }
+
+ibBindZoneReferral OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of DNS referrals since DNS process started."
+   ::= { ibZoneStatisticsEntry 3 }
+
+ibBindZoneNxRRset OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of DNS query received for non-existent record."
+   ::= { ibZoneStatisticsEntry 4 }
+
+ibBindZoneNxDomain OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of DNS query received for non-existent domain."
+   ::= { ibZoneStatisticsEntry 5 }
+
+ibBindZoneRecursion OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of Queries received using recursion since DNS process
+                  started."
+   ::= { ibZoneStatisticsEntry 6 }
+
+ibBindZoneFailure OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of Failed queries since DNS process started."
+   ::= { ibZoneStatisticsEntry 7 }
+
+-- Interface to query for zone statistics when there are more
+-- views than just the default one. Same as the original interface
+-- above (except for names and OIDs), but with the addition of the
+-- view name.
+
+ibZonePlusViewStatisticsTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbZonePlusViewStatisticsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of named ZONE+VIEW statistics."
+   ::= { ibDnsModule 2 }
+
+ibZonePlusViewStatisticsEntry OBJECT-TYPE
+   SYNTAX        IbZonePlusViewStatisticsEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row of the ibZonePlusViewStatisticsEntry containing
+                 info about a particular zone in a particular view."
+   INDEX         { ibBindViewName, ibBindZonePlusViewName }
+   ::= { ibZonePlusViewStatisticsTable 1}
+
+IbZonePlusViewStatisticsEntry ::=
+   SEQUENCE {
+      ibBindZonePlusViewName             IbString,
+      ibBindZonePlusViewSuccess          Counter64,
+      ibBindZonePlusViewReferral         Counter64,
+      ibBindZonePlusViewNxRRset          Counter64,
+      ibBindZonePlusViewNxDomain         Counter64,
+      ibBindZonePlusViewRecursion        Counter64,
+      ibBindZonePlusViewFailure          Counter64,
+      ibBindViewName                     IbString
+   }
+
+ibBindZonePlusViewName OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "DNS Zone name. The first one in the default view is the
+                  global summary statistics. Index name for global statistics
+                  is 'summary'."
+   ::= { ibZonePlusViewStatisticsEntry 1 }
+
+ibBindZonePlusViewSuccess OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of Successful responses since DNS process started."
+   ::= { ibZonePlusViewStatisticsEntry 2 }
+
+ibBindZonePlusViewReferral OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of DNS referrals since DNS process started."
+   ::= { ibZonePlusViewStatisticsEntry 3 }
+
+ibBindZonePlusViewNxRRset OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of DNS query received for non-existent record."
+   ::= { ibZonePlusViewStatisticsEntry 4 }
+
+ibBindZonePlusViewNxDomain OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of DNS query received for non-existent domain."
+   ::= { ibZonePlusViewStatisticsEntry 5 }
+
+ibBindZonePlusViewRecursion OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of Queries received using recursion since DNS process
+                  started."
+   ::= { ibZonePlusViewStatisticsEntry 6 }
+
+ibBindZonePlusViewFailure OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of Failed queries since DNS process started."
+   ::= { ibZonePlusViewStatisticsEntry 7 }
+
+ibBindViewName OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "DNS view name. Empty for default view and summary."
+   ::= { ibZonePlusViewStatisticsEntry 8 }
+
+ibDDNSUpdateStatistics OBJECT IDENTIFIER
+   ::= { ibDnsModule 3 }
+
+ibDDNSUpdateSuccess OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of successful dynamic DNS update."
+   ::= { ibDDNSUpdateStatistics 1 }
+
+ibDDNSUpdateFailure OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of failure dynamic DNS update."
+   ::= { ibDDNSUpdateStatistics 2 }
+
+ibDDNSUpdateReject OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of dynamic DNS update rejects maybe
+                  due to permission failure."
+   ::= { ibDDNSUpdateStatistics 3 }
+
+ibDDNSUpdatePrerequisiteReject OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of dynamic DNS update rejects due to
+                  prerequisite failure."
+   ::= { ibDDNSUpdateStatistics 4 }
+
+ibBindZoneTransferCount OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Number of zone transfer."
+   ::= { ibDnsModule 4 }
+
+END
