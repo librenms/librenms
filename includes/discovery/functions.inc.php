@@ -338,10 +338,7 @@ function sensor_low_limit($class, $current) {
             break;
 
         case 'signal':
-            $limit = ($current * 1.20);
-            if ($limit < -80 && $current > -80) {
-                $limit = -80;
-            }
+            $limit = -80;
             break;
     }//end switch
 
@@ -387,7 +384,7 @@ function sensor_limit($class, $current) {
             break;
 
         case 'signal';
-            $limit = 0;
+            $limit = -30;
             break;
     }//end switch
 
