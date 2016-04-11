@@ -1,0 +1,105 @@
+--
+-- Copyright (c) 2004-2009, Infoblox, Inc
+-- All rights reserved.
+
+IB-SMI-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Imports
+--
+
+IMPORTS MODULE-IDENTITY, OBJECT-TYPE, enterprises
+		        FROM SNMPv2-SMI 
+        TEXTUAL-CONVENTION
+		        FROM SNMPv2-TC;
+
+--
+-- Module Identity
+--        
+
+infoblox MODULE-IDENTITY
+         LAST-UPDATED  "200911120000Z"  --  Nov 12, 2009
+         ORGANIZATION  "Infoblox"
+         CONTACT-INFO  "Infoblox
+                        4750 Patrick Henry Drive
+                        Santa Clara, CA 95054
+                        1-888-463-6259
+	                support@infoblox.com"
+         DESCRIPTION
+           "This is the MIB module for object type definitions
+	    that are used throughout the infoblox enterprise MIBs."
+
+         REVISION  "200801140000Z"  --  Jan 14, 2008
+         DESCRIPTION   "Updated copyright and CONTACT_INFO"
+                                                                                                
+         REVISION  "200501100000Z"  --  Jan 10, 2005
+         DESCRIPTION   "Added copyright"
+                                                                                                
+         REVISION  "200405210000Z"  --  May 21, 2004
+         DESCRIPTION   "Creation of the MIB file"
+                                                                                                
+         ::= {  enterprises  7779  }
+
+infobloxProducts  OBJECT IDENTIFIER ::= { infoblox 1 }
+
+ibDefault 	OBJECT IDENTIFIER ::= { infobloxProducts 1000 }
+ibRsp2 		OBJECT IDENTIFIER ::= { infobloxProducts 1001 }
+ibCisco 	OBJECT IDENTIFIER ::= { infobloxProducts 1002 }
+ibVm 		OBJECT IDENTIFIER ::= { infobloxProducts 1003 }
+ibVnios 	OBJECT IDENTIFIER ::= { infobloxProducts 1004 }
+
+ib1000 		OBJECT IDENTIFIER ::= { infobloxProducts 1101 }
+ib1200 		OBJECT IDENTIFIER ::= { infobloxProducts 1102 }
+ib500 		OBJECT IDENTIFIER ::= { infobloxProducts 1103 }
+
+ib550 		OBJECT IDENTIFIER ::= { infobloxProducts 1201 }
+ib1050 		OBJECT IDENTIFIER ::= { infobloxProducts 1202 }
+ib1550 		OBJECT IDENTIFIER ::= { infobloxProducts 1203 }
+ib1552 		OBJECT IDENTIFIER ::= { infobloxProducts 1204 }
+ib2000 		OBJECT IDENTIFIER ::= { infobloxProducts 1205 }
+ib250 		OBJECT IDENTIFIER ::= { infobloxProducts 1206 }
+ib1220 		OBJECT IDENTIFIER ::= { infobloxProducts 1207 }
+
+ib550a 		OBJECT IDENTIFIER ::= { infobloxProducts 1301 }
+ib1050a 	OBJECT IDENTIFIER ::= { infobloxProducts 1302 }
+ib1550a 	OBJECT IDENTIFIER ::= { infobloxProducts 1303 }
+ib1552a 	OBJECT IDENTIFIER ::= { infobloxProducts 1304 }
+ib1852a 	OBJECT IDENTIFIER ::= { infobloxProducts 1305 }
+ib250a 		OBJECT IDENTIFIER ::= { infobloxProducts 1306 }
+ib2000a 	OBJECT IDENTIFIER ::= { infobloxProducts 1307 }
+
+ib4000 		OBJECT IDENTIFIER ::= { infobloxProducts 1420 }
+ib4010 		OBJECT IDENTIFIER ::= { infobloxProducts 1421 }
+ib4020 		OBJECT IDENTIFIER ::= { infobloxProducts 1422 }
+
+ibSNMP        OBJECT IDENTIFIER ::= { infoblox 3 }  -- oid for SNMP tree
+ibProduct     OBJECT IDENTIFIER ::= { ibSNMP 1 }
+ibOne         OBJECT IDENTIFIER ::= { ibProduct 1 }
+ibTrapOne     OBJECT IDENTIFIER ::= { ibOne 1 }
+ibPlatformOne OBJECT IDENTIFIER ::= { ibOne 2 }
+ibDNSOne      OBJECT IDENTIFIER ::= { ibOne 3 }
+ibDHCPOne     OBJECT IDENTIFIER ::= { ibOne 4 }
+
+IbString ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT  "255a"
+   STATUS        current
+   DESCRIPTION   "A text string with 255 octets"
+   SYNTAX        OCTET STRING (SIZE (0..255))
+
+IbNode ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "A node name string"
+   SYNTAX        OCTET STRING (SIZE (0..127))
+                                                                                
+IbIpAddr ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "An Ip address in xxx.xxx.xxx.xxx notation"
+   SYNTAX        OCTET STRING (SIZE(0..16))
+
+IbIpv6Addr ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "An Ipv6 address in semicolon notation"
+   SYNTAX        OCTET STRING (SIZE (0..46))
+
+END
+
