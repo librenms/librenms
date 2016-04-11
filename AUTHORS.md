@@ -27,7 +27,7 @@ LibreNMS contributors:
 - Mohammad Al-Shami <mohammad@al-shami.net> (mohshami)
 - Rudy Hardeman <zarya@gigafreak.net> (zarya)
 - Freddie Cash <fjwcash@gmail.com> (fjwcash)
-- Thom Seddon <thom@seddonmedia.co.uk> (thomseddon) 
+- Thom Seddon <thom@seddonmedia.co.uk> (thomseddon)
 - Vitali Kari <vitali.kari@gmail.com> (vitalisator)
 - James Campbell <neokjames@gmail.com> (neokjames)
 - Steve Calvário <calvario.steve@gmail.com> (Calvario)
@@ -92,6 +92,9 @@ LibreNMS contributors:
 - Marco Di Cerbo <marco@dottoremoe.com> (marcodc)
 - David Bell <me@geordish.org> (geordish)
 - Ibrahim Tachijian <barhom@netsat.se> (barhom)
+- Guillaume Coeugnet <aliasprotect-git@yahoo.fr> (gcoeugnet)
+- Jared Newell <jared.newell@gmail.com> (Jaredn)
+- Karsten Nerdinger <karsten-git-librenms@nerdinger.net> (piratonym)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
@@ -99,4 +102,4 @@ Observium was written by:
 - Tom Laermans
 - various others as indicated in the file contents and commit logs
 
- 
+

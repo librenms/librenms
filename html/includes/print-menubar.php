@@ -361,8 +361,8 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square','dbm'=>'sun-o', 'load'=>'spinner','state'=>'bullseye');
-foreach (array('fanspeed','humidity','temperature') as $item) {
+$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square','dbm'=>'sun-o', 'load'=>'spinner','state'=>'bullseye','signal'=>'wifi');
+foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg"></i> '.nicecase($item).'</a></li>');
         unset($menu_sensors[$item]);$sep++;

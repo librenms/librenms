@@ -162,7 +162,7 @@ if ($device['os_group'] == 'cisco') {
                 if ($ok) {
                     discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
                     #Cisco IOS-XR : add a fake sensor to graph as dbm
-                    if ($type == "power" and $device['os'] == "iosxr" and preg_match ("/Transceiver (R|T)x/i", $descr) ) {
+                    if ($type == "power" and $device['os'] == "iosxr" and preg_match ("/power (R|T)x/i", $descr) ) {
                             // convert Watts to dbm
                             $type = "dbm";
                             $limit_low = 10 * log10($limit_low*1000);
