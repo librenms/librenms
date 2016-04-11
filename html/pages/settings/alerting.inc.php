@@ -835,6 +835,59 @@ echo '
                             <textarea class="form-control" name="global-config-textarea" id="playsms_to" placeholder="Enter the config options" data-config_id="'.$playsms_url['config_id'].'" data-type="playsms">'.$upd_mobiles.'</textarea>
                             <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+$canopsis_host   = get_config_by_name('alert.transports.canopsis.host');
+$canopsis_port   = get_config_by_name('alert.transports.canopsis.port');
+$canopsis_user   = get_config_by_name('alert.transports.canopsis.user');
+$canopsis_passwd = get_config_by_name('alert.transports.canopsis.passwd');
+$canopsis_vhost  = get_config_by_name('alert.transports.canopsis.vhost');
+echo '
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#canopsis_transport_expand"><i class="fa fa-caret-down"></i> Canopsis transport</a> <button name="test-alert" id="test-alert" type="button" data-transport="canopsis" class="btn btn-primary btn-xs pull-right">Test transport</button>
+                </h4>
+            </div>
+            <div id="canopsis_transport_expand" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="form-group has-feedback">
+                        <label for="canopsis_host" class="col-sm-4 control-label">Canopsis Hostname </label>
+                        <div class="col-sm-4">
+                            <input id="canopsis_host" class="form-control" type="text" name="global-config-input" value="'.$canopsis_host['config_value'].'" data-config_id="'.$canopsis_host['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="canopsis_port" class="col-sm-4 control-label">Canopsis Port number </label>
+                        <div class="col-sm-4">
+                            <input id="canopsis_port" class="form-control" type="text" name="global-config-input" value="'.$canopsis_port['config_value'].'" data-config_id="'.$canopsis_port['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="canopsis_user" class="col-sm-4 control-label">User</label>
+                        <div class="col-sm-4">
+                            <input id="canopsis_user" class="form-control" type="text" name="global-config-input" value="'.$canopsis_user['config_value'].'" data-config_id="'.$canopsis_user['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="canopsis_passwd" class="col-sm-4 control-label">Password</label>
+                        <div class="col-sm-4">
+                            <input id="canopsis_passwd" class="form-control" type="password" name="global-config-input" value="'.$canopsis_passwd['config_value'].'" data-config_id="'.$canopsis_passwd['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label for="canopsis_vhost" class="col-sm-4 control-label">Vhost</label>
+                        <div class="col-sm-4">
+                            <input id="canopsis_vhost" class="form-control" type="text" name="global-config-input" value="'.$canopsis_vhost['config_value'].'" data-config_id="'.$canopsis_vhost['config_id'].'">
+                            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -20,6 +20,9 @@ function poll_sensor($device, $class, $unit) {
                 if ($device['os'] == 'netapp') {
                     include 'includes/polling/temperatures/netapp.inc.php';
                 }
+                else if ($device['os'] == 'canopy') {
+                    include 'includes/polling/temperatures/canopy.inc.php';
+                }
                 else {
                     // Try 5 times to get a valid temp reading
                     for ($i = 0; $i < 5; $i++) {
@@ -42,6 +45,11 @@ function poll_sensor($device, $class, $unit) {
             else if ($class == 'state') {
                 $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-Oevq', 'SNMPv2-MIB')));
             }
+            else if ($class == 'signal') {
+               $currentOS = $device['os'];
+               include "includes/polling/signal/$currentOS.inc.php";
+               $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
+           }
             else if ($class == 'dbm') {
                 $sensor_value = trim(str_replace('"', '', snmp_get($device, $sensor['sensor_oid'], '-OUqnv', "SNMPv2-MIB$mib")));
                 //iosxr does not expose dbm values through SNMP so we convert Watts to dbm to have a nice graph to show
