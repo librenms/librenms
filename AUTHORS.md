@@ -93,6 +93,7 @@ LibreNMS contributors:
 - David Bell <me@geordish.org> (geordish)
 - Ibrahim Tachijian <barhom@netsat.se> (barhom)
 - Guillaume Coeugnet <aliasprotect-git@yahoo.fr> (gcoeugnet)
+- Karsten Nerdinger <karsten-git-librenms@nerdinger.net> (piratonym)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
