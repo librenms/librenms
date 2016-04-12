@@ -1252,10 +1252,28 @@ function function_check($function) {
     return function_exists($function);
 }
 
-function force_influx_data($type,$data) {
-    if ($type == 'f' || $type == 'float') {
-        return(sprintf("%.1f",$data));
+function force_influx_data($data) {
+   /*
+    * It is not trivial to detect if something is a float or an integer, and
+    * therefore may cause breakages on inserts.
+    * Just setting every number to a float gets around this, but may introduce
+    * inefficiencies.
+    * I've left the detection statement in there for a possible change in future,
+    * but currently everything just gets set to a float.
+    */
+
+    if (is_numeric($data)) {
+        // If it is an Integer
+        if (ctype_digit($data)) {
+            return floatval($data);
+        // Else it is a float
+        } else {
+            return floatval($data);
+        }
+    } else {
+        return $data;
     }
+
 }// end force_influx_data
 
 /**
