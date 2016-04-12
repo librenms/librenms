@@ -54,7 +54,7 @@ if ($device['os'] != 'Snom') {
             $value = $data_array[0][$oid];
         }
         else {
-            $value = 'U';
+            $value = null;
         }
         $fields[$oid] = $value;
     }
