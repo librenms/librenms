@@ -871,3 +871,6 @@ $config['ignore_unmapable_port'] = False;
 // InfluxDB default configuration
 $config['influxdb']['timeout']      = 0;
 $config['influxdb']['verifySSL']    = false;
+
+// Typeahead default configuration
+$config['typeahead_limit']    = 5;

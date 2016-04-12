@@ -204,6 +204,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_device.ttAdapter(),
+    limit: '.$config['typeahead_limit'].',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Devices</strong></h5>",
@@ -240,6 +241,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_port.ttAdapter(),
+    limit: '.$config['typeahead_limit'].',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Ports</strong></h5>",
@@ -275,6 +277,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_application.ttAdapter(),
+    limit: '.$config['typeahead_limit'].',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Applications</strong></h5>",
@@ -312,6 +315,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_munin.ttAdapter(),
+    limit: '.$config['typeahead_limit'].',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Munin</strong></h5>",
@@ -346,6 +350,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_bill.ttAdapter(),
+    limit: '.$config['typeahead_limit'].',
     async: false,
     templates: {
       header: "<h5><strong><i class=\'fa fa-money\'></i>&nbsp;Bill</strong></h5>",
