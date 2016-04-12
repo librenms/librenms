@@ -327,6 +327,16 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
                 if (is_file($configs.$device['hostname'])) {
                     $device_config_file = $configs.$device['hostname'];
                 }
+                elseif (is_file($configs.strtok($device['hostname'], '.'))) { // Strip domain
+                    $device_config_file = $configs.strtok($device['hostname'], '.');
+                }
+                else {
+                    if (!empty($config['mydomain'])) { // Try with domain name if set
+                        if (is_file($configs.$device['hostname'].'.'.$config['mydomain'])) {
+                            $device_config_file = $configs.$device['hostname'].'.'.$config['mydomain'];
+                        }
+                    }
+                } // end if
             }
 
             if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
