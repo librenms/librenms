@@ -101,6 +101,22 @@ class SyslogTest extends \PHPUnit_Framework_TestCase
             array('device_id'=>1, 'program'=>'RXSBIF_SEQ_NUM_ERROR', 'msg'=>'slot=x')
         );
 
+        // With program from syslog
+	$this->checkSyslog(
+            "1.1.1.1||local7||notice||notice||bd||2016-04-04 15:18:43||Apr 4 13:18:42.670: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/32, changed state to up||345735",
+            array('device_id'=>1, 'program'=>'%LINEPROTO-5-UPDOWN', 'msg'=>'Line protocol on Interface GigabitEthernet0/32, changed state to up')
+        );
+
+        // Incorrect time
+	$this->checkSyslog(
+            "1.1.1.1||user||info||info||0e||2016-04-06 15:20:35||*Apr 4 21:26:41.778 UTC: %LWAPP-3-REPLAY_ERR: 1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx||",
+            array('device_id'=>1, 'program'=>'%LWAPP-3-REPLAY_ERR', 'msg'=>'1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx')
+        );
+
+	$this->checkSyslog(
+            "1.1.1.1||user||info||info||0e||2016-04-06 15:20:35||.Apr 4 21:26:41.778 UTC: %LWAPP-3-REPLAY_ERR: 1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx||",
+            array('device_id'=>1, 'program'=>'%LWAPP-3-REPLAY_ERR', 'msg'=>'1 wcm: Received replay error on slot 1, WLAN ID 1, count 1 from AP xxxx.xxxx.xxxx')
+        );
     }
     public function testLinuxSyslog()
     {
