@@ -55,7 +55,7 @@ function process_syslog($entry, $update) {
             // multipart message
             if(strpos($entry['msg'], ':') !== false) {
                 $matches = array();
-                $timestamp_prefix = '([A-Z][a-z]{2} \d\d? \d\d:\d\d:\d\d(.\d\d\d)?( [A-Z]{3})?: )?';
+                $timestamp_prefix = '([\*\.]?[A-Z][a-z]{2} \d\d? \d\d:\d\d:\d\d(.\d\d\d)?( [A-Z]{3})?: )?';
                 $program_match = '(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?)';
                 $message_match = '(?<msg>.*)';
                 if(preg_match('/^' . $timestamp_prefix . $program_match . ': ?' . $message_match . '/', $entry['msg'], $matches)) {
