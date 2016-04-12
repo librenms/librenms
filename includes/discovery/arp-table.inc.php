@@ -4,6 +4,16 @@ unset($mac_table);
 
 echo 'ARP Table : ';
 
+if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0) ){
+    $vrfs_lite_cisco = $device['vrf_lite_cisco'];
+}
+else  {
+    $vrfs_lite_cisco = array(array('context_name'=>null));
+}
+
+foreach ($vrfs_lite_cisco as $vrf) {
+    $device['context_name']=$vrf['context_name'];
+
 $ipNetToMedia_data = snmp_walk($device, 'ipNetToMediaPhysAddress', '-Oq', 'IP-MIB');
 $ipNetToMedia_data = str_replace('ipNetToMediaPhysAddress.', '', trim($ipNetToMedia_data));
 $ipNetToMedia_data = str_replace('IP-MIB::', '', trim($ipNetToMedia_data));
@@ -48,7 +58,7 @@ foreach (explode("\n", $ipNetToMedia_data) as $data) {
                 log_event("MAC change: $ip : ".mac_clean_to_readable($old_mac).' -> '.mac_clean_to_readable($clean_mac), $device, 'interface', $interface['port_id']);
             }
 
-            dbUpdate(array('mac_address' => $clean_mac), 'ipv4_mac', 'port_id=? AND ipv4_address=?', array($interface['port_id'], $ip));
+            dbUpdate(array('mac_address' => $clean_mac, 'context_name' => $device['context_name']), 'ipv4_mac', 'port_id=? AND ipv4_address=?', array($interface['port_id'], $ip));
             echo '.';
         }
         else if (isset($interface['port_id'])) {
@@ -58,8 +68,8 @@ foreach (explode("\n", $ipNetToMedia_data) as $data) {
                             'port_id'      => $interface['port_id'],
                             'mac_address'  => $clean_mac,
                             'ipv4_address' => $ip,
+                            'context_name' => $device['context_name'],
                            );
-
             dbInsert($insert_data, 'ipv4_mac');
         }//end if
     }//end if
@@ -76,6 +86,8 @@ foreach (dbFetchRows($sql) as $entry) {
         echo '-';
     }
 }
-
 echo "\n";
 unset($mac);
+    unset($device['context_name']);
+}
+unset($vrfs_c);
