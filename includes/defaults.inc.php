@@ -440,7 +440,7 @@ $config['enable_vrfs'] = 1;
 // Enable VRFs
 $config['enable_vrf_lite_cisco'] = 1;
 // Enable VRF lite cisco
-$config['enable_route'] = 1;
+$config['enable_route'] = 0;
 // Enable routes for VRF lite cisco
 $config['enable_printers'] = 0;
 // Enable Printer support
