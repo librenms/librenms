@@ -58,7 +58,10 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
             $tmp_tags[$k] = $v;
         }
         foreach ($fields as $k => $v) {
-            $tmp_fields[$k] = force_influx_data('f',$v);
+            $tmp_fields[$k] = force_influx_data($v);
+            if( $tmp_fields[$k] === null) {
+               unset($tmp_fields[$k]);
+           }
         }
         
         d_echo("\nInfluxDB data:\n");
@@ -76,7 +79,12 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
                     $tmp_fields // optional additional fields
                 )
             );
-            $result = $influxdb->writePoints($points);
+            try {
+                $result = $influxdb->writePoints($points);
+            } catch (Exception $e) {
+                d_echo("Caught exception: ", $e->getMessage(), "\n");
+                d_echo($e->getTrace());
+            }
         }
         else {
             print $console_color->convert('[%gInfluxDB Disabled%n] ', false);
