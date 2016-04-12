@@ -717,6 +717,7 @@ $('#gsearch').typeahead({
 },
 {
   source: devices.ttAdapter(),
+  limit: '<?php echo($config['typeahead_limit']); ?>',
   async: true,
   display: 'name',
   valueKey: 'name',
@@ -727,6 +728,7 @@ $('#gsearch').typeahead({
 },
 {
   source: ports.ttAdapter(),
+  limit: '<?php echo($config['typeahead_limit']); ?>',
   async: true,
   display: 'name',
   valueKey: 'name',
@@ -737,6 +739,7 @@ $('#gsearch').typeahead({
 },
 {
   source: bgp.ttAdapter(),
+  limit: '<?php echo($config['typeahead_limit']); ?>',
   async: true,
   display: 'name',
   valueKey: 'name',
