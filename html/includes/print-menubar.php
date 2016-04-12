@@ -3,7 +3,7 @@ require $config['install_dir'].'/includes/object-cache.inc.php';
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
-$service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
+$service_status = get_service_status();
 $if_alerts      = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
 if ($_SESSION['userlevel'] >= 5) {
@@ -219,18 +219,20 @@ if ($config['show_services']) {
 
 <?php
 
-if ($service_alerts) {
-    echo('
-            <li role="presentation" class="divider"></li>
-            <li><a href="services/state=down/"><i class="fa fa-bell-o fa-fw fa-lg"></i> Alerts ('.$service_alerts.')</a></li>');
+if (($service_status[1] > 0) || ($service_status[2] > 0)) {
+    echo '            <li role="presentation" class="divider"></li>';
+    if ($service_status[1] > 0) {
+        echo '            <li><a href="services/state=warning/"><i class="fa fa-bell-o fa-col-warning fa-fw fa-lg"></i> Warning ('.$service_status[1].')</a></li>';
+    }
+    if ($service_status[2] > 0) {
+        echo '            <li><a href="services/state=critical/"><i class="fa fa-bell-o fa-col-danger fa-fw fa-lg"></i> Critical ('.$service_status[2].')</a></li>';
+    }
 }
 
 if ($_SESSION['userlevel'] >= '10') {
     echo('
             <li role="presentation" class="divider"></li>
-            <li><a href="addsrv/"><i class="fa fa-cog fa-col-success fa-fw fa-lg"></i> Add Service</a></li>
-            <li><a href="editsrv/"><i class="fa fa-cog fa-col-primary fa-fw fa-lg"></i> Edit Service</a></li>
-            <li><a href="delsrv/"><i class="fa fa-cog fa-col-danger fa-fw fa-lg"></i> Delete Service</a></li>');
+            <li><a href="addsrv/"><i class="fa fa-cog fa-col-success fa-fw fa-lg"></i> Add Service</a></li>');
 }
 ?>
           </ul>

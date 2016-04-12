@@ -13,6 +13,7 @@
         - [`get_graphs`](#api-route-5)
         - [`get_graph_generic_by_hostname`](#api-route-6)
         - [`get_port_graphs`](#api-route-7)
+        - [`get_port_stack`](#api-route-29)
         - [`get_components`](#api-route-25)
         - [`add_components`](#api-route-26)
         - [`edit_components`](#api-route-27)
@@ -272,6 +273,47 @@ Output:
             "ifName": "eth1"
         }
     ]
+}
+```
+
+### <a name="api-route-29">Function: `get_port_stack`</a> [`top`](#top)
+
+Get a list of port mappings for a device.  This is useful for showing physical ports that are in a virtual port-channel.
+
+Route: /api/v0/devices/:hostname/port_stack
+
+- hostname can be either the device hostname or id
+
+Input:
+
+ - valid_mappings: Filter the result by only showing valid mappings ("0" values not shown).
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/port_stack?valid_mappings
+```
+
+Output:
+
+```text
+{
+  "status": "ok",
+  "err-msg": "",
+  "count": 2,
+  "mappings": [
+    {
+      "device_id": "3742",
+      "port_id_high": "1001000",
+      "port_id_low": "51001",
+      "ifStackStatus": "active"
+    },
+    {
+      "device_id": "3742",
+      "port_id_high": "1001000",
+      "port_id_low": "52001",
+      "ifStackStatus": "active"
+    }
+  ]
 }
 ```
 
