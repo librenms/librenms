@@ -106,9 +106,12 @@ if ($ipSystemStats) {
             $oid_ds      = truncate($oid_ds, 19, '');
             $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
             if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
-                $stats[$oid] = '0';
+                $stats[$oid] = 0;
             }
-            $fields[$oid] = $stats[$oid];
+            if (is_null($stats[$oid])) {
+                $stats[$oid] = 0;
+            }
+            $fields[$oid] = intval($stats[$oid]);
         }
 
         if (!file_exists($rrdfile)) {

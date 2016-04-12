@@ -601,21 +601,21 @@ foreach ($ports as $port) {
         }//end if
 
         $fields = array(
-            'INOCTETS'         => $this_port['ifInOctets'],
-            'OUTOCTETS'        => $this_port['ifOutOctets'],
-            'INERRORS'         => $this_port['ifInErrors'],
-            'OUTERRORS'        => $this_port['ifOutErrors'],
-            'INUCASTPKTS'      => $this_port['ifInUcastPkts'],
-            'OUTUCASTPKTS'     => $this_port['ifOutUcastPkts'],
-            'INNUCASTPKTS'     => $this_port['ifInNUcastPkts'],
-            'OUTNUCASTPKTS'    => $this_port['ifOutNUcastPkts'],
-            'INDISCARDS'       => $this_port['ifInDiscards'],
-            'OUTDISCARDS'      => $this_port['ifOutDiscards'],
-            'INUNKNOWNPROTOS'  => $this_port['ifInUnknownProtos'],
-            'INBROADCASTPKTS'  => $this_port['ifInBroadcastPkts'],
-            'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'],
-            'INMULTICASTPKTS'  => $this_port['ifInMulticastPkts'],
-            'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
+            'INOCTETS'         => intval($this_port['ifInOctets']),
+            'OUTOCTETS'        => intval($this_port['ifOutOctets']),
+            'INERRORS'         => intval($this_port['ifInErrors']),
+            'OUTERRORS'        => intval($this_port['ifOutErrors']),
+            'INUCASTPKTS'      => intval($this_port['ifInUcastPkts']),
+            'OUTUCASTPKTS'     => intval($this_port['ifOutUcastPkts']),
+            'INNUCASTPKTS'     => intval($this_port['ifInNUcastPkts']),
+            'OUTNUCASTPKTS'    => intval($this_port['ifOutNUcastPkts']),
+            'INDISCARDS'       => intval($this_port['ifInDiscards']),
+            'OUTDISCARDS'      => intval($this_port['ifOutDiscards']),
+            'INUNKNOWNPROTOS'  => intval($this_port['ifInUnknownProtos']),
+            'INBROADCASTPKTS'  => intval($this_port['ifInBroadcastPkts']),
+            'OUTBROADCASTPKTS' => intval($this_port['ifOutBroadcastPkts']),
+            'INMULTICASTPKTS'  => intval($this_port['ifInMulticastPkts']),
+            'OUTMULTICASTPKTS' => intval($this_port['ifOutMulticastPkts']),
         );
 
         if ($tune_port === true) {
@@ -623,13 +623,12 @@ foreach ($ports as $port) {
         }
         rrdtool_update("$rrdfile", $fields);
 
-        $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
-        $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
-        $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
-        $fields['ifOutErrors_rate'] = $port['ifOutErrors_rate'];
-        $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
-        $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
-
+        $fields['ifInUcastPkts_rate'] = intval($port['ifInUcastPkts_rate']);
+        $fields['ifOutUcastPkts_rate'] = intval($port['ifOutUcastPkts_rate']);
+        $fields['ifInErrors_rate'] = intval($port['ifInErrors_rate']);
+        $fields['ifOutErrors_rate'] = intval($port['ifOutErrors_rate']);
+        $fields['ifInOctets_rate'] = intval($port['ifInOctets_rate']);
+        $fields['ifOutOctets_rate'] = intval($port['ifOutOctets_rate']);
         $tags = array('ifName' => $port['ifName'], 'port_descr_type' => $port['port_descr_type']);
         influx_update($device,'ports',$tags,$fields);
 

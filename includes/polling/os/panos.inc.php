@@ -14,7 +14,7 @@ if (is_numeric($sessions)) {
     }
 
     $fields = array(
-        'sessions' => $sessions,
+        'sessions' => intval($sessions),
     );
 
     rrdtool_update($sessrrd, $fields);

@@ -41,7 +41,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
     }
 
     $fields = array(
-        'users' => $hrSystem[0]['hrSystemNumUsers'],
+        'users' => intval($hrSystem[0]['hrSystemNumUsers']),
     );
 
     rrdtool_update($rrd_file, $fields);

@@ -57,7 +57,7 @@ if (is_numeric($uptime)) {
     $tags = array(
         'rrd_def' => 'DS:uptime:GAUGE:600:0:U',
     );
-    data_update($device, 'uptime', $tags, $uptime);
+    data_update($device, 'uptime', $tags, intval($uptime));
 
     $graphs['uptime'] = true;
 

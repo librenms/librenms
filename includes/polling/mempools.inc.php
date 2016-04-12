@@ -27,8 +27,8 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     }
 
     $fields = array(
-        'used' => $mempool['used'],
-        'free' => $mempool['free'],
+        'used' => intval($mempool['used']),
+        'free' => intval($mempool['free']),
     );
     rrdtool_update($mempool_rrd, $fields);
 

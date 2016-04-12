@@ -58,7 +58,8 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
             $tmp_tags[$k] = $v;
         }
         foreach ($fields as $k => $v) {
-            $tmp_fields[$k] = force_influx_data('f',$v);
+            $tmp_fields[$k] = $v;
+            //$tmp_fields[$k] = force_influx_data('f',$v);
         }
         
         d_echo("\nInfluxDB data:\n");

@@ -112,7 +112,7 @@ function poll_sensor($device, $class, $unit) {
         echo "$sensor_value $unit\n";
 
         $fields = array(
-            'sensor' => $sensor_value,
+            'sensor' => floatval($sensor_value),
         );
 
         rrdtool_update($rrd_file, $fields);
@@ -293,7 +293,7 @@ function poll_device($device, $options) {
 
         $device_end  = microtime(true);
         $device_run  = ($device_end - $device_start);
-        $device_time = substr($device_run, 0, 5);
+        $device_time = floatval(substr($device_run, 0, 5));
 
         // Poller performance
         if (!empty($device_time)) {
@@ -313,7 +313,7 @@ function poll_device($device, $options) {
                 'rrd_def' => 'DS:ping:GAUGE:600:0:65535',
             );
             $fields = array(
-                'ping' => $ping_time,
+                'ping' => floatval($ping_time),
             );
 
             $update_array['last_ping']             = array('NOW()');
