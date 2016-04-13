@@ -95,6 +95,17 @@ $config['os'][$os]['over'][1]['text']  = 'Processor Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_ucd_memory';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'viprinet';
+$config['os'][$os]['text']             = 'viprinet';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'viprinet';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'Processor Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_ucd_memory';
+
 $os = 'edgeos';
 $config['os'][$os]['text']             = 'EdgeOS';
 $config['os'][$os]['type']             = 'network';
