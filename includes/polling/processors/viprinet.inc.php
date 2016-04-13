@@ -1,6 +1,5 @@
 <?php
-// Simple hard-coded poller for Pulse Secure
-echo 'Viprinet Secure CPU Usage';
+echo 'Viprinet CPU Usage';
 
 if ($device['os'] == 'viprinet') {
     $usage = str_replace('"',"", snmp_get($device, 'VIPRINET-MIB::vpnRouterCPULoad.0', '-OvQ'));
