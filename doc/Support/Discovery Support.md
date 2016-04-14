@@ -44,6 +44,7 @@ $config['discovery_modules']['processors']                = 1;
 $config['discovery_modules']['mempools']                  = 1;
 $config['discovery_modules']['ipv4-addresses']            = 1;
 $config['discovery_modules']['ipv6-addresses']            = 1;
+$config['discovery_modules']['route']                     = 1;
 $config['discovery_modules']['sensors']                   = 1;
 $config['discovery_modules']['storage']                   = 1;
 $config['discovery_modules']['hr-device']                 = 1;
@@ -83,6 +84,8 @@ $config['discovery_modules']['charge']                    = 1;
 `ipv4-addresses`: IPv4 Address detection
 
 `ipv6-addresses`: IPv6 Address detection
+
+`route`: Route detection
 
 `sensors`: Sensor detection such as Temperature, Humidity, Voltages + More
 
