@@ -1,0 +1,11 @@
+--- functions.php
++++ functions.php
+@@ -98,7 +98,7 @@
+     global $config;
+ 
+     $sysDescr    = snmp_get ($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+-    $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
++    $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn", "all");
+ 
+     d_echo("| $sysDescr | $sysObjectId | ");
+ 

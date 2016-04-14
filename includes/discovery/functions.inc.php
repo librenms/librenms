@@ -128,7 +128,21 @@ function discover_device($device, $options = null) {
 
     if (is_mib_poller_enabled($device)) {
         $devicemib = array($device['sysObjectID'] => 'all');
+	d_echo "Registering sysObjectID:\n"; 
+
         register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
+
+	// Hmm - sysObjectID usuallu points to an enumeration - which is not really that useful.
+	// Rather - a walk of SNMPv2-MIB::sysORID is propably more useful.
+	//
+
+	d_echo "Registering all sysORID\n";
+	$implemented = snmp_walk($device, 'sysORID','-Oq', 'SNMPv2-MIB', null);
+
+	foreach(split("\n",$implemented) as $line) {
+	    list($idx, $devicemib) = explode(' ', $line);
+    	    register_mibs($device, array( $devicemib => 'all'), "includes/discovery/functions.inc.php");
+	};
     }
 
     // Set type to a predefined type for the OS if it's not already set

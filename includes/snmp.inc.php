@@ -875,6 +875,7 @@ function snmp_mib_parse($oid, $mib, $module, $mibdir=null) {
 
     // The main mib entry doesn't have any useful data in it - only return items that have the syntax specified.
     if (isset($result['syntax']) && isset($result['object_type'])) {
+    // if (isset($result['object_type'])) {
         $result['mib'] = $mib;
         return $result;
     }
@@ -1000,7 +1001,7 @@ function snmp_translate($oid, $module, $mibdir = null)
     }
 
     $cmd  = 'snmptranslate'.mibdir($mibdir);
-    $cmd .= " -m $module $oid";
+    $cmd .= " -IR  -m $module $oid";
     // load all the MIBs looking for our object
     $cmd .= ' 2>/dev/null';
     // ignore invalid MIBs
