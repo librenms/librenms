@@ -96,6 +96,7 @@ LibreNMS contributors:
 - Jared Newell <jared.newell@gmail.com> (Jaredn)
 - Karsten Nerdinger <karsten-git-librenms@nerdinger.net> (piratonym)
 - Michael Nguyen <mnguyen1289@gmail.com> (mnguyen1289)
+- Casey Schoonover <casey.schoonover@llcc.edu> (cschoonover91)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
