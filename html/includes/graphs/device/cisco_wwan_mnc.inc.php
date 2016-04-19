@@ -13,7 +13,7 @@ require 'includes/graphs/common.inc.php';
 $rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cisco-wwan-mnc.rrd';
 if (file_exists($rrdfilename)) {
     $rrd_options .= ' DEF:mnc='.$rrdfilename.':mnc:LAST ';
-    $rrd_options .= ' -l -r';
+    $rrd_options .= ' --lower-limit 0 '
     $rrd_options .= " --vertical-label='MNC'";
     $rrd_options .= " LINE2:mnc#750F7DFF:'MNC Mobile Netwok Code'";
     $rrd_options .= ' GPRINT:mnc:LAST:%0.2lf%s\\\l ';

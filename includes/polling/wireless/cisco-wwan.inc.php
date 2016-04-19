@@ -10,7 +10,7 @@
  */
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cisco-wwan-rssi.rrd";
-$rssi = snmp_get($device, "1.3.6.1.4.1.9.9.661.1.3.4.1.1.1.13", "-Ovqn", "");
+$rssi = snmp_get($device, "CISCO-WAN-3G-MIB::c3gCurrentGsmRssi.13", "-Ovqn", "CISCO-WAN-3G-MIB");
 
 if (is_numeric($rssi)) {
     if (!is_file($rrd_filename)) {
@@ -26,7 +26,7 @@ if (is_numeric($rssi)) {
 
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cisco-wwan-mnc.rrd";
-$mnc = snmp_get($device, "1.3.6.1.4.1.9.9.661.1.3.2.1.11.13", "-Ovqn", "");
+$mnc = snmp_get($device, "CISCO-WAN-3G-MIB::c3gGsmMnc.13", "-Ovqn", "CISCO-WAN-3G-MIB");
 if (is_numeric($mnc)) {
     if (!is_file($rrd_filename)) {
         rrdtool_create($rrd_filename, " --step 300 DS:mnc:GAUGE:600:0:U".$config['rrd_rra']);
@@ -38,3 +38,4 @@ if (is_numeric($mnc)) {
     $graphs['cisco_wwan_mnc'] = TRUE;
     unset($rrd_filename,$mnc);
 }
+
