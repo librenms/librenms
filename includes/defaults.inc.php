@@ -439,8 +439,6 @@ $config['enable_pseudowires'] = 1;
 $config['enable_vrfs'] = 1;
 // Enable VRFs
 $config['enable_vrf_lite_cisco'] = 1;
-// Enable VRF lite cisco
-$config['enable_route'] = 0;
 // Enable routes for VRF lite cisco
 $config['enable_printers'] = 0;
 // Enable Printer support
@@ -730,7 +728,7 @@ $config['discovery_modules']['mempools']             = 1;
 $config['discovery_modules']['cisco-vrf-lite']       = 1;
 $config['discovery_modules']['ipv4-addresses']       = 1;
 $config['discovery_modules']['ipv6-addresses']       = 1;
-$config['discovery_modules']['route']                = 1;
+$config['discovery_modules']['route']                = 0;
 $config['discovery_modules']['sensors']              = 1;
 $config['discovery_modules']['storage']              = 1;
 $config['discovery_modules']['hr-device']            = 1;
@@ -874,3 +872,4 @@ $config['ignore_unmapable_port'] = False;
 // InfluxDB default configuration
 $config['influxdb']['timeout']      = 0;
 $config['influxdb']['verifySSL']    = false;
+
