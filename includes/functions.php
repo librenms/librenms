@@ -1267,7 +1267,8 @@ function force_influx_data($data) {
         if (ctype_digit($data)) {
             return floatval($data);
         // Else it is a float
-        } else {
+        }
+        else {
             return floatval($data);
         }
     } else {
