@@ -1,0 +1,105 @@
+-- *********************************************************************
+-- BROCADE-LLDP-EXT-DOT3-CAPABILITY-MIB.mib: 
+--     LLDP-EXT-DOT3-MIB AGENT-CAPABILITIES
+--   
+-- June 2012, Chakraborty Debojyoti
+--   
+-- Copyright (c) 2012 by Brocade Communications Systems, Inc.
+-- All rights reserved.
+-- *********************************************************************
+BROCADE-LLDP-EXT-DOT3-CAPABILITY-MIB    DEFINITIONS ::= BEGIN
+IMPORTS
+    brocadeAgentCapability
+        FROM Brocade-REG-MIB
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+brocadeLLDP-EXT-DOT3Capability    MODULE-IDENTITY
+    LAST-UPDATED       "201206060000Z"
+    ORGANIZATION       "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO    
+            "Customer Support Group
+             Brocade Communications Systems, Inc.
+             Postal: 130 Holger Way
+             San Jose, CA 95134
+             U.S.A
+             Tel: +1-408-333-8000
+             E-mail: support@Brocade.com
+             web: www.brocade.com."
+
+    DESCRIPTION        
+        "Agent capabilities for LLDP-EXT-DOT3-MIB implementation."
+        
+    REVISION           "201206060000Z"
+    DESCRIPTION        
+        "The initial version of this MIB module."
+    ::=  {  brocadeAgentCapability  2 }
+
+--
+-- Agent capability for NOS 3.0.0 (VDX Platform)
+--    
+brocadeLLDP-EXT-DOT3Vdx300R1    AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "NOS3.0.0"
+    STATUS             current
+    DESCRIPTION        "LLDP-EXT-DOT3-MIB capabilities."
+
+    SUPPORTS        LLDP-EXT-DOT3-MIB
+    INCLUDES        { 
+                        lldpXdot3ConfigGroup,
+                        lldpXdot3LocSysGroup,
+                        lldpXdot3RemSysGroup
+                    }
+     
+    VARIATION       lldpXdot3LocPowerPortClass
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3LocPowerMDISupported
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3LocPowerMDIEnabled          
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3LocPowerPairControlable
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3LocPowerPairs          
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3LocPowerClass
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3RemPowerPortClass
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3RemPowerMDISupported
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3RemPowerMDIEnabled          
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3RemPowerPairControlable
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3RemPowerPairs           
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    VARIATION       lldpXdot3RemPowerClass 
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    ::=  {  brocadeLLDP-EXT-DOT3Capability  1  }
+
+END
