@@ -1,0 +1,135 @@
+--
+-- Title: Switch CPUorMemory MIB.
+--
+
+RESOURCE-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      DisplayString, TEXTUAL-CONVENTION, TruthValue
+      FROM SNMPv2-TC
+      Integer32, OBJECT-TYPE, OBJECT-IDENTITY,
+      MODULE-IDENTITY
+      FROM SNMPv2-SMI
+      sw
+      FROM SWBASE-MIB;
+
+  swCpuOrMemoryUsage  MODULE-IDENTITY
+    LAST-UPDATED "1306051130Z" -- Jun 5, 2013 11:30am
+    ORGANIZATION "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO "Customer Support Group
+          Brocade Communications Systems,
+          130 Holger Way,
+          San Jose, CA 95134 U.S.A
+          Tel: +1-408-333-8000
+          Fax: +1-408-333-8101
+          Email: support@Brocade.COM
+          WEB: www.brocade.com"
+
+
+    DESCRIPTION "The MIB module is for system information.
+                 Copyright (c) 1996-2003 Brocade Communications Systems, Inc.
+         All rights reserved."
+    REVISION   "1104151830Z" -- Apr 15, 2011 6:30pm 
+    DESCRIPTION "Initial version of this module."
+    REVISION   "1306051130Z" -- Jun 5, 2013 11:30am 
+    DESCRIPTION "Updated Syntax for swCpuAction, swMemAction and description for 
+	swCpuUsageLimit, swMemUsageLimit. Also added default values if applicable"
+
+    ::= { sw 26 }
+
+	swCpuUsage   OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "System's cpu usage."
+     ::= { swCpuOrMemoryUsage 1 }
+
+    swCpuNoOfRetries         OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of times system should take cpu utilization sample before sending the CPU utilization trap."
+	DEFVAL { 3 }
+     ::= { swCpuOrMemoryUsage 2 }
+
+    swCpuUsageLimit         OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "It describes the CPU usage limit in percentage. If the	cpu usage value exceeds the 
+					limit then the appropriate action will be taken based on the swCpuAction value."
+	DEFVAL { 75 }
+     ::= { swCpuOrMemoryUsage 3 }
+
+    swCpuPollingInterval  OBJECT-TYPE
+    SYNTAX      Integer32 (10..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Time interval between two memory samples."
+	DEFVAL { 120 }
+     ::= { swCpuOrMemoryUsage 4 }
+
+    swCpuAction  OBJECT-TYPE
+	SYNTAX      INTEGER {
+					none (0),
+					raslog (1),
+					snmp (2),
+					raslogandSnmp (3)
+				}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Specifies  the  actions to be taken if system
+	             	resources  exceed  the  specified  threshold."
+	DEFVAL { none }
+     ::= { swCpuOrMemoryUsage 5 }
+
+    swMemUsage   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "System's memory usage."
+     ::= { swCpuOrMemoryUsage 6 }
+
+    swMemNoOfRetries         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of times system should take memory usage 
+					sample before sending the memory usage trap."
+	DEFVAL { 3 }
+     ::= { swCpuOrMemoryUsage 7 }
+
+    swMemUsageLimit         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "It describes the Memory usage limit in percentage. If the memory usage value
+					exceeds the limit then the appropriate action will be taken based on the swMemAction value."
+	DEFVAL { 60 }
+     ::= { swCpuOrMemoryUsage 8 }
+
+    swMemPollingInterval  OBJECT-TYPE
+    SYNTAX      Integer32 (10..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Time interval between two memory samples."
+	DEFVAL { 120 }
+     ::= { swCpuOrMemoryUsage 9 }
+
+    swMemAction  OBJECT-TYPE
+	SYNTAX      INTEGER {
+					none (0),
+					raslog (1),
+					snmp (2),
+					raslogandSnmp (3)
+				}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Specifies  the  actions to be taken if system
+	             	resources  exceed  the  specified  threshold."
+	DEFVAL { none }
+     ::= { swCpuOrMemoryUsage 10 }
+
+END
