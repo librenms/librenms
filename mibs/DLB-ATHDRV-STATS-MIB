@@ -1,0 +1,1892 @@
+--
+--  Deliberant Atheros Driver Statistics MIB
+--
+
+DLB-ATHDRV-STATS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, Integer32, Counter64, Gauge32
+        FROM SNMPv2-SMI
+    MacAddress
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    dlbMgmt
+        FROM DELIBERANT-MIB;
+
+dlbAthDrvStatsMIB MODULE-IDENTITY
+    LAST-UPDATED    "200812120000Z"
+    ORGANIZATION    "Deliberant"
+    CONTACT-INFO    "
+        Deliberant Customer Support
+        E-mail: support@deliberant.com"
+    DESCRIPTION
+        "The Atheros Driver Statistics MIB by Deliberant."
+    REVISION    "200812120000Z"
+    DESCRIPTION
+        "First revision."
+    ::= { dlbMgmt 7 }
+
+dlbAthDrvStatsMIBObjects  OBJECT IDENTIFIER ::= { dlbAthDrvStatsMIB 1 }
+
+dlbAthStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbAthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Atheros driver's network traffic statistics table."
+    ::= { dlbAthDrvStatsMIBObjects 1 }
+
+dlbAthStatsEntry OBJECT-TYPE
+    SYNTAX  DlbAthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Atheros driver's network traffic statistics table entry."
+    INDEX { ifIndex }
+    ::= { dlbAthStatsTable 1 }
+
+DlbAthStatsEntry ::=
+    SEQUENCE {
+        dlbAthWatchdogTimeouts             Counter32,
+        dlbAthHardwareErrorInterrupts      Counter32,
+        dlbAthBeaconMissInterrupts         Counter32,
+        dlbAthRecvOverrunInterrupts        Counter32,
+        dlbAthRecvEolInterrupts            Counter32,
+        dlbAthTxmitUnderrunInterrupts      Counter32,
+        dlbAthTxManagementFrames           Counter32,
+        dlbAthTxFramesDiscQueueDepth       Counter32,
+        dlbAthTxFramesDiscDeviceGone       Counter32,
+        dlbAthTxQueueFull                  Counter32,
+        dlbAthTxEncapsulationFailed        Counter32,
+        dlbAthTxFailedNoNode               Counter32,
+        dlbAthTxFailedNoDataTxBuffer       Counter32,
+        dlbAthTxFailedNoMgtTxBuffer        Counter32,
+        dlbAthTxFailedTooManyRetries       Counter32,
+        dlbAthTxFailedFifoUnderrun         Counter32,
+        dlbAthTxFailedXmitFiltered         Counter32,
+        dlbAthShortOnchipTxRetries         Counter32,
+        dlbAthLongOnchipTxRetries          Counter32,
+        dlbAthTxFailedBogusXmitRate        Counter32,
+        dlbAthTxFramesNoAckMarked          Counter32,
+        dlbAthTxFramesRtsEnabled           Counter32,
+        dlbAthTxFramesCtsEnabled           Counter32,
+        dlbAthTxFramesShortPreamble        Counter32,
+        dlbAthTxFramesAlternateRate        Counter32,
+        dlbAthTxFrames11gProtection        Counter32,
+        dlbAthRxFailedDescOverrun          Counter32,
+        dlbAthRxFailedBadCrc               Counter32,
+        dlbAthRxFailedFifoOverrun          Counter32,
+        dlbAthRxFailedDecryptErrors        Counter32,
+        dlbAthRxFailedMicFailure           Counter32,
+        dlbAthRxFailedFrameTooShort        Counter32,
+        dlbAthRxSetupFailedNoSkbuff        Counter32,
+        dlbAthRxManagementFrames           Counter32,
+        dlbAthRxControlFrames              Counter32,
+        dlbAthNoSkbuffForBeacon            Counter32,
+        dlbAthBeaconsTransmitted           Counter32,
+        dlbAthPeriodicCalibrations         Counter32,
+        dlbAthPeriodicCalibrFailures       Counter32,
+        dlbAthRfgainValueChange            Counter32,
+        dlbAthRateControlChecks            Counter32,
+        dlbAthRateCtrlRaisedXmitRate       Counter32,
+        dlbAthRateCtrlDroppedXmitRate      Counter32,
+        dlbAthRssiOfLastAck                Gauge32,
+        dlbAthRssiOfLastRcv                Gauge32
+}
+
+dlbAthWatchdogTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Watchdog timeouts."
+    ::= { dlbAthStatsEntry 1 }
+
+dlbAthHardwareErrorInterrupts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware error interrupts."
+    ::= { dlbAthStatsEntry 2 }
+
+dlbAthBeaconMissInterrupts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Beacon miss interrupts."
+    ::= { dlbAthStatsEntry 3 }
+ 
+dlbAthRecvOverrunInterrupts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received overrun interrupts."
+    ::= { dlbAthStatsEntry 4 }
+
+dlbAthRecvEolInterrupts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received EOL interrupts."
+    ::= { dlbAthStatsEntry 5 }
+
+dlbAthTxmitUnderrunInterrupts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmission underrun interrupts."
+    ::= { dlbAthStatsEntry 6 }
+
+dlbAthTxManagementFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted management frames."
+    ::= { dlbAthStatsEntry 7 }
+ 
+dlbAthTxFramesDiscQueueDepth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit frames discarded due to queue depth."
+    ::= { dlbAthStatsEntry 8 }
+
+dlbAthTxFramesDiscDeviceGone OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit frames discarded due to device gone."
+    ::= { dlbAthStatsEntry 9 }
+
+dlbAthTxQueueFull OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit queue stopped because it is full."
+    ::= { dlbAthStatsEntry 10 }
+
+dlbAthTxEncapsulationFailed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit encapsulation failed."
+    ::= { dlbAthStatsEntry 11 }
+ 
+dlbAthTxFailedNoNode OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to no node."
+    ::= { dlbAthStatsEntry 12 }
+
+dlbAthTxFailedNoDataTxBuffer OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to no place in transmit buffer for data frames."
+    ::= { dlbAthStatsEntry 13 }
+
+dlbAthTxFailedNoMgtTxBuffer OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to no place in transmit buffer for management frames."
+    ::= { dlbAthStatsEntry 14 }
+
+dlbAthTxFailedTooManyRetries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to too many retries."
+    ::= { dlbAthStatsEntry 15 }
+
+dlbAthTxFailedFifoUnderrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to FIFO underruns."
+    ::= { dlbAthStatsEntry 16 }
+
+dlbAthTxFailedXmitFiltered OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to filtered packets."
+    ::= { dlbAthStatsEntry 17 }
+ 
+dlbAthShortOnchipTxRetries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Short on-chip transmission retries."
+    ::= { dlbAthStatsEntry 18 }
+
+dlbAthLongOnchipTxRetries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Long on-chip transmission retries."
+    ::= { dlbAthStatsEntry 19 }
+ 
+dlbAthTxFailedBogusXmitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to bogus transmission rate."
+    ::= { dlbAthStatsEntry 20 }
+ 
+dlbAthTxFramesNoAckMarked OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted frames with no ACK marked."
+    ::= { dlbAthStatsEntry 21 }
+
+dlbAthTxFramesRtsEnabled OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted frames with RTS enabled."
+    ::= { dlbAthStatsEntry 22 }
+ 
+dlbAthTxFramesCtsEnabled OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted frames with CTS enabled."
+    ::= { dlbAthStatsEntry 23 }
+
+dlbAthTxFramesShortPreamble OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted frames with short preamble."
+    ::= { dlbAthStatsEntry 24 }
+
+dlbAthTxFramesAlternateRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted frames with an alternate rate."
+    ::= { dlbAthStatsEntry 25 }
+
+dlbAthTxFrames11gProtection OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted frames with 11g protection."
+    ::= { dlbAthStatsEntry 26 }
+
+dlbAthRxFailedDescOverrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to desc overrun."
+    ::= { dlbAthStatsEntry 27 }
+ 
+dlbAthRxFailedBadCrc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to bad CRC."
+    ::= { dlbAthStatsEntry 28 }
+
+dlbAthRxFailedFifoOverrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to FIFO overrun."
+    ::= { dlbAthStatsEntry 29 }
+
+dlbAthRxFailedDecryptErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to decryption errors."
+    ::= { dlbAthStatsEntry 30 }
+
+dlbAthRxFailedMicFailure OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to MIC failure."
+    ::= { dlbAthStatsEntry 31 }
+
+dlbAthRxFailedFrameTooShort OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to frame being too short."
+    ::= { dlbAthStatsEntry 32 }
+
+dlbAthRxSetupFailedNoSkbuff OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reception setup failed due to no space in skbuff buffer."
+    ::= { dlbAthStatsEntry 33 }
+ 
+dlbAthRxManagementFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received management frames."
+    ::= { dlbAthStatsEntry 34 }
+ 
+dlbAthRxControlFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received control frames."
+    ::= { dlbAthStatsEntry 35 }
+ 
+dlbAthNoSkbuffForBeacon OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "No skbuff buffer space available for beacon."
+    ::= { dlbAthStatsEntry 36 }
+
+dlbAthBeaconsTransmitted OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Beacons transmitted."
+    ::= { dlbAthStatsEntry 37 }
+
+dlbAthPeriodicCalibrations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Periodic calibrations."
+    ::= { dlbAthStatsEntry 38 }
+
+dlbAthPeriodicCalibrFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Periodic calibration failures."
+    ::= { dlbAthStatsEntry 39 }
+
+dlbAthRfgainValueChange OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RFgain value changes."
+    ::= { dlbAthStatsEntry 40 }
+
+dlbAthRateControlChecks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate control checks."
+    ::= { dlbAthStatsEntry 41 }
+ 
+dlbAthRateCtrlRaisedXmitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate control raised transmission rate."
+    ::= { dlbAthStatsEntry 42 }
+
+dlbAthRateCtrlDroppedXmitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate control dropped transmission rate."
+    ::= { dlbAthStatsEntry 43 }
+ 
+dlbAthRssiOfLastAck OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSSI of last ACK."
+    ::= { dlbAthStatsEntry 44 }
+
+dlbAthRssiOfLastRcv OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSSI of last reception."
+    ::= { dlbAthStatsEntry 45 }
+
+dlbAthPhyErrorsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbAthPhyErrorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "PHY errrors table."
+    ::= { dlbAthDrvStatsMIBObjects 2 }
+
+dlbAthPhyErrorsEntry OBJECT-TYPE
+    SYNTAX  DlbAthPhyErrorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "PHY errors table entry."
+    INDEX { ifIndex }
+    ::= { dlbAthPhyErrorsTable 1 }
+
+DlbAthPhyErrorsEntry ::=
+    SEQUENCE {
+        dlbAthPhyTransmitUnderrun          Counter32,
+        dlbAthPhyTimingError               Counter32,
+        dlbAthPhyIllegalParity             Counter32,
+        dlbAthPhyIllegalRate               Counter32,
+        dlbAthPhyIllegalLength             Counter32,
+        dlbAthPhyRadarDetect               Counter32,
+        dlbAthPhyIllegalService            Counter32,
+        dlbAthPhyTxmitOverrideRecv         Counter32,
+        dlbAthPhyOfdmTiming                Counter32,
+        dlbAthPhyOfdmIllegalParity         Counter32,
+        dlbAthPhyOfdmIllegalRate           Counter32,
+        dlbAthPhyOfdmIllegalLength         Counter32,
+        dlbAthPhyOfdmPowerDrop             Counter32,
+        dlbAthPhyOfdmIllegalService        Counter32,
+        dlbAthPhyOfdmRestart               Counter32,
+        dlbAthPhyCckTiming                 Counter32,
+        dlbAthPhyCckHeaderCrc              Counter32,
+        dlbAthPhyCckIllegalRate            Counter32,
+        dlbAthPhyCckIllegalService         Counter32,
+        dlbAthPhyCckRestart                Counter32
+}
+
+dlbAthPhyTransmitUnderrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit underrun errors."
+    ::= { dlbAthPhyErrorsEntry 1 }
+
+dlbAthPhyTimingError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timing errors."
+    ::= { dlbAthPhyErrorsEntry 2 }
+
+dlbAthPhyIllegalParity OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Illegal parity errors."
+    ::= { dlbAthPhyErrorsEntry 3 }
+
+dlbAthPhyIllegalRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Illegal rate errors."
+    ::= { dlbAthPhyErrorsEntry 4 }
+
+dlbAthPhyIllegalLength OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Illegal length errors."
+    ::= { dlbAthPhyErrorsEntry 5 }
+
+dlbAthPhyRadarDetect OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radar detected."
+    ::= { dlbAthPhyErrorsEntry 6 }
+
+dlbAthPhyIllegalService OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Illegal service errors."
+    ::= { dlbAthPhyErrorsEntry 7 }
+
+dlbAthPhyTxmitOverrideRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmission overrode reception errors."
+    ::= { dlbAthPhyErrorsEntry 8 }
+
+dlbAthPhyOfdmTiming OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OFDM timing errors."
+    ::= { dlbAthPhyErrorsEntry 9 }
+
+dlbAthPhyOfdmIllegalParity OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OFDM illegal parity errors."
+    ::= { dlbAthPhyErrorsEntry 10 }
+
+dlbAthPhyOfdmIllegalRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OFDM illegal rate errors."
+    ::= { dlbAthPhyErrorsEntry 11 }
+
+dlbAthPhyOfdmIllegalLength OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OFDM illegal length errors."
+    ::= { dlbAthPhyErrorsEntry 12 }
+
+dlbAthPhyOfdmPowerDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OFDM power dropped."
+    ::= { dlbAthPhyErrorsEntry 13 }
+
+dlbAthPhyOfdmIllegalService OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OFDM illegal service errors."
+    ::= { dlbAthPhyErrorsEntry 14 }
+
+dlbAthPhyOfdmRestart OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times OFDM restarted."
+    ::= { dlbAthPhyErrorsEntry 15 }
+
+dlbAthPhyCckTiming OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CCK timing errors."
+    ::= { dlbAthPhyErrorsEntry 16 }
+
+dlbAthPhyCckHeaderCrc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CCK header CRC errors."
+    ::= { dlbAthPhyErrorsEntry 17 }
+
+dlbAthPhyCckIllegalRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CCK illegal rate errors."
+    ::= { dlbAthPhyErrorsEntry 18 }
+
+dlbAthPhyCckIllegalService OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CCK illegal service errors."
+    ::= { dlbAthPhyErrorsEntry 19 }
+
+dlbAthPhyCckRestart OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times CCK restarted."
+    ::= { dlbAthPhyErrorsEntry 20 }
+
+dlbAthAntennaStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbAthAntennaStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Antenna statistics table."
+    ::= { dlbAthDrvStatsMIBObjects 3 }
+
+dlbAthAntennaStatsEntry OBJECT-TYPE
+    SYNTAX  DlbAthAntennaStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Antenna statistics table entry."
+    INDEX { ifIndex }
+    ::= { dlbAthAntennaStatsTable 1 }
+
+DlbAthAntennaStatsEntry ::=
+    SEQUENCE {
+        dlbAthSwitchedDefaultRxAntenna     Counter32,
+        dlbAthTxUsedAlternateAntenna       Counter32,
+        dlbAthTxFramesAntenna1             Counter32,
+        dlbAthRxFramesAntenna1             Counter32,
+        dlbAthTxFramesAntenna2             Counter32,
+        dlbAthRxFramesAntenna2             Counter32,
+        dlbAthTxFramesAntenna3             Counter32,
+        dlbAthRxFramesAntenna3             Counter32
+}
+
+dlbAthSwitchedDefaultRxAntenna OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times default/RX antenna was switched."
+    ::= { dlbAthAntennaStatsEntry 1 }
+ 
+dlbAthTxUsedAlternateAntenna OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times alternate antenna was used for transmission."
+    ::= { dlbAthAntennaStatsEntry 2 }
+
+dlbAthTxFramesAntenna1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted over first antenna."
+    ::= { dlbAthAntennaStatsEntry 3 }
+
+dlbAthRxFramesAntenna1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received over first antenna."
+    ::= { dlbAthAntennaStatsEntry 4 }
+
+dlbAthTxFramesAntenna2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted over second antenna."
+    ::= { dlbAthAntennaStatsEntry 5 }
+
+dlbAthRxFramesAntenna2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received over second antenna."
+    ::= { dlbAthAntennaStatsEntry 6 }
+
+dlbAthTxFramesAntenna3 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted over third antenna."
+    ::= { dlbAthAntennaStatsEntry 7 }
+
+dlbAthRxFramesAntenna3 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received over third antenna."
+    ::= { dlbAthAntennaStatsEntry 8 }
+
+dlbAthDot11StatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbAthDot11StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "802.11 stack statistics table."
+    ::= { dlbAthDrvStatsMIBObjects 4 }
+
+dlbAthDot11StatsEntry OBJECT-TYPE
+    SYNTAX  DlbAthDot11StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "802.11 stack statistics table entry."
+    INDEX { ifIndex }
+    ::= { dlbAthDot11StatsTable 1 }
+
+DlbAthDot11StatsEntry ::=
+    SEQUENCE {
+        dlbAthDot11RxBadVersion          Counter32,
+        dlbAthDot11RxTooShort            Counter32,
+        dlbAthDot11RxWrongBssid          Counter32,
+        dlbAthDot11RxDup                 Counter32,
+        dlbAthDot11RxWrongDirection      Counter32,
+        dlbAthDot11RxMcastEcho           Counter32,
+        dlbAthDot11RxNotAssoc            Counter32,
+        dlbAthDot11RxNoPrivacy           Counter32,
+        dlbAthDot11RxUnencrypted         Counter32,
+        dlbAthDot11RxWepFail             Counter32,
+        dlbAthDot11RxDecapFail           Counter32,
+        dlbAthDot11RxDiscardMgt          Counter32,
+        dlbAthDot11RxDiscardCtrl         Counter32,
+        dlbAthDot11RxBeaconFrames        Counter32,
+        dlbAthDot11RxRateSetTrunc        Counter32,
+        dlbAthDot11RxReqElemMissing      Counter32,
+        dlbAthDot11RxElementTooBig       Counter32,
+        dlbAthDot11RxElementTooSmall     Counter32,
+        dlbAthDot11RxElementUnknown      Counter32,
+        dlbAthDot11RxInvalidChannel      Counter32,
+        dlbAthDot11RxChannelMismatch     Counter32,
+        dlbAthDot11RxNodesAllocated      Counter32,
+        dlbAthDot11RxSsidMismatch        Counter32,
+        dlbAthDot11RxUnsupportedAuthAlg  Counter32,
+        dlbAthDot11RxAuthFail            Counter32,
+        dlbAthDot11RxTkipCtrm            Counter32,
+        dlbAthDot11RxAssocWrongBssid     Counter32,
+        dlbAthDot11RxAssocNotAuth        Counter32,
+        dlbAthDot11RxAssocCapMismatch    Counter32,
+        dlbAthDot11RxAssocNoRateMatch    Counter32,
+        dlbAthDot11RxAssocBadWpaIe       Counter32,
+        dlbAthDot11RxDeauth              Counter32,
+        dlbAthDot11RxDisassoc            Counter32,
+        dlbAthDot11RxUnknownSubtype      Counter32,
+        dlbAthDot11RxNoBuffer            Counter32,
+        dlbAthDot11RxDecryptCrcError     Counter32,
+        dlbAthDot11RxMgmtInAhdocDemo     Counter32,
+        dlbAthDot11RxBadAuthRequest      Counter32,
+        dlbAthDot11RxPortUnauth          Counter32,
+        dlbAthDot11RxBadKeyId            Counter32,
+        dlbAthDot11RxCcmpBadSeqNum       Counter32,
+        dlbAthDot11RxCcmpBadFormat       Counter32,
+        dlbAthDot11RxCcmpMicCheck        Counter32,
+        dlbAthDot11RxTkipBadSeqNum       Counter32,
+        dlbAthDot11RxTkipBadFormat       Counter32,
+        dlbAthDot11RxTkipMicCheck        Counter32,
+        dlbAthDot11RxTkipIcvCheck        Counter32,
+        dlbAthDot11RxBadCipherKeyType    Counter32,
+        dlbAthDot11RxCipherKeyNotSet     Counter32,
+        dlbAthDot11RxAclPolicy           Counter32,
+        dlbAthDot11RxFastFrames          Counter32,
+        dlbAthDot11RxFfBadTunnelHdr      Counter32,
+        dlbAthDot11TxNoBuffer            Counter32,
+        dlbAthDot11TxNoNode              Counter32,
+        dlbAthDot11TxBadMgtFrames        Counter32,
+        dlbAthDot11TxBadCipherKeyType    Counter32,
+        dlbAthDot11TxNoDefKey            Counter32,
+        dlbAthDot11TxNoCryptoHeadroom    Counter32,
+        dlbAthDot11TxGoodFastFrames      Counter32,
+        dlbAthDot11TxBadFastFrames       Counter32,
+        dlbAthDot11ActiveScans           Counter32,
+        dlbAthDot11PassiveScans          Counter32,
+        dlbAthDot11NodesTimeout          Counter32,
+        dlbAthDot11CryptoCipherMalloc    Counter32,
+        dlbAthDot11CryptoSwTkip          Counter32,
+        dlbAthDot11CryptoTkipSwMicEnc    Counter32,
+        dlbAthDot11CryptoTkipSwMicDec    Counter32,
+        dlbAthDot11CryptoTkipCtrm        Counter32,
+        dlbAthDot11CryptoSwCcmp          Counter32,
+        dlbAthDot11CryptoSwWep           Counter32,
+        dlbAthDot11CryptoCipherRej       Counter32,
+        dlbAthDot11CryptoNoKey           Counter32,
+        dlbAthDot11CryptoDelKey          Counter32,
+        dlbAthDot11CryptoBadCipher       Counter32,
+        dlbAthDot11CryptoNoCipher        Counter32,
+        dlbAthDot11CryptoAttachFail      Counter32,
+        dlbAthDot11CryptoSwFallback      Counter32,
+        dlbAthDot11CryptoKeyFail         Counter32,
+        dlbAthDot11SnoopMcastPass        Counter32,
+        dlbAthDot11SnoopMcastDrop        Counter32
+    }
+    
+dlbAthDot11RxBadVersion OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with bad version."
+    ::= { dlbAthDot11StatsEntry 1 }
+
+dlbAthDot11RxTooShort OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received too short frames."
+    ::= { dlbAthDot11StatsEntry 2 }
+
+dlbAthDot11RxWrongBssid OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received from wrong BSSID."
+    ::= { dlbAthDot11StatsEntry 3 }
+
+dlbAthDot11RxDup OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received and discarded duplicate frames."
+    ::= { dlbAthDot11StatsEntry 4 }
+
+dlbAthDot11RxWrongDirection OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received with wrong direction."
+    ::= { dlbAthDot11StatsEntry 5 }
+
+dlbAthDot11RxMcastEcho OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames discarded due to multicast echo."
+    ::= { dlbAthDot11StatsEntry 6 }
+
+dlbAthDot11RxNotAssoc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames discarded because station is not associated."
+    ::= { dlbAthDot11StatsEntry 7 }
+
+dlbAthDot11RxNoPrivacy OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with WEP while privacy was off."
+    ::= { dlbAthDot11StatsEntry 8 }
+
+dlbAthDot11RxUnencrypted OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received unencrypted frames while privacy was on."
+    ::= { dlbAthDot11StatsEntry 9 }
+
+dlbAthDot11RxWepFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames that failed WEP processing."
+    ::= { dlbAthDot11StatsEntry 10 }
+
+dlbAthDot11RxDecapFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames that failed decapsulation."
+    ::= { dlbAthDot11StatsEntry 11 }
+
+dlbAthDot11RxDiscardMgt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received and discarded management frames."
+    ::= { dlbAthDot11StatsEntry 12 }
+
+dlbAthDot11RxDiscardCtrl OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received and discarded control frames."
+    ::= { dlbAthDot11StatsEntry 13 }
+
+dlbAthDot11RxBeaconFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received beacon frames."
+    ::= { dlbAthDot11StatsEntry 14 }
+
+dlbAthDot11RxRateSetTrunc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with rate set truncated."
+    ::= { dlbAthDot11StatsEntry 15 }
+
+dlbAthDot11RxReqElemMissing OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with required element missing."
+    ::= { dlbAthDot11StatsEntry 16 }
+
+dlbAthDot11RxElementTooBig OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with too big elements."
+    ::= { dlbAthDot11StatsEntry 17 }
+
+dlbAthDot11RxElementTooSmall OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with too small elements."
+    ::= { dlbAthDot11StatsEntry 18 }
+
+dlbAthDot11RxElementUnknown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with unknown elements."
+    ::= { dlbAthDot11StatsEntry 19 }
+
+dlbAthDot11RxInvalidChannel OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Recevied frames with invalid channel."
+    ::= { dlbAthDot11StatsEntry 20 }
+
+dlbAthDot11RxChannelMismatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with channel mismatch."
+    ::= { dlbAthDot11StatsEntry 21 }
+
+dlbAthDot11RxNodesAllocated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Nodes allocated for received frames."
+    ::= { dlbAthDot11StatsEntry 22 }
+
+dlbAthDot11RxSsidMismatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frame SSID mismatches."
+    ::= { dlbAthDot11StatsEntry 23 }
+
+dlbAthDot11RxUnsupportedAuthAlg OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with unsupported authentication algorithm."
+    ::= { dlbAthDot11StatsEntry 24 }
+
+dlbAthDot11RxAuthFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Station authentication failures."
+    ::= { dlbAthDot11StatsEntry 25 }
+
+dlbAthDot11RxTkipCtrm OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Station authentication failures due to TKIP countermeasures."
+    ::= { dlbAthDot11StatsEntry 26 }
+
+dlbAthDot11RxAssocWrongBssid OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Associations from wrong BSSID."
+    ::= { dlbAthDot11StatsEntry 27 }
+
+dlbAthDot11RxAssocNotAuth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Associations without authentication."
+    ::= { dlbAthDot11StatsEntry 28 }
+
+dlbAthDot11RxAssocCapMismatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Associations with capabilities mismatch."
+    ::= { dlbAthDot11StatsEntry 29 }
+
+dlbAthDot11RxAssocNoRateMatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Associations with no matching rate."
+    ::= { dlbAthDot11StatsEntry 30 }
+
+dlbAthDot11RxAssocBadWpaIe OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Associations with bad WPA IE."
+    ::= { dlbAthDot11StatsEntry 31 }
+
+dlbAthDot11RxDeauth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Deauthentications."
+    ::= { dlbAthDot11StatsEntry 32 }
+
+dlbAthDot11RxDisassoc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disassociations."
+    ::= { dlbAthDot11StatsEntry 33 }
+
+dlbAthDot11RxUnknownSubtype OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with unknown subtype."
+    ::= { dlbAthDot11StatsEntry 34 }
+
+dlbAthDot11RxNoBuffer OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Buffer allocations failed for received frames."
+    ::= { dlbAthDot11StatsEntry 35 }
+
+dlbAthDot11RxDecryptCrcError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Decryptions failed with CRC error."
+    ::= { dlbAthDot11StatsEntry 36 }
+
+dlbAthDot11RxMgmtInAhdocDemo OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Discarded management frames received in ahdoc demo mode."
+    ::= { dlbAthDot11StatsEntry 37 }
+
+dlbAthDot11RxBadAuthRequest OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bad authentication requests."
+    ::= { dlbAthDot11StatsEntry 38 }
+
+dlbAthDot11RxPortUnauth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames discarded due to unauthorized port."
+    ::= { dlbAthDot11StatsEntry 39 }
+
+dlbAthDot11RxBadKeyId OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with incorrect keyid."
+    ::= { dlbAthDot11StatsEntry 40 }
+
+dlbAthDot11RxCcmpBadSeqNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CCMP sequence number violations."
+    ::= { dlbAthDot11StatsEntry 41 }
+
+dlbAthDot11RxCcmpBadFormat OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bad format CCMP frames."
+    ::= { dlbAthDot11StatsEntry 42 }
+
+dlbAthDot11RxCcmpMicCheck OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CCMP MIC check failures."
+    ::= { dlbAthDot11StatsEntry 43 }
+
+dlbAthDot11RxTkipBadSeqNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TKIP sequence number violations."
+    ::= { dlbAthDot11StatsEntry 44 }
+
+dlbAthDot11RxTkipBadFormat OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bad format TKIP frames."
+    ::= { dlbAthDot11StatsEntry 45 }
+
+dlbAthDot11RxTkipMicCheck OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TKIP MIC check failures."
+    ::= { dlbAthDot11StatsEntry 46 }
+
+dlbAthDot11RxTkipIcvCheck OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TKIP ICV check failures."
+    ::= { dlbAthDot11StatsEntry 47 }
+
+dlbAthDot11RxBadCipherKeyType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to bad cipher/key type."
+    ::= { dlbAthDot11StatsEntry 48 }
+
+dlbAthDot11RxCipherKeyNotSet OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receptions failed due to cipher/key not setup."
+    ::= { dlbAthDot11StatsEntry 49 }
+
+dlbAthDot11RxAclPolicy OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames discarded due to ACL policy."
+    ::= { dlbAthDot11StatsEntry 50 }
+
+dlbAthDot11RxFastFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received fast frames."
+    ::= { dlbAthDot11StatsEntry 51 }
+
+dlbAthDot11RxFfBadTunnelHdr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fast frames failed due to bad tunnel header."
+    ::= { dlbAthDot11StatsEntry 52 }
+
+dlbAthDot11TxNoBuffer OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Buffer allocations failed for transmitted frames."
+    ::= { dlbAthDot11StatsEntry 53 }
+
+dlbAthDot11TxNoNode OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed for no node."
+    ::= { dlbAthDot11StatsEntry 54 }
+
+dlbAthDot11TxBadMgtFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Attempted transmissions of unknown management frame."
+    ::= { dlbAthDot11StatsEntry 55 }
+
+dlbAthDot11TxBadCipherKeyType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to bad cipher/key type."
+    ::= { dlbAthDot11StatsEntry 56 }
+
+dlbAthDot11TxNoDefKey OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to no default key."
+    ::= { dlbAthDot11StatsEntry 57 }
+
+dlbAthDot11TxNoCryptoHeadroom OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmissions failed due to no space for crypto headers."
+    ::= { dlbAthDot11StatsEntry 58 }
+
+dlbAthDot11TxGoodFastFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Successful fast frames transmissions."
+    ::= { dlbAthDot11StatsEntry 59 }
+
+dlbAthDot11TxBadFastFrames OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Failed fast frames transmissions."
+    ::= { dlbAthDot11StatsEntry 60 }
+
+dlbAthDot11ActiveScans OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active scans started."
+    ::= { dlbAthDot11StatsEntry 61 }
+
+dlbAthDot11PassiveScans OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Passive scans started."
+    ::= { dlbAthDot11StatsEntry 62 }
+
+dlbAthDot11NodesTimeout OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Nodes timed out due to inactivity."
+    ::= { dlbAthDot11StatsEntry 63 }
+
+dlbAthDot11CryptoCipherMalloc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Failed memory allocations for cipher context."
+    ::= { dlbAthDot11StatsEntry 64 }
+
+dlbAthDot11CryptoSwTkip OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TKIP encryptions done in software."
+    ::= { dlbAthDot11StatsEntry 65 }
+
+dlbAthDot11CryptoTkipSwMicEnc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TKIP MIC encryptions done in software."
+    ::= { dlbAthDot11StatsEntry 66 }
+
+dlbAthDot11CryptoTkipSwMicDec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TKIP MIC decryptions done in software."
+    ::= { dlbAthDot11StatsEntry 67 }
+
+dlbAthDot11CryptoTkipCtrm OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TKIP frames dropped due to countermeasures."
+    ::= { dlbAthDot11StatsEntry 68 }
+
+dlbAthDot11CryptoSwCcmp OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CCMP encryptions done in software."
+    ::= { dlbAthDot11StatsEntry 69 }
+
+dlbAthDot11CryptoSwWep OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "WEP encryptions done in software."
+    ::= { dlbAthDot11StatsEntry 70 }
+
+dlbAthDot11CryptoCipherRej OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Crypto failures due to cipher rejected data."
+    ::= { dlbAthDot11StatsEntry 71 }
+
+dlbAthDot11CryptoNoKey OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Crypto failures due to no key index."
+    ::= { dlbAthDot11StatsEntry 72 }
+
+dlbAthDot11CryptoDelKey OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Failed driver key deletions."
+    ::= { dlbAthDot11StatsEntry 73 }
+
+dlbAthDot11CryptoBadCipher OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Crypto failures due to unknown cipher."
+    ::= { dlbAthDot11StatsEntry 74 }
+
+dlbAthDot11CryptoNoCipher OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Crypto failures due to unavailable cipher module."
+    ::= { dlbAthDot11StatsEntry 75 }
+
+dlbAthDot11CryptoAttachFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Crypto failures due to cipher attach failure."
+    ::= { dlbAthDot11StatsEntry 76 }
+
+dlbAthDot11CryptoSwFallback OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Crypto fallbacks to software implementation."
+    ::= { dlbAthDot11StatsEntry 77 }
+
+dlbAthDot11CryptoKeyFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Crypto failures due to driver key allocation failure."
+    ::= { dlbAthDot11StatsEntry 78 }
+
+dlbAthDot11SnoopMcastPass OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast packets passed by snooping filter."
+    ::= { dlbAthDot11StatsEntry 79 }
+
+dlbAthDot11SnoopMcastDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast packets dropped by snooping filter."
+    ::= { dlbAthDot11StatsEntry 80 }
+
+dlbAthPeerStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbAthPeerStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Peer statistics table."
+    ::= { dlbAthDrvStatsMIBObjects 5 }
+
+dlbAthPeerStatsEntry OBJECT-TYPE
+    SYNTAX  DlbAthPeerStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Peer statistics table entry."
+    INDEX { ifIndex, dlbAthPeerIndex }
+    ::= { dlbAthPeerStatsTable 1 }
+
+DlbAthPeerStatsEntry ::=
+    SEQUENCE {
+        dlbAthPeerIndex             Integer32,
+        dlbAthPeerMacAddr           MacAddress,
+        dlbAthPeerRxData            Counter32,
+        dlbAthPeerRxMgmt            Counter32,
+        dlbAthPeerRxCtrl            Counter32,
+        dlbAthPeerRxBeacons         Counter64,
+        dlbAthPeerRxProbeResponse   Counter32,
+        dlbAthPeerRxUcast           Counter32,
+        dlbAthPeerRxMcast           Counter32,
+        dlbAthPeerRxBytes           Counter64,
+        dlbAthPeerRxDup             Counter32,
+        dlbAthPeerRxNoPrivacy       Counter32,
+        dlbAthPeerRxWepFail         Counter32,
+        dlbAthPeerRxDemicFail       Counter32,
+        dlbAthPeerRxDecapFail       Counter32,
+        dlbAthPeerRxDefragFail      Counter32,
+        dlbAthPeerRxDissasoc        Counter32,
+        dlbAthPeerRxDeauth          Counter32,
+        dlbAthPeerRxDecryptCrc      Counter32,
+        dlbAthPeerRxUnauth          Counter32,
+        dlbAthPeerRxUnencrypted     Counter32,
+        dlbAthPeerTxData            Counter32,
+        dlbAthPeerTxMgmt            Counter32,
+        dlbAthPeerTxProbeReq        Counter32,
+        dlbAthPeerTxUcast           Counter32,
+        dlbAthPeerTxMcast           Counter32,
+        dlbAthPeerTxBytes           Counter64,
+        dlbAthPeerTxNoVlanTag       Counter32,
+        dlbAthPeerTxVlanMismatch    Counter32,
+        dlbAthPeerTxUapsd           Counter32,
+        dlbAthPeerUapsdTriggers     Counter32,
+        dlbAthPeerTxEospLost        Counter32,
+        dlbAthPeerTxAssoc           Counter32,
+        dlbAthPeerTxAssocFail       Counter32,
+        dlbAthPeerTxAuth            Counter32,
+        dlbAthPeerTxAuthFail        Counter32,
+        dlbAthPeerTxDeauth          Counter32,
+        dlbAthPeerTxDeauthCode      Counter32,
+        dlbAthPeerTxDisassoc        Counter32,
+        dlbAthPeerTxDisassocCode    Counter32,
+        dlbAthPeerPsqDrops          Counter32,
+        dlbAthPeerMcastSnoop        Counter32
+    }
+
+dlbAthPeerIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Peer index, indexed from 1."
+    ::= { dlbAthPeerStatsEntry 1 }
+
+dlbAthPeerMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peer MAC address."
+    ::= { dlbAthPeerStatsEntry 2 }
+
+dlbAthPeerRxData OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received data frames."
+    ::= { dlbAthPeerStatsEntry 3 }
+
+dlbAthPeerRxMgmt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received management frames."
+    ::= { dlbAthPeerStatsEntry 4 }
+
+dlbAthPeerRxCtrl OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received control frames."
+    ::= { dlbAthPeerStatsEntry 5 }
+
+dlbAthPeerRxBeacons OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received beacon frames."
+    ::= { dlbAthPeerStatsEntry 6 }
+
+dlbAthPeerRxProbeResponse OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received probe response frames."
+    ::= { dlbAthPeerStatsEntry 7 }
+
+dlbAthPeerRxUcast OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received unicast frames."
+    ::= { dlbAthPeerStatsEntry 8 }
+
+dlbAthPeerRxMcast OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received multicast/broadcast frames."
+    ::= { dlbAthPeerStatsEntry 9 }
+
+dlbAthPeerRxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received bytes."
+    ::= { dlbAthPeerStatsEntry 10 }
+
+dlbAthPeerRxDup OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received and discarded duplicate frames."
+    ::= { dlbAthPeerStatsEntry 11 }
+
+dlbAthPeerRxNoPrivacy OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames with WEP while privacy was off."
+    ::= { dlbAthPeerStatsEntry 12 }
+
+dlbAthPeerRxWepFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames that failed WEP processing."
+    ::= { dlbAthPeerStatsEntry 13 }
+
+dlbAthPeerRxDemicFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIC decoding failures."
+    ::= { dlbAthPeerStatsEntry 14 }
+
+dlbAthPeerRxDecapFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Decapsulation failures."
+    ::= { dlbAthPeerStatsEntry 15 }
+
+dlbAthPeerRxDefragFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Defragmentation failures."
+    ::= { dlbAthPeerStatsEntry 16 }
+
+dlbAthPeerRxDissasoc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disassociations."
+    ::= { dlbAthPeerStatsEntry 17 }
+
+dlbAthPeerRxDeauth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Deauthentications."
+    ::= { dlbAthPeerStatsEntry 18 }
+
+dlbAthPeerRxDecryptCrc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Decryptions failed with CRC error."
+    ::= { dlbAthPeerStatsEntry 19 }
+
+dlbAthPeerRxUnauth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received frames discarded due to unauthorized port."
+    ::= { dlbAthPeerStatsEntry 20 }
+
+dlbAthPeerRxUnencrypted OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received unencrypted frames while privacy was on."
+    ::= { dlbAthPeerStatsEntry 21 }
+
+dlbAthPeerTxData OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted data frames."
+    ::= { dlbAthPeerStatsEntry 22 }
+
+dlbAthPeerTxMgmt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tranmitted management frames."
+    ::= { dlbAthPeerStatsEntry 23 }
+
+dlbAthPeerTxProbeReq OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted probe requests."
+    ::= { dlbAthPeerStatsEntry 24 }
+
+dlbAthPeerTxUcast OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted unicast frames."
+    ::= { dlbAthPeerStatsEntry 25 }
+
+dlbAthPeerTxMcast OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted multicast/broadcast frames."
+    ::= { dlbAthPeerStatsEntry 26 }
+
+dlbAthPeerTxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { dlbAthPeerStatsEntry 27 }
+
+dlbAthPeerTxNoVlanTag OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Frames discarded due to no tag."
+    ::= { dlbAthPeerStatsEntry 28 }
+
+dlbAthPeerTxVlanMismatch OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Frames discarded due to bad tag."
+    ::= { dlbAthPeerStatsEntry 29 }
+
+dlbAthPeerTxUapsd OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Frames in UAPSD queue."
+    ::= { dlbAthPeerStatsEntry 30 }
+
+dlbAthPeerUapsdTriggers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of UAPSD triggers."
+    ::= { dlbAthPeerStatsEntry 31 }
+
+dlbAthPeerTxEospLost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Retried frames with UAPSD EOSP set."
+    ::= { dlbAthPeerStatsEntry 32 }
+
+dlbAthPeerTxAssoc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Associations/reassociations."
+    ::= { dlbAthPeerStatsEntry 33 }
+
+dlbAthPeerTxAssocFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Association/reassociation failures."
+    ::= { dlbAthPeerStatsEntry 34 }
+
+dlbAthPeerTxAuth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Authentications/reauthentications."
+    ::= { dlbAthPeerStatsEntry 35 }
+
+dlbAthPeerTxAuthFail OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Authentication/reauthentication failures."
+    ::= { dlbAthPeerStatsEntry 36 }
+
+dlbAthPeerTxDeauth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Deauthentications."
+    ::= { dlbAthPeerStatsEntry 37 }
+
+dlbAthPeerTxDeauthCode OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last deauthentication reason."
+    ::= { dlbAthPeerStatsEntry 38 }
+
+dlbAthPeerTxDisassoc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disassociations."
+    ::= { dlbAthPeerStatsEntry 39 }
+
+dlbAthPeerTxDisassocCode OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last disassociation reason."
+    ::= { dlbAthPeerStatsEntry 40 }
+
+dlbAthPeerPsqDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Power save queue drops."
+    ::= { dlbAthPeerStatsEntry 41 }
+
+dlbAthPeerMcastSnoop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Frames passed by multicast snooping."
+    ::= { dlbAthPeerStatsEntry 42 }
+
+END

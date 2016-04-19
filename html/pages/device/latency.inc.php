@@ -49,6 +49,7 @@ if ($vars['view'] == 'incoming') {
         echo '</td></tr>';
 
         $graph_array['type']   = 'device_smokeping_in_all';
+        $graph_array['device'] = $device['device_id'];
         $graph_array['legend'] = no;
         echo '<tr><td>';
         echo '<h3>Aggregate</h3>';

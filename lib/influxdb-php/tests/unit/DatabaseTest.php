@@ -27,34 +27,54 @@ class DatabaseTest extends AbstractTest
     {
         parent::setUp();
 
-        $this->resultData = file_get_contents(dirname(__FILE__) . '/result.example.json');
+        $this->resultData = file_get_contents(dirname(__FILE__) . '/json/result.example.json');
 
         $this->mockClient->expects($this->any())
             ->method('listDatabases')
             ->will($this->returnValue(array('test123', 'test')));
 
-        $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/input.example.json');
+        $this->dataToInsert = file_get_contents(dirname(__FILE__) . '/json/input.example.json');
 
     }
+
+    public function testGetters()
+    {
+        $this->assertInstanceOf('InfluxDB\Client', $this->database->getClient());
+        $this->assertInstanceOf('InfluxDB\Query\Builder', $this->database->getQueryBuilder());
+    }
+
 
     /**
      *
      */
-    public function testQuery()
+    public function testQueries()
     {
         $testResultSet = new ResultSet($this->resultData);
         $this->assertEquals($this->database->query('SELECT * FROM test_metric'), $testResultSet);
+
+        $this->database->drop();
+        $this->assertEquals('DROP DATABASE "influx_test_db"', Client::$lastQuery);
+
     }
 
-    public function testCreateRetentionPolicy()
+
+    public function testRetentionPolicyQueries()
     {
-        $retentionPolicy = new Database\RetentionPolicy('test', '1d', 1, true);
+        $retentionPolicy = $this->getTestRetentionPolicy();
 
-        $mockClient = $this->getClientMock(true);
+        $this->assertEquals(
+            $this->getTestDatabase()->createRetentionPolicy($retentionPolicy),
+            new ResultSet($this->getEmptyResult())
+        );
 
-        $database = new Database('test', $mockClient);
+        $this->database->listRetentionPolicies();
+        $this->assertEquals('SHOW RETENTION POLICIES ON "influx_test_db"', Client::$lastQuery);
 
-        $this->assertEquals($database->createRetentionPolicy($retentionPolicy), new ResultSet($this->getEmptyResult()));
+        $this->database->alterRetentionPolicy($this->getTestRetentionPolicy());
+        $this->assertEquals(
+            'ALTER RETENTION POLICY "test" ON "influx_test_db" DURATION 1d REPLICATION 1 DEFAULT',
+            Client::$lastQuery
+        );
     }
 
     /**
@@ -64,6 +84,38 @@ class DatabaseTest extends AbstractTest
     {
         new Database(null, $this->mockClient);
     }
+
+    public function testCreate()
+    {
+        // test create with retention policy
+        $this->database->create($this->getTestRetentionPolicy('influx_test_db'), true);
+        $this->assertEquals(
+            'CREATE RETENTION POLICY "influx_test_db" ON "influx_test_db" DURATION 1d REPLICATION 1 DEFAULT',
+            Client::$lastQuery
+        );
+
+        // test creating a database without create if not exists
+        $this->database->create(null, true);
+        $this->assertEquals('CREATE DATABASE IF NOT EXISTS "influx_test_db"', Client::$lastQuery);
+
+        // test creating a database without create if not exists
+        $this->database->create(null, false);
+        $this->assertEquals('CREATE DATABASE "influx_test_db"', Client::$lastQuery);
+
+
+        $this->mockClient->expects($this->any())
+            ->method('query')
+            ->will($this->returnCallback(function () {
+                throw new \Exception('test exception');
+            }));
+
+
+        // test an exception being handled correctly
+        $this->setExpectedException('\InfluxDB\Database\Exception');
+        $this->database->create($this->getTestRetentionPolicy('influx_test_db'), false);
+
+    }
+
 
     public function testExists()
     {
@@ -96,5 +148,76 @@ class DatabaseTest extends AbstractTest
         );
 
         $this->assertEquals(true, $this->database->writePoints(array($point1, $point2)));
+
+        $this->mockClient->expects($this->once())
+            ->method('write')
+            ->will($this->throwException(new \Exception('Test exception')));
+
+        $this->setExpectedException('InfluxDB\Exception');
+
+        $this->database->writePoints(array($point1, $point2));
+
+    }
+
+    public function testQueryBuilderOrderBy()
+    {
+        $this->assertEquals(
+            $this->database->getQueryBuilder()
+                ->from('test_metric')
+                ->orderBy('time', 'DESC')->getQuery(),
+            'SELECT * FROM "test_metric" ORDER BY time DESC');
+
+        $this->assertEquals(
+            $this->database->getQueryBuilder()
+                ->from('test_metric')
+                ->orderBy('time', 'DESC')
+                ->orderBy('some_field', 'ASC')
+                ->getQuery(),
+            'SELECT * FROM "test_metric" ORDER BY time DESC,some_field ASC');
+    }
+
+    /**
+     * @see https://github.com/influxdata/influxdb-php/pull/36
+     */
+    public function testReservedNames()
+    {
+        $database = new Database('stats', $this->mockClient);
+
+        // test handling of reserved keywords in database name
+        $database->create();
+        $this->assertEquals('CREATE DATABASE IF NOT EXISTS "stats"', Client::$lastQuery);
+
+        $database->listRetentionPolicies();
+        $this->assertEquals('SHOW RETENTION POLICIES ON "stats"', Client::$lastQuery);
+
+        // test handling of reserved keywords in retention policy names
+        $database->create($this->getTestRetentionPolicy('default'));
+        $this->assertEquals(
+            'CREATE RETENTION POLICY "default" ON "stats" DURATION 1d REPLICATION 1 DEFAULT',
+            Client::$lastQuery
+        );
+
+        // test handling of reserved keywords in measurement names
+        $this->assertEquals($database->getQueryBuilder()->from('server')->getQuery(), 'SELECT * FROM "server"');
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Database
+     */
+    protected function getTestDatabase($name = 'test')
+    {
+        return new Database($name, $this->getClientMock(true));
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Database\RetentionPolicy
+     */
+    protected function getTestRetentionPolicy($name = 'test')
+    {
+        return new Database\RetentionPolicy($name, '1d', 1, true);
     }
 }

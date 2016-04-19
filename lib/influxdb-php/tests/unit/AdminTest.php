@@ -47,7 +47,7 @@ class AdminTest extends AbstractTest
 
     public function testShowUsers()
     {
-        $testJson = file_get_contents(dirname(__FILE__) . '/result-test-users.example.json');
+        $testJson = file_get_contents(dirname(__FILE__) . '/json/result-test-users.example.json');
 
         $clientMock = $this->getClientMock();
         $testResult = new ResultSet($testJson);

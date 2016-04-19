@@ -31,6 +31,11 @@ interface DriverInterface
     public function setParameters(array $parameters);
 
     /**
+     * @return array
+     */
+    public function getParameters();
+
+    /**
      * Send the data
      *
      * @param $data

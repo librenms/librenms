@@ -17,3 +17,5 @@ $version = trim(
 
 $version = str_replace('V', '', $version);
 $version = str_replace('"', '', $version);
+
+$serial = trim(snmp_get($device, 'snChasSerNum.0', '-Ovq', 'FOUNDRY-SN-AGENT-MIB'), '"');

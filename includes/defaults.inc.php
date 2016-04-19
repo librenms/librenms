@@ -715,6 +715,7 @@ $config['poller_modules']['cisco-voice']                 = 1;
 $config['poller_modules']['cisco-cbqos']                 = 1;
 $config['poller_modules']['stp']                         = 1;
 $config['poller_modules']['cisco-otv']                   = 1;
+$config['poller_modules']['services']                    = 1;
 
 // List of discovery modules. Need to be in this array to be
 // considered for execution.
@@ -866,3 +867,7 @@ $config['default_port_association_mode'] = 'ifIndex';
 // Ignore ports which can't be mapped using a devices port_association_mode
 // See include/polling/ports.inc.php for a lenghty explanation.
 $config['ignore_unmapable_port'] = False;
+
+// InfluxDB default configuration
+$config['influxdb']['timeout']      = 0;
+$config['influxdb']['verifySSL']    = false;
