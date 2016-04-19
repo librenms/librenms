@@ -2038,6 +2038,14 @@ $config['graph_types']['device']['cisco-iosxcode']['descr']    = 'Transcoder Uti
 $config['graph_descr']['device_smokeping_in_all'] = 'This is an aggregate graph of the incoming smokeping tests to this host. The line corresponds to the average RTT. The shaded area around each line denotes the standard deviation.';
 $config['graph_descr']['device_processor']        = 'This is an aggregate graph of all processors in the system.';
 
+$config['graph_types']['device']['cisco_wwan_rssi']['section'] = 'wireless';
+$config['graph_types']['device']['cisco_wwan_rssi']['order']   = '0';
+$config['graph_types']['device']['cisco_wwan_rssi']['descr']   = 'Signal Rssi';
+$config['graph_types']['device']['cisco_wwan_mnc']['section']  = 'wireless';
+$config['graph_types']['device']['cisco_wwan_mnc']['order']    = '1';
+$config['graph_types']['device']['cisco_wwan_mnc']['descr']    = 'MNC';
+
+
 // Device Types
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
