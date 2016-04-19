@@ -41,3 +41,9 @@ if (empty($hardware)) {
 
 // if(isset($cisco_hardware_oids[$poll_device['sysObjectID']])) { $hardware = $cisco_hardware_oids[$poll_device['sysObjectID']]; }
 $serial = get_main_serial($device);
+
+
+if (strstr($hardware, 'cisco819')) {
+      include 'includes/polling/wireless/cisco-wwan.inc.php';
+}
+
