@@ -14,7 +14,7 @@ $status    = 'error';
 $message   = 'unknown error';
 
 $device_id = mres($_POST['device_id']);
-$notes = mres($_POST['notes']);
+$notes = $_POST['notes'];
 
 if (isset($notes) && (dbUpdate(array('notes' => $notes), 'devices', 'device_id = ?', array($device_id)))) {
     $status  = 'ok';

@@ -207,6 +207,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $hostname .= '<br />'.$device['sysName'];
         if (empty($port_count)) {
             $port_count = 0;
+            $col_port = '';
         }
         if ($port_count) {
             $col_port = ' <img src="images/icons/port.png" align=absmiddle /> '.$port_count.'<br />';

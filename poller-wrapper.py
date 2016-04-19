@@ -163,6 +163,8 @@ if ('distributed_poller' in config and
             print "Could not connect to memcached, disabling distributed poller."
             distpoll = False
             IsNode = False
+    except SystemExit:
+        raise
     except ImportError:
         print "ERROR: missing memcache python module:"
         print "On deb systems: apt-get install python-memcache"

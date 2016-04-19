@@ -6,7 +6,7 @@ by ensuring:
 	$config['update'] = 0;
 
 is no longer commented out. If you would like to perform a manual update
-then you can do this by running the following command:
+then you can do this by running the following command as the librenms user:
 
 	./daily.sh
 

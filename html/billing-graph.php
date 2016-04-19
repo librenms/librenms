@@ -67,8 +67,27 @@ else {
     exit;
 }
 
-$start = $_GET[from];
-$end   = $_GET[to];
+$rate_data    = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', array($bill_id));
+$bill_name = $rate_data['bill_name'];
+
+if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
+    $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($_GET['bill_id'], $_GET['bill_hist_id']));
+    if (is_null($histrow)) {
+        header("HTTP/1.0 404 Not Found");
+        exit();
+    }
+    $start        = $histrow['from'];
+    $end          = $histrow['to'];
+    $rate_95th    = $histrow['rate_95th'];
+    $rate_average = $histrow['rate_average'];
+} 
+else {
+    $start        = $_GET[from];
+    $end          = $_GET[to];
+    $rate_95th    = $rate_data['rate_95th'];
+    $rate_average = $rate_data['rate_average'];
+}
+
 $xsize = $_GET[x];
 $ysize = $_GET[y];
 $count = $_GET[count];
@@ -86,15 +105,6 @@ $dur = ($end - $start);
 
 $datefrom = date('Ymthis', $start);
 $dateto   = date('Ymthis', $end);
-
-// $rate_data = getRates($bill_id,$datefrom,$dateto);
-$rate_data    = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', array($bill_id));
-$rate_95th    = $rate_data['rate_95th'];
-$rate_average = $rate_data['rate_average'];
-
-// $bi_a = dbFetchRow("SELECT * FROM bills WHERE bill_id = ?", array($bill_id));
-// $bill_name = $bi_a['bill_name'];
-$bill_name = $rate_data['bill_name'];
 
 $dur = ($end - $start);
 

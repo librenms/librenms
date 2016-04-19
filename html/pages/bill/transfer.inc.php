@@ -30,12 +30,6 @@ $lastmonth      = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 
 $yesterday      = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
 $rightnow       = date(U);
 
-echo '<h3>Billed Ports</h3>';
-
-foreach ($ports as $port) {
-    echo generate_port_link($port).' on '.generate_device_link($port).'<br />';
-}
-
 $cur_days   = date('d', (strtotime('now') - strtotime($datefrom)));
 $total_days = date('d', (strtotime($dateto) - strtotime($datefrom)));
 
@@ -81,65 +75,84 @@ function showPercent($per) {
     $background       = get_percentage_colours($per);
     $right_background = $background['right'];
     $left_background  = $background['left'];
-    $res              = print_percentage_bar(350, 20, $per, null, 'ffffff', $left_background, $per.'%', 'ffffff', $right_background);
+    $res              = print_percentage_bar(200, 20, $per, null, 'ffffff', $left_background, $per.'%', 'ffffff', $right_background);
     return $res;
 
 }//end showPercent()
 
+?>
 
-echo '<h3>Bill Summary</h3>';
-echo '<h4>Quota Bill (Billing Period from '.$fromtext.' to '.$totext.')</h4>';
-echo '<table class="table">';
-echo '  <tr style="font-weight: bold;">';
-echo '    <td width="125">Bandwidth</td>';
-echo '    <td width="10"></td>';
-echo '    <td width="100">Used</td>';
-echo '    <td width="100">Allowed</td>';
-echo '    <td width="100">Average</td>';
-echo '    <td width="100">Estimated</td>';
-echo '    <td width="360"></td>';
-echo '  </tr>';
-echo '  <tr style="background: '.$list_colour_b.';">';
-echo '    <td>Transferred</td>';
-echo '    <td>:</td>';
-echo '    <td>'.$total['data'].'</td>';
-echo '    <td>'.$total['allow'].'</td>';
-echo '    <td>'.$total['ave'].'</td>';
-echo '    <td>'.$total['est'].'</td>';
-echo '    <td width="360">'.showPercent($total['per']).'</td>';
-echo '  </tr>';
+<h3>Transfer Report</h3>
+<strong>Billing Period from <?php echo $fromtext ?> to <?php echo $totext ?></strong>
+<br /><br />
 
-echo '  <tr style="background: '.$list_colour_a.';">';
-echo '    <td>Inbound</td>';
-echo '    <td>:</td>';
-echo '    <td>'.$in['data'].'</td>';
-echo '    <td>'.$in['allow'].'</td>';
-echo '    <td>'.$in['ave'].'</td>';
-echo '    <td>'.$in['est'].'</td>';
-echo '    <td>'.showPercent($in['per']).'</td>';
-echo '  </tr>';
-echo '  <tr style="background: '.$list_colour_b.';">';
-echo '    <td>Outbound</td>';
-echo '    <td>:</td>';
-echo '    <td>'.$out['data'].'</td>';
-echo '    <td>'.$out['allow'].'</td>';
-echo '    <td>'.$out['ave'].'</td>';
-echo '    <td>'.$out['est'].'</td>';
-echo '    <td>'.showPercent($out['per']).'</td>';
-echo '  </tr>';
-if ($ousage['over'] > 0 && $bill_data['bill_type'] == 'quota') {
-    echo '  <tr style="background: '.$list_colour_a.';">';
-    echo '    <td>Already overusage</td>';
-    echo '    <td>:</td>';
-    echo '    <td><span style="color: #'.$total['bg']['left'].'; font-weight: bold;">'.$ousage['data'].'</span></td>';
-    echo '    <td>'.$ousage['allow'].'</td>';
-    echo '    <td>'.$ousage['ave'].'</td>';
-    echo '    <td>'.$ousage['est'].'</td>';
-    echo '    <td>'.showPercent($ousage['per']).'</td>';
-}
+<div class="row">
+    <div class="col-lg-5 col-lg-push-7">
+        <?php print_port_list() ?>
+    </div>
+    <div class="col-lg-7 col-lg-pull-5">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Bill Summary
+                </h3>
+            </div>
+            <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Bandwidth</th>
+                    <th>Used</th>
+                    <th>Allowed</th>
+                    <th>Average</th>
+                    <th>Estimated</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Transferred</th>
+                    <td><?php echo $total['data'] ?></td>
+                    <td><?php echo $total['allow'] ?></td>
+                    <td><?php echo $total['ave'] ?></td>
+                    <td><?php echo $total['est'] ?></td>
+                    <td><?php echo showPercent($total['per']) ?></td>
+                </tr>
+                <tr>
+                    <th>Inbound</th>
+                    <td><?php echo $in['data'] ?></td>
+                    <td><?php echo $in['allow'] ?></td>
+                    <td><?php echo $in['ave'] ?></td>
+                    <td><?php echo $in['est'] ?></td>
+                    <td><?php echo showPercent($in['per']) ?></td>
+                </tr>
+                <tr>
+                    <th>Outbound</th>
+                    <td><?php echo $out['data'] ?></td>
+                    <td><?php echo $out['allow'] ?></td>
+                    <td><?php echo $out['ave'] ?></td>
+                    <td><?php echo $out['est'] ?></td>
+                    <td><?php echo showPercent($out['per']) ?></td>
+                </tr>
+        <?php if ($ousage['over'] > 0 && $bill_data['bill_type'] == 'quota') { ?>
+                <tr>
+                    <th>Already overusage</th>
+                    <td><span style="color: #<?php echo $total['bg']['left'] ?>; font-weight: bold;"><?php echo $ousage['data'] ?></span></td>
+                    <td><?php echo $ousage['allow'] ?></td>
+                    <td><?php echo $ousage['ave'] ?></td>
+                    <td><?php echo $ousage['est'] ?></td>
+                    <td><?php echo showPercent($ousage['per']) ?></td>
+                </tr>
+                
+        <?php } ?>        
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-echo '</table>';
 
+
+<?php 
 $bi  = "<img src='bandwidth-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
 $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
 $bi .= '&amp;type=day&imgbill=1';
@@ -163,7 +176,31 @@ $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
 $mi .= '&amp;&type=day';
 $mi .= '&amp;x=1190&amp;y=250';
 $mi .= "$type'>";
+?>
 
-echo "<h3>Billing Period View</h3>$bi";
-echo "<h3>Rolling 24 Hour View</h3>$di";
-echo "<h3>Rolling Monthly View</h3>$mi";
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Billing Period View</h3>
+    </div>
+    <div class="panel-body">
+    <?php echo $bi ?>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Rolling 24 Hour View</h3>
+    </div>
+    <div class="panel-body">
+    <?php echo $di ?>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Rolling Monthly View</h3>
+    </div>
+    <div class="panel-body">
+    <?php echo $mi ?>
+    </div>
+</div>
