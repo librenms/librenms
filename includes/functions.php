@@ -1271,7 +1271,8 @@ function force_influx_data($data) {
         else {
             return floatval($data);
         }
-    } else {
+    } 
+    else {
         return $data;
     }
 
