@@ -128,7 +128,7 @@ Next, add the following to `/etc/apache2/sites-available/librenms.conf`:
 </VirtualHost>
 ```
 
-If you are running Apache 2.2.18 or higher then change AllowEncodedSlashes to NoDecode
+If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes On` to `AllowEncodedSlashes NoDecode`
 
 If you have Apache 2.3 or newer then please add the following line before `AllowOverride All`:
 
