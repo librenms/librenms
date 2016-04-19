@@ -39,6 +39,18 @@ $tmp_link_ids = array();
 $ports = array();
 $devices = array();
 
+$where = "";
+if (is_numeric($vars['group'])) {
+    $group_pattern = dbFetchCell('SELECT `pattern` FROM `device_groups` WHERE id = '.$vars['group']);
+    $group_pattern = rtrim($group_pattern, '&&');
+    $group_pattern = rtrim($group_pattern, '||');
+
+    $device_id_sql = GenGroupSQL($group_pattern);
+    if ($device_id_sql) {
+        $where .= " AND D1.device_id IN ($device_id_sql) OR D2.device_id IN ($device_id_sql)";
+    }
+}
+
 if (in_array('mac',$config['network_map_items'])) {
     $ports = dbFetchRows("SELECT
                              `D1`.`device_id` AS `local_device_id`,
@@ -74,6 +86,7 @@ if (in_array('mac',$config['network_map_items'])) {
                              `P1`.`port_id` IS NOT NULL AND
                              `P2`.`port_id` IS NOT NULL AND
                              `D1`.`device_id` != `D2`.`device_id`
+                             $where
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
                      ", $sql_array);
@@ -115,6 +128,7 @@ if (in_array('xdp', $config['network_map_items'])) {
                              `remote_device_id` != 0 AND
                              `local_device_id` IS NOT NULL AND
                              `remote_device_id` IS NOT NULL
+                             $where
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
                       ", $sql_array);

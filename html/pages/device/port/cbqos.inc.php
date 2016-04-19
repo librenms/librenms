@@ -41,90 +41,79 @@ function find_child($components,$parent,$level) {
     }
 }
 
-$rrdarr = glob($config['rrd_dir'].'/'.$device['hostname'].'/port-'.$port['ifIndex'].'-cbqos-*.rrd');
-if (!empty($rrdarr)) {
-    require_once "../includes/component.php";
-    $component = new component();
-    $options['filter']['type'] = array('=','Cisco-CBQOS');
-    $components = $component->getComponents($device['device_id'],$options);
-
-    // We only care about our device id.
-    $components = $components[$device['device_id']];
-
-    if (!isset($vars['policy'])) {
-        // not set, find the first parent and use it.
-        foreach ($components as $id => $array) {
-            if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex'])  && ($array['parent'] == 0) ) {
-                // Found the first policy
-                $vars['policy'] = $id;
-                continue;
-            }
-        }
-    }
-    echo "\n\n";
-
-    // Display the ingress policy at the top of the page.
-    echo "<div class='col-md-6'><ul class='mktree' id='ingress'>";
-    echo '<div><strong><i class="fa fa-sign-in"></i>&nbsp;Ingress Policy:</strong></div>';
-    $found = false;
+if (!isset($vars['policy'])) {
+    // not set, find the first parent and use it.
     foreach ($components as $id => $array) {
-        if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 1)  && ($array['parent'] == 0) ) {
-            echo "<li class='liOpen'>";
-            echo('<a href="' . generate_url($vars, array('policy' => $id)) . '">' . $array['label'] . '</a>');
-            find_child($components,$id,1);
-            echo "</li>";
-            $found = true;
+        if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex'])  && ($array['parent'] == 0) ) {
+            // Found the first policy
+            $vars['policy'] = $id;
+            continue;
         }
     }
-    if (!$found) {
-        // No Ingress policies
-        echo '<div><i>No Policies</i></div>';
+}
+echo "\n\n";
+
+// Display the ingress policy at the top of the page.
+echo "<div class='col-md-6'><ul class='mktree' id='ingress'>";
+echo '<div><strong><i class="fa fa-sign-in"></i>&nbsp;Ingress Policy:</strong></div>';
+$found = false;
+foreach ($components as $id => $array) {
+    if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 1)  && ($array['parent'] == 0) ) {
+        echo "<li class='liOpen'>";
+        echo('<a href="' . generate_url($vars, array('policy' => $id)) . '">' . $array['label'] . '</a>');
+        find_child($components,$id,1);
+        echo "</li>";
+        $found = true;
     }
-    echo '</ul></div>';
+}
+if (!$found) {
+    // No Ingress policies
+    echo '<div><i>No Policies</i></div>';
+}
+echo '</ul></div>';
 
-    // Display the egress policy at the top of the page.
-    echo "<div class='col-md-6'><ul class='mktree' id='egress'>";
-    echo '<div><strong><i class="fa fa-sign-out"></i>&nbsp;Egress Policy:</strong></div>';
-    $found = false;
-    foreach ($components as $id => $array) {
-        if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 2)  && ($array['parent'] == 0) ) {
-            echo "<li class='liOpen'>";
-            echo('<a href="' . generate_url($vars, array('policy' => $id)) . '">' . $array['label'] . '</a>');
-            find_child($components,$id,1);
-            echo "</li>";
-            $found = true;
-        }
+// Display the egress policy at the top of the page.
+echo "<div class='col-md-6'><ul class='mktree' id='egress'>";
+echo '<div><strong><i class="fa fa-sign-out"></i>&nbsp;Egress Policy:</strong></div>';
+$found = false;
+foreach ($components as $id => $array) {
+    if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($array['direction'] == 2)  && ($array['parent'] == 0) ) {
+        echo "<li class='liOpen'>";
+        echo('<a href="' . generate_url($vars, array('policy' => $id)) . '">' . $array['label'] . '</a>');
+        find_child($components,$id,1);
+        echo "</li>";
+        $found = true;
     }
-    if (!$found) {
-        // No Egress policies
-        echo '<div><i>No Policies</i></div>';
-    }
-    echo "</ul></div>\n\n";
+}
+if (!$found) {
+    // No Egress policies
+    echo '<div><i>No Policies</i></div>';
+}
+echo "</ul></div>\n\n";
 
-    // Let's make sure the policy we are trying to access actually exists.
-    foreach ($components as $id => $array) {
-        if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($id == $vars['policy']) ) {
-            // The policy exists.
+// Let's make sure the policy we are trying to access actually exists.
+foreach ($components as $id => $array) {
+    if ( ($array['qos-type'] == 1) && ($array['ifindex'] == $port['ifIndex']) && ($id == $vars['policy']) ) {
+        // The policy exists.
 
-            echo "<div class='col-md-12'>&nbsp;</div>\n\n";
+        echo "<div class='col-md-12'>&nbsp;</div>\n\n";
 
-            // Display each graph row.
-            echo "<div class='col-md-12'>";
-            echo "<div class='graphhead'>Traffic by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
-            $graph_array['policy'] = $vars['policy'];
-            $graph_type = 'port_cbqos_traffic';
-            include 'includes/print-interface-graphs.inc.php';
+        // Display each graph row.
+        echo "<div class='col-md-12'>";
+        echo "<div class='graphhead'>Traffic by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
+        $graph_array['policy'] = $vars['policy'];
+        $graph_type = 'port_cbqos_traffic';
+        include 'includes/print-interface-graphs.inc.php';
 
-            echo "<div class='graphhead'>QoS Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
-            $graph_array['policy'] = $vars['policy'];
-            $graph_type = 'port_cbqos_bufferdrops';
-            include 'includes/print-interface-graphs.inc.php';
+        echo "<div class='graphhead'>QoS Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
+        $graph_array['policy'] = $vars['policy'];
+        $graph_type = 'port_cbqos_bufferdrops';
+        include 'includes/print-interface-graphs.inc.php';
 
-            echo "<div class='graphhead'>Buffer Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
-            $graph_array['policy'] = $vars['policy'];
-            $graph_type = 'port_cbqos_qosdrops';
-            include 'includes/print-interface-graphs.inc.php';
-            echo "</div>\n\n";
-        }
+        echo "<div class='graphhead'>Buffer Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
+        $graph_array['policy'] = $vars['policy'];
+        $graph_type = 'port_cbqos_qosdrops';
+        include 'includes/print-interface-graphs.inc.php';
+        echo "</div>\n\n";
     }
 }

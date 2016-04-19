@@ -49,9 +49,9 @@ if (count($processors)) {
             $minigraph =  generate_lazy_graph_tag($graph_array);
 
             echo '<tr>
-                <td>'.overlib_link($link, $text_descr, $overlib_content).'</td>
-                <td>'.overlib_link($link, $minigraph, $overlib_content).'</td>
-                <td>'.overlib_link($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']), $overlib_content).'
+                <td class="col-md-4">'.overlib_link($link, $text_descr, $overlib_content).'</td>
+                <td class="col-md-4">'.overlib_link($link, $minigraph, $overlib_content).'</td>
+                <td class="col-md-4">'.overlib_link($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']), $overlib_content).'
                 </a></td>
               </tr>';
         }
@@ -104,9 +104,9 @@ if (count($processors)) {
         $background   = get_percentage_colours($totalPercent);
 
          echo '<tr>
-             <td>'.overlib_link($link, $text_descr, $overlib_content).'</td>
-             <td>'.overlib_link($link,'x'.count($processors),$overlib_content).'</td>
-             <td>'.overlib_link($link, print_percentage_bar(200, 20, $totalPercent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']), $overlib_content).'</td>
+             <td class="col-md-4">'.overlib_link($link, $text_descr, $overlib_content).'</td>
+             <td class="col-md-4">'.overlib_link($link,'x'.count($processors),$overlib_content).'</td>
+             <td class="col-md-4">'.overlib_link($link, print_percentage_bar(200, 20, $totalPercent, null, 'ffffff', $background['left'], $percent.'%', 'ffffff', $background['right']), $overlib_content).'</td>
            </tr>';
 
     }

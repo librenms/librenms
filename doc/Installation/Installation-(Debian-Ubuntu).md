@@ -177,6 +177,14 @@ Create the admin user - priv should be 10
 
 Substitute your desired username, password and email address--and leave the angled brackets off.
 
+### Validate your install ###
+
+Run validate.php as root in the librenms directory
+
+    php validate.php
+
+This will check your install to verify it is set up correctly.
+
 ### Add localhost ###
 
     php addhost.php localhost public v2c

@@ -4,7 +4,7 @@
 !/.gitignore
 !/.editorconfig
 !/.scrutinizer.yml
-
+!/.travis.yml
 
 # Others #
 ##########

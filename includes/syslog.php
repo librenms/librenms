@@ -52,38 +52,24 @@ function process_syslog($entry, $update) {
         $os = get_cache($entry['host'], 'os');
 
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
-            $matches = array();
-            // if (preg_match('#%(?P<program>.*):( ?)(?P<msg>.*)#', $entry['msg'], $matches)) {
-            // $entry['msg'] = $matches['msg'];
-            // $entry['program'] = $matches['program'];
-            // }
-            // unset($matches);
-            if (strstr($entry[msg], '%')) {
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
-                list(,$entry[msg]) = split(': %', $entry['msg']);
-                $entry['msg']      = '%'.$entry['msg'];
-                $entry['msg']      = preg_replace('/^%(.+?):\ /', '\\1||', $entry['msg']);
+            // multipart message
+            if(strpos($entry['msg'], ':') !== false) {
+                $matches = array();
+                $timestamp_prefix = '([\*\.]?[A-Z][a-z]{2} \d\d? \d\d:\d\d:\d\d(.\d\d\d)?( [A-Z]{3})?: )?';
+                $program_match = '(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?)';
+                $message_match = '(?<msg>.*)';
+                if(preg_match('/^' . $timestamp_prefix . $program_match . ': ?' . $message_match . '/', $entry['msg'], $matches)) {
+                    $entry['program'] = $matches['program'];
+                    $entry['msg'] = $matches['msg'];
+                }
+                unset($matches);
             }
             else {
-                $entry['msg'] = preg_replace('/^.*[0-9]:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^[0-9][0-9]\ [A-Z]{3}:/', '', $entry['msg']);
-                $entry['msg'] = preg_replace('/^(.+?):\ /', '\\1||', $entry['msg']);
-            }
-
-            $entry['msg'] = preg_replace('/^.+\.[0-9]{3}:/', '', $entry['msg']);
-            $entry['msg'] = preg_replace('/^.+-Traceback=/', 'Traceback||', $entry['msg']);
-
-            list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            $entry['msg'] = preg_replace('/^[0-9]+:/', '', $entry['msg']);
-
-            if (!$entry['program']) {
-                $entry['msg'] = preg_replace('/^([0-9A-Z\-]+?):\ /', '\\1||', $entry['msg']);
-                list($entry['program'], $entry['msg']) = explode('||', $entry['msg']);
-            }
-
-            if (!$entry['msg']) {
-                $entry['msg'] = $entry['program'];
-                unset($entry['program']);
+                // if this looks like a program (no groups of 2 or more lowercase letters), move it to program
+                if (!preg_match('/[(a-z)]{2,}/', $entry['msg'])) {
+                    $entry['program'] = $entry['msg'];
+                    unset($entry['msg']);
+               }
             }
         }
         else if ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
@@ -98,16 +84,9 @@ function process_syslog($entry, $update) {
         }
         else if ($os == 'linux') {
             $matches = array();
-            // User_CommonName/123.213.132.231:39872 VERIFY OK: depth=1, /C=PL/ST=Malopolska/O=VLO/CN=v-lo.krakow.pl/emailAddress=root@v-lo.krakow.pl
-            if ($entry['facility'] == 'daemon' and preg_match('#/([0-9]{1,3}\.) {3}[0-9]{1,3}:[0-9]{4,} ([A-Z]([A-Za-z])+( ?)) {2,}:#', $entry['msg'])) {
-                $entry['program'] = 'OpenVPN';
-            } //end if
-            // POP3(username): Disconnected: Logged out top=0/0, retr=0/0, del=0/1, size=2802
-            else if ($entry['facility'] == 'mail' and preg_match('#^(((pop3|imap)\-login)|((POP3|IMAP)\(.*\))):', $entry['msg'])) {
-                $entry['program'] = 'Dovecot';
-            } // pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
+            // pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
             // pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-            else if (preg_match('#^(?P<program>(.*((\(|\[).*(\)|\])))):(?P<msg>.*)$#', $entry['msg'], $matches)) {
+            if (preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', $entry['msg'], $matches)) {
                 $entry['msg']     = $matches['msg'];
                 $entry['program'] = $matches['program'];
             } // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
@@ -124,6 +103,15 @@ function process_syslog($entry, $update) {
             }
 
             unset($matches);
+        }
+        else if ($os == 'procurve') {
+            $matches = array();
+            if (preg_match('/^(?P<program>[A-Za-z]+): {2}(?P<msg>.*)/', $entry['msg'], $matches)) {
+                $entry['msg']     = $matches['msg']. " [". $entry['program']. "]";
+                $entry['program'] = $matches['program'];
+            }
+            unset($matches);
+
         }//end if
 
         if (!isset($entry['program'])) {
@@ -132,7 +120,7 @@ function process_syslog($entry, $update) {
         }
 
         $entry['program'] = strtoupper($entry['program']);
-        array_walk($entry, 'trim');
+        $entry = array_map('trim', $entry);
 
         if ($update) {
             dbInsert(

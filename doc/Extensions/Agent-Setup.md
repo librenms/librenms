@@ -19,11 +19,11 @@ cp check_mk_agent /usr/bin/check_mk_agent
 chmod +x /usr/bin/check_mk_agent
 ```
 
-* Copy the xinetd config file into place.
+* Copy the service file(s) into place.
 
-```shell
-cp check_mk_xinetd /etc/xinetd.d/check_mk
-```
+| xinetd | systemd |
+| --- | --- |
+| `cp check_mk_xinetd /etc/xinetd.d/check_mk` | `cp check_mk@.service check_mk.socket /etc/systemd/system` |
 
 * Create the relevant directories.
 
@@ -33,11 +33,12 @@ mkdir -p /usr/lib/check_mk_agent/plugins /usr/lib/check_mk_agent/local
 
 * Copy each of the scripts from `agent-local/` into `/usr/lib/check_mk_agent/local` that you require to be graphed.
 * Make each one executable that you want to use with `chmod +x /usr/lib/check_mk_agent/local/$script`
-* And restart xinetd.
+* Enable service scripts
 
-```shell
-/etc/init.d/xinetd restart
-```
+| xinetd | systemd |
+| --- | --- |
+| `/etc/init.d/xinetd restart` | `systemctl enable --now check_mk.socket` |
+
 
 * Login to the LibreNMS web interface and edit the device you want to monitor. Under the modules section, ensure that unix-agent is enabled.
 * Then under Applications, enable the apps that you plan to monitor.
