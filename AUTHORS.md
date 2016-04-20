@@ -97,6 +97,7 @@ LibreNMS contributors:
 - Karsten Nerdinger <karsten-git-librenms@nerdinger.net> (piratonym)
 - Michael Nguyen <mnguyen1289@gmail.com> (mnguyen1289)
 - Casey Schoonover <casey.schoonover@llcc.edu> (cschoonover91)
+- Chris A. Evans <thecityofguanyu@outlook.com> (thecityofguanyu)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
