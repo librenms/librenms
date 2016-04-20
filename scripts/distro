@@ -86,6 +86,9 @@ elif [ "${OS}" = "Darwin" ] ; then
   if [ -f /usr/bin/sw_vers ] ; then
     OSSTR=`/usr/bin/sw_vers|grep -v Build|sed 's/^.*:.//'| tr "\n" ' '`
   fi
+
+elif [ "${OS}" = "FreeBSD" ] ; then
+  OSSTR=`/usr/bin/uname -mior`
 fi
 
 echo ${OSSTR}
