@@ -19,7 +19,7 @@
 //like the others, so if i use the context, you will have the same information n time the context how have the same VRF
 global $debug;
 
-if ($config['enable_route']) {
+if ($config['discovery_modules']['route']) {
     $ids = array();
 
     // For the moment only will be cisco and the version 3
