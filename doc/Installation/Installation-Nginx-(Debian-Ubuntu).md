@@ -71,7 +71,7 @@ You need to configure snmpd appropriately if you have not already done so.  An a
 
 Adding the above line to `/etc/snmp/snmpd.conf` and running `service snmpd restart` will activate this config.
 
-In `/etc/php5/apache2/php.ini` and `/etc/php5/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
+In `/etc/php5/fpm/php.ini` and `/etc/php5/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid
 examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 Please also ensure that `allow_url_fopen` is enabled. Other functions needed for LibreNMS include `exec,passthru,shell_exec,escapeshellarg,escapeshellcmd,proc_close,proc_open,popen`.
 
@@ -101,7 +101,7 @@ Sometimes the initial clone can take quite a while (nearly 3 minutes on a 10 Mbp
 
 ### Web Interface ###
 
-To prepare the web interface (and adding devices shortly), you'll need to create and chown a directory as well as create an Apache vhost.
+To prepare the web interface (and adding devices shortly), you'll need to create and chown a directory as well as create a Nginx vhost.
 
 First, create and chown the `rrd` directory and create the `logs` directory:
 
@@ -127,7 +127,7 @@ server {
  }
  location ~ \.php {
   fastcgi_param PATH_INFO $fastcgi_path_info;
-  include fastcgi.conf;
+  include fastcgi_params;
   fastcgi_split_path_info ^(.+\.php)(/.+)$;
   fastcgi_pass unix:/var/run/php5-fpm.sock;
  }
