@@ -128,7 +128,7 @@ Next, add the following to `/etc/apache2/sites-available/librenms.conf`:
 </VirtualHost>
 ```
 
-If you are running Apache 2.2.18 or higher then change AllowEncodedSlashes to NoDecode
+If you are running Apache 2.2.18 or higher then change `AllowEncodedSlashes On` to `AllowEncodedSlashes NoDecode`
 
 If you have Apache 2.3 or newer then please add the following line before `AllowOverride All`:
 
@@ -176,6 +176,14 @@ Create the admin user - priv should be 10
     php adduser.php <name> <pass> 10 <email>
 
 Substitute your desired username, password and email address--and leave the angled brackets off.
+
+### Validate your install ###
+
+Run validate.php as root in the librenms directory
+
+    php validate.php
+
+This will check your install to verify it is set up correctly.
 
 ### Add localhost ###
 

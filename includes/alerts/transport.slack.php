@@ -45,7 +45,7 @@ foreach( $opts as $tmp_api ) {
         var_dump("API '$host' returned Error"); //FIXME: propper debuging
         var_dump("Params: ".$alert_message); //FIXME: propper debuging
         var_dump("Return: ".$ret); //FIXME: propper debuging
-        return false;
+        return 'HTTP Status code '.$code;
     }
 }
 return true;

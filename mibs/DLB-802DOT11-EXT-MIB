@@ -1,0 +1,452 @@
+--
+--  Deliberant 802.11 Extension MIB
+--
+
+DLB-802DOT11-EXT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter32, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    MacAddress, TruthValue
+        FROM SNMPv2-TC
+    sysLocation
+        FROM SNMPv2-MIB
+    ifIndex, InterfaceIndex, ifPhysAddress
+        FROM IF-MIB
+    dlbMgmt
+        FROM DELIBERANT-MIB;
+
+dlb802dot11ExtMIB MODULE-IDENTITY
+    LAST-UPDATED    "201003310000Z"
+    ORGANIZATION    "Deliberant"
+    CONTACT-INFO    "
+        Deliberant Customer Support
+        E-mail: support@deliberant.com"
+    DESCRIPTION
+        "The Deliberant 802.11 Extension MIB."
+    REVISION    "201003310000Z"
+    DESCRIPTION
+        "Added dlbDot11IfAssocNodeCount."
+    REVISION    "200905150000Z"
+    DESCRIPTION
+        "Added dlbDot11RemoteNodeStatsTable and dlbRemoteNodeConnected, 
+        dlbRemoteNodeDisconnected notifications."
+    REVISION    "200812120000Z"
+    DESCRIPTION
+        "First revision."
+    ::= { dlbMgmt 5 }
+
+dlb802dot11ExtMIBObjects
+        OBJECT IDENTIFIER ::= { dlb802dot11ExtMIB 1 }
+
+dlbDot11Notifs
+        OBJECT IDENTIFIER ::= { dlb802dot11ExtMIBObjects 0 }
+dlbDot11Info
+        OBJECT IDENTIFIER ::= { dlb802dot11ExtMIBObjects 1 }
+dlbDot11Conf
+        OBJECT IDENTIFIER ::= { dlb802dot11ExtMIBObjects 2 }
+dlbDot11Stats
+        OBJECT IDENTIFIER ::= { dlb802dot11ExtMIBObjects 3 }
+
+dlbDot11IfConfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbDot11IfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface configuration table."
+    ::= { dlbDot11Conf 1 }
+
+dlbDot11IfConfEntry OBJECT-TYPE
+    SYNTAX  DlbDot11IfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface configuration table entry."
+    INDEX { ifIndex }
+    ::= { dlbDot11IfConfTable 1 }
+
+DlbDot11IfConfEntry ::=
+    SEQUENCE {
+        dlbDot11IfParentIndex          InterfaceIndex,
+        dlbDot11IfProtocol             OCTET STRING,
+        dlbDot11IfMode                 INTEGER,
+        dlbDot11IfESSID                OCTET STRING,
+        dlbDot11IfAccessPoint          MacAddress,
+        dlbDot11IfCountryCode          Integer32,
+        dlbDot11IfFrequency            Integer32,
+        dlbDot11IfChannel              Integer32,
+        dlbDot11IfChannelBandwidth     Integer32,
+        dlbDot11IfTxPower              Gauge32,
+        dlbDot11IfBitRate              Gauge32,
+        dlbDot11IfLinkQuality          Gauge32,
+        dlbDot11IfMaxLinkQuality       Gauge32,
+        dlbDot11IfSignalLevel          Integer32,
+        dlbDot11IfNoiseLevel           Integer32,
+        dlbDot11IfAssocNodeCount       Gauge32
+    }
+
+dlbDot11IfParentIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless interface's parent index, which corresponds to ifIndex in MIB-II interfaces table.
+         This is only applicable if the interface is virtual and it is created under some other interface, like 
+        it is for Atheros cards when using MadWiFi driver, where parent interfaces are wifi0, wifi1, etc."
+    ::= { dlbDot11IfConfEntry 1 }
+
+dlbDot11IfProtocol OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Protocol string, for example 'IEEE 802.11g'."
+    ::= { dlbDot11IfConfEntry 2 }
+
+dlbDot11IfMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    auto(0),
+                    adhoc(1),
+                    managed(2),
+                    master(3),
+                    repeater(4),
+                    secondary(5),
+                    monitor(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless interface operation mode"
+    ::= { dlbDot11IfConfEntry 3 }
+
+dlbDot11IfESSID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ESSID"
+    ::= { dlbDot11IfConfEntry 4 }
+
+dlbDot11IfAccessPoint OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Access point's MAC address if working in managed mode and connected.
+         Current interface's MAC address, when working in master mode."
+    ::= { dlbDot11IfConfEntry 5 }
+
+dlbDot11IfCountryCode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Country code."
+    ::= { dlbDot11IfConfEntry 6 }
+
+dlbDot11IfFrequency OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current frequency as reported by driver."
+    ::= { dlbDot11IfConfEntry 7 }
+
+dlbDot11IfChannel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel number."
+    ::= { dlbDot11IfConfEntry 8 }
+
+dlbDot11IfChannelBandwidth OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel bandwidth."
+    ::= { dlbDot11IfConfEntry 9 }
+
+dlbDot11IfTxPower OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit power in dBm."
+    ::= { dlbDot11IfConfEntry 10 }
+
+dlbDot11IfBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmission bitrate."
+    ::= { dlbDot11IfConfEntry 11 }
+
+dlbDot11IfLinkQuality OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Link quality value."
+    ::= { dlbDot11IfConfEntry 12 }
+
+dlbDot11IfMaxLinkQuality OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum possible link quality value for current wireless card."
+    ::= { dlbDot11IfConfEntry 13 }
+
+dlbDot11IfSignalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal level."
+    ::= { dlbDot11IfConfEntry 14 }
+
+dlbDot11IfNoiseLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise level."
+    ::= { dlbDot11IfConfEntry 15 }
+
+dlbDot11IfAssocNodeCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of associated nodes when working in access point mode. 
+         1 - if associated to remote access point in client mode."
+    ::= { dlbDot11IfConfEntry 16 }
+
+dlbDot11IfErrStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbDot11IfErrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface statistics table."
+    ::= { dlbDot11Stats 1 }
+
+dlbDot11IfErrStatsEntry OBJECT-TYPE
+    SYNTAX  DlbDot11IfErrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface statistics table entry."
+    INDEX { ifIndex }
+    ::= { dlbDot11IfErrStatsTable 1 }
+
+DlbDot11IfErrStatsEntry ::=
+    SEQUENCE {
+        dlbDot11IfRxInvalidNWID        Counter32,
+        dlbDot11IfRxInvalidCrypt       Counter32,
+        dlbDot11IfRxInvalidFrag        Counter32,
+        dlbDot11IfTxExcessiveRetries   Counter32,
+        dlbDot11IfInvalidMisc          Counter32,
+        dlbDot11IfMissedBeacons        Counter32
+    }
+
+dlbDot11IfRxInvalidNWID OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets with invalid NWID/ESSID. Increasing value usually means that there are 
+        other stations transmitting on the same channel or adjacent channels."
+    ::= { dlbDot11IfErrStatsEntry 1 }
+
+dlbDot11IfRxInvalidCrypt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets the hardware was unable to decrypt."
+    ::= { dlbDot11IfErrStatsEntry 2 }
+
+dlbDot11IfRxInvalidFrag OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets that were missing link layer fragments for complete re-assembly."
+    ::= { dlbDot11IfErrStatsEntry 3 }
+
+dlbDot11IfTxExcessiveRetries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets hardware failed to deliver."
+    ::= { dlbDot11IfErrStatsEntry 4 }
+
+dlbDot11IfInvalidMisc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Other packets lost in relation with specific wireless operations."
+    ::= { dlbDot11IfErrStatsEntry 5 }
+
+dlbDot11IfMissedBeacons OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of beacons that should have been sent by remote access point but were not received.
+        Increasing number usually means that communicating peers moved out of range."
+    ::= { dlbDot11IfErrStatsEntry 6 }
+
+dlbDot11RemoteNodeStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DlbDot11RemoteNodeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Remote node statistics table. This table shows statistics for associated or already disconnected clients 
+        on wireless interfaces which are operating in access point mode. For interfaces operating in client mode and
+        associated to remote access point information about access point is shown."
+    ::= { dlbDot11Stats 2 }
+
+dlbDot11RemoteNodeStatsEntry OBJECT-TYPE
+    SYNTAX  DlbDot11RemoteNodeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless remote node statistics table entry."
+    INDEX { ifIndex, dlbDot11RmtNodeMacAddress }
+    ::= { dlbDot11RemoteNodeStatsTable 1 }
+
+DlbDot11RemoteNodeStatsEntry ::=
+    SEQUENCE {
+        dlbDot11RmtNodeMacAddress             MacAddress,
+        dlbDot11RmtNodeAssociated             TruthValue,
+        dlbDot11RmtNodeTxBytes                Counter32,
+        dlbDot11RmtNodeRxBytes                Counter32,
+        dlbDot11RmtNodeAssocTime              Integer32,
+        dlbDot11RmtNodeDisassocTime           Integer32
+    }
+
+dlbDot11RmtNodeMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote node MAC address."
+    ::= { dlbDot11RemoteNodeStatsEntry 1 }
+
+dlbDot11RmtNodeAssociated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote node is currently associated."
+    ::= { dlbDot11RemoteNodeStatsEntry 2 }
+
+dlbDot11RmtNodeTxBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bytes transmitted to remote node. This object is optional."
+    ::= { dlbDot11RemoteNodeStatsEntry 3 }
+
+dlbDot11RmtNodeRxBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bytes received from remote node. This object is optional."
+    ::= { dlbDot11RemoteNodeStatsEntry 4 }
+
+dlbDot11RmtNodeAssocTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UNIX timestamp of the association. This object is optional."
+    ::= { dlbDot11RemoteNodeStatsEntry 5 }
+
+dlbDot11RmtNodeDisassocTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UNIX timestamp of the disassociation (if remote node recently dissasociated). 
+        This object is optional."
+    ::= { dlbDot11RemoteNodeStatsEntry 6 }
+
+--
+-- Notifications
+--
+
+dlbFrequencyChange NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        dlbDot11IfFrequency
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent on frequency change."
+    ::= { dlbDot11Notifs 1 }
+
+dlbNoiseThresholdReached NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        dlbDot11IfNoiseLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when noise becomes bigger than threshold."
+    ::= { dlbDot11Notifs 2 }
+
+dlbRemoteNodeConnected NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifPhysAddress,
+        ifIndex,
+        dlbDot11RmtNodeMacAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when remote node associates."
+    ::= { dlbDot11Notifs 3 }
+
+dlbRemoteNodeDisconnected NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifPhysAddress,
+        ifIndex,
+        dlbDot11RmtNodeMacAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when remote node dissasociates."
+    ::= { dlbDot11Notifs 4 }
+
+dlbLinkQualThresholdReached NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        dlbDot11IfLinkQuality
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when link quality crosses the specified threshold."
+    ::= { dlbDot11Notifs 5 }
+
+END

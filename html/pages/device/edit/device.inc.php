@@ -5,7 +5,7 @@ if ($_POST['editing']) {
 
         $override_sysLocation_bool = mres($_POST['override_sysLocation']);
         if (isset($_POST['sysLocation'])) {
-            $override_sysLocation_string = mres($_POST['sysLocation']);
+            $override_sysLocation_string = $_POST['sysLocation'];
         }
 
         if ($device['override_sysLocation'] != $override_sysLocation_bool || $device['location'] != $override_sysLocation_string) {

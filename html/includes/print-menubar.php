@@ -3,7 +3,7 @@ require $config['install_dir'].'/includes/object-cache.inc.php';
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
-$service_alerts = dbFetchCell("SELECT COUNT(service_id) FROM services WHERE service_status = '0'");
+$service_status = get_service_status();
 $if_alerts      = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
 if ($_SESSION['userlevel'] >= 5) {
@@ -48,14 +48,14 @@ else {
       <ul class="nav navbar-nav">
         <li class="dropdown">
           <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-lightbulb-o fa-fw fa-lg fa-nav-icons hidden-md"></i> <span class="hidden-sm">Overview</span></a>
-          <ul class="dropdown-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
-          <li class="dropdown-submenu">
-            <a><i class="fa fa-exclamation-circle fa-fw fa-lg"> </i> Alerts</a>
-            <ul class="dropdown-menu scrollable-menu">
-            <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
-            <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
+          <ul class="dropdown-menu multi-level" role="menu">
+             <li><a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-lightbulb-o fa-fw fa-lg"></i> Overview</a></li>
+             <li class="dropdown-submenu">
+                <a><i class="fa fa-exclamation-circle fa-fw fa-lg"> </i> Alerts</a>
+                <ul class="dropdown-menu scrollable-menu">
+                    <li><a href="<?php echo(generate_url(array('page'=>'alerts'))); ?>"><i class="fa fa-bell fa-fw fa-lg"></i> Notifications</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-log'))); ?>"><i class="fa fa-th-list fa-fw fa-lg"></i> Historical Log</a></li>
+                    <li><a href="<?php echo(generate_url(array('page'=>'alert-stats'))); ?>"><i class="fa fa-bar-chart fa-fw fa-lg"></i> Statistics</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
 ?>
@@ -70,9 +70,24 @@ if ($_SESSION['userlevel'] >= '10') {
           </li>
           <li class="dropdown-submenu">
            <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>"><i class="fa fa-sitemap fa-fw fa-lg"></i> Maps</a>
-           <ul class="dropdown-menu scrollable-menu">
-           <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
-           <li><a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a></li>
+           <ul class="dropdown-menu">
+                <li><a href="<?php echo(generate_url(array('page'=>'availability-map'))); ?>"><i class="fa fa-arrow-circle-up fa-fw fa-lg"></i> Availability</a></li>
+               <li>
+                    <a href="<?php echo(generate_url(array('page'=>'map'))); ?>"><i class="fa fa-desktop fa-fw fa-lg"></i> Network</a>
+               </li>
+                <?php
+
+                    require_once '../includes/device-groups.inc.php';
+                    $devices_groups = GetDeviceGroups();
+                    if (count($devices_groups) > 0 ){
+                        echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups Maps</a><ul class="dropdown-menu scrollable-menu">';
+                        foreach( $devices_groups as $group ) {
+                            echo '<li><a href="'.generate_url(array('page'=>'map','group'=>$group['id'])).'" alt="'.$group['desc'].'"><i class="fa fa-th fa-fw fa-lg"></i> '.ucfirst($group['name']).'</a></li>';
+                        }
+                        unset($group);
+                        echo '</ul></li>';
+                    }
+                ?>
            </ul>
           </li>
           <li class="dropdown-submenu">
@@ -145,8 +160,6 @@ foreach (dbFetchRows($sql,$param) as $devtype) {
 
         echo ('</ul>
              </li>');
-            require_once '../includes/device-groups.inc.php';
-            $devices_groups = GetDeviceGroups();
             if (count($devices_groups) > 0 ){
                 echo '<li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"></i> Device Groups</a><ul class="dropdown-menu scrollable-menu">';
                 foreach( $devices_groups as $group ) {
@@ -206,18 +219,20 @@ if ($config['show_services']) {
 
 <?php
 
-if ($service_alerts) {
-    echo('
-            <li role="presentation" class="divider"></li>
-            <li><a href="services/state=down/"><i class="fa fa-bell-o fa-fw fa-lg"></i> Alerts ('.$service_alerts.')</a></li>');
+if (($service_status[1] > 0) || ($service_status[2] > 0)) {
+    echo '            <li role="presentation" class="divider"></li>';
+    if ($service_status[1] > 0) {
+        echo '            <li><a href="services/state=warning/"><i class="fa fa-bell-o fa-col-warning fa-fw fa-lg"></i> Warning ('.$service_status[1].')</a></li>';
+    }
+    if ($service_status[2] > 0) {
+        echo '            <li><a href="services/state=critical/"><i class="fa fa-bell-o fa-col-danger fa-fw fa-lg"></i> Critical ('.$service_status[2].')</a></li>';
+    }
 }
 
 if ($_SESSION['userlevel'] >= '10') {
     echo('
             <li role="presentation" class="divider"></li>
-            <li><a href="addsrv/"><i class="fa fa-cog fa-col-success fa-fw fa-lg"></i> Add Service</a></li>
-            <li><a href="editsrv/"><i class="fa fa-cog fa-col-primary fa-fw fa-lg"></i> Edit Service</a></li>
-            <li><a href="delsrv/"><i class="fa fa-cog fa-col-danger fa-fw fa-lg"></i> Delete Service</a></li>');
+            <li><a href="addsrv/"><i class="fa fa-cog fa-col-success fa-fw fa-lg"></i> Add Service</a></li>');
 }
 ?>
           </ul>
@@ -346,8 +361,8 @@ if ($menu_sensors) {
     echo('            <li role="presentation" class="divider"></li>');
 }
 
-$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square','dbm'=>'sun-o', 'load'=>'spinner','state'=>'bullseye');
-foreach (array('fanspeed','humidity','temperature') as $item) {
+$icons = array('fanspeed'=>'tachometer','humidity'=>'tint','temperature'=>'fire','current'=>'bolt','frequency'=>'line-chart','power'=>'power-off','voltage'=>'bolt','charge'=>'plus-square','dbm'=>'sun-o', 'load'=>'spinner','state'=>'bullseye','signal'=>'wifi');
+foreach (array('fanspeed','humidity','temperature','signal') as $item) {
     if (isset($menu_sensors[$item])) {
         echo('            <li><a href="health/metric='.$item.'/"><i class="fa fa-'.$icons[$item].' fa-fw fa-lg"></i> '.nicecase($item).'</a></li>');
         unset($menu_sensors[$item]);$sep++;

@@ -54,8 +54,8 @@ if(is_admin() !== false) {
                         <select id='condition' name='condition' placeholder='Condition' class='form-control'>
                                 <option value='='>Equals</option>
                                 <option value='!='>Not Equals</option>
-				<option value='~'>Like</option>
-				<option value='!~'>Not Like</option>
+                                <option value='~'>Like</option>
+                                <option value='!~'>Not Like</option>
                                 <option value='>'>Larger than</option>
                                 <option value='>='>Larger than or Equals</option>
                                 <option value='<'>Smaller than</option>
@@ -156,8 +156,8 @@ $('#create-alert').on('hide.bs.modal', function (event) {
 });
 
 $('#add-map').click('',function (event) {
-	$('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
-	$('#map-stub').val('');
+    $('#map-tags').data('tagmanager').populate([ $('#map-stub').val() ]);
+    $('#map-stub').val('');
 });
 
 $('#create-alert').on('show.bs.modal', function (event) {
@@ -255,9 +255,10 @@ $('#suggest').typeahead({
   async: true,
   displayKey: 'name',
   valueKey: name,
-    templates: {
-        suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
-    }
+  templates: {
+      suggestion: Handlebars.compile('<p>&nbsp;{{name}}</p>')
+  },
+  limit: 20
 });
 
 var map_devices = new Bloodhound({

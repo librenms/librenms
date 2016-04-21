@@ -4,6 +4,7 @@ if (!$os) {
     $skip_oids = array(
         '.1.3.6.1.4.1.674.10892.2',
         '.1.3.6.1.4.1.17163.1.1',
+        '.1.3.6.1.4.1.17713.21'
     );
     if (preg_match('/^Linux/', $sysDescr) && !in_array($sysObjectId, $skip_oids)) {
         $os = 'linux';
@@ -49,6 +50,23 @@ if (!$os) {
             else if (trim(snmp_get($device, 'fwVersion.1', '-Osqnv', 'UBNT-AirFIBER-MIB')) != '') {
                 $os = 'airos-af';
             }
+        }
+        else if (snmp_get($device, 'GANDI-MIB::rxCounter.0', '-Osqnv', 'GANDI-MIB') !== false) {
+            $os = 'pktj';
+            $pktj_mibs = array (
+               "rxCounter"       => "GANDI-MIB",  // RX Packets
+               "txCounter"       => "GANDI-MIB",  // TX Packets
+               "dropCounter"     => "GANDI-MIB",  // Dropped counters
+               "acldropCounter"  => "GANDI-MIB",  // ACL Dropped counter
+               "ratedropCounter" => "GANDI-MIB",  // Rate Dropped counter
+               "KNIrxCounter"    => "GANDI-MIB",  // KNI RX counter
+               "KNItxCounter"    => "GANDI-MIB",  // KNI TX counter
+               "KNIdropCounter"  => "GANDI-MIB",  // KNI DROP counter
+            );
+            register_mibs($device, $pktj_mibs, "include/discovery/os/linux.inc.php");
+        }
+        elseif (stristr($sysObjectId, 'cumulusMib') || strstr($sysObjectId, '.1.3.6.1.4.1.40310')) {
+            $os = 'cumulus';
         }
         else {
             // Check for Synology DSM
