@@ -129,7 +129,7 @@ rrdtool_pipe_open($rrd_process, $rrd_pipes);
 echo "Starting polling run:\n\n";
 $polled_devices = 0;
 if (!isset($query)) {
-    $query = "SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
+    $query = "SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC;";
 }
 
 foreach (dbFetch($query) as $device) {
