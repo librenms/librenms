@@ -1,6 +1,7 @@
 <?php
 
 $where = '1';
+$param = array();
 
 if (!empty($_POST['searchPhrase'])) {
     $where .= ' AND S.msg LIKE "%'.mres($_POST['searchPhrase']).'%"';
@@ -31,8 +32,8 @@ if ($_SESSION['userlevel'] >= '5') {
     $sql .= ' WHERE '.$where;
 }
 else {
-    $sql   = 'FROM syslog AS S, devices_perms AS P';
-    $sql  .= 'WHERE S.device_id = P.device_id AND P.user_id = ?';
+    $sql   = 'FROM syslog AS S, devices_perms AS P ';
+    $sql  .= 'WHERE S.device_id = P.device_id AND P.user_id = ? AND ';
     $sql  .= $where;
     $param = array_merge(array($_SESSION['user_id']), $param);
 }

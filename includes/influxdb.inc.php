@@ -29,6 +29,9 @@ function influxdb_connect() {
     if ($config['influxdb']['transport'] == 'http') {
         $influxdb_conn = 'influxdb';
     }
+    elseif ($config['influxdb']['transport'] == 'https') {
+        $influxdb_conn = 'https+influxdb';
+    }
     elseif ($config['influxdb']['transport'] == 'udp') {
         $influxdb_conn = 'udp+influxdb';
     }
@@ -37,7 +40,7 @@ function influxdb_connect() {
         return false;
     }
 
-    $db = \InfluxDB\Client::fromDSN($influxdb_conn.'://'.$influxdb_url);
+    $db = \InfluxDB\Client::fromDSN($influxdb_conn.'://'.$influxdb_url, $config['influxdb']['timeout'], $config['influxdb']['verifySSL']);
     return($db);
 
 }// end influxdb_connect
@@ -55,7 +58,10 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
             $tmp_tags[$k] = $v;
         }
         foreach ($fields as $k => $v) {
-            $tmp_fields[$k] = force_influx_data('f',$v);
+            $tmp_fields[$k] = force_influx_data($v);
+            if( $tmp_fields[$k] === null) {
+               unset($tmp_fields[$k]);
+           }
         }
         
         d_echo("\nInfluxDB data:\n");
@@ -73,7 +79,12 @@ function influx_update($device,$measurement,$tags=array(),$fields) {
                     $tmp_fields // optional additional fields
                 )
             );
-            $result = $influxdb->writePoints($points);
+            try {
+                $result = $influxdb->writePoints($points);
+            } catch (Exception $e) {
+                d_echo("Caught exception: ", $e->getMessage(), "\n");
+                d_echo($e->getTrace());
+            }
         }
         else {
             print $console_color->convert('[%gInfluxDB Disabled%n] ', false);

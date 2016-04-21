@@ -1,0 +1,14 @@
+{
+  "results":[
+    {
+      "series":[
+        {
+          "columns":[
+            "user",
+            "admin"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,811 @@
+--
+--  Deliberant 3 series radio driver MIB
+--
+
+DLB-RADIO3-DRV-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Counter32, Gauge32, IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+    MacAddress
+        FROM SNMPv2-TC
+    sysLocation
+        FROM SNMPv2-MIB
+    ifIndex
+        FROM IF-MIB
+    dlbMgmt
+        FROM DELIBERANT-MIB;
+
+dlbRadio3DrvMIB MODULE-IDENTITY
+    LAST-UPDATED    "201001060000Z"
+    ORGANIZATION    "Deliberant"
+    CONTACT-INFO    "
+        Deliberant Customer Support
+        E-mail: support@deliberant.com"
+    DESCRIPTION
+        "Deliberant 3 series radio driver MIB."
+    REVISION    "201001060000Z"
+    DESCRIPTION
+        "First revision."
+    ::= { dlbMgmt 8 }
+
+dlbRadio3DrvMIBObjects
+        OBJECT IDENTIFIER ::= { dlbRadio3DrvMIB 1 }
+
+dlbRdo3DrvNotifs
+        OBJECT IDENTIFIER ::= { dlbRadio3DrvMIBObjects 0 }
+dlbRdo3DrvInfo
+        OBJECT IDENTIFIER ::= { dlbRadio3DrvMIBObjects 1 }
+dlbRdo3DrvConf
+        OBJECT IDENTIFIER ::= { dlbRadio3DrvMIBObjects 2 }
+dlbRdo3DrvStats
+        OBJECT IDENTIFIER ::= { dlbRadio3DrvMIBObjects 3 }
+
+dlbRdo3StatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF dlbRdo3StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Radio driver's information and network traffic statistics table."
+    ::= { dlbRdo3DrvStats 1 }
+
+dlbRdo3StatsEntry OBJECT-TYPE
+    SYNTAX  dlbRdo3StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Radio driver's information and network traffic statistics table entry."
+    INDEX { ifIndex, dlbRdo3Endpoint }
+    ::= { dlbRdo3StatsTable 1 }
+
+dlbRdo3StatsEntry ::=
+    SEQUENCE {
+        dlbRdo3Endpoint                     Integer32,
+        dlbRdo3LastUpdate                   TimeTicks,
+        dlbRdo3MacAddress                   MacAddress,
+        dlbRdo3IpAddress                    IpAddress,
+        dlbRdo3CountryCode                  OCTET STRING,
+        dlbRdo3Encryption                   OCTET STRING,
+        dlbRdo3Parameters                   OCTET STRING,
+        dlbRdo3Capabilities                 OCTET STRING,
+        dlbRdo3TxPower                      Gauge32,
+        dlbRdo3TxPackets                    Counter32,
+        dlbRdo3TxBytes                      Counter32,
+        dlbRdo3TxXmitFailed                 Counter32,
+        dlbRdo3TxXmitDropped                Counter32,
+        dlbRdo3TxOverruns                   Counter32,
+        dlbRdo3TxSuccess                    Counter32,
+        dlbRdo3TxFailed                     Counter32,
+        dlbRdo3TxRetried                    Counter32,
+        dlbRdo3TxNotRetried                 Counter32,
+        dlbRdo3TxPacketsPerMcs              OCTET STRING,
+        dlbRdo3TxMsdus                      Counter32,
+        dlbRdo3TxNotAggregated              Counter32,
+        dlbRdo3TxAckRequired                Counter32,
+        dlbRdo3TxNoAckRequired              Counter32,
+        dlbRdo3TxAltRate                    Counter32,
+        dlbRdo3TxManagement                 Counter32,
+        dlbRdo3TxLegacy                     Counter32,
+        dlbRdo3TxLegacyBytes                Counter32,
+        dlbRdo3TxAmsdus                     Counter32,
+        dlbRdo3TxPktsInAmsdus               Counter32,
+        dlbRdo3TxAmsduBytes                 Counter32,
+        dlbRdo3TxMpdus                      Counter32,
+        dlbRdo3TxMpduBytes                  Counter32,
+        dlbRdo3TxFragmented                 Counter32,
+        dlbRdo3TxFragBytes                  Counter32,
+        dlbRdo3RxPackets                    Counter32,
+        dlbRdo3RxBytes                      Counter32,
+        dlbRdo3RxDropped                    Counter32,
+        dlbRdo3RxCrcErrors                  Counter32,
+        dlbRdo3RxIcvErrors                  Counter32,
+        dlbRdo3RxMicErrors                  Counter32,
+        dlbRdo3RxKeyNotValid                Counter32,
+        dlbRdo3RxAclDiscarded               Counter32,
+        dlbRdo3RxManagement                 Counter32,
+        dlbRdo3RxControl                    Counter32,
+        dlbRdo3RxData                       Counter32,
+        dlbRdo3RxUnknown                    Counter32,
+        dlbRdo3RxNullData                   Counter32,
+        dlbRdo3RxBroadcast                  Counter32,
+        dlbRdo3RxMulticast                  Counter32,
+        dlbRdo3RxUnicast                    Counter32,
+        dlbRdo3RxCck                        Counter32,
+        dlbRdo3RxOfdm                       Counter32,
+        dlbRdo3RxHtMixedMode                Counter32,
+        dlbRdo3RxHtGreenfield               Counter32,
+        dlbRdo3RxAmsdus                     Counter32,
+        dlbRdo3RxPacketsInAmsdus            Counter32,
+        dlbRdo3RxAmpdus                     Counter32,
+        dlbRdo3RxMpduBytes                  Counter32,
+        dlbRdo3RxRoBufTotal                 Counter32,
+        dlbRdo3RxRoBufInSeq                 Counter32,
+        dlbRdo3RxRoBufDup                   Counter32,
+        dlbRdo3RxRoBufExpired               Counter32,
+        dlbRdo3RxRoBufBuffered              Counter32,
+        dlbRdo3RxRoBufReordered             Counter32,
+        dlbRdo3RxRoBufFlushed               Counter32,
+        dlbRdo3RxRoBufTooBig                Counter32,
+        dlbRdo3RxL2Pad                      Counter32,
+        dlbRdo3RxBlockAcks                  Counter32,
+        dlbRdo3RxFragments                  Counter32,
+        dlbRdo3RxStbc                       Counter32,
+        dlbRdo3RxShortGuardInt              Counter32,
+        dlbRdo3Rx40MhzBandwidth             Counter32,
+        dlbRdo3RxHtControl                  Counter32,
+        dlbRdo3RxPacketsPerMcs              OCTET STRING,
+        dlbRdo3RxLastSigLevel0              Integer32,
+        dlbRdo3RxLastSigLevel1              Integer32,
+        dlbRdo3RxLastSigLevel2              Integer32,
+        dlbRdo3RxNoise                      Integer32,
+        dlbRdo3RxLastSnr0                   Integer32,
+        dlbRdo3RxLastSnr1                   Integer32
+}        
+
+dlbRdo3Endpoint OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Peer index. Local device has index 0."
+    ::= { dlbRdo3StatsEntry 1 }
+
+dlbRdo3LastUpdate OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "sysUptime value of time point when statistics was gathered."
+    ::= { dlbRdo3StatsEntry 2 }
+
+dlbRdo3MacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device's MAC address."
+    ::= { dlbRdo3StatsEntry 3 }
+
+dlbRdo3IpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device's IP address."
+    ::= { dlbRdo3StatsEntry 4 }
+
+dlbRdo3CountryCode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Country code."
+    ::= { dlbRdo3StatsEntry 5 }
+
+dlbRdo3Encryption OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption type."
+    ::= { dlbRdo3StatsEntry 6 }
+
+dlbRdo3Parameters OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radio parameters."
+    ::= { dlbRdo3StatsEntry 7 }
+
+dlbRdo3Capabilities OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radio capabilities."
+    ::= { dlbRdo3StatsEntry 8 }
+
+dlbRdo3TxPower OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmission power."
+    ::= { dlbRdo3StatsEntry 9 }
+
+dlbRdo3TxPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted packets."
+    ::= { dlbRdo3StatsEntry 10 }
+
+dlbRdo3TxBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted bytes."
+    ::= { dlbRdo3StatsEntry 11 }
+
+dlbRdo3TxXmitFailed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets failing initial checks before sending them to radio hardware."
+    ::= { dlbRdo3StatsEntry 12 }
+
+dlbRdo3TxXmitDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets dropped because radio was offline or in reset state."
+    ::= { dlbRdo3StatsEntry 13 }
+
+dlbRdo3TxOverruns OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmission overruns."
+    ::= { dlbRdo3StatsEntry 14 }
+
+dlbRdo3TxSuccess OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of successfully transmitted packets."
+    ::= { dlbRdo3StatsEntry 15 }
+
+dlbRdo3TxFailed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmission failures."
+    ::= { dlbRdo3StatsEntry 16 }
+
+dlbRdo3TxRetried OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmission retries."
+    ::= { dlbRdo3StatsEntry 17 }
+
+dlbRdo3TxNotRetried OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets sent without retries."
+    ::= { dlbRdo3StatsEntry 18 }
+
+dlbRdo3TxPacketsPerMcs OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets sent using each of Modulation and Coding Schemes."
+    ::= { dlbRdo3StatsEntry 19 }
+
+dlbRdo3TxMsdus OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted MAC Service Data Units."
+    ::= { dlbRdo3StatsEntry 20 }
+
+dlbRdo3TxNotAggregated OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets transmitted without aggregation."
+    ::= { dlbRdo3StatsEntry 21 }
+
+dlbRdo3TxAckRequired OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets transmitted which required acknowledgment."
+    ::= { dlbRdo3StatsEntry 22 }
+
+dlbRdo3TxNoAckRequired OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets transmitted which did not require acknowledgment."
+    ::= { dlbRdo3StatsEntry 23 }
+
+dlbRdo3TxAltRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of data rate alterations."
+    ::= { dlbRdo3StatsEntry 24 }
+
+dlbRdo3TxManagement OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted management frames."
+    ::= { dlbRdo3StatsEntry 25 }
+
+dlbRdo3TxLegacy OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted legacy packets."
+    ::= { dlbRdo3StatsEntry 26 }
+
+dlbRdo3TxLegacyBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes transmitted in legacy mode."
+    ::= { dlbRdo3StatsEntry 27 }
+
+dlbRdo3TxAmsdus OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted aggregated MAC Service Data Units."
+    ::= { dlbRdo3StatsEntry 28 }
+
+dlbRdo3TxPktsInAmsdus OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets contained in transmitted aggregated MAC Service Data Units."
+    ::= { dlbRdo3StatsEntry 29 }
+
+dlbRdo3TxAmsduBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes transmitted in aggregated MAC Service Data Units."
+    ::= { dlbRdo3StatsEntry 30 }
+
+dlbRdo3TxMpdus OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted MAC Protocol Data Units."
+    ::= { dlbRdo3StatsEntry 31 }
+
+dlbRdo3TxMpduBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes transmitted in MAC Protocol Data Units."
+    ::= { dlbRdo3StatsEntry 32 }
+
+dlbRdo3TxFragmented OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted fragmented packets."
+    ::= { dlbRdo3StatsEntry 33 }
+
+dlbRdo3TxFragBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes transmitted in fragmented packets."
+    ::= { dlbRdo3StatsEntry 34 }
+
+dlbRdo3RxPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets."
+    ::= { dlbRdo3StatsEntry 35 }
+
+dlbRdo3RxBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received bytes."
+    ::= { dlbRdo3StatsEntry 36 }
+
+dlbRdo3RxDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped packets."
+    ::= { dlbRdo3StatsEntry 37 }
+
+dlbRdo3RxCrcErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets that failed CRC check."
+    ::= { dlbRdo3StatsEntry 38 }
+
+dlbRdo3RxIcvErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets with invalid Integrity Check Value."
+    ::= { dlbRdo3StatsEntry 39 }
+
+dlbRdo3RxMicErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets failing Message Integrity Code check."
+    ::= { dlbRdo3StatsEntry 40 }
+
+dlbRdo3RxKeyNotValid OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets with encryption key errors."
+    ::= { dlbRdo3StatsEntry 41 }
+
+dlbRdo3RxAclDiscarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets discarded by Access Control List check."
+    ::= { dlbRdo3StatsEntry 42 }
+
+dlbRdo3RxManagement OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received management packets."
+    ::= { dlbRdo3StatsEntry 43 }
+
+dlbRdo3RxControl OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received control packets."
+    ::= { dlbRdo3StatsEntry 44 }
+
+dlbRdo3RxData OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received data packets."
+    ::= { dlbRdo3StatsEntry 45 }
+
+dlbRdo3RxUnknown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets of unknown type."
+    ::= { dlbRdo3StatsEntry 46 }
+
+dlbRdo3RxNullData OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received NULL DATA frames."
+    ::= { dlbRdo3StatsEntry 47 }
+
+dlbRdo3RxBroadcast OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received broadcast packets."
+    ::= { dlbRdo3StatsEntry 48 }
+
+dlbRdo3RxMulticast OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received multicast packets."
+    ::= { dlbRdo3StatsEntry 49 }
+
+dlbRdo3RxUnicast OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received unicast packets."
+    ::= { dlbRdo3StatsEntry 50 }
+
+dlbRdo3RxCck OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using Complementary Code Keying modulation."
+    ::= { dlbRdo3StatsEntry 51 }
+
+dlbRdo3RxOfdm OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using Orthogonal Frequency-Division Multiplexing modulation."
+    ::= { dlbRdo3StatsEntry 52 }
+
+dlbRdo3RxHtMixedMode OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using High Throughput mixed mode."
+    ::= { dlbRdo3StatsEntry 53 }
+
+dlbRdo3RxHtGreenfield OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using High Throughput Greenfield mode."
+    ::= { dlbRdo3StatsEntry 54 }
+
+dlbRdo3RxAmsdus OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received aggregated MAC Service Data Units."
+    ::= { dlbRdo3StatsEntry 55 }
+
+dlbRdo3RxPacketsInAmsdus OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received in aggregated MAC Service Data Units."
+    ::= { dlbRdo3StatsEntry 56 }
+
+dlbRdo3RxAmpdus OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received aggregated MAC Protocol Data Units."
+    ::= { dlbRdo3StatsEntry 57 }
+
+dlbRdo3RxMpduBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes received in MAC Protocol Data Units."
+    ::= { dlbRdo3StatsEntry 58 }
+
+dlbRdo3RxRoBufTotal OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of received packets moved into reordering buffer."
+    ::= { dlbRdo3StatsEntry 59 }
+
+dlbRdo3RxRoBufInSeq OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets in reordering buffer which are in sequence."
+    ::= { dlbRdo3StatsEntry 60 }
+
+dlbRdo3RxRoBufDup OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of duplicate packets in reordering buffer."
+    ::= { dlbRdo3StatsEntry 61 }
+
+dlbRdo3RxRoBufExpired OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of expired packets in reordering buffer."
+    ::= { dlbRdo3StatsEntry 62 }
+
+dlbRdo3RxRoBufBuffered OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets held in reordering buffer."
+    ::= { dlbRdo3StatsEntry 63 }
+
+dlbRdo3RxRoBufReordered OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets reordered in reordering buffer."
+    ::= { dlbRdo3StatsEntry 64 }
+
+dlbRdo3RxRoBufFlushed OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets flushed from reordering buffer."
+    ::= { dlbRdo3StatsEntry 65 }
+
+dlbRdo3RxRoBufTooBig OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of oversized packets dropped from reordering buffer."
+    ::= { dlbRdo3StatsEntry 66 }
+
+dlbRdo3RxL2Pad OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with padding between header and payload."
+    ::= { dlbRdo3StatsEntry 67 }
+
+dlbRdo3RxBlockAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received block acknowledgments."
+    ::= { dlbRdo3StatsEntry 68 }
+
+dlbRdo3RxFragments OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received fragmented packets."
+    ::= { dlbRdo3StatsEntry 69 }
+
+dlbRdo3RxStbc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using Space-Time Block Coding technique."
+    ::= { dlbRdo3StatsEntry 70 }
+
+dlbRdo3RxShortGuardInt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received with Short Guard Interval."
+    ::= { dlbRdo3StatsEntry 71 }
+
+dlbRdo3Rx40MhzBandwidth OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using 40MHz bandwidth."
+    ::= { dlbRdo3StatsEntry 72 }
+
+dlbRdo3RxHtControl OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using High Throughput encoding."
+    ::= { dlbRdo3StatsEntry 73 }
+
+dlbRdo3RxPacketsPerMcs OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received using each of Modulation and Coding Schemes."
+    ::= { dlbRdo3StatsEntry 74 }
+
+dlbRdo3RxLastSigLevel0 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reception signal level on antenna 0."
+    ::= { dlbRdo3StatsEntry 75 }
+
+dlbRdo3RxLastSigLevel1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reception signal level on antenna 1."
+    ::= { dlbRdo3StatsEntry 76 }
+
+dlbRdo3RxLastSigLevel2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reception signal level on antenna 2."
+    ::= { dlbRdo3StatsEntry 77 }
+
+dlbRdo3RxNoise OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reception noise."
+    ::= { dlbRdo3StatsEntry 78 }
+
+dlbRdo3RxLastSnr0 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last registered signal-to-noise level on antenna 0."
+    ::= { dlbRdo3StatsEntry 79 }
+
+dlbRdo3RxLastSnr1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last registered signal-to-noise level on antenna 1."
+    ::= { dlbRdo3StatsEntry 80 }
+
+dlbRdo3RxDropsThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        dlbRdo3MacAddress,
+        dlbRdo3RxDropped
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when percentage of frames dropped in relation
+         to number of frames received over the same time period reaches the threshold."
+    ::= { dlbRdo3DrvNotifs 1 }
+
+dlbRdo3TxRetriesThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        dlbRdo3MacAddress,
+        dlbRdo3TxRetried
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when percentage of transmission retries in relation
+         to number of frames transmitted over the same time period reaches the threshold."
+    ::= { dlbRdo3DrvNotifs 2 }
+
+END

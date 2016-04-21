@@ -4,13 +4,11 @@ if ($_SESSION['userlevel'] < '10') {
     include 'includes/error-no-perm.inc.php';
 }
 else {
-    if ($_POST['addsrv']) {
+    if ($vars['addsrv']) {
         if ($_SESSION['userlevel'] >= '10') {
             $updated = '1';
 
-            // FIXME should call add_service (needs more parameters)
-            $service_id = dbInsert(array('device_id' => $_POST['device'], 'service_ip' => $_POST['ip'], 'service_type' => $_POST['type'], 'service_desc' => $_POST['descr'], 'service_param' => $_POST['params'], 'service_ignore' => '0', 'service_status' => '0', 'service_checked' => '0', 'service_changed' => '0', 'service_message' => 'New check', 'service_disabled' => '0'), 'services');
-
+            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], 0);
             if ($service_id) {
                 $message       .= $message_break.'Service added ('.$service_id.')!';
                 $message_break .= '<br />';
