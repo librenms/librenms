@@ -1,0 +1,64 @@
+-- *********************************************************************
+-- BROCADE-LLDP-CAPABILITY-MIB.mib: LLDP-MIB AGENT-CAPABILITIES
+--   
+-- June 2012, Chakraborty Debojyoti
+--   
+-- Copyright (c) 2012 by Brocade Communications Systems, Inc.
+-- All rights reserved.
+-- *********************************************************************
+BROCADE-LLDP-CAPABILITY-MIB    DEFINITIONS ::= BEGIN
+IMPORTS
+    brocadeAgentCapability
+        FROM Brocade-REG-MIB
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+brocadeLLDPCapability    MODULE-IDENTITY
+    LAST-UPDATED       "201206060000Z"
+    ORGANIZATION       "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO    
+            "Customer Support Group
+             Brocade Communications Systems, Inc.
+             Postal: 130 Holger Way
+             San Jose, CA 95134
+             U.S.A
+             Tel: +1-408-333-8000
+             E-mail: support@Brocade.com
+             web: www.brocade.com."
+
+    DESCRIPTION        
+        "Agent capabilities for LLDP-MIB implementation."
+        
+    REVISION           "201206060000Z"
+    DESCRIPTION        
+        "The initial version of this MIB module."
+    ::=  {  brocadeAgentCapability  1  }
+
+--
+-- Agent capability for NOS 3.0.0 (VDX Platform)
+--    
+brocadeLLDPVdx300R1    AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "NOS3.0.0"
+    STATUS             current
+    DESCRIPTION        "LLDP-MIB capabilities."
+
+    SUPPORTS        LLDP-MIB
+    INCLUDES        { 
+                        lldpConfigGroup,
+                        lldpConfigRxGroup,
+                        lldpConfigTxGroup,
+                        lldpStatsRxGroup,
+                        lldpStatsTxGroup,
+                        lldpLocSysGroup,
+                        lldpRemSysGroup
+                    }                       
+
+    VARIATION       lldpConfigManAddrPortsTxEnable 
+    ACCESS          not-implemented
+    DESCRIPTION     "Not Supported."
+
+    ::=  {  brocadeLLDPCapability  1 }
+
+END
