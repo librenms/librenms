@@ -103,7 +103,7 @@ else {
     $params = array('user' => $_SESSION['user_id'], 'lastpoll' => array($lastpoll_seconds), 'count' => array($interface_count), 'filter' => ($widget_settings['interface_filter']?:(int)1));
     if (is_admin() || is_read()) {
         $query = '
-            SELECT *, p.ifInOctets_rate + p.ifOutOctets_rate as total
+            SELECT p.*, devices.*, p.ifInOctets_rate + p.ifOutOctets_rate as total
             FROM ports as p
             INNER JOIN devices ON p.device_id = devices.device_id
             AND unix_timestamp() - p.poll_time <= :lastpoll
@@ -115,7 +115,7 @@ else {
     }
     else {
         $query = '
-            SELECT ports.*, devices.hostname, ports.ifInOctets_rate + ports.ifOutOctets_rate as total
+            SELECT ports.*, devices.*, ports.ifInOctets_rate + ports.ifOutOctets_rate as total
             FROM ports
             INNER JOIN devices ON ports.device_id = devices.device_id
             LEFT JOIN ports_perms ON ports.port_id = ports_perms.port_id

@@ -68,8 +68,20 @@ else {
     exit;
 }
 
-$start = $_GET['from'];
-$end   = $_GET['to'];
+if (is_numeric($_GET['bill_id']) && is_numeric($_GET[bill_hist_id])) {
+    $histrow = dbFetchRow('SELECT UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to` FROM bill_history WHERE bill_id = ? AND bill_hist_id = ?', array($_GET['bill_id'], $_GET['bill_hist_id']));
+    if (is_null($histrow)) {
+        header("HTTP/1.0 404 Not Found");
+        exit();
+    }
+    $start        = $histrow['from'];
+    $end          = $histrow['to'];
+} 
+else {
+    $start        = $_GET[from];
+    $end          = $_GET[to];
+}
+
 $xsize = (is_numeric($_GET['x']) ? $_GET['x'] : '800' );
 $ysize = (is_numeric($_GET['y']) ? $_GET['y'] : '250' );
 // $count        = (is_numeric($_GET['count']) ? $_GET['count'] : "0" );

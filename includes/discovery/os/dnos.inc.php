@@ -7,7 +7,23 @@ if (!$os) {
     if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3042')) {
         $os = 'dnos';
     }
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3044')) {
+        $os = 'dnos';
+    }
     if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3054')) {
         $os = 'dnos';
     }
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3055')) {
+        //Dell N2024P
+        $os = 'dnos';
+    }
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3056')) {
+        //Dell N2048P
+        $os = 'dnos';
+    }
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.674.10895.3046')) {
+        //Dell N4064F
+        $os = 'dnos';
+    }
+
 }

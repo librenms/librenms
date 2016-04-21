@@ -1,3 +1,54 @@
+### March 2016
+
+#### Bug fixes
+  - WebUI:
+    - Skip authentication check in graph.php if unauth graphs is enabled (PR3019)
+    - Stop double escaping notes for devices (PR3149)
+    - Corrected aggregate graph on smokeping page (PR3177)
+    - Fix non-admin syslog queries (PR3191)
+    - Fix services SQL (PR3205)
+  - Discovery / Polling:
+    - Revert arp discovery to pre-vrf lite support (PR3126)
+    - Fix IOS-XR DBM sensors (PR3291)
+  - Alerting:
+    - Fix alert failure response from transports (PR3283)
+  - Misc:
+    - Fix data in bills if counters doesn't change (PR3132)
+    - Improve performance of billing poller (PR3129)
+    - Fix API tokens when using LDAP auth (PR3178)
+    - Import notifications with original datetime (PR3200)
+    - Add sysName for top-interfaces widget (PR3201)
+    - Fix Cisco syslog parsing when logging timestamp enabled (PR3203)
+
+#### Improvements
+  - WebUI:
+    - Added ability to show device group specific maps (PR3018)
+    - Updated Billing UI (PR3194, PR3195, PR3216, PR3239, PR3240)
+    - Added Juniper
+    - Added config option for HTML emails in mail transport (PR3221)
+  - Discovery / Polling:
+    - Added Juniper state support (PR3121)
+    - Added Ironware state support (PR3160)
+    - Check sysObjectID before detecting ILO temp sensors (PR3204)
+    - Improved Avtech support (PR3207)
+    - Improved Dell NOS detection (PR3213)
+    - Added Juniper alarm state monitoring (PR3226)
+    - Updated Drac state support (PR3228)
+    - Improved serial # detection for Brocade Ironware devices (PR3292)
+  - Added detection for:
+    - Develop Ineo printers (PR3224)
+    - Cumulus Linux (PR3237)
+    - Deliberant WiFi (PR3246)
+    - Juniper EX2500 (PR3254)
+    - Cambium devices (PR3279)
+  - Alerting:
+    - Added Canopsis alerting transport (PR3299)
+  - Misc:
+    - Improved syslog support (PR3171, PR3172, PR3173)
+    - Added Nginx install docs for Debian/Ubuntu (PR3301)
+    - Updated InfluxDB php module (PR3302)
+    - Updated Component API (PR3304)
+
 ### February 2016
 
 #### Bug fixes
@@ -5,27 +56,60 @@
     - Quote snmp v2c community (PR2927)
     - For entity-sensor, changed variable name again (PR2948)
     - Fix some issues with/introduced by port association mode configuration (PR2923)
+    - Deal with 0 value sensors better (PR2972, PR2973)
+    - Reverted Fortigate CPU change from Dec 2015 (PR2990)
+    - Reverted bgp code from vrf lite support (PR3010, PR3011, PR3028, PR3050)
+    - Add icon to database (PR3076)
+    - Discovery updated to check for distributed polling group (PR3086)
   - WebUI:
     - Fix ceph graps (PR2909, PR2942)
     - BGP Overlib (PR2915)
-    - Added `application/json` headers where json is returned (PR2936)
+    - Added `application/json` headers where json is returned (PR2936, PR2961)
     - Stop realtime graph page from auto refreshing (PR2939)
     - Updated parsing of alert rules to allow `|` (PR2917)
     - Fix IP Display (PR2951)
+    - Added missing from email config option (PR2986)
+    - Ignore devices that do not provide an uptime statistic (PR3009)
+    - Added unique id for alert widget (PR3034)
   - Misc:
     - Updated `device_by_id_cache()` to convert IP column (PR2940)
+    - Fixed auto updating if not enabled (PR3063)
   - Documentation:
     - Removed devloping doc as none of the info is current (PR2911)
 
 #### Improvements
+  - WebUI:
+    - Merged device option links to dropdown (PR2955)
+    - Added ability to configure # results for global search (PR2957)
+    - Added ability to show / hide line numbers for config for devices (PR2988)
+    - Added support for showing diff for Oxidized configs (PR2994)
+    - Updated visjs to 4.14.0 (PR3031)
+    - Updated apps layout to use panels (PR3117)
   - Discovery / Polling:
     - Added ability to ignore device sensors from entity mib (PR2862)
     - Added `ifOperStatus_prev` and `ifAdminStatus_prev` values to db (PR2912)
+    - Improved bgpPolling efficiency (PR2967)
+    - Use raw timeticks for uptime (PR3021)
+    - Introduced state monitoring (PR3102)
   - Added detection for:
     - Dell Networking N2048 (PR2949)
+    - Calix E7 devices (PR2958)
+    - Improved support for Netonix (PR2959)
+    - Improved detection for Windows 10 (PR2962)
+    - Improved support for FortiOS (PR2991)
+    - Barracuda Spam firewall support (PR2998)
+    - Improved sysDescr parsing for Unifi Switches (PR3020)
+    - Canon iR (PR3045)
+    - Cisco SF500 (PR3057)
+    - Eaton UPS (PR3066, PR3067, PR3070, PR3071)
+    - ServerIron / ServerIron ADX (PR3074)
+    - Additional Qnap sensors (PR3088, PR3089)
+    - Avtech environment sensors (PR3091)
   - Misc:
     - Added check for rrd vadility (PR2908)
     - Add systemd unit file for the python poller service (PR2913)
+    - Added more detection to validate for bad installs (PR2985)
+    - Syslog cleanup (PR3036, PR3093, PR3099)
   - Documentation:
     -  Added description of AD configuration options (PR2910)
     -  Add description to mibbases polling (PR2919)

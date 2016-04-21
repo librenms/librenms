@@ -41,7 +41,7 @@ foreach( $opts as $method=>$apis ) {
             var_dump("API '$host' returned Error"); //FIXME: propper debuging
             var_dump("Params: ".$api); //FIXME: propper debuging
             var_dump("Return: ".$ret); //FIXME: propper debuging
-            return false;
+            return 'HTTP Status code '.$code;
         }
     }
 }
