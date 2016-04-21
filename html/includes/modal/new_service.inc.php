@@ -11,17 +11,20 @@
  * the source code distribution for details.
  */
 
-if(is_admin() !== false) {
+if (is_admin() !== false) {
 
     // Build the types list.
-    if ($handle = opendir($config['nagios_plugins'])) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && !strstr($file, '.') && strstr($file, 'check_')) {
-                list(,$check_name) = explode('_',$file,2);
+    $dir = $config['nagios_plugins'];
+    if (file_exists($dir) && is_dir($dir)) {
+        $files = scandir($dir);
+        $dir .= DIRECTORY_SEPARATOR;
+        d_print_r($files);
+        foreach ($files as $file) {
+            if (is_executable($dir.$file) && is_file($dir.$file) && strstr($file, 'check_')) {
+                list(,$check_name) = explode('_', $file, 2);
                 $stype .= "<option value='$check_name'>$check_name</option>";
             }
         }
-        closedir($handle);
     }
 
 ?>
