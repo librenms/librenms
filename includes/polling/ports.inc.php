@@ -214,7 +214,7 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
         if ($suffix)
             $suffix_tmp = "-$suffix";
 
-        $old_rrd_path = trim ($config['rrd_dir']) . '/' . $device['hostname'] . "/port-$ifIndex$suffix_tmp.rrd";
+        $old_rrd_path = trim ($config['old_rrd_dir']) . '/' . $device['hostname'] . "/port-$ifIndex$suffix_tmp.rrd";
         $new_rrd_path = get_port_rrdfile_path ($device['hostname'], $port_id, $suffix);
 
         if (is_file ($old_rrd_path)) {

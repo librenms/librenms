@@ -34,7 +34,7 @@ if (is_array($hrstorage_array)) {
         }
 
         if ($device['os'] == 'vmware' && $descr == 'Real Memory') {
-            $old_rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('storage-hrstorage-'.safename($descr).'.rrd');
+            $old_rrdfile = $config['old_rrd_dir'].'/'.$device['hostname'].'/'.safename('storage-hrstorage-'.safename($descr).'.rrd');
             $new_rrdfile = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('mempool-hrstorage-'.$storage['hrStorageIndex'].'.rrd');
             rename($old_rrdfile, $new_rrdfile);
             $deny = 1;

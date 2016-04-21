@@ -63,7 +63,7 @@ if (is_array($hrDevice_array)) {
             $descr = str_replace('(TM)', '', $descr);
             $descr = str_replace('(R)', '', $descr);
 
-            $old_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('hrProcessor-'.$index.'.rrd');
+            $old_rrd = $config['old_rrd_dir'].'/'.$device['hostname'].'/'.safename('hrProcessor-'.$index.'.rrd');
             $new_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('processor-hr-'.$index.'.rrd');
 
             d_echo("$old_rrd $new_rrd");

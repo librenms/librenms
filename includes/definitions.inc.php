@@ -2173,6 +2173,10 @@ if (!isset($config['rrd_dir'])) {
     $config['rrd_dir'] = $config['install_dir'].'/rrd';
 }
 
+if (!isset($config['old_rrd_dir'])) {
+    $config['old_rrd_dir'] = $config['install_dir'].'/rrd';
+}
+
 if (!isset($config['log_dir'])) {
     $config['log_dir'] = $config['install_dir'].'/logs';
 }
