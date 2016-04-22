@@ -1302,7 +1302,7 @@ function list_ipsec() {
         $message = "No valid hostname or device ID provided";
     }
     else {
-        $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? `D`.`device_id` = `I`.`device_id`", array($device_id));
+        $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", array($device_id));
         $total  = count($ipsec);
         $status = 'ok';
         $code   = 200;
