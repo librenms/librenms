@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 """
  poller-wrapper A small tool which wraps around the poller and tries to
                 guide the polling process with a more modern approach with a
