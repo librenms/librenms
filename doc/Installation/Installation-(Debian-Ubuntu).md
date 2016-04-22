@@ -1,6 +1,8 @@
 
 > NOTE: These instructions have been tested on a fresh install of Ubuntu 12.04 and 14.04.
 
+> NOTE: At this time LibreNMS does not support PHP7.  Distributions which ship only PHP7 are therefore not supported; known distributions which this affects are: Ubuntu 16.04 LTS.
+
 > NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 ### On the DB Server ###
