@@ -128,6 +128,19 @@ $app->group(
                     }
                 );
                 // End Inventory
+                // Routing section
+                $app->group(
+                    '/routing',
+                    function () use ($app) {
+                        $app->group(
+                            '/ipsec',
+                            function () use ($app) {
+                                $app->get('/data/:hostname', 'authToken', 'list_ipsec')->name('list_ipsec');
+                            }
+                        );
+                    }
+                );
+		// End Routing
             }
         );
         $app->get('/v0', 'authToken', 'show_endpoints');
