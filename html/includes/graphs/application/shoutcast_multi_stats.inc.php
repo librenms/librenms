@@ -15,7 +15,7 @@ $x      = 0;
 if ($handle = opendir($rrddir)) {
     while (false !== ($file = readdir($handle))) {
         if ($file != '.' && $file != '..') {
-            if (stripos($file, 'app-shoutcast-'.$app['app_id'])) {
+            if (stripos($file, 'app-shoutcast-'.$app['app_id']) !== false) {
                 array_push($files, $file);
             }
         }
