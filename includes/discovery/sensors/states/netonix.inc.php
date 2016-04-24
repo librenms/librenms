@@ -12,7 +12,7 @@
 
 if ($device['os'] == 'netonix') {
 
-    $temp = snmpwalk_cache_multi_oid($device, '.1.3.6.1.4.1.46242.5.1.2');
+    $temp = snmpwalk_cache_multi_oid($device, '.1.3.6.1.4.1.46242.5.1.2', array());
     $cur_oid = '.1.3.6.1.4.1.';
 
     if (is_array($temp)) {
