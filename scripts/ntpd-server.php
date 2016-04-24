@@ -25,7 +25,7 @@ $cmd2  = shell_exec($ntpdc.' -c iostats');
 $vars  = array();
 $vars2 = array();
 $vars  = explode(',', $cmd);
-$vars2 = eregi_replace(' ', '', $cmd2);
+$vars2 = str_replace(' ', '', $cmd2);
 $vars2 = explode("\n", $vars2);
 
 
