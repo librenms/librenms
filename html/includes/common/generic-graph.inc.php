@@ -204,6 +204,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_device.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Devices</strong></h5>",
@@ -240,6 +241,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_port.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Ports</strong></h5>",
@@ -275,6 +277,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_application.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Applications</strong></h5>",
@@ -312,6 +315,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_munin.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong>&nbsp;Munin</strong></h5>",
@@ -346,6 +350,7 @@ function '.$unique_id.'() {
   },
   {
     source: '.$unique_id.'_bill.ttAdapter(),
+    limit: '.$typeahead_limit.',
     async: false,
     templates: {
       header: "<h5><strong><i class=\'fa fa-money\'></i>&nbsp;Bill</strong></h5>",
@@ -432,3 +437,4 @@ else {
     $common_output[]                   = '<a href="graphs/'.$param.'/type='.$widget_settings['graph_type'].'/from='.$config['time'][$widget_settings['graph_range']].'"><img class="minigraph-image" width="'.$widget_dimensions['x'].'" height="'.$widget_dimensions['y'].'" src="graph.php?'.$param.'&from='.$config['time'][$widget_settings['graph_range']].'&to='.$config['time']['now'].'&width='.$widget_dimensions['x'].'&height='.$widget_dimensions['y'].'&type='.$widget_settings['graph_type'].'&legend='.($widget_settings['graph_legend'] == 1 ? 'yes' : 'no').'&absolute=1"/></a>';
 
 }
+
