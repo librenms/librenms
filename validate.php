@@ -109,7 +109,7 @@ if (isset($config['user'])) {
         // This isn't just the log directory, let's print the list to the user
         $files = explode(PHP_EOL, $find_result);
         if (is_array($files)) {
-            print_fail("We have found some files that are owned by a different user than $tmp_user, this will stop you updating automatically and / or rrd files being updated causing graphs to fail:\n");
+            print_fail("We have found some files that are owned by a different user than $tmp_user, this will stop you updating automatically and / or rrd files being updated causing graphs to fail:\nIf you don't run a bespoke install then you can fix this by running `chown -R $tmp_user:$tmp_user ".$config['install_dir']."`");
             foreach ($files as $file) {
                 echo "$file\n";
             }
