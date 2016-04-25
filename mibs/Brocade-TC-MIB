@@ -1,0 +1,78 @@
+--
+-- Title: Brocade Registration MIB, Version v5.0
+--
+-- This is specified based on SMIv2, mainly to ensure that the specification
+-- can be parsed easily by off-the-shelf network management product in
+-- the market.
+--
+-- The goal of this mib is to access all the Brocade Enterprise products.
+-- This mib file contains the generic textual conventions of Brocade's product.
+--
+
+
+Brocade-TC DEFINITIONS ::= BEGIN
+  IMPORTS
+	bcsiModules
+      FROM Brocade-REG-MIB
+	TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+	Integer32, MODULE-IDENTITY
+      FROM SNMPv2-SMI;
+
+  bcsiModuleTC MODULE-IDENTITY
+    LAST-UPDATED "0210030000Z"
+    ORGANIZATION "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO "Customer Support Group
+		  Brocade Communications Systems,
+		  1745 Technology Drive,
+		  San Jose, CA 95110 U.S.A
+		  Tel: +1-408-392-6061
+		  Fax: +1-408-392-6656
+		  Email: support@Brocade.COM
+		  WEB: www.brocade.com"
+		
+
+    DESCRIPTION	"The MIB module	contains all shared textual conventions
+                 for Brocade specific MIBs.
+                 Copyright (c) 1996-2002 Brocade Communications Systems, Inc.
+  				 All rights reserved."
+    REVISION	"0301131430Z" -- Jan 13, 2003 2:30pm
+    DESCRIPTION	"The initial version of this module."
+    ::=	{ bcsiModules 2 }
+
+  -- additional textual conventions
+
+  FcWwn 	::= TEXTUAL-CONVENTION		
+     STATUS  current
+     DESCRIPTION   "The World Wide Name (WWN) of Brocade's 
+                    specific products and ports."
+     SYNTAX  OCTET STRING (SIZE(8))
+
+  SwDomainIndex		::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "The Fibre Channel domain ID of the switch."
+     SYNTAX  Integer32 (1..239)
+
+  SwNbIndex         ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Index of the neighbour ISL entry."
+     SYNTAX  Integer32 (1..2048)
+
+  SwSensorIndex		::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Index of the Sensor entry."
+     SYNTAX  Integer32 (1..1024)
+
+  SwPortIndex		::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Index of the Port start from 1 upto Maximum
+                    number of ports of the Brocade Switch."
+     SYNTAX  Integer32
+
+  SwTrunkMaster		::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Index of the Trunk Master start from 1 upto Maximum
+                    number of trunk groups of Brocade Switch."
+     SYNTAX  Integer32
+
+END
