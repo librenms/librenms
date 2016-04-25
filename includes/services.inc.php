@@ -179,6 +179,11 @@ function poll_service($service) {
         $update['service_message'] = $msg;
     }
 
+    if ($service['service_message'] != $msg) {
+        // Message has changed, update.
+        $update['service_message'] = $msg;
+    }
+
     if (count($update) > 0) {
         edit_service($update,$service['service_id']);
     }
