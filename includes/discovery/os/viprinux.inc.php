@@ -2,6 +2,6 @@
 
 if (!$os) {
     if (strstr($sysDescr, 'Viprinet VPN Router')) {
-        $os = 'viprinet';
+        $os = 'viprinux';
     }
 }
