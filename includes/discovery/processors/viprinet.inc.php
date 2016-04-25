@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'viprinet') {
+if ($device['os'] == 'viprinux') {
 
     $usage = str_replace('"',"", snmp_get($device, 'VIPRINET-MIB::vpnRouterCPULoad.0', '-OvQ'));
     $descr = 'Processor';

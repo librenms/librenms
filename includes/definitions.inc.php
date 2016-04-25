@@ -95,10 +95,10 @@ $config['os'][$os]['over'][1]['text']  = 'Processor Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_ucd_memory';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
-$os = 'viprinet';
-$config['os'][$os]['text']             = 'viprinet';
+$os = 'viprinux';
+$config['os'][$os]['text']             = 'Viprinux';
 $config['os'][$os]['type']             = 'network';
-$config['os'][$os]['icon']             = 'viprinet';
+$config['os'][$os]['icon']             = 'viprinux';
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
