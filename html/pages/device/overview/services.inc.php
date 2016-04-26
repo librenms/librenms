@@ -3,14 +3,14 @@
 if ($services['total']) {
     // Build the string.
     foreach (service_get ($device['device_id']) as $data) {
-        if ($data['service_status'] == '1') {
+        if ($data['service_status'] == '0') {
             // Ok
             $status = 'green';
-        } elseif ($data['service_status'] == '0') {
-            // Critical
+        } elseif ($data['service_status'] == '1') {
+            // Warning
             $status = 'red';
         } elseif ($data['service_status'] == '2') {
-            // Warning
+            // Critical
             $status = 'red';
         } else {
             // Unknown
@@ -29,9 +29,9 @@ if ($services['total']) {
                 <table class="table table-hover table-condensed table-striped">
                     <tr>
                         <td title="Total"><img src='images/16/cog.png'> <?=$services['total']?></td>
-                        <td title="Status - Ok"><img src='images/16/cog_add.png'> <?=$services[1]?></td>
-                        <td title="Status - Critical"><img src='images/16/cog_delete.png'> <?=$services[0]?></td>
-                        <td title="Status - Unknown"><img src='images/16/cog_error.png'> <?=$services[2]?></td>
+                        <td title="Status - Ok"><img src='images/16/cog_add.png'> <?=$services[0]?></td>
+                        <td title="Status - Warning"><img src='images/16/cog_error.png'> <?=$services[1]?></td>
+                        <td title="Status - Critical"><img src='images/16/cog_delete.png'> <?=$services[2]?></td>
                     </tr>
                     <tr>
                         <td colspan='4'><?=$string?></td>
