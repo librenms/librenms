@@ -124,7 +124,6 @@ $config['top_ports'] = 1;
 // This enables the top X ports box
 $config['top_devices'] = 1;
 // This enables the top X devices box
-$config['min_graph_height'] = 300;
 $config['page_title_prefix'] = '';
 $config['page_title_suffix'] = $config['project_name'];
 $config['timestamp_format']  = 'd-m-Y H:i:s';
