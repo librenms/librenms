@@ -40,8 +40,8 @@ $temp_output .= '
     <tr class="active">
       <td><a href="services/">Services</a></td>
       <td><a href="services/"><span>'.$services['count'].'</span></a></td>
-      <td><a href="services/state=up/view=details/"><span class="green">'.$services['up'].'</span></a></td>
-      <td><a href="services/state=down/view=details/"><span class="red"> '.$services['down'].'</span></a></td>
+      <td><a href="services/state=ok/view=details/"><span class="green">'.$services['up'].'</span></a></td>
+      <td><a href="services/state=critical/view=details/"><span class="red"> '.$services['down'].'</span></a></td>
       <td><a href="services/ignore=1/view=details/"><span class="grey"> '.$services['ignored'].'</span></a></td>
       <td><a href="services/disabled=1/view=details/"><span class="black"> '.$services['disabled'].'</span></a></td>
       '.($config['summary_errors'] ? '<td>-</td>' : '').'
