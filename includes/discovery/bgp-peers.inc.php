@@ -1,9 +1,8 @@
 <?php
-
 if ($config['enable_bgp']) {
     // Discover BGP peers
     echo 'BGP Sessions : ';
-
+    
     if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0) ){
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
     }
@@ -14,13 +13,11 @@ if ($config['enable_bgp']) {
     $bgpLocalAs = trim(snmp_walk($device, '.1.3.6.1.2.1.15.2', '-Oqvn', 'BGP4-MIB', $config['mibdir']));
 
     foreach ($vrfs_lite_cisco as $vrf) {
-                $device['context_name'] = $vrf['context_name'];
-
+            $device['context_name'] = $vrf['context_name'];
             if (is_numeric($bgpLocalAs)) {
                 echo "AS$bgpLocalAs ";
-
                 if ($bgpLocalAs != $device['bgpLocalAs']) {
-                    dbUpdate(array('bgpLocalAs' => $bgpLocalAs,'context_name' => $device['context_name']), 'devices', 'device_id=?', array($device['device_id']));
+                    dbUpdate(array('bgpLocalAs' => $bgpLocalAs), 'devices', 'device_id=?', array($device['device_id']));
                     echo 'Updated AS ';
                 }
 
@@ -92,7 +89,7 @@ if ($config['enable_bgp']) {
                 }
             }
 
-            // Process disovered peers
+		// Process disovered peers
             if (isset($peerlist)) {
                 foreach ($peerlist as $peer) {
                     $astext = get_astext($peer['as']);
@@ -217,12 +214,11 @@ if ($config['enable_bgp']) {
             }
 
             // Delete removed peers
-            $sql = "SELECT * FROM bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+            $sql = "SELECT * FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND context_name = '".$device['context_name']."'";
 
             foreach (dbFetchRows($sql) as $entry) {
                 unset($exists);
                 $i = 0;
-
                 while ($i < count($peerlist) && !isset($exists)) {
                     if ($peerlist[$i]['ip'] == $entry['bgpPeerIdentifier']) {
                         $exists = 1;
@@ -241,8 +237,9 @@ if ($config['enable_bgp']) {
             unset($peerlist);
 
             echo "\n";
-                unset($device['context_name']);
+           unset($device['context_name']);
     }
     unset($device['context_name']);
     unset($vrfs_c);
 }
+echo "FIN BGP \n\n\n";
