@@ -125,7 +125,7 @@ else {
             $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/2));
         }
         else {
-            $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5));
+            $graph_array['height'] = max($graph_array['height'],($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5)));
         }
     }
 
