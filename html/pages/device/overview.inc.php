@@ -10,7 +10,7 @@ $ports['disabled'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE device_id =
 $services = get_service_status($device['device_id']);
 $services['total'] = array_sum($services);
 
-if ($services[0]) {
+if ($services[2]) {
     $services_colour = $warn_colour_a;
 }
 else {

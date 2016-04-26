@@ -44,6 +44,13 @@ function poll_sensor($device, $class, $unit) {
             }
             else if ($class == 'state') {
                 $sensor_value = trim(str_replace('"', '', snmp_walk($device, $sensor['sensor_oid'], '-Oevq', 'SNMPv2-MIB')));
+                if (!is_numeric($sensor_value)) {
+                    $state_value = dbFetchCell('SELECT `state_value` FROM `state_translations` LEFT JOIN `sensors_to_state_indexes` ON `state_translations`.`state_index_id` = `sensors_to_state_indexes`.`state_index_id` WHERE `sensors_to_state_indexes`.`sensor_id` = ? AND `state_translations`.`state_descr` LIKE ?', array($sensor['sensor_id'], $sensor_value));
+                    d_echo('State value of ' . $sensor_value . ' is ' . $state_value . "\n");
+                    if (is_numeric($state_value)) {
+                        $sensor_value = $state_value;
+                    }
+                }
             }
             else if ($class == 'signal') {
                $currentOS = $device['os'];
