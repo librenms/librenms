@@ -416,7 +416,7 @@ class ircbot {
 
     private function chkdb() {
         if (!is_resource($this->sql)) {
-            if (($this->sql = mysql_connect($this->config['db_host'], $this->config['db_user'], $this->config['db_pass'])) != false && mysql_select_db($this->config['db_name'])) {
+            if (($this->sql = mysqli_connect($this->config['db_host'], $this->config['db_user'], $this->config['db_pass'])) != false && mysqli_select_db($this->sql, $this->config['db_name'])) {
                 return true;
             }
             else {
