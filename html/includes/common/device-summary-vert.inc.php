@@ -31,7 +31,7 @@ $temp_output .= '
 if ($config['show_services']) {
 
     $temp_output .= '
-      <td><a href="services/view=details/state=up/"><span class="green">'. $services['up'] .'</span></a></td>
+      <td><a href="services/view=details/state=ok/"><span class="green">'. $services['up'] .'</span></a></td>
 ';
 
 }
@@ -47,7 +47,7 @@ $temp_output .= '
 if ($config['show_services']) {
 
     $temp_output .= '
-      <td><a href="services/view=details/state=down/"><span class="red">'. $services['down'] .'</span></a></td>
+      <td><a href="services/view=details/state=critical/"><span class="red">'. $services['down'] .'</span></a></td>
 ';
 
 }
