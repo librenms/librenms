@@ -699,8 +699,8 @@ function get_smokeping_files($device) {
         if ($handle = opendir($smokeping_dir)) {
             while (false !== ($file = readdir($handle))) {
                 if ($file != '.' && $file != '..') {
-                    if (eregi('.rrd', $file)) {
-                        if (eregi('~', $file)) {
+                    if (stripos($file, '.rrd') !== false) {
+                        if (strpos($file, '~') !== false) {
                             list($target,$slave) = explode('~', str_replace('.rrd', '', $file));
                             $target = str_replace('_', '.', $target);
                             $smokeping_files['in'][$target][$slave] = $file;

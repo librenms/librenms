@@ -15,7 +15,7 @@ $x      = 0;
 if ($handle = opendir($rrddir)) {
     while (false !== ($file = readdir($handle))) {
         if ($file != '.' && $file != '..') {
-            if (eregi('app-shoutcast-'.$app['app_id'], $file)) {
+            if (stripos($file, 'app-shoutcast-'.$app['app_id']) !== false) {
                 array_push($files, $file);
             }
         }
@@ -23,8 +23,8 @@ if ($handle = opendir($rrddir)) {
 }
 
 foreach ($files as $id => $file) {
-    $hostname                 = eregi_replace('app-shoutcast-'.$app['app_id'].'-', '', $file);
-    $hostname                 = eregi_replace('.rrd', '', $hostname);
+    $hostname                 = str_ireplace('app-shoutcast-'.$app['app_id'].'-', '', $file);
+    $hostname                 = str_ireplace('.rrd', '', $hostname);
     list($host, $port)        = explode('_', $hostname, 2);
     $rrd_filenames[]          = $rrddir.'/'.$file;
     $rrd_list[$i]['filename'] = $rrddir.'/'.$file;

@@ -30,6 +30,7 @@
         - [`get_devices_by_group`](#api-route-get_devices_by_group)
     - [`routing`](#api-routing)
         - [`list_bgp`](#api-route-1)
+        - [`list_ipsec`](#list_ipsec)
     - [`switching`](#api-switching)
         - [`get_vlans`](#api-route-4)
     - [`alerts`](#api-alerts)
@@ -865,6 +866,43 @@ Output:
  ]
 }
 ```
+
+### <a name="list_ipsec">Function: `list_ipsec`</a> [`top`](#top)
+
+List the current IPSec tunnels which are active.
+
+Route: /api/v0/routing/ipsec/data/:hostname
+
+- hostname can be either the device hostname or id
+
+Input:
+
+ -
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/ipsec/data/localhost
+```
+
+Output:
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 0,
+    "ipsec": [
+        "tunnel_id": "1",
+        "device_id": "1",
+        "peer_port": "0",
+        "peer_addr": "127.0.0.1",
+        "local_addr": "127.0.0.2",
+        "local_port": "0",
+        "tunnel_name": "",
+        "tunnel_status": "active"
+    ]
+}
+```
+> Please note, this will only show active VPN sessions not all configured.
 
 ## <a name="api-switching">`Switching`</a> [`top`](#top)
 
