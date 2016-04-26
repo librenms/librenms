@@ -1288,3 +1288,33 @@ function get_devices_by_group() {
     echo _json_encode($output);
 
 }
+
+function list_ipsec() {
+    $app      = \Slim\Slim::getInstance();
+    $router   = $app->router()->getCurrentRoute()->getParams();
+    $status   = 'error';
+    $code     = 404;
+    $message  = '';
+    $hostname = $router['hostname'];
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (!is_numeric($device_id)) {
+        $message = "No valid hostname or device ID provided";
+    }
+    else {
+        $ipsec  = dbFetchRows("SELECT `D`.`hostname`, `I`.* FROM `ipsec_tunnels` AS `I`, `devices` AS `D` WHERE `I`.`device_id`=? AND `D`.`device_id` = `I`.`device_id`", array($device_id));
+        $total  = count($ipsec);
+        $status = 'ok';
+        $code   = 200;
+    }
+
+    $output  = array(
+        'status'  => $status,
+        'err-msg' => $message,
+        'count'   => $total,
+        'ipsec'  => $ipsec,
+    );
+    $app->response->setStatus($code);
+    $app->response->headers->set('Content-Type', 'application/json');
+    echo _json_encode($output);
+}
