@@ -3,8 +3,9 @@ require $config['install_dir'].'/includes/object-cache.inc.php';
 
 // FIXME - this could do with some performance improvements, i think. possible rearranging some tables and setting flags at poller time (nothing changes outside of then anyways)
 
-$service_status = get_service_status();
-$if_alerts      = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
+$service_status   = get_service_status();
+$typeahead_limit  = $config['webui']['global_search_result_limit'];
+$if_alerts        = dbFetchCell("SELECT COUNT(port_id) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'");
 
 if ($_SESSION['userlevel'] >= 5) {
     $links['count']        = dbFetchCell("SELECT COUNT(*) FROM `links`");
@@ -717,6 +718,7 @@ $('#gsearch').typeahead({
 },
 {
   source: devices.ttAdapter(),
+  limit: '<?php echo($typeahead_limit); ?>',
   async: true,
   display: 'name',
   valueKey: 'name',
@@ -727,6 +729,7 @@ $('#gsearch').typeahead({
 },
 {
   source: ports.ttAdapter(),
+  limit: '<?php echo($typeahead_limit); ?>',
   async: true,
   display: 'name',
   valueKey: 'name',
@@ -737,6 +740,7 @@ $('#gsearch').typeahead({
 },
 {
   source: bgp.ttAdapter(),
+  limit: '<?php echo($typeahead_limit); ?>',
   async: true,
   display: 'name',
   valueKey: 'name',
@@ -749,3 +753,4 @@ $('#gsearch').bind('typeahead:open', function(ev, suggestion) {
     $('#gsearch').addClass('search-box');
 });
 </script>
+
