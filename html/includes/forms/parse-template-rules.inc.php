@@ -11,9 +11,9 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-header('Content-type: application/json');
 
 if (is_admin() === false) {
+	header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -25,5 +25,6 @@ if (is_numeric($template_id) && $template_id > 0) {
     }
 
     $output = array('rule_id' => $rules);
+	header('Content-type: application/json');
     echo _json_encode($output);
 }
