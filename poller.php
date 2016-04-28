@@ -134,6 +134,7 @@ if (!isset($query)) {
 
 foreach (dbFetch($query) as $device) {
     $device = dbFetchRow("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'");
+    $device['vrf_lite_cisco'] = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = '".$device['device_id']."'");
     poll_device($device, $options);
     RunRules($device['device_id']);
     echo "\r\n";
