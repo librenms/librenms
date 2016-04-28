@@ -11,9 +11,9 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-header('Content-type: application/json');
 
 if (is_admin() === false) {
+	header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -51,5 +51,5 @@ if (file_exists($config['install_dir']."/includes/alerts/transport.".$transport.
         }
     }
 }
-
+header('Content-type: application/json');
 echo _json_encode(array('status' => $status));
