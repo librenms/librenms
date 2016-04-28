@@ -11,11 +11,19 @@ $search_conf = array(
     ),
 );
 
+$graph_conf = array(
+    array('name'               => 'webui.min_graph_height',
+          'descr'              => 'Set the minimum graph height',
+          'type'               => 'text',
+    ),
+);
+
 echo '
 <div class="panel-group" id="accordion">
     <form class="form-horizontal" role="form" action="" method="post">
 ';
 
+echo generate_dynamic_config_panel('Graph settings',true,$config_groups,$graph_conf);
 echo generate_dynamic_config_panel('Search settings',true,$config_groups,$search_conf);
 
 echo '
