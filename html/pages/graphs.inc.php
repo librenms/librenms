@@ -108,7 +108,7 @@ else {
     echo('</tr></table>');
 
     $graph_array = $vars;
-    $graph_array['height'] = "300";
+    $graph_array['height'] = $config['webui']['min_graph_height'];
     $graph_array['width']  = $graph_width;
 
     if($_SESSION['screen_width']) {
@@ -125,7 +125,7 @@ else {
             $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/2));
         }
         else {
-            $graph_array['height'] = ($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5));
+            $graph_array['height'] = max($graph_array['height'],($_SESSION['screen_height'] - ($_SESSION['screen_height']/1.5)));
         }
     }
 
