@@ -21,6 +21,7 @@
  * @package LibreNMS
  * @subpackage Notifications
  */
+header('Content-type: application/json');
 
 $status    = 'error';
 $message   = 'unknown error';
