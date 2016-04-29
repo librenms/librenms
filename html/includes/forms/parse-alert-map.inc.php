@@ -13,6 +13,7 @@
  */
 
 if (is_admin() === false) {
+	header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -31,5 +32,6 @@ if (is_numeric($map_id) && $map_id > 0) {
                'rule'   => $map['name'],
                'target' => $map['target'],
               );
+	header('Content-type: application/json');
     echo _json_encode($output);
 }
