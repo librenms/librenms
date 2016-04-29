@@ -59,6 +59,14 @@ if ($username !== 'root') {
 // load config.php now
 require_once 'includes/defaults.inc.php';
 require_once 'config.php';
+
+// make sure install_dir is set correctly, or the next includes will fail
+if(!file_exists($config['install_dir'].'/config.php')) {
+    print_fail('$config[\'install_dir\'] is not set correctly.  It should probably be set to: ' . getcwd());
+    exit;
+}
+
+// continue loading includes
 require_once 'includes/definitions.inc.php';
 require_once 'includes/functions.php';
 require_once 'includes/common.php';
@@ -73,6 +81,14 @@ if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sh
 else {
     echo "Commit SHA: $cur_sha\n";
 }
+if($versions['local_branch'] != 'master') {
+    print_warn("Your local git branch is not master, this will prevent automatic updates.");
+}
+if($versions['git_modified'] === true) {
+    print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
+    echo(implode("\n", $versions['git_modified_files']) . "\n");
+}
+
 echo "DB Schema: ".$versions['db_schema']."\n";
 echo "PHP: ".$versions['php_ver']."\n";
 echo "MySQL: ".$versions['mysql_ver']."\n";

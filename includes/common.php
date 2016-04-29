@@ -1041,7 +1041,13 @@ function version_info($remote=true) {
         curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
         $output['github'] = json_decode(curl_exec($api),true);
     }
-    $output['local_sha']   = chop(`git rev-parse HEAD`);
+    $output['local_sha']    = rtrim(`git rev-parse HEAD`);
+    $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
+
+    exec('git diff --name-only --exit-code', $cmdoutput, $code);
+    $output['git_modified'] = ($code !== 0);
+    $output['git_modified_files'] = $cmdoutput;
+
     $output['db_schema']   = dbFetchCell('SELECT version FROM dbSchema');
     $output['php_ver']     = phpversion();
     $output['mysql_ver']   = dbFetchCell('SELECT version()');
