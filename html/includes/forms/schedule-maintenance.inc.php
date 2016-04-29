@@ -13,6 +13,7 @@
  */
 
 if (is_admin() === false) {
+	header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -128,5 +129,5 @@ else if ($sub_type == 'del-maintenance') {
         'message' => $message,
     );
 }//end if
-
+header('Content-type: application/json');
 echo _json_encode($response);
