@@ -1,4 +1,5 @@
 <?php
+header('Content-type: application/json');
 
 if (is_admin() === false) {
     $response = array(
