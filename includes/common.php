@@ -753,16 +753,16 @@ function round_Nth($val = 0, $round_to) {
  */
 function is_mib_poller_enabled($device)
 {
-    if (!is_module_enabled('poller', 'mib')) {
-        return false;
+    if (is_dev_attrib_enabled($device, 'poll_mib')) {
+        d_echo('MIB module enabled for '.$device['hostname']."\n");
+        return true;
     }
 
-    if (!is_dev_attrib_enabled($device, 'poll_mib')) {
-        d_echo('MIB module disabled for '.$device['hostname']."\n");
-        return false;
+    if (is_module_enabled('poller', 'mib')) {
+        return true;
     }
 
-    return true;
+    return false;
 } // is_mib_poller_enabled
 
 
