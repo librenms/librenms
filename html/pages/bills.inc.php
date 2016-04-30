@@ -79,7 +79,7 @@ if ($_POST['addbill'] == 'yes') {
         dbInsert(array('bill_id' => $bill_id, 'port_id' => $_POST['port_id']), 'bill_ports');
     }
     
-    header('Location: /' . generate_url(array('page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit')));
+    header('Location: ' . generate_url(array('page' => 'bill', 'bill_id' => $bill_id, 'view' => 'edit')));
     exit();
 }
 
@@ -159,7 +159,7 @@ include 'includes/modal/new_bill.inc.php';
                period: $('select#period').val()
            };
        },
-       url: "/ajax_table.php"
+       url: "ajax_table.php"
     }).on("loaded.rs.jquery.bootgrid", function() {
     });
     $('#table-filters select').on('change', function() { grid.bootgrid('reload'); });
