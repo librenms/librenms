@@ -873,8 +873,8 @@ function is_port_valid($port, $device) {
     else {
         $valid = 1;
         $if = strtolower($port['ifDescr']);
-		$ifname = strtolower($port['ifName']);
-		$ifalias = strtolower($port['ifAlias']);
+        $ifname = strtolower($port['ifName']);
+        $ifalias = strtolower($port['ifAlias']);
         $fringe = $config['bad_if'];
         if( is_array($config['os'][$device['os']]['bad_if']) ) {
             $fringe = array_merge($config['bad_if'],$config['os'][$device['os']]['bad_if']);
@@ -897,7 +897,7 @@ function is_port_valid($port, $device) {
                 }
             }
         }
-		if (is_array($config['bad_ifname_regexp'])) {
+        if (is_array($config['bad_ifname_regexp'])) {
             $fringe = $config['bad_ifname_regexp'];
             if( is_array($config['os'][$device['os']]['bad_ifname_regexp']) ) {
                 $fringe = array_merge($config['bad_ifname_regexp'],$config['os'][$device['os']]['bad_ifname_regexp']);
@@ -909,7 +909,7 @@ function is_port_valid($port, $device) {
                 }
             }
         }
-		if (is_array($config['bad_ifalias_regexp'])) {
+        if (is_array($config['bad_ifalias_regexp'])) {
             $fringe = $config['bad_ifalias_regexp'];
             if( is_array($config['os'][$device['os']]['bad_ifalias_regexp']) ) {
                 $fringe = array_merge($config['bad_ifalias_regexp'],$config['os'][$device['os']]['bad_ifalias_regexp']);
