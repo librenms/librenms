@@ -13,6 +13,7 @@
  */
 
 if (is_admin() === false) {
+	header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -99,4 +100,5 @@ $response = array(
     'status'  => $status,
     'message' => $message,
 );
+header('Content-type: application/json');
 echo _json_encode($response);

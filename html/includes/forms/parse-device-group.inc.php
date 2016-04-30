@@ -13,6 +13,7 @@
  */
 
 if (is_admin() === false) {
+	header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -34,5 +35,6 @@ if (is_numeric($group_id) && $group_id > 0) {
         'desc'    => $group['desc'],
         'pattern' => $group_split,
     );
+	header('Content-type: application/json');
     echo _json_encode($output);
 }

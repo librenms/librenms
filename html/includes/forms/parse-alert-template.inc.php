@@ -13,6 +13,7 @@
  */
 
 if (is_admin() === false) {
+	header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
 
@@ -26,5 +27,6 @@ if (is_numeric($template_id) && $template_id > 0) {
         'title'     => $template['title'],
         'title_rec' => $template['title_rec'],
     );
+	header('Content-type: application/json');
     echo _json_encode($output);
 }
