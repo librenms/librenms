@@ -153,7 +153,7 @@ function getImage($device) {
 function getImageSrc($device) {
     global $config;
 
-    return $config['base_url'] . '/images/os/' . getImageName($device) . '.png';
+    return 'images/os/' . getImageName($device) . '.png';
 }
 
 function getImageName($device, $use_database=true) {
