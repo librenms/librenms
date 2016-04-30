@@ -21,6 +21,7 @@
  * @package LibreNMS
  * @subpackage Dashboards
  */
+header('Content-type: application/json');
 
 $status    = 'error';
 $message   = 'unknown error';
