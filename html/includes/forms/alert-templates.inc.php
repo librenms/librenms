@@ -21,6 +21,7 @@
  * @package LibreNMS
  * @subpackage Alerts
  */
+header('Content-type: text/plain');
 
 if(is_admin() === false) {
     die('ERROR: You need to be admin');

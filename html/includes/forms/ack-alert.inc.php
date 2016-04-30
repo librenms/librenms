@@ -11,6 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+header('Content-type: text/plain');
 
 $alert_id = mres($_POST['alert_id']);
 $state    = mres($_POST['state']);

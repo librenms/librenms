@@ -125,7 +125,7 @@ function CollectData($bill_id) {
         $out_delta = $prev_out_delta;
     }
 
-    if ($period < '0') {
+    if (!empty($period) && $period < '0') {
         logfile("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
     }
     else {
