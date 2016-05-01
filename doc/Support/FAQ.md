@@ -13,6 +13,7 @@
  - [How do I debug the poller process?](#faq12)
  - [Why do I get a lot apache or rrdtool zombies in my process list?](#faq14)
  - [Why do I see traffic spikes in my graphs?](#faq15)
+ - [How do I change the IP / hostname of a device?](#faq16)
 
 ### Developing
  - [How do I add support for a new OS?](#faq8)
@@ -103,6 +104,14 @@ This occurs either when a counter resets or the device sends back bogus data mak
 Before this all rrd files were set to 100G max values, now you can enable support to limit this to the actual port speed.
 
 rrdtool tune will change the max value when the interface speed is detected as being changed (min value will be set for anything 10M or over) or when you run the included script (scripts/tune_port.php).
+
+#### <a name="faq16"> How do I change the IP / hostname of a device?</a>
+
+There is a host rename tool called renamehost.php in your librenms root directory. When renaming you are also changing the device's IP / hostname address for monitoring.
+Usage:
+```bash
+./renamehost.php <old hostname> <new hostname>
+```
 
 #### <a name="faq8"> How do I add support for a new OS?</a>
 
