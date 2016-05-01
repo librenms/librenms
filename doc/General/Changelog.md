@@ -1,3 +1,45 @@
+### April 2016
+
+#### Bug fixes
+  - Discovery / Polling:
+    - Fix poweralert OS detection (PR3414)
+  - WebUI:
+    - Fixed headers for varying ajax calls (PR3432, PR3433, PR3434, PR3435)
+  - Misc:
+    - Update syslog to support incorrect time (PR3348)
+    - Fixed InfluxDB to send data as int/float (PR3354)
+    - Small bug fixes to the services update (PR3366, PR3396, PR3425, PR3426, PR3427)
+    - Fix bug with obtaining data for new bills in some scenarios (PR3404)
+    - Improved PHP 7 support (PR3417)
+    - Fix urls within billing section for sub dir support (PR3442)
+
+#### Improvements
+  - WebUI:
+    - Update rancid file detection (PR3341)
+    - Make graphs in widgets clickable (PR3355)
+    - Add config option to set the typeahead results (PR3363)
+    - Add config option to set min graph height (PR3410)
+  - Discovery / Polling:
+    - Updated Infoblox mibs and logo (PR3340)
+    - Updated arp discovery to support vrf lite (PR3359)
+    - Added RSSI and MNC for Cisco WWAN routers (PR3371)
+    - Updated DNOS and added CPU, Memory and Temp (PR3391, PR3393, PR3395)
+    - Added PoE state support for Netonix devices (PR3416)
+    - Added ability to exclude ports via ifName and ifAlias regex (PR3439)
+  - Added detection for:
+    - Viprenet routers (PR3365)
+    - FreeBSD via distro script (PR3399)
+  - Documentation:
+    - Updated nginx install docs (PR3397)
+    - Added FAQ on renaming hosts (PR3444)
+  - API:
+    - Added call for IPsec tunnels (PR3411)
+  - Misc:
+    - Added check_mk FreeBSD agent support (PR3406)
+    - Added suggestion to fix files not owned by correct user to validate.php (PR3415)
+    - Added detection for missing timezone to validate.php (PR3428)
+    - Added detection for install_dir config and local git repo issues to validate.php (PR3440)
+
 ### March 2016
 
 #### Bug fixes
