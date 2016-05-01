@@ -33,11 +33,15 @@ Any issues with these images should be reported via [Github](https://github.com/
 #### Download
 
 [OVA Image](http://www.lathwood.co.uk/librenms/librenms_centos_7.ova) - 968M
+
   - md5sum: 619ef0071ee25c95cf2939a388b9021b
+
   - sha256sum: 39c1e129badd407b7c8c51bfa2e240ae6424947b95964872cd871f00bccaf141
 
 [VMDK Image](http://www.lathwood.co.uk/librenms/librenms_centos_7.vmdk) - 2.5G
+
   - md5sum: fccbd2fdc645f706ca9da2fdfe0f11f1
+
   - sha256sum: 1038b4c475cd67dfbcdce3f13b482949c15cf0862a73ab50e00e4d6b253f3897
 
 #### Credentials
