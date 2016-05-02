@@ -949,6 +949,11 @@ $config['os'][$os]['text'] = 'Liebert';
 $config['os'][$os]['type'] = 'power';
 $config['os'][$os]['icon'] = 'liebert';
 
+$os = 'powerwalker';
+$config['os'][$os]['text'] = 'PowerWalker UPS';
+$config['os'][$os]['type'] = 'power';
+$config['os'][$os]['icon'] = 'powerwalker';
+
 $os = 'engenius';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['text']             = 'EnGenius Access Point';
