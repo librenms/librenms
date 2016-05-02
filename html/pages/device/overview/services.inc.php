@@ -28,13 +28,13 @@ if ($services['total']) {
                 </div>
                 <table class="table table-hover table-condensed table-striped">
                     <tr>
-                        <td title="Total"><img src='images/16/cog.png'> <?=$services['total']?></td>
-                        <td title="Status - Ok"><img src='images/16/cog_add.png'> <?=$services[0]?></td>
-                        <td title="Status - Warning"><img src='images/16/cog_error.png'> <?=$services[1]?></td>
-                        <td title="Status - Critical"><img src='images/16/cog_delete.png'> <?=$services[2]?></td>
+                        <td title="Total"><img src='images/16/cog.png'> <?php echo $services['total']?></td>
+                        <td title="Status - Ok"><img src='images/16/cog_add.png'> <?php echo $services[0]?></td>
+                        <td title="Status - Warning"><img src='images/16/cog_error.png'> <?php echo $services[1]?></td>
+                        <td title="Status - Critical"><img src='images/16/cog_delete.png'> <?php echo $services[2]?></td>
                     </tr>
                     <tr>
-                        <td colspan='4'><?=$string?></td>
+                        <td colspan='4'><?php echo $string?></td>
                     </tr>
                 </table>
             </div>
