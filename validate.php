@@ -152,7 +152,8 @@ if(strstr($strict_mode, 'STRICT_TRANS_TABLES')) {
     print_warn('You have MySQL STRICT_TRANS_TABLES enabled, it is advisable to disable this until full support has been added: https://dev.mysql.com/doc/refman/5.0/en/sql-mode.html');
 }
 
-if (empty(ini_get('date.timezone'))) {
+$tz = ini_get('date.timezone');
+if (empty($tz)) {
     print_fail('You have no timezone set for php: http://php.net/manual/en/datetime.configuration.php#ini.date.timezone');
 }
 
