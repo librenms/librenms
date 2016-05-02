@@ -68,9 +68,9 @@ if (!$os) {
         elseif (stristr($sysObjectId, 'cumulusMib') || strstr($sysObjectId, '.1.3.6.1.4.1.40310')) {
             $os = 'cumulus';
         }
-        elseif (strstr($sysObjectId, '.1.3.6.1.4.1.8072.3.2.10')) {
-            $os = 'sophos';
-        }
+//        elseif (strstr($sysObjectId, '.1.3.6.1.4.1.8072.3.2.10')) {
+//            $os = 'sophos';
+//        }
         else {
             // Check for Synology DSM
             $hrSystemInitialLoadParameters = trim(snmp_get($device, 'HOST-RESOURCES-MIB::hrSystemInitialLoadParameters.0', '-Osqnv'));
