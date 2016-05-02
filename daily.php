@@ -114,6 +114,14 @@ if ($options['f'] === 'bill_data') {
     }
 }
 
+if ($options['f'] === 'alert_log') {
+    if (is_numeric($config['alert_log_purge']) && $config['alert_log_purge'] > 0) {
+        if (dbDelete('alert_log', 'time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)', array($config['alert_log_purge']))) {
+            echo 'Alert log data cleared for entries over '.$config['alert_log_purge']." days\n";
+        }
+    }
+}
+
 if ($options['f'] === 'purgeusers') {
     $purge = 0;
     if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
