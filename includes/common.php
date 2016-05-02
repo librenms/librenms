@@ -488,7 +488,7 @@ function get_dev_attrib($device, $attrib_type, $attrib_value='') {
 
 function is_dev_attrib_enabled($device, $attrib, $default = true) {
     $val = get_dev_attrib($device, $attrib);
-    if ($val != NULL) {
+    if ($val != null) {
         // attribute is set
         return ($val != 0);
     }
@@ -753,16 +753,11 @@ function round_Nth($val = 0, $round_to) {
  */
 function is_mib_poller_enabled($device)
 {
-    if (!is_module_enabled('poller', 'mib')) {
-        return false;
+    $val = get_dev_attrib($device, 'poll_mib');
+    if ($val == null) {
+        return is_module_enabled('poller', 'mib');
     }
-
-    if (!is_dev_attrib_enabled($device, 'poll_mib')) {
-        d_echo('MIB module disabled for '.$device['hostname']."\n");
-        return false;
-    }
-
-    return true;
+    return $val;
 } // is_mib_poller_enabled
 
 
