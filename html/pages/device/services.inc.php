@@ -64,20 +64,20 @@ if (count($services) > '0') {
             $status = "<span class='grey'>Unknown</span>";
         }
 ?>
-            <tr id="row_<?=$service['service_id']?>">
+            <tr id="row_<?php echo $service['service_id']?>">
                 <td>
                     <div class="col-sm-12">
-                        <div class="col-sm-2"><?=$service['service_type']?></div>
-                        <div class="col-sm-6"><?=$service['service_desc']?></div>
-                        <div class="col-sm-2"><?=$status?></div>
+                        <div class="col-sm-2"><?php echo $service['service_type']?></div>
+                        <div class="col-sm-6"><?php echo $service['service_desc']?></div>
+                        <div class="col-sm-2"><?php echo $status?></div>
                         <div class="pull-right">
-                            <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?=$service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
-                            <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?=$service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
+                            <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
+                            <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?php echo $service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
                         </div>
                     </div>
                     <div class="col-sm-12">
-                        <div class="col-sm-8"><?=nl2br(trim($service['service_message']))?></div>
-                        <div class="col-sm-4"><?=formatUptime(time() - $service['service_changed'])?></div>
+                        <div class="col-sm-8"><?php echo nl2br(trim($service['service_message']))?></div>
+                        <div class="col-sm-4"><?php echo formatUptime(time() - $service['service_changed'])?></div>
                     </div>
 <?php
         if ($vars['view'] == 'details') {
