@@ -128,6 +128,12 @@ $config['os'][$os]['over'][1]['text']  = 'Processor Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+// Time server
+$os = 'microsemitime';
+$config['os'][$os]['text']             = 'Microsemi Timing';
+$config['os'][$os]['type']             = 'timing';
+$config['os'][$os]['icon']             = 'microsemi';
+
 // Ubiquiti
 $os = 'unifi';
 $config['os'][$os]['text']             = 'Ubiquiti UniFi';
