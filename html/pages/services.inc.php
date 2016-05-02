@@ -133,15 +133,15 @@ foreach (dbFetchRows($host_sql, $host_par) as $device) {
             $status = "<span class='grey'><b>".$service['service_type']."</b></span>";
         }
 ?>
-    <tr id="row_<?=$service['service_id']?>">
-        <td><?=$devlink?></td>
-        <td><?=$status?></td>
-        <td><?=formatUptime(time() - $service['service_changed'])?></td>
-        <td><span class='box-desc'><?=nl2br(trim($service['service_message']))?></span></td>
-        <td><span class='box-desc'><?=nl2br(trim($service['service_desc']))?></span></td>
+    <tr id="row_<?php echo $service['service_id']?>">
+        <td><?php echo $devlink?></td>
+        <td><?php echo $status?></td>
+        <td><?php echo formatUptime(time() - $service['service_changed'])?></td>
+        <td><span class='box-desc'><?php echo nl2br(trim($service['service_message']))?></span></td>
+        <td><span class='box-desc'><?php echo nl2br(trim($service['service_desc']))?></span></td>
         <td>
-            <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?=$service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
-            <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?=$service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
+            <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='<?php echo $service['service_id']?>' name='edit-service'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span></button>
+            <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='<?php echo $service['service_id']?>' name='delete-service'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>
         </td>
     </tr>
 <?php

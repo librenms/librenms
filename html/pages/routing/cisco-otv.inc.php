@@ -10,9 +10,9 @@ $COMPONENTS = $COMPONENT->getComponents(null,$options);
 foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
     $LINK = generate_url(array('page' => 'device', 'device' => $DEVICE_ID, 'tab' => 'routing', 'proto' => 'cisco-otv'));
 ?>
-<div class="panel panel-default" id="overlays-<?=$DEVICE_ID?>">
+<div class="panel panel-default" id="overlays-<?php echo $DEVICE_ID?>">
     <div class="panel-heading">
-        <h3 class="panel-title"><a href="<?=$LINK?>"><?=gethostbyid($DEVICE_ID)?> - Overlay's & Adjacencies</a></h3>
+        <h3 class="panel-title"><a href="<?php echo $LINK?>"><?php echo gethostbyid($DEVICE_ID)?> - Overlay's & Adjacencies</a></h3>
     </div>
     <div class="panel list-group">
         <?php
@@ -28,8 +28,8 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                     $GLI = "list-group-item-danger";
                 }
                 ?>
-                <a class="list-group-item <?=$GLI?>" data-toggle="collapse" data-target="#<?=$OVERLAY['index']?>" data-parent="#overlays-<?=$DEVICE_ID?>"><?=$OVERLAY['label']?> - <?=$OVERLAY['transport']?> <?=$OVERLAY_STATUS?></a>
-                <div id="<?=$OVERLAY['index']?>" class="sublinks collapse">
+                <a class="list-group-item <?php echo $GLI?>" data-toggle="collapse" data-target="#<?php echo $OVERLAY['index']?>" data-parent="#overlays-<?php echo $DEVICE_ID?>"><?php echo $OVERLAY['label']?> - <?php echo $OVERLAY['transport']?> <?php echo $OVERLAY_STATUS?></a>
+                <div id="<?php echo $OVERLAY['index']?>" class="sublinks collapse">
                     <?php
                     foreach ($COMP as $AID => $ADJACENCY) {
                         if (($ADJACENCY['otvtype'] == 'adjacency') && ($ADJACENCY['index'] == $OVERLAY['index'])) {
@@ -42,7 +42,7 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                                 $GLI = "list-group-item-danger";
                             }
                             ?>
-                            <a class="list-group-item <?=$GLI?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?=$ADJACENCY['label']?> - <?=$ADJACENCY['endpoint']?> <?=$ADJ_STATUS?></a>
+                            <a class="list-group-item <?php echo $GLI?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $ADJACENCY['label']?> - <?php echo $ADJACENCY['endpoint']?> <?php echo $ADJ_STATUS?></a>
                         <?php
                         }
                     }
