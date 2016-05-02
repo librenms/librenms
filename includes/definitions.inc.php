@@ -1565,7 +1565,7 @@ $config['os'][$os]['over'][0]['text']  = 'Traffic';
 $os = 'poseidon';
 $config['os'][$os]['text']             = 'Poseidon';
 $config['os'][$os]['type']             = 'environment';
-$config['os'][$os]['icon']             = 'generic';
+$config['os'][$os]['icon']             = 'poseidon';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
