@@ -39,7 +39,7 @@ if (is_admin() !== false) {
             <div class="modal-body">
                 <form method="post" role="form" id="service" class="form-horizontal service-form">
                     <input type="hidden" name="service_id" id="service_id" value="">
-                    <input type="hidden" name="device_id" id="device_id" value="<?=$device['device_id']?>">
+                    <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
                     <input type="hidden" name="type" id="type" value="create-service">
                     <div class="form-service">
                         <div class="col-sm-12">
@@ -50,7 +50,7 @@ if (is_admin() !== false) {
                         <label for='stype' class='col-sm-3 control-label'>Type: </label>
                         <div class="col-sm-9">
                             <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
-                                <?=$stype?>
+                                <?php echo $stype?>
                             </select>
                         </div>
                     </div>
@@ -63,7 +63,7 @@ if (is_admin() !== false) {
                     <div class="form-service">
                         <label for='ip' class='col-sm-3 control-label'>IP Address: </label>
                         <div class="col-sm-9">
-                            <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?=$device['hostname']?>'/>
+                            <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='<?php echo $device['hostname']?>'/>
                         </div>
                     </div>
                     <div class="form-service">
