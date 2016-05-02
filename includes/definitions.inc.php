@@ -574,6 +574,12 @@ $config['os'][$os]['text']  = 'ZTE ZXR10';
 $config['os'][$os]['type']  = 'network';
 $config['os'][$os]['icon']  = 'zte';
 
+// Cisco WAP
+$os = 'ciscowap';
+$config['os'][$os]['text']             = 'Cisco Wireless Acess Point';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'cisco';
+
 // Ruckus Wireless
 $os = 'ruckuswireless';
 $config['os'][$os]['text']             = 'Ruckus Wireless';
