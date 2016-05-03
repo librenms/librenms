@@ -80,7 +80,7 @@ else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' 
                     $_POST['rule']   = $name;
                     $_POST['target'] = $target;
                     $_POST['map_id'] = '';
-                    include 'forms/create-map-item.inc.php';
+                    include 'create-map-item.inc.php';
                     unset($ret,$target,$raw,$rule,$msg,$map_id);
                 }
             }
