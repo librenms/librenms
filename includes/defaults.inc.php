@@ -844,7 +844,8 @@ $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
 $config['leaflet']['default_lat']                       = '51.4800';
 $config['leaflet']['default_lng']                       = '0';
-$config['leaflet']['default_zoom']                       = 2;
+$config['leaflet']['default_zoom']                      = 2;
+$config['leaflet']['tile_url']                          = "{s}.tile.openstreetmap.org";
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
