@@ -61,6 +61,16 @@ foreach (get_all_devices() as $hostname) {
 ?>
                "</select>"+
                "</div>"+
+               "<div class=\"form-group\">"+
+               "<label>"+
+               "<strong>&nbsp;State&nbsp;</strong>"+
+               "</label>"+
+               "<select name=\"state\" id=\"state\" class=\"form-control input-sm\">"+
+               "<option value=\"-1\"></option>"+
+               "<option value=\"0\">Ok</option>"+
+               "<option value=\"1\">Alert</option>"+
+               "</select>"+
+               "</div>"+
                "<button type=\"submit\" class=\"btn btn-default input-sm\">Filter</button>"+
                "</form></span></div>"+
                "<div class=\"col-sm-4 actionBar\"><p class=\"{{css.search}}\"></p><p class=\"{{css.actions}}\"></p></div></div></div>"
@@ -69,7 +79,8 @@ foreach (get_all_devices() as $hostname) {
     {
         return {
             id: "alertlog",
-            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>'
+            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
+            state: '<?php echo htmlspecialchars($_POST['state']); ?>'
         };
     },
     url: "ajax_table.php"
