@@ -7,6 +7,11 @@ if (is_numeric($_POST['device_id'])) {
     $param[] = $_POST['device_id'];
 }
 
+if ($_POST['state'] >= 0) {
+    $where .= ' AND `E`.`state` = ?';
+    $param[] = mres($_POST['state']);
+}
+
 if ($_SESSION['userlevel'] >= '5') {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 }
