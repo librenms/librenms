@@ -95,8 +95,9 @@ if (defined('show_settings')) {
             }
 
             $temp_output[] = '<a href="' . generate_url(array(
-                'page' => 'service',
-                'service' => $device['service_id']
+                'page' => 'device',
+                'tab' => 'services',
+                'device' => $service['device_id']
                 )) . '" role="button" class="btn ' . $btn_type . ' btn-xs" title="' .$service['hostname']." - ".$service['service_type']." - ".$service['service_desc'] . '" style="min-height:' . $tile_width . 'px; min-width: ' . $tile_width . 'px; border-radius:0px; margin:0px; padding:0px;"></a>';
         }
     }
