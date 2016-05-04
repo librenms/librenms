@@ -99,6 +99,7 @@ LibreNMS contributors:
 - Casey Schoonover <casey.schoonover@llcc.edu> (cschoonover91)
 - Chris A. Evans <thecityofguanyu@outlook.com> (thecityofguanyu)
 - Rainer Schüler <github@layer3.de> (rschueler)
+- Jussi Sorjonen <mieleton@mieleton.net> (mieleton)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
