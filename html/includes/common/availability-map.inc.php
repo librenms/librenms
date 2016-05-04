@@ -18,13 +18,13 @@ if (defined('show_settings')) {
     <form class="form-horizontal" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
             <label for="tile_width" class="col-sm-4 control-label">Tile width</label>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <input class="form-control" name="tile_width" placeholder="I.e 10" value="'.$current_width.'">
             </div>
         </div>
         <div class="form-group">
             <label for="show_services" class="col-sm-4 control-label">Show</label>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <select class="form-control" name="mode">
                     <option value="0" '.($current_mode == 0 ? 'selected':'').'>Only Devices</option>
                     <option value="1"' .($current_mode == 1 ? 'selected':'').'>Only Services</option>
@@ -39,7 +39,8 @@ if (defined('show_settings')) {
         </div>
     </form>
     ';
-} else {
+}
+else {
     require_once 'includes/object-cache.inc.php';
     $mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
     $tile_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
@@ -56,7 +57,8 @@ if (defined('show_settings')) {
             $param = array(
                 $_SESSION['user_id']
                 );
-        } else {
+        }
+        else {
             $sql .= ' WHERE';
         }
         $sql .= " `D`.`ignore` = '0' AND `D`.`disabled` = '0' ORDER BY `hostname`";
@@ -67,11 +69,13 @@ if (defined('show_settings')) {
                 if (($device['uptime'] < $config['uptime_warning']) && ($device['uptime'] != '0')) {
                     $btn_type = 'btn-warning';
                     $warn_count++;
-                } else {
+                }
+                else {
                     $btn_type = 'btn-success';
                     $up_count ++;
                 }
-            } else {
+            }
+            else {
                 $btn_type = 'btn-danger';
                 $down_count++;
             }
@@ -89,7 +93,8 @@ if (defined('show_settings')) {
             if ($service['service_status'] == '0') {
                 $btn_type = 'btn-success';
                 $up_count ++;
-            } else {
+            }
+            else {
                 $btn_type = 'btn-danger';
                 $down_count += 1;
             }
