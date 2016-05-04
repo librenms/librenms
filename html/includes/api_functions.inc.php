@@ -115,6 +115,11 @@ function get_graph_generic_by_hostname() {
     $hostname     = $router['hostname'];
     $vars         = array();
     $vars['type'] = $router['type'] ?: 'device_uptime';
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = device_by_id_cache($device_id);
+
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
