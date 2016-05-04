@@ -18,13 +18,13 @@ if (defined('show_settings')) {
     <form class="form-horizontal" onsubmit="widget_settings(this); return false;">
         <div class="form-group">
             <label for="tile_width" class="col-sm-4 control-label">Tile width</label>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <input class="form-control" name="tile_width" placeholder="I.e 10" value="'.$current_width.'">
             </div>
         </div>
         <div class="form-group">
             <label for="show_services" class="col-sm-4 control-label">Show</label>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <select class="form-control" name="mode">
                     <option value="0" '.($current_mode == 0 ? 'selected':'').'>Only Devices</option>
                     <option value="1"' .($current_mode == 1 ? 'selected':'').'>Only Services</option>
