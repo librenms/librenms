@@ -101,6 +101,7 @@ LibreNMS contributors:
 - Rainer Schüler <github@layer3.de> (rschueler)
 - Jussi Sorjonen <mieleton@mieleton.net> (mieleton)
 - Jens Langhammer <jens@beryju.org> (BeryJu)
+- Robert Verspuy <robert@exa.nl> (exarv)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
