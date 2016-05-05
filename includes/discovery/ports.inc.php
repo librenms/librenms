@@ -21,7 +21,7 @@ if ($device['port_association_mode'])
     $port_association_mode = get_port_assoc_mode_name ($device['port_association_mode']);
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
-$ports_mapped = get_ports_mapped ($device['id']);
+$ports_mapped = get_ports_mapped ($device['device_id']);
 $ports_db = $ports_mapped['ports'];
 
 //
@@ -32,7 +32,7 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
         if ($suffix)
             $suffix_tmp = "-$suffix";
 
-        $old_rrd_path = trim ($config['rrd_dir']) . '/' . $device['hostname'] . "/port-$ifIndex$suffix_tmp.rrd";
+        $old_rrd_path = trim ($config['old_rrd_dir']) . '/' . $device['hostname'] . "/port-$ifIndex$suffix_tmp.rrd";
         $new_rrd_path = get_port_rrdfile_path ($device['hostname'], $port_id, $suffix);
 
         if (is_file ($old_rrd_path)) {

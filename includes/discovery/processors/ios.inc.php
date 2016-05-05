@@ -27,7 +27,7 @@ if ($device['os_group'] == 'cisco' || $device['os'] == 'acsw') {
                 $descr = "Processor $index";
             }
 
-            $old_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('cpmCPU-'.$index.'.rrd');
+            $old_rrd = $config['old_rrd_dir'].'/'.$device['hostname'].'/'.safename('cpmCPU-'.$index.'.rrd');
             $new_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('processor-cpm-'.$index.'.rrd');
 
             if (is_file($old_rrd)) {
