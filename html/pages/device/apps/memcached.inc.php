@@ -7,6 +7,7 @@ $graphs = array(
     'memcached_commands' => 'Commands',
     'memcached_data'     => 'Data Size',
     'memcached_items'    => 'Items',
+    'memcached_hitmiss'  => 'Hits/Misses',
     'memcached_uptime'   => 'Uptime',
     'memcached_threads'  => 'Threads',
 
