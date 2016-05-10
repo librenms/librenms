@@ -220,6 +220,12 @@ $config['addhost_alwayscheckip']   = FALSE; #TRUE - check for duplicate ips even
                                             #FALSE- only check when adding host by ip.
 ```
 
+By default we allow hosts to be added with duplicate sysName's, you can disable this with the following config:
+
+```php
+$config['allow_duplicate_sysName'] = false;
+```
+
 #### SNMP Settings
 
 ```php
