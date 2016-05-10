@@ -204,9 +204,13 @@ if (!empty($argv[1])) {
         echo 'Added device '.$device['hostname'].' ('.$device_id.")\n";
         exit;
     }
-}//end if
+    else {
+        print $console_color->convert("%rWe couldn't add this device, please check the snmp details%n\n");
+    }
+}
+else {
 
-print $console_color->convert(
+    print $console_color->convert(
     "\n".$config['project_name_version'].' Add Host Tool
 
     Usage (SNMPv1/2c): ./addhost.php [-g <poller group>] [-f] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] ['.implode('|', $config['snmp']['transports']).']
@@ -224,4 +228,5 @@ print $console_color->convert(
 
     %rRemember to run discovery for the host afterwards.%n
 '
-);
+    );
+}
