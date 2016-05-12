@@ -33,17 +33,17 @@ Any issues with these images should be reported via [Github](https://github.com/
 
 #### Download
 
-[OVA Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.ova) - 1.2G
+[OVA Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.ova) - 1.3G
 
-  - md5sum: 00fe34b925d09aa24ef05038d813e095
+  - md5sum: 944fcd73e918eabec7509569c2d98cf0
 
-  - sha256sum: 10c82dc30962f319bcea04838b1a46fb8dec225648c38e9aff26f9812f14d176
+  - sha256sum: 2a792e1d39813f0bdd510445aa04bc88e226311e825dddeb3780cf5d58bef43c
 
-[VMDK Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.vmdk) - 3.2G
+[VMDK Image](http://www.lathwood.co.uk/librenms/librenms_ubuntu_1604.vmdk) - 3.3G
 
-  - md5sum: 063fbbdd506d78fa1de801d04ad0db99
+  - md5sum: e84e31e437e946a9a01d0c87059bfe04
 
-  - sha256sum: deccef6e62462ce905b7c423ad5da753d49d9eb5173ca2faeef27d92e970a5d2
+  - sha256sum: 4f687608291161ffd8f5e1aee38be1d6b9e0c2a13d15252da62fe783578f5708
 
 #### Credentials
 
