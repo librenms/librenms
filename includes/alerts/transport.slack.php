@@ -23,9 +23,6 @@
 
 foreach( $opts as $tmp_api ) {
     $host = $tmp_api['url'];
-    foreach( $obj as $k=>$v ) {
-        $api = str_replace("%".$k,$method == "get" ? urlencode($v) : $v, $api);
-    }
     $curl = curl_init();
     $data = array(
         'text' => $obj['msg'],
@@ -34,11 +31,15 @@ foreach( $opts as $tmp_api ) {
         'icon_url' => $tmp_api['icon_url'],
         'icon_emoji' => $tmp_api['icon_emoji'],
     );
-    $alert_message = "payload=" . json_encode($data);
+    $alert_message = json_encode($data);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        'Content-Type: application/json')
+    );
     curl_setopt($curl, CURLOPT_URL, $host);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST,true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message );
+
     $ret = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     if( $code != 200 ) {
