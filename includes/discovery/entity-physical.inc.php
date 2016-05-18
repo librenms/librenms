@@ -10,6 +10,12 @@ if ($config['enable_inventory']) {
         echo ' jnxBoxAnatomy';
         $entity_array = snmpwalk_cache_oid($device, 'jnxBoxAnatomy', $entity_array, 'JUNIPER-MIB');
     }
+    elseif ($device['os'] == 'timos') {
+	$entity_array = array();
+        echo 'tmnxHwObjs';
+        $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', '+'.$config['mib_dir'].'/aos:'.$config['mib_dir']);
+        //print_r($entity_array);
+    }
     else {
         $entity_array = array();
         echo ' entPhysicalEntry';
@@ -39,6 +45,24 @@ if ($config['enable_inventory']) {
             $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
             // fix for issue 1865, $entPhysicalIndex, as it contains a quad dotted number on newer Junipers
             // using str_replace to remove all dots should fix this even if it changes in future
+	    $entPhysicalIndex = str_replace('.','',$entPhysicalIndex);
+        }
+        elseif ($device['os'] == 'timos') {
+            $entPhysicalDescr        = $entry['tmnxCardTypeDescription'];
+            $entPhysicalContainedIn  = $entry['tmnxHwContainedIn'];
+            $entPhysicalClass        = $entry['tmnxHwClass'];
+            $entPhysicalName         = $entry['tmnxCardTypeName'];
+            $entPhysicalSerialNum    = $entry['tmnxHwSerialNumber'];
+            $entPhysicalModelName    = $entry['tmnxHwMfgBoardNumber'];
+            $entPhysicalMfgName      = $entry['tmnxHwMfgBoardNumber'];
+            $entPhysicalVendorType   = $entry['tmnxCardTypeName'];
+            $entPhysicalParentRelPos = $entry['tmnxHwParentRelPos'];
+            $entPhysicalHardwareRev  = '1.0';
+            $entPhysicalFirmwareRev  = $entry['tmnxHwBootCodeVersion'];
+            $entPhysicalSoftwareRev  = $entry['tmnxHwBootCodeVersion'];
+            $entPhysicalIsFRU        = $entry['tmnxHwIsFRU'];
+            $entPhysicalAlias        = $entry['tmnxHwAlias'];
+            $entPhysicalAssetID      = $entry['tmnxHwAssetID'];
 	    $entPhysicalIndex = str_replace('.','',$entPhysicalIndex);
         }
         else {
