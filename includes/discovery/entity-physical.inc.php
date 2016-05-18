@@ -14,7 +14,6 @@ if ($config['enable_inventory']) {
 	$entity_array = array();
         echo 'tmnxHwObjs';
         $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', '+'.$config['mib_dir'].'/aos:'.$config['mib_dir']);
-        //print_r($entity_array);
     }
     else {
         $entity_array = array();
