@@ -14,14 +14,11 @@ if (is_admin() === true || is_read() === true) {
     }
 
     // Build the types list.
-    if ($handle = opendir($config['nagios_plugins'])) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && !strstr($file, '.') && strstr($file, 'check_')) {
-                list(,$check_name) = explode('_',$file,2);
-                $servicesform .= "<option value='$check_name'>$check_name</option>";
-            }
+    foreach (scandir($config['nagios_plugins']) as $file) {
+        if (substr($file, 0, 6) === 'check_') {
+            $check_name = substr($file, 6);
+            $servicesform .= "<option value='$check_name'>$check_name</option>";
         }
-        closedir($handle);
     }
 
     $dev         = device_by_id_cache($device['device_id']);
