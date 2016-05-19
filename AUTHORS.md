@@ -102,6 +102,7 @@ LibreNMS contributors:
 - Jussi Sorjonen <mieleton@mieleton.net> (mieleton)
 - Jens Langhammer <jens@beryju.org> (BeryJu)
 - Robert Verspuy <robert@exa.nl> (exarv)
+- Peter Tkatchenko <peter@flytrace.com> (Peter2121)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
