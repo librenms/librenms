@@ -168,3 +168,27 @@ $config['radius']['timeout']    = 3;
 $config['radius']['users_purge'] = 14;//Purge users who haven't logged in for 14 days.
 $config['radius']['default_level'] = 1;//Set the default user level when automatically creating a user.
 ```
+
+#### HTTP Authentication / AD Authorization
+
+Config option: `ad-authorization`
+
+This module is a combination of ___http-auth___ and ___active_directory___
+
+LibreNMS will expect the user to have authenticated via your webservice already (e.g. using Kerberos Authentication in Apache) but will use Active Directory lookups to determine and assign the userlevel of a user.
+The userlevel will be calculated by using AD group membership information as the ___active_directory___ module does.
+
+The configuration is the same as for the ___active_directory___ module with two extra, optional options: auth_ad_binduser and auth_ad_bindpassword.
+These should be set to a AD user with read capabilities in your AD Domain in order to be able to perform searches. 
+If these options are omitted, the module will attempt an anonymous bind (which then of course must be allowed by your Active Directory server(s)).
+
+There is also one extra option for controlling user information caching: auth_ldap_cache_ttl.
+This option allows to control how long user information (user_exists, userid, userlevel) are cached within the PHP Session.
+The default value is 300 seconds.
+To disable this caching (highly discourage) set this option to 0.
+
+```php
+$config['auth_ad_binduser']     = "ad_binduser";
+$config['auth_ad_bindpassword'] = "ad_bindpassword";
+$config['auth_ldap_cache_ttl']  = 300;
+```
