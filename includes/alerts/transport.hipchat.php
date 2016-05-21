@@ -36,20 +36,23 @@ foreach($opts as $option) {
         $option["message_format"] = 'text';
     }
 
+    // Sane default of making the message color green if the message indicates
+    // that the alert recovered.
+    if(stripos($data["message"], "recovered")) {
+        $color = "green";
+    } else {
+	      $color = $option["color"];
+    }
+
     $data[] = "message=".urlencode($obj["msg"]);
     $data[] = "room_id=".urlencode($option["room_id"]);
     $data[] = "from=".urlencode($option["from"]);
-    $data[] = "color=".urlencode($option["color"]);
+    $data[] = "color=".urlencode($color);
     $data[] = "notify=".urlencode($option["notify"]);
     $data[] = "message_format=".urlencode($option["message_format"]);
 
     $data = implode('&', $data);
 
-    // Sane default of making the message color green if the message indicates
-    // that the alert recovered.
-    if(strstr($data["message"], "recovered")) {
-        $data["color"] = "green";
-    }
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST, true);
