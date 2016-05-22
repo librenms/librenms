@@ -21,6 +21,7 @@
  * @subpackage Alerts
  */
 
+// loop through each room
 foreach($opts as $option) {
     $url = $option['url'];
     foreach($obj as $key=>$value) {
@@ -37,9 +38,11 @@ foreach($opts as $option) {
     }
 
     // Sane default of making the message color green if the message indicates
-    // that the alert recovered.
-    if(stripos($data["message"], "recovered")) {
+    // that the alert recovered.   If it rebooted, make it yellow.
+    if(stripos($obj["msg"], "recovered")) {
         $color = "green";
+    } elseif(stripos($obj["msg"], "rebooted")) {
+        $color = "yellow";
     } else {
 	      $color = $option["color"];
     }
