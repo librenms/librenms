@@ -1671,6 +1671,18 @@ $config['os'][$os]['icon']             = 'deliberant';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
+// Xirrus AP
+$os = 'xirrus';
+$config['os'][$os]['text']             = 'Xirrus';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'xirrus';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_wifi_clients';
+$config['os'][$os]['over'][1]['text']  = 'Wifi Clients';
+
+
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
