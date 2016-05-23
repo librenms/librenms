@@ -88,7 +88,6 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
                 $wificlients2++;
             }
         }
-	echo "Xirrus - $wificlients1 / $wificlients2\n";
     }
 
     if (isset($wificlients1) && $wificlients1 != '') {
