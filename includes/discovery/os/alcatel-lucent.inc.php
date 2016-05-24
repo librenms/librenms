@@ -34,4 +34,8 @@ if (!$os) {
     if (strpos($sysObjectId, '.1.3.6.1.4.1.6527.1.9.1') !== false) {
         $os = 'timos';
     }
+    // TiMOS-B-7.0.R4 both/mpc ALCATEL SAS-M 24F 2XFP 7210
+    if (strpos($sysObjectId, '.1.3.6.1.4.1.6527.6.2.1.2.2.2') !== false) {
+        $os = 'timos';
+    }
 }//end if
