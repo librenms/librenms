@@ -34,4 +34,8 @@ if (!$os) {
     if (strpos($sysObjectId, '.1.3.6.1.4.1.6527.1.9.1') !== false) {
         $os = 'timos';
     }
+    // TiMOS-B-6.0.R2 both/hops ALCATEL-LUCENT SAR 7705
+    if (strpos($sysObjectId, '.1.3.6.1.4.1.6527.6.1.1.2.1') !== false) {
+        $os = 'timos';
+    }    
 }//end if
