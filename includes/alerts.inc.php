@@ -37,7 +37,7 @@ function GenSQL($rule) {
         return false;
     }
     //Pretty-print rule to dissect easier
-    $pretty = array('*'  => '*', '('  => ' ( ', ')'  => ' ) ', '/'  => '/ ', '&&' => ' && ', '||' => ' || ', 'DATE_SUB ( NOW (  )' => 'DATE_SUB( NOW()');
+    $pretty = array('*'  => '*', '('  => ' ( ', ')'  => ' ) ', '/'  => '/', '&&' => ' && ', '||' => ' || ', 'DATE_SUB ( NOW (  )' => 'DATE_SUB( NOW()');
     $rule = str_replace(array_keys($pretty),$pretty,$rule);
     $tmp = explode(" ",$rule);
     $tables = array();
