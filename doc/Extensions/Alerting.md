@@ -564,6 +564,12 @@ All macros that are not unary should return Boolean.
 
 You can only apply _Equal_ or _Not-Equal_ Operations on Boolean-macros where `True` is represented by `"1"` and `False` by `"0"`.
 
+Note, if using a /, spaces must be inserted around it.
+
+Example 
+```php
+((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100
+```
 
 ## <a name="macros-device">Device</a> (Boolean)
 
@@ -627,7 +633,7 @@ Entity: `%macros.port_usage_perc`
 
 Description: Return port-usage in percent.
 
-Source: `((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100`
+Source: `((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100`
 
 ## <a name="macros-time">Time</a>
 
