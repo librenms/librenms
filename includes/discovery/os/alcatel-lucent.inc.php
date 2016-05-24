@@ -34,4 +34,8 @@ if (!$os) {
     if (strpos($sysObjectId, '.1.3.6.1.4.1.6527.1.9.1') !== false) {
         $os = 'timos';
     }
+    // TiMOS-C-12.0.R16 cpm/hops64 ALCATEL XRS 7950
+    if (strpos($sysObjectId, '.1.3.6.1.4.1.6527.1.15.2') !== false) {
+        $os = 'timos';
+    }
 }//end if
