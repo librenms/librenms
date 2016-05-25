@@ -55,7 +55,21 @@ if ($config['autodiscovery']['xdp'] === true) {
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']));
 
                     if (!$remote_device_id) {
-                        $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
+                        if(!$config['discovery_by_ip']) {
+                            $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
+                        }
+                        else {
+                            $ip_arr = explode(" ", $array['cdpCacheAddress']);
+
+                            $a = hexdec($ip_arr[0]);
+                            $b = hexdec($ip_arr[1]);
+                            $c = hexdec($ip_arr[2]);
+                            $d = hexdec($ip_arr[3]);
+
+                            $cdp_ip = "$a.$b.$c.$d";
+
+                            $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
+                        }
                     }
 
                     if ($remote_device_id) {
