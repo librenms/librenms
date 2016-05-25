@@ -627,7 +627,9 @@ Entity: `%macros.port_usage_perc`
 
 Description: Return port-usage in percent.
 
-Source: `((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100`
+Source: `((%ports.ifInOctets_rate*8) / %ports.ifSpeed)*100`
+
+**Warning:** When using division operator, you have to include a space after the '/' operator. The space before the operator is just to add visibility.
 
 ## <a name="macros-time">Time</a>
 
