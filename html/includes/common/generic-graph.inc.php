@@ -400,12 +400,12 @@ else {
         }
         foreach ($config[$type.'_descr'] as $additional_type) {
             if (!empty($additional_type)) {
-                $type_where  .= " $or `port_descr_type` = ?";
+                $type_where  .= " $or `port_descr_type` LIKE ?";
                 $or           = 'OR';
                 $type_param[] = $additional_type;
             }
         }
-        $type_where  .= " $or `port_descr_type` = ?";
+        $type_where  .= " $or `port_descr_type` LIKE ?";
         $or           = 'OR';
         $type_param[] = $type;
         $type_where  .= ') ';
@@ -419,7 +419,7 @@ else {
         }
     }
     elseif ($type == 'custom') {
-        foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE `port_descr_type` = ? ORDER BY ifAlias", array($widget_settings['graph_custom'])) as $port) {
+        foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE `port_descr_type` LIKE ? ORDER BY ifAlias", array($widget_settings['graph_custom'])) as $port) {
             $tmp[] = $port['port_id'];
         }
         $param                         = 'id='.implode(',',$tmp);

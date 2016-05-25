@@ -24,13 +24,13 @@ foreach (explode(',', $vars['type']) as $type) {
 
     foreach ($config[$type.'_descr'] as $additional_type) {
         if (!empty($additional_type)) {
-            $type_where  .= " $or `port_descr_type` = ?";
+            $type_where  .= " $or `port_descr_type` LIKE ?";
             $or           = 'OR';
             $type_param[] = $additional_type;
         }
     }
 
-    $type_where  .= " $or `port_descr_type` = ?";
+    $type_where  .= " $or `port_descr_type` LIKE ?";
     $or           = 'OR';
     $type_param[] = $type;
 }

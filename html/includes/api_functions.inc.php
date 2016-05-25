@@ -499,7 +499,7 @@ function get_graph_by_portgroup() {
     $or             = '';
     $type_param     = array();
     foreach (explode(',', $group) as $type) {
-        $type_where  .= " $or `port_descr_type` = ?";
+        $type_where  .= " $or `port_descr_type` LIKE ?";
         $or           = 'OR';
         $type_param[] = $type;
     }
