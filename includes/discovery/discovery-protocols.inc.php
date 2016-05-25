@@ -59,7 +59,7 @@ if ($config['autodiscovery']['xdp'] === true) {
                             $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
                         }
                         else {
-                            $ip_arr = explode(" ", $array['cdpCacheAddress']);
+                            $ip_arr = explode(" ", $cdp['cdpCacheAddress']);
 
                             $a = hexdec($ip_arr[0]);
                             $b = hexdec($ip_arr[1]);
