@@ -164,7 +164,7 @@ If you see `nothing to commit, working directory clean` then let's go for it :)
 Let's say that you want to test a users (f0o) new development branch (issue-1337) then you can do the following:
 
 ```bash
-git remote add f0o https://github.com/librenms/librenms.git
+git remote add f0o https://github.com/f0o/librenms.git
 git remote update f0o
 git checkout issue-1337
 ```
