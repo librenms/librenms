@@ -21,8 +21,8 @@ $pallette = array(
     16 => '006400'
 );
 
-$rrd_options .= ' -E ';
-$rrd_options .= " COMMENT:'Signal RSSI            Cur     Min    Max\\n'";
+$rrd_options .= ' -l 0 -E ';
+$rrd_options .= " COMMENT:'Average Data Rate       Cur    Min    Max\\n'";
 $radioId=1;
 foreach(glob($config['rrd_dir'].'/'.$device['hostname'].'/xirrus_stats-*.rrd') as $rrd) {
     // get radio name
@@ -34,11 +34,11 @@ foreach(glob($config['rrd_dir'].'/'.$device['hostname'].'/xirrus_stats-*.rrd') a
 
     $descr        = "iap$radioId             ";
 
-    $rrd_options .= " DEF:rssi$radioId=$rrd:rssi:AVERAGE";
-    $rrd_options .= " LINE2:rssi$radioId#".$color.":'".$descr."'";
-    $rrd_options .= " GPRINT:rssi$radioId:LAST:'%5.0lf'";
-    $rrd_options .= " GPRINT:rssi$radioId:MIN:'%5.0lf'";
-    $rrd_options .= " GPRINT:rssi$radioId:MAX:'%5.0lf'\\l";
+    $rrd_options .= " DEF:rate$radioId=$rrd:dataRate:AVERAGE";
+    $rrd_options .= " LINE2:rate$radioId#".$color.":'".$descr."'";
+    $rrd_options .= " GPRINT:rate$radioId:LAST:'%5.0lf'";
+    $rrd_options .= " GPRINT:rate$radioId:MIN:'%5.0lf'";
+    $rrd_options .= " GPRINT:rate$radioId:MAX:'%5.0lf'\\l";
 
     $radioId++;
 }//end foreach
