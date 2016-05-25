@@ -22,7 +22,7 @@ $pallette = array(
 );
 
 $rrd_options .= ' -E ';
-$rrd_options .= " COMMENT:'Signal RSSI            Cur     Min    Max\\n'";
+$rrd_options .= " COMMENT:'Noisefloor              Cur    Min    Max\\n'";
 $radioId=1;
 foreach(glob($config['rrd_dir'].'/'.$device['hostname'].'/xirrus_stats-*.rrd') as $rrd) {
     // get radio name
@@ -34,11 +34,11 @@ foreach(glob($config['rrd_dir'].'/'.$device['hostname'].'/xirrus_stats-*.rrd') a
 
     $descr        = "iap$radioId             ";
 
-    $rrd_options .= " DEF:rssi$radioId=$rrd:rssi:AVERAGE";
-    $rrd_options .= " LINE2:rssi$radioId#".$color.":'".$descr."'";
-    $rrd_options .= " GPRINT:rssi$radioId:LAST:'%5.0lf'";
-    $rrd_options .= " GPRINT:rssi$radioId:MIN:'%5.0lf'";
-    $rrd_options .= " GPRINT:rssi$radioId:MAX:'%5.0lf'\\l";
+    $rrd_options .= " DEF:noise$radioId=$rrd:noiseFloor:AVERAGE";
+    $rrd_options .= " LINE2:noise$radioId#".$color.":'".$descr."'";
+    $rrd_options .= " GPRINT:noise$radioId:LAST:'%5.0lf'";
+    $rrd_options .= " GPRINT:noise$radioId:MIN:'%5.0lf'";
+    $rrd_options .= " GPRINT:noise$radioId:MAX:'%5.0lf'\\l";
 
     $radioId++;
 }//end foreach

@@ -78,18 +78,6 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
         echo (($wificlients1 + 0).' clients on wireless connector, ');
     }
 
-    if ($device['os'] == 'xirrus') {
-        $wificlients1=0; $wificlients2=0;
-        $assoc = snmpwalk_cache_oid($device, 'XIRRUS-MIB::stationAssociationIAP', array(), 'XIRRUS-MIB');
-        foreach($assoc as $station) {
-            if ($station['stationAssociationIAP']=='iap1') {
-                $wificlients1++;
-            } else {
-                $wificlients2++;
-            }
-        }
-    }
-
     if (isset($wificlients1) && $wificlients1 != '') {
         $tags = array(
             'rrd_def'   => 'DS:wificlients:GAUGE:600:-273:1000',
