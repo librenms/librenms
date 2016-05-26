@@ -24,25 +24,32 @@ foreach($radios as $idx => $radio) {
 // cleanup
 unset($rrd_filename); unset($radios); unset($rssi); unset($radioName);
 
-// station associations
-// custom RRDs and graph as each AP may have 16 radios
-$assoc = snmpwalk_cache_oid($device, 'XIRRUS-MIB::stationAssociationIAP', array(), 'XIRRUS-MIB');
-foreach($assoc as $s) {
-    $radio = array_pop($s);
-    $associations[$radio]++;
-}
-unset($radio); unset($assoc);
-// write to rrds
-print_r($associations);
-foreach($associations as $radio => $count) {
-    $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/xirrus_users-$radio.rrd";
-    if (!is_file($rrd_filename)) {
-        rrdtool_create($rrd_filename, " --step 300 DS:stations:GAUGE:600:0:3200".$config['rrd_rra']);
+// if this config flag is true, don't poll for stations
+// this in case of large APs which may have many stations
+// to prevent causing long polling times
+if ($config['xirrus_disable_stations']!=true) {
+    // station associations
+    // custom RRDs and graph as each AP may have 16 radios
+    $assoc = snmpwalk_cache_oid($device, 'XIRRUS-MIB::stationAssociationIAP', array(), 'XIRRUS-MIB');
+    foreach($assoc as $s) {
+        $radio = array_pop($s);
+        $associations[$radio]++;
     }
-    rrdtool_update($rrd_filename, array('stations'=>$count));	
+    unset($radio); unset($assoc);
+    // write to rrds
+    foreach($associations as $radio => $count) {
+        $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/xirrus_users-$radio.rrd";
+        if (!is_file($rrd_filename)) {
+            rrdtool_create($rrd_filename, " --step 300 DS:stations:GAUGE:600:0:3200".$config['rrd_rra']);
+        }
+        rrdtool_update($rrd_filename, array('stations'=>$count));	
+    }
+    // cleanup
+    unset($assocations); unset($rrd_filename);
+    $graphs['xirrus_stations'] = TRUE;
+} else {
+    $graphs['xirrus_stations'] = FALSE;
 }
-// cleanup
-unset($assocations); unset($rrd_filename);
 
 $graphs['xirrus_rssi'] = TRUE;
 $graphs['xirrus_dataRates'] = TRUE;
