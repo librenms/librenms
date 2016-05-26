@@ -55,7 +55,7 @@ if ($config['autodiscovery']['xdp'] === true) {
                     $remote_device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `sysName` = ? OR `hostname` = ?', array($cdp['cdpCacheDeviceId'], $cdp['cdpCacheDeviceId']));
 
                     if (!$remote_device_id) {
-                        if(!$config['discovery_by_ip']) {
+                        if($config['discovery_by_ip'] !== true) {
                             $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
                         }
                         else {
