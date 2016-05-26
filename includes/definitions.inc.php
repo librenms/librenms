@@ -1672,8 +1672,8 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
 // Xirrus AP
-$os = 'xirrus';
-$config['os'][$os]['text']             = 'Xirrus';
+$os = 'xirrus_aos';
+$config['os'][$os]['text']             = 'Xirrus ArrayOS';
 $config['os'][$os]['type']             = 'wireless';
 $config['os'][$os]['icon']             = 'xirrus';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
