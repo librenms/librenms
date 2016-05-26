@@ -2,7 +2,9 @@
 
 if(!$os) {
     if (strstr($sysDescr, 'Xirrus')) {
-        $os = 'xirrus';
+	if (strstr($sysDescr, 'ArrayOS')) {
+	        $os = 'xirrus_aos';
+	}
     }
 }
 
