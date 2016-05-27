@@ -245,9 +245,9 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     alerts_grid.find(".incident").each( function() {
       $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
       $(this).parent().parent().on("mouseenter", function() {
-        $(this).find(".incident-toggle").fadeIn(400);
+        $(this).find(".incident-toggle").fadeIn(200);
       }).on("mouseleave", function() {
-        $(this).find(".incident-toggle").fadeOut(400);
+        $(this).find(".incident-toggle").fadeOut(200);
       }).on("click", "td:not(.incident-toggle-td)", function() {
         var target = $(this).parent().find(".incident-toggle").data("target");
         if( $(this).parent().find(".incident-toggle").hasClass(\'glyphicon-plus\') ) {
