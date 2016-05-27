@@ -169,7 +169,7 @@ foreach (array('Private','Shared (Read)','Shared') as $k=>$v) {
             <ul class="dropdown-menu">
 <?php
 foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
-    echo '              <li><a href="javacript:void(0)" class="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a></li>';
+    echo '              <li><a href="#" onsubmit="return false;" class="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a></li>';
 }
 ?>
             </ul>
