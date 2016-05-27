@@ -26,9 +26,14 @@ $interval = mres($_POST['interval']);
 $mute     = mres($_POST['mute']);
 $invert   = mres($_POST['invert']);
 $name     = mres($_POST['name']);
+if ($_POST['proc'] != "") { $proc = $_POST['proc']; }
+else { $proc = "noproc.pdf"; }
 
 if (empty($rule)) {
     $update_message = 'ERROR: No rule was generated - did you forget to click and / or?';
+}
+else if (! file_exists ("procs/".$proc)) {
+    $update_message = 'ERROR: Procedure \''.$proc.'\' doesn\'t exists in procs directory';
 }
 else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' || $_POST['device_id'][0] == ':') {
     $device_id = $_POST['device_id'];
@@ -61,7 +66,7 @@ else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' 
     );
     $extra_json = json_encode($extra);
     if (is_numeric($alert_id) && $alert_id > 0) {
-        if (dbUpdate(array('rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'name' => $name), 'alert_rules', 'id=?', array($alert_id)) >= 0) {
+        if (dbUpdate(array('rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'name' => $name, 'proc' => $proc), 'alert_rules', 'id=?', array($alert_id)) >= 0) {
             $update_message = "Edited Rule: <i>$name: $rule</i>";
         }
         else {
@@ -73,7 +78,7 @@ else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' 
             $device_id = ':'.$device_id;
         }
 
-        if (dbInsert(array('device_id' => $device_id, 'rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'disabled' => 0, 'name' => $name), 'alert_rules')) {
+        if (dbInsert(array('device_id' => $device_id, 'rule' => $rule, 'severity' => mres($_POST['severity']), 'extra' => $extra_json, 'disabled' => 0, 'name' => $name, 'proc' => $proc), 'alert_rules')) {
             $update_message = "Added Rule: <i>$name: $rule</i>";
             if (is_array($_POST['maps'])) {
                 foreach ($_POST['maps'] as $target) {
