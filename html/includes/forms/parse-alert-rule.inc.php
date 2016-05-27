@@ -28,6 +28,7 @@ if (is_numeric($alert_id) && $alert_id > 0) {
         'severity' => $rule['severity'],
         'extra'    => $rule['extra'],
         'name'     => $rule['name'],
+	'proc'     => $rule['proc'],
         'rules'    => $rule_split,
     );
 	header('Content-type: application/json');

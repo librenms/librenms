@@ -26,6 +26,7 @@ if(defined('show_settings')) {
     $current_severity     = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
     $current_state        = isset($widget_settings['state']) ? $widget_settings['state'] : '';
     $current_group        = isset($widget_settings['group']) ? $widget_settings['group'] : '';
+    $current_proc         = isset($widget_settings['proc']) ? $widget_settings['proc'] : '';
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
@@ -94,6 +95,20 @@ if(defined('show_settings')) {
       </select>
     </div>
   </div>
+  <div class="form-group row">
+    <div class="col-sm-4">
+      <label for="proc" class="control-label">Show Doc field: </label>
+    </div>
+    <div class="col-sm-8">
+      <select class="form-control" name="proc">';
+
+    $common_output[] = '<option value="1"'.($current_proc == '1' ? ' selected' : ' ').'>show</option>';
+    $common_output[] = '<option value="0"'.($current_proc == '0' ? ' selected' : ' ').'>hide</option>';
+
+    $common_output[] = '
+      </select>
+    </div>
+  </div>
 
   <div class="form-group">
     <div class="col-sm-12">
@@ -109,6 +124,7 @@ else {
     $state        = $widget_settings['state'];
     $min_severity = $widget_settings['min_severity'];
     $group        = $widget_settings['group'];
+    $proc         = $widget_settings['proc'];
 
     $title = "Alerts";
 
@@ -165,7 +181,11 @@ else {
                 <th data-column-id="hostname">Hostname</th>
                 <th data-column-id="timestamp">Timestamp</th>
                 <th data-column-id="severity">Severity</th>
-                <th data-column-id="ack" data-formatter="ack" data-sortable="false">Acknowledge</th>
+                <th data-column-id="ack" data-formatter="ack" data-sortable="false">Acknowledge</th>';
+    if (is_numeric($proc)) {
+	if ($proc) { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
+    }
+    $common_output[] = '
             </tr>
         </thead>
     </table>
@@ -192,6 +212,9 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     if (is_numeric($group)) {
         $common_output[]="group: '$group',\n";
     }
+    if (is_numeric($proc)) {
+        $common_output[]="proc: '$proc',\n";
+    }
 
     $common_output[]='
             device_id: \'' . $device['device_id'] .'\'
@@ -204,7 +227,10 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         },
         "ack": function(column,row) {
             return "<button type=\'button\' class=\'btn btn-"+row.ack_col+" btn-sm command-ack-alert\' data-target=\'#ack-alert\' data-state=\'"+row.state+"\' data-alert_id=\'"+row.alert_id+"\' name=\'ack-alert\' id=\'ack-alert\' data-extra=\'"+row.extra+"\'><span class=\'glyphicon glyphicon-"+row.ack_ico+"\'aria-hidden=\'true\'></span></button>";
-        }
+        },
+	"proc": function(column,row) {
+		return "<button type=\'button\' class=\'btn command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Test</button>";
+	}
     },
     templates: {
     }
@@ -219,9 +245,9 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     alerts_grid.find(".incident").each( function() {
       $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
       $(this).parent().parent().on("mouseenter", function() {
-        $(this).find(".incident-toggle").fadeIn(200);
+        $(this).find(".incident-toggle").fadeIn(400);
       }).on("mouseleave", function() {
-        $(this).find(".incident-toggle").fadeOut(200);
+        $(this).find(".incident-toggle").fadeOut(400);
       }).on("click", "td:not(.incident-toggle-td)", function() {
         var target = $(this).parent().find(".incident-toggle").data("target");
         if( $(this).parent().find(".incident-toggle").hasClass(\'glyphicon-plus\') ) {
@@ -229,6 +255,22 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
           $(target).collapse(\'toggle\');
         }
       });
+    });
+    alerts_grid.find(".command-open-proc").on("click", function(e) {
+        e.preventDefault();
+        var alert_id = $(this).data("alert_id");
+	$.ajax({
+            type: "POST",
+            url: "ajax_form.php",
+            data: { type: "open-proc", alert_id: alert_id },
+            success: function(msg){
+		window.open("procs/"+msg);
+//                $("#message").html(\'<div class="alert alert-info">Opening \'+msg+\'</div>\');
+            },
+            error: function(){
+                 $("#message").html(\'<div class="alert alert-info">An error occurred opening procedure for this alert. Does the procedure exists ?</div>\');
+            }
+        });
     });
     alerts_grid.find(".command-ack-alert").on("click", function(e) {
         e.preventDefault();
