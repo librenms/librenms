@@ -912,7 +912,7 @@ $config['os'][$os]['over'][1]['text']  = 'Current';
 $config['os'][$os]['over'][2]['graph'] = 'device_frequency';
 $config['os'][$os]['over'][2]['text']  = 'Frequencies';
 
-$os = 'eaton';
+$os = 'eatonups';
 $config['os'][$os]['text']             = 'Eaton UPS';
 $config['os'][$os]['type']             = 'power';
 $config['os'][$os]['icon']             = 'eaton';
