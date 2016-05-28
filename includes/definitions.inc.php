@@ -996,6 +996,17 @@ $config['os'][$os]['over'][1]['text']  = 'Current';
 $config['os'][$os]['over'][2]['graph'] = 'device_frequency';
 $config['os'][$os]['over'][2]['text']  = 'Frequencies';
 
+$os = 'eatonups';
+$config['os'][$os]['text']             = 'Eaton UPS';
+$config['os'][$os]['type']             = 'power';
+$config['os'][$os]['icon']             = 'eaton';
+$config['os'][$os]['over'][0]['graph'] = 'device_voltage';
+$config['os'][$os]['over'][0]['text']  = 'Voltage';
+$config['os'][$os]['over'][1]['graph'] = 'device_current';
+$config['os'][$os]['over'][1]['text']  = 'Current';
+$config['os'][$os]['over'][2]['graph'] = 'device_frequency';
+$config['os'][$os]['over'][2]['text']  = 'Frequencies';
+
 $os = 'deltaups';
 $config['os'][$os]['text'] = 'Delta UPS';
 $config['os'][$os]['type'] = 'power';
