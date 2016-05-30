@@ -87,35 +87,5 @@ if ($device['os'] == 'eatonups') {
 
         discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
-	
-//    for ($i = 1; $i <= $numPhase; $i++) {
-//        $load_oid = ".1.3.6.1.4.1.534.1.4.1.0";
-//        $descr    = 'Output Load';
-//        if ($numPhase > 1) {
-//            $descr .= " Phase $i";
-//       }
-//
-//        $current = snmp_get($device, $load_oid, '-Oqv');
-//        if (!$current) {
-//            $load_oid .= '.0';
-//            $Phaseload   = snmp_get($device, $load_oid, '-Oqv');
-//        }
-
-////        $current /= 10;
-//        $type     = 'mge-ups';
-//        $divisor  = 10;
-//        $index    = (100 + $i);
-//
-//        discover_sensor($valid['sensor'], 'load', $device, $load_oid, $index, $type, $descr, '1', '1', null, null, null, null, $load);
-//    }
-
-	// SJH - 27-05-2016	
-    // UPS Battery Level
-//    $ups_battery_level_oid = '.1.3.6.1.4.1.534.1.2.4.0';
-//    $ups_battery_level     = snmp_get($device, $ups_battery_level_oid, '-Oqv');
-
-//    if (is_numeric($ups_battery_level)) {
-//        discover_sensor($valid['sensor'], 'charge', $device, $ups_battery_level_oid, 'UPS Battery Level', $ups_device_manufacturer.' '.$ups_device_model, 'UPS Battery Level', '1', '1', null, null, null, null, $ups_battery_level);
-//    }
 
 }//end if
