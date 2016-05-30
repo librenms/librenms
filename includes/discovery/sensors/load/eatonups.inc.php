@@ -1,6 +1,4 @@
 <?php
-// test comment
-
 /*
  * LibreNMS
  *
