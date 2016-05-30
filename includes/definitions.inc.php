@@ -1680,6 +1680,21 @@ $config['os'][$os]['icon']             = 'deliberant';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Device Traffic';
 
+// Xirrus AP
+$os = 'xirrus_aos';
+$config['os'][$os]['text']             = 'Xirrus ArrayOS';
+$config['os'][$os]['type']             = 'wireless';
+$config['os'][$os]['icon']             = 'xirrus';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_xirrus_stations';
+$config['os'][$os]['over'][1]['text']  = 'Wifi Clients';
+$config['os'][$os]['over'][2]['graph'] = 'device_xirrus_rssi';
+$config['os'][$os]['over'][2]['text']  = 'Signal RSSI';
+
+
+
+
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
 
@@ -2152,6 +2167,21 @@ $config['graph_types']['device']['cisco_wwan_rssi']['descr']   = 'Signal Rssi';
 $config['graph_types']['device']['cisco_wwan_mnc']['section']  = 'wireless';
 $config['graph_types']['device']['cisco_wwan_mnc']['order']    = '1';
 $config['graph_types']['device']['cisco_wwan_mnc']['descr']    = 'MNC';
+
+$config['graph_types']['device']['xirrus_rssi']['section'] = 'wireless';
+$config['graph_types']['device']['xirrus_rssi']['order']   = '0';
+$config['graph_types']['device']['xirrus_rssi']['descr']   = 'Signal Rssi';
+$config['graph_types']['device']['xirrus_dataRates']['section'] = 'wireless';
+$config['graph_types']['device']['xirrus_dataRates']['order']   = '0';
+$config['graph_types']['device']['xirrus_dataRates']['descr']   = 'Average DataRates';
+$config['graph_types']['device']['xirrus_noiseFloor']['section'] = 'wireless';
+$config['graph_types']['device']['xirrus_noiseFloor']['order']   = '0';
+$config['graph_types']['device']['xirrus_noiseFloor']['descr']   = 'Noise Floor';
+$config['graph_types']['device']['xirrus_stations']['section'] = 'wireless';
+$config['graph_types']['device']['xirrus_stations']['order']   = '0';
+$config['graph_types']['device']['xirrus_stations']['descr']   = 'Associated Stations';
+
+
 
 
 // Device Types
