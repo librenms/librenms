@@ -393,7 +393,12 @@ else {
     elseif ($type == 'munin') {
         $param                        = 'device='.$widget_settings['graph_'.$type]['device_id'].'&plugin='.$widget_settings['graph_'.$type]['name'];
     }
-    elseif ($type == 'transit' || $type == 'peering' || $type == 'core') {
+    elseif ($type == 'transit' || $type == 'peering' || $type == 'core' || $type == 'custom') {
+
+        if ( $type == 'custom' ) {
+            $type = $widget_settings['graph_custom'];
+        }
+
         $type_where = ' (';
         if (is_array($config[$type.'_descr']) === false) {
             $config[$type.'_descr'] = array($config[$type.'_descr']);
@@ -402,12 +407,12 @@ else {
             if (!empty($additional_type)) {
                 $type_where  .= " $or `port_descr_type` LIKE ?";
                 $or           = 'OR';
-                $type_param[] = $additional_type;
+                $type_param[] = strtr($additional_type, '@', '%');
             }
         }
         $type_where  .= " $or `port_descr_type` LIKE ?";
         $or           = 'OR';
-        $type_param[] = $type;
+        $type_param[] = strtr($type, '@', '%');
         $type_where  .= ') ';
         foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE $type_where ORDER BY ifAlias", $type_param) as $port) {
             $tmp[] = $port['port_id'];
@@ -415,17 +420,7 @@ else {
         $param                         = 'id='.implode(',',$tmp);
         $widget_settings['graph_type'] = 'multiport_bits_separate';
         if (empty($widget_settings['title'])) {
-            $widget_settings['title']  = 'Overall '.ucfirst($type).' Bits ('.$widget_settings['graph_range'].')';
-        }
-    }
-    elseif ($type == 'custom') {
-        foreach (dbFetchRows("SELECT port_id FROM `ports` WHERE `port_descr_type` LIKE ? ORDER BY ifAlias", array($widget_settings['graph_custom'])) as $port) {
-            $tmp[] = $port['port_id'];
-        }
-        $param                         = 'id='.implode(',',$tmp);
-        $widget_settings['graph_type'] = 'multiport_bits_separate';
-        if (empty($widget_settings['title'])) {
-            $widget_settings['title']  = 'Overall '.ucfirst(htmlspecialchars($widget_settings['graph_custom'])).' Bits ('.$widget_settings['graph_range'].')';
+            $widget_settings['title']  = 'Overall '.ucfirst(htmlspecialchars($type)).' Bits ('.$widget_settings['graph_range'].')';
         }
     }
     else {
