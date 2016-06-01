@@ -68,28 +68,6 @@ if ($device['os'] == 'eatonups') {
         discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 
-    // XUPS-MIB::xupsOutputNumPhases.0 = INTEGER: 1
-    $oids = trim(snmp_walk($device, 'xupsOutputNumPhases', '-OsqnU'));
-    $oids = trim(snmp_walk($device, '.1.3.6.1.4.1.534.1.4.4.1.1', '-OsqnU'));
-    d_echo($oids."\n");
-
-    list($unused,$numPhase) = explode(' ', $oids);
-    for ($i = 1; $i <= $numPhase; $i++) {
-        // XUPS-MIB::xupsOutputVoltage.1 = INTEGER: 228
-        $watts_oid = ".1.3.6.1.4.1.534.1.4.4.1.4.$i";
-        $descr    = 'Output Watts';
-        if ($numPhase > 1) {
-            $descr .= " Phase $i";
-        }
-
-        $type    = 'xups';
-        $divisor = 1;
-        $power = (snmp_get($device, $watts_oid, '-Oqv') / $divisor);
-        $index   = '4.4.1.4.'.$i;
-
-        discover_sensor($valid['sensor'], 'power', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $power);
-    }
-
     // XUPS-MIB::xupsBypassNumPhases.0 = INTEGER: 1
     $oids = trim(snmp_walk($device, 'xupsBypassNumPhases', '-OsqnU'));
     d_echo($oids."\n");
@@ -109,20 +87,5 @@ if ($device['os'] == 'eatonups') {
 
         discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
-
-//        $output_load_oid = ".1.3.6.1.4.1.534.1.4.1.0";
-//        $output_load   = snmp_get($device, $output_load_oid, '-Oqv');
-//        $descr    = 'Output Load';
-//		$index = (100 + $i);
-//		$type = 'xups';
-//
-//        discover_sensor($valid['sensor'], 'load', $device, $output_load_oid, $index, $type, $descr, '1', '1', null, null, null, null, $output_load);
-
-//	$ups_battery_level_oid = '.1.3.6.1.4.1.534.1.2.4.0';
-//	$ups_battery_level     = snmp_get($device, $ups_battery_level_oid, '-Oqv');
-//
-//    if (is_numeric($ups_battery_level)) {
-//        discover_sensor($valid['sensor'], 'charge', $device, $ups_battery_level_oid, 'UPS Battery Level', $ups_device_manufacturer.' '.$ups_device_model, 'UPS Battery Level', '1', '1', null, null, null, null, $ups_battery_level);
-//    }
 
 }//end if
