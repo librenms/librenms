@@ -11,8 +11,8 @@
 * the source code distribution for details.
 */
 
-include_once("../config.php");
 include_once("../includes/defaults.inc.php");
+include_once("../config.php");
 include_once("../includes/definitions.inc.php");
 
 ?>
