@@ -14,14 +14,15 @@
 if ($device['os'] == 'eatonups') {
     echo 'XUPS-MIB';
 
-        $load_oid = ".1.3.6.1.4.1.534.1.4.1.0";
-        $descr    = 'Output Load';
+    $load_oid = ".1.3.6.1.4.1.534.1.4.1.0";
+    $descr    = 'Output Load';
 
-        $load = snmp_get($device, $load_oid, '-OsqnU');
+    $load = snmp_get($device, $load_oid, '-OsqnU');
 
-        $type     = 'xups';
-        $index    = (100 + $i);
+    $type     = 'xups';
+    $index    = (100 + $i);
 
-        discover_sensor($valid['sensor'], 'load', $device, $load_oid, $index, $type, $descr, '1', '1', null, null, null, null, $load);
-    }
+    discover_sensor($valid['sensor'], 'load', $device, $load_oid, $index, $type, $descr, '1', '1', null, null, null, null, $load);
+
+}
 
