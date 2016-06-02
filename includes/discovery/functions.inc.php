@@ -63,7 +63,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
                     $extra_log = ' (port ' . $int['label'] . ') ';
                 }
 
-                log_event('Device $' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
+                log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
             } else {
                 log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - check ping and SNMP access", $device['device_id'], 'discovery');
             }
