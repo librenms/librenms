@@ -1,5 +1,6 @@
 <?php
 
+require_once 'includes/device-groups.inc.php';
 
 function poll_sensor($device, $class, $unit) {
     global $config, $memcache, $agent_sensors;
@@ -273,6 +274,9 @@ function poll_device($device, $options) {
                 }
             }
         }//end if
+
+        // Update device_groups
+        UpdateGroupsForDevice($device['device_id']);
 
         if (!$options['m']) {
             // FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
