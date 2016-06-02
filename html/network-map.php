@@ -44,7 +44,7 @@ if (is_array($config['branding'])) {
     }
 }
 
-if (isset($_GET['device'])) {
+if (is_numeric($_GET['device']) && isset($_GET['device'])) {
     $where = 'WHERE device_id = '.mres($_GET['device']);
 }
 else {
