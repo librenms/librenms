@@ -47,17 +47,21 @@ Any issues with these images should be reported via [Github](https://github.com/
 
 #### Credentials
 
+> Please note the second character of the SSH password is a CAPITAL EYE
+
   - SSH
     - username: librenms
-    - password: CIne3fwdfds
+    - password: `CIne3fwdfds`
+
+> Please note the second character of the SSH password is a CAPITAL EYE
 
   - MySQL/MariaDB
     - username: root
-    - password: NIfceu3fqfd
+    - password: `NIfceu3fqfd`
 
     - username: librenms
-    - password: D42nf23rewD
+    - password: `D42nf23rewD`
 
   - WebUI
     - username: librenms
-    - password: D32fwefwef
+    - password: `D32fwefwef`
