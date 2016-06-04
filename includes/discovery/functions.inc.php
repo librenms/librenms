@@ -770,6 +770,30 @@ function avtech_add_sensor($device, $sensor) {
     $type = $sensor['type'] ? $sensor['type'] : 'temperature';
     d_echo('Sensor type: ' . $type . "\n");
 
+    if ($type == 'switch') {
+        // set up state sensor
+        $type = 'state';
+        $state_name = 'avtachSwitchState';
+        $state_index_id = create_state_index($state_name);
+
+        //Create State Translation
+        if ($state_index_id) {
+            $states = array(
+                 array($state_index_id,'off',0,0,-1),
+                 array($state_index_id,'on',0,1,0),
+             );
+            foreach($states as $value){
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+    }
 
     // set the description
     if ($sensor['descr_oid']) {
@@ -814,6 +838,11 @@ function avtech_add_sensor($device, $sensor) {
 
     // add the sensor
     discover_sensor($valid['sensor'], $type, $device, $oid, $id, $device['os'], $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
+
+    if ($type == 'state') {
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
+
     return true;
 }
 

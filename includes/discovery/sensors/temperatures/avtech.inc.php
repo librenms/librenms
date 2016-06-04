@@ -1,6 +1,6 @@
 <?php
 
-// AVTECH TEMPPAGER
+// AVTECH TEMPPAGER/ROOMALERT
 if ($device['os'] == 'avtech') {
     echo 'AVTECH: ';
     if (strpos($device['sysObjectID'], '.20916.1.7') !== false) {
@@ -45,14 +45,6 @@ if ($device['os'] == 'avtech') {
             'descr_oid' => $device_oid.'1.1.2.6.0',
         );
         avtech_add_sensor($device, $sen1);
-
-//        $switch = array(
-//            'id'        => 2,
-//            'type'      => 'state',
-//            'oid'       => $device_oid.'1.2.1.0',
-//            'descr_oid' => $device_oid.'1.2.2.0',
-//        );
-//        avtech_add_sensor($device, $switch);
     }
     elseif (strpos($device['sysObjectID'], '.20916.1.1') !== false) {
     //  TemPageR 4E
