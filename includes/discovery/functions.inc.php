@@ -779,8 +779,8 @@ function avtech_add_sensor($device, $sensor) {
         //Create State Translation
         if ($state_index_id) {
             $states = array(
-                 array($state_index_id,'off',0,0,-1),
-                 array($state_index_id,'on',0,1,0),
+                 array($state_index_id,'Off',0,0,-1),
+                 array($state_index_id,'On',0,1,0),
              );
             foreach($states as $value){
                 $insert = array(
