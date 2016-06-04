@@ -28,7 +28,7 @@ if ($device['os'] == 'avtech') {
         );
         avtech_add_sensor($device, $sen2);
     }
-    if (strpos($device['sysObjectID'], '.20916.1.9') !== false) {
+    elseif (strpos($device['sysObjectID'], '.20916.1.9') !== false) {
     //  RoomAlert 3E
         $device_oid = '.1.3.6.1.4.1.20916.1.9.';
 
