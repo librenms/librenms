@@ -28,6 +28,32 @@ if ($device['os'] == 'avtech') {
         );
         avtech_add_sensor($device, $sen2);
     }
+    if (strpos($device['sysObjectID'], '.20916.1.9') !== false) {
+    //  RoomAlert 3E
+        $device_oid = '.1.3.6.1.4.1.20916.1.9.';
+
+        $internal = array(
+            'id'        => 0,
+            'oid'       => $device_oid.'1.1.1.1.0',
+            'descr_oid' => $device_oid.'1.1.1.3.0',
+        );
+        avtech_add_sensor($device, $internal);
+
+        $sen1 = array(
+            'id'        => 1,
+            'oid'       => $device_oid.'1.1.2.1.0',
+            'descr_oid' => $device_oid.'1.1.2.6.0',
+        );
+        avtech_add_sensor($device, $sen1);
+
+//        $switch = array(
+//            'id'        => 2,
+//            'type'      => 'state',
+//            'oid'       => $device_oid.'1.2.1.0',
+//            'descr_oid' => $device_oid.'1.2.2.0',
+//        );
+//        avtech_add_sensor($device, $switch);
+    }
     elseif (strpos($device['sysObjectID'], '.20916.1.1') !== false) {
     //  TemPageR 4E
         $device_oid = '.1.3.6.1.4.1.20916.1.1.';
