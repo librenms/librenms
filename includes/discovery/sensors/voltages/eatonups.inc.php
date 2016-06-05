@@ -27,7 +27,7 @@ if ($device['os'] == 'eatonups') {
     }
 
     // XUPS-MIB::xupsInputNumPhases.0 = INTEGER: 1
-    $oids = trim(snmp_walk($device, '.1.3.6.1.4.1.534.1.3.4.1.1', '-OsqnU', 'XUPS-MIB'));
+    $oids = trim(snmp_walk($device, '.1.3.6.1.4.1.534.1.3.4.1.1', '-OsqnU'));
     d_echo($oids."\n");
 
     list($unused,$numPhase) = explode(' ', $oids);
