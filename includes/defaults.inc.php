@@ -181,6 +181,8 @@ $config['snmp']['community'][0] = 'public';
 // Communities to try during adding hosts and discovery
 $config['snmp']['port'] = 161;
 // Port Client SNMP is running on
+$config['snmp']['use_ip'] = false;
+// Use cached DNS resolution for SNMP polls
 // SNMPv3 default settings
 // The array can be expanded to give another set of parameters
 // NOTE: If you change these, also change the equivalents in includes/defaults.inc.php - not sure why they are separate
