@@ -46,17 +46,7 @@ if ($device['os'] != 'Snom') {
 
     $data_array = snmpwalk_cache_oid($device, 'icmp', array(), 'IP-MIB');
 
-    $fields = array();
-
-    foreach ($oids as $oid) {
-        if (is_numeric($data_array[0][$oid])) {
-            $value = $data_array[0][$oid];
-        }
-        else {
-            $value = 'U';
-        }
-        $fields[$oid] = $value;
-    }
+    $fields = $data_array[0];
 
     unset($snmpstring);
 
