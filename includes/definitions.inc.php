@@ -1666,6 +1666,17 @@ $config['os'][$os]['text']             = 'Infoblox';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'infoblox';
 
+$os = 'ibm-amm';
+$config['os'][$os]['text']             = 'IBM AMM';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'ibmnos';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // Lenovo EMC (NAS)
 $os = 'lenovoemc';
 $config['os'][$os]['type']             = 'storage';
