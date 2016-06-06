@@ -760,7 +760,8 @@ function avtech_add_sensor($device, $sensor) {
     // get the sensor value
     $value = snmp_get($device, $oid, '-OvQ');
     // if the sensor doesn't exist abort
-    if ($value === false || $value == 0) {  //issue unfortunately non-existant sensors return 0
+    if ($value === false || ($type == 'temperature' && $value == 0)) {
+        //issue unfortunately some non-existant sensors return 0
         d_echo('Error: sensor returned no data, skipping' . "\n");
         return false;
     }
@@ -770,12 +771,12 @@ function avtech_add_sensor($device, $sensor) {
     $type = $sensor['type'] ? $sensor['type'] : 'temperature';
     d_echo('Sensor type: ' . $type . "\n");
 
-    $state_name = null;
+    $type_name = $device['os'];
     if ($type == 'switch') {
         // set up state sensor
+        $type_name .= ucfirst($type);
         $type = 'state';
-        $state_name = 'avtachSwitchState';
-        $state_index_id = create_state_index($state_name);
+        $state_index_id = create_state_index($type_name);
 
         //Create State Translation
         if (isset($state_index_id)) {
@@ -813,8 +814,11 @@ function avtech_add_sensor($device, $sensor) {
     if ($sensor['divisor']) {
         $divisor = $sensor['divisor'];
     }
-    else {
+    elseif ($type == 'temperature') {
         $divisor = 100;
+    }
+    else {
+        $divisor = 1;
     }
     d_echo('Sensor divisor: ' . $divisor . "\n");
 
@@ -838,10 +842,10 @@ function avtech_add_sensor($device, $sensor) {
     d_echo('Sensor alarm max: ' . $max . "\n");
 
     // add the sensor
-    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $device['os'], $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
+    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $type_name, $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
 
-    if ($type == 'state' && isset($state_name)) {
-        create_sensor_to_state_index($device, $state_name, $id);
+    if ($type == 'state') {
+        create_sensor_to_state_index($device, $type_name, $id);
     }
 
     return true;
