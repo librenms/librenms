@@ -760,7 +760,8 @@ function avtech_add_sensor($device, $sensor) {
     // get the sensor value
     $value = snmp_get($device, $oid, '-OvQ');
     // if the sensor doesn't exist abort
-    if ($value === false || $value == 0) {  //issue unfortunately non-existant sensors return 0
+    if ($value === false || ($type == 'temperature' && $value == 0)) {
+        //issue unfortunately some non-existant sensors return 0
         d_echo('Error: sensor returned no data, skipping' . "\n");
         return false;
     }
@@ -770,6 +771,31 @@ function avtech_add_sensor($device, $sensor) {
     $type = $sensor['type'] ? $sensor['type'] : 'temperature';
     d_echo('Sensor type: ' . $type . "\n");
 
+    $type_name = $device['os'];
+    if ($type == 'switch') {
+        // set up state sensor
+        $type_name .= ucfirst($type);
+        $type = 'state';
+        $state_index_id = create_state_index($type_name);
+
+        //Create State Translation
+        if (isset($state_index_id)) {
+            $states = array(
+                 array($state_index_id,'Off',0,0,-1),
+                 array($state_index_id,'On',0,1,0),
+             );
+            foreach($states as $value){
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+    }
 
     // set the description
     if ($sensor['descr_oid']) {
@@ -788,8 +814,11 @@ function avtech_add_sensor($device, $sensor) {
     if ($sensor['divisor']) {
         $divisor = $sensor['divisor'];
     }
-    else {
+    elseif ($type == 'temperature') {
         $divisor = 100;
+    }
+    else {
+        $divisor = 1;
     }
     d_echo('Sensor divisor: ' . $divisor . "\n");
 
@@ -813,7 +842,12 @@ function avtech_add_sensor($device, $sensor) {
     d_echo('Sensor alarm max: ' . $max . "\n");
 
     // add the sensor
-    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $device['os'], $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
+    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $type_name, $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
+
+    if ($type == 'state') {
+        create_sensor_to_state_index($device, $type_name, $id);
+    }
+
     return true;
 }
 
