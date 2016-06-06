@@ -262,14 +262,14 @@ print_r($peer_afis);
                             $cbgp_data=  array_pop($cbgp_data);
                             d_echo("$cbgp_data\n");
                         }//end if
-                        $cbgpPeerAcceptedPrefixes=  !empty($cbgp_data['cbgpPeerAcceptedPrefixes'])?$cbgp_data['cbgpPeerAcceptedPrefixes']:'';
-                        $cbgpPeerDeniedPrefixes=  !empty($cbgp_data['cbgpPeerDeniedPrefixes'])?$cbgp_data['cbgpPeerDeniedPrefixes']:'';
-                        $cbgpPeerPrefixAdminLimit=  !empty($cbgp_data['cbgpPeerPrefixAdminLimit'])?$cbgp_data['cbgpPeerPrefixAdminLimit']:'';
-                        $cbgpPeerPrefixThreshold=  !empty($cbgp_data['cbgpPeerPrefixThreshold'])?$cbgp_data['cbgpPeerPrefixThreshold']:'';
-                        $cbgpPeerPrefixClearThreshold=  !empty($cbgp_data['cbgpPeerPrefixClearThreshold'])?$cbgp_data['cbgpPeerPrefixClearThreshold']:'';
-                        $cbgpPeerAdvertisedPrefixes=  !empty($cbgp_data['cbgpPeerAdvertisedPrefixes'])?$cbgp_data['cbgpPeerAdvertisedPrefixes']:'';
-                        $cbgpPeerSuppressedPrefixes=  !empty($cbgp_data['cbgpPeerSuppressedPrefixes'])?$cbgp_data['cbgpPeerSuppressedPrefixes']:'';
-                        $cbgpPeerWithdrawnPrefixes=  !empty($cbgp_data['cbgpPeerWithdrawnPrefixes'])?$cbgp_data['cbgpPeerWithdrawnPrefixes']:'';
+                        $cbgpPeerAcceptedPrefixes = $cbgp_data['cbgpPeerAcceptedPrefixes'];
+                        $cbgpPeerDeniedPrefixes = $cbgp_data['cbgpPeerDeniedPrefixes'];
+                        $cbgpPeerPrefixAdminLimit = $cbgp_data['cbgpPeerPrefixAdminLimit'];
+                        $cbgpPeerPrefixThreshold = $cbgp_data['cbgpPeerPrefixThreshold'];
+                        $cbgpPeerPrefixClearThreshold = $cbgp_data['cbgpPeerPrefixClearThreshold'];
+                        $cbgpPeerAdvertisedPrefixes = $cbgp_data['cbgpPeerAdvertisedPrefixes'];
+                        $cbgpPeerSuppressedPrefixes = $cbgp_data['cbgpPeerSuppressedPrefixes'];
+                        $cbgpPeerWithdrawnPrefixes = $cbgp_data['cbgpPeerWithdrawnPrefixes'];
                         unset($cbgp_data);
                     }//end if
 
