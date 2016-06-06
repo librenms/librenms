@@ -97,7 +97,7 @@ if(defined('show_settings')) {
   </div>
   <div class="form-group row">
     <div class="col-sm-4">
-      <label for="proc" class="control-label">Show Doc field: </label>
+      <label for="proc" class="control-label">Show Procedure field: </label>
     </div>
     <div class="col-sm-8">
       <select class="form-control" name="proc">';
@@ -264,11 +264,11 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
             url: "ajax_form.php",
             data: { type: "open-proc", alert_id: alert_id },
             success: function(msg){
-		window.open("procs/"+msg);
-//                $("#message").html(\'<div class="alert alert-info">Opening \'+msg+\'</div>\');
+		if (msg != "ERROR") { window.open(msg); }
+		else { $("#message").html(\'<div class="alert alert-info">Procedure link does not seem to be valid, please check the rule.</div>\'); }
             },
             error: function(){
-                 $("#message").html(\'<div class="alert alert-info">An error occurred opening procedure for this alert. Does the procedure exists ?</div>\');
+                 $("#message").html(\'<div class="alert alert-info">An error occurred opening procedure for this alert. Does the procedure link was configured  ?</div>\');
             }
         });
     });

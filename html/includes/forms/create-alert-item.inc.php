@@ -27,13 +27,10 @@ $mute     = mres($_POST['mute']);
 $invert   = mres($_POST['invert']);
 $name     = mres($_POST['name']);
 if ($_POST['proc'] != "") { $proc = $_POST['proc']; }
-else { $proc = "noproc.pdf"; }
+else { $proc = ""; }
 
 if (empty($rule)) {
     $update_message = 'ERROR: No rule was generated - did you forget to click and / or?';
-}
-else if (! file_exists ("procs/".$proc)) {
-    $update_message = 'ERROR: Procedure \''.$proc.'\' doesn\'t exists in procs directory';
 }
 else if (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' || $_POST['device_id'][0] == ':') {
     $device_id = $_POST['device_id'];
