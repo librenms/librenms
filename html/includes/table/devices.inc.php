@@ -87,7 +87,7 @@ if (!empty($_POST['group'])) {
     $sql .= ' AND ( ';
     foreach (GetDevicesFromGroup($_POST['group']) as $dev) {
         $sql    .= '`devices`.`device_id` = ? OR ';
-        $param[] = $dev['device_id'];
+        $param[] = $dev;
     }
 
     $sql  = substr($sql, 0, (strlen($sql) - 3));
