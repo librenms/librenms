@@ -183,7 +183,7 @@ else {
                 <th data-column-id="severity">Severity</th>
                 <th data-column-id="ack" data-formatter="ack" data-sortable="false">Acknowledge</th>';
     if (is_numeric($proc)) {
-	if ($proc) { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
+        if ($proc) { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
     }
     $common_output[] = '
             </tr>
@@ -228,9 +228,9 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         "ack": function(column,row) {
             return "<button type=\'button\' class=\'btn btn-"+row.ack_col+" btn-sm command-ack-alert\' data-target=\'#ack-alert\' data-state=\'"+row.state+"\' data-alert_id=\'"+row.alert_id+"\' name=\'ack-alert\' id=\'ack-alert\' data-extra=\'"+row.extra+"\'><span class=\'glyphicon glyphicon-"+row.ack_ico+"\'aria-hidden=\'true\'></span></button>";
         },
-	"proc": function(column,row) {
-		return "<button type=\'button\' class=\'btn command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Open</button>";
-	}
+        "proc": function(column,row) {
+            return "<button type=\'button\' class=\'btn command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Open</button>";
+        }
     },
     templates: {
     }
@@ -259,13 +259,13 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
     alerts_grid.find(".command-open-proc").on("click", function(e) {
         e.preventDefault();
         var alert_id = $(this).data("alert_id");
-	$.ajax({
+        $.ajax({
             type: "POST",
             url: "ajax_form.php",
             data: { type: "open-proc", alert_id: alert_id },
             success: function(msg){
-		if (msg != "ERROR") { window.open(msg); }
-		else { $("#message").html(\'<div class="alert alert-info">Procedure link does not seem to be valid, please check the rule.</div>\'); }
+	        if (msg != "ERROR") { window.open(msg); }
+                else { $("#message").html(\'<div class="alert alert-info">Procedure link does not seem to be valid, please check the rule.</div>\'); }
             },
             error: function(){
                  $("#message").html(\'<div class="alert alert-info">An error occurred opening procedure for this alert. Does the procedure link was configured  ?</div>\');
