@@ -22,7 +22,7 @@ if ($device['os'] == 'ibm-amm') {
     d_echo($mmtemp);
 
     if (!empty($mmtemp)) {
-        $descr = 'Management module temperature'
+        $descr = 'Management module temperature';
         $divisor = 1;
         $current = $mmtemp;
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, 0, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
@@ -39,7 +39,7 @@ if ($device['os'] == 'ibm-amm') {
     d_echo($fptemp);
 
     if (!empty($fptemp)) {
-        $descr = 'Front panel temperature'
+        $descr = 'Front panel temperature';
         $divisor = 1;
         $current = $fptemp;
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, 0, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
