@@ -1,6 +1,6 @@
 <?php
 
-require_once 'includes/device-groups.inc.php';
+require_once $config['install_dir'].'/includes/device-groups.inc.php';
 
 function poll_sensor($device, $class, $unit) {
     global $config, $memcache, $agent_sensors;
