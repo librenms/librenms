@@ -103,10 +103,29 @@ if (is_admin()) {
         }
     }
     else if ($config['oxidized']['enabled'] === true && isset($config['oxidized']['url'])) {
+        // Try with hostname as set in librenms first
+        $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$device['hostname'].'?format=json'), true);
+        $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
+        
+        // Try other hostname format if Oxidized request failed
+        if (! $node_info) {
+          // Adjust hostname based on whether domain was already in it or not
+          if (strpos($oxidized_hostname, '.') !== false) {
+            // Use short name
+            $oxidized_hostname = strtok($device['hostname'], '.');
+          } else {
+            // Add domain if $config['mydomain'] is set
+            $oxidized_hostname = $config['mydomain'] ? $device['hostname'].'.'.$config['mydomain'] : $oxidized_hostname;
+          }
+          // Try Oxidized again with new hostname, if it has changed
+          if ($oxidized_hostname != $device['hostname']) {
+            $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
+          }
+        }
+
         if ($config['oxidized']['features']['versioning'] === true) { // fetch a list of versions
-            $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $device['hostname']).'&format=json'), true);
+            $config_versions = json_decode(file_get_contents($config['oxidized']['url'].'/node/version?node_full='.(isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname).'&format=json'), true);
         }
 
         $config_total = 1;
@@ -147,7 +166,7 @@ if (is_admin()) {
             }
 
             if (isset($previous_config)) {
-                $url = $config['oxidized']['url'].'/node/version/diffs?node='.$device['hostname'].'&group=';
+                $url = $config['oxidized']['url'].'/node/version/diffs?node='.$oxidized_hostname.'&group=';
                 if (!empty($node_info['group'])) {
                     $url .= $node_info['group'];
                 }
@@ -156,11 +175,11 @@ if (is_admin()) {
                 $text = file_get_contents($url); // fetch diff
             } else {
                 // fetch current_version
-                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$device['hostname'].'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
+                $text = file_get_contents($config['oxidized']['url'].'/node/version/view?node='.$oxidized_hostname.'&group='.(!empty($node_info['group']) ? $node_info['group'] : '').'&oid='.$current_config['oid'].'&date='.urlencode($current_config['date']).'&num='.$current_config['version'].'&format=text');
             }
         }
         else {  // just fetch the only version
-            $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$device['hostname']);
+            $text = file_get_contents($config['oxidized']['url'].'/node/fetch/'.(!empty($node_info['group']) ? $node_info['group'].'/' : '').$oxidized_hostname);
 
         }
 
