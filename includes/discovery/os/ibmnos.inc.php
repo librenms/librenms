@@ -11,7 +11,7 @@
  */
 
 if (!$os) {
-    if (stristr($sysDescr, 'IBM Networking Operating System') || stristr($sysDescr, 'IBM Flex System Fabric')) {
+    if (stristr($sysDescr, 'IBM Networking Operating System') || stristr($sysDescr, 'IBM Flex System Fabric') || stristr($sysDescr, 'IBM Networking OS')) {
         $os = 'ibmnos';
     }
 }
