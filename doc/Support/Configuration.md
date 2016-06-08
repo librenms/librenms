@@ -210,7 +210,7 @@ Disable the footer of the WebUI by setting `enable_footer` to 0.
 You can enable the old style network map (only available for individual devices with links discovered via xDP) by setting:
 ```php
 $config['gui']['network-map']['style'] = 'old';
-````
+```
 
 #### Add host settings
 The following setting controls how hosts are added.  If a host is added as an ip address it is checked to ensure the ip is not already present.  If the ip is present the host is not added.
