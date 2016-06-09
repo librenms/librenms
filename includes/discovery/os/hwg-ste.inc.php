@@ -11,7 +11,7 @@
  */
 
 if (!$os) {
-    if (strstr($sysObjectId, '.1.3.6.1.4.1.21796.3.3')) {
-        $os = 'poseidon';
+    if (strstr($sysObjectId, '.1.3.6.1.4.1.21796.4.1')) {
+        $os = 'hwg-ste';
     }
 }
