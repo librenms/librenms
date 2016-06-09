@@ -114,10 +114,10 @@ if (is_admin()) {
           if (strpos($oxidized_hostname, '.') !== false) {
             // Use short name
             $oxidized_hostname = strtok($device['hostname'], '.');
-          } else {
-            // Add domain if $config['mydomain'] is set
-            $oxidized_hostname = $config['mydomain'] ? $device['hostname'].'.'.$config['mydomain'] : $oxidized_hostname;
+          } elseif($config['mydomain']) {
+              $oxidized_hostname = $device['hostname'].'.'.$config['mydomain'];
           }
+
           // Try Oxidized again with new hostname, if it has changed
           if ($oxidized_hostname != $device['hostname']) {
             $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
