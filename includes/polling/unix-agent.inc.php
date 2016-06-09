@@ -52,19 +52,20 @@ if ($device['os_group'] == 'unix') {
 
         $graphs['agent'] = true;
 
+        $agentapps = array(
+            "apache",
+            "bind",
+            "ceph",
+            "mysql",
+            "nginx",
+            "powerdns",
+            "proxmox",
+            "rrdcached",
+            "tinydns");
+
         foreach (explode('<<<', $agent_raw) as $section) {
             list($section, $data) = explode('>>>', $section);
             list($sa, $sb)    = explode('-', $section, 2);
-
-            $agentapps = array(
-                "apache",
-                "ceph",
-                "mysql",
-                "nginx",
-                "bind",
-                "powerdns",
-                "proxmox",
-                "tinydns");
 
             if (in_array($section, $agentapps)) {
                 $agent_data['app'][$section] = trim($data);
