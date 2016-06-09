@@ -185,6 +185,7 @@ else {
     if (is_numeric($proc)) {
         if ($proc) { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
     }
+    else { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
     $common_output[] = '
             </tr>
         </thead>
