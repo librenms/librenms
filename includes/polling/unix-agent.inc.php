@@ -114,7 +114,7 @@ if ($device['os_group'] == 'unix') {
             if (file_exists("includes/polling/applications/$key.inc.php")) {
                 d_echo("Enabling $key for ".$device['hostname']." if not yet enabled\n");
 
-                if (in_array($key, array('apache', 'mysql', 'nginx', 'proxmox', 'ceph', 'powerdns'))) {
+                if (in_array($key, $agentapps)) {
                     if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], $key)) == '0') {
                         echo "Found new application '$key'\n";
                         dbInsert(array('device_id' => $device['device_id'], 'app_type' => $key, 'app_status' => '', 'app_instance' => ''), 'applications');
