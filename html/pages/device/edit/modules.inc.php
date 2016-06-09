@@ -18,7 +18,9 @@
       </tr>
 <?php
 
-foreach ($config['poller_modules'] as $module => $module_status) {
+$poller_modules = $config['poller_modules'];
+ksort($poller_modules);
+foreach ($poller_modules as $module => $module_status) {
     echo('
       <tr>
         <td><strong>'.$module.'</strong></td>
@@ -86,7 +88,9 @@ foreach ($config['poller_modules'] as $module => $module_status) {
 
 <?php
 
-foreach ($config['discovery_modules'] as $module => $module_status) {
+$discovery_modules = $config['discovery_modules'];
+ksort($discovery_modules);
+foreach ($discovery_modules as $module => $module_status) {
     echo('
       <tr>
         <td>

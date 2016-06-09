@@ -10,7 +10,7 @@ else {
 
 $nginx_rrd = $config['rrd_dir'].'/'.$device['hostname'].'/app-nginx-'.$app['app_id'].'.rrd';
 
-echo " nginx statistics\n";
+echo ' nginx';
 
 list($active, $reading, $writing, $waiting, $req) = explode("\n", $nginx);
 if (!is_file($nginx_rrd)) {
@@ -25,7 +25,7 @@ if (!is_file($nginx_rrd)) {
     );
 }
 
-print "active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req";
+d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req");
 $fields = array(
                 'Requests' => $req,
                 'Active'   => $active,
