@@ -1045,6 +1045,17 @@ $config['os'][$os]['text'] = 'Blade Network Technologies';
 $config['os'][$os]['type'] = 'network';
 $config['os'][$os]['icon'] = 'bnt';
 
+$os = 'ibm-imm';
+$config['os'][$os]['text']             = 'IBM IMM';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'ibmnos';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 $os = 'ibmnos';
 $config['os'][$os]['text']             = 'IBM Networking Operating System';
 $config['os'][$os]['type']             = 'network';
