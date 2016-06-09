@@ -33,6 +33,13 @@ $graphs['nginx']     = array(
     'req',
 );
 
+$graphs['rrdcached'] = array(
+    'queue_length',
+    'events',
+    'tree',
+    'journal'
+);
+
 $graphs['bind']      = array('queries');
 
 $graphs['tinydns']   = array(
