@@ -1645,10 +1645,18 @@ $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
 // HWGroup Poseidon
-$os = 'poseidon';
-$config['os'][$os]['text']             = 'Poseidon';
+$os = 'hwg-poseidon';
+$config['os'][$os]['text']             = 'HWg Poseidon';
 $config['os'][$os]['type']             = 'environment';
-$config['os'][$os]['icon']             = 'poseidon';
+$config['os'][$os]['icon']             = 'hwg-poseidon';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+
+// HWGroup STE
+$os = 'hwg-ste';
+$config['os'][$os]['text']             = 'HWg STE';
+$config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['icon']             = 'hwg';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
