@@ -110,18 +110,19 @@ if (is_admin()) {
         
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
-          // Adjust hostname based on whether domain was already in it or not
-          if (strpos($oxidized_hostname, '.') !== false) {
-            // Use short name
-            $oxidized_hostname = strtok($device['hostname'], '.');
-          } elseif($config['mydomain']) {
-              $oxidized_hostname = $device['hostname'].'.'.$config['mydomain'];
-          }
+            // Adjust hostname based on whether domain was already in it or not
+            if (strpos($oxidized_hostname, '.') !== false) {
+                // Use short name
+                $oxidized_hostname = strtok($device['hostname'], '.');
+            } 
+            elseif($config['mydomain']) {
+                $oxidized_hostname = $device['hostname'].'.'.$config['mydomain'];
+            }
 
-          // Try Oxidized again with new hostname, if it has changed
-          if ($oxidized_hostname != $device['hostname']) {
-            $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
-          }
+            // Try Oxidized again with new hostname, if it has changed
+            if ($oxidized_hostname != $device['hostname']) {
+                $node_info = json_decode(file_get_contents($config['oxidized']['url'].'/node/show/'.$oxidized_hostname.'?format=json'), true);
+            }
         }
 
         if ($config['oxidized']['features']['versioning'] === true) { // fetch a list of versions
