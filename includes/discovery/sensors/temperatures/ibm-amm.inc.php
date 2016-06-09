@@ -11,8 +11,8 @@
  */
 
 if ($device['os'] == 'ibm-amm') {
-    $oid = 'mmTemp.0';
-    $mmtemp = snmp_get($device, $oid, '-OsqnU', 'BLADE-MIB');
+    $oid = 'BLADE-MIB::mmTemp.0';
+    $mmtemp = snmp_get($device, $oid, '-OsqnU');
 
     preg_match('/[\d\.]+/', $mmtemp, $temp_response);
     if (!empty($temp_response[0])) {
@@ -25,11 +25,11 @@ if ($device['os'] == 'ibm-amm') {
         $descr = 'Management module temperature';
         $divisor = 1;
         $current = $mmtemp;
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 0, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
     }
 
-    $oid = 'frontPanelTemp.0';
-    $fptemp = snmp_get($device, $oid, '-OsqnU', 'BLADE-MIB');
+    $oid = 'BLADE-MIB::frontPanelTemp.0';
+    $fptemp = snmp_get($device, $oid, '-OsqnU');
 
     preg_match('/[\d\.]+/', $fptemp, $temp_response);
     if (!empty($temp_response[0])) {
@@ -42,7 +42,7 @@ if ($device['os'] == 'ibm-amm') {
         $descr = 'Front panel temperature';
         $divisor = 1;
         $current = $fptemp;
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 0, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
     }
 
 }

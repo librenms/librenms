@@ -27,7 +27,7 @@ if ($device['os'] == 'ibm-amm') {
             if ($state_index_id) {
 
                 $states = array(
-                    array($state_index_id,'uknown',0,1,3) ,
+                    array($state_index_id,'unknown',0,1,3) ,
                     array($state_index_id,'good',1,2,0) ,
                     array($state_index_id,'warning',1,3,1) ,
                     array($state_index_id,'bad',1,4,2) ,
