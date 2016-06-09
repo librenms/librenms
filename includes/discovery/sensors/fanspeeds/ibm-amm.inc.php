@@ -12,7 +12,7 @@
 
 if ($device['os'] == 'ibm-amm') {
 
-    $oids = array('blower1speedRPM', 'blower1speedRPM', 'blower1speedRPM', 'blower1speedRPM');
+    $oids = array('blower1speedRPM', 'blower2speedRPM', 'blower3speedRPM', 'blower4speedRPM');
     d_echo($oids."\n");
     if (!empty($oids)) {
 
@@ -20,10 +20,11 @@ if ($device['os'] == 'ibm-amm') {
         foreach ($oids as $data) {
 
             if (!empty($data)) {
-                $value = snmp_get($device, $oid.'.0', '-OsqnU', 'BLADE-MIB');
+                $value = snmp_get($device, $data.'.0', '-OsqnU', 'BLADE-MIB');
                 if (is_numeric($value)) {
+                    $oid = 'BLADE-MIB::' . $data . '.0';
                     $descr = $data;
-                    discover_sensor($valid['sensor'], 'fanspeed', $device, $data, 0, 'snmp', $descr, 1, 1, null, null, null, null, $value);
+                    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, 0, 'snmp', $descr, 1, 1, null, null, null, null, $value);
                 }
 
             }
