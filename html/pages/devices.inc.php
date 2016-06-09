@@ -200,7 +200,7 @@ if($format == "graph") {
         $where .= " AND ( ";
         foreach( GetDevicesFromGroup($vars['group']) as $dev ) {
             $where .= "device_id = ? OR ";
-            $sql_param[] = $dev['device_id'];
+            $sql_param[] = $dev;
         }
         $where = substr($where, 0, strlen($where)-3);
         $where .= " )";
