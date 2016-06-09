@@ -4,7 +4,7 @@ $data = $agent_data['app']['memcached'][$app['app_instance']];
 
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-memcached-'.$app['app_id'].'.rrd';
 
-echo 'memcached('.$app['app_instance'].') ';
+echo ' memcached('.$app['app_instance'].')';
 
 if (!is_file($rrd_filename)) {
     rrdtool_create(
