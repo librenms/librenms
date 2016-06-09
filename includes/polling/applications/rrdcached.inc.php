@@ -1,6 +1,6 @@
 <?php
 
-echo " rrdcached";
+echo ' rrdcached';
 
 $data = "";
 
