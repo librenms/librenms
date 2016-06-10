@@ -104,6 +104,7 @@ LibreNMS contributors:
 - Robert Verspuy <robert@exa.nl> (exarv)
 - Peter Tkatchenko <peter@flytrace.com> (Peter2121)
 - Marc Runkel <marc@runkel.org> (mrunkel)
+- oam7575 <oam7575@gmail.com> (oam7575)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

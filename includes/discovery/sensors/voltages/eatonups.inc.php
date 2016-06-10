@@ -87,4 +87,5 @@ if ($device['os'] == 'eatonups') {
 
         discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
+
 }//end if
