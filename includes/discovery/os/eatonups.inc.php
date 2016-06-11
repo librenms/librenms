@@ -1,5 +1,6 @@
 <?php
-    if (strstr($sysDescr, 'Eaton 5P') ||
+if (!$os) {
+    if  (strstr($sysDescr, 'Eaton 5P') ||
         strstr($sysDescr, 'Eaton 9130') ||
         strstr($sysDescr, 'Eaton 93E') ||
         strstr($sysDescr, 'Eaton 9PX') ||
@@ -8,3 +9,4 @@
 
         $os = 'eatonups';
     }
+}
