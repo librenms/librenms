@@ -16,15 +16,16 @@ if ($device['os'] == 'ibm-amm') {
     d_echo($oids."\n");
     if (!empty($oids)) {
 
-        echo 'BLADE-MIB';
-        foreach ($oids as $data) {
+        echo 'BLADE-MIB ';
+        foreach ($oids as $index => $data) {
 
             if (!empty($data)) {
-                $value = snmp_get($device, $data.'.0', '-OsqnU', 'BLADE-MIB');
+                $value = trim(snmp_get($device, $data.'.0', '-Oqv', 'BLADE-MIB'), '"');
+
                 if (is_numeric($value)) {
                     $oid = 'BLADE-MIB::' . $data . '.0';
                     $descr = $data;
-                    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, 0, 'snmp', $descr, 1, 1, null, null, null, null, $value);
+                    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, null, null, null, null, $value);
                 }
 
             }
