@@ -105,6 +105,7 @@ LibreNMS contributors:
 - Peter Tkatchenko <peter@flytrace.com> (Peter2121)
 - Marc Runkel <marc@runkel.org> (mrunkel)
 - Josh Driver <keeperofdakeys@gmail.com> (keeperofdakeys)
+- Felix Eckhofer <felix@eckhofer.com> (tribut)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
