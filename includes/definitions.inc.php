@@ -1619,6 +1619,18 @@ $config['os'][$os]['icon']             = 'generic';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
+// HP Blade Management
+$os = 'hpblmos';
+$config['os'][$os]['text']             = 'HP Blade Management';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'hp';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 // HP MSM 
 $os = 'hpmsm';
 $config['os'][$os]['text']             = 'HP MSM';
@@ -1696,6 +1708,12 @@ $os = 'ibm-amm';
 $config['os'][$os]['text']             = 'IBM AMM';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'ibmnos';
+
+// Oracle ILOM
+$os = 'oracle-ilom';
+$config['os'][$os]['text']             = 'Oracle ILOM';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'oracle';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 $config['os'][$os]['over'][1]['graph'] = 'device_processor';
