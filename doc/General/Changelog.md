@@ -1,3 +1,88 @@
+### June 2016
+
+#### Bug fixes
+  - WebUI:
+    - Rename $ds to $ldap_connection for auth modules (PR3596)
+  - Misc:
+    - Fix smokeping path in gen_smokeping (PR3577)
+    - Fix full include path in includes/polling/functions.inc.php (PR3614)
+
+#### Improvements
+  - Added / improved detection for:
+    - HPE 3Par (PR3578)
+    - Buffalo TeraStation (PR3587)
+    - Samsung C printers (PR3598)
+    - Roomalert3e (PR3599)
+    - Avtech Switches (PR3611)
+    - IBM Bladecenter switches (PR3623)
+    - HWg support (PR3624)
+    - IBM IMM (PR3625)
+  - Polling / Discovery:
+    - Use lsb_release in distro script (PR3580)
+    - Allow lmsensors fanspeeds of 0 to be discovered (PR3616)
+    - Added support for rrdcached application monitoring (PR3627)
+  - WebUI:
+    - Resolve some reported security issues (PR3586) With thanks to https://twitter.com/wireghoul
+    - Order apps list alphabetically (PR3600)
+    - Network map improvements (PR3602)
+    - Added support for varying hostname formats in Oxidized integration (PR3617)
+    - Added device hw/location on hover in alerts table (PR3621)
+  - Misc:
+    - Added pivot table for device groups ready for V2 (PR3589)
+
+### May 2016
+
+#### Bug fixes
+  - WebUI:
+    - Fixed broken performance charts using VisJS (PR3479)
+    - Fixed include path to file in create alert item (PR3480)
+    - Updated services box on front page to utilise the new services (PR3481)
+    - Potential fix for intermittent logouts (PR3372)
+    - Updated sensors hostname to use correct variable (PR3485)
+  - Polling / Discovery:
+    - Only poll AirMAX if device supports the MIB (PR3486)
+  - Alerting:
+    - Don't alert unless the sensor value surpasses the threshold (PR3507)
+
+#### Improvements
+  - Added / improved detection for:
+    - Microsemo timing devices (PR3453)
+    - Bintec smart routers (PR3454)
+    - PoweWalker support (PR3456)
+    - BDCom support (PR3459)
+    - Cisco WAPs (PR3460)
+    - EMC Data domain (PR3461)
+    - Xerox support (PR3462)
+    - Calix support (PR3463)
+    - Isilon OneFS (PR3482)
+    - Ricoh printers (PR3483)
+    - HP Virtual Connect (PR3487)
+    - Equallogic arrays + Dell servers (PR3519)
+    - Alcatel-Lucent SR + SAR (PR3535, PR3553)
+    - Xirrus Wireless Access Points (PR3543)
+  - Polling / Discovery:
+    - Add config option to stop devices with duplicate sysName's being added (PR3473)
+    - Enable discovery support of CDP neighbours by IP (PR3561)
+  - Alerting:
+    - Added ability to use sysName in templates (PR3470)
+    - Send Slack alerts as pure JSON (PR3522)
+    - Apply colour to HipChat messages (PR3539)
+  - WebUI:
+    - Added ability to filter alerts by state (PR3471)
+    - Added support for using local openstreet map tiles (PR3472)
+    - Added ability to show services on availability map (PR3496)
+    - Added combined auth module for http auth and AD auth (PR3531)
+    - List services alphabetically (PR3538)
+    - Added support for scrollable widgets (PR3565)
+  - Graphs:
+    - Added Hit/Misses for memcached graphs (PR3499)
+  - API:
+    - Update get_graph_generic_by_hostname to use device_id as well (PR3494)
+  - Docs:
+    - Added configuration for SNMP Proxy support (PR3528)
+  - Misc:
+    - Added purge for alert log (PR3469)
+
 ### April 2016
 
 #### Bug fixes
