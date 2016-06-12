@@ -13,15 +13,18 @@
 if ($device['os'] == 'ibm-amm') {
 
     $index = 1;
-    $oids = array('blower1State','blower2State','blower3State','blower4State');
+    $oids = array(
+        'blower1State' => '.1.3.6.1.4.1.2.3.51.2.2.3.10.0',
+        'blower2State' => '.1.3.6.1.4.1.2.3.51.2.2.3.11.0',
+        'blower3State' => '.1.3.6.1.4.1.2.3.51.2.2.3.12.0',
+        'blower4State' => '.1.3.6.1.4.1.2.3.51.2.2.3.13.0'
+    );
 
-    foreach ($oids as $oid) {
+    foreach ($oids as $state_name => $oid) {
 
-        $state = snmp_get($device, $oid.'.0', '-OsqnU', 'BLADE-MIB');
-
+        $state = snmp_get($device, $oid, '-Oqv');
         if (!empty($state)) {
 
-            $state_name = $oid;
             $state_index_id = create_state_index($state_name);
             
             if ($state_index_id) {
@@ -46,7 +49,7 @@ if ($device['os'] == 'ibm-amm') {
 
             }//end if
 
-            discover_sensor($valid['sensor'], 'state', $device, $oid, 0, $state_name, $state_name, '1', '1', null, null, null, null, $state, 'snmp', $index);
+            discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $state_name, '1', '1', null, null, null, null, $state, 'snmp', $index);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
             $index++;
@@ -56,15 +59,18 @@ if ($device['os'] == 'ibm-amm') {
     }//end foreach
 
     $index = 1;
-    $oids = array('blower1ControllerState','blower2ControllerState','blower3ControllerState','blower4ControllerState');
+    $oids = array(
+        'blower1ControllerState' => '.1.3.6.1.4.1.2.3.51.2.2.3.30.0',
+        'blower2ControllerState' => '.1.3.6.1.4.1.2.3.51.2.2.3.31.0',
+        'blower3ControllerState' => '.1.3.6.1.4.1.2.3.51.2.2.3.32.0',
+        'blower4ControllerState' => '.1.3.6.1.4.1.2.3.51.2.2.3.33.0');
 
-    foreach ($oids as $oid) {
+    foreach ($oids as $state_name => $oid) {
 
-        $state = snmp_get($device, $oid.'.0', '-OsqnU', 'BLADE-MIB');
+        $state = snmp_get($device, $oid, '-Oqv');
 
-        if (!empty($state)) {
+        if (is_numeric($state) && $state != 2) {
 
-            $state_name = $oid;
             $state_index_id = create_state_index($state_name);
 
             if ($state_index_id) {
@@ -90,7 +96,7 @@ if ($device['os'] == 'ibm-amm') {
 
             }//end if
 
-            discover_sensor($valid['sensor'], 'state', $device, $oid, 0, $state_name, $state_name, '1', '1', null, null, null, null, $state, 'snmp', $index);
+            discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $state_name, '1', '1', null, null, null, null, $state, 'snmp', $index);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
             $index++;
