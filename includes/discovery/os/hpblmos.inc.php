@@ -14,3 +14,4 @@ if (!$os) {
     if (strstr($sysObjectId, '.1.3.6.1.4.1.11.5.7.1.2')) {
         $os = 'hpblmos';
     }
+}
