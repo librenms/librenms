@@ -1725,6 +1725,15 @@ $config['os'][$os]['over'][1]['text']  = 'Wifi Clients';
 $config['os'][$os]['over'][2]['graph'] = 'device_xirrus_rssi';
 $config['os'][$os]['over'][2]['text']  = 'Signal RSSI';
 
+// Rittal CMC
+$os = 'rittal_cmc';
+$config['os'][$os]['text']             = 'Rittal CMC III';
+$config['os'][$os]['type']             = 'environment';
+$config['os'][$os]['over'][0]['graph'] = 'device_temperature';
+$config['os'][$os]['over'][0]['text']  = 'Temperature';
+$config['os'][$os]['over'][1]['graph'] = 'device_humidity';
+$config['os'][$os]['over'][1]['text']  = 'Humidity';
+$config['os'][$os]['icon']             = 'rittal';
 
 
 
