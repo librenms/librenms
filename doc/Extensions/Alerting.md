@@ -111,6 +111,8 @@ Controls:
 Placeholders:
 
 - Hostname of the Device: `%hostname`
+- sysName of the Device: `%sysName`
+- location of the Device: `%location`
 - Title for the Alert: `%title`
 - Time Elapsed, Only available on recovery (`%state == 0`): `%elapsed`
 - Alert-ID: `%id`
