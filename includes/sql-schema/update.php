@@ -31,43 +31,43 @@ if (!isset($debug)) {
     }
 }
 
-$insert = 0;
+function getDbVersion() {
+    if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
+    }
+    else {
+        $db_rev = 0;
+    }
 
-if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
+    // For transition from old system
+    if ($old_rev = @dbFetchCell('SELECT revision FROM `dbSchema`')) {
+        echo "-- Transitioning from old revision-based schema to database version system\n";
+        $db_rev = 6;
+
+        if ($old_rev <= 1000) {
+            $db_rev = 1;
+        }
+
+        if ($old_rev <= 1435) {
+            $db_rev = 2;
+        }
+
+        if ($old_rev <= 2245) {
+            $db_rev = 3;
+        }
+
+        if ($old_rev <= 2804) {
+            $db_rev = 4;
+        }
+
+        if ($old_rev <= 2827) {
+            $db_rev = 5;
+        }
+    }//end if
+    
+    return $db_rev;
 }
-else {
-    $db_rev = 0;
-    $insert = 1;
-}
 
-// For transition from old system
-if ($old_rev = @dbFetchCell('SELECT revision FROM `dbSchema`')) {
-    echo "-- Transitioning from old revision-based schema to database version system\n";
-    $db_rev = 6;
-
-    if ($old_rev <= 1000) {
-        $db_rev = 1;
-    }
-
-    if ($old_rev <= 1435) {
-        $db_rev = 2;
-    }
-
-    if ($old_rev <= 2245) {
-        $db_rev = 3;
-    }
-
-    if ($old_rev <= 2804) {
-        $db_rev = 4;
-    }
-
-    if ($old_rev <= 2827) {
-        $db_rev = 5;
-    }
-
-    $insert = 1;
-}//end if
-
+$db_rev = getDbVersion();
 $updating = 0;
 
 $include_dir_regexp = '/\.sql$/';
@@ -84,6 +84,21 @@ if ($handle = opendir($config['install_dir'].'/sql-schema')) {
 
 asort($filelist);
 $tmp = explode('.', max($filelist), 2);
+if ($tmp[0] <= $db_rev) {
+    if ($debug) {
+        echo "DB Schema already up to date.\n";
+    }
+    return;
+}
+
+// Lock DB to prevent multiple updates...
+$lockname = "${config['db_name']}.schemaupdate";
+if (dbFetchCell('SELECT GET_LOCK(?, 10)', array($lockname)) !== '1') {
+    echo " couldn't update database - another schema update in progress\n";
+    exit(1);
+}
+// Check again that DB update still needs doing
+$db_rev = getDbVersion();
 if ($tmp[0] <= $db_rev) {
     if ($debug) {
         echo "DB Schema already up to date.\n";
@@ -158,11 +173,8 @@ foreach ($filelist as $file) {
 
         $updating++;
         $db_rev = $filename;
-        if ($insert) {
+        if (dbUpdate(array('version' => $db_rev), 'dbSchema') == 0) {
             dbInsert(array('version' => $db_rev), 'dbSchema');
-        }
-        else {
-            dbUpdate(array('version' => $db_rev), 'dbSchema');
         }
     }//end if
 }//end foreach
@@ -174,3 +186,4 @@ if ($updating) {
     }
 }
 
+dbFetchCell('SELECT RELEASE_LOCK(?)', array($lockname));
