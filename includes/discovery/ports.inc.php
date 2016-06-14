@@ -62,7 +62,7 @@ foreach ($port_stats as $ifIndex => $port) {
 
         // Port re-discovered after previous deletion?
         else if ($ports_db[$port_id]['deleted'] == '1') {
-            dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($ports_db[$port_id]));
+            dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($port_id));
             $ports_db[$port_id]['deleted'] = '0';
             echo 'U';
         }
@@ -78,7 +78,7 @@ foreach ($port_stats as $ifIndex => $port) {
     else {
         if (is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != '1') {
-                dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($ports_db[$port_id]));
+                dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
                 $ports_db[$port_id]['deleted'] = '1';
                 echo '-';
             }
