@@ -106,6 +106,7 @@ LibreNMS contributors:
 - Marc Runkel <marc@runkel.org> (mrunkel)
 - Josh Driver <keeperofdakeys@gmail.com> (keeperofdakeys)
 - Felix Eckhofer <felix@eckhofer.com> (tribut)
+- Vikram Adukia <adukia@dropbox.com> (justmedude)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
