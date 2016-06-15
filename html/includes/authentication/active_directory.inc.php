@@ -295,9 +295,9 @@ function get_dn($samaccountname) {
 }
 
 function get_cn($dn) {
-    dn = str_replace('\\,','~',$dn);
+    $dn = str_replace('\\,','~C0mmA~',$dn);
     preg_match('/[^,]*/', $dn, $matches, PREG_OFFSET_CAPTURE, 3);
-    $matches[0][0] = str_replace('~',',',$matches[0][0]);
+    $matches[0][0] = str_replace('~C0mmA~',',',$matches[0][0]);
     return $matches[0][0];
 }
 
