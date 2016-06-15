@@ -73,14 +73,22 @@ function CollectData($bill_id) {
             $port_data['last_out_measurement'] = $last_counters[out_counter];
             $port_data['last_out_delta']       = $last_counters[out_delta];
 
-            if ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
+            $tmp_period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('".mres($last_counters['timestamp'])."')");
+
+            if (delta_to_bits($port_data['in_delta'], $tmp_period) > $port_data['ifSpeed']) {
+                $port_data['in_delta'] = $port_data['last_in_delta'];
+            }
+            elseif ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
                 $port_data['in_delta'] = ($port_data['in_measurement'] - $port_data['last_in_measurement']);
             }
             else {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
             
-            if ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
+            if (delta_to_bits($port_data['out_delta'], $tmp_period) > $port_data['ifSpeed']) {
+                $port_data['out_delta'] = $port_data['last_out_delta'];
+            }
+            elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
                 $port_data['out_delta'] = ($port_data['out_measurement'] - $port_data['last_out_measurement']);
             }
             else {
@@ -91,7 +99,7 @@ function CollectData($bill_id) {
             $port_data['in_delta'] = '0';
             $port_data['out_delta'] = '0';
         }
-        
+
         $fields = array('timestamp' => $now, 'in_counter' => $port_data['in_measurement'], 'out_counter' => $port_data['out_measurement'], 'in_delta' => $port_data['in_delta'], 'out_delta' => $port_data['out_delta']);
         if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "'") == 0) {
             $fields['port_id'] = $port_id;

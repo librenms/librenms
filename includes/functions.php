@@ -1534,3 +1534,7 @@ function create_sensor_to_state_index($device, $state_name, $index)
         dbInsert($insert, 'sensors_to_state_indexes');
     }
 }
+
+function delta_to_bits($delta,$period) {
+    return round(($_delta * 8 / $period), 2);
+}
