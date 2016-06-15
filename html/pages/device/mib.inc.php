@@ -61,7 +61,7 @@ if (is_module_enabled('poller', 'mib')) {
                 device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
             };
         },
-        url: "/ajax_table.php",
+        url: "ajax_table.php",
         formatters: {
         },
         templates: {
@@ -80,7 +80,7 @@ if (is_module_enabled('poller', 'mib')) {
                 device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
             };
         },
-        url: "/ajax_table.php",
+        url: "ajax_table.php",
         formatters: {
         },
         templates: {
