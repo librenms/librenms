@@ -1401,6 +1401,13 @@ $config['os'][$os]['over'][0]['graph'] = 'device_current';
 $config['os'][$os]['over'][0]['text']  = 'Current';
 $config['os'][$os]['icon']             = 'servertech';
 
+$os = 'sentry4';
+$config['os'][$os]['text']             = 'ServerTech Sentry4';
+$config['os'][$os]['type']             = 'power';
+$config['os'][$os]['over'][0]['graph'] = 'device_current';
+$config['os'][$os]['over'][0]['text']  = 'Current';
+$config['os'][$os]['icon']             = 'servertech';
+
 $os = 'raritan';
 $config['os'][$os]['text']             = 'Raritan PDU';
 $config['os'][$os]['type']             = 'power';
