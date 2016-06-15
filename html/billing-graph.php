@@ -131,8 +131,8 @@ foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
     $period    = $row['period'];
     $in_delta  = $row['in_delta'];
     $out_delta = $row['out_delta'];
-    $in_value  = round(($in_delta * 8 / $period), 2);
-    $out_value = round(($out_delta * 8 / $period), 2);
+    $in_value  = delta_to_bits($in_delta, $period);
+    $out_value = delta_to_bits($out_delta, $period);;
 
     $last = $timestamp;
 

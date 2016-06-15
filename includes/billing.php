@@ -63,7 +63,7 @@ function getDates($dayofmonth, $months=0) {
 }//end getDates()
 
 
-function getValue($host, $port, $id, $inout) {
+function getValue($host, $port, $id, $inout, $port_data=array()) {
     global $config;
 
     $oid    = 'IF-MIB::ifHC'.$inout.'Octets.'.$id;
@@ -81,8 +81,9 @@ function getValue($host, $port, $id, $inout) {
 
 function getLastPortCounter($port_id) {
     $return = array();
-    $row    = dbFetchRow("SELECT in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ?", array($port_id));
+    $row    = dbFetchRow("SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ?", array($port_id));
     if (!is_null($row)) {
+        $return[timestamp]   = $row['timestamp'];
         $return[in_counter]  = $row['in_counter'];
         $return[in_delta]    = $row['in_delta'];
         $return[out_counter] = $row['out_counter'];
