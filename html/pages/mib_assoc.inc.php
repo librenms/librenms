@@ -41,7 +41,7 @@ if (is_module_enabled('poller', 'mib')) {
                 id: "device_mibs",
             };
         },
-        url: "/ajax_table.php",
+        url: "ajax_table.php",
         formatters: {
         },
         templates: {
