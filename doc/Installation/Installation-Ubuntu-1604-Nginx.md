@@ -33,16 +33,14 @@ sql-mode=""
 
 ### Web Server ###
 
-#### Install / Configure Apache
+#### Install / Configure Nginx 
 
-`apt-get install libapache2-mod-php7.0 php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl snmp graphviz php7.0-mcrypt php7.0-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git`
+`apt-get install php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl php7.0-fpm snmp graphviz php7.0-mcrypt php7.0-json nginx-full fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git`
 
-In `/etc/php7.0/apache2/php.ini` and `/etc/php7.0/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
+In `/etc/php7.0/fpm/php.ini` and `/etc/php7.0/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 
 ```bash
-a2enmod php7.0
-a2dismod mpm_event
-a2enmod mpm_prefork
+service php7.0-fpm restart
 phpenmod mcrypt
 ```
 
@@ -66,35 +64,40 @@ git clone https://github.com/librenms/librenms.git librenms
 cd /opt/librenms
 mkdir rrd logs
 chmod 775 rrd
-vim /etc/apache2/sites-available/librenms.conf
+vim /etc/nginx/conf.d/librenms.conf
 ```
 
 Add the following config:
 
-```apache
-<VirtualHost *:80>
-  DocumentRoot /opt/librenms/html/
-  ServerName  librenms.example.com
-  CustomLog /opt/librenms/logs/access_log combined
-  ErrorLog /opt/librenms/logs/error_log
-  AllowEncodedSlashes NoDecode
-  <Directory "/opt/librenms/html/">
-    Require all granted
-    AllowOverride All
-    Options FollowSymLinks MultiViews
-  </Directory>
-</VirtualHost>
+```nginx
+server {
+ listen      80;
+ server_name librenms.example.com;
+ root        /opt/librenms/html;
+ index       index.php;
+ access_log  /opt/librenms/logs/access_log;
+ error_log   /opt/librenms/logs/error_log;
+ location / {
+  try_files $uri $uri/ @librenms;
+ }
+ location ~ \.php {
+  include fastcgi.conf;
+  fastcgi_split_path_info ^(.+\.php)(/.+)$;
+  fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+ }
+ location ~ /\.ht {
+  deny all;
+ }
+ location @librenms {
+  rewrite api/v0(.*)$ /api_v0.php/$1 last;
+  rewrite ^(.+)$ /index.php/$1 last;
+ }
+}
 ```
 
 ```bash
-a2ensite librenms.conf
-a2enmod rewrite
-service apache2 restart
+service nginx restart
 ```
-
-> NOTE: If this is the only site you are hosting on this server (it should be :)) then you will need to disable the default site.
-
-`a2dissite 000-default`
 
 #### Web installer
 
