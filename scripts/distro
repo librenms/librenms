@@ -67,10 +67,12 @@ elif [ "${OS}" = "Linux" ] ; then
   fi
 
   if [ -f /etc/lsb-release -a "${IGNORE_LSB}" != 1 ] ; then
-    LSB_DIST="`cat /etc/lsb-release | grep DISTRIB_ID | cut -d "=" -f2`"
-    LSB_REV="`cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d "=" -f2`"
+    LSB_DIST=$(lsb_release -si)
+    LSB_REV=$(lsb_release -sr)
     if [ "$LSB_DIST" != "" ] ; then
       DIST=$LSB_DIST
+    fi
+    if [ "$LSB_REV" != "" ] ; then
       REV=$LSB_REV
     fi
   fi

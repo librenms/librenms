@@ -16,6 +16,8 @@ if (is_admin() === false) {
     die('ERROR: You need to be admin');
 }
 
+require_once '../includes/device-groups.inc.php';
+
 $pattern  = $_POST['patterns'];
 $group_id = $_POST['group_id'];
 $name     = mres($_POST['name']);
@@ -38,7 +40,7 @@ if (empty($pattern)) {
     $update_message = 'ERROR: No group was generated';
 }
 else if (is_numeric($group_id) && $group_id > 0) {
-    if (dbUpdate(array('pattern' => $pattern, 'name' => $name, 'desc' => $desc), 'device_groups', 'id=?', array($group_id)) >= 0) {
+    if (EditDeviceGroup($group_id, $name, $desc, $pattern)) {
         $update_message = "Edited Group: <i>$name: $pattern</i>";
     }
     else {
@@ -46,7 +48,7 @@ else if (is_numeric($group_id) && $group_id > 0) {
     }
 }
 else {
-    if (dbInsert(array('pattern' => $pattern, 'name' => $name, 'desc' => $desc), 'device_groups')) {
+    if (AddDeviceGroup($name, $desc, $pattern)) {
         $update_message = "Added Group: <i>$name: $pattern</i>";
     }
     else {

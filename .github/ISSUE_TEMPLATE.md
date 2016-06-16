@@ -9,7 +9,7 @@ Please replace the relevant information in these commands.
 ```bash
 ./discovery.php -h HOSTNAME -d -m os
 ./poller.php -h HOSTNAME -r -f -d -m os
-snmpbulkwalk -v2c -c COMMUNITY HOSTNAME .
+snmpbulkwalk -On -v2c -c COMMUNITY HOSTNAME .
 ```
 
 If possible please also provide what the OS name should be if it doesn't exist already.
