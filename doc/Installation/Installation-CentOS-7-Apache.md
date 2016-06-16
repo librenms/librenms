@@ -6,7 +6,7 @@
 
 #### Install / Configure MySQL
 ```bash
-apt-get install mariadb-server mariadb-client
+yum install mariadb-server mariadb
 mysql -uroot -p
 ```
 
@@ -20,7 +20,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-`vim /etc/mysql/mariadb.conf.d/50-server.cnf`
+`vim /etc/my.cnf`
 
 Within the [mysqld] section please add:
 
@@ -35,22 +35,17 @@ sql-mode=""
 
 #### Install / Configure Apache
 
-`apt-get install libapache2-mod-php7.0 php7.0-cli php7.0-mysql php7.0-gd php7.0-snmp php-pear php7.0-curl snmp graphviz php7.0-mcrypt php7.0-json apache2 fping imagemagick whois mtr-tiny nmap python-mysqldb snmpd php-net-ipv4 php-net-ipv6 rrdtool git`
+`yum install epel-release`
 
-In `/etc/php7.0/apache2/php.ini` and `/etc/php7.0/cli/php.ini`, ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
+`yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-pear php70w-curl php70w-common php70w-fpm nginx net-snmp mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php70w-mcrypt fping git`
 
-```bash
-a2enmod php7.0
-a2dismod mpm_event
-a2enmod mpm_prefork
-phpenmod mcrypt
-```
+In `/etc/php.ini` ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 
 #### Add librenms user
 
 ```bash
 useradd librenms -d /opt/librenms -M -r
-usermod -a -G librenms www-data
+usermod -a -G librenms apache
 ```
 
 #### Clone repo
@@ -66,7 +61,7 @@ git clone https://github.com/librenms/librenms.git librenms
 cd /opt/librenms
 mkdir rrd logs
 chmod 775 rrd
-vim /etc/apache2/sites-available/librenms.conf
+vim /etc/httpd/conf.d/librenms.conf
 ```
 
 Add the following config:
@@ -87,14 +82,12 @@ Add the following config:
 ```
 
 ```bash
-a2ensite librenms.conf
-a2enmod rewrite
-service apache2 restart
+service httpd restart
 ```
 
 > NOTE: If this is the only site you are hosting on this server (it should be :)) then you will need to disable the default site.
 
-`a2dissite 000-default`
+`rm -f /etc/httpd/conf.d/welcome.conf`
 
 #### Web installer
 
