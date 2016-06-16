@@ -169,7 +169,7 @@ foreach (array('Private','Shared (Read)','Shared') as $k=>$v) {
             <ul class="dropdown-menu">
 <?php
 foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widgets) {
-    echo '              <li><a href="javascript:return false;" name="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a></li>';
+    echo '              <li><a href="#" onsubmit="return false;" class="place_widget" data-widget_id="'.$widgets['widget_id'] .'">'. $widgets['widget_title'] .'</a></li>';
 }
 ?>
             </ul>
@@ -316,7 +316,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
             });
         });
 
-        $('a[name="place_widget"]').on('click',  function(event, state) {
+        $('.place_widget').on('click',  function(event, state) {
             var widget_id = $(this).data('widget_id');
             $.ajax({
                 type: 'POST',
@@ -458,11 +458,11 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
               '</span>'+
               '<span class="fade-edit pull-right">'+
-              '<a href="javascript:return false;" class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</a>&nbsp;'+
-              '<a href="javascript:return false;" class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</a>&nbsp;'+
+              '<i class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
+              '<i class="text-danger fa fa-times close-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Close" data-toggle="tooltip" data-placement="top" title="Remove">&nbsp;</i>&nbsp;'+
               '</span>'+
               '</header>'+
-              '<div class="widget_body" id="widget_body_'+data.user_widget_id+'" style="height: 100%; width:100%;">'+data.widget+'</div>'+
+              '<div class="widget_body" id="widget_body_'+data.user_widget_id+'">'+data.widget+'</div>'+
               '\<script\>var timeout'+data.user_widget_id+' = grab_data('+data.user_widget_id+','+data.refresh+',\''+data.widget+'\');\<\/script\>'+
               '</li>';
         if (data.hasOwnProperty('col') && data.hasOwnProperty('row')) {
@@ -506,6 +506,7 @@ foreach (dbFetchRows("SELECT * FROM `widgets` ORDER BY `widget_title`") as $widg
                 }
             });
         }
+	return false;
     }
 
     function widget_reload(id,data_type) {

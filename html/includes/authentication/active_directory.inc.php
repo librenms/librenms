@@ -8,25 +8,25 @@ if (isset($config['auth_ad_check_certificates']) &&
     putenv('LDAPTLS_REQCERT=never');
 };
 
-$ds = @ldap_connect($config['auth_ad_url']);
+$ldap_connection = @ldap_connect($config['auth_ad_url']);
 
 // disable referrals and force ldap version to 3
 
-ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+ldap_set_option($ldap_connection, LDAP_OPT_REFERRALS, 0);
+ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 
 function authenticate($username, $password) {
-    global $config, $ds;
+    global $config, $ldap_connection;
 
-    if ($ds) {
+    if ($ldap_connection) {
         // bind with sAMAccountName instead of full LDAP DN
-        if ($username && ldap_bind($ds, "{$username}@{$config['auth_ad_domain']}", $password)) {
+        if ($username && ldap_bind($ldap_connection, "{$username}@{$config['auth_ad_domain']}", $password)) {
             // group membership in one of the configured groups is required
             if (isset($config['auth_ad_require_groupmembership']) &&
                 $config['auth_ad_require_groupmembership'] > 0) {
-                $search = ldap_search($ds, $config['auth_ad_base_dn'],
+                $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'],
                                       "(samaccountname={$username})", array('memberOf'));
-                $entries = ldap_get_entries($ds, $search);
+                $entries = ldap_get_entries($ldap_connection, $search);
 
                 $user_authenticated = 0; 
                 
@@ -53,7 +53,7 @@ function authenticate($username, $password) {
         }
     }
     else {
-        echo ldap_error($ds);
+        echo ldap_error($ldap_connection);
     }
 
     return 0;
@@ -108,11 +108,11 @@ function user_exists_in_db($username) {
 }
 
 function user_exists($username) {
-    global $config, $ds;
+    global $config, $ldap_connection;
 
-    $search = ldap_search($ds, $config['auth_ad_base_dn'],
+    $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'],
                           "(samaccountname={$username})",array('samaccountname'));
-    $entries = ldap_get_entries($ds, $search);
+    $entries = ldap_get_entries($ldap_connection, $search);
 
 
     if ($entries['count']) {
@@ -124,14 +124,14 @@ function user_exists($username) {
 
 
 function get_userlevel($username) {
-    global $config, $ds;
+    global $config, $ldap_connection;
 
     $userlevel = 0;
 
     // Find all defined groups $username is in
-    $search = ldap_search($ds, $config['auth_ad_base_dn'],
+    $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'],
                           "(samaccountname={$username})", array('memberOf'));
-    $entries = ldap_get_entries($ds, $search);
+    $entries = ldap_get_entries($ldap_connection, $search);
     
     // Loop the list and find the highest level
     foreach ($entries[0]['memberof'] as $entry) {
@@ -146,12 +146,12 @@ function get_userlevel($username) {
 
 
 function get_userid($username) {
-    global $config, $ds;
+    global $config, $ldap_connection;
 
     $attributes = array('objectsid');
-    $search = ldap_search($ds, $config['auth_ad_base_dn'],
+    $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'],
                           "(samaccountname={$username})", $attributes);    
-    $entries = ldap_get_entries($ds, $search);
+    $entries = ldap_get_entries($ldap_connection, $search);
 
     if ($entries['count']) {
         return preg_replace('/.*-(\d+)$/','$1',sid_from_ldap($entries[0]['objectsid'][0]));
@@ -172,7 +172,7 @@ function deluser($username) {
 
 
 function get_userlist() {
-    global $config, $ds;
+    global $config, $ldap_connection;
     $userlist = array();
     $userhash = array();
 
@@ -180,14 +180,14 @@ function get_userlist() {
 
     foreach($ldap_groups as $ldap_group) {
         $group_cn = get_cn($ldap_group);
-        $search = ldap_search($ds, $config['auth_ad_base_dn'], "(cn={$group_cn})", array('member'));
-        $entries = ldap_get_entries($ds, $search);
+        $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], "(cn={$group_cn})", array('member'));
+        $entries = ldap_get_entries($ldap_connection, $search);
         
         foreach($entries[0]['member'] as $member) {
             $member_cn = get_cn($member);
-            $search = ldap_search($ds, $config['auth_ad_base_dn'], "(cn={$member_cn})",
+            $search = ldap_search($ldap_connection, $config['auth_ad_base_dn'], "(cn={$member_cn})",
                                   array('sAMAccountname', 'displayName', 'objectSID', 'mail'));
-            $results = ldap_get_entries($ds, $search);
+            $results = ldap_get_entries($ldap_connection, $search);
             foreach($results as $result) {
                 if(isset($result['samaccountname'][0])) {
                     $userid = preg_replace('/.*-(\d+)$/','$1',
@@ -235,12 +235,12 @@ function update_user($user_id, $realname, $level, $can_modify_passwd, $email) {
 
 
 function get_fullname($username) {
-    global $config, $ds;
+    global $config, $ldap_connection;
 
     $attributes = array('name');
-    $result = ldap_search($ds, $config['auth_ad_base_dn'],
+    $result = ldap_search($ldap_connection, $config['auth_ad_base_dn'],
                           "(samaccountname={$username})", $attributes);
-    $entries = ldap_get_entries($ds, $result);
+    $entries = ldap_get_entries($ldap_connection, $result);
     if ($entries['count'] > 0) {
         $membername = $entries[0]['name'][0];
     }
@@ -279,13 +279,13 @@ function get_group_list() {
 }
 
 function get_dn($samaccountname) {
-    global $config, $ds;
+    global $config, $ldap_connection;
 
 
     $attributes = array('dn');
-    $result = ldap_search($ds, $config['auth_ad_base_dn'],
+    $result = ldap_search($ldap_connection, $config['auth_ad_base_dn'],
                           "(samaccountname={$samaccountname})", $attributes);
-    $entries = ldap_get_entries($ds, $result);
+    $entries = ldap_get_entries($ldap_connection, $result);
     if ($entries['count'] > 0) {
         return $entries[0]['dn'];
     }

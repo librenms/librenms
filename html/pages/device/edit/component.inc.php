@@ -67,7 +67,7 @@
                 event.preventDefault();
                 $.ajax({
                     type: "POST",
-                    url: "/ajax_form.php",
+                    url: "ajax_form.php",
                     data: $('form#components').serialize(),
                     dataType: "json",
                     success: function(data){
@@ -97,6 +97,6 @@
                 device_id: "<?php echo $device['device_id']; ?>"
             };
         },
-        url: "/ajax_table.php"
+        url: "ajax_table.php"
     });
 </script>

@@ -15,7 +15,7 @@ if (defined('show_settings')) {
     $current_mode = isset($widget_settings['mode']) ? $widget_settings['mode'] : 0;
     $current_width = isset($widget_settings['tile_width']) ? $widget_settings['tile_width'] : 10;
     $common_output[] = '
-    <form class="form-horizontal" onsubmit="widget_settings(this); return false;">
+    <form class="form-horizontal" onsubmit="return widget_settings(this)">
         <div class="form-group">
             <label for="tile_width" class="col-sm-4 control-label">Tile width</label>
             <div class="col-sm-6">
