@@ -48,3 +48,8 @@ You will need to specify your own subnets that you would like to scan for which 
 
 By default we don't add devices by IP address, we look for a reverse dns name to be found and add with that. If this fails 
 and you would like to still add devices automatically then you will need to set `$config['discovery_by_ip'] = true;`
+
+#### Short hostnames
+
+If your devices only return a short hostname such as lax-fa0-dc01 but the full name should be lax-fa0-dc01.example.com then you can 
+set `$config['mydomain'] = 'example.com';`
