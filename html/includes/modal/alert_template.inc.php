@@ -69,7 +69,7 @@ if(is_admin() === false) {
                             </span><br /><br />
                             <span><strong>Placeholders:</strong><br />
 <?php
-    $placeholders = array('hostname','title','elapsed','id','uid','faults','state','severity','rule','timestamp','contacts','key','value','new line');
+    $placeholders = array('hostname', 'sysName', 'location', 'title','elapsed','id','uid','faults','state','severity','rule','timestamp','contacts','key','value','new line');
     foreach ($placeholders as $placeholder) {
         echo '              <button type="button" class="btn btn-success btn-sm" data-target="#placeholder-add" id="placeholder-add" name="placeholder-add" data-type="placeholder" data-value="'.$placeholder.'">'.$placeholder.'</button>';
     }
@@ -102,9 +102,10 @@ $('#alert-template').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var template_id = button.data('template_id');
     var action = button.data('template_action');
-    $('#template').val();
+    $('#template').val('');
     $('#line').val('');
     $('#value').val('');
+    $('#name').val('');
     if(action == 'edit') {
         $('#template_id').val(template_id);
         $.ajax({
@@ -120,6 +121,9 @@ $('#alert-template').on('show.bs.modal', function (event) {
             }
         });
     }
+});
+$('#alert-template').on('hide.bs.modal', function(event) {
+    $('#template_id').val('');
 });
 
 $('#create-template').click('', function(e) {

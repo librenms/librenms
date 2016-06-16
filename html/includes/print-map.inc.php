@@ -32,10 +32,10 @@ if (is_admin() === false && is_read() === false) {
     $sql_array[] = $_SESSION['user_id'];
 }
 
-$tmp_devices = array();
-$tmp_ids = array();
-$tmp_links = array();
-$tmp_link_ids = array();
+$devices_by_id = array();
+$links = array();
+$link_assoc_seen = array();
+$device_assoc_seen = array();
 $ports = array();
 $devices = array();
 
@@ -74,12 +74,15 @@ if (in_array('mac',$config['network_map_items'])) {
                              `P2`.`ifOperStatus` AS `remote_ifoperstatus`,
                              `P2`.`ifAdminStatus` AS `remote_ifadminstatus`,
                              `P2`.`ifInOctets_rate` AS `remote_ifinoctets_rate`,
-                             `P2`.`ifOutOctets_rate` AS `remote_ifoutoctets_rate`
+                             `P2`.`ifOutOctets_rate` AS `remote_ifoutoctets_rate`,
+                             SUM(IF(`P2_ip`.`ipv4_address` = `M`.`ipv4_address`, 1, 0))
+                                 AS `remote_matching_ips`
                       FROM `ipv4_mac` AS `M`
                              LEFT JOIN `ports` AS `P1` ON `P1`.`port_id`=`M`.`port_id`
                              LEFT JOIN `ports` AS `P2` ON `P2`.`ifPhysAddress`=`M`.`mac_address`
                              LEFT JOIN `devices` AS `D1` ON `P1`.`device_id`=`D1`.`device_id`
                              LEFT JOIN `devices` AS `D2` ON `P2`.`device_id`=`D2`.`device_id`
+                             LEFT JOIN `ipv4_addresses` AS `P2_ip` ON `P2_ip`.`port_id` = `P2`.`port_id`
                              $join_sql
                       WHERE
                              `M`.`mac_address` NOT IN ('000000000000','ffffffffffff') AND
@@ -89,6 +92,7 @@ if (in_array('mac',$config['network_map_items'])) {
                              $where
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
+                      ORDER BY `remote_matching_ips` DESC, `local_ifname`, `remote_ifname`
                      ", $sql_array);
 }
 
@@ -131,11 +135,14 @@ if (in_array('xdp', $config['network_map_items'])) {
                              $where
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
+                      ORDER BY `local_ifname`, `remote_ifname`
                       ", $sql_array);
 }
 
 $list = array_merge($ports,$devices);
 
+// Iterate though ports and links, generating a set of devices (nodes)
+// and links (edges) that make up the topology graph.
 foreach ($list as $items) {
     $local_device = array('device_id'=>$items['local_device_id'], 'os'=>$items['local_os'], 'hostname'=>$items['local_hostname']);
     $remote_device = array('device_id'=>$items['remote_device_id'], 'os'=>$items['remote_os'], 'hostname'=>$items['remote_hostname']);
@@ -143,14 +150,16 @@ foreach ($list as $items) {
     $local_port = array('port_id'=>$items['local_port_id'],'device_id'=>$items['local_port_device_id'],'ifName'=>$items['local_ifname'],'ifSpeed'=>$items['local_ifspeed'],'ifOperStatus'=>$items['local_ifoperstatus'],'ifAdminStatus'=>$items['local_adminstatus']);
     $remote_port = array('port_id'=>$items['remote_port_id'],'device_id'=>$items['remote_port_device_id'],'ifName'=>$items['remote_ifname'],'ifSpeed'=>$items['remote_ifspeed'],'ifOperStatus'=>$items['remote_ifoperstatus'],'ifAdminStatus'=>$items['remote_adminstatus']);
 
-    if (!in_array($items['local_device_id'],$tmp_ids)) {
-        $tmp_devices[] = array('id'=>$items['local_device_id'],'label'=>$items['local_hostname'],'title'=>generate_device_link($local_device,'',array(),'','','',0),'shape'=>'box');
+    $local_device_id = $items['local_device_id'];
+    if (!array_key_exists($local_device_id, $devices_by_id)) {
+        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>$items['local_hostname'],'title'=>generate_device_link($local_device,'',array(),'','','',0),'shape'=>'box');
     }
-    array_push($tmp_ids,$items['local_device_id']);
-    if (!in_array($items['remote_device_id'],$tmp_ids)) {
-        $tmp_devices[] = array('id'=>$items['remote_device_id'],'label'=>$items['remote_hostname'],'title'=>generate_device_link($remote_device,'',array(),'','','',0),'shape'=>'box');
+
+    $remote_device_id = $items['remote_device_id'];
+    if (!array_key_exists($remote_device_id, $devices_by_id)) {
+        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>$items['remote_hostname'],'title'=>generate_device_link($remote_device,'',array(),'','','',0),'shape'=>'box');
     }
-    array_push($tmp_ids,$items['remote_device_id']);
+
     $speed = $items['local_ifspeed']/1000/1000;
     if ($speed == 100) {
         $width = 3;
@@ -183,22 +192,30 @@ foreach ($list as $items) {
         $link_used = 100;
     }
     $link_color = $config['network_map_legend'][$link_used];
-    $id1 = $items['local_port_id'].':'.$items['remote_port_id'];
-    $id2 = $items['remote_port_id'].':'.$items['local_port_id'];
-    if (!in_array($id1,$tmp_link_ids) || !in_array($id2,$tmp_link_ids)) {
+    $link_id1 = $items['local_port_id'].':'.$items['remote_port_id'];
+    $link_id2 = $items['remote_port_id'].':'.$items['local_port_id'];
+    $device_id1 = $items['local_device_id'].':'.$items['remote_device_id'];
+    $device_id2 = $items['remote_device_id'].':'.$items['local_device_id'];
+
+    // Ensure only one link exists between any two ports, or any two devices.
+    if (!array_key_exists($link_id1, $link_assoc_seen) &&
+        !array_key_exists($link_id2, $link_assoc_seen) &&
+        !array_key_exists($device_id1, $device_assoc_seen) &&
+        !array_key_exists($device_id2, $device_assoc_seen)) {
         $local_port = ifNameDescr($local_port);
         $remote_port = ifNameDescr($remote_port);
-        $tmp_links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>\n",'',0,1),'width'=>$width,'color'=>$link_color);
+        $links[] = array('from'=>$items['local_device_id'],'to'=>$items['remote_device_id'],'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),'title'=>generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=".$items['local_port_id']."&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>\n",'',0,1),'width'=>$width,'color'=>$link_color);
     }
-    array_push($tmp_link_ids,$id1);
-    array_push($tmp_link_ids,$id2);
+    $link_assoc_seen[$link_id1] = 1;
+    $link_assoc_seen[$link_id2] = 1;
+    $device_assoc_seen[$device_id1] = 1;
+    $device_assoc_seen[$device_id2] = 1;
 }
 
-$node_devices = $tmp_devices;
-$nodes = json_encode($node_devices);
-$edges = json_encode($tmp_links);
+$nodes = json_encode(array_values($devices_by_id));
+$edges = json_encode($links);
 
-if (count($node_devices) > 1 && count($tmp_links) > 0) {
+if (count($devices_by_id) > 1 && count($links) > 0) {
  
 ?>
  

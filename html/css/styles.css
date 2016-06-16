@@ -1864,3 +1864,10 @@ label {
     border-radius: 4px;
     box-shadow: 0 5px 15px rgba(0,0,0,.5);
 }
+
+.edit-widget, .close-widget { cursor: pointer; }
+.widget_body {
+    overflow-y: auto;
+    width: 100%;
+    height: calc(100% - 35px);
+}

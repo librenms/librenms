@@ -1271,7 +1271,7 @@ function get_devices_by_group() {
     }
     else {
         $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?",array($name));
-        $devices = GetDevicesFromGroup($group_id);
+        $devices = GetDevicesFromGroup($group_id, true);
         $count = count($devices);
         if (empty($devices)) {
             $message = 'No devices found in group ' . $name;

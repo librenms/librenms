@@ -15,10 +15,6 @@ if (!$os) {
         $os = 'routeros';
     }
 
-    if ($sysDescr == 'RB260GS') {
-        $os = 'routeros';
-    }
-
     // poll Cisco AAA MIB
     if (!empty($os)) {
         $extra_mibs = array(
