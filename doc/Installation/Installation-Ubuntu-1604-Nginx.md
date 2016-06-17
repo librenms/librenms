@@ -106,7 +106,7 @@ Now head to: http://librenms.example.com/install.php and follow the on-screen in
 #### Configure snmpd
 
 ```bash
-cp /opt/librenms/snmpd.conf.exmaple /etc/snmpd.conf
+cp /opt/librenms/snmpd.conf.example /etc/snmpd.conf
 vim /etc/snmpd.conf
 ```
 
