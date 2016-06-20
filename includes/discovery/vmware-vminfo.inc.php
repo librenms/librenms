@@ -16,8 +16,6 @@ if (($device['os'] == 'vmware') || ($device['os'] == 'linux')) {
      * CONSOLE: Start the VMware discovery process.
      */
 
-    echo 'VMware VM: ';
-
     /*
      * Fetch information about Virtual Machines.
      */

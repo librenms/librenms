@@ -1,7 +1,6 @@
 <?php
 
 if ($config['enable_inventory']) {
-    echo 'Physical Inventory : ';
 
     echo "\nCaching OIDs:";
 
