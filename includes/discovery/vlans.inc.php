@@ -1,7 +1,5 @@
 <?php
 
-echo "VLANs:\n";
-
 // Pre-cache the existing state of VLANs for this device from the database
 $vlans_db_raw = dbFetchRows('SELECT * FROM `vlans` WHERE `device_id` = ?', array($device['device_id']));
 foreach ($vlans_db_raw as $vlan_db) {
