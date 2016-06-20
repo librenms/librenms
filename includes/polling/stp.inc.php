@@ -102,7 +102,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
         }
         
         // Logging if designated root port changed since last db update
-        if ($stp_db['rootPort'] != $stp['rootPort']) {
+        if (isset($stp['rootPort']) && $stp_db['rootPort'] != $stp['rootPort']) {
             log_event('STP root port changed: '.$stp_db['rootPort'].' > '.$stp['rootPort'], $device, 'stp');
         }
         
