@@ -2,8 +2,6 @@
 
 unset($mac_table);
 
-echo 'ARP Table : ';
-
 if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0) ){
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 }

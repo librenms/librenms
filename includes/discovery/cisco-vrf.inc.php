@@ -5,8 +5,6 @@ if ($config['enable_vrfs']) {
     if ($device['os_group'] == 'cisco' || $device['os_group'] == 'junos' || $device['os'] == 'ironware') {
         unset($vrf_count);
 
-        echo 'VRFs : ';
-
         /*
             There are 2 MIBs for VPNs : MPLS-VPN-MIB (oldest) and MPLS-L3VPN-STD-MIB (newest)
             Unfortunately, there is no simple way to find out which one to use, unless we reference
