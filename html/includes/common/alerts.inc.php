@@ -180,7 +180,7 @@ else {
                 <th data-column-id="details" data-sortable="false">&nbsp;</th>
                 <th data-column-id="hostname">Hostname</th>
                 <th data-column-id="timestamp">Timestamp</th>
-                <th data-column-id="severity">Severity</th>
+                <th data-column-id="severity" data-formatter="severity">Severity</th>
                 <th data-column-id="ack" data-formatter="ack" data-sortable="false">Acknowledge</th>';
     if (is_numeric($proc)) {
         if ($proc) { $common_output[] = '<th data-column-id="proc" data-formatter="proc" data-sortable="false">Procedure</th>'; }
@@ -231,6 +231,13 @@ var alerts_grid = $("#alerts_'.$unique_id.'").bootgrid({
         },
         "proc": function(column,row) {
             return "<button type=\'button\' class=\'btn command-open-proc\' data-alert_id=\'"+row.alert_id+"\' name=\'open-proc\' id=\'open-proc\'>Open</button>";
+        },
+        "severity": function(column,row) {
+            var eventColor = "info";
+            if (row.severity.match (/critical/)) { eventColor = "danger"; }
+            else if (row.severity.match (/warning/)) { eventColor = "warning"; }
+            else if (row.severity.match (/ok/)) { eventColor = "success"; }
+            return "<h4><span class=\'label label-" + eventColor + " threeqtr-width\'>" + row.severity + "</span></h4>";
         }
     },
     templates: {
