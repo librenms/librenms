@@ -1,7 +1,5 @@
 <?php
 
-echo 'Polling Netstats:';
-
 require 'netstats-ip.inc.php';
 require 'netstats-tcp.inc.php';
 require 'netstats-udp.inc.php';
