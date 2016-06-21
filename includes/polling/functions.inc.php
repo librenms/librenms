@@ -534,6 +534,7 @@ function load_poller_module($module, $device) {
     echo "\n#### Load poller module $module ####\n";
     include "includes/polling/$module.inc.php";
     $module_time = microtime(true) - $module_start;
-    echo "\n>> Runtime for poller module '$module': $module_time\n";
+    $module_time = substr($module_time, 0, 5);
+    echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
     echo "#### Unload poller module $module ####\n\n";
 }
