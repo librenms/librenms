@@ -237,17 +237,14 @@ function poll_device($device, $options) {
         if ($options['m']) {
             foreach (explode(',', $options['m']) as $module) {
                 if (is_file('includes/polling/'.$module.'.inc.php')) {
-                    include 'includes/polling/'.$module.'.inc.php';
+                    load_poller_module($module, $device, $attribs);
                 }
             }
         }
         else {
             foreach ($config['poller_modules'] as $module => $module_status) {
                 if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
-                    $module_start = microtime(true);
-                    include 'includes/polling/'.$module.'.inc.php';
-                    $module_time = microtime(true) - $module_start;
-                    echo "Runtime for polling module '$module': $module_time\n";
+                    load_poller_module($module, $device, $attribs);
 
                     // save per-module poller stats
                     $tags = array(
@@ -530,3 +527,13 @@ function location_to_latlng($device) {
         }
     }
 }// end location_to_latlng()
+
+function load_poller_module($module, $device) {
+    global $config, $valid;
+    $module_start = microtime(true);
+    echo "\n#### Load poller module $module ####\n";
+    include "includes/polling/$module.inc.php";
+    $module_time = microtime(true) - $module_start;
+    echo "\n>> Runtime for poller module '$module': $module_time\n";
+    echo "#### Unload poller module $module ####\n\n";
+}
