@@ -36,7 +36,11 @@ if (!empty($filter_hostname)) {
         $query .= ' && ';
     }
     $ip = gethostbyname($filter_hostname);
+    $device = device_by_name($filter_hostname);
     $query .= 'source:"'.$filter_hostname.'" || source:"'.$ip.'"';
+    if (isset($device['ip'])) {
+        $query .= ' || source:"'.$device['ip'].'"';
+    }
 }
 
 $graylog_url = $config['graylog']['server'] . ':' . $config['graylog']['port'] . '/search/universal/relative?query=' . urlencode($query) . '&range='. $filter_range . $extra_query;
