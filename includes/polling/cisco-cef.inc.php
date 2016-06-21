@@ -1,7 +1,6 @@
 <?php
 
 if ($device['os_group'] == 'cisco') {
-    echo 'Cisco CEF Switching Path: ';
 
     $cefs   = array();
     $cefs   = snmpwalk_cache_threepart_oid($device, 'CISCO-CEF-MIB::cefSwitchingStatsEntry', $cefs, 'CISCO-CEF-MIB');

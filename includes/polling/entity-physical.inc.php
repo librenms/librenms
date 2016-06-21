@@ -1,7 +1,5 @@
 <?php
 
-echo 'Entity Physical: ';
-
 if ($device['os'] == 'ios') {
     echo "Cisco Cat6xxx/76xx Crossbar : \n";
 

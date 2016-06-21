@@ -1,7 +1,6 @@
 <?php
 
 if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['type'] == 'wireless') {
-    echo "Wireless: MAG\n";
 
     if ($device['os'] == 'airos') {
         echo "It Is Airos\n";
