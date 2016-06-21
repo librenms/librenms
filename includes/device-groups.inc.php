@@ -236,7 +236,6 @@ function RunGroupMacros($rule,$x=1) {
  */
 function UpdateGroupsForDevice($device_id)
 {
-    global $debug;
     $queried_groups = QueryGroupsFromDevice($device_id);
     $db_groups = GetGroupsFromDevice($device_id);
 
