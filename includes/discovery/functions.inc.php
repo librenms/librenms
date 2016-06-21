@@ -854,6 +854,7 @@ function load_discovery_module($module, $device, $attribs) {
     echo "#### Load disco module $module ####\n";
     include "includes/discovery/$module.inc.php";
     $module_time = microtime(true) - $module_start;
-    echo "\n>> Runtime for discovery module '$module': $module_time\n";
+    $module_time = substr($module_time, 0, 5)
+    echo "\n>> Runtime for discovery module '$module': $module_time seconds\n";
     echo "#### Unload disco module $module ####\n\n";
 }
