@@ -13,3 +13,7 @@ $version  = snmp_get($device, 'CISCOSB-Physicaldescription-MIB::rlPhdUnitGenPara
 $hardware = str_replace(' ', '', snmp_get($device, 'CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1', '-Ovq'));
 $serial   = snmp_get($device, 'CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamSerialNum.1', '-Ovq');
 $features = snmp_get($device, 'CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamServiceTag.1', '-Ovq');
+
+if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.9.6.1.89.26.1') {
+	$hardware = 'SG220-26';
+}
