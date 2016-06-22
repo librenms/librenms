@@ -93,7 +93,7 @@ if ($percentile) {
     $rrd_options .= ' GPRINT:percentile_in:%6.2lf%s';
 }
 
-$rrd_options .= ' COMMENT:\\n';
+$rrd_options .= " COMMENT:\\n";
 $rrd_options .= ' AREA:dout#'.$colour_area_out.':';
 $rrd_options .= ' LINE1.25:dout#'.$colour_line_out.":'".$out_text."'";
 $rrd_options .= ' GPRINT:out:LAST:%6.2lf%s';
