@@ -33,6 +33,4 @@ if (!$os) {
         //Dell N3024P
         $os = 'dnos';
     }
-
-
 }
