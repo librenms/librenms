@@ -38,7 +38,7 @@ if (!empty($filter_hostname)) {
     $ip = gethostbyname($filter_hostname);
     $device = device_by_name($filter_hostname);
     $query .= 'source:"'.$filter_hostname.'" || source:"'.$ip.'"';
-    if (isset($device['ip'])) {
+    if (isset($device['ip']) && $ip != $device['ip']) {
         $query .= ' || source:"'.$device['ip'].'"';
     }
 }
