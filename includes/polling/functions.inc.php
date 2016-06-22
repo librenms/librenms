@@ -244,7 +244,7 @@ function poll_device($device, $options) {
         else {
             foreach ($config['poller_modules'] as $module => $module_status) {
                 if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
-                    load_poller_module($module, $device, $attribs);
+                    $module_time = load_poller_module($module, $device, $attribs);
 
                     // save per-module poller stats
                     $tags = array(
@@ -528,7 +528,7 @@ function location_to_latlng($device) {
     }
 }// end location_to_latlng()
 
-function load_poller_module($module, $device) {
+function load_poller_module($module, $device, $attribs) {
     global $config, $valid;
     $module_start = microtime(true);
     echo "\n#### Load poller module $module ####\n";
@@ -537,4 +537,5 @@ function load_poller_module($module, $device) {
     $module_time = substr($module_time, 0, 5);
     echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
     echo "#### Unload poller module $module ####\n\n";
+    return $module_time;
 }
