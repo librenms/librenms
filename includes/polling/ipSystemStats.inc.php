@@ -46,7 +46,6 @@
 // IP-MIB::ipSystemStatsDiscontinuityTime.ipv6 = Timeticks: (0) 0:00:00.00
 // IP-MIB::ipSystemStatsRefreshRate.ipv4 = Gauge32: 30000 milli-seconds
 // IP-MIB::ipSystemStatsRefreshRate.ipv6 = Gauge32: 30000 milli-seconds
-echo 'Polling IP-MIB ipSystemStats ';
 
 $ipSystemStats = snmpwalk_cache_oid($device, 'ipSystemStats', null, 'IP-MIB');
 

@@ -1,7 +1,5 @@
 <?php
 
-echo 'hrDevice : ';
-
 $hrDevice_oids = array(
     'hrDeviceEntry',
     'hrProcessorEntry',

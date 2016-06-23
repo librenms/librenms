@@ -58,7 +58,6 @@ if ($device['os_group'] == 'cisco') {
     $error_overlay[6] = "destroy";
 
     $module = 'Cisco-OTV';
-    echo $module.': ';
 
     require_once 'includes/component.php';
     $component = new component();
