@@ -1,6 +1,5 @@
 <?php
 
-echo 'OSPF: ';
 $ospf_instance_count  = 0;
 $ospf_port_count      = 0;
 $ospf_area_count      = 0;
