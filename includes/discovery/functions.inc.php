@@ -108,20 +108,17 @@ function discover_device($device, $options = null) {
     if ($options['m']) {
         foreach (explode(',', $options['m']) as $module) {
             if (is_file("includes/discovery/$module.inc.php")) {
-                include "includes/discovery/$module.inc.php";
+                load_discovery_module($module, $device, $attribs);
             }
         }
     } else {
         foreach ($config['discovery_modules'] as $module => $module_status) {
             if ($attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
-                $module_start = microtime(true);
-                include 'includes/discovery/' . $module . '.inc.php';
-                $module_time = microtime(true) - $module_start;
-                echo "Runtime for discovery module '$module': $module_time\n";
+                load_discovery_module($module, $device, $attribs);
             } else if (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
-                echo "Module [ $module ] disabled on host.\n";
+                echo "Module [ $module ] disabled on host.\n\n";
             } else {
-                echo "Module [ $module ] disabled globally.\n";
+                echo "Module [ $module ] disabled globally.\n\n";
             }
         }
     }
@@ -851,3 +848,13 @@ function avtech_add_sensor($device, $sensor) {
     return true;
 }
 
+function load_discovery_module($module, $device, $attribs) {
+    global $config, $valid;
+    $module_start = microtime(true);
+    echo "#### Load disco module $module ####\n";
+    include "includes/discovery/$module.inc.php";
+    $module_time = microtime(true) - $module_start;
+    $module_time = substr($module_time, 0, 5);
+    echo "\n>> Runtime for discovery module '$module': $module_time seconds\n";
+    echo "#### Unload disco module $module ####\n\n";
+}

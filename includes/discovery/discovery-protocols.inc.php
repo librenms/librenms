@@ -1,7 +1,5 @@
 <?php
 
-echo 'Discovery protocols:';
-
 global $link_exists;
 
 $community = $device['community'];
