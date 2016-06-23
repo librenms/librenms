@@ -194,6 +194,7 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
 
     $data = trim(external_exec($cmd));
     $data = str_replace('"', '', $data);
+    $data = str_replace('End of MIB', '', $data);
 
     if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data))) {
         $data = false;
