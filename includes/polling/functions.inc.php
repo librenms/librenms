@@ -235,42 +235,47 @@ function poll_device($device, $options) {
         include 'includes/polling/core.inc.php';
 
         if ($options['m']) {
+            $config['poller_modules'] = array();
             foreach (explode(',', $options['m']) as $module) {
                 if (is_file('includes/polling/'.$module.'.inc.php')) {
-                    load_poller_module($module, $device, $attribs);
+                    $config['poller_modules'][$module] = 1;
                 }
             }
         }
-        else {
-            foreach ($config['poller_modules'] as $module => $module_status) {
-                if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
-                    $module_time = load_poller_module($module, $device, $attribs);
+        foreach ($config['poller_modules'] as $module => $module_status) {
+            if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
+                $module_start = microtime(true);
+                echo "\n#### Load poller module $module ####\n";
+                include "includes/polling/$module.inc.php";
+                $module_time = microtime(true) - $module_start;
+                $module_time = substr($module_time, 0, 5);
+                echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
+                echo "#### Unload poller module $module ####\n\n";
 
-                    // save per-module poller stats
-                    $tags = array(
-                        'module'      => $module,
-                        'rrd_def'     => 'DS:poller:GAUGE:600:0:U',
-                        'rrd_name'    => array('poller-perf', $module),
-                    );
-                    $fields = array(
-                        'poller' => $module_time,
-                    );
-                    data_update($device, 'poller-perf', $tags, $fields);
+                // save per-module poller stats
+                $tags = array(
+                    'module'      => $module,
+                    'rrd_def'     => 'DS:poller:GAUGE:600:0:U',
+                    'rrd_name'    => array('poller-perf', $module),
+                );
+                $fields = array(
+                    'poller' => $module_time,
+                );
+                data_update($device, 'poller-perf', $tags, $fields);
 
-                    // remove old rrd
-                    $oldrrd = rrd_name($device['hostname'], array('poller', $module, 'perf'));
-                    if (is_file($oldrrd)) {
-                        unlink($oldrrd);
-                    }
-                }
-                else if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
-                    echo "Module [ $module ] disabled on host.\n";
-                }
-                else {
-                    echo "Module [ $module ] disabled globally.\n";
-                }
+                // remove old rrd
+                $oldrrd = rrd_name($device['hostname'], array('poller', $module, 'perf'));
+                if (is_file($oldrrd)) {
+                    unlink($oldrrd);
+                 }
             }
-        }//end if
+            else if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
+                echo "Module [ $module ] disabled on host.\n";
+            }
+            else {
+                echo "Module [ $module ] disabled globally.\n";
+            }
+        }
 
         // Update device_groups
         UpdateGroupsForDevice($device['device_id']);
@@ -528,14 +533,3 @@ function location_to_latlng($device) {
     }
 }// end location_to_latlng()
 
-function load_poller_module($module, $device, $attribs) {
-    global $config, $valid;
-    $module_start = microtime(true);
-    echo "\n#### Load poller module $module ####\n";
-    include "includes/polling/$module.inc.php";
-    $module_time = microtime(true) - $module_start;
-    $module_time = substr($module_time, 0, 5);
-    echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
-    echo "#### Unload poller module $module ####\n\n";
-    return $module_time;
-}

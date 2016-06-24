@@ -106,20 +106,26 @@ function discover_device($device, $options = null) {
 
     // If we've specified modules, use them, else walk the modules array
     if ($options['m']) {
+        $config['discovery_modules'] = array();
         foreach (explode(',', $options['m']) as $module) {
             if (is_file("includes/discovery/$module.inc.php")) {
-                load_discovery_module($module, $device, $attribs);
+                $config['discovery_modules'][$module] = 1;
             }
         }
-    } else {
-        foreach ($config['discovery_modules'] as $module => $module_status) {
-            if ($attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
-                load_discovery_module($module, $device, $attribs);
-            } else if (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
-                echo "Module [ $module ] disabled on host.\n\n";
-            } else {
-                echo "Module [ $module ] disabled globally.\n\n";
-            }
+    }
+    foreach ($config['discovery_modules'] as $module => $module_status) {
+        if ($attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
+            $module_start = microtime(true);
+            echo "#### Load disco module $module ####\n";
+            include "includes/discovery/$module.inc.php";
+            $module_time = microtime(true) - $module_start;
+            $module_time = substr($module_time, 0, 5);
+            echo "\n>> Runtime for discovery module '$module': $module_time seconds\n";
+            echo "#### Unload disco module $module ####\n\n";
+        } else if (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
+            echo "Module [ $module ] disabled on host.\n\n";
+        } else {
+            echo "Module [ $module ] disabled globally.\n\n";
         }
     }
 
@@ -848,13 +854,3 @@ function avtech_add_sensor($device, $sensor) {
     return true;
 }
 
-function load_discovery_module($module, $device, $attribs) {
-    global $config, $valid;
-    $module_start = microtime(true);
-    echo "#### Load disco module $module ####\n";
-    include "includes/discovery/$module.inc.php";
-    $module_time = microtime(true) - $module_start;
-    $module_time = substr($module_time, 0, 5);
-    echo "\n>> Runtime for discovery module '$module': $module_time seconds\n";
-    echo "#### Unload disco module $module ####\n\n";
-}
