@@ -1283,3 +1283,58 @@ function get_ripe_api_whois_data_json($ripe_data_param, $ripe_query_param) {
     return json_decode(file_get_contents($ripe_whois_url) , true);
 }//end get_ripe_api_whois_data_json()
 
+/**
+ * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
+ * One or an array of strings can be provided as an argument; if an array is passed, all ports matching
+ * any of the types in the array are returned.
+ * @param $types mixed String or strings matching 'port_descr_type's.
+ * @return array Rows from the ports table for matching ports.
+ */
+function get_ports_from_type($given_types) {
+    global $config;
+
+    # Make the arg an array if it isn't, so subsequent steps only have to handle arrays.
+    if(!is_array($given_types)) {
+        $given_types = array($given_types);
+    }
+
+    # Check the config for a '_descr' entry for each argument. This is how a 'custom_descr' entry can
+    #  be key/valued to some other string that's actually searched for in the DB. Merge or append the
+    #  configured value if it's an array or a string. Or append the argument itself if there's no matching
+    #  entry in config.
+    $search_types = array();
+    foreach($given_types as $type) {
+        if(isset($config[$type.'_descr']) === true) {
+            if (is_array($config[$type.'_descr']) === true) {
+                $search_types = array_merge($search_types, $config[$type.'_descr']);
+            }
+            else {
+                $search_types[] = $config[$type.'_descr'];
+            }
+        }
+        else {
+            $search_types[] = $type;
+        }
+    }
+
+    # Using the full list of strings to search the DB for, build the 'where' portion of a query that
+    #  compares 'port_descr_type' with entry in the list. Also, since '@' is the convential wildcard,
+    #  replace it with '%' so it functions as a wildcard in the SQL query.
+    $type_where = ' (';
+    $or = '';
+    $type_param = array();
+
+    foreach($search_types as $type) {
+        if (!empty($type)) {
+            $type            = strtr($type, '@', '%');
+            $type_where     .= " $or `port_descr_type` LIKE ?";
+            $or              = 'OR';
+            $type_param[]    = $type;
+        }
+    }
+    $type_where  .= ') ';
+
+    # Run the query with the generated 'where' and necessary parameters, and send it back.
+    $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
+    return $ports;
+}
