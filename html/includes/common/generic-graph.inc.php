@@ -74,6 +74,7 @@ if( defined('show_settings') || empty($widget_settings) ) {
         <option value="peering"'.($widget_settings['graph_type'] == 'peering' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Peering</option>
         <option value="core"'.($widget_settings['graph_type'] == 'core' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Core</option>
         <option value="custom"'.($widget_settings['graph_type'] == 'custom' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Custom Descr</option>
+        <option value="manual"'.($widget_settings['graph_type'] == 'manual' ? ' selected' : '').'>&nbsp;&nbsp;&nbsp;Manual Descr</option>
         <option disabled></option>
         <option value="bill_bits"'.($widget_settings['graph_type'] == 'bill_bits' ? ' selected' : '').'>Bill</option>
       </select>
@@ -149,6 +150,14 @@ if( defined('show_settings') || empty($widget_settings) ) {
     }
     $common_output[] = '      </select>
     </div>
+  </div>
+  <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_manual">
+    <div class="col-sm-2">
+      <label for="graph_manual" class="control-label">Manual Port-Desc: </label>
+    </div>
+    <div class="col-sm-10">
+      <input type="text" class="form-control input_'.$unique_id.'_manual" name="graph_manual" placeholder="Descr String" value="'.htmlspecialchars($widget_settings['graph_manual']).'">';
+    $common_output[] = '    </div>
   </div>
   <div class="form-group input_'.$unique_id.'" id="input_'.$unique_id.'_bill">
     <div class="col-sm-2">
@@ -393,9 +402,10 @@ else {
     elseif ($type == 'munin') {
         $param                        = 'device='.$widget_settings['graph_'.$type]['device_id'].'&plugin='.$widget_settings['graph_'.$type]['name'];
     }
-    elseif ($type == 'transit' || $type == 'peering' || $type == 'core' || $type == 'custom') {
-        if ( $type == 'custom' ) {
-            $type = $widget_settings['graph_custom'];
+    elseif ($type == 'transit' || $type == 'peering' || $type == 'core' || $type == 'custom' || $type == 'manual') {
+        if ( $type == 'custom' || $type == 'manual') {
+            $type = $widget_settings['graph_'.$type];
+            $type = explode(',', $type);
         }
 
         $ports = get_ports_from_type($type);
