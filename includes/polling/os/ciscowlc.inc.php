@@ -85,13 +85,12 @@ foreach ($radios as $key => $value) {
         $txpow         = $value['bsnAPIfPhyTxPowerLevel'];
         $type          = $value['bsnAPIfType'];
         $interference  = 128 + $interferences[$key . '.' . $channel]['bsnAPIfInterferencePower'];
+        $radioutil     = $loadParams[$key]['bsnAPIfLoadChannelUtilization'];
 
         // TODO
-
         $numactbssid   = 0;
         $nummonbssid   = 0;
         $nummonclients = 0;
-        $radioutil     = $loadParams[$key]['bsnAPIfLoadChannelUtilization'];
 
 	d_echo("  name: $name\n");
 	d_echo("  radionum: $radionum\n");
