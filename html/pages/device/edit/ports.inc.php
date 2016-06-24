@@ -16,6 +16,7 @@
                 <th data-column-id='ifOperStatus'>Oper</th>
                 <th data-column-id='disabled' data-sortable='false'>Disable</th>
                 <th data-column-id='ignore' data-sortable='false'>Ignore</th>
+                <th data-column-id='ifSpeed'>ifSpeed</th>
                 <th data-column-id='port_tune' data-sortable='false' data-searchable='false'>RRD Tune</th>
                 <th data-column-id='ifAlias'>Description</th>
             </tr>
