@@ -6,8 +6,9 @@ made to InfluxDB itself then we cannot guarantee that your data will be ok so en
 risk!
 
 ### Requirements
- - InfluxDB 0.94
+ - InfluxDB >= 0.94
  - Grafana
+ - PHP 5.5 for InfluxDB-PHP
 
 The setup of the above is completely out of scope here and we aren't really able to provide any help with this side
 of things.

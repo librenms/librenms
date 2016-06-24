@@ -13,11 +13,11 @@
  */
 
 if (empty($_SERVER['PATH_INFO'])) {
-    if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") ) {
-        $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'].$_SERVER['PHP_SELF'],"",$_SERVER['ORIG_SCRIPT_FILENAME']);
+    if( strstr($_SERVER['SERVER_SOFTWARE'],"nginx") && isset($_SERVER['PATH_TRANSLATED']) && isset($_SERVER['ORIG_SCRIPT_FILENAME']) ) {
+            $_SERVER['PATH_INFO'] = str_replace($_SERVER['PATH_TRANSLATED'] . $_SERVER['PHP_SELF'], "", $_SERVER['ORIG_SCRIPT_FILENAME']);
     }
     else {
-        $_SERVER['PATH_INFO'] = !empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '';
+        $_SERVER['PATH_INFO'] = isset($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '';
     }
 }
 
@@ -320,7 +320,7 @@ echo('<h5>Powered by <a href="' . $config['project_home'] . '" target="_blank" c
 }
 
 if(dbFetchCell("SELECT COUNT(`device_id`) FROM `devices` WHERE `last_polled` <= DATE_ADD(NOW(), INTERVAL - 15 minute) AND `ignore` = 0 AND `disabled` = 0 AND status = 1",array()) > 0) {
-    $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
+    $msg_box[] = array('type' => 'warning', 'message' => "<a href=\"poll-log/filter=unpolled/\">It appears as though you have some devices that haven't completed polling within the last 15 minutes, you may want to check that out :)</a>",'title' => 'Devices unpolled');
 }
 
 if(is_array($msg_box)) {

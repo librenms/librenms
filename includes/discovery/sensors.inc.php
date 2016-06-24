@@ -2,8 +2,6 @@
 
 $valid['sensor'] = array();
 
-echo 'Sensors: ';
-
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
 require 'includes/discovery/sensors/entity-sensor.inc.php';
 require 'includes/discovery/sensors/ipmi.inc.php';

@@ -1,5 +1,6 @@
 <?php
 
+require_once $config['install_dir'].'/includes/device-groups.inc.php';
 
 function poll_sensor($device, $class, $unit) {
     global $config, $memcache, $agent_sensors;
@@ -128,11 +129,11 @@ function poll_sensor($device, $class, $unit) {
         influx_update($device,'sensor',$tags,$fields);
 
         // FIXME also warn when crossing WARN level!!
-        if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value <= $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
+        if ($sensor['sensor_limit_low'] != '' && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' under threshold: '.$sensor_value." $unit (< ".$sensor['sensor_limit_low']." $unit)", $device, $class, $sensor['sensor_id']);
         }
-        else if ($sensor['sensor_limit'] != '' && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value >= $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
+        else if ($sensor['sensor_limit'] != '' && $sensor['sensor_current'] < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
             log_event(ucfirst($class).' '.$sensor['sensor_descr'].' above threshold: '.$sensor_value." $unit (> ".$sensor['sensor_limit']." $unit)", $device, $class, $sensor['sensor_id']);
         }
@@ -236,17 +237,14 @@ function poll_device($device, $options) {
         if ($options['m']) {
             foreach (explode(',', $options['m']) as $module) {
                 if (is_file('includes/polling/'.$module.'.inc.php')) {
-                    include 'includes/polling/'.$module.'.inc.php';
+                    load_poller_module($module, $device, $attribs);
                 }
             }
         }
         else {
             foreach ($config['poller_modules'] as $module => $module_status) {
                 if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
-                    $module_start = microtime(true);
-                    include 'includes/polling/'.$module.'.inc.php';
-                    $module_time = microtime(true) - $module_start;
-                    echo "Runtime for polling module '$module': $module_time\n";
+                    $module_time = load_poller_module($module, $device, $attribs);
 
                     // save per-module poller stats
                     $tags = array(
@@ -273,6 +271,9 @@ function poll_device($device, $options) {
                 }
             }
         }//end if
+
+        // Update device_groups
+        UpdateGroupsForDevice($device['device_id']);
 
         if (!$options['m']) {
             // FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
@@ -526,3 +527,15 @@ function location_to_latlng($device) {
         }
     }
 }// end location_to_latlng()
+
+function load_poller_module($module, $device, $attribs) {
+    global $config, $valid;
+    $module_start = microtime(true);
+    echo "\n#### Load poller module $module ####\n";
+    include "includes/polling/$module.inc.php";
+    $module_time = microtime(true) - $module_start;
+    $module_time = substr($module_time, 0, 5);
+    echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
+    echo "#### Unload poller module $module ####\n\n";
+    return $module_time;
+}

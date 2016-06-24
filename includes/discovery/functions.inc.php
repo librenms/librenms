@@ -63,7 +63,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
                     $extra_log = ' (port ' . $int['label'] . ') ';
                 }
 
-                log_event('Device $' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
+                log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
             } else {
                 log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - check ping and SNMP access", $device['device_id'], 'discovery');
             }
@@ -108,20 +108,17 @@ function discover_device($device, $options = null) {
     if ($options['m']) {
         foreach (explode(',', $options['m']) as $module) {
             if (is_file("includes/discovery/$module.inc.php")) {
-                include "includes/discovery/$module.inc.php";
+                load_discovery_module($module, $device, $attribs);
             }
         }
     } else {
         foreach ($config['discovery_modules'] as $module => $module_status) {
             if ($attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
-                $module_start = microtime(true);
-                include 'includes/discovery/' . $module . '.inc.php';
-                $module_time = microtime(true) - $module_start;
-                echo "Runtime for discovery module '$module': $module_time\n";
+                load_discovery_module($module, $device, $attribs);
             } else if (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
-                echo "Module [ $module ] disabled on host.\n";
+                echo "Module [ $module ] disabled on host.\n\n";
             } else {
-                echo "Module [ $module ] disabled globally.\n";
+                echo "Module [ $module ] disabled globally.\n\n";
             }
         }
     }
@@ -760,7 +757,8 @@ function avtech_add_sensor($device, $sensor) {
     // get the sensor value
     $value = snmp_get($device, $oid, '-OvQ');
     // if the sensor doesn't exist abort
-    if ($value === false || $value == 0) {  //issue unfortunately non-existant sensors return 0
+    if ($value === false || ($type == 'temperature' && $value == 0)) {
+        //issue unfortunately some non-existant sensors return 0
         d_echo('Error: sensor returned no data, skipping' . "\n");
         return false;
     }
@@ -770,6 +768,31 @@ function avtech_add_sensor($device, $sensor) {
     $type = $sensor['type'] ? $sensor['type'] : 'temperature';
     d_echo('Sensor type: ' . $type . "\n");
 
+    $type_name = $device['os'];
+    if ($type == 'switch') {
+        // set up state sensor
+        $type_name .= ucfirst($type);
+        $type = 'state';
+        $state_index_id = create_state_index($type_name);
+
+        //Create State Translation
+        if (isset($state_index_id)) {
+            $states = array(
+                 array($state_index_id,'Off',1,0,-1),
+                 array($state_index_id,'On',1,1,0),
+             );
+            foreach($states as $value){
+                $insert = array(
+                    'state_index_id' => $value[0],
+                    'state_descr' => $value[1],
+                    'state_draw_graph' => $value[2],
+                    'state_value' => $value[3],
+                    'state_generic_value' => $value[4]
+                );
+                dbInsert($insert, 'state_translations');
+            }
+        }
+    }
 
     // set the description
     if ($sensor['descr_oid']) {
@@ -788,8 +811,11 @@ function avtech_add_sensor($device, $sensor) {
     if ($sensor['divisor']) {
         $divisor = $sensor['divisor'];
     }
-    else {
+    elseif ($type == 'temperature') {
         $divisor = 100;
+    }
+    else {
+        $divisor = 1;
     }
     d_echo('Sensor divisor: ' . $divisor . "\n");
 
@@ -813,7 +839,22 @@ function avtech_add_sensor($device, $sensor) {
     d_echo('Sensor alarm max: ' . $max . "\n");
 
     // add the sensor
-    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $device['os'], $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
+    discover_sensor($valid['sensor'], $type, $device, $oid, $id, $type_name, $descr, $divisor, '1', $min, null, null, $max, $value/$divisor);
+
+    if ($type == 'state') {
+        create_sensor_to_state_index($device, $type_name, $id);
+    }
+
     return true;
 }
 
+function load_discovery_module($module, $device, $attribs) {
+    global $config, $valid;
+    $module_start = microtime(true);
+    echo "#### Load disco module $module ####\n";
+    include "includes/discovery/$module.inc.php";
+    $module_time = microtime(true) - $module_start;
+    $module_time = substr($module_time, 0, 5);
+    echo "\n>> Runtime for discovery module '$module': $module_time seconds\n";
+    echo "#### Unload disco module $module ####\n\n";
+}

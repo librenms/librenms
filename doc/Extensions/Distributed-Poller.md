@@ -1,26 +1,22 @@
 # Distributed Poller
 LibreNMS has the ability to distribute polling of devices to other machines.
 
-These machines can be in a different physical location and therefore minimize network latencies for colocations.
+These machines can be in a different physical location and therefore minimize network latency for devices that are a considerable 
+distance away or are behind NAT firewalls.
 
-Devices can also be grouped together into a `poller_group` to pin these devices to a single or a group of designated pollers.
+Devices can be grouped together into a `poller_group` to pin these devices to a single or a group of designated pollers.
 
-~~All pollers need to share their RRD-folder, for example via NFS or a combination of NFS and rrdcached.~~
+> All pollers need to share their RRD-folder, for example via NFS or a combination of NFS and rrdcached.
 
-> This is no longer a strict requirement with the use of rrdtool 1.5 and above. If you are NOT running 1.5 then you will still
-need to share the RRD-folder.
+It is a requirement that all pollers can access the central memcached to communicate with each other.
 
-It is also required that all pollers can access the central memcached to communicate with each other.
+By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`. One can also specify a comma separated string of poller groups in $config['distributed_poller_group'].  The poller will then poll devices from any of the groups listed.  If new devices get added from the poller they will be assigned to the first poller group in the list unless the group is specified when adding the device.
 
-In order to enable distributed polling, set `$config['distributed_poller'] = true` and your memcached details into `$config['distributed_poller_memcached_host']` and `$config['distributed_poller_memcached_port']`.
-By default, all hosts are shared and have the `poller_group = 0`. To pin a device to a poller, set it to a value greater than 0 and set the same value in the poller's config with `$config['distributed_poller_group']`.
-Usually the poller's name is equal to the machine's hostname, if you want to change it set `$config['distributed_poller_name']`.
-One can also specify a comma separated string of poller groups in $config['distributed_poller_group'].  The poller will then poll devices from any of the groups listed.  If new devices get added from the poller they will be assigned to the first poller group in the list unless the group is specified when adding the device.
+A standard configuration for a distrinuted poller would look like:
 
-## Configuration
 ```php
 // Distributed Poller-Settings
-$config['distributed_poller']                            = false;
+$config['distributed_poller']                            = true;
 $config['distributed_poller_name']                       = file_get_contents('/proc/sys/kernel/hostname');
 $config['distributed_poller_group']                      = 0;
 $config['distributed_poller_memcached_host']             = 'example.net';
@@ -32,39 +28,28 @@ Below is an example setup based on a real deployment which at the time of writin
 
 ![Example Setup](http://docs.librenms.org/img/librenms-distributed-diagram.png)
 
-###Architecture
+### Architecture
 How you setup the distribution is entirely up to you, you can choose to host the majority of the required services on a single virtual machine or server and then a poller to actually query the devices being monitored all the way through to having a dedicated server for each of the individual roles. Below are notes on what you need to consider both from the software layer but also connectivity.
 
-####Web / API Layer
+#### Web / API Layer
 This is typically Apache but we have setup guides for both Nginx and Lighttpd which should work perfectly fine. There is nothing unique about the role this service is providing except that if you are adding devices from this layer then the web service will need to be able to connect to the end device via SNMP and perform an ICMP test.
 
 It is advisable to run RRDCached within this setup so that you don't need to share the rrd folder via a remote file share such as NFS. The web service can then generate rrd graphs via RRDCached. If RRDCached isn't an option then you can mount the rrd directory to read the RRD files directly.
 
-We would recommend that you run some form of php caching application such as PHP XCache
+#### Database Server
+MySQL / MariaDB - At the moment these are the only database servers that are supported, work is being done to ensure MySQL Strict mode is also supported but this should be considered to be incomplete still and therefor disabled.
 
-The MySQL server should be contactable from this layer on port 3306 unless it's changed.
+The pollers, web and API layers should all be able to access the database server directly.
 
-####Database Server
-MySQL - At the moment this is the only database server that is supported, work is being done to ensure MySQL Strict mode is also supported but this should be considered to be incomplete still.
-
-The pollers, web and API layers should all be able to access the database server directly. It would be possible to configure MySQL multi master but that is outside the scope of this document.
-
-####RRD Storage
+#### RRD Storage
 Central storage should be provided so all RRD files can be read from and written to in one location. As suggested above, it's recommended that RRD Cached is configured and used.
 
-For this example, we are running RRDCached to allow all pollers and web/api servers to read/write to the rrd files ~~with the rrd directory also exported by NFS for simple access and maintenance.~~
+For this example, we are running RRDCached to allow all pollers and web/api servers to read/write to the rrd files with the rrd directory also exported by NFS for simple access and maintenance.
 
-Sharing rrd files via something like NFS is no longer required if you run rrdtool 1.5 or greater. If you don't - please share your rrd folder as before. If you run rrdtool
-1.5 or greater then add this config to your pollers:
+#### Memcache
+Memcache is required for the distributed pollers to be able to register to a central location and record what devices are polled. Memcache can run from any of the servers so long as it is accessible by all pollers.
 
-```php
-$config['rrdtool_version'] = 1.5;
-```
-
-####Memcache
-Memcache is required for the distributed pollers to be able to register to a central location and record what devices are polled. Memcache can run from any of the kit so long as it is accessible by all pollers.
-
-####Pollers
+#### Pollers
 Pollers can be installed and run from anywhere, the only requirements are:
 
 They can access the Memcache instance
@@ -77,31 +62,121 @@ This will provide the ability to have a single poller behind a NAT firewall moni
 
 Another benefit to this is that you can provide N+x pollers, i.e if you know that you require three pollers to process all devices within 300 seconds then adding a 4th poller will mean that should any one single poller fail then the remaining three will complete polling in time. You could also use this to take a poller out of service for maintenance, i.e OS updates and software updates.
 
-It is extremely advisable to either run a central recursive dns server such as pdns-recursor and have all of your pollers use this or install a recursive dns server on each poller - the volume of DNS requests on large installs can be significant.
+It is extremely advisable to either run a central recursive dns server such as pdns-recursor and have all of your pollers use this or install a recursive dns server on each poller - the volume of DNS requests on large installs can be significant and will slow polling down enough to cause issues with a large number of devices.
 
-####Discovery
+#### Discovery
 It's not necessary to run discovery services on all pollers. In fact, you should only run one discovery process per poller group. Designate a single poller to run discovery (or a separate server if required).
 
-####Config sample
-Memcache:
+#### Config sample
+The following config is taken from a live setup which consists of a Web server, DB server, RRDCached server and 3 pollers.
 
- - This doesn't require any special config. The example setup is running "-m 64 -p 11211 -l <ip>"
-
-RRDCached:
-
- - You will need to tune RRDCached to suite your environment.
- - The following is used in this example setup "-l 0:42217 -j /var/lib/rrdcached/journal/ -F -b /opt/librenms/rrd -B -w 1800 -z 900 -p /var/run/rrdcached.pid"
-
+Web Server:
+Running Apache and an install of LibreNMS in /opt/librenms
+ - config.php
 ```php
-$config['rrdcached']    = "127.0.0.1:42217";
-$config['rrd_dir']      = "/opt/librenms/rrd";
-$config['rrdcached_dir'] = "";
+$config['distributed_poller'] = true;
+$config['rrdcached']    = "example.com:42217";
+$config['rrdcached_dir'] = ".";
 ```
 
-For rrdtool 1.5 or greater then you can enable support for rrdcached to create the rrd files:
+Database Server:
+Running Memcache and MariaDB
+ - Memcache
 
-```php
-$config['rrdtool_version'] = 1.5;
+Ubuntu (/etc/memcached.conf)
+```conf
+-d
+-m 64
+-p 11211
+-u memcache
+-l ip.ip.ip.ip
 ```
 
-$config['rrdcached_dir'] Is only needed if you are using tcp connections for rrd cached and needs only to be set if you want to store rrd files within a sub directory of your rrdcached base directory.
+RRDCached Server:
+Running RRDCached
+  - RRDCached
+
+Ubuntu (/etc/default/rrdcached)
+```conf
+OPTS="-l 0:42217"
+OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
+OPTS="$OPTS -b /opt/librenms/rrd -B"
+OPTS="$OPTS -w 1800 -z 900"
+```
+
+Poller 1:
+Running an install of LibreNMS in /opt/librenms
+
+`config.php`
+```php
+$config['distributed_poller_name']           = file_get_contents('/etc/hostname');
+$config['distributed_poller_group']          = '0';
+$config['distributed_poller_memcached_host'] = "example.com";
+$config['distributed_poller_memcached_port'] = 11211;
+$config['distributed_poller_host']           = "example.com";
+$config['distributed_poller_port']           = 11211;
+$config['distributed_poller']                = true;
+$config['rrdcached']                         = "example.com:42217";
+$config['rrdcached_dir']                     = ".";
+$config['update']                            = 0;
+```
+
+`/etc/cron.d/librenms`
+Runs discovery and polling for group 0, daily.sh to deal with notifications and DB cleanup and alerts.
+```conf
+33  */6 * * * librenms /opt/librenms/discovery.php -h all >> /dev/null 2>&1
+*/5 *   * * * librenms /opt/librenms/discovery.php -h new >> /dev/null 2>&1
+*/5 *   * * * librenms /opt/librenms/poller-wrapper.py 24 >> /opt/librenms/logs/wrapper.log
+15  0   * * * librenms /opt/librenms/daily.sh >> /dev/null 2>&1
+*   *   * * * librenms /opt/librenms/alerts.php >> /dev/null 2>&1
+```
+
+Poller 2:
+Running an install of LibreNMS in /opt/librenms
+
+`config.php`
+```php
+$config['distributed_poller_name']           = file_get_contents('/etc/hostname');
+$config['distributed_poller_group']          = '0';
+$config['distributed_poller_memcached_host'] = "example.com";
+$config['distributed_poller_memcached_port'] = 11211;
+$config['distributed_poller_host']           = "example.com";
+$config['distributed_poller_port']           = 11211;
+$config['distributed_poller']                = true;
+$config['rrdcached']                         = "example.com:42217";
+$config['rrdcached_dir']                     = ".";
+$config['update']                            = 0;
+```
+
+`/etc/cron.d/librenms`
+Runs billing as well as polling for group 0.
+```conf
+*/5 * * * * librenms /opt/librenms/poller-wrapper.py 24 >> /opt/librenms/logs/wrapper.log
+*/5 * * * * librenms /opt/librenms/poll-billing.php >> /dev/null 2>&1
+01  * * * * librenms /opt/librenms/billing-calculate.php >> /dev/null 2>&1
+```
+
+Poller 3:
+Running an install of LibreNMS in /opt/librenms
+
+`config.php`
+```php
+$config['distributed_poller_name']           = file_get_contents('/etc/hostname');
+$config['distributed_poller_group']          = '2,3';
+$config['distributed_poller_memcached_host'] = "example.com";
+$config['distributed_poller_memcached_port'] = 11211;
+$config['distributed_poller_host']           = "example.com";
+$config['distributed_poller_port']           = 11211;
+$config['distributed_poller']                = true;
+$config['rrdcached']                         = "example.com:42217";
+$config['rrdcached_dir']                     = ".";
+$config['update']                            = 0;
+```
+
+`/etc/cron.d/librenms`
+Runs discovery and polling for groups 2 and 3.
+```conf
+33  */6 * * * librenms /opt/librenms/discovery.php -h all >> /dev/null 2>&1
+*/5 *   * * * librenms /opt/librenms/discovery.php -h new >> /dev/null 2>&1
+*/5 *   * * * librenms /opt/librenms/poller-wrapper.py 16 >> /opt/librenms/logs/wrapper.log
+```

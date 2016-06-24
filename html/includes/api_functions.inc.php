@@ -115,6 +115,11 @@ function get_graph_generic_by_hostname() {
     $hostname     = $router['hostname'];
     $vars         = array();
     $vars['type'] = $router['type'] ?: 'device_uptime';
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = device_by_id_cache($device_id);
+
     if (!empty($_GET['from'])) {
         $vars['from'] = $_GET['from'];
     }
@@ -1266,7 +1271,7 @@ function get_devices_by_group() {
     }
     else {
         $group_id = dbFetchCell("SELECT `id` FROM `device_groups` WHERE `name`=?",array($name));
-        $devices = GetDevicesFromGroup($group_id);
+        $devices = GetDevicesFromGroup($group_id, true);
         $count = count($devices);
         if (empty($devices)) {
             $message = 'No devices found in group ' . $name;

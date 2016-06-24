@@ -116,7 +116,6 @@ $graph_data = _json_encode($data);
             id: 1,
             content: names[1],
             options: {
-                yAxisOrientation: 'right',
                 drawPoints: {
                     style: 'circle'
                 },
@@ -130,7 +129,6 @@ $graph_data = _json_encode($data);
             id: 2,
             content: names[2],
             options: {
-                yAxisOrientation: 'right',
                 drawPoints: {
                     style: 'circle'
                 },
@@ -144,7 +142,6 @@ $graph_data = _json_encode($data);
             id: 3,
             content: names[3],
             options: {
-                yAxisOrientation: 'right',
                 drawPoints: {
                     style: 'circle'
                 },
@@ -163,21 +160,13 @@ echo $graph_data; ?>
     ;
     var dataset = new vis.DataSet(items);
     var options = {
-        barChart: {width:50, align:'right',handleOverlap:'sideBySide'}, // align: left, center, right
+        barChart: {width:50, align:'right'}, // align: left, center, right
         drawPoints: false,
         legend: {left:{position:"bottom-left"}},
         dataAxis: {
             icons:true,
             showMajorLabels: true,
             showMinorLabels: true,
-            customRange: {
-               left: {
-                    min: 0, max: 100
-               },
-               right: {
-                    min: 0, max: <?php echo $max_val; ?>
-                }
-            }
         },
         zoomMin: 86400, //24hrs
         zoomMax: <?php
@@ -188,6 +177,6 @@ echo $milisec_diff;
 ?>,
         orientation:'top'
     };
-    var graph2d = new vis.Graph2d(container, items, groups, options);
+    var graph2d = new vis.Graph2d(container, dataset, groups, options);
 
 </script>

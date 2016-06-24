@@ -775,6 +775,8 @@ $config['perf_times_purge'] = 30;
 // Number in days of how long to keep performace polling stats  entries for.
 $config['device_perf_purge'] = 7;
 // Number in days of how long to keep device performance data for.
+$config['alert_log_purge'] = 365;
+// Number in days of how long to keep alert log data for.
 
 // Date format for PHP date()s
 $config['dateformat']['long'] = 'r';
@@ -791,6 +793,10 @@ $config['dateformat']['mysql']['time']    = '%H:%i:%s';
 $config['enable_clear_discovery'] = 1;
 // Set this to 0 if you want to disable the web option to rediscover devices
 $config['force_ip_to_sysname']    = false;// Set to true if you want to use sysName in place of IPs
+
+// Allow duplicate devices by sysName
+$config['allow_duplicate_sysName'] = true;// Set to false if you want to only allow unique sysName's
+
 $config['enable_port_relationship'] = true;
 // Set this to false to not display neighbour relationships for ports
 $config['enable_footer'] = 1;
@@ -842,7 +848,8 @@ $config['map']['engine']                                = 'leaflet';
 $config['mapael']['default_map']                        = 'maps/world_countries.js';
 $config['leaflet']['default_lat']                       = '51.4800';
 $config['leaflet']['default_lng']                       = '0';
-$config['leaflet']['default_zoom']                       = 2;
+$config['leaflet']['default_zoom']                      = 2;
+$config['leaflet']['tile_url']                          = "{s}.tile.openstreetmap.org";
 
 // General GUI options
 $config['gui']['network-map']['style']                  = 'new';//old is also valid
@@ -872,4 +879,7 @@ $config['ignore_unmapable_port'] = False;
 // InfluxDB default configuration
 $config['influxdb']['timeout']      = 0;
 $config['influxdb']['verifySSL']    = false;
+
+// Xirrus - Disable station/client polling if true as it may take a long time on larger/heavily used APs.
+$config['xirrus_disable_stations']  = false;
 

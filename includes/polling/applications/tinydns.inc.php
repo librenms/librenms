@@ -25,7 +25,7 @@
  */
 
 if (!empty($agent_data['app']['tinydns']) && $app['app_id'] > 0) {
-    echo ' tinydns ';
+    echo ' tinydns';
     $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-tinydns-'.$app['app_id'].'.rrd';
     if (!is_file($rrd_filename)) {
         rrdtool_create(

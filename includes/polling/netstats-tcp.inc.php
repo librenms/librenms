@@ -36,17 +36,7 @@ if ($device['os'] != 'Snom') {
 
     $data = snmp_get_multi($device, $snmpstring, '-OQUs', 'TCP-MIB');
 
-    $fields = array();
-
-    foreach ($oids as $oid) {
-        if (is_numeric($data[0][$oid])) {
-            $value = $data[0][$oid];
-        }
-        else {
-            $value = 'U';
-        }
-        $fields[$oid] = $value;
-    }
+    $fields = $data[0];
 
     unset($snmpstring);
 

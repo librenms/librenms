@@ -28,8 +28,8 @@ foreach ($components as $oid => $overlay) {
             $gli = "list-group-item-danger";
         }
 ?>
-        <a class="list-group-item <?=$gli?>" data-toggle="collapse" data-target="#<?=$overlay['index']?>" data-parent="#overlays"><?=$overlay['label']?> - <?=$overlay['transport']?> <?=$overlay_status?></a>
-        <div id="<?=$overlay['index']?>" class="sublinks collapse">
+        <a class="list-group-item <?php echo $gli?>" data-toggle="collapse" data-target="#<?php echo $overlay['index']?>" data-parent="#overlays"><?php echo $overlay['label']?> - <?php echo $overlay['transport']?> <?php echo $overlay_status?></a>
+        <div id="<?php echo $overlay['index']?>" class="sublinks collapse">
 <?php
         foreach ($components as $aid => $adjacency) {
             if (($adjacency['otvtype'] == 'adjacency') && ($adjacency['index'] == $overlay['index'])) {
@@ -42,7 +42,7 @@ foreach ($components as $oid => $overlay) {
                     $gli = "list-group-item-danger";
                 }
 ?>
-            <a class="list-group-item <?=$gli?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?=$adjacency['label']?> - <?=$adjacency['endpoint']?> <?=$adj_status?></a>
+            <a class="list-group-item <?php echo $gli?> small"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $adjacency['label']?> - <?php echo $adjacency['endpoint']?> <?php echo $adj_status?></a>
 <?php
             }
         }

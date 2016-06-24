@@ -92,7 +92,7 @@ echo "
     </select>
     </div>
     <div class='col-sm-2'>
-    <input type='text' name='port' placeholder='port' class='form-control input-sm'>
+    <input type='text' name='port' placeholder='port' class='form-control input-sm' value='".($device['port'] == $config['snmp']['port'] ? "" : $device['port'])."'>
     </div>
     <div class='col-sm-1'>
     <select name='transport' id='transport' class='form-control input-sm'>";

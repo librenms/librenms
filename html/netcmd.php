@@ -36,7 +36,7 @@ if (!$_SESSION['authenticated']) {
 $output = '';
 if ($_GET['query'] && $_GET['cmd']) {
     $host = $_GET['query'];
-    if (Net_IPv6::checkIPv6($host) || Net_IPv4::validateip($host) || preg_match('/^[a-zA-Z0-9.-]*$/', $host)) {
+    if (Net_IPv6::checkIPv6($host) || Net_IPv4::validateip($host) || filter_var('http://'.$host, FILTER_VALIDATE_URL)) {
         switch ($_GET['cmd']) {
         case 'whois':
             $cmd = $config['whois']." $host | grep -v \%";
@@ -66,5 +66,5 @@ if ($_GET['query'] && $_GET['cmd']) {
     }//end if
 }//end if
 
-$output = trim($output);
+$output = htmlentities(trim($output), ENT_QUOTES);
 echo "<pre>$output</pre>";

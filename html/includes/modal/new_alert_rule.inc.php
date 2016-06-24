@@ -134,6 +134,12 @@ if(is_admin() !== false) {
                 </div>
             </div>
         </div>
+        <div class='form-group'>
+            <label for='proc' class='col-sm-3 control-label'>Procedure URL: </label>
+            <div class='col-sm-9'>
+                <input type='text' id='proc' name='proc' class='form-control' maxlength='30'>
+            </div>
+        </div>
         <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-3">
                         <button class="btn btn-success btn-sm" type="submit" name="rule-submit" id="rule-submit" value="save">Save Rule</button>
@@ -219,6 +225,7 @@ $('#create-alert').on('show.bs.modal', function (event) {
             $("[name='mute']").bootstrapSwitch('state',extra['mute']);
             $("[name='invert']").bootstrapSwitch('state',extra['invert']);
             $('#name').val(output['name']);
+            $('#proc').val(output['proc']);
         }
     });
 });
