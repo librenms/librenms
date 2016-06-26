@@ -244,11 +244,12 @@ function poll_device($device, $options) {
         }
         foreach ($config['poller_modules'] as $module => $module_status) {
             if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
+                $module_start = 0;
+                $module_time  = 0;
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
                 include "includes/polling/$module.inc.php";
                 $module_time = microtime(true) - $module_start;
-                $module_time = substr($module_time, 0, 5);
                 echo "\n>> Runtime for poller module '$module': $module_time seconds\n";
                 echo "#### Unload poller module $module ####\n\n";
 
