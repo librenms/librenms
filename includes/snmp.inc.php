@@ -1001,7 +1001,7 @@ function snmp_translate($oid, $module, $mibdir = null)
     }
 
     $cmd  = 'snmptranslate'.mibdir($mibdir);
-    $cmd .= " -m $module $oid";
+    $cmd .= " -IR -m $module $oid";
     // load all the MIBs looking for our object
     $cmd .= ' 2>/dev/null';
     // ignore invalid MIBs
