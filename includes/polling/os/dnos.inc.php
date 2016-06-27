@@ -9,8 +9,6 @@ Copyright (c) 1999-2015 by Dell Inc. All Rights Reserved.
 Build Time: Mon May 4 20:52:56 2015";
 */
 
-
-
 $temp_hardware = snmp_get($device, 'productIdentificationDisplayName.0', '-Ovq', 'Dell-Vendor-MIB');
 
 if (preg_match('/Dell Networking N[1234].*/' , $temp_hardware) == 1) {  // If Dell N-Series
