@@ -1039,7 +1039,7 @@ function version_info($remote=true) {
     $output['local_sha']    = rtrim(`git rev-parse HEAD`);
     $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
 
-    exec('git diff --name-only --exit-code', $cmdoutput, $code);
+    exec('su '.$config['user'].' -c "git diff --name-only --exit-code"', $cmdoutput, $code);
     $output['git_modified'] = ($code !== 0);
     $output['git_modified_files'] = $cmdoutput;
 
