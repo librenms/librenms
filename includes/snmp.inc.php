@@ -1245,14 +1245,14 @@ function register_mibs($device, $mibs, $included_by)
         return;
     }
 
-    echo "MIB: registering\n";
+    d_echo("MIB: registering\n");
 
     foreach ($mibs as $name => $module) {
         $translated = snmp_translate($name, $module);
         if ($translated) {
             $mod = $translated[0];
             $nam = $translated[1];
-            echo "     $mod::$nam\n";
+            d_echo("     $mod::$nam\n");
             if (snmp_mib_load($nam, $mod, $included_by) > 0) {
                 // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
                 $columns = array('device_id', 'module', 'mib', 'included_by');
@@ -1266,11 +1266,11 @@ function register_mibs($device, $mibs, $included_by)
                 update_db_table('device_mibs', $columns, 3, $rows);
             }
             else {
-                echo("MIB: Could not load definition for $mod::$nam\n");
+                d_echo("MIB: Could not load definition for $mod::$nam\n");
             }
         }
         else {
-            echo("MIB: Could not find $module::$name\n");
+            d_echo("MIB: Could not find $module::$name\n");
         }
     }
 
