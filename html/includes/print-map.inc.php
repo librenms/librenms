@@ -127,7 +127,7 @@ if (in_array('xdp', $config['network_map_items'])) {
                       WHERE
                              `active`=1 AND
                              `local_device_id` != 0 AND
-                             `remote_device_id` != 0 AND
+                             `remote_device_id` != 0
                              $where
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
