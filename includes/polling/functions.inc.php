@@ -160,6 +160,14 @@ function poll_device($device, $options) {
     echo $device['hostname'].' '.$device['device_id'].' '.$device['os'].' ';
     $ip = dnslookup($device);
 
+    if (!filter_var($ip, FILTER_VALIDATE_IP) === false  &&  $config['snmp']['use_ip'] === true) {
+        d_echo("Valid IP address.\n");
+        $device['poll_host'] = $ip;
+    }
+    else {
+        $device['poll_host'] = $device['hostname'];
+    }
+
     if (!empty($ip) && $ip != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to '.$ip, $device, 'system');
         $db_ip = inet_pton($ip);

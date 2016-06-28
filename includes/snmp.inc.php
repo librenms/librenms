@@ -73,7 +73,7 @@ function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=nul
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'];
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'];
     $cmd .= ' '.$oids;
 
     if (!$debug) {
@@ -128,7 +128,7 @@ function snmp_get($device, $oid, $options=null, $mib=null, $mibdir=null) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'];
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'];
     $cmd .= ' '.$oid;
 
     if (!$debug) {
@@ -186,7 +186,7 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' '.$oid;
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' '.$oid;
 
     if (!$debug) {
         $cmd .= ' 2>/dev/null';
@@ -245,7 +245,7 @@ function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' '.$oid;
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' '.$oid;
 
     if (!$debug) {
         $cmd .= ' 2>/dev/null';
@@ -476,7 +476,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib=0) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' '.$oid;
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' '.$oid;
 
     if (!$debug) {
         $cmd .= ' 2>/dev/null';
@@ -529,7 +529,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib=0) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' '.$oid;
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' '.$oid;
 
     if (!$debug) {
         $cmd .= ' 2>/dev/null';
@@ -588,7 +588,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib=0) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' '.$oid;
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' '.$oid;
 
     if (!$debug) {
         $cmd .= ' 2>/dev/null';
@@ -647,7 +647,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
     }
 
     $cmd .= ' -t '.$timeout.' -r '.$retries;
-    $cmd .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' '.$string;
+    $cmd .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' '.$string;
 
     if (!$debug) {
         $cmd .= ' 2>/dev/null';
@@ -689,7 +689,7 @@ function snmp_cache_portIfIndex($device, $array) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd      .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' portIfIndex';
+    $cmd      .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' portIfIndex';
     $output    = trim(external_exec($cmd));
 
     foreach (explode("\n", $output) as $entry) {
@@ -725,7 +725,7 @@ function snmp_cache_portName($device, $array) {
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
 
-    $cmd      .= ' '.$device['transport'].':'.$device['hostname'].':'.$device['port'].' portName';
+    $cmd      .= ' '.$device['transport'].':'.$device['poll_host'].':'.$device['port'].' portName';
     $output    = trim(external_exec($cmd));
     // echo("Caching: portName\n");
     foreach (explode("\n", $output) as $entry) {
