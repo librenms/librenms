@@ -69,7 +69,7 @@ if (!$os) {
         elseif (stristr($sysObjectId, 'cumulusMib') || strstr($sysObjectId, '.1.3.6.1.4.1.40310')) {
             $os = 'cumulus';
         }
-        elseif (strstr($sysDescr, 'g56fa85e') || strstr($sysDescr, 'gc80f187')) {
+        elseif (strstr($sysDescr, 'g56fa85e') || strstr($sysDescr, 'gc80f187') || strstr($sysDescr, 'g829be90') || strstr($sysDescr, 'g63c0044')) {
             $os = 'sophos';
         }
         else {
