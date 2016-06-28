@@ -583,6 +583,14 @@ $config['os'][$os]['text']  = 'Huawei VRP';
 $config['os'][$os]['type']  = 'network';
 $config['os'][$os]['icon']  = 'huawei';
 
+// Huawei access products
+$os = 'smartax';
+$config['os'][$os]['group']  = 'huawei';
+$config['os'][$os]['text']   = 'Huawei SmartAX';
+$config['os'][$os]['type']   = 'network';
+$config['os'][$os]['icon']   = 'huawei';
+$config['os'][$os]['ifname'] = 1;
+
 // ZTE
 $os = 'zxr10';
 $config['os'][$os]['group'] = 'zxr10';
