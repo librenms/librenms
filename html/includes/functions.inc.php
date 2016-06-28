@@ -892,14 +892,6 @@ function generate_ap_url($ap, $vars=array()) {
 
 }//end generate_ap_url()
 
-
-function report_this($message) {
-    global $config;
-    return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the '.$config['project_name'].' developers.</h2>';
-
-}//end report_this()
-
-
 function report_this_text($message) {
     global $config;
     return $message.'\nPlease report this to the '.$config['project_name'].' developers at '.$config['project_issues'].'\n';
