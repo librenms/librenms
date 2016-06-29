@@ -598,6 +598,11 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 $config['os'][$os]['icon']             = 'cisco';
 
+$os = 'vccodec';
+$config['os'][$os]['text']             = 'TelePresence Codec';
+$config['os'][$os]['type']             = 'collaboration';
+$config['os'][$os]['icon']             = 'cisco';
+
 // Brocade NOS
 $os = 'nos';
 $config['os'][$os]['text']             = 'Brocade NOS';
