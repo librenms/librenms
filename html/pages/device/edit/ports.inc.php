@@ -67,6 +67,46 @@
             }
         });
     });
+    $(document).on('blur', "[name='if-speed']", function (){
+        var $this = $(this);
+        var speed = $this.val();
+        var device_id = $this.data('device_id');
+        var port_id = $this.data('port_id');
+        var ifName = $this.data('ifname');
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: "update-ifspeed", speed: speed, ifName: ifName, port_id: port_id, device_id: device_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $this.closest('.form-group').addClass('has-success');
+                    $this.next().addClass('glyphicon-ok');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-success');
+                        $this.next().removeClass('glyphicon-ok');
+                    }, 2000);
+                } else if (data.status == 'na') {
+
+                } else {
+                    $(this).closest('.form-group').addClass('has-error');
+                    $this.next().addClass('glyphicon-remove');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-error');
+                        $this.next().removeClass('glyphicon-remove');
+                    }, 2000);
+                }
+            },
+            error: function () {
+                $(this).closest('.form-group').addClass('has-error');
+                $this.next().addClass('glyphicon-remove');
+                setTimeout(function(){
+                   $this.closest('.form-group').removeClass('has-error');
+                   $this.next().removeClass('glyphicon-remove');
+                }, 2000);
+            }
+        });
+    });
     $(document).ready(function() {
         $('form#ignoreport').submit(function (event) {
             $('#disable-toggle').click(function (event) {
