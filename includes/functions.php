@@ -719,6 +719,7 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL) {
     }
 
     $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
+        'device_id' => ($device['device_id'] ? $device['device_id'] : 0),
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
         'datetime' => array("NOW()"),

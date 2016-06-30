@@ -107,6 +107,8 @@ LibreNMS contributors:
 - Josh Driver <keeperofdakeys@gmail.com> (keeperofdakeys)
 - Felix Eckhofer <felix@eckhofer.com> (tribut)
 - Vikram Adukia <adukia@dropbox.com> (justmedude) 
+- Tijmen de Mes <tijmen@ag-projects.com> (tijmenNL)
+- Benjamin Busche <benjamin.busche@gmail.com> (optic00)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

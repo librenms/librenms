@@ -194,6 +194,7 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
 
     $data = trim(external_exec($cmd));
     $data = str_replace('"', '', $data);
+    $data = str_replace('End of MIB', '', $data);
 
     if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data))) {
         $data = false;
@@ -1000,7 +1001,7 @@ function snmp_translate($oid, $module, $mibdir = null)
     }
 
     $cmd  = 'snmptranslate'.mibdir($mibdir);
-    $cmd .= " -m $module $oid";
+    $cmd .= " -IR -m $module $oid";
     // load all the MIBs looking for our object
     $cmd .= ' 2>/dev/null';
     // ignore invalid MIBs
@@ -1244,14 +1245,14 @@ function register_mibs($device, $mibs, $included_by)
         return;
     }
 
-    echo "MIB: registering\n";
+    d_echo("MIB: registering\n");
 
     foreach ($mibs as $name => $module) {
         $translated = snmp_translate($name, $module);
         if ($translated) {
             $mod = $translated[0];
             $nam = $translated[1];
-            echo "     $mod::$nam\n";
+            d_echo("     $mod::$nam\n");
             if (snmp_mib_load($nam, $mod, $included_by) > 0) {
                 // NOTE: `last_modified` omitted due to being automatically maintained by MySQL
                 $columns = array('device_id', 'module', 'mib', 'included_by');
@@ -1265,11 +1266,11 @@ function register_mibs($device, $mibs, $included_by)
                 update_db_table('device_mibs', $columns, 3, $rows);
             }
             else {
-                echo("MIB: Could not load definition for $mod::$nam\n");
+                d_echo("MIB: Could not load definition for $mod::$nam\n");
             }
         }
         else {
-            echo("MIB: Could not find $module::$name\n");
+            d_echo("MIB: Could not find $module::$name\n");
         }
     }
 

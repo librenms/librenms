@@ -6,7 +6,6 @@ if ($device['os_group'] == 'cisco') {
         'cipMacHCSwitchedBytes',
         'cipMacHCSwitchedPkts',
     );
-    echo 'Cisco MAC - Caching OID: ';
     $cip_array = array();
 
     foreach ($cip_oids as $oid) {

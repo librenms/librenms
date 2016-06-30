@@ -100,7 +100,7 @@ else {
     }
 
     $rrd_options .= "\\\\n";
-    $rrd_options .= " COMMENT:\\\\n";
+    $rrd_options .= " COMMENT:\\n";
 
     if ($print_total) {
         $rrd_options .= ' GPRINT:'.$ds.'_tot:Total\ %6.2lf%s\)\\\\l';
