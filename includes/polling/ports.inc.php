@@ -111,7 +111,6 @@ $pagp_oids = array(
 $ifmib_oids = array_merge($data_oids, $stat_oids);
 
 $ifmib_oids = array(
-    //'ifEntry',
     'ifDescr',
     'ifXEntry',
     'ifAdminStatus',
@@ -366,6 +365,10 @@ foreach ($ports as $port) {
             echo 'HC ';
             $this_port['ifInOctets']  = $this_port['ifHCInOctets'];
             $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
+        }
+        if (is_numeric($this_port['ifHCInUcastPkts']) && $this_port['ifHCInUcastPkts'] > 0 && is_numeric($this_port['ifHCOutUcastPkts']) && $this_port['ifHCOutUcastPkts'] > 0) {
+            $this_port['ifInUcastPkts']  = $this_port['ifHCInUcastPkts'];
+            $this_port['ifOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
         }
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
