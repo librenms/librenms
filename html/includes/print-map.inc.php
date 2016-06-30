@@ -78,16 +78,14 @@ if (in_array('mac',$config['network_map_items'])) {
                              SUM(IF(`P2_ip`.`ipv4_address` = `M`.`ipv4_address`, 1, 0))
                                  AS `remote_matching_ips`
                       FROM `ipv4_mac` AS `M`
-                             LEFT JOIN `ports` AS `P1` ON `P1`.`port_id`=`M`.`port_id`
-                             LEFT JOIN `ports` AS `P2` ON `P2`.`ifPhysAddress`=`M`.`mac_address`
-                             LEFT JOIN `devices` AS `D1` ON `P1`.`device_id`=`D1`.`device_id`
-                             LEFT JOIN `devices` AS `D2` ON `P2`.`device_id`=`D2`.`device_id`
-                             LEFT JOIN `ipv4_addresses` AS `P2_ip` ON `P2_ip`.`port_id` = `P2`.`port_id`
+                             INNER JOIN `ports` AS `P1` ON `P1`.`port_id`=`M`.`port_id`
+                             INNER JOIN `ports` AS `P2` ON `P2`.`ifPhysAddress`=`M`.`mac_address`
+                             INNER JOIN `devices` AS `D1` ON `P1`.`device_id`=`D1`.`device_id`
+                             INNER JOIN `devices` AS `D2` ON `P2`.`device_id`=`D2`.`device_id`
+                             INNER JOIN `ipv4_addresses` AS `P2_ip` ON `P2_ip`.`port_id` = `P2`.`port_id`
                              $join_sql
                       WHERE
                              `M`.`mac_address` NOT IN ('000000000000','ffffffffffff') AND
-                             `P1`.`port_id` IS NOT NULL AND
-                             `P2`.`port_id` IS NOT NULL AND
                              `D1`.`device_id` != `D2`.`device_id`
                              $where
                              $sql
@@ -121,17 +119,15 @@ if (in_array('xdp', $config['network_map_items'])) {
                              `P2`.`ifInOctets_rate` AS `remote_ifinoctets_rate`,
                              `P2`.`ifOutOctets_rate` AS `remote_ifoutoctets_rate`
                       FROM `links`
-                             LEFT JOIN `devices` AS `D1` ON `D1`.`device_id`=`links`.`local_device_id`
-                             LEFT JOIN `devices` AS `D2` ON `D2`.`device_id`=`links`.`remote_device_id`
-                             LEFT JOIN `ports` AS `P1` ON `P1`.`port_id`=`links`.`local_port_id`
-                             LEFT JOIN `ports` AS `P2` ON `P2`.`port_id`=`links`.`remote_port_id`
+                             INNER JOIN `devices` AS `D1` ON `D1`.`device_id`=`links`.`local_device_id`
+                             INNER JOIN `devices` AS `D2` ON `D2`.`device_id`=`links`.`remote_device_id`
+                             INNER JOIN `ports` AS `P1` ON `P1`.`port_id`=`links`.`local_port_id`
+                             INNER JOIN `ports` AS `P2` ON `P2`.`port_id`=`links`.`remote_port_id`
                              $join_sql
                       WHERE
                              `active`=1 AND
                              `local_device_id` != 0 AND
-                             `remote_device_id` != 0 AND
-                             `local_device_id` IS NOT NULL AND
-                             `remote_device_id` IS NOT NULL
+                             `remote_device_id` != 0
                              $where
                              $sql
                       GROUP BY `P1`.`port_id`,`P2`.`port_id`
