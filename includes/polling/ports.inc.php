@@ -444,6 +444,11 @@ foreach ($ports as $port) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 }
             }
+            if ($oid == 'ifSpeed' || $oid == 'ifHighSpeed') {
+                if (get_dev_attrib($device, 'ifSpeed:'.$port['ifName'], 1)) {
+                    $this_port[$oid] = $port[$oid];
+                }
+            }
 
             if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
                 $port['update'][$oid] = array('NULL');
