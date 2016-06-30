@@ -2,7 +2,6 @@
 if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     global $config;
 
-    echo 'Aruba Controller: ';
     $polled = time();
 
     // Build SNMP Cache Array

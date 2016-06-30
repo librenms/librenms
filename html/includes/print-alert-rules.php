@@ -155,7 +155,7 @@ $start      = (($page_number - 1) * $results);
 $full_query = $full_query.$query." LIMIT $start,$results";
 
 foreach (dbFetchRows($full_query, $param) as $rule) {
-    $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY id DESC LIMIT 1', array($rule['id']));
+    $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
     $ico   = 'ok';
     $col   = 'success';
     $extra = '';
@@ -165,15 +165,10 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
             $ico = 'ok';
             $col = 'success';
         }
-        else if ((int) $sub['state'] === 1) {
+        elseif ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
             $ico   = 'remove';
             $col   = 'danger';
             $extra = 'danger';
-        }
-        else if ((int) $sub['state'] === 2) {
-            $ico   = 'time';
-            $col   = 'default';
-            $extra = 'warning';
         }
     }
 

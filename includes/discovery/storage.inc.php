@@ -1,7 +1,5 @@
 <?php
 
-echo 'Storage : ';
-
 // Include all discovery modules
 $include_dir = 'includes/discovery/storage';
 require 'includes/include-dir.inc.php';

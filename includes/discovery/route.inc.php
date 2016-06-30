@@ -25,7 +25,6 @@ $ids = array();
 // For the moment only will be cisco and the version 3
 if ($device['os_group'] == "cisco") {
 
-    echo ("ROUTE : ");
     //RFC1213-MIB
     $mib = "RFC1213-MIB";
     //IpRouteEntry
