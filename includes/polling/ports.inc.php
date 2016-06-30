@@ -117,6 +117,8 @@ $ifmib_oids = array(
     'ifOperStatus',
     'ifInErrors',
     'ifOutErrors',
+    'ifInDiscards',
+    'ifOutDiscards',
 );
 
 echo 'Caching Oids: ';
