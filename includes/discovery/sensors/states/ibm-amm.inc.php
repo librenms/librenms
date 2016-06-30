@@ -30,10 +30,10 @@ if ($device['os'] == 'ibm-amm') {
             if ($state_index_id) {
 
                 $states = array(
-                    array($state_index_id,'unknown',0,1,3) ,
-                    array($state_index_id,'good',1,2,0) ,
-                    array($state_index_id,'warning',1,3,1) ,
-                    array($state_index_id,'bad',1,4,2) ,
+                    array($state_index_id,'unknown',0,0,3) ,
+                    array($state_index_id,'good',1,1,0) ,
+                    array($state_index_id,'warning',1,2,1) ,
+                    array($state_index_id,'bad',1,3,2) ,
                 );
  
                 foreach($states as $value) { 
