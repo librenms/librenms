@@ -746,7 +746,7 @@ Entity: `%sensors.sensor_class = "current" && %sensors.sensor_descr = "Bank Tota
 
 Description: APC PDU over ampage
 
-Example: `%macors.pdu_over_ampage_apc = "1"`
+Example: `%macros.pdu_over_ampage_apc = "1"`
 
 # <a name="extra">Additional Options</a>
 
