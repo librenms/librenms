@@ -70,7 +70,7 @@
     $(document).on('blur keyup', "[name='if-speed']", function (e){
         if (e.type === 'keyup' && e.keyCode !== 13) return;
         var $this = $(this);
-        var speed = $this.val();
+        var speed = $this.val().replace(/[^0-9]/gi, '');
         var device_id = $this.data('device_id');
         var port_id = $this.data('port_id');
         var ifName = $this.data('ifname');
@@ -83,8 +83,7 @@
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
                     $this.next().addClass('glyphicon-ok');
-                    var new_val = speed.replace(/[^0-9]/gi, '');
-                    $this.val(new_val);
+                    $this.val(speed);
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
                         $this.next().removeClass('glyphicon-ok');
