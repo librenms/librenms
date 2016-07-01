@@ -28,7 +28,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         // $ip isn't a valid IP so it must be a name.
         if ($ip == $dst_host) {
             d_echo("name lookup of $dst_host failed\n");
-            log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - check name lookup", $device['device_id'], 'discovery');
+            log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check name lookup", $device['device_id'], 'discovery');
  
             return false;
         }
@@ -68,12 +68,13 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
                 log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
             } else {
-                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - check SNMP access", $device['device_id'], 'discovery');
+                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check SNMP access", $device['device_id'], 'discovery');
             }
 
             return $remote_device_id;
-        } else {
-            log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - check SNMP access", $device['device_id'], 'discovery');
+        } 
+        else {
+            log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check SNMP access", $device['device_id'], 'discovery');
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
