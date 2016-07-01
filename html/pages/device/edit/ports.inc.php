@@ -83,7 +83,7 @@
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
                     $this.next().addClass('glyphicon-ok');
-                    var new_val = speed.text().replace(/[^0-9]/gi, '');
+                    var new_val = speed.replace(/[^0-9]/gi, '');
                     $this.val(new_val);
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
