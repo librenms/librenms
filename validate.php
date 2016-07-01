@@ -36,7 +36,7 @@ if (isset($options['h'])) {
 if (strstr(`php -ln config.php`, 'No syntax errors detected')) {
     $first_line = `head -n1 config.php`;
     $last_lines = explode(PHP_EOL, `tail -n2 config.php`);
-    if (strstr($first_line, '\<\?php')) {
+    if (substr($first_line, 0, 5) !== '<?php') {
         print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
     }
     else if ($last_lines[0] == '?>' && $last_lines[1] == '') {
@@ -84,9 +84,14 @@ else {
 if($versions['local_branch'] != 'master') {
     print_warn("Your local git branch is not master, this will prevent automatic updates.");
 }
-if($versions['git_modified'] === true) {
+
+$modifiedcmd = 'git diff --name-only --exit-code';
+if($username === 'root') {
+    $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
+}
+if(exec($modifiedcmd, $cmdoutput, $code) !== 0) {
     print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
-    echo(implode("\n", $versions['git_modified_files']) . "\n");
+    echo(implode("\n", $cmdoutput) . "\n");
 }
 
 echo "DB Schema: ".$versions['db_schema']."\n";
