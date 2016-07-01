@@ -109,6 +109,7 @@ LibreNMS contributors:
 - Vikram Adukia <adukia@dropbox.com> (justmedude) 
 - Tijmen de Mes <tijmen@ag-projects.com> (tijmenNL)
 - Benjamin Busche <benjamin.busche@gmail.com> (optic00)
+- Brandon Boudrias <bt.boudrias@gmail.com> (brandune)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:
