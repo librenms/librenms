@@ -22,8 +22,8 @@ $port_id = mres($_POST['port_id']);
 if (!empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
     // We have ifName and  port id so update ifAlias
     if (empty($speed)) {
-        $speed = 999999;
-        $high_speed = 999999;
+        $speed = array('NULL');
+        $high_speed = array('NULL');
         // Set to 999999 so we avoid using ifDescr on port poll
     }
     else {
@@ -31,7 +31,7 @@ if (!empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
     }
     if (dbUpdate(array('ifSpeed'=>$speed, 'ifHighSpeed'=>$high_speed), 'ports', '`port_id`=?', array($port_id)) > 0) {
         $device = device_by_id_cache($device_id);
-        if ($speed == '999999') {
+        if (is_array($speed)) {
             del_dev_attrib($device, 'ifSpeed:'.$ifName);
             log_event("$ifName Port speed cleared manually", $device, 'interface', $port_id);
         }
