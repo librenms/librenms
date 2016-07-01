@@ -1744,6 +1744,11 @@ $config['os'][$os]['text']             = 'Infoblox';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'infoblox';
 
+$os = 'ibm-amm';
+$config['os'][$os]['text']             = 'IBM AMM';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'ibmnos';
+
 // Oracle ILOM
 $os = 'oracle-ilom';
 $config['os'][$os]['text']             = 'Oracle ILOM';
