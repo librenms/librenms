@@ -85,11 +85,13 @@ if($versions['local_branch'] != 'master') {
     print_warn("Your local git branch is not master, this will prevent automatic updates.");
 }
 
+// check for modified files
 $modifiedcmd = 'git diff --name-only --exit-code';
 if($username === 'root') {
     $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
 }
-if(exec($modifiedcmd, $cmdoutput, $code) !== 0) {
+exec($modifiedcmd, $cmdoutput, $code);
+if($code !== 0) {
     print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
     echo(implode("\n", $cmdoutput) . "\n");
 }
