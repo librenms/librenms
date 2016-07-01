@@ -740,13 +740,13 @@ Description: Device component is down such as Fan, PSU, etc for Cisco devices.
 
 Example: `%macros.device_component_down_cisco = "1"`
 
-### PDU over ampage [APC]
+### PDU over amperage [APC]
 
 Entity: `%sensors.sensor_class = "current" && %sensors.sensor_descr = "Bank Total" && %sensors.sensor_current > %sensors.sensor_limit && %devices.os = "apc"`
 
-Description: APC PDU over ampage
+Description: APC PDU over amperage
 
-Example: `%macros.pdu_over_ampage_apc = "1"`
+Example: `%macros.pdu_over_amperage_apc = "1"`
 
 # <a name="extra">Additional Options</a>
 
