@@ -1,0 +1,28 @@
+PRIV-VENDORDEF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+enterprises
+FROM SNMPv2-SMI;
+
+privateVendorOID MODULE-IDENTITY
+LAST-UPDATED "200709290000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"Vendor Id Definition"
+
+REVISION "200709290000Z"
+DESCRIPTION
+"Initial."
+
+::= { enterprises 738 }
+
+END

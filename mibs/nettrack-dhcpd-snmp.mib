@@ -1,0 +1,115 @@
+NETTRACK-DHCPD-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	enterprises
+		FROM SNMPv2-SMI
+	;
+
+nettrack OBJECT IDENTIFIER
+	::= { enterprises 21695 }
+
+public OBJECT IDENTIFIER
+	::= { nettrack 1 }
+
+dhcpdSnmp MODULE-IDENTITY
+	LAST-UPDATED
+		"201602080000Z"
+	ORGANIZATION
+		"net-track GmbH"
+	CONTACT-INFO
+		"net-track GmbH
+		Duensstrasse 1
+		3186 Duedingen
+		Switzerland
+		www.net-track.ch
+		info@net-track.ch"
+	DESCRIPTION
+		"Management Information for the dhcpd-snmp extension."
+	REVISION
+		"201602080000Z"
+	DESCRIPTION
+		"Included nettrack enterprise object, updated contact information."
+	REVISION
+		"200601260000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { public 2 }
+
+dhcpdSnmpPools OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of address pools configured for monitoring."
+	::= { dhcpdSnmp 1 }
+
+dhcpdSnmpPoolTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF DhcpdSnmpPoolEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table holds the attributes of each configured
+		 address pool."
+	::= { dhcpdSnmp 2 }
+
+DhcpdSnmpPoolEntry ::= SEQUENCE {
+dhcpdSnmpPoolIndex		Integer32,
+dhcpdSnmpPoolDescription	DisplayString,
+dhcpdSnmpPoolSize		Integer32,
+dhcpdSnmpPoolActiveLeases	Integer32,
+dhcpdSnmpPoolExpiredLeases	Integer32,
+dhcpdSnmpPoolAvailableAddresses	Integer32
+}
+
+dhcpdSnmpPoolIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The index for each address pool."
+	::= { dhcpdSnmpPoolTable 1 }
+
+dhcpdSnmpPoolDescription OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Holds a textual description of the current pool."
+	::= { dhcpdSnmpPoolTable 2 }
+
+dhcpdSnmpPoolSize OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of addresses in the pool."
+	::= { dhcpdSnmpPoolTable 3 }
+
+dhcpdSnmpPoolActiveLeases OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active leases."
+	::= { dhcpdSnmpPoolTable 4 }
+
+dhcpdSnmpPoolExpiredLeases OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Expired leases."
+	::= { dhcpdSnmpPoolTable 5 }
+
+dhcpdSnmpPoolAvailableAddresses OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Available addresses."
+	::= { dhcpdSnmpPoolTable 6 }
+
+END

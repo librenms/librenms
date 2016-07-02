@@ -1,0 +1,466 @@
+--
+-- Accedian Enterprise Specific MIB
+--
+-- Copyright (c) 2005-2008, Accedian Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ACD-SMAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    acdMibs
+        FROM ACCEDIAN-SMI;
+
+acdSmap MODULE-IDENTITY
+
+    LAST-UPDATED "200810010100Z"
+    ORGANIZATION "Accedian Networks, Inc."
+    CONTACT-INFO
+            "Accedian Technical Assistance Center
+             Accedian Networks, Inc.
+             4878 Levy, suite 202
+             Saint-Laurent, Quebec Canada H4R 2P1
+             E-mail: support@accedian.com"
+    DESCRIPTION
+            "The Service mapping database for this Accedian Networks device."
+
+    REVISION "200810010100Z"        -- 1 October 2008
+    DESCRIPTION
+            "Definition revision."
+
+    REVISION "200806150100Z"        -- 15 June 2008
+    DESCRIPTION
+            "Initial version of MIB module ACD-SMAP-MIB."
+
+    ::= { acdMibs 8 }
+
+acdSmapNotifications    OBJECT IDENTIFIER ::= { acdSmap 0 }
+acdSmapMIBObjects       OBJECT IDENTIFIER ::= { acdSmap 1 }
+acdSmapConformance      OBJECT IDENTIFIER ::= { acdSmap 2 }
+
+acdSmapConfig           OBJECT IDENTIFIER ::= { acdSmapMIBObjects 1 }
+
+---------------------------------------------------------------------------
+ -- The CoS Profile configuration table
+ -- This table contains all CoS Profile entry configurations.
+---------------------------------------------------------------------------
+
+acdSmapCoSProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapCoSProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The CoS profile table. Each row in the table represents a CoS Profile.
+         A CoS profile is used to map an input packet to an L2 class of service.
+         This traffic mapping (classification) is accomplished using one of
+         the following fields in the incoming packet:
+
+         p-bits in 802.1Q / 802.1Q-in-Q tags
+         IP precedence bits in IPv4 TOS byte
+         DSCP bits in IPv4 DSCP byte
+
+         The class of service value (0-7) assigned to the outgoing traffic is
+         selected based on the conformance level (Green/Yellow) of the incoming
+         traffic. The following sections describe the general configuration
+         parameters and the mapping table of a CoS profile."
+    ::= { acdSmapConfig 1 }
+
+acdSmapCoSProfEntry OBJECT-TYPE
+    SYNTAX      AcdSmapCoSProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a CoS profile."
+    INDEX   { acdSmapCoSProfID }
+    ::=  { acdSmapCoSProfTable 1 }
+
+AcdSmapCoSProfEntry ::= SEQUENCE {
+    acdSmapCoSProfID                    Unsigned32,
+    acdSmapCoSProfRowStatus             RowStatus,
+    acdSmapCoSProfName                  DisplayString,
+    acdSmapCoSProfType                  INTEGER,
+    acdSmapCoSProfDecodeDropBit         TruthValue,
+    acdSmapCoSProfEncodeDropBit         TruthValue
+}
+
+acdSmapCoSProfID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each CoS Profile instance."
+    ::= { acdSmapCoSProfEntry 1 }
+
+acdSmapCoSProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new CoS Profile you shall provide the a unique name and the
+        type for an empty row with the RowStatus set to Create and Go. To
+        delete the CoS Profile you need to set the RowStatus to destroy."
+    ::= { acdSmapCoSProfEntry 2 }
+
+acdSmapCoSProfName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is a string to uniquely identify the CoS profile."
+    ::= { acdSmapCoSProfEntry 3 }
+
+acdSmapCoSProfType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pcp(1),
+                    dscp(2),
+                    pre(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the type of CoS profile. Possible values are:  PCP, IP
+         precedence or DSCP."
+    ::= { acdSmapCoSProfEntry 4 }
+
+acdSmapCoSProfDecodeDropBit  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This field is only valid for PCP CoS profiles. If this field is set,
+         the pre-marking color is decoded from the DEI bit (Drop Eligible
+         Indication). Otherwise, the user defined pre-color is used."
+    DEFVAL      { false }
+    ::= { acdSmapCoSProfEntry 5 }
+
+acdSmapCoSProfEncodeDropBit  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This field controls the DEI bit in an S-VLAN tag. If this field is set
+         and the outgoing packet is marked yellow then the DEI bit is set to 1.
+         Otherwise, the DEI is set to 0."
+    DEFVAL      { false }
+    ::= { acdSmapCoSProfEntry 6 }
+
+---------------------------------------------------------------------------
+ -- The CoS Profile Code Point configuration table
+ -- This table contains all Code Point for a CoS profile entry.
+---------------------------------------------------------------------------
+
+acdSmapCoSProfCodePointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapCoSProfCodePointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Configuration table of all code point entries. Each row in the
+         table represents a Code point. the number of code points depend of the
+         acdSmapCoSProfType value.
+
+         p-bits in 802.1Q / 802.1Q-in-Q tags
+         IP precedence bits in IPv4 TOS byte
+         DSCP bits in IPv4 DSCP byte
+
+         The class of service value (0-7) assigned to the outgoing traffic is
+         selected based on the conformance level (Green/Yellow) of the incoming
+         traffic."
+    ::= { acdSmapConfig 2 }
+
+acdSmapCoSProfCodePointEntry OBJECT-TYPE
+    SYNTAX      AcdSmapCoSProfCodePointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings for a code point."
+    INDEX   { acdSmapCoSProfID, acdSmapCoSProfCodePointID }
+    ::=  { acdSmapCoSProfCodePointTable 1 }
+
+AcdSmapCoSProfCodePointEntry ::= SEQUENCE {
+    acdSmapCoSProfCodePointID               Unsigned32,
+    acdSmapCoSProfCodePointPreMarkingColor  INTEGER,
+    acdSmapCoSProfCodePointGreenOut         Unsigned32,
+    acdSmapCoSProfCodePointYellowOut        Unsigned32
+}
+
+acdSmapCoSProfCodePointID  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each row. Base on Code Point, 0 to 63 for DSCP or 0
+         to 7 for PCP or IP precedence."
+    ::= { acdSmapCoSProfCodePointEntry 1 }
+
+acdSmapCoSProfCodePointPreMarkingColor  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    green(1),
+                    yellow(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the user pre-color to mark the incoming traffic. This field
+         is only valid if acdSmapCoSProfDecodeDropBit is not set."
+    DEFVAL      { green }
+    ::= { acdSmapCoSProfCodePointEntry 2 }
+
+acdSmapCoSProfCodePointGreenOut  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The class of service value that will be used in the outgoing green
+         packets. This value is selected if the result of the bandwidth
+         regulator assigned to this entry is green or if the pre-marking
+         color is green and no bandwidth regulator is assigned to this entry."
+    DEFVAL      { 0 }
+    ::= { acdSmapCoSProfCodePointEntry 3 }
+
+acdSmapCoSProfCodePointYellowOut  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The class of service value that will be used in the outgoing yellow
+         packets. This value is selected if the result of the bandwidth
+         regulator assigned to this entry is yellow or if the pre-marking
+         color is yellow and no bandwidth regulator is assigned to this entry."
+    DEFVAL      { 0 }
+    ::= { acdSmapCoSProfCodePointEntry 4 }
+
+---------------------------------------------------------------------------
+ -- The Regulator Set configuration table
+ -- This table contains all Regulator Set entry configurations.
+---------------------------------------------------------------------------
+
+acdSmapRegSetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapRegSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Regulator Set profile table. Each row in the table represents a
+         Regulator Set. A bandwidth regulator set allows the user to regulate
+         traffic based on the following information:
+
+         p-bits in 802.1Q / 802.1Q-in-Q tags
+         IP precedence bits in IPv4 TOS byte
+         DSCP bits in IPv4 DSCP byte.
+        "
+    ::= { acdSmapConfig 3 }
+
+acdSmapRegSetEntry OBJECT-TYPE
+    SYNTAX      AcdSmapRegSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a Regulator set."
+    INDEX   { acdSmapRegSetID }
+    ::=  { acdSmapRegSetTable 1 }
+
+AcdSmapRegSetEntry ::= SEQUENCE {
+    acdSmapRegSetID                 Unsigned32,
+    acdSmapRegSetRowStatus          RowStatus,
+    acdSmapRegSetName               DisplayString,
+    acdSmapRegSetType               INTEGER
+}
+
+acdSmapRegSetID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each Regulator set instance."
+    ::= { acdSmapRegSetEntry 1 }
+
+acdSmapRegSetRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated. To
+        create a new Regulator set you shall provide the a unique name and the
+        type for an empty row with the RowStatus set to Create and Go. To
+        delete the CoS Profile you need to set the RowStatus to destroy."
+    ::= { acdSmapRegSetEntry 2 }
+
+acdSmapRegSetName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is a string to uniquely identify the Regulator set."
+    ::= { acdSmapRegSetEntry 3 }
+
+acdSmapRegSetType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pcp(1),
+                    dscp(2),
+                    pre(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the type of Regulator Set. Possible values are:  PCP, IP
+         precedence or DSCP."
+    ::= { acdSmapRegSetEntry 4 }
+
+---------------------------------------------------------------------------
+ -- The Regulator Set Code Point configuration table
+ -- This table contains all Code Point for a Regulator set profile entry.
+---------------------------------------------------------------------------
+
+acdSmapRegSetCodePointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapRegSetCodePointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Configuration table of all code point entries. Each row in the
+         table represents a Code point. the number of code points depend of the
+         acdSmapCoSProfType value.
+
+         p-bits in 802.1Q / 802.1Q-in-Q tags;
+         IP precedence bits in IPv4 TOS byte;
+         DSCP bits in IPv4 DSCP byte.
+         "
+    ::= { acdSmapConfig 4 }
+
+acdSmapRegSetCodePointEntry OBJECT-TYPE
+    SYNTAX      AcdSmapRegSetCodePointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings for a code point."
+    INDEX   { acdSmapRegSetID, acdSmapRegSetCodePointID }
+    ::=  { acdSmapRegSetCodePointTable 1 }
+
+AcdSmapRegSetCodePointEntry ::= SEQUENCE {
+    acdSmapRegSetCodePointID                Unsigned32,
+    acdSmapRegSetCodePointRegulatorID       Unsigned32,
+    acdSmapRegSetCodePointRegulatorEnable   TruthValue
+}
+
+acdSmapRegSetCodePointID  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each row. Base on Code Point, 0 to 64 for DSCP or 0
+         to 7 for PCP or IP precedence."
+    ::= { acdSmapRegSetCodePointEntry 1 }
+
+
+acdSmapRegSetCodePointRegulatorID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The bandwidth regulator that will be used to regulate the traffic flow
+         that has this PCP/IP precendence/DSCP value. Refer to acdRegulatorTable 
+         to find the exact identifier (same as acdRegulatorID)."
+    DEFVAL      { 0 }
+    ::= { acdSmapRegSetCodePointEntry 2 }
+
+acdSmapRegSetCodePointRegulatorEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable traffic regulation for this  PCP, IP precedence or
+         DSCP value."
+    DEFVAL      { false }
+    ::= { acdSmapRegSetCodePointEntry 3 }
+
+---------------------------------------------------------------------------
+ -- ACD-SMAP-MIB Module - Conformance Information
+---------------------------------------------------------------------------
+
+acdSmapCompliances  OBJECT IDENTIFIER ::= { acdSmapConformance 1 }
+acdSmapGroups       OBJECT IDENTIFIER ::= { acdSmapConformance 2 }
+
+---------------------------------------------------------------------------
+ -- Units of conformance
+---------------------------------------------------------------------------
+
+acdSmapCoSProfGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapCoSProfRowStatus,
+        acdSmapCoSProfName,
+        acdSmapCoSProfType,
+        acdSmapCoSProfDecodeDropBit,
+        acdSmapCoSProfEncodeDropBit
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the CoS profile Group."
+    ::= { acdSmapGroups 1 }
+
+acdSmapCoSProfCodePointGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapCoSProfCodePointPreMarkingColor,
+        acdSmapCoSProfCodePointGreenOut,
+        acdSmapCoSProfCodePointYellowOut
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the CoS profile CodePoint Group."
+    ::= { acdSmapGroups 2 }
+
+acdSmapRegSetGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapRegSetRowStatus,
+        acdSmapRegSetName,
+        acdSmapRegSetType
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Regulator Set Group."
+    ::= { acdSmapGroups 3 }
+
+acdSmapRegSetCodePointGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapRegSetCodePointRegulatorID,
+        acdSmapRegSetCodePointRegulatorEnable
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Regulator Set CodePoint Group."
+    ::= { acdSmapGroups 4 }
+
+acdSmapCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the ACD-SMAP-MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            acdSmapCoSProfGroup,
+            acdSmapCoSProfCodePointGroup,
+            acdSmapRegSetGroup,
+            acdSmapRegSetCodePointGroup
+         }
+
+    OBJECT  acdSmapCoSProfRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdSmapRegSetRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    ::= { acdSmapCompliances 1 }
+
+END
