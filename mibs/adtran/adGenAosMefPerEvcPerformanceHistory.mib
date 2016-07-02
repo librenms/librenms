@@ -1,0 +1,617 @@
+ADTRAN-MEF-PER-EVC-PERF-HISTORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY,
+   OBJECT-TYPE,
+   Integer32
+      FROM SNMPv2-SMI
+   DisplayString
+       FROM SNMPv2-TC
+   HCPerfTimeElapsed,
+   HCPerfValidIntervals,
+   HCPerfInvalidIntervals,
+   HCPerfCurrentCount,
+   HCPerfIntervalCount,
+   HCPerfTotalCount
+      FROM HC-PerfHist-TC-MIB
+   MODULE-COMPLIANCE,
+   OBJECT-GROUP
+      FROM SNMPv2-CONF
+   adIdentity
+      FROM ADTRAN-MIB
+   adGenAOSMef,
+   adGenAOSConformance
+      FROM ADTRAN-AOS;
+
+adGenAosMefPerEvcPerfHistoryMib MODULE-IDENTITY
+   LAST-UPDATED "201409100000Z" -- September 10, 2014
+   ORGANIZATION "ADTRAN Inc."
+   CONTACT-INFO
+     "Info:   www.adtran.com
+      Postal: ADTRAN, Inc.
+              901 Explorer Blvd.
+              Huntsville, AL 35806
+      Tel:    +1 888 423-8726
+      E-mail: support@adtran.com"
+
+   DESCRIPTION
+     "This MIB module defines high capacity performance statistics
+      per EVC within an AOS product.
+
+      Copyright (C) ADTRAN, Inc. (2014)."
+
+   REVISION    "201409100000Z" -- September 10, 2014
+   DESCRIPTION
+     "Initial version"
+    ::= { adIdentity 10000 53 9 3 }
+
+adGenAosMefPerEvcPerfHistory OBJECT IDENTIFIER ::= { adGenAOSMef 3 }
+
+------------------------------------------------------------
+-- Current Table for Interface Performance History
+--
+adMefPerEvcPhCurTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AdMefPerEvcPhCurEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This table contains current performance history information that has been
+      recorded since the last 15 minute interval ended and from when the last
+      1 day interval ended.  This table is indexed by adMefPerEvcPhCurEvcNameFixedLen."
+   ::= { adGenAosMefPerEvcPerfHistory 1 }
+
+adMefPerEvcPhCurEntry OBJECT-TYPE
+   SYNTAX      AdMefPerEvcPhCurEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This specifies the information contained in one entry of the
+      adMefPerEvcPhCurTable.  It is indexed by an EVC's adMefPerEvcPhCurEvcNameFixedLen."
+   INDEX { adMefPerEvcPhCurEvcNameFixedLen }
+   ::= { adMefPerEvcPhCurTable 1 }
+
+AdMefPerEvcPhCurEntry ::=
+   SEQUENCE
+   {
+      adMefPerEvcPhCurEvcNameFixedLen                  OCTET STRING,
+      adMefPerEvcPhCurTimeElapsed15Min                 HCPerfTimeElapsed,
+      adMefPerEvcPhCurValidIntervals15Min              HCPerfValidIntervals,
+      adMefPerEvcPhCurInvalidIntervals15Min            HCPerfInvalidIntervals,
+      adMefPerEvcPhCurIngressGreenOctets15Min          HCPerfCurrentCount,
+      adMefPerEvcPhCurIngressGreenFrames15Min          HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenOctets15Min           HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenFrames15Min           HCPerfCurrentCount,
+      adMefPerEvcPhCurIngressGreenFrameDiscards15Min   HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenFrameDiscards15Min    HCPerfCurrentCount,
+      adMefPerEvcPhCurIngressGreenOctetDiscards15Min   HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenOctetDiscards15Min    HCPerfCurrentCount,
+      adMefPerEvcPhCurTimeElapsed1Day                  HCPerfTimeElapsed,
+      adMefPerEvcPhCurValidIntervals1Day               HCPerfValidIntervals,
+      adMefPerEvcPhCurInvalidIntervals1Day             HCPerfInvalidIntervals,
+      adMefPerEvcPhCurIngressGreenOctets1Day           HCPerfCurrentCount,
+      adMefPerEvcPhCurIngressGreenFrames1Day           HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenOctets1Day            HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenFrames1Day            HCPerfCurrentCount,
+      adMefPerEvcPhCurIngressGreenFrameDiscards1Day    HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenFrameDiscards1Day     HCPerfCurrentCount,
+      adMefPerEvcPhCurIngressGreenOctetDiscards1Day    HCPerfCurrentCount,
+      adMefPerEvcPhCurEgressGreenOctetDiscards1Day     HCPerfCurrentCount
+   }
+
+adMefPerEvcPhCurEvcNameFixedLen OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE (50))
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The name of the EVC.  This string is padded at the end with 0x00 so that 
+      this table index has a fixed length of characters of the specified SIZE."
+   ::= { adMefPerEvcPhCurEntry 1}
+
+adMefPerEvcPhCurTimeElapsed15Min OBJECT-TYPE
+   SYNTAX      HCPerfTimeElapsed
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Total elapsed seconds in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 2 }
+
+adMefPerEvcPhCurValidIntervals15Min OBJECT-TYPE
+   SYNTAX      HCPerfValidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of valid 15 minute intervals over the last 24 hours."
+   ::= { adMefPerEvcPhCurEntry 3 }
+
+adMefPerEvcPhCurInvalidIntervals15Min OBJECT-TYPE
+   SYNTAX      HCPerfInvalidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of invalid 15 minute intervals over the last 24 hours."
+   ::= { adMefPerEvcPhCurEntry 4 }
+
+adMefPerEvcPhCurIngressGreenOctets15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green octets in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 5 }
+
+adMefPerEvcPhCurIngressGreenFrames15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 6 }
+
+adMefPerEvcPhCurEgressGreenOctets15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 7 }
+
+adMefPerEvcPhCurEgressGreenFrames15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 8 }
+
+adMefPerEvcPhCurIngressGreenFrameDiscards15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames discarded in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 9 }
+
+adMefPerEvcPhCurEgressGreenFrameDiscards15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames discarded in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 10 }
+
+adMefPerEvcPhCurIngressGreenOctetDiscards15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green octets discarded in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 11 }
+
+adMefPerEvcPhCurEgressGreenOctetDiscards15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets discarded in the current 15 minute interval."
+   ::= { adMefPerEvcPhCurEntry 12 }
+
+adMefPerEvcPhCurTimeElapsed1Day OBJECT-TYPE
+   SYNTAX      HCPerfTimeElapsed
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Total elapsed seconds in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 13 }
+
+adMefPerEvcPhCurValidIntervals1Day OBJECT-TYPE
+   SYNTAX      HCPerfValidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of valid 1 day intervals available."
+   ::= { adMefPerEvcPhCurEntry 14 }
+
+adMefPerEvcPhCurInvalidIntervals1Day OBJECT-TYPE
+   SYNTAX      HCPerfInvalidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of invalid 1 day intervals available."
+   ::= { adMefPerEvcPhCurEntry 15 }
+
+adMefPerEvcPhCurIngressGreenOctets1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green octets in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 16 }
+
+adMefPerEvcPhCurIngressGreenFrames1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 17 }
+
+adMefPerEvcPhCurEgressGreenOctets1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 18 }
+
+adMefPerEvcPhCurEgressGreenFrames1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 19 }
+
+adMefPerEvcPhCurIngressGreenFrameDiscards1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames discarded in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 20 }
+
+adMefPerEvcPhCurEgressGreenFrameDiscards1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames discarded in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 21 }
+
+adMefPerEvcPhCurIngressGreenOctetDiscards1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green octets discarded in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 22 }
+
+adMefPerEvcPhCurEgressGreenOctetDiscards1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets discarded in the current 1 day interval."
+   ::= { adMefPerEvcPhCurEntry 23 }
+
+------------------------------------------------------------
+-- 15 Minute Interval Table for Interface Performance History
+--
+adMefPerEvcPh15MinIntervalTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AdMefPerEvcPh15MinIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This table contains performance history information for each valid 15
+      minute interval.  This table is indexed by adMefPerEvcPh15MinEvcNameFixedLen,
+      and the interval number."
+   ::= { adGenAosMefPerEvcPerfHistory 2 }
+
+adMefPerEvcPh15MinIntervalEntry OBJECT-TYPE
+   SYNTAX      AdMefPerEvcPh15MinIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "An entry in the adMefPerEvcPh15MinIntervalTable."
+   INDEX { adMefPerEvcPh15MinEvcNameFixedLen, adMefPerEvcPh15MinIntervalNumber }
+   ::= { adMefPerEvcPh15MinIntervalTable 1 }
+
+AdMefPerEvcPh15MinIntervalEntry ::=
+   SEQUENCE
+   {
+      adMefPerEvcPh15MinEvcNameFixedLen                OCTET STRING,
+      adMefPerEvcPh15MinIntervalNumber                 Integer32,
+      adMefPerEvcPh15MinIngressGreenOctets             HCPerfIntervalCount,
+      adMefPerEvcPh15MinIngressGreenFrames             HCPerfIntervalCount,
+      adMefPerEvcPh15MinEgressGreenOctets              HCPerfIntervalCount,
+      adMefPerEvcPh15MinEgressGreenFrames              HCPerfIntervalCount,
+      adMefPerEvcPh15MinIngressGreenFrameDiscards      HCPerfIntervalCount,
+      adMefPerEvcPh15MinEgressGreenFrameDiscards       HCPerfIntervalCount,
+      adMefPerEvcPh15MinIngressGreenOctetDiscards      HCPerfIntervalCount,
+      adMefPerEvcPh15MinEgressGreenOctetDiscards       HCPerfIntervalCount
+   }
+
+adMefPerEvcPh15MinEvcNameFixedLen OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE (50))
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The name of the EVC.  This string is padded at the end with 0x00 so that 
+      this table index has a fixed length of characters of the specified SIZE."
+   ::= { adMefPerEvcPh15MinIntervalEntry 1}
+
+adMefPerEvcPh15MinIntervalNumber OBJECT-TYPE
+   SYNTAX      Integer32 (1..96)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "Performance history interval number.  Interval 1 is the most
+      recent previous interval; interval 96 is 24 hours ago.
+      Intervals 2..96 are optional."
+   ::= { adMefPerEvcPh15MinIntervalEntry 2 }
+
+adMefPerEvcPh15MinIngressGreenOctets OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green octets in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 3 }
+
+adMefPerEvcPh15MinIngressGreenFrames OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 4 }
+
+adMefPerEvcPh15MinEgressGreenOctets OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 5 }
+
+adMefPerEvcPh15MinEgressGreenFrames OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 6 }
+
+adMefPerEvcPh15MinIngressGreenFrameDiscards OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames discarded in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 7 }
+
+adMefPerEvcPh15MinEgressGreenFrameDiscards OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames discarded in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 8 }
+
+adMefPerEvcPh15MinIngressGreenOctetDiscards OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames discarded in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 9 }
+
+adMefPerEvcPh15MinEgressGreenOctetDiscards OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets discarded in the 15 minute interval."
+   ::= { adMefPerEvcPh15MinIntervalEntry 10 }
+
+------------------------------------------------------------
+-- 1 Day Interval Table for Interface Performance History
+--
+adMefPerEvcPh1DayIntervalTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AdMefPerEvcPh1DayIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This table contains performance history information for each valid 1
+      day interval.  This table is indexed by adMefPerEvcPh1DayEvcNameFixedLen,
+      and the interval number."
+   ::= { adGenAosMefPerEvcPerfHistory 3 }
+
+adMefPerEvcPh1DayIntervalEntry OBJECT-TYPE
+   SYNTAX      AdMefPerEvcPh1DayIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "An entry in the adMefPerEvcPh1DayIntervalTable."
+   INDEX { adMefPerEvcPh1DayEvcNameFixedLen, adMefPerEvcPh1DayIntervalNumber }
+   ::= { adMefPerEvcPh1DayIntervalTable 1 }
+
+AdMefPerEvcPh1DayIntervalEntry ::=
+   SEQUENCE
+   {
+      adMefPerEvcPh1DayEvcNameFixedLen                 OCTET STRING,
+      adMefPerEvcPh1DayIntervalNumber                  Integer32,
+      adMefPerEvcPh1DayIngressGreenOctets              HCPerfTotalCount,
+      adMefPerEvcPh1DayIngressGreenFrames              HCPerfTotalCount,
+      adMefPerEvcPh1DayEgressGreenOctets               HCPerfTotalCount,
+      adMefPerEvcPh1DayEgressGreenFrames               HCPerfTotalCount,
+      adMefPerEvcPh1DayIngressGreenFrameDiscards       HCPerfTotalCount,
+      adMefPerEvcPh1DayEgressGreenFrameDiscards        HCPerfTotalCount,
+      adMefPerEvcPh1DayIngressGreenOctetDiscards       HCPerfTotalCount,
+      adMefPerEvcPh1DayEgressGreenOctetDiscards        HCPerfTotalCount
+   }
+
+adMefPerEvcPh1DayEvcNameFixedLen OBJECT-TYPE
+   SYNTAX      OCTET STRING (SIZE (50))
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The name of the EVC.  This string is padded at the end with 0x00 so that 
+      this table index has a fixed length of characters of the specified SIZE."
+   ::= { adMefPerEvcPh1DayIntervalEntry 1}
+
+adMefPerEvcPh1DayIntervalNumber OBJECT-TYPE
+   SYNTAX      Integer32 (1..30)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "Performance history interval number.  Interval 1 is the most recent
+      previous day; interval 7 is 7 days ago.  Intervals 2..30 are optional."
+   ::= { adMefPerEvcPh1DayIntervalEntry 2 }
+
+adMefPerEvcPh1DayIngressGreenOctets OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green octets in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 3 }
+
+adMefPerEvcPh1DayIngressGreenFrames OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 4 }
+
+adMefPerEvcPh1DayEgressGreenOctets OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 5 }
+
+adMefPerEvcPh1DayEgressGreenFrames OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 6 }
+
+adMefPerEvcPh1DayIngressGreenFrameDiscards OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green frames discarded in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 7 }
+
+adMefPerEvcPh1DayEgressGreenFrameDiscards OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green frames discarded in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 8 }
+
+adMefPerEvcPh1DayIngressGreenOctetDiscards OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress green octets discarded in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 9 }
+
+adMefPerEvcPh1DayEgressGreenOctetDiscards OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of egress green octets discarded in the 1 day interval."
+   ::= { adMefPerEvcPh1DayIntervalEntry 10 }
+
+------------------------------------------------------------
+-- Conformance information
+--
+adGenAosMefPerEvcPerfHistoryConformance OBJECT IDENTIFIER
+   ::= { adGenAOSConformance 23 }
+
+adGenAosMefPerEvcPerfHistoryGroups OBJECT IDENTIFIER
+   ::= { adGenAosMefPerEvcPerfHistoryConformance 1 }
+
+adGenAosMefPerEvcPerfHistoryCompliances OBJECT IDENTIFIER
+   ::= { adGenAosMefPerEvcPerfHistoryConformance 2 }
+
+-- Compliance statements
+--
+adGenAosMefPerEvcPerfHistoryCompliance MODULE-COMPLIANCE
+   STATUS  current
+   DESCRIPTION
+     "The compliance statement for SNMPv2 entities which
+      implement UNI interface per-queue performance history."
+   MODULE
+   MANDATORY-GROUPS {
+      adMefPerEvcPhCurGroup,
+      adMefPerEvcPh15MinIntervalGroup,
+      adMefPerEvcPh1DayIntervalGroup
+   }
+   ::= { adGenAosMefPerEvcPerfHistoryCompliances 1 }
+
+-- Units of conformance
+--
+adMefPerEvcPhCurGroup OBJECT-GROUP
+   OBJECTS {
+      adMefPerEvcPhCurTimeElapsed15Min,
+      adMefPerEvcPhCurValidIntervals15Min,
+      adMefPerEvcPhCurInvalidIntervals15Min,
+      adMefPerEvcPhCurIngressGreenOctets15Min,
+      adMefPerEvcPhCurIngressGreenFrames15Min,
+      adMefPerEvcPhCurEgressGreenOctets15Min,
+      adMefPerEvcPhCurEgressGreenFrames15Min,
+      adMefPerEvcPhCurIngressGreenFrameDiscards15Min,
+      adMefPerEvcPhCurEgressGreenFrameDiscards15Min,
+      adMefPerEvcPhCurIngressGreenOctetDiscards15Min,
+      adMefPerEvcPhCurEgressGreenOctetDiscards15Min,
+      adMefPerEvcPhCurTimeElapsed1Day,
+      adMefPerEvcPhCurValidIntervals1Day,
+      adMefPerEvcPhCurInvalidIntervals1Day,
+      adMefPerEvcPhCurIngressGreenOctets1Day,
+      adMefPerEvcPhCurIngressGreenFrames1Day,
+      adMefPerEvcPhCurEgressGreenOctets1Day,
+      adMefPerEvcPhCurEgressGreenFrames1Day,
+      adMefPerEvcPhCurIngressGreenFrameDiscards1Day,
+      adMefPerEvcPhCurEgressGreenFrameDiscards1Day,
+      adMefPerEvcPhCurIngressGreenOctetDiscards1Day,
+      adMefPerEvcPhCurEgressGreenOctetDiscards1Day
+   }
+   STATUS  current
+   DESCRIPTION
+     "The Current Group."
+   ::= { adGenAosMefPerEvcPerfHistoryGroups 1 }
+
+adMefPerEvcPh15MinIntervalGroup OBJECT-GROUP
+   OBJECTS {
+      adMefPerEvcPh15MinIngressGreenOctets,
+      adMefPerEvcPh15MinIngressGreenFrames,
+      adMefPerEvcPh15MinEgressGreenOctets,
+      adMefPerEvcPh15MinEgressGreenFrames,
+      adMefPerEvcPh15MinIngressGreenFrameDiscards,
+      adMefPerEvcPh15MinEgressGreenFrameDiscards,
+      adMefPerEvcPh15MinIngressGreenOctetDiscards,
+      adMefPerEvcPh15MinEgressGreenOctetDiscards
+   }
+   STATUS  current
+   DESCRIPTION
+     "The 15 minute interval group."
+   ::= { adGenAosMefPerEvcPerfHistoryGroups 2 }
+
+adMefPerEvcPh1DayIntervalGroup OBJECT-GROUP
+   OBJECTS {
+      adMefPerEvcPh1DayIngressGreenOctets,
+      adMefPerEvcPh1DayIngressGreenFrames,
+      adMefPerEvcPh1DayEgressGreenOctets,
+      adMefPerEvcPh1DayEgressGreenFrames,
+      adMefPerEvcPh1DayIngressGreenFrameDiscards,
+      adMefPerEvcPh1DayEgressGreenFrameDiscards,
+      adMefPerEvcPh1DayIngressGreenOctetDiscards,
+      adMefPerEvcPh1DayEgressGreenOctetDiscards
+   }
+   STATUS  current
+   DESCRIPTION
+     "The 1 day interval group."
+   ::= { adGenAosMefPerEvcPerfHistoryGroups 3 }
+
+END
+
