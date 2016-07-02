@@ -1,0 +1,508 @@
+-- Changes to RFC1643 - EtherLike MIB
+--   Removed unused IMPORT of Gauge.
+-- dperkins@scruznet.com
+
+
+   EtherLike-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+          Counter                FROM RFC1155-SMI
+          ifIndex, transmission  FROM RFC1213-MIB
+          OBJECT-TYPE            FROM RFC-1212;
+
+       -- This MIB module uses the extended OBJECT-TYPE macro as
+       -- defined in RFC-1212.
+
+      dot3    OBJECT IDENTIFIER ::= { transmission 7 }
+
+      -- the Ethernet-like Statistics group
+
+       dot3StatsTable  OBJECT-TYPE
+            SYNTAX     SEQUENCE OF Dot3StatsEntry
+            ACCESS     not-accessible
+            STATUS     mandatory
+            DESCRIPTION
+             "Statistics for a collection of ethernet-like
+             interfaces attached to a particular system."
+            ::= { dot3 2 }
+
+
+       dot3StatsEntry   OBJECT-TYPE
+            SYNTAX      Dot3StatsEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+              "Statistics for a particular interface to an
+              ethernet-like medium."
+            INDEX     { dot3StatsIndex }
+            ::= { dot3StatsTable 1 }
+
+       Dot3StatsEntry ::= SEQUENCE {
+            dot3StatsIndex                      INTEGER,
+            dot3StatsAlignmentErrors            Counter,
+            dot3StatsFCSErrors                  Counter,
+            dot3StatsSingleCollisionFrames      Counter,
+            dot3StatsMultipleCollisionFrames    Counter,
+            dot3StatsSQETestErrors              Counter,
+            dot3StatsDeferredTransmissions      Counter,
+            dot3StatsLateCollisions             Counter,
+            dot3StatsExcessiveCollisions        Counter,
+            dot3StatsInternalMacTransmitErrors  Counter,
+            dot3StatsCarrierSenseErrors         Counter,
+            dot3StatsFrameTooLongs              Counter,
+            dot3StatsInternalMacReceiveErrors   Counter,
+            dot3StatsEtherChipSet               OBJECT IDENTIFIER
+       }
+
+       dot3StatsIndex   OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+              "An index value that uniquely identifies an
+              interface to an ethernet-like medium.  The
+              interface identified by a particular value of
+              this index is the same interface as identified
+              by the same value of ifIndex."
+            ::= { dot3StatsEntry 1 }
+
+       dot3StatsAlignmentErrors   OBJECT-TYPE
+            SYNTAX     Counter
+            ACCESS     read-only
+            STATUS     mandatory
+            DESCRIPTION
+             "A count of frames received on a particular
+             interface that are not an integral number of
+             octets in length and do not pass the FCS check.
+
+             The count represented by an instance of this
+             object is incremented when the alignmentError
+             status is returned by the MAC service to the
+             LLC (or other MAC user). Received frames for
+             which multiple error conditions obtain are,
+             according to the conventions of IEEE 802.3
+             Layer Management, counted exclusively according
+             to the error status presented to the LLC."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 2 }
+
+       dot3StatsFCSErrors   OBJECT-TYPE
+            SYNTAX      Counter
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+            "A count of frames received on a particular
+            interface that are an integral number of octets
+            in length but do not pass the FCS check.
+
+            The count represented by an instance of this
+            object is incremented when the frameCheckError
+            status is returned by the MAC service to the
+            LLC (or other MAC user). Received frames for
+            which multiple error conditions obtain are,
+            according to the conventions of IEEE 802.3
+            Layer Management, counted exclusively according
+            to the error status presented to the LLC."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 3 }
+
+       dot3StatsSingleCollisionFrames   OBJECT-TYPE
+            SYNTAX      Counter
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+            "A count of successfully transmitted frames on
+            a particular interface for which transmission
+            is inhibited by exactly one collision.
+
+            A frame that is counted by an instance of this
+            object is also counted by the corresponding
+            instance of either the ifOutUcastPkts,
+            ifOutMulticastPkts, or ifOutBroadcastPkts,
+            and is not counted by the corresponding
+            instance of the dot3StatsMultipleCollisionFrames
+            object."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 4 }
+
+       dot3StatsMultipleCollisionFrames   OBJECT-TYPE
+            SYNTAX      Counter
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+            "A count of successfully transmitted frames on
+            a particular interface for which transmission
+             is inhibited by more than one collision.
+
+            A frame that is counted by an instance of this
+            object is also counted by the corresponding
+            instance of either the ifOutUcastPkts,
+            ifOutMulticastPkts, or ifOutBroadcastPkts,
+            and is not counted by the corresponding
+            instance of the dot3StatsSingleCollisionFrames
+            object."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 5 }
+
+       dot3StatsSQETestErrors   OBJECT-TYPE
+            SYNTAX     Counter
+            ACCESS     read-only
+            STATUS     mandatory
+            DESCRIPTION
+            "A count of times that the SQE TEST ERROR
+            message is generated by the PLS sublayer for a
+            particular interface. The SQE TEST ERROR
+            message is defined in section 7.2.2.2.4 of
+            ANSI/IEEE 802.3-1985 and its generation is
+            described in section 7.2.4.6 of the same
+            document."
+            REFERENCE
+            "ANSI/IEEE Std 802.3-1985 Carrier Sense
+            Multiple Access with Collision Detection Access
+            Method and Physical Layer Specifications"
+            ::= { dot3StatsEntry 6 }
+
+       dot3StatsDeferredTransmissions   OBJECT-TYPE
+            SYNTAX      Counter
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+            "A count of frames for which the first
+            transmission attempt on a particular interface
+            is delayed because the medium is busy.
+
+            The count represented by an instance of this
+            object does not include frames involved in
+            collisions."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 7 }
+
+       dot3StatsLateCollisions   OBJECT-TYPE
+            SYNTAX      Counter
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+            "The number of times that a collision is
+            detected on a particular interface later than
+            512 bit-times into the transmission of a
+            packet.
+
+            Five hundred and twelve bit-times corresponds
+            to 51.2 microseconds on a 10 Mbit/s system. A
+            (late) collision included in a count
+            represented by an instance of this object is
+            also considered as a (generic) collision for
+            purposes of other collision-related
+            statistics."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 8 }
+
+       dot3StatsExcessiveCollisions   OBJECT-TYPE
+            SYNTAX    Counter
+            ACCESS    read-only
+            STATUS    mandatory
+            DESCRIPTION
+            "A count of frames for which transmission on a
+            particular interface fails due to excessive
+            collisions."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 9 }
+
+
+       dot3StatsInternalMacTransmitErrors   OBJECT-TYPE
+            SYNTAX    Counter
+            ACCESS    read-only
+            STATUS    mandatory
+            DESCRIPTION
+            "A count of frames for which transmission on a
+            particular interface fails due to an internal
+            MAC sublayer transmit error. A frame is only
+            counted by an instance of this object if it is
+            not counted by the corresponding instance of
+            either the dot3StatsLateCollisions object, the
+            dot3StatsExcessiveCollisions object, or the
+            dot3StatsCarrierSenseErrors object.
+
+            The precise meaning of the count represented by
+            an instance of this object is implementation-
+            specific.  In particular, an instance of this
+            object may represent a count of transmission
+            errors on a particular interface that are not
+            otherwise counted."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 10 }
+
+       dot3StatsCarrierSenseErrors   OBJECT-TYPE
+            SYNTAX    Counter
+            ACCESS    read-only
+            STATUS    mandatory
+            DESCRIPTION
+            "The number of times that the carrier sense
+            condition was lost or never asserted when
+            attempting to transmit a frame on a particular
+            interface.
+
+            The count represented by an instance of this
+            object is incremented at most once per
+            transmission attempt, even if the carrier sense
+            condition fluctuates during a transmission
+            attempt."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 11 }
+
+       -- { dot3StatsEntry 12 } is not assigned
+
+       dot3StatsFrameTooLongs   OBJECT-TYPE
+            SYNTAX    Counter
+            ACCESS    read-only
+            STATUS    mandatory
+            DESCRIPTION
+            "A count of frames received on a particular
+            interface that exceed the maximum permitted
+            frame size.
+
+            The count represented by an instance of this
+            object is incremented when the frameTooLong
+            status is returned by the MAC service to the
+            LLC (or other MAC user). Received frames for
+            which multiple error conditions obtain are,
+            according to the conventions of IEEE 802.3
+            Layer Management, counted exclusively according
+            to the error status presented to the LLC."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 13 }
+
+       -- { dot3StatsEntry 14 } is not assigned
+
+       -- { dot3StatsEntry 15 } is not assigned
+
+       dot3StatsInternalMacReceiveErrors   OBJECT-TYPE
+            SYNTAX    Counter
+            ACCESS    read-only
+            STATUS    mandatory
+            DESCRIPTION
+            "A count of frames for which reception on a
+            particular interface fails due to an internal
+            MAC sublayer receive error. A frame is only
+            counted by an instance of this object if it is
+            not counted by the corresponding instance of
+            either the dot3StatsFrameTooLongs object, the
+            dot3StatsAlignmentErrors object, or the
+            dot3StatsFCSErrors object.
+
+            The precise meaning of the count represented by
+            an instance of this object is implementation-
+            specific.  In particular, an instance of this
+            object may represent a count of receive errors
+            on a particular interface that are not
+            otherwise counted."
+            REFERENCE
+            "IEEE 802.3 Layer Management"
+            ::= { dot3StatsEntry 16 }
+
+       dot3StatsEtherChipSet   OBJECT-TYPE
+            SYNTAX        OBJECT IDENTIFIER
+            ACCESS        read-only
+            STATUS        mandatory
+            DESCRIPTION
+            "This object contains an OBJECT IDENTIFIER
+            which identifies the chipset used to
+            realize the interface. Ethernet-like
+            interfaces are typically built out of
+            several different chips. The MIB implementor
+            is presented with a decision of which chip
+            to identify via this object. The implementor
+            should identify the chip which is usually
+            called the Medium Access Control chip.
+            If no such chip is easily identifiable,
+            the implementor should identify the chip
+            which actually gathers the transmit
+            and receive statistics and error
+            indications. This would allow a
+            manager station to correlate the
+            statistics and the chip generating
+            them, giving it the ability to take
+            into account any known anomalies
+            in the chip."
+            ::= { dot3StatsEntry 17 }
+
+       -- the Ethernet-like Collision Statistics group
+
+       -- Implementation of this group is optional; it is appropriate
+       -- for all systems which have the necessary metering
+
+       dot3CollTable  OBJECT-TYPE
+            SYNTAX    SEQUENCE OF Dot3CollEntry
+            ACCESS    not-accessible
+            STATUS    mandatory
+            DESCRIPTION
+            "A collection of collision histograms for a
+            particular set of interfaces."
+            ::= { dot3 5 }
+
+
+       dot3CollEntry  OBJECT-TYPE
+            SYNTAX    Dot3CollEntry
+            ACCESS    not-accessible
+            STATUS    mandatory
+            DESCRIPTION
+            "A cell in the histogram of per-frame
+            collisions for a particular interface.  An
+            instance of this object represents the
+            frequency of individual MAC frames for which
+            the transmission (successful or otherwise) on a
+            particular interface is accompanied by a
+            particular number of media collisions."
+            INDEX     { ifIndex, dot3CollCount }
+            ::= { dot3CollTable 1 }
+
+       Dot3CollEntry ::= SEQUENCE {
+            dot3CollCount        INTEGER,
+            dot3CollFrequencies  Counter
+       }
+
+       -- { dot3CollEntry 1 } is no longer in use
+
+       dot3CollCount  OBJECT-TYPE
+            SYNTAX    INTEGER (1..16)
+            ACCESS    not-accessible
+            STATUS    mandatory
+            DESCRIPTION
+            "The number of per-frame media collisions for
+            which a particular collision histogram cell
+            represents the frequency on a particular
+            interface."
+            ::= { dot3CollEntry 2 }
+
+
+       dot3CollFrequencies   OBJECT-TYPE
+            SYNTAX    Counter
+            ACCESS    read-only
+            STATUS    mandatory
+            DESCRIPTION
+            "A count of individual MAC frames for which the
+            transmission (successful or otherwise) on a
+            particular interface occurs after the
+            frame has experienced exactly the number
+            of collisions in the associated
+            dot3CollCount object.
+
+            For example, a frame which is transmitted
+            on interface 77 after experiencing
+            exactly 4 collisions would be indicated
+            by incrementing only dot3CollFrequencies.77.4.
+            No other instance of dot3CollFrequencies would
+            be incremented in this example."
+            ::= { dot3CollEntry 3 }
+
+       --  802.3 Tests
+
+       dot3Tests   OBJECT IDENTIFIER ::= { dot3 6 }
+
+       dot3Errors  OBJECT IDENTIFIER ::= { dot3 7 }
+
+
+       --  TDR Test
+
+       -- The Time-Domain Reflectometry (TDR) test is specific
+       -- to ethernet-like interfaces with the exception of
+       -- 10BaseT and 10BaseF. The TDR value may be useful
+       -- in determining the approximate distance to a cable fault.
+       -- It is advisable to repeat this test to check for a
+       -- consistent resulting TDR value, to verify that there
+       -- is a fault.
+
+       dot3TestTdr OBJECT IDENTIFIER ::= { dot3Tests 1 }
+
+       -- A TDR test returns as its result the time interval,
+       -- measured in 10 MHz ticks or 100 nsec units, between
+       -- the start of TDR test transmission and the subsequent
+       -- detection of a collision or deassertion of carrier.  On
+       -- successful completion of a TDR test, the result is
+       -- stored as the value of the appropriate instance of the
+       -- MIB object dot3TestTdrValue, and the OBJECT IDENTIFIER
+       -- of that instanceis stored in the corresponding instance
+       -- of ifExtnsTestCode (thereby indicating where the
+       -- result has been stored).
+
+
+       -- Loopback Test
+
+       -- Another test is the full-duplex loopback test.
+       -- This test configures the MAC chip and executes
+       -- an internal loopback test of memory, data paths,
+       -- and the MAC chip logic.  This loopback test can
+       -- only be executed if the interface is offline.
+       -- Once the test has completed, the MAC chip should
+       -- be reinitialized for network operation, but it
+       -- should remain offline.
+
+       dot3TestLoopBack OBJECT IDENTIFIER ::= { dot3Tests 2 }
+
+       -- If an error occurs during a test, the object
+       -- ifTestResult (defined in RFC1573) will be set
+       -- to failed(7).  The following two OBJECT
+       -- IDENTIFIERs may be used to provided more
+       -- information as values for ifTestCode.
+
+                -- couldn't initialize MAC chip for test
+       dot3ErrorInitError     OBJECT IDENTIFIER ::= { dot3Errors 1 }
+
+                -- expected data not received (or not
+                -- received correctly) in loopback test
+       dot3ErrorLoopbackError OBJECT IDENTIFIER ::= { dot3Errors 2 }
+
+       -- RFC1573 does away with the interface chipset object.
+       -- The following OBJECT IDENTIFIER definitions are
+       -- retained for purposes of backwards compatibility
+       -- with pre-RFC1573 systems.
+       --  802.3 Hardware Chipsets
+
+       -- The object ifExtnsChipSet is provided in RFC1229 to
+       -- identify the MAC hardware used to communcate on an
+       -- interface.  The following hardware chipsets are
+       -- provided for 802.3:
+
+       dot3ChipSets          OBJECT IDENTIFIER ::= { dot3 8 }
+       dot3ChipSetAMD        OBJECT IDENTIFIER ::= { dot3ChipSets 1 }
+       dot3ChipSetAMD7990    OBJECT IDENTIFIER ::= { dot3ChipSetAMD 1 }
+       dot3ChipSetAMD79900   OBJECT IDENTIFIER ::= { dot3ChipSetAMD 2 }
+       dot3ChipSetAMD79C940  OBJECT IDENTIFIER ::= { dot3ChipSetAMD 3 }
+
+       dot3ChipSetIntel      OBJECT IDENTIFIER ::= { dot3ChipSets 2 }
+       dot3ChipSetIntel82586 OBJECT IDENTIFIER ::= { dot3ChipSetIntel 1 }
+       dot3ChipSetIntel82596 OBJECT IDENTIFIER ::= { dot3ChipSetIntel 2 }
+
+       dot3ChipSetSeeq       OBJECT IDENTIFIER ::= { dot3ChipSets 3 }
+       dot3ChipSetSeeq8003   OBJECT IDENTIFIER ::= { dot3ChipSetSeeq 1 }
+
+       dot3ChipSetNational      OBJECT IDENTIFIER ::= { dot3ChipSets 4 }
+       dot3ChipSetNational8390  OBJECT IDENTIFIER ::=
+                                  { dot3ChipSetNational 1 }
+       dot3ChipSetNationalSonic OBJECT IDENTIFIER ::=
+                                  { dot3ChipSetNational 2 }
+
+       dot3ChipSetFujitsu       OBJECT IDENTIFIER ::= { dot3ChipSets 5 }
+       dot3ChipSetFujitsu86950  OBJECT IDENTIFIER ::=
+                                  { dot3ChipSetFujitsu 1 }
+
+       dot3ChipSetDigital       OBJECT IDENTIFIER ::= { dot3ChipSets 6 }
+       dot3ChipSetDigitalDC21040  OBJECT IDENTIFIER ::=
+                                  { dot3ChipSetDigital 1 }
+
+       -- For those chipsets not represented above, OBJECT IDENTIFIER
+       -- assignment is required in other documentation, e.g., assignment
+       -- within that part of the registration tree delegated to
+       -- individual enterprises (see RFC1155).
+
+   END
