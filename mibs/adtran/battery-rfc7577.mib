@@ -1,0 +1,1049 @@
+BATTERY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        mib-2, Integer32, Unsigned32
+            FROM SNMPv2-SMI                                -- RFC 2578
+        DateAndTime
+           FROM SNMPv2-TC                                 -- RFC 2579
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+           FROM SNMPv2-CONF                               -- RFC 2580
+        SnmpAdminString
+           FROM SNMP-FRAMEWORK-MIB                        -- RFC 3411
+        entPhysicalIndex
+           FROM ENTITY-MIB;                               -- RFC 6933l
+
+batteryMIB MODULE-IDENTITY
+    LAST-UPDATED "201506150000Z"         -- 15 June 2015
+    ORGANIZATION "IETF EMAN Working Group"
+    CONTACT-INFO
+        "General Discussion: eman@ietf.org
+        To Subscribe: <http://www.ietf.org/mailman/listinfo/eman>
+        Archive: <http://www.ietf.org/mail-archive/web/eman>
+
+        Editor:
+          Juergen Quittek
+          NEC Europe, Ltd.
+          NEC Laboratories Europe
+          Kurfuersten-Anlage 36
+          69115 Heidelberg
+          Germany
+          Tel: +49 6221 4342-115
+          Email: quittek@neclab.eu"
+
+    DESCRIPTION
+        "This MIB module defines a set of objects for monitoring
+        batteries of networked devices and of their components.
+
+        Copyright (c) 2015 IETF Trust and the persons identified as
+        authors of the code.  All rights reserved.
+
+        Redistribution and use in source and binary forms, with or
+        without modification, is permitted pursuant to, and subject
+        to the license terms contained in, the Simplified BSD License
+        set forth in Section 4.c of the IETF Trust's Legal Provisions
+        Relating to IETF Documents
+        (http://trustee.ietf.org/license-info).
+
+        This version of this MIB module is part of RFC 7577; see
+        the RFC itself for full legal notices."
+--  Revision history
+
+    REVISION "201506150000Z"         -- 15 June 2015
+    DESCRIPTION
+        "Initial version published as RFC 7577."
+
+    ::= { mib-2 233 }
+
+--******************************************************************
+-- Top-Level Structure of the MIB Module
+--******************************************************************
+
+batteryNotifications OBJECT IDENTIFIER ::= { batteryMIB 0 }
+batteryObjects       OBJECT IDENTIFIER ::= { batteryMIB 1 }
+batteryConformance   OBJECT IDENTIFIER ::= { batteryMIB 2 }
+
+--==================================================================
+-- 1.  Object Definitions
+--==================================================================
+
+--------------------------------------------------------------------
+-- 1.1.  Battery Table
+--------------------------------------------------------------------
+batteryTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BatteryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information on batteries.  It contains
+        one conceptual row per battery in a managed entity.
+
+        Batteries are indexed by the entPhysicalIndex of the
+        entPhysicalTable defined in the ENTITY-MIB (RFC 6933).
+
+        For implementations of the BATTERY-MIB, an implementation of
+        the ENTITY-MIB complying with the entity4CRCompliance
+        MODULE-COMPLIANCE statement of the ENTITY-MIB is required.
+
+        If batteries are replaced, and the replacing battery uses
+        the same physical connector as the replaced battery, then
+        the replacing battery SHOULD be indexed with the same value
+        of object entPhysicalIndex as the replaced battery."
+    ::= { batteryObjects 1 }
+
+batteryEntry OBJECT-TYPE
+    SYNTAX      BatteryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry providing information on a battery."
+    INDEX  { entPhysicalIndex }
+    ::= { batteryTable 1 }
+
+BatteryEntry ::=
+    SEQUENCE {
+        batteryIdentifier               SnmpAdminString,
+        batteryFirmwareVersion          SnmpAdminString,
+        batteryType                     INTEGER,
+        batteryTechnology               Unsigned32,
+        batteryDesignVoltage            Unsigned32,
+        batteryNumberOfCells            Unsigned32,
+        batteryDesignCapacity           Unsigned32,
+        batteryMaxChargingCurrent       Unsigned32,
+        batteryTrickleChargingCurrent   Unsigned32,
+        batteryActualCapacity           Unsigned32,
+        batteryChargingCycleCount       Unsigned32,
+        batteryLastChargingCycleTime    DateAndTime,
+        batteryChargingOperState        INTEGER,
+        batteryChargingAdminState       INTEGER,
+        batteryActualCharge             Unsigned32,
+        batteryActualVoltage            Unsigned32,
+        batteryActualCurrent            Integer32,
+        batteryTemperature              Integer32,
+        batteryAlarmLowCharge           Unsigned32,
+        batteryAlarmLowVoltage          Unsigned32,
+        batteryAlarmLowCapacity         Unsigned32,
+        batteryAlarmHighCycleCount      Unsigned32,
+        batteryAlarmHighTemperature     Integer32,
+        batteryAlarmLowTemperature      Integer32,
+        batteryCellIdentifier           SnmpAdminString
+    }
+
+batteryIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains an identifier for the battery.
+
+        Many manufacturers deliver not only simple batteries but
+        battery packages including additional hardware and firmware.
+        Typically, these modules include an identifier that can be
+        retrieved by a device in which a battery has been installed.
+        The identifier is useful when batteries are removed and
+        reinstalled in the same or other devices.  Then, the device
+        or the network management system can trace batteries and
+        achieve continuity of battery monitoring.
+
+        If the battery is identified by more than one value,
+        for example, by a model number and a serial number,
+        then the value of this object is a concatenation of these
+        values, separated by the colon symbol ':'.  The values
+        should be ordered so that a more significant value comes
+        before a less significant one.  In the example above, the
+        (more significant) model number would be first, and the serial
+        number would follow: '<model number>:<serial number>'.
+
+        If the battery identifier cannot be represented using the
+        ISO/IEC IS 10646-1 character set, then a hexadecimal
+        encoding of a binary representation of the entire battery
+        identifier must be used.
+
+        The value of this object must be an empty string if there
+        is no battery identifier or if the battery identifier is
+        unknown."
+    ::= { batteryEntry 1 }
+
+batteryFirmwareVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the version number of the firmware
+        that is included in a battery module.
+
+        Many manufacturers deliver not pure batteries but battery
+        packages including additional hardware and firmware.
+
+        Since the behavior of the battery may change with the
+        firmware, it may be useful to retrieve the firmware version
+        number.
+
+        The value of this object must be an empty string if there
+        is no firmware or if the version number of the firmware is
+        unknown."
+    ::= { batteryEntry 2 }
+
+batteryType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    other(2),
+                    primary(3),
+                    rechargeable(4),
+                    capacitor(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of battery.
+
+        It distinguishes between primary (not rechargeable)
+        batteries, rechargeable (secondary) batteries, and
+        capacitors.  Capacitors are not really batteries but
+        are often used in the same way as a battery.
+
+        The value other(2) can be used if the battery type is known
+        but is none of the ones above.  Value unknown(1) is to be used
+        if the type of battery cannot be determined."
+
+    ::= { batteryEntry 3 }
+
+batteryTechnology OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the technology used by the battery.
+        Numbers identifying battery technologies are registered at
+        IANA.  A current list of assignments can be found at
+        <http://www.iana.org/assignments/battery-technologies>.
+
+        Value unknown(1) MUST be used if the technology of the
+        battery cannot be determined.
+
+        Value other(2) can be used if the battery technology is known
+        but is not one of the types already registered at IANA."
+    ::= { batteryEntry 4 }
+
+batteryDesignVoltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "millivolt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the design (or nominal) voltage of the
+        battery in units of millivolt (mV).
+
+        Note that the design voltage is a constant value and
+        typically different from the actual voltage of the battery.
+
+        A value of 0 indicates that the design voltage is unknown."
+    ::= { batteryEntry 5 }
+
+batteryNumberOfCells OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the number of cells contained in the
+        battery.
+
+        A value of 0 indicates that the number of cells is unknown."
+    ::= { batteryEntry 6 }
+
+batteryDesignCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliampere hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the design (or nominal) capacity of
+        the battery in units of milliampere hours (mAh).
+
+        Note that the design capacity is a constant value and
+        typically different from the actual capacity of the battery.
+        Usually, this is a value provided by the manufacturer of the
+        battery.
+
+        A value of 0 indicates that the design capacity is
+        unknown."
+    ::= { batteryEntry 7 }
+
+batteryMaxChargingCurrent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the maximum current to be used for
+        charging the battery in units of milliampere (mA).
+
+        Note that the maximum charging current may not lead to
+        optimal charge of the battery and that some batteries can
+        only be charged with the maximum current for a limited
+        amount of time.
+
+        A value of 0 indicates that the maximum charging current is
+        unknown."
+    ::= { batteryEntry 8 }
+
+batteryTrickleChargingCurrent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the recommended average current
+        to be used for trickle charging the battery in units of
+        mA.
+
+        Typically, this is a value recommended by the manufacturer
+        of the battery or by the manufacturer of the charging
+        circuit.
+
+        A value of 0 indicates that the recommended trickle charging
+        current is unknown."
+    ::= { batteryEntry 9 }
+
+batteryActualCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliampere hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the actual capacity of the
+        battery in units of mAh.
+
+        Typically, the actual capacity of a battery decreases
+        with time and with usage of the battery.  It is usually
+        lower than the design capacity.
+
+        Note that the actual capacity needs to be measured and is
+        typically an estimate based on observed discharging and
+        charging cycles of the battery.
+
+        A value of 'ffffffff'H indicates that the actual capacity
+        cannot be determined."
+    ::= { batteryEntry 10 }
+
+batteryChargingCycleCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the number of completed charging
+        cycles that the battery underwent.  In line with the
+        Smart Battery Data Specification Revision 1.1, a charging
+        cycle is defined as the process of discharging the battery
+        by a total amount equal to the battery design capacity as
+        given by object batteryDesignCapacity.  A charging cycle
+        may include several steps of charging and discharging the
+        battery until the discharging amount given by
+        batteryDesignCapacity has been reached.  As soon as a
+        charging cycle has been completed, the next one starts
+        immediately, independent of the battery's current charge at
+        the end of the cycle.
+
+        For batteries of type primary(3), the value of this object is
+        always 0.
+
+        A value of 'ffffffff'H indicates that the number of charging
+        cycles cannot be determined."
+    ::= { batteryEntry 11 }
+
+batteryLastChargingCycleTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time of the last charging cycle.  The value
+        '0000000000000000'H is returned if the battery has not been
+        charged yet or if the last charging time cannot be
+        determined.
+
+        For batteries of type primary(1), the value of this object is
+        always '0000000000000000'H."
+    ::= { batteryEntry 12 }
+
+batteryChargingOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    charging(2),
+                    maintainingCharge(3),
+                    noCharging(4),
+                    discharging(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the current charging state of the
+        battery.
+
+        Value unknown(1) indicates that the charging state of the
+        battery cannot be determined.
+
+        Value charging(2) indicates that the battery is being
+        charged in a way such that the charge of the battery
+        increases.
+
+        Value maintainingCharge(3) indicates that the battery is
+        being charged with a low-average current that compensates
+        self-discharging.  This includes trickle charging, float
+        charging, and other methods for maintaining the current
+        charge of a battery.  In typical implementations of charging
+        controllers, state maintainingCharge(3) is only applied
+        if the battery is fully charged or almost fully charged.
+
+        Value noCharging(4) indicates that the battery is not being
+        charged or discharged by electric current between the
+        battery and electric circuits external to the battery.
+        Note that the battery may still be subject to
+        self-discharging.
+
+        Value discharging(5) indicates that the battery is either
+        used as the power source for electric circuits external to
+        the battery or discharged intentionally by the
+        charging controller, e.g., for the purpose of battery
+        maintenance.  In any case, the charge of the battery
+        decreases."
+    ::= { batteryEntry 13 }
+
+batteryChargingAdminState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notSet(1),
+                    charge(2),
+                    doNotCharge(3),
+                    discharge(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the desired
+        charging state of the battery.  The real state is
+        indicated by object batteryChargingOperState.  See the
+        definition of object batteryChargingOperState for a
+        description of the values.
+
+        When this object is initialized by an implementation of the
+        BATTERY-MIB module, its value is set to notSet(1).  In this
+        case, the charging controller is free to choose which
+        operational state is suitable.
+
+        When the batteryChargingAdminState object is set, then the
+        BATTERY-MIB implementation must try to set the battery
+        to the indicated state.  The result will be indicated by
+        object batteryChargingOperState.
+
+        Setting object batteryChargingAdminState to value notSet(1)
+        is a request to the charging controller to operate
+        autonomously and choose the operational state that is
+        suitable.
+
+        Setting object batteryChargingAdminState to value charge(2)
+        is a request to enter the operational state charging(2) until
+        the battery is fully charged.  When the battery is fully
+        charged, or if the battery was already fully charged or
+        almost fully charged at the time of the request, the
+        operational state will change to maintainingCharge(3) if the
+        charging controller and the battery support the functionality
+        of maintaining the charge, or it will change to noCharging(4)
+        otherwise.
+
+        Setting object batteryChargingAdminState to value
+        doNotCharge(3) is a request for entering operational
+        state noCharging(4).
+
+        Setting object batteryChargingAdminState to value
+        discharge(4) is a request for entering operational
+        state discharging(5).  Discharging can be accomplished
+        by ordinary use, applying a dedicated load, or any other
+        means.  An example for applying this state is battery
+        maintenance.  If the battery is empty or almost empty, the
+        operational state will change to noCharging(4).
+        The charging controller will decide which charge condition
+        will be considered empty dependent on the battery
+        technology used.  This is done to avoid damage on the
+        battery due to deep discharge.
+
+        Due to operational conditions and limitations of the
+        implementation of the BATTERY-MIB module, changing the
+        battery status according to a set value of object
+        batteryChargingAdminState may not be possible.
+        Setting the value of object batteryChargingAdminState
+        may result in not changing the state of the battery
+        to this value or even in setting the charging state
+        to another value than the requested one.  For example,
+        the charging controller might at any time decide to
+        enter state discharging(5), if there is an operational need
+        to use the battery for supplying power."
+    ::= { batteryEntry 14 }
+
+batteryActualCharge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliampere hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the actual charge of the battery
+        in units of mAh.
+
+        Note that the actual charge needs to be measured and is
+        typically an estimate based on observed discharging and
+        charging cycles of the battery.
+
+        A value of 'ffffffff'H indicates that the actual charge
+        cannot be determined."
+    ::= { batteryEntry 15 }
+
+batteryActualVoltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "millivolt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the actual voltage of the battery
+        in units of mV.
+
+        A value of 'ffffffff'H indicates that the actual voltage
+        cannot be determined."
+    ::= { batteryEntry 16 }
+
+batteryActualCurrent OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "milliampere"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides the actual charging or discharging
+        current of the battery in units of mA.
+        The charging current is represented by positive values,
+        and the discharging current is represented by negative values.
+
+        A value of '7fffffff'H indicates that the actual current
+        cannot be determined."
+    ::= { batteryEntry 17 }
+
+batteryTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "deci-degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ambient temperature at or within close proximity
+        of the battery.
+          
+        A value of '7fffffff'H indicates that the temperature
+        cannot be determined."
+    ::= { batteryEntry 18 }
+
+batteryAlarmLowCharge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliampere hours"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides the lower-threshold value for object
+        batteryActualCharge.  If the value of object
+        batteryActualCharge falls below this threshold,
+        a low-battery alarm will be raised.  The alarm procedure may
+        include generating a batteryLowNotification.
+
+        This object should be set to a value such that when the
+        batteryLowNotification is generated, the battery is still
+        sufficiently charged to keep the device(s) that it powers
+        operational for a time long enough to take actions before
+        the powered device(s) enters a 'sleep' or 'off' state.
+
+        A value of 0 indicates that no alarm will be raised for any
+        value of object batteryActualVoltage."
+    ::= { batteryEntry 19 }
+
+batteryAlarmLowVoltage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "millivolt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides the lower-threshold value for object
+        batteryActualVoltage.  If the value of object
+        batteryActualVoltage falls below this threshold,
+        a low-battery alarm will be raised.  The alarm procedure may
+        include generating a batteryLowNotification.
+
+        This object should be set to a value such that when the
+        batteryLowNotification is generated, the battery is still
+        sufficiently charged to keep the device(s) that it powers
+        operational for a time long enough to take actions before
+        the powered device(s) enters a 'sleep' or 'off' state.
+
+        A value of 0 indicates that no alarm will be raised for any
+        value of object batteryActualVoltage."
+    ::= { batteryEntry 20 }
+
+batteryAlarmLowCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliampere hours"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides the lower-threshold value for object
+        batteryActualCapacity.  If the value of object
+        batteryActualCapacity falls below this threshold,
+        a battery aging alarm will be raised.  The alarm procedure
+        may include generating a batteryAgingNotification.
+
+        A value of 0 indicates that no alarm will be raised for any
+        value of object batteryActualCapacity."
+    ::= { batteryEntry 21 }
+
+batteryAlarmHighCycleCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides the upper-threshold value for object
+        batteryChargingCycleCount.  If the value of object
+        batteryChargingCycleCount rises above this threshold,
+        a battery aging alarm will be raised.  The alarm procedure
+        may include generating a batteryAgingNotification.
+
+        A value of 0 indicates that no alarm will be raised for any
+        value of object batteryChargingCycleCount."
+    ::= { batteryEntry 22 }
+
+batteryAlarmHighTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "deci-degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides the upper-threshold value for object
+        batteryTemperature.  If the value of object
+        batteryTemperature rises above this threshold, a battery
+        high temperature alarm will be raised.  The alarm procedure
+        may include generating a batteryTemperatureNotification.
+
+        A value of '7fffffff'H indicates that no alarm will be
+        raised for any value of object batteryTemperature."
+    ::= { batteryEntry 23 }
+
+batteryAlarmLowTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "deci-degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides the lower-threshold value for object
+        batteryTemperature.  If the value of object
+        batteryTemperature falls below this threshold, a battery
+        low temperature alarm will be raised.  The alarm procedure
+        may include generating a batteryTemperatureNotification.
+
+        A value of '7fffffff'H indicates that no alarm will be
+        raised for any value of object batteryTemperature."
+    ::= { batteryEntry 24 }
+
+batteryCellIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies one or more cells of a
+        battery.  The format of the cell identifier may vary between
+        different implementations.  It should uniquely identify one
+        or more cells of the indexed battery.
+
+        This object can be used for batteries, such as lithium
+        polymer batteries for which battery controllers monitor
+        cells individually.
+
+        This object is used by notifications of types
+        batteryLowNotification, batteryTemperatureNotification,
+        batteryCriticalNotification, and batteryAgingNotification.
+        These notifications can use the value of this object to
+        indicate the event that triggered the generation of the
+        notification in more detail by specifying a single cell
+        or a set of cells within the battery that is specifically
+        addressed by the notification.
+
+        An example use case for this object is a single cell in a
+        battery that exceeds the temperature indicated by object
+        batteryAlarmHighTemperature.  In such a case, a
+        batteryTemperatureNotification can be generated that not
+        only indicates the battery for which the temperature limit
+        has been exceeded but also the particular cell.
+
+        The initial value of this object is the empty string.  The
+        value of this object is set each time a
+        batteryLowNotification, batteryTemperatureNotification,
+        batteryCriticalNotification, or batteryAgingNotification
+        is generated.
+
+        When a notification is generated that does not indicate a
+        specific cell or set of cells, the value of this object is
+        set to the empty string."
+    ::= { batteryEntry 25 }
+
+--==================================================================
+-- 2.  Notifications
+--==================================================================
+
+batteryChargingStateNotification NOTIFICATION-TYPE
+    OBJECTS     {
+        batteryChargingOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated when a charging state
+        of the battery (indicated by the value of object
+        batteryChargingOperState) is triggered by an event other
+        than a write action to object batteryChargingAdminState.
+        Such an event may, for example, be triggered by a local
+        battery controller."
+    ::= { batteryNotifications 1 }
+
+batteryLowNotification NOTIFICATION-TYPE
+    OBJECTS     {
+        batteryActualCharge,
+        batteryActualVoltage,
+        batteryCellIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated when the current charge
+        (batteryActualCharge) or the current voltage
+        (batteryActualVoltage) of the battery falls below a
+        threshold defined by object batteryAlarmLowCharge or object
+        batteryAlarmLowVoltage, respectively.
+
+        Note that, typically, this notification is generated in a
+        state where the battery is still sufficiently charged to keep
+        the device(s) that it powers operational for some time.
+        If the charging state of the battery has become critical,
+        i.e., the device(s) powered by the battery must go to a
+        'sleep' or 'off' state, then the batteryCriticalNotification
+        should be used instead.
+
+        If the low charge or voltage has been detected for a single
+        cell or a set of cells of the battery and not for the entire
+        battery, then object batteryCellIdentifier should be set to
+        a value that identifies the cell or set of cells.
+        Otherwise, the value of object batteryCellIdentifier should
+        be set to the empty string when this notification is
+        generated.
+
+        The notification should not be sent again for the same
+        battery or cell before either (a) the current voltage or
+        the current charge, respectively, has become higher than the
+        corresponding threshold through charging or (b) an indication
+        of a maintenance action has been detected, such as a battery
+        disconnection event or a reinitialization of the battery
+        monitoring system.
+
+        This notification should not be sent when the battery is in
+        a charging mode, i.e., the value of object
+        batteryChargingOperState is charging(2)."
+    ::= { batteryNotifications 2 }
+
+batteryCriticalNotification NOTIFICATION-TYPE
+    OBJECTS     {
+        batteryActualCharge,
+        batteryActualVoltage,
+        batteryCellIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated when the current charge
+        of the battery falls so low that it cannot provide a
+        sufficient power supply function for regular operation
+        of the powered device(s).  The battery needs to be charged
+        before it can be used for regular power supply again.  The
+        battery may still provide sufficient power for a 'sleep'
+        mode of a powered device(s) or for a transition into an 'off'
+        mode.
+
+        If the critical state is caused by a single cell or a set of
+        cells of the battery, then object batteryCellIdentifier
+        should be set to a value that identifies the cell or set of
+        cells.  Otherwise, the value of object batteryCellIdentifier
+        should be set to the empty string when this notification is
+        generated.
+
+        The notification should not be sent again for the same
+        battery before either the battery charge has increased
+        through charging to a non-critical value or an indication
+        of a maintenance action has been detected, such as a battery
+        disconnection event or a reinitialization of the battery
+        monitoring system.
+
+        This notification should not be sent when the battery is in
+        a charging mode, i.e., the value of object
+        batteryChargingOperState is charging(2)."
+    ::= { batteryNotifications 3 }
+
+batteryTemperatureNotification NOTIFICATION-TYPE
+    OBJECTS     {
+        batteryTemperature,
+        batteryCellIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated when the measured
+        temperature (batteryTemperature) rises above the threshold
+        defined by object batteryAlarmHighTemperature or falls
+        below the threshold defined by object
+        batteryAlarmLowTemperature.
+
+        If the low or high temperature has been detected for a
+        single cell or a set of cells of the battery and not for the
+        entire battery, then object batteryCellIdentifier should be
+        set to a value that identifies the cell or set of cells.
+        Otherwise, the value of object batteryCellIdentifier should
+        be set to the empty string when this notification is
+        generated.
+
+        It may occur that the temperature alternates between values
+        slightly below and slightly above a threshold.  For limiting
+        the notification rate in such a case, this notification
+        should not be sent again for the same battery or cell,
+        respectively, within a time interval of 10 minutes.
+
+        An exception to the rate limitations occurs immediately
+        after the reinitialization of the battery monitoring system.
+        At this point in time, if the battery temperature is above
+        the threshold defined by object batteryAlarmHighTemperature
+        or below the threshold defined by object
+        batteryAlarmLowTemperature, respectively, then this
+        notification should be sent, independent of the time at
+        which previous notifications for the same battery or cell,
+        respectively, had been sent."
+    ::= { batteryNotifications 4 }
+
+batteryAgingNotification NOTIFICATION-TYPE
+    OBJECTS     {
+        batteryActualCapacity,
+        batteryChargingCycleCount,
+        batteryCellIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated when the actual
+        capacity (batteryActualCapacity) falls below a threshold
+        defined by object batteryAlarmLowCapacity
+        or when the charging cycle count of the battery
+        (batteryChargingCycleCount) exceeds the threshold defined
+        by object batteryAlarmHighCycleCount.
+
+        If the aging has been detected for a single cell or a set
+        of cells of the battery and not for the entire battery, then
+        object batteryCellIdentifier should be set to a value that
+        identifies the cell or set of cells.  Otherwise, the value
+        of object batteryCellIdentifier should be set to the empty
+        string when this notification is generated.
+
+        This notification should not be sent again for the same
+        battery or cell, respectively, before an indication of a
+        maintenance action has been detected, such as a battery
+        disconnection event or a reinitialization of the battery
+        monitoring system."
+     ::= { batteryNotifications 5 }
+
+batteryConnectedNotification NOTIFICATION-TYPE
+    OBJECTS     {
+        batteryIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated when it has been
+        detected that a battery has been connected.  The battery
+        can be identified by the value of object batteryIdentifier
+        as well as by the value of index entPhysicalIndex that is
+        contained in the OID of object batteryIdentifier."
+    ::= { batteryNotifications 6 }
+
+batteryDisconnectedNotification NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This notification can be generated when it has been
+        detected that one or more batteries have been disconnected."
+    ::= { batteryNotifications 7 }
+    
+--==================================================================
+-- 3.  Conformance Information
+--==================================================================
+
+batteryCompliances OBJECT IDENTIFIER ::= { batteryConformance 1 }
+batteryGroups      OBJECT IDENTIFIER ::= { batteryConformance 2 }
+
+--------------------------------------------------------------------
+-- 3.1.  Compliance Statements
+--------------------------------------------------------------------
+
+batteryCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for implementations of the
+        BATTERY-MIB module.
+
+        A compliant implementation MUST implement the objects
+        defined in the mandatory groups batteryDescriptionGroup
+        and batteryStatusGroup.
+
+        Note that this compliance statement requires
+        compliance with the entity4CRCompliance
+        MODULE-COMPLIANCE statement of the
+        ENTITY-MIB (RFC 6933)."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            batteryDescriptionGroup,
+            batteryStatusGroup
+        }
+
+        GROUP   batteryAlarmThresholdsGroup
+        DESCRIPTION
+           "A compliant implementation does not have to implement
+            the batteryAlarmThresholdsGroup."
+
+        GROUP   batteryNotificationsGroup
+        DESCRIPTION
+           "A compliant implementation does not have to implement
+            the batteryNotificationsGroup."
+
+        GROUP   batteryPerCellNotificationsGroup
+        DESCRIPTION
+           "A compliant implementation does not have to implement
+            the batteryPerCellNotificationsGroup."
+
+        GROUP   batteryAdminGroup
+        DESCRIPTION
+           "A compliant implementation does not have to implement
+            the batteryAdminGroup."
+
+        OBJECT batteryAlarmLowCharge
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "A compliant implementation is not required
+            to support set operations on this object."
+
+        OBJECT batteryAlarmLowVoltage
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "A compliant implementation is not required
+            to support set operations on this object."
+
+        OBJECT batteryAlarmLowCapacity
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "A compliant implementation is not required
+            to support set operations on this object."
+
+        OBJECT batteryAlarmHighCycleCount
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "A compliant implementation is not required
+            to support set operations on this object."
+
+        OBJECT batteryAlarmHighTemperature
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "A compliant implementation is not required
+            to support set operations on this object."
+
+        OBJECT batteryAlarmLowTemperature
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "A compliant implementation is not required
+            to support set operations on this object."
+
+    ::= { batteryCompliances 1 }
+
+--------------------------------------------------------------------
+-- 3.2.  MIB Grouping
+--------------------------------------------------------------------
+
+batteryDescriptionGroup OBJECT-GROUP
+    OBJECTS {
+        batteryIdentifier,
+        batteryFirmwareVersion,
+        batteryType,
+        batteryTechnology,
+        batteryDesignVoltage,
+        batteryNumberOfCells,
+        batteryDesignCapacity,
+        batteryMaxChargingCurrent,
+        batteryTrickleChargingCurrent
+    }
+    STATUS      current
+    DESCRIPTION
+       "A compliant implementation MUST implement the objects
+       contained in this group."
+    ::= { batteryGroups 1 }
+
+batteryStatusGroup OBJECT-GROUP
+    OBJECTS {
+        batteryActualCapacity,
+        batteryChargingCycleCount,
+        batteryLastChargingCycleTime,
+        batteryChargingOperState,
+        batteryActualCharge,
+        batteryActualVoltage,
+        batteryActualCurrent,
+        batteryTemperature
+    }
+    STATUS      current
+    DESCRIPTION
+       "A compliant implementation MUST implement the objects
+       contained in this group."
+    ::= { batteryGroups 2 }
+
+batteryAdminGroup OBJECT-GROUP
+    OBJECTS {
+        batteryChargingAdminState
+    }
+    STATUS      current
+    DESCRIPTION
+       "A compliant implementation does not have to implement the
+       object contained in this group."
+    ::= { batteryGroups 3 }
+
+batteryAlarmThresholdsGroup OBJECT-GROUP
+    OBJECTS {
+        batteryAlarmLowCharge,
+        batteryAlarmLowVoltage,
+        batteryAlarmLowCapacity,
+        batteryAlarmHighCycleCount,
+        batteryAlarmHighTemperature,
+        batteryAlarmLowTemperature
+    }
+    STATUS      current
+    DESCRIPTION
+       "A compliant implementation does not have to implement the
+       objects contained in this group."
+    ::= { batteryGroups 4 }
+
+batteryNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        batteryChargingStateNotification,
+        batteryLowNotification,
+        batteryCriticalNotification,
+        batteryAgingNotification,
+        batteryTemperatureNotification,
+        batteryConnectedNotification,
+        batteryDisconnectedNotification
+    }
+    STATUS      current
+    DESCRIPTION
+        "A compliant implementation does not have to implement the
+        notifications contained in this group."
+    ::= { batteryGroups 5 }
+
+batteryPerCellNotificationsGroup OBJECT-GROUP
+    OBJECTS {
+        batteryCellIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "A compliant implementation does not have to implement the
+        object contained in this group."
+    ::= { batteryGroups 6 }
+END
