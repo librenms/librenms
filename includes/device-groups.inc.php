@@ -135,7 +135,13 @@ function GenGroupSQL($pattern, $search='',$extra=0) {
     if ($extra === 1) {
         $sql_extra = ",`devices`.*";
     }
-    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE ('.$join.''.str_replace("(","",$tables[0]).'.device_id = ?) && '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
+    if (!empty($search)) {
+        $search = str_replace("(","",$tables[0]).'.'.$search;
+    }
+    if (!empty($join)) {
+        $join = '('.rtrim($join, ' && ').') &&';
+    }
+    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE '.$join.' '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
     return $sql;
 
 }//end GenGroupSQL()
