@@ -1,0 +1,104 @@
+-- Changes to rfc1449 - SNMPv2-TM (SNMPv2 transport mappings)
+--      No Changes needed.
+-- dperkins@scruznet.com
+
+SNMPv2-TM DEFINITIONS ::= BEGIN
+
+          IMPORTS
+              snmpDomains, snmpProxys
+                  FROM SNMPv2-SMI
+              TEXTUAL-CONVENTION
+                  FROM SNMPv2-TC;
+
+          -- SNMPv2 over UDP
+
+          snmpUDPDomain  OBJECT IDENTIFIER ::= { snmpDomains 1 }
+          -- for a SnmpUDPAddress of length 6:
+          --
+          -- octets   contents        encoding
+          --  1-4     IP-address      network-byte order
+          --  5-6     UDP-port        network-byte order
+          --
+          SnmpUDPAddress ::= TEXTUAL-CONVENTION
+              DISPLAY-HINT "1d.1d.1d.1d/2d"
+              STATUS       current
+              DESCRIPTION
+                      "Represents a UDP address."
+              SYNTAX       OCTET STRING (SIZE (6))
+
+
+          -- SNMPv2 over OSI
+
+          snmpCLNSDomain OBJECT IDENTIFIER ::= { snmpDomains 2 }
+          snmpCONSDomain OBJECT IDENTIFIER ::= { snmpDomains 3 }
+          -- for a SnmpOSIAddress of length m:
+          --
+          -- octets   contents            encoding
+          --    1     length of NSAP      "n" as an unsigned-integer
+          --                                (either 0 or from 3 to 20)
+          -- 2..(n+1) NSAP                concrete binary representation
+          -- (n+2)..m TSEL                string of (up to 64) octets
+          --
+          SnmpOSIAddress ::= TEXTUAL-CONVENTION
+              DISPLAY-HINT "*1x:/1x:"
+              STATUS       current
+              DESCRIPTION
+                      "Represents an OSI transport-address."
+              SYNTAX       OCTET STRING (SIZE (1 | 4..85))
+
+
+          -- SNMPv2 over DDP
+
+          snmpDDPDomain  OBJECT IDENTIFIER ::= { snmpDomains 4 }
+          -- for a SnmpNBPAddress of length m:
+          --
+          --    octets      contents         encoding
+          --       1        length of object "n" as an unsigned integer
+          --     2..(n+1)   object           string of (up to 32) octets
+          --      n+2       length of type   "p" as an unsigned integer
+          -- (n+3)..(n+2+p) type             string of (up to 32) octets
+          --     n+3+p      length of zone   "q" as an unsigned integer
+          -- (n+4+p)..m     zone             string of (up to 32) octets
+          --
+          -- for comparison purposes, strings are case-insensitive
+          --
+          -- all strings may contain any octet other than 255 (hex ff)
+          --
+          SnmpNBPAddress ::= TEXTUAL-CONVENTION
+              STATUS       current
+              DESCRIPTION
+                      "Represents an NBP name."
+              SYNTAX       OCTET STRING (SIZE (3..99))
+
+
+          -- SNMPv2 over IPX
+
+          snmpIPXDomain  OBJECT IDENTIFIER ::= { snmpDomains 5 }
+          -- for a SnmpIPXAddress of length 12:
+          --
+          -- octets   contents            encoding
+          --  1-4     network-number      network-byte order
+          --  5-10    physical-address    network-byte order
+          -- 11-12    socket-number       network-byte order
+          --
+          SnmpIPXAddress ::= TEXTUAL-CONVENTION
+              DISPLAY-HINT "4x.1x:1x:1x:1x:1x:1x.2d"
+              STATUS       current
+              DESCRIPTION
+                      "Represents an IPX address."
+              SYNTAX       OCTET STRING (SIZE (12))
+
+
+          -- for proxy to community-based SNMPv1 (RFC 1157)
+
+          rfc1157Proxy   OBJECT IDENTIFIER ::= { snmpProxys 1 }
+
+          -- uses SnmpUDPAddress
+          rfc1157Domain  OBJECT IDENTIFIER ::= { rfc1157Proxy 1 }
+
+          -- the community-based noAuth
+          rfc1157noAuth  OBJECT IDENTIFIER ::= { rfc1157Proxy 2 }
+
+
+END
+
