@@ -1,0 +1,280 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-MAC-SECURITY-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-MAC-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtMacSecurityMIB MODULE-IDENTITY
+    LAST-UPDATED "201003260000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The MIB module for managing port MAC security."
+    REVISION    "201003260000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 109 }
+
+
+PrvtMacSecLrnProfileNameType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "30t"
+    STATUS      current
+    DESCRIPTION 
+        "The name of a learning profile."
+    SYNTAX      OCTET STRING (SIZE(1..30))
+
+PrvtMacSecWatermarkActionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Action to perform upon reaching the watermark MAC count value."
+    SYNTAX      INTEGER { log(3), trap(4) }
+
+PrvtMacSecSecurityActionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Action to perform upon reaching the maximum MAC count value."
+    SYNTAX      INTEGER { operationalShutdown(1), trap(2) }
+
+PrvtMacSecPolicyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Type of policy a MAC security profile may have."
+    SYNTAX      INTEGER { portSecurity(1), portLimit(2) }
+
+PrvtMacSecEntryStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The state of a port with regards to MAC count."
+    SYNTAX      INTEGER { noViolation(1), watermarkReached(2), 
+                    maxMacCountReached(3), errorState(4) }
+
+prvtMacSecNotifications OBJECT IDENTIFIER
+    ::= { prvtMacSecurityMIB 0 }
+
+prvtMacSecObjects OBJECT IDENTIFIER
+    ::= { prvtMacSecurityMIB 1 }
+
+prvtMacSecLrnProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtMacSecLrnProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of learning profiles.
+         A learning profile specifies the thresholds, and actions to take with regards to the number of MAC addresses learned."
+    ::= { prvtMacSecObjects 1 }
+
+prvtMacSecLrnProfEntry OBJECT-TYPE
+    SYNTAX      PrvtMacSecLrnProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtMacSecLrnProfTable."
+    INDEX       { prvtMacSecLrnProfName }
+    ::= { prvtMacSecLrnProfTable 1 }
+
+PrvtMacSecLrnProfEntry ::= SEQUENCE {
+    prvtMacSecLrnProfName               PrvtMacSecLrnProfileNameType,
+    prvtMacSecLrnProfRowStatus          RowStatus,
+    prvtMacSecLrnProfPolicy             PrvtMacSecPolicyType,
+    prvtMacSecLrnProfMaxMacCount        Unsigned32,
+    prvtMacSecLrnProfIgnoreFiltered     TruthValue,
+    prvtMacSecLrnProfAction             PrvtMacSecSecurityActionType,
+    prvtMacSecLrnProfWatermarkAction    PrvtMacSecWatermarkActionType,
+    prvtMacSecLrnProfWatermarkCount     Unsigned32
+}
+
+prvtMacSecLrnProfName OBJECT-TYPE
+    SYNTAX      PrvtMacSecLrnProfileNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name uniquely identifying the learning profile."
+    ::= { prvtMacSecLrnProfEntry 1 }
+
+prvtMacSecLrnProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this instance."
+    ::= { prvtMacSecLrnProfEntry 2 }
+
+prvtMacSecLrnProfPolicy OBJECT-TYPE
+    SYNTAX      PrvtMacSecPolicyType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of MAC security policy that this learning profile follows."
+    ::= { prvtMacSecLrnProfEntry 3 }
+
+prvtMacSecLrnProfMaxMacCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum allowed number of MAC addresses to be learned.
+         This value should be greater than or equal to the watermark MAC count, prvtMacSecLrnProfWatermarkCount."
+    ::= { prvtMacSecLrnProfEntry 4 }
+
+prvtMacSecLrnProfIgnoreFiltered OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "When the violation limit is reached, do not learn violating MACs as filtered, but simply ignore them."
+    ::= { prvtMacSecLrnProfEntry 5 }
+
+prvtMacSecLrnProfAction OBJECT-TYPE
+    SYNTAX      PrvtMacSecSecurityActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The action to perform upon reaching the prvtMacSecLrnProfMaxMacCount value."
+    ::= { prvtMacSecLrnProfEntry 6 }
+
+prvtMacSecLrnProfWatermarkAction OBJECT-TYPE
+    SYNTAX      PrvtMacSecWatermarkActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The action to perform upon reaching the prvtMacSecLrnProfWatermarkCount value."
+    ::= { prvtMacSecLrnProfEntry 7 }
+
+prvtMacSecLrnProfWatermarkCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Sets the watermark at which the action specified in prvtMacSecLrnProfWatermarkAction will be taken.
+         This value should be less than the maximum MAC count, prvtMacSecLrnProfMaxMacCount."
+    ::= { prvtMacSecLrnProfEntry 8 }
+
+prvtMacSecIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtMacSecIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The table of profiles that have been assigned to each interface."
+    ::= { prvtMacSecObjects 2 }
+
+prvtMacSecIfEntry OBJECT-TYPE
+    SYNTAX      PrvtMacSecIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtMacSecIfTable."
+    INDEX       { prvtMacSecIfName }
+    ::= { prvtMacSecIfTable 1 }
+
+PrvtMacSecIfEntry ::= SEQUENCE {
+    prvtMacSecIfName            OCTET STRING,
+    prvtMacSecIfRowStatus       RowStatus,
+    prvtMacSecIfProfile         PrvtMacSecLrnProfileNameType,
+    prvtMacSecIfCurrMacCount    Unsigned32,
+    prvtMacSecIfState           PrvtMacSecEntryStateType
+}
+
+prvtMacSecIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface name."
+    ::= { prvtMacSecIfEntry 1 }
+
+prvtMacSecIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this instance."
+    ::= { prvtMacSecIfEntry 2 }
+
+prvtMacSecIfProfile OBJECT-TYPE
+    SYNTAX      PrvtMacSecLrnProfileNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name of a learning profile from prvtMacSecLrnProfTable."
+    ::= { prvtMacSecIfEntry 3 }
+
+prvtMacSecIfCurrMacCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current MAC count for this entry."
+    ::= { prvtMacSecIfEntry 4 }
+
+prvtMacSecIfState OBJECT-TYPE
+    SYNTAX      PrvtMacSecEntryStateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current state of this entry."
+    ::= { prvtMacSecIfEntry 5 }
+
+portSecurityWmarkViolation NOTIFICATION-TYPE
+    OBJECTS     { prvtMacSecIfName }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtMacSecNotifications 1 }
+
+portSecurityViolation NOTIFICATION-TYPE
+    OBJECTS     { prvtMacSecIfName }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtMacSecNotifications 2 }
+
+END -- end of module PRVT-MAC-SECURITY-MIB.
