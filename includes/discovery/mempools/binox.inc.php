@@ -14,7 +14,7 @@
 
 
 
-if ($device['os'] == "batm") {
+if ($device['os'] == "binox") {
     echo("telco systems: ");
 
     $used       = snmp_get($device, ".1.3.6.1.4.1.738.10.111.3.1.3.0", "-Ovq");
@@ -22,10 +22,9 @@ if ($device['os'] == "batm") {
     $used       = str_replace('"', '', $used);
     $total      = "100";
     $free       = ($total - $used);
-
     $percent    = $used;
 
     if (is_numeric($used)) {
-        discover_mempool($valid_mempool, $device, 0, "batm", "Memory", "1", NULL, NULL);
+        discover_mempool($valid_mempool, $device, 0, "binox", "Memory", "1", NULL, NULL);
     }
 }

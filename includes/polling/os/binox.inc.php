@@ -13,26 +13,6 @@
  */
 
 
-if ($device['os'] == 'batm') {
- if (strpos($device['sysObjectID'], 'enterprises.738.1.5.100') !== false) {
-
-/* $version = snmp_get($device, '.1.3.6.1.2.1.1.1.0', '-Ovqs', '');
- preg_match('/[^ ]+\..+\..+\.[^ ]+/', $version, $matches);
- $version = $matches[0]; */
-
- $version = snmp_get($device, '.1.3.6.1.4.1.738.1.111.1.1.4.0', '-Ovqs', '');
- $serial = snmp_get($device, '.1.3.6.1.4.1.738.1.5.100.1.3.1.0', '-Ovqs', '');
- $hardware   = snmp_get($device, '.1.3.6.1.4.1.738.1.5.100.1.3.2.0', '-OQv', '');
- $features       = '';
-
- $version = str_replace('"', '', $version);
- $serial = str_replace('"', '', $serial);
- $hardware = str_replace('"', '', $hardware);
-
- }
-
- elseif  (strpos($device['sysObjectID'], 'enterprises.738.10.5.100') !== false) {
-
  $version = snmp_get($device, '.1.3.6.1.4.1.738.10.111.1.1.1.1.0', '-Ovqs', '');
  $serial = snmp_get($device, '.1.3.6.1.4.1.738.10.5.100.1.3.1.0', '-Ovqs', '');
  $hardware   = snmp_get($device, '.1.3.6.1.4.1.738.10.5.100.1.3.4.0', '-OQv', '');
@@ -41,11 +21,3 @@ if ($device['os'] == 'batm') {
  $version = str_replace('"', '', $version);
  $serial = str_replace('"', '', $serial);
  $hardware = str_replace('"', '', $hardware);
-
- }
-
-else {
-
-
- }
-}
