@@ -132,7 +132,7 @@ foreach (dbFetch('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bil
     $in_delta  = $row['in_delta'];
     $out_delta = $row['out_delta'];
     $in_value  = delta_to_bits($in_delta, $period);
-    $out_value = delta_to_bits($out_delta, $period);;
+    $out_value = delta_to_bits($out_delta, $period);
 
     $last = $timestamp;
 
