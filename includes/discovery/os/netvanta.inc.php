@@ -15,9 +15,9 @@
 
 if (!$os) {
     if (preg_match('/NetVanta/', $sysDescr)) {
-        $os = 'adtran';
+        $os = 'adtran-aos';
     }
     elseif (strstr($sysObjectId, '.1.3.6.1.4.1.664')) {
-        $os = 'adtran';
+        $os = 'adtran-aos';
    }
 }

@@ -13,14 +13,15 @@
  */
 
 
-if ($device['os'] == 'adtran') {
+if ($device['os'] == 'adtran-aos') {
 
-    echo 'AdTran AOS Netvanta:';
+    echo 'ADTRAN AOS:';
     $descr = 'Processor';
     $usage = snmp_get($device, '.1.3.6.1.4.1.664.5.53.1.4.1.0', '-Ovq');
     echo "This is the CP info AAAA $usage AAAA";
 
     if (is_numeric($usage)) {
         discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.664.5.53.1.4.1.0', '0', 'adtran', $descr, '1', $usage, null, null);
-      }
+    }
 }
+
