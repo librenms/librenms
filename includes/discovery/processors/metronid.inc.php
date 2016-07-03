@@ -14,18 +14,18 @@
 
 
 
-if ($device['os'] == 'accedian') {
- if ($device['version'] == 'AEN_5.3.1_22558') { 
- } // don't poll 5.3.1_22558 devices due to bug that crashes snmpd
- else {
-    echo 'Accedian MetroNID:';
-    $descr = 'Processor';
-    $usage = snmp_get($device, '.1.3.6.1.4.1.22420.1.1.20.0', '-Ovq');
-    $usage = trim($usage, "percent");
-    echo "usage";
+if ($device['os'] == 'aen') {
+    if ($device['version'] == 'AEN_5.3.1_22558') { 
+     } // don't poll v5.3.1_22558 devices due to bug that crashes snmpd
+    else {
+        echo 'Accedian MetroNID:';
+        $descr = 'Processor';
+        $usage = snmp_get($device, '.1.3.6.1.4.1.22420.1.1.20.0', '-Ovq');
+        $usage = trim($usage, "percent");
+        echo "usage";
 
-    if (is_numeric($usage)) {
-        discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.22420.1.1.20.0', '0', 'accedian', $descr, '1', $usage, null, null);
+        if (is_numeric($usage)) {
+            discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.22420.1.1.20.0', '0', 'aen', $descr, '1', $usage, null, null);
+        }
     }
-  }
 }

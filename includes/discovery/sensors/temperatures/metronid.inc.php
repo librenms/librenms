@@ -13,7 +13,7 @@
  */
 
 
-if ($device['os'] == 'accedian') {
+if ($device['os'] == 'aen') {
     echo("Accedian MetroNID");
 
     // Chassis temperature
