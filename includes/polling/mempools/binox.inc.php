@@ -16,9 +16,10 @@
 // Somewhat of an ugly hack since Telco Systems device
 // don't support fetching total memory of the device over SNMP. Only used percentage.
 // Given OID returns usage in percent so we set total to 100 in order to get a proper graph
+
 $mempool['total']       = "100";
 $usage                  = snmp_get($device, ".1.3.6.1.4.1.738.10.111.3.1.3.0", "-Ovq");
-$usage = str_replace('%', '', $usage);
-$usage = str_replace('"', '', $usage);
+$usage                  = str_replace('%', '', $usage);
+$usage                  = str_replace('"', '', $usage);
 $mempool['used']        = $usage;
 $mempool['free']        = ($mempool['total'] - $mempool['used']);
