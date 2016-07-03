@@ -583,6 +583,14 @@ $config['os'][$os]['text']  = 'Huawei VRP';
 $config['os'][$os]['type']  = 'network';
 $config['os'][$os]['icon']  = 'huawei';
 
+// Huawei access products
+$os = 'smartax';
+$config['os'][$os]['group']  = 'huawei';
+$config['os'][$os]['text']   = 'Huawei SmartAX';
+$config['os'][$os]['type']   = 'network';
+$config['os'][$os]['icon']   = 'huawei';
+$config['os'][$os]['ifname'] = 1;
+
 // ZTE
 $os = 'zxr10';
 $config['os'][$os]['group'] = 'zxr10';
@@ -933,6 +941,20 @@ $config['os'][$os]['over'][3]['text'] = 'Storage Usage';
 // EMC Isilon OneFS
 $os = 'onefs';
 $config['os'][$os]['text'] = 'EMC Isilon OneFS';
+$config['os'][$os]['type'] = 'storage';
+$config['os'][$os]['icon'] = 'emc';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text'] = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text'] = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text'] = 'Memory Usage';
+$config['os'][$os]['over'][3]['graph'] = 'device_storage';
+$config['os'][$os]['over'][3]['text'] = 'Storage Usage';
+
+// EMC FlareOS
+$os = 'flareos';
+$config['os'][$os]['text'] = 'EMC CLARiiON';
 $config['os'][$os]['type'] = 'storage';
 $config['os'][$os]['icon'] = 'emc';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
@@ -1721,6 +1743,11 @@ $os = 'nios';
 $config['os'][$os]['text']             = 'Infoblox';
 $config['os'][$os]['type']             = 'appliance';
 $config['os'][$os]['icon']             = 'infoblox';
+
+$os = 'ibm-amm';
+$config['os'][$os]['text']             = 'IBM AMM';
+$config['os'][$os]['type']             = 'appliance';
+$config['os'][$os]['icon']             = 'ibmnos';
 
 // Oracle ILOM
 $os = 'oracle-ilom';

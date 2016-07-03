@@ -4,7 +4,6 @@
 // snmpwalk -v2c -c <community> <hostname> -M mibs/junose/ -m Juniper-UNI-ATM-MIB juniAtmVpStatsEntry
 // JunOSe ATM vps
 if ($device['os'] == 'junose' && $config['enable_ports_junoseatmvp']) {
-    echo 'JunOSe ATM vps : ';
     $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', $config['install_dir'].'/mibs/junose');
     $valid_vp = array();
     d_echo($vp_array);

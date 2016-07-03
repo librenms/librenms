@@ -1,7 +1,5 @@
 <?php
 
-echo 'Port Stack: ';
-
 $sql = "SELECT * FROM `ports_stack` WHERE `device_id` = '".$device['device_id']."'";
 
 foreach (dbFetchRows($sql) as $entry) {
