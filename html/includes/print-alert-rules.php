@@ -75,6 +75,14 @@ if (isset($_POST['create-default'])) {
         'disabled'  => 0,
         'name'      => 'Sensor under limit',
     );
+    $default_rules[] = array(
+        'device_id' => '-1',
+        'rule'      => '%services.service_status != "0"',
+        'severity'  => 'critical',
+        'extra'     => '{"mute":false,"count":"-1","delay":"300"}',
+        'disabled'  => 0,
+        'name'      => 'Service up/down',
+    );
     foreach ($default_rules as $add_rule) {
         dbInsert($add_rule, 'alert_rules');
     }
