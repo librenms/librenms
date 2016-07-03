@@ -15,6 +15,6 @@
 
 if (!$os) {
     if (preg_match('/AMN-/', $sysDescr)) {
-        $os = 'accedian';
+        $os = 'aen';
     }
 }

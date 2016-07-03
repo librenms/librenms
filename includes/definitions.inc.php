@@ -772,7 +772,7 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
-$os = 'accedian';
+$os = 'aen';
 $config['os'][$os]['text']             = 'Accedian AEN';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'accedian';
