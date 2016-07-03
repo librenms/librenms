@@ -1,7 +1,6 @@
 <?php
 
 if ($config['enable_sla'] && $device['os_group'] == 'cisco') {
-    echo 'SLAs : ';
 
     $slas = snmp_walk($device, 'ciscoRttMonMIB.ciscoRttMonObjects.rttMonCtrl', '-Osq', '+CISCO-RTTMON-MIB');
 

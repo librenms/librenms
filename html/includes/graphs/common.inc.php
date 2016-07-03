@@ -90,6 +90,10 @@ if ($_GET['bg']) {
     $rrd_options .= ' -c CANVAS#'.mres($_GET['bg']).' ';
 }
 
+if ($_GET['font']) {
+    $rrd_options .= ' -c FONT#'.mres($_GET['font']).' ';
+}
+
 // $rrd_options .= " -c BACK#FFFFFF";
 if ($height < '99') {
     $rrd_options .= ' --only-graph';
