@@ -121,7 +121,6 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 #### Final steps
 
 ```bash
-chown librenms:librenms /opt/librenms/.git/index
 chown -R librenms:librenms /opt/librenms
 ```
 
