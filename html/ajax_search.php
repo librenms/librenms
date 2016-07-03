@@ -50,7 +50,7 @@ if (isset($_REQUEST['search'])) {
         else if ($_REQUEST['type'] == 'device') {
             // Device search
             if (is_admin() === true || is_read() === true) {
-                $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
+                $results = dbFetchRows("SELECT * FROM `devices` WHERE `hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%' OR `sysName` LIKE '%".$search."%' ORDER BY hostname LIMIT ".$limit);
             }
             else {
                 $results = dbFetchRows("SELECT * FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND (`hostname` LIKE '%".$search."%' OR `location` LIKE '%".$search."%') ORDER BY hostname LIMIT ".$limit, array($_SESSION['user_id']));

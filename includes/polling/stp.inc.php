@@ -14,8 +14,6 @@
  * needs RSTP-MIB
  */
 
-echo "Spanning Tree: ";
-
 // Pre-cache existing state of STP for this device from database
 $stp_db = dbFetchRow('SELECT * FROM `stp` WHERE `device_id` = ?', array($device['device_id']));
 //d_echo($stp_db);
@@ -102,7 +100,7 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
         }
         
         // Logging if designated root port changed since last db update
-        if ($stp_db['rootPort'] != $stp['rootPort']) {
+        if (isset($stp['rootPort']) && $stp_db['rootPort'] != $stp['rootPort']) {
             log_event('STP root port changed: '.$stp_db['rootPort'].' > '.$stp['rootPort'], $device, 'stp');
         }
         

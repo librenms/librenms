@@ -16,6 +16,7 @@
                 <th data-column-id='ifOperStatus'>Oper</th>
                 <th data-column-id='disabled' data-sortable='false'>Disable</th>
                 <th data-column-id='ignore' data-sortable='false'>Ignore</th>
+                <th data-column-id='ifSpeed'>ifSpeed (bits/s)</th>
                 <th data-column-id='port_tune' data-sortable='false' data-searchable='false'>RRD Tune</th>
                 <th data-column-id='ifAlias'>Description</th>
             </tr>
@@ -41,6 +42,48 @@
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
                     $this.next().addClass('glyphicon-ok');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-success');
+                        $this.next().removeClass('glyphicon-ok');
+                    }, 2000);
+                } else if (data.status == 'na') {
+
+                } else {
+                    $(this).closest('.form-group').addClass('has-error');
+                    $this.next().addClass('glyphicon-remove');
+                    setTimeout(function(){
+                        $this.closest('.form-group').removeClass('has-error');
+                        $this.next().removeClass('glyphicon-remove');
+                    }, 2000);
+                }
+            },
+            error: function () {
+                $(this).closest('.form-group').addClass('has-error');
+                $this.next().addClass('glyphicon-remove');
+                setTimeout(function(){
+                   $this.closest('.form-group').removeClass('has-error');
+                   $this.next().removeClass('glyphicon-remove');
+                }, 2000);
+            }
+        });
+    });
+    $(document).on('blur keyup', "[name='if-speed']", function (e){
+        if (e.type === 'keyup' && e.keyCode !== 13) return;
+        var $this = $(this);
+        var speed = $this.val().replace(/[^0-9]/gi, '');
+        var device_id = $this.data('device_id');
+        var port_id = $this.data('port_id');
+        var ifName = $this.data('ifname');
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: "update-ifspeed", speed: speed, ifName: ifName, port_id: port_id, device_id: device_id},
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'ok') {
+                    $this.closest('.form-group').addClass('has-success');
+                    $this.next().addClass('glyphicon-ok');
+                    $this.val(speed);
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
                         $this.next().removeClass('glyphicon-ok');

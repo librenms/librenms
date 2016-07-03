@@ -80,11 +80,11 @@ if ($config['warn']['ifdown']) {
     FIXME service permissions? seem nonexisting now.. */
 // Service down boxes
 if (is_admin() === true || is_read() === true) {
-    $sql     = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0' AND `D`.`status` = '2' LIMIT ".$config['front_page_down_box_limit'];
+    $sql     = "SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = '2' AND D.ignore = '0' AND S.service_ignore = '0' LIMIT ".$config['front_page_down_box_limit'];
     $param[] = '';
 }
 else {
-    $sql     = "SELECT * FROM services AS S, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND S.`device_id` = D.`device_id` AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '0' AND `D`.`status` = '2' LIMIT ".$config['front_page_down_box_limit'];
+    $sql     = "SELECT * FROM services AS S, devices AS D, devices_perms AS P WHERE P.`user_id` = ? AND P.`device_id` = D.`device_id` AND S.`device_id` = D.`device_id` AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '2' LIMIT ".$config['front_page_down_box_limit'];
     $param[] = $_SESSION['user_id'];
 }
 
@@ -252,8 +252,8 @@ else {
     echo '</div>';
 }//end if
 
-echo '</div>';
+?>
 
-echo '
 </div>
-';
+
+</div>

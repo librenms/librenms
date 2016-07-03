@@ -13,8 +13,6 @@ if (count($vp_rows)) {
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketOctets', $vp_cache, 'Juniper-UNI-ATM-MIB', $config['install_dir'].'/mibs/junose');
     $vp_cache = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsOutPacketErrors', $vp_cache, 'Juniper-UNI-ATM-MIB', $config['install_dir'].'/mibs/junose');
 
-    echo 'Checking JunOSe ATM vps: ';
-
     foreach ($vp_rows as $vp) {
         echo '.';
 

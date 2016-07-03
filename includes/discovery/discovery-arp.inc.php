@@ -13,8 +13,6 @@
 // License: GPLv3
 //
 
-echo 'ARP Discovery: ';
-
 $hostname = $device['hostname'];
 $deviceid = $device['device_id'];
 

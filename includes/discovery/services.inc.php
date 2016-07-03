@@ -1,7 +1,6 @@
 <?php
 
 if ($config['discover_services']) {
-    echo 'Services: ';
 
     // FIXME: use /etc/services?
     $known_services = array(
