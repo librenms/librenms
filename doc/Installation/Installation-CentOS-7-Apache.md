@@ -1,4 +1,4 @@
-> NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
+n> NOTE: These instructions assume you are the root user.  If you are not, prepend `sudo` to the shell commands (the ones that aren't at `mysql>` prompts) or temporarily become a user with root privileges with `sudo -s` or `sudo -i`.
 
 ### DB Server ###
 
@@ -111,7 +111,6 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 #### Final steps
 
 ```bash
-chown librenms:librenms /opt/librenms/.git/index
 chown -R librenms:librenms /opt/librenms
 ```
 
