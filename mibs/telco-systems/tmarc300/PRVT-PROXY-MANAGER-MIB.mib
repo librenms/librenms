@@ -1,0 +1,554 @@
+PRVT-PROXY-MANAGER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Unsigned32,
+IpAddress,
+NOTIFICATION-TYPE,
+Integer32
+FROM SNMPv2-SMI
+
+TEXTUAL-CONVENTION,
+RowStatus,
+MacAddress
+FROM SNMPv2-TC
+
+ipSwitch
+FROM PRVT-SWITCH-MIB;
+
+
+prvtProxyManager MODULE-IDENTITY
+LAST-UPDATED "200901160000Z"
+
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"The MIB module for management of the PRVT-PROXY-MANAGER product."
+
+-- Revision history.
+REVISION "200901160000Z"
+DESCRIPTION "Added prvtProxySecurityEnabled, prvtProxyAcceptInforms,
+prvtProxyManMappingAuthenticated, prvtProxyManagerUnauthenticatedDevice"
+
+REVISION "200711130000Z"
+DESCRIPTION "Initial version"
+
+::= { ipSwitch 6 }
+
+prvtProxyManNotifications OBJECT IDENTIFIER ::= { prvtProxyManager 0 } -- traps
+prvtProxyManObjects OBJECT IDENTIFIER ::= { prvtProxyManager 1 } -- tables
+
+PrvtProxyManStates ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "The the switch on/off states of the Proxy Manager
+modes."
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+
+PrvtProxyManProtocols ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "The the switch on/off states of the Proxy Manager
+modes."
+SYNTAX INTEGER {
+unknown(0),
+snmp-udp(1),
+snmptrap-udp(2),
+telnet-tcp(3),
+ssh-tcp(4),
+tftp-udp(5),
+syslog-udp(6)
+}
+
+PrvtProxyManPortTypes ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "The the switch on/off states of the Proxy Manager
+modes."
+SYNTAX INTEGER {
+unknown(0),
+tcp(1),
+udp(2)
+}
+
+PrvtProxyManDirection ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "Specifices the traffic flow direction "
+SYNTAX INTEGER {
+noDirection(0),
+inbound(1),
+outbound(2)
+}
+
+PrvtProxyManAuthentication ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "Authenticated state of Managed device"
+SYNTAX INTEGER {
+authenticated(0),
+unauthenticated(1)
+}
+
+PrvtProxySecurity ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "State of Proxy Security"
+SYNTAX INTEGER {
+securityEnabled(0),
+securityDisabled(1)
+}
+
+PrvtProxyAcceptInformsType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "State of Proxy Inform Accept"
+SYNTAX INTEGER {
+informsEnabled(0),
+informsDisabled(1)
+}
+
+-- Proxy scalar object
+
+prvtProxyManDeviceAddress OBJECT-TYPE
+SYNTAX MacAddress
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"The object represents the discovered device address.
+It is used only for topology change notifications."
+::= { prvtProxyManObjects 1 }
+
+-- Proxy Manager instance table
+-- This table is used to configure the global parameters of the Proxy Manager.
+prvtProxyManConfigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtProxyManConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The table of containing the global configuration of the Proxy Manager instance."
+::= { prvtProxyManObjects 2 }
+
+prvtProxyManConfigEntry OBJECT-TYPE
+SYNTAX PrvtProxyManConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Each entry represents configuration for a ProxyManager instance."
+INDEX { prvtProxyManIndex }
+::= { prvtProxyManConfigTable 1 }
+
+PrvtProxyManConfigEntry ::= SEQUENCE {
+prvtProxyManIndex Unsigned32,
+prvtProxyManStatus PrvtProxyManStates,
+prvtProxyManAutoMapMode PrvtProxyManStates,
+prvtProxyManVlan Unsigned32,
+prvtProxyManIpAddr IpAddress,
+prvtProxyManIpMask Unsigned32,
+prvtProxyManIpRangeStart IpAddress,
+prvtProxyManIpRangeEnd IpAddress,
+prvtProxyManLeasePeriod Unsigned32,
+prvtProxyManRowStatus RowStatus,
+prvtProxySecurityEnabled PrvtProxySecurity,
+prvtProxyAcceptInforms PrvtProxyAcceptInformsType
+
+}
+
+prvtProxyManIndex OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The index of this prvtProxyManConfigEntry. This is the
+instance index of the ProxyManager.
+
+Currently only one instance is supported."
+::= { prvtProxyManConfigEntry 1 }
+
+prvtProxyManStatus OBJECT-TYPE
+SYNTAX PrvtProxyManStates
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The object indicates whether the Proxy manger is enabled(1)
+or disabled(2). In order to enable the Proxy Manager,
+prvtProxyManIpRangeEnd, prvtProxyManIpRangeStart,
+prvtProxyManIpMask, prvtProxyManIpAddr, prvtProxyManVlan, must
+be correctly set and consistent.
+
+In order to enable the manager prvtProxyManRowStatus should be active.
+"
+::= { prvtProxyManConfigEntry 2 }
+
+prvtProxyManAutoMapMode OBJECT-TYPE
+SYNTAX PrvtProxyManStates
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The object indicates whether the devices will be configured
+automatically - enabled(1) or manually - disabled(2).
+
+If the object is set to disable, the configuration can be
+managed via prvtProxyManMappingTable"
+DEFVAL { 1 }
+::= { prvtProxyManConfigEntry 3 }
+
+prvtProxyManVlan OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The vlan of the network specified for proxy managment.
+
+This field is mandatory for the Proxy Manager in order
+to work correctly"
+::= { prvtProxyManConfigEntry 4 }
+
+prvtProxyManIpAddr OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The ip address of the device manged by the Proxy
+Manager.
+
+This field is mandatory for the Proxy Manager in order
+to work correctly"
+::= { prvtProxyManConfigEntry 5 }
+
+prvtProxyManIpMask OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The bit mask of the network where the proxy manager resides.
+
+This field is mandatory for the Proxy Manager in order
+to work correctly"
+::= { prvtProxyManConfigEntry 6 }
+
+prvtProxyManIpRangeStart OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The start of the ip address range, used by DHCP to provide
+ip addresses for the discuvered devices
+
+This field is mandatory for the Proxy Manager in order
+to work correctly"
+::= { prvtProxyManConfigEntry 7 }
+
+prvtProxyManIpRangeEnd OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The end of the ip address range, used by DHCP to provide
+ip addresses for the discuvered devices
+
+This field is mandatory for the Proxy Manager in order
+to work correctly"
+::= { prvtProxyManConfigEntry 8 }
+
+prvtProxyManLeasePeriod OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The period for which the mapped devices are available in
+the proxy manager. After it expire, the mapped device
+can request new lease again. Valid range is <0-604800> seconds. Default value is 300."
+::= { prvtProxyManConfigEntry 9 }
+
+prvtProxyManRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This object indicates the state of the configuration entry. It
+is read-only and can not be used to create or destroy or manually change
+the state. Only one configuration entry is supported.
+The only valid values are:
+- notReady(3) - the ProxyManger is not correctly configured and there are some field inconsistencies.
+- acitive(1) - the ProxyManger is configured and the proxy manager is ready to be enabled.
+
+The objects which are checked for consistency are:
+prvtProxyManIpRangeEnd - the ip range should be in the network, defined by the ip address/mask objects
+prvtProxyManIpRangeStart - the ip range should be in the network defined by the ip address/mask objects
+prvtProxyManIpMask - shoudl be valid ip mask
+prvtProxyManIpAddr - should be valid ip address.
+prvtProxyManVlan - the vlan should exists"
+::= { prvtProxyManConfigEntry 10 }
+
+prvtProxySecurityEnabled OBJECT-TYPE
+SYNTAX PrvtProxySecurity
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The attribute is used to specify the proxy security, The default is securityDisabled(1)."
+::= { prvtProxyManConfigEntry 11 }
+
+prvtProxyAcceptInforms OBJECT-TYPE
+SYNTAX PrvtProxyAcceptInformsType
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The attribute is used to specify the accept policy for DHCP Informs messaged. The default if informsDisabled(1)."
+::= { prvtProxyManConfigEntry 12 }
+
+-- Global table for supported protocols
+-- This table contains all the protocols which will be managed by Proxy Managers.
+
+prvtProxyManProtoTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtProxyManProtoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The table of containing all supported protocols,
+which will be processed by an active ProxyManager
+instance
+
+This table is read-only.
+"
+::= { prvtProxyManObjects 3 }
+
+prvtProxyManProtoEntry OBJECT-TYPE
+SYNTAX PrvtProxyManProtoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Each entry represents a hardcoded protocol supported by Proxy Manager."
+INDEX { prvtProxyManProtoIndex }
+::= { prvtProxyManProtoTable 1 }
+
+PrvtProxyManProtoEntry ::= SEQUENCE {
+prvtProxyManProtoIndex PrvtProxyManProtocols,
+prvtProxyManProtoSvcPort Integer32,
+prvtProxyManProtoSvcPortType PrvtProxyManPortTypes,
+prvtProxyManProtoSrcPort Integer32,
+prvtProxyManProtoDirection PrvtProxyManDirection,
+prvtProxyManProtoStatus PrvtProxyManStates
+}
+
+prvtProxyManProtoIndex OBJECT-TYPE
+SYNTAX PrvtProxyManProtocols
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The index of prvtProxyManProtoTable. It is an enumeration
+representing all supported protocols by Proxy Manager"
+::= { prvtProxyManProtoEntry 1 }
+
+prvtProxyManProtoSvcPort OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The object represents the number of the port for the supported standard protocol."
+::= { prvtProxyManProtoEntry 2 }
+
+prvtProxyManProtoSvcPortType OBJECT-TYPE
+SYNTAX PrvtProxyManPortTypes
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The object represents the type of the managed standard port in the
+transport porotocol."
+::= { prvtProxyManProtoEntry 3 }
+
+prvtProxyManProtoSrcPort OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"TBD"
+::= { prvtProxyManProtoEntry 4 }
+
+prvtProxyManProtoDirection OBJECT-TYPE
+SYNTAX PrvtProxyManDirection
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The object identifies direction of the traffic flow (noDirection/inbound/outbound)."
+::= { prvtProxyManProtoEntry 5 }
+
+prvtProxyManProtoStatus OBJECT-TYPE
+SYNTAX PrvtProxyManStates
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object indicates whether the protocol is to be
+managed by Proxy manager - enable(1) or not - disable(2)."
+::= { prvtProxyManProtoEntry 6 }
+
+
+-- Proxy Manager mapping table
+-- This table shows and allow to comfigure mannually the according to the its active mode.
+
+prvtProxyManMappingTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtProxyManMappingEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The table show the mapping between the deiscoverd devices and the ports they are mapped by the proxy manager.
+It is also used to create mannual mappings between devices and ports if the prvtProxyManAutoMapMode is disabled"
+::= { prvtProxyManObjects 4 }
+
+prvtProxyManMappingEntry OBJECT-TYPE
+SYNTAX PrvtProxyManMappingEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Each entry represents a mapped device to a port."
+INDEX {prvtProxyManMappingDevice, prvtProxyManMappingIndex, prvtProxyManMappingProto }
+::= { prvtProxyManMappingTable 1 }
+
+PrvtProxyManMappingEntry ::= SEQUENCE {
+prvtProxyManMappingDevice Unsigned32,
+prvtProxyManMappingIndex Unsigned32,
+prvtProxyManMappingProto PrvtProxyManProtocols,
+prvtProxyManMappingDirection PrvtProxyManDirection,
+prvtProxyManMappingGlobalPort Integer32,
+prvtProxyManMappingLocalSrcPort Integer32,
+prvtProxyManMappingLocalDstPort Integer32,
+prvtProxyManMappingRowStatus RowStatus,
+prvtProxyManMappingMAC MacAddress,
+prvtProxyManMappingIfIndex Integer32,
+prvtProxyManMappingAuthenticated PrvtProxyManAuthentication
+}
+
+prvtProxyManMappingDevice OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The object represents the id of the deiscovered device in the LAN.
+It is index in the prvtProxyManMappingTable"
+::= { prvtProxyManMappingEntry 1 }
+
+prvtProxyManMappingIndex OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The object represents the index of the mapping entry.
+It is unique per device and is index in the prvtProxyManMappingTable"
+::= { prvtProxyManMappingEntry 2 }
+
+prvtProxyManMappingProto OBJECT-TYPE
+SYNTAX PrvtProxyManProtocols
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The object represents the protocol, which will be processed.
+It is index in prvtProxyManMappingTable. "
+::= { prvtProxyManMappingEntry 3 }
+
+prvtProxyManMappingDirection OBJECT-TYPE
+SYNTAX PrvtProxyManDirection
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The object identifies the traffic flow direction.(inbound/outbound)."
+::= { prvtProxyManMappingEntry 4 }
+
+prvtProxyManMappingGlobalPort OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"TBD"
+::= { prvtProxyManMappingEntry 5 }
+
+prvtProxyManMappingLocalSrcPort OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"TBD "
+::= { prvtProxyManMappingEntry 6 }
+
+prvtProxyManMappingLocalDstPort OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"TBD"
+::= { prvtProxyManMappingEntry 7 }
+
+prvtProxyManMappingRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Indicates the state of the mapping entry.
+- notReady(3) - the mapping entry is not configured yet
+- notInService(3) - the mapping entry is configured but the configuration is not applied yet
+- acitive(3) - the mapping entry is configured and the configuration is applied
+
+The objects which need to be configured in order
+to apply the cinfiguration are:
+prvtProxyManMappingMAC
+prvtProxyManMappingPort"
+::= { prvtProxyManMappingEntry 8 }
+
+prvtProxyManMappingMAC OBJECT-TYPE
+SYNTAX MacAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The mac address of the managed device.
+
+This field is manadatory"
+::= { prvtProxyManMappingEntry 9 }
+
+prvtProxyManMappingIfIndex OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object shows the ifIndex associated with the managed device."
+::= { prvtProxyManMappingEntry 10 }
+
+prvtProxyManMappingAuthenticated OBJECT-TYPE
+SYNTAX PrvtProxyManAuthentication
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object shows the authenticated state of the managed device."
+::= { prvtProxyManMappingEntry 11 }
+
+prvtProxyManagerNewDevice NOTIFICATION-TYPE
+OBJECTS {
+prvtProxyManDeviceAddress
+}
+STATUS current
+DESCRIPTION
+"This notification is triggered, when a new managed device is descovered
+and added in the proxy manager's list"
+::= { prvtProxyManNotifications 1 }
+
+prvtProxyManagerRemovedDevice NOTIFICATION-TYPE
+OBJECTS {
+prvtProxyManDeviceAddress
+}
+STATUS current
+DESCRIPTION
+"This notification is triggered, when a managed device is removed from
+the proxy manager's list"
+::= { prvtProxyManNotifications 2 }
+
+prvtProxyManagerUnauthenticatedDevice NOTIFICATION-TYPE
+OBJECTS {
+prvtProxyManDeviceAddress
+}
+STATUS current
+DESCRIPTION
+"This notification is triggered, when a managed device failed to be authenticated from
+the proxy manager's list"
+::= { prvtProxyManNotifications 3 }
+
+END

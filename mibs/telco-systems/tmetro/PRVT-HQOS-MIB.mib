@@ -1,0 +1,3283 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-HQOS-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-HQOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    serviceAccessSwitch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+prvtHqosMIB MODULE-IDENTITY
+    LAST-UPDATED "201008260000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The private MIB module to manage Hierarchical Quality of Service."
+    REVISION    "201008260000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { serviceAccessSwitch 5 }
+
+
+PrvtHqosNamedItem ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "The name of an item."
+    SYNTAX      OCTET STRING (SIZE(1..6))
+
+PrvtHqosNamedItemOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "Same as PrvtHqosNamedItem except that a zero-length string is used
+         to represent that no value is assigned."
+    SYNTAX      OCTET STRING (SIZE(0..6))
+
+PrvtHqosLspExpValueType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "MPLS Experimental bits."
+    SYNTAX      Integer32 (0..7)
+
+PrvtHqosDot1pPriority ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "IEEE 802.1p priority. Zero is lowest, seven is highest."
+    SYNTAX      Integer32 (0..7)
+
+PrvtHqosFcType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The name of a Forwarding Class."
+    SYNTAX      INTEGER { be(1), l2(2), af(3), l1(4), h2(5), ef(6), 
+                    h1(7), nc(8) }
+
+PrvtHqosDscpValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The value of a Differential Services Code Point."
+    SYNTAX      Integer32 (0..63)
+
+PrvtHqosDescrType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "The description for an item."
+    SYNTAX      OCTET STRING (SIZE(0..30))
+
+PrvtHqosServiceQueueId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identification number of a service queue."
+    SYNTAX      Integer32 (1..24)
+
+PrvtHqosNetQueueIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identification number of a network queue."
+    SYNTAX      Integer32 (1..24)
+
+PrvtHqosServicePolicyId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identification number of a service policy."
+    SYNTAX      Unsigned32 (1..64)
+
+PrvtHqosNetPolNameType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "The identification string of a network policy."
+    SYNTAX      OCTET STRING (SIZE(1..6))
+
+PrvtHqosNetPolNameOrNoneType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "Same as PrvtHqosNetPolNameType except that a zero
+         length string is used to represent no network policy."
+    SYNTAX      OCTET STRING (SIZE(0..6))
+
+PrvtHqosRateValueL1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Rate in kbps."
+    SYNTAX      Integer32 (80..5242875)
+
+PrvtHqosRateValueL2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Rate in kbps."
+    SYNTAX      Integer32 (16..1048575)
+
+PrvtHqosRateValueNet ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Rate in kbps."
+    SYNTAX      Integer32 (160..1048575)
+
+PrvtHqosBurstValueL1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Burst size in kilobytes."
+    SYNTAX      Integer32 (16..65535)
+
+PrvtHqosBurstValueL2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Burst size in kilobytes."
+    SYNTAX      Integer32 (16..16383)
+
+PrvtHqosBurstValueNet ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Burst size in kilobytesRate."
+    SYNTAX      Integer32 (1..16383)
+
+PrvtHqosBurstValueIntf ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Burst size in kilobytes."
+    SYNTAX      Integer32 (1..32767)
+
+PrvtHqosWredMinValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Minimum WRED limit."
+    SYNTAX      Integer32 (0..32768)
+
+PrvtHqosWredMaxValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Maximum WRED limit."
+    SYNTAX      Integer32 (8..32768)
+
+PrvtHqosWredProbValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "WRED probability."
+    SYNTAX      Integer32 (0..100)
+
+PrvtHqosLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The priority level to apply to a packet."
+    SYNTAX      INTEGER { low(1), high(2) }
+
+PrvtHqosWeight ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The weight of the specified entity while feeding into the parent."
+    SYNTAX      Integer32 (1..220)
+
+PrvtHqosColorType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The traffic conformance level (i.e. traffic color)."
+    SYNTAX      INTEGER { green(1), yellow(2) }
+
+PrvtHqosIfShaperId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of an Interface Shaper Profile."
+    SYNTAX      Integer32 (1..2)
+
+PrvtHqosIfShaperIdOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Same as PrvtHqosIfShaperId except that the value of zero represents
+         no shaper profile."
+    SYNTAX      Integer32 (0..2)
+
+PrvtHqosL1ShaperId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a L1 Scheduler Shaper Profile."
+    SYNTAX      Integer32 (1..16)
+
+PrvtHqosNetShaperId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a Network Shaper Profile."
+    SYNTAX      Integer32 (17..64)
+
+PrvtHqosL2ShaperId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a L2 Scheduler Shaper Profile."
+    SYNTAX      Integer32 (1..255)
+
+PrvtHqosPolicerIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a Policer Profile."
+    SYNTAX      Integer32 (1..256)
+
+PrvtHqosQueueType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The type of queue."
+    SYNTAX      INTEGER { unicast(1), broadcast(2), multicast(3) }
+
+PrvtHqosServWfqIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a Service WFQ Profile."
+    SYNTAX      Integer32 (1..64)
+
+PrvtHqosServSchedWfqIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a Service Scheduler WFQ Profile."
+    SYNTAX      Integer32 (1..63)
+
+PrvtHqosNetWfqIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a Network WFQ Profile."
+    SYNTAX      Integer32 (1..16)
+
+PrvtHqosWredIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identifier of a WRED Profile."
+    SYNTAX      Integer32 (1..32)
+
+PrvtHqosMapType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The type of mapping - VPT or DSCP."
+    SYNTAX      INTEGER { vpt(1), dscp(2) }
+
+PrvtHqosStatsCountType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "The value of a statistics counter.
+         The value is represented as an ASCII string."
+    SYNTAX      OCTET STRING
+
+hqosMIBObjects OBJECT IDENTIFIER
+    ::= { prvtHqosMIB 1 }
+
+svcIngObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 1 }
+
+prvtHqosSvcIngTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy Table
+         Each entry in this table defines a service ingress policy.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in the following tables:
+         - prvtHqosSvcIngQueueTable
+         - prvtHqosSvcIngFcTable
+         - prvtHqosSvcIngFcDscpTable
+         - prvtHqosSvcIngFcDot1pTable
+         - prvtHqosSvcIngFcDefaultTable
+         - prvtHqosSvcIngFcQueueTable"
+    ::= { svcIngObjects 1 }
+
+prvtHqosSvcIngEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngTable."
+    INDEX       { prvtHqosSvcIngId }
+    ::= { prvtHqosSvcIngTable 1 }
+
+PrvtHqosSvcIngEntry ::= SEQUENCE {
+    prvtHqosSvcIngId            PrvtHqosServicePolicyId,
+    prvtHqosSvcIngRowStatus     RowStatus,
+    prvtHqosSvcIngDescr         PrvtHqosDescrType
+}
+
+prvtHqosSvcIngId OBJECT-TYPE
+    SYNTAX      PrvtHqosServicePolicyId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a service ingress policy."
+    ::= { prvtHqosSvcIngEntry 1 }
+
+prvtHqosSvcIngRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service ingress policy."
+    ::= { prvtHqosSvcIngEntry 2 }
+
+prvtHqosSvcIngDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the service ingress policy."
+    ::= { prvtHqosSvcIngEntry 3 }
+
+prvtHqosSvcIngQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy Queue Table
+         Entries in this table define queues belonging to service ingress policies.
+         A queue is specified using a unique queue identifier (prvtHqosSvcIngQueueId),
+         and its parent scheduler policy name (prvtHqosSchedIngPolicyName) and
+         scheduler name (prvtHqosSchedIngVirtName)."
+    ::= { svcIngObjects 2 }
+
+prvtHqosSvcIngQueueEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngQueueTable."
+    INDEX       { prvtHqosSvcIngId, prvtHqosSvcIngQueueId, 
+                  prvtHqosSchedIngPolicyName, prvtHqosSchedIngVirtName }
+    ::= { prvtHqosSvcIngQueueTable 1 }
+
+PrvtHqosSvcIngQueueEntry ::= SEQUENCE {
+    prvtHqosSvcIngQueueId           PrvtHqosServiceQueueId,
+    prvtHqosSvcIngQueueRowStatus    RowStatus,
+    prvtHqosSvcIngQueueServWfq      PrvtHqosServWfqIdType,
+    prvtHqosSvcIngQueueWred         PrvtHqosWredIdType,
+    prvtHqosSvcIngQueuePolicer      PrvtHqosPolicerIdType
+}
+
+prvtHqosSvcIngQueueId OBJECT-TYPE
+    SYNTAX      PrvtHqosServiceQueueId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a queue belonging to a service ingress policy."
+    ::= { prvtHqosSvcIngQueueEntry 1 }
+
+prvtHqosSvcIngQueueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service ingress policy queue."
+    ::= { prvtHqosSvcIngQueueEntry 2 }
+
+prvtHqosSvcIngQueueServWfq OBJECT-TYPE
+    SYNTAX      PrvtHqosServWfqIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WFQ profile that needs to be used by the scheduler to which the queue would be feeding to.
+         Must be set to the prvtHqosWfqSvcIngPrfId of an entry existing in prvtHqosWfqSvcIngPrfTable."
+    ::= { prvtHqosSvcIngQueueEntry 3 }
+
+prvtHqosSvcIngQueueWred OBJECT-TYPE
+    SYNTAX      PrvtHqosWredIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WRED profile applied to this service ingress policy queue.
+         Must be set to the prvtHqosWredPrfId of an entry existing in prvtHqosWredPrfTable."
+    ::= { prvtHqosSvcIngQueueEntry 4 }
+
+prvtHqosSvcIngQueuePolicer OBJECT-TYPE
+    SYNTAX      PrvtHqosPolicerIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The policer profile applied to this service ingress policy queue.
+         Must be set to the prvtHqosPolicerSvcPrfId of an entry existing in prvtHqosPolicerSvcPrfTable."
+    ::= { prvtHqosSvcIngQueueEntry 5 }
+
+prvtHqosSvcIngFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy FC Table
+         A list of forwarding classes belonging to service ingress policies.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in the following tables:
+         - prvtHqosSvcIngFcDscpTable
+         - prvtHqosSvcIngFcDot1pTable
+         - prvtHqosSvcIngFcDefaultTable
+         - prvtHqosSvcIngFcQueueTable"
+    ::= { svcIngObjects 3 }
+
+prvtHqosSvcIngFcEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngFcTable."
+    INDEX       { prvtHqosSvcIngId, prvtHqosSvcIngFcType }
+    ::= { prvtHqosSvcIngFcTable 1 }
+
+PrvtHqosSvcIngFcEntry ::= SEQUENCE {
+    prvtHqosSvcIngFcType        PrvtHqosFcType,
+    prvtHqosSvcIngFcRowStatus   RowStatus
+}
+
+prvtHqosSvcIngFcType OBJECT-TYPE
+    SYNTAX      PrvtHqosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The forwarding class to which this row applies."
+    ::= { prvtHqosSvcIngFcEntry 1 }
+
+prvtHqosSvcIngFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this forwarding class."
+    ::= { prvtHqosSvcIngFcEntry 2 }
+
+prvtHqosSvcIngFcDscpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngFcDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy FC DSCP Mapping Table
+         Each entry in this table defines a DSCP to forwarding class mapping.
+         Note that DSCP to FC mappings can not be used together with
+         Dot1p (VPT) to FC mappings."
+    ::= { svcIngObjects 4 }
+
+prvtHqosSvcIngFcDscpEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngFcDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngFcDscpTable."
+    INDEX       { prvtHqosSvcIngId, prvtHqosSvcIngFcType, 
+                  prvtHqosSvcIngFcDscpValue }
+    ::= { prvtHqosSvcIngFcDscpTable 1 }
+
+PrvtHqosSvcIngFcDscpEntry ::= SEQUENCE {
+    prvtHqosSvcIngFcDscpValue       PrvtHqosDscpValue,
+    prvtHqosSvcIngFcDscpRowStatus   RowStatus,
+    prvtHqosSvcIngFcDscpColor       PrvtHqosColorType
+}
+
+prvtHqosSvcIngFcDscpValue OBJECT-TYPE
+    SYNTAX      PrvtHqosDscpValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Differentiated Services Code Point value to match in the packet."
+    ::= { prvtHqosSvcIngFcDscpEntry 1 }
+
+prvtHqosSvcIngFcDscpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this DSCP value."
+    ::= { prvtHqosSvcIngFcDscpEntry 2 }
+
+prvtHqosSvcIngFcDscpColor OBJECT-TYPE
+    SYNTAX      PrvtHqosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color (conformance level) to apply to traffic matching this
+         row's DSCP value."
+    ::= { prvtHqosSvcIngFcDscpEntry 3 }
+
+prvtHqosSvcIngFcDot1pTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngFcDot1pEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy FC Dot1p Mapping Table
+         Each entry in this table defines a Dot1p (VPT) to forwarding class mapping.
+         Note that VPT to FC mappings can not be used together with
+         DSCP to FC mappings."
+    ::= { svcIngObjects 5 }
+
+prvtHqosSvcIngFcDot1pEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngFcDot1pEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngFcDot1pTable."
+    INDEX       { prvtHqosSvcIngId, prvtHqosSvcIngFcType, 
+                  prvtHqosSvcIngFcDot1pValue }
+    ::= { prvtHqosSvcIngFcDot1pTable 1 }
+
+PrvtHqosSvcIngFcDot1pEntry ::= SEQUENCE {
+    prvtHqosSvcIngFcDot1pValue      PrvtHqosDot1pPriority,
+    prvtHqosSvcIngFcDot1pRowStatus  RowStatus,
+    prvtHqosSvcIngFcDot1pColor      PrvtHqosColorType
+}
+
+prvtHqosSvcIngFcDot1pValue OBJECT-TYPE
+    SYNTAX      PrvtHqosDot1pPriority
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Dot1p (VPT) value to match in the packet."
+    ::= { prvtHqosSvcIngFcDot1pEntry 1 }
+
+prvtHqosSvcIngFcDot1pRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service ingress policy's Dot1p entry."
+    ::= { prvtHqosSvcIngFcDot1pEntry 2 }
+
+prvtHqosSvcIngFcDot1pColor OBJECT-TYPE
+    SYNTAX      PrvtHqosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color (conformance level) to apply to traffic matching this
+         forwarding-class's Dot1p value."
+    ::= { prvtHqosSvcIngFcDot1pEntry 3 }
+
+prvtHqosSvcIngFcDefaultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngFcDefaultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy FC Default Mapping Table
+         This table is used to configure, for each forwarding class, the default settings for
+         all VPT or DSCP values.
+         Only one entry may be created for each service policy's forwarding class (i.e. per
+         prvtHqosSvcIngId, prvtHqosSvcIngFcType combination)."
+    ::= { svcIngObjects 6 }
+
+prvtHqosSvcIngFcDefaultEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngFcDefaultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngFcDefaultTable."
+    INDEX       { prvtHqosSvcIngId, prvtHqosSvcIngFcType, 
+                  prvtHqosSvcIngFcDefaultMapType }
+    ::= { prvtHqosSvcIngFcDefaultTable 1 }
+
+PrvtHqosSvcIngFcDefaultEntry ::= SEQUENCE {
+    prvtHqosSvcIngFcDefaultMapType      PrvtHqosMapType,
+    prvtHqosSvcIngFcDefaultRowStatus    RowStatus,
+    prvtHqosSvcIngFcDefaultColor        PrvtHqosColorType
+}
+
+prvtHqosSvcIngFcDefaultMapType OBJECT-TYPE
+    SYNTAX      PrvtHqosMapType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The mapping type (DSCP, or VPT) to which this row applies."
+    ::= { prvtHqosSvcIngFcDefaultEntry 1 }
+
+prvtHqosSvcIngFcDefaultRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this mapping type."
+    ::= { prvtHqosSvcIngFcDefaultEntry 2 }
+
+prvtHqosSvcIngFcDefaultColor OBJECT-TYPE
+    SYNTAX      PrvtHqosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The default color (conformance level) to apply for all values (DSCP/VPT)
+         applicable for the mapping type."
+    ::= { prvtHqosSvcIngFcDefaultEntry 3 }
+
+prvtHqosSvcIngFcQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngFcQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy FC Queue Table
+         This table maintains, for service ingress policies, the mapping of
+         a particular forwarding class traffic type into a specified queue.
+         A queue is specified using a unique queue identifier
+         (prvtHqosSvcIngQueueId), and its parent scheduler policy
+         name (prvtHqosSchedIngPolicyName) and scheduler name
+         (prvtHqosSchedIngVirtName)."
+    ::= { svcIngObjects 7 }
+
+prvtHqosSvcIngFcQueueEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngFcQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngFcQueueTable."
+    INDEX       { prvtHqosSvcIngId, prvtHqosSvcIngFcType, 
+                  prvtHqosSvcIngFcQueueType, prvtHqosSvcIngQueueId, 
+                  prvtHqosSchedIngPolicyName, prvtHqosSchedIngVirtName }
+    ::= { prvtHqosSvcIngFcQueueTable 1 }
+
+PrvtHqosSvcIngFcQueueEntry ::= SEQUENCE {
+    prvtHqosSvcIngFcQueueType       PrvtHqosQueueType,
+    prvtHqosSvcIngFcQueueRowStatus  RowStatus
+}
+
+prvtHqosSvcIngFcQueueType OBJECT-TYPE
+    SYNTAX      PrvtHqosQueueType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type (unicast/multicast/broadcast) of the queue to which this row applies."
+    ::= { prvtHqosSvcIngFcQueueEntry 1 }
+
+prvtHqosSvcIngFcQueueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this forwarding class queue."
+    ::= { prvtHqosSvcIngFcQueueEntry 2 }
+
+prvtHqosSvcIngQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcIngQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Queue Statistics Table
+         Entries in this table contain the per-port statistics for
+         service ingress queues."
+    ::= { svcIngObjects 8 }
+
+prvtHqosSvcIngQStatsEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcIngQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcIngQStatsTable."
+    INDEX       { prvtHqosSvcIngId, prvtHqosSvcIngQueueId, 
+                  prvtHqosSchedIngPolicyName, prvtHqosSchedIngVirtName, 
+                  ifIndex }
+    ::= { prvtHqosSvcIngQStatsTable 1 }
+
+PrvtHqosSvcIngQStatsEntry ::= SEQUENCE {
+    prvtHqosSvcIngQStatsGrnBytes        PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsGrnPckts        PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsYlwBytes        PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsYlwPckts        PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsTxBytes         PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsTxPckts         PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsWredGrnBytes    PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsWredGrnPckts    PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsWredYlwBytes    PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsWredYlwPckts    PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsPolDropBytes    PrvtHqosStatsCountType,
+    prvtHqosSvcIngQStatsPolDropPckts    PrvtHqosStatsCountType
+}
+
+prvtHqosSvcIngQStatsGrnBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of green traffic."
+    ::= { prvtHqosSvcIngQStatsEntry 2 }
+
+prvtHqosSvcIngQStatsGrnPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of green traffic."
+    ::= { prvtHqosSvcIngQStatsEntry 3 }
+
+prvtHqosSvcIngQStatsYlwBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of yellow traffic."
+    ::= { prvtHqosSvcIngQStatsEntry 4 }
+
+prvtHqosSvcIngQStatsYlwPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of yellow traffic."
+    ::= { prvtHqosSvcIngQStatsEntry 5 }
+
+prvtHqosSvcIngQStatsTxBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of traffic transmitted."
+    ::= { prvtHqosSvcIngQStatsEntry 6 }
+
+prvtHqosSvcIngQStatsTxPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of traffic transmitted."
+    ::= { prvtHqosSvcIngQStatsEntry 7 }
+
+prvtHqosSvcIngQStatsWredGrnBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of green traffic dropped due to the WRED."
+    ::= { prvtHqosSvcIngQStatsEntry 8 }
+
+prvtHqosSvcIngQStatsWredGrnPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of green traffic dropped due to the WRED."
+    ::= { prvtHqosSvcIngQStatsEntry 9 }
+
+prvtHqosSvcIngQStatsWredYlwBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of yellow traffic dropped due to the WRED."
+    ::= { prvtHqosSvcIngQStatsEntry 10 }
+
+prvtHqosSvcIngQStatsWredYlwPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of yellow traffic dropped due to the WRED."
+    ::= { prvtHqosSvcIngQStatsEntry 11 }
+
+prvtHqosSvcIngQStatsPolDropBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of traffic dropped due to the policer."
+    ::= { prvtHqosSvcIngQStatsEntry 12 }
+
+prvtHqosSvcIngQStatsPolDropPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of traffic dropped due to the policer."
+    ::= { prvtHqosSvcIngQStatsEntry 13 }
+
+svcEgrObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 2 }
+
+prvtHqosSvcEgrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcEgrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Egress Policy Table
+         Each entry in this table defines a service egress policy.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in the following tables:
+         - prvtHqosSvcEgrQueueTable
+         - prvtHqosSvcEgrFcTable
+         - prvtHqosSvcEgrFcQueueTable"
+    ::= { svcEgrObjects 1 }
+
+prvtHqosSvcEgrEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcEgrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcEgrTable."
+    INDEX       { prvtHqosSvcEgrId }
+    ::= { prvtHqosSvcEgrTable 1 }
+
+PrvtHqosSvcEgrEntry ::= SEQUENCE {
+    prvtHqosSvcEgrId            PrvtHqosServicePolicyId,
+    prvtHqosSvcEgrRowStatus     RowStatus,
+    prvtHqosSvcEgrDescr         PrvtHqosDescrType
+}
+
+prvtHqosSvcEgrId OBJECT-TYPE
+    SYNTAX      PrvtHqosServicePolicyId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a service egress policy."
+    ::= { prvtHqosSvcEgrEntry 1 }
+
+prvtHqosSvcEgrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service egress policy."
+    ::= { prvtHqosSvcEgrEntry 2 }
+
+prvtHqosSvcEgrDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the service egress policy."
+    ::= { prvtHqosSvcEgrEntry 3 }
+
+prvtHqosSvcEgrQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcEgrQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Egress Policy Queue Table
+         Entries in this table define queues belonging to service egress policies.
+         A queue is specified using a unique queue identifier (prvtHqosSvcEgrQueueId),
+         and its parent scheduler policy name (prvtHqosSchedEgrPolicyName) and
+         scheduler name (prvtHqosSchedEgrVirtName)."
+    ::= { svcEgrObjects 2 }
+
+prvtHqosSvcEgrQueueEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcEgrQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcEgrQueueTable."
+    INDEX       { prvtHqosSvcEgrId, prvtHqosSvcEgrQueueId, 
+                  prvtHqosSchedEgrPolicyName, prvtHqosSchedEgrVirtName }
+    ::= { prvtHqosSvcEgrQueueTable 1 }
+
+PrvtHqosSvcEgrQueueEntry ::= SEQUENCE {
+    prvtHqosSvcEgrQueueId           PrvtHqosServiceQueueId,
+    prvtHqosSvcEgrQueueRowStatus    RowStatus,
+    prvtHqosSvcEgrQueueServWfq      PrvtHqosServWfqIdType,
+    prvtHqosSvcEgrQueueWred         PrvtHqosWredIdType
+}
+
+prvtHqosSvcEgrQueueId OBJECT-TYPE
+    SYNTAX      PrvtHqosServiceQueueId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a queue belonging to a service egress policy."
+    ::= { prvtHqosSvcEgrQueueEntry 1 }
+
+prvtHqosSvcEgrQueueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service egress policy queue."
+    ::= { prvtHqosSvcEgrQueueEntry 2 }
+
+prvtHqosSvcEgrQueueServWfq OBJECT-TYPE
+    SYNTAX      PrvtHqosServWfqIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WFQ profile that needs to be used by the scheduler to which the queue would be feeding to.
+         Must be set to the prvtHqosWfqSvcEgrPrfId of an entry existing in prvtHqosWfqSvcEgrPrfTable."
+    ::= { prvtHqosSvcEgrQueueEntry 3 }
+
+prvtHqosSvcEgrQueueWred OBJECT-TYPE
+    SYNTAX      PrvtHqosWredIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WRED profile applied to this service egress policy queue.
+         Must be set to the prvtHqosWredPrfId of an entry existing in prvtHqosWredPrfTable."
+    ::= { prvtHqosSvcEgrQueueEntry 4 }
+
+prvtHqosSvcEgrFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcEgrFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Egress Policy FC Mapping Table
+         This table allows configuration that is specific to a forwarding class.
+         Before a row for a specific forwarding class may be created in
+         prvtHqosSvcEgrFcQueueTable, or in prvtHqosSvcEgrFcColorTable, a row with
+         that forwarding class must first be created in this table.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in prvtHqosSvcEgrFcQueueTable, and
+         prvtHqosSvcEgrFcColorTable."
+    ::= { svcEgrObjects 3 }
+
+prvtHqosSvcEgrFcEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcEgrFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcEgrFcTable."
+    INDEX       { prvtHqosSvcEgrId, prvtHqosSvcEgrFcNumber }
+    ::= { prvtHqosSvcEgrFcTable 1 }
+
+PrvtHqosSvcEgrFcEntry ::= SEQUENCE {
+    prvtHqosSvcEgrFcNumber      PrvtHqosFcType,
+    prvtHqosSvcEgrFcRowStatus   RowStatus
+}
+
+prvtHqosSvcEgrFcNumber OBJECT-TYPE
+    SYNTAX      PrvtHqosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The forwarding class to which this row applies."
+    ::= { prvtHqosSvcEgrFcEntry 1 }
+
+prvtHqosSvcEgrFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this forwarding class."
+    ::= { prvtHqosSvcEgrFcEntry 3 }
+
+prvtHqosSvcEgrFcQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcEgrFcQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Egress Policy FC Queue Table
+         This table maintains, for service egress policies, the mapping of
+         traffic forwarding class into a specified queue.
+         A queue is specified using a unique queue identifier
+         (prvtHqosSvcEgrQueueId), and its parent scheduler policy
+         name (prvtHqosSchedEgrPolicyName) and scheduler name
+         (prvtHqosSchedEgrVirtName)."
+    ::= { svcEgrObjects 4 }
+
+prvtHqosSvcEgrFcQueueEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcEgrFcQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcEgrFcQueueTable."
+    INDEX       { prvtHqosSvcEgrId, prvtHqosSvcEgrFcNumber, 
+                  prvtHqosSvcEgrFcQueueType, prvtHqosSvcEgrQueueId, 
+                  prvtHqosSchedEgrPolicyName, prvtHqosSchedEgrVirtName }
+    ::= { prvtHqosSvcEgrFcQueueTable 1 }
+
+PrvtHqosSvcEgrFcQueueEntry ::= SEQUENCE {
+    prvtHqosSvcEgrFcQueueType       PrvtHqosQueueType,
+    prvtHqosSvcEgrFcQueueRowStatus  RowStatus
+}
+
+prvtHqosSvcEgrFcQueueType OBJECT-TYPE
+    SYNTAX      PrvtHqosQueueType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type (unicast/multicast/broadcast) of the queue to which this row applies."
+    ::= { prvtHqosSvcEgrFcQueueEntry 1 }
+
+prvtHqosSvcEgrFcQueueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this queue."
+    ::= { prvtHqosSvcEgrFcQueueEntry 2 }
+
+prvtHqosSvcEgrFcColorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcEgrFcColorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Egress Policy FC Color Table
+         This table allows remarking of VPT bits based on forwarding class and color."
+    ::= { svcEgrObjects 5 }
+
+prvtHqosSvcEgrFcColorEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcEgrFcColorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcEgrFcColorTable."
+    INDEX       { prvtHqosSvcEgrId, prvtHqosSvcEgrFcNumber, 
+                  prvtHqosSvcEgrFcColorValue }
+    ::= { prvtHqosSvcEgrFcColorTable 1 }
+
+PrvtHqosSvcEgrFcColorEntry ::= SEQUENCE {
+    prvtHqosSvcEgrFcColorValue          PrvtHqosColorType,
+    prvtHqosSvcEgrFcColorRowStatus      RowStatus,
+    prvtHqosSvcEgrFcColorDot1PValue     PrvtHqosDot1pPriority
+}
+
+prvtHqosSvcEgrFcColorValue OBJECT-TYPE
+    SYNTAX      PrvtHqosColorType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The traffic color (conformance level) to which this row applies."
+    ::= { prvtHqosSvcEgrFcColorEntry 2 }
+
+prvtHqosSvcEgrFcColorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this forwarding class and color."
+    ::= { prvtHqosSvcEgrFcColorEntry 3 }
+
+prvtHqosSvcEgrFcColorDot1PValue OBJECT-TYPE
+    SYNTAX      PrvtHqosDot1pPriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The 802.1p value to use for packet remarking for traffic belonging
+         to this forwarding class and color."
+    ::= { prvtHqosSvcEgrFcColorEntry 4 }
+
+prvtHqosSvcEgrQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSvcEgrQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Egress Queue Statistics Table
+         Entries in this table contain the per-port statistics for
+         service egress queues."
+    ::= { svcEgrObjects 6 }
+
+prvtHqosSvcEgrQStatsEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSvcEgrQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSvcEgrQStatsTable."
+    INDEX       { prvtHqosSvcEgrId, prvtHqosSvcEgrQueueId, 
+                  prvtHqosSchedEgrPolicyName, prvtHqosSchedEgrVirtName, 
+                  ifIndex }
+    ::= { prvtHqosSvcEgrQStatsTable 1 }
+
+PrvtHqosSvcEgrQStatsEntry ::= SEQUENCE {
+    prvtHqosSvcEgrQStatsGrnBytes        PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsGrnPckts        PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsYlwBytes        PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsYlwPckts        PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsTxBytes         PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsTxPckts         PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsWredGrnBytes    PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsWredGrnPckts    PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsWredYlwBytes    PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsWredYlwPckts    PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsPolDropBytes    PrvtHqosStatsCountType,
+    prvtHqosSvcEgrQStatsPolDropPckts    PrvtHqosStatsCountType
+}
+
+prvtHqosSvcEgrQStatsGrnBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of green traffic."
+    ::= { prvtHqosSvcEgrQStatsEntry 2 }
+
+prvtHqosSvcEgrQStatsGrnPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of green traffic."
+    ::= { prvtHqosSvcEgrQStatsEntry 3 }
+
+prvtHqosSvcEgrQStatsYlwBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of yellow traffic."
+    ::= { prvtHqosSvcEgrQStatsEntry 4 }
+
+prvtHqosSvcEgrQStatsYlwPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of yellow traffic."
+    ::= { prvtHqosSvcEgrQStatsEntry 5 }
+
+prvtHqosSvcEgrQStatsTxBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of traffic transmitted."
+    ::= { prvtHqosSvcEgrQStatsEntry 6 }
+
+prvtHqosSvcEgrQStatsTxPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of traffic transmitted."
+    ::= { prvtHqosSvcEgrQStatsEntry 7 }
+
+prvtHqosSvcEgrQStatsWredGrnBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of green traffic dropped due to the WRED."
+    ::= { prvtHqosSvcEgrQStatsEntry 8 }
+
+prvtHqosSvcEgrQStatsWredGrnPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of green traffic dropped due to the WRED."
+    ::= { prvtHqosSvcEgrQStatsEntry 9 }
+
+prvtHqosSvcEgrQStatsWredYlwBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of yellow traffic dropped due to the WRED."
+    ::= { prvtHqosSvcEgrQStatsEntry 10 }
+
+prvtHqosSvcEgrQStatsWredYlwPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of yellow traffic dropped due to the WRED."
+    ::= { prvtHqosSvcEgrQStatsEntry 11 }
+
+prvtHqosSvcEgrQStatsPolDropBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of traffic dropped due to the policer."
+    ::= { prvtHqosSvcEgrQStatsEntry 12 }
+
+prvtHqosSvcEgrQStatsPolDropPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of traffic dropped due to the policer."
+    ::= { prvtHqosSvcEgrQStatsEntry 13 }
+
+netObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 3 }
+
+prvtHqosNetPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Policy Table
+         Each entry in this table defines a network (ingress or egress) policy.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in the following tables:
+         - prvtHqosNetIngLspExpTable
+         - prvtHqosNetEgrFcTable"
+    ::= { netObjects 1 }
+
+prvtHqosNetPolicyEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetPolicyTable."
+    INDEX       { prvtHqosNetPolicyName }
+    ::= { prvtHqosNetPolicyTable 1 }
+
+PrvtHqosNetPolicyEntry ::= SEQUENCE {
+    prvtHqosNetPolicyName       PrvtHqosNetPolNameType,
+    prvtHqosNetPolicyRowStatus  RowStatus,
+    prvtHqosNetPolicyDescr      PrvtHqosDescrType
+}
+
+prvtHqosNetPolicyName OBJECT-TYPE
+    SYNTAX      PrvtHqosNetPolNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a network policy."
+    ::= { prvtHqosNetPolicyEntry 1 }
+
+prvtHqosNetPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this network policy."
+    ::= { prvtHqosNetPolicyEntry 2 }
+
+prvtHqosNetPolicyDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the network policy"
+    ::= { prvtHqosNetPolicyEntry 3 }
+
+prvtHqosNetIngLspExpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetIngLspExpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Ingress Policy LSP EXP Mapping Table
+         This table contains network ingress policies' LSP EXP bits to
+         forwarding class and color mappings."
+    ::= { netObjects 2 }
+
+prvtHqosNetIngLspExpEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetIngLspExpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetIngLspExpTable."
+    INDEX       { prvtHqosNetPolicyName, prvtHqosNetIngLspExpValue }
+    ::= { prvtHqosNetIngLspExpTable 1 }
+
+PrvtHqosNetIngLspExpEntry ::= SEQUENCE {
+    prvtHqosNetIngLspExpValue       PrvtHqosLspExpValueType,
+    prvtHqosNetIngLspExpRowStatus   RowStatus,
+    prvtHqosNetIngLspExpFC          PrvtHqosFcType,
+    prvtHqosNetIngLspExpColor       PrvtHqosColorType
+}
+
+prvtHqosNetIngLspExpValue OBJECT-TYPE
+    SYNTAX      PrvtHqosLspExpValueType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The LSP EXP bit value to which this row applies."
+    ::= { prvtHqosNetIngLspExpEntry 1 }
+
+prvtHqosNetIngLspExpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this LSP EXP bit value."
+    ::= { prvtHqosNetIngLspExpEntry 2 }
+
+prvtHqosNetIngLspExpFC OBJECT-TYPE
+    SYNTAX      PrvtHqosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The forwarding class to assign to traffic matching the LSP EXP bit value."
+    ::= { prvtHqosNetIngLspExpEntry 3 }
+
+prvtHqosNetIngLspExpColor OBJECT-TYPE
+    SYNTAX      PrvtHqosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color (conformance level) to assign to traffic matching the LSP EXP bit value."
+    ::= { prvtHqosNetIngLspExpEntry 4 }
+
+prvtHqosNetEgrFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetEgrFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Egress FC Mapping Table
+         This table allows remarking of LSP EXP bits based on forwarding class and color."
+    ::= { netObjects 3 }
+
+prvtHqosNetEgrFcEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetEgrFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetEgrFcTable."
+    INDEX       { prvtHqosNetPolicyName, prvtHqosNetEgrFcNumber, 
+                  prvtHqosNetEgrFcColor }
+    ::= { prvtHqosNetEgrFcTable 1 }
+
+PrvtHqosNetEgrFcEntry ::= SEQUENCE {
+    prvtHqosNetEgrFcNumber          PrvtHqosFcType,
+    prvtHqosNetEgrFcColor           PrvtHqosColorType,
+    prvtHqosNetEgrFcRowStatus       RowStatus,
+    prvtHqosNetEgrFcLspExpValue     PrvtHqosLspExpValueType
+}
+
+prvtHqosNetEgrFcNumber OBJECT-TYPE
+    SYNTAX      PrvtHqosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The forwarding class to which this row applies."
+    ::= { prvtHqosNetEgrFcEntry 1 }
+
+prvtHqosNetEgrFcColor OBJECT-TYPE
+    SYNTAX      PrvtHqosColorType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The traffic color (conformance level) to which this row applies."
+    ::= { prvtHqosNetEgrFcEntry 2 }
+
+prvtHqosNetEgrFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this forwarding class and color."
+    ::= { prvtHqosNetEgrFcEntry 3 }
+
+prvtHqosNetEgrFcLspExpValue OBJECT-TYPE
+    SYNTAX      PrvtHqosLspExpValueType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value to assign to the LSP EXP bits of traffic belonging to the forwarding class and color."
+    ::= { prvtHqosNetEgrFcEntry 4 }
+
+netQueueObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 4 }
+
+prvtHqosNetQPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetQPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Egress Queue Policy Table
+         Each entry in this table defines a network egress queue policy.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in the following tables:
+         - prvtHqosNetQPolicyQueueTable
+         - prvtHqosNetQPolicyFcTable
+         - prvtHqosNetQPolicyFcQueueTable"
+    ::= { netQueueObjects 1 }
+
+prvtHqosNetQPolicyEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetQPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetQPolicyTable."
+    INDEX       { prvtHqosNetQPolicyName }
+    ::= { prvtHqosNetQPolicyTable 1 }
+
+PrvtHqosNetQPolicyEntry ::= SEQUENCE {
+    prvtHqosNetQPolicyName          PrvtHqosNamedItem,
+    prvtHqosNetQPolicyRowStatus     RowStatus,
+    prvtHqosNetQPolicyDescr         PrvtHqosDescrType
+}
+
+prvtHqosNetQPolicyName OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a network egress queue policy."
+    ::= { prvtHqosNetQPolicyEntry 1 }
+
+prvtHqosNetQPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this network egress queue policy."
+    ::= { prvtHqosNetQPolicyEntry 2 }
+
+prvtHqosNetQPolicyDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the network egress queue policy."
+    ::= { prvtHqosNetQPolicyEntry 3 }
+
+prvtHqosNetQPolicyQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetQPolicyQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Egress Queue Table
+         Entries in this table define queues belonging to network (egress) queue policies."
+    ::= { netQueueObjects 2 }
+
+prvtHqosNetQPolicyQueueEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetQPolicyQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetQPolicyQueueTable."
+    INDEX       { prvtHqosNetQPolicyName, prvtHqosNetQPolicyQueueId }
+    ::= { prvtHqosNetQPolicyQueueTable 1 }
+
+PrvtHqosNetQPolicyQueueEntry ::= SEQUENCE {
+    prvtHqosNetQPolicyQueueId           PrvtHqosNetQueueIdType,
+    prvtHqosNetQPolicyQueueRowStatus    RowStatus,
+    prvtHqosNetQPolicyQueueLevel        PrvtHqosLevel,
+    prvtHqosNetQPolicyQueueWfq          PrvtHqosNetWfqIdType,
+    prvtHqosNetQPolicyQueueWred         PrvtHqosWredIdType,
+    prvtHqosNetQPolicyQueueShaper       PrvtHqosNetShaperId
+}
+
+prvtHqosNetQPolicyQueueId OBJECT-TYPE
+    SYNTAX      PrvtHqosNetQueueIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a queue belonging to a network (egress) queue policy."
+    ::= { prvtHqosNetQPolicyQueueEntry 1 }
+
+prvtHqosNetQPolicyQueueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this queue."
+    ::= { prvtHqosNetQPolicyQueueEntry 2 }
+
+prvtHqosNetQPolicyQueueLevel OBJECT-TYPE
+    SYNTAX      PrvtHqosLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the level of priority for the queue while feeding to the parent."
+    ::= { prvtHqosNetQPolicyQueueEntry 3 }
+
+prvtHqosNetQPolicyQueueWfq OBJECT-TYPE
+    SYNTAX      PrvtHqosNetWfqIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WFQ profile that needs to be used by the scheduler to which the queue would be feeding to.
+         Must be set to the prvtHqosWfqNetworkPrfId of an entry existing in prvtHqosWfqNetworkPrfTable."
+    ::= { prvtHqosNetQPolicyQueueEntry 4 }
+
+prvtHqosNetQPolicyQueueWred OBJECT-TYPE
+    SYNTAX      PrvtHqosWredIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WRED profile applied to this queue.
+         Must be set to the prvtHqosWredPrfId of an entry existing in prvtHqosWredPrfTable."
+    ::= { prvtHqosNetQPolicyQueueEntry 5 }
+
+prvtHqosNetQPolicyQueueShaper OBJECT-TYPE
+    SYNTAX      PrvtHqosNetShaperId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaping profile applied to this queue.
+         Must be set to the prvtHqosShaperNetPrfId of an entry existing in prvtHqosShaperNetPrfTable."
+    ::= { prvtHqosNetQPolicyQueueEntry 6 }
+
+prvtHqosNetQPolicyFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetQPolicyFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Policy FC Table
+         A list of forwarding classes belonging to network queue policies.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in prvtHqosNetQPolicyFcQueueTable."
+    ::= { netQueueObjects 3 }
+
+prvtHqosNetQPolicyFcEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetQPolicyFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetQPolicyFcTable."
+    INDEX       { prvtHqosNetQPolicyName, prvtHqosNetQPolicyFcNumber }
+    ::= { prvtHqosNetQPolicyFcTable 1 }
+
+PrvtHqosNetQPolicyFcEntry ::= SEQUENCE {
+    prvtHqosNetQPolicyFcNumber      PrvtHqosFcType,
+    prvtHqosNetQPolicyFcRowStatus   RowStatus
+}
+
+prvtHqosNetQPolicyFcNumber OBJECT-TYPE
+    SYNTAX      PrvtHqosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The forwarding class to which this row applies."
+    ::= { prvtHqosNetQPolicyFcEntry 1 }
+
+prvtHqosNetQPolicyFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this forwarding class."
+    ::= { prvtHqosNetQPolicyFcEntry 2 }
+
+prvtHqosNetQPolicyFcQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetQPolicyFcQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Queue Policy FC Queue Table
+         This table maintains, for network queue policies, the mapping of a
+         particular forwarding class traffic type into a specified queue."
+    ::= { netQueueObjects 4 }
+
+prvtHqosNetQPolicyFcQueueEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetQPolicyFcQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetQPolicyFcQueueTable."
+    INDEX       { prvtHqosNetQPolicyName, prvtHqosNetQPolicyFcNumber, 
+                  prvtHqosNetQPolicyFcQueueType, 
+                  prvtHqosNetQPolicyQueueId }
+    ::= { prvtHqosNetQPolicyFcQueueTable 1 }
+
+PrvtHqosNetQPolicyFcQueueEntry ::= SEQUENCE {
+    prvtHqosNetQPolicyFcQueueType       PrvtHqosQueueType,
+    prvtHqosNetQPolicyFcQueueRStatus    RowStatus
+}
+
+prvtHqosNetQPolicyFcQueueType OBJECT-TYPE
+    SYNTAX      PrvtHqosQueueType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type (unicast/multicast/broadcast) of the queue to be assigned to the forwarding class."
+    ::= { prvtHqosNetQPolicyFcQueueEntry 3 }
+
+prvtHqosNetQPolicyFcQueueRStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this queue."
+    ::= { prvtHqosNetQPolicyFcQueueEntry 4 }
+
+prvtHqosNetEgrQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosNetEgrQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Egress Queue Statistics Table
+         Entries in this table contain the per-port statistics for
+         network egress queues."
+    ::= { netQueueObjects 5 }
+
+prvtHqosNetEgrQStatsEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosNetEgrQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosNetEgrQStatsTable."
+    INDEX       { prvtHqosNetQPolicyName, prvtHqosNetQPolicyQueueId, 
+                  ifIndex }
+    ::= { prvtHqosNetEgrQStatsTable 1 }
+
+PrvtHqosNetEgrQStatsEntry ::= SEQUENCE {
+    prvtHqosNetEgrQStatsGrnBytes        PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsGrnPckts        PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsYlwBytes        PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsYlwPckts        PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsTxBytes         PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsTxPckts         PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsWredGrnBytes    PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsWredGrnPckts    PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsWredYlwBytes    PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsWredYlwPckts    PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsPolDropBytes    PrvtHqosStatsCountType,
+    prvtHqosNetEgrQStatsPolDropPckts    PrvtHqosStatsCountType
+}
+
+prvtHqosNetEgrQStatsGrnBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of green traffic."
+    ::= { prvtHqosNetEgrQStatsEntry 2 }
+
+prvtHqosNetEgrQStatsGrnPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of green traffic."
+    ::= { prvtHqosNetEgrQStatsEntry 3 }
+
+prvtHqosNetEgrQStatsYlwBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of yellow traffic."
+    ::= { prvtHqosNetEgrQStatsEntry 4 }
+
+prvtHqosNetEgrQStatsYlwPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of yellow traffic."
+    ::= { prvtHqosNetEgrQStatsEntry 5 }
+
+prvtHqosNetEgrQStatsTxBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of traffic transmitted."
+    ::= { prvtHqosNetEgrQStatsEntry 6 }
+
+prvtHqosNetEgrQStatsTxPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of traffic transmitted."
+    ::= { prvtHqosNetEgrQStatsEntry 7 }
+
+prvtHqosNetEgrQStatsWredGrnBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of green traffic dropped due to the WRED."
+    ::= { prvtHqosNetEgrQStatsEntry 8 }
+
+prvtHqosNetEgrQStatsWredGrnPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of green traffic dropped due to the WRED."
+    ::= { prvtHqosNetEgrQStatsEntry 9 }
+
+prvtHqosNetEgrQStatsWredYlwBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of yellow traffic dropped due to the WRED."
+    ::= { prvtHqosNetEgrQStatsEntry 10 }
+
+prvtHqosNetEgrQStatsWredYlwPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of yellow traffic dropped due to the WRED."
+    ::= { prvtHqosNetEgrQStatsEntry 11 }
+
+prvtHqosNetEgrQStatsPolDropBytes OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of bytes of traffic dropped due to the policer."
+    ::= { prvtHqosNetEgrQStatsEntry 12 }
+
+prvtHqosNetEgrQStatsPolDropPckts OBJECT-TYPE
+    SYNTAX      PrvtHqosStatsCountType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets of traffic dropped due to the policer."
+    ::= { prvtHqosNetEgrQStatsEntry 13 }
+
+schedObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 5 }
+
+prvtHqosSchedIngPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSchedIngPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Scheduler Ingress Policy Table
+         Each entry in this table defines an ingress service scheduler policy.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in the following tables:
+         - prvtHqosSchedIngVirtTable
+         - prvtHqosSchedIngRootTable"
+    ::= { schedObjects 1 }
+
+prvtHqosSchedIngPolicyEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSchedIngPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSchedIngPolicyTable."
+    INDEX       { prvtHqosSchedIngPolicyName }
+    ::= { prvtHqosSchedIngPolicyTable 1 }
+
+PrvtHqosSchedIngPolicyEntry ::= SEQUENCE {
+    prvtHqosSchedIngPolicyName          PrvtHqosNamedItem,
+    prvtHqosSchedIngPolicyRowStatus     RowStatus,
+    prvtHqosSchedIngPolicyDescr         PrvtHqosDescrType
+}
+
+prvtHqosSchedIngPolicyName OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an ingress service scheduler policy."
+    ::= { prvtHqosSchedIngPolicyEntry 1 }
+
+prvtHqosSchedIngPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this ingress service scheduler policy."
+    ::= { prvtHqosSchedIngPolicyEntry 2 }
+
+prvtHqosSchedIngPolicyDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the ingress service scheduler policy"
+    ::= { prvtHqosSchedIngPolicyEntry 3 }
+
+prvtHqosSchedIngVirtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSchedIngVirtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Ingress Virtual Scheduler Table
+         Each entry in this table defines an ingress virtual (L2) scheduler."
+    ::= { schedObjects 2 }
+
+prvtHqosSchedIngVirtEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSchedIngVirtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSchedIngVirtTable."
+    INDEX       { prvtHqosSchedIngPolicyName, prvtHqosSchedIngVirtName }
+    ::= { prvtHqosSchedIngVirtTable 1 }
+
+PrvtHqosSchedIngVirtEntry ::= SEQUENCE {
+    prvtHqosSchedIngVirtName        PrvtHqosNamedItem,
+    prvtHqosSchedIngVirtRowStatus   RowStatus,
+    prvtHqosSchedIngVirtDescr       PrvtHqosDescrType,
+    prvtHqosSchedIngVirtParent      PrvtHqosNamedItem,
+    prvtHqosSchedIngVirtLevel       PrvtHqosLevel,
+    prvtHqosSchedIngVirtWfqProfile  PrvtHqosServSchedWfqIdType,
+    prvtHqosSchedIngVirtShaper      PrvtHqosL2ShaperId
+}
+
+prvtHqosSchedIngVirtName OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a virtual scheduler belonging to an ingress service policy."
+    ::= { prvtHqosSchedIngVirtEntry 1 }
+
+prvtHqosSchedIngVirtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this ingress virtual scheduler."
+    ::= { prvtHqosSchedIngVirtEntry 2 }
+
+prvtHqosSchedIngVirtDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the ingress virtual scheduler."
+    ::= { prvtHqosSchedIngVirtEntry 3 }
+
+prvtHqosSchedIngVirtParent OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The scheduler to which this scheduler would be feeding to.
+         Must be set to the prvtHqosSchedIngRootName of an entry in prvtHqosSchedIngRootTable
+         that has the same prvtHqosSchedIngPolicyName."
+    ::= { prvtHqosSchedIngVirtEntry 4 }
+
+prvtHqosSchedIngVirtLevel OBJECT-TYPE
+    SYNTAX      PrvtHqosLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The priority level of the scheduler."
+    ::= { prvtHqosSchedIngVirtEntry 5 }
+
+prvtHqosSchedIngVirtWfqProfile OBJECT-TYPE
+    SYNTAX      PrvtHqosServSchedWfqIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WFQ profile number for this scheduler.
+         Must be set to the prvtHqosWfqSchedIngPrfId of an entry in prvtHqosWfqSchedIngPrfTable."
+    ::= { prvtHqosSchedIngVirtEntry 6 }
+
+prvtHqosSchedIngVirtShaper OBJECT-TYPE
+    SYNTAX      PrvtHqosL2ShaperId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaping profile applied to the scheduler.
+         Must be set to the prvtHqosShaperL2IngPrfId of an entry in prvtHqosShaperL2IngPrfTable."
+    ::= { prvtHqosSchedIngVirtEntry 7 }
+
+prvtHqosSchedIngRootTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSchedIngRootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Ingress Root Scheduler Table
+         Each entry in this table defines an ingress root scheduler.
+         A maximum of 2 entries may be created per policy (prvtHqosSchedIngPolicyName)."
+    ::= { schedObjects 3 }
+
+prvtHqosSchedIngRootEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSchedIngRootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSchedIngRootTable."
+    INDEX       { prvtHqosSchedIngPolicyName, prvtHqosSchedIngRootName }
+    ::= { prvtHqosSchedIngRootTable 1 }
+
+PrvtHqosSchedIngRootEntry ::= SEQUENCE {
+    prvtHqosSchedIngRootName        PrvtHqosNamedItem,
+    prvtHqosSchedIngRootRowStatus   RowStatus,
+    prvtHqosSchedIngRootDescr       PrvtHqosDescrType,
+    prvtHqosSchedIngRootLevel       PrvtHqosLevel,
+    prvtHqosSchedIngRootShaper      PrvtHqosL1ShaperId
+}
+
+prvtHqosSchedIngRootName OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an ingress root scheduler belonging to an ingress service policy."
+    ::= { prvtHqosSchedIngRootEntry 1 }
+
+prvtHqosSchedIngRootRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this ingress root scheduler."
+    ::= { prvtHqosSchedIngRootEntry 2 }
+
+prvtHqosSchedIngRootDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the ingress root scheduler."
+    ::= { prvtHqosSchedIngRootEntry 3 }
+
+prvtHqosSchedIngRootLevel OBJECT-TYPE
+    SYNTAX      PrvtHqosLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The priority level of the ingress root scheduler."
+    ::= { prvtHqosSchedIngRootEntry 4 }
+
+prvtHqosSchedIngRootShaper OBJECT-TYPE
+    SYNTAX      PrvtHqosL1ShaperId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaping profile applied to the ingress root scheduler.
+         Must be set to the prvtHqosShaperL1IngPrfId of an entry in prvtHqosShaperL1IngPrfTable."
+    ::= { prvtHqosSchedIngRootEntry 5 }
+
+prvtHqosSchedEgrPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSchedEgrPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Egress Service Scheduler Policy Table
+         Each entry in this table defines an egress service scheduler policy.
+         Note that deletion of a row in this table will also result in
+         the deletion of the dependent rows in the following tables:
+         - prvtHqosSchedEgrVirtTable
+         - prvtHqosSchedEgrRootTable"
+    ::= { schedObjects 4 }
+
+prvtHqosSchedEgrPolicyEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSchedEgrPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSchedEgrPolicyTable."
+    INDEX       { prvtHqosSchedEgrPolicyName }
+    ::= { prvtHqosSchedEgrPolicyTable 1 }
+
+PrvtHqosSchedEgrPolicyEntry ::= SEQUENCE {
+    prvtHqosSchedEgrPolicyName          PrvtHqosNamedItem,
+    prvtHqosSchedEgrPolicyRowStatus     RowStatus,
+    prvtHqosSchedEgrPolicyDescr         PrvtHqosDescrType
+}
+
+prvtHqosSchedEgrPolicyName OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an egress scheduler policy."
+    ::= { prvtHqosSchedEgrPolicyEntry 1 }
+
+prvtHqosSchedEgrPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this egress scheduler policy."
+    ::= { prvtHqosSchedEgrPolicyEntry 2 }
+
+prvtHqosSchedEgrPolicyDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the egress scheduler policy"
+    ::= { prvtHqosSchedEgrPolicyEntry 3 }
+
+prvtHqosSchedEgrVirtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSchedEgrVirtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Egress Virtual Scheduler Table
+         Each entry in this table defines an egress virtual (L2) scheduler."
+    ::= { schedObjects 5 }
+
+prvtHqosSchedEgrVirtEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSchedEgrVirtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSchedEgrVirtTable."
+    INDEX       { prvtHqosSchedEgrPolicyName, prvtHqosSchedEgrVirtName }
+    ::= { prvtHqosSchedEgrVirtTable 1 }
+
+PrvtHqosSchedEgrVirtEntry ::= SEQUENCE {
+    prvtHqosSchedEgrVirtName        PrvtHqosNamedItem,
+    prvtHqosSchedEgrVirtRowStatus   RowStatus,
+    prvtHqosSchedEgrVirtDescr       PrvtHqosDescrType,
+    prvtHqosSchedEgrVirtParent      PrvtHqosNamedItem,
+    prvtHqosSchedEgrVirtLevel       PrvtHqosLevel,
+    prvtHqosSchedEgrVirtWfqProfile  PrvtHqosServSchedWfqIdType,
+    prvtHqosSchedEgrVirtShaper      PrvtHqosL2ShaperId
+}
+
+prvtHqosSchedEgrVirtName OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a virtual scheduler belonging to an egress service policy."
+    ::= { prvtHqosSchedEgrVirtEntry 1 }
+
+prvtHqosSchedEgrVirtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this egress virtual scheduler."
+    ::= { prvtHqosSchedEgrVirtEntry 2 }
+
+prvtHqosSchedEgrVirtDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the egress virtual scheduler."
+    ::= { prvtHqosSchedEgrVirtEntry 3 }
+
+prvtHqosSchedEgrVirtParent OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The scheduler to which this scheduler would be feeding to.
+         Must be set to the prvtHqosSchedEgrRootName of an entry in prvtHqosSchedEgrRootTable
+         that has the same prvtHqosSchedEgrPolicyName."
+    ::= { prvtHqosSchedEgrVirtEntry 4 }
+
+prvtHqosSchedEgrVirtLevel OBJECT-TYPE
+    SYNTAX      PrvtHqosLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The priority level of the scheduler."
+    ::= { prvtHqosSchedEgrVirtEntry 5 }
+
+prvtHqosSchedEgrVirtWfqProfile OBJECT-TYPE
+    SYNTAX      PrvtHqosServSchedWfqIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WFQ profile number for this scheduler.
+         Must be set to the prvtHqosWfqSchedEgrPrfId of an entry in prvtHqosWfqSchedEgrPrfTable."
+    ::= { prvtHqosSchedEgrVirtEntry 6 }
+
+prvtHqosSchedEgrVirtShaper OBJECT-TYPE
+    SYNTAX      PrvtHqosL2ShaperId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaping profile applied to this scheduler.
+         Must be set to the prvtHqosShaperL2EgrPrfId of an entry in prvtHqosShaperL2EgrPrfTable."
+    ::= { prvtHqosSchedEgrVirtEntry 7 }
+
+prvtHqosSchedEgrRootTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosSchedEgrRootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Egress Root Scheduler Table
+         Each entry in this table defines an egress root scheduler.
+         A maximum of 2 entries may be created per policy (prvtHqosSchedEgrPolicyName)."
+    ::= { schedObjects 6 }
+
+prvtHqosSchedEgrRootEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosSchedEgrRootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosSchedEgrRootTable."
+    INDEX       { prvtHqosSchedEgrPolicyName, prvtHqosSchedEgrRootName }
+    ::= { prvtHqosSchedEgrRootTable 1 }
+
+PrvtHqosSchedEgrRootEntry ::= SEQUENCE {
+    prvtHqosSchedEgrRootName        PrvtHqosNamedItem,
+    prvtHqosSchedEgrRootRowStatus   RowStatus,
+    prvtHqosSchedEgrRootDescr       PrvtHqosDescrType,
+    prvtHqosSchedEgrRootLevel       PrvtHqosLevel,
+    prvtHqosSchedEgrRootShaper      PrvtHqosL1ShaperId
+}
+
+prvtHqosSchedEgrRootName OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an egress root scheduler belonging to an egress service policy."
+    ::= { prvtHqosSchedEgrRootEntry 1 }
+
+prvtHqosSchedEgrRootRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this egress root scheduler."
+    ::= { prvtHqosSchedEgrRootEntry 2 }
+
+prvtHqosSchedEgrRootDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the egress root scheduler."
+    ::= { prvtHqosSchedEgrRootEntry 3 }
+
+prvtHqosSchedEgrRootLevel OBJECT-TYPE
+    SYNTAX      PrvtHqosLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The priority level of the egress root scheduler."
+    ::= { prvtHqosSchedEgrRootEntry 4 }
+
+prvtHqosSchedEgrRootShaper OBJECT-TYPE
+    SYNTAX      PrvtHqosL1ShaperId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaping profile applied to the egress root scheduler.
+         Must be set to the prvtHqosShaperL1EgrPrfId of an entry in prvtHqosShaperL1EgrPrfTable."
+    ::= { prvtHqosSchedEgrRootEntry 5 }
+
+wredObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 6 }
+
+prvtHqosWredPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosWredPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "WRED Profile Table
+         Each entry in this table defines a WRED profile."
+    ::= { wredObjects 1 }
+
+prvtHqosWredPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosWredPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosWredPrfTable."
+    INDEX       { prvtHqosWredPrfId }
+    ::= { prvtHqosWredPrfTable 1 }
+
+PrvtHqosWredPrfEntry ::= SEQUENCE {
+    prvtHqosWredPrfId                   PrvtHqosWredIdType,
+    prvtHqosWredPrfRowStatus            RowStatus,
+    prvtHqosWredPrfDescr                PrvtHqosDescrType,
+    prvtHqosWredPrfGreenMinAverage      PrvtHqosWredMinValue,
+    prvtHqosWredPrfGreenMaxAverage      PrvtHqosWredMaxValue,
+    prvtHqosWredPrfGreenProbability     PrvtHqosWredProbValue,
+    prvtHqosWredPrfYellowMinAverage     PrvtHqosWredMinValue,
+    prvtHqosWredPrfYellowMaxAverage     PrvtHqosWredMaxValue,
+    prvtHqosWredPrfYellowProbability    PrvtHqosWredProbValue
+}
+
+prvtHqosWredPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosWredIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a WRED profile."
+    ::= { prvtHqosWredPrfEntry 1 }
+
+prvtHqosWredPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this WRED profile."
+    ::= { prvtHqosWredPrfEntry 2 }
+
+prvtHqosWredPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the WRED profile."
+    ::= { prvtHqosWredPrfEntry 3 }
+
+prvtHqosWredPrfGreenMinAverage OBJECT-TYPE
+    SYNTAX      PrvtHqosWredMinValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Drop start threshold for the green traffic in kilobytes."
+    ::= { prvtHqosWredPrfEntry 4 }
+
+prvtHqosWredPrfGreenMaxAverage OBJECT-TYPE
+    SYNTAX      PrvtHqosWredMaxValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Absolute drop threshold for the green traffic in kilobytes."
+    ::= { prvtHqosWredPrfEntry 5 }
+
+prvtHqosWredPrfGreenProbability OBJECT-TYPE
+    SYNTAX      PrvtHqosWredProbValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Drop probability slope for the green traffic."
+    ::= { prvtHqosWredPrfEntry 6 }
+
+prvtHqosWredPrfYellowMinAverage OBJECT-TYPE
+    SYNTAX      PrvtHqosWredMinValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Drop start threshold for the yellow traffic in kilobytes."
+    ::= { prvtHqosWredPrfEntry 7 }
+
+prvtHqosWredPrfYellowMaxAverage OBJECT-TYPE
+    SYNTAX      PrvtHqosWredMaxValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Absolute drop threshold for the yellow traffic in kilobytes."
+    ::= { prvtHqosWredPrfEntry 8 }
+
+prvtHqosWredPrfYellowProbability OBJECT-TYPE
+    SYNTAX      PrvtHqosWredProbValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Drop probability slope for the yellow traffic."
+    ::= { prvtHqosWredPrfEntry 9 }
+
+shaperObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 7 }
+
+prvtHqosShaperL1IngPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosShaperL1IngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Root(L1) Scheduler Shaper Ingress Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on an ingress root scheduler."
+    ::= { shaperObjects 1 }
+
+prvtHqosShaperL1IngPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosShaperL1IngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosShaperL1IngPrfTable."
+    INDEX       { prvtHqosShaperL1IngPrfId }
+    ::= { prvtHqosShaperL1IngPrfTable 1 }
+
+PrvtHqosShaperL1IngPrfEntry ::= SEQUENCE {
+    prvtHqosShaperL1IngPrfId            PrvtHqosL1ShaperId,
+    prvtHqosShaperL1IngPrfRowStatus     RowStatus,
+    prvtHqosShaperL1IngPrfCIR           PrvtHqosRateValueL1,
+    prvtHqosShaperL1IngPrfPIR           PrvtHqosRateValueL1,
+    prvtHqosShaperL1IngPrfCBS           PrvtHqosBurstValueL1,
+    prvtHqosShaperL1IngPrfPBS           PrvtHqosBurstValueL1,
+    prvtHqosShaperL1IngPrfDescr         PrvtHqosDescrType
+}
+
+prvtHqosShaperL1IngPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosL1ShaperId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a root scheduler shaper ingress profile."
+    ::= { prvtHqosShaperL1IngPrfEntry 1 }
+
+prvtHqosShaperL1IngPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this shaper profile."
+    ::= { prvtHqosShaperL1IngPrfEntry 2 }
+
+prvtHqosShaperL1IngPrfCIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed information rate in kbps."
+    ::= { prvtHqosShaperL1IngPrfEntry 3 }
+
+prvtHqosShaperL1IngPrfPIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peak information rate allowed in kbps."
+    ::= { prvtHqosShaperL1IngPrfEntry 4 }
+
+prvtHqosShaperL1IngPrfCBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL1IngPrfEntry 5 }
+
+prvtHqosShaperL1IngPrfPBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL1IngPrfEntry 6 }
+
+prvtHqosShaperL1IngPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the shaper profile."
+    ::= { prvtHqosShaperL1IngPrfEntry 7 }
+
+prvtHqosShaperL1EgrPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosShaperL1EgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Root(L1) Scheduler Shaper Egress Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on an egress root scheduler."
+    ::= { shaperObjects 2 }
+
+prvtHqosShaperL1EgrPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosShaperL1EgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosShaperL1EgrPrfTable."
+    INDEX       { prvtHqosShaperL1EgrPrfId }
+    ::= { prvtHqosShaperL1EgrPrfTable 1 }
+
+PrvtHqosShaperL1EgrPrfEntry ::= SEQUENCE {
+    prvtHqosShaperL1EgrPrfId            PrvtHqosL1ShaperId,
+    prvtHqosShaperL1EgrPrfRowStatus     RowStatus,
+    prvtHqosShaperL1EgrPrfCIR           PrvtHqosRateValueL1,
+    prvtHqosShaperL1EgrPrfPIR           PrvtHqosRateValueL1,
+    prvtHqosShaperL1EgrPrfCBS           PrvtHqosBurstValueL1,
+    prvtHqosShaperL1EgrPrfPBS           PrvtHqosBurstValueL1,
+    prvtHqosShaperL1EgrPrfDescr         PrvtHqosDescrType
+}
+
+prvtHqosShaperL1EgrPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosL1ShaperId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a root scheduler shaper egress profile."
+    ::= { prvtHqosShaperL1EgrPrfEntry 1 }
+
+prvtHqosShaperL1EgrPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this shaper profile."
+    ::= { prvtHqosShaperL1EgrPrfEntry 2 }
+
+prvtHqosShaperL1EgrPrfCIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed information rate in kbps."
+    ::= { prvtHqosShaperL1EgrPrfEntry 3 }
+
+prvtHqosShaperL1EgrPrfPIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peak information rate allowed in kbps."
+    ::= { prvtHqosShaperL1EgrPrfEntry 4 }
+
+prvtHqosShaperL1EgrPrfCBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL1EgrPrfEntry 5 }
+
+prvtHqosShaperL1EgrPrfPBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL1
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL1EgrPrfEntry 6 }
+
+prvtHqosShaperL1EgrPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the shaper profile."
+    ::= { prvtHqosShaperL1EgrPrfEntry 7 }
+
+prvtHqosShaperL2IngPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosShaperL2IngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "(L2) Scheduler Shaper Ingress Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on an ingress L2 scheduler."
+    ::= { shaperObjects 3 }
+
+prvtHqosShaperL2IngPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosShaperL2IngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosShaperL2IngPrfTable."
+    INDEX       { prvtHqosShaperL2IngPrfId }
+    ::= { prvtHqosShaperL2IngPrfTable 1 }
+
+PrvtHqosShaperL2IngPrfEntry ::= SEQUENCE {
+    prvtHqosShaperL2IngPrfId            PrvtHqosL2ShaperId,
+    prvtHqosShaperL2IngPrfRowStatus     RowStatus,
+    prvtHqosShaperL2IngPrfCIR           PrvtHqosRateValueL2,
+    prvtHqosShaperL2IngPrfPIR           PrvtHqosRateValueL2,
+    prvtHqosShaperL2IngPrfCBS           PrvtHqosBurstValueL2,
+    prvtHqosShaperL2IngPrfPBS           PrvtHqosBurstValueL2,
+    prvtHqosShaperL2IngPrfDescr         PrvtHqosDescrType
+}
+
+prvtHqosShaperL2IngPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosL2ShaperId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a L2 scheduler shaper ingress profile."
+    ::= { prvtHqosShaperL2IngPrfEntry 1 }
+
+prvtHqosShaperL2IngPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this shaper profile."
+    ::= { prvtHqosShaperL2IngPrfEntry 2 }
+
+prvtHqosShaperL2IngPrfCIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed information rate in kbps."
+    ::= { prvtHqosShaperL2IngPrfEntry 3 }
+
+prvtHqosShaperL2IngPrfPIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peak information rate allowed in kbps."
+    ::= { prvtHqosShaperL2IngPrfEntry 4 }
+
+prvtHqosShaperL2IngPrfCBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL2IngPrfEntry 5 }
+
+prvtHqosShaperL2IngPrfPBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL2IngPrfEntry 6 }
+
+prvtHqosShaperL2IngPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the profile."
+    ::= { prvtHqosShaperL2IngPrfEntry 7 }
+
+prvtHqosShaperL2EgrPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosShaperL2EgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "(L2) Scheduler Shaper Egress Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on an egress L2 scheduler."
+    ::= { shaperObjects 4 }
+
+prvtHqosShaperL2EgrPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosShaperL2EgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosShaperL2EgrPrfTable."
+    INDEX       { prvtHqosShaperL2EgrPrfId }
+    ::= { prvtHqosShaperL2EgrPrfTable 1 }
+
+PrvtHqosShaperL2EgrPrfEntry ::= SEQUENCE {
+    prvtHqosShaperL2EgrPrfId            PrvtHqosL2ShaperId,
+    prvtHqosShaperL2EgrPrfRowStatus     RowStatus,
+    prvtHqosShaperL2EgrPrfCIR           PrvtHqosRateValueL2,
+    prvtHqosShaperL2EgrPrfPIR           PrvtHqosRateValueL2,
+    prvtHqosShaperL2EgrPrfCBS           PrvtHqosBurstValueL2,
+    prvtHqosShaperL2EgrPrfPBS           PrvtHqosBurstValueL2,
+    prvtHqosShaperL2EgrPrfDescr         PrvtHqosDescrType
+}
+
+prvtHqosShaperL2EgrPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosL2ShaperId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a L2 scheduler shaper egress profile."
+    ::= { prvtHqosShaperL2EgrPrfEntry 1 }
+
+prvtHqosShaperL2EgrPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this shaper profile."
+    ::= { prvtHqosShaperL2EgrPrfEntry 2 }
+
+prvtHqosShaperL2EgrPrfCIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed information rate in kbps."
+    ::= { prvtHqosShaperL2EgrPrfEntry 3 }
+
+prvtHqosShaperL2EgrPrfPIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peak information rate allowed in kbps."
+    ::= { prvtHqosShaperL2EgrPrfEntry 4 }
+
+prvtHqosShaperL2EgrPrfCBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL2EgrPrfEntry 5 }
+
+prvtHqosShaperL2EgrPrfPBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueL2
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum burst size allowed in kilobytes."
+    ::= { prvtHqosShaperL2EgrPrfEntry 6 }
+
+prvtHqosShaperL2EgrPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the shaper profile."
+    ::= { prvtHqosShaperL2EgrPrfEntry 7 }
+
+prvtHqosShaperNetPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosShaperNetPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Shaper Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on a network scheduler."
+    ::= { shaperObjects 5 }
+
+prvtHqosShaperNetPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosShaperNetPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosShaperNetPrfTable."
+    INDEX       { prvtHqosShaperNetPrfId }
+    ::= { prvtHqosShaperNetPrfTable 1 }
+
+PrvtHqosShaperNetPrfEntry ::= SEQUENCE {
+    prvtHqosShaperNetPrfId          PrvtHqosNetShaperId,
+    prvtHqosShaperNetPrfRowStatus   RowStatus,
+    prvtHqosShaperNetPrfCIR         PrvtHqosRateValueNet,
+    prvtHqosShaperNetPrfPIR         PrvtHqosRateValueNet,
+    prvtHqosShaperNetPrfCBS         PrvtHqosBurstValueNet,
+    prvtHqosShaperNetPrfPBS         PrvtHqosBurstValueNet,
+    prvtHqosShaperNetPrfDescr       PrvtHqosDescrType
+}
+
+prvtHqosShaperNetPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosNetShaperId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a network scheduler shaper profile."
+    ::= { prvtHqosShaperNetPrfEntry 1 }
+
+prvtHqosShaperNetPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this shaper profile."
+    ::= { prvtHqosShaperNetPrfEntry 2 }
+
+prvtHqosShaperNetPrfCIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed information rate in kbps."
+    ::= { prvtHqosShaperNetPrfEntry 3 }
+
+prvtHqosShaperNetPrfPIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peak information rate allowed in kbps."
+    ::= { prvtHqosShaperNetPrfEntry 4 }
+
+prvtHqosShaperNetPrfCBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed burst size allowed in kilobytes."
+    ::= { prvtHqosShaperNetPrfEntry 5 }
+
+prvtHqosShaperNetPrfPBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum burst size allowed in kilobytes."
+    ::= { prvtHqosShaperNetPrfEntry 6 }
+
+prvtHqosShaperNetPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the shaper profile."
+    ::= { prvtHqosShaperNetPrfEntry 7 }
+
+prvtHqosShaperIfPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosShaperIfPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface Shaper Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on an interface."
+    ::= { shaperObjects 6 }
+
+prvtHqosShaperIfPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosShaperIfPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosShaperIfPrfTable."
+    INDEX       { prvtHqosShaperIfPrfId }
+    ::= { prvtHqosShaperIfPrfTable 1 }
+
+PrvtHqosShaperIfPrfEntry ::= SEQUENCE {
+    prvtHqosShaperIfPrfId           PrvtHqosIfShaperId,
+    prvtHqosShaperIfPrfRowStatus    RowStatus,
+    prvtHqosShaperIfPrfCIR          PrvtHqosRateValueNet,
+    prvtHqosShaperIfPrfPIR          PrvtHqosRateValueNet,
+    prvtHqosShaperIfPrfCBS          PrvtHqosBurstValueIntf,
+    prvtHqosShaperIfPrfPBS          PrvtHqosBurstValueIntf,
+    prvtHqosShaperIfPrfDescr        PrvtHqosDescrType
+}
+
+prvtHqosShaperIfPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosIfShaperId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an interface shaper profile."
+    ::= { prvtHqosShaperIfPrfEntry 1 }
+
+prvtHqosShaperIfPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this interface shaper profile."
+    ::= { prvtHqosShaperIfPrfEntry 2 }
+
+prvtHqosShaperIfPrfCIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed information rate in kbps."
+    ::= { prvtHqosShaperIfPrfEntry 3 }
+
+prvtHqosShaperIfPrfPIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peak information rate allowed in kbps."
+    ::= { prvtHqosShaperIfPrfEntry 4 }
+
+prvtHqosShaperIfPrfCBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueIntf
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed burst size allowed in kilobytes."
+    ::= { prvtHqosShaperIfPrfEntry 5 }
+
+prvtHqosShaperIfPrfPBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueIntf
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum burst size allowed in kilobytes."
+    ::= { prvtHqosShaperIfPrfEntry 6 }
+
+prvtHqosShaperIfPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the shaper profile."
+    ::= { prvtHqosShaperIfPrfEntry 7 }
+
+wfqObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 8 }
+
+prvtHqosWfqSvcIngPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosWfqSvcIngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress WFQ Profile Table
+         Each entry in this table defines a service ingress WFQ profile."
+    ::= { wfqObjects 1 }
+
+prvtHqosWfqSvcIngPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosWfqSvcIngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosWfqSvcIngPrfTable."
+    INDEX       { prvtHqosWfqSvcIngPrfId }
+    ::= { prvtHqosWfqSvcIngPrfTable 1 }
+
+PrvtHqosWfqSvcIngPrfEntry ::= SEQUENCE {
+    prvtHqosWfqSvcIngPrfId          PrvtHqosServWfqIdType,
+    prvtHqosWfqSvcIngPrfRowStatus   RowStatus,
+    prvtHqosWfqSvcIngPrfCirWeight   PrvtHqosWeight,
+    prvtHqosWfqSvcIngPrfDescr       PrvtHqosDescrType
+}
+
+prvtHqosWfqSvcIngPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosServWfqIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an ingress WFQ service profile."
+    ::= { prvtHqosWfqSvcIngPrfEntry 1 }
+
+prvtHqosWfqSvcIngPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this ingress WFQ service profile."
+    ::= { prvtHqosWfqSvcIngPrfEntry 2 }
+
+prvtHqosWfqSvcIngPrfCirWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative weight for the packets where the WFQ service profile
+         is applied."
+    ::= { prvtHqosWfqSvcIngPrfEntry 3 }
+
+prvtHqosWfqSvcIngPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the WFQ service profile."
+    ::= { prvtHqosWfqSvcIngPrfEntry 4 }
+
+prvtHqosWfqSvcEgrPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosWfqSvcEgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service WFQ Egress Profile Table
+         Each entry in this table defines a service egress WFQ profile."
+    ::= { wfqObjects 2 }
+
+prvtHqosWfqSvcEgrPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosWfqSvcEgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosWfqSvcEgrPrfTable."
+    INDEX       { prvtHqosWfqSvcEgrPrfId }
+    ::= { prvtHqosWfqSvcEgrPrfTable 1 }
+
+PrvtHqosWfqSvcEgrPrfEntry ::= SEQUENCE {
+    prvtHqosWfqSvcEgrPrfId          PrvtHqosServWfqIdType,
+    prvtHqosWfqSvcEgrPrfRowStatus   RowStatus,
+    prvtHqosWfqSvcEgrPrfCirWeight   PrvtHqosWeight,
+    prvtHqosWfqSvcEgrPrfDescr       PrvtHqosDescrType
+}
+
+prvtHqosWfqSvcEgrPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosServWfqIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an egress WFQ service profile."
+    ::= { prvtHqosWfqSvcEgrPrfEntry 1 }
+
+prvtHqosWfqSvcEgrPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this egress WFQ service profile."
+    ::= { prvtHqosWfqSvcEgrPrfEntry 2 }
+
+prvtHqosWfqSvcEgrPrfCirWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative weight for the packets where the WFQ service profile
+         is applied."
+    ::= { prvtHqosWfqSvcEgrPrfEntry 3 }
+
+prvtHqosWfqSvcEgrPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the WFQ service profile."
+    ::= { prvtHqosWfqSvcEgrPrfEntry 4 }
+
+prvtHqosWfqSchedIngPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosWfqSchedIngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Scheduler Ingress WFQ Profile Table
+         Each entry in this table defines a scheduler ingress WFQ profile.
+         A maximum of 16 entries may be created."
+    ::= { wfqObjects 3 }
+
+prvtHqosWfqSchedIngPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosWfqSchedIngPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosWfqSchedIngPrfTable."
+    INDEX       { prvtHqosWfqSchedIngPrfId }
+    ::= { prvtHqosWfqSchedIngPrfTable 1 }
+
+PrvtHqosWfqSchedIngPrfEntry ::= SEQUENCE {
+    prvtHqosWfqSchedIngPrfId            PrvtHqosServSchedWfqIdType,
+    prvtHqosWfqSchedIngPrfRowStatus     RowStatus,
+    prvtHqosWfqSchedIngPrfWeight        PrvtHqosWeight,
+    prvtHqosWfqSchedIngPrfCirWeight     PrvtHqosWeight,
+    prvtHqosWfqSchedIngPrfDescr         PrvtHqosDescrType
+}
+
+prvtHqosWfqSchedIngPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosServSchedWfqIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an ingress WFQ scheduler profile."
+    ::= { prvtHqosWfqSchedIngPrfEntry 1 }
+
+prvtHqosWfqSchedIngPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this ingress WFQ scheduler profile."
+    ::= { prvtHqosWfqSchedIngPrfEntry 2 }
+
+prvtHqosWfqSchedIngPrfWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative weight for the packets where the WFQ scheduler profile
+         is applied."
+    ::= { prvtHqosWfqSchedIngPrfEntry 3 }
+
+prvtHqosWfqSchedIngPrfCirWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative CIR weight for the packets where the WFQ scheduler profile
+         is applied."
+    ::= { prvtHqosWfqSchedIngPrfEntry 4 }
+
+prvtHqosWfqSchedIngPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the WFQ scheduler profile."
+    ::= { prvtHqosWfqSchedIngPrfEntry 5 }
+
+prvtHqosWfqSchedEgrPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosWfqSchedEgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Scheduler Egress WFQ Profile Table
+         Each entry in this table defines a scheduler egress WFQ profile.
+         A maximum of 16 entries may be created."
+    ::= { wfqObjects 4 }
+
+prvtHqosWfqSchedEgrPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosWfqSchedEgrPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosWfqSchedEgrPrfTable."
+    INDEX       { prvtHqosWfqSchedEgrPrfId }
+    ::= { prvtHqosWfqSchedEgrPrfTable 1 }
+
+PrvtHqosWfqSchedEgrPrfEntry ::= SEQUENCE {
+    prvtHqosWfqSchedEgrPrfId            PrvtHqosServSchedWfqIdType,
+    prvtHqosWfqSchedEgrPrfRowStatus     RowStatus,
+    prvtHqosWfqSchedEgrPrfWeight        PrvtHqosWeight,
+    prvtHqosWfqSchedEgrPrfCirWeight     PrvtHqosWeight,
+    prvtHqosWfqSchedEgrPrfDescr         PrvtHqosDescrType
+}
+
+prvtHqosWfqSchedEgrPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosServSchedWfqIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an egress WFQ scheduler profile."
+    ::= { prvtHqosWfqSchedEgrPrfEntry 1 }
+
+prvtHqosWfqSchedEgrPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this egress WFQ scheduler profile."
+    ::= { prvtHqosWfqSchedEgrPrfEntry 2 }
+
+prvtHqosWfqSchedEgrPrfWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative weight for the packets where the WFQ scheduler profile
+         is applied."
+    ::= { prvtHqosWfqSchedEgrPrfEntry 3 }
+
+prvtHqosWfqSchedEgrPrfCirWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative CIR weight for the packets where the WFQ scheduler profile
+         is applied."
+    ::= { prvtHqosWfqSchedEgrPrfEntry 4 }
+
+prvtHqosWfqSchedEgrPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the WFQ scheduler profile."
+    ::= { prvtHqosWfqSchedEgrPrfEntry 5 }
+
+prvtHqosWfqNetworkPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosWfqNetworkPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network WFQ Profile Table
+         Each entry in this table defines a network WFQ profile.
+         A maximum of 16 entries may be created."
+    ::= { wfqObjects 5 }
+
+prvtHqosWfqNetworkPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosWfqNetworkPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosWfqNetworkPrfTable."
+    INDEX       { prvtHqosWfqNetworkPrfId }
+    ::= { prvtHqosWfqNetworkPrfTable 1 }
+
+PrvtHqosWfqNetworkPrfEntry ::= SEQUENCE {
+    prvtHqosWfqNetworkPrfId         PrvtHqosNetWfqIdType,
+    prvtHqosWfqNetworkPrfRowStatus  RowStatus,
+    prvtHqosWfqNetworkPrfWeight     PrvtHqosWeight,
+    prvtHqosWfqNetworkPrfCirWeight  PrvtHqosWeight,
+    prvtHqosWfqNetworkPrfDescr      PrvtHqosDescrType
+}
+
+prvtHqosWfqNetworkPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosNetWfqIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a WFQ network profile."
+    ::= { prvtHqosWfqNetworkPrfEntry 1 }
+
+prvtHqosWfqNetworkPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this WFQ network profile."
+    ::= { prvtHqosWfqNetworkPrfEntry 2 }
+
+prvtHqosWfqNetworkPrfWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative weight for the packets where the WFQ network profile
+         is applied."
+    ::= { prvtHqosWfqNetworkPrfEntry 3 }
+
+prvtHqosWfqNetworkPrfCirWeight OBJECT-TYPE
+    SYNTAX      PrvtHqosWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The relative CIR weight for the packets where the WFQ network profile
+         is applied."
+    ::= { prvtHqosWfqNetworkPrfEntry 4 }
+
+prvtHqosWfqNetworkPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the WFQ network profile."
+    ::= { prvtHqosWfqNetworkPrfEntry 5 }
+
+ifObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 9 }
+
+prvtHqosIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "HQOS Interface Table
+         Contains HQOS specific information regarding an interface (port)."
+    ::= { ifObjects 1 }
+
+prvtHqosIfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosIfTable."
+    INDEX       { ifIndex }
+    ::= { prvtHqosIfTable 1 }
+
+PrvtHqosIfEntry ::= SEQUENCE {
+    prvtHqosIfRowStatus             RowStatus,
+    prvtHqosIfNetworkPolicy         PrvtHqosNetPolNameOrNoneType,
+    prvtHqosIfNetQueueEgrPolicy     PrvtHqosNamedItemOrNone,
+    prvtHqosIfShaperProfile         PrvtHqosIfShaperIdOrNone
+}
+
+prvtHqosIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this port."
+    ::= { prvtHqosIfEntry 1 }
+
+prvtHqosIfNetworkPolicy OBJECT-TYPE
+    SYNTAX      PrvtHqosNetPolNameOrNoneType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The network policy applied to the port.
+         Must be set to a zero length string or to the prvtHqosNetPolicyName of an entry
+         in prvtHqosNetPolicyTable.
+         A zero length string represents that no network policy is applied to the
+         port."
+    ::= { prvtHqosIfEntry 2 }
+
+prvtHqosIfNetQueueEgrPolicy OBJECT-TYPE
+    SYNTAX      PrvtHqosNamedItemOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The network egress queue policy applied to the port.
+         Must be set to a zero length string or to the prvtHqosNetQPolicyName of an entry
+         in prvtHqosNetQPolicyTable.
+         A zero length string represents that no network egress queue policy is
+         applied to the port."
+    ::= { prvtHqosIfEntry 3 }
+
+prvtHqosIfShaperProfile OBJECT-TYPE
+    SYNTAX      PrvtHqosIfShaperIdOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaper profile applied to the port.
+         Must be set to a value of zero or to the prvtHqosShaperIfPrfId of an entry
+         in prvtHqosShaperIfPrfTable.
+         The value of zero indicates that no shaper profile is applied to the port."
+    ::= { prvtHqosIfEntry 4 }
+
+policerObjects OBJECT IDENTIFIER
+    ::= { hqosMIBObjects 10 }
+
+prvtHqosPolicerSvcPrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtHqosPolicerSvcPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Policer Profile Table
+         Each entry in this table defines a service policer profile."
+    ::= { policerObjects 1 }
+
+prvtHqosPolicerSvcPrfEntry OBJECT-TYPE
+    SYNTAX      PrvtHqosPolicerSvcPrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry belonging to prvtHqosPolicerSvcPrfTable."
+    INDEX       { prvtHqosPolicerSvcPrfId }
+    ::= { prvtHqosPolicerSvcPrfTable 1 }
+
+PrvtHqosPolicerSvcPrfEntry ::= SEQUENCE {
+    prvtHqosPolicerSvcPrfId         PrvtHqosPolicerIdType,
+    prvtHqosPolicerSvcPrfRowStatus  RowStatus,
+    prvtHqosPolicerSvcPrfCIR        PrvtHqosRateValueNet,
+    prvtHqosPolicerSvcPrfPIR        PrvtHqosRateValueNet,
+    prvtHqosPolicerSvcPrfCBS        PrvtHqosBurstValueIntf,
+    prvtHqosPolicerSvcPrfPBS        PrvtHqosBurstValueIntf,
+    prvtHqosPolicerSvcPrfDescr      PrvtHqosDescrType
+}
+
+prvtHqosPolicerSvcPrfId OBJECT-TYPE
+    SYNTAX      PrvtHqosPolicerIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a service policer profile."
+    ::= { prvtHqosPolicerSvcPrfEntry 1 }
+
+prvtHqosPolicerSvcPrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service policer profile."
+    ::= { prvtHqosPolicerSvcPrfEntry 2 }
+
+prvtHqosPolicerSvcPrfCIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed information rate in kbps."
+    ::= { prvtHqosPolicerSvcPrfEntry 3 }
+
+prvtHqosPolicerSvcPrfPIR OBJECT-TYPE
+    SYNTAX      PrvtHqosRateValueNet
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The peak information rate allowed in kbps."
+    ::= { prvtHqosPolicerSvcPrfEntry 4 }
+
+prvtHqosPolicerSvcPrfCBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueIntf
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The committed burst size allowed in kilobytes."
+    ::= { prvtHqosPolicerSvcPrfEntry 5 }
+
+prvtHqosPolicerSvcPrfPBS OBJECT-TYPE
+    SYNTAX      PrvtHqosBurstValueIntf
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum burst size allowed in kilobytes."
+    ::= { prvtHqosPolicerSvcPrfEntry 6 }
+
+prvtHqosPolicerSvcPrfDescr OBJECT-TYPE
+    SYNTAX      PrvtHqosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-defined description for the service policer profile."
+    ::= { prvtHqosPolicerSvcPrfEntry 7 }
+
+END -- end of module PRVT-HQOS-MIB.

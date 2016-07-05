@@ -1,0 +1,484 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename:   PRVT-MPLS-IF-MIB.mib
+-- ** Project:    T-Metro Switches.
+-- ** Purpose:    Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications.  All rights reserved.
+--                             WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information.  This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM.  Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+--
+PRVT-MPLS-IF-MIB DEFINITIONS ::= BEGIN
+
+
+  IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,Integer32, Unsigned32
+         FROM SNMPv2-SMI  
+    TEXTUAL-CONVENTION, RowStatus, TruthValue                FROM SNMPv2-TC       
+  ifIndex,ifEntry
+        FROM IF-MIB
+	InetAddress            FROM INET-ADDRESS-MIB
+ 	mpls				 		FROM PRVT-CR-LDP-MIB;
+   
+ 		
+  prvtMPLSIfMib MODULE-IDENTITY
+        LAST-UPDATED "200801010000Z"
+        ORGANIZATION "BATM Advanced Communication"
+        CONTACT-INFO
+        " BATM/Telco Systems Support team
+				Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+
+        DESCRIPTION
+        "This module includes configuration parameters for MPLS and RSVP interface specific parameters."
+
+        -- revision history
+         REVISION     "200801010000Z"
+     	 DESCRIPTION
+		"Removed redefined OIDs in private vendor extension definitions." 
+        REVISION     "200701230000Z"
+     	 DESCRIPTION
+		"Changed ifaceRsvpHelloTolerance, ifaceRsvpHelloPersist to Unsigned32." 
+        REVISION     "200606270000Z"
+     	 DESCRIPTION
+		"Changes the ingress and egress label ranges." 
+		REVISION     "200601080000Z"
+     	 DESCRIPTION
+		"Added the global label space object and changed augmentation to ifTable."    
+        REVISION     "200511110000Z"
+     	 DESCRIPTION
+		"Initial version."             
+		
+        ::= { mpls 6 }
+
+
+   	-- --------------------------------------------------------------------
+	--      PRVT-MPLS-MIB organisation
+	-- --------------------------------------------------------------------
+
+	prvtMPLSIfaceObjs            OBJECT IDENTIFIER ::= { prvtMPLSIfMib 1}
+	prvtMPLSRouteObjs            OBJECT IDENTIFIER ::= { prvtMPLSIfMib 2}
+
+       
+    -- -----------------------------------------------------------------------------
+    -- Interface objects 
+    -- -----------------------------------------------------------------------------
+    prvtMplsIfaceTable 	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PrvtMplsIfaceEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+            "This table contains object for configuring MPLS and LDP interface specific parameters."
+		::= { prvtMPLSIfaceObjs 1 }
+
+    prvtMplsIfaceEntry 	OBJECT-TYPE
+		SYNTAX	PrvtMplsIfaceEntry		
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		    "The MPLS/LDP configuration of an IP interface."
+        INDEX { ifIndex }
+     		::= { prvtMplsIfaceTable 1 }
+
+    PrvtMplsIfaceEntry ::= SEQUENCE {
+        ifaceMplsEnable       			TruthValue,
+        ifaceMplsPHPEnable       		TruthValue, 
+        ifaceMplsIngressLblRangeLow		Integer32,
+        ifaceMplsIngressLblRangeHigh	Integer32, 
+        ifaceMplsEgressLblRangeLow		Integer32,
+        ifaceMplsEgressLblRangeHigh		Integer32, 
+        ifaceMplsLdpHelloHoldTimer		Integer32, 
+        ifaceMplsLdpKeepaliveHoldTimer	Integer32,
+        ifaceMplsLdpUseGlobalLabelSpace	TruthValue
+    }
+
+    ifaceMplsEnable OBJECT-TYPE
+        SYNTAX  TruthValue
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "Enable or disable MPLS on this interface."
+		::= { prvtMplsIfaceEntry 1 }
+
+    ifaceMplsPHPEnable OBJECT-TYPE
+        SYNTAX  TruthValue
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "Enable or disable Penultimate Hop Popping on this interface."
+		::= { prvtMplsIfaceEntry 2 }
+
+    ifaceMplsIngressLblRangeLow OBJECT-TYPE
+        SYNTAX  Integer32 (32768..131071)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "This is the lower border of the Ingress Lable Range for this interface."
+		::= { prvtMplsIfaceEntry 3 }
+  
+	 ifaceMplsIngressLblRangeHigh OBJECT-TYPE
+        SYNTAX  Integer32 (32768..131071)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "This is the higher border of the Ingress Lable Range for this interface."
+		::= { prvtMplsIfaceEntry 4 } 
+		
+	ifaceMplsEgressLblRangeLow OBJECT-TYPE
+        SYNTAX  Integer32 (32768..131071)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "This is the lower border of the Egress Lable Range for this interface."
+		::= { prvtMplsIfaceEntry 5 }
+  
+	 ifaceMplsEgressLblRangeHigh OBJECT-TYPE
+        SYNTAX  Integer32 (32768..131071)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "This is the higher border of the Egress Lable Range for this interface."
+		::= { prvtMplsIfaceEntry 6 }
+          
+     ifaceMplsLdpHelloHoldTimer OBJECT-TYPE
+        SYNTAX  Integer32 (1..65535)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "LDP Hello Hold Time."
+		::= { prvtMplsIfaceEntry 7 }
+     
+	ifaceMplsLdpKeepaliveHoldTimer OBJECT-TYPE
+        SYNTAX  Integer32 (1..65535)
+		MAX-ACCESS	read-write
+		STATUS	current                                                
+		DESCRIPTION
+            "LDP Hello Keep-alive Time."
+		::= { prvtMplsIfaceEntry 8 }   
+		
+	ifaceMplsLdpUseGlobalLabelSpace OBJECT-TYPE
+        SYNTAX  TruthValue
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "Default value is true and correct value is true."
+		::= { prvtMplsIfaceEntry 9 }
+  
+
+		
+		
+	prvtRsvpIfaceTable 	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PrvtRsvpIfaceEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+            "This table contains object for configuring RSVP interface specific parameters."
+		::= { prvtMPLSIfaceObjs 2 }
+
+    prvtRsvpIfaceEntry 	OBJECT-TYPE
+		SYNTAX	PrvtRsvpIfaceEntry		
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		    "The MPLS/LDP configuration of an IP interface."
+        AUGMENTS { ifEntry }
+     		::= { prvtRsvpIfaceTable 1 }
+
+    PrvtRsvpIfaceEntry ::= SEQUENCE {
+        ifaceRsvpRefreshInterval       	Integer32,
+        ifaceRsvpRefreshMultiple       	Integer32, 
+        ifaceRsvpSlewNumerator			Integer32,
+        ifaceRsvpSlewDenom				Integer32, 
+        ifaceRsvpBlockadeMultiple		Integer32, 
+        ifaceRsvpNotifyRRDecay			Integer32, 
+        ifaceRsvpNotifyRRInterval		Integer32, 
+        ifaceRsvpNotifyRRLimit			Integer32, 
+        ifaceRsvpHelloInterval			Integer32,  
+        ifaceRsvpHelloDecay				Integer32,  
+        ifaceRsvpHelloTolerance			Unsigned32, 
+        ifaceRsvpHelloPersist			Unsigned32, 
+        ifaceRsvpHelloTTL				Integer32
+
+    }
+        
+       ifaceRsvpRefreshInterval OBJECT-TYPE
+        SYNTAX  Integer32 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The RSVP value, R,  which is used to set the average
+     		interval between refresh path and resv messages."
+		::= { prvtRsvpIfaceEntry 1 }
+  
+	 ifaceRsvpRefreshMultiple OBJECT-TYPE
+        SYNTAX  Integer32 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The RSVP value, K, which is the number of unresponded Path
+     	or Resv refresh attempts which must be made, spaced by
+     	the refresh interval before the state is deemed to have
+     	timed out."
+		::= { prvtRsvpIfaceEntry 2} 
+		
+	ifaceRsvpSlewNumerator OBJECT-TYPE
+        SYNTAX  Integer32 (1..214783647)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The numerator of the fraction, SlewMax, which is the maximum
+     		allowable increase in the refresh interval, R, to prevent
+     		state timeout while changing R.  R is increased by this
+     		fraction until it reaches the new desired value."
+		::= { prvtRsvpIfaceEntry 3 }
+  
+	 ifaceRsvpSlewDenom OBJECT-TYPE
+        SYNTAX  Integer32 (1..214783647)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The denominator of the fraction, SlewMax, which is the
+     	maximum allowable increase in the refresh interval, R, to
+     	prevent state timeout while changing R.  R is increased by
+     	this fraction until it reaches the new desired value."
+		::= { prvtRsvpIfaceEntry 4 }     
+		
+	ifaceRsvpBlockadeMultiple OBJECT-TYPE
+        SYNTAX  Integer32 (1..214783647)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The RSVP value, Kb, which is the number of refresh timeout
+     		periods after which blockade state is deleted."
+		::= { prvtRsvpIfaceEntry 5 }
+  
+	 ifaceRsvpNotifyRRDecay OBJECT-TYPE
+        SYNTAX  Integer32    (0..100)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The percentage increase in the rapid retransmission
+     		interval for each consecutive unacknowledged RSVP Notify
+    		 message.  A value of 0 indicates a constant retransmission
+     		rate."
+		::= { prvtRsvpIfaceEntry 6} 
+		
+	ifaceRsvpNotifyRRInterval OBJECT-TYPE
+        SYNTAX  Integer32 (1..214783647)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The interval in milliseconds before a Notify message is
+     		first resent if no acknowledgement is received."
+		::= { prvtRsvpIfaceEntry 7 }
+  
+	 ifaceRsvpNotifyRRLimit OBJECT-TYPE
+        SYNTAX  Integer32 (1..214783647)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The maximum number of times a Notify message is resent if
+     		no acknowledgement is received."
+		::= { prvtRsvpIfaceEntry 8 }
+
+     
+     
+     ifaceRsvpHelloInterval OBJECT-TYPE
+        SYNTAX  Integer32 
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The interval between sending consecutive Hello messages."
+		::= { prvtRsvpIfaceEntry 9 }
+  
+	 ifaceRsvpHelloDecay OBJECT-TYPE
+        SYNTAX  Integer32    (0..100)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "Percentage increase of hello interval after each Hello message
+ 			sent when the hello session with the neighbor has timed out."
+		::= { prvtRsvpIfaceEntry 10} 
+		
+	ifaceRsvpHelloTolerance OBJECT-TYPE
+        SYNTAX  Unsigned32 
+        MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The number of hello periods which may pass without receiving a successful 
+            Hello message from a partner before the Hello session times out."
+		::= { prvtRsvpIfaceEntry 11 }
+  
+	 ifaceRsvpHelloPersist OBJECT-TYPE
+        SYNTAX  Unsigned32 		
+        MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The number of hello periods which may pass after the Hello session times out before Hello messages cease."
+		::= { prvtRsvpIfaceEntry 12 }
+
+     ifaceRsvpHelloTTL OBJECT-TYPE
+        SYNTAX  Integer32 (1..255) 		
+        MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+            "The Time To Live that will be set in the IP header of all Hello packets sent to the neighbor associated with this interface."
+		::= { prvtRsvpIfaceEntry 13 }
+   
+prvtMplsRouteProtocolTable 	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PrvtMplsRouteProtocolEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+            "This table contains for configuring the egress and ingress routes for LDP label
+            packets. It supports all CLI route types - bgp, isis, ospf, rip, static, kernel and 
+            connected."
+		::= { prvtMPLSRouteObjs 1 }
+
+prvtMplsRouteProtocolEntry 	OBJECT-TYPE
+		SYNTAX	PrvtMplsRouteProtocolEntry		
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		    "An entry in the table represents the configuration of a particular route type for ingress
+		    or egress." 
+		INDEX { prvtMplsRouteDirection, prvtMplsRouteType } 
+        ::= { prvtMplsRouteProtocolTable 1 }
+       
+PrvtMplsRouteProtocolEntry ::= SEQUENCE {
+        prvtMplsRouteDirection       	INTEGER,
+        prvtMplsRouteType     		  	INTEGER, 
+        prvtMplsRouteRowStatus			RowStatus
+      }
+
+ 	prvtMplsRouteDirection OBJECT-TYPE
+        SYNTAX  INTEGER {
+         		ingress(1),
+         		egress(2)
+        }
+		MAX-ACCESS	read-only    
+		STATUS	current                                                                                               
+		DESCRIPTION
+            "The direction of the route that will be used to receive or send LDP packets."
+		::= { prvtMplsRouteProtocolEntry 1 }
+  
+	 prvtMplsRouteType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                 bgp(1),
+  				 connected(2),
+  				 isis(3),
+  				 kernel(4),
+  				 ospf(5),
+  				 rip(6),
+  				 static(7)   
+        }
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+        "The type of the route which will be used to send or receive LDP packets."
+		::= { prvtMplsRouteProtocolEntry 2} 
+		
+	prvtMplsRouteRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+            "This object is used to create an entry in the table. Only createAndGo(4) should be 
+            used."
+		::= { prvtMplsRouteProtocolEntry 3 }
+  
+prvtMplsRouteAddressTable 	OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PrvtMplsRouteAddressEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+            "This table contains for configuring the egress and ingress routes for LDP label
+            packets. It supports all CLI route types - bgp, isis, ospf, rip, static, kernel and 
+            connected."
+		::= { prvtMPLSRouteObjs 2 }
+
+prvtMplsRouteAddressEntry 	OBJECT-TYPE
+		SYNTAX	PrvtMplsRouteAddressEntry		
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		    "An entry in the table represents the configuration of a particular route type for ingress
+		    or egress." 
+		INDEX { prvtMplsAddressDirection, prvtMplsAddressIPAddr, prvtMplsAddressMask  } 
+        ::= { prvtMplsRouteAddressTable 1 }
+       
+PrvtMplsRouteAddressEntry ::= SEQUENCE {
+        prvtMplsAddressDirection       	INTEGER,
+        prvtMplsAddressIPAddr     		InetAddress, 
+        prvtMplsAddressMask    		  	Integer32, 
+        prvtMplsAddressRowStatus		RowStatus
+      }
+
+ 	prvtMplsAddressDirection OBJECT-TYPE
+        SYNTAX  INTEGER {
+         		ingress(1),
+         		egress(2)
+        }
+		MAX-ACCESS	read-only    
+		STATUS	current                                                                                               
+		DESCRIPTION
+            "The direction of the route that will be used to receive or send LDP packets."
+		::= { prvtMplsRouteAddressEntry 1 }
+  
+	 prvtMplsAddressIPAddr OBJECT-TYPE
+        SYNTAX  InetAddress 
+        MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+        "The IP address of the route that will be used to send or receive LDP packets."
+		::= { prvtMplsRouteAddressEntry 2}
+		
+	prvtMplsAddressMask OBJECT-TYPE
+        SYNTAX  Integer32(0..32)
+        MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+        "The mask for the IP address of the route that will be used to send or receive LDP packets."
+		::= { prvtMplsRouteAddressEntry 3}  
+		
+	prvtMplsAddressRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+            "This object is used to create an entry in the table. Only createAndGo(4) should be 
+            used."
+		::= { prvtMplsRouteAddressEntry 4 }
+ 
+END
