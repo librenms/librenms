@@ -39,8 +39,4 @@ if ($device['os'] == 'binox') {
             }
         }
     }
-
-    else {
-
-    }
 }
