@@ -112,7 +112,6 @@ $ifmib_oids = array_merge($data_oids, $stat_oids);
 
 $ifmib_oids = array(
     'ifDescr',
-    'ifXEntry',
     'ifAdminStatus',
     'ifOperStatus',
     'ifInErrors',
@@ -122,13 +121,17 @@ $ifmib_oids = array(
 );
 
 echo 'Caching Oids: ';
-foreach ($ifmib_oids as $oid) {
-    echo "$oid ";
-    $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
-}
+$port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
+
 
 if (!isset($port_stats[1]['ifHCInOctets']) && !is_numeric($port_stats[1]['ifHCInOctets'])) {
     $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB');
+}
+else {
+    foreach ($ifmib_oids as $oid) {
+        echo "$oid ";
+        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+    }
 }
 
 if ($config['enable_ports_etherlike']) {
