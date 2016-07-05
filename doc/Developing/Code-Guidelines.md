@@ -2,7 +2,11 @@
 
 This document is here to help code standards for contributions towards LibreNMS. The original code base that we forked from had a lack of standards and as such the code base has a variety of different styles. Whilst we don't want to restrict how people write code, these guidelines should mean we have a good standard going forward that makes reading the code easier. All modern day ide's should be able to assist in these guidelines without breaking your usual workflow.
 
-### Indentation
+## PHP-FIG PSR-2 Coding Style
+All new code should follow the [PHP-FIG PSR-2 standard](http://www.php-fig.org/psr/psr-2/).
+Below are a few key items from that specification, please make sure to follow the full spec.
+
+### [Indentation](http://www.php-fig.org/psr/psr-2/#2-4-indenting)
 Please use four (4) spaces to indent code rather than a tab. Ensure you increase indentation for nested code blocks.
 ```php
 if ($foo == 5) {
@@ -10,46 +14,32 @@ if ($foo == 5) {
         if ($foo == 5) {
 ```
 
-### Line length
-Try to keep the length of a line to about 75-85 characters. This isn't essential but does enable compatibility for all screen sizes but above all enables reading of code easier.
+### [Line length](http://www.php-fig.org/psr/psr-2/#1-overview)
+Try to keep the length of a line under 80 characters. If you must exceed 80 characters, please keep it under 120 characters.  This makes reading the code easier and also enables compatibility for all screen sizes.
 
-### Control structures
-A space should be used both before and after the parenthesis and also surrounding the condition operator.
+### [Control structures](http://www.php-fig.org/psr/psr-2/#5-control-structures)
+A space must be used both before and after the parenthesis and also surrounding the condition operator.
 ```php
 if ($foo == 5) {
 ```
 
-Rather than
-
-```php
-if($foo==5){
-```
-
-Don't put blocks of code on a single line as in this example.
-```php
-if ($foo == 5) { echo 'foo is 5'; }
-```
-
-and instead format the code like.
+Do not put blocks of code on a single line, do use parenthesis
 ```php
 if ($foo == 5) {
     echo 'foo is 5';
 }
 ```
 
-Start else and elsif on new lines, e.g.
+else and elseif should start on the same line as ending of the previous code block.
 ```php
 if ($foo == 5) {
     echo 'foo is 5';
-}
-elsif ($foo == 4) {
+} elsif ($foo == 4) {
     echo 'foo is 4';
-}
-else {
+} else {
     echo 'foo is something else';
 }
 ```
-This makes diffs much cleaner when moving around blocks of code.
 
 
 ### Including files
@@ -58,10 +48,10 @@ Using parenthesis around file includes isn't required, instead just place the fi
 require_once 'includes/snmp.inc.php';
 ```
 
-### PHP tags
+### [PHP tags](http://www.php-fig.org/psr/psr-1/#1-overview)
 Ensure you use <?php rather than the shorthand version <?.
 ```php
 <?php
 ```
 
-The `?>` tag isn't required for included php files. For instance anything in includes/ or html/includes don't need the tag along with config.php. If the php file is standalone then you still need the tag. If you are unsure, add it in :)
+The `?>` [must be excluded](http://www.php-fig.org/psr/psr-2/#2-2-files) from all files that only include PHP (no html). For instance anything in includes/ or html/includes don't need the tag along with config.php.
