@@ -13,7 +13,7 @@
  */
 
 
-if ($device['os'] == 'batm') {
+if ($device['os'] == 'binox') {
     if (strpos($device['sysObjectID'], 'enterprises.738.10.5.100') !== false) {
         echo("Telco Systems:");
 
