@@ -30,7 +30,7 @@ if ($device['os'] == 'binos') {
         $value = str_replace('"', '', $value);
 
         if (is_numeric($value)) {
-            discover_sensor($valid['sensor'], 'temperature', $device, $valueoid, 1, 'binos', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $hig$
+            discover_sensor($valid['sensor'], 'temperature', $device, $valueoid, 1, 'binos', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
         }
      }
 
