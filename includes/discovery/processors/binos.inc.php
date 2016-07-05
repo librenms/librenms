@@ -25,8 +25,5 @@ if ($device['os'] == 'binos') {
             discover_processor($valid['processor'], $device, '.1.3.6.1.4.1.738.1.111.3.1.2.1.0', '0', 'binos', $descr, '1', $usage, null, null);
         }
     }
-    else {
-
-    }
 }
 

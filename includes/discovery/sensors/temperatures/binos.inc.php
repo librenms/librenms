@@ -32,9 +32,5 @@ if ($device['os'] == 'binos') {
         if (is_numeric($value)) {
             discover_sensor($valid['sensor'], 'temperature', $device, $valueoid, 1, 'binos', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
         }
-     }
-
-    else {
-
     }
 }

@@ -33,7 +33,4 @@ if ($device['os'] == 'binox') {
             discover_sensor($valid['sensor'], 'temperature', $device, $valueoid, 1, 'binox', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
          }
     }
-    else {
-
-    }
 }
