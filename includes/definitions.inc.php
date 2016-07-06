@@ -423,6 +423,19 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'acs';
+$config['os'][$os]['group']            = "cisco";
+$config['os'][$os]['text']             = 'Cisco ACS';
+$config['os'][$os]['ifname']           = 1;
+$config['os'][$os]['type']             = 'server';
+$config['os'][$os]['icon']             = 'cisco';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 $os = 'cat1900';
 $config['os'][$os]['group']            = 'cat1900';
 $config['os'][$os]['text']             = 'Cisco Catalyst 1900';
