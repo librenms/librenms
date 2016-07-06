@@ -25,6 +25,7 @@
  * @subpackage Devices
  */
 
+include_once($config['install_dir'].'/includes/common.inc.php');
 
 /**
  * Add a new device group
@@ -97,26 +98,50 @@ function GenGroupSQL($pattern, $search='',$extra=0) {
     $pattern = rtrim($pattern, '||');
 
     $tables = array_keys(array_flip($tables));
-    $x      = sizeof($tables);
-    $i      = 0;
-    $join   = '';
-    while ($i < $x) {
-        if (isset($tables[($i + 1)])) {
-            $join .= $tables[$i].'.device_id = '.$tables[($i + 1)].'.device_id && ';
+    if( dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?',array($tables[0],'device_id')) != 1 ) {
+        //Our first table has no valid glue, append the 'devices' table to it!
+        array_unshift($tables, 'devices');
+    }
+    $x = sizeof($tables)-1;
+    $i = 0;
+    $join = "";
+    while( $i < $x ) {
+        if( isset($tables[$i+1]) ) {
+            $gtmp = ResolveGlues(array($tables[$i+1]),'device_id');
+            if( $gtmp === false ) {
+                //Cannot resolve glue-chain. Rule is invalid.
+                return false;
+            }
+            $last = "";
+            $qry = "";
+            foreach( $gtmp as $glue ) {
+                if( empty($last) ) {
+                    list($tmp,$last) = explode('.',$glue);
+                    $qry .= $glue.' = ';
+                }
+                else {
+                    list($tmp,$new) = explode('.',$glue);
+                    $qry .= $tmp.'.'.$last.' && '.$tmp.'.'.$new.' = ';
+                    $last = $new;
+                }
+                if( !in_array($tmp, $tables) ) {
+                    $tables[] = $tmp;
+                }
+            }
+            $join .= "( ".$qry.$tables[0].".device_id ) && ";
         }
-
         $i++;
     }
-
-    if (!empty($search)) {
-        $search .= ' &&';
-    }
-
-    $sql_extra = '';
     if ($extra === 1) {
         $sql_extra = ",`devices`.*";
     }
-    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
+    if (!empty($search)) {
+        $search = str_replace("(","",$tables[0]).'.'.$search;
+    }
+    if (!empty($join)) {
+        $join = '('.rtrim($join, ' && ').') &&';
+    }
+    $sql = 'SELECT DISTINCT('.str_replace('(', '', $tables[0]).'.device_id)'.$sql_extra.' FROM '.implode(',', $tables).' WHERE '.$join.' '.$search.' ('.str_replace(array('%', '@', '!~', '~'), array('', '.*', 'NOT REGEXP', 'REGEXP'), $pattern).')';
     return $sql;
 
 }//end GenGroupSQL()
