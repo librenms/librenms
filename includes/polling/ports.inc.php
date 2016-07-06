@@ -108,8 +108,6 @@ $pagp_oids = array(
     'pagpGroupIfIndex',
 );
 
-$ifmib_oids = array_merge($data_oids, $stat_oids);
-
 $ifmib_oids = array(
     'ifDescr',
     'ifAdminStatus',
@@ -123,8 +121,8 @@ $ifmib_oids = array(
 echo 'Caching Oids: ';
 $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
 
-
-if (!isset($port_stats[1]['ifHCInOctets']) && !is_numeric($port_stats[1]['ifHCInOctets'])) {
+$hc_test = array_slice($port_stats, 0, 1);
+if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
     $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB');
 }
 else {
