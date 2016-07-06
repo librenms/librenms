@@ -1230,3 +1230,69 @@ function get_port_id ($ports_mapped, $port, $port_association_mode) {
 
     return $port_id;
 }
+
+/**
+ * Create a glue-chain
+ * @param array $tables Initial Tables to construct glue-chain
+ * @param string $target Glue to find (usual device_id)
+ * @param int $x Recursion Anchor
+ * @param array $hist History of processed tables
+ * @param array $last Glues on the fringe
+ * @return string|boolean
+ */
+function ResolveGlues($tables,$target,$x=0,$hist=array(),$last=array()) {
+    if( sizeof($tables) == 1 && $x != 0 ) {
+        if( dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?',array($tables[0],$target)) == 1 ) {
+            return array_merge($last,array($tables[0].'.'.$target));
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        $x++;
+        if( $x > 30 ) {
+            //Too much recursion. Abort.
+            return false;
+        }
+        foreach( $tables as $table ) {
+            $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"',array($table));
+            if( sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target ) {
+                //Search for new candidates to expand
+                $ntables = array();
+                list($tmp) = explode('_',$glues[0]['COLUMN_NAME'],2);
+                $ntables[] = $tmp;
+                $ntables[] = $tmp.'s';
+                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table,0,-1).'_%" && TABLE_NAME != "'.$table.'"');
+                foreach( $tmp as $expand ) {
+                    $ntables[] = $expand['TABLE_NAME'];
+                }
+                $tmp = ResolveGlues($ntables,$target,$x++,array_merge($tables,$ntables),array_merge($last,array($table.'.'.$glues[0]['COLUMN_NAME'])));
+                if( is_array($tmp) ) {
+                    return $tmp;
+                }
+            }
+            else {
+                foreach( $glues as $glue ) {
+                    if( $glue['COLUMN_NAME'] == $target ) {
+                        return array_merge($last,array($table.'.'.$target));
+                    }
+                    else {
+                        list($tmp) = explode('_',$glue['COLUMN_NAME']);
+                        $tmp .= 's';
+                        if( !in_array($tmp,$tables) && !in_array($tmp,$hist) ) {
+                            //Expand table
+                            $tmp = ResolveGlues(array($tmp),$target,$x++,array_merge($tables,array($tmp)),array_merge($last,array($table.'.'.$glue['COLUMN_NAME'])));
+                            if( is_array($tmp) ) {
+                                return $tmp;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //You should never get here.
+    return false;
+}
+
