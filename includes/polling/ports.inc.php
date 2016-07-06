@@ -108,17 +108,28 @@ $pagp_oids = array(
     'pagpGroupIfIndex',
 );
 
-$ifmib_oids = array_merge($data_oids, $stat_oids);
-
 $ifmib_oids = array(
-    'ifEntry',
-    'ifXEntry',
+    'ifDescr',
+    'ifAdminStatus',
+    'ifOperStatus',
+    'ifInErrors',
+    'ifOutErrors',
+    'ifInDiscards',
+    'ifOutDiscards',
 );
 
 echo 'Caching Oids: ';
-foreach ($ifmib_oids as $oid) {
-    echo "$oid ";
-    $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
+
+$hc_test = array_slice($port_stats, 0, 1);
+if (!isset($hc_test[0]['ifHCInOctets']) && !is_numeric($hc_test[0]['ifHCInOctets'])) {
+    $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB');
+}
+else {
+    foreach ($ifmib_oids as $oid) {
+        echo "$oid ";
+        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+    }
 }
 
 if ($config['enable_ports_etherlike']) {
@@ -357,6 +368,10 @@ foreach ($ports as $port) {
             echo 'HC ';
             $this_port['ifInOctets']  = $this_port['ifHCInOctets'];
             $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
+        }
+        if (is_numeric($this_port['ifHCInUcastPkts']) && $this_port['ifHCInUcastPkts'] > 0 && is_numeric($this_port['ifHCOutUcastPkts']) && $this_port['ifHCOutUcastPkts'] > 0) {
+            $this_port['ifInUcastPkts']  = $this_port['ifHCInUcastPkts'];
+            $this_port['ifOutUcastPkts'] = $this_port['ifHCOutUcastPkts'];
         }
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
