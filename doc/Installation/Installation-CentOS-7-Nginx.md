@@ -7,6 +7,7 @@
 #### Install / Configure MySQL
 ```bash
 yum install mariadb-server mariadb
+service mariadb restart
 mysql -uroot -p
 ```
 
@@ -29,15 +30,22 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mysql restart```
+```service mariadb restart```
 
 ### Web Server ###
 
 #### Install / Configure Nginx 
 
-`yum install epel-release`
+```bash
+yum install epel-release
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
-`yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-pear php70w-curl php70w-common php70w-fpm nginx net-snmp mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php70w-mcrypt fping git`
+yum install php70w php70w-cli php70w-gd php70w-mysql php70w-snmp php70w-pear php70w-curl php70w-common php70w-fpm nginx net-snmp mariadb ImageMagick jwhois nmap mtr rrdtool MySQL-python net-snmp-utils cronie php70w-mcrypt fping git
+
+pear install Net_IPv4-1.3.4
+pear install Net_IPv6-1.2.2b2
+```
 
 In `/etc/php.ini` ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 
@@ -97,6 +105,18 @@ server {
 }
 ```
 
+#### SELinux
+
+```bash
+    yum install policycoreutils-python
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
+    restorecon -RFvv /opt/librenms/logs/
+    setsebool -P httpd_can_sendmail=1
+```
+
+#### Restart Web server
+
 ```bash
 service nginx restart
 ```
@@ -105,11 +125,15 @@ service nginx restart
 
 Now head to: http://librenms.example.com/install.php and follow the on-screen instructions.
 
+Once you have completed the web installer steps. Please add the following to `config.php`
+
+`$config['fping'] = "/usr/sbin/fping";`
+
 #### Configure snmpd
 
 ```bash
-cp /opt/librenms/snmpd.conf.example /etc/snmpd.conf
-vim /etc/snmpd.conf
+cp /opt/librenms/snmpd.conf.example /etc/snmpd/snmpd.conf
+vim /etc/snmpd/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
@@ -124,6 +148,8 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 
 ```bash
 chown -R librenms:librenms /opt/librenms
+systemctl enable nginx
+systemctl enable mariadb
 ```
 
 Now run validate your install and make sure everything is ok:
