@@ -136,7 +136,7 @@ function GenGroupSQL($pattern, $search='',$extra=0) {
         $sql_extra = ",`devices`.*";
     }
     if (!empty($search)) {
-        $search = str_replace("(","",$tables[0]).'.'.$search;
+        $search = str_replace("(","",$tables[0]).'.'.$search. ' AND';
     }
     if (!empty($join)) {
         $join = '('.rtrim($join, ' && ').') &&';
