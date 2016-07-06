@@ -26,9 +26,7 @@
 
 This is currently well documented within the doc folder of the installation files.
 
-For Debian / Ubuntu installs follow [Debian / Ubuntu](http://docs.librenms.org/Installation/Installation-(Debian-Ubuntu))
-
-For RedHat / CentOS installs follow [RedHat / CentOS](http://docs.librenms.org/Installation/Installation-(RHEL-CentOS))
+Please see the following [doc](http://docs.librenms.org/Installation/Installing-LibreNMS/)
 
 #### <a name="faq2"> How do I add a device?</a>
 
