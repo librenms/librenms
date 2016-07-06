@@ -1666,7 +1666,7 @@ $config['os'][$os]['over'][0]['text']  = 'Traffic';
 $os = 'macosx';
 $config['os'][$os]['text']             = 'Apple OS X';
 $config['os'][$os]['type']             = 'server';
-$config['os'][$os]['icon']             = 'generic';
+$config['os'][$os]['icon']             = 'apple';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
 $config['os'][$os]['over'][0]['text']  = 'Traffic';
 
