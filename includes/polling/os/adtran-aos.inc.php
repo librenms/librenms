@@ -13,7 +13,7 @@
  */
 
 
-$hardware = snmp_get($device, 'adAOSDeviceProductName.0', '-Ovqs', 'ADTRAN-AOSUNIT', $config['install_dir'].'/mibs);
+$hardware = snmp_get($device, 'adAOSDeviceProductName.0', '-Ovqs', 'ADTRAN-AOSUNIT', $config['install_dir'].'/mibs');
 $version = snmp_get($device, 'adAOSDeviceVersion.0', '-Ovqs', 'ADTRAN-AOSUNIT', $config['install_dir'].'/mibs');
 $serial = snmp_get($device, 'adAOSDeviceSerialNumber.0', '-Ovqs', 'ADTRAN-AOSUNIT', $config['install_dir'].'/mibs');
 $features = '';
