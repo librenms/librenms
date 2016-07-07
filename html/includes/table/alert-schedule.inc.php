@@ -47,15 +47,18 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `S`.`schedule_id`, DATE_FORMAT(`S`.`start`, '".$config['dateformat']['mysql']['compact']."') AS `start`, DATE_FORMAT(`S`.`end`, '".$config['dateformat']['mysql']['compact']."') AS `end`, `S`.`title` $sql";
+$sql = "SELECT `S`.`schedule_id`, DATE_FORMAT(NOW(), '".$config['dateformat']['mysql']['compact']."') AS now, DATE_FORMAT(`S`.`start`, '".$config['dateformat']['mysql']['compact']."') AS `start`, DATE_FORMAT(`S`.`end`, '".$config['dateformat']['mysql']['compact']."') AS `end`, `S`.`title` $sql";
 
 foreach (dbFetchRows($sql, $param) as $schedule) {
     $status = 0;
-    if ($schedule['end'] < date('dS M Y H:i::s')) {
+    $start  = strtotime($schedule['start']);
+    $end    = strtotime($schedule['end']);
+    $now    = strtotime($schedule['now']);
+    if ($end < $now) {
         $status = 1;
     }
 
-    if (date('dS M Y H:i::s') >= $schedule['start'] && date('dS M Y H:i::s') < $schedule['end']) {
+    if ($now >= $start && $now < $end) {
         $status = 2;
     }
 

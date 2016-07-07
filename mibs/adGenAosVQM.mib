@@ -1,0 +1,3941 @@
+       ADTRAN-AOS-VQM DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           TimeTicks, IpAddress, Integer32, Gauge32, Unsigned32, Counter32,
+           Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DisplayString, TruthValue, DateAndTime, TEXTUAL-CONVENTION
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           ifIndex
+                FROM IF-MIB
+           adIdentity
+               FROM ADTRAN-MIB
+           adGenAOSConformance, adGenAOSVoice
+               FROM ADTRAN-AOS;
+
+       adGenAOSVQMMib MODULE-IDENTITY
+        LAST-UPDATED "200901060000Z"  -- Jan 6, 2009 / YYYYMMDDHHMMZ
+        ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                901 Explorer Blvd.
+                Huntsville, AL 35806
+
+                Tel: +1 800 726-8663
+                Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                "ADTRAN-AOS-VQM MIB module."
+
+       ::= { adIdentity 10000 53 5 3 }
+
+        adVQM                   OBJECT IDENTIFIER ::= { adGenAOSVoice 3 }
+        adVQMTrap               OBJECT IDENTIFIER ::= { adVQM 0 }
+        adVQMTrapControl        OBJECT IDENTIFIER ::= { adVQM 1 }
+        adVQMCfg                OBJECT IDENTIFIER ::= { adVQM 2 }
+        adVQMThreshold          OBJECT IDENTIFIER ::= { adVQM 3 }
+        adVQMSysPerf            OBJECT IDENTIFIER ::= { adVQM 4 }
+        adVQMInterface          OBJECT IDENTIFIER ::= { adVQM 5 }
+        adVQMEndPoint           OBJECT IDENTIFIER ::= { adVQM 6 }
+        adVQMHistory            OBJECT IDENTIFIER ::= { adVQM 7 }
+        adVQMActive             OBJECT IDENTIFIER ::= { adVQM 8 }
+
+-- ========================================================================
+        MOSvalue ::= TEXTUAL-CONVENTION
+                DISPLAY-HINT "d"
+                STATUS  current
+                DESCRIPTION
+                        "MOS values typically are represented as a value from
+                        1.00-5.00. In this representation the MOS score will be
+                        scaled by 100.  Hence a value of 3.25 will be
+                        represented as 325. A value of 65535 shall be
+                        interpreted as NULL or unsupported."
+                SYNTAX  Integer32 (100..1000|65535)
+
+        Percentage ::= TEXTUAL-CONVENTION
+                DISPLAY-HINT "d"
+                STATUS  current
+                DESCRIPTION
+                        "Percentages typically are represented as a value from
+                        0.00%-100.00%. In this representation the percentage
+                        will be scaled by 100.  Hence a value of 0.45 will be
+                        represented as 45 and a value of 100.00 will be
+                        represented as 1000. A value of 65535 shall be
+                        interpreted as NULL or unsupported."
+                SYNTAX  Integer32 (0..1000|65535)
+
+        MsecValue ::= TEXTUAL-CONVENTION
+                DISPLAY-HINT "d"
+                STATUS  current
+                DESCRIPTION
+                        "Millisecond values typically are represented as a
+                        value with a decimal place.
+                        In this representation th value will be
+                        scaled by 10.  Hence a value of 1.5 will be represented
+                        as 15."
+                SYNTAX  Integer32
+
+
+
+     adVQMEndOfCallTrap NOTIFICATION-TYPE
+         OBJECTS  {
+                adVqmTrapEventType,
+                adVqmCallHistMosLq,
+                adVqmCallHistMosPq,
+                adVqmCallHistPktsLostTotal,
+                adVqmCallHistOutOfOrder,
+                adVqmCallHistPdvAverageMs
+         }
+         STATUS      current
+         DESCRIPTION
+            "This trap indicates that the severity level has been met at the
+            end of a call to generate a trap. Enable this trap using
+            adVqmTrapState. The severity level, by default, is set to warning.
+            Use adVqmTrapCfgSeverityLevel to change the severity level setting."
+     ::= { adVQMTrap 1 }
+
+
+     adVqmTrapState OBJECT-TYPE
+         SYNTAX  INTEGER     { enabled(1), disabled(2) }
+         MAX-ACCESS   read-write
+         STATUS   current
+         DESCRIPTION
+            "This variable indicates whether the system produces
+            the vqmEndOfCall trap."
+         DEFVAL { disabled }
+         ::= { adVQMTrapControl 1 }
+
+     adVqmTrapCfgSeverityLevel OBJECT-TYPE
+         SYNTAX  INTEGER     {
+                        error(1),
+                        warning(2),
+                        notice(3),
+                        info(4)
+                         }
+         MAX-ACCESS   read-write
+         STATUS   current
+         DESCRIPTION
+            "This read-write variable indicates the severity level that will
+            generate an adVqmEndOfCallTrap. If traps are enabled, a trap will be
+            generated at the end of a call for all calls that have a numerical
+            severity level equal to or less than the configured
+            severity level."
+         DEFVAL { warning }
+         ::= { adVQMTrapControl 2 }
+
+     adVqmTrapEventType OBJECT-TYPE
+        SYNTAX  BITS {
+                        lQMos(0),
+                        pQMos(1),
+                        loss(2),
+                        outOfOrder(3),
+                        jitter(4)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This variable indicates the event that generated the most
+                recent trap. The vqmTrapEventType is a bitmap and can represent
+                multiple failures simultaneously.
+                The various bit positions are:
+                BIT   EVENT      DESCRIPTION
+                0     LQMos      LQ-MOS threshold exceeded
+                1     PQMos      PQ-MOS threshold exceeded
+                2     Loss       Loss threshold exceeded
+                3     OutOfOrder Out-of-Order threshold exceeded
+                4     Jitter     Jitter threshold exceeded
+                "
+         ::= { adVQMTrapControl 3 }
+
+     -- adVQMCfg Group
+     adVqmCfgEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled (2)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "VQM feature global enable/disable."
+         ::= { adVQMCfg 1 }
+
+     adVqmCfgSipEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled (2)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "VQM uses SIP signaling to monitor for RTP traffic."
+         ::= { adVQMCfg 2 }
+
+     adVqmCfgUdpEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled (2)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "VQM uses UDP packet inspection to monitor for RTP
+                traffic."
+         ::= { adVQMCfg 3 }
+
+     adVqmCfgInternationalCode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none (1),
+                japan (5)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Regional scoring adjustment for VQM calculations."
+         ::= { adVQMCfg 4 }
+
+     adVqmCfgJitterBufferType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                jitterBufferFixed (1),
+                jitterBufferAdaptive (2),
+                jitterBufferUnknown (3)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Regional scoring adjustment for VQM calculations."
+         ::= { adVQMCfg 5 }
+
+     adVqmCfgJitterBufferAdaptiveMin OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Minimum adaptive jitter buffer delay (10-240 ms)."
+         ::= { adVQMCfg 6 }
+
+     adVqmCfgJitterBufferAdaptiveNominal OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Adaptive starting delay applied to packets (10-240 ms)."
+         ::= { adVQMCfg 7 }
+
+     adVqmCfgJitterBufferAdaptiveMax OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Adaptive maximum jitter buffer delay (40-320 ms)."
+         ::= { adVQMCfg 8 }
+
+     adVqmCfgJitterBufferFixedNominal OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Fixed jitter buffer constant delay applied to packets
+                (4-250 ms)."
+         ::= { adVQMCfg 9 }
+
+     adVqmCfgJitterBufferFixedSize OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Number packets fixed jitter buffer can hold (10-500 pkts)."
+         ::= { adVQMCfg 10 }
+
+     adVqmCfgJitterBufferThresholdEarlyMs OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Jitter buffer threshold for early arriving packets."
+         ::= { adVQMCfg 11 }
+
+     adVqmCfgJitterBufferThresholdLateMs OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Jitter buffer threshold for late arriving packets."
+         ::= { adVQMCfg 12 }
+
+     adVqmCfgRoundTripPingEnabled OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled (2)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Ping use for measuring round-trip delay between
+                end-points."
+         ::= { adVQMCfg 13 }
+
+     adVqmCfgRoundTripPingType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                ping (1),
+                timestamp (2)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "ICMP Ping or ICMP Timestamp used for delay measurements."
+         ::= { adVQMCfg 14 }
+
+     adVqmCfgCallHistorySize OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Size of Call History buffer."
+         ::= { adVQMCfg 15 }
+
+     adVqmCfgHistoryThresholdLqmos OBJECT-TYPE
+        SYNTAX          MOSvalue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Store history statistics if below LQ MOS threshold value."
+         ::= { adVQMCfg 16 }
+
+     adVqmCfgHistoryThresholdCqmos OBJECT-TYPE
+        SYNTAX          MOSvalue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Store history statistics if below CQ MOS threshold value."
+         ::= { adVQMCfg 17 }
+
+     adVqmCfgHistoryThresholdPqmos OBJECT-TYPE
+        SYNTAX          MOSvalue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Store history statistics if below PESQ MOS threshold
+                value."
+         ::= { adVQMCfg 18 }
+
+     adVqmCfgHistoryThresholdLoss OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Store history statistics if loss packets are greater than
+                threshold value."
+         ::= { adVQMCfg 19 }
+
+     adVqmCfgHistoryThresholdOutOfOrder OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Store history statistics if Out of Order packets are greater
+                than threshold value."
+         ::= { adVQMCfg 20 }
+
+     adVqmCfgHistoryThresholdJitter OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Store history statistics if Jitter exceeds threshold value."
+         ::= { adVQMCfg 21 }
+
+     adVqmCfgClear OBJECT-TYPE
+        SYNTAX INTEGER {
+                clear (1)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Clear all VQM statistics.
+            This is a write-only variable. A read will result in no action
+            being taken."
+         ::= { adVQMCfg 22 }
+
+     adVqmCfgClearCallHistory OBJECT-TYPE
+        SYNTAX INTEGER {
+                clear (1)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Clear only call history buffer.
+            This is a write-only variable. A read will result in no action
+            being taken."
+         ::= { adVQMCfg 23 }
+
+
+
+     --
+     -- adVQMThreshold Group
+     --
+
+     adVqmThresholdLqmosInfo OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening Quality MOS threshold value for info event."
+         ::= { adVQMThreshold 1 }
+
+     adVqmThresholdLqmosNotice OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening Quality MOS threshold value for notice event."
+         ::= { adVQMThreshold 2 }
+
+     adVqmThresholdLqmosWarning OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening Quality MOS threshold value for warning event."
+         ::= { adVQMThreshold 3 }
+
+     adVqmThresholdLqmosError OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening Quality MOS threshold value for error event."
+         ::= { adVQMThreshold 4 }
+
+     adVqmThresholdPqmosInfo OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Normalized PESQ MOS threshold value for info event."
+         ::= { adVQMThreshold 5 }
+
+     adVqmThresholdPqmosNotice OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Normalized PESQ MOS threshold value for notice event."
+         ::= { adVQMThreshold 6 }
+
+     adVqmThresholdPqmosWarning OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Normalized PESQ MOS threshold value for warning event."
+         ::= { adVQMThreshold 7 }
+
+     adVqmThresholdPqmosError OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Normalized PESQ MOS threshold value for error event."
+         ::= { adVQMThreshold 8 }
+
+     adVqmThresholdOutOfOrderInfo OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Out of order packet threshold value for info event."
+         ::= { adVQMThreshold 9 }
+
+     adVqmThresholdOutOfOrderNotice OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Out of order packet threshold value for notice event."
+         ::= { adVQMThreshold 10 }
+
+     adVqmThresholdOutOfOrderWarning OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Out of order packet threshold value for warning event."
+         ::= { adVQMThreshold 11 }
+
+     adVqmThresholdOutOfOrderError OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Out of order packet threshold value for error event."
+         ::= { adVQMThreshold 12 }
+
+     adVqmThresholdLossInfo OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Loss of packet threshold value for info event."
+         ::= { adVQMThreshold 13 }
+
+     adVqmThresholdLossNotice OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Loss of packet threshold value for notice event."
+         ::= { adVQMThreshold 14 }
+
+     adVqmThresholdLossWarning OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Loss of packet threshold value for warning event."
+         ::= { adVQMThreshold 15 }
+
+     adVqmThresholdLossError OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Loss of packet threshold value for error event."
+         ::= { adVQMThreshold 16 }
+
+     adVqmThresholdJitterInfo OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Jitter threshold value for info event."
+         ::= { adVQMThreshold 17 }
+
+     adVqmThresholdJitterNotice OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Jitter threshold value for notice event."
+         ::= { adVQMThreshold 18 }
+
+     adVqmThresholdJitterWarning OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Jitter threshold value for warning event."
+         ::= { adVQMThreshold 19 }
+
+     adVqmThresholdJitterError OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Jitter threshold value for error event."
+         ::= { adVQMThreshold 20 }
+
+
+
+        --
+        -- adVQMSysPerf Group
+        --
+
+     adVqmSysActiveCalls OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of active calls."
+         ::= { adVQMSysPerf 1 }
+
+     adVqmSysActiveExcellent OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Active calls in excellent MOS range (4.400 - 4.000)."
+         ::= { adVQMSysPerf 2 }
+
+     adVqmSysActiveGood OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Active calls in good MOS range (3.999 - 3.600)."
+         ::= { adVQMSysPerf 3 }
+
+     adVqmSysActiveFair OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Active calls in fair MOS range (3.599 - 2.600)."
+         ::= { adVQMSysPerf 4 }
+
+     adVqmSysActivePoor OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Active calls in poor MOS range (2.599 - 0.000)."
+         ::= { adVQMSysPerf 5 }
+
+     adVqmSysCallHistoryCalls OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of calls in history buffer."
+         ::= { adVQMSysPerf 6 }
+
+     adVqmSysCallHistoryExcellent OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "History calls in excellent MOS range."
+         ::= { adVQMSysPerf 7 }
+
+     adVqmSysCallHistoryGood OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "History calls in good MOS range."
+         ::= { adVQMSysPerf 8 }
+
+     adVqmSysCallHistoryFair OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "History calls in fair MOS range."
+         ::= { adVQMSysPerf 9 }
+
+     adVqmSysCallHistoryPoor OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "History calls in poor MOS range."
+         ::= { adVQMSysPerf 10 }
+
+     adVqmSysAllCallsExcellent OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total calls in excellent MOS range."
+         ::= { adVQMSysPerf 11 }
+
+     adVqmSysAllCallsGood OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total calls in good MOS range."
+         ::= { adVQMSysPerf 12 }
+
+     adVqmSysAllCallsFair OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total calls in fair MOS range."
+         ::= { adVQMSysPerf 13 }
+
+     adVqmSysAllCallsPoor OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total calls in poor MOS range."
+         ::= { adVQMSysPerf 14 }
+
+     --
+     -- adVQMInterfaceTable
+     --
+
+     adVQMInterfaceTable OBJECT-TYPE
+         SYNTAX         SEQUENCE OF AdVQMInterfaceEntry
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION
+            "The adVqmInterface table provides aggregate statistics for each
+            system interface.  VQM processes RTP stream packets as received by
+            the interface (inbound direction).  The user can enable or disable
+            each system interface for VQM using the CLI/GUI.  The VQM interface
+            table objects include enable/disable, packet statistics for number
+            received, lost, out-of-order, discarded, number of active and
+            completed calls, MOS scores, delay measurements, and quality
+            analysis counts."
+         ::= { adVQMInterface 1 }
+
+     adVQMInterfaceEntry OBJECT-TYPE
+         SYNTAX   AdVQMInterfaceEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "The statistics for a particular interface."
+         INDEX { adVqmIfcId }
+         ::= { adVQMInterfaceTable 1 }
+
+
+     AdVQMInterfaceEntry ::=
+        SEQUENCE {
+                adVqmIfcId                      Unsigned32,
+                adVqmIfcName                    DisplayString,
+                adVqmIfcPktsRx                  Counter64,
+                adVqmIfcPktsLost                Counter64,
+                adVqmIfcPktsOoo                 Counter64,
+                adVqmIfcPktsDiscarded           Counter64,
+                adVqmIfcNumberActiveCalls       Counter32,
+                adVqmIfcTerminatedCalls         Counter32,
+                adVqmIfcRLqMinimum              Unsigned32,
+                adVqmIfcRLqAverage              Unsigned32,
+                adVqmIfcRLqMaximum              Unsigned32,
+                adVqmIfcRCqMinimum              Unsigned32,
+                adVqmIfcRCqAverage              Unsigned32,
+                adVqmIfcRCqMaximum              Unsigned32,
+                adVqmIfcRG107Minimum            Unsigned32,
+                adVqmIfcRG107Average            Unsigned32,
+                adVqmIfcRG107Maximum            Unsigned32,
+                adVqmIfcMosLqMinimum            MOSvalue,
+                adVqmIfcMosLqAverage            MOSvalue,
+                adVqmIfcMosLqMaximum            MOSvalue,
+                adVqmIfcMosCqMinimum            MOSvalue,
+                adVqmIfcMosCqAverage            MOSvalue,
+                adVqmIfcMosCqMaximum            MOSvalue,
+                adVqmIfcMosPqMinimum            MOSvalue,
+                adVqmIfcMosPqAverage            MOSvalue,
+                adVqmIfcMosPqMaximum            MOSvalue,
+                adVqmIfcLossMinimum             Unsigned32,
+                adVqmIfcLossAverage             Unsigned32,
+                adVqmIfcLossMaximum             Unsigned32,
+                adVqmIfcDiscardsMinimum         Unsigned32,
+                adVqmIfcDiscardsAverage         Unsigned32,
+                adVqmIfcDiscardsMaximum         Unsigned32,
+                adVqmIfcPdvAverageMs            INTEGER,
+                adVqmIfcPdvMaximumMs            INTEGER,
+                adVqmIfcDelayMinMsec            Unsigned32,
+                adVqmIfcDelayAvgMsec            Unsigned32,
+                adVqmIfcDelayMaxMsec            Unsigned32,
+                adVqmIfcNumberStreamsExcellent  Counter32,
+                adVqmIfcNumberStreamsGood       Counter32,
+                adVqmIfcNumberStreamsFair       Counter32,
+                adVqmIfcNumberStreamsPoor       Counter32,
+                adVqmIfcClear                   INTEGER
+     }
+
+     adVqmIfcId OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "VQM interface index number. This number is unique to the VQM MIB."
+         ::= { adVQMInterfaceEntry 1 }
+
+
+     adVqmIfcName OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Interface name."
+         ::= { adVQMInterfaceEntry 2 }
+
+     adVqmIfcPktsRx OBJECT-TYPE
+         SYNTAX         Counter64
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Packets received."
+         ::= { adVQMInterfaceEntry 3 }
+
+     adVqmIfcPktsLost OBJECT-TYPE
+         SYNTAX         Counter64
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Packets lost."
+         ::= { adVQMInterfaceEntry 4 }
+
+     adVqmIfcPktsOoo OBJECT-TYPE
+         SYNTAX         Counter64
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Packets received out-of-order."
+         ::= { adVQMInterfaceEntry 5 }
+
+     adVqmIfcPktsDiscarded OBJECT-TYPE
+         SYNTAX         Counter64
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Packets discarded."
+         ::= { adVQMInterfaceEntry 6 }
+
+     adVqmIfcNumberActiveCalls OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of active calls."
+         ::= { adVQMInterfaceEntry 7 }
+
+     adVqmIfcTerminatedCalls OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of terminated calls."
+         ::= { adVQMInterfaceEntry 8 }
+
+     adVqmIfcRLqMinimum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum listening quality R Factor."
+         ::= { adVQMInterfaceEntry 9 }
+
+     adVqmIfcRLqAverage OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average listening quality R Factor."
+         ::= { adVQMInterfaceEntry 10 }
+
+     adVqmIfcRLqMaximum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum listening quality R Factor."
+         ::= { adVQMInterfaceEntry 11 }
+
+     adVqmIfcRCqMinimum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum conversation quality R Factor."
+         ::= { adVQMInterfaceEntry 12 }
+
+     adVqmIfcRCqAverage OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average conversation quality R Factor."
+         ::= { adVQMInterfaceEntry 13 }
+
+     adVqmIfcRCqMaximum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum conversation quality R Factor."
+         ::= { adVQMInterfaceEntry 14 }
+
+     adVqmIfcRG107Minimum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum G.107 R Factor."
+         ::= { adVQMInterfaceEntry 15 }
+
+     adVqmIfcRG107Average OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average G.107 R Factor."
+         ::= { adVQMInterfaceEntry 16 }
+
+     adVqmIfcRG107Maximum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum G.107 R Factor."
+         ::= { adVQMInterfaceEntry 17 }
+
+     adVqmIfcMosLqMinimum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum listening quality MOS score."
+         ::= { adVQMInterfaceEntry 18 }
+
+     adVqmIfcMosLqAverage OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average listening quality MOS score."
+         ::= { adVQMInterfaceEntry 19 }
+
+     adVqmIfcMosLqMaximum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum listening quality MOS score."
+         ::= { adVQMInterfaceEntry 20 }
+
+     adVqmIfcMosCqMinimum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum conversation quality MOS score."
+         ::= { adVQMInterfaceEntry 21 }
+
+     adVqmIfcMosCqAverage OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average conversation quality MOS score."
+         ::= { adVQMInterfaceEntry 22 }
+
+     adVqmIfcMosCqMaximum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum conversation quality MOS score."
+         ::= { adVQMInterfaceEntry 23 }
+
+     adVqmIfcMosPqMinimum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum PESQ, P.862 raw MOS score."
+         ::= { adVQMInterfaceEntry 24 }
+
+     adVqmIfcMosPqAverage OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average PESQ, P.862 raw MOS score."
+         ::= { adVQMInterfaceEntry 25 }
+
+     adVqmIfcMosPqMaximum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum PESQ, P.862 raw MOS score."
+         ::= { adVQMInterfaceEntry 26 }
+
+     adVqmIfcLossMinimum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum network lost packets for all calls completed."
+         ::= { adVQMInterfaceEntry 27 }
+
+     adVqmIfcLossAverage OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average network lost packets for all calls completed."
+         ::= { adVQMInterfaceEntry 28 }
+
+     adVqmIfcLossMaximum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum network lost packets for all calls completed."
+         ::= { adVQMInterfaceEntry 29 }
+
+     adVqmIfcDiscardsMinimum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum packets discarded due to late or early arrival."
+         ::= { adVQMInterfaceEntry 30 }
+
+     adVqmIfcDiscardsAverage OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average packets discarded due to late or early arrival."
+         ::= { adVQMInterfaceEntry 31 }
+
+     adVqmIfcDiscardsMaximum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum packets discarded due to late or early arrival."
+         ::= { adVQMInterfaceEntry 32 }
+
+     adVqmIfcPdvAverageMs OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Mean of Average packet delay variation for packets."
+         ::= { adVQMInterfaceEntry 33 }
+
+     adVqmIfcPdvMaximumMs OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum of reported average packet delay variation."
+         ::= { adVQMInterfaceEntry 34 }
+
+     adVqmIfcDelayMinMsec OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum packet delay in ms."
+         ::= { adVQMInterfaceEntry 35 }
+
+     adVqmIfcDelayAvgMsec OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average packet delay in ms."
+         ::= { adVQMInterfaceEntry 36 }
+
+     adVqmIfcDelayMaxMsec OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum packet delay in ms."
+         ::= { adVQMInterfaceEntry 37 }
+
+     adVqmIfcNumberStreamsExcellent OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with excellent MOS score."
+         ::= { adVQMInterfaceEntry 38 }
+
+     adVqmIfcNumberStreamsGood OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with good MOS score."
+         ::= { adVQMInterfaceEntry 39 }
+
+     adVqmIfcNumberStreamsFair OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with fair MOS score."
+         ::= { adVQMInterfaceEntry 40 }
+
+     adVqmIfcNumberStreamsPoor OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with poor MOS score."
+         ::= { adVQMInterfaceEntry 41 }
+
+     adVqmIfcClear OBJECT-TYPE
+        SYNTAX INTEGER {
+                clear (1)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Clear all VQM statistics.
+            This is a write-only variable. A read will result in no action
+            being taken."
+         ::= { adVQMInterfaceEntry 42 }
+
+     --
+     -- adVqmEndPoint
+     --
+
+     adVQMEndPointTable OBJECT-TYPE
+         SYNTAX         SEQUENCE OF AdVQMEndPointEntry
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION
+            "The adVqmEndPoint table provides aggregate statistics for each
+            VoIP end-point device.  The RTP Source IP address,
+            adVqmEndPointRtpSourceIp, provides a unique table index.
+            The VQM End-point table provides summary statistics for MOS scores,
+            packets lost, out-of-order, jitter, delay and quality analysis
+            counts."
+         ::= { adVQMEndPoint 1 }
+
+     adVQMEndPointEntry OBJECT-TYPE
+         SYNTAX   AdVQMEndPointEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "The statistics for a particular VoIP end-point device."
+         INDEX { adVqmEndPointRtpSourceIp }
+         ::= { adVQMEndPointTable 1 }
+
+
+     AdVQMEndPointEntry ::=
+        SEQUENCE {
+                adVqmEndPointRtpSourceIp                IpAddress,
+                adVqmEndPointNumberCompletedCalls       Counter32,
+                adVqmEndPointInterfaceId                Unsigned32,
+                adVqmEndPointInterfaceName              DisplayString,
+                adVqmEndPointMosLqMinimum               MOSvalue,
+                adVqmEndPointMosLqAverage               MOSvalue,
+                adVqmEndPointMosLqMaximum               MOSvalue,
+                adVqmEndPointMosPqMinimum               MOSvalue,
+                adVqmEndPointMosPqAverage               MOSvalue,
+                adVqmEndPointMosPqMaximum               MOSvalue,
+                adVqmEndPointPktsLostTotal              Counter32,
+                adVqmEndPointPktsOutOfOrder             Counter32,
+                adVqmEndPointJitterMaximum              Unsigned32,
+                adVqmEndPointNumberStreamsExcellent     Counter32,
+                adVqmEndPointNumberStreamsGood          Counter32,
+                adVqmEndPointNumberStreamsFair          Counter32,
+                adVqmEndPointNumberStreamsPoor          Counter32
+     }
+
+     adVqmEndPointRtpSourceIp OBJECT-TYPE
+         SYNTAX         IpAddress
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source IP Address of RTP stream from this end-point."
+         ::= { adVQMEndPointEntry 1 }
+
+     adVqmEndPointNumberCompletedCalls OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of completed calls on this end-point."
+         ::= { adVQMEndPointEntry 2 }
+
+     adVqmEndPointInterfaceId OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Interface index that received RTP stream from this end-point."
+         ::= { adVQMEndPointEntry 3 }
+
+     adVqmEndPointInterfaceName OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Interface name that received RTP stream from this end-point."
+         ::= { adVQMEndPointEntry 4 }
+
+     adVqmEndPointMosLqMinimum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum listening quality MOS score."
+         ::= { adVQMEndPointEntry 5 }
+
+     adVqmEndPointMosLqAverage OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average listening quality MOS score."
+         ::= { adVQMEndPointEntry 6 }
+
+     adVqmEndPointMosLqMaximum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum listening quality MOS score."
+         ::= { adVQMEndPointEntry 7 }
+
+     adVqmEndPointMosPqMinimum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Minimum PESQ MOS score."
+         ::= { adVQMEndPointEntry 8 }
+
+     adVqmEndPointMosPqAverage OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average PESQ MOS score."
+         ::= { adVQMEndPointEntry 9 }
+
+     adVqmEndPointMosPqMaximum OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum PESQ MOS score."
+         ::= { adVQMEndPointEntry 10 }
+
+     adVqmEndPointPktsLostTotal OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total packets lost."
+         ::= { adVQMEndPointEntry 11 }
+
+     adVqmEndPointPktsOutOfOrder OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total out-of-order packets."
+         ::= { adVQMEndPointEntry 12 }
+
+     adVqmEndPointJitterMaximum OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum jitter."
+         ::= { adVQMEndPointEntry 13 }
+
+     adVqmEndPointNumberStreamsExcellent OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with excellent MOS score."
+         ::= { adVQMEndPointEntry 14 }
+
+     adVqmEndPointNumberStreamsGood OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with good MOS score."
+         ::= { adVQMEndPointEntry 15 }
+
+     adVqmEndPointNumberStreamsFair OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with fair MOS score."
+         ::= { adVQMEndPointEntry 16 }
+
+     adVqmEndPointNumberStreamsPoor OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number voice streams with poor MOS score."
+         ::= { adVQMEndPointEntry 17 }
+
+     --
+     -- adVqmCallHistory
+     --
+
+     adVQMCallHistoryTable OBJECT-TYPE
+         SYNTAX         SEQUENCE OF AdVQMCallHistoryEntry
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION
+            "The adVqmCallHistory table provides detail voice quality statistics
+            on completed RTP voice streams.  A voice call will typically have
+            two entries in this table one for each RTP stream.  A combination
+            of Source IP Address and Port, Destination IP Address and Port,
+            and SSRC (synchronization source ID) are necessary to uniquely
+            identify the call session.
+            One management option is to configure VQM to only save call history
+            information for poor quality calls that exceed threshold limits.
+            Threshold limit settings are available for MOS scores and packet
+            statistics for loss, out-of-order, and jitter.  Setting the maximum
+            call history buffer size to a lower value (default is 100 streams)
+            can reduce the amount of data transfer to the NMS during a
+            SNMP query."
+         ::= { adVQMHistory 1 }
+
+     adVQMCallHistoryEntry OBJECT-TYPE
+         SYNTAX   AdVQMCallHistoryEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "The statistics for a particular VoIP end-point device."
+         INDEX { adVqmCallHistRtpSourceIp, adVqmCallHistRtpSourcePort,
+                adVqmCallHistRtpDestIp, adVqmCallHistRtpDestPort,
+                adVqmCallHistSsrcid }
+         ::= { adVQMCallHistoryTable 1 }
+
+     AdVQMCallHistoryEntry ::=
+        SEQUENCE {
+                adVqmCallHistRtpSourceIp                IpAddress,
+                adVqmCallHistRtpSourcePort              Unsigned32,
+                adVqmCallHistRtpDestIp                  IpAddress,
+                adVqmCallHistRtpDestPort                Unsigned32,
+                adVqmCallHistSsrcid                     Unsigned32,
+                adVqmCallHistTo                         DisplayString,
+                adVqmCallHistFrom                       DisplayString,
+                adVqmCallHistRtpSourceUri               DisplayString,
+                adVqmCallHistCallid                     DisplayString,
+                adVqmCallHistCcmid                      Unsigned32,
+                adVqmCallHistSourceIntName              DisplayString,
+                adVqmCallHistDestIntName                DisplayString,
+                adVqmCallHistSourceIntDescription       DisplayString,
+                adVqmCallHistDestIntDescription         DisplayString,
+                adVqmCallHistCallStart                  DisplayString,
+                adVqmCallHistCallDurationMs             Unsigned32,
+                adVqmCallHistCodec                      INTEGER,
+                adVqmCallHistCodecClass                 INTEGER,
+                adVqmCallHistDscp                       Unsigned32,
+                adVqmCallHistPktsRcvdTotal              Counter32,
+                adVqmCallHistPktsLostTotal              Counter32,
+                adVqmCallHistPktsDiscardedTotal         Counter32,
+                adVqmCallHistOutOfOrder                 Counter32,
+                adVqmCallHistPdvAverageMs               Unsigned32,
+                adVqmCallHistPdvMaximumMs               Unsigned32,
+                adVqmCallHistRtDelayInst                INTEGER,
+                adVqmCallHistRtDelayAverage             INTEGER,
+                adVqmCallHistRtDelayMaximum             INTEGER,
+                adVqmCallHistOnewayDelayInst            INTEGER,
+                adVqmCallHistOnewayDelayAverage         INTEGER,
+                adVqmCallHistOnewayDelayMaximum         INTEGER,
+                adVqmCallHistOrigDelayInst              INTEGER,
+                adVqmCallHistOrigDelayAverage           INTEGER,
+                adVqmCallHistOrigDelayMaximum           INTEGER,
+                adVqmCallHistTermDelayMinimum           INTEGER,
+                adVqmCallHistTermDelayAverage           INTEGER,
+                adVqmCallHistTermDelayMaximum           INTEGER,
+                adVqmCallHistRLq                        Unsigned32,
+                adVqmCallHistRCq                        Unsigned32,
+                adVqmCallHistRNominal                   Unsigned32,
+                adVqmCallHistRG107                      Unsigned32,
+                adVqmCallHistMosLq                      MOSvalue,
+                adVqmCallHistMosCq                      MOSvalue,
+                adVqmCallHistMosPq                      MOSvalue,
+                adVqmCallHistMosNominal                 MOSvalue,
+                adVqmCallHistDegLoss                    Percentage,
+                adVqmCallHistDegDiscard                 Percentage,
+                adVqmCallHistDegVocoder                 Percentage,
+                adVqmCallHistDegRecency                 Percentage,
+                adVqmCallHistDegDelay                   Percentage,
+                adVqmCallHistDegSiglvl                  Percentage,
+                adVqmCallHistDegNoiselvl                Percentage,
+                adVqmCallHistDegEcholvl                 Percentage,
+                adVqmCallHistBurstRLq                   Unsigned32,
+                adVqmCallHistBurstCount                 Counter32,
+                adVqmCallHistBurstRateAvg               Percentage,
+                adVqmCallHistBurstLenAvgPkts            Unsigned32,
+                adVqmCallHistBurstLenAvgMsec            Unsigned32,
+                adVqmCallHistGapR                       Unsigned32,
+                adVqmCallHistGapCount                   Counter32,
+                adVqmCallHistGapLossRateAvg             Percentage,
+                adVqmCallHistGapLenPkts                 Unsigned32,
+                adVqmCallHistGapLenMsec                 Unsigned32,
+                adVqmCallHistLossRateAvg                Percentage,
+                adVqmCallHistNetworkLossAvg             Percentage,
+                adVqmCallHistDiscardRateAvg             Percentage,
+                adVqmCallHistExcessBurst                Unsigned32,
+                adVqmCallHistExcessGap                  Unsigned32,
+                adVqmCallHistPpdvMsec                   MsecValue,
+                adVqmCallHistLateThresholdMs            MsecValue,
+                adVqmCallHistLateThresholdPc            Percentage,
+                adVqmCallHistLateUnderThresh            Counter32,
+                adVqmCallHistLateTotalCount             Counter32,
+                adVqmCallHistLatePeakJitterMs           MsecValue,
+                adVqmCallHistEarlyThreshMs              MsecValue,
+                adVqmCallHistEarlyThreshPc              Percentage,
+                adVqmCallHistEarlyUnderThresh           Counter32,
+                adVqmCallHistEarlyTotalCount            Counter32,
+                adVqmCallHistEarlyPeakJitterMs          MsecValue,
+                adVqmCallHistDelayIncreaseCount         Counter32,
+                adVqmCallHistDelayDecreaseCount         Counter32,
+                adVqmCallHistResyncCount                Counter32,
+                adVqmCallHistJitterBufferType           INTEGER,
+                adVqmCallHistJbCfgMin                   Unsigned32,
+                adVqmCallHistJbCfgNom                   Unsigned32,
+                adVqmCallHistJbCfgMax                   Unsigned32,
+                adVqmCallHistDuplicatePkts              Counter32,
+                adVqmCallHistEarlyPkts                  Counter32,
+                adVqmCallHistLatePkts                   Counter32,
+                adVqmCallHistOverrunDiscardPkts         Counter32,
+                adVqmCallHistUnderrunDiscardPkts        Counter32,
+                adVqmCallHistDelayMinMsec               Unsigned32,
+                adVqmCallHistDelayAvgMsec               Unsigned32,
+                adVqmCallHistDelayMaxMsec               Unsigned32,
+                adVqmCallHistDelayCurrentMsec           Unsigned32,
+                adVqmCallHistExtRLqIn                   INTEGER,
+                adVqmCallHistExtRLqOut                  INTEGER,
+                adVqmCallHistExtRCqIn                   INTEGER,
+                adVqmCallHistExtRCqOut                  INTEGER,
+                adVqmCallHistThroughPutIndex            Unsigned32,
+                adVqmCallHistReliabilityIndex           Unsigned32,
+                adVqmCallHistBitrate                    Unsigned32
+     }
+
+     adVqmCallHistRtpSourceIp OBJECT-TYPE
+         SYNTAX         IpAddress
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source IP Address of RTP stream."
+         ::= { adVQMCallHistoryEntry 1 }
+
+     adVqmCallHistRtpSourcePort OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source port number."
+         ::= { adVQMCallHistoryEntry 2 }
+
+     adVqmCallHistRtpDestIp OBJECT-TYPE
+         SYNTAX         IpAddress
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination IP address of RTP stream."
+         ::= { adVQMCallHistoryEntry 3 }
+
+     adVqmCallHistRtpDestPort OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination port number."
+         ::= { adVQMCallHistoryEntry 4 }
+
+     adVqmCallHistSsrcid OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "SSRC (synchronization source ID) for this stream per RFC3550."
+         ::= { adVQMCallHistoryEntry 5 }
+
+     adVqmCallHistTo OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "To URI (dialed) from monitored SIP call signaling."
+         ::= { adVQMCallHistoryEntry 6 }
+
+     adVqmCallHistFrom OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "From URI (originating caller) from monitored SIP call signaling."
+         ::= { adVQMCallHistoryEntry 7 }
+
+     adVqmCallHistRtpSourceUri OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "URI of sender RTP, either To URI or From URI."
+         ::= { adVQMCallHistoryEntry 8 }
+
+     adVqmCallHistCallid OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "SIP call-ID from monitored SIP call signaling."
+         ::= { adVQMCallHistoryEntry 9 }
+
+     adVqmCallHistCcmid OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Internal generated call-ID."
+         ::= { adVQMCallHistoryEntry 10 }
+
+     adVqmCallHistSourceIntName OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source interface name that RTP arrived inbound to unit."
+         ::= { adVQMCallHistoryEntry 11 }
+
+     adVqmCallHistDestIntName OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination interface name for RTP."
+         ::= { adVQMCallHistoryEntry 12 }
+
+     adVqmCallHistSourceIntDescription OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source interface description as defined in CLI or GUI."
+         ::= { adVQMCallHistoryEntry 13 }
+
+     adVqmCallHistDestIntDescription OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination interface description as defined in CLI or GUI."
+         ::= { adVQMCallHistoryEntry 14 }
+
+     adVqmCallHistCallStart OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Time at which monitoring began on this RTP stream."
+         ::= { adVQMCallHistoryEntry 15 }
+
+     adVqmCallHistCallDurationMs OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Elapsed time from start to last RTP packet on this stream."
+         ::= { adVQMCallHistoryEntry 16 }
+
+     adVqmCallHistCodec OBJECT-TYPE
+         SYNTAX         INTEGER
+                        {
+                        -- -1
+                        unknown         (1),
+                        -- 0
+                        g711U           (2),
+                        g711UPLC        (3),
+                        g723153K        (4),
+                        deprecated1     (5),
+                        g723163K        (6),
+                        deprecated2     (7),
+                        g728            (8),
+                        deprecated3     (9),
+                        g729            (10),
+                        deprecated4     (11),
+                        g729A           (12),
+                        deprecated5     (13),
+                        user1           (14),
+                        user2           (15),
+                        user3           (16),
+                        user4           (17),
+                        gsmfr           (18),
+                        reservedgsmhr   (19),
+                        gsmefr          (20),
+                        sx7300          (21),
+                        sx9600          (22),
+                        g711A           (23),
+                        g711APLC        (24),
+                        deprecated6     (25),
+                        g72616K         (26),
+                        g72624K         (27),
+                        g72632K         (28),
+                        g72640K         (29),
+                        gipse711U       (30),
+                        gipse711A       (31),
+                        gipsilbc        (32),
+                        gipsisac        (33),
+                        gipsipcmwb      (34),
+                        g729E8K0        (35),
+                        g729E11k8       (36),
+                        wblinearpcm     (37),
+                        wblinearpcmPlc  (38),
+                        g722at64k       (39),
+                        g722at56k       (40),
+                        g722at48k       (41),
+                        g7221at32k      (42),
+                        g7221at24k      (43),
+                        g7222at23k85    (44),
+                        g7222at23k05    (45),
+                        g7222at19k85    (46),
+                        g7222at18k25    (47),
+                        g7222at15k85    (48),
+                        g7222at14k25    (49),
+                        g7222at12k85    (50),
+                        g7222at8k85     (51),
+                        g7222at6k6      (52),
+                        qcelp8          (53),
+                        qcelp13         (54),
+                        evrc            (55),
+                        smv812          (56),
+                        smv579          (57),
+                        smv444          (58),
+                        smv395          (59),
+                        amrnb12k2       (60),
+                        amrnb10k2       (61),
+                        amrnb7k95       (62),
+                        amrnb7k4        (63),
+                        amrnb6k7        (64),
+                        amrnb5k9        (65),
+                        amrnb5k15       (66),
+                        amrnb4k75       (67),
+                        ilbc13k3        (68),
+                        ilbc15k2        (69),
+                        g711u56k        (70),
+                        g711uPLC56k     (71),
+                        g711A56k        (72),
+                        g711APLC56k     (73),
+                        g7231C          (74),
+                        speex2k15       (75),
+                        speex5k95       (76),
+                        speeX8k         (77),
+                        speeX11k        (78),
+                        speeX15k        (79),
+                        speeX18k2       (80),
+                        speeX24k6       (81),
+                        speeX3k95       (82),
+                        speeX12k8       (83),
+                        speeX16k8       (84),
+                        speeX20k6       (85),
+                        speeX23k8       (86),
+                        speeX27k8       (87),
+                        speeX34k2       (88),
+                        speeX42k2       (89)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Last voice CODEC detected on this stream."
+         ::= { adVQMCallHistoryEntry 17 }
+
+     adVqmCallHistCodecClass OBJECT-TYPE
+         SYNTAX         INTEGER {
+                wideband        (1),
+                other           (2)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Class to which CODEC vocoder belongs."
+         ::= { adVQMCallHistoryEntry 18 }
+
+     adVqmCallHistDscp OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Differentiated Services Code Point (DSCP) in RTP packet IP header."
+         ::= { adVQMCallHistoryEntry 19 }
+
+     adVqmCallHistPktsRcvdTotal OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total received RTP packets in this stream."
+         ::= { adVQMCallHistoryEntry 20 }
+
+     adVqmCallHistPktsLostTotal OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total packets determined to be lost in network by simulated jitter
+            buffer."
+         ::= { adVQMCallHistoryEntry 21 }
+
+     adVqmCallHistPktsDiscardedTotal OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total packets discarded by simulated jitter buffer."
+         ::= { adVQMCallHistoryEntry 22 }
+
+     adVqmCallHistOutOfOrder OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total packets received out of order at simulated jitter buffer."
+         ::= { adVQMCallHistoryEntry 23 }
+
+     adVqmCallHistPdvAverageMs OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average Packet Delay Variation (PDV) in RTP stream in
+            milliseconds."
+         ::= { adVQMCallHistoryEntry 24 }
+
+     adVqmCallHistPdvMaximumMs OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum Packet Delay Variation (PDV) in RTP stream in
+            milliseconds."
+         ::= { adVQMCallHistoryEntry 25 }
+
+     adVqmCallHistRtDelayInst OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous round-trip delay obtained from RTCP or RTCP XR
+            reports."
+         ::= { adVQMCallHistoryEntry 26 }
+
+     adVqmCallHistRtDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average round-trip delay obtained from RTCP or RTCP XR reports."
+         ::= { adVQMCallHistoryEntry 27 }
+
+     adVqmCallHistRtDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum round-trip delay obtained from RTCP or RTCP XR reports."
+         ::= { adVQMCallHistoryEntry 28 }
+
+     adVqmCallHistOnewayDelayInst OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous one-way delay including simulated jitter buffer (SJB)
+            delay."
+         ::= { adVQMCallHistoryEntry 29 }
+
+     adVqmCallHistOnewayDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average one-way delay including SJB delay."
+         ::= { adVQMCallHistoryEntry 30 }
+
+     adVqmCallHistOnewayDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum one-way delay including SJB delay."
+         ::= { adVQMCallHistoryEntry 31 }
+
+     adVqmCallHistOrigDelayInst OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous origination end-point delay from RTCP XR reports."
+         ::= { adVQMCallHistoryEntry 32 }
+
+     adVqmCallHistOrigDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average origination end-point delay from RTCP XR reports."
+         ::= { adVQMCallHistoryEntry 33 }
+
+     adVqmCallHistOrigDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum origination end-point delay from RTCP XR reports."
+         ::= { adVQMCallHistoryEntry 34 }
+
+     adVqmCallHistTermDelayMinimum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous termination end-point delay, simulated jitter
+            buffer + codec."
+         ::= { adVQMCallHistoryEntry 35 }
+
+     adVqmCallHistTermDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average termination end-point delay, simulated jitter
+            buffer + codec."
+         ::= { adVQMCallHistoryEntry 36 }
+
+     adVqmCallHistTermDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum termination end-point delay, simulated jitter
+            buffer + codec."
+         ::= { adVQMCallHistoryEntry 37 }
+
+     adVqmCallHistRLq OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening quality R factor."
+         ::= { adVQMCallHistoryEntry 38 }
+
+     adVqmCallHistRCq OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Conversational quality R factor."
+         ::= { adVQMCallHistoryEntry 39 }
+
+     adVqmCallHistRNominal OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Nominal or generally accepted maximum R factor for this stream."
+         ::= { adVQMCallHistoryEntry 40 }
+
+     adVqmCallHistRG107 OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "R factor based on ITU G.107 E Model for this stream."
+         ::= { adVQMCallHistoryEntry 41 }
+
+     adVqmCallHistMosLq OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening quality MOS score."
+         ::= { adVQMCallHistoryEntry 42 }
+
+     adVqmCallHistMosCq OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Conversational quality MOS score."
+         ::= { adVQMCallHistoryEntry 43 }
+
+     adVqmCallHistMosPq OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening quality MOS score normalized to the PESQ scale."
+         ::= { adVQMCallHistoryEntry 44 }
+
+     adVqmCallHistMosNominal OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Nominal or generally accepted maximum MOS score for this stream."
+         ::= { adVQMCallHistoryEntry 45 }
+
+     adVqmCallHistDegLoss OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to packet loss."
+         ::= { adVQMCallHistoryEntry 46 }
+
+     adVqmCallHistDegDiscard OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to packet discard."
+         ::= { adVQMCallHistoryEntry 47 }
+
+     adVqmCallHistDegVocoder OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to voice CODEC selection."
+         ::= { adVQMCallHistoryEntry 48 }
+
+     adVqmCallHistDegRecency OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to loss or discard recency in
+            call."
+         ::= { adVQMCallHistoryEntry 49 }
+
+     adVqmCallHistDegDelay OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to delay."
+         ::= { adVQMCallHistoryEntry 50 }
+
+     adVqmCallHistDegSiglvl OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to low speech energy signal
+            level."
+         ::= { adVQMCallHistoryEntry 51 }
+
+     adVqmCallHistDegNoiselvl OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to high noise levels."
+         ::= { adVQMCallHistoryEntry 52 }
+
+     adVqmCallHistDegEcholvl OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to high echo levels."
+         ::= { adVQMCallHistoryEntry 53 }
+
+     adVqmCallHistBurstRLq OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average listening quality R factor during burst condition."
+         ::= { adVQMCallHistoryEntry 54 }
+
+     adVqmCallHistBurstCount OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of times the stream was in a burst condition."
+         ::= { adVQMCallHistoryEntry 55 }
+
+     adVqmCallHistBurstRateAvg OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost or discarded while in
+            burst condition."
+         ::= { adVQMCallHistoryEntry 56 }
+
+     adVqmCallHistBurstLenAvgPkts OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average burst length in packets."
+         ::= { adVQMCallHistoryEntry 57 }
+
+     adVqmCallHistBurstLenAvgMsec OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average burst length in miliseconds."
+         ::= { adVQMCallHistoryEntry 58 }
+
+     adVqmCallHistGapR OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average listening quality R factor while stream is in a gap
+            condition."
+         ::= { adVQMCallHistoryEntry 59 }
+
+     adVqmCallHistGapCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of times the stream is in gap condition."
+         ::= { adVQMCallHistoryEntry 60 }
+
+     adVqmCallHistGapLossRateAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost or discarded while in
+            gap condition."
+         ::= { adVQMCallHistoryEntry 61 }
+
+     adVqmCallHistGapLenPkts  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average gap length in packets."
+         ::= { adVQMCallHistoryEntry 62 }
+
+     adVqmCallHistGapLenMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average gap length in milliseconds."
+         ::= { adVQMCallHistoryEntry 63 }
+
+     adVqmCallHistLossRateAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost or discarded."
+         ::= { adVQMCallHistoryEntry 64 }
+
+     adVqmCallHistNetworkLossAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost in network, excludes
+            SJB discards."
+         ::= { adVQMCallHistoryEntry 65 }
+
+     adVqmCallHistDiscardRateAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames discarded by SJB."
+         ::= { adVQMCallHistoryEntry 66 }
+
+     adVqmCallHistExcessBurst  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total length of speech lost during burst conditions not handled
+            effectively by packet loss-concealment."
+         ::= { adVQMCallHistoryEntry 67 }
+
+     adVqmCallHistExcessGap  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total length of speech lost during gap conditions not handled
+            effectively by packet loss-concealment."
+         ::= { adVQMCallHistoryEntry 68 }
+
+     adVqmCallHistPpdvMsec  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Packet to packed delay variation (jitter) in ms, as defined in
+            RFC3550."
+         ::= { adVQMCallHistoryEntry 69 }
+
+     adVqmCallHistLateThresholdMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Late threshold for SJB, packets arriving under this threshold are
+            not discarded."
+         ::= { adVQMCallHistoryEntry 70 }
+
+     adVqmCallHistLateThresholdPc  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage of total packets (including both early and late packets)
+            not judged as being under the late jitter threshold."
+         ::= { adVQMCallHistoryEntry 71 }
+
+     adVqmCallHistLateUnderThresh  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Count of late packets which arrived under the late jitter
+            threshold."
+         ::= { adVQMCallHistoryEntry 72 }
+
+     adVqmCallHistLateTotalCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total count of late packets arriving after the expected delay."
+         ::= { adVQMCallHistoryEntry 73 }
+
+     adVqmCallHistLatePeakJitterMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Largest jitter encountered among packets counted as late."
+         ::= { adVQMCallHistoryEntry 74 }
+
+     adVqmCallHistEarlyThreshMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Early threshold for SJB, packets arriving under this threshold
+            will not be discarded by SJB as early."
+         ::= { adVQMCallHistoryEntry 75 }
+
+     adVqmCallHistEarlyThreshPc  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage of total packets (including both early and late packets)
+            not judged as being under the early jitter threshold."
+         ::= { adVQMCallHistoryEntry 76 }
+
+     adVqmCallHistEarlyUnderThresh  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Count of early packets which arrived under the early jitter
+            threshold."
+         ::= { adVQMCallHistoryEntry 77 }
+
+     adVqmCallHistEarlyTotalCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total count of early packets arriving before the expected delay."
+         ::= { adVQMCallHistoryEntry 78 }
+
+     adVqmCallHistEarlyPeakJitterMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Largest jitter encountered among packets counted as early."
+         ::= { adVQMCallHistoryEntry 79 }
+
+     adVqmCallHistDelayIncreaseCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of SJB delay increases (adaptive mode only)."
+         ::= { adVQMCallHistoryEntry 80 }
+
+     adVqmCallHistDelayDecreaseCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of SJB delay decreases (adaptive mode only)."
+         ::= { adVQMCallHistoryEntry 81 }
+
+     adVqmCallHistResyncCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of  SJB resynchronizations caused by discontinuous
+            transmission (DTX), voice activity detection (VAD), or silence
+            suppression."
+         ::= { adVQMCallHistoryEntry 82 }
+
+     adVqmCallHistJitterBufferType  OBJECT-TYPE
+         SYNTAX         INTEGER {
+                        fixed     (1),
+                        adaptive  (2),
+                        unknown   (3)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Configured SJB type either adaptive or fixed for this stream."
+         ::= { adVQMCallHistoryEntry 83 }
+
+     adVqmCallHistJbCfgMin  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Adaptive jitter buffer minimum delay applied to packets received."
+         ::= { adVQMCallHistoryEntry 84 }
+
+     adVqmCallHistJbCfgNom  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Adaptive jitter buffer inital delay applied to packets received,
+            or fixed jitter buffer delay applied to each packet."
+         ::= { adVQMCallHistoryEntry 85 }
+
+     adVqmCallHistJbCfgMax  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Adaptive jitter buffer upper bound on delay applied to packets
+            received, or fixed jitter buffer maximum number of packets that will
+            be inserted in buffer."
+         ::= { adVQMCallHistoryEntry 86 }
+
+     adVqmCallHistDuplicatePkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of duplicated packets discarded by SJB."
+         ::= { adVQMCallHistoryEntry 87 }
+
+     adVqmCallHistEarlyPkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets arriving early."
+         ::= { adVQMCallHistoryEntry 88 }
+
+     adVqmCallHistLatePkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets arriving late."
+         ::= { adVQMCallHistoryEntry 89 }
+
+     adVqmCallHistOverrunDiscardPkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets discarded by SJB due to jitter buffer
+            overrun."
+         ::= { adVQMCallHistoryEntry 90 }
+
+     adVqmCallHistUnderrunDiscardPkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets discarded by SJB due to jitter buffer
+            underrun."
+         ::= { adVQMCallHistoryEntry 91 }
+
+     adVqmCallHistDelayMinMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay minimum value."
+         ::= { adVQMCallHistoryEntry 92 }
+
+     adVqmCallHistDelayAvgMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay average value."
+         ::= { adVQMCallHistoryEntry 93 }
+
+     adVqmCallHistDelayMaxMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay maximum value."
+         ::= { adVQMCallHistoryEntry 94 }
+
+     adVqmCallHistDelayCurrentMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay current value."
+         ::= { adVQMCallHistoryEntry 95 }
+
+     adVqmCallHistExtRLqIn  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External listening quality R factor (in), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMCallHistoryEntry 96 }
+
+     adVqmCallHistExtRLqOut  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External listening quality R factor (out), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMCallHistoryEntry 97 }
+
+     adVqmCallHistExtRCqIn  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External conversational quality R factor (in), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMCallHistoryEntry 98 }
+
+     adVqmCallHistExtRCqOut  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External conversational quality R factor (out), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMCallHistoryEntry 99 }
+
+     adVqmCallHistThroughPutIndex  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Estimated throughput for fax or data call; bitrate range from 0 to
+            35000 bps, calculated based on gap/burst conditions and loss/discard
+            rates."
+         ::= { adVQMCallHistoryEntry 100 }
+
+     adVqmCallHistReliabilityIndex  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Reliability index for a fax or data call ranging from 0 least to
+            100 most reliable."
+         ::= { adVQMCallHistoryEntry 101 }
+
+     adVqmCallHistBitrate  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Actual bitrate of RTP stream, calculated using size of each RTP
+            packet in bits and duration of audio represented in each packet,
+            indication of required bandwidth."
+         ::= { adVQMCallHistoryEntry 102 }
+
+     --
+     -- adVqmActiveCall
+     --
+
+     adVQMActiveCallTable OBJECT-TYPE
+         SYNTAX         SEQUENCE OF AdVQMActiveCallEntry
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION
+                "The adVqmActiveCall table provides detail voice quality
+                statistics on currently active RTP voice streams.  A voice call
+                will have two entries in this table one for each active RTP
+                stream.  A combination of Source IP Address and Port,
+                Destination IP Address and Port, and SSRC
+                (synchronization source ID) are necessary to uniquely identify
+                the call session.
+                The VQM Active Call table shares the same type of information
+                as found in the Call History table.  The VQM Manager transfers
+                the active call statistics into the call history table database
+                when the call completes."
+         ::= { adVQMActive 1 }
+
+     adVQMActiveCallEntry OBJECT-TYPE
+         SYNTAX   AdVQMActiveCallEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "The statistics for a particular VoIP end-point device."
+         INDEX { adVqmActCallRtpSourceIp, adVqmActCallRtpSourcePort,
+                adVqmActCallRtpDestIp, adVqmActCallRtpDestPort,
+                adVqmActCallSsrcid }
+         ::= { adVQMActiveCallTable 1 }
+
+     AdVQMActiveCallEntry ::=
+        SEQUENCE {
+                adVqmActCallRtpSourceIp                IpAddress,
+                adVqmActCallRtpSourcePort              Unsigned32,
+                adVqmActCallRtpDestIp                  IpAddress,
+                adVqmActCallRtpDestPort                Unsigned32,
+                adVqmActCallSsrcid                     Unsigned32,
+                adVqmActCallTo                         DisplayString,
+                adVqmActCallFrom                       DisplayString,
+                adVqmActCallRtpSourceUri               DisplayString,
+                adVqmActCallCallid                     DisplayString,
+                adVqmActCallCcmid                      Unsigned32,
+                adVqmActCallSourceIntName              DisplayString,
+                adVqmActCallDestIntName                DisplayString,
+                adVqmActCallSourceIntDescription       DisplayString,
+                adVqmActCallDestIntDescription         DisplayString,
+                adVqmActCallCallStart                  DisplayString,
+                adVqmActCallCallDurationMs             Unsigned32,
+                adVqmActCallCodec                      INTEGER,
+                adVqmActCallCodecClass                 INTEGER,
+                adVqmActCallDscp                       Unsigned32,
+                adVqmActCallPktsRcvdTotal              Counter32,
+                adVqmActCallPktsLostTotal              Counter32,
+                adVqmActCallPktsDiscardedTotal         Counter32,
+                adVqmActCallOutOfOrder                 Counter32,
+                adVqmActCallPdvAverageMs               Unsigned32,
+                adVqmActCallPdvMaximumMs               Unsigned32,
+                adVqmActCallRtDelayInst                INTEGER,
+                adVqmActCallRtDelayAverage             INTEGER,
+                adVqmActCallRtDelayMaximum             INTEGER,
+                adVqmActCallOnewayDelayInst            INTEGER,
+                adVqmActCallOnewayDelayAverage         INTEGER,
+                adVqmActCallOnewayDelayMaximum         INTEGER,
+                adVqmActCallOrigDelayInst              INTEGER,
+                adVqmActCallOrigDelayAverage           INTEGER,
+                adVqmActCallOrigDelayMaximum           INTEGER,
+                adVqmActCallTermDelayMinimum           INTEGER,
+                adVqmActCallTermDelayAverage           INTEGER,
+                adVqmActCallTermDelayMaximum           INTEGER,
+                adVqmActCallRLq                        Unsigned32,
+                adVqmActCallRCq                        Unsigned32,
+                adVqmActCallRNominal                   Unsigned32,
+                adVqmActCallRG107                      Unsigned32,
+                adVqmActCallMosLq                      MOSvalue,
+                adVqmActCallMosCq                      MOSvalue,
+                adVqmActCallMosPq                      MOSvalue,
+                adVqmActCallMosNominal                 MOSvalue,
+                adVqmActCallDegLoss                    Percentage,
+                adVqmActCallDegDiscard                 Percentage,
+                adVqmActCallDegVocoder                 Percentage,
+                adVqmActCallDegRecency                 Percentage,
+                adVqmActCallDegDelay                   Percentage,
+                adVqmActCallDegSiglvl                  Percentage,
+                adVqmActCallDegNoiselvl                Percentage,
+                adVqmActCallDegEcholvl                 Percentage,
+                adVqmActCallBurstRLq                   Unsigned32,
+                adVqmActCallBurstCount                 Counter32,
+                adVqmActCallBurstRateAvg               Percentage,
+                adVqmActCallBurstLenAvgPkts            Unsigned32,
+                adVqmActCallBurstLenAvgMsec            Unsigned32,
+                adVqmActCallGapR                       Unsigned32,
+                adVqmActCallGapCount                   Counter32,
+                adVqmActCallGapLossRateAvg             Percentage,
+                adVqmActCallGapLenPkts                 Unsigned32,
+                adVqmActCallGapLenMsec                 Unsigned32,
+                adVqmActCallLossRateAvg                Percentage,
+                adVqmActCallNetworkLossAvg             Percentage,
+                adVqmActCallDiscardRateAvg             Percentage,
+                adVqmActCallExcessBurst                Unsigned32,
+                adVqmActCallExcessGap                  Unsigned32,
+                adVqmActCallPpdvMsec                   MsecValue,
+                adVqmActCallLateThresholdMs            MsecValue,
+                adVqmActCallLateThresholdPc            Percentage,
+                adVqmActCallLateUnderThresh            Counter32,
+                adVqmActCallLateTotalCount             Counter32,
+                adVqmActCallLatePeakJitterMs           MsecValue,
+                adVqmActCallEarlyThreshMs              MsecValue,
+                adVqmActCallEarlyThreshPc              Percentage,
+                adVqmActCallEarlyUnderThresh           Counter32,
+                adVqmActCallEarlyTotalCount            Counter32,
+                adVqmActCallEarlyPeakJitterMs          MsecValue,
+                adVqmActCallDelayIncreaseCount         Counter32,
+                adVqmActCallDelayDecreaseCount         Counter32,
+                adVqmActCallResyncCount                Counter32,
+                adVqmActCallJitterBufferType           INTEGER,
+                adVqmActCallJbCfgMin                   Unsigned32,
+                adVqmActCallJbCfgNom                   Unsigned32,
+                adVqmActCallJbCfgMax                   Unsigned32,
+                adVqmActCallDuplicatePkts              Counter32,
+                adVqmActCallEarlyPkts                  Counter32,
+                adVqmActCallLatePkts                   Counter32,
+                adVqmActCallOverrunDiscardPkts         Counter32,
+                adVqmActCallUnderrunDiscardPkts        Counter32,
+                adVqmActCallDelayMinMsec               Unsigned32,
+                adVqmActCallDelayAvgMsec               Unsigned32,
+                adVqmActCallDelayMaxMsec               Unsigned32,
+                adVqmActCallDelayCurrentMsec           Unsigned32,
+                adVqmActCallExtRLqIn                   INTEGER,
+                adVqmActCallExtRLqOut                  INTEGER,
+                adVqmActCallExtRCqIn                   INTEGER,
+                adVqmActCallExtRCqOut                  INTEGER,
+                adVqmActCallThroughPutIndex            Unsigned32,
+                adVqmActCallReliabilityIndex           Unsigned32,
+                adVqmActCallBitrate                    Unsigned32
+     }
+
+     adVqmActCallRtpSourceIp OBJECT-TYPE
+         SYNTAX         IpAddress
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source IP Address of RTP stream."
+         ::= { adVQMActiveCallEntry 1 }
+
+     adVqmActCallRtpSourcePort OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source port number."
+         ::= { adVQMActiveCallEntry 2 }
+
+     adVqmActCallRtpDestIp OBJECT-TYPE
+         SYNTAX         IpAddress
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination IP address of RTP stream."
+         ::= { adVQMActiveCallEntry 3 }
+
+     adVqmActCallRtpDestPort OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination port number."
+         ::= { adVQMActiveCallEntry 4 }
+
+     adVqmActCallSsrcid OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "SSRC (synchronization source ID) for this stream per RFC3550."
+         ::= { adVQMActiveCallEntry 5 }
+
+     adVqmActCallTo OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "To URI (dialed) from monitored SIP call signaling."
+         ::= { adVQMActiveCallEntry 6 }
+
+     adVqmActCallFrom OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "From URI (originating caller) from monitored SIP call signaling."
+         ::= { adVQMActiveCallEntry 7 }
+
+     adVqmActCallRtpSourceUri OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "URI of sender RTP, either To URI or From URI."
+         ::= { adVQMActiveCallEntry 8 }
+
+     adVqmActCallCallid OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "SIP call-ID from monitored SIP call signaling."
+         ::= { adVQMActiveCallEntry 9 }
+
+     adVqmActCallCcmid OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Internal generated call-ID."
+         ::= { adVQMActiveCallEntry 10 }
+
+     adVqmActCallSourceIntName OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source interface name that RTP arrived inbound to unit."
+         ::= { adVQMActiveCallEntry 11 }
+
+     adVqmActCallDestIntName OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination interface name for RTP."
+         ::= { adVQMActiveCallEntry 12 }
+
+     adVqmActCallSourceIntDescription OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Source interface description as defined in CLI or GUI."
+         ::= { adVQMActiveCallEntry 13 }
+
+     adVqmActCallDestIntDescription OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Destination interface description as defined in CLI or GUI."
+         ::= { adVQMActiveCallEntry 14 }
+
+     adVqmActCallCallStart OBJECT-TYPE
+         SYNTAX         DisplayString
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Time at which monitoring began on this RTP stream."
+         ::= { adVQMActiveCallEntry 15 }
+
+     adVqmActCallCallDurationMs OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Elapsed time from start to last RTP packet on this stream."
+         ::= { adVQMActiveCallEntry 16 }
+
+     adVqmActCallCodec OBJECT-TYPE
+         SYNTAX         INTEGER
+                        {
+                        -- -1
+                        unknown         (1),
+                        -- 0
+                        g711U           (2),
+                        g711UPLC        (3),
+                        g723153K        (4),
+                        deprecated1     (5),
+                        g723163K        (6),
+                        deprecated2     (7),
+                        g728            (8),
+                        deprecated3     (9),
+                        g729            (10),
+                        deprecated4     (11),
+                        g729A           (12),
+                        deprecated5     (13),
+                        user1           (14),
+                        user2           (15),
+                        user3           (16),
+                        user4           (17),
+                        gsmfr           (18),
+                        reservedgsmhr   (19),
+                        gsmefr          (20),
+                        sx7300          (21),
+                        sx9600          (22),
+                        g711A           (23),
+                        g711APLC        (24),
+                        deprecated6     (25),
+                        g72616K         (26),
+                        g72624K         (27),
+                        g72632K         (28),
+                        g72640K         (29),
+                        gipse711U       (30),
+                        gipse711A       (31),
+                        gipsilbc        (32),
+                        gipsisac        (33),
+                        gipsipcmwb      (34),
+                        g729E8K0        (35),
+                        g729E11k8       (36),
+                        wblinearpcm     (37),
+                        wblinearpcmPlc  (38),
+                        g722at64k       (39),
+                        g722at56k       (40),
+                        g722at48k       (41),
+                        g7221at32k      (42),
+                        g7221at24k      (43),
+                        g7222at23k85    (44),
+                        g7222at23k05    (45),
+                        g7222at19k85    (46),
+                        g7222at18k25    (47),
+                        g7222at15k85    (48),
+                        g7222at14k25    (49),
+                        g7222at12k85    (50),
+                        g7222at8k85     (51),
+                        g7222at6k6      (52),
+                        qcelp8          (53),
+                        qcelp13         (54),
+                        evrc            (55),
+                        smv812          (56),
+                        smv579          (57),
+                        smv444          (58),
+                        smv395          (59),
+                        amrnb12k2       (60),
+                        amrnb10k2       (61),
+                        amrnb7k95       (62),
+                        amrnb7k4        (63),
+                        amrnb6k7        (64),
+                        amrnb5k9        (65),
+                        amrnb5k15       (66),
+                        amrnb4k75       (67),
+                        ilbc13k3        (68),
+                        ilbc15k2        (69),
+                        g711u56k        (70),
+                        g711uPLC56k     (71),
+                        g711A56k        (72),
+                        g711APLC56k     (73),
+                        g7231C          (74),
+                        speex2k15       (75),
+                        speex5k95       (76),
+                        speeX8k         (77),
+                        speeX11k        (78),
+                        speeX15k        (79),
+                        speeX18k2       (80),
+                        speeX24k6       (81),
+                        speeX3k95       (82),
+                        speeX12k8       (83),
+                        speeX16k8       (84),
+                        speeX20k6       (85),
+                        speeX23k8       (86),
+                        speeX27k8       (87),
+                        speeX34k2       (88),
+                        speeX42k2       (89)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Last voice CODEC detected on this stream."
+         ::= { adVQMActiveCallEntry 17 }
+
+     adVqmActCallCodecClass OBJECT-TYPE
+         SYNTAX         INTEGER {
+                wideband        (1),
+                other           (2)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Class to which CODEC vocoder belongs."
+         ::= { adVQMActiveCallEntry 18 }
+
+     adVqmActCallDscp OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Differentiated Services Code Point (DSCP) in RTP packet IP header."
+         ::= { adVQMActiveCallEntry 19 }
+
+     adVqmActCallPktsRcvdTotal OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total received RTP packets in this stream."
+         ::= { adVQMActiveCallEntry 20 }
+
+     adVqmActCallPktsLostTotal OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total packets determined to be lost in network by simulated jitter
+            buffer."
+         ::= { adVQMActiveCallEntry 21 }
+
+     adVqmActCallPktsDiscardedTotal OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total packets discarded by simulated jitter buffer."
+         ::= { adVQMActiveCallEntry 22 }
+
+     adVqmActCallOutOfOrder OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total packets received out of order at simulated jitter buffer."
+         ::= { adVQMActiveCallEntry 23 }
+
+     adVqmActCallPdvAverageMs OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average Packet Delay Variation (PDV) in RTP stream in
+            milliseconds."
+         ::= { adVQMActiveCallEntry 24 }
+
+     adVqmActCallPdvMaximumMs OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum Packet Delay Variation (PDV) in RTP stream in
+            milliseconds."
+         ::= { adVQMActiveCallEntry 25 }
+
+     adVqmActCallRtDelayInst OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous round-trip delay obtained from RTCP or RTCP XR
+            reports."
+         ::= { adVQMActiveCallEntry 26 }
+
+     adVqmActCallRtDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average round-trip delay obtained from RTCP or RTCP XR reports."
+         ::= { adVQMActiveCallEntry 27 }
+
+     adVqmActCallRtDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum round-trip delay obtained from RTCP or RTCP XR reports."
+         ::= { adVQMActiveCallEntry 28 }
+
+     adVqmActCallOnewayDelayInst OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous one-way delay including simulated jitter buffer (SJB)
+            delay."
+         ::= { adVQMActiveCallEntry 29 }
+
+     adVqmActCallOnewayDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average one-way delay including SJB delay."
+         ::= { adVQMActiveCallEntry 30 }
+
+     adVqmActCallOnewayDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum one-way delay including SJB delay."
+         ::= { adVQMActiveCallEntry 31 }
+
+     adVqmActCallOrigDelayInst OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous origination end-point delay from RTCP XR reports."
+         ::= { adVQMActiveCallEntry 32 }
+
+     adVqmActCallOrigDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average origination end-point delay from RTCP XR reports."
+         ::= { adVQMActiveCallEntry 33 }
+
+     adVqmActCallOrigDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum origination end-point delay from RTCP XR reports."
+         ::= { adVQMActiveCallEntry 34 }
+
+     adVqmActCallTermDelayMinimum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Instantaneous termination end-point delay, simulated jitter
+            buffer + codec."
+         ::= { adVQMActiveCallEntry 35 }
+
+     adVqmActCallTermDelayAverage OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average termination end-point delay, simulated jitter
+            buffer + codec."
+         ::= { adVQMActiveCallEntry 36 }
+
+     adVqmActCallTermDelayMaximum OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Maximum termination end-point delay, simulated jitter
+            buffer + codec."
+         ::= { adVQMActiveCallEntry 37 }
+
+     adVqmActCallRLq OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening quality R factor."
+         ::= { adVQMActiveCallEntry 38 }
+
+     adVqmActCallRCq OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Conversational quality R factor."
+         ::= { adVQMActiveCallEntry 39 }
+
+     adVqmActCallRNominal OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Nominal or generally accepted maximum R factor for this stream."
+         ::= { adVQMActiveCallEntry 40 }
+
+     adVqmActCallRG107 OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "R factor based on ITU G.107 E Model for this stream."
+         ::= { adVQMActiveCallEntry 41 }
+
+     adVqmActCallMosLq OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening quality MOS score."
+         ::= { adVQMActiveCallEntry 42 }
+
+     adVqmActCallMosCq OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Conversational quality MOS score."
+         ::= { adVQMActiveCallEntry 43 }
+
+     adVqmActCallMosPq OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Listening quality MOS score normalized to the PESQ scale."
+         ::= { adVQMActiveCallEntry 44 }
+
+     adVqmActCallMosNominal OBJECT-TYPE
+         SYNTAX         MOSvalue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Nominal or generally accepted maximum MOS score for this stream."
+         ::= { adVQMActiveCallEntry 45 }
+
+     adVqmActCallDegLoss OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to packet loss."
+         ::= { adVQMActiveCallEntry 46 }
+
+     adVqmActCallDegDiscard OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to packet discard."
+         ::= { adVQMActiveCallEntry 47 }
+
+     adVqmActCallDegVocoder OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to voice CODEC selection."
+         ::= { adVQMActiveCallEntry 48 }
+
+     adVqmActCallDegRecency OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to loss or discard recency in
+            call."
+         ::= { adVQMActiveCallEntry 49 }
+
+     adVqmActCallDegDelay OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to delay."
+         ::= { adVQMActiveCallEntry 50 }
+
+     adVqmActCallDegSiglvl OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to low speech energy signal
+            level."
+         ::= { adVQMActiveCallEntry 51 }
+
+     adVqmActCallDegNoiselvl OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to high noise levels."
+         ::= { adVQMActiveCallEntry 52 }
+
+     adVqmActCallDegEcholvl OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage quality degradation due to high echo levels."
+         ::= { adVQMActiveCallEntry 53 }
+
+     adVqmActCallBurstRLq OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average listening quality R factor during burst condition."
+         ::= { adVQMActiveCallEntry 54 }
+
+     adVqmActCallBurstCount OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of times the stream was in a burst condition."
+         ::= { adVQMActiveCallEntry 55 }
+
+     adVqmActCallBurstRateAvg OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost or discarded while in
+            burst condition."
+         ::= { adVQMActiveCallEntry 56 }
+
+     adVqmActCallBurstLenAvgPkts OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average burst length in packets."
+         ::= { adVQMActiveCallEntry 57 }
+
+     adVqmActCallBurstLenAvgMsec OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average burst length in miliseconds."
+         ::= { adVQMActiveCallEntry 58 }
+
+     adVqmActCallGapR OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average listening quality R factor while stream is in a gap
+            condition."
+         ::= { adVQMActiveCallEntry 59 }
+
+     adVqmActCallGapCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Number of times the stream is in gap condition."
+         ::= { adVQMActiveCallEntry 60 }
+
+     adVqmActCallGapLossRateAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost or discarded while in
+            gap condition."
+         ::= { adVQMActiveCallEntry 61 }
+
+     adVqmActCallGapLenPkts  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average gap length in packets."
+         ::= { adVQMActiveCallEntry 62 }
+
+     adVqmActCallGapLenMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Average gap length in milliseconds."
+         ::= { adVQMActiveCallEntry 63 }
+
+     adVqmActCallLossRateAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost or discarded."
+         ::= { adVQMActiveCallEntry 64 }
+
+     adVqmActCallNetworkLossAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames lost in network, excludes
+            SJB discards."
+         ::= { adVQMActiveCallEntry 65 }
+
+     adVqmActCallDiscardRateAvg  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total average percentage of frames discarded by SJB."
+         ::= { adVQMActiveCallEntry 66 }
+
+     adVqmActCallExcessBurst  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total length of speech lost during burst conditions not handled
+            effectively by packet loss-concealment."
+         ::= { adVQMActiveCallEntry 67 }
+
+     adVqmActCallExcessGap  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total length of speech lost during gap conditions not handled
+            effectively by packet loss-concealment."
+         ::= { adVQMActiveCallEntry 68 }
+
+     adVqmActCallPpdvMsec  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Packet to packed delay variation (jitter) in ms, as defined in
+            RFC3550."
+         ::= { adVQMActiveCallEntry 69 }
+
+     adVqmActCallLateThresholdMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Late threshold for SJB, packets arriving under this threshold are
+            not discarded."
+         ::= { adVQMActiveCallEntry 70 }
+
+     adVqmActCallLateThresholdPc  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage of total packets (including both early and late packets)
+            not judged as being under the late jitter threshold."
+         ::= { adVQMActiveCallEntry 71 }
+
+     adVqmActCallLateUnderThresh  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Count of late packets which arrived under the late jitter
+            threshold."
+         ::= { adVQMActiveCallEntry 72 }
+
+     adVqmActCallLateTotalCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total count of late packets arriving after the expected delay."
+         ::= { adVQMActiveCallEntry 73 }
+
+     adVqmActCallLatePeakJitterMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Largest jitter encountered among packets counted as late."
+         ::= { adVQMActiveCallEntry 74 }
+
+     adVqmActCallEarlyThreshMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Early threshold for SJB, packets arriving under this threshold
+            will not be discarded by SJB as early."
+         ::= { adVQMActiveCallEntry 75 }
+
+     adVqmActCallEarlyThreshPc  OBJECT-TYPE
+         SYNTAX         Percentage
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Percentage of total packets (including both early and late packets)
+            not judged as being under the early jitter threshold."
+         ::= { adVQMActiveCallEntry 76 }
+
+     adVqmActCallEarlyUnderThresh  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Count of early packets which arrived under the early jitter
+            threshold."
+         ::= { adVQMActiveCallEntry 77 }
+
+     adVqmActCallEarlyTotalCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total count of early packets arriving before the expected delay."
+         ::= { adVQMActiveCallEntry 78 }
+
+     adVqmActCallEarlyPeakJitterMs  OBJECT-TYPE
+         SYNTAX         MsecValue
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Largest jitter encountered among packets counted as early."
+         ::= { adVQMActiveCallEntry 79 }
+
+     adVqmActCallDelayIncreaseCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of SJB delay increases (adaptive mode only)."
+         ::= { adVQMActiveCallEntry 80 }
+
+     adVqmActCallDelayDecreaseCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of SJB delay decreases (adaptive mode only)."
+         ::= { adVQMActiveCallEntry 81 }
+
+     adVqmActCallResyncCount  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of  SJB resynchronizations caused by discontinuous
+            transmission (DTX), voice activity detection (VAD), or silence
+            suppression."
+         ::= { adVQMActiveCallEntry 82 }
+
+     adVqmActCallJitterBufferType  OBJECT-TYPE
+         SYNTAX         INTEGER {
+                        fixed     (1),
+                        adaptive  (2),
+                        unknown   (3)
+         }
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Configured SJB type either adaptive or fixed for this stream."
+         ::= { adVQMActiveCallEntry 83 }
+
+     adVqmActCallJbCfgMin  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Adaptive jitter buffer minimum delay applied to packets received."
+         ::= { adVQMActiveCallEntry 84 }
+
+     adVqmActCallJbCfgNom  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Adaptive jitter buffer inital delay applied to packets received,
+            or fixed jitter buffer delay applied to each packet."
+         ::= { adVQMActiveCallEntry 85 }
+
+     adVqmActCallJbCfgMax  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Adaptive jitter buffer upper bound on delay applied to packets
+            received, or fixed jitter buffer maximum number of packets that will
+            be inserted in buffer."
+         ::= { adVQMActiveCallEntry 86 }
+
+     adVqmActCallDuplicatePkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of duplicated packets discarded by SJB."
+         ::= { adVQMActiveCallEntry 87 }
+
+     adVqmActCallEarlyPkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets arriving early."
+         ::= { adVQMActiveCallEntry 88 }
+
+     adVqmActCallLatePkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets arriving late."
+         ::= { adVQMActiveCallEntry 89 }
+
+     adVqmActCallOverrunDiscardPkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets discarded by SJB due to jitter buffer
+            overrun."
+         ::= { adVQMActiveCallEntry 90 }
+
+     adVqmActCallUnderrunDiscardPkts  OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Total number of packets discarded by SJB due to jitter buffer
+            underrun."
+         ::= { adVQMActiveCallEntry 91 }
+
+     adVqmActCallDelayMinMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay minimum value."
+         ::= { adVQMActiveCallEntry 92 }
+
+     adVqmActCallDelayAvgMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay average value."
+         ::= { adVQMActiveCallEntry 93 }
+
+     adVqmActCallDelayMaxMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay maximum value."
+         ::= { adVQMActiveCallEntry 94 }
+
+     adVqmActCallDelayCurrentMsec  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Simulated jitter buffer delay current value."
+         ::= { adVQMActiveCallEntry 95 }
+
+     adVqmActCallExtRLqIn  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External listening quality R factor (in), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMActiveCallEntry 96 }
+
+     adVqmActCallExtRLqOut  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External listening quality R factor (out), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMActiveCallEntry 97 }
+
+     adVqmActCallExtRCqIn  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External conversational quality R factor (in), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMActiveCallEntry 98 }
+
+     adVqmActCallExtRCqOut  OBJECT-TYPE
+         SYNTAX         INTEGER
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "External conversational quality R factor (out), from RTCP XR report
+            (RFC3611)."
+         ::= { adVQMActiveCallEntry 99 }
+
+     adVqmActCallThroughPutIndex  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Estimated throughput for fax or data call; bitrate range from 0 to
+            35000 bps, calculated based on gap/burst conditions and loss/discard
+            rates."
+         ::= { adVQMActiveCallEntry 100 }
+
+     adVqmActCallReliabilityIndex  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Reliability index for a fax or data call ranging from 0 least to
+            100 most reliable."
+         ::= { adVQMActiveCallEntry 101 }
+
+     adVqmActCallBitrate  OBJECT-TYPE
+         SYNTAX         Unsigned32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Actual bitrate of RTP stream, calculated using size of each RTP
+            packet in bits and duration of audio represented in each packet,
+            indication of required bandwidth."
+         ::= { adVQMActiveCallEntry 102 }
+
+
+     -- conformance information
+
+     adGenAOSVqmConformance OBJECT IDENTIFIER ::= { adGenAOSConformance 10 }
+     adGenAOSVqmGroups      OBJECT IDENTIFIER ::= { adGenAOSVqmConformance 1 }
+     adGenAOSVqmCompliances OBJECT IDENTIFIER ::= { adGenAOSVqmConformance 2 }
+
+--
+-- MIB Compliance statements.
+--
+
+-- Full compliance statement
+     adGenAOSVqmFullCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        version 1 of the adGenAosVQM MIB. When this MIB is implemented
+        with support for read-only, then such an implementation can claim
+        full compliance. "
+
+         MODULE  -- this module
+
+         GROUP adVQMCfgGroup
+         DESCRIPTION
+            "A collection of objects providing global configuration information
+            of a VQM entity."
+
+         GROUP adVQMThresholdGroup
+         DESCRIPTION
+            "A collection of objects providing global threshold configuration
+            information of a VQM entity."
+
+         GROUP adVQMSysPerfGroup
+         DESCRIPTION
+            "A collection of objects providing global system performance
+            information of a VQM entity."
+
+         GROUP adVQMInterfaceGroup
+         DESCRIPTION
+            "A collection of VQM aggregate statistics for each
+            system interface."
+
+         GROUP adVQMEndPointGroup
+         DESCRIPTION
+            "A collection of VQM aggregate statistics for each
+            end-point device."
+
+         GROUP adVQMCallHistoryGroup
+         DESCRIPTION
+            "A collection of detailed voice quality statistics
+            on completed RTP voice streams."
+
+         GROUP adVQMActiveCallGroup
+         DESCRIPTION
+            "A collection of detailed voice quality statistics
+            on currently active RTP voice streams."
+
+         GROUP adVQMTrapGroup
+         DESCRIPTION
+            "This optional group is used for the management of
+            asynchronous notifications by Voice Quality Monitoring."
+
+         GROUP  adVQMNotificationGroup
+         DESCRIPTION
+            "This optional group defines the asynchronous
+            notifications generated by Voice Quality Monitoring."
+
+         ::= { adGenAOSVqmCompliances 1 }
+
+     -- units of conformance
+
+     adVQMCfgGroup    OBJECT-GROUP
+         OBJECTS {
+                adVqmCfgEnable,
+                adVqmCfgSipEnable,
+                adVqmCfgUdpEnable,
+                adVqmCfgInternationalCode,
+                adVqmCfgJitterBufferType,
+                adVqmCfgJitterBufferAdaptiveMin,
+                adVqmCfgJitterBufferAdaptiveNominal,
+                adVqmCfgJitterBufferAdaptiveMax,
+                adVqmCfgJitterBufferFixedNominal,
+                adVqmCfgJitterBufferFixedSize,
+                adVqmCfgJitterBufferThresholdEarlyMs,
+                adVqmCfgJitterBufferThresholdLateMs,
+                adVqmCfgRoundTripPingEnabled,
+                adVqmCfgRoundTripPingType,
+                adVqmCfgCallHistorySize,
+                adVqmCfgHistoryThresholdLqmos,
+                adVqmCfgHistoryThresholdCqmos,
+                adVqmCfgHistoryThresholdPqmos,
+                adVqmCfgHistoryThresholdLoss,
+                adVqmCfgHistoryThresholdOutOfOrder,
+                adVqmCfgHistoryThresholdJitter,
+                adVqmCfgClear,
+                adVqmCfgClearCallHistory
+            -- ????adVqmCfgTrapPriority                    INTEGER ( We do not currently have a column to support this OID.)
+         }
+         STATUS  current
+         DESCRIPTION
+            "The adVQMCfg group contains read-only VQM system configuration
+            information for global enable/disable, type of RTP stream detection,
+            jitter buffer emulator settings, ping settings for measuring delay,
+            and call history buffer filter threshold values.  Network Management
+            System may read these values to augment their charts and graphs of
+            VQM performance statistics.  Clear write-only controls provide the
+            NMS the ability to clear VQM performance statistics."
+         ::= { adGenAOSVqmGroups 1 }
+
+     adVQMThresholdGroup    OBJECT-GROUP
+         OBJECTS {
+                adVqmThresholdLqmosInfo,
+                adVqmThresholdLqmosNotice,
+                adVqmThresholdLqmosWarning,
+                adVqmThresholdLqmosError,
+                adVqmThresholdPqmosInfo,
+                adVqmThresholdPqmosNotice,
+                adVqmThresholdPqmosWarning,
+                adVqmThresholdPqmosError,
+                adVqmThresholdOutOfOrderInfo,
+                adVqmThresholdOutOfOrderNotice,
+                adVqmThresholdOutOfOrderWarning,
+                adVqmThresholdOutOfOrderError,
+                adVqmThresholdLossInfo,
+                adVqmThresholdLossNotice,
+                adVqmThresholdLossWarning,
+                adVqmThresholdLossError,
+                adVqmThresholdJitterInfo,
+                adVqmThresholdJitterNotice,
+                adVqmThresholdJitterWarning,
+                adVqmThresholdJitterError
+         }
+         STATUS  current
+         DESCRIPTION
+                "The adVQMThreshold group contains read-only configuration
+                threshold setting values for VQM event messages.  Threshold
+                values include Information, Notice, Warning, and Error events
+                for MOS scores, packet loss, out-of-order, and jitter."
+         ::= { adGenAOSVqmGroups 2 }
+
+     adVQMSysPerfGroup    OBJECT-GROUP
+         OBJECTS {
+                adVqmSysActiveCalls,
+                adVqmSysActiveExcellent,
+                adVqmSysActiveGood,
+                adVqmSysActiveFair,
+                adVqmSysActivePoor,
+                adVqmSysCallHistoryCalls,
+                adVqmSysCallHistoryExcellent,
+                adVqmSysCallHistoryGood,
+                adVqmSysCallHistoryFair,
+                adVqmSysCallHistoryPoor,
+                adVqmSysAllCallsExcellent,
+                adVqmSysAllCallsGood,
+                adVqmSysAllCallsFair,
+                adVqmSysAllCallsPoor
+         }
+         STATUS  current
+         DESCRIPTION
+                "The adVQMSysPerfGroup group provides an overall
+                summary view of the quality of voice streams flowing through
+                the system. VQM voice call analysis rates the quality of RTP
+                voice streams as Excellent, Good, Fair or Poor.  The numbers of
+                calls for each quality rating are available for currently active
+                calls, completed calls (history), and all calls (totals).  The
+                total number of calls monitored by VQM is the sum of active
+                calls adVqmSysActiveCalls) and history calls
+                (adVqmSysCallHistoryCalls)."
+         ::= { adGenAOSVqmGroups 3 }
+
+     adVQMInterfaceGroup    OBJECT-GROUP
+         OBJECTS {
+                adVqmIfcId,
+                adVqmIfcName,
+                adVqmIfcPktsRx,
+                adVqmIfcPktsLost,
+                adVqmIfcPktsOoo,
+                adVqmIfcPktsDiscarded,
+                adVqmIfcNumberActiveCalls,
+                adVqmIfcTerminatedCalls,
+                adVqmIfcRLqMinimum,
+                adVqmIfcRLqAverage,
+                adVqmIfcRLqMaximum,
+                adVqmIfcRCqMinimum,
+                adVqmIfcRCqAverage,
+                adVqmIfcRCqMaximum,
+                adVqmIfcRG107Minimum,
+                adVqmIfcRG107Average,
+                adVqmIfcRG107Maximum,
+                adVqmIfcMosLqMinimum,
+                adVqmIfcMosLqAverage,
+                adVqmIfcMosLqMaximum,
+                adVqmIfcMosCqMinimum,
+                adVqmIfcMosCqAverage,
+                adVqmIfcMosCqMaximum,
+                adVqmIfcMosPqMinimum,
+                adVqmIfcMosPqAverage,
+                adVqmIfcMosPqMaximum,
+                adVqmIfcLossMinimum,
+                adVqmIfcLossAverage,
+                adVqmIfcLossMaximum,
+                adVqmIfcDiscardsMinimum,
+                adVqmIfcDiscardsAverage,
+                adVqmIfcDiscardsMaximum,
+                adVqmIfcPdvAverageMs,
+                adVqmIfcPdvMaximumMs,
+                adVqmIfcDelayMinMsec,
+                adVqmIfcDelayAvgMsec,
+                adVqmIfcDelayMaxMsec,
+                adVqmIfcNumberStreamsExcellent,
+                adVqmIfcNumberStreamsGood,
+                adVqmIfcNumberStreamsFair,
+                adVqmIfcNumberStreamsPoor,
+                adVqmIfcClear
+         }
+         STATUS  current
+         DESCRIPTION
+            "The adVQMInterface group defines aggregate statistics for each
+            system interface."
+         ::= { adGenAOSVqmGroups 4 }
+
+
+     adVQMEndPointGroup    OBJECT-GROUP
+         OBJECTS {
+                adVqmEndPointRtpSourceIp,
+                adVqmEndPointNumberCompletedCalls,
+                adVqmEndPointInterfaceId,
+                adVqmEndPointInterfaceName,
+                adVqmEndPointMosLqMinimum,
+                adVqmEndPointMosLqAverage,
+                adVqmEndPointMosLqMaximum,
+                adVqmEndPointMosPqMinimum,
+                adVqmEndPointMosPqAverage,
+                adVqmEndPointMosPqMaximum,
+                adVqmEndPointPktsLostTotal,
+                adVqmEndPointPktsOutOfOrder,
+                adVqmEndPointJitterMaximum,
+                adVqmEndPointNumberStreamsExcellent,
+                adVqmEndPointNumberStreamsGood,
+                adVqmEndPointNumberStreamsFair,
+                adVqmEndPointNumberStreamsPoor
+         }
+         STATUS  current
+         DESCRIPTION
+            "The adVQMEndPoint group defines aggregate statistics for each
+            VoIP end-point entity."
+         ::= { adGenAOSVqmGroups 5 }
+
+     adVQMCallHistoryGroup    OBJECT-GROUP
+         OBJECTS {
+                adVqmCallHistRtpSourceIp,
+                adVqmCallHistRtpSourcePort,
+                adVqmCallHistRtpDestIp,
+                adVqmCallHistRtpDestPort,
+                adVqmCallHistSsrcid,
+                adVqmCallHistTo,
+                adVqmCallHistFrom,
+                adVqmCallHistRtpSourceUri,
+                adVqmCallHistCallid,
+                adVqmCallHistCcmid,
+                adVqmCallHistSourceIntName,
+                adVqmCallHistDestIntName,
+                adVqmCallHistSourceIntDescription,
+                adVqmCallHistDestIntDescription,
+                adVqmCallHistCallStart,
+                adVqmCallHistCallDurationMs,
+                adVqmCallHistCodec,
+                adVqmCallHistCodecClass,
+                adVqmCallHistDscp,
+                adVqmCallHistPktsRcvdTotal,
+                adVqmCallHistPktsLostTotal,
+                adVqmCallHistPktsDiscardedTotal,
+                adVqmCallHistOutOfOrder,
+                adVqmCallHistPdvAverageMs,
+                adVqmCallHistPdvMaximumMs,
+                adVqmCallHistRtDelayInst,
+                adVqmCallHistRtDelayAverage,
+                adVqmCallHistRtDelayMaximum,
+                adVqmCallHistOnewayDelayInst,
+                adVqmCallHistOnewayDelayAverage,
+                adVqmCallHistOnewayDelayMaximum,
+                adVqmCallHistOrigDelayInst,
+                adVqmCallHistOrigDelayAverage,
+                adVqmCallHistOrigDelayMaximum,
+                adVqmCallHistTermDelayMinimum,
+                adVqmCallHistTermDelayAverage,
+                adVqmCallHistTermDelayMaximum,
+                adVqmCallHistRLq,
+                adVqmCallHistRCq,
+                adVqmCallHistRNominal,
+                adVqmCallHistRG107,
+                adVqmCallHistMosLq,
+                adVqmCallHistMosCq,
+                adVqmCallHistMosPq,
+                adVqmCallHistMosNominal,
+                adVqmCallHistDegLoss,
+                adVqmCallHistDegDiscard,
+                adVqmCallHistDegVocoder,
+                adVqmCallHistDegRecency,
+                adVqmCallHistDegDelay,
+                adVqmCallHistDegSiglvl,
+                adVqmCallHistDegNoiselvl,
+                adVqmCallHistDegEcholvl,
+                adVqmCallHistBurstRLq,
+                adVqmCallHistBurstCount,
+                adVqmCallHistBurstRateAvg,
+                adVqmCallHistBurstLenAvgPkts,
+                adVqmCallHistBurstLenAvgMsec,
+                adVqmCallHistGapR,
+                adVqmCallHistGapCount,
+                adVqmCallHistGapLossRateAvg,
+                adVqmCallHistGapLenPkts,
+                adVqmCallHistGapLenMsec,
+                adVqmCallHistLossRateAvg,
+                adVqmCallHistNetworkLossAvg,
+                adVqmCallHistDiscardRateAvg,
+                adVqmCallHistExcessBurst,
+                adVqmCallHistExcessGap,
+                adVqmCallHistPpdvMsec,
+                adVqmCallHistLateThresholdMs,
+                adVqmCallHistLateThresholdPc,
+                adVqmCallHistLateUnderThresh,
+                adVqmCallHistLateTotalCount,
+                adVqmCallHistLatePeakJitterMs,
+                adVqmCallHistEarlyThreshMs,
+                adVqmCallHistEarlyThreshPc,
+                adVqmCallHistEarlyUnderThresh,
+                adVqmCallHistEarlyTotalCount,
+                adVqmCallHistEarlyPeakJitterMs,
+                adVqmCallHistDelayIncreaseCount,
+                adVqmCallHistDelayDecreaseCount,
+                adVqmCallHistResyncCount,
+                adVqmCallHistJitterBufferType,
+                adVqmCallHistJbCfgMin,
+                adVqmCallHistJbCfgNom,
+                adVqmCallHistJbCfgMax,
+                adVqmCallHistDuplicatePkts,
+                adVqmCallHistEarlyPkts,
+                adVqmCallHistLatePkts,
+                adVqmCallHistOverrunDiscardPkts,
+                adVqmCallHistUnderrunDiscardPkts,
+                adVqmCallHistDelayMinMsec,
+                adVqmCallHistDelayAvgMsec,
+                adVqmCallHistDelayMaxMsec,
+                adVqmCallHistDelayCurrentMsec,
+                adVqmCallHistExtRLqIn,
+                adVqmCallHistExtRLqOut,
+                adVqmCallHistExtRCqIn,
+                adVqmCallHistExtRCqOut,
+                adVqmCallHistThroughPutIndex,
+                adVqmCallHistReliabilityIndex,
+                adVqmCallHistBitrate
+         }
+         STATUS  current
+         DESCRIPTION
+            "The adVQMCallHistory group defines provides detail voice quality
+            statistics on 'completed' RTP voice streams."
+         ::= { adGenAOSVqmGroups 6 }
+
+     adVQMActiveCallGroup    OBJECT-GROUP
+         OBJECTS {
+                adVqmActCallRtpSourceIp,
+                adVqmActCallRtpSourcePort,
+                adVqmActCallRtpDestIp,
+                adVqmActCallRtpDestPort,
+                adVqmActCallSsrcid,
+                adVqmActCallTo,
+                adVqmActCallFrom,
+                adVqmActCallRtpSourceUri,
+                adVqmActCallCallid,
+                adVqmActCallCcmid,
+                adVqmActCallSourceIntName,
+                adVqmActCallDestIntName,
+                adVqmActCallSourceIntDescription,
+                adVqmActCallDestIntDescription,
+                adVqmActCallCallStart,
+                adVqmActCallCallDurationMs,
+                adVqmActCallCodec,
+                adVqmActCallCodecClass,
+                adVqmActCallDscp,
+                adVqmActCallPktsRcvdTotal,
+                adVqmActCallPktsLostTotal,
+                adVqmActCallPktsDiscardedTotal,
+                adVqmActCallOutOfOrder,
+                adVqmActCallPdvAverageMs,
+                adVqmActCallPdvMaximumMs,
+                adVqmActCallRtDelayInst,
+                adVqmActCallRtDelayAverage,
+                adVqmActCallRtDelayMaximum,
+                adVqmActCallOnewayDelayInst,
+                adVqmActCallOnewayDelayAverage,
+                adVqmActCallOnewayDelayMaximum,
+                adVqmActCallOrigDelayInst,
+                adVqmActCallOrigDelayAverage,
+                adVqmActCallOrigDelayMaximum,
+                adVqmActCallTermDelayMinimum,
+                adVqmActCallTermDelayAverage,
+                adVqmActCallTermDelayMaximum,
+                adVqmActCallRLq,
+                adVqmActCallRCq,
+                adVqmActCallRNominal,
+                adVqmActCallRG107,
+                adVqmActCallMosLq,
+                adVqmActCallMosCq,
+                adVqmActCallMosPq,
+                adVqmActCallMosNominal,
+                adVqmActCallDegLoss,
+                adVqmActCallDegDiscard,
+                adVqmActCallDegVocoder,
+                adVqmActCallDegRecency,
+                adVqmActCallDegDelay,
+                adVqmActCallDegSiglvl,
+                adVqmActCallDegNoiselvl,
+                adVqmActCallDegEcholvl,
+                adVqmActCallBurstRLq,
+                adVqmActCallBurstCount,
+                adVqmActCallBurstRateAvg,
+                adVqmActCallBurstLenAvgPkts,
+                adVqmActCallBurstLenAvgMsec,
+                adVqmActCallGapR,
+                adVqmActCallGapCount,
+                adVqmActCallGapLossRateAvg,
+                adVqmActCallGapLenPkts,
+                adVqmActCallGapLenMsec,
+                adVqmActCallLossRateAvg,
+                adVqmActCallNetworkLossAvg,
+                adVqmActCallDiscardRateAvg,
+                adVqmActCallExcessBurst,
+                adVqmActCallExcessGap,
+                adVqmActCallPpdvMsec,
+                adVqmActCallLateThresholdMs,
+                adVqmActCallLateThresholdPc,
+                adVqmActCallLateUnderThresh,
+                adVqmActCallLateTotalCount,
+                adVqmActCallLatePeakJitterMs,
+                adVqmActCallEarlyThreshMs,
+                adVqmActCallEarlyThreshPc,
+                adVqmActCallEarlyUnderThresh,
+                adVqmActCallEarlyTotalCount,
+                adVqmActCallEarlyPeakJitterMs,
+                adVqmActCallDelayIncreaseCount,
+                adVqmActCallDelayDecreaseCount,
+                adVqmActCallResyncCount,
+                adVqmActCallJitterBufferType,
+                adVqmActCallJbCfgMin,
+                adVqmActCallJbCfgNom,
+                adVqmActCallJbCfgMax,
+                adVqmActCallDuplicatePkts,
+                adVqmActCallEarlyPkts,
+                adVqmActCallLatePkts,
+                adVqmActCallOverrunDiscardPkts,
+                adVqmActCallUnderrunDiscardPkts,
+                adVqmActCallDelayMinMsec,
+                adVqmActCallDelayAvgMsec,
+                adVqmActCallDelayMaxMsec,
+                adVqmActCallDelayCurrentMsec,
+                adVqmActCallExtRLqIn,
+                adVqmActCallExtRLqOut,
+                adVqmActCallExtRCqIn,
+                adVqmActCallExtRCqOut,
+                adVqmActCallThroughPutIndex,
+                adVqmActCallReliabilityIndex,
+                adVqmActCallBitrate
+         }
+         STATUS  current
+         DESCRIPTION
+            "The adVQMActiveCall group defines provides detail voice quality
+            statistics on 'current' RTP voice streams."
+         ::= { adGenAOSVqmGroups 7 }
+
+     adVQMTrapGroup    OBJECT-GROUP
+         OBJECTS {
+                        adVqmTrapState,
+                        adVqmTrapCfgSeverityLevel,
+                        adVqmTrapEventType
+                  }
+         STATUS  current
+         DESCRIPTION
+            "The objects necessary to control VQM notification messages."
+         ::= { adGenAOSVqmGroups 8 }
+
+     adVQMNotificationGroup NOTIFICATION-GROUP
+         NOTIFICATIONS { adVQMEndOfCallTrap }
+         STATUS  current
+         DESCRIPTION
+            "Traps which may be used to enhance event driven
+            management of VQM."
+         ::= { adGenAOSVqmGroups 9 }
+
+     END
+
+
+

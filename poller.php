@@ -27,6 +27,7 @@ $versions = version_info(false);
 echo "Version info:\n";
 $cur_sha = $versions['local_sha'];
 echo "Commit SHA: $cur_sha\n";
+echo "Commit Date: ".$versions['local_date']."\n";
 echo "DB Schema: ".$versions['db_schema']."\n";
 echo "PHP: ".$versions['php_ver']."\n";
 echo "MySQL: ".$versions['mysql_ver']."\n";
