@@ -1536,5 +1536,5 @@ function create_sensor_to_state_index($device, $state_name, $index)
 }
 
 function delta_to_bits($delta,$period) {
-    return round(($_delta * 8 / $period), 2);
+    return round(($delta * 8 / $period), 2);
 }

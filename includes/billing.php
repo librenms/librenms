@@ -63,7 +63,7 @@ function getDates($dayofmonth, $months=0) {
 }//end getDates()
 
 
-function getValue($host, $port, $id, $inout, $port_data=array()) {
+function getValue($host, $port, $id, $inout) {
     global $config;
 
     $oid    = 'IF-MIB::ifHC'.$inout.'Octets.'.$id;
