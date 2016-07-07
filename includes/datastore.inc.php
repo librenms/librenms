@@ -38,8 +38,18 @@ function rrd_array_filter($arr)
 } // rrd_array_filter
 
 
-/*
+/**
  * Datastore-independent function which should be used for all polled metrics.
+ *
+ * RRD Tags:
+ *   rrd_name    array|string: the rrd filename
+ *   rrd_oldname array|string: old rrd filename to rename
+ *   rrd_step             int: rrd step, defaults to 300
+ *
+ * @param array $device
+ * @param string $measurement Name of this measurement
+ * @param array $tags tags for the data (or to control rrdtool)
+ * @param array $fields
  */
 function data_update($device, $measurement, $tags, $fields)
 {

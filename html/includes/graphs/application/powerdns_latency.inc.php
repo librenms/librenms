@@ -9,7 +9,7 @@ $colour_line     = 'B3D0DB';
 $colour_area_max = 'FFEE99';
 $graph_max       = 100;
 $unit_text       = 'Latency';
-$powerdns_rrd    = $config['rrd_dir'].'/'.$device['hostname'].'/app-powerdns-'.$app['app_id'].'.rrd';
+$powerdns_rrd    = rrd_name($device['hostname'], array('app', 'powerdns', $app['app_id']));
 
 if (is_file($powerdns_rrd)) {
     $rrd_filename = $powerdns_rrd;

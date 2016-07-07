@@ -24,7 +24,7 @@ if ($sla['owner']) {
     $name .= ' (Owner: '.$sla['owner'].')';
 }
 
-$rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('sla-'.$sla['sla_nr'].'.rrd');
+$rrd_file = rrd_name($device['hostname'], array('sla', $sla['sla_nr']));
 
 $rrd_options .= " DEF:rtt=$rrd_file:rtt:AVERAGE ";
 $rrd_options .= ' VDEF:avg=rtt,AVERAGE ';

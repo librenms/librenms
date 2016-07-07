@@ -54,18 +54,14 @@ if ($device['os'] == 'netscaler') {
 
     $oids = array_merge($oids_gauge, $oids_counter);
 
-    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
-
-    $rrd_create = $config['rrd_rra'];
-
+    $rrd_def = array();
     foreach ($oids_gauge as $oid) {
-        $oid_ds          = truncate(str_replace('vsvr', '', $oid), 19, '');
-        $rrd_create .= " DS:$oid_ds:GAUGE:600:U:100000000000";
+        $oid_ds    = truncate(str_replace('vsvr', '', $oid), 19, '');
+        $rrd_def[] = "DS:$oid_ds:GAUGE:600:U:100000000000";
     }
-
     foreach ($oids_counter as $oid) {
-    $oid_ds          = truncate(str_replace('vsvr', '', $oid), 19, '');
-        $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
+        $oid_ds    = truncate(str_replace('vsvr', '', $oid), 19, '');
+        $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
     }
 
     $vsvr_array = snmpwalk_cache_oid($device, 'vserverEntry', array(), 'NS-ROOT-MIB');
@@ -81,7 +77,7 @@ if ($device['os'] == 'netscaler') {
     foreach ($vsvr_array as $index => $vsvr) {
         if (isset($vsvr['vsvrName'])) {
             $vsvr_exist[$vsvr['vsvrName']] = 1;
-            $rrd_file  = $config['rrd_dir'].'/'.$device['hostname'].'/netscaler-vsvr-'.safename($vsvr['vsvrName']).'.rrd';
+            $rrd_name  = 'netscaler-vsvr-'.$vsvr['vsvrName'];
 
             $fields = array();
             foreach ($oids as $oid) {
@@ -92,6 +88,13 @@ if ($device['os'] == 'netscaler') {
                     $fields[$oid] = 'U';
                 }
             }
+
+            $tags = array(
+                'vsvrName' => $vsvr['vsvrName'],
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def
+            );
+            data_update($device,'netscaler-vsvr',$tags,$fields);
 
             echo str_pad($vsvr['vsvrName'], 25).' | '.str_pad($vsvr['vsvrType'], 5).' | '.str_pad($vsvr['vsvrState'], 6).' | '.str_pad($vsvr['vsvrIpAddress'], 16).' | '.str_pad($vsvr['vsvrPort'], 5);
             echo ' | '.str_pad($vsvr['vsvrRequestRate'], 8).' | '.str_pad($vsvr['vsvrRxBytesRate'].'B/s', 8).' | '.str_pad($vsvr['vsvrTxBytesRate'].'B/s', 8);
@@ -115,15 +118,6 @@ if ($device['os'] == 'netscaler') {
                 $updated = dbUpdate($db_update, 'netscaler_vservers', '`vsvr_id` = ?', array($vsvrs[$vsvr['vsvrName']]['vsvr_id']));
                 echo ' U';
             }
-
-            if (!file_exists($rrd_file)) {
-                rrdtool_create($rrd_file, $rrd_create);
-            }
-
-            rrdtool_update($rrd_file, $fields);
-
-            $tags = array('vsvrName' => $vsvr['vsvrName']);
-            influx_update($device,'netscaler-vsvr',$tags,$fields);
 
             echo "\n";
         }//end if

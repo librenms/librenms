@@ -18,7 +18,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$proxmox_rrd = $config['rrd_dir'].'/proxmox/'.$vars['cluster'].'/'.$vars['vmid'].'_netif_'.$vars['port'].'.rrd';
+$proxmox_rrd = config['rrd_dir'].'/proxmox/'.$vars['cluster'].'/'.$vars['vmid'].'_netif_'.$vars['port'].'.rrd';
 
 if (is_file($proxmox_rrd)) {
     $rrd_filename = $proxmox_rrd;

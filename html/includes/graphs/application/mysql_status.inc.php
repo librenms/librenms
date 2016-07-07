@@ -2,7 +2,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-mysql-'.$app['app_id'].'-status.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id'], 'status'));
 
 $array = array(
     'State_closing_tables'       => 'd2',

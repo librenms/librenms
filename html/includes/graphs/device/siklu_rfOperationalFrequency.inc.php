@@ -2,7 +2,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/siklu-wireless.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'siklu-wireless');
 
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Hz                        Now    Min     Max\\n'";

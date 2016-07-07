@@ -70,13 +70,11 @@ foreach ($ipsec_array as $index => $tunnel) {
         $tunnel['cipSecTunOutUncompOctets'] = $tunnel['cipSecTunHcOutUncompOctets'];
     }
 
-    $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/ipsectunnel-'.$address.'.rrd';
-
-    $rrd_create = $config['rrd_rra'];
-
+    $rrd_name = array('ipsectunnel', $address);
+    $rrd_def = array();
     foreach ($oids as $oid) {
         $oid_ds      = truncate(str_replace('cipSec', '', $oid), 19, '');
-        $rrd_create .= " DS:$oid_ds:COUNTER:600:U:1000000000";
+        $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:1000000000";
     }
 
     $fields = array();
@@ -92,16 +90,11 @@ foreach ($ipsec_array as $index => $tunnel) {
     }
 
     if (isset($tunnel['cikeTunRemoteValue'])) {
-        if (!file_exists($rrd_file)) {
-            rrdtool_create($rrd_file, $rrd_create);
-        }
-        rrdtool_update($rrd_file, $fields);
-
-        $tags = array('address' => $address);
-        influx_update($device,'ipsectunnel',$tags,$fields);
+        $tags = compact('address', 'rrd_name', 'rrd_def');
+        data_update($device,'ipsectunnel',$tags,$fields);
 
         // $graphs['ipsec_tunnels'] = TRUE;
     }
 }//end foreach
 
-unset($rrd_file,$rrd_create,$fields,$oids, $data, $data_array, $oid, $tunnel);
+unset($rrd_name,$rrd_def,$fields,$oids, $data, $data, $oid, $tunnel);

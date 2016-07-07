@@ -1,6 +1,6 @@
 <?php
 
-if (is_file($config['rrd_dir'].'/'.$device['hostname'].'/netstats-ip_forward.rrd')) {
+if (is_file(rrd_name($device['hostname'], 'netstats-ip_forward'))) {
     $graph_title = 'IP Forward statistics';
     $graph_type  = 'device_ip_forward';
 

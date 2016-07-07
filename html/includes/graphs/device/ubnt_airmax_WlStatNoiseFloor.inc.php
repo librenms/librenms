@@ -3,7 +3,7 @@
 require 'includes/graphs/common.inc.php';
 
 // $rrd_options .= " -l 0 -E ";
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/ubnt-airmax-mib.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'ubnt-airmax-mib');
 
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dbm                      Now      Min     Max\\n'";
