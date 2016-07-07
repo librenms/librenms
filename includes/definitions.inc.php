@@ -784,7 +784,7 @@ $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
 $os = 'adtran-aos';
-$config['os'][$os]['text']             = 'ADTRAN AOS';
+$config['os'][$os]['text']             = 'Adtran AOS';
 $config['os'][$os]['type']             = 'network';
 $config['os'][$os]['icon']             = 'adtran';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
