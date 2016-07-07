@@ -3,7 +3,7 @@
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 $device = device_by_id_cache($id);
 
-$file = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('screenos-sessions.rrd');
+$file = rrd_name($device['hostname'], 'screenos-sessions');
 
 $rrd_list[0]['filename'] = $file;
 $rrd_list[0]['descr']    = 'Maxiumum';

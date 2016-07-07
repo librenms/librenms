@@ -1,6 +1,6 @@
 <?php
 
-if (is_file($config['rrd_dir'].'/'.$device['hostname'].'/netstats-ip.rrd')) {
+if (is_file(rrd_name($device['hostname'], 'netstats-ip'))) {
     $graph_title = 'IP Statistics';
     $graph_type  = 'device_ip';
 

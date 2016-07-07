@@ -1,6 +1,6 @@
 <?php
 
-if (is_file($config['rrd_dir'].'/'.$device['hostname'].'/netstats-icmp.rrd')) {
+if (is_file(rrd_name($device['hostname'], 'netstats-icmp'))) {
     $graph_title = 'ICMP Statistics';
     $graph_type  = 'device_icmp';
 

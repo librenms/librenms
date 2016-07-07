@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/netscaler-stats-tcp.rrd';
+$rrd_filename = rrd_name($device['hostname'], 'netscaler-stats-tcp');
 
 $ds_in  = 'CurClientConn';
 $ds_out = 'CurServerConn';

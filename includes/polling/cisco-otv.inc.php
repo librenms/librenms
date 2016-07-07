@@ -129,16 +129,16 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    Message: ".$array['error']."\n");
                 d_echo("    VLAN Count: ".$count_vlan."\n");
 
-                $filename = "cisco-otv-".$array['label']."-vlan.rrd";
-                $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
+                $label = $array['label'];
+                $rrd_name = array('cisco', 'otv', $label, 'vlan');
+                $rrd_def = 'DS:count:GAUGE:600:0:U';
 
-                if (!file_exists ($rrd_filename)) {
-                    rrdtool_create ($rrd_filename, " DS:count:GAUGE:600:0:U" . $config['rrd_rra']);
-                }
-                $rrd['count'] = $count_vlan;
+                $fields = array(
+                    'count' => $count_vlan
+                );
 
-                // Update RRD
-                rrdtool_update ($rrd_filename, $rrd);
+                $tags = compact('label', 'rrd_name', 'rrd_def');
+                data_update($device, 'cisco-otv-vlan', $tags, $fields);
 
             }
             elseif ($array['otvtype'] == 'adjacency') {
@@ -169,27 +169,26 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    Message: ".$array['error']."\n");
             }
             elseif ($array['otvtype'] == 'endpoint') {
-                if (isset($count_mac[$array['endpoint']])) {
-                    $rrd['count'] = $count_mac[$array['endpoint']];
-                }
-                else {
-                    $rrd['count'] = "0";
+                $count = 0;
+                $endpoint = $array['endpoint'];
+
+                if (isset($count_mac[$endpoint])) {
+                    $count = $count_mac[$endpoint];
                 }
 
                 // Let's log some debugging
                 d_echo("\n\nEndpoint Component: ".$key."\n");
                 d_echo("    Label: ".$array['label']."\n");
-                d_echo("    MAC Count: ".$rrd['count']."\n");
+                d_echo("    MAC Count: ".$count."\n");
 
-                $filename = "cisco-otv-".$array['endpoint']."-mac.rrd";
-                $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename ($filename);
+                $rrd_name = array('cisco', 'otv', $endpoint, 'mac');
+                $rrd_def = 'DS:count:GAUGE:600:0:U';
+                $fields = array(
+                    'count' => $count
+                );
 
-                if (!file_exists ($rrd_filename)) {
-                    rrdtool_create ($rrd_filename, " DS:count:GAUGE:600:0:U" . $config['rrd_rra']);
-                }
-
-                // Update RRD
-                rrdtool_update ($rrd_filename, $rrd);
+                $tags = compact('endpoint', 'rrd_name', 'rrd_def');
+                data_update($device, 'cisco-otv-mac', $tags, $fields);
 
             } // End If
 

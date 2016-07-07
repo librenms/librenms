@@ -4,7 +4,7 @@ require 'includes/graphs/common.inc.php';
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-mysql-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
 
 $array = array(
           'MaCs' => array(

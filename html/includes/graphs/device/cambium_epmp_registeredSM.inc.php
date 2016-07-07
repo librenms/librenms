@@ -10,7 +10,7 @@
  */
 
 require 'includes/graphs/common.inc.php';
-$rrdfilename = $config['rrd_dir'].'/'.$device['hostname'].'/cambium-epmp-registeredSM.rrd';
+$rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-registeredSM');
 if (file_exists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:regSM='.$rrdfilename.':regSM:AVERAGE ';

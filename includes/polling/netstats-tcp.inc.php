@@ -19,15 +19,12 @@ if ($device['os'] != 'Snom') {
     // $oids['tcp_collect'] = $oids['tcp'];
     // $oids['tcp_collect'][] = 'tcpHCInSegs';
     // $oids['tcp_collect'][] = 'tcpHCOutSegs';
-    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
-    $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/netstats-tcp.rrd';
 
-    $rrd_create = $config['rrd_rra'];
-
+    $rrd_def = array();
+    $snmpstring = '';
     foreach ($oids as $oid) {
-        $oid_ds          = truncate($oid, 19, '');
-        $rrd_create .= " DS:$oid_ds:COUNTER:600:U:10000000";
-        // Limit to 10MPPS
+        $oid_ds      = truncate($oid, 19, '');
+        $rrd_def[]   = " DS:$oid_ds:COUNTER:600:U:10000000"; // Limit to 10MPPS
         $snmpstring .= ' TCP-MIB::'.$oid.'.0';
     }
 
@@ -40,18 +37,13 @@ if ($device['os'] != 'Snom') {
 
     unset($snmpstring);
 
-    if (isset($data[0]['tcpInSegs']) && isset($data[0]['tcpOutSegs'])) {
-        if (!file_exists($rrd_file)) {
-            rrdtool_create($rrd_file, $rrd_create);
-        }
+    if (isset($fields['tcpInSegs']) && isset($fields['tcpOutSegs'])) {
 
-        rrdtool_update($rrd_file, $fields);
-
-        $tags = array();
-        influx_update($device,'netstats-tcp',$tags,$fields);
+        $tags = compact('rrd_def');
+        data_update($device,'netstats-tcp',$tags,$fields);
 
         $graphs['netstat_tcp'] = true;
     }
 
-    unset($oids, $data, $data_array, $oid, $protos);
+    unset($oids, $data, $data, $oid, $protos);
 }//end if

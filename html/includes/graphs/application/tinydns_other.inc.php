@@ -30,7 +30,7 @@ $i            = 0;
 $scale_min    = 0;
 $nototal      = 1;
 $unit_text    = 'Query/sec';
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-tinydns-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'tinydns', $app['app_id']));
 $array        = array(
     'other',
     'hinfo',

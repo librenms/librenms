@@ -127,6 +127,8 @@ function rrdtool_graph($graph_file, $options)
 
         fclose($rrd_pipes[0]);
 
+        $line = "";
+        $data = "";
         while (strlen($line) < 1) {
             $line  = fgets($rrd_pipes[1], 1024);
             $data .= $line;
@@ -208,33 +210,46 @@ function rrdtool($command, $filename, $options)
 /**
  * Generates an rrd database at $filename using $options
  *
+ * @internal
  * @param string filename
  * @param string options
+ * @return array|bool
  */
-
-
 function rrdtool_create($filename, $options)
 {
-    global $config;
-    if( $config['rrdcached'] && $config['rrdtool_version'] >= 1.5 ) {
-        $chk = rrdtool('info', $filename, '');
-        if (!empty($chk[0])) {
-            return true;
-        }
+    if (rrdtool_check_rrd_exists($filename)) {
+        return true;
     }
-    return rrdtool('create', $filename,  str_replace(array("\r", "\n"), '', $options));
+    return rrdtool('create', $filename, str_replace(array("\r", "\n"), '', $options));
 }
 
+/**
+ * Checks if the rrd file exists on the server
+ * This will perform a remote check if using rrdcached and rrdtool >= 1.5
+ *
+ * @param $filename
+ * @return bool
+ */
+function rrdtool_check_rrd_exists($filename)
+{
+    global $config;
+    if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
+        $chk = rrdtool('info', $filename, '');
+        return !empty($chk[0]);
+    } else {
+        return is_file($filename);
+    }
+}
 
 /**
  * Updates an rrd database at $filename using $options
  * Where $options is an array, each entry which is not a number is replaced with "U"
  *
- * @param string filename
- * @param array options
+ * @internal
+ * @param string $filename
+ * @param array $options
+ * @return array|string
  */
-
-
 function rrdtool_update($filename, $options)
 {
     $values = array();
@@ -302,16 +317,19 @@ function rrdtool_escape($string, $maxlength=null){
 } // rrdtool_escape
 
 
-/*
- * @return the name of the rrd file for $host's $extra component
- * @param host Host name
- * @param extra Components of RRD filename - will be separated with "-"
+/**
+ * Generates a filename based on the hostname (or IP) and some extra items
+ * 
+ * @param string $host Host name
+ * @param array|string $extra Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+ * @param string $extension File extension (default is .rrd)
+ * @return string the name of the rrd file for $host's $extra component
  */
-function rrd_name($host, $extra, $exten = ".rrd")
+function rrd_name($host, $extra, $extension = ".rrd")
 {
     global $config;
     $filename = safename(is_array($extra) ? implode("-", $extra) : $extra);
-    return implode("/", array($config['rrd_dir'], $host, $filename.$exten));
+    return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
 } // rrd_name
 
 function rrdtool_tune($type, $filename, $max) {
@@ -332,22 +350,27 @@ function rrdtool_tune($type, $filename, $max) {
 } // rrdtool_tune
 
 
-/*
+/**
  * rrdtool backend implementation of data_update
+ *
+ * @param $device
+ * @param $measurement
+ * @param $tags
+ * @param $fields
  */
 function rrdtool_data_update($device, $measurement, $tags, $fields)
 {
     global $config;
 
-    $rrd_name = $tags['rrd_name'] ? $tags['rrd_name'] : $measurement;
-    $step = $tags['rrd_step'] ? $tags['rrd_step'] : 300;
+    $rrd_name = $tags['rrd_name'] ?: $measurement;
+    $step = $tags['rrd_step'] ?: 300;
     $oldname = $tags['rrd_oldname'];
     if (isset($oldname) && !empty($oldname)) {
         rrd_file_rename($device, $oldname, $rrd_name);
     }
 
     $rrd = rrd_name($device['hostname'], $rrd_name);
-    if (!is_file($rrd) && $tags['rrd_def']) {
+    if (!rrdtool_check_rrd_exists($rrd) && $tags['rrd_def']) {
         $rrd_def = is_array($tags['rrd_def']) ? $tags['rrd_def'] : array($tags['rrd_def']);
         // add the --step and the rra definitions to the command
         $newdef = "--step $step ".implode(' ', $rrd_def).$config['rrd_rra'];

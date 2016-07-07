@@ -6,7 +6,7 @@ $scale_min    = 0;
 $colours      = 'mixed';
 $nototal      = (($width < 224) ? 1 : 0);
 $unit_text    = 'Buffer';
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-ntpdserver-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'ntpdserver', $app['app_id']));
 $array        = array(
                  'buffer_recv' => array('descr' => 'Received'),
                  'buffer_used' => array('descr' => 'Used'),
