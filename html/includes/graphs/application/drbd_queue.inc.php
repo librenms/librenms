@@ -2,7 +2,7 @@
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-drbd-'.$app['app_instance'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'drbd', $app['app_instance']));
 
 $array = array(
           'lo' => 'Local I/O',

@@ -7,7 +7,7 @@ if (is_numeric($vars['id'])) {
         $device = device_by_id_cache($service['device_id']);
 
         // This doesn't quite work for all yet.
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('service-'.$service['service_type'].'-'.$service['service_id'].'.rrd');
+        $rrd_filename = rrd_name($device['hostname'], array('service', $service['service_type'], $service['service_id']));
 
         $title  = generate_device_link($device);
         $title .= ' :: Service :: '.htmlentities($service['service_type']);

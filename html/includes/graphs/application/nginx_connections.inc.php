@@ -4,7 +4,7 @@ $scale_min = 0;
 
 require 'includes/graphs/common.inc.php';
 
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-nginx-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'nginx', $app['app_id']));
 
 $array = array(
           'Reading' => array(

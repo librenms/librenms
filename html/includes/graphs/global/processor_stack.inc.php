@@ -3,7 +3,7 @@
 $i = 0;
 
 foreach (dbFetchRows('SELECT * FROM `processors` AS P, devices AS D WHERE D.device_id = P.device_id') as $proc) {
-    $rrd_filename = $config['rrd_dir'].'/'.$proc['hostname'].'/'.safename('processor-'.$proc['processor_type'].'-'.$proc['processor_index'].'.rrd');
+    $rrd_filename = rrd_name($proc['hostname'], array('processor', $proc['processor_type'], $proc['processor_index']));
 
     if (is_file($rrd_filename)) {
         $descr = short_hrDeviceDescr($proc['processor_descr']);

@@ -38,7 +38,7 @@ $rrd_additions = "";
 $count = 0;
 foreach ($components as $id => $array) {
     if ( ($array['qos-type'] == 2) && ($array['parent'] == $components[$vars['policy']]['sp-obj']) && ($array['sp-id'] == $components[$vars['policy']]['sp-id'])) {
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("port-".$array['ifindex']."-cbqos-".$array['sp-id']."-".$array['sp-obj'].".rrd");
+        $rrd_filename = rrd_name($device['hostname'], array('port', $array['ifindex'], 'cbqos', $array['sp-id'], $array['sp-obj']));
 
         if (file_exists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's

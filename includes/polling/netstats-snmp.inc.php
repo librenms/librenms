@@ -36,34 +36,24 @@ if ($device['os'] != 'Snom') {
         'snmpProxyDrops',
     );
 
-    unset($snmpstring, $fields, $snmpdata, $snmpdata_cmd, $rrd_create);
-    $rrd_file = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('netstats-snmp.rrd');
+    $data = snmpwalk_cache_oid($device, 'snmp', array(), 'SNMPv2-MIB');
 
-    $rrd_create = $config['rrd_rra'];
-
-    foreach ($oids as $oid) {
-        $oid_ds          = truncate($oid, 19, '');
-        $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
-    }
-
-    $data_array = snmpwalk_cache_oid($device, 'snmp', array(), 'SNMPv2-MIB');
-
-    $fields = $data_array[0];
+    $fields = $data[0];
     unset($fields['snmpEnableAuthenTraps']);
 
-    if (isset($data_array[0]['snmpInPkts']) && isset($data_array[0]['snmpOutPkts'])) {
-        if (!file_exists($rrd_file)) {
-            rrdtool_create($rrd_file, $rrd_create);
+    if (isset($fields['snmpInPkts']) && isset($fields['snmpOutPkts'])) {
+        $rrd_def = array();
+        foreach ($oids as $oid) {
+            $oid_ds    = truncate($oid, 19, '');
+            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
         }
 
-        rrdtool_update($rrd_file, $fields);
-
-        $tags = array();
-        influx_update($device,'netstats-snmp',$tags,$fields);
+        $tags = compact('rrd_def');
+        data_update($device,'netstats-snmp',$tags,$fields);
 
         $graphs['netstat_snmp']     = true;
         $graphs['netstat_snmp_pkt'] = true;
     }
 
-    unset($oids, $data, $data_array, $oid, $protos);
+    unset($oids, $data, $feilds, $oid, $rrd_def, $tags);
 }//end if

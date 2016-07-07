@@ -64,7 +64,7 @@ $iter         = '0';
 $rrd_options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
 
 foreach ($accs as $acc) {
-    $this_rrd = $config['rrd_dir'].'/'.$acc['hostname'].'/'.safename('cip-'.$acc['ifIndex'].'-'.$acc['mac'].'.rrd');
+    $this_rrd = rrd_name($acc['hostname'], array('cip', $acc['ifIndex'], $acc['mac']));
     if (is_file($this_rrd)) {
         $mac  = formatmac($acc['mac']);
         $name = $mac;

@@ -5,7 +5,7 @@ require 'includes/graphs/common.inc.php';
 $scale_min    = 0;
 $nototal      = (($width < 550) ? 1 : 0);
 $unit_text    = 'Messages/sec';
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-mailscannerV2-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'mailscannerV2', $app['app_id']));
 $array        = array(
                  'spam'  => array(
                              'descr'  => 'Spam',

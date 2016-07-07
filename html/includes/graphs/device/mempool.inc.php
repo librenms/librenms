@@ -34,7 +34,7 @@ foreach (dbFetchRows('SELECT * FROM `mempools` where `device_id` = ?', array($de
     }
 
     $descr        = rrdtool_escape(short_hrDeviceDescr($mempool['mempool_descr']), 22);
-    $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('mempool-'.$mempool['mempool_type'].'-'.$mempool['mempool_index'].'.rrd');
+    $rrd_filename = rrd_name($device['hostname'], array('mempool', $mempool['mempool_type'], $mempool['mempool_index']));
 
     if (is_file($rrd_filename)) {
         $rrd_options .= " DEF:mempoolfree$i=$rrd_filename:free:AVERAGE ";

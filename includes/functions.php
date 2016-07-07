@@ -192,13 +192,11 @@ function getImageName($device, $use_database=true) {
 function renamehost($id, $new, $source = 'console') {
     global $config;
 
-    // FIXME does not check if destination exists!
     $host = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
-    if (rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new") === TRUE) {
+    if (!is_dir($config['rrd_dir']."/$new") && rename($config['rrd_dir']."/$host", $config['rrd_dir']."/$new") === TRUE) {
         dbUpdate(array('hostname' => $new), 'devices', 'device_id=?', array($id));
         log_event("Hostname changed -> $new ($source)", $id, 'system');
-    }
-    else {
+    } else {
         echo "Renaming of $host failed\n";
         log_event("Renaming of $host failed", $id, 'system');
     }

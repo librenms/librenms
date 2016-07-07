@@ -3,7 +3,7 @@
 $i = 0;
 
 foreach ($procs as $proc) {
-    $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('processor-'.$proc['processor_type'].'-'.$proc['processor_index'].'.rrd');
+    $rrd_filename = rrd_name($device['hostname'], array('processor', $proc['processor_type'], $proc['processor_index']));
 
     if (is_file($rrd_filename)) {
         $descr = short_hrDeviceDescr($proc['processor_descr']);

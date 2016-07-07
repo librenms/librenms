@@ -56,27 +56,29 @@ foreach ($APstats as $key => $value) {
 	$numClients += $value['bsnApIfNoOfUsers'];
 }
 
-$rrdfile = $host_rrd.'/ciscowlc'.safename('.rrd');
-if (!is_file($rrdfile)) {
-	rrdtool_create($rrdfile, ' --step 300 DS:NUMAPS:GAUGE:600:0:12500000000 DS:NUMCLIENTS:GAUGE:600:0:12500000000 '.$config['rrd_rra']);
-}
+$rrd_def = array(
+    'DS:NUMAPS:GAUGE:600:0:12500000000',
+    'DS:NUMCLIENTS:GAUGE:600:0:12500000000'
+);
 
 $fields = array(
-	'NUMAPS'     => $numAccessPoints,
-	'NUMCLIENTS' => $numClients
+    'NUMAPS'     => $numAccessPoints,
+    'NUMCLIENTS' => $numClients
 );
-$ret = rrdtool_update($rrdfile, $fields);
+
+$tags = compact('rrd_def');
+data_update($device, 'ciscowlc', $tags, $fields);
 
 // also save the info about how many clients in the same place as the wireless module
-$wificlientsrrd = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename('wificlients-radio1.rrd');
-
-if (!is_file($wificlientsrrd)) {
-        rrdtool_create($wificlientsrrd, '--step 300 DS:wificlients:GAUGE:600:-273:10000 '.$config['rrd_rra']);
-}
+$radio = 1;
+$rrd_name = 'wificlients-radio'.$radio;
+$rrd_def = 'DS:wificlients:GAUGE:600:-273:10000';
 
 $fields = array(
-	'wificlients' => $numClients
+    'wificlients' => $numClients
 );
 
-rrdtool_update($wificlientsrrd, $fields);
+$tags = compact('radio', 'rrd_name', 'rrd_def');
+data_update($device, 'wificlients', $tags, $fields);
+
 $graphs['wifi_clients'] = true;

@@ -6,7 +6,7 @@ $scale_min    = 0;
 $colours      = 'mixed';
 $nototal      = (($width < 550) ? 1 : 0);
 $unit_text    = 'Messages/sec';
-$rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-mailscannerV2-'.$app['app_id'].'.rrd';
+$rrd_filename = rrd_name($device['hostname'], array('app', 'mailscannerV2', $app['app_id']));
 $array        = array(
                  'msg_rejected' => array('descr' => 'Rejected'),
                  'msg_relay'    => array('descr' => 'Relayed'),

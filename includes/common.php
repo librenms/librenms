@@ -134,22 +134,23 @@ function get_sensor_rrd($device, $sensor) {
 
     # For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
     if ($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi") {
-        $rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_descr'] . ".rrd");
+        return "sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_descr'];
+    } else {
+        return "sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'];
     }
-    else {
-        $rrd_file = $config['rrd_dir']."/".$device['hostname']."/".safename("sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'] . ".rrd");
+}
+
+function getPortRrdName($port_id, $suffix='')
+{
+    if(!empty($suffix)) {
+        $suffix = '-' . $suffix;
     }
 
-    return($rrd_file);
+    return "port-id$port_id$suffix";
 }
 
 function get_port_rrdfile_path ($hostname, $port_id, $suffix = '') {
-    global $config;
-
-    if (! empty ($suffix))
-        $suffix = '-' . $suffix;
-
-    return trim ($config['rrd_dir']) . '/' . safename ($hostname) . '/' . 'port-id' . safename($port_id) . safename ($suffix) . '.rrd';
+    return rrd_name($hostname, getPortRrdName($port_id, $suffix));
 }
 
 function get_port_by_index_cache($device_id, $ifIndex) {
@@ -996,7 +997,6 @@ Set <tt>$config[\'poller_modules\'][\'mib\'] = 1;</tt> in <tt>config.php</tt> to
 function ceph_rrd($gtype) {
     global $device;
     global $vars;
-    global $config;
 
     if ($gtype == "osd") {
         $var = $vars['osd'];
@@ -1005,8 +1005,7 @@ function ceph_rrd($gtype) {
         $var = $vars['pool'];
     }
 
-    $rrd = join('-', array('app', 'ceph', $vars['id'], $gtype, $var)).'.rrd';
-    return join('/', array($config['rrd_dir'], $device['hostname'], $rrd));
+    return rrd_name($device['hostname'], array('app', 'ceph', $vars['id'], $gtype, $var));
 } // ceph_rrd
 
 /**

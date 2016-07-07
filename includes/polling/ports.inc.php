@@ -209,17 +209,11 @@ $ports = $ports_mapped['ports'];
 //
 // Rename any old RRD files still named after the previous ifIndex based naming schema.
 foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
-    foreach (array ('', 'adsl', 'dot3') as $suffix) {
-        $suffix_tmp = '';
-        if ($suffix)
-            $suffix_tmp = "-$suffix";
+    foreach (array ('', '-adsl', '-dot3') as $suffix) {
+        $old_rrd_name = "port-$ifIndex$suffix.rrd";
+        $new_rrd_name = getPortRrdName($port_id, ltrim($suffix, '-'));
 
-        $old_rrd_path = trim ($config['rrd_dir']) . '/' . $device['hostname'] . "/port-$ifIndex$suffix_tmp.rrd";
-        $new_rrd_path = get_port_rrdfile_path ($device['hostname'], $port_id, $suffix);
-
-        if (is_file ($old_rrd_path)) {
-            rename ($old_rrd_path, $new_rrd_path);
-        }
+        rrd_file_rename($device, $old_rrd_name, $new_rrd_name);
     }
 }
 
@@ -581,29 +575,26 @@ foreach ($ports as $port) {
             }
         }
 
-        // Update RRDs
-        $rrdfile = get_port_rrdfile_path ($device['hostname'], $port_id);
-        if (!is_file($rrdfile)) {
-            rrdtool_create(
-                $rrdfile,
-                ' --step 300 
-                DS:INOCTETS:DERIVE:600:0:12500000000 
-                DS:OUTOCTETS:DERIVE:600:0:12500000000 
-                DS:INERRORS:DERIVE:600:0:12500000000 
-                DS:OUTERRORS:DERIVE:600:0:12500000000 
-                DS:INUCASTPKTS:DERIVE:600:0:12500000000 
-                DS:OUTUCASTPKTS:DERIVE:600:0:12500000000 
-                DS:INNUCASTPKTS:DERIVE:600:0:12500000000 
-                DS:OUTNUCASTPKTS:DERIVE:600:0:12500000000 
-                DS:INDISCARDS:DERIVE:600:0:12500000000 
-                DS:OUTDISCARDS:DERIVE:600:0:12500000000 
-                DS:INUNKNOWNPROTOS:DERIVE:600:0:12500000000 
-                DS:INBROADCASTPKTS:DERIVE:600:0:12500000000 
-                DS:OUTBROADCASTPKTS:DERIVE:600:0:12500000000 
-                DS:INMULTICASTPKTS:DERIVE:600:0:12500000000 
-                DS:OUTMULTICASTPKTS:DERIVE:600:0:12500000000 '.$config['rrd_rra']
-            );
-        }//end if
+        // Update data stores
+        $rrd_name = getPortRrdName($port_id);
+        $rrdfile = rrd_name($device['hostname'], $rrd_name);
+        $rrd_def = array(
+            'DS:INOCTETS:DERIVE:600:0:12500000000',
+            'DS:OUTOCTETS:DERIVE:600:0:12500000000',
+            'DS:INERRORS:DERIVE:600:0:12500000000',
+            'DS:OUTERRORS:DERIVE:600:0:12500000000',
+            'DS:INUCASTPKTS:DERIVE:600:0:12500000000',
+            'DS:OUTUCASTPKTS:DERIVE:600:0:12500000000',
+            'DS:INNUCASTPKTS:DERIVE:600:0:12500000000',
+            'DS:OUTNUCASTPKTS:DERIVE:600:0:12500000000',
+            'DS:INDISCARDS:DERIVE:600:0:12500000000',
+            'DS:OUTDISCARDS:DERIVE:600:0:12500000000',
+            'DS:INUNKNOWNPROTOS:DERIVE:600:0:12500000000',
+            'DS:INBROADCASTPKTS:DERIVE:600:0:12500000000',
+            'DS:OUTBROADCASTPKTS:DERIVE:600:0:12500000000',
+            'DS:INMULTICASTPKTS:DERIVE:600:0:12500000000',
+            'DS:OUTMULTICASTPKTS:DERIVE:600:0:12500000000'
+        );
 
         $fields = array(
             'INOCTETS'         => $this_port['ifInOctets'],
@@ -626,7 +617,9 @@ foreach ($ports as $port) {
         if ($tune_port === true) {
             rrdtool_tune('port',$rrdfile,$this_port['ifSpeed']);
         }
-        rrdtool_update("$rrdfile", $fields);
+
+        $tags = compact('ifName', 'port_descr_type', 'rrd_name', 'rrd_def');
+        rrdtool_data_update($device, 'ports', $tags, $fields);
 
         $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
         $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
@@ -635,7 +628,6 @@ foreach ($ports as $port) {
         $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
-        $tags = array('ifName' => $port['ifName'], 'port_descr_type' => $port['port_descr_type']);
         influx_update($device,'ports',$tags,$fields);
 
         // End Update IF-MIB
