@@ -1,7 +1,6 @@
 <?php
 if ($config['enable_bgp']) {
     // Discover BGP peers
-    echo 'BGP Sessions : ';
     
     if( key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0) ){
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
@@ -139,7 +138,7 @@ if ($config['enable_bgp']) {
                                 $bgp_ip      = str_replace('"', '', str_replace(' ', '', $bgp_ip));
                                 if ($afi && $safi && $bgp_ip == $peer['ip']) {
                                     $af_list[$bgp_ip][$afi][$safi] = 1;
-                                    if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ?, AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi)) == 0) {
+                                    if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi)) == 0) {
                                         dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'afi' => $afi, 'safi' => $safi, 'context_name' => $device['context_name']), 'bgpPeers_cbgp');
                                     }
                                 }
@@ -190,7 +189,7 @@ if ($config['enable_bgp']) {
                                 list ($afi,$safi)     = explode('.', $afisafi);
                                 $safi                 = $safis[$safi];
                                 $af_list[$afi][$safi] = 1;
-                                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ?, AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi)) == 0) {
+                                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', array($device['device_id'], $peer['ip'], $afi, $safi)) == 0) {
                                     dbInsert(array('device_id' => $device['device_id'], 'bgpPeerIdentifier' => $peer['ip'], 'afi' => $afi, 'safi' => $safi), 'bgpPeers_cbgp');
                                 }
                             }

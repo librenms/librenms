@@ -42,12 +42,12 @@ $rrd_list = array(
     array(
         'ds' => 'updates_received',
         'filename' => $rrd_filename,
-        'descr' => 'Updates Recieved',
+        'descr' => 'Updates Received',
     ),
     array (
         'ds' => 'flushes_received',
         'filename' => $rrd_filename,
-        'descr' => 'Flushes Recieved',
+        'descr' => 'Flushes Received',
     ),
 );
 

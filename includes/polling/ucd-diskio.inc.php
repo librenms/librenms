@@ -6,8 +6,6 @@ if (count($diskio_data)) {
     $diskio_cache = array();
     $diskio_cache = snmpwalk_cache_oid($device, 'diskIOEntry', $diskio_cache, 'UCD-DISKIO-MIB');
 
-    echo 'Checking UCD DiskIO MIB: ';
-
     foreach ($diskio_data as $diskio) {
         $index = $diskio['diskio_index'];
 

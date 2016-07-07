@@ -10,7 +10,8 @@
  * the source code distribution for details.
  */
 if (!$os) {
-    if (strpos($sysObjectId, '1.3.6.1.4.1.8072.3.2.16') !== false) {
+    if (strpos($sysObjectId, '1.3.6.1.4.1.8072.3.2.16') !== false ||
+        preg_match('/Darwin Kernel Version 15/', $sysDescr)) {
         $os = 'macosx';
     }
 }

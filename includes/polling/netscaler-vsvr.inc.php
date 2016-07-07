@@ -31,7 +31,6 @@
 // NS-ROOT-MIB::vsvrTotalClients."observium" = Counter64: 43023
 // NS-ROOT-MIB::vsvrClientConnOpenRate."observium" = STRING: "0"
 if ($device['os'] == 'netscaler') {
-    echo "Netscaler VServers\n";
 
     $oids_gauge = array(
                    'vsvrCurClntConnections',
