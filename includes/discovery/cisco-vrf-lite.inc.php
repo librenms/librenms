@@ -24,7 +24,6 @@ if ($config['enable_vrf_lite_cisco']) {
 
     // For the moment only will be cisco and the version 3
     if ($device['os_group'] == "cisco" && $device['snmpver'] == 'v3') {
-        echo ("VRF lite cisco : \n");
         $mib = "SNMP-COMMUNITY-MIB";
         $mib = "CISCO-CONTEXT-MAPPING-MIB";
         //-Osq because if i put the n the oid from the first command is not the same of this one

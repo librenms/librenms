@@ -1,7 +1,5 @@
 <?php
 
-echo 'OS: ';
-
 $os   = getHostOS($device);
 if ($os != $device['os']) {
     log_event('Device OS changed '.$device['os']." => $os", $device, 'system');

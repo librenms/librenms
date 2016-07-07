@@ -1,0 +1,795 @@
+ADTRAN-IF-PERF-HISTORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY,
+   OBJECT-TYPE,
+   Integer32
+      FROM SNMPv2-SMI
+   ifIndex
+      FROM IF-MIB
+   HCPerfTimeElapsed,
+   HCPerfValidIntervals,
+   HCPerfInvalidIntervals,
+   HCPerfCurrentCount,
+   HCPerfIntervalCount,
+   HCPerfTotalCount
+      FROM HC-PerfHist-TC-MIB
+   MODULE-COMPLIANCE,
+   OBJECT-GROUP
+      FROM SNMPv2-CONF
+   adIdentity
+      FROM ADTRAN-MIB
+   adGenAOSCommon,
+   adGenAOSConformance
+      FROM ADTRAN-AOS;
+
+adGenAosIfPerfHistoryMib MODULE-IDENTITY
+   LAST-UPDATED "201308230000Z" -- August 23, 2013
+   ORGANIZATION "ADTRAN Inc."
+   CONTACT-INFO
+     "Info:   www.adtran.com
+      Postal: ADTRAN, Inc.
+              901 Explorer Blvd.
+              Huntsville, AL 35806
+      Tel:    +1 888 423-8726
+      E-mail: support@adtran.com"
+
+   DESCRIPTION
+     "This MIB module defines high capacity performance statistics for
+      interfaces within an AOS product.
+
+      Copyright (C) ADTRAN, Inc. (2013)."
+
+   REVISION    "201308230000Z" -- August 23, 2013
+   DESCRIPTION
+     "Initial version"
+    ::= { adIdentity 10000 53 1 7 }
+
+adGenAosIfPerfHistory OBJECT IDENTIFIER ::= { adGenAOSCommon 7 }
+
+------------------------------------------------------------
+-- Current Table for Interface Performance History
+--
+adIfPhCurTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AdIfPhCurEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This table contains current performance history information that has been
+      recorded since the last 15 minute interval ended and from when the last
+      1 day interval ended.  This table is indexed by by ifIndex which SHOULD be
+      maintained in a persistent manner."
+   ::= { adGenAosIfPerfHistory 1 }
+
+adIfPhCurEntry OBJECT-TYPE
+   SYNTAX      AdIfPhCurEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This specifies the information contained in one entry of the
+      adIfPerfHistoryCurTable.  It is indexed by an interface's IfIndex."
+   INDEX { ifIndex }
+   ::= { adIfPhCurTable 1 }
+
+AdIfPhCurEntry ::=
+   SEQUENCE
+   {
+      adIfPhCurTimeElapsed15Min           HCPerfTimeElapsed,
+      adIfPhCurValidIntervals15Min        HCPerfValidIntervals,
+      adIfPhCurInvalidIntervals15Min      HCPerfInvalidIntervals,
+      adIfPhCurInOctets15Min              HCPerfCurrentCount,
+      adIfPhCurInUcastPkts15Min           HCPerfCurrentCount,
+      adIfPhCurInMcastPkts15Min           HCPerfCurrentCount,
+      adIfPhCurInBcastPkts15Min           HCPerfCurrentCount,
+      adIfPhCurInDiscards15Min            HCPerfCurrentCount,
+      adIfPhCurInErrors15Min              HCPerfCurrentCount,
+      adIfPhCurInUnknownProtos15Min       HCPerfCurrentCount,
+      adIfPhCurOutOctets15Min             HCPerfCurrentCount,
+      adIfPhCurOutUcastPkts15Min          HCPerfCurrentCount,
+      adIfPhCurOutMcastPkts15Min          HCPerfCurrentCount,
+      adIfPhCurOutBcastPkts15Min          HCPerfCurrentCount,
+      adIfPhCurOutDiscards15Min           HCPerfCurrentCount,
+      adIfPhCurOutErrors15Min             HCPerfCurrentCount,
+      adIfPhCurTimeElapsed1Day            HCPerfTimeElapsed,
+      adIfPhCurValidIntervals1Day         HCPerfValidIntervals,
+      adIfPhCurInvalidIntervals1Day       HCPerfInvalidIntervals,
+      adIfPhCurInOctets1Day               HCPerfCurrentCount,
+      adIfPhCurInUcastPkts1Day            HCPerfCurrentCount,
+      adIfPhCurInMcastPkts1Day            HCPerfCurrentCount,
+      adIfPhCurInBcastPkts1Day            HCPerfCurrentCount,
+      adIfPhCurInDiscards1Day             HCPerfCurrentCount,
+      adIfPhCurInErrors1Day               HCPerfCurrentCount,
+      adIfPhCurInUnknownProtos1Day        HCPerfCurrentCount,
+      adIfPhCurOutOctets1Day              HCPerfCurrentCount,
+      adIfPhCurOutUcastPkts1Day           HCPerfCurrentCount,
+      adIfPhCurOutMcastPkts1Day           HCPerfCurrentCount,
+      adIfPhCurOutBcastPkts1Day           HCPerfCurrentCount,
+      adIfPhCurOutDiscards1Day            HCPerfCurrentCount,
+      adIfPhCurOutErrors1Day              HCPerfCurrentCount
+   }
+
+adIfPhCurTimeElapsed15Min OBJECT-TYPE
+   SYNTAX      HCPerfTimeElapsed
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Total elapsed seconds in the current 15 minute interval."
+   ::= { adIfPhCurEntry 1 }
+
+adIfPhCurValidIntervals15Min OBJECT-TYPE
+   SYNTAX      HCPerfValidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of valid 15 minute intervals over the last 24 hours."
+   ::= { adIfPhCurEntry 2 }
+
+adIfPhCurInvalidIntervals15Min OBJECT-TYPE
+   SYNTAX      HCPerfInvalidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of invalid 15 minute intervals over the last 24 hours."
+   ::= { adIfPhCurEntry 3 }
+
+adIfPhCurInOctets15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets received in the current 15 minute interval."
+   ::= { adIfPhCurEntry 4 }
+
+adIfPhCurInUcastPkts15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of unicast packets received in the current 15 minute interval."
+   ::= { adIfPhCurEntry 5 }
+
+adIfPhCurInMcastPkts15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of multicast packets received in the current 15 minute interval."
+   ::= { adIfPhCurEntry 6 }
+
+adIfPhCurInBcastPkts15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of broadcast packets received in the current 15 minute interval."
+   ::= { adIfPhCurEntry 7 }
+
+adIfPhCurInDiscards15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets discarded in the current 15 minute interval."
+   ::= { adIfPhCurEntry 8 }
+
+adIfPhCurInErrors15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets containing errors in the current 15 minute interval."
+   ::= { adIfPhCurEntry 9 }
+
+adIfPhCurInUnknownProtos15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets with an unknown or unsupported protocol in the
+      current 15 minute interval."
+   ::= { adIfPhCurEntry 10 }
+
+adIfPhCurOutOctets15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets transmitted in the current 15 minute interval."
+   ::= { adIfPhCurEntry 11 }
+
+adIfPhCurOutUcastPkts15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted unicast packets in the current 15 minute interval."
+   ::= { adIfPhCurEntry 12 }
+
+adIfPhCurOutMcastPkts15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted multicast packets in the current 15 minute interval."
+   ::= { adIfPhCurEntry 13 }
+
+adIfPhCurOutBcastPkts15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted broadcast packets in the current 15 minute interval."
+   ::= { adIfPhCurEntry 14 }
+
+adIfPhCurOutDiscards15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of discarded outbound packets in the current 15 minute interval."
+   ::= { adIfPhCurEntry 15 }
+
+adIfPhCurOutErrors15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of outbound packets that could not be transmitted due to error in
+      the current 15 minute interval."
+   ::= { adIfPhCurEntry 16 }
+
+adIfPhCurTimeElapsed1Day OBJECT-TYPE
+   SYNTAX      HCPerfTimeElapsed
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Total elapsed seconds in the current 1 day interval."
+   ::= { adIfPhCurEntry 17 }
+
+adIfPhCurValidIntervals1Day OBJECT-TYPE
+   SYNTAX      HCPerfValidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of valid 1 day intervals available."
+   ::= { adIfPhCurEntry 18 }
+
+adIfPhCurInvalidIntervals1Day OBJECT-TYPE
+   SYNTAX      HCPerfInvalidIntervals
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Number of invalid 1 day intervals available."
+   ::= { adIfPhCurEntry 19 }
+
+adIfPhCurInOctets1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets received in the current 1 day interval."
+   ::= { adIfPhCurEntry 20 }
+
+adIfPhCurInUcastPkts1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of unicast packets received in the current 1 day interval."
+   ::= { adIfPhCurEntry 21 }
+
+adIfPhCurInMcastPkts1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of multicast packets received in the current 1 day interval."
+   ::= { adIfPhCurEntry 22 }
+
+adIfPhCurInBcastPkts1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of broadcast packets received in the current 1 day interval."
+   ::= { adIfPhCurEntry 23 }
+
+adIfPhCurInDiscards1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets discarded in the current 1 day interval."
+   ::= { adIfPhCurEntry 24 }
+
+adIfPhCurInErrors1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets containing errors in the current 1 day interval."
+   ::= { adIfPhCurEntry 25 }
+
+adIfPhCurInUnknownProtos1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets with an unknown or unsupported protocol in the
+      current 1 day interval."
+   ::= { adIfPhCurEntry 26 }
+
+adIfPhCurOutOctets1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets transmitted in the current 1 day interval."
+   ::= { adIfPhCurEntry 27 }
+
+adIfPhCurOutUcastPkts1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted unicast packets in the current 1 day interval."
+   ::= { adIfPhCurEntry 28 }
+
+adIfPhCurOutMcastPkts1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted multicast packets in the current 1 day interval."
+   ::= { adIfPhCurEntry 29 }
+
+adIfPhCurOutBcastPkts1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted broadcast packets in the current 1 day interval."
+   ::= { adIfPhCurEntry 30 }
+
+adIfPhCurOutDiscards1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of discarded outbound packets in the current 1 day interval."
+   ::= { adIfPhCurEntry 31 }
+
+adIfPhCurOutErrors1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of outbound packets that could not be transmitted due to error in
+      the current 1 day interval."
+   ::= { adIfPhCurEntry 32 }
+
+------------------------------------------------------------
+-- 15 Minute Interval Table for Interface Performance History
+--
+adIfPh15MinIntervalTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AdIfPh15MinIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This table contains performance history information for each valid 15
+      minute interval.  This table is indexed by by ifIndex and the interval
+      number."
+   ::= { adGenAosIfPerfHistory 2 }
+
+adIfPh15MinIntervalEntry OBJECT-TYPE
+   SYNTAX      AdIfPh15MinIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "An entry in the adIfPh15MinIntervalTable."
+   INDEX { ifIndex, adIfPh15MinIntervalNumber }
+   ::= { adIfPh15MinIntervalTable 1 }
+
+AdIfPh15MinIntervalEntry ::=
+   SEQUENCE
+   {
+      adIfPh15MinIntervalNumber            Integer32,
+      adIfPh15MinInOctets                  HCPerfIntervalCount,
+      adIfPh15MinInUcastPkts               HCPerfIntervalCount,
+      adIfPh15MinInMcastPkts               HCPerfIntervalCount,
+      adIfPh15MinInBcastPkts               HCPerfIntervalCount,
+      adIfPh15MinInDiscards                HCPerfIntervalCount,
+      adIfPh15MinInErrors                  HCPerfIntervalCount,
+      adIfPh15MinInUnknownProtos           HCPerfIntervalCount,
+      adIfPh15MinOutOctets                 HCPerfIntervalCount,
+      adIfPh15MinOutUcastPkts              HCPerfIntervalCount,
+      adIfPh15MinOutMcastPkts              HCPerfIntervalCount,
+      adIfPh15MinOutBcastPkts              HCPerfIntervalCount,
+      adIfPh15MinOutDiscards               HCPerfIntervalCount,
+      adIfPh15MinOutErrors                 HCPerfIntervalCount
+   }
+
+adIfPh15MinIntervalNumber OBJECT-TYPE
+   SYNTAX      Integer32 (1..96)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "Performance history interval number.  Interval 1 is the most
+      recent previous interval; interval 96 is 24 hours ago.
+      Intervals 2..96 are optional."
+   ::= { adIfPh15MinIntervalEntry 1 }
+
+adIfPh15MinInOctets OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets received in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 2 }
+
+adIfPh15MinInUcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of unicast packets received in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 3 }
+
+adIfPh15MinInMcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of multicast packets received in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 4 }
+
+adIfPh15MinInBcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of broadcast packets received in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 5 }
+
+adIfPh15MinInDiscards OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets discarded in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 6 }
+
+adIfPh15MinInErrors OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets containing errors in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 7 }
+
+adIfPh15MinInUnknownProtos OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets with an unknown or unsupported protocol in the
+      15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 8 }
+
+adIfPh15MinOutOctets OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets transmitted in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 9 }
+
+adIfPh15MinOutUcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted unicast packets in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 10 }
+
+adIfPh15MinOutMcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted multicast packets in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 11 }
+
+adIfPh15MinOutBcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted broadcast packets in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 12 }
+
+adIfPh15MinOutDiscards OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of discarded outbound packets in the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 13 }
+
+adIfPh15MinOutErrors OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of outbound packets that could not be transmitted due to error in
+      the 15 minute interval."
+   ::= { adIfPh15MinIntervalEntry 14 }
+
+------------------------------------------------------------
+-- 1 Day Interval Table for Interface Performance History
+--
+adIfPh1DayIntervalTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF AdIfPh1DayIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "This table contains performance history information for each valid 1
+      day interval.  This table is indexed by by ifIndex and the interval
+      number."
+   ::= { adGenAosIfPerfHistory 3 }
+
+adIfPh1DayIntervalEntry OBJECT-TYPE
+   SYNTAX      AdIfPh1DayIntervalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "An entry in the adIfPh1DayIntervalTable."
+   INDEX { ifIndex, adIfPh1DayIntervalNumber }
+   ::= { adIfPh1DayIntervalTable 1 }
+
+AdIfPh1DayIntervalEntry ::=
+   SEQUENCE
+   {
+      adIfPh1DayIntervalNumber            Integer32,
+      adIfPh1DayInOctets                  HCPerfTotalCount,
+      adIfPh1DayInUcastPkts               HCPerfTotalCount,
+      adIfPh1DayInMcastPkts               HCPerfTotalCount,
+      adIfPh1DayInBcastPkts               HCPerfTotalCount,
+      adIfPh1DayInDiscards                HCPerfTotalCount,
+      adIfPh1DayInErrors                  HCPerfTotalCount,
+      adIfPh1DayInUnknownProtos           HCPerfTotalCount,
+      adIfPh1DayOutOctets                 HCPerfTotalCount,
+      adIfPh1DayOutUcastPkts              HCPerfTotalCount,
+      adIfPh1DayOutMcastPkts              HCPerfTotalCount,
+      adIfPh1DayOutBcastPkts              HCPerfTotalCount,
+      adIfPh1DayOutDiscards               HCPerfTotalCount,
+      adIfPh1DayOutErrors                 HCPerfTotalCount
+   }
+
+adIfPh1DayIntervalNumber OBJECT-TYPE
+   SYNTAX      Integer32 (1..30)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "Performance history interval number.  Interval 1 is the most recent
+      previous day; interval 7 is 7 days ago.  Intervals 2..30 are optional."
+   ::= { adIfPh1DayIntervalEntry 1 }
+
+adIfPh1DayInOctets OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets received in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 2 }
+
+adIfPh1DayInUcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of unicast packets received in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 3 }
+
+adIfPh1DayInMcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of multicast packets received in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 4 }
+
+adIfPh1DayInBcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of broadcast packets received in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 5 }
+
+adIfPh1DayInDiscards OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets discarded in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 6 }
+
+adIfPh1DayInErrors OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets containing errors in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 7 }
+
+adIfPh1DayInUnknownProtos OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of inbound packets with an unknown or unsupported protocol in the
+      1 day interval."
+   ::= { adIfPh1DayIntervalEntry 8 }
+
+adIfPh1DayOutOctets OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of octets transmitted in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 9 }
+
+adIfPh1DayOutUcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted unicast packets in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 10 }
+
+adIfPh1DayOutMcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted multicast packets in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 11 }
+
+adIfPh1DayOutBcastPkts OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of transmitted broadcast packets in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 12 }
+
+adIfPh1DayOutDiscards OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of discarded outbound packets in the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 13 }
+
+adIfPh1DayOutErrors OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of outbound packets that could not be transmitted due to error in
+      the 1 day interval."
+   ::= { adIfPh1DayIntervalEntry 14 }
+
+------------------------------------------------------------
+-- Conformance information
+--
+adGenAosIfPerfHistoryConformance OBJECT IDENTIFIER
+   ::= { adGenAOSConformance 16 }
+
+adGenAosIfPerfHistoryGroups OBJECT IDENTIFIER
+   ::= { adGenAosIfPerfHistoryConformance 1 }
+
+adGenAosIfPerfHistoryCompliances OBJECT IDENTIFIER
+   ::= { adGenAosIfPerfHistoryConformance 2 }
+
+-- Compliance statements
+--
+adGenAosIfPerfHistoryCompliance MODULE-COMPLIANCE
+   STATUS  current
+   DESCRIPTION
+     "The compliance statement for SNMPv2 entities which
+      implement interface performance history."
+   MODULE
+   MANDATORY-GROUPS {
+      adIfPhCurGroup,
+      adIfPh15MinIntervalGroup,
+      adIfPh1DayIntervalGroup
+   }
+   ::= { adGenAosIfPerfHistoryCompliances 1 }
+
+-- Units of conformance
+--
+adIfPhCurGroup OBJECT-GROUP
+   OBJECTS {
+      adIfPhCurTimeElapsed15Min,
+      adIfPhCurValidIntervals15Min,
+      adIfPhCurInvalidIntervals15Min,
+      adIfPhCurInOctets15Min,
+      adIfPhCurInUcastPkts15Min,
+      adIfPhCurInMcastPkts15Min,
+      adIfPhCurInBcastPkts15Min,
+      adIfPhCurInDiscards15Min,
+      adIfPhCurInErrors15Min,
+      adIfPhCurInUnknownProtos15Min,
+      adIfPhCurOutOctets15Min,
+      adIfPhCurOutUcastPkts15Min,
+      adIfPhCurOutMcastPkts15Min,
+      adIfPhCurOutBcastPkts15Min,
+      adIfPhCurOutDiscards15Min,
+      adIfPhCurOutErrors15Min,
+      adIfPhCurTimeElapsed1Day,
+      adIfPhCurValidIntervals1Day,
+      adIfPhCurInvalidIntervals1Day,
+      adIfPhCurInOctets1Day,
+      adIfPhCurInUcastPkts1Day,
+      adIfPhCurInMcastPkts1Day,
+      adIfPhCurInBcastPkts1Day,
+      adIfPhCurInDiscards1Day,
+      adIfPhCurInErrors1Day,
+      adIfPhCurInUnknownProtos1Day,
+      adIfPhCurOutOctets1Day,
+      adIfPhCurOutUcastPkts1Day,
+      adIfPhCurOutMcastPkts1Day,
+      adIfPhCurOutBcastPkts1Day,
+      adIfPhCurOutDiscards1Day,
+      adIfPhCurOutErrors1Day
+   }
+   STATUS  current
+   DESCRIPTION
+     "The Current Group."
+   ::= { adGenAosIfPerfHistoryGroups 1 }
+
+adIfPh15MinIntervalGroup OBJECT-GROUP
+   OBJECTS {
+      adIfPh15MinInOctets,
+      adIfPh15MinInUcastPkts,
+      adIfPh15MinInMcastPkts,
+      adIfPh15MinInBcastPkts,
+      adIfPh15MinInDiscards,
+      adIfPh15MinInErrors,
+      adIfPh15MinInUnknownProtos,
+      adIfPh15MinOutOctets,
+      adIfPh15MinOutUcastPkts,
+      adIfPh15MinOutMcastPkts,
+      adIfPh15MinOutBcastPkts,
+      adIfPh15MinOutDiscards,
+      adIfPh15MinOutErrors
+   }
+   STATUS  current
+   DESCRIPTION
+     "The 15 minute interval group."
+   ::= { adGenAosIfPerfHistoryGroups 2 }
+
+adIfPh1DayIntervalGroup OBJECT-GROUP
+   OBJECTS {
+      adIfPh1DayInOctets,
+      adIfPh1DayInUcastPkts,
+      adIfPh1DayInMcastPkts,
+      adIfPh1DayInBcastPkts,
+      adIfPh1DayInDiscards,
+      adIfPh1DayInErrors,
+      adIfPh1DayInUnknownProtos,
+      adIfPh1DayOutOctets,
+      adIfPh1DayOutUcastPkts,
+      adIfPh1DayOutMcastPkts,
+      adIfPh1DayOutBcastPkts,
+      adIfPh1DayOutDiscards,
+      adIfPh1DayOutErrors
+   }
+   STATUS  current
+   DESCRIPTION
+     "The 1 day interval group."
+   ::= { adGenAosIfPerfHistoryGroups 3 }
+
+END

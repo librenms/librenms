@@ -198,7 +198,6 @@ if ($device['os_group'] == "cisco") {
         // Write the Components back to the DB.
         $component->setComponentPrefs($device['device_id'],$components);
 
-        echo $module." ";
     } // end if count components
 
     // Clean-up after yourself!

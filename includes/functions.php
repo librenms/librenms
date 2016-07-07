@@ -719,6 +719,7 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL) {
     }
 
     $insert = array('host' => ($device['device_id'] ? $device['device_id'] : 0),
+        'device_id' => ($device['device_id'] ? $device['device_id'] : 0),
         'reference' => ($reference ? $reference : "NULL"),
         'type' => ($type ? $type : "NULL"),
         'datetime' => array("NOW()"),
@@ -1538,3 +1539,9 @@ function create_sensor_to_state_index($device, $state_name, $index)
 function delta_to_bits($delta,$period) {
     return round(($delta * 8 / $period), 2);
 }
+
+function report_this($message) {
+    global $config;
+    return '<h2>'.$message.' Please <a href="'.$config['project_issues'].'">report this</a> to the '.$config['project_name'].' developers.</h2>';
+
+}//end report_this()

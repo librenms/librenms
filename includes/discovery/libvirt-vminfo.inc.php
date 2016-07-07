@@ -5,8 +5,6 @@
 if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
     $libvirt_vmlist = array();
 
-    echo 'Libvirt VM: ';
-
     $ssh_ok = 0;
 
     $userHostname = $device['hostname'];
