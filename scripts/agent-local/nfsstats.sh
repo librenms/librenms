@@ -1,4 +1,12 @@
 #!/bin/bash
+#############################################################
+# - put this file on the nfs server somewhere like /opt/    #
+# - edit your snmpd.conf and add line                       #
+#  extend nfsstat /opt/nfsstats.sh                          #
+# - restart snmpd                                           #
+# - make sure that you have all the binaries required below #
+#############################################################
+
 CFG_NFSVER='3'
 BIN_NFSSTAT='/usr/sbin/nfsstat'
 BIN_TR='/usr/bin/tr'
