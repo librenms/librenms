@@ -796,6 +796,17 @@ $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
 
+$os = 'adtran-aos';
+$config['os'][$os]['text']             = 'Adtran AOS';
+$config['os'][$os]['type']             = 'network';
+$config['os'][$os]['icon']             = 'adtran';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text']  = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text']  = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+
 $os = 'bintec-smart';
 $config['os'][$os]['text']             = 'Bintec Smart Router';
 $config['os'][$os]['type']             = 'network';
