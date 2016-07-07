@@ -1,5 +1,4 @@
 <?php
-
 require 'includes/graphs/common.inc.php';
 $scale_min    = 0;
 $colours      = 'mixed';
@@ -9,31 +8,31 @@ $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfsstats-'.$app
 $array        = array(
                  'total' => array(
                                     'descr'  => 'Total',
-                                    'colour' => '570623',
+                                    'colour' => '000000',
                                    ),
                  'null' => array(
                                     'descr'  => 'NULL',
-                                    'colour' => 'D37F9D',
+                                    'colour' => '630606',
                                    ),
                  'getattr' => array(
                                     'descr'  => 'Get attributes',
-                                    'colour' => 'F1B264',
+                                    'colour' => '50C150',
                                    ),
                  'setattr' => array(
                                     'descr'  => 'Set attributes',
-                                    'colour' => '634219',
+                                    'colour' => '4D65A2',
                                    ),
                   'lookup' => array(
                                     'descr'  => 'Lookup',
-                                    'colour' => '60849A',
+                                    'colour' => '8B64A1',
                                     ),
                   'access' => array(
                                     'descr'  => 'Access',
-                                    'colour' => 'AED983',
+                                    'colour' => 'AAAA39',
                                     ),
                   'read' => array(
                                     'descr'  => 'Read',
-                                    'colour' => '9AD95A',
+                                    'colour' => '',
                                     ),
                   'write' => array(
                                     'descr'  => 'Write',
@@ -41,7 +40,7 @@ $array        = array(
                                     ),
                   'create' => array(
                                     'descr'  => 'Create',
-                                    'colour' => '132E3F',
+                                    'colour' => '690D87',
                                     ),
                   'mkdir' => array(
                                     'descr'  => 'Make dir',
@@ -49,7 +48,7 @@ $array        = array(
                                     ),
                   'remove' => array(
                                     'descr'  => 'Remove',
-                                    'colour' => '570623',
+                                    'colour' => 'F16464',
                                   ),
                   'rmdir' => array(
                                     'descr'  => 'Remove dir',
@@ -57,7 +56,7 @@ $array        = array(
                                   ),
                   'rename' => array(
                                     'descr'  => 'Rename',
-                                    'colour' => 'AA7739',
+                                    'colour' => 'A40B62',
                                   ),
                   'readdirplus' => array(
                                     'descr'  => 'Read dir plus',
