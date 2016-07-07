@@ -18,4 +18,5 @@
  $version = str_replace('"', '', $version);
  $serial = snmp_get($device, 'slcSystemSerialNo.0', '-Ovqs', 'LANTRONIX-SLC-MIB');
  $serial = str_replace('"', '', $serial);
- $features       = '';
+ $features = snmp_get($device, 'slcSystemModelString.0', '-Ovqs', 'LANTRONIX-SLC-MIB');
+ $features = str_replace('"', '', $features);
