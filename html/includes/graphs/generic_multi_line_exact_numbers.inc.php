@@ -88,7 +88,7 @@ foreach ($rrd_list as $rrd) {
         $t_defname = $g_defname;
     }
 
-    if ($i && ($stack === 1)) {
+    if ($i && ($dostack === 1)) {
     	$stack = ':STACK';
     }
     
