@@ -359,8 +359,6 @@ function poll_device($device, $options) {
 
 
 function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs) {
-    global $config;
-
     echo "This is poll_mib_def Processing\n";
     $mib = null;
 
