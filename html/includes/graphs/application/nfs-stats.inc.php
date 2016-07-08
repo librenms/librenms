@@ -2,9 +2,12 @@
 require 'includes/graphs/common.inc.php';
 $scale_min    = 0;
 $colours      = 'mixed';
-$unit_text    = 'Operation';
-$unitlen      = 9;
+$unit_text    = 'Operations';
+$unitlen      = 10;
+$bigdescrlen  = 15;
+$smalldescrlen = 15;
 $dostack      = 0;
+$printtotal      = 0;
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfsstats-'.$app['app_id'].'.rrd';
 $array        = array(
                  'total' => array(
