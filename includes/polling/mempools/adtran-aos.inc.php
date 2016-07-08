@@ -1,7 +1,7 @@
 <?php
 
 /*
- * LibreNMS Adtran AOS RAM discovery module
+ * LibreNMS Adtran AOS RAM polling module
  *
  * Copyright (c) 2016 Chris A. Evans <thecityofguanyu@outlook.com>
  *
