@@ -16,7 +16,7 @@ $array        = array(
 $i = 0;
 $x = 0;
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     $max_colours = count($config['graph_colours'][$colours]);
     foreach ($array as $ds => $vars) {
         $x = (($x <= $max_colours) ? $x : 0);

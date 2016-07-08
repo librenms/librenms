@@ -1,6 +1,6 @@
 <?php
 
-if (is_file(rrd_name($device['hostname'], 'ipSystemStats-ipv6'))) {
+if (rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'ipSystemStats-ipv6'))) {
     $graph_title = 'IPv6 IP Packet Statistics';
     $graph_type  = 'device_ipSystemStats_v6';
 
@@ -12,7 +12,7 @@ if (is_file(rrd_name($device['hostname'], 'ipSystemStats-ipv6'))) {
     include 'includes/print-device-graph.php';
 }
 
-if (is_file(rrd_name($device['hostname'], 'ipSystemStats-ipv4'))) {
+if (rrdtool_check_rrd_exists(rrd_name($device['hostname'], 'ipSystemStats-ipv4'))) {
     $graph_title = 'IPv4 IP Packet Statistics';
     $graph_type  = 'device_ipSystemStats_v4';
 
