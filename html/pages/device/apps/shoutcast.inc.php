@@ -33,7 +33,8 @@ if (isset($total) && $total === true) {
 
 $files = glob(rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], '*')));
 foreach ($files as $file) {
-    $hostname = end(explode('-',basename($file, '.rrd')));
+    $pieces = explode('-', basename($file, '.rrd'));
+    $hostname = end($pieces);
     list($host, $port) = explode('_', $hostname, 2);
     $graphs            = array(
         'shoutcast_bits'  => 'Traffic Statistics - '.$host.' (Port: '.$port.')',

@@ -10,7 +10,8 @@ $nototal    = 0;
 $rrd_list = array();
 $rrd_filenames = glob(rrd_name($device['hostname'], array('app', 'shoutcast', $app['app_id'], '*')));
 foreach ($rrd_filenames as $file) {
-    $hostname = end(explode('-',basename($file, '.rrd')));
+    $pieces = explode('-', basename($file, '.rrd'));
+    $hostname = end($pieces);
     list($host, $port) = explode('_', $hostname, 2);
     $rrd_list[] = array(
         'filename' => $file,
