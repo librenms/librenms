@@ -51,17 +51,10 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 
     $rrd_process = proc_open($command, $descriptorspec, $rrd_pipes, $cwd, $env);
 
-    stream_set_blocking($rrd_pipes[1], 0);
-    stream_set_blocking($rrd_pipes[2], 0);
+    stream_set_blocking($rrd_pipes[1], false);
+    stream_set_blocking($rrd_pipes[2], false);
 
-    if (is_resource($rrd_process)) {
-        // $pipes now looks like this:
-        // 0 => writeable handle connected to child stdin
-        // 1 => readable handle connected to child stdout
-        // Any error output will be appended to /tmp/error-output.txt
-        return true;
-    }
-
+    return is_resource($rrd_process);
 }
 
 
@@ -159,23 +152,23 @@ function rrdtool_graph($graph_file, $options)
 /**
  * Generates and pipes a command to rrdtool
  *
- * @param  string command
- * @param  string filename
- * @param  string options
+ * @param $command create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
+ * @param $filename The full patth to the rrd file
+ * @param $options rrdtool command options
+ * @param int $timeout seconds give up waiting for output, default 0 usually results in empty output
+ * @return array the output of stdout and stderr in an array
  * @global config
  * @global debug
  * @global rrd_pipes
  */
-
-
-function rrdtool($command, $filename, $options)
+function rrdtool($command, $filename, $options, $timeout=0)
 {
     global $config, $debug, $rrd_pipes, $console_color;
 
     if ($config['rrdcached'] &&
-        (version_compare($config['rrdtool_version'], '1.5.5', '>=') ||
-        (version_compare($config['rrdtool_version'], '1.5', '>=') && $command != "tune") ||
-        ($command != "create" && $command != "tune"))
+        (version_compare($config['rrdtool_version'], '1.5.5', '>=') ||  // 1.5.5+ supports all commands
+        (version_compare($config['rrdtool_version'], '1.5', '>=') && $command != "tune") || // 1.5+ supports all except tune
+        ($command != "create" && $command != "tune")) // older supports all except create and tune
         ) {
         if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
             $filename = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $filename);
@@ -183,27 +176,26 @@ function rrdtool($command, $filename, $options)
         }
 
         $cmd = "$command $filename $options --daemon ".$config['rrdcached'];
-    }
-    else {
+    } else {
         $cmd = "$command $filename $options";
     }
 
     if ($config['norrd']) {
         print $console_color->convert('[%rRRD Disabled%n]');
-    }
-    else {
+    } else {
         fwrite($rrd_pipes[0], $cmd."\n");
     }
 
+    stream_select($r = $rrd_pipes,  $w = null, $x = null, $timeout);
+    $output = array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
+
     if ($debug) {
-        echo stream_get_contents($rrd_pipes[1]);
-        echo stream_get_contents($rrd_pipes[2]);
+        echo $output[0];
+        echo $output[1];
         print $console_color->convert('RRD[%g'.$cmd.'%n] ');
     }
-    else {
-        return array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
-    }
 
+    return $output;
 }
 
 
@@ -234,8 +226,8 @@ function rrdtool_check_rrd_exists($filename)
 {
     global $config;
     if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
-        $chk = rrdtool('info', $filename, '');
-        return !empty($chk[0]);
+        $chk = rrdtool('first', $filename, '', 5); // wait up to 5 seconds
+        return substr(rtrim($chk[0]), -25) !== 'No such file or directory';
     } else {
         return is_file($filename);
     }
