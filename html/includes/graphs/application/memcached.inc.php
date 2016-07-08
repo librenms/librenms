@@ -1,5 +1,5 @@
 <?php
 $rrd = rrd_name($device['hostname'], array('app', 'memcached', $app['app_id']));
-if (is_file($rrd)) {
+if (rrdtool_check_rrd_exists($rrd)) {
     $rrd_filename = $rrd;
 }

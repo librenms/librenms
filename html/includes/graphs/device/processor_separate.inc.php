@@ -5,7 +5,7 @@ $i = 0;
 foreach ($procs as $proc) {
     $rrd_filename = rrd_name($device['hostname'], array('processor', $proc['processor_type'], $proc['processor_index']));
 
-    if (is_file($rrd_filename)) {
+    if (rrdtool_check_rrd_exists($rrd_filename)) {
         $descr = short_hrDeviceDescr($proc['processor_descr']);
 
         $rrd_list[$i]['filename'] = $rrd_filename;

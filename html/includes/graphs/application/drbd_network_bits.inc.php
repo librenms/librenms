@@ -6,7 +6,7 @@ require 'includes/graphs/common.inc.php';
 
 $drbd_rrd = rrd_name($device['hostname'], array('app', 'drbd', $app['app_instance']));
 
-if (is_file($drbd_rrd)) {
+if (rrdtool_check_rrd_exists($drbd_rrd)) {
     $rrd_filename = $drbd_rrd;
 }
 

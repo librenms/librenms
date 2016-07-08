@@ -11,7 +11,7 @@ $graph_max       = 100;
 $unit_text       = 'Latency';
 $powerdns_rrd    = rrd_name($device['hostname'], array('app', 'powerdns', $app['app_id']));
 
-if (is_file($powerdns_rrd)) {
+if (rrdtool_check_rrd_exists($powerdns_rrd)) {
     $rrd_filename = $powerdns_rrd;
 }
 
