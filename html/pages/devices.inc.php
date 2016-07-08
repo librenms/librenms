@@ -43,7 +43,7 @@ $menu_options = array('bits'        => 'Bits',
     'storage'     => 'Storage',
     'diskio'      => 'Disk I/O',
     'poller_perf' => 'Poller',
-    'ping_perf'   => 'Ping'
+    'ping_perf'   => 'Ping',
     'temperature' => 'Temperature'
 );
 $sep = "";
