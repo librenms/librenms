@@ -2,6 +2,9 @@
 
 $valid['sensor'] = array();
 
+// Pre-cache data for later use
+require 'includes/discovery/sensors/pre-cache.inc.php';
+
 require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
 require 'includes/discovery/sensors/entity-sensor.inc.php';
 require 'includes/discovery/sensors/ipmi.inc.php';
