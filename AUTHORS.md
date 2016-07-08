@@ -110,6 +110,7 @@ LibreNMS contributors:
 - Tijmen de Mes <tijmen@ag-projects.com> (tijmenNL)
 - Benjamin Busche <benjamin.busche@gmail.com> (optic00)
 - Brandon Boudrias <bt.boudrias@gmail.com> (brandune)
+- Andy Noyland <andrew@noyland.co.uk> (Zappatron) 
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

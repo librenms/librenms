@@ -319,14 +319,16 @@ function device_by_id_cache($device_id, $refresh = '0') {
 		
 		//order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
 		$vrfs_lite_cisco = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
-		$device['vrf_lite_cisco'] = array();
 		if(!empty($vrfs_lite_cisco)){
+			$device['vrf_lite_cisco'] = array();
 			foreach ($vrfs_lite_cisco as $vrf){
 				$device['vrf_lite_cisco'][$vrf['context_name']] = $vrf;
 			}
 		}
 
-        $device['ip'] = inet6_ntop($device['ip']);
+        if(!empty($device['ip'])) {
+            $device['ip'] = inet6_ntop($device['ip']);
+        }
         $cache['devices']['id'][$device_id] = $device;
     }
     return $device;
@@ -1035,12 +1037,10 @@ function version_info($remote=true) {
         curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
         $output['github'] = json_decode(curl_exec($api),true);
     }
-    $output['local_sha']    = rtrim(`git rev-parse HEAD`);
+    list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ci' -s HEAD`));
+    $output['local_sha']    = $local_sha;
+    $output['local_date']   = $local_date;
     $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
-
-    exec('git diff --name-only --exit-code', $cmdoutput, $code);
-    $output['git_modified'] = ($code !== 0);
-    $output['git_modified_files'] = $cmdoutput;
 
     $output['db_schema']   = dbFetchCell('SELECT version FROM dbSchema');
     $output['php_ver']     = phpversion();
@@ -1233,3 +1233,69 @@ function get_port_id ($ports_mapped, $port, $port_association_mode) {
 
     return $port_id;
 }
+
+/**
+ * Create a glue-chain
+ * @param array $tables Initial Tables to construct glue-chain
+ * @param string $target Glue to find (usual device_id)
+ * @param int $x Recursion Anchor
+ * @param array $hist History of processed tables
+ * @param array $last Glues on the fringe
+ * @return string|boolean
+ */
+function ResolveGlues($tables,$target,$x=0,$hist=array(),$last=array()) {
+    if( sizeof($tables) == 1 && $x != 0 ) {
+        if( dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?',array($tables[0],$target)) == 1 ) {
+            return array_merge($last,array($tables[0].'.'.$target));
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        $x++;
+        if( $x > 30 ) {
+            //Too much recursion. Abort.
+            return false;
+        }
+        foreach( $tables as $table ) {
+            $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"',array($table));
+            if( sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target ) {
+                //Search for new candidates to expand
+                $ntables = array();
+                list($tmp) = explode('_',$glues[0]['COLUMN_NAME'],2);
+                $ntables[] = $tmp;
+                $ntables[] = $tmp.'s';
+                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table,0,-1).'_%" && TABLE_NAME != "'.$table.'"');
+                foreach( $tmp as $expand ) {
+                    $ntables[] = $expand['TABLE_NAME'];
+                }
+                $tmp = ResolveGlues($ntables,$target,$x++,array_merge($tables,$ntables),array_merge($last,array($table.'.'.$glues[0]['COLUMN_NAME'])));
+                if( is_array($tmp) ) {
+                    return $tmp;
+                }
+            }
+            else {
+                foreach( $glues as $glue ) {
+                    if( $glue['COLUMN_NAME'] == $target ) {
+                        return array_merge($last,array($table.'.'.$target));
+                    }
+                    else {
+                        list($tmp) = explode('_',$glue['COLUMN_NAME']);
+                        $tmp .= 's';
+                        if( !in_array($tmp,$tables) && !in_array($tmp,$hist) ) {
+                            //Expand table
+                            $tmp = ResolveGlues(array($tmp),$target,$x++,array_merge($tables,array($tmp)),array_merge($last,array($table.'.'.$glue['COLUMN_NAME'])));
+                            if( is_array($tmp) ) {
+                                return $tmp;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //You should never get here.
+    return false;
+}
+
