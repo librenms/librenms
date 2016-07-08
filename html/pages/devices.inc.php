@@ -44,6 +44,7 @@ $menu_options = array('bits'        => 'Bits',
     'diskio'      => 'Disk I/O',
     'poller_perf' => 'Poller',
     'ping_perf'   => 'Ping'
+    'temperature' => 'Temperature'
 );
 $sep = "";
 foreach ($menu_options as $option => $text) {
