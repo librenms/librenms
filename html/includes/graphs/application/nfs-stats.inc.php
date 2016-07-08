@@ -4,6 +4,7 @@ $scale_min    = 0;
 $colours      = 'mixed';
 $unit_text    = 'Operation';
 $unitlen      = 9;
+$stack	      = 0;
 $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfsstats-'.$app['app_id'].'.rrd';
 $array        = array(
                  'total' => array(
