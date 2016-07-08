@@ -65,7 +65,7 @@ function nicecase($item) {
         return 'BIND';
 
     case 'nfs-stats':
-	return 'NFS Stats';
+        return 'NFS Stats';
 
     default:
         return ucfirst($item);
