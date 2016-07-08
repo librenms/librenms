@@ -69,10 +69,6 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' VDEF:tot'.$rrd['ds'].$i.'='.$rrd['ds'].$i.',TOTAL';
     }
 
-    if ($i) {
-        $stack = ':STACK';
-    }
-
     $g_defname = $rrd['ds'];
     if (is_numeric($multiplier)) {
         $g_defname    = $rrd['ds'].'_cdef';
@@ -92,6 +88,10 @@ foreach ($rrd_list as $rrd) {
         $t_defname = $g_defname;
     }
 
+    if ($i && ($stack === 1)) {
+    	$stack = ':STACK';
+    }
+    
     $rrd_options .= ' LINE2:'.$g_defname.$i.'#'.$colour.":'".$descr."'$stack";
     $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%8.0lf%s GPRINT:'.$t_defname.$i.'min:MIN:%8.0lf%s';
     $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%8.0lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%8.0lf%s\\n'";
