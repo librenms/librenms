@@ -11,7 +11,7 @@ $graph_max       = 100;
 $unit_text       = 'Frequency';
 $ntpclient_rrd   = rrd_name($device['hostname'], array('app', 'ntpclient', $app['app_id']));
 
-if (is_file($ntpclient_rrd)) {
+if (rrdtool_check_rrd_exists($ntpclient_rrd)) {
     $rrd_filename = $ntpclient_rrd;
 }
 

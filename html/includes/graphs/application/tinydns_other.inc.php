@@ -40,7 +40,7 @@ $array        = array(
 $colours      = 'mixed';
 $rrd_list     = array();
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = strtoupper($ds);

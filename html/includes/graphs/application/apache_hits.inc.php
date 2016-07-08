@@ -6,7 +6,7 @@ require 'includes/graphs/common.inc.php';
 
 $apache_rrd = rrd_name($device['hostname'], array('app', 'apache', $app['app_id']));
 
-if (is_file($apache_rrd)) {
+if (rrdtool_check_rrd_exists($apache_rrd)) {
     $rrd_filename = $apache_rrd;
 }
 

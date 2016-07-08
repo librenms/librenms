@@ -48,7 +48,7 @@ $rrd_list     = array();
 
 $config['graph_colours']['merged'] = array_merge($config['graph_colours']['greens'], $config['graph_colours']['blues']);
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = strtoupper($ds);

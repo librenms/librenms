@@ -20,7 +20,7 @@ $oids = array(
 $i            = 0;
 $rrd_filename = get_port_rrdfile_path ($device['hostname'], $port['port_id'], 'dot3');
 
-if (is_file($rrd_filename)) {
+if (rrdtool_check_rrd_exists($rrd_filename)) {
     foreach ($oids as $oid) {
         $oid        = str_replace('dot3Stats', '', $oid);
         $oid_ds = truncate($oid, 19, '');

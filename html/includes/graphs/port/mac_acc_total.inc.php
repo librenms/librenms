@@ -65,7 +65,7 @@ $rrd_options .= " COMMENT:'                                     In\: Current    
 
 foreach ($accs as $acc) {
     $this_rrd = rrd_name($acc['hostname'], array('cip', $acc['ifIndex'], $acc['mac']));
-    if (is_file($this_rrd)) {
+    if (rrdtool_check_rrd_exists($this_rrd)) {
         $mac  = formatmac($acc['mac']);
         $name = $mac;
         $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ? AND port_id = ?', array($acc['mac'], $acc['port_id']));
