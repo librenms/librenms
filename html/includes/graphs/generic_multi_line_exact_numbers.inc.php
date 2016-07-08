@@ -2,29 +2,27 @@
 require 'includes/graphs/common.inc.php';
 
 if ($width > '500') {
-    $descr_len = 24;
+    $descr_len = $bigdescrlen;
 } else {
-    $descr_len  = 12;
-    $descr_len += round(($width - 250) / 8);
+    $descr_len = $smalldescrlen;
 }
 
-if ($nototal) {
+if ($printtotal === 1) {
     $descr_len += '2';
     $unitlen  += '2';
 }
 
+$unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
+
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."Now      Min      Max     Avg\l'";
-    if (!$nototal) {
+    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 10)), 0, ($descr_len + 10))."Now         Min         Max        Avg\l'";
+    if($printtotal === 1) {
         $rrd_options .= " COMMENT:'Total      '";
     }
     $rrd_options .= " COMMENT:'\l'";
 } else {
-    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5))."Now      Min      Max     Avg\l'";
+    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, ($descr_len + 10)), 0, ($descr_len + 10))."Now         Min         Max        Avg\l'";
 }
-
-$unitlen = '10';
-$unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
 
 foreach ($rrd_list as $rrd) {
     if ($rrd['colour']) {
@@ -65,7 +63,7 @@ foreach ($rrd_list as $rrd) {
         $plusX        = ',+';
     }
     
-    if (!$nototal) {
+    if ($printtotal === 1) {
         $rrd_options .= ' VDEF:tot'.$rrd['ds'].$i.'='.$rrd['ds'].$i.',TOTAL';
     }
 
@@ -96,7 +94,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%8.0lf%s GPRINT:'.$t_defname.$i.'min:MIN:%8.0lf%s';
     $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%8.0lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%8.0lf%s\\n'";
 
-    if (!$nototal) {
+    if ($printtotal === 1) {
         $rrd_options .= ' GPRINT:tot'.$rrd['ds'].$i.":%6.2lf%s'".rrdtool_escape($total_units)."'";
     }
 
