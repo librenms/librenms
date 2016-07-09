@@ -29,7 +29,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
         echo $sensor." $unit\n";
 
-        $rrd_name = get_sensor_rrd($device, $ipmisensors);
+        $rrd_name = get_sensor_rrd_name($device, $ipmisensors);
         $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
 
         $fields = array(
