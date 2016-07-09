@@ -29,7 +29,7 @@ vi /etc/yum.repos.d/rpmforge.repo
 vi /etc/sysconfig/rrdcached
 
 # Settings for rrdcached
-OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
+OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
 RRDC_USER=librenms
 
 mkdir /var/run/rrdcached
@@ -71,24 +71,23 @@ touch /etc/systemd/system/rrdcached.service
 - Edit rrdcached.service and paste the example config:
 ```ssh
 [Unit]
-Description=RRDtool Cache
+Description=Data caching daemon for rrdtool
 After=network.service
 
 [Service]
 Type=forking
 PIDFile=/run/rrdcached.pid
-ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
+ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
 RRDC_USER=librenms
 
 [Install]
 WantedBy=default.target
 ```
 
-- Restart the systemctl daemon so it can recognize the newly created rrdcached.service. Enable the rrdcached.service on boot, and start the service.
+- Reload the systemd unit files from disk, so it can recognize the newly created rrdcached.service. Enable the rrdcached.service on boot and start the service.
 ```ssh
 systemctl daemon-reload
-systemctl enable rrdcached.service
-systemctl start rrdcached.service
+systemctl enable --now rrdcached.service
 ```
 
 - Edit /opt/librenms/config.php to include:
