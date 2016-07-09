@@ -186,7 +186,9 @@ function rrdtool($command, $filename, $options, $timeout=0)
         fwrite($rrd_pipes[0], $cmd."\n");
     }
 
-    stream_select($r = $rrd_pipes,  $w = null, $x = null, $timeout);
+    if($timeout > 0) {
+        stream_select($r = $rrd_pipes,  $w = null, $x = null, $timeout);
+    }
     $output = array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
 
     if ($debug) {
@@ -226,7 +228,7 @@ function rrdtool_check_rrd_exists($filename)
 {
     global $config;
     if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
-        $chk = rrdtool('first', $filename, '', 5); // wait up to 5 seconds
+        $chk = rrdtool('last', $filename, '', 5); // wait up to 5 seconds
         return substr(rtrim($chk[0]), -25) !== 'No such file or directory';
     } else {
         return is_file($filename);

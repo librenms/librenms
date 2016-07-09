@@ -107,7 +107,7 @@ function poll_sensor($device, $class, $unit) {
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
-        $rrd_name = get_sensor_rrd($device, $sensor);
+        $rrd_name = get_sensor_rrd_name($device, $sensor);
         $rrd_def = 'DS:sensor:GAUGE:600:-20000:20000';
 
         echo "$sensor_value $unit\n";

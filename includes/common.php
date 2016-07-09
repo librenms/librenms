@@ -129,14 +129,19 @@ function sgn($int) {
     }
 }
 
-function get_sensor_rrd($device, $sensor) {
+function get_sensor_rrd($device, $sensor)
+{
+    return rrd_name($device['hostname'], get_sensor_rrd_name($device, $sensor));
+}
+
+function get_sensor_rrd_name($device, $sensor) {
     global $config;
 
     # For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
     if ($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi") {
-        return "sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_descr'];
+        return array('sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_descr']);
     } else {
-        return "sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'];
+        return array('sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']);
     }
 }
 

@@ -15,15 +15,6 @@ else {
 
 echo ' mysql';
 
-$data = explode("\n", $mysql);
-
-$map = array();
-foreach ($data as $str) {
-    list($key, $value) = explode(':', $str);
-    $map[$key]         = (float) trim($value);
-    // $nstring .= (float)trim($elements[1]).":";
-}
-
 // General Stats
 $mapping = array(
     'IDBLBSe' => 'cr',
@@ -108,7 +99,15 @@ $mapping = array(
     'CUMi'    => 'c9',
 );
 
-unset($fields);
+$data = explode("\n", $mysql);
+
+$map = array();
+foreach ($data as $str) {
+    list($key, $value) = explode(':', $str);
+    $map[$key]         = (float) trim($value);
+}
+
+$fields = array();
 foreach ($mapping as $k => $v) {
     $fields[$k] = isset($map[$v]) ? $map[$v] : (-1);
 }
