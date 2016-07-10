@@ -20,7 +20,7 @@
 */
 
 
-if ($device['os'] == 'adtrana-aos') {
+if ($device['os'] == 'adtran-aos') {
     echo 'Adtran AOS: ';
 
     $used  = snmp_get($device, 'adGenAOSHeapSize.0', '-OvQ', 'ADTRAN-AOSCPU');
