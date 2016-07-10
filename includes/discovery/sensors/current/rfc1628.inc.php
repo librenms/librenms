@@ -2,7 +2,10 @@
 
 $divisor = 10;
 if ($device['os'] == 'poweralert') {
-    $divisor = 1;
+    $serial = trim(snmp_get($device, '.1.3.6.1.4.1.850.100.1.1.4.0', '-Ovq', 'TRIPPLITE-MIB'), '"');
+    if (version_compare($serial, '12.04.0055', '>=')) {
+        $divisor = 1;
+    }
 }
 
 // RFC1628 UPS
