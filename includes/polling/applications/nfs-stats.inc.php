@@ -7,10 +7,11 @@ echo 'nfs-stats';
 
 $nfsstats = snmp_walk($device, $oid, $options, $mib);
 list(
+    $ra_size,
     $rc_hits,$rc_misses,$rc_nocache,
     $fh_lookup,$fh_anon,$fh_ncachedir,$fh_ncachenondir,$fh_stale,
     $io_read,$io_write,
-    $ra_size,$ra_range01,$ra_range02,$ra_range03,$ra_range04,$ra_range05,$ra_range06,$ra_range07,$ra_range08,$ra_range09,$ra_range10,$ra_notfound,
+    $ra_range01,$ra_range02,$ra_range03,$ra_range04,$ra_range05,$ra_range06,$ra_range07,$ra_range08,$ra_range09,$ra_range10,$ra_notfound,
     $net_all,$net_udp,$net_tcp,$net_tcpconn,
     $rpc_calls,$rpc_badcalls,$rpc_badfmt,$rpc_badauth,$rpc_badclnt,
     $proc3_null,$proc3_getattr,$proc3_setattr,$proc3_lookup,$proc3_access,$proc3_readlink,$proc3_read,$proc3_write,$proc3_create,$proc3_mkdir,$proc3_symlink,$proc3_mknod,$proc3_remove,$proc3_rmdir,$proc3_rename,$proc3_link,$proc3_readdir,$proc3_readdirplus,$proc3_fsstat,$proc3_fsinfo,$proc3_pathconf,$proc3_commit
