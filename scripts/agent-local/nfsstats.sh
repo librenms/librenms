@@ -27,8 +27,8 @@ $BIN_CAT /proc/net/rpc/nfsd | $BIN_SED -n 2p | $BIN_AWK '{print $2,$3,$4,$5,$6}'
 #get io bytes (io - values: read, write)
 $BIN_CAT /proc/net/rpc/nfsd | $BIN_SED -n 3p | $BIN_AWK '{print $2,$3}' | $BIN_TR " " "\n" >> $LOG_NEW
 
-#get read ahead cache (ra - values: size, 0-10%, 10-20%, 20-30%, 30-40%, 40-50%, 50-60%, 60-70%, 70-80%, 80-90%, not-found)
-$BIN_CAT /proc/net/rpc/nfsd | $BIN_SED -n 5p | $BIN_AWK '{print $2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12}' | $BIN_TR " " "\n" >> $LOG_NEW
+#get read ahead cache (ra - values: size, 0-10%, 10-20%, 20-30%, 30-40%, 40-50%, 50-60%, 60-70%, 70-80%, 80-90%, 90-100%, not-found)
+$BIN_CAT /proc/net/rpc/nfsd | $BIN_SED -n 5p | $BIN_AWK '{print $2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' | $BIN_TR " " "\n" >> $LOG_NEW
 
 #get server packet stats (net - values: all reads, udp packets, tcp packets, tcp conn)
 $BIN_CAT /proc/net/rpc/nfsd | $BIN_SED -n 6p | $BIN_AWK '{print $2,$3,$4,$5}' | $BIN_TR " " "\n" >> $LOG_NEW
