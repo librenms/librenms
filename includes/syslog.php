@@ -12,7 +12,8 @@ function get_cache($host, $value) {
         switch ($value) {
         case 'device_id':
             // Try by hostname
-            $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', array($host, $host));
+            $ip = inet_pton($host);
+            $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ? OR `ip` = ?', array($host, $host, $ip));
             // If failed, try by IP
             if (!is_numeric($dev_cache[$host]['device_id'])) {
                 $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM `ipv4_addresses` AS A, `ports` AS I WHERE A.ipv4_address = ? AND I.port_id = A.port_id', array($host));
