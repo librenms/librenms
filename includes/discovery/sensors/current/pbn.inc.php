@@ -18,8 +18,8 @@ if ($device['os'] == 'pbn' || $device['os_group'] == 'pbn') {
         if (is_numeric($entry['curr']) && ($entry['curr'] !== '-65535')) {
             $oid = 'NMS-IF-MIB::curr.'.$index;
             $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Current';
-            $limit_low = 9000/$divisor;
-            $warn_limit_low = 9500/$divisor;
+            $limit_low = 8000/$divisor;
+            $warn_limit_low = 8500/$divisor;
             $limit = 15000/$divisor;
             $warn_limit = 14500/$divisor;
             $value = $entry['curr']/$divisor;
