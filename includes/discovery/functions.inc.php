@@ -68,13 +68,13 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
 
                 log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery');
             } else {
-                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check SNMP access", $device['device_id'], 'discovery');
+                log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery');
             }
 
             return $remote_device_id;
         } 
         else {
-            log_event("$method discovery of " . $dst_host . " ($ip) failed - Check SNMP access", $device['device_id'], 'discovery');
+            log_event("$method discovery of " . $dst_host . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery');
         }
     } else {
         d_echo("$ip not in a matched network - skipping\n");
