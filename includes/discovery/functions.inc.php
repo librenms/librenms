@@ -105,16 +105,18 @@ function discover_device($device, $options = null) {
     echo "\n";
 
     // If we've specified modules, use them, else walk the modules array
+    $force_module = false;
     if ($options['m']) {
         $config['discovery_modules'] = array();
         foreach (explode(',', $options['m']) as $module) {
             if (is_file("includes/discovery/$module.inc.php")) {
                 $config['discovery_modules'][$module] = 1;
+                $force_module = true;
             }
         }
     }
     foreach ($config['discovery_modules'] as $module => $module_status) {
-        if ($attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
+        if ($force_module === true || $attribs['discover_' . $module] || ( $module_status && !isset($attribs['discover_' . $module]))) {
             $module_start = microtime(true);
             echo "#### Load disco module $module ####\n";
             include "includes/discovery/$module.inc.php";
