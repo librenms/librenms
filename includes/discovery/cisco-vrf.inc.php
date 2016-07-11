@@ -77,6 +77,17 @@ if ($config['enable_vrfs']) {
                     $vrf_name .= chr($oid_values[$i]);
                 }
 
+                // Brocade Ironware outputs VRF RD values as Hex-STRING rather than string. This has to be converted to decimal
+
+                if ($device['os'] == 'ironware') {
+                    $vrf_rd = substr($oid, -24);  // Grab last 24 characters from $oid, which is the RD hex value
+                    $vrf_rd = str_replace(' ', '', $vrf_rd); // Remove whitespace
+                    $vrf_rd = str_split($vrf_rd, 8); // Split it into an array, with an object for each half of the RD
+                    $vrf_rd[0] = hexdec($vrf_rd[0]); // Convert first object to decimal
+                    $vrf_rd[1] = hexdec($vrf_rd[1]); // Convert second object to deciamal
+                    $vrf_rd = implode(':', $vrf_rd); // Combine back into string, delimiter by colon
+                }
+
                 echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
                 echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
                 echo "\n  [VRF $vrf_name] DESC  - ".$descr_table[$vrf_oid];
