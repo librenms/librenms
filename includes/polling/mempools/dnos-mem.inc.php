@@ -20,7 +20,6 @@ if (strstr($sysObjectId, '.1.3.6.1.4.1.6027.1.3.')) {
         $mempool['perc'] = snmp_get($device, ".1.3.6.1.4.1.6027.3.10.1.2.9.1.5.1." . $mempool['mempool_index'], "-OvQ");
         $mempool['used'] = $mempool['total'] * $mempool['perc'] / 100;
         $mempool['free'] = $mempool['total'] - $mempool['used'];
-        var_dump($mempool);
 }
 elseif (strstr($sysObjectId, '.1.3.6.1.4.1.6027.1.2.')) {
         echo 'C-Series ';
