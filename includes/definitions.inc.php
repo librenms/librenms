@@ -740,6 +740,8 @@ $config['os'][$os]['over'][1]['graph'] = 'device_processor';
 $config['os'][$os]['over'][1]['text']  = 'CPU Usage';
 $config['os'][$os]['over'][2]['graph'] = 'device_mempool';
 $config['os'][$os]['over'][2]['text']  = 'Memory Usage';
+$config['os'][$os]['over'][3]['graph'] = 'device_pulse_users';
+$config['os'][$os]['over'][3]['text']  = 'Active Users';
 
 $os = 'fortigate';
 $config['os'][$os]['text']             = 'Fortinet Fortigate';
