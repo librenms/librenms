@@ -13,6 +13,7 @@
 
 require_once "../includes/component.php";
 $component = new component();
+$options = array();
 $options['filter']['type'] = array('=','Cisco-CBQOS');
 $components = $component->getComponents($device['device_id'],$options);
 
@@ -35,6 +36,7 @@ $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'Class-Map              Now      Avg      Max\\n'";
 $rrd_additions = "";
 
+$colours = array_merge($config['graph_colours']['mixed'],$config['graph_colours']['manycolours'],$config['graph_colours']['manycolours']);
 $count = 0;
 foreach ($components as $id => $array) {
     if ( ($array['qos-type'] == 2) && ($array['parent'] == $components[$vars['policy']]['sp-obj']) && ($array['sp-id'] == $components[$vars['policy']]['sp-id'])) {
@@ -47,17 +49,17 @@ foreach ($components as $id => $array) {
                 $stack = ":STACK ";
             }
 
-            // Grab a color from the array.
-            if ( isset($config['graph_colours']['mixed'][$count]) ) {
-                $color = $config['graph_colours']['mixed'][$count];
+            // Grab a colour from the array.
+            if ( isset($colours[$count]) ) {
+                $colour = $colours[$count];
             }
             else {
-                $color = $config['graph_colours']['oranges'][$count-7];
+                d_echo("<pre>Error: Out of colours. Have: ".(count($colours)-1).", Requesting:".$count."</pre>");
             }
 
             $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":qosdrops:AVERAGE ";
             $rrd_additions .= " CDEF:MOD" . $count . "=DS" . $count . ",8,* ";
-            $rrd_additions .= " AREA:MOD" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['label'],0,15),15) . "'" . $stack;
+            $rrd_additions .= " AREA:MOD" . $count . "#" . $colour . ":'" . str_pad(substr($components[$id]['label'],0,15),15) . "'" . $stack;
             $rrd_additions .= " GPRINT:MOD" . $count . ":LAST:%6.2lf%s ";
             $rrd_additions .= " GPRINT:MOD" . $count . ":AVERAGE:%6.2lf%s ";
             $rrd_additions .= " GPRINT:MOD" . $count . ":MAX:%6.2lf%s\\\l ";
@@ -69,6 +71,7 @@ foreach ($components as $id => $array) {
 
 if ($rrd_additions == "") {
     // We didn't add any data points.
+    d_echo("<pre>No DS to add</pre>");
 }
 else {
     $rrd_options .= $rrd_additions;
