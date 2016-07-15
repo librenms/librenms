@@ -14,14 +14,11 @@
 /**
  * Opens up a pipe to RRDTool using handles provided
  *
+ * @param $rrd_process
+ * @param $rrd_pipes
+ * @global $config
  * @return boolean
- * @global config
- * @global debug
- * @param  &rrd_process
- * @param  &rrd_pipes
  */
-
-
 function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 {
     global $config;
@@ -61,9 +58,9 @@ function rrdtool_pipe_open(&$rrd_process, &$rrd_pipes)
 /**
  * Closes the pipe to RRDTool
  *
+ * @param  resource $rrd_process
+ * @param  array $rrd_pipes
  * @return integer
- * @param  resource rrd_process
- * @param  array rrd_pipes
  */
 
 
@@ -89,9 +86,9 @@ function rrdtool_pipe_close($rrd_process, &$rrd_pipes)
  * Generates a graph file at $graph_file using $options
  * Opens its own rrdtool pipe.
  *
+ * @param string $graph_file
+ * @param string $options
  * @return integer
- * @param  string graph_file
- * @param  string options
  */
 
 
@@ -152,10 +149,10 @@ function rrdtool_graph($graph_file, $options)
 /**
  * Generates and pipes a command to rrdtool
  *
- * @param $command create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
- * @param $filename The full patth to the rrd file
- * @param $options rrdtool command options
- * @param int $timeout seconds give up waiting for output, default 0 usually results in empty output
+ * @param string $command create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
+ * @param string $filename The full patth to the rrd file
+ * @param string $options rrdtool command options
+ * @param integer $timeout seconds give up waiting for output, default 0 usually results in empty output
  * @return array the output of stdout and stderr in an array
  * @global config
  * @global debug
@@ -180,21 +177,23 @@ function rrdtool($command, $filename, $options, $timeout=0)
         $cmd = "$command $filename $options";
     }
 
-    if ($config['norrd']) {
+    // do not write rrd files, but allow read-only commands
+    if ($config['norrd'] && !in_array($command, array('graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'))) {
         print $console_color->convert('[%rRRD Disabled%n]');
+        $output = array(null, null);
     } else {
         fwrite($rrd_pipes[0], $cmd."\n");
-    }
 
-    if($timeout > 0) {
-        stream_select($r = $rrd_pipes,  $w = null, $x = null, $timeout);
+        if($timeout > 0) {
+            stream_select($r = $rrd_pipes,  $w = null, $x = null, $timeout);
+        }
+        $output = array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
     }
-    $output = array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
 
     if ($debug) {
         echo $output[0];
         echo $output[1];
-        print $console_color->convert('RRD[%g'.$cmd.'%n] ');
+        print $console_color->convert('RRD[%g'.$cmd."%n] \n");
     }
 
     return $output;
@@ -205,8 +204,8 @@ function rrdtool($command, $filename, $options, $timeout=0)
  * Generates an rrd database at $filename using $options
  *
  * @internal
- * @param string filename
- * @param string options
+ * @param string $filename
+ * @param string $options
  * @return array|bool
  */
 function rrdtool_create($filename, $options)
@@ -229,7 +228,7 @@ function rrdtool_check_rrd_exists($filename)
     global $config;
     if ($config['rrdcached'] && version_compare($config['rrdtool_version'], '1.5', '>=')) {
         $chk = rrdtool('last', $filename, '', 5); // wait up to 5 seconds
-        return substr(rtrim($chk[0]), -25) !== 'No such file or directory';
+        return substr(str_replace(array("\r", "\n"), '', $chk[0]), -25) !== 'No such file or directory';
     } else {
         return is_file($filename);
     }
@@ -287,20 +286,19 @@ function rrdtool_lastupdate($filename, $options)
 
 
 /**
- * Escapes strings for RRDtool,
- *
+ * Escapes strings for RRDtool
+ * 
+ * @param string $string the string to escape
+ * @param integer $length if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
  * @return string
- *
- * @param string string to escape
- * @param integer if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
  */
-function rrdtool_escape($string, $maxlength=null){
+function rrdtool_escape($string, $length=null){
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
     $result = str_replace('%', '%%', $result);          # double percent signs
-    if (is_numeric($maxlength)) {
-        $extra  = substr_count($string, ':', 0, $maxlength);
-        $result = substr(str_pad($result, $maxlength), 0, ($maxlength + $extra));
+    if (is_numeric($length)) {
+        $extra  = substr_count($string, ':', 0, $length);
+        $result = substr(str_pad($result, $length), 0, ($length + $extra));
         if ($extra > 0) {
             $result = substr($result, 0, (-1 * $extra));
         }
@@ -326,6 +324,14 @@ function rrd_name($host, $extra, $extension = ".rrd")
     return implode("/", array($config['rrd_dir'], $host, $filename.$extension));
 } // rrd_name
 
+/**
+ * Modify an rrd file's max value and trim the peaks as defined by rrdtool
+ * 
+ * @param string $type only 'port' is supported at this time
+ * @param string $filename the path to the rrd file
+ * @param integer $max the new max value
+ * @return bool
+ */
 function rrdtool_tune($type, $filename, $max) {
     $fields = array();
     if ($type === 'port') {
@@ -347,10 +353,16 @@ function rrdtool_tune($type, $filename, $max) {
 /**
  * rrdtool backend implementation of data_update
  *
- * @param $device
- * @param $measurement
- * @param $tags
- * @param $fields
+ * Tags:
+ *   rrd_def     array|string: (required) an array of rrd field definitions example: "DS:dataName:COUNTER:600:U:100000000000"
+ *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
+ *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
+ *   rrd_step             int: rrd step, defaults to 300
+ *
+ * @param array $device device array
+ * @param string $measurement the name of this measurement (if no rrd_name tag is given, this will be used to name the file)
+ * @param array $tags tags to pass additional info to rrdtool
+ * @param array $fields data values to update
  */
 function rrdtool_data_update($device, $measurement, $tags, $fields)
 {
@@ -375,11 +387,13 @@ function rrdtool_data_update($device, $measurement, $tags, $fields)
 } // rrdtool_data_update
 
 
-/*
+/**
+ * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
+ *
+ * @param array $device Device object
+ * @param string $oldname RRD name array as used with rrd_name()
+ * @param string $newname RRD name array as used with rrd_name()
  * @return bool indicating rename success or failure
- * @param device Device object
- * @param oldname RRD name array as used with rrd_name()
- * @param newname RRD name array as used with rrd_name()
  */
 function rrd_file_rename($device, $oldname, $newname)
 {
