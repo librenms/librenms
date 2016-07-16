@@ -8,6 +8,7 @@ Table of Content:
 - [Templates](#templates)
     - [Syntax](#templates-syntax)
     - [Examples](#templates-examples)
+    - [Included](#templates-included)
 - [Transports](#transports)
     - [E-Mail](#transports-email)
     - [API](#transports-api)
@@ -35,6 +36,8 @@ Table of Content:
     - [Device](#macros-device)
     - [Port](#macros-port)
     - [Time](#macros-time)
+    - [Sensors](#macros-sensors)
+    - [Misc](#macros-misc)
 - [Additional Options](#extra)
 
 
@@ -151,6 +154,16 @@ Conditional formatting example, will display a link to the host in email or just
 
 Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped (replaced with `\'`) in the output and should therefore be avoided.
 
+## <a name="templates-included">Included</a>
+
+We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
+assign the BGP template to this rule to provide more information.
+
+The included templates are:
+
+  - BGP Sessions
+  - Ports
+  - Temperature
 
 # <a name="transports">Transports</a>
 
@@ -671,7 +684,9 @@ Description: Only select sensors that aren't ignored.
 
 Source: `(%sensors.sensor_alert = 1)`
 
-## <a name="macros-packetloss">Packet Loss</a> (Boolean)
+## <a name="macros-misc">Misc</a> (Boolean)
+
+### Packet Loss
 
 Entity: `(%macros.packet_loss_5m)`
 
@@ -684,6 +699,54 @@ Entity: `(%macros.packet_loss_15m)`
 Description: Packet loss % value for the device within the last 15 minutes.
 
 Example: `%macros.packet_loss_15m` > 50
+
+### Ports in usage perc (Int)
+
+Entity: `((%ports.ifInOctets_rate*8)/%ports.ifSpeed)*100`
+
+Description: Port in used more than 50%
+
+Example: `%macros.port_in_usage_perc > 50
+
+### Ports out usage perc (Int)
+
+Entity: `((%ports.ifOutOctets_rate*8)/%ports.ifSpeed)*100`
+
+Description: Port out used more than 50%
+
+Example: `%macros.port_out_usage_perc > 50
+
+### Ports now down (Boolean)
+
+Entity: `%ports.ifOperStatus != %ports.ifOperStatus_prev && %ports.ifOperStatus_prev = "up" && %ports.ifAdminStatus = "up"`
+
+Description: Ports that were previously up and have now gone down.
+
+Example: `%macros.port_now_down = "1"`
+
+### Device component down [JunOS]
+
+Entity: `%sensors.sensor_class = "state" && %sensors.sensor_current != "6" && %sensors.sensor_type = "jnxFruState" && %sensors.sensor_current != "2"`
+
+Description: Device component is down such as Fan, PSU, etc for JunOS devices.
+
+Example: `%macros.device_component_down_junos = "1"`
+
+### Device component down [Cisco]
+
+Entity: `%sensors.sensor_current != "1" && %sensors.sensor_current != "5" && %sensors.sensor_type ~ "^cisco.*State$"`
+
+Description: Device component is down such as Fan, PSU, etc for Cisco devices.
+
+Example: `%macros.device_component_down_cisco = "1"`
+
+### PDU over amperage [APC]
+
+Entity: `%sensors.sensor_class = "current" && %sensors.sensor_descr = "Bank Total" && %sensors.sensor_current > %sensors.sensor_limit && %devices.os = "apc"`
+
+Description: APC PDU over amperage
+
+Example: `%macros.pdu_over_amperage_apc = "1"`
 
 # <a name="extra">Additional Options</a>
 

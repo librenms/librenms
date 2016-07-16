@@ -49,6 +49,8 @@
     - [`bills`](#api-bills)
         - [`list_bills`](#api-route-22)
         - [`get_bill`](#api-route-23)
+    - [`resources`](#api-resources)
+        - [`list_arp`](#api-resources-list_arp)
 Describes the API structure.
 
 # <a name="api-structure">`Structure`</a> [`top`](#top)
@@ -1403,3 +1405,37 @@ Output:
 }
 ```
 
+### <a name="api-resources-list_arp">Function: `list_arp`</a> [`top`](#top)
+
+Retrieve a specific ARP entry or all ARP enties for a device
+
+Route: /api/v0/resources/ip/arp/:ip
+
+ - ip is the specific IP you would like to query, if this is all then you need to pass ?device=_hostname_ (or device id)
+
+Input:
+
+ - device if you specify all for the IP then you need to populate this with the hostname or id of the device.
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/arp/1.1.1.1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/arp/1.1.1.1?device=localhost
+```
+
+Output:
+```text
+{
+    "status": "ok",
+    "err-msg": "",
+    "count": 1,
+    "arp": [
+        {
+            "port_id": "229",
+            "mac_address": "da160e5c2002",
+            "ipv4_address": "1.1.1.1",
+            "context_name": ""
+        }
+    ]
+}
+```

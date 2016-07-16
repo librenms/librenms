@@ -93,9 +93,9 @@ if($username === 'root') {
     $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
 }
 exec($modifiedcmd, $cmdoutput, $code);
-if($code !== 0) {
+if($code !== 0 && !empty($cmdoutput)) {
     print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
-    echo(implode("\n", $cmdoutput) . "\n");
+    echo('    ' . implode("\n    ", $cmdoutput) . "\n");
 }
 
 echo "DB Schema: ".$versions['db_schema']."\n";
