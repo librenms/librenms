@@ -7,8 +7,6 @@ echo 'os-updates';
 
 $osupdates = snmp_get($device, $oid, $options, $mib);
 
-//list($updates) = explode("\n",$osupdates);
-
 if(!is_file($rrd_filename))
 {
     rrdtool_create(

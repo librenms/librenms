@@ -14,7 +14,6 @@ CMD_YUM='check-update'
 BIN_APT='/usr/bin/apt'
 CMD_APT='list --upgradable'
 
-#general check for os based on /etc/os-release
 if [ -f /etc/os-release ]; then
 	OS=`$BIN_AWK -F= '/^ID=/{print $2}' /etc/os-release`
 	if [ $OS == "opensuse" ]; then
