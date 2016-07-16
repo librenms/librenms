@@ -51,8 +51,6 @@ unset($sep);
 
 print_optionbar_end();
 
-echo '<table>';
-
 foreach ($slas as $sla) {
     if ($vars['view'] != 'all' && $vars['view'] != $sla['rtt_type']) {
         continue;
@@ -69,14 +67,16 @@ foreach ($slas as $sla) {
 
     $graph_array['type'] = 'device_sla';
     $graph_array['id']   = $sla['sla_id'];
-    echo '<tr><td>';
-    echo '<h3>'.htmlentities($name).'</h3>';
-
+    echo '<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">'.htmlentities($name).'</h3>
+    </div>
+    <div class="panel-body">';
+    echo "<div class='row'>";
     include 'includes/print-graphrow.inc.php';
-
-    echo '</td></tr>';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
 }
-
-echo '</table>';
 
 $pagetitle[] = 'SLAs';
