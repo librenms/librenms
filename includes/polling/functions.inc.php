@@ -234,16 +234,18 @@ function poll_device($device, $options) {
         // we always want the core module to be included
         include 'includes/polling/core.inc.php';
 
+        $force_module = false;
         if ($options['m']) {
             $config['poller_modules'] = array();
             foreach (explode(',', $options['m']) as $module) {
                 if (is_file('includes/polling/'.$module.'.inc.php')) {
                     $config['poller_modules'][$module] = 1;
+                    $force_module = true;
                 }
             }
         }
         foreach ($config['poller_modules'] as $module => $module_status) {
-            if ($attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
+            if ($force_module === true || $attribs['poll_'.$module] || ( $module_status && !isset($attribs['poll_'.$module]))) {
                 $module_start = 0;
                 $module_time  = 0;
                 $module_start = microtime(true);
@@ -270,7 +272,7 @@ function poll_device($device, $options) {
                     unlink($oldrrd);
                  }
             }
-            else if (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
+            elseif (isset($attribs['poll_'.$module]) && $attribs['poll_'.$module] == '0') {
                 echo "Module [ $module ] disabled on host.\n";
             }
             else {
