@@ -66,7 +66,7 @@ function CollectData($bill_id) {
         $port_data['in_measurement']  = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
         $port_data['out_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');
 
-        $last_counters = getLastPortCounter($port_id);
+        $last_counters = getLastPortCounter($port_id, $bill_id);
         if ($last_counters['state'] == 'ok') {
             $port_data['last_in_measurement']  = $last_counters[in_counter];
             $port_data['last_in_delta']        = $last_counters[in_delta];
@@ -75,7 +75,7 @@ function CollectData($bill_id) {
 
             $tmp_period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('".mres($last_counters['timestamp'])."')");
 
-            if (delta_to_bits($port_data['in_measurement'], $tmp_period)-$port_data['last_in_measurement'] > $port_data['ifSpeed']) {
+            if ((delta_to_bits($port_data['in_measurement'], $tmp_period)-delta_to_bits($port_data['last_in_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
             elseif ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
@@ -85,7 +85,7 @@ function CollectData($bill_id) {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
             
-            if (delta_to_bits($port_data['out_measurement'], $tmp_period)-$port_data['last_out_measurement'] > $port_data['ifSpeed']) {
+            if ((delta_to_bits($port_data['out_measurement'], $tmp_period)-delta_to_bits($port_data['last_out_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['out_delta'] = $port_data['last_out_delta'];
             }
             elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {
@@ -101,7 +101,8 @@ function CollectData($bill_id) {
         }
 
         $fields = array('timestamp' => $now, 'in_counter' => $port_data['in_measurement'], 'out_counter' => $port_data['out_measurement'], 'in_delta' => $port_data['in_delta'], 'out_delta' => $port_data['out_delta']);
-        if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "'") == 0) {
+        if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "' AND `bill_id`='$bill_id'") == 0) {
+            $fields['bill_id'] = $bill_id;
             $fields['port_id'] = $port_id;
             dbInsert($fields, 'bill_port_counters');
         }
