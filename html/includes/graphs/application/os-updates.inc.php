@@ -8,6 +8,8 @@ $bigdescrlen   = 18;
 $smalldescrlen = 18;
 $dostack       = 0;
 $printtotal    = 0;
+$addarea       = 1;
+$transparency  = 33;
 $rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-os-updates-'.$app['app_id'].'.rrd';
 $array = array(
     'packages' => array('descr' => 'packages','colour' => '2B9220',),
