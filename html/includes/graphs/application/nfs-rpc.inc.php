@@ -8,6 +8,8 @@ $bigdescrlen   = 15;
 $smalldescrlen = 15;
 $dostack       = 0;
 $printtotal    = 0;
+$addarea       = 1;
+$transparency  = 33;
 $rrd_filename  = $config['rrd_dir'].'/'.$device['hostname'].'/app-nfs-stats-'.$app['app_id'].'.rrd';
 $array = array(
     'rpc_calls' => array('descr' => 'calls','colour' => '000000',),
