@@ -23,10 +23,16 @@ function find_child($components,$parent,$level) {
             echo "<li>";
             if ($array['qos-type'] == 1) {
                 // Its a policy, we need to make it a link.
-                echo('<a href="' . generate_url($vars, array('policy' => $id)) . '">' . $array['label'] . '</a>');
+                $linkvars = array_merge($vars, array('policy' => $id));
+                unset($linkvars['class']);
+                echo('<a href="' . generate_url($linkvars) . '">' . $array['label'] . '</a>');
+            }
+            elseif ($array['qos-type'] == 2) {
+                // Its a class, we need to make it a link.
+                echo('<a href="' . generate_url($vars, array('policy' => $parent,'class' => $id)) . '">' . $array['label'] . '</a>');
             }
             else {
-                // No policy, no link
+                // Unknown, no link
                 echo $array['label'];
             }
             if (isset($array['match'])) {
@@ -102,16 +108,25 @@ foreach ($components as $id => $array) {
         echo "<div class='col-md-12'>";
         echo "<div class='graphhead'>Traffic by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
         $graph_array['policy'] = $vars['policy'];
+        if (isset($vars['class'])) {
+            $graph_array['class'] = $vars['class'];
+        }
         $graph_type = 'port_cbqos_traffic';
         include 'includes/print-interface-graphs.inc.php';
 
         echo "<div class='graphhead'>QoS Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
         $graph_array['policy'] = $vars['policy'];
+        if (isset($vars['class'])) {
+            $graph_array['class'] = $vars['class'];
+        }
         $graph_type = 'port_cbqos_bufferdrops';
         include 'includes/print-interface-graphs.inc.php';
 
         echo "<div class='graphhead'>Buffer Drops by CBQoS Class - ".$components[$vars['policy']]['label']."</div>";
         $graph_array['policy'] = $vars['policy'];
+        if (isset($vars['class'])) {
+            $graph_array['class'] = $vars['class'];
+        }
         $graph_type = 'port_cbqos_qosdrops';
         include 'includes/print-interface-graphs.inc.php';
         echo "</div>\n\n";

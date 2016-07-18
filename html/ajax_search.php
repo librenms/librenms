@@ -62,6 +62,9 @@ if (isset($_REQUEST['search'])) {
 
                 foreach ($results as $result) {
                     $name = $result['hostname'];
+                    if ($result['sysName'] != $name && !empty($result['sysName'])) {
+                        $name .= ' ('.$result['sysName'].') ';
+                    }
                     if ($result['disabled'] == 1) {
                         $highlight_colour = '#808080';
                     }

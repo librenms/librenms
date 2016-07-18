@@ -141,6 +141,19 @@ $app->group(
                     }
                 );
 		// End Routing
+                // Resources section
+                $app->group(
+                    '/resources',
+                    function () use ($app) {
+                        $app->group(
+                            '/ip',
+                            function () use ($app) {
+                                $app->get('/arp/:ip', 'authToken', 'list_arp')->name('list_arp');
+                            }
+                        );
+                    }
+                );
+                // End Resources
             }
         );
         $app->get('/v0', 'authToken', 'show_endpoints');
