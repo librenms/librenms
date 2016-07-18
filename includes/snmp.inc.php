@@ -167,6 +167,10 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
     }
     else {
         $snmpcommand = $config['snmpbulkwalk'];
+        $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+        if ($max_repeaters > 0) {
+            $snmpcommand .= " -Cr$max_repeaters ";
+        }
     }
 
     $cmd = $snmpcommand;
@@ -230,6 +234,10 @@ function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
     }
     else {
         $snmpcommand = $config['snmpbulkwalk'];
+        $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+        if ($max_repeaters > 0) {
+            $snmpcommand .= " -Cr$max_repeaters ";
+        }
     }
 
     $cmd  = $snmpcommand;
@@ -301,6 +309,10 @@ function snmp_cache_ifIndex($device) {
     }
     else {
         $snmpcommand = $config['snmpbulkwalk'];
+        $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+        if ($max_repeaters > 0) {
+            $snmpcommand .= " -Cr$max_repeaters ";
+        }
     }
 
     $cmd  = $snmpcommand;
@@ -461,6 +473,10 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib=0) {
     }
     else {
         $snmpcommand = $config['snmpbulkwalk'];
+        $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+        if ($max_repeaters > 0) {
+            $snmpcommand .= " -Cr$max_repeaters ";
+        }
     }
 
     $cmd  = $snmpcommand;
@@ -515,6 +531,10 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib=0) {
     }
     else {
         $snmpcommand = $config['snmpbulkwalk'];
+        $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+        if ($max_repeaters > 0) {
+            $snmpcommand .= " -Cr$max_repeaters ";
+        }
     }
 
     $cmd  = $snmpcommand;
@@ -573,6 +593,10 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib=0) {
     }
     else {
         $snmpcommand = $config['snmpbulkwalk'];
+        $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+        if ($max_repeaters > 0) {
+            $snmpcommand .= " -Cr$max_repeaters ";
+        }
     }
 
     $cmd  = $snmpcommand;
