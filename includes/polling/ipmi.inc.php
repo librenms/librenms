@@ -2,6 +2,8 @@
 
 $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_type='ipmi'", array($device['device_id']));
 
+d_echo($ipmi_rows);
+
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['user']     = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
@@ -13,6 +15,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     }
 
     $results = external_exec($config['ipmitool'].' -I '.$ipmi['type'].' -c '.$remote.' sdr 2>/dev/null');
+    d_echo($results);
     echo " done.\n";
 
     foreach (explode("\n", $results) as $row) {

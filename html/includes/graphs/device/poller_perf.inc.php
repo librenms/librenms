@@ -21,5 +21,5 @@ $rrd_filename = rrd_name($device['hostname'], 'poller-perf');
 $rrd_options .= ' DEF:poller='.$rrd_filename.':poller:AVERAGE';
 $rrd_options .= " 'COMMENT:Seconds      Current  Minimum  Maximum  Average\\n'";
 $rrd_options .= ' LINE1.25:poller#36393D:Poller';
-$rrd_options .= ' GPRINT:poller:LAST:%6.2lf  GPRINT:poller:AVERAGE:%6.2lf';
+$rrd_options .= ' GPRINT:poller:LAST:%6.2lf  GPRINT:poller:MIN:%6.2lf';
 $rrd_options .= " GPRINT:poller:MAX:%6.2lf  'GPRINT:poller:AVERAGE:%6.2lf\\n'";
