@@ -38,14 +38,13 @@ if ($device['os'] != 'Snom') {
 
     $data = snmpwalk_cache_oid($device, 'snmp', array(), 'SNMPv2-MIB');
 
-    $fields = $data[0];
-    unset($fields['snmpEnableAuthenTraps']);
-
-    if (isset($fields['snmpInPkts']) && isset($fields['snmpOutPkts'])) {
+    if (isset($data[0]['snmpInPkts'])) {
         $rrd_def = array();
+        $fields = array();
         foreach ($oids as $oid) {
             $oid_ds    = truncate($oid, 19, '');
             $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
+            $fields[$oid] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
         }
 
         $tags = compact('rrd_def');
@@ -55,5 +54,5 @@ if ($device['os'] != 'Snom') {
         $graphs['netstat_snmp_pkt'] = true;
     }
 
-    unset($oids, $data, $feilds, $oid, $rrd_def, $tags);
+    unset($oids, $data, $rrd_def, $fields, $tags);
 }//end if
