@@ -13,6 +13,7 @@
 
 require_once "../includes/component.php";
 $component = new component();
+$options = array();
 $options['filter']['type'] = array('=','Cisco-CBQOS');
 $components = $component->getComponents($device['device_id'],$options);
 
@@ -35,40 +36,69 @@ $rrd_options .= " -l 0 -E ";
 $rrd_options .= " COMMENT:'Class-Map              Now      Avg      Max\\n'";
 $rrd_additions = "";
 
+$colours = array_merge($config['graph_colours']['mixed'],$config['graph_colours']['manycolours'],$config['graph_colours']['manycolours']);
 $count = 0;
+
+d_echo("<pre>Policy: ".$vars['policy']);
+d_echo("\nSP-OBJ: ".$components[$vars['policy']]['sp-obj']);
 foreach ($components as $id => $array) {
+    $addtograph = false;
+
+    // We only care about children of the selected policy.
     if ( ($array['qos-type'] == 2) && ($array['parent'] == $components[$vars['policy']]['sp-obj']) && ($array['sp-id'] == $components[$vars['policy']]['sp-id'])) {
-        $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("port-".$array['ifindex']."-cbqos-".$array['sp-id']."-".$array['sp-obj'].".rrd");
 
-        if (file_exists($rrd_filename)) {
-            // Stack the area on the second and subsequent DS's
-            $stack = "";
-            if ($count != 0) {
-                $stack = ":STACK ";
+        // Are we trying to only graph a single class?
+        if (isset($vars['class'])) {
+            // Yes, is this the selected class
+            if ($vars['class'] == $id) {
+                $addtograph = true;
             }
-
-            // Grab a color from the array.
-            if ( isset($config['graph_colours']['mixed'][$count]) ) {
-                $color = $config['graph_colours']['mixed'][$count];
-            }
-            else {
-                $color = $config['graph_colours']['oranges'][$count-7];
-            }
-
-            $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":bufferdrops:AVERAGE ";
-            $rrd_additions .= " CDEF:MOD" . $count . "=DS" . $count . ",8,* ";
-            $rrd_additions .= " AREA:MOD" . $count . "#" . $color . ":'" . str_pad(substr($components[$id]['label'],0,15),15) . "'" . $stack;
-            $rrd_additions .= " GPRINT:MOD" . $count . ":LAST:%6.2lf%s ";
-            $rrd_additions .= " GPRINT:MOD" . $count . ":AVERAGE:%6.2lf%s ";
-            $rrd_additions .= " GPRINT:MOD" . $count . ":MAX:%6.2lf%s\\\l ";
-
-            $count++;
         }
+        else {
+            // No, Graph everything
+            $addtograph = true;
+        }
+
+        // Add the class map to the graph
+        if ($addtograph === true) {
+            d_echo("\n  Class: ".$components[$id]['label']."\t+ added to the graph");
+            $rrd_filename = $config['rrd_dir'].'/'.$device['hostname'].'/'.safename("port-".$array['ifindex']."-cbqos-".$array['sp-id']."-".$array['sp-obj'].".rrd");
+
+            if (file_exists($rrd_filename)) {
+                // Stack the area on the second and subsequent DS's
+                $stack = "";
+                if ($count != 0) {
+                    $stack = ":STACK ";
+                }
+
+                // Grab a colour from the array.
+                if ( isset($colours[$count]) ) {
+                    $colour = $colours[$count];
+                }
+                else {
+                    d_echo("\nError: Out of colours. Have: ".(count($colours)-1).", Requesting:".$count);
+                }
+
+                $rrd_additions .= " DEF:DS" . $count . "=" . $rrd_filename . ":bufferdrops:AVERAGE ";
+                $rrd_additions .= " CDEF:MOD" . $count . "=DS" . $count . ",8,* ";
+                $rrd_additions .= " AREA:MOD" . $count . "#" . $colour . ":'" . str_pad(substr($components[$id]['label'],0,15),15) . "'" . $stack;
+                $rrd_additions .= " GPRINT:MOD" . $count . ":LAST:%6.2lf%s ";
+                $rrd_additions .= " GPRINT:MOD" . $count . ":AVERAGE:%6.2lf%s ";
+                $rrd_additions .= " GPRINT:MOD" . $count . ":MAX:%6.2lf%s\\\l ";
+
+                $count++;
+            } // End if file exists
+        }
+        else {
+            d_echo("\n  Class: ".$components[$id]['label']."\t- NOT added to the graph");
+        } // End if addtograph
     }
 }
+d_echo("</pre>");
 
 if ($rrd_additions == "") {
     // We didn't add any data points.
+    d_echo("<pre>No DS to add</pre>");
 }
 else {
     $rrd_options .= $rrd_additions;
