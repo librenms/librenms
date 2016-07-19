@@ -28,7 +28,7 @@ foreach( $opts as $tmp_api ) {
     $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
     $data = array(
         'attachments' => array(
-                0 => array(
+            0 => array(
                 'fallback' => $slack_msg,
                 'color' => $color,
                 'title' => $obj['title'],
