@@ -24,8 +24,17 @@
 foreach( $opts as $tmp_api ) {
     $host = $tmp_api['url'];
     $curl = curl_init();
+    $slack_msg = strip_tags($obj['msg']);
+    $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
     $data = array(
-        'text' => $obj['msg'],
+        'attachments' => array(
+                0 => array(
+                'fallback' => $slack_msg,
+                'color' => $color,
+                'title' => $obj['title'],
+                'text' => $slack_msg,
+            )
+        ),
         'channel' => $tmp_api['channel'],
         'username' => $tmp_api['username'],
         'icon_url' => $tmp_api['icon_url'],
