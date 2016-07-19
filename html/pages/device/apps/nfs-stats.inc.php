@@ -3,7 +3,14 @@
 global $config;
 
 $graphs = array(
-    'nfs-stats' => 'NFS Server - Statistics',
+    'nfs-stats' => 'NFS Statistics',
+    'nfs-io' => 'IO',
+    'nfs-fh' => 'File handler',
+    'nfs-rc' => 'Reply cache',
+    'nfs-ra' => 'Read ahead cache',
+    'nfs-net' => 'Network stats',
+    'nfs-rpc' => 'RPC Stats',
+
 );
 
 foreach ($graphs as $key => $text) {
