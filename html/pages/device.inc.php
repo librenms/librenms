@@ -360,7 +360,7 @@ if (device_permitted($vars['device']) || $check_device == $vars['device']) {
             }
 
             foreach ($config['nfsen_rrds'] as $nfsenrrds) {
-                if ($configs[(strlen($nfsenrrds) - 1)] != '/') {
+                if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
                     $nfsenrrds .= '/';
                 }
 

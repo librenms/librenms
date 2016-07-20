@@ -7,7 +7,7 @@ if (!is_array($config['nfsen_rrds'])) {
 }
 
 foreach ($config['nfsen_rrds'] as $nfsenrrds) {
-    if ($configs[(strlen($nfsenrrds) - 1)] != '/') {
+    if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
         $nfsenrrds .= '/';
     }
 
