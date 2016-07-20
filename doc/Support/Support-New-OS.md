@@ -316,7 +316,7 @@ $sessions = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv
 
 if (is_numeric($sessions)) {
     $rrd_def = array(
-        'DS:sessions:GAUGE:600:0:U'
+        'DS:sessions:GAUGE:600:0:U',
     }
     $fields = array(
         'sessions' => $sessions
