@@ -103,6 +103,13 @@ function discover_device($device, $options = null) {
         }
     }
 
+    // Set type to a predefined type for the OS if it's not already set
+    if ($device['type'] == 'unknown' || $device['type'] == '') {
+        if ($config['os'][$device['os']]['type']) {
+            $device['type'] = $config['os'][$device['os']]['type'];
+        }
+    }
+
     if ($config['os'][$device['os']]['group']) {
         $device['os_group'] = $config['os'][$device['os']]['group'];
         echo ' (' . $device['os_group'] . ')';
@@ -140,13 +147,6 @@ function discover_device($device, $options = null) {
     if (is_mib_poller_enabled($device)) {
         $devicemib = array($device['sysObjectID'] => 'all');
         register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
-    }
-
-    // Set type to a predefined type for the OS if it's not already set
-    if ($device['type'] == 'unknown' || $device['type'] == '') {
-        if ($config['os'][$device['os']]['type']) {
-            $device['type'] = $config['os'][$device['os']]['type'];
-        }
     }
 
     $device_end = microtime(true);
