@@ -1,0 +1,43 @@
+-- file: RFC-1215.my 
+-- Changes:
+--      Added MODULE definition.
+--      Commented out TRAP-TYPE macro definition and replaced
+--        with SMIC directive to enable it.
+-- dperkins@scruznet.com
+
+
+RFC-1215 DEFINITIONS ::= BEGIN
+
+
+    -- Make builtin items known
+
+    -- SMI TRAP-TYPE
+
+        --  TRAP-TYPE MACRO ::=
+        --  BEGIN
+        --      TYPE NOTATION ::= "ENTERPRISE" value
+        --                            (enterprise OBJECT IDENTIFIER)
+        --                        VarPart
+        --                        DescrPart
+        --                        ReferPart
+        --      VALUE NOTATION ::= value (VALUE INTEGER)
+        --
+        --      VarPart ::=
+        --                 "VARIABLES" "{" VarTypes "}"
+        --                      | empty
+        --      VarTypes ::=
+        --                 VarType | VarTypes "," VarType
+        --      VarType ::=
+        --                 value (vartype ObjectName)
+        --
+        --      DescrPart ::=
+        --                 "DESCRIPTION" value (description DisplayString)
+        --                      | empty
+        --
+        --      ReferPart ::=
+        --                 "REFERENCE" value (reference DisplayString)
+        --                      | empty
+        --
+        --  END
+
+END
