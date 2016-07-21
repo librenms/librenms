@@ -1926,8 +1926,17 @@ $config['os'][$os]['over'][1]['text']  = 'Wifi Clients';
 $config['os'][$os]['over'][2]['graph'] = 'device_xirrus_rssi';
 $config['os'][$os]['over'][2]['text']  = 'Signal RSSI';
 
-
-
+// McAfee SIEM
+$os = 'nitro';
+$config['os'][$os]['text'] = 'McAfee SIEM Nitro';
+$config['os'][$os]['type'] = 'appliance';
+$config['os'][$os]['icon'] = 'mcafee';
+$config['os'][$os]['over'][0]['graph'] = 'device_bits';
+$config['os'][$os]['over'][0]['text'] = 'Device Traffic';
+$config['os'][$os]['over'][1]['graph'] = 'device_processor';
+$config['os'][$os]['over'][1]['text'] = 'CPU Usage';
+$config['os'][$os]['over'][2]['graph'] = 'device_mempool';
+$config['os'][$os]['over'][2]['text'] = 'Memory Usage';
 
 // Graph Types
 require_once $config['install_dir'].'/includes/load_db_graph_types.inc.php';
