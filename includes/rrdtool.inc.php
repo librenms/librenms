@@ -182,12 +182,20 @@ function rrdtool($command, $filename, $options, $timeout=0)
         print $console_color->convert('[%rRRD Disabled%n]');
         $output = array(null, null);
     } else {
-        fwrite($rrd_pipes[0], $cmd."\n");
-
-        if($timeout > 0) {
-            stream_select($r = $rrd_pipes,  $w = null, $x = null, $timeout);
+        if ($timeout > 0) {
+            // if we care about the output, indicated by the fact that we are waiting for it
+            // remove any previous output before sending the command
+            stream_get_contents($rrd_pipes[1]);
+            stream_get_contents($rrd_pipes[2]);
         }
-        $output = array(stream_get_contents($rrd_pipes[1]),stream_get_contents($rrd_pipes[2]));
+
+        fwrite($rrd_pipes[0], $cmd . "\n");
+
+        if ($timeout > 0) {
+            // this causes us to block until we receive output for up to $timeout seconds
+            stream_select($r = $rrd_pipes, $w = null, $x = null, $timeout);
+        }
+        $output = array(stream_get_contents($rrd_pipes[1]), stream_get_contents($rrd_pipes[2]));
     }
 
     if ($debug) {
