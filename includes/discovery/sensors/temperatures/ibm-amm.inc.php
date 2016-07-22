@@ -11,7 +11,7 @@
  */
 
 if ($device['os'] == 'ibm-amm') {
-    $oid = 'BLADE-MIB::mmTemp.0';
+    $oid = '.1.3.6.1.4.1.2.3.51.2.2.1.1.2.0'; // BLADE-MIB::mmTemp.0
     $mmtemp = snmp_get($device, $oid, '-Oqv');
 
     preg_match('/[\d\.]+/', $mmtemp, $temp_response);
@@ -28,7 +28,7 @@ if ($device['os'] == 'ibm-amm') {
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
     }
 
-    $oid = 'BLADE-MIB::frontPanelTemp.0';
+    $oid = '.1.3.6.1.4.1.2.3.51.2.2.1.5.1.0'; // BLADE-MIB::frontPanelTemp.0
     $fptemp = snmp_get($device, $oid, '-Oqv');
 
     preg_match('/[\d\.]+/', $fptemp, $temp_response);
