@@ -12,7 +12,7 @@
 
 if ($device['os'] == 'ibm-amm') {
     $oid = 'BLADE-MIB::mmTemp.0';
-    $mmtemp = snmp_get($device, $oid, '-OsqnU');
+    $mmtemp = snmp_get($device, $oid, '-Oqv');
 
     preg_match('/[\d\.]+/', $mmtemp, $temp_response);
     if (!empty($temp_response[0])) {
@@ -29,7 +29,7 @@ if ($device['os'] == 'ibm-amm') {
     }
 
     $oid = 'BLADE-MIB::frontPanelTemp.0';
-    $fptemp = snmp_get($device, $oid, '-OsqnU');
+    $fptemp = snmp_get($device, $oid, '-Oqv');
 
     preg_match('/[\d\.]+/', $fptemp, $temp_response);
     if (!empty($temp_response[0])) {
