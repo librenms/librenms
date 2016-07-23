@@ -13,11 +13,11 @@
  */
 
 
-if ($device['os'] == 'calix-e5') {
+if (strstr($sysObjectId, '.6321.1.2.3')) { // E5-1xx Series
     echo 'Calix E5: ';
 
     if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.4') !== false) { // E5-121
-        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-121-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix-e5');
+        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-121-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix');
         $oids = trim($oids);
         $oids = str_replace('.1.3.6.1.4.1.6321.1.2.3.4.98.2.3.1.2.', '', $oids);
         foreach (explode("\n", $oids) as $data) {
@@ -31,13 +31,13 @@ if ($device['os'] == 'calix-e5') {
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix-e5', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
 
     if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.3') !== false) { // E5-120
-        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-120-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix-e5');
+        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-120-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix');
         $oids = trim($oids);
         $oids = str_replace('.1.3.6.1.4.1.6321.1.2.3.3.98.2.3.1.2.', '', $oids);
         foreach (explode("\n", $oids) as $data) {
@@ -51,14 +51,14 @@ if ($device['os'] == 'calix-e5') {
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix-e5', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
 
 
     if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.2') !== false) { // E5-111
-        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-111-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix-e5');
+        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-111-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix');
         $oids = trim($oids);
         $oids = str_replace('.1.3.6.1.4.1.6321.1.2.3.2.98.2.3.1.2.', '', $oids);
         foreach (explode("\n", $oids) as $data) {
@@ -72,13 +72,13 @@ if ($device['os'] == 'calix-e5') {
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix-e5', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
 
     if (strpos($device['sysObjectID'], 'enterprises.6321.1.2.3.1') !== false) { // E5-110
-        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-110-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix-e5');
+        $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-110-IESCOMMON-MIB', '+'.$config['install_dir'].'/mibs/calix');
         $oids = trim($oids);
         $oids = str_replace('.1.3.6.1.4.1.6321.1.2.3.1.98.2.3.1.2.', '', $oids);
         foreach (explode("\n", $oids) as $data) {
@@ -92,7 +92,7 @@ if ($device['os'] == 'calix-e5') {
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix-e5', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
