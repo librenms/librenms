@@ -45,6 +45,12 @@ function mibdir($mibdir) {
 
 }//end mibdir()
 
+function mibpath($mib, $mibdir) {
+    global $config;
+    return ' -m '.($mibdir ? $mibdir : $config['mibdir']) .'/'.$mib;
+
+}//end mibpath()
+
 
 function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=null) {
     global $debug,$config,$runtime_stats,$mibs_loaded;
@@ -65,10 +71,8 @@ function snmp_get_multi($device, $oids, $options='-OQUs', $mib=null, $mibdir=nul
     }
 
     if ($mib) {
-        $cmd .= ' -m '.$mib;
+        $cmd .= mibpath($mib, $mibdir);
     }
-
-    $cmd .= mibdir($mibdir);
 
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
@@ -120,10 +124,8 @@ function snmp_get($device, $oid, $options=null, $mib=null, $mibdir=null) {
     }
 
     if ($mib) {
-        $cmd .= ' -m '.$mib;
+        $cmd .= mibpath($mib, $mibdir);
     }
-
-    $cmd .= mibdir($mibdir);
 
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
     $cmd .= isset($retries) ? ' -r '.$retries : '';
@@ -182,7 +184,7 @@ function snmp_walk($device, $oid, $options=null, $mib=null, $mibdir=null) {
     }
 
     if ($mib) {
-        $cmd .= " -m $mib";
+        $cmd .= mibpath($mib, $mibdir);
     }
 
     $cmd .= mibdir($mibdir);
@@ -245,7 +247,7 @@ function snmpwalk_cache_cip($device, $oid, $array=array(), $mib=0) {
 
     $cmd .= ' -O snQ';
     if ($mib) {
-        $cmd .= " -m $mib";
+        $cmd .= mibpath($mib, $mibdir);
     }
 
     $cmd .= mibdir(null);
@@ -486,7 +488,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib=0) {
     $cmd .= mibdir(null);
 
     if ($mib) {
-        $cmd .= " -m $mib";
+        $cmd .= mibpath($mib, $mibdir);
     }
 
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
@@ -543,7 +545,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib=0) {
     $cmd .= ' -O QUs';
     $cmd .= mibdir(null);
     if ($mib) {
-        $cmd .= " -m $mib";
+        $cmd .= mibpath($mib, $mibdir);
     }
 
     $cmd .= isset($timeout) ? ' -t '.$timeout : '';
@@ -604,7 +606,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib=0) {
 
     $cmd .= ' -O QUs';
     if ($mib) {
-        $cmd .= " -m $mib";
+        $cmd .= mibpath($mib, $mibdir);
     }
 
     $cmd .= mibdir(null);
@@ -667,7 +669,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
 
     $cmd .= mibdir(null);
     if ($mib) {
-        $cmd .= " -m $mib";
+        $cmd .= mibpath($mib, $mibdir);
     }
 
     $cmd .= ' -t '.$timeout.' -r '.$retries;
