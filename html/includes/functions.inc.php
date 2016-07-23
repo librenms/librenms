@@ -70,6 +70,9 @@ function nicecase($item) {
     case 'nfs-v3-stats':
         return 'NFS v3 Stats';
 
+    case 'os-updates':
+        return 'OS updates';
+
     default:
         return ucfirst($item);
     }
