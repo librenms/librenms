@@ -12,26 +12,22 @@
 
 if ($device['os'] == 'ibm-amm') {
 
-    $oids = array('blower1speedRPM', 'blower2speedRPM', 'blower3speedRPM', 'blower4speedRPM');
-    d_echo($oids."\n");
-    if (!empty($oids)) {
+    $descr_prefix = 'Blower ';
+    $oids = array(
+        '.1.3.6.1.4.1.2.3.51.2.2.3.20.0', // BLADE-MIB:blower1speedRPM
+        '.1.3.6.1.4.1.2.3.51.2.2.3.21.0', // BLADE-MIB:blower2speedRPM
+        '.1.3.6.1.4.1.2.3.51.2.2.3.22.0', // BLADE-MIB:blower3speedRPM
+        '.1.3.6.1.4.1.2.3.51.2.2.3.23.0', // BLADE-MIB:blower4speedRPM
+    );
 
-        echo 'BLADE-MIB ';
-        foreach ($oids as $index => $data) {
+    echo 'BLADE-MIB ';
+    foreach ($oids as $index => $oid) {
+        $value = trim(snmp_get($device, $oid, '-Oqv'), '"');
 
-            if (!empty($data)) {
-                $value = trim(snmp_get($device, $data.'.0', '-Oqv', 'BLADE-MIB'), '"');
-
-                if (is_numeric($value)) {
-                    $oid = 'BLADE-MIB::' . $data . '.0';
-                    $descr = $data;
-                    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, null, null, null, null, $value);
-                }
-
-            }
-
+        if (is_numeric($value)) {
+            $descr = $descr_prefix . ($index + 1);
+            discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, null, null, null, null, $value);
         }
-
     }
 
 }
