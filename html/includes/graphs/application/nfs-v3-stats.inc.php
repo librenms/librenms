@@ -51,4 +51,4 @@ else {
     echo "file missing: $rrd_filename";
 }
 
-require 'includes/graphs/generic_v3_multiline.inc.php';
+require 'includes/graphs/generic_multi_line_exact_numbers.inc.php';
