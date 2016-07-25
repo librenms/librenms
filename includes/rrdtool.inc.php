@@ -104,10 +104,7 @@ function rrdtool_graph($graph_file, $options)
         // 1 => readable handle connected to child stdout
         // Any error output will be appended to /tmp/error-output.txt
         if ($config['rrdcached']) {
-            if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
-                $options = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $options);
-                $options = str_replace($config['rrd_dir'], './'.$config['rrdcached_dir'].'/', $options);
-            }
+            $options = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $options);
 
             fwrite($rrd_pipes[0], 'graph --daemon '.$config['rrdcached']." $graph_file $options");
         }
@@ -158,7 +155,7 @@ function rrdtool_graph($graph_file, $options)
  * @global debug
  * @global rrd_pipes
  */
-function rrdtool($command, $filename, $options, $timeout=0)
+function rrdtool($command, $filename, $options, $timeout=1)
 {
     global $config, $debug, $rrd_pipes, $console_color;
 
@@ -167,11 +164,11 @@ function rrdtool($command, $filename, $options, $timeout=0)
         (version_compare($config['rrdtool_version'], '1.5', '>=') && $command != "tune") || // 1.5+ supports all except tune
         ($command != "create" && $command != "tune")) // older supports all except create and tune
         ) {
-        if (isset($config['rrdcached_dir']) && $config['rrdcached_dir'] !== false) {
-            $filename = str_replace($config['rrd_dir'].'/', './'.$config['rrdcached_dir'].'/', $filename);
-            $filename = str_replace($config['rrd_dir'], './'.$config['rrdcached_dir'].'/', $filename);
-        }
 
+        // only relative paths if using rrdcached
+        $filename = str_replace(array($config['rrd_dir'].'/', $config['rrd_dir']), '', $filename);
+
+        // using rrdcached, append --daemon
         $cmd = "$command $filename $options --daemon ".$config['rrdcached'];
     } else {
         $cmd = "$command $filename $options";
@@ -182,26 +179,18 @@ function rrdtool($command, $filename, $options, $timeout=0)
         print $console_color->convert('[%rRRD Disabled%n]');
         $output = array(null, null);
     } else {
-        if ($timeout > 0) {
-            // if we care about the output, indicated by the fact that we are waiting for it
-            // remove any previous output before sending the command
-            stream_get_contents($rrd_pipes[1]);
-            stream_get_contents($rrd_pipes[2]);
-        }
 
         fwrite($rrd_pipes[0], $cmd . "\n");
 
-        if ($timeout > 0) {
-            // this causes us to block until we receive output for up to $timeout seconds
-            stream_select($r = $rrd_pipes, $w = null, $x = null, $timeout);
-        }
+        // this causes us to block until we receive output for up to $timeout seconds
+        stream_select($r = $rrd_pipes, $w = null, $x = null, $timeout);
         $output = array(stream_get_contents($rrd_pipes[1]), stream_get_contents($rrd_pipes[2]));
     }
 
     if ($debug) {
-        echo $output[0];
-        echo $output[1];
         print $console_color->convert('RRD[%g'.$cmd."%n] \n");
+        echo 'rrdtool output: ';
+        var_dump($output);
     }
 
     return $output;
