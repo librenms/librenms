@@ -85,7 +85,6 @@ Running Apache and an install of LibreNMS in /opt/librenms
 ```php
 $config['distributed_poller'] = true;
 $config['rrdcached']    = "example.com:42217";
-$config['rrdcached_dir'] = ".";
 ```
 
 Database Server:
@@ -126,7 +125,6 @@ $config['distributed_poller_host']           = "example.com";
 $config['distributed_poller_port']           = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
-$config['rrdcached_dir']                     = ".";
 $config['update']                            = 0;
 ```
 
@@ -153,7 +151,6 @@ $config['distributed_poller_host']           = "example.com";
 $config['distributed_poller_port']           = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
-$config['rrdcached_dir']                     = ".";
 $config['update']                            = 0;
 ```
 
@@ -178,7 +175,6 @@ $config['distributed_poller_host']           = "example.com";
 $config['distributed_poller_port']           = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
-$config['rrdcached_dir']                     = ".";
 $config['update']                            = 0;
 ```
 
