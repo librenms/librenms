@@ -19,7 +19,7 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
         // Loop over each component, pulling out the Overlays.
         foreach ($COMP as $OID => $OVERLAY) {
             if ($OVERLAY['otvtype'] == 'overlay') {
-                if ($OVERLAY['status'] == 1) {
+                if ($OVERLAY['status'] == 0) {
                     $OVERLAY_STATUS = "<span class='green pull-right'>Normal</span>";
                     $GLI = "";
                 }
@@ -33,7 +33,7 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                     <?php
                     foreach ($COMP as $AID => $ADJACENCY) {
                         if (($ADJACENCY['otvtype'] == 'adjacency') && ($ADJACENCY['index'] == $OVERLAY['index'])) {
-                            if ($ADJACENCY['status'] == 1) {
+                            if ($ADJACENCY['status'] == 0) {
                                 $ADJ_STATUS = "<span class='green pull-right'>Normal</span>";
                                 $GLI = "";
                             }
