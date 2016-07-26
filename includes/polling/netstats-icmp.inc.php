@@ -34,13 +34,15 @@ if ($device['os'] != 'Snom') {
     );
 
     $data = snmpwalk_cache_oid($device, 'icmp', array(), 'IP-MIB');
-    $fields = $data[0];
+    $data = $data[0];
 
-    if (isset($fields['icmpInMsgs']) && isset($fields['icmpOutMsgs'])) {
+    if (isset($data['icmpInMsgs']) && isset($data['icmpOutMsgs'])) {
         $rrd_def = array();
+        $fields = array();
         foreach ($oids as $oid) {
             $oid_ds    = truncate($oid, 19, '');
             $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
+            $fields[$oid] = isset($data[$oid]) ? $data[$oid] : 'U';
         }
 
         $tags = compact('rrd_def');
