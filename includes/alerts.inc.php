@@ -281,5 +281,18 @@ function GetContacts($results) {
             $contacts[$user['email']] = $user['realname'];
         }
     }
-    return $contacts;
+
+    $tmp_contacts = array();
+    foreach ($contacts as $email => $name) {
+        if (strstr($email, ',')) {
+            $split_contacts = preg_split("/[,\s]+/", $email);
+            foreach ($split_contacts as $split_email) {
+                $tmp_contacts[$split_email] = $name;
+            }
+        } else {
+            $tmp_contacts[$email] = $name;
+        }
+    }
+
+    return $tmp_contacts;
 }
