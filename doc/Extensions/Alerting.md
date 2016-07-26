@@ -192,6 +192,11 @@ $config['alert']['admins']  = true; //Include Administrators into alert-contacts
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
+For all but the default contact, we support setting multiple email addresses separated by a comma. So you can 
+set the devices sysContact, override the sysContact or have your users emails set like:
+
+`email@domain.com, alerting@domain.com`
+
 E-Mail transport is enabled with adding the following to your `config.php`:
 ~
 ```php
