@@ -15,9 +15,9 @@ if (preg_match('/Dell Networking N[1234].*/' , $temp_hardware) == 1) {  // If De
     $hardware = $temp_hardware;
     $version  = snmp_get($device, 'productIdentificationVersion.0', '-Ovq', 'Dell-Vendor-MIB');
     $features = snmp_get($device, 'productIdentificationDescription.0', '-Ovq', 'Dell-Vendor-MIB');
-}
-else {  // Assume S-series
-    list(,,$version,$hardware,,) = explode(PHP_EOL, $poll_device['sysDescr']);
+} else {  // Assume S-series
+    $sysDescr =  preg_replace('/[\r]+/',' ', $poll_device['sysDescr']);
+    list(,,$version,$hardware,,) = explode(PHP_EOL, $sysDescr);
     list(,$version) = explode(': ',$version);
     list(,$hardware) = explode(': ',$hardware);
 }
