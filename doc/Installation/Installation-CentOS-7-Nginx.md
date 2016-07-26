@@ -50,15 +50,14 @@ pear install Net_IPv6-1.2.2b2
 In `/etc/php.ini` ensure date.timezone is set to your preferred time zone.  See http://php.net/manual/en/timezones.php for a list of supported timezones.  Valid examples are: "America/New York", "Australia/Brisbane", "Etc/UTC".
 
 ```bash
-service php7.0-fpm restart
-phpenmod mcrypt
+service php-fpm restart
 ```
 
 #### Add librenms user
 
 ```bash
 useradd librenms -d /opt/librenms -M -r
-usermod -a -G librenms apache
+usermod -a -G librenms nginx
 ```
 
 #### Clone repo
