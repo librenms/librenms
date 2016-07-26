@@ -189,8 +189,9 @@ function rrdtool($command, $filename, $options, $timeout=1)
 
     if ($debug) {
         print $console_color->convert('RRD[%g'.$cmd."%n] \n");
-        echo 'rrdtool output: ';
-        var_dump($output);
+        echo 'RRDtool Output: ';
+        echo $output[0];
+        echo $output[1];
     }
 
     return $output;
