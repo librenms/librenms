@@ -1,4 +1,0 @@
-site_name: LibreNMS
-docs_dir: /home/murrant/projects/librenms/doc
-pages:
-- Home: index.md
