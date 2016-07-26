@@ -7,7 +7,7 @@
 #### Install / Configure MySQL
 ```bash
 apt-get install mariadb-server mariadb-client
-service mariadb restart
+service mysql restart
 mysql -uroot -p
 ```
 
@@ -30,7 +30,7 @@ innodb_file_per_table=1
 sql-mode=""
 ```
 
-```service mariadb restart```
+```service mysql restart```
 
 ### Web Server ###
 
