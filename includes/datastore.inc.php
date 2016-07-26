@@ -22,8 +22,11 @@ require_once $config['install_dir'] . "/includes/rrdtool.inc.php";
 require_once $config['install_dir'] . "/includes/influxdb.inc.php";
 
 
-/*
- * @return Copy of $arr with all keys beginning with 'rrd_' removed.
+/**
+ * Filter all elements with keys that start with 'rrd_'
+ *
+ * @param array $arr input array
+ * @return array Copy of $arr with all keys beginning with 'rrd_' removed.
  */
 function rrd_array_filter($arr)
 {

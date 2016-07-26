@@ -476,7 +476,7 @@ foreach ($ports as $port) {
                 $port_tune = get_dev_attrib($device, 'ifName_tune:'.$port['ifName']);
                 $device_tune = get_dev_attrib($device,'override_rrdtool_tune');
                 if ($port_tune == "true" ||
-                    ($device_tune == "true" && $port_tune != 'false') || 
+                    ($device_tune == "true" && $port_tune != 'false') ||
                     ($config['rrdtool_tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {
                     if ($oid == 'ifSpeed') {
                         $tune_port = true;
@@ -646,7 +646,7 @@ foreach ($ports as $port) {
         $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
         $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
-        influx_update($device,'ports',$tags,$fields);
+        influx_update($device, 'ports', rrd_array_filter($tags), $fields);
 
         // End Update IF-MIB
         // Update PAgP
