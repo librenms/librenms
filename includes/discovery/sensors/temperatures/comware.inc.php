@@ -12,7 +12,7 @@
 
 if ($device['os'] == 'comware') {
     
-    $entphydata = dbFetchRows("SELECT `entPhysicalIndex`, `entPhysicalDescr` FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalDescr` REGEXP 'MODULE|SENSOR' ORDER BY `entPhysicalIndex`", array(
+    $entphydata = dbFetchRows("SELECT `entPhysicalIndex`, `entPhysicalClass`, `entPhysicalName` FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalClass` REGEXP 'module|sensor' ORDER BY `entPhysicalIndex`", array(
         $device['device_id']
     ));
     $tempdata   = snmpwalk_cache_multi_oid($device, 'hh3cEntityExtTemperature', array(), 'HH3C-ENTITY-EXT-MIB');
