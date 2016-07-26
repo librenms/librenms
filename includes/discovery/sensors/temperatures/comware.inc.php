@@ -15,9 +15,11 @@ if ($device['os'] == 'comware') {
     $entphydata = dbFetchRows("SELECT `entPhysicalIndex`, `entPhysicalClass`, `entPhysicalName` FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalClass` REGEXP 'module|sensor' ORDER BY `entPhysicalIndex`", array(
         $device['device_id']
     ));
-    $tempdata   = snmpwalk_cache_multi_oid($device, 'hh3cEntityExtTemperature', array(), 'HH3C-ENTITY-EXT-MIB');
     
     if (!empty($entphydata)) {
+
+        $tempdata   = snmpwalk_cache_multi_oid($device, 'hh3cEntityExtTemperature', array(), 'HH3C-ENTITY-EXT-MIB');
+
         foreach ($entphydata as $index) {
             foreach ($tempdata as $tempindex => $value) {
                 if ($index['entPhysicalIndex'] == $tempindex) {
