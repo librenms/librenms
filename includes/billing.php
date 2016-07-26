@@ -79,10 +79,11 @@ function getValue($host, $port, $id, $inout) {
 
 }//end getValue()
 
-function getLastPortCounter($port_id) {
+function getLastPortCounter($port_id, $bill_id) {
     $return = array();
-    $row    = dbFetchRow("SELECT in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ?", array($port_id));
+    $row    = dbFetchRow("SELECT timestamp, in_counter, in_delta, out_counter, out_delta FROM bill_port_counters WHERE `port_id` = ? AND `bill_id` = ?", array($port_id, $bill_id));
     if (!is_null($row)) {
+        $return[timestamp]   = $row['timestamp'];
         $return[in_counter]  = $row['in_counter'];
         $return[in_delta]    = $row['in_delta'];
         $return[out_counter] = $row['out_counter'];

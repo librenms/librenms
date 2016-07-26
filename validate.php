@@ -76,8 +76,7 @@ $versions = version_info();
 echo "Version info:\n";
 $cur_sha = $versions['local_sha'];
 if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
-    $commit_date = new DateTime($versions['local_date']);
-    $commit_date->setTimezone(new DateTimeZone(date_default_timezone_get()));
+    $commit_date = new DateTime($versions['local_date'], new DateTimeZone(date_default_timezone_get()));
     print_warn("Your install is out of date: $cur_sha " . $commit_date->format('(r)'));
 }
 else {
@@ -93,9 +92,9 @@ if($username === 'root') {
     $modifiedcmd = 'su '.$config['user'].' -c "'.$modifiedcmd.'"';
 }
 exec($modifiedcmd, $cmdoutput, $code);
-if($code !== 0) {
+if($code !== 0 && !empty($cmdoutput)) {
     print_warn("Your local git contains modified files, this could prevent automatic updates.\nModified files:");
-    echo(implode("\n", $cmdoutput) . "\n");
+    echo('    ' . implode("\n    ", $cmdoutput) . "\n");
 }
 
 echo "DB Schema: ".$versions['db_schema']."\n";
