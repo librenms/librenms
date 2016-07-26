@@ -13,25 +13,21 @@ if ($device['os'] == 'dnos') {
                 if (is_numeric($free)) {
                         discover_mempool($valid_mempool, $device, 0, 'dnos-mem', 'Memory Utilization', '1', null, null);
                 }
-        }
-        elseif (strstr($sysObjectId, '.1.3.6.1.4.1.6027.1.2.')) {
+        } elseif (strstr($sysObjectId, '.1.3.6.1.4.1.6027.1.2.')) {
                 echo 'C-Series ';
                 $free = snmp_get($device, '.1.3.6.1.4.1.6027.3.8.1.3.7.1.6.1', '-OvQ');
 
                 if (is_numeric($free)) {
                         discover_mempool($valid_mempool, $device, 0, 'dnos-mem', 'Memory Utilization', '1', null, null);
                 }
-        }
-        elseif (strstr($sysObjectId, '.1.3.6.1.4.1.6027.1.1.')) {
+        } elseif (strstr($sysObjectId, '.1.3.6.1.4.1.6027.1.1.')) {
                 echo 'E-Series ';
                 $free = snmp_get($device, '.1.3.6.1.4.1.6027.3.1.1.3.7.1.6.1', '-OvQ');
 
                 if (is_numeric($free)) {
                         discover_mempool($valid_mempool, $device, 0, 'dnos-mem', 'Memory Utilization', '1', null, null);
                 }
-        }
-        else
-        {
+        } else {
                 $free = snmp_get($device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.1.0', '-OvQ');
 
                 if (is_numeric($free)) {
