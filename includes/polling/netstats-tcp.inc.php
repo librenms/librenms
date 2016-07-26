@@ -31,9 +31,11 @@ if ($device['os'] != 'Snom') {
     $fields = $data[0];
 
     // use HC Segs if we have them.
-    if (isset($fields['tcpHCInSegs']) && !empty($fields['tcpHCInSegs'])) {
-        $fields['tcpInSegs'] = $fields['tcpHCInSegs'];
-        $fields['tcpOutSegs'] = $fields['tcpHCOutSegs'];
+    if (isset($fields['tcpHCInSegs'])) {
+        if (!empty($fields['tcpHCInSegs'])) {
+            $fields['tcpInSegs'] = $fields['tcpHCInSegs'];
+            $fields['tcpOutSegs'] = $fields['tcpHCOutSegs'];
+        }
         unset($fields['tcpHCInSegs'], $fields['tcpHCOutSegs']);
     }
 
