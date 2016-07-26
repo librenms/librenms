@@ -67,6 +67,9 @@ function nicecase($item) {
     case 'nfs-stats':
         return 'NFS Stats';
 
+    case 'nfs-v3-stats':
+        return 'NFS v3 Stats';
+
     default:
         return ucfirst($item);
     }
