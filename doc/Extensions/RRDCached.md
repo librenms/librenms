@@ -79,7 +79,6 @@ After=network.service
 Type=forking
 PIDFile=/run/rrdcached.pid
 ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
-RRDC_USER=librenms
 
 [Install]
 WantedBy=default.target
