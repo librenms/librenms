@@ -24,7 +24,7 @@ if ($device['os'] == 'comware') {
             foreach ($tempdata as $tempindex => $value) {
                 if ($index['entPhysicalIndex'] == $tempindex) {
                     $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
-                    discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $tempindex, $tempindex, 'comware', $index['entPhysicalDescr'], '1', '1', null, null, null, null, $value['hh3cEntityExtTemperature'], 'snmp', $index);
+                    discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $tempindex, $tempindex, 'comware', $index['entPhysicalName'], '1', '1', null, null, null, null, $value['hh3cEntityExtTemperature'], 'snmp', $index);
                 }
             }
             
