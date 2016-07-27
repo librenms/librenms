@@ -18,7 +18,7 @@ if ($device['os'] == 'comware') {
     $divisor_alarm = 1000000;
     foreach ($comware_oids as $index => $entry) {
         if (is_numeric($entry['hh3cTransceiverBiasCurrent']) && $entry['hh3cTransceiverBiasCurrent'] != 2147483647) {
-            $oid                       = '.1.3.6.1.4.1.25506.2.70.1.1.1.17.15.' . $index;
+            $oid                       = '.1.3.6.1.4.1.25506.2.70.1.1.1.17.' . $index;
             $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", array(
                 $index,
                 $device['device_id']
