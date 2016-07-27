@@ -21,7 +21,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-`vim /etc/my.cnf`
+`vim /etc/my.cnf.d/server.cnf`
 
 Within the [mysqld] section please add:
 

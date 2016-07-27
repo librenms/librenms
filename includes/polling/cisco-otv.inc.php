@@ -106,11 +106,11 @@ if ($device['os_group'] == "cisco") {
                 // If we have set a message, we have an error, activate alert.
                 if ($message !== false) {
                     $array['error'] = $message;
-                    $array['status'] = 0;
+                    $array['status'] = 2;
                 }
                 else {
                     $array['error'] = "";
-                    $array['status'] = 1;
+                    $array['status'] = 0;
                 }
 
                 // Time to graph the count of the active VLAN's on this overlay.
@@ -154,11 +154,11 @@ if ($device['os_group'] == "cisco") {
                 // If we have set a message, we have an error, activate alert.
                 if ($message !== false) {
                     $array['error'] = $message;
-                    $array['status'] = 0;
+                    $array['status'] = 1;
                 }
                 else {
                     $array['error'] = "";
-                    $array['status'] = 1;
+                    $array['status'] = 0;
                 }
 
                 // Let's log some debugging
