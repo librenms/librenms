@@ -14,7 +14,7 @@ if ($device['os'] == 'comware') {
 
     echo 'Pre-cache Comware: ';
 
-    $junos_oids = array();
+    $comware_oids = array();
     echo 'Caching OIDs:';
 
     $comware_oids = snmpwalk_cache_multi_oid($device, 'hh3cTransceiverInfoTable', $oids, 'HH3C-TRANSCEIVER-INFO-MIB');
