@@ -20,7 +20,7 @@ One recommendation we can make is that you set the following in my.cnf:
 innodb_flush_log_at_trx_commit = 0
 ```
 
-You can also set this to 2. This will have the possibility that you could lose upto 1 second on mysql data in the event
+You can also set this to 2. This will have the possibility that you could lose up to 1 second on mysql data in the event
 MySQL crashes or your server does but it provides an amazing difference in IO use.
 
 
