@@ -268,7 +268,7 @@ $config['alert']['transports']['irc'] = true;
 
 > You can configure these options within the WebUI now, please avoid setting these options within config.php
 
-The Slack transport will POST the alert message to your Slack Incoming WebHook, you are able to specify multiple webhooks along with the relevant options to go with it. All options are optional, the only required value is for url, without this then no call to Slack will be made. Below is an example of how to send alerts to two channels with different customised options:
+The Slack transport will POST the alert message to your Slack Incoming WebHook using the [attachments](https://api.slack.com/docs/message-attachments) option, you are able to specify multiple webhooks along with the relevant options to go with it. Simple html tags are stripped from the message. All options are optional, the only required value is for url, without this then no call to Slack will be made. Below is an example of how to send alerts to two channels with different customised options:
 
 ~~
 ```php

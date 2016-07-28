@@ -138,6 +138,14 @@ That's it!  You now should be able to log in to http://librenms.example.com/.  P
 
 We now suggest that you add localhost as your first device from within the WebUI.
 
+#### What next?
+
+Now that you've installed LibreNMS, we'd suggest that you have a read of a few other docs to get you going:
+
+ - (Performance tuning)[http://docs.librenms.org/Support/Performance]
+ - (Alerting)[http://docs.librenms.org/Extensions/Alerting/]
+ - (Device Groups)[http://docs.librenms.org/Extensions/Device-Groups/]
+
 #### Closing
 
 We hope you enjoy using LibreNMS. If you do, it would be great if you would consider opting into the stats system we have, please see [this page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on what it is and how to enable it.
