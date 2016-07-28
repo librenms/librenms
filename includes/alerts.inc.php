@@ -287,7 +287,9 @@ function GetContacts($results) {
         if (strstr($email, ',')) {
             $split_contacts = preg_split("/[,\s]+/", $email);
             foreach ($split_contacts as $split_email) {
-                $tmp_contacts[$split_email] = $name;
+                if(!empty($split_email)) {
+                    $tmp_contacts[$split_email] = $name;
+                }
             }
         } else {
             $tmp_contacts[$email] = $name;
