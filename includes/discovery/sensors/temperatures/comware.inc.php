@@ -25,7 +25,7 @@ if ($device['os'] == 'comware') {
             foreach ($tempdata as $tempindex => $value) {
                 if ($index['entPhysicalIndex'] == $tempindex && $value['hh3cEntityExtTemperature'] != 65535) {
                     $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
-                    discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $tempindex, $tempindex, 'comware', $index['entPhysicalName'], '1', '1', null, null, null, null, $value['hh3cEntityExtTemperature'], 'snmp', $index);
+                    discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $tempindex, 'temp-' . $tempindex, 'comware', $index['entPhysicalName'], '1', '1', null, null, null, null, $value['hh3cEntityExtTemperature'], 'snmp', $index);
                 }
             }
             
@@ -42,16 +42,16 @@ if ($device['os'] == 'comware') {
                 $index,
                 $device['device_id']
             ));
-            $limit_low                 = $entry[' hh3cTransceiverTempLoAlarm'] / $divisor_alarm;
-            $warn_limit_low            = $entry[' hh3cTransceiverTempLoWarn'] / $divisor_alarm;
-            $limit                     = $entry[' hh3cTransceiverTempHiAlarm'] / $divisor_alarm;
-            $warn_limit                = $entry[' hh3cTransceiverTempHiWarn'] / $divisor_alarm;
+            $limit_low                 = $entry['hh3cTransceiverTempLoAlarm'] / $divisor_alarm;
+            $warn_limit_low            = $entry['hh3cTransceiverTempLoWarn'] / $divisor_alarm;
+            $limit                     = $entry['hh3cTransceiverTempHiAlarm'] / $divisor_alarm;
+            $warn_limit                = $entry['hh3cTransceiverTempHiWarn'] / $divisor_alarm;
             $current                   = $entry['hh3cTransceiverTemperature'];
             $entPhysicalIndex          = $index;
             $entPhysicalIndex_measured = 'ports';
             foreach ($dbquery as $dbindex => $dbresult) {
                 $descr = $dbresult['ifDescr'] . ' Temperature';
-                discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'rx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+                discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
             }
         }
     }
