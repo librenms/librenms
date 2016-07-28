@@ -10,8 +10,8 @@
  * the source code distribution for details.
  */
 
-$oids = 'entPhysicalModelName.1 entPhysicalContainedIn.1 entPhysicalName.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1 entPhysicalModelName.1 entPhysicalContainedIn.1 ';
-$data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+$oids = 'entPhysicalContainedIn.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1 entPhysicalModelName.1';
+$data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 if ($data[1]['entPhysicalContainedIn'] == '0') {
     if (!empty($data[1]['entPhysicalSoftwareRev'])) {
         $version = $data[1]['entPhysicalSoftwareRev'];
