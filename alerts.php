@@ -455,12 +455,13 @@ function FormatAlertTpl($obj) {
 function DescribeAlert($alert) {
     $obj              = array();
     $i                = 0;
-    $device           = dbFetchRow('SELECT hostname, sysName, location FROM devices WHERE device_id = ?', array($alert['device_id']));
+    $device           = dbFetchRow('SELECT hostname, sysName, location, uptime FROM devices WHERE device_id = ?', array($alert['device_id']));
     $tpl              = dbFetchRow('SELECT `template`,`title`,`title_rec` FROM `alert_templates` JOIN `alert_template_map` ON `alert_template_map`.`alert_templates_id`=`alert_templates`.`id` WHERE `alert_template_map`.`alert_rule_id`=?', array($alert['rule_id']));
     $default_tpl      = "%title\r\nSeverity: %severity\r\n{if %state == 0}Time elapsed: %elapsed\r\n{/if}Timestamp: %timestamp\r\nUnique-ID: %uid\r\nRule: {if %name}%name{else}%rule{/if}\r\n{if %faults}Faults:\r\n{foreach %faults}  #%key: %value.string\r\n{/foreach}{/if}Alert sent to: {foreach %contacts}%value <%key> {/foreach}";
     $obj['hostname']  = $device['hostname'];
     $obj['sysName']   = $device['sysName'];
     $obj['location']  = $device['location'];
+    $obj['uptime']    = $device['uptime'];
     $obj['device_id'] = $alert['device_id'];
     $extra            = $alert['details'];
     if (!isset($tpl['template'])) {
