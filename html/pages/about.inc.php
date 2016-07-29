@@ -10,7 +10,7 @@ $git_log = `git log -10`;
         <h4 class="modal-title" id="myModalLabel">Local git log</h4>
       </div>
       <div class="modal-body">
-	<pre><?php htmlspecialchars($git_log, ENT_COMPAT,'ISO-8859-1', true); ?></pre>
+	<pre><?php echo htmlspecialchars($git_log, ENT_COMPAT,'ISO-8859-1', true); ?></pre>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
