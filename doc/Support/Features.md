@@ -21,6 +21,8 @@ Here's a brief list of supported vendors, some might be missing.
 If you are unsure of whether your device is supported or not, feel free to ask us.
 
 * 3Com
+* ADTRAN
+* Acceidan
 * Aerohive
 * AKCP
 * Alcatel-Lucent
@@ -32,13 +34,21 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Aruba
 * Avaya
 * Avocent
+* AVTECH
 * Axis
 * Barracuda
 * BCM963
+* BDCom
+* Bintec
 * BNT
 * Brocade
 * Brother
+* Buffalo
+* Calix
+* Cambium
+* Canon
 * Canopy
+* Check Point
 * Cisco
 * Cisco Small Business
 * Citrix
@@ -46,34 +56,44 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Comware
 * D-Link
 * Datacom
+* Deliberant
 * Dell
 * Delta Power Solutions
+* DEVELOP
 * Eaton
+* EMC
 * Engenius
 * Enterasys
 * Epson
 * Extreme Networks
 * F5
+* Fastback Networks
 * FiberHome
 * Force10
-* Fortigate
+* Fortinet
 * FreeBSD
 * Gamatronic
 * Hikvision
 * HP
 * Huawei
+* HW group
 * IBM
+* Infoblox
 * iPoMan
 * ITWatchDogs
 * Juniper
 * Konica Minolta
 * Kyocera
+* Lantronix
+* Lenovo
+* Lexmark
 * Liebert
 * LigoWave
 * Linux
 * Mellanox
 * Meraki
 * MGE
+* Microsemi
 * Mikrotik
 * MRVLD
 * Multimatic
@@ -88,12 +108,14 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * NRG
 * OKI
 * OpenBSD
+* Oracle
 * PacketShaper
 * Palo Alto Networks
 * Papouch
 * PBN
 * Perle
 * Powercode
+* Powerwalker
 * Prestige
 * Proxim
 * Proxmox
@@ -104,7 +126,8 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Ricoh
 * Riverbed
 * Ruckus
-* SAF
+* SAF Tehnika
+* Samsung
 * Siklu
 * Sentry3
 * Solaris
@@ -112,10 +135,12 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * SpeedTouch
 * Supermicro
 * Symbol
+* Telco Systems
 * TPLink
 * Tranzeo
-* Triplite
+* Tripp Lite
 * Ubiquiti
+* Viprinet
 * VMware
 * VRP
 * Vyatta
@@ -124,5 +149,6 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * WebPower
 * Windows
 * Xerox
+* Xirrus
 * ZTE
 * ZyXEL
