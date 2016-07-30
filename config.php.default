@@ -46,6 +46,8 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 $config['poller-wrapper']['alerter'] = FALSE;
 # Uncomment the next line to disable daily updates
 #$config['update'] = 0;
+$config['rrd_purge'] = 90;
+// Number in days of how long to keep old rrd files.
 
 # Uncomment to submit callback stats via proxy
 #$config['callback_proxy'] = "hostname:port";
