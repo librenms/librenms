@@ -13,6 +13,8 @@ foreach ($tunnels_db as $tunnel) {
     $tunnels[$tunnel['peer_addr']] = $tunnel;
 }
 
+$valid_tunnels = array();
+
 foreach ($ipsec_array as $index => $tunnel) {
     $tunnel = array_merge($tunnel, $ike_array[$tunnel['cipSecTunIkeTunnelIndex']]);
 
@@ -50,6 +52,7 @@ foreach ($ipsec_array as $index => $tunnel) {
 
     if (!is_array($tunnels[$tunnel['cikeTunRemoteValue']]) && !empty($tunnel['cikeTunRemoteValue'])) {
         $tunnel_id = dbInsert(array('device_id' => $device['device_id'], 'peer_addr' => $tunnel['cikeTunRemoteValue'], 'local_addr' => $tunnel['cikeTunLocalValue'], 'tunnel_name' => $tunnel['cikeTunLocalName']), 'ipsec_tunnels');
+        $valid_tunnels[] = $tunnel_id;
     }
     else {
         foreach ($db_oids as $db_oid => $db_value) {
@@ -57,6 +60,7 @@ foreach ($ipsec_array as $index => $tunnel) {
         }
 
         $updated = dbUpdate($db_update, 'ipsec_tunnels', '`tunnel_id` = ?', array($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id']));
+        $valud_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
     }
 
     if (is_numeric($tunnel['cipSecTunHcInOctets']) && is_numeric($tunnel['cipSecTunHcInDecompOctets'])
@@ -103,5 +107,13 @@ foreach ($ipsec_array as $index => $tunnel) {
         // $graphs['ipsec_tunnels'] = TRUE;
     }
 }//end foreach
+
+if (is_array($valid_tunnels)) {
+    d_echo($valid_tunnels);
+    if (empty($valid_tunnels)) {
+        $valid_tunnels = array(0);
+    }
+    dbDelete('ipsec_tunnels', "`tunnel_id` NOT IN (".implode(',', $valid_tunnels).") AND `device_id`=?", array($device['device_id']);
+}
 
 unset($rrd_file,$rrd_create,$fields,$oids, $data, $data_array, $oid, $tunnel);
