@@ -113,7 +113,7 @@ if (is_array($valid_tunnels)) {
     if (empty($valid_tunnels)) {
         $valid_tunnels = array(0);
     }
-    dbDelete('ipsec_tunnels', "`tunnel_id` NOT IN (".implode(',', $valid_tunnels).") AND `device_id`=?", array($device['device_id']);
+    dbDelete('ipsec_tunnels', "`tunnel_id` NOT IN (".implode(',', $valid_tunnels).") AND `device_id`=?", array($device['device_id']));
 }
 
 unset($rrd_file,$rrd_create,$fields,$oids, $data, $data_array, $oid, $tunnel);
