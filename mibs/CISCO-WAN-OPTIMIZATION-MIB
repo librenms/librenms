@@ -1,0 +1,3878 @@
+-- *****************************************************************
+-- CISCO-WAN-OPTIMIZATION-MIB.my : A MIB for WAN Optimization
+-- Features
+--   
+-- October 2010, Chetan K Patel, Pooja Subramanya.
+--   
+-- Copyright (c) 2010-2016 by cisco Systems Inc.
+-- All rights reserved.
+--   
+-- *****************************************************************
+
+CISCO-WAN-OPTIMIZATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    NOTIFICATION-TYPE,
+    Counter64,
+    Unsigned32,
+    Gauge32,
+    Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    TimeInterval,
+    DateAndTime,
+    TimeStamp
+        FROM SNMPv2-TC
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    CiscoMilliSeconds,
+    TimeIntervalSec,
+    Unsigned64
+        FROM CISCO-TC
+    cpmCPUTotalMonIntervalValue
+        FROM CISCO-PROCESS-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoWanOptimizationMIB MODULE-IDENTITY
+    LAST-UPDATED    "201605220000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+            E-mail: cs-waas@cisco.com, cs-waas-express@cisco.com"
+    DESCRIPTION
+        "This MIB is for managing Wide Area Network (WAN) Optimization
+        systems. The objective of WAN optimization system is to reduce
+        as much traffic as possible on WAN link and improve the
+        application response time for various applications, which gets
+        affected due to bandwidth, packet loss, congestion and latency
+        limitations of WAN link. WAN optimization system is generally
+        peer based system. They are located at both end of WAN link and
+        peer with each other to perform optimization. This MIB provides
+        instrumentation for monitoring statistics for various features
+        implemented for WAN optimization. WAN optimization features
+        includes TCP protocol optimizations and various Application
+        Optimizers (AOs). AOs include SMB AO, HTTP AO, CIFS AO, NFS AO,
+        MAPI AO, VIDEO AO, SSL AO and EPM AO.
+
+        Acronyms and Terminology used in this MIB are:
+        AO               : Application Optimizer
+        TFO              : Traffic Flow Optimization
+        SMB              : Server Message Block
+        CIFS             : Common Internet File System
+        HTTP             : Hyper Text Transfer Protocol
+        NFS              : Network File System
+        SSL              : Secure Socket Layer
+        MAPI             : Messaging Application Programming Interface
+        EPM              : End Point Mapper
+        RA               : Read Ahead
+        MD               : Meta Data
+        PT               : Pass Through
+        AD               : Auto Discovery
+        RTT              : Round Trip Time
+        Conn             : Connections
+        File Server      : SMB/CIFS file server
+        peer             : It refers to peer WAN optimization system 
+                           located on other end of WAN and registered 
+                           with this device to optimize the traffic.
+        SharePoint       : SharePoint is a Microsoft Application that 
+                           provides a collaborative environment for 
+                           using Microsoft Office and related 
+                           applications. Typical deployments of 
+                           Microsoft SharePoint use one or more        
+                           SharePoint servers in a server farm for 
+                           scalability. The actual data for the various
+                           documents, etc. are usually stored in a 
+                           backend database. The SharePoint server(s) 
+                           communicate with the backend database using 
+                           SharePoint Back-end protocols. Clients 
+                           (either Microsoft Office Applications like 
+                           Word, Excel, PowerPoint or Web Browsers) 
+                           typically connect to the SharePoint server 
+                           and communicate using SOAP over HTTP.
+        Fast Connections : End to end connections which uses existing 
+                           TCP connection over WAN and reconstructs
+                           only LAN connection is fast connection.
+        DRE              : Data Redundancy Elimination.
+        LZ               : Lemple-Ziv data compression.
+        PLZ             : Persistent Lemple-Ziv data compression."
+    REVISION        "201605220000Z"
+    DESCRIPTION
+        "Edited descriptions of CwoDreCacheStatus object.
+        Changed Max-Access of cwoDrePerfStatsEncodeCompressionRatio and
+        cwoDrePerfStatsDecodeCompressionRatio objects."
+    REVISION        "201605180000Z"
+    DESCRIPTION
+        "Added cwoAoHttpxStatsAKC table for HTTP Akamai Cache objects.
+        Added cwoAoDre table for DRE objects."
+    REVISION        "201511300000Z"
+    DESCRIPTION
+        "Deprecated cwoAoVideoxStats and cwoAoCifsxStats tables as all
+        the objects in them are deprecated."
+    REVISION        "201305230000Z"
+    DESCRIPTION
+        "Added the below counters in cwoAoSmbxStats table Signed SMB
+        Bytes Stats enhancement feature
+        cwoAoSmbxStatsRdL4SignWANBytes
+        cwoAoSmbxStatsWrL4SignWANBytes
+        cwoAoSmbxStatsRdSignLANBytes
+        cwoAoSmbxStatsWrSignLANBytes"
+    REVISION        "201212130000Z"
+    DESCRIPTION
+        "Added the below new counters which display SharePoint AO
+        statistics in cwoAoHttpxStats group.
+        cwoAoHttpxStatsTotalSPSessions
+        cwoAoHttpxStatsTotalSPPFSessions
+        cwoAoHttpxStatsTotalSPPFObjects
+        cwoAoHttpxStatsTotalSPRTTSaved
+        cwoAoHttpxStatsTotalSPPFMissTime
+
+        Added the below new counters in cwoAoCifsxStats group to support
+        the CIFS Atkins feature.
+        cwoAoCifsxStatsFFTotalReqs
+        cwoAoCifsxStatsFFRemoteReqs
+        cwoAoCifsxStatsFFLocalRespTime
+        cwoAoCifsxStatsFFRemoteRespTime
+        cwoAoCifsxStatsDirResources"
+    REVISION        "201203050000Z"
+    DESCRIPTION
+        "(1) Added cwoAoStatsLoadStatus and cwoAoStatsBwOpt in
+        cwoAoStatsTable
+        (2) Added cwoAoSmbStatsBwOpt in cwoAoSmbxstats Group
+        (3) Added cwoAoHttpxStats - Statistics Group for HTTP AO
+        (4) Added cwoAoMapixStats - Statistics Group for MAPI AO
+        (5) Added cwoAoNfsxStats - Statistics Group for NFS AO
+        (6) Added cwoAoVideoxStats - Statistics Group for Video AO
+        (7) Added cwoAoCifsxstats - Statistics Group for CIFS AO
+        (8) Added cwoApp - Gorup which includes objects for
+        Applications associated with AOs.
+        (9) Added cwoPmap - Group which includes objects for 
+             policy-map.
+        (10) Added cwoCmap - Group which includes objects for 
+         class-maps associated with active policy-map.
+        (11) Addes cwoTfoStatsLoadStatus in cswTfoStats group"
+    REVISION        "201104190000Z"
+    DESCRIPTION
+        "New License Notification Group has been added."
+    REVISION        "201010260000Z"
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { ciscoMgmt 762 }
+
+
+
+CwoHttpAKCPrepStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents various Akamai cache preposition task status of a
+        HTTP application optimizer.
+
+        unknown(1)    : The prepositioning task is in unknown state.
+
+        scheduled(2)  : The prepositioning task is scheduled to run.
+
+        disabled(3)   : The prepositioning task is disabled.
+
+        success(4)    : The prepositioning task completed successfully.
+
+        error(5)      : The prepositioning task has an error."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        scheduled(2),
+                        disabled(3),
+                        success(4),
+                        error(5)
+                    }
+
+CwoDreCacheStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents various DRE cache status of an application
+        optimizer.
+
+        notUsable(1)    : This state indicates that DRE cache is    
+                          currently not usable/accessible   
+                          (eg.,when DRE partition is not    
+                          mounted/available).
+
+        initializing(2) : This state indicates that DRE cache is   
+                          getting initialized.
+
+        usable(3)       : This state indicates that DRE cache is   
+                          accessible and in usable condition.
+
+        tempFailed(4)   : This state indicates that DRE cache is    
+                          temporarily not available due to internal
+                          errors.
+
+        failed(5)       : This state indicates that DRE cache    
+                          initialization failed."
+    SYNTAX          INTEGER  {
+                        notUsable(1),
+                        initializing(2),
+                        usable(3),
+                        temporarilyFailed(4),
+                        failed(5)
+                    }
+
+CwoAoName ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the name of an Application Optimizer supported by
+        this system."
+    SYNTAX          OCTET STRING (SIZE (1..96))
+
+CwoAoOperationalState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents Various operational states of an Application
+        Optimizer.
+
+        shutdown       : This state indicates that an AO is in shutdown
+                         state.
+
+        initializing   : This state indicates that an AO is getting    
+                         Initialized.
+
+        normalRunning  : This state indicates that an AO is running    
+                         normally.
+
+        normalDisabled : This state indicates that an AO is in normal 
+                         disabled.
+
+        licenseExpired : This state indicates that license for an AO is
+                         expired.
+
+        cleaningup     : This state indicates that an AO is in cleaning
+                         up state.
+
+        error          : This state indicates that some error has  
+                         happened in AO operation."
+    SYNTAX          INTEGER  {
+                        shutdown(1),
+                        initializing(2),
+                        normalRunning(3),
+                        normalDisabled(4),
+                        licenseExpired(5),
+                        cleaningup(6),
+                        error(7)
+                    }
+
+CwoLoadStates ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents load status of the system or feature.
+
+        unknown    : This state is applicable when feature is not
+                     active or disabled.
+        green      : This state indicates that the feature is operating 
+                     normally, within acceptable load limits.  
+        yellow     : This state indicates that the feature is       
+                     overloaded, and new connections received by it
+                     may not get optimized.
+        red        : This state indicates that the feature is not    
+                     healthy, and existing as well as new
+                     connections received by it may not get optimized."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        green(2),
+                        yellow(3),
+                        red(4)
+                    }
+
+CwoTypes ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents various types related to wan optimization system.
+        One such use is types of class-map and policy-map for wan
+        optimization syatem.
+
+        waas           : It is used for wan optimization functionality.
+        appnav         : It is used for application traffic redirection 
+                         to wan optimization systems."
+    SYNTAX          INTEGER  {
+                        waas(1),
+                        appnav(2)
+                    }
+-- Textual Conventions definition will be defined before this line
+
+ciscoWanOptimizationMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIB 0 }
+
+ciscoWanOptimizationMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIB 1 }
+
+-- Conformance Information
+
+ciscoWanOptimizationMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIB 3 }
+
+ciscoWanOptimizationMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBConform 1 }
+
+-- General WAN Optimization Group. It contains general statistics
+-- related to WAN Optimization system.
+
+cwoGeneral  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBObjects 1 }
+
+-- Traffic Flow Optimization Group.
+
+cwoTfo  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBObjects 2 }
+
+-- Statistics for AOs.
+
+cwoAo  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBObjects 3 }
+
+-- Application Group
+
+cwoApp  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBObjects 4 }
+
+-- Policy map Group
+
+cwoPmap  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBObjects 5 }
+
+-- Class map Group
+
+cwoCmap  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBObjects 6 }
+
+cwoDre  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBObjects 7 }
+
+
+cwoGeneralActivePeers OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "number of peers"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of active peers connected
+        with this device for WAN optimization." 
+    ::= { cwoGeneral 1 }
+
+cwoGeneralMaxActivePeers OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains maximum number of peers that this device
+        can peer with for WAN optimization." 
+    ::= { cwoGeneral 2 }
+
+cwoGeneralCpuThrottleHigh OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object contains high threshold (percentage) value of CPU
+        usage of system when WAN optimization feature is running. The
+        current CPU utilization, stored in cpmCPUTotalMonIntervalValue,
+        is compared against this value. A cwoCpuThrottlingOn
+        notification is generated whenever cpmCPUTotalMonIntervalValue
+        exceeds cwoGeneralCpuThrottleHigh for
+        cwoGeneralCpuThrottlPeriod." 
+    ::= { cwoGeneral 3 }
+
+cwoGeneralCpuThrottleLow OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object contains low threshold (percentage) value of CPU
+        usage of system when WAN optimization feature is running. The 
+        current CPU utilization, stored in cpmCPUTotalMonIntervalValue,
+        is
+        compared against this value. A cwoCpuThrottlingOff notification
+        is generated if a prior cwoCpuThrottlingOn notification was 
+        generated, and the current value of cpmCPUTotalMonIntervalValue
+        is below cwoGeneralCpuThrottleLow for
+        cwoGeneralCpuThrottlPeriod.
+
+        Note that the value of cwoGeneralCpuThrottleLow must be less
+        than
+        or equal to cwoGeneralCpuThrottleHigh." 
+    ::= { cwoGeneral 4 }
+
+cwoGeneralCpuThrottlPeriod OBJECT-TYPE
+    SYNTAX          TimeInterval
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This Object indicates CPU throttling observation period. The
+        value of the CPU utilization for this period is stored in 
+        cpmCPUTotalMonIntervalValue. If the value of 
+        cpmCPUTotalMonIntervalValue object is above  
+        cwoGeneralCPUThrottleHigh, a cwoCPUThrottlingOn notification 
+        is sent. If it is below cwoGeneralCPUThrottleLow, a 
+        cwoCPUThrottlingOff notification is sent to the NMS." 
+    ::= { cwoGeneral 5 }
+-- Statistics of TFO
+
+cwoTfoStats  OBJECT IDENTIFIER
+    ::= { cwoTfo 1 }
+
+
+cwoTfoStatsTotalOptConn OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of TCP connections optimized
+        since TFO was started or its statistics were last reset." 
+    ::= { cwoTfoStats 1 }
+
+cwoTfoStatsActiveOptConn OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of currently active TCP connections
+        getting optimized." 
+    ::= { cwoTfoStats 2 }
+
+cwoTfoStatsMaxActiveConn OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains maximum number of active TCP connections
+        that this device can optimize." 
+    ::= { cwoTfoStats 3 }
+
+cwoTfoStatsActiveOptTCPPlusConn OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of active TCP connections going
+        through TCP plus other optimization." 
+    ::= { cwoTfoStats 4 }
+
+cwoTfoStatsActiveOptTCPOnlyConn OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of active connections going through
+        only TCP optimization." 
+    ::= { cwoTfoStats 5 }
+
+cwoTfoStatsActiveOptTCPPrepConn OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of current active TCP connections
+        that were originated by an accelerator to acquire data in
+        anticipation of its future use." 
+    ::= { cwoTfoStats 6 }
+
+cwoTfoStatsActiveADConn OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of current active TCP connections
+        in the auto-discovery state." 
+    ::= { cwoTfoStats 7 }
+
+cwoTfoStatsReservedConn OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of TCP connections reserved for the
+        MAPI accelerator." 
+    ::= { cwoTfoStats 8 }
+
+cwoTfoStatsPendingConn OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of TCP connections, which are
+        pending in queue of connections to be optimized." 
+    ::= { cwoTfoStats 9 }
+
+cwoTfoStatsActivePTConn OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of active Pass Through TCP
+        connections. Connections which are not selected for optimization
+        are called Pass Through." 
+    ::= { cwoTfoStats 10 }
+cwoDreCacheStats  OBJECT IDENTIFIER
+    ::= { cwoDre 1 }
+
+cwoDrePerfStats  OBJECT IDENTIFIER
+    ::= { cwoDre 2 }
+
+
+cwoDreCacheStatsStatus OBJECT-TYPE
+    SYNTAX          CwoDreCacheStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object describes the status of the portion of the disk
+        that is meant for DRE cache." 
+    ::= { cwoDreCacheStats 1 }
+
+cwoDreCacheStatsAge OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the age of the oldest data present in the
+        DRE cache. For example, let us say that the portion of the disk
+        space allocated for DRE cache is 1GB and it is full. Now, if
+        new data is written onto this cache, then it would replace the
+        oldest data in the cache in First-In-First-Out (FIFO) order.
+        This object will specify what is the oldest data now present in
+        the cache. It takes the format of <x>d<x>h<x>m, where 'x' is an
+        integer number. For example, 6d20h30m means that the oldest
+        data's age is 6 days, 20 hours and 30 minutes." 
+    ::= { cwoDreCacheStats 2 }
+
+cwoDreCacheStatsTotal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of available disk space
+        for DRE cache. For example,  if the total disk space is 202 GB
+        and let us say that 20% of this disk space is allocated for DRE
+        cache, then this would mean that 40GB (40960 MB) out of the
+        total disk space is allocated for DRE cache." 
+    ::= { cwoDreCacheStats 3 }
+
+cwoDreCacheStatsUsed OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of DRE disk space
+        currently used out of the total space allocated for DRE cache.
+        For example, if the disk space allocated for DRE cache is 
+        972798MB and if this object indicates 1%, it means that 9727 MB
+        is used and remaining approximate 963071 MB of disk space is
+        free." 
+    ::= { cwoDreCacheStats 4 }
+
+cwoDreCacheStatsDataUnitUsage OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates DRE disk space currently used by data
+        unit. DRE stores the actual data as data units in data block
+        and the metadata (chuck signature) in signature block." 
+    ::= { cwoDreCacheStats 5 }
+
+cwoDreCacheStatsReplacedOneHrDataUnit OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the amount of data unit replaced in the
+        last one hour in DRE cache. DRE stores the actual data as data
+        units in the cache data block. If new data units have to be
+        stored in the cache, the older data units in the cache are
+        evicted in First-In-First-Out (FIFO) order. This object would
+        also indicate how much new data units have been stored in the
+        DRE cache in the past one hour." 
+    ::= { cwoDreCacheStats 6 }
+
+cwoDreCacheStatsDataUnitAge OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the age of oldest data unit  in the data
+        block. DRE stores the actual data as data units in the data
+        block and the metadata (chuck signature) in signature block. If
+        new data unit should be written to the data block when it is
+        full, then the oldest data unit currently present in the data
+        block will be evicted.  So this object would indicate the age
+        of the oldest data unit present in the DRE cache. It takes the
+        format of <x>d<x>h<x>m, where 'x' is an integer number. For
+        example, 6d20h30m means that the oldest data's age is 6 days, 20
+        hours and 30 minutes." 
+    ::= { cwoDreCacheStats 7 }
+
+cwoDreCacheStatsSigblockUsage OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates DRE disk space currently used by sigblock
+        or signature block. DRE stores the actual data as data units in
+        cache data block and the metadata (chuck signature) in
+        signature block." 
+    ::= { cwoDreCacheStats 8 }
+
+cwoDreCacheStatsReplacedOneHrSigblock OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the amount of signatures replaced in last
+        one hour in sigblock. DRE stores the metadata (chuck signature)
+        in signature block of DRE cache. If new signatures have to be
+        stored in the cache, the older signatures in the sigblock are
+        evicted in First-In-First-Out (FIFO) order. This object would
+        also indicate how much new signatures have been stored in the
+        DRE cache sigblock in the past one hour." 
+    ::= { cwoDreCacheStats 9 }
+
+cwoDreCacheStatsSigblockAge OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the age of oldest signature in the
+        sigblock. DRE stores the actual data as data units in the data
+        block and the metadata (chuck signature) in signature block. 
+        If a new signature should be written to the sigblock when it is
+        full, then the oldest signature currently present in the
+        sigblock will be evicted. So this object would indicate the age
+        of the oldest signature present in the DRE cache. It takes the
+        format of <x>d<x>h<x>m, where 'x' is an integer number. For
+        example, 6d20h30m means that the oldest data's age is 6 days, 20
+        hours and 30 minutes." 
+    ::= { cwoDreCacheStats 10 }
+
+cwoDrePerfStatsEncodeCompressionRatio OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total compression ratio provided by
+        all the DRE components - DRE, LZ and PLZ (if applicable), during
+        the encoding process. It is the ratio of the number of bytes
+        entering the DRE module (from LAN side) and the number of bytes
+        exiting the DRE module (from WAN side). This object indicates
+        the value that is calculated since the last time the counter was
+        cleared. The calculation is not based on per-connection or
+        per-peer basis." 
+    ::= { cwoDrePerfStats 1 }
+
+cwoDrePerfStatsEncodeCompressionLatency OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "ms"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the processing latency that is introduced
+        by DRE/LZ/PLZ processes during the encoding of data that is
+        coming into the DRE module.
+        The encoding process comprises of dividing the input data into
+        chunks and calculating the signature of every chunk. This
+        encoding process would add certain latency. Then the LZ
+        compression would add further latency. This object indicates
+        the value that is calculated since the last time the counter was
+        cleared. The calculation is not based on per-connection or
+        per-peer basis." 
+    ::= { cwoDrePerfStats 2 }
+
+cwoDrePerfStatsEncodeAvgMsgSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average size of all the messages
+        handled by DRE during encoding (i.e., for all the messages
+        received from the LAN side). The message size is an important
+        factor in performance of DRE. This object indicates the value
+        that is calculated since the last time the counter was cleared.
+        The calculation is not based on per-connection or per-peer
+        basis." 
+    ::= { cwoDrePerfStats 3 }
+
+cwoDrePerfStatsDecodeCompressionRatio OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total compression ratio provided by
+        all the DRE components - DRE, LZ and PLZ (if applicable),
+        during the decoding process. It is the ratio of the number of
+        bytes entering the DRE module (from WAN side) and the number of
+        bytes exiting the DRE module (from LAN side). This object
+        indicates the value that is calculated since the last time the
+        counter was cleared. The calculation is not based on
+        per-connection or per-peer basis." 
+    ::= { cwoDrePerfStats 4 }
+
+cwoDrePerfStatsDecodeCompressionLatency OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "ms"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the processing latency that is introduced
+        by DRE/LZ/PLZ processes during the decoding of data that is
+        coming into the DRE module.
+        The LZ decompression (for applicable data) would add certain
+        latency. Then the decoding process that involves a lot of
+        signature look-up for disk IO and data fetch from the data unit
+        for recreation of original data, would add further latency.
+        This object indicates the value that is calculated since the
+        last
+        time the counter was cleared. The calculation is not based on
+        per-connection or per-peer basis." 
+    ::= { cwoDrePerfStats 5 }
+
+cwoDrePerfStatsDecodeAvgMsgSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average size of all the messages
+        handled by DRE during decoding (i.e., for all the messages
+        received from the WAN side). The message size is an important
+        factor in performance of DRE. This object indicates the value
+        that is calculated since the last time the counter was cleared.
+        The calculation is not based on per-connection or per-peer
+        basis." 
+    ::= { cwoDrePerfStats 6 }
+
+cwoTfoStatsTotalNormalClosedConn OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of optimized TCP connections
+        which were closed normally since TFO was started or its
+        statistics were last reset." 
+    ::= { cwoTfoStats 11 }
+
+cwoTfoStatsResetConn OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of optimized TCP connections,
+        which are reset since TFO was started or its statistics were
+        last reset." 
+    ::= { cwoTfoStats 12 }
+
+cwoTfoStatsLoadStatus OBJECT-TYPE
+    SYNTAX          CwoLoadStates
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the load status of Traffic Flow Optimizer
+        (TFO)." 
+    ::= { cwoTfoStats 13 }
+-- Statistics table of AO
+
+cwoAoStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwoAoStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table gives statistics of Application Optimizers."
+    ::= { cwoAo 1 }
+
+cwoAoStatsEntry OBJECT-TYPE
+    SYNTAX          CwoAoStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing statistics for particular Application
+        optimizer. An entry will be created during system startup and
+        will include AOs, which are supported by this system."
+    INDEX           { cwoAoStatsName } 
+    ::= { cwoAoStatsTable 1 }
+
+CwoAoStatsEntry ::= SEQUENCE {
+        cwoAoStatsName                CwoAoName,
+        cwoAoStatsIsConfigured        TruthValue,
+        cwoAoStatsIsLicensed          TruthValue,
+        cwoAoStatsOperationalState    CwoAoOperationalState,
+        cwoAoStatsStartUpTime         DateAndTime,
+        cwoAoStatsLastResetTime       DateAndTime,
+        cwoAoStatsTotalHandledConns   Counter32,
+        cwoAoStatsTotalOptConns       Counter32,
+        cwoAoStatsTotalHandedOffConns Counter32,
+        cwoAoStatsTotalDroppedConns   Counter32,
+        cwoAoStatsActiveOptConns      Gauge32,
+        cwoAoStatsPendingConns        Gauge32,
+        cwoAoStatsMaxActiveOptConns   Unsigned32,
+        cwoAoStatsLoadStatus          CwoLoadStates,
+        cwoAoStatsBwOpt               Gauge32
+}
+
+cwoAoStatsName OBJECT-TYPE
+    SYNTAX          CwoAoName
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents name of the AO." 
+    ::= { cwoAoStatsEntry 1 }
+
+cwoAoStatsIsConfigured OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether the AO is configured or not. If
+        AO is not configured then the operational state
+        (cwoAoStatsOperationalState) of AO would be 'shutdown'." 
+    ::= { cwoAoStatsEntry 2 }
+
+cwoAoStatsIsLicensed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether license for the AO is valid or
+        not. If License for AO is not valid then operational state
+        (cwoAoStatsOperationalState) of AO would be 'shutdown'." 
+    ::= { cwoAoStatsEntry 3 }
+
+cwoAoStatsOperationalState OBJECT-TYPE
+    SYNTAX          CwoAoOperationalState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates operational state of the AO. If AO is not
+        configured or license is not valid for this AO then operational
+        state of AO would be 'shutdown'." 
+    ::= { cwoAoStatsEntry 4 }
+
+cwoAoStatsStartUpTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains date and time when AO was started. This
+        object will hold NULL value when AO is in shutdown state." 
+    ::= { cwoAoStatsEntry 5 }
+
+cwoAoStatsLastResetTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains date and time when statistics of AO were
+        set to reset last time. When statistics of AO set to reset then
+        all statistics counters will also set to reset. This object will
+        hold NULL value when AO is in shutdown state." 
+    ::= { cwoAoStatsEntry 6 }
+
+cwoAoStatsTotalHandledConns OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of connections handled by AO
+        since it was started or its statistics were last reset." 
+    ::= { cwoAoStatsEntry 7 }
+
+cwoAoStatsTotalOptConns OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of connections optimized by
+        AO since it was started or its statistics were last reset." 
+    ::= { cwoAoStatsEntry 8 }
+
+cwoAoStatsTotalHandedOffConns OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of connections handed off to
+        Generic optimization by AO since it was started or its
+        statistics last reset." 
+    ::= { cwoAoStatsEntry 9 }
+
+cwoAoStatsTotalDroppedConns OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of connections dropped by AO
+        since it was started or its statistics were last reset." 
+    ::= { cwoAoStatsEntry 10 }
+
+cwoAoStatsActiveOptConns OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of active connections which are
+        getting optimized by AO." 
+    ::= { cwoAoStatsEntry 11 }
+
+cwoAoStatsPendingConns OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of connections currently pending in
+        queue of connections to be optimized by AO." 
+    ::= { cwoAoStatsEntry 12 }
+
+cwoAoStatsMaxActiveOptConns OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains maximum number of active TCP connections
+        that AO can optimize." 
+    ::= { cwoAoStatsEntry 13 }
+
+cwoAoStatsLoadStatus OBJECT-TYPE
+    SYNTAX          CwoLoadStates
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the load status of an AO." 
+    ::= { cwoAoStatsEntry 14 }
+
+cwoAoStatsBwOpt OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage bandwidth optimization
+        achieved due to optimizations done by an AO." 
+    ::= { cwoAoStatsEntry 15 }
+ 
+
+-- Extended statistics for SMB AO
+
+cwoAoSmbxStats  OBJECT IDENTIFIER
+    ::= { cwoAo 2 }
+
+
+cwoAoSmbxStatsBytesReadCache OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of bytes read from SMB
+        Application Optimizer cache (Read-ahead and Metadata cache)
+        since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 1 }
+
+cwoAoSmbxStatsBytesWriteCache OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of bytes written to SMB
+        Application Optimizer cache (Read-ahead and Metadata) since it
+        was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 2 }
+
+cwoAoSmbxStatsBytesReadServer OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of bytes read from file
+        servers by SMB Application Optimizer since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 3 }
+
+cwoAoSmbxStatsBytesWriteServer OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of bytes written to file
+        servers by SMB Application Optimizer since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 4 }
+
+cwoAoSmbxStatsBytesReadClient OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of bytes read by SMB
+        Application Optimizer clients since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 5 }
+
+cwoAoSmbxStatsBytesWriteClient OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of bytes written by SMB
+        Application optimizer clients since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 6 }
+
+cwoAoSmbxStatsProcessedReqs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of requests processed by SMB
+        Application Optimizer since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 7 }
+
+cwoAoSmbxStatsActiveReqs OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of active requests getting
+        processed by SMB Application Optimizer." 
+    ::= { cwoAoSmbxStats 8 }
+
+cwoAoSmbxStatsTotalTimedOutReqs OBJECT-TYPE
+    SYNTAX          Unsigned64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of requests timed out in SMB
+        Application Optimizer since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 9 }
+
+cwoAoSmbxStatsTotalRemoteReqs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of SMB requests sent to
+        remote file server since SMB AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 10 }
+
+cwoAoSmbxStatsTotalLocalReqs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of SMB requests served
+        locally by SMB Application Optimizer since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 11 }
+
+cwoAoSmbxStatsRemoteAvgTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains average duration of time taken by SMB
+        Application Optimizer to process all remote requests since it
+        was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 12 }
+
+cwoAoSmbxStatsLocalAvgTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains average duration of time taken by SMB
+        Application Optimizer to process all local requests since it
+        was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 13 }
+
+cwoAoSmbxStatsRACacheHitCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains SMB Application Optimizer Read Ahead Cache
+        hit count since SMB AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 14 }
+
+cwoAoSmbxStatsMDCacheHitCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains SMB Application Optimizer Metadata cache
+        hit count since SMB AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 15 }
+
+cwoAoSmbxStatsRACacheHitRate OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains SMB Application Optimizer Read Ahead cache
+        hit rate since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 16 }
+
+cwoAoSmbxStatsMDCacheHitRate OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains SMB Application Optimizer Metadata cache
+        hit rate since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 17 }
+
+cwoAoSmbxStatsMaxRACacheSize OBJECT-TYPE
+    SYNTAX          Unsigned64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains Maximum disk space that can be allocated
+        for Read Ahead data in SMB Application Optimizer cache." 
+    ::= { cwoAoSmbxStats 18 }
+
+cwoAoSmbxStatsMaxMDCacheSize OBJECT-TYPE
+    SYNTAX          Unsigned64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains maximum disk space that can be allocated
+        for Metadata in SMB Application Optimizer cache." 
+    ::= { cwoAoSmbxStats 19 }
+
+cwoAoSmbxStatsMDCacheSize OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains current size of Metadata cache in SMB
+        Application Optimizer." 
+    ::= { cwoAoSmbxStats 20 }
+
+cwoAoSmbxStatsRAEvictedAge OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains amount of time spent in the SMB
+        Application Optimizer Read Ahead cache by the resource that was
+        last evicted since last update. If this amount is too short or
+        too long, it is recommended to modify the size of the cache." 
+    ::= { cwoAoSmbxStats 21 }
+
+cwoAoSmbxStatsRTT OBJECT-TYPE
+    SYNTAX          TimeIntervalSec
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total round trip time for all SMB
+        connections since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 22 }
+
+cwoAoSmbxStatsTotalRespTimeSaving OBJECT-TYPE
+    SYNTAX          TimeIntervalSec
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total response time saved due to SMB AO
+        optimizations since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 23 }
+
+cwoAoSmbxStatsOpenFiles OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "files"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains number of files currently opened by SMB
+        Application Optimizer." 
+    ::= { cwoAoSmbxStats 24 }
+
+cwoAoSmbxStatsTotalFilesInRACache OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "files"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total number of files in SMB Application
+        optimizer Read Ahead cache." 
+    ::= { cwoAoSmbxStats 25 }
+
+cwoAoSmbxStatsRdL4SignWANBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the total number of Layer 4 (L4) optimized
+        signed bytes read from WAN by SMB Application Optimizer since
+        the SMB Application Optimizer was started. L4 optimization
+        comprises of TFO, DRE and LZ optimizations.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 26 }
+
+cwoAoSmbxStatsWrL4SignWANBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the total number of Layer 4 (L4) optimized
+        signed bytes written to WAN by SMB Application Optimizer since
+        SMB Application Optimizer was started. L4 optimization comprises
+        of TFO, DRE and LZ optimizations.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 27 }
+
+cwoAoSmbxStatsRdSignLANBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the total number of signed bytes read from
+        LAN by SMB Application Optimizer since the SMB Application
+        Optimizer was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 28 }
+
+cwoAoSmbxStatsWrSignLANBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the total number of original signed bytes
+        written to LAN by SMB Application Optimizer since SMB
+        Application Optimizer was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the SMB AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the SMB
+        AO." 
+    ::= { cwoAoSmbxStats 29 }
+-- Extended statistics for HTTP AO
+
+cwoAoHttpxStats  OBJECT IDENTIFIER
+    ::= { cwoAo 3 }
+
+
+cwoAoHttpxStatsTotalSavedTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total time saved due to optimizations
+        done by HTTP AO since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the HTTP AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the HTTP
+        AO." 
+    ::= { cwoAoHttpxStats 1 }
+
+cwoAoHttpxStatsTotalRTT OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total Round Trip Time (RTT) for all the
+        connections going through HTTP AO since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the HTTP AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the HTTP
+        AO." 
+    ::= { cwoAoHttpxStats 2 }
+
+cwoAoHttpxStatsTotalMDCMTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total time for Meta Data Cache Misses
+        (MDCM) for HTTP AO since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the HTTP AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the HTTP
+        AO." 
+    ::= { cwoAoHttpxStats 3 }
+
+cwoAoHttpxStatsEstSavedTime OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates percentage estimated time saved due to
+        optimizations done by HTTP AO since it was started." 
+    ::= { cwoAoHttpxStats 4 }
+
+cwoAoHttpxStatsTotalSPSessions OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of SharePoint Optimized
+        HTTP sessions. This counter is incremented for every
+        session on which SharePoint optimization can be performed. An
+        HTTP session is tagged as a SharePoint Session based on the
+        information present in the HTTP request." 
+    ::= { cwoAoHttpxStats 5 }
+
+cwoAoHttpxStatsTotalSPPFSessions OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "sessions"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of SharePoint Pre-fetch
+        optimized HTTP sessions. This counter is incremented
+        for every session on which SharePoint pre-fetch optimization
+        can be performed. An HTTP session is tagged as a SharePoint
+        pre-fetch Session based on the information present in the HTTP
+        request. A pre-fetch operation is one where the edge WAAS
+        device fetches the next set of data (which it anticipates the
+        client will request later) from the server based on the current
+        HTTP Request information." 
+    ::= { cwoAoHttpxStats 6 }
+
+cwoAoHttpxStatsTotalSPPFObjects OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of pre-fetched objects
+        served locally for SharePoint pre-fetch sessions. The edge WAAS
+        device maintains a local cache where the pre-fetched responses
+        are saved. This object is incremented whenever the SharePoint
+        client request is served from the pre-fetch cache." 
+    ::= { cwoAoHttpxStats 7 }
+
+cwoAoHttpxStatsTotalSPRTTSaved OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains total Round Trip Time (RTT) saved due to
+        SharePoint pre-fetch optimizations since SharePoint pre-fetch
+        optimization was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the HTTP AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the HTTP
+        AO." 
+    ::= { cwoAoHttpxStats 8 }
+
+cwoAoHttpxStatsTotalSPPFMissTime OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total time for SharePoint pre-fetch
+        Cache Misses since SharePoint pre-fetch optimization  was
+        started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the HTTP AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the HTTP
+        AO." 
+    ::= { cwoAoHttpxStats 9 }
+cwoAoHttpxStatsAKC  OBJECT IDENTIFIER
+    ::= { cwoAoHttpxStats 10 }
+
+cwoAoHttpxStatsAKCBypassEntry  OBJECT IDENTIFIER
+    ::= { cwoAoHttpxStatsAKC 1 }
+
+cwoAoHttpxStatsAKCStdEntry  OBJECT IDENTIFIER
+    ::= { cwoAoHttpxStatsAKC 2 }
+
+cwoAoHttpxStatsAKCBasicEntry  OBJECT IDENTIFIER
+    ::= { cwoAoHttpxStatsAKC 3 }
+
+cwoAoHttpxStatsAKCAdvEntry  OBJECT IDENTIFIER
+    ::= { cwoAoHttpxStatsAKC 4 }
+
+cwoAoHttpxStatsAKCTotalEntry  OBJECT IDENTIFIER
+    ::= { cwoAoHttpxStatsAKC 5 }
+
+
+cwoAoHttpxStatsAKCPrepTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwoAoHttpxStatsAKCPrepEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table gives statistics of Akamai Preposition tasks."
+    ::= { cwoAoHttpxStatsAKC 6 }
+
+cwoAoHttpxStatsAKCPrepEntry OBJECT-TYPE
+    SYNTAX          CwoAoHttpxStatsAKCPrepEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing statistics for a particular Akamai
+        Preposition task."
+    INDEX           { cwoAoHttpxStatsAKCPrepTaskName } 
+    ::= { cwoAoHttpxStatsAKCPrepTable 1 }
+
+CwoAoHttpxStatsAKCPrepEntry ::= SEQUENCE {
+        cwoAoHttpxStatsAKCPrepTaskName          OCTET STRING,
+        cwoAoHttpxStatsAKCPrepStatus            CwoHttpAKCPrepStatus,
+        cwoAoHttpxStatsAKCPrepCacheStoreBytes   Gauge32,
+        cwoAoHttpxStatsAKCPrepUncacheStoreBytes Gauge32
+}
+
+cwoAoHttpxStatsAKCPrepTaskName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (0..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the name of the preposition task in
+        Akamai connected cache preposition operation." 
+    ::= { cwoAoHttpxStatsAKCPrepEntry 1 }
+
+cwoAoHttpxStatsAKCPrepStatus OBJECT-TYPE
+    SYNTAX          CwoHttpAKCPrepStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the current status of the preposition
+        task in Akamai connected cache preposition operation." 
+    ::= { cwoAoHttpxStatsAKCPrepEntry 2 }
+
+cwoAoHttpxStatsAKCPrepCacheStoreBytes OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of response bytes stored
+        in the cache for a particular preposition task in Akamai
+        connected cache preposition operation." 
+    ::= { cwoAoHttpxStatsAKCPrepEntry 3 }
+
+cwoAoHttpxStatsAKCPrepUncacheStoreBytes OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of response bytes not
+        stored in the cache for a particular preposition task in Akamai
+        connected cache preposition operation." 
+    ::= { cwoAoHttpxStatsAKCPrepEntry 4 }
+ 
+
+
+cwoAoHttpxStatsAKCBypassCacheTrans OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Akamai connected cache statistics for
+        total number of cache-bypass transactions that were handled in 
+        bypass mode transparent cache profile. When bypass mode
+        transparent cache profile is set for a particular hostname, the
+        caching for the hostname specified in a rule is suppressed. In
+        this mode, the cache-engine turns off caching for one or more
+        configured sites." 
+    ::= { cwoAoHttpxStatsAKCBypassEntry 1 }
+
+cwoAoHttpxStatsAKCBypassRespBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of response bytes saved
+        for cache-hit HTTP transactions in bypass mode transparent
+        cache profile." 
+    ::= { cwoAoHttpxStatsAKCBypassEntry 2 }
+
+cwoAoHttpxStatsAKCBypassCacheTransPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        cache-hit HTTP transactions in bypass mode transparent cache
+        profile." 
+    ::= { cwoAoHttpxStatsAKCBypassEntry 3 }
+
+cwoAoHttpxStatsAKCBypassRespBytesPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        response bytes saved for cache-hit HTTP transactions in bypass
+        mode transparent cache profile." 
+    ::= { cwoAoHttpxStatsAKCBypassEntry 4 }
+
+cwoAoHttpxStatsAKCBypassCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total response time saved for
+        cache-hit HTTP transactions in bypass mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCBypassEntry 5 }
+
+cwoAoHttpxStatsAKCBypassAvgCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average response time saved per
+        cache-hit HTTP transaction in bypass mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCBypassEntry 6 }
+
+cwoAoHttpxStatsAKCBypassRespTimeSavedPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total response time
+        saved for cache-hit HTTP transactions in bypass mode
+        transparent cache profile." 
+    ::= { cwoAoHttpxStatsAKCBypassEntry 7 }
+
+cwoAoHttpxStatsAKCStdCacheTrans OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Akamai connected cache statistics for
+        total number of cache-hit transactions that were served from
+        cache in standard mode transparent cache profile. This is a
+        default mode.In this mode, the cache engine also follows the
+        RFC-2616 behavior for cache control headers with the exception
+        of not honoring the client cache override behavior." 
+    ::= { cwoAoHttpxStatsAKCStdEntry 1 }
+
+cwoAoHttpxStatsAKCStdRespBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of response bytes saved
+        for cache-hit HTTP transactions in standard mode transparent
+        cache profile." 
+    ::= { cwoAoHttpxStatsAKCStdEntry 2 }
+
+cwoAoHttpxStatsAKCStdCacheTransPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        cache-hit HTTP transactions in standard mode transparent cache
+        profile." 
+    ::= { cwoAoHttpxStatsAKCStdEntry 3 }
+
+cwoAoHttpxStatsAKCStdRespBytesPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        response bytes saved for cache-hit HTTP transactions in standard
+        mode transparent cache profile." 
+    ::= { cwoAoHttpxStatsAKCStdEntry 4 }
+
+cwoAoHttpxStatsAKCStdCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total response time saved for
+        cache-hit HTTP transactions in standard mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCStdEntry 5 }
+
+cwoAoHttpxStatsAKCStdAvgCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average response time saved per
+        cache-hit HTTP transaction in standard mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCStdEntry 6 }
+
+cwoAoHttpxStatsAKCStdRespTimeSavedPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total response time
+        saved for cache-hit HTTP transactions in standard mode
+        transparent cache profile." 
+    ::= { cwoAoHttpxStatsAKCStdEntry 7 }
+
+cwoAoHttpxStatsAKCBasicCacheTrans OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Akamai connected cache statistics for
+        total number of cache-hit transactions that were served from
+        cache in basic mode transparent cache profile. In this mode, the
+        cache engine works in strict RFC-2616 behavior, and therefore,
+        only caches responses that are marked explicitly as cacheable
+        with cache-control headers or responses that have an expiry
+        header to service and accelerate traffic from a datacenter to a
+        branch office over any type of IP network." 
+    ::= { cwoAoHttpxStatsAKCBasicEntry 1 }
+
+cwoAoHttpxStatsAKCBasicRespBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of response bytes saved
+        for cache-hit HTTP transactions in basic mode transparent cache
+        profile." 
+    ::= { cwoAoHttpxStatsAKCBasicEntry 2 }
+
+cwoAoHttpxStatsAKCBasicCacheTransPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        cache-hit HTTP transactions in basic mode transparent cache
+        profile." 
+    ::= { cwoAoHttpxStatsAKCBasicEntry 3 }
+
+cwoAoHttpxStatsAKCBasicRespBytesPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        response bytes saved for cache-hit HTTP transactions in basic
+        mode transparent cache profile." 
+    ::= { cwoAoHttpxStatsAKCBasicEntry 4 }
+
+cwoAoHttpxStatsAKCBasicCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total response time saved for
+        cache-hit HTTP transactions in basic mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCBasicEntry 5 }
+
+cwoAoHttpxStatsAKCBasicAvgCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average response time saved per
+        cache-hit HTTP transaction in basic mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCBasicEntry 6 }
+
+cwoAoHttpxStatsAKCBasicRespTimeSavedPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total response time
+        saved for cache-hit HTTP transactions in basic mode transparent
+        cache profile." 
+    ::= { cwoAoHttpxStatsAKCBasicEntry 7 }
+
+cwoAoHttpxStatsAKCAdvCacheTrans OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Akamai connected cache statistics for
+        total number of cache-hit transactions that were served from
+        cache in advanced mode transparent cache profile. In advanced
+        mode,the cache engine caches media types more aggressively, and
+        caches all object types for longer time (when there is no
+        explicit expiration time)." 
+    ::= { cwoAoHttpxStatsAKCAdvEntry 1 }
+
+cwoAoHttpxStatsAKCAdvRespBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of response bytes saved
+        for cache-hit HTTP transactions in advanced mode transparent
+        cache profile." 
+    ::= { cwoAoHttpxStatsAKCAdvEntry 2 }
+
+cwoAoHttpxStatsAKCAdvCacheTransPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        cache-hit HTTP transactions in advanced mode transparent cache
+        profile." 
+    ::= { cwoAoHttpxStatsAKCAdvEntry 3 }
+
+cwoAoHttpxStatsAKCAdvRespBytesPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        response bytes saved for cache-hit HTTP transactions in
+        advanced mode transparent cache profile." 
+    ::= { cwoAoHttpxStatsAKCAdvEntry 4 }
+
+cwoAoHttpxStatsAKCAdvCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total response time saved for
+        cache-hit HTTP transactions in advanced mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCAdvEntry 5 }
+
+cwoAoHttpxStatsAKCAdvAvgCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average response time saved per
+        cache-hit HTTP transaction in advanced mode transparent cache
+        profile, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCAdvEntry 6 }
+
+cwoAoHttpxStatsAKCAdvRespTimeSavedPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total response time
+        saved for cache-hit HTTP transactions in advanced mode
+        transparent cache profile." 
+    ::= { cwoAoHttpxStatsAKCAdvEntry 7 }
+
+cwoAoHttpxStatsAKCTotalCacheTrans OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the aggregation of all the statistics
+        related to various Akamai Connected Cache profile types -
+        Bypass, Standard, Basic and Advanced." 
+    ::= { cwoAoHttpxStatsAKCTotalEntry 1 }
+
+cwoAoHttpxStatsAKCTotalRespBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of response bytes saved
+        for cache-hit HTTP transactions in all transparent cache
+        profile modes." 
+    ::= { cwoAoHttpxStatsAKCTotalEntry 2 }
+
+cwoAoHttpxStatsAKCTotalCacheTransPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        cache-hit HTTP transactions in all transparent cache profile
+        modes." 
+    ::= { cwoAoHttpxStatsAKCTotalEntry 3 }
+
+cwoAoHttpxStatsAKCTotalRespBytesPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total number of
+        response bytes saved for cache-hit HTTP transactions in all
+        transparent cache profile modes." 
+    ::= { cwoAoHttpxStatsAKCTotalEntry 4 }
+
+cwoAoHttpxStatsAKCTotalCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total response time saved for
+        cache-hit HTTP transactions in all transparent cache profile
+        modes, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCTotalEntry 5 }
+
+cwoAoHttpxStatsAKCTotalAvgCacheRespTimeSaved OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average response time saved per
+        cache-hit HTTP transaction in all transparent cache profile
+        modes, in milli-seconds." 
+    ::= { cwoAoHttpxStatsAKCTotalEntry 6 }
+
+cwoAoHttpxStatsAKCTotalRespTimeSavedPercent OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the percentage of total response time
+        saved for Cache-hit HTTP transactions in all transparent cache
+        profile modes." 
+    ::= { cwoAoHttpxStatsAKCTotalEntry 7 }
+-- Extended statistics for MAPI AO
+
+cwoAoMapixStats  OBJECT IDENTIFIER
+    ::= { cwoAo 4 }
+
+
+cwoAoMapixStatsUnEncrALRT OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates Average Local Response Time (ALRT) for
+        unencrypted connections of MAPI AO since it was started." 
+    ::= { cwoAoMapixStats 1 }
+
+cwoAoMapixStatsEncrALRT OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates Average Local Response Time (ALRT) for
+        encrypted connections of MAPI AO since it was started." 
+    ::= { cwoAoMapixStats 2 }
+
+cwoAoMapixStatsUnEncrARRT OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates Average Remote Response Time (ARRT) for
+        unencrypted connections of MAPI AO since it was started." 
+    ::= { cwoAoMapixStats 3 }
+
+cwoAoMapixStatsEncrARRT OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates Average Remote Response Time (ARRT) for
+        encrypted connections of MAPI AO since it was started." 
+    ::= { cwoAoMapixStats 4 }
+
+cwoAoMapixStatsTotalUnEncrLRs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total requests served locally for
+        unencrypted connections by MAPI AO since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the MAPI AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the MAPI
+        AO." 
+    ::= { cwoAoMapixStats 5 }
+
+cwoAoMapixStatsTotalEncrLRs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total requests served locally for
+        encrypted connections by MAPI AO since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the MAPI AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the MAPI
+        AO." 
+    ::= { cwoAoMapixStats 6 }
+
+cwoAoMapixStatsTotalUnEncrRRs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total Remote Requests(RR) served by
+        remote servers for unencrypted connections of MAPI AO since it
+        was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the MAPI AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the MAPI
+        AO." 
+    ::= { cwoAoMapixStats 7 }
+
+cwoAoMapixStatsTotalEncrRRs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total Remote Requests(RR) served by
+        remote servers for encrypted connections by MAPI AO since it
+        was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the MAPI AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the MAPI
+        AO." 
+    ::= { cwoAoMapixStats 8 }
+
+cwoAoMapixStatsUnEncrAvgRedTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates average time reduced for unencrypted
+        connections due to optimizations done by MAPI AO since it was
+        started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the MAPI AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the MAPI
+        AO." 
+    ::= { cwoAoMapixStats 9 }
+
+cwoAoMapixStatsEncrAvgRedTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates average time reduced for encrypted
+        connections due to optimizations done by MAPI AO since it was
+        started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the MAPI AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the MAPI
+        AO." 
+    ::= { cwoAoMapixStats 10 }
+-- Extended statistics for NFS AO
+
+cwoAoNfsxStats  OBJECT IDENTIFIER
+    ::= { cwoAo 5 }
+
+
+cwoAoNfsxStatsALRT OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates Average Local Response Time (ALRT) for
+        NFS AO since it was started." 
+    ::= { cwoAoNfsxStats 1 }
+
+cwoAoNfsxStatsARRT OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates Average Remote Response Time (ARRT) for
+        NFS AO since it was started." 
+    ::= { cwoAoNfsxStats 2 }
+
+cwoAoNfsxStatsTotalLRs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total requests served locally by NFS AO
+        since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the NFS AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the NFS
+        AO." 
+    ::= { cwoAoNfsxStats 3 }
+
+cwoAoNfsxStatsTotalRRs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total Remote Requests (RR) served by
+        remote servers for NFS AO since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the NFS AO. The last discontinuity time is
+        indicated by the value of cwoAoStatsLastResetTime for the NFS
+        AO." 
+    ::= { cwoAoNfsxStats 4 }
+
+cwoAoNfsxStatsEstTimeSaved OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates percentage estimated time saved due to
+        optimizations done by NFS AO since it was started." 
+    ::= { cwoAoNfsxStats 5 }
+-- Extended statistics for Video AO
+
+cwoAoVideoxStats  OBJECT IDENTIFIER
+    ::= { cwoAo 6 }
+
+
+cwoAoVideoxStatsTotalInBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates total incoming bytes for Video AO since
+        it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the Video AO. The last discontinuity time
+        is indicated by the value of cwoAoStatsLastResetTime for the
+        Video AO." 
+    ::= { cwoAoVideoxStats 1 }
+
+cwoAoVideoxStatsTotalOutBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates total outgoing bytes for Video AO since
+        it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the Video AO. The last discontinuity time
+        is indicated by the value of cwoAoStatsLastResetTime for the
+        Video AO." 
+    ::= { cwoAoVideoxStats 2 }
+-- Extended Statistics for CIFS AO
+
+cwoAoCifsxStats  OBJECT IDENTIFIER
+    ::= { cwoAo 7 }
+
+
+cwoAoCifsxStatsTotalReadBytes OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the total bytes read by clients
+        from the client side (via cache or remotely) using CIFS AO
+        since CIFS AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 1 }
+
+cwoAoCifsxStatsTotalWrittenBytes OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the total bytes written to the
+        client-side using the CIFS AO since CIFS AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 2 }
+
+cwoAoCifsxStatsTotalRemoteReqs OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the total requests sent to remote file
+        server since CIFS AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 3 }
+
+cwoAoCifsxStatsTotalLocalReqs OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the total number requests served locally
+        by CIFS AO since it was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 4 }
+
+cwoAoCifsxStatsTotalRemoteTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the total duration of time taken by CIFS
+        AO to process all remote requests since CIFS AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 5 }
+
+cwoAoCifsxStatsTotalLocalTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the total duration of time taken by CIFS
+        AO to process all local requests since CIFS AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 6 }
+
+cwoAoCifsxStatsConnectedSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "sessions"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the number of currently connected CIFS
+        sessions." 
+    ::= { cwoAoCifsxStats 7 }
+
+cwoAoCifsxStatsOpenFiles OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "files"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the number of currently open CIFS files." 
+    ::= { cwoAoCifsxStats 8 }
+
+cwoAoCifsxStatsMaxCacheSize OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the maximum disk space (in KB) allocated
+        for data in the CIFS AO cache." 
+    ::= { cwoAoCifsxStats 9 }
+
+cwoAoCifsxStatsCurrentCacheSize OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the amount of disk space (in KB),
+        currently being used for data in the CIFS AO cache." 
+    ::= { cwoAoCifsxStats 10 }
+
+cwoAoCifsxStatsMaxCacheResources OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "files"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the maximum number of cache resources
+        (files and directories) supported by the CIFS AO cache,
+        regardless of the size of these resources." 
+    ::= { cwoAoCifsxStats 11 }
+
+cwoAoCifsxStatsCacheResources OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "files"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the number of cache resources (files
+        and directories) currently held in the CIFS AO cache." 
+    ::= { cwoAoCifsxStats 12 }
+
+cwoAoCifsxStatsEvictedResources OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "files"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the number of cache resources (files and
+        directories) that have been evicted from the cache since CIFS
+        AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 13 }
+
+cwoAoCifsxStatsLastEvictedTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the time when cache resources (files and
+        directories) were last evicted from the CIFS AO cache. 00:00 is
+        displayed if no cache resources have been evicted since CIFS AO
+        was started." 
+    ::= { cwoAoCifsxStats 14 }
+
+cwoAoCifsxStatsVolHiWatermark OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the disk usage high watermark in
+        percentage that triggers the eviction of resources from the
+        CIFS AO cache." 
+    ::= { cwoAoCifsxStats 15 }
+
+cwoAoCifsxStatsVolLoWatermark OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the target disk usage low watermark
+        percentage to be reached via cache eviction when triggered by
+        cfVolHiWatermark. When this low watermark is reached, cache
+        eviction stops." 
+    ::= { cwoAoCifsxStats 16 }
+
+cwoAoCifsxStatsAmntHiWatermark OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the target percentage of maximum cache
+        resources (defined by cfMaxCacheResources) that triggers the
+        eviction of resources from the CIFS AO cache." 
+    ::= { cwoAoCifsxStats 17 }
+
+cwoAoCifsxStatsAmntLoWatermark OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the target percentage of maximum cache
+        resources (defined by cfMaxCacheResources) to be reached via
+        cache eviction when triggered by cfAmntHiWatermark. When this
+        low watermark is reached, cache eviction stops." 
+    ::= { cwoAoCifsxStats 18 }
+
+cwoAoCifsxStatsEvictedAge OBJECT-TYPE
+    SYNTAX          TimeInterval
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the amount of time spent in the CIFS AO
+        cache by the resource that was last evicted. If this amount is
+        too short or too long, it is recommended to modify the size of
+        the cache." 
+    ::= { cwoAoCifsxStats 19 }
+
+cwoAoCifsxStatsEvictedLastAccess OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object indicates the value of sysUpTime when the resource,
+        which was last evicted from the CIFS AO cache has been last
+        accessed." 
+    ::= { cwoAoCifsxStats 20 }
+
+cwoAoCifsxStatsFFTotalReqs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object contains total number of FindFirst (FF) requests
+        since CIFS AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 21 }
+
+cwoAoCifsxStatsFFRemoteReqs OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "requests"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object contains total number of FindFirst (FF) requests
+        sent to the remote file-server since CIFS AO was started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 22 }
+
+cwoAoCifsxStatsFFLocalRespTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object contains the average local response time for
+        FindFirst (FF) requests replied locally since CIFS AO was
+        started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 23 }
+
+cwoAoCifsxStatsFFRemoteRespTime OBJECT-TYPE
+    SYNTAX          CiscoMilliSeconds
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object contains the average remote response time for
+        FindFirst (FF) requests replied remotely since CIFS AO was
+        started.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the CIFS AO. The last discontinuity time
+        is
+        indicated by the value of cwoAoStatsLastResetTime for the CIFS
+        AO." 
+    ::= { cwoAoCifsxStats 24 }
+
+cwoAoCifsxStatsDirResources OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "files"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object contains the total number of currently allocated
+        Directory Resources in CIFS AO." 
+    ::= { cwoAoCifsxStats 25 }
+-- Application statistics Table
+
+cwoAppStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwoAppStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists the statistics for applications configured on
+        the wan optimization system."
+    ::= { cwoApp 1 }
+
+cwoAppStatsEntry OBJECT-TYPE
+    SYNTAX          CwoAppStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry describing statistics for applications configured on
+        the WAN optimization system. The WAN opimitization system
+        creates an entry when a user configures an application for
+        optimization. The WAN optimization system deletes an entry, when
+        user removes the application from the configuration."
+    INDEX           { cwoAppStatsAppName } 
+    ::= { cwoAppStatsTable 1 }
+
+CwoAppStatsEntry ::= SEQUENCE {
+        cwoAppStatsAppName        SnmpAdminString,
+        cwoAppStatsOriginalBytes  Counter64,
+        cwoAppStatsOptimizedBytes Counter64,
+        cwoAppStatsPTBytes        Counter64
+}
+
+cwoAppStatsAppName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the name of a particular application,
+        which is configured for optimization." 
+    ::= { cwoAppStatsEntry 1 }
+
+cwoAppStatsOriginalBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total original traffic (uncompressed) in
+        bytes of a particular application that has entered into the
+        system." 
+    ::= { cwoAppStatsEntry 2 }
+
+cwoAppStatsOptimizedBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total optimized traffic in bytes of a
+        particular application." 
+    ::= { cwoAppStatsEntry 3 }
+
+cwoAppStatsPTBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total pass-through traffic in bytes of a
+        particular application." 
+    ::= { cwoAppStatsEntry 4 }
+ 
+
+-- Policy map statistics table
+
+cwoPmapStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwoPmapStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists the staistics for active policy maps."
+    ::= { cwoPmap 1 }
+
+cwoPmapStatsEntry OBJECT-TYPE
+    SYNTAX          CwoPmapStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry describing statistics related with an active policy
+        map of a given type. The WAN optimization system creates/deletes
+        an entry for a policy map when it is made active/inactive
+        through configuration changes."
+    INDEX           {
+                        cwoPmapStatsType,
+                        cwoPmapStatsName
+                    } 
+    ::= { cwoPmapStatsTable 1 }
+
+CwoPmapStatsEntry ::= SEQUENCE {
+        cwoPmapStatsType         CwoTypes,
+        cwoPmapStatsName         SnmpAdminString,
+        cwoPmapStatsDescr        SnmpAdminString,
+        cwoPmapStatsTotalConns   Counter64,
+        cwoPmapStatsTotalBytes   Counter64,
+        cwoPmapStatsTotalPTConns Counter64,
+        cwoPmapStatsTotalPTBytes Counter64
+}
+
+cwoPmapStatsType OBJECT-TYPE
+    SYNTAX          CwoTypes
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates type of the policy map." 
+    ::= { cwoPmapStatsEntry 1 }
+
+cwoPmapStatsName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates name of the policy map." 
+    ::= { cwoPmapStatsEntry 2 }
+
+cwoPmapStatsDescr OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the descriptive information of the policy
+        map configured on the WAN optimization system. If the
+        description is not configured for a given policy map then this
+        string will contain a NULL string." 
+    ::= { cwoPmapStatsEntry 3 }
+
+cwoPmapStatsTotalConns OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "connections"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total number of connections processed by
+        the policy map since it is active." 
+    ::= { cwoPmapStatsEntry 4 }
+
+cwoPmapStatsTotalBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total bytes processed by the policy map
+        since it is active." 
+    ::= { cwoPmapStatsEntry 5 }
+
+cwoPmapStatsTotalPTConns OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "connections"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total connections, which are made
+        as pass-through due to some reason by the policy map since it
+        is
+        active." 
+    ::= { cwoPmapStatsEntry 6 }
+
+cwoPmapStatsTotalPTBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total bytes which are made pass-through
+        by the policy map since it is active." 
+    ::= { cwoPmapStatsEntry 7 }
+ 
+
+-- Class map statistics table.
+
+cwoCmapStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwoCmapStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table lists the staistics for class maps associated with
+        the active policy map."
+    ::= { cwoCmap 1 }
+
+cwoCmapStatsEntry OBJECT-TYPE
+    SYNTAX          CwoCmapStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry describes statistics for the class maps associated
+        with active policy maps. A new entry will be created for the
+        class map when a new class map gets associated to the policy map
+        through the configuration changes. An entry will be deleted,
+        when the class map is disassociated from the active policy map
+        through the configuration changes."
+    INDEX           {
+                        cwoCmapStatsType,
+                        cwoCmapStatsName
+                    } 
+    ::= { cwoCmapStatsTable 1 }
+
+CwoCmapStatsEntry ::= SEQUENCE {
+        cwoCmapStatsType         CwoTypes,
+        cwoCmapStatsName         SnmpAdminString,
+        cwoCmapStatsDescr        SnmpAdminString,
+        cwoCmapStatsTotalConns   Counter64,
+        cwoCmapStatsTotalBytes   Counter64,
+        cwoCmapStatsTotalPTConns Counter64,
+        cwoCmapStatsTotalPTBytes Counter64
+}
+
+cwoCmapStatsType OBJECT-TYPE
+    SYNTAX          CwoTypes
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the type of the class map." 
+    ::= { cwoCmapStatsEntry 1 }
+
+cwoCmapStatsName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the name of the class map." 
+    ::= { cwoCmapStatsEntry 2 }
+
+cwoCmapStatsDescr OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the descriptive information of the class
+        map configured on the WAN optimization system. If the
+        description is not configured for a given class map then this
+        string will contain a NULL string." 
+    ::= { cwoCmapStatsEntry 3 }
+
+cwoCmapStatsTotalConns OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "connections"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of connections processed
+        by the class map." 
+    ::= { cwoCmapStatsEntry 4 }
+
+cwoCmapStatsTotalBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total bytes processed by the
+        class map." 
+    ::= { cwoCmapStatsEntry 5 }
+
+cwoCmapStatsTotalPTConns OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "connections"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates total connections, which are made
+        as pass-through due to some reason by the class map." 
+    ::= { cwoCmapStatsEntry 6 }
+
+cwoCmapStatsTotalPTBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total bytes which are made
+        pass-through by the class map." 
+    ::= { cwoCmapStatsEntry 7 }
+ 
+
+
+-- Notifications
+
+cwoTfoConnectionOverload NOTIFICATION-TYPE
+    OBJECTS         { cwoTfoStatsMaxActiveConn }
+    STATUS          current
+    DESCRIPTION
+        "This notification indicates that the device has reached its
+        limit of number of connections it can optimize. No new
+        connections will be picked-up for optimization, while the device
+        is in this state."
+   ::= { ciscoWanOptimizationMIBNotifs 1 }
+
+cwoPeerOverload NOTIFICATION-TYPE
+    OBJECTS         { cwoGeneralMaxActivePeers }
+    STATUS          current
+    DESCRIPTION
+        "This notification indicates the device has reached its limit of
+        number of peer devices with which it can optimize connections.
+        While the device is in this state, connections from new peer
+        device will not be picked-up for optimization."
+   ::= { ciscoWanOptimizationMIBNotifs 2 }
+
+cwoCpuThrottlingOn NOTIFICATION-TYPE
+    OBJECTS         {
+                        cwoGeneralCpuThrottleHigh,
+                        cwoGeneralCpuThrottlPeriod,
+                        cpmCPUTotalMonIntervalValue
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification indicates that the device has detected that
+        the current CPU utilization (stored in
+        cpmCPUTotalMonIntervalValue) is higher than the
+        cwoGeneralCpuThrottleHigh. As a result the device has entered
+        into a throttling mode due to which connections under
+        optimization may experience slowdown. This notification is
+        generated the moment it occurs after a time lapse of 30 minutes
+        since the previous notification."
+   ::= { ciscoWanOptimizationMIBNotifs 3 }
+
+cwoCpuThrottlingOff NOTIFICATION-TYPE
+    OBJECTS         {
+                        cwoGeneralCpuThrottleLow,
+                        cwoGeneralCpuThrottlPeriod,
+                        cpmCPUTotalMonIntervalValue
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification indicates that device has detected that the
+        CPU utilization of device (stored in
+        cpmCPUTotalMonIntervalValue) has fallen below the
+        cwoGeneralCpuThrottleLow from cwoGeneralCpuThrottleHigh. As a
+        result the device has come out of the throttling mode and there
+        should not be any negative impact of CPU usage on connection
+        under optimization. This notification is generated the moment it
+        occurs after a time lapse of 30 minutes since the previous
+        notification."
+   ::= { ciscoWanOptimizationMIBNotifs 4 }
+
+cwoLicenseExpired NOTIFICATION-TYPE
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the license on the system
+        expires after the period for which it was installed."
+   ::= { ciscoWanOptimizationMIBNotifs 5 }
+
+cwoLicenseRevoked NOTIFICATION-TYPE
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when a requested revoke ticket
+        is obtained. This ticket could have been requested in order to
+        move the license to a different system."
+   ::= { ciscoWanOptimizationMIBNotifs 6 }
+
+cwoLicenseDeleted NOTIFICATION-TYPE
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the license on the system
+        is cleared."
+   ::= { ciscoWanOptimizationMIBNotifs 7 }
+
+-- compliance statements
+
+ciscoWanOptimizationMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "This is a default module-compliance containing default object
+        groups."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cwoTfoBaseGroup,
+                        cwoOverloadNotificationGroup
+                    }
+
+    GROUP           cwoGeneralGroup
+    DESCRIPTION
+        "This group is optional and indicates general statistics for WAN
+        optimization system/sub-system."
+
+    GROUP           cwoTfoExtGroup
+    DESCRIPTION
+        "This group is optional and includes more specific stats for TFO."
+
+    GROUP           cwoAoStatsGroup
+    DESCRIPTION
+        "This group includes common statistics for AO. It is optional for
+        systems which does not support any AO."
+
+    GROUP           cwoCpuNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoAoSmbExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems who does not
+        support SMB AO."
+    ::= { ciscoWanOptimizationMIBCompliances 1 }
+
+ciscoWanOptimizationMIBCompliance1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "This is a default module-compliance containing default object
+        groups."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cwoTfoBaseGroup,
+                        cwoOverloadNotificationGroup
+                    }
+
+    GROUP           cwoGeneralGroup
+    DESCRIPTION
+        "This group is optional and indicates general statistics for WAN
+        optimization system/sub-system."
+
+    GROUP           cwoTfoExtGroup
+    DESCRIPTION
+        "This group is optional and includes more specific stats for TFO."
+
+    GROUP           cwoAoStatsGroup
+    DESCRIPTION
+        "This group includes common statistics for AO. It is optional for
+        systems which does not support any AO."
+
+    GROUP           cwoCpuNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoAoSmbExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems who does
+        not
+        support SMB AO."
+
+    GROUP           cwoLicenseNotificationGroup
+    DESCRIPTION
+        "This group is optional for systems that have wan optimization."
+    ::= { ciscoWanOptimizationMIBCompliances 2 }
+
+ciscoWanOptimizationMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "This is a default module-compliance containing default object
+        groups. This compliance module deprecates 
+        ciscoWanOptimizationMIBCompliance1."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cwoTfoBaseGroup }
+
+    GROUP           cwoGeneralGroup
+    DESCRIPTION
+        "This group is optional and indicates general statistics for WAN
+        optimization system/sub-system."
+
+    GROUP           cwoCpuNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoOverloadNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoLicenseNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoAoHttpExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support HTTP AO."
+
+    GROUP           cwoAoMapiExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support MAPI AO."
+
+    GROUP           cwoAoNfsExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support NFS AO."
+
+    GROUP           cwoAoVideoExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support Video AO."
+
+    GROUP           cwoAoCifsExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support CIFS AO."
+
+    GROUP           cwoAoApplicationStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not associates applications with AOs."
+
+    GROUP           cwoAoPolicyMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement policy map for processing traffic."
+
+    GROUP           cwoAoClassMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement class-maps for processing traffic."
+
+    GROUP           cwoAoStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoTfoExtGroupRev1
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoTfoExtGroup
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoAoStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoSmbExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization system, which does
+        not support SMB AO."
+    ::= { ciscoWanOptimizationMIBCompliances 3 }
+
+ciscoWanOptimizationMIBComplianceRev3 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "This is a default module-compliance containing default object
+        groups. This compliance module deprecates 
+        ciscoWanOptimizationMIBComplianceRev2."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cwoTfoBaseGroup }
+
+    GROUP           cwoGeneralGroup
+    DESCRIPTION
+        "This group is optional and indicates general statistics for WAN
+        optimization system/sub-system."
+
+    GROUP           cwoCpuNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoOverloadNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoLicenseNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoAoHttpExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support HTTP AO."
+
+    GROUP           cwoAoMapiExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support MAPI AO."
+
+    GROUP           cwoAoNfsExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support NFS AO."
+
+    GROUP           cwoAoVideoExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support Video AO."
+
+    GROUP           cwoAoCifsExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support CIFS AO."
+
+    GROUP           cwoAoApplicationStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not associates applications with AOs."
+
+    GROUP           cwoAoPolicyMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement policy map for processing traffic."
+
+    GROUP           cwoAoClassMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement class-maps for processing traffic."
+
+    GROUP           cwoAoStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoTfoExtGroupRev1
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoTfoExtGroup
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoAoStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoSmbExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization system, which does
+        not support SMB AO."
+
+    GROUP           cwoAoHttpExtendedStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support HTTP AO."
+
+    GROUP           cwoAoCifsExtendedStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support CIFS AO."
+    ::= { ciscoWanOptimizationMIBCompliances 4 }
+
+ciscoWanOptimizationMIBComplianceRev4 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "This is a default module-compliance containing default object
+        groups. This compliance module deprecates 
+        ciscoWanOptimizationMIBComplianceRev3."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cwoTfoBaseGroup }
+
+    GROUP           cwoGeneralGroup
+    DESCRIPTION
+        "This group is optional and indicates general statistics for WAN
+        optimization system/sub-system."
+
+    GROUP           cwoCpuNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoOverloadNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoLicenseNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoAoHttpExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support HTTP AO."
+
+    GROUP           cwoAoMapiExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support MAPI AO."
+
+    GROUP           cwoAoNfsExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support NFS AO."
+
+    GROUP           cwoAoVideoExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support Video AO."
+
+    GROUP           cwoAoCifsExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support CIFS AO."
+
+    GROUP           cwoAoApplicationStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not associates applications with AOs."
+
+    GROUP           cwoAoPolicyMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement policy map for processing traffic."
+
+    GROUP           cwoAoClassMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement class-maps for processing traffic."
+
+    GROUP           cwoAoStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoTfoExtGroupRev1
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoTfoExtGroup
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoAoStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoSmbExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization system, which does
+        not support SMB AO."
+
+    GROUP           cwoAoHttpExtendedStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support HTTP AO."
+
+    GROUP           cwoAoCifsExtendedStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support CIFS AO."
+
+    GROUP           cwoAoSmbExtendedStatsGroupRev1
+    DESCRIPTION
+        "This group is mandatory only for WAN optimization system that
+        support Signed Bytes statistics for SMB AO."
+    ::= { ciscoWanOptimizationMIBCompliances 5 }
+
+ciscoWanOptimizationMIBComplianceRev5 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "This is a default module-compliance containing default object
+        groups. This compliance module deprecates 
+        ciscoWanOptimizationMIBComplianceRev4."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cwoTfoBaseGroup }
+
+    GROUP           cwoGeneralGroup
+    DESCRIPTION
+        "This group is optional and indicates general statistics for WAN
+        optimization system/sub-system."
+
+    GROUP           cwoCpuNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service"
+
+    GROUP           cwoOverloadNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoLicenseNotificationGroup
+    DESCRIPTION
+        "This group is optional to implement, but mandatory for systems
+        which run WAN optimization as a service."
+
+    GROUP           cwoAoHttpExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support HTTP AO."
+
+    GROUP           cwoAoMapiExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support MAPI AO."
+
+    GROUP           cwoAoNfsExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support NFS AO."
+
+    GROUP           cwoAoApplicationStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not associates applications with AOs."
+
+    GROUP           cwoAoPolicyMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement policy map for processing traffic."
+
+    GROUP           cwoAoClassMapStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not implement class-maps for processing traffic."
+
+    GROUP           cwoAoStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoTfoExtGroupRev1
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoTfoExtGroup
+    DESCRIPTION
+        "This group is optional for system supporting TFO AO."
+
+    GROUP           cwoAoStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support various AOs for traffic optimization."
+
+    GROUP           cwoAoSmbExtendedStatsGroup
+    DESCRIPTION
+        "This group is optional for WAN optimization system, which does
+        not support SMB AO."
+
+    GROUP           cwoAoHttpExtendedStatsGroupRev1
+    DESCRIPTION
+        "This group is optional for WAN optimization systems which does
+        not support HTTP AO."
+
+    GROUP           cwoAoSmbExtendedStatsGroupRev1
+    DESCRIPTION
+        "This group is mandatory only for WAN optimization system that
+        support Signed Bytes statistics for SMB AO."
+
+    GROUP           cwoAoHttpExtendedStatsGroupRev2
+    DESCRIPTION
+        "This group is mandatory only for WAN optimization system that
+        support Akamai Cache statistics for HTTP AO"
+
+    GROUP           cwoDreCacheStatsGroup
+    DESCRIPTION
+        "This group is optional for system supporting DRE cache
+        statistics."
+
+    GROUP           cwoDrePerfStatsGroup
+    DESCRIPTION
+        "This group is optional for system supporting DRE performance
+        statistics."
+    ::= { ciscoWanOptimizationMIBCompliances 6 }
+-- Groups
+
+ciscoWanOptimizationMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoWanOptimizationMIBConform 2 }
+
+
+cwoGeneralGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoGeneralActivePeers,
+                        cwoGeneralMaxActivePeers,
+                        cwoGeneralCpuThrottleHigh,
+                        cwoGeneralCpuThrottleLow,
+                        cwoGeneralCpuThrottlPeriod
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the general statistics of
+        WAN optimization system/sub-system."
+    ::= { ciscoWanOptimizationMIBGroups 1 }
+
+cwoTfoBaseGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoTfoStatsTotalOptConn,
+                        cwoTfoStatsActiveOptConn,
+                        cwoTfoStatsMaxActiveConn,
+                        cwoTfoStatsTotalNormalClosedConn,
+                        cwoTfoStatsResetConn
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the common statistics for
+        TFO."
+    ::= { ciscoWanOptimizationMIBGroups 2 }
+
+cwoTfoExtGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoTfoStatsActiveOptTCPPlusConn,
+                        cwoTfoStatsActiveOptTCPOnlyConn,
+                        cwoTfoStatsActiveOptTCPPrepConn,
+                        cwoTfoStatsActiveADConn,
+                        cwoTfoStatsReservedConn,
+                        cwoTfoStatsPendingConn,
+                        cwoTfoStatsActivePTConn
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the statistics for
+        TFO, which are optional."
+    ::= { ciscoWanOptimizationMIBGroups 3 }
+
+cwoAoStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoStatsIsConfigured,
+                        cwoAoStatsIsLicensed,
+                        cwoAoStatsOperationalState,
+                        cwoAoStatsStartUpTime,
+                        cwoAoStatsTotalHandledConns,
+                        cwoAoStatsTotalOptConns,
+                        cwoAoStatsTotalHandedOffConns,
+                        cwoAoStatsTotalDroppedConns,
+                        cwoAoStatsActiveOptConns,
+                        cwoAoStatsPendingConns,
+                        cwoAoStatsMaxActiveOptConns,
+                        cwoAoStatsLastResetTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group includes statistics for AO. Which are common for all
+        AOs."
+    ::= { ciscoWanOptimizationMIBGroups 4 }
+
+cwoOverloadNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cwoTfoConnectionOverload,
+                        cwoPeerOverload
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains notifications event for various overload
+        condition on wan optimization system."
+    ::= { ciscoWanOptimizationMIBGroups 5 }
+
+cwoCpuNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cwoCpuThrottlingOn,
+                        cwoCpuThrottlingOff
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains notifications event for wan optimization
+        system, which are specific to some WAN optimization systems."
+    ::= { ciscoWanOptimizationMIBGroups 6 }
+
+cwoAoSmbExtendedStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoSmbxStatsBytesReadCache,
+                        cwoAoSmbxStatsBytesWriteCache,
+                        cwoAoSmbxStatsBytesReadServer,
+                        cwoAoSmbxStatsBytesWriteServer,
+                        cwoAoSmbxStatsBytesReadClient,
+                        cwoAoSmbxStatsBytesWriteClient,
+                        cwoAoSmbxStatsProcessedReqs,
+                        cwoAoSmbxStatsActiveReqs,
+                        cwoAoSmbxStatsTotalTimedOutReqs,
+                        cwoAoSmbxStatsTotalRemoteReqs,
+                        cwoAoSmbxStatsTotalLocalReqs,
+                        cwoAoSmbxStatsRemoteAvgTime,
+                        cwoAoSmbxStatsLocalAvgTime,
+                        cwoAoSmbxStatsRACacheHitCount,
+                        cwoAoSmbxStatsMDCacheHitCount,
+                        cwoAoSmbxStatsRACacheHitRate,
+                        cwoAoSmbxStatsMDCacheHitRate,
+                        cwoAoSmbxStatsMaxRACacheSize,
+                        cwoAoSmbxStatsMaxMDCacheSize,
+                        cwoAoSmbxStatsMDCacheSize,
+                        cwoAoSmbxStatsRAEvictedAge,
+                        cwoAoSmbxStatsRTT,
+                        cwoAoSmbxStatsTotalRespTimeSaving,
+                        cwoAoSmbxStatsOpenFiles,
+                        cwoAoSmbxStatsTotalFilesInRACache
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This Group contains statistics which are specific to SMB AO."
+    ::= { ciscoWanOptimizationMIBGroups 7 }
+
+cwoLicenseNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cwoLicenseExpired,
+                        cwoLicenseRevoked,
+                        cwoLicenseDeleted
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains notifications event for actions on
+        licensing on wan optimization systems."
+    ::= { ciscoWanOptimizationMIBGroups 8 }
+
+cwoAoHttpExtendedStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoHttpxStatsTotalSavedTime,
+                        cwoAoHttpxStatsTotalRTT,
+                        cwoAoHttpxStatsTotalMDCMTime,
+                        cwoAoHttpxStatsEstSavedTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics which are specific to HTTP AO."
+    ::= { ciscoWanOptimizationMIBGroups 9 }
+
+cwoAoMapiExtendedStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoMapixStatsUnEncrALRT,
+                        cwoAoMapixStatsUnEncrARRT,
+                        cwoAoMapixStatsTotalUnEncrLRs,
+                        cwoAoMapixStatsTotalUnEncrRRs,
+                        cwoAoMapixStatsUnEncrAvgRedTime,
+                        cwoAoMapixStatsEncrALRT,
+                        cwoAoMapixStatsEncrARRT,
+                        cwoAoMapixStatsTotalEncrLRs,
+                        cwoAoMapixStatsTotalEncrRRs,
+                        cwoAoMapixStatsEncrAvgRedTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics which are specific to MAPI AO."
+    ::= { ciscoWanOptimizationMIBGroups 10 }
+
+cwoAoNfsExtendedStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoNfsxStatsALRT,
+                        cwoAoNfsxStatsARRT,
+                        cwoAoNfsxStatsTotalLRs,
+                        cwoAoNfsxStatsTotalRRs,
+                        cwoAoNfsxStatsEstTimeSaved
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics which are specific to NFS AO."
+    ::= { ciscoWanOptimizationMIBGroups 11 }
+
+cwoAoVideoExtendedStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoVideoxStatsTotalInBytes,
+                        cwoAoVideoxStatsTotalOutBytes
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This group contains statistics which are specific to Video AO.
+        This group is deprecated as all the objects in cwoAoVideoxStats
+        table are deprecated."
+    ::= { ciscoWanOptimizationMIBGroups 12 }
+
+cwoAoCifsExtendedStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoCifsxStatsTotalReadBytes,
+                        cwoAoCifsxStatsTotalWrittenBytes,
+                        cwoAoCifsxStatsTotalRemoteReqs,
+                        cwoAoCifsxStatsTotalLocalReqs,
+                        cwoAoCifsxStatsTotalRemoteTime,
+                        cwoAoCifsxStatsTotalLocalTime,
+                        cwoAoCifsxStatsConnectedSessions,
+                        cwoAoCifsxStatsOpenFiles,
+                        cwoAoCifsxStatsMaxCacheSize,
+                        cwoAoCifsxStatsCurrentCacheSize,
+                        cwoAoCifsxStatsMaxCacheResources,
+                        cwoAoCifsxStatsCacheResources,
+                        cwoAoCifsxStatsEvictedResources,
+                        cwoAoCifsxStatsLastEvictedTime,
+                        cwoAoCifsxStatsVolHiWatermark,
+                        cwoAoCifsxStatsVolLoWatermark,
+                        cwoAoCifsxStatsAmntHiWatermark,
+                        cwoAoCifsxStatsAmntLoWatermark,
+                        cwoAoCifsxStatsEvictedAge,
+                        cwoAoCifsxStatsEvictedLastAccess
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This group contains statistics which are specific to CIFS AO.
+        This group is deprecated as all the objects in cwoAoCifsxStats
+        table are deprecated."
+    ::= { ciscoWanOptimizationMIBGroups 13 }
+
+cwoAoApplicationStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoAppStatsOriginalBytes,
+                        cwoAppStatsOptimizedBytes,
+                        cwoAppStatsPTBytes
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics for applications associated with
+        AO."
+    ::= { ciscoWanOptimizationMIBGroups 14 }
+
+cwoAoPolicyMapStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoPmapStatsDescr,
+                        cwoPmapStatsTotalConns,
+                        cwoPmapStatsTotalBytes,
+                        cwoPmapStatsTotalPTConns,
+                        cwoPmapStatsTotalPTBytes
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics for active policy map."
+    ::= { ciscoWanOptimizationMIBGroups 15 }
+
+cwoAoClassMapStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoCmapStatsDescr,
+                        cwoCmapStatsTotalConns,
+                        cwoCmapStatsTotalBytes,
+                        cwoCmapStatsTotalPTConns,
+                        cwoCmapStatsTotalPTBytes
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics for class maps associated with
+        active policy map."
+    ::= { ciscoWanOptimizationMIBGroups 16 }
+
+cwoAoStatsGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoStatsLoadStatus,
+                        cwoAoStatsBwOpt
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group includes statistics, which are common for all AOs."
+    ::= { ciscoWanOptimizationMIBGroups 17 }
+
+cwoAoTfoExtGroupRev1 OBJECT-GROUP
+    OBJECTS         { cwoTfoStatsLoadStatus }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the statistics for TFO,
+        which are optional."
+    ::= { ciscoWanOptimizationMIBGroups 18 }
+
+cwoAoHttpExtendedStatsGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoHttpxStatsTotalSPSessions,
+                        cwoAoHttpxStatsTotalSPPFSessions,
+                        cwoAoHttpxStatsTotalSPPFObjects,
+                        cwoAoHttpxStatsTotalSPRTTSaved,
+                        cwoAoHttpxStatsTotalSPPFMissTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics specific to cwoAoHttpxStats
+        group enhancement and SharePoint AO."
+    ::= { ciscoWanOptimizationMIBGroups 19 }
+
+cwoAoCifsExtendedStatsGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoCifsxStatsFFTotalReqs,
+                        cwoAoCifsxStatsFFRemoteReqs,
+                        cwoAoCifsxStatsFFLocalRespTime,
+                        cwoAoCifsxStatsFFRemoteRespTime,
+                        cwoAoCifsxStatsDirResources
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This group contains statistics specific to CIFS Atkins
+        feature. This group is deprecated as all the objects in
+        cwoAoCifsxStats table are deprecated."
+    ::= { ciscoWanOptimizationMIBGroups 20 }
+
+cwoAoSmbExtendedStatsGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoSmbxStatsRdL4SignWANBytes,
+                        cwoAoSmbxStatsWrL4SignWANBytes,
+                        cwoAoSmbxStatsRdSignLANBytes,
+                        cwoAoSmbxStatsWrSignLANBytes
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics specific to Signed Bytes
+        Statistics feature for SMB AO."
+    ::= { ciscoWanOptimizationMIBGroups 21 }
+
+cwoAoHttpExtendedStatsGroupRev2 OBJECT-GROUP
+    OBJECTS         {
+                        cwoAoHttpxStatsAKCBypassCacheTrans,
+                        cwoAoHttpxStatsAKCBypassRespBytes,
+                        cwoAoHttpxStatsAKCBypassCacheTransPercent,
+                        cwoAoHttpxStatsAKCBypassRespBytesPercent,
+                        cwoAoHttpxStatsAKCBypassCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCBypassAvgCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCBypassRespTimeSavedPercent,
+                        cwoAoHttpxStatsAKCStdCacheTrans,
+                        cwoAoHttpxStatsAKCStdRespBytes,
+                        cwoAoHttpxStatsAKCStdCacheTransPercent,
+                        cwoAoHttpxStatsAKCStdRespBytesPercent,
+                        cwoAoHttpxStatsAKCStdCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCStdAvgCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCStdRespTimeSavedPercent,
+                        cwoAoHttpxStatsAKCBasicCacheTrans,
+                        cwoAoHttpxStatsAKCBasicRespBytes,
+                        cwoAoHttpxStatsAKCBasicCacheTransPercent,
+                        cwoAoHttpxStatsAKCBasicRespBytesPercent,
+                        cwoAoHttpxStatsAKCBasicCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCBasicAvgCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCBasicRespTimeSavedPercent,
+                        cwoAoHttpxStatsAKCAdvCacheTrans,
+                        cwoAoHttpxStatsAKCAdvRespBytes,
+                        cwoAoHttpxStatsAKCAdvCacheTransPercent,
+                        cwoAoHttpxStatsAKCAdvRespBytesPercent,
+                        cwoAoHttpxStatsAKCAdvCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCAdvAvgCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCAdvRespTimeSavedPercent,
+                        cwoAoHttpxStatsAKCTotalCacheTrans,
+                        cwoAoHttpxStatsAKCTotalRespBytes,
+                        cwoAoHttpxStatsAKCTotalCacheTransPercent,
+                        cwoAoHttpxStatsAKCTotalRespBytesPercent,
+                        cwoAoHttpxStatsAKCTotalCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCTotalAvgCacheRespTimeSaved,
+                        cwoAoHttpxStatsAKCTotalRespTimeSavedPercent,
+                        cwoAoHttpxStatsAKCPrepStatus,
+                        cwoAoHttpxStatsAKCPrepCacheStoreBytes,
+                        cwoAoHttpxStatsAKCPrepUncacheStoreBytes
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics specific to cwoAoHttpxStats
+        group enhancement and HTTP Akamai Cache."
+    ::= { ciscoWanOptimizationMIBGroups 22 }
+
+cwoDreCacheStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoDreCacheStatsStatus,
+                        cwoDreCacheStatsAge,
+                        cwoDreCacheStatsTotal,
+                        cwoDreCacheStatsUsed,
+                        cwoDreCacheStatsDataUnitUsage,
+                        cwoDreCacheStatsReplacedOneHrDataUnit,
+                        cwoDreCacheStatsDataUnitAge,
+                        cwoDreCacheStatsSigblockUsage,
+                        cwoDreCacheStatsReplacedOneHrSigblock,
+                        cwoDreCacheStatsSigblockAge
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics specific to DRE cache
+        statistics."
+    ::= { ciscoWanOptimizationMIBGroups 23 }
+
+cwoDrePerfStatsGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwoDrePerfStatsEncodeCompressionRatio,
+                        cwoDrePerfStatsEncodeCompressionLatency,
+                        cwoDrePerfStatsEncodeAvgMsgSize,
+                        cwoDrePerfStatsDecodeCompressionRatio,
+                        cwoDrePerfStatsDecodeCompressionLatency,
+                        cwoDrePerfStatsDecodeAvgMsgSize
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains statistics specific to DRE performance
+        statistics."
+    ::= { ciscoWanOptimizationMIBGroups 24 }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
