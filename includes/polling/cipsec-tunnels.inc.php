@@ -60,7 +60,7 @@ foreach ($ipsec_array as $index => $tunnel) {
         }
 
         $updated = dbUpdate($db_update, 'ipsec_tunnels', '`tunnel_id` = ?', array($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id']));
-        $valud_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
+        $valid_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
     }
 
     if (is_numeric($tunnel['cipSecTunHcInOctets']) && is_numeric($tunnel['cipSecTunHcInDecompOctets'])
