@@ -1038,7 +1038,7 @@ function version_info($remote=true) {
         curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
         $output['github'] = json_decode(curl_exec($api),true);
     }
-    list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ci' -s HEAD`));
+    list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
     $output['local_sha']    = $local_sha;
     $output['local_date']   = $local_date;
     $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
