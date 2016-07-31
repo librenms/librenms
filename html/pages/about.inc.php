@@ -237,5 +237,5 @@ echo "
 
     // convert the version date from ISO 8601 to the browser's timezone
     var ver_date = $('#version_date');
-    ver_date.text(new Date(ver_date.text()).toString());
+    ver_date.text(moment.unix(ver_date.text()));
 </script>
