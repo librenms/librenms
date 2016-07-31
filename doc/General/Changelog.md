@@ -1,3 +1,53 @@
+### July 2016
+
+#### Bug fixes
+  - API
+    - Stop outputting vrf lite and IP info when device doesn't exist (PR3785)
+  - WebUI
+    - Added force refresh for generic image widget (PR3817)
+    - Fixed NFSen tab not showing in all cases (PR3857)
+  - Discovery / Polling
+    - Fixed incorrect IBM-AMM thresholds (PR3866)
+    - Fixed Pulse OS whitespace in polling (PR3883)
+  - Misc
+    - Fixed device group search (PR3788)
+    - Fixed sporadic device delete (PR3805)
+    - Retry creation of two tables (PR3848)
+
+#### Improvements
+  - Added / improved detection for:
+    - Telco systems (PR3773, PR3804)
+    - Cisco ACS (PR3786)
+    - Adtran AOS (PR3787, PR3799)
+    - Lantronix SLC (PR3797)
+    - PBN Sensor support (PR3820)
+    - Ironware VRF discovery (PR3827)
+    - Comware sensors discovery (PR3881, PR3889, PR3896)
+    - Brocade VDX detection (PR3888)
+    - Checkpoint GAiA (PR3890)
+    - Cisco ASA-X Hardware detection (PR3897)
+  - WebUI
+    - Added sysName to global search if != hostname (PR3815)
+    - Improved look of device SLA panel (PR3831)
+    - Added more colours to Cisco CBQOS graphs (PR3842)
+    - Improved look of Cisco IPSEC Tunnels page (PR3874)
+  - Discovery / Polling
+    - Added ability to set Max repeaters per device (PR3781)
+  - Applications
+    - Moved all application scripts to librenms/librenms-agent repo (PR3865, PR3886)
+    - Added NFS stats (PR3792, PR3853)
+    - Added PowerDNS Recursor (PR3869)
+  - Alerting
+    - Updated format for Slack alerts (PR3852)
+    - Added support for multiple emails in sysContact and users table (PR3885)
+    - Added ability to use uptime in alert templates (PR3893)
+  - Misc
+    - Added date to git version info (PR3782)
+    - Added logging of versions when upgrading (PR3807)
+    - Added ability to lookup device from IP for syslog (PR3812)
+    - Updated component system (PR3821)
+    - Improvements to validate script (PR3840, PR3868)
+
 ### June 2016
 
 #### Bug fixes
