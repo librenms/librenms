@@ -458,12 +458,12 @@ foreach ($ports as $port) {
         foreach ($data_oids as $oid) {
 
             if ($oid == 'ifAlias') {
-                if (get_dev_attrib($device, 'ifName:'.$port['ifName'], 1)) {
+                if ($attribs['ifName:'.$port['ifName']]) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 }
             }
             if ($oid == 'ifSpeed' || $oid == 'ifHighSpeed') {
-                if (get_dev_attrib($device, 'ifSpeed:'.$port['ifName'], 1)) {
+                if ($attribs['ifSpeed:'.$port['ifName']]) {
                     $this_port[$oid] = $port[$oid];
                 }
             }
