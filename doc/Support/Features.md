@@ -90,6 +90,7 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 * Liebert
 * LigoWave
 * Linux
+* Maipu
 * Mellanox
 * Meraki
 * MGE
