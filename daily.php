@@ -35,7 +35,9 @@ if ($options['f'] === 'rrd_purge') {
     if (is_numeric($config['rrd_purge']) && $config['rrd_purge'] > 0) {
         $cmd = "find ".$config['rrd_dir']." -mtime +".$config['rrd_purge']." -exec rm -Rf {} \;";
         $purge = `$cmd`;
-        echo 'purged old rrd files';
+        if (!empty($purge)) {
+            echo $purge;
+        }
     }
 }
 
