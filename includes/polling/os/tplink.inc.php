@@ -1,5 +1,4 @@
 <?php
 
-preg_match('/JetStream [0-9]+-Port/', $poll_device['sysDescr'], $tmp_hardware);
-
-$hardware = $tmp_hardware[0];
+$version  = trim(snmp_get($device, 'RMON-MIB::rmon.19.2.0', '-Ovq'), '"');
+$hardware = trim(snmp_get($device, 'RMON-MIB::rmon.19.3.0', '-Ovq'), '"');
