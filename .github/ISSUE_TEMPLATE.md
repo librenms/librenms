@@ -2,7 +2,7 @@
 
 > Please read this information carefully.
 
-[ ] Is your install upto date? [Updating your install](http://docs.librenms.org/General/Updating/)
+[ ] Is your install up to date? [Updating your install](http://docs.librenms.org/General/Updating/)
 
 [ ] Please include all of the information between the `====================================` section of `./validate.php`.
 
