@@ -76,7 +76,7 @@ else
             status_run 'Fetching notifications' "$0 notifications"
         ;;
         cleanup)
-            # DB-Cleanups
+            # Cleanups
             php daily.php -f syslog
             php daily.php -f eventlog
             php daily.php -f authlog
@@ -86,6 +86,7 @@ else
             php daily.php -f purgeusers
             php daily.php -f bill_data
             php daily.php -f alert_log
+            php daily.php -f rrd_purge
         ;;
         submodules)
             # Init+Update our submodules
