@@ -385,26 +385,10 @@ function snmpwalk_cache_multi_oid($device, $oid, $array, $mib=null, $mibdir=null
             $r_oid              = trim($r_oid);
             $value              = trim($value);
             $oid_parts          = explode('.', $r_oid);
-            $r_oid              = $oid_parts['0'];
-            $index              = $oid_parts['1'];
-            if (isset($oid_parts['2'])) {
-                $index .= '.'.$oid_parts['2'];
-            }
-
-            if (isset($oid_parts['3'])) {
-                $index .= '.'.$oid_parts['3'];
-            }
-
-            if (isset($oid_parts['4'])) {
-                $index .= '.'.$oid_parts['4'];
-            }
-
-            if (isset($oid_parts['5'])) {
-                $index .= '.'.$oid_parts['5'];
-            }
-
-            if (isset($oid_parts['6'])) {
-                $index .= '.'.$oid_parts['6'];
+            $r_oid              = array_shift($oid_parts);
+            $index              = array_shift($oid_parts);
+            foreach ($oid_parts as $tmp_oid) {
+                $index .= '.'.$tmp_oid;
             }
 
             if (!strstr($value, 'at this OID') && isset($r_oid) && isset($index)) {
