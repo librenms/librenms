@@ -498,8 +498,11 @@ $config['perf_times_purge']                               = 30;
 $config['device_perf_purge']                              = 30;
 $config['rrd_purge']                                      = 90;// Not set by default
 ```
-This option will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
+These options will ensure data within LibreNMS over X days old is automatically purged. You can alter these individually,
 values are in days.
+
+> NOTE: Please be aware that `$config['rrd_purge']` is _NOT_ set by default. This option will remove any old data within 
+the rrd directory automatically - only enable this if you are comfortable with that happening.
 
 #### Syslog options
 
