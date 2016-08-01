@@ -1,11 +1,11 @@
 <?php
-
-$oid = '.1.3.6.1.4.1.8072.1.3.2.4';
-$nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
-
 $name = 'nfsstat';
 $app_id = $app['app_id'];
+$oid = '.1.3.6.1.4.1.8072.1.3.2.4';
+
 echo ' ' . $name;
+
+$nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = array(
@@ -47,3 +47,5 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+
+unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);
