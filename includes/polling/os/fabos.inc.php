@@ -2,7 +2,13 @@
 
 $version  = trim(snmp_get($device, '1.3.6.1.4.1.1588.2.1.1.1.1.6.0', '-Ovq'), '"');
 $gethardware = trim(snmp_get($device, 'SNMPv2-SMI::mib-2.75.1.1.4.1.3.1', '-Ovq'), '"');
-$getid = strstr(str_replace("SNMPv2-SMI::enterprises.1588.2.1.1.", "", $gethardware), ".", true);
+$revboard = str_replace("SNMPv2-SMI::enterprises.1588.2.1.1.", "", $gethardware);
+if(strpos($revboard, ".") !== false) {
+	$getid = strstr(str_replace($revboard, "", $gethardware), ".", true);
+} else {
+	$getid = $revboard;
+}
+
 switch($getid)
 {
 	case "1":
