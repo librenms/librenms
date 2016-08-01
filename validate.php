@@ -73,6 +73,7 @@ require_once 'includes/common.php';
 require_once $config['install_dir'].'/includes/alerts.inc.php';
 
 $versions = version_info();
+echo "====================================\n";
 echo "Version info:\n";
 $cur_sha = $versions['local_sha'];
 if ($config['update_channel'] == 'master' && $cur_sha != $versions['github']['sha']) {
@@ -102,6 +103,7 @@ echo "PHP: ".$versions['php_ver']."\n";
 echo "MySQL: ".$versions['mysql_ver']."\n";
 echo "RRDTool: ".$versions['rrdtool_ver']."\n";
 echo "SNMP: ".$versions['netsnmp_ver']."\n";
+echo "====================================\n";
 
 // Check php modules we use to make sure they are loaded
 $extensions = array('pcre','curl','session','snmp','mcrypt');
