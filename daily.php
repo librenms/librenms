@@ -33,10 +33,10 @@ if ($options['f'] === 'update') {
 
 if ($options['f'] === 'rrd_purge') {
     if (is_numeric($config['rrd_purge']) && $config['rrd_purge'] > 0) {
-        $cmd = "find ".$config['rrd_dir']." -mtime +".$config['rrd_purge']." -print -exec rm -Rf {} \;";
+        $cmd = "find ".$config['rrd_dir']." -type f -mtime +".$config['rrd_purge']." -print -exec rm -f {} +";
         $purge = `$cmd`;
         if (!empty($purge)) {
-            echo "Purged the following RRD files due to old age (over ".$config['rrd_purge']." days old)";
+            echo "Purged the following RRD files due to old age (over ".$config['rrd_purge']." days old):\n";
             echo $purge;
         }
     }
