@@ -150,6 +150,7 @@ function poll_device($device, $options) {
     global $config, $device, $polled_devices, $db_stats, $memcache;
 
     $attribs = get_dev_attribs($device['device_id']);
+    $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
 
     $status = 0;
     unset($array);

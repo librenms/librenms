@@ -32,3 +32,7 @@ else if (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftw
 if (isset($data[1]['entPhysicalSerialNum']) && $data[1]['entPhysicalSerialNum'] != '') {
     $serial = $data[1]['entPhysicalSerialNum'];
 }
+
+if (empty($hardware)) {
+    $hardware = snmp_get($device, 'sysObjectID.0', '-Osqv', 'SNMPv2-MIB:CISCO-PRODUCTS-MIB');
+}

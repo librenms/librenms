@@ -10,8 +10,8 @@
  * the source code distribution for details.
 */
 
-$version = trim(snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
-$hardware = "Juniper " . trim(snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"),'"');
+$version = preg_replace('/[\r\n\"]+/',' ',snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
+$hardware = "Juniper " . preg_replace('/[\r\n\"]+/',' ',snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
 $hostname = trim($poll_device['sysName'],'"');
 
 $users = snmp_get($device, 'PULSESECURE-PSG-MIB::iveConcurrentUsers.0', '-OQv');
