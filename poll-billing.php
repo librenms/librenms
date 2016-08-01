@@ -75,7 +75,7 @@ function CollectData($bill_id) {
 
             $tmp_period = dbFetchCell("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('".mres($last_counters['timestamp'])."')");
 
-            if ((delta_to_bits($port_data['in_measurement'], $tmp_period)-delta_to_bits($port_data['last_in_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
+            if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['in_measurement'], $tmp_period)-delta_to_bits($port_data['last_in_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
             elseif ($port_data['in_measurement'] >= $port_data['last_in_measurement']) {
@@ -85,7 +85,7 @@ function CollectData($bill_id) {
                 $port_data['in_delta'] = $port_data['last_in_delta'];
             }
             
-            if ((delta_to_bits($port_data['out_measurement'], $tmp_period)-delta_to_bits($port_data['last_out_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
+            if ($port_data['ifSpeed'] > 0 && (delta_to_bits($port_data['out_measurement'], $tmp_period)-delta_to_bits($port_data['last_out_measurement'], $tmp_period)) > $port_data['ifSpeed']) {
                 $port_data['out_delta'] = $port_data['last_out_delta'];
             }
             elseif ($port_data['out_measurement'] >= $port_data['last_out_measurement']) {

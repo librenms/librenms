@@ -47,8 +47,7 @@ foreach ($stats as $stat => $color) {
 }
 
 // Set up Total value
-$rrd_options .= " 'CDEF:cdeftotal=cdefrequest,cdefack,cdefdiscover,cdefoffer,
-    cdefinform,cdefnack,cdefrelease,cdefdecline,cdefother,+,+,+,+,+,+,+,+'";
+$rrd_options .= " 'CDEF:cdeftotal=cdefrequest,cdefack,cdefdiscover,cdefoffer,cdefinform,cdefnack,cdefrelease,cdefdecline,cdefother,+,+,+,+,+,+,+,+'";
 $rrd_options .= " 'LINE1:cdeftotal#000000FF:Total'";
 $filler = 8 - strlen("Total");
 $current_pad = str_pad("", $filler, ' ', STR_PAD_LEFT);

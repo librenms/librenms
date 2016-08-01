@@ -452,12 +452,12 @@ foreach ($ports as $port) {
         foreach ($data_oids as $oid) {
 
             if ($oid == 'ifAlias') {
-                if (get_dev_attrib($device, 'ifName:'.$port['ifName'], 1)) {
+                if ($attribs['ifName:'.$port['ifName']]) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 }
             }
             if ($oid == 'ifSpeed' || $oid == 'ifHighSpeed') {
-                if (get_dev_attrib($device, 'ifSpeed:'.$port['ifName'], 1)) {
+                if ($attribs['ifSpeed:'.$port['ifName']]) {
                     $this_port[$oid] = $port[$oid];
                 }
             }
@@ -473,8 +473,8 @@ foreach ($ports as $port) {
                 }
             }
             else if ($port[$oid] != $this_port[$oid]) {
-                $port_tune = get_dev_attrib($device, 'ifName_tune:'.$port['ifName']);
-                $device_tune = get_dev_attrib($device,'override_rrdtool_tune');
+                $port_tune = $attribs['ifName_tune:'.$port['ifName']];
+                $device_tune = $attribs['override_rrdtool_tune'];
                 if ($port_tune == "true" ||
                     ($device_tune == "true" && $port_tune != 'false') ||
                     ($config['rrdtool_tune'] == "true" && $port_tune != 'false' && $device_tune != 'false')) {

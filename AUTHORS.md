@@ -112,6 +112,7 @@ LibreNMS contributors:
 - Brandon Boudrias <bt.boudrias@gmail.com> (brandune)
 - Andy Noyland <andrew@noyland.co.uk> (Zappatron) 
 - Cercel Valentin <crc@nuamchefazi.ro> (crcro)
+- Ahmed Sajid <ahmed4343@hotmail.com> (ahmedsajid)
 
 [1]: http://observium.org/ "Observium web site"
 Observium was written by:

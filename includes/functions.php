@@ -879,7 +879,7 @@ function is_port_valid($port, $device) {
             $fringe = array_merge($config['bad_if'],$config['os'][$device['os']]['bad_if']);
         }
         foreach ($fringe as $bi) {
-            if (strstr($if, $bi)) {
+            if (stristr($if, $bi)) {
                 $valid = 0;
                 d_echo("ignored : $bi : $if");
             }
@@ -926,7 +926,7 @@ function is_port_valid($port, $device) {
                 $fringe = array_merge($config['bad_iftype'],$config['os'][$device['os']]['bad_iftype']);
             }
             foreach ($fringe as $bi) {
-                if (strstr($port['ifType'], $bi)) {
+                if (stristr($port['ifType'], $bi)) {
                     $valid = 0;
                     d_echo("ignored ifType : ".$port['ifType']." (matched: ".$bi." )");
                 }
