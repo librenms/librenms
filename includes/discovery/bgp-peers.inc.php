@@ -21,53 +21,59 @@ if ($config['enable_bgp']) {
                 }
 
                 $peer2      = false;
-                $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB', $config['mibdir']);
-                if (empty($peers_data)) {
-                    $peers_data = snmp_walk($device, 'BGP4-MIB::bgpPeerRemoteAs', '-Oq', 'BGP4-MIB', $config['mibdir']);
-                }
-                else {
-                    $peer2 = true;
-                }
-
-                d_echo("Peers : $peers_data \n");
-
-                $peers = trim(str_replace('CISCO-BGP4-MIB::cbgpPeer2RemoteAs.', '', $peers_data));
-                $peers = trim(str_replace('BGP4-MIB::bgpPeerRemoteAs.', '', $peers));
-
-                foreach (explode("\n", $peers) as $peer) {
-                    if ($peer2 === true) {
-                        list($ver, $peer) = explode('.', $peer, 2);
+                if ($device['os'] !== 'junos') {
+                    $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB', $config['mibdir']);
+                    if (empty($peers_data)) {
+                        $peers_data = snmp_walk($device, 'BGP4-MIB::bgpPeerRemoteAs', '-Oq', 'BGP4-MIB', $config['mibdir']);
+                    }
+                    else {
+                        $peer2 = true;
                     }
 
-                    list($peer_ip, $peer_as) = explode(' ', $peer);
-                    if (strstr($peer_ip, ':')) {
-                        $peer_ip_snmp = preg_replace('/:/', ' ', $peer_ip);
-                        $peer_ip      = preg_replace('/(\S+\s+\S+)\s/', '$1:', $peer_ip_snmp);
-                        $peer_ip      = str_replace('"', '', str_replace(' ', '', $peer_ip));
+                    d_echo("Peers : $peers_data \n");
+
+                    $peers = trim(str_replace('CISCO-BGP4-MIB::cbgpPeer2RemoteAs.', '', $peers_data));
+                    $peers = trim(str_replace('BGP4-MIB::bgpPeerRemoteAs.', '', $peers));
+
+                    foreach (explode("\n", $peers) as $peer) {
+                        if ($peer2 === true) {
+                            list($ver, $peer) = explode('.', $peer, 2);
+                        }
+
+                        list($peer_ip, $peer_as) = explode(' ', $peer);
+                        if (strstr($peer_ip, ':')) {
+                            $peer_ip_snmp = preg_replace('/:/', ' ', $peer_ip);
+                            $peer_ip      = preg_replace('/(\S+\s+\S+)\s/', '$1:', $peer_ip_snmp);
+                            $peer_ip      = str_replace('"', '', str_replace(' ', '', $peer_ip));
+                        }
+
+                        if ($peer && $peer_ip != '0.0.0.0') {
+                            d_echo("Found peer $peer_ip (AS$peer_as)\n");
+
+                            $peerlist[] = array(
+                                'ip'  => $peer_ip,
+                                'as'  => $peer_as,
+                                'ver' => $ver,
+                            );
+                        }
                     }
-
-                    if ($peer && $peer_ip != '0.0.0.0') {
-                        d_echo("Found peer $peer_ip (AS$peer_as)\n");
-
-                        $peerlist[] = array(
-                            'ip'  => $peer_ip,
-                            'as'  => $peer_as,
-                            'ver' => $ver,
-                        );
-                    }
-                }
-
-                if ($device['os'] == 'junos') {
+                } elseif ($device['os'] == 'junos') {
                     // Juniper BGP4-V2 MIB
                     // FIXME: needs a big cleanup! also see below.
                     // FIXME: is .0.ipv6 the only possible value here?
-                    $result = snmp_walk($device, 'jnxBgpM2PeerRemoteAs.0.ipv6', '-Onq', 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
-                    $peers  = trim(str_replace('.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.', '', $result));
+                    $result = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', $config['install_dir'].'/mibs/junos');
+                    $peers  = trim(str_replace('.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.', '', $result));
                     foreach (explode("\n", $peers) as $peer) {
                         list($peer_ip_snmp, $peer_as) = explode(' ', $peer);
-
                         // Magic! Basically, takes SNMP form and finds peer IPs from the walk OIDs.
-                        $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 16)))));
+                        $octets = count(explode(".", $peer_ip_snmp));
+                        if ($octets > 11) {
+                            // ipv6
+                            $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 16)))));
+                        } else {
+                            // ipv4
+                            $peer_ip = implode('.', array_slice(explode('.', $peer_ip_snmp), (count(explode('.', $peer_ip_snmp)) - 4)));
+                        }
 
                         if ($peer) {
                             d_echo("Found peer $peer_ip (AS$peer_as)\n");
