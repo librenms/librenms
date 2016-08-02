@@ -1058,7 +1058,7 @@ $config['os'][$os]['over'][3]['text'] = 'Storage Usage';
 
 // EMC FlareOS
 $os = 'flareos';
-$config['os'][$os]['text'] = 'FLARE OS';
+$config['os'][$os]['text'] = 'EMC Flare OS';
 $config['os'][$os]['type'] = 'storage';
 $config['os'][$os]['icon'] = 'emc';
 $config['os'][$os]['over'][0]['graph'] = 'device_bits';
